@@ -1,0 +1,129 @@
+<template>
+
+<div class="row">
+   <div class="col-md-12">
+       <div class="input-group input-group-sm mb-4" style="width: 400px">
+            <select class="custom-select select-arrow small" id="questionType" style="border-radius: 100px 0 0 100px">
+                <option value='codeOfConduct'>Code of Conduct</option>
+                <option value='general'>General</option>
+                <option value='spread'>Spread</option>
+                <option value='metadata'>Metadata</option>
+                <option value='timing'>Timing</option>
+                <option value='audio'>Audio</option>
+                <option value='videoBackground'>Video/BG</option>
+                <option value='skinning'>Skinning</option>
+                <option value='storyboarding'>Storyboarding</option>
+                <option value='osu'>osu!</option>
+                <option value='taiko'>osu!taiko</option>
+                <option value='catch'>osu!catch</option>
+                <option value='mania'>osu!mania</option>
+                <option value='bn'>BN Rules</option>
+            </select>
+            <div class="input-group-append">
+                <button style="border-radius: 0 100px 100px 0;" class="rounded-circle-left btn btn-qat" id="artistButton" @click="loadContent($event);">Load test content</button>
+            </div>
+        </div>
+        <p class="errors">{{info}}</p>
+    </div>
+    <div v-if="category" class="col-md-12">
+        <hr>
+        <h2>{{category}} Questions 
+            <button
+            class="btn btn-qat"
+            data-toggle="modal"
+            data-target="#addQuestion"
+            @click="resetInput()"
+        >Add question</button></h2>
+        <table v-if="questions && questions.length" class="small table text-shadow col-md-12 mt-2">
+            <tbody>
+                <tr v-for="question in questions" :key="question.id">
+                    <td scope="row" style="padding: 1px;">
+                        {{question.content}}
+                        <a href="#" data-toggle="modal" data-target="#editQuestion" :data-entry="question.id" @click.prevent="selectQuestion(question)">edit</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <add-question
+        :category="category"
+        :raw-category="rawCategory"
+        @add-question="addQuestionToList($event)"
+    ></add-question>
+
+    <edit-question
+        :question="selectedQuestion"
+        :category="category"
+        @update-question="updateQuestion($event)"
+        @delete-question="deleteQuestion($event)"
+    ></edit-question>
+
+</div>
+
+</template>
+
+
+
+<script>
+import AddQuestion from '../components/rcTest/AddQuestion.vue';
+import EditQuestion from '../components/rcTest/EditQuestion.vue';
+
+export default {
+    name: 'manage-test-page',
+    components: {
+        AddQuestion,
+        EditQuestion
+    },
+    watch: {
+        
+    },
+    methods: {
+        updateQuestion: function (question) {
+			const i = this.questions.findIndex(q => q.id == question.id);
+			this.questions[i] = question;
+            this.selectedQuestion = question;
+        },
+        deleteQuestion: function (question) {
+            const i = this.questions.findIndex(q => q.id == question);
+            this.questions.splice(i, 1);
+            this.selectedQuestion = null;
+        },
+        selectQuestion: function(q){
+            this.selectedQuestion = q;
+        },
+        loadContent: function (e) {
+            e.target.disabled = true;
+            let questionType = $('#questionType').val();
+            axios
+                .get('/qat/manageTest/load/' + questionType)
+                .then(response => {
+                    this.questions = response.data;
+                    this.category = $("#questionType option:selected").text();
+                    this.rawCategory = $("#questionType").val();
+                    e.target.disabled = false;
+                });
+        },
+        resetInput: function() {
+            $('#optionList').text('');
+        },
+        addQuestionToList: function(q) {
+            this.questions.unshift(q);
+        }
+    },
+    data() {
+        return {
+            category: null,
+            rawCategory: null,
+            questions: [],
+            selectedQuestion: null,
+            info: '',
+        }
+    },
+    created() {
+        $("#loading").hide(); //this is temporary
+        $("#main").attr("style", "visibility: visible").hide().fadeIn();
+    }
+}
+</script>

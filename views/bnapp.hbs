@@ -1,0 +1,73 @@
+<div class="segment">
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc eu lorem velit. Mauris non magna nunc. Mauris accumsan leo sit amet neque tempor ultrices. Nullam sagittis erat nibh, eu tempor leo posuere sed. Quisque lacinia lorem nec elit sollicitudin laoreet. Morbi est est, lobortis eget libero sit amet, finibus vulputate neque. Donec interdum sollicitudin laoreet. Curabitur rhoncus dignissim lorem porta suscipit. Phasellus dignissim ultricies justo, a eleifend sem tristique vitae.</p>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc eu lorem velit. Mauris non magna nunc. Mauris accumsan leo sit amet neque tempor ultrices. Nullam sagittis erat nibh, eu tempor leo posuere sed. Quisque lacinia lorem nec elit sollicitudin laoreet. Morbi est est, lobortis eget libero sit amet, finibus vulputate neque. Donec interdum sollicitudin laoreet. Curabitur rhoncus dignissim lorem porta suscipit. Phasellus dignissim ultricies justo, a eleifend sem tristique vitae.</p>
+</div>
+
+<hr>
+
+{{#if loggedInAs}}
+<div class="segment">
+    <h4>Game-mode:</h4>
+    <div class="form-group row">
+        <div class="pl-4">
+            <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!"/>
+                <input type="radio" class="osu-radio hide-default" name="mode" value="osu"/>
+                <i class="fas fa-circle fa-lg"></i>
+            </label>
+            <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!taiko">
+                <input type="radio" class="taiko-radio hide-default" name="mode" value="taiko"/>
+                <i class="fas fa-drum fa-lg"></i>
+            </label>
+            <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!catch">
+                <input type="radio" class="catch-radio hide-default" name="mode" value="catch"/>
+                <i class="fas fa-apple-alt fa-lg"></i>
+            </label>
+            <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!mania">
+                <input type="radio" class="mania-radio hide-default" name="mode" value="mania"/>
+                <i class="fas fa-stream fa-lg"></i>
+            </label>
+        </div>
+    </div>
+
+    <h4>Example mods:</h4>
+    <p class="small ml-4 mb-3">Link the discussion pages of at least two mapsets you've modded in the last six months. These (and potentially more) will be evaluated by the QAT.</small>
+    <div class="form-group row">
+        <div class="pl-4" style="width: 95%">
+            <div class="input-group mb-3">
+                <input id="mod0" type="text" class="form-control text-input" placeholder="link to mod">
+            </div>
+            <div class="input-group mb-3">
+                <input id="mod1" type="text" class="form-control text-input" placeholder="link to mod">
+            </div>
+            <div class="input-group mb-3">
+                <input id="mod2" type="text" class="form-control text-input" placeholder="link to mod">
+            </div>
+            <div class="input-group mb-3 ">
+                <input id="mod3" type="text" class="form-control text-input" placeholder="link to mod">
+            </div>
+        </div>
+    </div>
+
+    <div id="errors" class="errors"></div>
+    <div id="confirm" class="confirm"></div>
+
+    <div class="col-md-6 mt-2 text-center mx-auto">
+        <button id="apply" class="btn btn-lg btn-block btn-qat" type="submit">Apply</button>
+    </div>
+    {{#if pendingTest}}
+    <div class="col-md-6 mt-2 text-center mx-auto">
+        <a href="/qat/testsubmission" class="btn btn-lg btn-qat" type="submit">Start the test now</a>
+    </div>
+    {{/if}}
+</div>
+{{/if}}
+
+
+{{!-- Temp stuff --}}
+<hr>
+<form action="/qat/testsubmission/generatetest" method="post">
+    <button class="btn btn-lg btn-qat" type="submit">temp generate test</button>
+    <a href="/qat/testsubmission" class="btn btn-lg btn-qat" type="submit">temp visit test</a>
+</form>
+
+<hr>
