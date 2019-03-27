@@ -1,16 +1,45 @@
 {
-  "name": "qatapp",
+  "name": "qat",
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "build": "webpack --mode production",
+    "devstart": "nodemon ./bin/www",
+    "devstart-client": "webpack-dev-server --mode development --port 8080 --watch --progress --colors --config-name qat"
   },
   "dependencies": {
+    "axios": "^0.18.0",
+    "connect-mongo": "^2.0.3",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "express": "~4.16.0",
+    "express-session": "^1.15.6",
+    "handlebars": "^4.1.0",
     "hbs": "~4.0.1",
     "http-errors": "~1.6.2",
-    "morgan": "~1.9.0"
+    "mongoose": "^5.4.4",
+    "morgan": "~1.9.0",
+    "vue": "^2.6.6"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.3.3",
+    "@babel/preset-env": "^7.3.1",
+    "babel-loader": "^8.0.5",
+    "babel-plugin-transform-regenerator": "^6.26.0",
+    "css-loader": "^2.1.0",
+    "file-loader": "^3.0.1",
+    "nodemon": "^1.18.9",
+    "vue-loader": "^15.6.2",
+    "vue-template-compiler": "^2.6.6",
+    "webpack": "^4.29.4",
+    "webpack-cli": "^3.2.3",
+    "webpack-dev-server": "^3.2.0"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "public/*",
+      "src/*"
+    ]
   }
 }
