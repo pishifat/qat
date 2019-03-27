@@ -401,8 +401,8 @@ export default {
                 const er = await this.executePost(
                     '/nat/bnEval/setConsensus/' + this.discussRound.id, {consensus: consensus}, e);
                 if (er) {
-                    if (a.error) {
-                        this.info = a.error;
+                    if (er.error) {
+                        this.info = er.error;
                     } else {
                         await this.$emit('update-eval-round', er);
                     }
