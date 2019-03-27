@@ -92,6 +92,8 @@ router.get('/callback', async (req, res) => {
         } else if (response.is_bng) {
             req.session.group = 'bn';
         }
+        req.session.username = response.username;
+        req.session.osuId = response.id;
         res.redirect('/qat/login');
     }
 });
