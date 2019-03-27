@@ -2,7 +2,7 @@
 <div id="addQuestion" class="modal fade" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header bg-qat-logo">
+            <div class="modal-header bg-nat-logo">
                 <h5 class="modal-title text-dark">Add "{{category}}" question</h5>
                 <button type="button" class="close" data-dismiss="modal">
                 <span>&times;</span>
@@ -31,7 +31,7 @@
                 <hr>
                 <span class="errors text-shadow" id="addEvalRoundsErrors">{{ info }}</span>
                 <span class="confirm text-shadow" id="addEvalRoundsConfirm">{{ confirm }}</span>
-                <button type="submit" class="btn btn-qat float-right" @click="addQuestion($event)">Add Question</button>
+                <button type="submit" class="btn btn-nat float-right" @click="addQuestion($event)">Add Question</button>
             </div>
         </div>
     </div>
@@ -54,7 +54,7 @@ export default {
             if(!newQuestion || !newQuestion.length || !questionType || !questionType.length){
                 this.info = "Cannot leave fields blank!"
             }else{
-                const question = await this.executePost('/qat/manageTest/addQuestion', {questionType: questionType, newQuestion: newQuestion.trim(), category: this.rawCategory}, e);
+                const question = await this.executePost('/nat/manageTest/addQuestion', {questionType: questionType, newQuestion: newQuestion.trim(), category: this.rawCategory}, e);
                 if (question) {
                     if (question.error) {
                         this.info = question.error;

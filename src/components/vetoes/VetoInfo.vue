@@ -18,15 +18,15 @@
                 </p>
                 <p class="text-shadow">
                     Status: <small>{{ veto.status }}</small>
-                    <button class="btn btn-sm btn-qat" @click="setStatus('upheld')">Upheld</button>
-                    <button class="btn btn-sm btn-qat" @click="setStatus('withdrawn')">Withdrawn</button>
+                    <button class="btn btn-sm btn-nat" @click="setStatus('upheld')">Upheld</button>
+                    <button class="btn btn-sm btn-nat" @click="setStatus('withdrawn')">Withdrawn</button>
                 </p>
                 <p class="text-shadow">People Involved:</p>
                 <ul v-for="debater in veto.debaters" :key="debater.id">
                     <li>{{ debater.username }}</li>
                 </ul>
                 <p class="text-shadow" v-if="veto.mediator">Mediator: <small>{{ veto.mediator.username }}</small></p>
-                <p class="text-shadow" v-else-if="isMediator"><button class="btn btn-sm btn-qat" @click="mediate()">Mediate this!</button></p>
+                <p class="text-shadow" v-else-if="isMediator"><button class="btn btn-sm btn-nat" @click="mediate()">Mediate this!</button></p>
             </div>
             <div class="modal-footer">
                 {{ this.info }}
@@ -51,7 +51,7 @@ export default {
     },
     methods: {
         mediate: async function() {
-            const r = await this.executePost('/qat/vetoes/mediate', { veto: this.veto });
+            const r = await this.executePost('/nat/vetoes/mediate', { veto: this.veto });
             if (r) {
                 if (r.error) {
                     this.info = r.error;
@@ -61,7 +61,7 @@ export default {
             }
         },
         setStatus: async function(status) {
-            const r = await this.executePost('/qat/vetoes/setStatus', { veto: this.veto, status: status });
+            const r = await this.executePost('/nat/vetoes/setStatus', { veto: this.veto, status: status });
             if (r) {
                 if (r.error) {
                     this.info = r.error;

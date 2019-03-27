@@ -98,7 +98,7 @@ export default {
     },
     created() {
         axios
-            .get('/qat/manageReports/relevantInfo')
+            .get('/nat/manageReports/relevantInfo')
             .then(response => {
                 this.reports = response.data.r;
             }).then(function(){
@@ -109,7 +109,7 @@ export default {
     mounted () {
         setInterval(() => {
             axios
-                .get('/qat/manageReports/relevantInfo')
+                .get('/nat/manageReports/relevantInfo')
                 .then(response => {
                     this.reports = response.data.r;
                 });

@@ -7,7 +7,7 @@
                 style="filter: drop-shadow(1px 1px 1px #000000); border-radius: 100px 0 0 100px" 
                 @keyup.enter="query($event)" maxlength="18"/>
             <div class="input-group-append">
-                <button style="border-radius: 0 100px 100px 0;" class="btn btn-qat" @click="query($event)" type="submit"><span class="append-button-padding">Search archives</span></button>
+                <button style="border-radius: 0 100px 100px 0;" class="btn btn-nat" @click="query($event)" type="submit"><span class="append-button-padding">Search archives</span></button>
             </div>
         </div>
         <p class="errors">{{info}}</p> 
@@ -84,7 +84,7 @@ export default {
             if(!username || !username.length){
                 this.info = "Must enter a username!"
             }else{
-                const result = await this.executePost('/qat/evalArchive/search/', { username: username }, e);
+                const result = await this.executePost('/nat/evalArchive/search/', { username: username }, e);
                 if (result) {
                     if (result.error) {
                         this.info = result.error;
@@ -110,7 +110,7 @@ export default {
     },
     created() {
         axios
-            .get('/qat/evalArchive/relevantInfo')
+            .get('/nat/evalArchive/relevantInfo')
             .then(response => {
                 this.evaluator = response.data.evaluator;
             }).then(function(){

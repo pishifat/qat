@@ -83,8 +83,8 @@ async function beatmapsetInfo(setId) {
 }
 
 async function isLoggedIn(req, res, next) {
-    if (req.session.qatMongoId) {
-        const u = await users.service.query({ _id: req.session.qatMongoId });
+    if (req.session.mongoId) {
+        const u = await users.service.query({ _id: req.session.mongoId });
         
         // If hidden, shouldn't be able to do anything
         if (!u || u.group == 'hidden') {
@@ -95,8 +95,8 @@ async function isLoggedIn(req, res, next) {
         if (req.session.cookie.maxAge < 30000) {
             const response = await refreshToken();
             req.session.cookie.maxAge = response.expires_in * 1000;
-            req.session.qatAccessToken = response.access_token;
-            req.session.qatRefreshToken = response.refresh_token;
+            req.session.accessToken = response.access_token;
+            req.session.refreshToken = response.refresh_token;
         }
 
         res.locals.userRequest = u;
@@ -106,24 +106,24 @@ async function isLoggedIn(req, res, next) {
     }
 }
 
-async function isBnOrQat(req, res, next) {
+async function isBnOrNat(req, res, next) {
     const u = res.locals.userRequest;
     
-    if (u.group == 'bn' || u.group == 'qat') {
+    if (u.group == 'bn' || u.group == 'nat') {
         next();
     } else {
         res.redirect('/qat');
     }
 }
 
-async function isQat(req, res, next) {
+async function isNat(req, res, next) {
     const u = res.locals.userRequest;
     
-    if (u.group == 'qat') {
+    if (u.group == 'nat') {
         next();
     } else {
         res.redirect('/qat');
     }
 }
 
-module.exports = { isLoggedIn, getToken, getUserInfo, beatmapsetInfo, isBnOrQat, isQat };
+module.exports = { isLoggedIn, getToken, getUserInfo, beatmapsetInfo, isBnOrNat, isNat };

@@ -16,18 +16,18 @@
                 </select>
             </small>
             <small>
-                <button class="btn btn-qat btn-sm ml-2" @click="selectAll($event)">Select all</button>
+                <button class="btn btn-nat btn-sm ml-2" @click="selectAll($event)">Select all</button>
             </small>
         </div>
         <div class="mb-2">
             <small>Mark selected as:
-                <button class="btn btn-qat btn-sm ml-2" @click="setGroupEval($event)">Group evaluation</button>
+                <button class="btn btn-nat btn-sm ml-2" @click="setGroupEval($event)">Group evaluation</button>
             </small>
             <small>
-                <button class="btn btn-qat btn-sm ml-2" @click="setIndividualEval($event)">Individual evaluation</button>
+                <button class="btn btn-nat btn-sm ml-2" @click="setIndividualEval($event)">Individual evaluation</button>
             </small>
             <small>
-                <button class="btn btn-qat-red btn-sm ml-2" @click="setComplete($event)">Archive</button>
+                <button class="btn btn-nat-red btn-sm ml-2" @click="setComplete($event)">Archive</button>
             </small>
         </div>
         <hr>
@@ -158,7 +158,7 @@ export default {
                 checkedApps.push( $(this).val() );
             });
             if(checkedApps.length){
-                const ers = await this.executePost('/qat/appEval/setGroupEval/', { checkedApps: checkedApps}, e);
+                const ers = await this.executePost('/nat/appEval/setGroupEval/', { checkedApps: checkedApps}, e);
                 if (ers) {
                     if (ers.error) {
                         this.info = ers.error;
@@ -175,7 +175,7 @@ export default {
                 checkedApps.push( $(this).val() );
             });
             if(checkedApps.length){
-                const ers = await this.executePost('/qat/appEval/setIndividualEval/', { checkedApps: checkedApps}, e);
+                const ers = await this.executePost('/nat/appEval/setIndividualEval/', { checkedApps: checkedApps}, e);
                 if (ers) {
                     if (ers.error) {
                         this.info = ers.error;
@@ -194,7 +194,7 @@ export default {
             if(checkedApps.length){
                 const result = confirm(`Are you sure? The consensus of any evaluation will affect its respective user.\n\nOnly do this after feedback PMs have been sent.`);
                 if(result){
-                    const ers = await this.executePost('/qat/appEval/setComplete/', { checkedApps: checkedApps}, e);
+                    const ers = await this.executePost('/nat/appEval/setComplete/', { checkedApps: checkedApps}, e);
                     if (ers) {
                         if (ers.error) {
                             this.info = ers.error;
@@ -230,7 +230,7 @@ export default {
     },
     created() {
         axios
-            .get('/qat/appEval/relevantInfo')
+            .get('/nat/appEval/relevantInfo')
             .then(response => {
                 this.allApplications = response.data.a;
                 this.evaluator = response.data.evaluator;
@@ -243,7 +243,7 @@ export default {
     mounted () {
         setInterval(() => {
             axios
-                .get('/qat/appEval/relevantInfo')
+                .get('/nat/appEval/relevantInfo')
                 .then(response => {
                     this.allApplications = response.data.a;
                     this.filter();

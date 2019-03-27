@@ -16,24 +16,24 @@
                 </select>
             </small> 
             <small>
-                <button class="btn btn-qat btn-sm ml-2" @click="selectAll($event)">Select all</button>
+                <button class="btn btn-nat btn-sm ml-2" @click="selectAll($event)">Select all</button>
             </small>
         </div>
         <div class="mb-2">
             <small>Mark selected as:
-                <button class="btn btn-qat btn-sm ml-2" @click="setGroupEval($event)">Group evaluation</button>
+                <button class="btn btn-nat btn-sm ml-2" @click="setGroupEval($event)">Group evaluation</button>
             </small>
             <small>
-                <button class="btn btn-qat btn-sm ml-2" @click="setIndividualEval($event)">Individual evaluation</button>
+                <button class="btn btn-nat btn-sm ml-2" @click="setIndividualEval($event)">Individual evaluation</button>
             </small>
             <small>
-                <button class="btn btn-qat-red btn-sm ml-2" @click="setComplete($event)">Archive</button>
+                <button class="btn btn-nat-red btn-sm ml-2" @click="setComplete($event)">Archive</button>
             </small>
         </div>
         <hr>
         <h2>Individual Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="only you can see these">?</sup> 
             <button
-            class="btn btn-qat"
+            class="btn btn-nat"
             data-toggle="modal"
             data-target="#addEvalRounds"
             @click="openAddEvalRounds()"
@@ -190,7 +190,7 @@ export default {
                 checkedRounds.push( $(this).val() );
             });
             if(checkedRounds.length){
-                const ers = await this.executePost('/qat/bnEval/setGroupEval/', { checkedRounds: checkedRounds}, e);
+                const ers = await this.executePost('/nat/bnEval/setGroupEval/', { checkedRounds: checkedRounds}, e);
                 if (ers) {
                     if (ers.error) {
                         this.info = ers.error;
@@ -207,7 +207,7 @@ export default {
                 checkedRounds.push( $(this).val() );
             });
             if(checkedRounds.length){
-                const ers = await this.executePost('/qat/bnEval/setIndividualEval/', { checkedRounds: checkedRounds}, e);
+                const ers = await this.executePost('/nat/bnEval/setIndividualEval/', { checkedRounds: checkedRounds}, e);
                 if (ers) {
                     if (ers.error) {
                         this.info = ers.error;
@@ -225,7 +225,7 @@ export default {
             });
             if(checkedRounds.length){
                 const result = confirm(`Are you sure? The consensus of any evaluation will affect its respective user.\n\nOnly do this after feedback PMs have been sent.`);
-                const ers = await this.executePost('/qat/bnEval/setComplete/', { checkedRounds: checkedRounds}, e);
+                const ers = await this.executePost('/nat/bnEval/setComplete/', { checkedRounds: checkedRounds}, e);
                 if (ers) {
                     if (ers.error) {
                         this.info = ers.error;
@@ -261,7 +261,7 @@ export default {
     },
     created() {
         axios
-            .get('/qat/bnEval/relevantInfo')
+            .get('/nat/bnEval/relevantInfo')
             .then(response => {
                 this.allEvalRounds = response.data.er;
                 this.reports = response.data.r;
@@ -275,7 +275,7 @@ export default {
     mounted () {
         setInterval(() => {
             axios
-                .get('/qat/bnEval/relevantInfo')
+                .get('/nat/bnEval/relevantInfo')
                 .then(response => {
                     this.allEvalRounds = response.data.er;
                     this.reports = response.data.r;

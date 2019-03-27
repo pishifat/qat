@@ -2,7 +2,7 @@
 <div id="addEvalRounds" class="modal fade" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header bg-qat-logo">
+            <div class="modal-header bg-nat-logo">
                 <h5 class="modal-title text-dark">Add BNs to evaluate</h5>
                 <button type="button" class="close" data-dismiss="modal">
                 <span>&times;</span>
@@ -42,9 +42,9 @@
                         </label>
                     </div>
                     <div class="form-check text-shadow mb-2">
-                        <input class="form-check-input" type="checkbox" value="" id="qat">
-                        <label class="form-check-label" for="qat">
-                            QAT
+                        <input class="form-check-input" type="checkbox" value="" id="nat">
+                        <label class="form-check-label" for="nat">
+                            NAT
                         </label>
                     </div>
 
@@ -71,7 +71,7 @@
                 <hr>
                 <span class="errors text-shadow" id="addEvalRoundsErrors">{{ info }}</span>
                 <span class="confirm text-shadow" id="addEvalRoundsConfirm">{{ confirm }}</span>
-                <button type="submit" class="btn btn-qat float-right" @click="addEvalRounds($event)">Add BNs</button>
+                <button type="submit" class="btn btn-nat float-right" @click="addEvalRounds($event)">Add BNs</button>
             </div>
         </div>
     </div>
@@ -101,12 +101,12 @@ export default {
 
             let probation = $('#probationBns').is(':checked');
             let bn = $('#fullBns').is(':checked');
-            let qat = $('#qat').is(':checked');
+            let nat = $('#nat').is(':checked');
             
             let includeUsers = $('#includeUsers').val();
             let excludeUsers = $('#excludeUsers').val();
 
-            if(!probation && !bn && !qat && !includeUsers){
+            if(!probation && !bn && !nat && !includeUsers){
                 this.info = "Must select user type!"
                 return;
             }
@@ -120,9 +120,9 @@ export default {
                 return;
             }
 
-            const result = await this.executePost('/qat/bnEval/addEvalRounds/', {
+            const result = await this.executePost('/nat/bnEval/addEvalRounds/', {
                 osu: osu, taiko: taiko, catch: ctb, mania: mania,
-                probation: probation, bn: bn, qat: qat,
+                probation: probation, bn: bn, nat: nat,
                 includeUsers: includeUsers, excludeUsers: excludeUsers, deadline: deadline
                 }, e);
             if (result) {

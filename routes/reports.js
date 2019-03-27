@@ -10,12 +10,11 @@ router.use(api.isLoggedIn);
 /* GET reports page */
 router.get('/', async (req, res, next) => {
     res.render('reports', { 
-        title: 'Report a BN/QAT', 
+        title: 'Report a BN/NAT', 
         script: '../js/reports.js', 
         isReports: true, 
-        layout: 'qatlayout',
-        isBnOrQat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'qat',
-        isQat: res.locals.userRequest.group == 'qat'
+        isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat',
+        isNat: res.locals.userRequest.group == 'nat'
     });
 });
 
@@ -26,7 +25,7 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
     if(!u){
         return res.json({ error: "Cannot find user! Make sure you spelled it correctly" })
     }
-    await reports.service.create(req.session.qatUsername, req.session.qatOsuId, u.id, req.body.reason);
+    await reports.service.create(req.session.username, req.session.osuId, u.id, req.body.reason);
     res.json({});
 });
 

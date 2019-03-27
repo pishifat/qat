@@ -66,7 +66,7 @@
     <div id="editReason" class="modal fade" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content custom-bg-dark" v-if="selectedEntry">
-                <div class="modal-header text-dark bg-qat-logo" >
+                <div class="modal-header text-dark bg-nat-logo" >
                     <h5 class="modal-title">Edit reason</h5>
                     <button type="button" class="close" data-dismiss="modal">
                     <span>&times;</span>
@@ -82,7 +82,7 @@
                                 style="filter: drop-shadow(1px 1px 1px #000000); border-radius: 100px 0 0 100px" 
                                 @keyup.enter="updateReason($event)" maxlength="50"/>
                             <div class="input-group-append">
-                                <button style="border-radius: 0 100px 100px 0;" class="btn btn-qat" @click="updateReason($event)" type="submit"><span class="append-button-padding">Save reason</span></button>
+                                <button style="border-radius: 0 100px 100px 0;" class="btn btn-nat" @click="updateReason($event)" type="submit"><span class="append-button-padding">Save reason</span></button>
                             </div>
                         </div>
                     </div>
@@ -123,7 +123,7 @@ export default {
             if(!reason || !reason.length){
                 this.info = "Must enter a reason!"
             }else{
-                const result = await this.executePost('/qat/dataCollection/updateReason/' + this.selectedEntry.id, { reason: reason }, e);
+                const result = await this.executePost('/nat/dataCollection/updateReason/' + this.selectedEntry.id, { reason: reason }, e);
                 if (result) {
                     if (result.error) {
                         this.info = result.error;
@@ -134,7 +134,7 @@ export default {
             }
         },
         updateValidity: async function(entryId, validity) {
-            const result = await this.executePost('/qat/dataCollection/updateValidity/' + entryId, { validity: validity });
+            const result = await this.executePost('/nat/dataCollection/updateValidity/' + entryId, { validity: validity });
             if (result) {
                 if (result.error) {
                     this.info = result.error;
@@ -154,7 +154,7 @@ export default {
     },
     created() {
         axios
-            .get('/qat/dataCollection/relevantInfo')
+            .get('/nat/dataCollection/relevantInfo')
             .then(response => {
                 this.dqs = response.data.dqs;
                 this.pops = response.data.pops;

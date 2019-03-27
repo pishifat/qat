@@ -5,12 +5,12 @@ const db = mongoose.createConnection(config.connection, { useNewUrlParser: true 
 const userSchema = new mongoose.Schema({
     osuId: { type: Number, required: true },
     username: { type: String, required: true },
-    group: { type: String, enum: ["bn", "qat", 'user'], default: 'user' },
+    group: { type: String, enum: ["bn", "nat", 'user'], default: 'user' },
     modes: [{ type: String, enum: ["osu", "taiko", "catch", "mania"] }],
     probation: [{ type: String, enum: ["osu", "taiko", "catch", "mania"] }],
     vetoMediator: { type: Boolean, default: true },
     bnDuration: [{ type: Date }],
-    qatDuration: [{ type: Date }],
+    natDuration: [{ type: Date }],
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 const User = db.model('User', userSchema);

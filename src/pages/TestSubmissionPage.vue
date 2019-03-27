@@ -4,7 +4,7 @@
         <select class="custom-select" v-model="selectedTest">
             <option v-for="pendingTest in testList" :key="pendingTest.id" :value="pendingTest.id">{{ pendingTest.mode }}</option>
         </select>
-        <button class="btn btn-sm btn-qat" @click="loadTest($event)">Start / Continue</button>
+        <button class="btn btn-sm btn-nat" @click="loadTest($event)">Start / Continue</button>
         <p class="text-danger">{{ info }}</p>
     </div>
 
@@ -38,7 +38,7 @@
             </div>
         </div>
         <hr>
-        <button type="submit" class="btn btn-lg btn-qat" @click="submit($event)">Submit</button>
+        <button type="submit" class="btn btn-lg btn-nat" @click="submit($event)">Submit</button>
     </div>
 </div>
 </template>
@@ -69,7 +69,7 @@ export default {
         },
         loadTest: async function (e) {
             if (this.selectedTest) {
-                const test = await this.executePost('/qat/testSubmission/loadTest', { testId: this.selectedTest }, e);
+                const test = await this.executePost('/nat/testSubmission/loadTest', { testId: this.selectedTest }, e);
                 if (test) {
                     if (test.error) this.info = test.error;
                     this.test = test;
@@ -86,7 +86,7 @@ export default {
             }, 1000);
         },
         submit: async function (e) {
-            const res = await this.executePost('/qat/testSubmission/submit', { testId: this.selectedTest }, e);
+            const res = await this.executePost('/nat/testSubmission/submit', { testId: this.selectedTest }, e);
             if (res) {
                 if (res.error) this.info = res.error;
                 else this.info = 'Test submitted'
@@ -95,7 +95,7 @@ export default {
     },
     created() {
         axios
-            .get('/qat/testSubmission/tests')
+            .get('/nat/testSubmission/tests')
             .then(response => {
                 this.testList = response.data.testList;
             })

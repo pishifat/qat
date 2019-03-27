@@ -21,14 +21,14 @@
                         <option class="ml-2" value="mania">osu!mania</option>
                     </select>
                 </small>
-                <button class="btn btn-sm btn-qat ml-1" data-toggle="modal" data-target="#addVeto">
+                <button class="btn btn-sm btn-nat ml-1" data-toggle="modal" data-target="#addVeto">
                     Submit veto
                 </button>
             </div>
 
             <button
                 :disabled="!(pre > 0)"
-                class="btn btn-sm btn-qat mx-auto my-2"
+                class="btn btn-sm btn-nat mx-auto my-2"
                 style="display:block"
                 type="button"
                 @click="showNewer()"
@@ -49,7 +49,7 @@
             <div class="small text-center mx-auto">{{ currentPage }} of {{ pages }}</div>
             <button
                 :disabled="!canShowOlder"
-                class="btn btn-sm btn-qat mx-auto my-2"
+                class="btn btn-sm btn-nat mx-auto my-2"
                 style="display:block"
                 type="button"
                 @click="showOlder()"
@@ -116,7 +116,7 @@ export default {
     },
     created() {
         axios
-            .get('/qat/vetoes/relevantInfo')
+            .get('/nat/vetoes/relevantInfo')
             .then(response => {
                 this.allObjs = response.data.vetoes;
                 this.userId = response.data.userId;
@@ -134,7 +134,7 @@ export default {
     },
     mounted() {
         setInterval(() => {
-            axios.get('/qat/vetoes/relevantInfo').then(response => {
+            axios.get('/nat/vetoes/relevantInfo').then(response => {
                 this.allObjs = response.data.vetoes;
                 if (this.isFiltered) {
                     this.filter();

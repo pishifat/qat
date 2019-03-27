@@ -30,7 +30,7 @@
     </div>
 
     <h4>Example mods:</h4>
-    <p class="small ml-4 mb-3">Link the discussion pages of at least two mapsets you've modded in the last six months. These (and potentially more) will be evaluated by the QAT.</small>
+    <p class="small ml-4 mb-3">Link the discussion pages of at least two mapsets you've modded in the last six months. These (and potentially more) will be evaluated by the NAT.</small>
     <div class="form-group row">
         <div class="pl-4" style="width: 95%">
             <div class="input-group mb-3">
@@ -52,11 +52,11 @@
     <div id="confirm" class="confirm"></div>
 
     <div class="col-md-6 mt-2 text-center mx-auto">
-        <button id="apply" class="btn btn-lg btn-block btn-qat" type="submit">Apply</button>
+        <button id="apply" class="btn btn-lg btn-block btn-nat" type="submit">Apply</button>
     </div>
     {{#if pendingTest}}
     <div class="col-md-6 mt-2 text-center mx-auto">
-        <a href="/qat/testsubmission" class="btn btn-lg btn-qat" type="submit">Start the test now</a>
+        <a href="/nat/testsubmission" class="btn btn-lg btn-nat" type="submit">Start the test now</a>
     </div>
     {{/if}}
 </div>
@@ -65,9 +65,9 @@
 
 {{!-- Temp stuff --}}
 <hr>
-<form action="/qat/testsubmission/generatetest" method="post">
-    <button class="btn btn-lg btn-qat" type="submit">temp generate test</button>
-    <a href="/qat/testsubmission" class="btn btn-lg btn-qat" type="submit">temp visit test</a>
+<form action="/nat/testsubmission/generatetest" method="post">
+    <button class="btn btn-lg btn-nat" type="submit">temp generate test</button>
+    <a href="/nat/testsubmission" class="btn btn-lg btn-nat" type="submit">temp visit test</a>
 </form>
 
 <hr>

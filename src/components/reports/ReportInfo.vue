@@ -3,7 +3,7 @@
 <div id="reportInfo" class="modal fade" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content" v-if="report">
-            <div class="modal-header text-dark bg-qat-logo">
+            <div class="modal-header text-dark bg-nat-logo">
                 <h5 class="modal-title">{{report.culprit.username}}</h5>
                 <button type="button" class="close" data-dismiss="modal">
                     <span>&times;</span>
@@ -40,7 +40,7 @@
 
             </div>
             <div class="modal-footer" style="overflow: hidden;">
-                <button class="btn btn-sm btn-qat" @click="submitReportEval($event)">{{report.valid && report.feedback ? 'Update Report Evaluation' : 'Submit Report Evaluation'}}</button>
+                <button class="btn btn-sm btn-nat" @click="submitReportEval($event)">{{report.valid && report.feedback ? 'Update Report Evaluation' : 'Submit Report Evaluation'}}</button>
             </div>
         </div>
     </div>
@@ -71,7 +71,7 @@ export default {
                 this.info = 'At least one field must have input!'
             }else{
                 const r = await this.executePost(
-                    '/qat/manageReports/submitReportEval/' + this.report.id, 
+                    '/nat/manageReports/submitReportEval/' + this.report.id, 
                     { valid: valid, feedback: this.feedback }, e);
                 if (r) {
                     if (r.error) {

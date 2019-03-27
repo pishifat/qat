@@ -16,9 +16,8 @@ router.get('/', async (req, res, next) => {
         title: 'Current BN Evaluations', 
         script: '../javascripts/bnEval.js', 
         isEval: true, 
-        layout: 'qatlayout', 
-        isBnOrQat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'qat',
-        isQat: res.locals.userRequest.group == 'qat'
+        isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat',
+        isNat: res.locals.userRequest.group == 'nat'
     });
 });
 
@@ -41,7 +40,7 @@ router.get('/relevantInfo', async (req, res, next) => {
         await evalRounds.service.query({active: true}, defaultDiscussPopulate, {createdAt: 1}, true ),
         await reports.service.query({valid: {$exists: true, $ne: 3}, feedback: {$exists: true, $nin: ''}}, {}, {}, true)
     ]);
-    res.json({ er: er, r: r, evaluator: req.session.qatMongoId });
+    res.json({ er: er, r: r, evaluator: req.session.mongoId });
 });
 
 
@@ -70,7 +69,7 @@ async function cycleModes(userId, modes, deadline, osu, taiko, ctb, mania){
 router.post('/addEvalRounds/', async (req, res) => {
     let fullBns = [];
     let probationBns = [];
-    let qat = [];
+    let nat = [];
     if(req.body.probation){
         probationBns = await users.service.query(
             {$and: [
@@ -106,10 +105,10 @@ router.post('/addEvalRounds/', async (req, res) => {
             ]}}]}, {}, {}, true);
     }
     
-    if(req.body.qat){
-        qat = await users.service.query(
+    if(req.body.nat){
+        nat = await users.service.query(
             {$and: [
-                {group: 'qat'},
+                {group: 'nat'},
                 {modes: {$in: [
                     req.body.osu && 'osu', 
                     req.body.taiko && 'taiko',
@@ -117,7 +116,7 @@ router.post('/addEvalRounds/', async (req, res) => {
                     req.body.mania && 'mania'
             ]}}]}, {}, {}, true);
     }
-    let allUsers = probationBns.concat(fullBns.concat(qat));
+    let allUsers = probationBns.concat(fullBns.concat(nat));
     
     let failed = [];
     if(req.body.excludeUsers){
@@ -162,7 +161,7 @@ router.post('/submitEval/:id', async (req, res) => {
     if(req.body.evaluationId){
         await evals.service.update(req.body.evaluationId, {behaviorComment: req.body.behaviorComment, moddingComment: req.body.moddingComment, vote: req.body.vote});
     }else{
-        let ev = await evals.service.create(req.session.qatMongoId, req.body.behaviorComment, req.body.moddingComment, req.body.vote);
+        let ev = await evals.service.create(req.session.mongoId, req.body.behaviorComment, req.body.moddingComment, req.body.vote);
         await evalRounds.service.update(req.params.id, {$push: {evaluations: ev._id}});
     }
     res.json(await evalRounds.service.query({ _id: req.params.id }, defaultDiscussPopulate));

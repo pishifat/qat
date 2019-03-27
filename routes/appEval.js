@@ -14,9 +14,8 @@ router.get('/', async (req, res, next) => {
         title: 'BN Application Evaluations', 
         script: '../javascripts/appEval.js', 
         isAppEval: true, 
-        layout: 'qatlayout', 
-        isBnOrQat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'qat',
-        isQat: res.locals.userRequest.group == 'qat'
+        isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat',
+        isNat: res.locals.userRequest.group == 'nat'
     });
 });
 
@@ -38,7 +37,7 @@ router.get('/relevantInfo', async (req, res, next) => {
         await bnApps.service.query({active: true}, defaultDiscussPopulate, {createdAt: 1}, true ),
         //await bnApps.service.query({active: true, discussion: true}, defaultDiscussPopulate, {createdAt: 1}, true ),
     ]);
-    res.json({ a: a, evaluator: req.session.qatMongoId });
+    res.json({ a: a, evaluator: req.session.mongoId });
 });
 
 
@@ -47,7 +46,7 @@ router.post('/submitEval/:id', async (req, res) => {
     if(req.body.evaluationId){
         await evals.service.update(req.body.evaluationId, {behaviorComment: req.body.behaviorComment, moddingComment: req.body.moddingComment, vote: req.body.vote});
     }else{
-        let ev = await evals.service.create(req.session.qatMongoId, req.body.behaviorComment, req.body.moddingComment, req.body.vote);
+        let ev = await evals.service.create(req.session.mongoId, req.body.behaviorComment, req.body.moddingComment, req.body.vote);
         a = await bnApps.service.update(req.params.id, {$push: {evaluations: ev._id}});
     }
     

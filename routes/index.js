@@ -9,37 +9,37 @@ const router = express.Router();
 
 /* GET bn app page */
 router.get('/', async (req, res, next) => {
-    let isBnOrQat;
+    let isBnOrNat;
     let isBn;
-    if (req.session.qatGroup == 'bn' || req.session.qatGroup == 'qat') {
-        isBnOrQat = true;
-        if (req.session.qatGroup == 'bn') isBn = true;
+    if (req.session.group == 'bn' || req.session.group == 'nat') {
+        isBnOrNat = true;
+        if (req.session.group == 'bn') isBn = true;
     }
-    res.render('qatIndex', { title: 'stuff', layout: false, loggedInAs: req.session.qatMongoId, isBnOrQat: isBnOrQat, isBn: isBn});
+    res.render('qatIndex', { title: 'NAT', layout: false, loggedInAs: req.session.mongoId, isBnOrNat: isBnOrNat, isBn: isBn});
 });
 
 /*-------below this line is the intimidating code that i never want to look at----------*/
 
 /* GET 'login' to get user's info */
 router.get('/login', async (req, res, next) => {
-    if (req.session.qatOsuId && req.session.qatUsername) {
-        const u = await users.service.query({ osuId: req.session.qatOsuId });
+    if (req.session.osuId && req.session.username) {
+        const u = await users.service.query({ osuId: req.session.osuId });
         if (!u || u.error) {
             const user = await users.service.create(
-                req.session.qatOsuId,
-                req.session.qatUsername,
-                req.session.qatGroup
+                req.session.osuId,
+                req.session.username,
+                req.session.group
             );
 
             if (user && !user.error) {
-                req.session.qatMongoId = user._id;
+                req.session.mongoId = user._id;
                 return next();
             } else {
                 return res.status(500).render('error', { message: 'Something went wrong!' });
             }
         } else {
-            req.session.qatMongoId = u._id;
-            req.session.qatGroup = u.group;
+            req.session.mongoId = u._id;
+            req.session.group = u.group;
             return next();
         }
     }
@@ -63,7 +63,6 @@ router.get('/login', async (req, res, next) => {
 
 /* GET user's token and user's info to login */
 router.get('/callback', async (req, res) => {
-    console.log('callback')
     if (!req.query.code || req.query.error) {
         return res.redirect('/qat');
     }
@@ -82,25 +81,18 @@ router.get('/callback', async (req, res) => {
     } else {
         // *1000 because maxAge is miliseconds, oauth is seconds
         req.session.cookie.maxAge = response.expires_in * 1000;
-        req.session.qatAccessToken = response.access_token;
-        req.session.qatRefreshToken = response.refresh_token;
+        req.session.accessToken = response.access_token;
+        req.session.refreshToken = response.refresh_token;
 
-        response = await api.getUserInfo(req.session.qatAccessToken);
+        response = await api.getUserInfo(req.session.accessToken);
         if (response.error) {
             res.status(500).render('error');
         } else if (response.is_qat) {
-            req.session.qatGroup = 'qat';
+            req.session.group = 'nat';
         } else if (response.is_bng) {
-            req.session.qatGroup = 'bn';
+            req.session.group = 'bn';
         }
-        if (response.ranked_and_approved_beatmapset_count >= 64 && response.kudosu.total >= 0) {
-            // todo also check if user is qat/bn
-            req.session.qatUsername = response.username;
-            req.session.qatOsuId = response.id;
-            res.redirect('/qat/login');
-        } else {
-            res.render('error', { message: 'bottom text' });
-        }
+        res.redirect('/qat/login');
     }
 });
 

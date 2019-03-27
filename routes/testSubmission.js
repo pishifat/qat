@@ -24,14 +24,13 @@ router.get('/', async (req, res, next) => {
     res.render('testsubmission', {
         title: 'Test Submission',
         script: '../javascripts/testSubmission.js',
-        layout: 'qatLayout'
     });
 });
 
 /* GET pending tests by user */
 router.get('/tests', async (req, res, next) => {
     const tests = await testSubmission.service.query({ 
-        applicant: req.session.qatMongoId, 
+        applicant: req.session.mongoId, 
         status: { $ne: 'finished' },
     }, null, null, true);
     
@@ -46,7 +45,7 @@ router.get('/tests', async (req, res, next) => {
 router.post('/loadTest', async (req, res, next) => {
     let test = await testSubmission.service.query({ 
         _id: req.body.testId,
-        applicant: req.session.qatMongoId,
+        applicant: req.session.mongoId,
         status: { $ne: 'finished' },
     }, defaultPopulate, { 'answers.question.category': 1 });
     
@@ -66,7 +65,7 @@ router.post('/loadTest', async (req, res, next) => {
 router.post('/submit', async (req, res, next) => {
     let test = await testSubmission.service.query({ 
         _id: req.body.testId,
-        applicant: req.session.qatMongoId,
+        applicant: req.session.mongoId,
         status: { $ne: 'finished' },
     });
     
@@ -82,9 +81,9 @@ router.post('/submit', async (req, res, next) => {
 
 // Temp
 router.post('/generateTest', async (req, res, next) => {
-    await testSubmission.service.create(req.session.qatMongoId, 'catch');
+    await testSubmission.service.create(req.session.mongoId, 'catch');
     
-    res.redirect('/qat/testSubmission');
+    res.redirect('/nat/testSubmission');
 });
 
 module.exports = router;

@@ -1,8 +1,8 @@
 :root {
-    --qat-logo: #4AC2C2;
-    --qat-logo-light: rgb(173, 255, 255);
-    --qat: rgb(212, 34, 34);
-    --qat-light: rgb(216, 104, 104);
+    --nat-logo: #4AC2C2;
+    --nat-logo-light: rgb(173, 255, 255);
+    --nat: rgb(212, 34, 34);
+    --nat-light: rgb(216, 104, 104);
     --bn: #773ab8;
     --bn-light: #c189fc;
     --probation: #cea0ff;
@@ -158,7 +158,7 @@ hr {
     box-shadow: 5px 5px 10px 5px black;
 }
 
-.navbar-qat {
+.navbar-nat {
     background-image: linear-gradient(#226161d1, transparent);
     padding-bottom: 20px;
 }
@@ -220,10 +220,6 @@ input[type='text']:focus {
     text-shadow: 1px 1px 1px #000000;
 }
 
-.qat {
-    color: var(--qat-logo);
-}
-
 .btn {
     filter: drop-shadow(1px 1px 1px #000000);
     border-radius: 10000px;
@@ -247,7 +243,7 @@ input[type='text']:focus {
     background-color: var(--dark);
 }
 
-.btn-qat-pass {
+.btn-nat-pass {
     background-color: var(--pass);
     border-color: var(--pass);
     filter: drop-shadow(1px 1px 1px #000000);
@@ -256,7 +252,7 @@ input[type='text']:focus {
 }
 
 
-.btn-qat-extend {
+.btn-nat-extend {
     background-color: var(--extend);
     border-color: var(--extend);
     filter: drop-shadow(1px 1px 1px #000000);
@@ -265,7 +261,7 @@ input[type='text']:focus {
 }
 
 
-.btn-qat-fail {
+.btn-nat-fail {
     background-color: var(--fail);
     border-color: var(--fail);
     filter: drop-shadow(1px 1px 1px #000000);
@@ -274,18 +270,18 @@ input[type='text']:focus {
 }
 
 
-.btn-qat {
-    background-color: var(--qat-logo);
-    border-color: var(--qat-logo);
+.btn-nat {
+    background-color: var(--nat-logo);
+    border-color: var(--nat-logo);
 }
 
-.btn-qat-red {
-    background-color: var(--qat-light);
-    border-color: var(--qat-light);
+.btn-nat-red {
+    background-color: var(--nat-light);
+    border-color: var(--nat-light);
 }
 
-.border-qat {
-    border-top: 5px solid var(--qat);
+.border-nat {
+    border-top: 5px solid var(--nat);
 }
 
 .border-bn {
@@ -312,12 +308,12 @@ input[type='text']:focus {
     border-left: 5px solid var(--fail);
 }
 
-.bg-qat-logo {
-    background-color: var(--qat-logo);
+.bg-nat-logo {
+    background-color: var(--nat-logo);
 }
 
-.bg-qat {
-    background-color: var(--qat-light);
+.bg-nat {
+    background-color: var(--nat-light);
 }
 
 .bg-bn {
@@ -453,7 +449,7 @@ input[type="radio"] + .fas { cursor: pointer; }
 }
 
 .dropdown-item:hover {
-    background-color: var(--qat-logo);
+    background-color: var(--nat-logo);
 }
 
 .modal-content {

@@ -7,7 +7,7 @@
                     <input id="username" placeholder="username"/>
                     <input id="osuId" placeholder="osu id"/>
                     <input id="mode" placeholder="mode (just 1)"/> 
-                    <input id="group" placeholder="bn/qat"/> 
+                    <input id="group" placeholder="bn/nat"/> 
                     <input id="probation" placeholder="probation mode"/> | 
                     <input id="date" placeholder="date" @keyup.enter="tempUpdate()"/>
                     <button @click="tempCreate()">temp create</button>
@@ -31,12 +31,12 @@
                 <small>Sort: 
                     <a :class="sortBy === 'username' ? 'sorted' : ''" href="#" @click.prevent="sort('username')">Name</a> | 
                     <a :class="sortBy === 'bnDuration' ? 'sorted' : ''" href="#" @click.prevent="sort('bnDuration')">BN Tenure</a> | 
-                    <a :class="sortBy === 'qatDuration' ? 'sorted' : ''" href="#" @click.prevent="sort('qatDuration')">QAT Tenure</a>
+                    <a :class="sortBy === 'natDuration' ? 'sorted' : ''" href="#" @click.prevent="sort('natDuration')">NAT Tenure</a>
                 </small>
             </div>
         </div>
 
-        <button :disabled="!(pre > 0)" class="btn btn-sm btn-qat mx-auto my-2" style="display:block" type="button" @click="showNewer()">
+        <button :disabled="!(pre > 0)" class="btn btn-sm btn-nat mx-auto my-2" style="display:block" type="button" @click="showNewer()">
             <i class="fas fa-angle-up mr-1"></i> show next <i class="fas fa-angle-up ml-1"></i>
         </button>
         <transition-group name="list" tag="div" class="row">
@@ -50,7 +50,7 @@
             ></user-card>
         </transition-group>
         <div class="small text-center mx-auto">{{currentPage}} of {{pages}}</div>
-        <button :disabled="!canShowOlder" class="btn btn-sm btn-qat mx-auto my-2" style="display:block" type="button" @click="showOlder()">
+        <button :disabled="!canShowOlder" class="btn btn-sm btn-nat mx-auto my-2" style="display:block" type="button" @click="showOlder()">
             <i class="fas fa-angle-down mr-1"></i> show previous <i class="fas fa-angle-down ml-1"></i>
         </button>
     </div>
@@ -109,7 +109,7 @@ export default {
             const mode = $('#mode').val();
             const group = $('#group').val();
             const probation = $('#probation').val();
-            const u = await this.executePost('/qat/users/tempCreate/', {username: username, osuId: osuId, mode: mode, group: group, probation: probation}, e);
+            const u = await this.executePost('/nat/users/tempCreate/', {username: username, osuId: osuId, mode: mode, group: group, probation: probation}, e);
             if(u){
                 console.log("ye");
             }
@@ -120,7 +120,7 @@ export default {
             const group = $('#group').val();
             const probation = $('#probation').val();
             const date = new Date($('#date').val());
-            const u = await this.executePost('/qat/users/tempUpdate/', {username: username, group: group, mode: mode, probation: probation, date: date}, e);
+            const u = await this.executePost('/nat/users/tempUpdate/', {username: username, group: group, mode: mode, probation: probation, date: date}, e);
             if(u){
                 console.log("yeeeee");
             }
@@ -138,7 +138,7 @@ export default {
     },
     created() {
         axios
-            .get('/qat/users/relevantInfo')
+            .get('/nat/users/relevantInfo')
             .then(response => {
                 this.allObjs = response.data.users;
                 this.userId = response.data.userId;
@@ -152,7 +152,7 @@ export default {
     mounted () {
         setInterval(() => {
             axios
-                .get('/users/relevantInfo')
+                .get('/nat/users/relevantInfo')
                 .then(response => {
                     this.allObjs = response.data.users;
                     if(this.isFiltered){

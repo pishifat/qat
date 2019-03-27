@@ -20,7 +20,7 @@
                 <option value='bn'>BN Rules</option>
             </select>
             <div class="input-group-append">
-                <button style="border-radius: 0 100px 100px 0;" class="rounded-circle-left btn btn-qat" id="artistButton" @click="loadContent($event);">Load test content</button>
+                <button style="border-radius: 0 100px 100px 0;" class="rounded-circle-left btn btn-nat" id="artistButton" @click="loadContent($event);">Load test content</button>
             </div>
         </div>
         <p class="errors">{{info}}</p>
@@ -29,7 +29,7 @@
         <hr>
         <h2>{{category}} Questions 
             <button
-            class="btn btn-qat"
+            class="btn btn-nat"
             data-toggle="modal"
             data-target="#addQuestion"
             @click="resetInput()"
@@ -97,7 +97,7 @@ export default {
             e.target.disabled = true;
             let questionType = $('#questionType').val();
             axios
-                .get('/qat/manageTest/load/' + questionType)
+                .get('/nat/manageTest/load/' + questionType)
                 .then(response => {
                     this.questions = response.data;
                     this.category = $("#questionType option:selected").text();

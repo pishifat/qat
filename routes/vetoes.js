@@ -11,7 +11,7 @@ const defaultPopulate = [
 ];
 
 router.use(api.isLoggedIn);
-router.use(api.isBnOrQat);
+router.use(api.isBnOrNat);
 
 /* GET bn app page */
 router.get('/', async (req, res, next) => {
@@ -19,16 +19,15 @@ router.get('/', async (req, res, next) => {
         title: 'vetoes',
         script: '../javascripts/vetoes.js',
         isVetoes: true,
-        layout: 'qatlayout',
-        isBnOrQat: true,
-        isQat: res.locals.userRequest.group == 'qat'
+        isBnOrNat: true,
+        isNat: res.locals.userRequest.group == 'nat'
     });
 });
 
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res, next) => {
     let v = await vetoes.service.query({}, defaultPopulate, { createdAt: 1 }, true);
-    res.json({ vetoes: v, userId: req.session.qatMongoId, userGroup: req.session.qatGroup, isMediator: res.locals.userRequest.vetoMediator });
+    res.json({ vetoes: v, userId: req.session.mongoId, userGroup: req.session.group, isMediator: res.locals.userRequest.vetoMediator });
 });
 
 /* POST create a new veto. */
@@ -59,7 +58,7 @@ router.post('/submit', async (req, res, next) => {
     }
 
     const v = await vetoes.service.create(
-        req.session.qatMongoId,
+        req.session.mongoId,
         req.body.beatmapLink,
         bmInfo.beatmapset_id,
         bmInfo.title + ' - ' + bmInfo.artist,
@@ -73,7 +72,7 @@ router.post('/submit', async (req, res, next) => {
 /* POST mediate a veto. */
 router.post('/mediate', async (req, res, next) => {
     const v = await vetoes.service.update(req.body.veto._id, {
-        mediator: req.session.qatMongoId,
+        mediator: req.session.mongoId,
         status: 'wip',
     });
     res.json(v);

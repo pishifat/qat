@@ -51,18 +51,18 @@ app.use(
 );
 
 app.use('/qat', indexRouter);
-app.use('/qat/bnApps', bnAppRouter);
-app.use('/qat/reports', reportsRouter);
-app.use('/qat/appEval', appEvalRouter);
-app.use('/qat/bnEval', bnEvalRouter);
-app.use('/qat/dataCollection', dataCollectionRouter);
-app.use('/qat/evalArchive', evalArchiveRouter);
-app.use('/qat/manageReports', manageReportsRouter);
-app.use('/qat/users', usersRouter);
-app.use('/qat/vetoes', vetoesRouter);
-app.use('/qat/testSubmission', testSubmissionRouter);
-app.use('/qat/managetest', manageTestRouter);
-app.use('/qat/bnscore', bnScoreRouter);
+app.use('/nat/bnApps', bnAppRouter);
+app.use('/nat/reports', reportsRouter);
+app.use('/nat/appEval', appEvalRouter);
+app.use('/nat/bnEval', bnEvalRouter);
+app.use('/nat/dataCollection', dataCollectionRouter);
+app.use('/nat/evalArchive', evalArchiveRouter);
+app.use('/nat/manageReports', manageReportsRouter);
+app.use('/nat/users', usersRouter);
+app.use('/nat/vetoes', vetoesRouter);
+app.use('/nat/testSubmission', testSubmissionRouter);
+app.use('/nat/managetest', manageTestRouter);
+app.use('/nat/bnscore', bnScoreRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

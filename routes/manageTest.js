@@ -14,9 +14,8 @@ router.get('/', async (req, res, next) => {
         title: 'Manage RC Test', 
         script: '../javascripts/manageTest.js', 
         isManageTest: true, 
-        layout: 'qatlayout',
-        isBnOrQat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'qat',
-        isQat: res.locals.userRequest.group == 'qat' });
+        isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat',
+        isNat: res.locals.userRequest.group == 'nat' });
 });
 
 //population

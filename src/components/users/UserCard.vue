@@ -1,7 +1,7 @@
 <template>
 
 <div class='col-md-4 col-lg-3 my-2' @click="selectUser()">
-    <div class="card" :class="user.probation.length && user.group != 'qat' ? 'border-probation' : 'border-' + user.group"
+    <div class="card" :class="user.probation.length && user.group != 'nat' ? 'border-probation' : 'border-' + user.group"
         data-toggle="modal" data-target='#extendedInfo' :data-user="user.osuId">
                 
         <div class='card-body user-card-spacing'>
@@ -15,7 +15,7 @@
                 <img :src="'https://a.ppy.sh/' + user.osuId" class="rounded-circle avatar-mini-thumb">
             </span>
             <p class="small ml-1 text-shadow" v-if="user.bnDuration.length">Joined BN: {{user.bnDuration[0].slice(0,10)}}</p>
-            <p class="small ml-1 text-shadow" v-if="user.qatDuration.length">Joined QAT: {{user.qatDuration[0].slice(0,10)}}</p>
+            <p class="small ml-1 text-shadow" v-if="user.natDuration.length">Joined NAT: {{user.natDuration[0].slice(0,10)}}</p>
         </div>
     </div>
 </div>

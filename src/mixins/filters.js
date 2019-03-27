@@ -137,26 +137,26 @@ const filters = {
                         return 0;
                     });
                 }
-            } else if (this.sortBy == 'qatDuration') {
+            } else if (this.sortBy == 'natDuration') {
                 if(this.isFiltered){
                     this.filteredObjs.sort((a, b) => {
                         if (this.asc) {
-                            if (this.sortDuration(a.qatDuration) > this.sortDuration(b.qatDuration)) return -1;
-                            if (this.sortDuration(a.qatDuration) < this.sortDuration(b.qatDuration)) return 1;
+                            if (this.sortDuration(a.natDuration) > this.sortDuration(b.natDuration)) return -1;
+                            if (this.sortDuration(a.natDuration) < this.sortDuration(b.natDuration)) return 1;
                         } else {
-                            if (this.sortDuration(a.qatDuration) < this.sortDuration(b.qatDuration)) return -1;
-                            if (this.sortDuration(a.qatDuration) > this.sortDuration(b.qatDuration)) return 1
+                            if (this.sortDuration(a.natDuration) < this.sortDuration(b.natDuration)) return -1;
+                            if (this.sortDuration(a.natDuration) > this.sortDuration(b.natDuration)) return 1
                         }
                         return 0;
                     });
                 }else{
                     this.allObjs.sort((a, b) => {
                         if (this.asc) {
-                            if (this.sortDuration(a.qatDuration) > this.sortDuration(b.qatDuration)) return -1;
-                            if (this.sortDuration(a.qatDuration) < this.sortDuration(b.qatDuration)) return 1;
+                            if (this.sortDuration(a.natDuration) > this.sortDuration(b.natDuration)) return -1;
+                            if (this.sortDuration(a.natDuration) < this.sortDuration(b.natDuration)) return 1;
                         } else {
-                            if (this.sortDuration(a.qatDuration) < this.sortDuration(b.qatDuration)) return -1;
-                            if (this.sortDuration(a.qatDuration) > this.sortDuration(b.qatDuration)) return 1
+                            if (this.sortDuration(a.natDuration) < this.sortDuration(b.natDuration)) return -1;
+                            if (this.sortDuration(a.natDuration) > this.sortDuration(b.natDuration)) return 1
                         }
                         return 0;
                     });

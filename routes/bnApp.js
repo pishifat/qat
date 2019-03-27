@@ -9,28 +9,27 @@ router.use(api.isLoggedIn);
 
 /* GET bn app page */
 router.get('/', async (req, res, next) => {
-    const test = await testSubmission.service.query({ applicant: req.session.qatMongoId, status: { $ne: 'finished' } });
+    const test = await testSubmission.service.query({ applicant: req.session.mongoId, status: { $ne: 'finished' } });
     
     res.render('bnapp', {
         title: 'Beatmap Nominator Application',
         script: '../js/bnApp.js',
         isBnApp: true,
-        layout: 'qatlayout',
-        loggedInAs: req.session.qatMongoId,
-        isBnOrQat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'qat',
-        isQat: res.locals.userRequest.group == 'qat',
+        loggedInAs: req.session.mongoId,
+        isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat',
+        isNat: res.locals.userRequest.group == 'nat',
         pendingTest: test
     });
 });
 
 /* POST a bn application */
 router.post('/apply', async (req, res, next) => {
-    if (req.session.qatMongoId) {
+    if (req.session.mongoId) {
         let date = new Date();
         date.setDate(date.getDate() - 90);
         const currentBnApp = await bnApps.service.query({
             $and: [
-                { applicant: req.session.qatMongoId },
+                { applicant: req.session.mongoId },
                 { mode: req.body.mode },
                 { createdAt: { $gte: date } },
             ],
@@ -38,14 +37,14 @@ router.post('/apply', async (req, res, next) => {
 
         if (!currentBnApp || currentBnApp.error) {
             const newBnApp = await bnApps.service.create(
-                req.session.qatMongoId,
+                req.session.mongoId,
                 req.body.mode,
                 req.body.mods
             );
             if (newBnApp && !newBnApp.error) {
                 // Create test
                 const t = await testSubmission.service.create(
-                    req.session.qatMongoId,
+                    req.session.mongoId,
                     req.body.mode
                 );
                 if (t.error) {
@@ -53,7 +52,7 @@ router.post('/apply', async (req, res, next) => {
                     return res.json({ error: 'Something went wrong while creating the test!' });
                 } else {
                     // Redirect so the applicant can do the test
-                    return res.redirect('/qat/bnapp');
+                    return res.redirect('/nat/bnapp');
                 }
             } else {
                 return res.json({ error: 'Failed to process application!' });

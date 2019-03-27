@@ -2,7 +2,7 @@
 <div id="discussionInfo" class="modal fade" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content custom-bg-dark" v-if="discussApp || discussRound">
-            <div class="modal-header text-dark bg-qat-logo">
+            <div class="modal-header text-dark bg-nat-logo">
                 <h5 v-if="discussApp" class="modal-title">
                     Application Evaluation: <a @click.stop :href="'https://osu.ppy.sh/users/' + discussApp.applicant.osuId" class="text-dark" target="_blank">{{discussApp.applicant.username}}</a>
                     <i v-if="discussApp.mode == 'osu'" class="far fa-circle"></i>
@@ -26,17 +26,17 @@
                             <span v-else>none</span>
                             <span v-if="!readOnly">
                             <button
-                                class="btn btn-sm btn-qat-pass"
+                                class="btn btn-sm btn-nat-pass"
                                 :disabled="discussRound.consensus == 'pass' "
                                 @click="setConsensus('pass', $event);"
                             >Set Pass</button>
                             <button
-                                class="btn btn-sm btn-qat-extend"
+                                class="btn btn-sm btn-nat-extend"
                                 :disabled="discussRound.consensus == 'extend' "
                                 @click="setConsensus('extend', $event);"
                             >Set Extend</button>
                             <button
-                                class="btn btn-sm btn-qat-fail"
+                                class="btn btn-sm btn-nat-fail"
                                 :disabled="discussRound.consensus == 'fail'"
                                 @click="setConsensus('fail', $event);"
                             >Set Fail</button>
@@ -54,12 +54,12 @@
                                 <span v-if="discussApp.consensus" :class="'vote-' + discussApp.consensus">{{discussApp.consensus}}</span>
                                 <span v-else>none</span>
                                 <button
-                                    class="btn btn-sm btn-qat-pass"
+                                    class="btn btn-sm btn-nat-pass"
                                     :disabled="discussApp.consensus == 'pass' "
                                     @click="setConsensus('pass', $event);"
                                 >Set Pass</button>
                                 <button
-                                    class="btn btn-sm btn-qat-fail"
+                                    class="btn btn-sm btn-nat-fail"
                                     :disabled="discussApp.consensus == 'fail'"
                                     @click="setConsensus('fail', $event);"
                                 >Set Fail</button>
@@ -171,16 +171,18 @@
                                         </tbody>
                                     </table>
                                 </div>
-                                
                             </div>
-                            <hr>
-                            <p v-if="relevantReports.length" class="text-shadow">Reports:</p>
-                            <div v-for="report in relevantReports" :key="report.id">
-                                <p class="text-shadow small pl-2" :class="report.valid == 1 ? 'vote-pass' : 'vote-extend'">
-                                    {{report.createdAt.slice(0,10)}}: {{report.reason}}
-                                </p>
+                            
+                            <div v-if="relevantReports.length">
+                                <hr>
+                                <p class="text-shadow">Reports:</p>
+                                <div v-for="report in relevantReports" :key="report.id">
+                                    <p class="text-shadow small pl-2" :class="report.valid == 1 ? 'vote-pass' : 'vote-extend'">
+                                        {{report.createdAt.slice(0,10)}}: {{report.reason}}
+                                    </p>
+                                </div>
                             </div>
-                            <hr>
+                            <hr> 
                         </div>
                         
                         <div v-if="discussApp" class="col-sm-12 row text-shadow">
@@ -243,7 +245,7 @@
                 </div>
             </div>
             <div v-if="!readOnly" class="modal-footer" style="overflow: hidden;">
-                <button class="btn btn-sm btn-qat" @click="submitEval($event)">{{evaluationId ? 'Update Evaluation' : 'Submit Evaluation'}}</button>
+                <button class="btn btn-sm btn-nat" @click="submitEval($event)">{{evaluationId ? 'Update Evaluation' : 'Submit Evaluation'}}</button>
             </div>
         </div>
     </div>
@@ -309,7 +311,7 @@ export default {
         },
         findRelevantActivity: function() {
             axios
-                .get('/qat/bnEval/userActivity/' + this.discussRound.bn.osuId)
+                .get('/nat/bnEval/userActivity/' + this.discussRound.bn.osuId)
                 .then(response => {
                     this.noms = response.data.noms;
                     this.nomsDqd = response.data.nomsDqd;
@@ -341,7 +343,7 @@ export default {
             }else{
                 if(this.discussApp){
                     const a = await this.executePost(
-                        '/qat/appEval/submitEval/' + this.discussApp.id, 
+                        '/nat/appEval/submitEval/' + this.discussApp.id, 
                         { evaluationId: this.evaluationId, 
                         vote: vote, 
                         behaviorComment: this.behaviorComment, 
@@ -362,7 +364,7 @@ export default {
                     }
                 }else{
                     const er = await this.executePost(
-                        '/qat/bnEval/submitEval/' + this.discussRound.id, 
+                        '/nat/bnEval/submitEval/' + this.discussRound.id, 
                         { evaluationId: this.evaluationId, 
                         vote: vote, 
                         behaviorComment: this.behaviorComment, 
@@ -387,7 +389,7 @@ export default {
         setConsensus: async function(consensus, e){
             if(this.discussApp){
                 const a = await this.executePost(
-                    '/qat/appEval/setConsensus/' + this.discussApp.id, {consensus: consensus}, e);
+                    '/nat/appEval/setConsensus/' + this.discussApp.id, {consensus: consensus}, e);
                 if (a) {
                     if (a.error) {
                         this.info = a.error;
@@ -397,7 +399,7 @@ export default {
                 }
             }else{
                 const er = await this.executePost(
-                    '/qat/bnEval/setConsensus/' + this.discussRound.id, {consensus: consensus}, e);
+                    '/nat/bnEval/setConsensus/' + this.discussRound.id, {consensus: consensus}, e);
                 if (er) {
                     if (a.error) {
                         this.info = a.error;

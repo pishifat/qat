@@ -3,7 +3,7 @@
 <div id="extendedInfo" class="modal fade" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content" v-if="user">
-            <div class="modal-header text-dark" :class="user.probation.length && user.group != 'qat' ? 'bg-probation' : 'bg-' + user.group">
+            <div class="modal-header text-dark" :class="user.probation.length && user.group != 'nat' ? 'bg-probation' : 'bg-' + user.group">
                 <h5 class="modal-title">{{user.username}}
                     <i v-if="user.modes.indexOf('osu') >= 0" class="far fa-circle"></i>
                     <i v-if="user.modes.indexOf('taiko') >= 0" class="fas fa-drum"></i>
@@ -17,11 +17,11 @@
             <div class="modal-body" style="overflow: hidden">
                 <p class="text-shadow">BN Score: coming soon</p>
                 <p class="text-shadow">Time as BN: {{calculateDuration('bn')}}</p>
-                <p class="text-shadow">Time as QAT: {{calculateDuration('qat')}}</p>
+                <p class="text-shadow">Time as NAT: {{calculateDuration('nat')}}</p>
                 <p v-if="user.id == userId" class="text-shadow">Veto Mediation: 
                     <button 
                         class="btn btn-sm justify-content-center" 
-                        :class="{ 'btn-qat': user.vetoMediator, 'btn-qat-red': !user.vetoMediator }" 
+                        :class="{ 'btn-nat': user.vetoMediator, 'btn-nat-red': !user.vetoMediator }" 
                         @click="switchMediator($event)"
                     >
                         {{user.vetoMediator ? 'Opt-in' : 'Opt-out'}}
@@ -29,9 +29,9 @@
                 </p>
                 <hr>
                 <button 
-                    class="btn btn-qat btn-sm justify-content-center"
-                    @click="user.group == 'bn' ? switchGroup('qat', $event) : switchGroup('bn', $event)">
-                    {{user.group == 'bn' ? 'Promote to QAT' : 'Promote to BN'}}
+                    class="btn btn-nat btn-sm justify-content-center"
+                    @click="user.group == 'bn' ? switchGroup('nat', $event) : switchGroup('bn', $event)">
+                    {{user.group == 'bn' ? 'Promote to NAT' : 'Promote to BN'}}
                 </button>
                 <p class="text-shadow float-right">Joined: {{user.createdAt.slice(0,10)}}</p>
             </div>
@@ -51,7 +51,7 @@ export default {
     methods: {
         //display
         calculateDuration: function(group) {
-            let dateArray = group == 'bn' ? this.user.bnDuration : this.user.qatDuration;
+            let dateArray = group == 'bn' ? this.user.bnDuration : this.user.natDuration;
             let days = 0;
             for (let i = 0; i < dateArray.length; i+=2) {
                 let a = new Date(dateArray[i]);
@@ -72,7 +72,7 @@ export default {
         },
         //real
         switchMediator: async function(e){
-            const u = await this.executePost('/qat/users/switchMediator/', {}, e);
+            const u = await this.executePost('/nat/users/switchMediator/', {}, e);
             if(u){
                 if (u.error) {
                     this.info = u.error
@@ -82,7 +82,7 @@ export default {
             }
         },
         switchGroup: async function(group, e){
-            const u = await this.executePost('/qat/users/switchGroup/' + this.user.id, {group: group}, e);
+            const u = await this.executePost('/nat/users/switchGroup/' + this.user.id, {group: group}, e);
             if(u){
                 if (u.error) {
                     this.info = u.error

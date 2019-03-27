@@ -24,7 +24,7 @@ $(function() {
             $('#errors').text('You must enter at least two mods!');
         } else {
             try {
-                const res = await axios.post(`/qat/bnapps/apply`, { mode: mode, mods: mods });
+                const res = await axios.post(`/nat/bnapps/apply`, { mode: mode, mods: mods });
                 // temporary while test doesnt exist
                 if (res.data.error) {
                     $('#errors').text(res.data.error);

@@ -2,7 +2,7 @@
     <div id="addVeto" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header bg-qat">
+                <div class="modal-header bg-nat">
                     <h5 class="modal-title text-dark">Submit a new veto</h5>
                     <button type="button" class="close" data-dismiss="modal">
                         <span>&times;</span>
@@ -49,7 +49,7 @@
                         </div>
                         <p class="errors text-shadow">{{ info }}</p>
                         <hr />
-                        <button type="submit" class="btn btn-qat float-right" @click="submitVeto($event)">
+                        <button type="submit" class="btn btn-nat float-right" @click="submitVeto($event)">
                             Submit
                         </button>
                     </div>
@@ -79,7 +79,7 @@ export default {
                 this.info = 'Fill the info';
             } else {
                 const veto = await this.executePost(
-                    '/qat/vetoes/submit',
+                    '/nat/vetoes/submit',
                     {
                         beatmapLink: this.beatmapLink,
                         reasonLink: this.reasonLink,

@@ -15,9 +15,8 @@ router.get('/', async (req, res, next) => {
         title: 'Evaluation Archives', 
         script: '../javascripts/evalArchive.js', 
         isEval: true, 
-        layout: 'qatlayout',
-        isBnOrQat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'qat',
-        isQat: res.locals.userRequest.group == 'qat'
+        isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat',
+        isNat: res.locals.userRequest.group == 'nat'
     });
 });
 
@@ -36,7 +35,7 @@ const defaultBnPopulate = [
 
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res, next) => {
-    res.json({ evaluator: req.session.qatMongoId });
+    res.json({ evaluator: req.session.mongoId });
 });
 
 

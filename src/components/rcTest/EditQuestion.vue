@@ -2,7 +2,7 @@
 <div id="editQuestion" class="modal fade" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content" v-if="question">
-            <div class="modal-header bg-qat-logo">
+            <div class="modal-header bg-nat-logo">
                 <h5 class="modal-title text-dark">Edit "{{category}}" question</h5>
                 <button type="button" class="close" data-dismiss="modal">
                 <span>&times;</span>
@@ -27,8 +27,8 @@
                     <div class="form-group">
                         <textarea class="form-control dark-textarea" id="newQuestionEdit" placeholder="avoid confusing wording..." maxlength="200" rows="2" v-model="question.content" @keyup.enter="addQuestion($event)"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-qat-red float-right ml-2" @click="deleteQuestion($event)">Delete Question</button>
-                    <button type="submit" class="btn btn-qat float-right ml-2" @click="updateQuestion($event)">Update Question</button>
+                    <button type="submit" class="btn btn-nat-red float-right ml-2" @click="deleteQuestion($event)">Delete Question</button>
+                    <button type="submit" class="btn btn-nat float-right ml-2" @click="updateQuestion($event)">Update Question</button>
                 </div>
                 <br class="mb-2">
                 <hr>
@@ -65,9 +65,9 @@
                 <hr>
                 <span class="errors text-shadow" id="addEvalRoundsErrors">{{ info }}</span>
                 <span class="confirm text-shadow" id="addEvalRoundsConfirm">{{ confirm }}</span>
-                <button type="submit" class="btn btn-qat-red float-right ml-2" @click="deleteOption($event)">Delete Selected Option</button>
-                <button type="submit" class="btn btn-qat float-right ml-2" @click="updateOption($event)">Edit Selected Option</button>
-                <button type="submit" class="btn btn-qat float-right ml-2" @click="addOption($event)">Add Option</button>
+                <button type="submit" class="btn btn-nat-red float-right ml-2" @click="deleteOption($event)">Delete Selected Option</button>
+                <button type="submit" class="btn btn-nat float-right ml-2" @click="updateOption($event)">Edit Selected Option</button>
+                <button type="submit" class="btn btn-nat float-right ml-2" @click="addOption($event)">Add Option</button>
                 
             </div>
         </div>
@@ -91,7 +91,7 @@ export default {
             if(!newQuestion || !newQuestion.length || !questionType || !questionType.length){
                 this.info = "Cannot leave question fields blank!"
             }else{
-                const question = await this.executePost('/qat/manageTest/updateQuestion/' + this.question.id, {questionType: questionType, newQuestion: newQuestion}, e);
+                const question = await this.executePost('/nat/manageTest/updateQuestion/' + this.question.id, {questionType: questionType, newQuestion: newQuestion}, e);
                 if (question) {
                     if (question.error) {
                         this.info = question.error;
@@ -105,7 +105,7 @@ export default {
         deleteQuestion: async function(e) {
             const result = confirm(`Are you sure?`);
             if(result){
-                const success = await this.executePost('/qat/manageTest/deleteQuestion/' + this.question.id, {}, e);
+                const success = await this.executePost('/nat/manageTest/deleteQuestion/' + this.question.id, {}, e);
                 if (success) {
                     this.$emit('delete-question', this.question.id);
                     $('#editQuestion').modal('hide');
@@ -125,7 +125,7 @@ export default {
                 if($('#negative').prop('checked')){
                     score = score * -1;
                 }
-                const question = await this.executePost('/qat/manageTest/addOption/' + this.question.id, {option: option, score: score}, e);
+                const question = await this.executePost('/nat/manageTest/addOption/' + this.question.id, {option: option, score: score}, e);
                 if (question) {
                     if (question.error) {
                         this.info = question.error;
@@ -153,7 +153,7 @@ export default {
                 if($('#negative').prop('checked')){
                     score = score * -1;
                 }
-                const question = await this.executePost('/qat/manageTest/updateOption/' + id, {option: option, score: score, questionId: this.question.id}, e);
+                const question = await this.executePost('/nat/manageTest/updateOption/' + id, {option: option, score: score, questionId: this.question.id}, e);
                 if (question) {
                     if (question.error) {
                         this.info = question.error;
@@ -174,7 +174,7 @@ export default {
             if(!checkedOptions.length){
                 this.info = 'Must select options!'
             }else{
-                const question = await this.executePost('/qat/manageTest/deleteOption/', {checkedOptions: checkedOptions, questionId: this.question.id}, e);
+                const question = await this.executePost('/nat/manageTest/deleteOption/', {checkedOptions: checkedOptions, questionId: this.question.id}, e);
                 if (question) {
                     if (question.error) {
                         this.info = question.error;

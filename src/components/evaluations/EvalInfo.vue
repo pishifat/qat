@@ -2,7 +2,7 @@
 <div id="evaluationInfo" class="modal fade" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content custom-bg-dark" v-if="application || evalRound">
-            <div class="modal-header text-dark bg-qat-logo">
+            <div class="modal-header text-dark bg-nat-logo">
                 <h5 v-if="application" class="modal-title">
                     Application Evaluation: <a @click.stop :href="'https://osu.ppy.sh/users/' + application.applicant.osuId" class="text-dark" target="_blank">{{application.applicant.username}}</a>
                     <i v-if="application.mode == 'osu'" class="far fa-circle"></i>
@@ -185,7 +185,7 @@
                 </div>
             </div>
             <div class="modal-footer" style="overflow: hidden;">
-                <button class="btn btn-sm btn-qat" @click="submitEval($event)">{{evaluationId ? 'Update Evaluation' : 'Submit Evaluation'}}</button>
+                <button class="btn btn-sm btn-nat" @click="submitEval($event)">{{evaluationId ? 'Update Evaluation' : 'Submit Evaluation'}}</button>
             </div>
         </div>
     </div>
@@ -249,7 +249,7 @@ export default {
         },
         findRelevantActivity: function() {
             axios
-                .get('/qat/bnEval/userActivity/' + this.evalRound.bn.osuId)
+                .get('/nat/bnEval/userActivity/' + this.evalRound.bn.osuId)
                 .then(response => {
                     this.noms = response.data.noms;
                     this.nomsDqd = response.data.nomsDqd;
@@ -281,7 +281,7 @@ export default {
             }else{
                 if(this.application){
                     const a = await this.executePost(
-                        '/qat/appEval/submitEval/' + this.application.id, 
+                        '/nat/appEval/submitEval/' + this.application.id, 
                         { evaluationId: this.evaluationId, 
                         vote: vote, 
                         behaviorComment: this.behaviorComment, 
@@ -302,7 +302,7 @@ export default {
                     }
                 }else{
                     const er = await this.executePost(
-                        '/qat/bnEval/submitEval/' + this.evalRound.id, 
+                        '/nat/bnEval/submitEval/' + this.evalRound.id, 
                         { evaluationId: this.evaluationId, 
                         vote: vote, 
                         behaviorComment: this.behaviorComment, 

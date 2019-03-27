@@ -9,25 +9,24 @@ router.use(api.isLoggedIn);
 /* GET bn app page */
 router.get('/', async (req, res, next) => {
     res.render('users', { 
-        title: 'BN/QAT Listing', 
+        title: 'BN/NAT Listing', 
         script: '../javascripts/users.js', 
         isUsers: true, 
-        layout: 'qatlayout',
-        isBnOrQat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'qat',
-        isQat: res.locals.userRequest.group == 'qat' });
+        isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat',
+        isNat: res.locals.userRequest.group == 'nat' });
 });
 
 
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res, next) => {
-    let u = await users.service.query({$or: [{group: 'qat'}, {group: 'bn'}]}, {}, {createdAt: 1}, true );
-    res.json({ users: u, userId: req.session.qatMongoId, userGroup: req.session.qatGroup });
+    let u = await users.service.query({$or: [{group: 'nat'}, {group: 'bn'}]}, {}, {createdAt: 1}, true );
+    res.json({ users: u, userId: req.session.mongoId, userGroup: req.session.group });
 });
 
 
 /* POST submit or edit eval */
 router.post('/switchMediator/', api.isLoggedIn, async (req, res) => {
-    let u = await users.service.update(req.session.qatMongoId, { vetoMediator: !res.locals.userRequest.vetoMediator });
+    let u = await users.service.update(req.session.mongoId, { vetoMediator: !res.locals.userRequest.vetoMediator });
     res.json(u);
 });
 
@@ -67,7 +66,7 @@ router.post('/tempUpdate/', api.isLoggedIn, async (req, res) => {
     }
     if(req.body.date){
         if(req.body.group == 'bn') await users.service.update(u.id, {$push: {bnDuration: req.body.date}});
-        if(req.body.group == 'qat') await users.service.update(u.id, {$push: {qatDuration: req.body.date}});  
+        if(req.body.group == 'nat') await users.service.update(u.id, {$push: {natDuration: req.body.date}});  
     }
     res.json(u);
 });
