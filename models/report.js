@@ -1,17 +1,17 @@
 const config = require('../config.json');
 const mongoose = require('mongoose');
-const qatDb = mongoose.createConnection(config.qat.connection, { useNewUrlParser: true })
+const db = mongoose.createConnection(config.connection, { useNewUrlParser: true })
 
 const reportSchema = new mongoose.Schema({
     reporterName: { type: String,  required: true },
     reporterOsuId: { type: Number, required: true },
-    culprit: { type: 'ObjectId', ref: 'QatUser', required: true },
+    culprit: { type: 'ObjectId', ref: 'User', required: true },
     reason: { type: String, required: true },
     valid: { type: Number, enum: [1, 2, 3] },
     feedback: { type: String }
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-const Report = qatDb.model('Report', reportSchema);
+const Report = db.model('Report', reportSchema);
 
 class ReportService
 {

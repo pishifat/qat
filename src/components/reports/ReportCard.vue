@@ -4,7 +4,7 @@
     <div class="card" 
         :class="report.valid == 1 ? 'border-pass' : report.valid == 2 ? 'border-extend' : report.valid == 3 ? 'border-fail' : ''"
         style="height: 100%" data-toggle="modal" data-target='#reportInfo' :data-user="report.id">   
-        <div class='card-body qat-user-card-spacing'>
+        <div class='card-body user-card-spacing'>
             <a :href="'https://osu.ppy.sh/users/' + report.culprit.osuId"
                 class="text-shadow" target="_blank" @click.stop>{{report.culprit.username}}</a> 
             <p class="small ml-1 text-shadow">Reported: {{report.createdAt.slice(0,10)}}</p>
@@ -40,7 +40,7 @@ export default {
         right:0.75rem;
     }
 
-    .qat-user-card-spacing{
+    .user-card-spacing{
         margin: 0;
         padding: 0.5rem 0.5rem 0.5rem 0.5rem;
     }

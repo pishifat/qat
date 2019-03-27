@@ -4,7 +4,7 @@
     <div class="card" :class="user.probation.length && user.group != 'qat' ? 'border-probation' : 'border-' + user.group"
         data-toggle="modal" data-target='#extendedInfo' :data-user="user.osuId">
                 
-        <div class='card-body qat-user-card-spacing'>
+        <div class='card-body user-card-spacing'>
             <a :href="'https://osu.ppy.sh/users/' + user.osuId"
                 class="text-shadow" target="_blank" @click.stop>{{user.username}}</a> 
             <i v-if="user.modes.indexOf('osu') >= 0" class="far fa-circle text-shadow"></i>
@@ -24,7 +24,7 @@
 
 <script>
 export default {
-    name: 'qat-user-card',
+    name: 'user-card',
     props: ['user', 'user-id'],
     methods: {
         selectUser: function () {
@@ -48,7 +48,7 @@ export default {
         right:0.75rem;
     }
 
-    .qat-user-card-spacing{
+    .user-card-spacing{
         margin: 0;
         padding: 0.5rem 0.5rem 0.5rem 0.5rem;
     }

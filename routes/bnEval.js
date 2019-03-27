@@ -3,7 +3,7 @@ const api = require('../models/api.js');
 const evals = require('../models/evaluation.js');
 const reports = require('../models/report.js');
 const evalRounds = require('../models/evalRound.js');
-const users = require('../models/qatUser.js');
+const users = require('../models/user.js');
 const aiess = require('../models/aiess.js');
 
 const router = express.Router();
@@ -24,14 +24,14 @@ router.get('/', async (req, res, next) => {
 
 //population
 const defaultPopulate = [
-    { populate: 'bn', display: 'username osuId', model: users.QatUser },
+    { populate: 'bn', display: 'username osuId', model: users.User },
     { populate: 'evaluations', display: 'evaluator behaviorComment moddingComment vote', model: evals.Evaluation }
 ];
 
 const defaultDiscussPopulate = [
-    { populate: 'bn', display: 'username osuId', model: users.QatUser },
+    { populate: 'bn', display: 'username osuId', model: users.User },
     { populate: 'evaluations', display: 'evaluator behaviorComment moddingComment vote', model: evals.Evaluation },
-    { innerPopulate: 'evaluations', model: evals.Evaluation, populate: { path: 'evaluator', select: 'username osuId', model: users.QatUser } },
+    { innerPopulate: 'evaluations', model: evals.Evaluation, populate: { path: 'evaluator', select: 'username osuId', model: users.User } },
 ];
 
 

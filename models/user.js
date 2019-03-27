@@ -1,8 +1,8 @@
 const config = require('../config.json');
 const mongoose = require('mongoose');
-const qatDb = mongoose.createConnection(config.qat.connection, { useNewUrlParser: true })
+const db = mongoose.createConnection(config.connection, { useNewUrlParser: true })
 
-const qatUserSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
     osuId: { type: Number, required: true },
     username: { type: String, required: true },
     group: { type: String, enum: ["bn", "qat", 'user'], default: 'user' },
@@ -13,17 +13,17 @@ const qatUserSchema = new mongoose.Schema({
     qatDuration: [{ type: Date }],
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-const QatUser = qatDb.model('QatUser', qatUserSchema);
+const User = db.model('User', userSchema);
 
-class QatUserService
+class UserService
 {
     async query(params, populate, sorting, getAll) {
         let query;
 
         if (getAll) {
-            query = QatUser.find(params);
+            query = User.find(params);
         } else {
-            query = QatUser.findOne(params);
+            query = User.findOne(params);
         }
 
         if (populate) {
@@ -46,7 +46,7 @@ class QatUserService
 
     async update(id, update) {
         try {
-            return await QatUser.findByIdAndUpdate(id, update, { 'new': true });
+            return await User.findByIdAndUpdate(id, update, { 'new': true });
         } catch(error) {
             return { error: error._message };
         }
@@ -54,13 +54,13 @@ class QatUserService
 
     async create(osuId, username, group) {
         try {
-            return await QatUser.create({osuId: osuId, username: username, group: group});
+            return await User.create({osuId: osuId, username: username, group: group});
         } catch(error) {
             return { error: error }
         }
     }
 }
 
-const service = new QatUserService();
+const service = new UserService();
 
-module.exports = { service, QatUser };
+module.exports = { service, User };

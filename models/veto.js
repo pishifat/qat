@@ -1,10 +1,10 @@
 const config = require('../config.json');
 const mongoose = require('mongoose');
-const qatDb = mongoose.createConnection(config.qat.connection, { useNewUrlParser: true });
-const users = require('../models/qatUser');
+const db = mongoose.createConnection(config.connection, { useNewUrlParser: true });
+const users = require('../models/user.js');
 
 const vetoesSchema = new mongoose.Schema({
-    sender: { type: 'ObjectId', ref: 'QatUser', required: true },
+    sender: { type: 'ObjectId', ref: 'User', required: true },
     mode: { type: String, enum: ['osu', 'taiko', 'catch', 'mania'] },
     beatmapLink: { type: String, required: true },
     beatmapId: { type: String },
@@ -12,17 +12,17 @@ const vetoesSchema = new mongoose.Schema({
     beatmapMapper: { type: String },
     reasonLink: { type: String, required: true },
     status: { type: String, enum: ['available', 'wip', 'upheld', 'withdrawn'], default: 'available' },
-    debaters: [{ type: 'ObjectId', ref: 'QatUser' }],
-    mediator: { type: 'ObjectId', ref: 'QatUser' },
+    debaters: [{ type: 'ObjectId', ref: 'User' }],
+    mediator: { type: 'ObjectId', ref: 'User' },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 vetoesSchema.pre('findByIdAndUpdate', function (next) {
-    this.populate('mediator', 'username osuId', users.QatUser);
-    this.populate('debaters', 'username osuId', users.QatUser);
+    this.populate('mediator', 'username osuId', users.User);
+    this.populate('debaters', 'username osuId', users.User);
     next();
 });
 
-const Veto = qatDb.model('Veto', vetoesSchema);
+const Veto = db.model('Veto', vetoesSchema);
 
 class VetoService
 {

@@ -1,7 +1,7 @@
 const express = require('express');
 const api = require('../models/api');
 const testSubmission = require('../models/testSubmission');
-const users = require('../models/qatUser');
+const users = require('../models/user');
 const questions = require('../models/question');
 const options = require('../models/option');
 
@@ -9,7 +9,7 @@ const router = express.Router();
 router.use(api.isLoggedIn);
 
 const defaultPopulate = [
-    { populate: 'applicant', display: 'username', model: users.QatUser },
+    { populate: 'applicant', display: 'username', model: users.User },
     { populate: 'answers', display: 'question optionChose', model: testSubmission.TestAnswer },
     { innerPopulate: 'answers', model: testSubmission.TestAnswer, populate: { 
             path: 'question', model: questions.Question, populate: {

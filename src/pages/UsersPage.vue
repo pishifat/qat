@@ -40,42 +40,42 @@
             <i class="fas fa-angle-up mr-1"></i> show next <i class="fas fa-angle-up ml-1"></i>
         </button>
         <transition-group name="list" tag="div" class="row">
-            <qat-user-card
+            <user-card
                 v-for="user in pageObjs"
                 :key="user.id"
                 :user="user"
                 :userId="userId"
                 :userGroup="userGroup"
                 @update:selectedUser="selectedUser = $event"
-            ></qat-user-card>
+            ></user-card>
         </transition-group>
         <div class="small text-center mx-auto">{{currentPage}} of {{pages}}</div>
         <button :disabled="!canShowOlder" class="btn btn-sm btn-qat mx-auto my-2" style="display:block" type="button" @click="showOlder()">
             <i class="fas fa-angle-down mr-1"></i> show previous <i class="fas fa-angle-down ml-1"></i>
         </button>
     </div>
-    <qat-user-info
+    <user-info
         :user="selectedUser"
         :user-id="userId"
         :user-group="userGroup"
         @update-user="updateUser($event)"
-    ></qat-user-info>
+    ></user-info>
 
 </div>
 </template>
 
 <script>
-import QatUserCard from '../components/qatusers/QatUserCard.vue';
-import QatUserInfo from '../components/qatusers/QatUserInfo.vue';
+import UserCard from '../components/users/UserCard.vue';
+import UserInfo from '../components/users/UserInfo.vue';
 import pagination from '../mixins/pagination.js';
 import filters from '../mixins/filters.js';
 import postData from '../mixins/postData.js';
 
 export default {
-    name: 'qat-users-page',
+    name: 'users-page',
     components: {
-        QatUserCard,
-        QatUserInfo, 
+        UserCard,
+        UserInfo, 
     },
     mixins: [postData, pagination, filters],
     methods: {
@@ -109,7 +109,7 @@ export default {
             const mode = $('#mode').val();
             const group = $('#group').val();
             const probation = $('#probation').val();
-            const u = await this.executePost('/qat/qatusers/tempCreate/', {username: username, osuId: osuId, mode: mode, group: group, probation: probation}, e);
+            const u = await this.executePost('/qat/users/tempCreate/', {username: username, osuId: osuId, mode: mode, group: group, probation: probation}, e);
             if(u){
                 console.log("ye");
             }
@@ -120,7 +120,7 @@ export default {
             const group = $('#group').val();
             const probation = $('#probation').val();
             const date = new Date($('#date').val());
-            const u = await this.executePost('/qat/qatusers/tempUpdate/', {username: username, group: group, mode: mode, probation: probation, date: date}, e);
+            const u = await this.executePost('/qat/users/tempUpdate/', {username: username, group: group, mode: mode, probation: probation, date: date}, e);
             if(u){
                 console.log("yeeeee");
             }
@@ -138,7 +138,7 @@ export default {
     },
     created() {
         axios
-            .get('/qat/qatusers/relevantInfo')
+            .get('/qat/users/relevantInfo')
             .then(response => {
                 this.allObjs = response.data.users;
                 this.userId = response.data.userId;

@@ -2,7 +2,7 @@ const express = require('express');
 const bnApps = require('../models/bnApp.js');
 const evals = require('../models/evaluation.js');
 const evalRounds = require('../models/evalRound.js');
-const users = require('../models/qatUser.js');
+const users = require('../models/user.js');
 const api = require('../models/api.js');
 
 const router = express.Router();
@@ -23,15 +23,15 @@ router.get('/', async (req, res, next) => {
 
 //population
 const defaultAppPopulate = [
-    { populate: 'applicant', display: 'username osuId', model: users.QatUser },
+    { populate: 'applicant', display: 'username osuId', model: users.User },
     { populate: 'evaluations', display: 'evaluator behaviorComment moddingComment vote', model: evals.Evaluation },
-    { innerPopulate: 'evaluations', model: evals.Evaluation, populate: { path: 'evaluator', select: 'username osuId', model: users.QatUser } },
+    { innerPopulate: 'evaluations', model: evals.Evaluation, populate: { path: 'evaluator', select: 'username osuId', model: users.User } },
 ];
 
 const defaultBnPopulate = [
-    { populate: 'bn', display: 'username osuId', model: users.QatUser },
+    { populate: 'bn', display: 'username osuId', model: users.User },
     { populate: 'evaluations', display: 'evaluator behaviorComment moddingComment vote', model: evals.Evaluation },
-    { innerPopulate: 'evaluations', model: evals.Evaluation, populate: { path: 'evaluator', select: 'username osuId', model: users.QatUser } },
+    { innerPopulate: 'evaluations', model: evals.Evaluation, populate: { path: 'evaluator', select: 'username osuId', model: users.User } },
 ];
 
 /* GET applicant listing. */

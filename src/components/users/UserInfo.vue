@@ -45,7 +45,7 @@
 import postData from "../../mixins/postData.js";
 
 export default {
-    name: 'qat-user-info',
+    name: 'user-info',
     props: [ 'user', 'user-id' ],
     mixins: [ postData ],
     methods: {
@@ -72,7 +72,7 @@ export default {
         },
         //real
         switchMediator: async function(e){
-            const u = await this.executePost('/qat/qatusers/switchMediator/', {}, e);
+            const u = await this.executePost('/qat/users/switchMediator/', {}, e);
             if(u){
                 if (u.error) {
                     this.info = u.error
@@ -82,7 +82,7 @@ export default {
             }
         },
         switchGroup: async function(group, e){
-            const u = await this.executePost('/qat/qatusers/switchGroup/' + this.user.id, {group: group}, e);
+            const u = await this.executePost('/qat/users/switchGroup/' + this.user.id, {group: group}, e);
             if(u){
                 if (u.error) {
                     this.info = u.error

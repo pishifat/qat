@@ -42,7 +42,7 @@ const config = {
         publicPath: '/javascripts/',
         port: 8080,
         proxy: {
-        '/': 'http://localhost:3000'
+        '/': 'http://localhost:3001'
         }
     }
 };
@@ -55,7 +55,7 @@ const qatConfig = Object.assign({}, config, {
         dataCollection: './src/dataCollection.js',
         evalArchive: './src/evalArchive.js',
         manageReports: './src/manageReports.js',
-        qatUsers: './src/qatUsers.js',
+        users: './src/users.js',
         vetoes: './src/vetoes.js',
         manageTest: './src/manageTest.js',
         testSubmission: './src/testSubmission.js',

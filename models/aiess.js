@@ -1,6 +1,6 @@
 const config = require('../config.json');
 const mongoose = require('mongoose');
-const qatDb = mongoose.createConnection(config.qat.connection, { useNewUrlParser: true })
+const db = mongoose.createConnection(config.connection, { useNewUrlParser: true })
 
 const aiessSchema = new mongoose.Schema({
     beatmapsetId: { type: Number },
@@ -12,7 +12,7 @@ const aiessSchema = new mongoose.Schema({
     valid: { type: Number, enum: [1, 2, 3] }
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-const Aiess = qatDb.model('aiess', aiessSchema, 'aiess');
+const Aiess = db.model('aiess', aiessSchema, 'aiess');
 
 class AiessService
 {

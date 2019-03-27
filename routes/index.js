@@ -3,7 +3,7 @@ const config = require('../config.json');
 const crypto = require('crypto');
 const api = require('../models/api.js');
 const bnApps = require('../models/bnApp.js');
-const users = require('../models/qatUser.js');
+const users = require('../models/user.js');
 
 const router = express.Router();
 
@@ -53,8 +53,8 @@ router.get('/login', async (req, res, next) => {
         let hashedState = Buffer.from(req.cookies._state).toString('base64');
         res.redirect(
             `https://osu.ppy.sh/oauth/authorize?response_type=code&client_id=${
-                config.qat.id
-            }&redirect_uri=${encodeURIComponent(config.qat.redirect)}&state=${hashedState}&scope=identify`
+                config.id
+            }&redirect_uri=${encodeURIComponent(config.redirect)}&state=${hashedState}&scope=identify`
         );
     }
 }, api.isLoggedIn, (req, res) => {

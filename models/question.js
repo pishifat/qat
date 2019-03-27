@@ -1,6 +1,6 @@
 const config = require('../config.json');
 const mongoose = require('mongoose');
-const qatDb = mongoose.createConnection(config.qat.connection, { useNewUrlParser: true })
+const db = mongoose.createConnection(config.connection, { useNewUrlParser: true })
 
 const questionSchema = new mongoose.Schema({
     category: { type: String, enum: [
@@ -14,7 +14,7 @@ const questionSchema = new mongoose.Schema({
     options: [{ type: 'ObjectId', ref: 'Option'}],
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-const Question = qatDb.model('Question', questionSchema);
+const Question = db.model('Question', questionSchema);
 
 class QuestionService
 {

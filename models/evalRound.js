@@ -1,9 +1,9 @@
 const config = require('../config.json');
 const mongoose = require('mongoose');
-const qatDb = mongoose.createConnection(config.qat.connection, { useNewUrlParser: true })
+const db = mongoose.createConnection(config.connection, { useNewUrlParser: true })
 
 const evalRoundSchema = new mongoose.Schema({
-    bn: { type: 'ObjectId', ref: 'QatUser', required: true },
+    bn: { type: 'ObjectId', ref: 'User', required: true },
     mode: { type: String, required: true },
     evaluations: [{ type: 'ObjectId', ref: 'Evaluation' }],
     deadline: { type: Date , required: true },
@@ -13,7 +13,7 @@ const evalRoundSchema = new mongoose.Schema({
     feedback: { type: String },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-const EvalRound = qatDb.model('EvalRound', evalRoundSchema);
+const EvalRound = db.model('EvalRound', evalRoundSchema);
 
 class EvalRoundService
 {

@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import QatUsersPage from './pages/QatUsersPage.vue';
+import UsersPage from './pages/UsersPage.vue';
 
 $(document).ready(function() {
     $("body").tooltip({ selector: '[data-toggle=tooltip]', trigger: 'hover', });
@@ -8,6 +8,6 @@ $(document).ready(function() {
 new Vue({
     el: '#app',
     components: {
-        QatUsersPage,
+        UsersPage,
     },
 });

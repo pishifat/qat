@@ -1,15 +1,15 @@
 const config = require('../config.json');
 const mongoose = require('mongoose');
-const qatDb = mongoose.createConnection(config.qat.connection, { useNewUrlParser: true })
+const db = mongoose.createConnection(config.connection, { useNewUrlParser: true })
 
 const evaluationSchema = new mongoose.Schema({
-    evaluator: { type: 'ObjectId', ref: 'QatUser', required: true },
+    evaluator: { type: 'ObjectId', ref: 'User', required: true },
     behaviorComment: { type: String, required: true },
     moddingComment: { type: String, required: true },
     vote: { type: Number, enum: [1, 2, 3] }
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-const Evaluation = qatDb.model('Evaluation', evaluationSchema);
+const Evaluation = db.model('Evaluation', evaluationSchema);
 
 class EvaluationService
 {

@@ -1,8 +1,6 @@
 const express = require('express');
-const bnApps = require('../models/bnApp.js');
 const evals = require('../models/evaluation.js');
-const evalRounds = require('../models/evalRound.js');
-const users = require('../models/qatUser.js');
+const users = require('../models/user.js');
 const aiess = require('../models/aiess.js');
 const api = require('../models/api.js');
 
@@ -22,18 +20,6 @@ router.get('/', async (req, res, next) => {
     });
 });
 
-//population
-const defaultAppPopulate = [
-    { populate: 'applicant', display: 'username osuId', model: users.QatUser },
-    { populate: 'evaluations', display: 'evaluator behaviorComment moddingComment vote', model: evals.Evaluation },
-    { innerPopulate: 'evaluations', model: evals.Evaluation, populate: { path: 'evaluator', select: 'username osuId', model: users.QatUser } },
-];
-
-const defaultBnPopulate = [
-    { populate: 'bn', display: 'username osuId', model: users.QatUser },
-    { populate: 'evaluations', display: 'evaluator behaviorComment moddingComment vote', model: evals.Evaluation },
-    { innerPopulate: 'evaluations', model: evals.Evaluation, populate: { path: 'evaluator', select: 'username osuId', model: users.QatUser } },
-];
 
 /* GET dq/pop listing */
 router.get('/relevantInfo', async (req, res, next) => {

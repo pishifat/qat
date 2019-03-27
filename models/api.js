@@ -1,15 +1,15 @@
 const querystring = require('querystring');
 const config = require('../config.json');
-const users = require('./qatUser.js');
+const users = require('./user.js');
 const axios = require('axios');
 
 async function getToken(code) {
     const postData = querystring.stringify({
         grant_type: 'authorization_code',
         code: code,
-        redirect_uri: config.qat.redirect,
-        client_id: config.qat.id,
-        client_secret: config.qat.secret
+        redirect_uri: config.redirect,
+        client_id: config.id,
+        client_secret: config.secret
     });
 
     const options = {
@@ -32,8 +32,8 @@ async function getToken(code) {
 async function refreshToken(refreshToken) {
     const postData = querystring.stringify({
         grant_type: 'refresh_token',
-        client_id: config.qat.id,
-        client_secret: config.qat.secret,
+        client_id: config.id,
+        client_secret: config.secret,
         refresh_token: refreshToken
     });
 

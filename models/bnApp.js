@@ -1,9 +1,9 @@
 const config = require('../config.json');
 const mongoose = require('mongoose');
-const qatDb = mongoose.createConnection(config.qat.connection, { useNewUrlParser: true });
+const db = mongoose.createConnection(config.connection, { useNewUrlParser: true });
 
 const bnAppSchema = new mongoose.Schema({
-    applicant: {type: 'ObjectId', ref: 'QatUser', required: true},
+    applicant: {type: 'ObjectId', ref: 'User', required: true},
     mode: { type: String, enum: ['osu', 'taiko', 'catch', 'mania'], required: true },
     mods: [{ type: String, required: true }],
     evaluations: [{type: 'ObjectId', ref: 'Evaluation'}],
@@ -15,7 +15,7 @@ const bnAppSchema = new mongoose.Schema({
 
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-const BnApp = qatDb.model('BnApp', bnAppSchema);
+const BnApp = db.model('BnApp', bnAppSchema);
 
 class BnAppService
 {

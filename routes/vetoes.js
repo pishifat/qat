@@ -1,13 +1,13 @@
 const express = require('express');
 const api = require('../models/api.js');
 const vetoes = require('../models/veto.js');
-const users = require('../models/qatUser');
+const users = require('../models/user');
 
 const router = express.Router();
 
 const defaultPopulate = [
-    { populate: 'mediator', display: 'username osuId', model: users.QatUser },
-    { populate: 'debaters', display: 'username osuId', model: users.QatUser },
+    { populate: 'mediator', display: 'username osuId', model: users.User },
+    { populate: 'debaters', display: 'username osuId', model: users.User },
 ];
 
 router.use(api.isLoggedIn);

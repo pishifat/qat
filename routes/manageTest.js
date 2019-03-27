@@ -2,7 +2,7 @@ const express = require('express');
 const api = require('../models/api.js');
 const questions = require('../models/question.js');
 const options = require('../models/option.js');
-const users = require('../models/qatUser.js');
+const users = require('../models/user.js');
 
 const router = express.Router();
 

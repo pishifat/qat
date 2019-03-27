@@ -3,7 +3,7 @@ const api = require('../models/api.js');
 const bnApps = require('../models/bnApp.js');
 const evals = require('../models/evaluation.js');
 const reports = require('../models/report.js');
-const users = require('../models/qatUser.js');
+const users = require('../models/user.js');
 
 const router = express.Router();
 

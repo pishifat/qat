@@ -1,10 +1,10 @@
 const config = require('../config.json');
 const mongoose = require('mongoose');
-const qatDb = mongoose.createConnection(config.qat.connection, { useNewUrlParser: true });
+const db = mongoose.createConnection(config.connection, { useNewUrlParser: true });
 const questions = require('./question');
 
 const testSubmission = new mongoose.Schema({
-    applicant: { type: 'ObjectId', ref: 'QatUser', required: true },
+    applicant: { type: 'ObjectId', ref: 'User', required: true },
     mode: { type: String, enum: ['osu', 'taiko', 'catch', 'mania'] },
     status: { type: String, enum: ['tbd', 'wip', 'finished'], default: 'tbd' },
     startedAt: { type: Date },
@@ -24,8 +24,8 @@ const testAnswer = new mongoose.Schema({
     feedback: { type: String },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-const TestAnswer = qatDb.model('TestAnswer', testAnswer);
-const TestSubmission = qatDb.model('TestSubmission', testSubmission);
+const TestAnswer = db.model('TestAnswer', testAnswer);
+const TestSubmission = db.model('TestSubmission', testSubmission);
 
 class TestSubmissionService
 {

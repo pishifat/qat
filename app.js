@@ -17,7 +17,7 @@ const bnEvalRouter = require('./routes/bnEval');
 const dataCollectionRouter = require('./routes/dataCollection');
 const evalArchiveRouter = require('./routes/evalArchive');
 const manageReportsRouter = require('./routes/manageReports');
-const usersRouter = require('./routes/qatUsers');
+const usersRouter = require('./routes/users');
 const vetoesRouter = require('./routes/vetoes');
 const testSubmissionRouter = require('./routes/testSubmission');
 const manageTestRouter = require('./routes/manageTest');
@@ -35,11 +35,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-//qatdb
-const db = mongoose.createConnection(config.qat.connection, { useNewUrlParser: true });
+//natdb
+const db = mongoose.createConnection(config.connection, { useNewUrlParser: true });
 db.on('error', console.error.bind(console, 'db connection error:'));
 db.once('open', function() {
-    console.log('qatdb connected');
+    console.log('natdb connected');
 });
 app.use(
   session({
@@ -58,7 +58,7 @@ app.use('/qat/bnEval', bnEvalRouter);
 app.use('/qat/dataCollection', dataCollectionRouter);
 app.use('/qat/evalArchive', evalArchiveRouter);
 app.use('/qat/manageReports', manageReportsRouter);
-app.use('/qat/qatusers', usersRouter);
+app.use('/qat/users', usersRouter);
 app.use('/qat/vetoes', vetoesRouter);
 app.use('/qat/testSubmission', testSubmissionRouter);
 app.use('/qat/managetest', manageTestRouter);
