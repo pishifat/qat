@@ -115,6 +115,9 @@ router.post('/submit', async (req, res, next) => {
                         if(option.content == inputObject[k].input.trim()){
                             await testSubmission.service.updateAnswer(answer.id, {$push: {optionsChosen: option.id}});
                             displayScore += option.score;
+                            if(option.metadataType == 'reference'){
+                                break; //otherwise possible to get points for multiple correct sources
+                            }
                         }
                     }
                     
@@ -124,13 +127,9 @@ router.post('/submit', async (req, res, next) => {
         }
     }
     
-    await testSubmission.service.update(req.body.testId, { submittedAt: Date.now(), status: 'wip' });
+    await testSubmission.service.update(req.body.testId, { submittedAt: Date.now(), status: 'finished' });
 
     res.json(displayScore);
-});
-
-router.get('/displayScore/:score', async (req, res, next) => {
-    res.redirect('/qat');
 });
 
 // Temp
