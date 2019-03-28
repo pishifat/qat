@@ -186,4 +186,4 @@ class TestSubmissionService
 
 const service = new TestSubmissionService();
 
-module.exports = { service, TestSubmission, TestAnswer };
+module.exports = { service, TestSubmission, TestAnswer, TestMetadataInput };

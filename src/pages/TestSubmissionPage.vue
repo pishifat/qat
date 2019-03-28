@@ -10,7 +10,7 @@
         <p class="text-danger">{{ info }}</p>
     </div>
 
-    <div v-if="test">
+    <div v-if="test" id="fullTest">
         <p class="text-center">
             User: {{ test.applicant.username }} - 
             Mode: {{ test.mode }}<!-- - 
@@ -23,7 +23,7 @@
                 </span>-->
         </p>
 
-        <div class="segment" v-for="(answer, i) in test.answers" :key="answer.id">
+        <div class="segment test-question" v-for="(answer, i) in test.answers" :key="answer.id">
             <small class="float-right">Q{{ ++i }} -- {{ answer.question.category }}</small>
             <div v-if="answer.question.questionType === 'text' || answer.question.questionType === 'image'">
                 <h5 style="width: 90%">{{ answer.question.content }}</h5>
@@ -57,12 +57,15 @@
             
         </div>
         <hr>
-        <button type="submit" class="btn btn-lg btn-nat" @click="submit($event)">Submit</button>
+        <div class="mx-auto text-center mb-4">
+            <button type="submit" class="btn btn-lg btn-nat" @click="submit($event)">Submit</button>
+            <p class="text-danger">{{ info }}</p>
+        </div>
     </div>
 </div>
 <div v-else>
     <div v-if="displayScore" class="segment">
-        <p>Your test has been submitted! Your score is {{displayScore}}/20, but that may change when someone manually reviews your score.</p>
+        <p>Your test has been submitted! Your score is {{Math.round(displayScore * 10)/10}}/20, but that may change when someone manually reviews your score.</p>
     </div>
     <p v-else class="text-center">Nothing to see here...</p>
 </div>
@@ -120,6 +123,8 @@ export default {
             }, 1000);*/
         },
         submit: async function (e) {
+            $('#fullTest').attr('style', 'visibility: hidden');
+            this.info = 'Submitting... (this can take a few seconds)'
             let title = $('#title').val();
             let titleUnicode = $('#titleUnicode').val();
             let artist = $('#artist').val();

@@ -52,22 +52,16 @@
     <div id="confirm" class="confirm"></div>
 
     <div class="col-md-6 mt-2 text-center mx-auto">
+        {{#unless pendingTest}}
         <button id="apply" class="btn btn-lg btn-block btn-nat" type="submit">Apply</button>
+        {{/unless}}
     </div>
-    {{#if pendingTest}}
-    <div class="col-md-6 mt-2 text-center mx-auto">
-        <a href="/nat/testsubmission" class="btn btn-lg btn-nat" type="submit">Start the test now</a>
+    <div class="col-md-6 mt-2 text-center mx-auto" id="startTest">
+        {{#if pendingTest}}
+        <a href="/nat/testsubmission" class="btn btn-lg btn-nat" type="submit">Begin Ranking Criteria Test</a>
+        <p class="small pt-2">Before your application can be reviewed, you must take a short Ranking Criteria knowledge test.</p>
+        {{/if}}
     </div>
-    {{/if}}
+    
 </div>
 {{/if}}
-
-
-{{!-- Temp stuff --}}
-<hr>
-<form action="/nat/testsubmission/generatetest" method="post">
-    <button class="btn btn-lg btn-nat" type="submit">temp generate test</button>
-    <a href="/nat/testsubmission" class="btn btn-lg btn-nat" type="submit">temp visit test</a>
-</form>
-
-<hr>

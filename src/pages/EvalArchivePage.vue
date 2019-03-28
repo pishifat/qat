@@ -7,7 +7,7 @@
                 style="filter: drop-shadow(1px 1px 1px #000000); border-radius: 100px 0 0 100px" 
                 @keyup.enter="query($event)" maxlength="18"/>
             <div class="input-group-append">
-                <button style="border-radius: 0 100px 100px 0;" class="btn btn-nat" @click="query($event)" type="submit"><span class="append-button-padding">Search archives</span></button>
+                <button style="border-radius: 0 100px 100px 0;" class="btn btn-nat" @click="query($event)" type="submit">Search archives</button>
             </div>
         </div>
         <p class="errors">{{info}}</p> 

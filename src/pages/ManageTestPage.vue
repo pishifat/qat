@@ -123,7 +123,7 @@ export default {
     },
     created() {
         $("#loading").hide(); //this is temporary
-        $("#main").attr("style", "visibility: visible").hide().fadeIn();
+        $("#main").attr("style", "visibility: visible");
     }
 }
 </script>

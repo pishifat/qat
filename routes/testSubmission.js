@@ -24,6 +24,8 @@ router.get('/', async (req, res, next) => {
     res.render('testsubmission', {
         title: 'Test Submission',
         script: '../javascripts/testSubmission.js',
+        isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat',
+        isNat: res.locals.userRequest.group == 'nat' 
     });
 });
 
@@ -130,13 +132,6 @@ router.post('/submit', async (req, res, next) => {
     await testSubmission.service.update(req.body.testId, { submittedAt: Date.now(), status: 'finished' });
 
     res.json(displayScore);
-});
-
-// Temp
-router.post('/generateTest', async (req, res, next) => {
-    await testSubmission.service.create(req.session.mongoId, 'catch');
-    
-    res.redirect('/nat/testSubmission');
 });
 
 module.exports = router;

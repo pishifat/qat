@@ -56,8 +56,14 @@
                 <li class="nav-item">
                     <a class="nav-link text-shadow {{#unless isManageReports}}inactive{{/unless}}" href="/nat/managereports">Manage Reports</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link text-shadow {{#unless isManageTest}}inactive{{/unless}}" href="/nat/managetest">Manage RC Test</a>
+                <li class="nav-item dropdown">
+                    <a class="nav-link text-shadow dropdown-toggle {{#unless isManageTest}}inactive{{/unless}}" href="#" data-toggle="dropdown">
+                        RC Test
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="/nat/managetest">Questions</a>
+                        <a class="dropdown-item" href="/nat/testresults">Results</a>
+                    </div>
                 </li>
                 {{/if}}
             </ul>

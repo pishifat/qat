@@ -32,6 +32,9 @@ $(function() {
                     $('#confirm').text(
                         'Your application has been submitted! Evaluation will take approximately one week.'
                     );
+                    $('#apply').hide();
+                    $('#startTest').html(`<a href="/nat/testsubmission" class="btn btn-lg btn-nat" type="submit">Begin Ranking Criteria Test</a>
+                        <p class="small pt-2">Before your application can be reviewed, you must take a short Ranking Criteria knowledge test.</p>`);
                 }
             } catch (error) {
                 console.log(error);

@@ -58,6 +58,7 @@ const qatConfig = Object.assign({}, config, {
         users: './src/users.js',
         vetoes: './src/vetoes.js',
         manageTest: './src/manageTest.js',
+        testResults: './src/testResults.js',
         testSubmission: './src/testSubmission.js',
     },
     output: {
