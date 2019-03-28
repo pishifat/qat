@@ -13,7 +13,7 @@ router.get('/', async (req, res, next) => {
     res.render('appeval', { 
         title: 'BN Application Evaluations', 
         script: '../javascripts/appEval.js', 
-        isAppEval: true, 
+        isEval: true, 
         isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat',
         isNat: res.locals.userRequest.group == 'nat'
     });

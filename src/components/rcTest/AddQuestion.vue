@@ -11,21 +11,28 @@
             <div class="modal-body" style="overflow: hidden">
                 <div class="container">
                     <div class="text-shadow mb-2"><p>Question:</p>
-                        <div class="form-check form-check-inline ml-2">
-                            <input class="form-check-input" type="radio" name="questionType" id="text" value="text">
-                            <label class="form-check-label text-shadow" for="text">Select text</label>
+                        <div v-if="rawCategory == 'metadata'">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="questionType" id="fill" value="fill">
+                                <label class="form-check-label text-shadow" for="fill">Fill in the blank</label>
+                            </div>
                         </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="questionType" id="image" value="image">
-                            <label class="form-check-label text-shadow" for="image">Select Image</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="questionType" id="fill" value="fill">
-                            <label class="form-check-label text-shadow" for="fill">Fill in blank</label>
+                        <div v-else>
+                            <div class="form-check form-check-inline ml-2">
+                                <input class="form-check-input" type="radio" name="questionType" id="text" value="text">
+                                <label class="form-check-label text-shadow" for="text">Select text</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="questionType" id="image" value="image">
+                                <label class="form-check-label text-shadow" for="image">Select Image</label>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">
-                        <textarea class="form-control dark-textarea" id="newQuestion" placeholder="avoid confusing wording..." maxlength="200" rows="2" @keyup.enter="addQuestion($event)"></textarea>
+                        <textarea class="form-control dark-textarea" id="newQuestion" 
+                            :placeholder="rawCategory == 'metadata' ? 'link to mapset with incorrect metadata...' : 'avoid confusing wording...'" 
+                            maxlength="300" rows="2" @keyup.enter="addQuestion($event)">
+                        </textarea>
                     </div>
                 </div>
                 <hr>
@@ -69,7 +76,8 @@ export default {
     data() {
         return {
             info: '',
-            confirm: ''
+            confirm: '',
+            type: null
         };
     },
 }

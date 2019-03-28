@@ -201,6 +201,7 @@ input[type='text']:focus {
     border-color: transparent;
     border-radius: 100px;
     width: 100px;
+    filter: drop-shadow(1px 1px 1px #000000);
     /* arrow */
     background-image: linear-gradient(45deg, transparent 50%, gray 50%),
         linear-gradient(135deg, gray 50%, transparent 50%);
@@ -454,6 +455,10 @@ input[type="radio"] + .fas { cursor: pointer; }
 
 .modal-content {
     background-color: var(--dark);
+}
+
+.inactive {
+    color: rgb(187, 187, 187);
 }
 
 .list-enter-active,

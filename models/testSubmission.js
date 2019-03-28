@@ -20,12 +20,25 @@ testSubmission.virtual('answers', {
 const testAnswer = new mongoose.Schema({
     test: { type: 'ObjectId', ref: 'TestSubmission', required: true },
     question: { type: 'ObjectId', ref: 'Question', required: true },
-    optionChose: { type: 'ObjectId', ref: 'Option' },
+    optionsChosen: [{ type: 'ObjectId', ref: 'Option' }],
+    metadataInput: [{ type: 'ObjectId', ref: 'TestMetadataInput' }],
     feedback: { type: String },
+}, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
+
+const testMetadataInput = new mongoose.Schema({
+    title: { type: String },
+    titleUnicode: { type: String },
+    artist: { type: String },
+    artistUnicode: { type: String },
+    source: { type: String },
+    reference1: { type: String },
+    reference2: { type: String },
+    reference3: { type: String }
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 const TestAnswer = db.model('TestAnswer', testAnswer);
 const TestSubmission = db.model('TestSubmission', testSubmission);
+const TestMetadataInput = db.model('TestMetadataInput', testMetadataInput);
 
 class TestSubmissionService
 {
@@ -69,6 +82,14 @@ class TestSubmissionService
         }
     }
 
+    async updateAnswer(id, update) {
+        try {
+            return await TestAnswer.findByIdAndUpdate(id, update, { 'new': true });
+        } catch(error) {
+            return { error: error._message };
+        }
+    }
+
     async create(applicant, mode) {
         try {
             const test = await TestSubmission.create({ 
@@ -105,19 +126,26 @@ class TestSubmissionService
             } 
             */
             
-            const categories = [
-                'codeOfConduct', 'general', 'spread', 'metadata', 
-                'timing', 'audio', 'videoBackground', 'skinning', 
-                'storyboarding', 'bn'
+            const categoriesObject = [
+                {name: 'bn', total: 2},
+                {name: 'codeOfConduct', total: 3},
+                {name: 'general', total: 1},
+                {name: 'spread', total: 3},
+                {name: 'metadata', total: 1},
+                {name: 'timing', total: 1},
+                {name: 'audio', total: 1},
+                {name: 'videoBackground', total: 1},
+                {name: 'skinning', total: 1},
+                {name: 'storyboarding', total: 1},
             ];
-            categories.push(mode);
+            categoriesObject.push({name: mode, total: 3});
             
             let qs = [];
-            for (let i = 0; i < categories.length; i++) {
-                const c = categories[i];
+            for (let i = 0; i < categoriesObject.length; i++) {
+                const name = categoriesObject[i].name;
+                const total = categoriesObject[i].total;
                 try {
-                    // 5 questions per category ?
-                    const questionsByCategory = await questions.Question.find({ category: c, active: true }).limit(5).exec()
+                    const questionsByCategory = await questions.Question.aggregate([ { $match : { category: name, active: true } }, { $sample: { size: total } } ]);
                     for (let j = 0; j < questionsByCategory.length; j++) {
                         const q = questionsByCategory[j];
                         qs.push(q);
@@ -139,6 +167,19 @@ class TestSubmissionService
             return { success: 'Test created' };
         } catch(error) {
             return { error: 'could not create the test' };
+        }
+    }
+
+    async createMetadataInput(title, titleUnicode, artist, artistUnicode, source, reference1, reference2, reference3) {
+        try {
+            return await TestMetadataInput.create({
+                title: title, titleUnicode: titleUnicode, 
+                artist: artist, artistUnicode: artistUnicode, 
+                source: source, reference1: reference1, 
+                refernece2: reference2, reference3: reference3
+            });
+        } catch(error) {
+            return { error: error._message }
         }
     }
 }

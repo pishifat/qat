@@ -20,7 +20,7 @@ router.get('/', async (req, res, next) => {
 
 //population
 const defaultPopulate = [
-    { populate: 'options', display: 'content score', model: options.Option },
+    { populate: 'options', display: 'content score metadataType', model: options.Option },
 
 ];
 
@@ -50,6 +50,9 @@ router.post('/addOption/:id', async (req, res) => {
     if(!o){
         return res.json({error: 'Something went wrong!'});
     }
+    if(req.body.metadataType) {
+        o = await options.service.update(o.id, {metadataType: req.body.metadataType});
+    }
     let q = await questions.service.update(req.params.id, {$push: {options: o.id}});
     q = await questions.service.query({_id: req.params.id}, defaultPopulate);
     res.json(q);
@@ -60,6 +63,9 @@ router.post('/updateOption/:id', async (req, res) => {
     let o = await options.service.update(req.params.id, {content: req.body.option, score: req.body.score});
     if(!o){
         return res.json({error: 'Something went wrong!'});
+    }
+    if(req.body.metadataType) {
+        o = await options.service.update(o.id, {metadataType: req.body.metadataType});
     }
     let q = await questions.service.query({_id: req.body.questionId}, defaultPopulate);
     res.json(q);

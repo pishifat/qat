@@ -1,6 +1,4 @@
 const express = require('express');
-const evals = require('../models/evaluation.js');
-const users = require('../models/user.js');
 const aiess = require('../models/aiess.js');
 const api = require('../models/api.js');
 
@@ -13,7 +11,7 @@ router.get('/', async (req, res, next) => {
     res.render('datacollection', { 
         title: 'Data Collection', 
         script: '../javascripts/dataCollection.js', 
-        isDataCollection: true, 
+        isEval: true, 
         isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat',
         isNat: res.locals.userRequest.group == 'nat'
     });

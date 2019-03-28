@@ -11,21 +11,28 @@
             <div class="modal-body" style="overflow: hidden">
                 <div class="container mb-2">
                     <div class="text-shadow mb-2"><p>Question:</p>
-                        <div class="form-check form-check-inline ml-2">
-                            <input class="form-check-input" type="radio" name="questionTypeEdit" id="textEdit" value="text" :checked="question.questionType == 'text'">
-                            <label class="form-check-label text-shadow" for="textEdit">Select text</label>
+                        <div v-if="question.category == 'metadata'">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="questionType" id="fill" value="fill" :checked="question.questionType == 'fill'">
+                                <label class="form-check-label text-shadow" for="fill">Fill in the blank</label>
+                            </div>
                         </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="questionTypeEdit" id="imageEdit" value="image" :checked="question.questionType == 'image'">
-                            <label class="form-check-label text-shadow" for="imageEdit">Select Image</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="questionTypeEdit" id="fillEdit" value="fill" :checked="question.questionType == 'fill'">
-                            <label class="form-check-label text-shadow" for="fillEdit">Fill in blank</label>
+                        <div v-else>
+                            <div class="form-check form-check-inline ml-2">
+                                <input class="form-check-input" type="radio" name="questionType" id="text" value="text" :checked="question.questionType == 'text'">
+                                <label class="form-check-label text-shadow" for="text">Select text</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="questionType" id="image" value="image" :checked="question.questionType == 'image'">
+                                <label class="form-check-label text-shadow" for="image">Select Image</label>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">
-                        <textarea class="form-control dark-textarea" id="newQuestionEdit" placeholder="avoid confusing wording..." maxlength="200" rows="2" v-model="question.content" @keyup.enter="addQuestion($event)"></textarea>
+                        <textarea class="form-control dark-textarea" id="newQuestion" 
+                            :placeholder="question.category == 'metadata' ? 'link to mapset with incorrect metadata...' : 'avoid confusing wording...'" 
+                            maxlength="300" rows="2" @keyup.enter="editQuestion($event)" v-model="question.content">
+                        </textarea>    
                     </div>
                     <button type="submit" class="btn btn-nat-red float-right ml-2" @click="deleteQuestion($event)">Delete Question</button>
                     <button type="submit" class="btn btn-nat float-right ml-2" @click="updateQuestion($event)">Update Question</button>
@@ -37,12 +44,14 @@
 
                     <table class="small table text-shadow col-md-12 mt-2">
                         <thead>
+                            <td v-if="question.category == 'metadata'" scope="col" style="padding: 2px;">Field</td>
                             <td scope="col" style="padding: 2px;">Option</td>
                             <td scope="col" style="padding: 2px;">Score</td>
                             <td scope="col" style="padding: 2px;">Select</td>
                         </thead>
                         <tbody>
                             <tr v-for="option in question.options" :key="option.id">
+                                <td v-if="question.category == 'metadata'" scope="row" style="padding: 1px;">{{option.metadataType}}</td>
                                 <td scope="row" style="padding: 1px;">
                                     <a v-if="question.questionType == 'image'" :href="option.content" target="_blank">{{option.content}}</a>
                                     <span v-else>{{option.content}}</span>
@@ -54,13 +63,23 @@
                     </table>
 
                     <div class="row col-md-12">
-                        <input id="option" class="form-control-sm text-input col-md-9 mb-2" type="text" maxlength="100" placeholder="potential answer... (if image, post link)" />
-                        <input id="score" class="form-control-sm text-input col-md-1 ml-1 mb-2" type="text" maxlength="5" placeholder="points..." style="min-width: 80px; width: 80;"/>
-                        <div class="form-check form-check-inline pb-2 ml-2">
-                            <input type="checkbox" id="negative">
-                            <label class="form-check-label text-shadow ml-1 small" for="negative">Negative</label>
-                        </div>
+                        <input id="option" class="form-control-sm text-input col-md-9 mb-2" 
+                            type="text" maxlength="150" placeholder="potential answer... (if image, post link)"
+                        />
+                        <input id="score" class="form-control-sm text-input col-md-1 ml-1 mb-2"
+                            type="text" maxlength="5" placeholder="points..." style="min-width: 80px; width: 80;"
+                        />
                     </div>
+                    <small v-if="question.category == 'metadata'">
+                        <select class="custom-select inline-custom-select" id="metadataType" style="min-width: 150px">
+                            <option value="title" selected>Title</option>
+                            <option value="titleUnicode" selected>Unicode Title</option>
+                            <option value="artist" selected>Artist</option>
+                            <option value="artistUnicode" selected>Unicode Artist</option>
+                            <option value="source" selected>Source</option>
+                            <option value="reference" selected>Link/Reference</option>
+                        </select>
+                    </small>
                 </div>
                 <hr>
                 <span class="errors text-shadow" id="addEvalRoundsErrors">{{ info }}</span>
@@ -116,16 +135,12 @@ export default {
             this.info = '';
             this.confirm = '';
             let option = $('#option').val();
-            let score = $('#score').val();
-            if(!option || !option.length || !score || !score.length){
+            let score = parseFloat($('#score').val());
+            let metadataType = $('#metadataType').val();
+            if(!option || !option.length || (!score && score != 0)){
                 this.info = "Cannot leave option fields blank!"
-            }else if(!score.match(/^[0-9]+$/)){
-                this.info = 'Score must be a number!'
             }else{
-                if($('#negative').prop('checked')){
-                    score = score * -1;
-                }
-                const question = await this.executePost('/nat/manageTest/addOption/' + this.question.id, {option: option, score: score}, e);
+                const question = await this.executePost('/nat/manageTest/addOption/' + this.question.id, {option: option, score: score, metadataType: metadataType}, e);
                 if (question) {
                     if (question.error) {
                         this.info = question.error;
@@ -141,18 +156,13 @@ export default {
             this.confirm = '';
             let id = $("input[name='optionList']:checked").val();
             let option = $('#option').val();
-            let score = $('#score').val();
+            let score = parseFloat($('#score').val());
             let checked = $("input[name='optionList']:checked").length;
             if(checked != 1){
                 this.info = 'You must select only one option to edit!';
-            }else if(!option || !option.length || !score || !score.length){
-                this.info = 'Cannot leave fields blank!';
-            }else if(!score.match(/^[0-9]+$/)){
-                this.info = 'Score must be a number!'
+            }else if(!option || !option.length || (!score && score != 0)){
+                this.info = "Cannot leave option fields blank!"
             }else{
-                if($('#negative').prop('checked')){
-                    score = score * -1;
-                }
                 const question = await this.executePost('/nat/manageTest/updateOption/' + id, {option: option, score: score, questionId: this.question.id}, e);
                 if (question) {
                     if (question.error) {
