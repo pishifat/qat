@@ -1,0 +1,25 @@
+<div class="row segment">
+    <div class="col-md-12">
+        <table class="small table mt-3">
+            <thead>
+                <td scope="col" style="padding: 2px;">date</td>
+                <td scope="col" style="padding: 2px;">user</td>
+                <td scope="col" style="padding: 2px;">action</td>
+            </thead>
+            <tbody>
+                {{#each logs}}
+                <tr>
+                    <td scope="row" style="padding: 1px;">{{shortDate createdAt}} GMT</td>
+                    <td scope="row" style="padding: 1px;">{{user.username}}</td>
+                    <td scope="row" style="padding: 1px;">{{shortAction action}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        <div class="text-center">
+            <button class="btn btn-sm btn-nat mb-2" type="button" id="showMore">
+                <i class="fas fa-angle-down mr-1"></i> show more <i class="fas fa-angle-down ml-1"></i>
+            </button>
+        </div>
+    </div>
+</div>

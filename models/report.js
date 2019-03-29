@@ -3,8 +3,7 @@ const mongoose = require('mongoose');
 const db = mongoose.createConnection(config.connection, { useNewUrlParser: true })
 
 const reportSchema = new mongoose.Schema({
-    reporterName: { type: String,  required: true },
-    reporterOsuId: { type: Number, required: true },
+    reporter: { type: 'ObjectId', ref: 'User', required: true },
     culprit: { type: 'ObjectId', ref: 'User', required: true },
     reason: { type: String, required: true },
     valid: { type: Number, enum: [1, 2, 3] },
@@ -55,9 +54,9 @@ class ReportService
         }
     }
 
-    async create(reporterName, reporterOsuId, culpritId, reason) {
+    async create(reporter, culpritId, reason) {
         try {
-            return await Report.create({reporterName: reporterName, reporterOsuId: reporterOsuId, culprit: culpritId, reason: reason});
+            return await Report.create({reporter: reporter, culprit: culpritId, reason: reason});
         } catch(error) {
             return { error: error._message }
         }

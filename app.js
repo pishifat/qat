@@ -23,6 +23,7 @@ const testSubmissionRouter = require('./routes/testSubmission');
 const manageTestRouter = require('./routes/manageTest');
 const testResultsRouter = require('./routes/testResults');
 const bnScoreRouter = require('./routes/bnScore');
+const logsRouter = require('./routes/logs');
 
 var app = express();
 
@@ -65,6 +66,7 @@ app.use('/nat/testSubmission', testSubmissionRouter);
 app.use('/nat/managetest', manageTestRouter);
 app.use('/nat/testresults', testResultsRouter);
 app.use('/nat/bnscore', bnScoreRouter);
+app.use('/nat/logs', logsRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -80,6 +82,19 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+
+//handlebar helper
+hbs.registerHelper('shortDate', function(date) {
+  return date.toString().slice(4, 24);
+});
+
+hbs.registerHelper('shortAction', function(action) {
+  if(action.length > 120){
+      return action.toString().slice(0, 120) + "...";
+  }else{
+      return action;
+  }
 });
 
 module.exports = app;
