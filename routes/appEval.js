@@ -1,12 +1,14 @@
 const express = require('express');
 const bnApps = require('../models/bnApp.js');
 const evals = require('../models/evaluation.js');
+const testSubmission = require('../models/testSubmission');
 const users = require('../models/user.js');
 const api = require('../models/api.js');
 
 const router = express.Router();
 
 router.use(api.isLoggedIn);
+router.use(api.isNat);
 
 /* GET bn app page */
 router.get('/', async (req, res, next) => {
@@ -27,6 +29,7 @@ const defaultPopulate = [
 
 const defaultDiscussPopulate = [
     { populate: 'applicant', display: 'username osuId', model: users.User },
+    { populate: 'test', display: 'totalScore', model: testSubmission.TestSubmission },
     { populate: 'evaluations', display: 'evaluator behaviorComment moddingComment vote', model: evals.Evaluation },
     { innerPopulate: 'evaluations', model: evals.Evaluation, populate: { path: 'evaluator', select: 'username osuId', model: users.User } },
 ];
@@ -34,8 +37,7 @@ const defaultDiscussPopulate = [
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res, next) => {
     const [a] = await Promise.all([
-        await bnApps.service.query({active: true}, defaultDiscussPopulate, {createdAt: 1}, true ),
-        //await bnApps.service.query({active: true, discussion: true}, defaultDiscussPopulate, {createdAt: 1}, true ),
+        await bnApps.service.query({active: true, test: { $exists: true }}, defaultDiscussPopulate, {createdAt: 1}, true ),
     ]);
     res.json({ a: a, evaluator: req.session.mongoId });
 });

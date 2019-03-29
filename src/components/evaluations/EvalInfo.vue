@@ -28,7 +28,11 @@
                                     <a :href="modUrl(mod)" target="_blank">{{modUrl(mod)}}</a>
                                 </li>
                             </ul>
-                            <p class="text-shadow">Test results: <a href="#">20/20 <i class="fas fa-angle-right"></i></a></p>
+                            <p class="text-shadow">Test results: 
+                                <span :class="application.test.totalScore > 15 ? 'vote-pass' : application.test.totalScore > 12.5 ? 'vote-extend' : 'vote-fail'">
+                                    {{application.test.totalScore || application.test.totalScore >= 0 ? application.test.totalScore + '/20' : 'incomplete'}}
+                                </span>
+                            </p>
                             <hr>
                         </div>
 

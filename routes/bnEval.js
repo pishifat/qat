@@ -9,6 +9,7 @@ const aiess = require('../models/aiess.js');
 const router = express.Router();
 
 router.use(api.isLoggedIn);
+router.use(api.isNat);
 
 /* GET bn app page */
 router.get('/', async (req, res, next) => {

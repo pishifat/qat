@@ -5,6 +5,7 @@ const api = require('../models/api.js');
 const router = express.Router();
 
 router.use(api.isLoggedIn);
+router.use(api.isNat);
 
 /* GET eval archive page */
 router.get('/', async (req, res, next) => {

@@ -36,6 +36,7 @@
                     </div>
                     <button type="submit" class="btn btn-nat-red float-right ml-2" @click="deleteQuestion($event)">Delete Question</button>
                     <button type="submit" class="btn btn-nat float-right ml-2" @click="updateQuestion($event)">Update Question</button>
+                    <button type="submit" class="btn float-right ml-2" :class="question.active ? 'btn-nat-red' : 'btn-nat'" @click="toggleActive($event)">{{question.active ? "Mark as inactive" : "Mark as active"}}</button>
                 </div>
                 <br class="mb-2">
                 <hr>
@@ -118,6 +119,17 @@ export default {
                         this.$emit('update-question', question);
                         this.confirm = 'Question updated! ';
                     }
+                }
+            }
+        },
+        toggleActive: async function(e) {
+            const question = await this.executePost('/nat/manageTest/toggleActive/' + this.question.id, {status: !this.question.active}, e);
+            if (question) {
+                if (question.error) {
+                    this.info = question.error;
+                } else {
+                    this.$emit('update-question', question);
+                    this.confirm = 'Question updated! ';
                 }
             }
         },

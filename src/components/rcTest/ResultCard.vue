@@ -1,16 +1,16 @@
 <template>
 
-<div class='col-md-4 my-2' @click="selectTest()">
+<div class="col-md-4 col-lg-3 col-sm-6 my-2" @click="selectTest()">
     <div class="card" style="height: 100%">   
-        <div class='card-body user-card-spacing'>
+        <div class='card-body user-card-spacing text-shadow'>
             <a :href="'https://osu.ppy.sh/users/' + selectedTest.applicant.osuId"
                 class="text-shadow" target="_blank" @click.stop>{{selectedTest.applicant.username}}</a>
                 <i v-if="selectedTest.mode == 'osu'" class="far fa-circle"></i>
                 <i v-else-if="selectedTest.mode == 'taiko'" class="fas fa-drum"></i>
                 <i v-else-if="selectedTest.mode == 'catch'" class="fas fa-apple-alt"></i>
                 <i v-else-if="selectedTest.mode == 'mania'" class="fas fa-stream"></i>
-            <p class="small ml-1 text-shadow">Score: {{calculateTotalScore()}}/20</p>
-            <p class="small ml-1 text-shadow">Application date: {{selectedTest.createdAt.slice(0,10)}}</p>
+            <p class="small ml-1 text-shadow">Score: {{selectedTest.totalScore}}/20</p>
+            <p class="small ml-1 text-shadow">Date: {{selectedTest.submittedAt.slice(0,10)}}</p>
             
         </div>
     </div>
@@ -25,15 +25,6 @@ export default {
     methods: {
         selectTest: function () {
             this.$emit('update:selected-test', this.selectedTest)
-        },
-        calculateTotalScore: function() {
-            let displayScore = 0;
-            this.selectedTest.answers.forEach(answer => {
-                answer.optionsChosen.forEach(option => {
-                    displayScore += option.score;
-                });
-            });
-            return Math.round(displayScore*10)/10;
         },
     }
 }

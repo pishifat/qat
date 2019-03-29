@@ -91,6 +91,8 @@ router.get('/callback', async (req, res) => {
             req.session.group = 'nat';
         } else if (response.is_bng) {
             req.session.group = 'bn';
+        }else{
+            req.session.group = 'user';
         }
         req.session.username = response.username;
         req.session.osuId = response.id;

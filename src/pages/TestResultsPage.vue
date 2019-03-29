@@ -13,8 +13,8 @@
         <p class="errors">{{info}}</p> 
     </div>
 
-    <div v-if="allTests && !selectedTest">
-        <transition-group name="list" tag="div" class="row col-lg-12">
+    <div class="col-md-12" v-if="allTests">
+        <transition-group name="list" tag="div" class="row">
             <result-card
                 v-for="test in allTests"
                 :key="test.id"
@@ -22,13 +22,14 @@
                 @update:selected-test="selectedTest = $event"
             ></result-card>
         </transition-group>
+        <hr>
     </div>
 
     <div v-if="selectedTest">
         <p class="text-center">
             User: {{ selectedTest.applicant.username }} - 
             Mode: {{ selectedTest.mode }} - 
-            Score: {{calculateTotalScore()}}
+            Score: {{ selectedTest.totalScore }}
         </p>
 
         <div class="segment" v-for="(answer, i) in selectedTest.answers" :key="answer.id">
@@ -37,9 +38,10 @@
                 <h5 style="width: 90%">{{ answer.question.content }}</h5>
                 <div v-for="option in getActiveOptions(answer.question.options)" :key="option.id">
                     <div class="form-check mb-2 ml-2" v-if="answer.question.questionType === 'text' || answer.question.questionType === 'image'">
-                        <!--i broke the indexof by populating, fix that-->
                         <input class="form-check-input" type="checkbox" :value="option.id" :id="option.id" :checked="answer.optionsChosen.indexOf(option.id) >= 0"> 
-                        <label class="form-check-label" :class="answer.optionsChosen.indexOf(option.id) >= 0 && option.score > 0 ? 'vote-pass' : answer.optionsChosen.indexOf(option.id) >= 0 ? 'vote-fail' : ''" v-if="answer.question.questionType === 'text'" :for="option.id">
+                        <label class="form-check-label" 
+                            :class="answer.optionsChosen.indexOf(option.id) >= 0 && option.score > 0 ? 'vote-pass' : answer.optionsChosen.indexOf(option.id) >= 0 ? 'vote-fail' : ''" 
+                            v-if="answer.question.questionType === 'text'" :for="option.id">
                             {{ option.content }}
                         </label>
                         <label :for="option.id"><img :src="option.content" v-if="answer.question.questionType === 'image'" class="test-image"></label>
@@ -53,15 +55,15 @@
                     and provide a reliable source or links.</h5>
                 <h5 class="pl-4"><a :href="answer.question.content" target="_blank">{{ answer.question.content }}</a></h5>
                 <div class="mb-2"> <!-- only metadata questions for now -->
-                    <input id="title" class="form-control" type="text" placeholder="Title..." v-model="answer.metadataInput[0].title">
-                    <input id="titleUnicode" class="form-control" type="text" placeholder="Unicode Title (if same as Title, copy that here)..." v-model="answer.metadataInput[0].titleUnicode">
-                    <input id="artist" class="form-control" type="text" placeholder="Artist..." v-model="answer.metadataInput[0].artist">
-                    <input id="artistUnicode" class="form-control" type="text" placeholder="Unicode Artist (if same as Artist, copy that here)..." v-model="answer.metadataInput[0].artistUnicode">
-                    <input id="source" class="form-control" type="text" placeholder="Source (if unclear or non-existent, leave empty)..." v-model="answer.metadataInput[0].source">
+                    <input id="title" class="form-control" type="text" placeholder="Title..." v-model="answer.metadataInput.title">
+                    <input id="titleUnicode" class="form-control" type="text" placeholder="Unicode Title (if same as Title, copy that here)..." v-model="answer.metadataInput.titleUnicode">
+                    <input id="artist" class="form-control" type="text" placeholder="Artist..." v-model="answer.metadataInput.artist">
+                    <input id="artistUnicode" class="form-control" type="text" placeholder="Unicode Artist (if same as Artist, copy that here)..." v-model="answer.metadataInput.artistUnicode">
+                    <input id="source" class="form-control" type="text" placeholder="Source (if unclear or non-existent, leave empty)..." v-model="answer.metadataInput.source">
                     <small class="pl-4">Link sources for the song information (only one link is necessary, but more could help you!):</small>
-                    <input id="reference1" class="form-control" type="text" placeholder="Reference 1" v-model="answer.metadataInput[0].reference1">
-                    <input id="reference2" class="form-control" type="text" placeholder="Reference 2" v-model="answer.metadataInput[0].reference2">
-                    <input id="reference3" class="form-control" type="text" placeholder="Reference 3" v-model="answer.metadataInput[0].reference3">
+                    <input id="reference1" class="form-control" type="text" placeholder="Reference 1" v-model="answer.metadataInput.reference1">
+                    <input id="reference2" class="form-control" type="text" placeholder="Reference 2" v-model="answer.metadataInput.reference2">
+                    <input id="reference3" class="form-control" type="text" placeholder="Reference 3" v-model="answer.metadataInput.reference3">
                 </div>
             </div>
         </div>
@@ -86,7 +88,11 @@ export default {
     },
     mixins: [postData],
     watch: {
-        
+        selectedTest: function(v) {
+            if(v){
+                this.getOptionIds();
+            }
+        }
     },
     methods: {
         calculateTotalScore: function() {
@@ -100,6 +106,14 @@ export default {
         },
         getActiveOptions: function (options) {
             return options.filter(o => o.active);
+        },
+        getOptionIds: function() {
+            this.selectedOptionIds = [];
+            this.selectedTest.answers.forEach(answer => {
+                answer.optionsChosen.forEach(option => {
+                    this.selectedOptionIds.push(option.id);
+                });
+            });
         },
         query: async function(e) {
             this.allTests = null;
@@ -128,6 +142,7 @@ export default {
             info: '',
             allTests: null,
             selectedTest: null,
+            selectedOptionIds: [],
         }
     },
     created() {
@@ -143,4 +158,11 @@ export default {
     font-weight: bold;
 }
 
+.test-image {
+    border-radius: 5px 5px 5px 5px;
+    -o-object-fit: contain;
+    object-fit: contain;
+    max-width: 500px;
+    max-height: 500px;
+}
 </style>

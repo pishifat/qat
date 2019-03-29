@@ -17,24 +17,22 @@ $(function() {
                 mods.push(mod);
             }
         }
-
         if (!mode) {
             $('#errors').text('You must select a gamemode!');
         } else if (mods.length < 2) {
             $('#errors').text('You must enter at least two mods!');
         } else {
+            $('#submitting').text(`Submitting... (this can take a few seconds)`);
             try {
                 const res = await axios.post(`/nat/bnapps/apply`, { mode: mode, mods: mods });
                 // temporary while test doesnt exist
                 if (res.data.error) {
                     $('#errors').text(res.data.error);
                 } else {
-                    $('#confirm').text(
-                        'Your application has been submitted! Evaluation will take approximately one week.'
-                    );
-                    $('#apply').hide();
+                    $('#applyBlock').hide();
                     $('#startTest').html(`<a href="/nat/testsubmission" class="btn btn-lg btn-nat" type="submit">Begin Ranking Criteria Test</a>
-                        <p class="small pt-2">Before your application can be reviewed, you must take a short Ranking Criteria knowledge test.</p>`);
+                        <p class="small pt-2 confirm">Your application has been submitted!</p>
+                        <p class="small">Before your application can be reviewed, you must take a short test.</p>`);
                 }
             } catch (error) {
                 console.log(error);
@@ -42,6 +40,7 @@ $(function() {
             }
         }
 
+        $('#submitting').text(``);
         $('#apply').attr('disabled', false);
     });
 });

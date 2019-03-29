@@ -51,6 +51,7 @@ router.post('/apply', async (req, res, next) => {
                     // Need to retry it somewhere later
                     return res.json({ error: 'Something went wrong while creating the test! Contact a NAT member to resolve the issue.' });
                 } else {
+                    await bnApps.service.update(newBnApp.id, {test: t._id});
                     // Redirect so the applicant can do the test
                     return res.redirect('/nat/bnapps');
                 }

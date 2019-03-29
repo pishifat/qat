@@ -35,10 +35,20 @@
             @click="resetInput()"
         >Add question</button></h2>
         <table v-if="questions && questions.length" class="small table text-shadow col-md-12 mt-2">
+            <thead>
+                <td scope="col" style="padding: 2px;">Question</td>
+                <td scope="col" style="padding: 2px;">Active</td>
+                <td scope="col" style="padding: 2px;">Edit</td>
+            </thead>
             <tbody>
                 <tr v-for="question in questions" :key="question.id">
                     <td scope="row" style="padding: 1px;">
                         {{question.content}}
+                    </td>
+                    <td scope="row" style="padding: 1px;" :class="question.active ? 'vote-pass' : 'vote-fail'">
+                        {{question.active ? 'active' : 'inactive'}}
+                    </td>
+                    <td scope="row" style="padding: 1px;">
                         <a href="#" data-toggle="modal" data-target="#editQuestion" :data-entry="question.id" @click.prevent="selectQuestion(question)">edit</a>
                     </td>
                 </tr>

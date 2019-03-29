@@ -11,6 +11,11 @@
     </div>
 
     <div v-if="test" id="fullTest">
+        <div class="segment test-question">
+            <p>this is the test</p>
+            <p>take it, then u become bn!</p>
+        </div>
+        
         <p class="text-center">
             User: {{ test.applicant.username }} - 
             Mode: {{ test.mode }}<!-- - 
@@ -58,14 +63,14 @@
         </div>
         <hr>
         <div class="mx-auto text-center mb-4">
-            <button type="submit" class="btn btn-lg btn-nat" @click="submit($event)">Submit</button>
-            <p class="text-danger">{{ info }}</p>
+            <a href="#top"><button type="submit" class="btn btn-lg btn-nat" @click="submit($event)">Submit</button></a>
+            <p class="small pt-2">{{ info }}</p>
         </div>
     </div>
 </div>
 <div v-else>
-    <div v-if="displayScore" class="segment">
-        <p>Your test has been submitted! Your score is {{Math.round(displayScore * 10)/10}}/20, but that may change when someone manually reviews your score.</p>
+    <div v-if="displayScore || displayScore == 0" class="segment">
+        <p>Your test has been submitted! Your score is {{displayScore}}/20, but that may change when someone manually reviews your score.</p>
     </div>
     <p v-else class="text-center">Nothing to see here...</p>
 </div>
@@ -123,7 +128,6 @@ export default {
             }, 1000);*/
         },
         submit: async function (e) {
-            $('#fullTest').attr('style', 'visibility: hidden');
             this.info = 'Submitting... (this can take a few seconds)'
             let title = $('#title').val();
             let titleUnicode = $('#titleUnicode').val();
@@ -137,13 +141,14 @@ export default {
             $("input:checked").each( function () {
                 checkedOptions.push( $(this).val() );
             });
+            $('.test-question').hide();
             const res = await this.executePost('/nat/testSubmission/submit', { 
                 testId: this.selectedTest, checkedOptions: checkedOptions,
                 title: title, titleUnicode: titleUnicode,
                 artist: artist, artistUnicode: artistUnicode,
                 source: source, reference1: reference1, reference2: reference2, reference3: reference3
             }, e);
-            if (res) {
+            if (res || res == 0) {
                 if (res.error) this.info = res.error;
                 else{
                     this.selectedTest = null;
@@ -184,11 +189,5 @@ export default {
     object-fit: contain;
     max-width: 500px;
     max-height: 500px;
-}
-
-.question-category {
-    position: relative;
-    top: 10px;
-    right: 10px;
 }
 </style>

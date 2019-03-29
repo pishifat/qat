@@ -9,6 +9,7 @@ const testSubmission = new mongoose.Schema({
     status: { type: String, enum: ['tbd', 'wip', 'finished'], default: 'tbd' },
     startedAt: { type: Date },
     submittedAt: { type: Date },
+    totalScore: { type: Number } //better to store this than populate full test for each application
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 testSubmission.virtual('answers', {
@@ -21,7 +22,7 @@ const testAnswer = new mongoose.Schema({
     test: { type: 'ObjectId', ref: 'TestSubmission', required: true },
     question: { type: 'ObjectId', ref: 'Question', required: true },
     optionsChosen: [{ type: 'ObjectId', ref: 'Option' }],
-    metadataInput: [{ type: 'ObjectId', ref: 'TestMetadataInput' }],
+    metadataInput: { type: 'ObjectId', ref: 'TestMetadataInput' },
     feedback: { type: String },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
@@ -164,7 +165,7 @@ class TestSubmissionService
             });
             await TestAnswer.insertMany(questionsToInsert);
 
-            return { success: 'Test created' };
+            return test;
         } catch(error) {
             return { error: 'could not create the test' };
         }

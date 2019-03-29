@@ -106,31 +106,31 @@ router.post('/submit', async (req, res, next) => {
         {category: 'reference', input: req.body.reference3},
     ];
     
-    for (let i = 0; i < test.answers.length; i++) {
+    let escape;
+    for (let i = 0; i < test.answers.length && !escape; i++) {
         if (test.answers[i].question.category == 'metadata'){
             answer = test.answers[i];
             await testSubmission.service.updateAnswer(answer.id, {$push: {metadataInput: metadataInput}});
-            for (let j = 0; j < answer.question.options.length; j++) {
+            for (let j = 0; j < answer.question.options.length && !escape; j++) {
                 option = answer.question.options[j];
-                for (let k = 0; k < inputObject.length; k++) {
+                for (let k = 0; k < inputObject.length && !escape; k++) {
                     if(option.metadataType == inputObject[k].category){
                         if(option.content == inputObject[k].input.trim()){
                             await testSubmission.service.updateAnswer(answer.id, {$push: {optionsChosen: option.id}});
                             displayScore += option.score;
                             if(option.metadataType == 'reference'){
-                                break; //otherwise possible to get points for multiple correct sources
+                                escape = true;
                             }
                         }
                     }
                     
                 }
             }
-            break;
+            escape = true;
         }
     }
-    
-    await testSubmission.service.update(req.body.testId, { submittedAt: Date.now(), status: 'finished' });
-
+    displayScore = Math.round(displayScore * 10)/10
+    await testSubmission.service.update(req.body.testId, { submittedAt: Date.now(), status: 'finished', totalScore: displayScore });
     res.json(displayScore);
 });
 

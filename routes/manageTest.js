@@ -7,6 +7,7 @@ const users = require('../models/user.js');
 const router = express.Router();
 
 router.use(api.isLoggedIn);
+router.use(api.isNat);
 
 /* GET bn app page */
 router.get('/', async (req, res, next) => {
@@ -40,6 +41,13 @@ router.post('/addQuestion/', async (req, res) => {
 /* POST edit question */
 router.post('/updateQuestion/:id', async (req, res) => {
     let q = await questions.service.update(req.params.id, {content: req.body.newQuestion, questionType: req.body.questionType});
+    q = await questions.service.query({_id: req.params.id}, defaultPopulate);
+    res.json(q);
+});
+
+/* POST edit activity of question */
+router.post('/toggleActive/:id', async (req, res) => {
+    let q = await questions.service.update(req.params.id, {active: req.body.status});
     q = await questions.service.query({_id: req.params.id}, defaultPopulate);
     res.json(q);
 });

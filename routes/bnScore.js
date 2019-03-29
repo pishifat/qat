@@ -8,6 +8,7 @@ const users = require('../models/user.js');
 const router = express.Router();
 
 router.use(api.isLoggedIn);
+router.use(api.isBnOrNat);
 
 /* GET bn app page */
 router.get('/', async (req, res, next) => {

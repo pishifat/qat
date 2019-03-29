@@ -10,8 +10,8 @@ const bnAppSchema = new mongoose.Schema({
     active: { type: Boolean, default: true },
     discussion: { type: Boolean, default: false },
     consensus: { type: String, enum: ["pass", "fail"] },
-    feedback: { type: String }
-    //testResult: [{ type: 'ObjectId', ref: 'rcTest'}],
+    feedback: { type: String },
+    test: { type: 'ObjectId', ref: 'TestSubmission' },
 
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 

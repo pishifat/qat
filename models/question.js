@@ -8,7 +8,6 @@ const questionSchema = new mongoose.Schema({
         'timing', 'audio', 'videoBackground', 'skinning', 
         'storyboarding', 'osu', 'taiko', 'catch', 'mania', 'bn'], required: true},
     content: { type: String, required: true },
-    //info: { type: String },
     active: { type: Boolean, default: true },
     questionType: { type: String, enum: ["text", "image", "fill"], required: true },
     options: [{ type: 'ObjectId', ref: 'Option'}],

@@ -8,6 +8,7 @@ const users = require('../models/user.js');
 const router = express.Router();
 
 router.use(api.isLoggedIn);
+router.use(api.isNat);
 
 /* GET bn app page */
 router.get('/', async (req, res, next) => {
@@ -35,10 +36,6 @@ const defaultTestPopulate = [
     },
     { innerPopulate: 'answers', model: testSubmission.TestAnswer, populate: { 
         path: 'metadataInput', model: testSubmission.TestMetadataInput
-        } 
-    },
-    { innerPopulate: 'answers', model: testSubmission.TestAnswer, populate: { 
-        path: 'optionsChosen', model: options.Option
         } 
     },
 ];
