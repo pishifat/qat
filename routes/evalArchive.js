@@ -51,16 +51,4 @@ router.post('/search/', async (req, res) => {
     res.json({a: a, b: b});
 });
 
-
-/* POST set invidivual eval */
-router.post('/setComplete/', async (req, res) => {
-    for (let i = 0; i < req.body.checkedApps.length; i++) {
-        await bnApps.service.update(req.body.checkedApps[i], {active: false});
-    }
-    
-    let a = await bnApps.service.query({active: false}, defaultDiscussPopulate, {createdAt: 1}, true );
-    let b = await bnApps.service.query({active: true}, defaultBnPopulate, {createdAt: 1}, true );
-    res.json(a);
-});
-
 module.exports = router;

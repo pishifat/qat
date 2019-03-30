@@ -31,7 +31,7 @@
                 <button 
                     class="btn btn-nat btn-sm justify-content-center"
                     @click="user.group == 'bn' ? switchGroup('nat', $event) : switchGroup('bn', $event)">
-                    {{user.group == 'bn' ? 'Promote to NAT' : 'Promote to BN'}}
+                    {{user.group == 'bn' ? 'Move to NAT' : 'Move to BN'}}
                 </button>
                 <p class="text-shadow float-right">Joined: {{user.createdAt.slice(0,10)}}</p>
             </div>

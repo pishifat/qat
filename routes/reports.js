@@ -28,7 +28,9 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
     }
     await reports.service.create(req.session.mongoId, u.id, req.body.reason);
     res.json({});
-    logs.service.create(req.session.mongoId, `Reported ${u.username}`)
+    let anon = await users.service.query({username: 'pishifat'});
+    logs.service.create(anon.id, 
+        `Reported "${u.username}" for reason "${req.body.reason.length > 50 ? req.body.reason.slice(0, 50) + '...' : req.body.reason}"`);
 });
 
 module.exports = router;

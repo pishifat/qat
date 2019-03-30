@@ -1,6 +1,7 @@
 const express = require('express');
 const api = require('../models/api.js');
 const bnApps = require('../models/bnApp.js');
+const logs = require('../models/log.js');
 const testSubmission = require('../models/testSubmission');
 
 const router = express.Router();
@@ -52,8 +53,9 @@ router.post('/apply', async (req, res, next) => {
                     return res.json({ error: 'Something went wrong while creating the test! Contact a NAT member to resolve the issue.' });
                 } else {
                     await bnApps.service.update(newBnApp.id, {test: t._id});
-                    // Redirect so the applicant can do the test
-                    return res.redirect('/nat/bnapps');
+                    logs.service.create(req.session.mongoId, 
+                        `Applied for ${req.body.mode} BN`);
+                    return res.json('pass');
                 }
             } else {
                 return res.json({ error: 'Failed to process application!' });

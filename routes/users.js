@@ -1,6 +1,7 @@
 const express = require('express');
 const api = require('../models/api.js');
 const users = require('../models/user.js');
+var logs = require('../models/log.js');
 
 const router = express.Router();
 
@@ -28,6 +29,8 @@ router.get('/relevantInfo', async (req, res, next) => {
 router.post('/switchMediator/', api.isLoggedIn, async (req, res) => {
     let u = await users.service.update(req.session.mongoId, { vetoMediator: !res.locals.userRequest.vetoMediator });
     res.json(u);
+    logs.service.create(req.session.mongoId, 
+        `Opted ${u.vetoMediator ? 'in to' : 'out of'}  veto mediation`);
 });
 
 /* POST switch usergroup */
@@ -35,6 +38,8 @@ router.post('/switchGroup/:id', api.isLoggedIn, async (req, res) => {
     let u = await users.service.update(req.params.id, { group: req.body.group });
     u = await users.service.update(req.params.id, {probation: []});
     res.json(u);
+    logs.service.create(req.session.mongoId, 
+        `Changed usergroup of "${u.username}" to "${req.body.group.toUpperCase()}"`);
 });
 
 

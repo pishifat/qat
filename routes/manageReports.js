@@ -1,7 +1,6 @@
 const express = require('express');
 const api = require('../models/api.js');
-const bnApps = require('../models/bnApp.js');
-const evals = require('../models/evaluation.js');
+const logs = require('../models/log.js');
 const reports = require('../models/report.js');
 const users = require('../models/user.js');
 
@@ -23,7 +22,6 @@ router.get('/', async (req, res, next) => {
 //population
 const defaultPopulate = [
     { populate: 'culprit', display: 'username osuId', model: users.User },
-
 ];
 
 /* GET applicant listing. */
@@ -44,6 +42,16 @@ router.post('/submitReportEval/:id', async (req, res) => {
     let r = await reports.service.query({_id: req.params.id}, defaultPopulate);
 
     res.json(r);
+    if(req.body.feedback && req.body.feedback.length){
+        logs.service.create(req.session.mongoId, 
+            `Set feedback on report to "${req.body.feedback.length > 50 ? req.body.feedback.slice(0,50) + '...' : req.body.feedback}"`);
+    }
+    if(req.body.valid){
+        logs.service.create(req.session.mongoId, 
+            `Set validity of report to
+            "${req.body.valid == 1 ? 'valid' : req.body.valid == 2 ? 'partially valid' : 'invalid'}"`);
+    }
+    
 });
 
 module.exports = router;

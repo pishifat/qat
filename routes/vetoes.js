@@ -2,6 +2,7 @@ const express = require('express');
 const api = require('../models/api.js');
 const vetoes = require('../models/veto.js');
 const users = require('../models/user');
+var logs = require('../models/log.js');
 
 const router = express.Router();
 
@@ -67,6 +68,8 @@ router.post('/submit', async (req, res, next) => {
         req.body.mode
     );
     res.json(v);
+    logs.service.create(req.session.mongoId, 
+        `Submitted a veto for mediation`);
 });
 
 /* POST mediate a veto. */

@@ -2,8 +2,8 @@ const express = require('express');
 const config = require('../config.json');
 const crypto = require('crypto');
 const api = require('../models/api.js');
-const bnApps = require('../models/bnApp.js');
 const users = require('../models/user.js');
+const logs = require('../models/log.js');
 
 const router = express.Router();
 
@@ -30,9 +30,11 @@ router.get('/login', async (req, res, next) => {
                 req.session.username,
                 req.session.group
             );
-
+            
             if (user && !user.error) {
                 req.session.mongoId = user._id;
+                logs.service.create(req.session.mongoId, 
+                    `Verified their account for the first time`);
                 return next();
             } else {
                 return res.status(500).render('error', { message: 'Something went wrong!' });

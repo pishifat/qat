@@ -1,6 +1,7 @@
 const express = require('express');
 const aiess = require('../models/aiess.js');
 const api = require('../models/api.js');
+const logs = require('../models/log.js');
 
 const router = express.Router();
 
@@ -33,9 +34,11 @@ router.get('/relevantInfo', async (req, res, next) => {
 router.post('/updateReason/:id', async (req, res) => {
     let a = await aiess.service.update(req.params.id, {content: req.body.reason});
     if(!a){
-        return res.json( { error: 'Something went wrong'} );
+        res.json( { error: 'Something went wrong'} );
     }else{
-        return res.json(a);
+        res.json(a);
+        logs.service.create(req.session.mongoId, 
+            `Updated DQ reason of s/${a.beatmapsetId} to "${a.content}"`);
     }
 });
 
@@ -43,9 +46,12 @@ router.post('/updateReason/:id', async (req, res) => {
 router.post('/updateValidity/:id', async (req, res) => {
     let a = await aiess.service.update(req.params.id, {valid: req.body.validity});
     if(!a){
-        return res.json( { error: 'Something went wrong'} );
+        res.json( { error: 'Something went wrong'} );
     }else{
-        return res.json(a);
+        res.json(a);
+        logs.service.create(req.session.mongoId, 
+            `Updated validity of s/${a.beatmapsetId} to 
+            "${req.body.validity == 1 ? 'valid' : req.body.validity == 2 ? 'partially valid' : 'invalid'}"`);
     }
 });
 

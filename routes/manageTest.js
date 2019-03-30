@@ -3,6 +3,7 @@ const api = require('../models/api.js');
 const questions = require('../models/question.js');
 const options = require('../models/option.js');
 const users = require('../models/user.js');
+const logs = require('../models/log.js');
 
 const router = express.Router();
 
@@ -36,6 +37,8 @@ router.get('/load/:type', async (req, res, next) => {
 router.post('/addQuestion/', async (req, res) => {
     let q = await questions.service.create(req.body.category, req.body.newQuestion, req.body.questionType);
     res.json(q);
+    logs.service.create(req.session.mongoId, 
+        `Added new "${req.body.category}" question to RC test: "${req.body.newQuestion.length > 50 ? req.body.newQuestion.slice(0,50) + '...' : req.body.newQuestion}"`);
 });
 
 /* POST edit question */
@@ -43,6 +46,8 @@ router.post('/updateQuestion/:id', async (req, res) => {
     let q = await questions.service.update(req.params.id, {content: req.body.newQuestion, questionType: req.body.questionType});
     q = await questions.service.query({_id: req.params.id}, defaultPopulate);
     res.json(q);
+    logs.service.create(req.session.mongoId, 
+        `Updated question on RC test: "${req.body.newQuestion.length > 50 ? req.body.newQuestion.slice(0,50) + '...' : req.body.newQuestion}"`);
 });
 
 /* POST edit activity of question */
@@ -50,6 +55,8 @@ router.post('/toggleActive/:id', async (req, res) => {
     let q = await questions.service.update(req.params.id, {active: req.body.status});
     q = await questions.service.query({_id: req.params.id}, defaultPopulate);
     res.json(q);
+    logs.service.create(req.session.mongoId, 
+        `Marked RC test question as "${req.body.status ? 'active' : 'inactive'}"`);
 });
 
 /* POST add option */
@@ -64,6 +71,8 @@ router.post('/addOption/:id', async (req, res) => {
     let q = await questions.service.update(req.params.id, {$push: {options: o.id}});
     q = await questions.service.query({_id: req.params.id}, defaultPopulate);
     res.json(q);
+    logs.service.create(req.session.mongoId, 
+        `Added option for RC test question: "${req.body.option.length > 50 ? req.body.option.slice(0,50) + '...' : req.body.option}"`);
 });
 
 /* POST edit option */
@@ -77,6 +86,8 @@ router.post('/updateOption/:id', async (req, res) => {
     }
     let q = await questions.service.query({_id: req.body.questionId}, defaultPopulate);
     res.json(q);
+    logs.service.create(req.session.mongoId, 
+        `Updated option for RC test question: "${req.body.option.length > 50 ? req.body.option.slice(0,50) + '...' : req.body.option}"`);
 });
 
 /* POST delete option */
@@ -86,6 +97,8 @@ router.post('/deleteOption/', async (req, res) => {
     }
     let q = await questions.service.query({_id: req.body.questionId}, defaultPopulate);
     res.json(q);
+    logs.service.create(req.session.mongoId, 
+        `Deleted ${req.body.checkedOptions.length} RC test question option${req.body.checkedOptions.length == 1 ? '' : 's'}`);
 });
 
 /* POST delete question */
@@ -96,15 +109,8 @@ router.post('/deleteQuestion/:id', async (req, res) => {
     }
     await questions.service.remove(req.params.id);
     res.json(true);
-});
-
-/* POST toggle active question */
-router.post('/toggleActive/:id', async (req, res) => {
-    let q = await questions.service.query({_id: req.params.id});
-    for (let i = 0; i < q.options.length; i++) {
-        await options.service.remove(q.options[i]);
-    }
-    res.json(true);
+    logs.service.create(req.session.mongoId, 
+        `Deleted RC test question: "${q.content.length > 50 ? q.content.slice(0,50) + '...' : q.content}"`);
 });
 
 module.exports = router;

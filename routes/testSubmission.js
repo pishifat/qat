@@ -4,6 +4,7 @@ const testSubmission = require('../models/testSubmission');
 const users = require('../models/user');
 const questions = require('../models/question');
 const options = require('../models/option');
+const logs = require('../models/log.js');
 
 const router = express.Router();
 router.use(api.isLoggedIn);
@@ -132,6 +133,8 @@ router.post('/submit', async (req, res, next) => {
     displayScore = Math.round(displayScore * 10)/10
     await testSubmission.service.update(req.body.testId, { submittedAt: Date.now(), status: 'finished', totalScore: displayScore });
     res.json(displayScore);
+    logs.service.create(req.session.mongoId, 
+        `Completed ${test.mode} BN app test`);
 });
 
 module.exports = router;

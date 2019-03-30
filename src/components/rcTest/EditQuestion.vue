@@ -13,23 +13,23 @@
                     <div class="text-shadow mb-2"><p>Question:</p>
                         <div v-if="question.category == 'metadata'">
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="questionType" id="fill" value="fill" :checked="question.questionType == 'fill'">
+                                <input class="form-check-input" type="radio" name="questionTypeEdit" id="fill" value="fill" :checked="question.questionType == 'fill'">
                                 <label class="form-check-label text-shadow" for="fill">Fill in the blank</label>
                             </div>
                         </div>
                         <div v-else>
                             <div class="form-check form-check-inline ml-2">
-                                <input class="form-check-input" type="radio" name="questionType" id="text" value="text" :checked="question.questionType == 'text'">
+                                <input class="form-check-input" type="radio" name="questionTypeEdit" id="text" value="text" :checked="question.questionType == 'text'">
                                 <label class="form-check-label text-shadow" for="text">Select text</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="questionType" id="image" value="image" :checked="question.questionType == 'image'">
+                                <input class="form-check-input" type="radio" name="questionTypeEdit" id="image" value="image" :checked="question.questionType == 'image'">
                                 <label class="form-check-label text-shadow" for="image">Select Image</label>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
-                        <textarea class="form-control dark-textarea" id="newQuestion" 
+                        <textarea class="form-control dark-textarea" id="newQuestionEdit" 
                             :placeholder="question.category == 'metadata' ? 'link to mapset with incorrect metadata...' : 'avoid confusing wording...'" 
                             maxlength="300" rows="2" @keyup.enter="editQuestion($event)" v-model="question.content">
                         </textarea>    
@@ -86,7 +86,7 @@
                 <span class="errors text-shadow" id="addEvalRoundsErrors">{{ info }}</span>
                 <span class="confirm text-shadow" id="addEvalRoundsConfirm">{{ confirm }}</span>
                 <button type="submit" class="btn btn-nat-red float-right ml-2" @click="deleteOption($event)">Delete Selected Option</button>
-                <button type="submit" class="btn btn-nat float-right ml-2" @click="updateOption($event)">Edit Selected Option</button>
+                <button type="submit" class="btn btn-nat float-right ml-2" @click="updateOption($event)">Update Selected Option</button>
                 <button type="submit" class="btn btn-nat float-right ml-2" @click="addOption($event)">Add Option</button>
                 
             </div>
@@ -108,6 +108,8 @@ export default {
             this.confirm = '';
             let questionType = $('input[name=questionTypeEdit]:checked').val();
             let newQuestion = $('#newQuestionEdit').val();
+            console.log(newQuestion)
+            console.log(questionType)
             if(!newQuestion || !newQuestion.length || !questionType || !questionType.length){
                 this.info = "Cannot leave question fields blank!"
             }else{

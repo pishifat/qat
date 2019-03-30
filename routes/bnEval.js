@@ -1,5 +1,6 @@
 const express = require('express');
 const api = require('../models/api.js');
+const logs = require('../models/log.js');
 const evals = require('../models/evaluation.js');
 const reports = require('../models/report.js');
 const evalRounds = require('../models/evalRound.js');
@@ -25,11 +26,6 @@ router.get('/', async (req, res, next) => {
 //population
 const defaultPopulate = [
     { populate: 'bn', display: 'username osuId', model: users.User },
-    { populate: 'evaluations', display: 'evaluator behaviorComment moddingComment vote', model: evals.Evaluation }
-];
-
-const defaultDiscussPopulate = [
-    { populate: 'bn', display: 'username osuId', model: users.User },
     { populate: 'evaluations', display: 'evaluator behaviorComment moddingComment vote', model: evals.Evaluation },
     { innerPopulate: 'evaluations', model: evals.Evaluation, populate: { path: 'evaluator', select: 'username osuId', model: users.User } },
 ];
@@ -38,7 +34,7 @@ const defaultDiscussPopulate = [
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res, next) => {
     const [er, r] = await Promise.all([
-        await evalRounds.service.query({active: true}, defaultDiscussPopulate, {createdAt: 1}, true ),
+        await evalRounds.service.query({active: true}, defaultPopulate, {createdAt: 1}, true ),
         await reports.service.query({valid: {$exists: true, $ne: 3}, feedback: {$exists: true, $nin: ''}}, {}, {}, true)
     ]);
     res.json({ er: er, r: r, evaluator: req.session.mongoId });
@@ -153,8 +149,10 @@ router.post('/addEvalRounds/', async (req, res) => {
             await cycleModes(allUsers[i].id, allUsers[i].modes, req.body.deadline, req.body.osu, req.body.taiko, req.body.catch, req.body.mania)
         }
     }
-    let ers = await evalRounds.service.query({active: true}, defaultDiscussPopulate, {createdAt: 1}, true);
+    let ers = await evalRounds.service.query({active: true}, defaultPopulate, {createdAt: 1}, true);
     res.json({ers: ers, failed: failed})
+    logs.service.create(req.session.mongoId, 
+        `Added BN evaluations for ${allUsers.length} user${allUsers.length == 1 ? '' : 's'}`);
 });
 
 /* POST submit or edit eval */
@@ -165,8 +163,10 @@ router.post('/submitEval/:id', async (req, res) => {
         let ev = await evals.service.create(req.session.mongoId, req.body.behaviorComment, req.body.moddingComment, req.body.vote);
         await evalRounds.service.update(req.params.id, {$push: {evaluations: ev._id}});
     }
-    res.json(await evalRounds.service.query({ _id: req.params.id }, defaultDiscussPopulate));
-    
+    let ev_ = await evalRounds.service.query({ _id: req.params.id }, defaultPopulate)
+    res.json(ev_);
+    logs.service.create(req.session.mongoId, 
+        `${req.body.evaluationId ? 'Updated' : 'Submitted'} ${ev_.mode} BN evaluation for "${ev_.bn.username}"`);
 });
 
 /* POST set group eval */
@@ -175,8 +175,10 @@ router.post('/setGroupEval/', async (req, res) => {
         await evalRounds.service.update(req.body.checkedRounds[i], {discussion: true});
     }
 
-    let a = await evalRounds.service.query({active: true}, defaultDiscussPopulate, {createdAt: 1}, true );
-    res.json(a);
+    let ev = await evalRounds.service.query({active: true}, defaultPopulate, {createdAt: 1}, true );
+    res.json(ev);
+    logs.service.create(req.session.mongoId, 
+        `Set ${req.body.checkedRounds.length} BN eval${req.body.checkedRounds.length == 1 ? '' : 's'} as group evaluation`);
 });
 
 /* POST set invidivual eval */
@@ -185,8 +187,10 @@ router.post('/setIndividualEval/', async (req, res) => {
         await evalRounds.service.update(req.body.checkedRounds[i], {discussion: false});
     }
     
-    let a = await evalRounds.service.query({active: true}, defaultDiscussPopulate, {createdAt: 1}, true );
-    res.json(a);
+    let ev = await evalRounds.service.query({active: true}, defaultPopulate, {createdAt: 1}, true );
+    res.json(ev);
+    logs.service.create(req.session.mongoId, 
+        `Set ${req.body.checkedRounds.length} BN eval${req.body.checkedRounds.length == 1 ? '' : 's'} as individual evaluation`);
 });
 
 /* POST set evals as complete */
@@ -210,15 +214,19 @@ router.post('/setComplete/', async (req, res) => {
         await evalRounds.service.update(req.body.checkedRounds[i], {active: false});
     }
     
-    let a = await evalRounds.service.query({active: true}, defaultDiscussPopulate, {createdAt: 1}, true );
-    res.json(a);
+    let ev = await evalRounds.service.query({active: true}, defaultPopulate, {createdAt: 1}, true );
+    res.json(ev);
+    logs.service.create(req.session.mongoId, 
+        `Set ${req.body.checkedRounds.length} BN eval${req.body.checkedRounds.length == 1 ? '' : 's'} as completed`)
 });
 
 /* POST set consensus of eval */
 router.post('/setConsensus/:id', async (req, res) => {
     await evalRounds.service.update(req.params.id, {consensus: req.body.consensus})
-    let a = await evalRounds.service.query({_id: req.params.id}, defaultDiscussPopulate);
-    res.json(a);
+    let ev = await evalRounds.service.query({_id: req.params.id}, defaultPopulate);
+    res.json(ev);
+    logs.service.create(req.session.mongoId, 
+        `Set consensus of ${ev.bn.username}'s ${ev.mode} BN app as ${req.body.consensus}`);
 });
 
 /* GET aiess info */
