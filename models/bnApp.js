@@ -1,6 +1,5 @@
-const config = require('../config.json');
 const mongoose = require('mongoose');
-const db = mongoose.createConnection(config.connection, { useNewUrlParser: true });
+const BaseService = require('./baseService');
 
 const bnAppSchema = new mongoose.Schema({
     applicant: {type: 'ObjectId', ref: 'User', required: true},
@@ -15,50 +14,20 @@ const bnAppSchema = new mongoose.Schema({
 
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-const BnApp = db.model('BnApp', bnAppSchema);
+const BnApp = mongoose.model('BnApp', bnAppSchema);
 
-class BnAppService
+class BnAppService extends BaseService
 {
-    async query(params, populate, sorting, getAll) {
-        let query;
-
-        if (getAll) {
-            query = BnApp.find(params);
-        } else {
-            query = BnApp.findOne(params);
-        }
-
-        if (populate) {
-            for (let i = 0; i < populate.length; i++) {
-                const p = populate[i];
-
-                if (p.innerPopulate) {
-                    query.populate({ path: p.innerPopulate, model: p.model, populate: p.populate });
-                } else {
-                    query.populate(p.populate, p.display, p.model);
-                }
-            }
-        }
-
-        if (sorting) {
-            query.sort(sorting);
-        }
-
-        try {
-            return await query.exec();
-        } catch(error) {
-            return { error: error._message };
-        }
+    constructor() {
+        super(BnApp);
     }
 
-    async update(id, update) {
-        try {
-            return await BnApp.findByIdAndUpdate(id, update, { 'new': true });
-        } catch(error) {
-            return { error: error._message };
-        }
-    }
-
+    /**
+     * 
+     * @param {object} userId UserId of applicant
+     * @param {string} mode 
+     * @param {string[]} mods 
+     */
     async create(userId, mode, mods) {
         try {
             return await BnApp.create({ applicant: userId, mode: mode, mods: mods });

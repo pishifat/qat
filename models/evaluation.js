@@ -1,6 +1,5 @@
-const config = require('../config.json');
 const mongoose = require('mongoose');
-const db = mongoose.createConnection(config.connection, { useNewUrlParser: true })
+const BaseService = require('./baseService');
 
 const evaluationSchema = new mongoose.Schema({
     evaluator: { type: 'ObjectId', ref: 'User', required: true },
@@ -9,45 +8,21 @@ const evaluationSchema = new mongoose.Schema({
     vote: { type: Number, enum: [1, 2, 3] }
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-const Evaluation = db.model('Evaluation', evaluationSchema);
+const Evaluation = mongoose.model('Evaluation', evaluationSchema);
 
-class EvaluationService
+class EvaluationService extends BaseService
 {
-    async query(params, populate, sorting, getAll) {
-        let query;
-
-        if (getAll) {
-            query = Evaluation.find(params);
-        } else {
-            query = Evaluation.findOne(params);
-        }
-
-        if (populate) {
-            for (let i = 0; i < populate.length; i++) {
-                const p = populate[i];
-                query.populate(p.populate, p.display);
-            }
-        }
-
-        if (sorting) {
-            query.sort(sorting);
-        }
-
-        try {
-            return await query.exec();
-        } catch(error) {
-            return { error: error._message };
-        }
+    constructor() {
+        super(Evaluation);
     }
 
-    async update(id, update) {
-        try {
-            return await Evaluation.findByIdAndUpdate(id, update, { 'new': true });
-        } catch(error) {
-            return { error: error._message };
-        }
-    }
-
+    /**
+     * 
+     * @param {object} evaluatorId UserId who evualates
+     * @param {string} behaviorComment 
+     * @param {string} moddingComment 
+     * @param {number} vote 
+     */
     async create(evaluatorId, behaviorComment, moddingComment, vote) {
         try {
             return await Evaluation.create({evaluator: evaluatorId, behaviorComment: behaviorComment, moddingComment: moddingComment, vote: vote});

@@ -1,6 +1,5 @@
-const config = require('../config.json');
 const mongoose = require('mongoose');
-const db = mongoose.createConnection(config.connection, { useNewUrlParser: true })
+const BaseService = require('./baseService');
 
 const userSchema = new mongoose.Schema({
     osuId: { type: Number, required: true },
@@ -13,45 +12,20 @@ const userSchema = new mongoose.Schema({
     natDuration: [{ type: Date }],
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-const User = db.model('User', userSchema);
+const User = mongoose.model('User', userSchema);
 
-class UserService
+class UserService extends BaseService
 {
-    async query(params, populate, sorting, getAll) {
-        let query;
-
-        if (getAll) {
-            query = User.find(params);
-        } else {
-            query = User.findOne(params);
-        }
-
-        if (populate) {
-            for (let i = 0; i < populate.length; i++) {
-                const p = populate[i];
-                query.populate(p.populate, p.display);
-            }
-        }
-
-        if (sorting) {
-            query.sort(sorting);
-        }
-
-        try {
-            return await query.exec();
-        } catch(error) {
-            return { error: error._message };
-        }
+    constructor() {
+        super(User);
     }
 
-    async update(id, update) {
-        try {
-            return await User.findByIdAndUpdate(id, update, { 'new': true });
-        } catch(error) {
-            return { error: error._message };
-        }
-    }
-
+    /**
+     * 
+     * @param {number} osuId Id from osu site
+     * @param {string} username 
+     * @param {string} group Options: bn, nat, user
+     */
     async create(osuId, username, group) {
         try {
             return await User.create({osuId: osuId, username: username, group: group});

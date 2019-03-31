@@ -88,7 +88,7 @@ async function isLoggedIn(req, res, next) {
         
         // If hidden, shouldn't be able to do anything
         if (!u || u.group == 'hidden') {
-            return res.redirect('/qat');
+            return res.redirect('/');
         }
 
         // Refresh if less than 30 sec left
@@ -102,7 +102,7 @@ async function isLoggedIn(req, res, next) {
         res.locals.userRequest = u;
         next();
     } else {
-        res.redirect('/qat');
+        res.redirect('/');
     }
 }
 
@@ -112,7 +112,7 @@ async function isBnOrNat(req, res, next) {
     if (u.group == 'bn' || u.group == 'nat') {
         next();
     } else {
-        res.redirect('/qat');
+        res.redirect('/');
     }
 }
 
@@ -122,7 +122,7 @@ async function isNat(req, res, next) {
     if (u.group == 'nat') {
         next();
     } else {
-        res.redirect('/qat');
+        res.redirect('/');
     }
 }
 

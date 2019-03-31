@@ -38,7 +38,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 //natdb
-const db = mongoose.createConnection(config.connection, { useNewUrlParser: true });
+mongoose.connect(config.connection, { useNewUrlParser: true });
+const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'db connection error:'));
 db.once('open', function() {
     console.log('natdb connected');
@@ -52,7 +53,7 @@ app.use(
   })
 );
 
-app.use('/qat', indexRouter);
+app.use('/', indexRouter);
 app.use('/nat/bnApps', bnAppRouter);
 app.use('/nat/reports', reportsRouter);
 app.use('/nat/appEval', appEvalRouter);

@@ -14,7 +14,7 @@ router.use(api.isNat);
 
 /* GET bn app page */
 router.get('/', async (req, res, next) => {
-    res.render('bneval', { 
+    res.render('evaluations/bneval', { 
         title: 'Current BN Evaluations', 
         script: '../javascripts/bnEval.js', 
         isEval: true, 

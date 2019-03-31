@@ -3,7 +3,6 @@
 <div class='col-md-4 col-lg-3 my-2' @click="selectUser()">
     <div class="card" :class="user.probation.length && user.group != 'nat' ? 'border-probation' : 'border-' + user.group"
         data-toggle="modal" data-target='#extendedInfo' :data-user="user.osuId">
-                
         <div class='card-body user-card-spacing'>
             <a :href="'https://osu.ppy.sh/users/' + user.osuId"
                 class="text-shadow" target="_blank" @click.stop>{{user.username}}</a> 

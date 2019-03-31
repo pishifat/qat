@@ -1,6 +1,5 @@
-const config = require('../config.json');
 const mongoose = require('mongoose');
-const db = mongoose.createConnection(config.connection, { useNewUrlParser: true })
+const BaseService = require('./baseService');
 
 const aiessSchema = new mongoose.Schema({
     beatmapsetId: { type: Number },
@@ -12,51 +11,18 @@ const aiessSchema = new mongoose.Schema({
     valid: { type: Number, enum: [1, 2, 3] }
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-const Aiess = db.model('aiess', aiessSchema, 'aiess');
+const Aiess = mongoose.model('aiess', aiessSchema, 'aiess');
 
-class AiessService
+class AiessService extends BaseService
 {
-    async query(params, populate, sorting, getAll) {
-        let query;
-
-        if (getAll) {
-            query = Aiess.find(params);
-        } else {
-            query = Aiess.findOne(params);
-        }
-
-        if (populate) {
-            for (let i = 0; i < populate.length; i++) {
-                const p = populate[i];
-                
-                if (p.innerPopulate) {
-                    query.populate({ path: p.innerPopulate, model: p.model, populate: p.populate });
-                } else {
-                    query.populate(p.populate, p.display, p.model);
-                }
-            }
-        }
-
-        if (sorting) {
-            query.sort(sorting);
-        }
-
-        try {
-            return await query.exec();
-        } catch(error) {
-            return { error: error._message };
-        }
+    constructor() {
+        super(Aiess);
     }
 
-    
-    async update(id, update) {
-        try {
-            return await Aiess.findByIdAndUpdate(id, update, { 'new': true });
-        } catch(error) {
-            return { error: error._message };
-        }
-    }
-
+    /**
+     * 
+     * @param {object} osuId 
+     */
     async create(osuId) {
         try {
             return await Aiess.create({userId: osuId});

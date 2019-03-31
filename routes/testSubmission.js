@@ -1,9 +1,9 @@
 const express = require('express');
 const api = require('../models/api');
-const testSubmission = require('../models/testSubmission');
+const testSubmission = require('../models/bnTest/testSubmission');
 const users = require('../models/user');
-const questions = require('../models/question');
-const options = require('../models/option');
+const questions = require('../models/bnTest/question');
+const options = require('../models/bnTest/option');
 const logs = require('../models/log.js');
 
 const router = express.Router();

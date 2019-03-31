@@ -3,26 +3,26 @@
 <div class="row">
     <div class="col-md-12">
         <h2>Disqualifications</h2>
-        <table class="small table text-shadow col-md-12 mt-2">
+        <table class="table table-sm table-dark table-hover col-md-12 mt-2">
             <thead>
-                <td scope="col" style="padding: 2px;">Date</td>
-                <td scope="col" style="padding: 2px;">Mapset</td>
-                <td scope="col" style="padding: 2px;">Reason</td>
-                <td scope="col" style="padding: 2px;">Validity</td>
-                <td scope="col" style="padding: 2px;"></td>
+                <td scope="col">Date</td>
+                <td scope="col">Mapset</td>
+                <td scope="col">Reason</td>
+                <td scope="col">Validity</td>
+                <td scope="col"></td>
             </thead>
             <tbody>
                 <tr v-for="dq in dqs" :key="dq.id">
-                    <td scope="row" style="padding: 1px;">{{new Date(dq.timestamp).toString().slice(4,15)}}</td>
-                    <td scope="row" style="padding: 1px;"><a :href="'https://osu.ppy.sh/beatmapsets/' + dq.beatmapsetId + '/discussion'" target="_blank">{{dq.metadata}}</a></td>
-                    <td scope="row" style="padding: 1px;">
+                    <td scope="row">{{new Date(dq.timestamp).toString().slice(4,15)}}</td>
+                    <td scope="row"><a :href="'https://osu.ppy.sh/beatmapsets/' + dq.beatmapsetId + '/discussion'" target="_blank">{{dq.metadata}}</a></td>
+                    <td scope="row">
                         {{dq.content.slice(0, dq.content.indexOf('.')+1 || 50)}} 
                         <a href="#" data-toggle="modal" data-target="#editReason" :data-entry="dq.id" @click.prevent="selectEntry(dq)">edit</a></td>
-                    <td scope="row" style="padding: 1px;"
+                    <td scope="row"
                         :class="dq.valid == 1 ? 'vote-pass' : dq.valid == 2 ? 'vote-extend' : dq.valid == 3 ? 'vote-fail' : ''">
                         {{dq.valid == 1 ? 'valid' : dq.valid == 2 ? 'partially valid' : dq.valid == 3 ? 'invalid' : 'none'}}
                     </td>
-                    <td scope="row" style="padding: 1px;">
+                    <td scope="row">
                         <a href="#" @click.prevent="updateValidity(dq.id, 1);"><i class="fas fa-square vote-pass"></i></a>
                         <a href="#" @click.prevent="updateValidity(dq.id, 2);"><i class="fas fa-square vote-extend"></i></a>
                         <a href="#" @click.prevent="updateValidity(dq.id, 3);"><i class="fas fa-square vote-fail"></i></a>

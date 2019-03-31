@@ -4,7 +4,6 @@ const crypto = require('crypto');
 const api = require('../models/api.js');
 const users = require('../models/user.js');
 const logs = require('../models/log.js');
-
 const router = express.Router();
 
 /* GET bn app page */
@@ -49,7 +48,7 @@ router.get('/login', async (req, res, next) => {
     if (!req.cookies._state) {
         crypto.randomBytes(48, function(err, buffer) {
             res.cookie('_state', buffer.toString('hex'), { httpOnly: true });
-            res.redirect('/qat/login');
+            res.redirect('/login');
         });
     } else {
         let hashedState = Buffer.from(req.cookies._state).toString('base64');
@@ -60,13 +59,13 @@ router.get('/login', async (req, res, next) => {
         );
     }
 }, api.isLoggedIn, (req, res) => {
-    res.redirect('/qat');
+    res.redirect('/');
 });
 
 /* GET user's token and user's info to login */
 router.get('/callback', async (req, res) => {
     if (!req.query.code || req.query.error) {
-        return res.redirect('/qat');
+        return res.redirect('/');
     }
 
     const decodedState = Buffer.from(req.query.state, 'base64').toString('ascii');
@@ -98,7 +97,7 @@ router.get('/callback', async (req, res) => {
         }
         req.session.username = response.username;
         req.session.osuId = response.id;
-        res.redirect('/qat/login');
+        res.redirect('/login');
     }
 });
 

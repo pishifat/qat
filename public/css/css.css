@@ -29,8 +29,31 @@ html {
 body {
     background-color: #151515;
     background: url('../images/triangles.png') repeat fixed;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Helvetica Neue', 'Whitney', Helvetica, 'Segoe UI', 'Roboto', sans-serif;
     overflow-x: hidden;
+}
+
+.text-light {
+    color: #b9bbbe !important;
+}
+
+.table-sm {
+    font-size: 0.9rem;
+}
+
+.table-dark {
+    background-color: transparent;
+    color: #b9bbbe !important;
+}
+
+.table-dark thead {
+    background-color: #1f2022c4;
+}
+
+.table-dark thead td {
+    font-weight: 600;
+    color: hsla(0,0%,100%,.8);
+    text-transform: uppercase;
 }
 
 a {
@@ -193,14 +216,13 @@ input[type='text']:focus {
 }
 
 .custom-select {
-    min-width: 5em;
-    width: 5em;
+    min-width: 7rem;
+    width: 7rem;
     height: 2.5em;
     background-color: #333;
     color: white;
     border-color: transparent;
     border-radius: 100px;
-    width: 100px;
     filter: drop-shadow(1px 1px 1px #000000);
     /* arrow */
     background-image: linear-gradient(45deg, transparent 50%, gray 50%),
@@ -408,6 +430,7 @@ input[type="radio"] + .fas { cursor: pointer; }
     box-shadow: 1px 1px 10px 0px #333;
     cursor: default;
     background-color: var(--dark);
+    height: 100%;
 }
 
 .card:hover {

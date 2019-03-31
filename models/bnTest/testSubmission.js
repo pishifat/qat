@@ -1,7 +1,6 @@
-const config = require('../config.json');
 const mongoose = require('mongoose');
-const db = mongoose.createConnection(config.connection, { useNewUrlParser: true });
 const questions = require('./question');
+const BaseService = require('../baseService');
 
 const testSubmission = new mongoose.Schema({
     applicant: { type: 'ObjectId', ref: 'User', required: true },
@@ -37,50 +36,14 @@ const testMetadataInput = new mongoose.Schema({
     reference3: { type: String }
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-const TestAnswer = db.model('TestAnswer', testAnswer);
-const TestSubmission = db.model('TestSubmission', testSubmission);
-const TestMetadataInput = db.model('TestMetadataInput', testMetadataInput);
+const TestAnswer = mongoose.model('TestAnswer', testAnswer);
+const TestSubmission = mongoose.model('TestSubmission', testSubmission);
+const TestMetadataInput = mongoose.model('TestMetadataInput', testMetadataInput);
 
-class TestSubmissionService
+class TestSubmissionService extends BaseService
 {
-    async query(params, populate, sorting, getAll) {
-        let query;
-
-        if (getAll) {
-            query = TestSubmission.find(params);
-        } else {
-            query = TestSubmission.findOne(params);
-        }
-
-        if (populate) {
-            for (let i = 0; i < populate.length; i++) {
-                const p = populate[i];
-
-                if (p.innerPopulate) {
-                    query.populate({ path: p.innerPopulate, model: p.model, populate: p.populate });
-                } else {
-                    query.populate(p.populate, p.display, p.model);
-                }
-            }
-        }
-
-        if (sorting) {
-            query.sort(sorting);
-        }
-
-        try {
-            return await query.exec();
-        } catch(error) {
-            return { error: error._message };
-        }
-    }
-
-    async update(id, update) {
-        try {
-            return await TestSubmission.findByIdAndUpdate(id, update, { 'new': true });
-        } catch(error) {
-            return { error: error._message };
-        }
+    constructor() {
+        super(TestSubmission);
     }
 
     async updateAnswer(id, update) {
@@ -91,6 +54,11 @@ class TestSubmissionService
         }
     }
 
+    /**
+     * Creates a test, including all the questions needed
+     * @param {object} applicant UserId of applicant
+     * @param {string} mode Options: 'osu', 'taiko', 'catch', 'mania'
+     */
     async create(applicant, mode) {
         try {
             const test = await TestSubmission.create({ 

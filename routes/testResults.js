@@ -1,9 +1,9 @@
 const express = require('express');
-const api = require('../models/api.js');
-const questions = require('../models/question.js');
-const testSubmission = require('../models/testSubmission');
-const options = require('../models/option.js');
-const users = require('../models/user.js');
+const api = require('../models/api');
+const questions = require('../models/bnTest/question');
+const testSubmission = require('../models/bnTest/testSubmission');
+const options = require('../models/bnTest/option');
+const users = require('../models/user');
 
 const router = express.Router();
 
@@ -12,7 +12,7 @@ router.use(api.isNat);
 
 /* GET bn app page */
 router.get('/', async (req, res, next) => {
-    res.render('testresults', { 
+    res.render('rcTest/testresults', { 
         title: 'RC Test Results', 
         script: '../javascripts/testResults.js', 
         isManageTest: true, 

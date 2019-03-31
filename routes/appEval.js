@@ -1,7 +1,7 @@
 const express = require('express');
 const bnApps = require('../models/bnApp.js');
 const evals = require('../models/evaluation.js');
-const testSubmission = require('../models/testSubmission');
+const testSubmission = require('../models/bnTest/testSubmission');
 const users = require('../models/user.js');
 const api = require('../models/api.js');
 const logs = require('../models/log.js');
@@ -13,7 +13,7 @@ router.use(api.isNat);
 
 /* GET bn app page */
 router.get('/', async (req, res, next) => {
-    res.render('appeval', { 
+    res.render('evaluations/appeval', { 
         title: 'BN Application Evaluations', 
         script: '../javascripts/appEval.js', 
         isEval: true, 

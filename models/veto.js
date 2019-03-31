@@ -1,7 +1,5 @@
-const config = require('../config.json');
 const mongoose = require('mongoose');
-const db = mongoose.createConnection(config.connection, { useNewUrlParser: true });
-const users = require('../models/user.js');
+const BaseService = require('./baseService');
 
 const vetoesSchema = new mongoose.Schema({
     sender: { type: 'ObjectId', ref: 'User', required: true },
@@ -17,50 +15,29 @@ const vetoesSchema = new mongoose.Schema({
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 vetoesSchema.pre('findByIdAndUpdate', function (next) {
-    this.populate('mediator', 'username osuId', users.User);
-    this.populate('debaters', 'username osuId', users.User);
+    this.populate('mediator', 'username osuId');
+    this.populate('debaters', 'username osuId');
     next();
 });
 
-const Veto = db.model('Veto', vetoesSchema);
+const Veto = mongoose.model('Veto', vetoesSchema);
 
-class VetoService
+class VetoService extends BaseService
 {
-    async query(params, populate, sorting, getAll) {
-        let query;
-
-        if (getAll) {
-            query = Veto.find(params);
-        } else {
-            query = Veto.findOne(params);
-        }
-
-        if (populate) {
-            for (let i = 0; i < populate.length; i++) {
-                const p = populate[i];
-                query.populate(p.populate, p.display, p.model);
-            }
-        }
-
-        if (sorting) {
-            query.sort(sorting);
-        }
-
-        try {
-            return await query.exec();
-        } catch(error) {
-            return { error: error._message };
-        }
+    constructor() {
+        super(Veto);
     }
 
-    async update(id, update) {
-        try {
-            return await Veto.findByIdAndUpdate(id, update, { 'new': true });
-        } catch(error) {
-            return { error: error._message };
-        }
-    }
-
+    /**
+     * 
+     * @param {object} sender UserId who creates
+     * @param {string} beatmapLink 
+     * @param {number} beatmapId 
+     * @param {string} beatmapTitle 
+     * @param {string} beatmapMapper 
+     * @param {string} reasonLink 
+     * @param {string} mode 'osu', 'taiko', 'catch', 'mania'
+     */
     async create(sender, beatmapLink, beatmapId, beatmapTitle, beatmapMapper, reasonLink, mode) {
         try {
             return await Veto.create({ 
@@ -73,7 +50,7 @@ class VetoService
                 mode: mode 
             });
         } catch(error) {
-            return { error: "could not create veto" }
+            return { error: 'could not create veto' }
         }
     }
 }

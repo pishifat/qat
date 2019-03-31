@@ -10,7 +10,7 @@ router.use(api.isNat);
 
 /* GET eval archive page */
 router.get('/', async (req, res, next) => {
-    res.render('datacollection', { 
+    res.render('evaluations/datacollection', { 
         title: 'Data Collection', 
         script: '../javascripts/dataCollection.js', 
         isEval: true, 

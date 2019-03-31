@@ -2,7 +2,7 @@ const express = require('express');
 const api = require('../models/api.js');
 const bnApps = require('../models/bnApp.js');
 const logs = require('../models/log.js');
-const testSubmission = require('../models/testSubmission');
+const testSubmission = require('../models/bnTest/testSubmission');
 
 const router = express.Router();
 

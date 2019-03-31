@@ -1,10 +1,9 @@
-const config = require('../config.json');
 const mongoose = require('mongoose');
-const db = mongoose.createConnection(config.connection, { useNewUrlParser: true })
+const BaseService = require('./baseService');
 
 const evalRoundSchema = new mongoose.Schema({
     bn: { type: 'ObjectId', ref: 'User', required: true },
-    mode: { type: String, required: true },
+    mode: { type: String, enum: ['osu', 'taiko', 'catch', 'mania'], required: true },
     evaluations: [{ type: 'ObjectId', ref: 'Evaluation' }],
     deadline: { type: Date , required: true },
     active: { type: Boolean, default: true },
@@ -13,50 +12,20 @@ const evalRoundSchema = new mongoose.Schema({
     feedback: { type: String },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-const EvalRound = db.model('EvalRound', evalRoundSchema);
+const EvalRound = mongoose.model('EvalRound', evalRoundSchema);
 
-class EvalRoundService
+class EvalRoundService extends BaseService
 {
-    async query(params, populate, sorting, getAll) {
-        let query;
-
-        if (getAll) {
-            query = EvalRound.find(params);
-        } else {
-            query = EvalRound.findOne(params);
-        }
-
-        if (populate) {
-            for (let i = 0; i < populate.length; i++) {
-                const p = populate[i];
-                
-                if (p.innerPopulate) {
-                    query.populate({ path: p.innerPopulate, model: p.model, populate: p.populate });
-                } else {
-                    query.populate(p.populate, p.display, p.model);
-                }
-            }
-        }
-
-        if (sorting) {
-            query.sort(sorting);
-        }
-
-        try {
-            return await query.exec();
-        } catch(error) {
-            return { error: error._message };
-        }
+    constructor() {
+        super(EvalRound);
     }
 
-    async update(id, update) {
-        try {
-            return await EvalRound.findByIdAndUpdate(id, update, { 'new': true });
-        } catch(error) {
-            return { error: error._message };
-        }
-    }
-
+    /**
+     * 
+     * @param {object} bnId UserId of bn to be evaluated
+     * @param {string} mode 'osu', 'taiko', 'catch', 'mania'
+     * @param {date} deadline 
+     */
     async create(bnId, mode, deadline) {
         try {
             return await EvalRound.create({bn: bnId, mode: mode, deadline: deadline});

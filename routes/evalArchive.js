@@ -12,7 +12,7 @@ router.use(api.isNat);
 
 /* GET eval archive page */
 router.get('/', async (req, res, next) => {
-    res.render('evalarchive', { 
+    res.render('evaluations/evalarchive', { 
         title: 'Evaluation Archives', 
         script: '../javascripts/evalArchive.js', 
         isEval: true, 

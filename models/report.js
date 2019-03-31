@@ -1,6 +1,5 @@
-const config = require('../config.json');
 const mongoose = require('mongoose');
-const db = mongoose.createConnection(config.connection, { useNewUrlParser: true })
+const BaseService = require('./baseService');
 
 const reportSchema = new mongoose.Schema({
     reporter: { type: 'ObjectId', ref: 'User', required: true },
@@ -10,50 +9,20 @@ const reportSchema = new mongoose.Schema({
     feedback: { type: String }
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-const Report = db.model('Report', reportSchema);
+const Report = mongoose.model('Report', reportSchema);
 
-class ReportService
+class ReportService extends BaseService
 {
-    async query(params, populate, sorting, getAll) {
-        let query;
-
-        if (getAll) {
-            query = Report.find(params);
-        } else {
-            query = Report.findOne(params);
-        }
-
-        if (populate) {
-            for (let i = 0; i < populate.length; i++) {
-                const p = populate[i];
-                
-                if (p.innerPopulate) {
-                    query.populate({ path: p.innerPopulate, model: p.model, populate: p.populate });
-                } else {
-                    query.populate(p.populate, p.display, p.model);
-                }
-            }
-        }
-
-        if (sorting) {
-            query.sort(sorting);
-        }
-
-        try {
-            return await query.exec();
-        } catch(error) {
-            return { error: error._message };
-        }
+    constructor() {
+        super(Report);
     }
 
-    async update(id, update) {
-        try {
-            return await Report.findByIdAndUpdate(id, update, { 'new': true });
-        } catch(error) {
-            return { error: error._message };
-        }
-    }
-
+    /**
+     * 
+     * @param {object} reporter UserId who creates
+     * @param {object} culpritId UserId who is being reported
+     * @param {string} reason 
+     */
     async create(reporter, culpritId, reason) {
         try {
             return await Report.create({reporter: reporter, culprit: culpritId, reason: reason});
