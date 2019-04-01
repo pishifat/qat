@@ -1,23 +1,22 @@
 <template>
 <div class="row">
     <div class="col-md-12">
-        <div class="row mb-3">
-            <div class="col-lg-12 col-md-12">
-                <small>temp
-                    <input id="username" placeholder="username"/>
-                    <input id="osuId" placeholder="osu id"/>
-                    <input id="mode" placeholder="mode (just 1)"/> 
-                    <input id="group" placeholder="bn/nat"/> 
-                    <input id="probation" placeholder="probation mode"/> | 
-                    <input id="date" placeholder="date" @keyup.enter="tempUpdate()"/>
-                    <button @click="tempCreate()">temp create</button>
-                    <button @click="tempUpdate()">temp update</button>
-                </small>
-                <hr>
-                <small>Search: 
-                    <input id="search" class="text-input" v-model="filterValue" type="text" placeholder="username... (3+ characters)" /> 
-                </small>
-                <small>
+        <!-- <small>temp
+            <input id="username" placeholder="username"/>
+            <input id="osuId" placeholder="osu id"/>
+            <input id="mode" placeholder="mode (just 1)"/> 
+            <input id="group" placeholder="bn/nat"/> 
+            <input id="probation" placeholder="probation mode"/> | 
+            <input id="date" placeholder="date" @keyup.enter="tempUpdate()"/>
+            <button @click="tempCreate()">temp create</button>
+            <button @click="tempUpdate()">temp update</button>
+        </small>
+        <hr> -->
+        <div class="row segment mb-1 mx-4" style="background-color: rgba(31, 31, 31, 0.88); margin: 0px;">
+            <small>Search: 
+                <input id="search" class="text-input" v-model="filterValue" type="text" placeholder="username... (3+ characters)" /> 
+            </small>
+            <small>
                 <select class="custom-select inline-custom-select ml-2" id="mode" v-model="filterMode">
                     <option value="" selected>All modes</option>
                     <option value="osu">osu!</option>
@@ -25,34 +24,44 @@
                     <option value="catch">osu!catch</option>
                     <option value="mania">osu!mania</option>
                 </select>
-                </small>
-            </div>
-            <div class="col-lg-4 col-md-4">
-                <small>Sort: 
-                    <a :class="sortBy === 'username' ? 'sorted' : ''" href="#" @click.prevent="sort('username')">Name</a> | 
-                    <a :class="sortBy === 'bnDuration' ? 'sorted' : ''" href="#" @click.prevent="sort('bnDuration')">BN Tenure</a> | 
-                    <a :class="sortBy === 'natDuration' ? 'sorted' : ''" href="#" @click.prevent="sort('natDuration')">NAT Tenure</a>
-                </small>
+            </small>
+        </div>
+        <div class="row segment mb-3 mx-4" style="background-color: rgba(31, 31, 31, 0.88); margin: 0px">
+            <small>Sort by:
+                <a :class="sortBy === 'username' ? 'sorted' : ''" href="#" @click.prevent="sort('username')">Name</a> | 
+                <a :class="sortBy === 'bnDuration' ? 'sorted' : ''" href="#" @click.prevent="sort('bnDuration')">BN Tenure</a> | 
+                <a :class="sortBy === 'natDuration' ? 'sorted' : ''" href="#" @click.prevent="sort('natDuration')">NAT Tenure</a>
+            </small>
+        </div>
+
+        <div class="row segment" style="background-color: rgba(37, 37, 37, 0.56); margin: 0px; padding: 0px;">
+            <div class="col-sm-12">
+                <div class="row mx-auto">
+                    <button :disabled="!(pre > 0)" class="btn btn-sm btn-nat mx-auto text-center my-2" type="button" @click="showNewer()">
+                        <i class="fas fa-angle-up mr-1"></i> show next <i class="fas fa-angle-up ml-1"></i>
+                    </button>
+                </div>
+                <transition-group name="list" tag="div" class="row mx-auto">
+                    <user-card
+                        v-for="user in pageObjs"
+                        :key="user.id"
+                        :user="user"
+                        :userId="userId"
+                        :userGroup="userGroup"
+                        @update:selectedUser="selectedUser = $event"
+                    ></user-card>
+                </transition-group>
+                <div class="row d-flex justify-content-center mt-2">
+                    <p class="small">{{currentPage}} of {{pages}}</p>
+                </div>
+                <div class="row d-flex justify-content-center">
+                    <button :disabled="!canShowOlder" class="btn btn-sm btn-nat text-center mb-2" type="button" @click="showOlder()">
+                        <i class="fas fa-angle-down mr-1"></i> show previous <i class="fas fa-angle-down ml-1"></i>
+                    </button>
+                </div>
             </div>
         </div>
 
-        <button :disabled="!(pre > 0)" class="btn btn-sm btn-nat mx-auto my-2" style="display:block" type="button" @click="showNewer()">
-            <i class="fas fa-angle-up mr-1"></i> show next <i class="fas fa-angle-up ml-1"></i>
-        </button>
-        <transition-group name="list" tag="div" class="row">
-            <user-card
-                v-for="user in pageObjs"
-                :key="user.id"
-                :user="user"
-                :userId="userId"
-                :userGroup="userGroup"
-                @update:selectedUser="selectedUser = $event"
-            ></user-card>
-        </transition-group>
-        <div class="small text-center mx-auto">{{currentPage}} of {{pages}}</div>
-        <button :disabled="!canShowOlder" class="btn btn-sm btn-nat mx-auto my-2" style="display:block" type="button" @click="showOlder()">
-            <i class="fas fa-angle-down mr-1"></i> show previous <i class="fas fa-angle-down ml-1"></i>
-        </button>
     </div>
     <user-info
         :user="selectedUser"

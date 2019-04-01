@@ -1,7 +1,25 @@
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const path = require('path');
 
-const config = {
+const qatConfig =  {
+    name: 'qat',
+    entry: {
+        appEval: './src/appEval.js',
+        bnEval: './src/bnEval.js',
+        dataCollection: './src/dataCollection.js',
+        evalArchive: './src/evalArchive.js',
+        manageReports: './src/manageReports.js',
+        users: './src/users.js',
+        vetoes: './src/vetoes.js',
+        manageTest: './src/manageTest.js',
+        testResults: './src/testResults.js',
+        testSubmission: './src/testSubmission.js',
+    },
+    output: {
+        filename: '[name].js',
+        path: path.resolve(__dirname, 'public/javascripts/'),
+        publicPath: '/'
+    },
     mode: 'development', // TOCHANGE production
     module: {
         rules: [
@@ -42,32 +60,9 @@ const config = {
         publicPath: '/javascripts/',
         port: 8080,
         proxy: {
-        '/': 'http://localhost:3001'
+            '/': 'http://localhost:3001'
         }
     }
 };
 
-const qatConfig = Object.assign({}, config, {
-    name: 'qat',
-    entry: {
-        appEval: './src/appEval.js',
-        bnEval: './src/bnEval.js',
-        dataCollection: './src/dataCollection.js',
-        evalArchive: './src/evalArchive.js',
-        manageReports: './src/manageReports.js',
-        users: './src/users.js',
-        vetoes: './src/vetoes.js',
-        manageTest: './src/manageTest.js',
-        testResults: './src/testResults.js',
-        testSubmission: './src/testSubmission.js',
-    },
-    output: {
-        filename: '[name].js',
-        path: path.resolve(__dirname, 'public/javascripts/'),
-        publicPath: '/'
-    },
-});
-
-module.exports = [
-    qatConfig,
-];
+module.exports = [ qatConfig ];

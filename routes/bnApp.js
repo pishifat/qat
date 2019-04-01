@@ -29,11 +29,9 @@ router.post('/apply', async (req, res, next) => {
         let date = new Date();
         date.setDate(date.getDate() - 90);
         const currentBnApp = await bnApps.service.query({
-            $and: [
-                { applicant: req.session.mongoId },
-                { mode: req.body.mode },
-                { createdAt: { $gte: date } },
-            ],
+            applicant: req.session.mongoId,
+            mode: req.body.mode,
+            createdAt: { $gte: date },
         });
 
         if (!currentBnApp || currentBnApp.error) {

@@ -28,7 +28,7 @@ router.get('/', async (req, res, next) => {
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res, next) => {
     let v = await vetoes.service.query({}, defaultPopulate, { createdAt: 1 }, true);
-    res.json({ vetoes: v, userId: req.session.mongoId, userGroup: req.session.group, isMediator: res.locals.userRequest.vetoMediator });
+    res.json({ vetoes: v, userId: req.session.mongoId, userGroup: res.locals.userRequest.group, isMediator: res.locals.userRequest.vetoMediator });
 });
 
 /* POST create a new veto. */

@@ -8,11 +8,17 @@ const router = express.Router();
 
 /* GET bn app page */
 router.get('/', async (req, res, next) => {
+    let user;
+
+    if (req.session.mongoId) {
+        user = await users.service.query({ _id: req.session.mongoId });
+    }
+
     let isBnOrNat;
     let isBn;
-    if (req.session.group == 'bn' || req.session.group == 'nat') {
+    if (user && (user.group == 'bn' || user.group == 'nat')) {
         isBnOrNat = true;
-        if (req.session.group == 'bn') isBn = true;
+        if (user.group == 'bn') isBn = true;
     }
     res.render('qatIndex', { title: 'NAT', layout: false, loggedInAs: req.session.mongoId, isBnOrNat: isBnOrNat, isBn: isBn});
 });
@@ -40,7 +46,6 @@ router.get('/login', async (req, res, next) => {
             }
         } else {
             req.session.mongoId = u._id;
-            req.session.group = u.group;
             return next();
         }
     }

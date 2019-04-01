@@ -21,7 +21,7 @@ router.get('/', async (req, res, next) => {
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res, next) => {
     let u = await users.service.query({$or: [{group: 'nat'}, {group: 'bn'}]}, {}, {createdAt: 1}, true );
-    res.json({ users: u, userId: req.session.mongoId, userGroup: req.session.group });
+    res.json({ users: u, userId: req.session.mongoId, userGroup: res.locals.userRequest.group });
 });
 
 
