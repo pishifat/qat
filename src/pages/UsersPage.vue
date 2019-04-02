@@ -12,7 +12,7 @@
             <button @click="tempUpdate()">temp update</button>
         </small>
         <hr> -->
-        <div class="row segment mb-1 mx-4" style="background-color: rgba(31, 31, 31, 0.88); margin: 0px;">
+        <div class="row segment mb-1 mx-4" style="margin: 0px;">
             <small>Search: 
                 <input id="search" class="text-input" v-model="filterValue" type="text" placeholder="username... (3+ characters)" /> 
             </small>
@@ -26,7 +26,7 @@
                 </select>
             </small>
         </div>
-        <div class="row segment mb-3 mx-4" style="background-color: rgba(31, 31, 31, 0.88); margin: 0px">
+        <div class="row segment mb-3 mx-4" style="margin: 0px">
             <small>Sort by:
                 <a :class="sortBy === 'username' ? 'sorted' : ''" href="#" @click.prevent="sort('username')">Name</a> | 
                 <a :class="sortBy === 'bnDuration' ? 'sorted' : ''" href="#" @click.prevent="sort('bnDuration')">BN Tenure</a> | 
@@ -34,7 +34,7 @@
             </small>
         </div>
 
-        <div class="row segment" style="background-color: rgba(37, 37, 37, 0.56); margin: 0px; padding: 0px;">
+        <div class="row segment" style="margin: 0px; padding: 0px;">
             <div class="col-sm-12">
                 <div class="row mx-auto">
                     <button :disabled="!(pre > 0)" class="btn btn-sm btn-nat mx-auto text-center my-2" type="button" @click="showNewer()">

@@ -7,8 +7,8 @@ var logs = require('../models/log.js');
 const router = express.Router();
 
 const defaultPopulate = [
-    { populate: 'mediator', display: 'username osuId', model: users.User },
-    { populate: 'debaters', display: 'username osuId', model: users.User },
+    { populate: 'vetoer', display: 'username osuId', model: users.User },
+    { populate: 'mediators', display: 'username osuId', model: users.User },
 ];
 
 router.use(api.isLoggedIn);
@@ -17,7 +17,7 @@ router.use(api.isBnOrNat);
 /* GET bn app page */
 router.get('/', async (req, res, next) => {
     res.render('vetoes', {
-        title: 'vetoes',
+        title: 'Vetoes',
         script: '../javascripts/vetoes.js',
         isVetoes: true,
         isBnOrNat: true,
@@ -33,7 +33,7 @@ router.get('/relevantInfo', async (req, res, next) => {
 
 /* POST create a new veto. */
 router.post('/submit', async (req, res, next) => {
-    let url = req.body.beatmapLink;
+    let url = req.body.discussionLink;
     if (url.length == 0) {
         url = undefined;
     }
@@ -60,11 +60,12 @@ router.post('/submit', async (req, res, next) => {
 
     const v = await vetoes.service.create(
         req.session.mongoId,
-        req.body.beatmapLink,
+        req.body.discussionLink,
         bmInfo.beatmapset_id,
-        bmInfo.title + ' - ' + bmInfo.artist,
+        bmInfo.artist  + ' - ' + bmInfo.title,
         bmInfo.creator,
-        req.body.reasonLink,
+        bmInfo.creator_id,
+        req.body.shortReason,
         req.body.mode
     );
     res.json(v);

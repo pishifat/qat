@@ -2,21 +2,21 @@ const mongoose = require('mongoose');
 const BaseService = require('./baseService');
 
 const vetoesSchema = new mongoose.Schema({
-    sender: { type: 'ObjectId', ref: 'User', required: true },
+    vetoer: { type: 'ObjectId', ref: 'User', required: true },
     mode: { type: String, enum: ['osu', 'taiko', 'catch', 'mania'] },
-    beatmapLink: { type: String, required: true },
+    discussionLink: { type: String, required: true },
     beatmapId: { type: String },
     beatmapTitle: { type: String },
     beatmapMapper: { type: String },
-    reasonLink: { type: String, required: true },
+    beatmapMapperId: { type: Number },
+    shortReason: { type: String, required: true },
     status: { type: String, enum: ['available', 'wip', 'upheld', 'withdrawn'], default: 'available' },
-    debaters: [{ type: 'ObjectId', ref: 'User' }],
-    mediator: { type: 'ObjectId', ref: 'User' },
+    mediators: [{ type: 'ObjectId', ref: 'User' }],
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 vetoesSchema.pre('findByIdAndUpdate', function (next) {
-    this.populate('mediator', 'username osuId');
-    this.populate('debaters', 'username osuId');
+    this.populate('mediators', 'username osuId');
+    this.populate('vetoer', 'username osuId');
     next();
 });
 
@@ -30,23 +30,24 @@ class VetoService extends BaseService
 
     /**
      * 
-     * @param {object} sender UserId who creates
-     * @param {string} beatmapLink 
+     * @param {object} vetoer UserId who creates
+     * @param {string} discussionLink 
      * @param {number} beatmapId 
      * @param {string} beatmapTitle 
      * @param {string} beatmapMapper 
-     * @param {string} reasonLink 
+     * @param {string} shortReason 
      * @param {string} mode 'osu', 'taiko', 'catch', 'mania'
      */
-    async create(sender, beatmapLink, beatmapId, beatmapTitle, beatmapMapper, reasonLink, mode) {
+    async create(vetoer, discussionLink, beatmapId, beatmapTitle, beatmapMapper, beatmapMapperId, shortReason, mode) {
         try {
             return await Veto.create({ 
-                sender: sender, 
-                beatmapLink: beatmapLink, 
+                vetoer: vetoer, 
+                discussionLink: discussionLink, 
                 beatmapId: beatmapId, 
                 beatmapTitle: beatmapTitle, 
                 beatmapMapper: beatmapMapper,
-                reasonLink: reasonLink, 
+                beatmapMapperId: beatmapMapperId,
+                shortReason: shortReason, 
                 mode: mode 
             });
         } catch(error) {

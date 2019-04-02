@@ -4,17 +4,22 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content" v-if="veto">
             <div class="modal-header text-dark" :class="'bg-' + veto.status">
-                <h5 class="modal-title">{{ fullTitle }}</h5>
+                <h5 class="modal-title">
+                    <a class="text-dark" :href="'https://osu.ppy.sh/beatmapsets/' + veto.beatmapId">{{ veto.beatmapTitle }}</a> by 
+                    <a class="text-dark" :href="'https://osu.ppy.sh/users/' + veto.beatmapMapperId">{{ veto.beatmapMapper }}</a>
+                </h5>
                 <button type="button" class="close" data-dismiss="modal">
                     <span>&times;</span>
                 </button>
             </div>
             <div class="modal-body" style="overflow: hidden">
-                <p class="text-shadow">Beatmap Link: 
-                    <a class="small ml-1" :href="veto.beatmapLink">{{ veto.beatmapLink }}</a>
-                </p>
-                <p class="text-shadow">Reason: 
-                    <a class="small ml-1" :href="veto.beatmapLink">{{ veto.reasonLink }}</a>
+                <div class="text-shadow">
+                    <a :href="veto.discussionLink">Read the veto discussion here</a>
+                    <br>
+                    <small class="ml-2">Veto reason: <i>{{ veto.shortReason }}</i></small>
+                </div>
+                <hr>
+                <p class="text-shadow small ml-4">
                 </p>
                 <p class="text-shadow">
                     Status: <small>{{ veto.status }}</small>
@@ -25,7 +30,7 @@
                 <ul v-for="debater in veto.debaters" :key="debater.id">
                     <li>{{ debater.username }}</li>
                 </ul>
-                <p class="text-shadow" v-if="veto.mediator">Mediator: <small>{{ veto.mediator.username }}</small></p>
+                <p class="text-shadow" v-if="veto.mediator">Vetoed by <small>{{ veto.vetoer.username }}</small></p>
                 <p class="text-shadow" v-else-if="isMediator"><button class="btn btn-sm btn-nat" @click="mediate()">Mediate this!</button></p>
             </div>
             <div class="modal-footer">

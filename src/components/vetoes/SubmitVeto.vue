@@ -15,7 +15,7 @@
                                 type="text"
                                 class="form-control text-input"
                                 placeholder="Beatmap Link"
-                                v-model="beatmapLink"
+                                v-model="discussionLink"
                             />
                         </div>
                         <div class="row mb-1">
@@ -23,7 +23,7 @@
                                 type="text"
                                 class="form-control text-input"
                                 placeholder="Reason Link"
-                                v-model="reasonLink"
+                                v-model="shortReason"
                             />
                         </div>
                         <div class="row mb-1">
@@ -67,22 +67,22 @@ export default {
     mixins: [postData],
     data() {
         return {
-            beatmapLink: null,
-            reasonLink: null,
+            discussionLink: null,
+            shortReason: null,
             mode: null,
             info: null,
         };
     },
     methods: {
         submitVeto: async function(e) {
-            if (!this.beatmapLink || !this.beatmapLink || !this.mode) {
+            if (!this.discussionLink || !this.shortReason || !this.mode) {
                 this.info = 'Fill the info';
             } else {
                 const veto = await this.executePost(
                     '/nat/vetoes/submit',
                     {
-                        beatmapLink: this.beatmapLink,
-                        reasonLink: this.reasonLink,
+                        discussionLink: this.discussionLink,
+                        shortReason: this.shortReason,
                         mode: this.mode,
                     },
                     e

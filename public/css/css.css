@@ -19,6 +19,7 @@
     --secondary-text: #b9bbbe;
 
     --dark: #252525;
+    --darker: #141414;
     --dark-alpha: #252525a6;
     --clicked: rgb(84, 161, 192);
 }
@@ -61,6 +62,10 @@ p, small, .small {
 a {
     color: var(--main-text);
     font-weight: bold;
+}
+
+.main-text {
+    color: var(--main-text);
 }
 
 a:hover {
@@ -176,6 +181,14 @@ hr {
 
 /* SPECIFICS */
 
+.main-text{
+    color: var(--main-text);
+}
+
+.secondary-text{
+    color: var(--secondary-text);
+}
+
 .segment {
     background-color: var(--dark-alpha);
     margin: 1rem 1rem 1rem 1rem;
@@ -191,9 +204,10 @@ hr {
 .text-input,
 .text-input:focus {
     min-width: 200px;
-    background-color: #333;
+    background-color: var(--darker);
     color: #f8f9fa;
-    border-color: transparent;
+    border-color: var(--dark);
+    border-width: 1px;
     filter: drop-shadow(1px 1px 1px #000000);
     padding-left: 0.75rem;
     border-radius: 100px 100px 100px 100px;
@@ -210,9 +224,10 @@ hr {
 
 input[type='text'],
 input[type='text']:focus {
-    background-color: #333;
+    background-color: var(--darker);
     color: white;
-    border-color: transparent;
+    border-color: var(--dark);
+    border-width: 1px;
     filter: drop-shadow(1px 1px 1px #000000);
     border-radius: 100px 100px 100px 100px;
 }
@@ -221,9 +236,9 @@ input[type='text']:focus {
     min-width: 7rem;
     width: 7rem;
     height: 2.5em;
-    background-color: #333;
+    background-color: var(--darker);
     color: white;
-    border-color: transparent;
+    border-color: var(--dark);
     border-radius: 100px;
     filter: drop-shadow(1px 1px 1px #000000);
     /* arrow */
@@ -429,10 +444,13 @@ input[type="radio"] + .fas { cursor: pointer; }
 .card {
     transition: all 0.12s ease-in-out;
     opacity: 0.9;
-    box-shadow: 1px 1px 10px 0px #333;
+    box-shadow: 1px 1px 4px 0px rgb(0, 0, 0);
     cursor: default;
-    background-color: var(--dark);
+    background-color: var(--darker);
     height: 100%;
+    border-left: solid 1px var(--dark);
+    border-bottom: solid 1px var(--dark);
+    border-right: solid 1px var(--dark);
 }
 
 .card:hover {
