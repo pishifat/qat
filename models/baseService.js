@@ -15,7 +15,7 @@ class BaseService {
      * @param {string} params ex: 'x: y'
      * @param {string} populate ex: 'populate: x, display: y' or 'innerPopulate: x, populate: y'
      * @param {string} sorting ex: 'x: -1'
-     * @param {bool} getAll 
+     * @param {boolean} getAll 
      */
     async query(params, populate, sorting, getAll) {
         let query;

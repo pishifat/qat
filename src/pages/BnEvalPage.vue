@@ -1,76 +1,12 @@
 <template>
 
 <div class="row">
-    <div class="col-md-12 mb-4">
-        <div class="mb-2">
-            <small>Search: 
-                <input id="search" class="text-input" v-model="filterValue" type="text" placeholder="username... (3+ characters)" /> 
-            </small>
-            <small>
-                <select class="custom-select inline-custom-select ml-2" id="mode" v-model="filterMode">
-                    <option value="" selected>All modes</option>
-                    <option value="osu">osu!</option>
-                    <option value="taiko">osu!taiko</option>
-                    <option value="catch">osu!catch</option>
-                    <option value="mania">osu!mania</option>
-                </select>
-            </small> 
-            <small>
-                <button class="btn btn-nat btn-sm ml-2" @click="selectAll($event)">Select all</button>
-            </small>
-        </div>
-        <div class="mb-2">
-            <small>Mark selected as:
-                <button class="btn btn-nat btn-sm ml-2" @click="setGroupEval($event)">Group evaluation</button>
-            </small>
-            <small>
-                <button class="btn btn-nat btn-sm ml-2" @click="setIndividualEval($event)">Individual evaluation</button>
-            </small>
-            <small>
-                <button class="btn btn-nat-red btn-sm ml-2" @click="setComplete($event)">Archive</button>
-            </small>
-        </div>
-        <hr>
-        <h2>Individual Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="only you can see these">?</sup> 
-            <button
-            class="btn btn-nat"
-            data-toggle="modal"
-            data-target="#addEvalRounds"
-            @click="openAddEvalRounds()"
-          >Add users to evaluate</button>
-        </h2>
-
-        <transition-group name="list" tag="div" class="row">
-            <eval-card
-                v-for="evalRound in evalRounds"
-                :eval-round="evalRound"
-                :evaluator="evaluator"
-                :key="evalRound.id"
-                @update:selectedEvalRound="selectedEvalRound = $event"
-            ></eval-card>
-        </transition-group>
-        
-        <p v-if="!evalRounds || evalRounds.length == 0" class="ml-4">No BNs to evaluate...</p>
-    </div>
     
-    <div class="col-md-12">
-        <hr>
-        <h2>Group Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="everyone can see these">?</sup></h2>
+    <base-eval-page
+        is-bn-eval
         
+    ></base-eval-page>
 
-        <transition-group name="list" tag="div" class="row">
-            <discuss-card
-                v-for="discussRound in discussRounds"
-                :discuss-round="discussRound"
-                :evaluator="evaluator"
-                :key="discussRound.id"
-                @update:selectedDiscussRound="selectedDiscussRound = $event"
-            ></discuss-card>
-        </transition-group>
-        
-        <p v-if="!discussRounds || discussRounds.length == 0" class="ml-4">No BNs to evaluate...</p>
-    </div>
-    
     <eval-info
         :evalRound="selectedEvalRound"
         :evaluator="evaluator"
@@ -96,6 +32,7 @@
 
 
 <script>
+import BaseEvalPage from './BaseEvalPage.vue';
 import AddEvalRounds from '../components/evaluations/AddEvalRounds.vue';
 import EvalCard from '../components/evaluations/EvalCard.vue';
 import EvalInfo from '../components/evaluations/EvalInfo.vue';
@@ -106,6 +43,7 @@ import postData from '../mixins/postData.js';
 export default {
     name: 'bn-eval-page',
     components: {
+        BaseEvalPage,
         AddEvalRounds,
         EvalCard,
         EvalInfo,
@@ -269,7 +207,7 @@ export default {
                 this.filter();
             }).then(function(){
                 $("#loading").fadeOut();
-                $("#main").attr("style", "visibility: visible").hide().fadeIn();
+                $("#main, footer").attr("style", "visibility: visible").hide().fadeIn();
             });
     },
     mounted () {

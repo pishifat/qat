@@ -1,6 +1,6 @@
 $(function () {
     $('#loading').hide();
-    $('#main').attr('style', 'visibility: visible');
+    $('#main, footer').attr('style', 'visibility: visible');
     $("body").tooltip({ selector: '[data-toggle=tooltip]', trigger: 'hover', });
 
     let skip = 100;
@@ -13,9 +13,9 @@ $(function () {
 
             $.each(logs, function (k, log) {
                 $(`<tr>
-                    <td scope="row" style="padding: 1px;">${new Date(log.createdAt).toString().slice(4,24)} GMT</td>
-                    <td scope="row" style="padding: 1px;">${log.user.username}</td>
-                    <td scope="row" style="padding: 1px;">${log.action.length > 120 ? log.action.slice(0,120) + "..." : log.action}</td>
+                    <td scope="row">${new Date(log.createdAt).toString().slice(4,24)} GMT</td>
+                    <td scope="row">${log.user.username}</td>
+                    <td scope="row">${log.action.length > 120 ? log.action.slice(0,120) + "..." : log.action}</td>
                 </tr>`).hide().appendTo('tbody').fadeIn();
             });
         });

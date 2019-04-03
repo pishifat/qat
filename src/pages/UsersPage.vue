@@ -12,7 +12,7 @@
             <button @click="tempUpdate()">temp update</button>
         </small>
         <hr> -->
-        <div class="row segment mb-1 mx-4" style="margin: 0px;">
+        <section class="row segment segment-solid my-1 mx-4">
             <small>Search: 
                 <input id="search" class="text-input" v-model="filterValue" type="text" placeholder="username... (3+ characters)" /> 
             </small>
@@ -25,16 +25,16 @@
                     <option value="mania">osu!mania</option>
                 </select>
             </small>
-        </div>
-        <div class="row segment mb-3 mx-4" style="margin: 0px">
+        </section>
+        <section class="row segment segment-solid my-1 mx-4">
             <small>Sort by:
                 <a :class="sortBy === 'username' ? 'sorted' : ''" href="#" @click.prevent="sort('username')">Name</a> | 
                 <a :class="sortBy === 'bnDuration' ? 'sorted' : ''" href="#" @click.prevent="sort('bnDuration')">BN Tenure</a> | 
                 <a :class="sortBy === 'natDuration' ? 'sorted' : ''" href="#" @click.prevent="sort('natDuration')">NAT Tenure</a>
             </small>
-        </div>
+        </section>
 
-        <div class="row segment" style="margin: 0px; padding: 0px;">
+        <section class="row segment mx-0 px-0">
             <div class="col-sm-12">
                 <div class="row mx-auto">
                     <button :disabled="!(pre > 0)" class="btn btn-sm btn-nat mx-auto text-center my-2" type="button" @click="showNewer()">
@@ -60,7 +60,7 @@
                     </button>
                 </div>
             </div>
-        </div>
+        </section>
 
     </div>
     <user-info
@@ -155,7 +155,7 @@ export default {
                 this.limit = 16;
             }).then(function(){
                 $("#loading").fadeOut();
-                $("#main").attr("style", "visibility: visible").hide().fadeIn();
+                $('#main, footer').attr("style", "visibility: visible").hide().fadeIn();
             });
     },
     mounted () {

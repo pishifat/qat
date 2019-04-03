@@ -32,8 +32,40 @@ html {
 body {
     background-color: #151515;
     background: url('../images/triangles.png') repeat fixed;
-    font-family: 'Helvetica Neue', 'Whitney', Helvetica, 'Segoe UI', 'Roboto', sans-serif;
-    overflow-x: hidden;
+    font-family: 'Helvetica Neue', Helvetica, sans-serif;
+}
+
+header {
+    background-color: #ffffff2e;
+    background-image: radial-gradient(circle, transparent, #000 90%); 
+    padding-bottom: 90px;
+    margin-bottom: -100px;
+    padding-top: 100px;
+    z-index: -1;
+}
+
+.header-img {
+    position: relative;
+    top: 0; 
+    left: 0;
+    min-width: 150px;
+    min-height: 150px;
+    width:150px;
+    height:150px;
+    opacity: 0.9;
+    padding: 15px;
+}
+
+.header-img-overlay {
+    position: relative;
+    padding: 1.25rem;
+}
+
+footer {
+    position: absolute; 
+    bottom: 0; 
+    left: calc(50% - 20px); 
+    margin-top: 15px;
 }
 
 p, small, .small {
@@ -83,10 +115,6 @@ a:hover {
 
 #main {
     visibility: hidden;
-}
-
-#app {
-    min-height: calc(80vh);
 }
 
 #loading {
@@ -194,6 +222,10 @@ hr {
     margin: 1rem 1rem 1rem 1rem;
     padding: 1rem 1rem 1rem 1rem;
     box-shadow: 5px 5px 10px 5px black;
+}
+
+.segment-solid {
+    background-color: var(--dark);
 }
 
 .navbar-nat {

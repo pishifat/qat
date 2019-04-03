@@ -147,7 +147,7 @@ export default {
     },
     created() {
         $("#loading").hide(); //this is temporary
-        $("#main").attr("style", "visibility: visible");
+        $("#main, footer").attr("style", "visibility: visible");
     }
 }
 </script>

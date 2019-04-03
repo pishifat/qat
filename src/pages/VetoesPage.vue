@@ -1,7 +1,7 @@
 <template>
     <div class="row">
         <div class="col-md-12">
-            <div class="mb-3">
+            <section class="row segment segment-solid my-1 mb-3">
                 <small
                     >Search:
                     <input
@@ -21,41 +21,52 @@
                         <option class="ml-2" value="mania">osu!mania</option>
                     </select>
                 </small>
-                <button class="btn btn-sm btn-nat ml-1" data-toggle="modal" data-target="#addVeto">
+
+                <button class="btn btn-sm btn-nat ml-3" data-toggle="modal" data-target="#addVeto">
                     Submit veto
                 </button>
-            </div>
-
-            <button
-                :disabled="!(pre > 0)"
-                class="btn btn-sm btn-nat mx-auto my-2"
-                style="display:block"
-                type="button"
-                @click="showNewer()"
-            >
-                <i class="fas fa-angle-up mr-1"></i> show next <i class="fas fa-angle-up ml-1"></i>
-            </button>
-            <transition-group name="list" tag="div" class="row">
-                <veto-card
-                    v-for="veto in pageObjs"
-                    :key="veto.id"
-                    :veto="veto"
-                    :userId="userId"
-                    :userGroup="userGroup"
-                    :filterMode="filterMode"
-                    @update:selectedVeto="selectedVeto = $event"
-                ></veto-card>
-            </transition-group>
-            <div class="small text-center mx-auto">{{ currentPage }} of {{ pages }}</div>
-            <button
-                :disabled="!canShowOlder"
-                class="btn btn-sm btn-nat mx-auto my-2"
-                style="display:block"
-                type="button"
-                @click="showOlder()"
-            >
-                <i class="fas fa-angle-down mr-1"></i> show previous <i class="fas fa-angle-down ml-1"></i>
-            </button>
+            </section>
+            
+            <section class="row segment mx-0 px-0">
+                <div class="col-sm-12">
+                    <div class="row mx-auto">
+                        <button
+                            :disabled="!(pre > 0)"
+                            class="btn btn-sm btn-nat mx-auto my-2"
+                            style="display:block"
+                            type="button"
+                            @click="showNewer()"
+                        >
+                            <i class="fas fa-angle-up mr-1"></i> show next <i class="fas fa-angle-up ml-1"></i>
+                        </button>
+                    </div>
+                    <transition-group name="list" tag="div" class="row mx-auto">
+                        <veto-card
+                            v-for="veto in pageObjs"
+                            :key="veto.id"
+                            :veto="veto"
+                            :userId="userId"
+                            :userGroup="userGroup"
+                            :filterMode="filterMode"
+                            @update:selectedVeto="selectedVeto = $event"
+                        ></veto-card>
+                    </transition-group>
+                    <div class="row d-flex justify-content-center mt-2">
+                        <div class="small text-center mx-auto">{{ currentPage }} of {{ pages }}</div>
+                    </div>
+                    <div class="row d-flex justify-content-center">
+                        <button
+                            :disabled="!canShowOlder"
+                            class="btn btn-sm btn-nat mx-auto my-2"
+                            style="display:block"
+                            type="button"
+                            @click="showOlder()"
+                        >
+                            <i class="fas fa-angle-down mr-1"></i> show previous <i class="fas fa-angle-down ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
         </div>
         <veto-info
             :veto="selectedVeto"
@@ -126,7 +137,7 @@ export default {
             })
             .then(function() {
                 $('#loading').fadeOut();
-                $('#main')
+                $('#main, footer')
                     .attr('style', 'visibility: visible')
                     .hide()
                     .fadeIn();

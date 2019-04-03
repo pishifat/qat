@@ -165,7 +165,7 @@ export default {
                 this.pops = response.data.pops;
             }).then(function(){
                 $("#loading").fadeOut();
-                $("#main").attr("style", "visibility: visible").hide().fadeIn();
+                $("#main, footer").attr("style", "visibility: visible").hide().fadeIn();
             });
     },
 }

@@ -43,22 +43,22 @@
                 <div class="container">
                     <p class="text-shadow">Options:</p>
 
-                    <table class="small table text-shadow col-md-12 mt-2">
+                    <table class="table table-sm table-dark table-hover col-md-12 mt-2">
                         <thead>
-                            <td v-if="question.category == 'metadata'" scope="col" style="padding: 2px;">Field</td>
-                            <td scope="col" style="padding: 2px;">Option</td>
-                            <td scope="col" style="padding: 2px;">Score</td>
-                            <td scope="col" style="padding: 2px;">Select</td>
+                            <td v-if="question.category == 'metadata'" scope="col">Field</td>
+                            <td scope="col">Option</td>
+                            <td scope="col">Score</td>
+                            <td scope="col">Select</td>
                         </thead>
                         <tbody>
                             <tr v-for="option in question.options" :key="option.id">
-                                <td v-if="question.category == 'metadata'" scope="row" style="padding: 1px;">{{option.metadataType}}</td>
-                                <td scope="row" style="padding: 1px;">
+                                <td v-if="question.category == 'metadata'" scope="row">{{option.metadataType}}</td>
+                                <td scope="row">
                                     <a v-if="question.questionType == 'image'" :href="option.content" target="_blank">{{option.content}}</a>
                                     <span v-else>{{option.content}}</span>
                                     </td>
-                                <td scope="row" style="padding: 1px;">{{option.score}}</td>
-                                <td scope="row" style="padding: 1px;"><input type="checkbox" name="optionList" :value="option.id"></td>
+                                <td scope="row">{{option.score}}</td>
+                                <td scope="row"><input type="checkbox" name="optionList" :value="option.id"></td>
                             </tr>
                         </tbody>
                     </table>

@@ -39,34 +39,34 @@
                         <div v-if="evalRound" class="col-sm-12">
                             <p class="text-shadow"><a :href="noms && '#noms'" data-toggle="collapse">Show unique nominations</a> ({{noms ? noms.length: '0'}})</p>
                             <div v-if="noms" class="collapse" id="noms">
-                                <table class="small table text-shadow col-md-12 mt-2">
+                                <table class="table table-sm table-dark table-hover col-md-12 mt-2">
                                     <thead>
-                                        <td scope="col" style="padding: 2px;">Date</td>
-                                        <td scope="col" style="padding: 2px;">Mapset</td>
+                                        <td scope="col">Date</td>
+                                        <td scope="col">Mapset</td>
                                     </thead>
                                     <tbody>
                                         <tr v-for="nom in noms" :key="nom.id">
-                                            <td scope="row" style="padding: 1px;">{{new Date(nom.timestamp).toString().slice(4,15)}}</td>
-                                            <td scope="row" style="padding: 1px;"><a :href="'https://osu.ppy.sh/beatmapsets/' + nom.beatmapsetId + '/discussion'" target="_blank">{{nom.metadata}}</a></td>
+                                            <td scope="row">{{new Date(nom.timestamp).toString().slice(4,15)}}</td>
+                                            <td scope="row"><a :href="'https://osu.ppy.sh/beatmapsets/' + nom.beatmapsetId + '/discussion'" target="_blank">{{nom.metadata}}</a></td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
                             <p class="text-shadow"><a :href="nomsDqd && '#nomsDqd'" data-toggle="collapse">Show disqualified nominations</a> ({{nomsDqd ? nomsDqd.length : '0'}})</p>
                             <div v-if="nomsDqd" class="collapse" id="nomsDqd">
-                                <table class="small table text-shadow col-md-12 mt-2">
+                                <table class="table table-sm table-dark table-hover col-md-12 mt-2">
                                     <thead>
-                                        <td scope="col" style="padding: 2px;">Date</td>
-                                        <td scope="col" style="padding: 2px;">Mapset</td>
-                                        <td scope="col" style="padding: 2px;">Reason</td>
-                                        <td scope="col" style="padding: 2px;">Validity</td>
+                                        <td scope="col">Date</td>
+                                        <td scope="col">Mapset</td>
+                                        <td scope="col">Reason</td>
+                                        <td scope="col">Validity</td>
                                     </thead>
                                     <tbody>
                                         <tr v-for="dq in nomsDqd" :key="dq.id">
-                                            <td scope="row" style="padding: 1px;">{{new Date(dq.timestamp).toString().slice(4,15)}}</td>
-                                            <td scope="row" style="padding: 1px;"><a :href="'https://osu.ppy.sh/beatmapsets/' + dq.beatmapsetId + '/discussion'" target="_blank">{{dq.metadata}}</a></td>
-                                            <td scope="row" style="padding: 1px;">{{dq.content.slice(0, dq.content.indexOf('.')+1 || 50)}}</td>
-                                            <td scope="row" style="padding: 1px;"
+                                            <td scope="row">{{new Date(dq.timestamp).toString().slice(4,15)}}</td>
+                                            <td scope="row"><a :href="'https://osu.ppy.sh/beatmapsets/' + dq.beatmapsetId + '/discussion'" target="_blank">{{dq.metadata}}</a></td>
+                                            <td scope="row">{{dq.content.slice(0, dq.content.indexOf('.')+1 || 50)}}</td>
+                                            <td scope="row"
                                                 :class="dq.valid == 1 ? 'vote-pass' : dq.valid == 2 ? 'vote-extend' : dq.valid == 3 ? 'vote-fail' : ''">
                                                 {{dq.valid == 1 ? 'valid' : dq.valid == 2 ? 'partially valid' : dq.valid == 3 ? 'invalid' : 'none'}}
                                             </td>
@@ -76,19 +76,19 @@
                             </div>
                             <p class="text-shadow"><a :href="nomsPopped && '#nomsPopped'" data-toggle="collapse">Show popped nominations</a> ({{nomsPopped ? nomsPopped.length : '0'}})</p>
                             <div v-if="nomsPopped" class="collapse" id="nomsPopped">
-                                <table class="small table text-shadow col-md-12 mt-2">
+                                <table class="table table-sm table-dark table-hover col-md-12 mt-2">
                                     <thead>
-                                        <td scope="col" style="padding: 2px;">Date</td>
-                                        <td scope="col" style="padding: 2px;">Mapset</td>
-                                        <td scope="col" style="padding: 2px;">Reason</td>
-                                        <td scope="col" style="padding: 2px;">Validity</td>
+                                        <td scope="col">Date</td>
+                                        <td scope="col">Mapset</td>
+                                        <td scope="col">Reason</td>
+                                        <td scope="col">Validity</td>
                                     </thead>
                                     <tbody>
                                         <tr v-for="pop in nomsPopped" :key="pop.id">
-                                            <td scope="row" style="padding: 1px;">{{new Date(pop.timestamp).toString().slice(4,15)}}</td>
-                                            <td scope="row" style="padding: 1px;"><a :href="'https://osu.ppy.sh/beatmapsets/' + pop.beatmapsetId + '/discussion'" target="_blank">{{pop.metadata}}</a></td>
-                                            <td scope="row" style="padding: 1px;">{{pop.content.slice(0, pop.content.indexOf('.')+1 || 50)}}</td>
-                                            <td scope="row" style="padding: 1px;"
+                                            <td scope="row">{{new Date(pop.timestamp).toString().slice(4,15)}}</td>
+                                            <td scope="row"><a :href="'https://osu.ppy.sh/beatmapsets/' + pop.beatmapsetId + '/discussion'" target="_blank">{{pop.metadata}}</a></td>
+                                            <td scope="row">{{pop.content.slice(0, pop.content.indexOf('.')+1 || 50)}}</td>
+                                            <td scope="row"
                                                 :class="pop.valid == 1 ? 'vote-pass' : pop.valid == 2 ? 'vote-extend' : pop.valid == 3 ? 'vote-fail' : ''">
                                                 {{pop.valid == 1 ? 'valid' : pop.valid == 2 ? 'partially valid' : pop.valid == 3 ? 'invalid' : 'none'}}
                                             </td>
@@ -98,19 +98,19 @@
                             </div>
                             <p class="text-shadow"><a :href="dqs && '#dqs'" data-toggle="collapse">Show disqualifications done by user</a> ({{dqs ? dqs.length : '0'}})</p>
                             <div v-if="dqs" class="collapse" id="dqs">
-                                <table class="small table text-shadow col-md-12 mt-2">
+                                <table class="table table-sm table-dark table-hover col-md-12 mt-2">
                                     <thead>
-                                        <td scope="col" style="padding: 2px;">Date</td>
-                                        <td scope="col" style="padding: 2px;">Mapset</td>
-                                        <td scope="col" style="padding: 2px;">Reason</td>
-                                        <td scope="col" style="padding: 2px;">Validity</td>
+                                        <td scope="col">Date</td>
+                                        <td scope="col">Mapset</td>
+                                        <td scope="col">Reason</td>
+                                        <td scope="col">Validity</td>
                                     </thead>
                                     <tbody>
                                         <tr v-for="dq in dqs" :key="dq.id">
-                                            <td scope="row" style="padding: 1px;">{{new Date(dq.timestamp).toString().slice(4,15)}}</td>
-                                            <td scope="row" style="padding: 1px;"><a :href="'https://osu.ppy.sh/beatmapsets/' + dq.beatmapsetId + '/discussion'" target="_blank">{{dq.metadata}}</a></td>
-                                            <td scope="row" style="padding: 1px;">{{dq.content.slice(0, dq.content.indexOf('.')+1 || 50)}}</td>
-                                            <td scope="row" style="padding: 1px;"
+                                            <td scope="row">{{new Date(dq.timestamp).toString().slice(4,15)}}</td>
+                                            <td scope="row"><a :href="'https://osu.ppy.sh/beatmapsets/' + dq.beatmapsetId + '/discussion'" target="_blank">{{dq.metadata}}</a></td>
+                                            <td scope="row">{{dq.content.slice(0, dq.content.indexOf('.')+1 || 50)}}</td>
+                                            <td scope="row"
                                                 :class="dq.valid == 1 ? 'vote-pass' : dq.valid == 2 ? 'vote-extend' : dq.valid == 3 ? 'vote-fail' : ''">
                                                 {{dq.valid == 1 ? 'valid' : dq.valid == 2 ? 'partially valid' : dq.valid == 3 ? 'invalid' : 'none'}}
                                             </td>
@@ -120,19 +120,19 @@
                             </div>
                             <p class="text-shadow"><a :href="pops && '#pops'" data-toggle="collapse">Show pops done by user</a> ({{pops ? pops.length : '0'}})</p>
                             <div v-if="pops" class="collapse" id="pops">
-                                <table class="small table text-shadow col-md-12 mt-2">
+                                <table class="table table-sm table-dark table-hover col-md-12 mt-2">
                                     <thead>
-                                        <td scope="col" style="padding: 2px;">Date</td>
-                                        <td scope="col" style="padding: 2px;">Mapset</td>
-                                        <td scope="col" style="padding: 2px;">Reason</td>
-                                        <td scope="col" style="padding: 2px;">Validity</td>
+                                        <td scope="col">Date</td>
+                                        <td scope="col">Mapset</td>
+                                        <td scope="col">Reason</td>
+                                        <td scope="col">Validity</td>
                                     </thead>
                                     <tbody>
                                         <tr v-for="pop in pops" :key="pop.id">
-                                            <td scope="row" style="padding: 1px;">{{new Date(pop.timestamp).toString().slice(4,15)}}</td>
-                                            <td scope="row" style="padding: 1px;"><a :href="'https://osu.ppy.sh/beatmapsets/' + pop.beatmapsetId + '/discussion'" target="_blank">{{pop.metadata}}</a></td>
-                                            <td scope="row" style="padding: 1px;">{{pop.content.slice(0, pop.content.indexOf('.')+1 || 50)}}</td>
-                                            <td scope="row" style="padding: 1px;"
+                                            <td scope="row">{{new Date(pop.timestamp).toString().slice(4,15)}}</td>
+                                            <td scope="row"><a :href="'https://osu.ppy.sh/beatmapsets/' + pop.beatmapsetId + '/discussion'" target="_blank">{{pop.metadata}}</a></td>
+                                            <td scope="row">{{pop.content.slice(0, pop.content.indexOf('.')+1 || 50)}}</td>
+                                            <td scope="row"
                                                 :class="pop.valid == 1 ? 'vote-pass' : pop.valid == 2 ? 'vote-extend' : pop.valid == 3 ? 'vote-fail' : ''">
                                                 {{pop.valid == 1 ? 'valid' : pop.valid == 2 ? 'partially valid' : pop.valid == 3 ? 'invalid' : 'none'}}
                                             </td>
