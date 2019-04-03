@@ -68,7 +68,7 @@ footer {
     margin-top: 15px;
 }
 
-p, small, .small {
+small, .small {
     color: var(--secondary-text) !important;
 }
 

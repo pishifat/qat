@@ -72,7 +72,6 @@
             :veto="selectedVeto"
             :user-id="userId"
             :user-group="userGroup"
-            :isMediator="isMediator"
             @update-veto="updateVeto($event)"
         ></veto-info>
         <submit-veto @submit-veto="SubmitVeto($event)"></submit-veto>
@@ -122,7 +121,6 @@ export default {
             userId: null,
             userGroup: null,
             selectedVeto: null,
-            isMediator: null,
         };
     },
     created() {
@@ -132,7 +130,6 @@ export default {
                 this.allObjs = response.data.vetoes;
                 this.userId = response.data.userId;
                 this.userGroup = response.data.userGroup;
-                this.isMediator = response.data.isMediator;
                 this.limit = 16;
             })
             .then(function() {

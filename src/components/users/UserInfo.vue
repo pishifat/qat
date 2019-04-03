@@ -21,10 +21,10 @@
                 <p v-if="user.id == userId" class="text-shadow">Veto Mediation: 
                     <button 
                         class="btn btn-sm justify-content-center" 
-                        :class="{ 'btn-nat': user.vetoMediator, 'btn-nat-red': !user.vetoMediator }" 
+                        :class="{ 'btn-nat': !user.vetoMediator, 'btn-nat-red': user.vetoMediator }" 
                         @click="switchMediator($event)"
                     >
-                        {{user.vetoMediator ? 'Opt-in' : 'Opt-out'}}
+                        {{user.vetoMediator ? 'Opt-out' : 'Opt-in'}}
                     </button>
                 </p>
                 <hr>

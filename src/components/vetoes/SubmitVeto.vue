@@ -22,7 +22,7 @@
                             <input
                                 type="text"
                                 class="form-control text-input"
-                                placeholder="Reason Link"
+                                placeholder="Reason for veto"
                                 v-model="shortReason"
                             />
                         </div>

@@ -2,13 +2,14 @@ const express = require('express');
 const api = require('../models/api.js');
 const vetoes = require('../models/veto.js');
 const users = require('../models/user');
-var logs = require('../models/log.js');
+const logs = require('../models/log.js');
+const mediations = require('../models/mediation.js');
 
 const router = express.Router();
 
 const defaultPopulate = [
     { populate: 'vetoer', display: 'username osuId', model: users.User },
-    { populate: 'mediators', display: 'username osuId', model: users.User },
+    { innerPopulate: 'mediations', model: mediations.Mediation, populate: { path: 'mediator', select: 'username osuId', model: users.User } },
 ];
 
 router.use(api.isLoggedIn);
@@ -28,7 +29,7 @@ router.get('/', async (req, res, next) => {
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res, next) => {
     let v = await vetoes.service.query({}, defaultPopulate, { createdAt: 1 }, true);
-    res.json({ vetoes: v, userId: req.session.mongoId, userGroup: res.locals.userRequest.group, isMediator: res.locals.userRequest.vetoMediator });
+    res.json({ vetoes: v, userId: req.session.mongoId, userGroup: res.locals.userRequest.group });
 });
 
 /* POST create a new veto. */
@@ -73,12 +74,32 @@ router.post('/submit', async (req, res, next) => {
         `Submitted a veto for mediation`);
 });
 
-/* POST mediate a veto. */
-router.post('/mediate', async (req, res, next) => {
-    const v = await vetoes.service.update(req.body.veto._id, {
-        mediator: req.session.mongoId,
-        status: 'wip',
-    });
+/* POST set status upheld or withdrawn. */
+router.post('/selectMediators', async (req, res, next) => {
+    const allUsers = await users.User.aggregate([ { $match : { group: { $ne: 'user' }, vetoMediator: true } }, { $sample: { size: 1000 } } ]);
+    console.log(allUsers)
+    let usernames = [];
+    for (let i = 0; i < allUsers.length; i++) {
+        let user = allUsers[i];
+        if(user.modes.indexOf(req.body.mode) >= -1 //should be 0 but testing
+        && user.probation.indexOf(req.body.mode) < 0){
+            usernames.push(user);
+            if(usernames.length >= 5){ //don't know this number yet
+                break;
+            }
+        }
+    }
+    res.json(usernames);
+});
+
+/* POST begin mediation */
+router.post('/beginMediation/:id', async (req, res, next) => {
+    for (let i = 0; i < req.body.mediators.length; i++) {
+        let mediator = req.body.mediators[i];
+        let m = await mediations.service.create(mediator._id);
+        await vetoes.service.update(req.params.id, {$push: {mediations: m}});
+    }
+    let v = await vetoes.service.query({_id: req.params.id}, defaultPopulate);
     res.json(v);
 });
 
@@ -89,5 +110,7 @@ router.post('/setStatus', async (req, res, next) => {
     });
     res.json(v);
 });
+
+
 
 module.exports = router;

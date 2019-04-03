@@ -11,13 +11,13 @@
             <img :src="'https://assets.ppy.sh/beatmaps/' + veto.beatmapId + '/covers/card.jpg'" class="card-img" style="opacity: 0.25; overflow: hidden;">
             <div class="card-body veto-card-spacing">
                 <p class="text-shadow">
-                    <a :href="'https://osu.ppy.sh/beatmapsets/' + veto.beatmapId">{{ veto.beatmapTitle }}</a>
+                    <a :href="'https://osu.ppy.sh/beatmapsets/' + veto.beatmapId" target="_blank" @click.stop>{{ veto.beatmapTitle }}</a>
                     <i v-if="veto.mode.indexOf('osu') >= 0" class="far fa-circle"></i>
                     <i v-if="veto.mode.indexOf('taiko') >= 0" class="fas fa-drum"></i>
                     <i v-if="veto.mode.indexOf('catch') >= 0" class="fas fa-apple-alt"></i>
                     <i v-if="veto.mode.indexOf('mania') >= 0" class="fas fa-stream"></i>
                 </p>
-                <p class="small text-shadow">Hosted by <a :href="'https://osu.ppy.sh/users/' + veto.beatmapMapperId">{{ veto.beatmapMapper }}</a></p>
+                <p class="small text-shadow">Hosted by <a :href="'https://osu.ppy.sh/users/' + veto.beatmapMapperId" target="_blank" @click.stop>{{ veto.beatmapMapper }}</a></p>
                 <p class="small text-shadow">{{ veto.createdAt.slice(0, 10) }}</p>
             </div>
         </div>

@@ -11,11 +11,11 @@ const vetoesSchema = new mongoose.Schema({
     beatmapMapperId: { type: Number },
     shortReason: { type: String, required: true },
     status: { type: String, enum: ['available', 'wip', 'upheld', 'withdrawn'], default: 'available' },
-    mediators: [{ type: 'ObjectId', ref: 'User' }],
+    mediations: [{ type: 'ObjectId', ref: 'Mediation' }],
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 vetoesSchema.pre('findByIdAndUpdate', function (next) {
-    this.populate('mediators', 'username osuId');
+    //this.populate('mediators', 'username osuId');
     this.populate('vetoer', 'username osuId');
     next();
 });
