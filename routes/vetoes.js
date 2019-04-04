@@ -77,12 +77,12 @@ router.post('/submit', async (req, res, next) => {
 /* POST set status upheld or withdrawn. */
 router.post('/selectMediators', async (req, res, next) => {
     const allUsers = await users.User.aggregate([ { $match : { group: { $ne: 'user' }, vetoMediator: true } }, { $sample: { size: 1000 } } ]);
-    console.log(allUsers)
     let usernames = [];
     for (let i = 0; i < allUsers.length; i++) {
         let user = allUsers[i];
         if(user.modes.indexOf(req.body.mode) >= -1 //should be 0 but testing
-        && user.probation.indexOf(req.body.mode) < 0){
+        && user.probation.indexOf(req.body.mode) < 0
+        && req.body.excludeUsers.indexOf(user.username.toLowerCase()) < 0){
             usernames.push(user);
             if(usernames.length >= 5){ //don't know this number yet
                 break;
@@ -97,19 +97,27 @@ router.post('/beginMediation/:id', async (req, res, next) => {
     for (let i = 0; i < req.body.mediators.length; i++) {
         let mediator = req.body.mediators[i];
         let m = await mediations.service.create(mediator._id);
-        await vetoes.service.update(req.params.id, {$push: {mediations: m}});
+        await vetoes.service.update(req.params.id, {$push: {mediations: m}, status: 'wip'});
     }
     let v = await vetoes.service.query({_id: req.params.id}, defaultPopulate);
     res.json(v);
 });
 
-/* POST set status upheld or withdrawn. */
-router.post('/setStatus', async (req, res, next) => {
-    const v = await vetoes.service.update(req.body.veto._id, {
-        status: req.body.status,
-    });
+/* POST submit mediation */
+router.post('/submitMediation/:id', async (req, res, next) => {
+    await mediations.service.update(req.body.mediationId, {comment: req.body.comment, vote: req.body.vote});
+    let v = await vetoes.service.query({_id: req.params.id}, defaultPopulate);
     res.json(v);
 });
+
+/* POST submit mediation */
+router.post('/concludeMediation/:id', async (req, res, next) => {
+    await vetoes.service.update(req.params.id, {status: req.body.majority ? 'upheld' : 'withdrawn'});
+    let v = await vetoes.service.query({_id: req.params.id}, defaultPopulate);
+    res.json(v);
+});
+
+
 
 
 

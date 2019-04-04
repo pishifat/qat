@@ -69,7 +69,7 @@ footer {
 }
 
 small, .small {
-    color: var(--secondary-text) !important;
+    color: var(--secondary-text);
 }
 
 .table-sm {
@@ -215,6 +215,11 @@ hr {
 
 .secondary-text{
     color: var(--secondary-text);
+}
+
+.min-spacing{
+    margin: 0px;
+    padding: 0px; 
 }
 
 .segment {
@@ -398,9 +403,10 @@ input[type='text']:focus {
 
 .dark-textarea,
 .dark-textarea:focus {
-    background-color: #333;
+    background-color: var(--darker);
+    border-color: var(--dark);
+    border-width: 1px;
     color: white;
-    border-color: #222;
     filter: drop-shadow(1px 1px 1px #000000);
     font-size:10pt;
 }
@@ -480,7 +486,6 @@ input[type="radio"] + .fas { cursor: pointer; }
     cursor: default;
     background-color: var(--darker);
     height: 100%;
-    border-left: solid 1px var(--dark);
     border-bottom: solid 1px var(--dark);
     border-right: solid 1px var(--dark);
 }

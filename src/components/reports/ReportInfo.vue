@@ -36,7 +36,7 @@
                     <label class="form-check-label text-shadow vote-fail" for="3">Invalid</label>
                 </div>
 
-                 <div :class="this.info.length ? 'errors' : 'confirm'" class="text-shadow ml-2" style="min-height: 24px;">{{info}} {{confirm}}</div>
+                 <div :class="info.length ? 'errors' : 'confirm'" class="text-shadow ml-2" style="min-height: 24px;">{{info}} {{confirm}}</div>
 
             </div>
             <div class="modal-footer" style="overflow: hidden;">

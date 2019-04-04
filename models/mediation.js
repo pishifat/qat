@@ -18,8 +18,6 @@ class MediationService extends BaseService
     /**
      * 
      * @param {object} mediatorId UserId who mediates
-     * @param {string} comment 
-     * @param {number} vote 
      */
     async create(mediatorId) {
         try {

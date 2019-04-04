@@ -3,14 +3,14 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header bg-nat">
-                    <h5 class="modal-title text-dark">Submit a new veto</h5>
+                    <h5 class="modal-title text-dark">Submit a veto for mediation</h5>
                     <button type="button" class="close" data-dismiss="modal">
                         <span>&times;</span>
                     </button>
                 </div>
                 <div class="modal-body" style="overflow: hidden">
                     <div class="container">
-                        <div class="row mb-1">
+                        <div class="row mb-2">
                             <input
                                 type="text"
                                 class="form-control text-input"
@@ -18,7 +18,7 @@
                                 v-model="discussionLink"
                             />
                         </div>
-                        <div class="row mb-1">
+                        <div class="row mb-2">
                             <input
                                 type="text"
                                 class="form-control text-input"
@@ -26,8 +26,8 @@
                                 v-model="shortReason"
                             />
                         </div>
-                        <div class="row mb-1">
-                            <h4>Game mode:</h4>
+                        <div class="row mt-3 text-shadow">
+                            <p>Game mode:</p>
                             <div class="row ml-4">
                                 <label class="mx-1">
                                     <input type="radio" class="osu-radio hide-default" name="osu" value="osu" v-model="mode" checked />
@@ -76,7 +76,7 @@ export default {
     methods: {
         submitVeto: async function(e) {
             if (!this.discussionLink || !this.shortReason || !this.mode) {
-                this.info = 'Fill the info';
+                this.info = 'Cannot leave fields blank!';
             } else {
                 const veto = await this.executePost(
                     '/nat/vetoes/submit',
