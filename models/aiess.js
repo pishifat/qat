@@ -5,7 +5,7 @@ const aiessSchema = new mongoose.Schema({
     beatmapsetId: { type: Number },
     userId: { type: Number },
     metadata: { type: String },
-    eventType: { type: String },
+    eventType: { type: String, enum: ['Bubbled', 'Qualified', 'Disqualified', 'Popped', 'Ranked'] },
     content: { type: String },
     timestamp: { type: Date },
     valid: { type: Number, enum: [1, 2, 3] }

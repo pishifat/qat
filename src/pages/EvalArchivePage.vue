@@ -1,8 +1,8 @@
 <template>
 
 <div class="row">
-    <div class="col-md-12 mb-4">
-       <div class="col-md-4 input-group input-group-sm mb-3">
+    <section class="row segment segment-solid mb-4">
+        <div class="input-group input-group-sm">
             <input class="form-control form-control-sm" type="text" placeholder="username" id="search" 
                 style="filter: drop-shadow(1px 1px 1px #000000); border-radius: 100px 0 0 100px" 
                 @keyup.enter="query($event)" maxlength="18"/>
@@ -10,46 +10,42 @@
                 <button style="border-radius: 0 100px 100px 0;" class="btn btn-nat" @click="query($event)" type="submit">Search archives</button>
             </div>
         </div>
-        <p class="errors">{{info}}</p> 
-    </div>
-    
-    <div class="col-md-12" v-if="queried">
-        <hr>
+        <p v-if="info" class="errors mt-1">{{info}}</p> 
+    </section>
+    <section class="col-md-12 segment" v-if="queried">
         <h2>Application Evaluations</h2>
         
-        <div v-if="appEvals">
-        <transition-group name="list" tag="div" class="row">
-            <discuss-card
-                v-for="discussApp in appEvals"
-                :discuss-app="discussApp"
-                :evaluator="evaluator"
-                :key="discussApp.id"
-                @update:selectedDiscussApp="selectedDiscussApp = $event"
-                @update:selectedDiscussRound="selectedDiscussRound = $event"
-            ></discuss-card>
-        </transition-group>
+        <div v-if="appEvals.length">
+            <transition-group name="list" tag="div" class="row">
+                <discuss-card
+                    v-for="discussApp in appEvals"
+                    :discuss-app="discussApp"
+                    :evaluator="evaluator"
+                    :key="discussApp.id"
+                    @update:selectedDiscussApp="selectedDiscussApp = $event"
+                    @update:selectedDiscussRound="selectedDiscussRound = $event"
+                ></discuss-card>
+            </transition-group>
         </div>
         <p v-else class="ml-4">None...</p>
-    </div>
-    
-    <div class="col-md-12" v-if="queried">
-        <hr>
+    </section>
+    <section class="col-md-12 segment" v-if="queried">
         <h2>BN Evaluations</h2>
         
-        <div v-if="bnEvals">
-        <transition-group name="list" tag="div" class="row">
-            <discuss-card
-                v-for="discussRound in bnEvals"
-                :discuss-round="discussRound"
-                :evaluator="evaluator"
-                :key="discussRound.id"
-                @update:selectedDiscussApp="selectedDiscussApp = $event"
-                @update:selectedDiscussRound="selectedDiscussRound = $event"
-            ></discuss-card>
-        </transition-group>
+        <div v-if="bnEvals.length">
+            <transition-group name="list" tag="div" class="row">
+                <discuss-card
+                    v-for="discussRound in bnEvals"
+                    :discuss-round="discussRound"
+                    :evaluator="evaluator"
+                    :key="discussRound.id"
+                    @update:selectedDiscussApp="selectedDiscussApp = $event"
+                    @update:selectedDiscussRound="selectedDiscussRound = $event"
+                ></discuss-card>
+            </transition-group>
         </div>
         <p v-else class="ml-4">None...</p>
-    </div>
+    </section>
 
     <discuss-info
         :discussApp="selectedDiscussApp"

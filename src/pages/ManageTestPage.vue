@@ -1,8 +1,8 @@
 <template>
 
 <div class="row">
-   <div class="col-md-12">
-       <div class="input-group input-group-sm mb-4" style="width: 400px">
+    <section class="row segment segment-solid mb-4">
+       <div class="input-group input-group-sm" style="width: 400px">
             <select class="custom-select select-arrow small" id="questionType" style="border-radius: 100px 0 0 100px">
                 <option value='codeOfConduct'>Code of Conduct</option>
                 <option value='general'>General</option>
@@ -23,10 +23,9 @@
                 <button style="border-radius: 0 100px 100px 0;" class="rounded-circle-left btn btn-nat" id="artistButton" @click="loadContent($event);">Load test content</button>
             </div>
         </div>
-        <p class="errors">{{info}}</p>
-    </div>
-    <div v-if="category" class="col-md-12">
-        <hr>
+        <p v-if="info" class="errors mt-1">{{info}}</p>
+    </section>
+    <section v-if="category" class="col-md-12 segment">
         <h2>{{category}} Questions 
             <button
             class="btn btn-nat"
@@ -55,7 +54,7 @@
             </tbody>
         </table>
 
-    </div>
+    </section>
 
     <add-question
         :category="category"

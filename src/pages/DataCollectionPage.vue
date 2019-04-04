@@ -1,7 +1,7 @@
 <template>
 
 <div class="row">
-    <div class="col-md-12">
+    <section class="col-md-12 segment segment-solid mx-0">
         <h2>Disqualifications</h2>
         <table class="table table-sm table-dark table-hover col-md-12 mt-2">
             <thead>
@@ -24,9 +24,15 @@
                         <a href="#" data-toggle="modal" data-target="#editReason" :data-entry="dq.id" @click.prevent="selectEntry(dq)">edit</a>
                         </td>
                     <td scope="row">
-                        <a href="#" @click.prevent="updateValidity(dq.id, 1);"><i class="fas fa-square vote-pass"></i></a>
-                        <a href="#" @click.prevent="updateValidity(dq.id, 2);"><i class="fas fa-square vote-extend"></i></a>
-                        <a href="#" @click.prevent="updateValidity(dq.id, 3);"><i class="fas fa-square vote-fail"></i></a>
+                        <a href="#" @click.prevent="updateValidity(dq.id, 1);"
+                            data-toggle="tooltip" data-placement="top" title="valid"
+                        ><i class="fas fa-square vote-pass"></i></a>
+                        <a href="#" @click.prevent="updateValidity(dq.id, 2);"
+                            data-toggle="tooltip" data-placement="top" title="partially valid"
+                        ><i class="fas fa-square vote-extend"></i></a>
+                        <a href="#" @click.prevent="updateValidity(dq.id, 3);"
+                            data-toggle="tooltip" data-placement="top" title="invalid"
+                        ><i class="fas fa-square vote-fail"></i></a>
                     </td>
                     <td scope="row">
                         
@@ -34,9 +40,9 @@
                 </tr>
             </tbody>
         </table>
-    </div>
+    </section>
 
-    <div class="col-md-12">
+    <section class="col-md-12 segment segment-solid mx-0">
         <h2>Pops</h2>
         <table class="table table-sm table-dark table-hover col-md-12 mt-2">
             <thead>
@@ -66,7 +72,7 @@
                 </tr>
             </tbody>
         </table>
-    </div>
+    </section>
 
     <div id="editReason" class="modal fade" tabindex="-1">
         <div class="modal-dialog">

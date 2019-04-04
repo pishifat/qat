@@ -4,6 +4,7 @@ const filters = {
             filterValue: '',
             filterMode: '',
             isFiltered: false,
+            hasPagination: true,
 
             sortBy: null,
             asc: false
@@ -29,8 +30,13 @@ const filters = {
                 this.sort(this.sortBy, true);
             }
 
-            this.limit = 16.01; //resets to first page
-            this.canShowOlder = true;
+            if (this.hasPagination) {
+                this.limit = 16.01; //resets to first page
+                this.canShowOlder = true;
+            } else {
+                if (this.isFiltered) this.pageObjs = this.filteredObjs;
+                else this.pageObjs = this.allObjs;
+            }
         },
         filterByMode: function() {
             if (this.filterMode.length) {
@@ -162,8 +168,11 @@ const filters = {
                     });
                 }
             }
-            this.limit = 16.01;
-            this.canShowOlder = true;
+
+            if (this.hasPagination) {
+                this.limit = 16.01;
+                this.canShowOlder = true;
+            }
         },
     }
 }

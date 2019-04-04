@@ -1,8 +1,8 @@
 <template>
 
 <div class="row">
-   <div class="col-md-12 mb-4">
-       <div class="col-md-4 input-group input-group-sm mb-3">
+   <section class="row mb-4 segment segment-solid">
+       <div class="input-group input-group-sm">
             <input class="form-control form-control-sm" type="text" placeholder="username" id="search" 
                 style="filter: drop-shadow(1px 1px 1px #000000); border-radius: 100px 0 0 100px" 
                 @keyup.enter="query($event)" maxlength="18"/>
@@ -10,10 +10,10 @@
                 <button style="border-radius: 0 100px 100px 0;" class="btn btn-nat" @click="query($event)" type="submit">Search tests</button>
             </div>
         </div>
-        <p class="errors">{{info}}</p> 
-    </div>
+        <p v-if="info" class="errors mt-1">{{info}}</p> 
+    </section>
 
-    <div class="col-md-12" v-if="allTests">
+    <section class="col-md-12 segment" v-if="allTests">
         <transition-group name="list" tag="div" class="row">
             <result-card
                 v-for="test in allTests"
@@ -22,11 +22,10 @@
                 @update:selected-test="selectedTest = $event"
             ></result-card>
         </transition-group>
-        <hr>
-    </div>
+    </section>
 
-    <div v-if="selectedTest">
-        <p class="text-center">
+    <section v-if="selectedTest">
+        <p class="text-center segment">
             User: {{ selectedTest.applicant.username }} - 
             Mode: {{ selectedTest.mode }} - 
             Score: {{ selectedTest.totalScore }}
@@ -67,10 +66,7 @@
                 </div>
             </div>
         </div>
-        <hr>
-    </div>
-
-
+    </section>
 </div>
 
 </template>

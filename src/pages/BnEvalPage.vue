@@ -1,11 +1,84 @@
 <template>
 
 <div class="row">
+    <div class="col-md-12">
+        <section class="row segment segment-solid my-1 mx-4">
+            <small>Search: 
+                <input id="search" class="text-input" v-model="filterValue" type="text" placeholder="username... (3+ characters)" /> 
+            </small>
+            <small>
+                <select class="custom-select inline-custom-select ml-2" id="mode" v-model="filterMode">
+                    <option value="" selected>All modes</option>
+                    <option value="osu">osu!</option>
+                    <option value="taiko">osu!taiko</option>
+                    <option value="catch">osu!catch</option>
+                    <option value="mania">osu!mania</option>
+                </select>
+            </small> 
+            <small>
+                <button class="btn btn-nat btn-sm ml-2" @click="selectAll($event)">Select all</button>
+            </small>
+        </section>
+        <section class="row segment segment-solid my-1 mx-4">
+            <small>Mark selected as:
+                <button class="btn btn-nat btn-sm ml-2" @click="setGroupEval($event)">Group evaluation</button>
+            </small>
+            <small>
+                <button class="btn btn-nat btn-sm ml-2" @click="setIndividualEval($event)">Individual evaluation</button>
+            </small>
+            <small>
+                <button class="btn btn-nat-red btn-sm ml-2" @click="setComplete($event)">Archive</button>
+            </small>
+        </section>
+        <hr>
+        <section class="row segment mx-1 px-0">
+            <div class="col-sm-12">
+                <h2>Individual Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="only you can see these">?</sup> 
+                    <button
+                        class="btn btn-nat"
+                        data-toggle="modal"
+                        data-target="#addEvalRounds"
+                        @click="openAddEvalRounds()"
+                    >Add users to evaluate</button>
+                </h2>
+                
+                <transition-group name="list" tag="div" class="row">
+                    <eval-card
+                        v-for="evalRound in pageObjs"
+                        :eval-round="evalRound"
+                        :evaluator="evaluator"
+                        :key="evalRound.id"
+                        @update:selectedEvalRound="selectedEvalRound = $event"
+                    ></eval-card>
+                </transition-group>
+                
+                <p v-if="!pageObjs || pageObjs.length == 0" class="ml-4">
+                    No BNs to evaluate...
+                </p>
+            </div>
+        </section>
+        <hr>
+        <section class="row segment mx-1 px-0">
+            <div class="col-sm-12">
+                <h2>Group Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="everyone can see these">?</sup></h2>
+                
+                <transition-group name="list" tag="div" class="row">
+                    <discuss-card
+                        v-for="discussRound in discussRounds"
+                        :discuss-round="discussRound"
+                        :evaluator="evaluator"
+                        :key="discussRound.id"
+                        @update:selectedDiscussRound="selectedDiscussRound = $event"
+                    ></discuss-card>
+                </transition-group>
+                
+                <p v-if="!discussRounds || discussRounds.length == 0" class="ml-4">
+                    No BNs to evaluate...
+                </p>
+            </div>
+        </section>
+    </div>
     
-    <base-eval-page
-        is-bn-eval
-        
-    ></base-eval-page>
 
     <eval-info
         :evalRound="selectedEvalRound"
@@ -29,98 +102,47 @@
 
 </template>
 
-
-
 <script>
-import BaseEvalPage from './BaseEvalPage.vue';
 import AddEvalRounds from '../components/evaluations/AddEvalRounds.vue';
 import EvalCard from '../components/evaluations/EvalCard.vue';
 import EvalInfo from '../components/evaluations/EvalInfo.vue';
 import DiscussCard from '../components/evaluations/DiscussCard.vue';
 import DiscussInfo from '../components/evaluations/DiscussInfo.vue';
 import postData from '../mixins/postData.js';
+import filters from '../mixins/filters.js';
 
 export default {
     name: 'bn-eval-page',
     components: {
-        BaseEvalPage,
         AddEvalRounds,
         EvalCard,
         EvalInfo,
         DiscussCard,
         DiscussInfo
     },
-    mixins: [postData],
-    watch: {
-        filterValue: function(v){
-            this.filter();
-        },
-        filterMode: function(v) {
-            this.filter();
-        },
-    },
+    mixins: [ postData, filters ],
     methods: {
+        filterBySearchValueContext: function(e) {
+            if(e.bn.username.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1){
+                return true;
+            }
+            return false;
+        },
         updateEvalRound: function (evalRound) {
-			const i = this.allEvalRounds.findIndex(er => er.id == evalRound.id);
-			this.allEvalRounds[i] = evalRound;
+			const i = this.allObjs.findIndex(er => er.id == evalRound.id);
+			this.allObjs[i] = evalRound;
             this.selectedEvalRound = evalRound;
             this.selectedDiscussRound = evalRound;
             this.filter();
         },
         updateAllEvalRounds: function (evalRounds) {
-            this.allEvalRounds = evalRounds;
+            this.allObjs = evalRounds;
             this.filter();
 		},
         openAddEvalRounds: function() {
             $('input[type=checkbox]').each(function() {
                 this.checked = false;
             });
-        },
-        filter: function () {            
-            this.filterValue = $("#search").val();
-            this.filterMode = $("#mode").val();
-            $("input[name='evalTypeCheck']").prop('checked', false);
-            
-            //reset
-            this.evalRounds = this.allEvalRounds.filter(er => !er.discussion);
-            this.discussRounds = this.allEvalRounds.filter(er => er.discussion);
-
-            //search
-            if(this.filterValue.length > 2){
-                this.filteredEvalRounds = this.allEvalRounds.filter(er => {
-                    if(er.bn.username.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1){
-                        return true;
-                    }
-                    return false;
-                });
-            }
-            
-            //mode
-            if(this.filterMode.length){
-                if(this.filterValue.length > 2){
-                    this.filteredEvalRounds = this.filteredEvalRounds.filter(er => {
-                        if(this.filterMode == "osu" && er.mode == 'osu') return true;
-                        if(this.filterMode == "taiko" && er.mode == 'taiko') return true;
-                        if(this.filterMode == "catch" && er.mode == 'catch') return true;
-                        if(this.filterMode == "mania" && er.mode == 'mania') return true;
-                        return false;
-                    });
-                }else{
-                    this.filteredEvalRounds = this.allEvalRounds.filter(er => {
-                        if(this.filterMode == "osu" && er.mode == 'osu') return true;
-                        if(this.filterMode == "taiko" && er.mode == 'taiko') return true;
-                        if(this.filterMode == "catch" && er.mode == 'catch') return true;
-                        if(this.filterMode == "mania" && er.mode == 'mania') return true;
-                        return false;
-                    });
-                }
-            }
-            
-            let isFiltered = (this.filterValue.length > 2 || this.filterMode.length);
-            if(isFiltered){
-                this.evalRounds = this.filteredEvalRounds.filter(a => !a.discussion);
-                this.discussRounds = this.filteredEvalRounds.filter(a => a.discussion);
-            }
         },
         setGroupEval: async function(e) {
             let checkedRounds = [];
@@ -133,7 +155,7 @@ export default {
                     if (ers.error) {
                         this.info = ers.error;
                     } else {
-                        this.allEvalRounds = ers;
+                        this.allObjs = ers;
                         this.filter();
                     }
                 }
@@ -150,7 +172,7 @@ export default {
                     if (ers.error) {
                         this.info = ers.error;
                     } else {
-                        this.allEvalRounds = ers;
+                        this.allObjs = ers;
                         this.filter();
                     }
                 }
@@ -168,7 +190,7 @@ export default {
                     if (ers.error) {
                         this.info = ers.error;
                     } else {
-                        this.allEvalRounds = ers;
+                        this.allObjs = ers;
                         this.filter();
                     }
                 }
@@ -181,19 +203,16 @@ export default {
     },
     data() {
         return {
-            reports: null,
-            allEvalRounds: null,
-            filteredEvalRounds: null,
-
-            evalRounds: null,
+            allObjs: null,
+            filteredObjs: null,
+            pageObjs: null,
             selectedEvalRound: null,
 
             discussRounds: null,
             selectedDiscussRound: null,
 
+            reports: null,
             evaluator: null,
-            filterMode: '',
-            filterValue: '',
             info: '',
         }
     },
@@ -201,9 +220,10 @@ export default {
         axios
             .get('/nat/bnEval/relevantInfo')
             .then(response => {
-                this.allEvalRounds = response.data.er;
+                this.allObjs = response.data.er;
                 this.reports = response.data.r;
                 this.evaluator = response.data.evaluator;
+                this.hasPagination = false;
                 this.filter();
             }).then(function(){
                 $("#loading").fadeOut();
@@ -215,7 +235,7 @@ export default {
             axios
                 .get('/nat/bnEval/relevantInfo')
                 .then(response => {
-                    this.allEvalRounds = response.data.er;
+                    this.allObjs = response.data.er;
                     this.reports = response.data.r;
                 });
         }, 300000);

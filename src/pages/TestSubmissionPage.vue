@@ -11,12 +11,12 @@
     </div>
 
     <div v-if="test" id="fullTest">
-        <div class="segment test-question">
+        <div class="segment segment-solid test-question">
             <p>this is the test</p>
             <p>take it, then u become bn!</p>
         </div>
         
-        <p class="text-center">
+        <p class="text-center segment">
             User: {{ test.applicant.username }} - 
             Mode: {{ test.mode }}<!-- - 
             Time remaining: 

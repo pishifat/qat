@@ -9,7 +9,7 @@ router.use(api.isLoggedIn);
 router.use(api.isNat);
 
 const defaultPopulate = [
-    { populate: 'user', display: 'username', model: users.User}
+    { populate: 'user', display: 'username', model: users.User },
 ];
 
 /* GET logs */
@@ -19,19 +19,30 @@ router.get('/', async (req, res, next) => {
         script: '../js/logs.js',
         isLogs: true,
         logs: await logs.service.query(
-            {user: req.session.mongoId},
+            { user: req.session.mongoId },
             defaultPopulate,
             { createdAt: -1 },
             true,
             100
         ),
-        isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat',
-        isNat: res.locals.userRequest.group == 'nat'
+        isBnOrNat:
+            res.locals.userRequest.group == 'bn' ||
+            res.locals.userRequest.group == 'nat',
+        isNat: res.locals.userRequest.group == 'nat',
     });
 });
 
 router.get('/more/:skip', async (req, res, next) => {
-    res.json(await logs.service.query({}, defaultPopulate, { createdAt: -1 }, true, 100, parseInt(req.params.skip)));
+    res.json(
+        await logs.service.query(
+            {},
+            defaultPopulate,
+            { createdAt: -1 },
+            true,
+            100,
+            parseInt(req.params.skip)
+        )
+    );
 });
 
 module.exports = router;

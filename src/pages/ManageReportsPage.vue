@@ -1,7 +1,7 @@
 <template>
 
 <div class="row">
-    <div class="col-md-12 mb-4">
+    <section class="col-md-12 segment segment-solid" style="background-image: url('../images/footer-triangles.png'); background-repeat: no-repeat; background-position: bottom left;">
         <h2>Open Reports</h2>
         <transition-group name="list" tag="div" class="row">
             <report-card
@@ -13,9 +13,9 @@
         </transition-group>
         
         <p v-if="!openReports || openReports.length == 0" class="ml-4">No open reports...</p>
-    </div>
+    </section>
 
-    <div class="col-md-12">
+    <section class="col-md-12 segment segment-solid" style="background-image: url('../images/footer-triangles.png'); background-repeat: no-repeat; background-position: bottom left;">
         <h2>Closed Reports</h2>
         <transition-group name="list" tag="div" class="row">
             <report-card
@@ -27,7 +27,7 @@
         </transition-group>
 
         <p v-if="!closedReports || closedReports.length == 0" class="ml-4">No closed reports...</p>
-    </div>
+    </section>
     
    <report-info
         :report="selectedReport"
@@ -37,8 +37,6 @@
 </div>
 
 </template>
-
-
 
 <script>
 import ReportCard from '../components/reports/ReportCard.vue';
@@ -58,24 +56,6 @@ export default {
         },
     },
     methods: {
-        executePost: async function (path, data, e) {
-            if (e) e.target.disabled = true;
-
-            try {
-                const res = await axios.post(path, data)
-                
-                if (res.data.error) {
-                    this.info = res.data.error;
-                } else {
-                    if (e) e.target.disabled = false;
-                    return res.data;
-                }
-            } catch (error) {
-                console.log(error)
-            }
-
-            if (e) e.target.disabled = false;
-        },
         updateReport: function (report) {
 			const i = this.reports.findIndex(r => r.id == report.id);
 			this.reports[i] = report;

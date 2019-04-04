@@ -2,7 +2,7 @@
 
 <div class="row">
     <div class="col-md-12">
-        <div class="mb-2">
+        <section class="row segment segment-solid my-1 mx-4">
             <small>Search: 
                 <input id="search" class="text-input" v-model="filterValue" type="text" placeholder="username... (3+ characters)" /> 
             </small>
@@ -18,8 +18,8 @@
             <small>
                 <button class="btn btn-nat btn-sm ml-2" @click="selectAll($event)">Select all</button>
             </small>
-        </div>
-        <div class="mb-2">
+        </section>
+        <section class="row segment segment-solid my-1 mx-4">
             <small>Mark selected as:
                 <button class="btn btn-nat btn-sm ml-2" @click="setGroupEval($event)">Group evaluation</button>
             </small>
@@ -29,35 +29,43 @@
             <small>
                 <button class="btn btn-nat-red btn-sm ml-2" @click="setComplete($event)">Archive</button>
             </small>
-        </div>
+        </section>
         <hr>
-        <h2>Individual Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="only you can see these">?</sup></h2> 
-        <transition-group name="list" tag="div" class="row">
-            <eval-card
-                v-for="application in applications"
-                :application="application"
-                :evaluator="evaluator"
-                :key="application.id"
-                @update:selectedApplication="selectedApplication = $event"
-            ></eval-card>
-        </transition-group>
-        <p v-if="!applications || applications.length == 0" class="ml-4">No applications to evaluate...</p>
-    </div>
+        <section class="row segment mx-1 px-0">
+            <div class="col-sm-12">
+                <h2>Individual Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="only you can see these">?</sup></h2> 
 
-    <div class="col-md-12 mt-4">
+                <transition-group name="list" tag="div" class="row">
+                    <eval-card
+                        v-for="application in pageObjs"
+                        :application="application"
+                        :evaluator="evaluator"
+                        :key="application.id"
+                        @update:selectedApplication="selectedApplication = $event"
+                    ></eval-card>
+                </transition-group>
+
+                <p v-if="!pageObjs || pageObjs.length == 0" class="ml-4">No applications to evaluate...</p>
+            </div>
+        </section>
         <hr>
-        <h2>Group Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="everyone can see these">?</sup></h2>
-        <transition-group name="list" tag="div" class="row">
-            <discuss-card
-                v-for="discussApp in discussApps"
-                :discuss-app="discussApp"
-                :evaluator="evaluator"
-                :key="discussApp.id"
-                @update:selectedDiscussApp="selectedDiscussApp = $event"
-            ></discuss-card>
-        </transition-group>
-        
-        <p v-if="!discussApps || discussApps.length == 0" class="ml-4">No applications to evaluate...</p>
+        <section class="row segment mx-1 px-0">
+            <div class="col-sm-12">
+                <h2>Group Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="everyone can see these">?</sup></h2>
+
+                <transition-group name="list" tag="div" class="row">
+                    <discuss-card
+                        v-for="discussApp in discussApps"
+                        :discuss-app="discussApp"
+                        :evaluator="evaluator"
+                        :key="discussApp.id"
+                        @update:selectedDiscussApp="selectedDiscussApp = $event"
+                    ></discuss-card>
+                </transition-group>
+                
+                <p v-if="!discussApps || discussApps.length == 0" class="ml-4">No applications to evaluate...</p>
+            </div>
+        </section>
     </div>
 
     <eval-info
@@ -81,6 +89,7 @@ import EvalCard from '../components/evaluations/EvalCard.vue';
 import EvalInfo from '../components/evaluations/EvalInfo.vue';
 import DiscussCard from '../components/evaluations/DiscussCard.vue';
 import DiscussInfo from '../components/evaluations/DiscussInfo.vue';
+import filters from '../mixins/filters.js';
 import postData from '../mixins/postData.js';
 
 export default {
@@ -91,66 +100,20 @@ export default {
         DiscussCard,
         DiscussInfo
     },
-    mixins: [postData],
-    watch: {
-        filterValue: function(){
-            this.filter();
-        },
-        filterMode: function() {
-            this.filter();
-        },
-    },
+    mixins: [ postData, filters ],
     methods: {
+        filterBySearchValueContext: function(a) {
+            if(a.applicant.username.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1){
+                return true;
+            }
+            return false;
+        },
         updateApplication: function (application) {
-			const i = this.allApplications.findIndex(a => a.id == application.id);
-			this.allApplications[i] = application;
+			const i = this.allObjs.findIndex(a => a.id == application.id);
+			this.allObjs[i] = application;
             this.selectedApplication = application;
             this.selectedDiscussApp = application;
             this.filter();
-        },
-        filter: function () {            
-            this.filterValue = $("#search").val();
-            this.filterMode = $("#mode").val();
-            $("input[name='evalTypeCheck']").prop('checked', false);
-            
-            //reset
-            this.applications = this.allApplications.filter(a => !a.discussion);
-            this.discussApps = this.allApplications.filter(a => a.discussion);
-
-            //search
-            if(this.filterValue.length > 2){
-                this.filteredApps = this.allApplications.filter(a => {
-                    if(a.applicant.username.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1) return true;
-                    return false;
-                });
-            }
-            
-            //mode
-            if(this.filterMode.length){
-                if(this.filterValue.length > 2){
-                    this.filteredApps = this.filteredApps.filter(a => {
-                        if(this.filterMode == "osu" && a.mode == 'osu') return true;
-                        if(this.filterMode == "taiko" && a.mode == 'taiko') return true;
-                        if(this.filterMode == "catch" && a.mode == 'catch') return true;
-                        if(this.filterMode == "mania" && a.mode == 'mania') return true;
-                        return false;
-                    });
-                }else{
-                    this.filteredApps = this.allApplications.filter(a => {
-                        if(this.filterMode == "osu" && a.mode == 'osu') return true;
-                        if(this.filterMode == "taiko" && a.mode == 'taiko') return true;
-                        if(this.filterMode == "catch" && a.mode == 'catch') return true;
-                        if(this.filterMode == "mania" && a.mode == 'mania') return true;
-                        return false;
-                    });
-                }
-            }
-
-            let isFiltered = (this.filterValue.length > 2 || this.filterMode.length);
-            if(isFiltered){
-                this.applications = this.filteredApps.filter(a => !a.discussion);
-                this.discussApps = this.filteredApps.filter(a => a.discussion);
-            }
         },
         setGroupEval: async function(e) {
             let checkedApps = [];
@@ -163,7 +126,7 @@ export default {
                     if (ers.error) {
                         this.info = ers.error;
                     } else {
-                        this.allApplications = ers;
+                        this.allObjs = ers;
                         this.filter();
                     }
                 }
@@ -180,7 +143,7 @@ export default {
                     if (ers.error) {
                         this.info = ers.error;
                     } else {
-                        this.allApplications = ers;
+                        this.allObjs = ers;
                         this.filter();
                     }
                 }
@@ -199,7 +162,7 @@ export default {
                         if (ers.error) {
                             this.info = ers.error;
                         } else {
-                            this.allApplications = ers;
+                            this.allObjs = ers;
                             this.filter();
                         }
                     }
@@ -213,10 +176,9 @@ export default {
     },
     data() {
         return {
-            allApplications: null,
-            filteredApps: null,
-
-            applications: null,
+            allObjs: null,
+            filteredObjs: null,
+            pageObjs: null,
             selectedApplication: null,
 
             discussApps: null,
@@ -224,16 +186,15 @@ export default {
             
             evaluator: null,
             info: '',
-            filterValue: '',
-            filterMode: '',
         }
     },
     created() {
         axios
             .get('/nat/appEval/relevantInfo')
             .then(response => {
-                this.allApplications = response.data.a;
+                this.allObjs = response.data.a;
                 this.evaluator = response.data.evaluator;
+                this.hasPagination = false;
                 this.filter();
             }).then(function(){
                 $("#loading").fadeOut();
@@ -245,7 +206,7 @@ export default {
             axios
                 .get('/nat/appEval/relevantInfo')
                 .then(response => {
-                    this.allApplications = response.data.a;
+                    this.allObjs = response.data.a;
                     this.filter();
                 });
         }, 300000);
