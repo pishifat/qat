@@ -37,7 +37,7 @@
 
                 <transition-group name="list" tag="div" class="row">
                     <eval-card
-                        v-for="application in pageObjs"
+                        v-for="application in applications"
                         :application="application"
                         :evaluator="evaluator"
                         :key="application.id"
@@ -45,7 +45,9 @@
                     ></eval-card>
                 </transition-group>
 
-                <p v-if="!pageObjs || pageObjs.length == 0" class="ml-4">No applications to evaluate...</p>
+                <div class="row">
+                    <p v-if="!applications || applications.length == 0" class="ml-4">No applications to evaluate...</p>
+                </div>
             </div>
         </section>
         <hr>
@@ -63,7 +65,9 @@
                     ></discuss-card>
                 </transition-group>
                 
-                <p v-if="!discussApps || discussApps.length == 0" class="ml-4">No applications to evaluate...</p>
+                <div class="row">
+                    <p v-if="!discussApps || discussApps.length == 0" class="ml-4">No applications to evaluate...</p>
+                </div>
             </div>
         </section>
     </div>
@@ -174,16 +178,29 @@ export default {
                 checkBoxes.prop("checked", !checkBoxes.prop("checked"));
         }
     },
+    computed: {
+        applications: function() {
+            if (this.pageObjs) {
+                return this.pageObjs.filter(e => {
+                    return !e.discussion
+                });
+            }
+        },
+        discussApps: function() {
+            if (this.pageObjs) {
+                return this.pageObjs.filter(e => {
+                    return e.discussion
+                });
+            }
+        },
+    },
     data() {
         return {
             allObjs: null,
             filteredObjs: null,
             pageObjs: null,
             selectedApplication: null,
-
-            discussApps: null,
             selectedDiscussApp: null,
-            
             evaluator: null,
             info: '',
         }

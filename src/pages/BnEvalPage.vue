@@ -44,7 +44,7 @@
                 
                 <transition-group name="list" tag="div" class="row">
                     <eval-card
-                        v-for="evalRound in pageObjs"
+                        v-for="evalRound in evalRounds"
                         :eval-round="evalRound"
                         :evaluator="evaluator"
                         :key="evalRound.id"
@@ -52,7 +52,7 @@
                     ></eval-card>
                 </transition-group>
                 
-                <p v-if="!pageObjs || pageObjs.length == 0" class="ml-4">
+                <p v-if="!evalRounds || evalRounds.length == 0" class="ml-4">
                     No BNs to evaluate...
                 </p>
             </div>
@@ -201,16 +201,29 @@ export default {
                 checkBoxes.prop("checked", !checkBoxes.prop("checked"));
         }
     },
+    computed: {
+        evalRounds: function() {
+            if (this.pageObjs) {
+                return this.pageObjs.filter(e => {
+                    return !e.discussion
+                });
+            }
+        },
+        discussRounds: function() {
+            if (this.pageObjs) {
+                return this.pageObjs.filter(e => {
+                    return e.discussion
+                });
+            }
+        },
+    },
     data() {
         return {
             allObjs: null,
             filteredObjs: null,
             pageObjs: null,
             selectedEvalRound: null,
-
-            discussRounds: null,
             selectedDiscussRound: null,
-
             reports: null,
             evaluator: null,
             info: '',

@@ -20,6 +20,6 @@ $(function () {
         if (mainHeight != $('#main').outerHeight(true)) {
             setFooterPosition();
         }
-    }, 1000);
+    }, 500);
 
 });

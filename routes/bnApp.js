@@ -1,8 +1,8 @@
 const express = require('express');
-const api = require('../models/api.js');
-const bnApps = require('../models/bnApp.js');
-const logs = require('../models/log.js');
-const testSubmission = require('../models/bnTest/testSubmission');
+const api = require('../models/api');
+const bnAppsService = require('../models/bnApp.js').service;
+const logsService = require('../models/log.js').service;
+const testSubmissionService = require('../models/bnTest/testSubmission').service;
 
 const router = express.Router();
 
@@ -10,8 +10,11 @@ router.use(api.isLoggedIn);
 
 /* GET bn app page */
 router.get('/', async (req, res, next) => {
-    const test = await testSubmission.service.query({ applicant: req.session.mongoId, status: { $ne: 'finished' } });
-    
+    const test = await testSubmissionService.query({
+        applicant: req.session.mongoId,
+        status: { $ne: 'finished' },
+    });
+
     res.render('bnapp', {
         title: 'Beatmap Nominator Application',
         script: '../js/bnApp.js',
@@ -19,44 +22,37 @@ router.get('/', async (req, res, next) => {
         loggedInAs: req.session.mongoId,
         isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat',
         isNat: res.locals.userRequest.group == 'nat',
-        pendingTest: test
+        pendingTest: test,
     });
 });
 
 /* POST a bn application */
 router.post('/apply', async (req, res, next) => {
     if (req.session.mongoId) {
-        let date = new Date();
-        date.setDate(date.getDate() - 90);
-        const currentBnApp = await bnApps.service.query({
+        let cooldownDate = new Date();
+        cooldownDate.setDate(cooldownDate.getDate() - 90);
+        const currentBnApp = await bnAppsService.query({
             applicant: req.session.mongoId,
             mode: req.body.mode,
-            createdAt: { $gte: date },
+            createdAt: { $gte: cooldownDate },
         });
 
-        if (!currentBnApp || currentBnApp.error) {
-            const newBnApp = await bnApps.service.create(
-                req.session.mongoId,
-                req.body.mode,
-                req.body.mods
-            );
-            if (newBnApp && !newBnApp.error) {
-                // Create test
-                const t = await testSubmission.service.create(
-                    req.session.mongoId,
-                    req.body.mode
-                );
-                if (t.error) {
-                    // Need to retry it somewhere later
-                    return res.json({ error: 'Something went wrong while creating the test! Contact a NAT member to resolve the issue.' });
-                } else {
-                    await bnApps.service.update(newBnApp.id, {test: t._id});
-                    logs.service.create(req.session.mongoId, 
-                        `Applied for ${req.body.mode} BN`);
-                    return res.json('pass');
-                }
-            } else {
+        if (currentBnApp.error) {
+            return res.json(currentBnApp.error);
+        }
+
+        if (!currentBnApp) {
+            // Create app & test
+            const [newBnApp, test] = await Promise.all([
+                await testSubmissionService.create(req.session.mongoId, req.body.mode),
+                await bnAppsService.create(req.session.mongoId, req.body.mode, req.body.mods),
+            ]);
+            if (!newBnApp || newBnApp.error || !test || test.error) {
                 return res.json({ error: 'Failed to process application!' });
+            } else {
+                await bnAppsService.update(newBnApp.id, { test: test._id });
+                logsService.create(req.session.mongoId, `Applied for ${req.body.mode} BN`);
+                return res.json('pass');
             }
         } else {
             if (currentBnApp.active) {
@@ -65,7 +61,9 @@ router.post('/apply', async (req, res, next) => {
                 return res.json({
                     error: `Your previous application was rejected (check your osu! forum PMs for details). 
                         You may apply for this game mode again on 
-                        ${new Date(currentBnApp.createdAt.setDate(currentBnApp.createdAt.getDate() + 90)).toString().slice(4, 15)}.`,
+                        ${new Date(currentBnApp.createdAt.setDate(currentBnApp.createdAt.getDate() + 90))
+                            .toString()
+                            .slice(4, 15)}.`,
                 });
             }
         }

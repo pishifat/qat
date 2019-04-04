@@ -35,7 +35,6 @@ $(function() {
                         <p class="small">Before your application can be reviewed, you must take a short test.</p>`);
                 }
             } catch (error) {
-                console.log(error);
                 $('#errors').text('Something went wrong');
             }
         }

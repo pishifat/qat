@@ -11,7 +11,6 @@ const bnAppSchema = new mongoose.Schema({
     consensus: { type: String, enum: ["pass", "fail"] },
     feedback: { type: String },
     test: { type: 'ObjectId', ref: 'TestSubmission' },
-
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 const BnApp = mongoose.model('BnApp', bnAppSchema);

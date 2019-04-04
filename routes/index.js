@@ -1,9 +1,9 @@
 const express = require('express');
 const config = require('../config.json');
 const crypto = require('crypto');
-const api = require('../models/api.js');
-const users = require('../models/user.js');
-const logs = require('../models/log.js');
+const api = require('../models/api');
+const usersService = require('../models/user').service;
+const logsService = require('../models/log').service;
 const router = express.Router();
 
 /* GET bn app page */
@@ -11,7 +11,7 @@ router.get('/', async (req, res, next) => {
     let user;
 
     if (req.session.mongoId) {
-        user = await users.service.query({ _id: req.session.mongoId });
+        user = await usersService.query({ _id: req.session.mongoId });
     }
 
     let isBnOrNat;
@@ -20,52 +20,62 @@ router.get('/', async (req, res, next) => {
         isBnOrNat = true;
         if (user.group == 'bn') isBn = true;
     }
-    res.render('qatIndex', { title: 'NAT', layout: false, loggedInAs: req.session.mongoId, isBnOrNat: isBnOrNat, isBn: isBn});
+    res.render('qatIndex', {
+        title: 'NAT',
+        layout: false,
+        loggedInAs: req.session.mongoId,
+        isBnOrNat: isBnOrNat,
+        isBn: isBn,
+    });
 });
 
 /*-------below this line is the intimidating code that i never want to look at----------*/
 
 /* GET 'login' to get user's info */
-router.get('/login', async (req, res, next) => {
-    if (req.session.osuId && req.session.username) {
-        const u = await users.service.query({ osuId: req.session.osuId });
-        if (!u || u.error) {
-            const user = await users.service.create(
-                req.session.osuId,
-                req.session.username,
-                req.session.group
-            );
-            
-            if (user && !user.error) {
-                req.session.mongoId = user._id;
-                logs.service.create(req.session.mongoId, 
-                    `Verified their account for the first time`);
-                return next();
-            } else {
-                return res.status(500).render('error', { message: 'Something went wrong!' });
-            }
-        } else {
-            req.session.mongoId = u._id;
-            return next();
-        }
-    }
+router.get(
+    '/login',
+    async (req, res, next) => {
+        if (req.session.osuId && req.session.username) {
+            const u = await usersService.query({ osuId: req.session.osuId });
+            if (!u || u.error) {
+                const user = await usersService.create(
+                    req.session.osuId,
+                    req.session.username,
+                    req.session.group
+                );
 
-    if (!req.cookies._state) {
-        crypto.randomBytes(48, function(err, buffer) {
-            res.cookie('_state', buffer.toString('hex'), { httpOnly: true });
-            res.redirect('/login');
-        });
-    } else {
-        let hashedState = Buffer.from(req.cookies._state).toString('base64');
-        res.redirect(
-            `https://osu.ppy.sh/oauth/authorize?response_type=code&client_id=${
-                config.id
-            }&redirect_uri=${encodeURIComponent(config.redirect)}&state=${hashedState}&scope=identify`
-        );
+                if (user && !user.error) {
+                    req.session.mongoId = user._id;
+                    logsService.create(req.session.mongoId, `Verified their account for the first time`);
+                    return next();
+                } else {
+                    return res.status(500).render('error', { message: 'Something went wrong!' });
+                }
+            } else {
+                req.session.mongoId = u._id;
+                return next();
+            }
+        }
+
+        if (!req.cookies._state) {
+            crypto.randomBytes(48, function(err, buffer) {
+                res.cookie('_state', buffer.toString('hex'), { httpOnly: true });
+                res.redirect('/login');
+            });
+        } else {
+            let hashedState = Buffer.from(req.cookies._state).toString('base64');
+            res.redirect(
+                `https://osu.ppy.sh/oauth/authorize?response_type=code&client_id=${
+                    config.id
+                }&redirect_uri=${encodeURIComponent(config.redirect)}&state=${hashedState}&scope=identify`
+            );
+        }
+    },
+    api.isLoggedIn,
+    (req, res) => {
+        res.redirect('/');
     }
-}, api.isLoggedIn, (req, res) => {
-    res.redirect('/');
-});
+);
 
 /* GET user's token and user's info to login */
 router.get('/callback', async (req, res) => {
@@ -97,7 +107,7 @@ router.get('/callback', async (req, res) => {
             req.session.group = 'nat';
         } else if (response.is_bng) {
             req.session.group = 'bn';
-        }else{
+        } else {
             req.session.group = 'user';
         }
         req.session.username = response.username;

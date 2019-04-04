@@ -1,16 +1,13 @@
-var express = require('express');
-var logs = require('../models/log.js');
-var users = require('../models/user.js');
-var api = require('../models/api.js');
+const express = require('express');
+const api = require('../models/api');
+const logsService = require('../models/log').service;
 
-var router = express.Router();
+const router = express.Router();
 
 router.use(api.isLoggedIn);
 router.use(api.isNat);
 
-const defaultPopulate = [
-    { populate: 'user', display: 'username', model: users.User },
-];
+const defaultPopulate = [{ populate: 'user', display: 'username' }];
 
 /* GET logs */
 router.get('/', async (req, res, next) => {
@@ -18,30 +15,21 @@ router.get('/', async (req, res, next) => {
         title: 'Logs',
         script: '../js/logs.js',
         isLogs: true,
-        logs: await logs.service.query(
+        logs: await logsService.query(
             { user: req.session.mongoId },
             defaultPopulate,
             { createdAt: -1 },
             true,
             100
         ),
-        isBnOrNat:
-            res.locals.userRequest.group == 'bn' ||
-            res.locals.userRequest.group == 'nat',
+        isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat',
         isNat: res.locals.userRequest.group == 'nat',
     });
 });
 
 router.get('/more/:skip', async (req, res, next) => {
     res.json(
-        await logs.service.query(
-            {},
-            defaultPopulate,
-            { createdAt: -1 },
-            true,
-            100,
-            parseInt(req.params.skip)
-        )
+        await logsService.query({}, defaultPopulate, { createdAt: -1 }, true, 100, parseInt(req.params.skip))
     );
 });
 
