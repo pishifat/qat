@@ -155,7 +155,7 @@ export default {
                 this.limit = 16;
             }).then(function(){
                 $("#loading").fadeOut();
-                $('#main, footer').attr("style", "visibility: visible").hide().fadeIn();
+                $('#main').attr("style", "visibility: visible").hide().fadeIn();
             });
     },
     mounted () {

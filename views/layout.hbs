@@ -84,18 +84,13 @@
         <header class="container-fluid text-white text-center">
             <img src="../images/cat.png" class="header-img">
             <div class="header-img-overlay">
-                <h3>{{title}}</h3>
+                <h3 class="header-img-overlay-title">{{title}}</h3>
             </div>
         </header>
         <div class="container">
             {{{body}}}
         </div>
     </div>
-
-    <footer style="visibility: hidden;">
-        <a href="#top"><img class="my-1 mx-auto d-block img-fluid" src="../images/cat.png" width="40" height="40"></a>
-        <p class="text-center small">{{title}}</p>
-    </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
@@ -107,7 +102,6 @@
     {{#if script}}
     <script src="{{{script}}}"></script>
     {{/if}}
-    <script src="../js/helper.js"></script>
 </body>
 
 </html>

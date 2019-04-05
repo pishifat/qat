@@ -1,8 +1,27 @@
+function calculateMonthScore(modCount, modeValue) {
+    if (!modCount) modCount = 0;
+    return score = Math.log(1 + modCount) / Math.log(Math.sqrt(1 + modeValue)) - (2 * (1 + modeValue)) / (1 + modCount);
+}
+
 $(function() {
     $('#loading').hide();
     $('#main').attr('style', 'visibility: visible');
     $("body").tooltip({ selector: '[data-toggle=tooltip]', trigger: 'hover', });
-
+    
+    $('.modCount').change(function() {
+        let modeValue;
+        if ($('input[name=mode]:checked').val()) {
+            modeValue = $('input[name=mode]:checked').val() == 'osu' ? 4 : 3;
+        } else {
+            modeValue = 4;
+        }
+        let totalScore = 0;
+        $('.modCount').each(function(k, e) {
+            totalScore += calculateMonthScore(parseInt($(e).val()), modeValue);
+        });
+        totalScore = totalScore.toFixed(2);
+        $('#totalScore').text(totalScore.toString());
+    });
 
     $('#apply').click(async function() {
         $('#apply').attr('disabled', true);

@@ -134,7 +134,7 @@ export default {
             })
             .then(function() {
                 $('#loading').fadeOut();
-                $('#main, footer')
+                $('#main')
                     .attr('style', 'visibility: visible')
                     .hide()
                     .fadeIn();

@@ -1,6 +1,6 @@
 $(function () {
     $('#loading').hide();
-    $('#main, footer').attr('style', 'visibility: visible');
+    $('#main').attr('style', 'visibility: visible');
     $("body").tooltip({ selector: '[data-toggle=tooltip]', trigger: 'hover', });
 
     let skip = 100;
