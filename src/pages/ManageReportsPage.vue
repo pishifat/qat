@@ -1,7 +1,7 @@
 <template>
 
 <div class="row">
-    <section class="col-md-12 segment segment-solid" style="background-image: url('../images/footer-triangles.png'); background-repeat: no-repeat; background-position: bottom left;">
+    <section class="col-md-12 segment">
         <h2>Open Reports</h2>
         <transition-group name="list" tag="div" class="row">
             <report-card
@@ -15,7 +15,7 @@
         <p v-if="!openReports || openReports.length == 0" class="ml-4">No open reports...</p>
     </section>
 
-    <section class="col-md-12 segment segment-solid" style="background-image: url('../images/footer-triangles.png'); background-repeat: no-repeat; background-position: bottom left;">
+    <section class="col-md-12 segment">
         <h2>Closed Reports</h2>
         <transition-group name="list" tag="div" class="row">
             <report-card

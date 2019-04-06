@@ -17,7 +17,7 @@ class BaseService {
      * @param {string} sorting ex: 'x: -1'
      * @param {boolean} getAll 
      */
-    async query(params, populate, sorting, getAll) {
+    async query(params, populate, sorting, getAll, limit, skip) {
         let query;
         
         if (getAll) {
@@ -40,6 +40,14 @@ class BaseService {
 
         if (sorting) {
             query.sort(sorting);
+        }
+
+        if(limit) {
+            query.limit(limit);
+        }
+
+        if (skip) {
+            query.skip(skip);
         }
 
         try {

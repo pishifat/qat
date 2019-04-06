@@ -44,12 +44,12 @@
                 Deadline: 
                 <span v-if="discussApp" class="errors">
                     {{createDeadline(discussApp.createdAt)}}
-                    <input @click.stop="checkSelection()" class="form-check-input bottom-right-checkbox"
+                    <input v-if="!readOnly" @click.stop="checkSelection()" class="form-check-input bottom-right-checkbox"
                     :id="discussApp.id + '-check'" type="checkbox" name="evalTypeCheck" :value="discussApp.id">
                 </span>
                 <span v-else class="errors">
                     {{new Date(discussRound.deadline).toString().slice(4,10)}}
-                    <input @click.stop="checkSelection()" class="form-check-input bottom-right-checkbox"
+                    <input v-if="!readOnly" @click.stop="checkSelection()" class="form-check-input bottom-right-checkbox"
                     :id="discussRound.id + '-check'" type="checkbox" name="evalTypeCheck" :value="discussRound.id">
                 </span>
             </p>
@@ -61,7 +61,7 @@
 <script>
 export default {
     name: 'discuss-card',
-    props: ['discuss-app', 'discuss-round', 'evaluator', 'all-checked'],
+    props: ['discuss-app', 'discuss-round', 'evaluator', 'all-checked', 'read-only'],
     watch: {
         discussApp: function(v){
             this.addVotes();

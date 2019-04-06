@@ -68,7 +68,7 @@
                                     @click="setConsensus('fail', $event);"
                                 >Set Fail</button>
                             </h5>
-                            <div v-if="discussApp.consensus">
+                            <div v-if="discussApp.consensus && !readOnly">
                                 <hr>
                                 <p class="text-shadow min-spacing mb-2">Application feedback: <button class="btn btn-sm btn-nat" @click="setFeedback($event);">Generate Feedback PM</button></p>
                                 <div class="form-group">
@@ -83,7 +83,7 @@
                             </div>
                             <hr>
                         </div>
-                        <div v-else class="col-sm-12">
+                        <div v-else-if="!readOnly" class="col-sm-12">
                             <div class="col-sm-12">
                                 <p class="text-shadow"><a :href="noms && '#noms'" data-toggle="collapse">Show unique nominations</a> ({{noms ? noms.length: '0'}})</p>
                                 <div v-if="noms" class="collapse" id="noms">
@@ -239,6 +239,12 @@
                             </div>
                         </div>
 
+                        <div class="col-sm-12 text-shadow" v-if="readOnly">
+                            <hr>
+                            <p>Forum PM Feedback:</p>
+                            <small class="ml-4">{{discussApp ? discussApp.feedback : discussRound.feedback}}</small>
+                        </div>
+
                         <div class="col-sm-12" v-if="!readOnly">
                             <hr>
                         </div>
@@ -294,16 +300,22 @@ export default {
     },
     watch: {
         discussApp: function() {
-            this.info = '';
-            this.confirm = '';
-            this.findRelevantEval();
+            if(!this.readOnly){
+                this.info = '';
+                this.confirm = '';
+                this.feedback = this.discussApp.feedback;
+                this.findRelevantEval();
+            }
         },
         discussRound: function() {
-            this.info = '';
-            this.confirm = '';
-            this.findRelevantEval();
-            if(this.reports && this.reports.length) this.findRelevantReports();
-            this.findRelevantActivity();
+            if(!this.readOnly){
+                this.info = '';
+                this.confirm = '';
+                this.feedback = this.discussRound.feedback;
+                this.findRelevantEval();
+                if(this.reports && this.reports.length) this.findRelevantReports();
+                this.findRelevantActivity();
+            }
         },
     },
     methods: {

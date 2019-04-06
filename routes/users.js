@@ -62,16 +62,18 @@ router.post('/tempCreate/', api.isLoggedIn, async (req, res) => {
 /* POST switch usergroup */
 router.post('/tempUpdate/', api.isLoggedIn, async (req, res) => {
     const u = await usersService.query({ username: new RegExp('^' + helper.escapeUsername(req.body.username) + '$', 'i') });
-    if (req.body.mode.length) {
+    if (req.body.mode.length && u.modes.indexOf(req.body.mode) == -1) {
         await usersService.update(u.id, { $push: { modes: req.body.mode } });
     }
-    if (req.body.probation.length) {
+    if (req.body.probation.length && u.probation.indexOf(req.body.mode) == -1) {
         await usersService.update(u.id, { $push: { probation: req.body.probation } });
     }
     if (req.body.date) {
-        if (req.body.group == 'bn') await usersService.update(u.id, { $push: { bnDuration: req.body.date } });
-        if (req.body.group == 'nat')
+        if (req.body.group == 'bn'){
+            await usersService.update(u.id, { $push: { bnDuration: req.body.date } });
+        }else{
             await usersService.update(u.id, { $push: { natDuration: req.body.date } });
+        }
     }
     res.json(u);
 });

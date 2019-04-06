@@ -16,7 +16,7 @@ router.get('/', async (req, res, next) => {
         script: '../js/logs.js',
         isLogs: true,
         logs: await logsService.query(
-            { user: req.session.mongoId },
+            {},
             defaultPopulate,
             { createdAt: -1 },
             true,

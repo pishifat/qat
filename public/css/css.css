@@ -115,6 +115,7 @@ a:hover {
 
 #main {
     visibility: hidden;
+    padding-bottom: 100px;
 }
 
 #loading {
@@ -227,10 +228,14 @@ hr {
     margin: 1rem 1rem 1rem 1rem;
     padding: 1rem 1rem 1rem 1rem;
     box-shadow: 5px 5px 10px 5px black;
+    background-image: url('../images/footer-triangles.png');
+    background-repeat: repeat-x;
+    background-position: bottom left;
 }
 
 .segment-solid {
     background-color: var(--dark);
+    background-image: url();
 }
 
 .navbar-nat {
