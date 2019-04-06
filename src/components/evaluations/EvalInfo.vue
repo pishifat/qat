@@ -253,7 +253,7 @@ export default {
         },
         findRelevantActivity: function() {
             axios
-                .get('/nat/bnEval/userActivity/' + this.evalRound.bn.osuId)
+                .get('/nat/bnEval/userActivity/' + this.evalRound.bn.osuId + '/' + this.evalRound.mode)
                 .then(response => {
                     this.noms = response.data.noms;
                     this.nomsDqd = response.data.nomsDqd;

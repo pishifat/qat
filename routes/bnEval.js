@@ -285,6 +285,7 @@ router.post('/setComplete/', async (req, res) => {
             await usersService.update(u.id, { $pull: { probation: er.mode } });
             if (!u.modes.length) {
                 await usersService.update(u.id, { group: 'user' });
+                await usersService.update(u.id, { $push: {bnDuration: new Date() }});
             }
         }
 
@@ -297,6 +298,10 @@ router.post('/setComplete/', async (req, res) => {
         }
         
         await evalRoundsService.update(req.body.checkedRounds[i], { active: false });
+        logsService.create(
+            req.session.mongoId,
+            `Set ${u.username}'s ${er.mode} BN eval as "${er.consensus}"`
+        );
     }
 
     let ev = await evalRoundsService.query({ active: true }, defaultPopulate, { createdAt: 1 }, true);
@@ -313,12 +318,23 @@ router.post('/setConsensus/:id', async (req, res) => {
     let ev = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(ev);
     logsService.create(
-        req.session.mongoId,`Set consensus of ${ev.bn.username}'s ${ev.mode} BN app as ${req.body.consensus}`
+        req.session.mongoId,`Set consensus of ${ev.bn.username}'s ${ev.mode} BN eval as ${req.body.consensus}`
+    );
+});
+
+/* POST set feedback of eval */
+router.post('/setFeedback/:id', async (req, res) => {
+    await evalRoundsService.update(req.params.id, { feedback: req.body.feedback });
+    let er = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
+    res.json(er);
+    logsService.create(
+        req.session.mongoId,
+        `Edited feedback of ${er.bn.username}'s ${er.mode} BN evaluation`
     );
 });
 
 /* GET aiess info */
-router.get('/userActivity/:id', async (req, res) => {
+router.get('/userActivity/:id/:mode', async (req, res) => {
     let date = new Date();
     date.setDate(date.getDate() - 90);
 
@@ -327,6 +343,7 @@ router.get('/userActivity/:id', async (req, res) => {
             userId: req.params.id,
             timestamp: { $gte: date },
             $or: [{ eventType: 'Bubbled' }, { eventType: 'Qualified' }],
+            modes: { $elemMatch: { $eq: req.params.mode }}
         },
         {},
         { beatmapsetId: 1 },

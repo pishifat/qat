@@ -110,9 +110,14 @@ router.post('/setComplete/', async (req, res) => {
             await usersService.update(u.id, { $push: { probation: a.mode } });
             if (u.group == 'user') {
                 await usersService.update(u.id, { group: 'bn' });
+                await usersService.update(u.id, { $push: {bnDuration: new Date() }});
             }
         }
         await bnAppsService.update(a.id, { active: false });
+        logsService.create(
+            req.session.mongoId,
+            `Set ${u.username}'s ${a.mode} application eval as "${a.consensus}"`
+        );
     }
 
     let a = await bnAppsService.query({ active: true }, defaultPopulate, { createdAt: 1 }, true);
@@ -131,6 +136,17 @@ router.post('/setConsensus/:id', async (req, res) => {
     logsService.create(
         req.session.mongoId,
         `Set consensus of ${a.applicant.username}'s ${a.mode} BN app as ${req.body.consensus}`
+    );
+});
+
+/* POST set feedback of eval */
+router.post('/setFeedback/:id', async (req, res) => {
+    await bnAppsService.update(req.params.id, { feedback: req.body.feedback });
+    let a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
+    res.json(a);
+    logsService.create(
+        req.session.mongoId,
+        `Edited feedback of ${a.applicant.username}'s ${a.mode} BN app`
     );
 });
 

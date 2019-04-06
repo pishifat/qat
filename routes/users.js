@@ -41,8 +41,7 @@ router.post('/switchMediator/', api.isLoggedIn, async (req, res) => {
 
 /* POST switch usergroup */
 router.post('/switchGroup/:id', api.isLoggedIn, async (req, res) => {
-    let u = await usersService.update(req.params.id, { group: req.body.group });
-    u = await usersService.update(req.params.id, { probation: [] });
+    let u = await usersService.update(req.params.id, { group: req.body.group,  probation: [], $push: {bnDuration: new Date(), natDuration: new Date()} });
     res.json(u);
     logsService.create(
         req.session.mongoId,

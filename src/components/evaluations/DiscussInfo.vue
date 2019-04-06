@@ -49,7 +49,11 @@
                                     <a :href="modUrl(mod)" target="_blank">{{modUrl(mod)}}</a>
                                 </li>
                             </ul>
-                            <p class="text-shadow">Test results: <a href="#">20/20 <i class="fas fa-angle-right"></i></a></p>
+                            <p class="text-shadow">Test results: 
+                                <span :class="discussApp.test.totalScore > 15 ? 'vote-pass' : discussApp.test.totalScore > 12.5 ? 'vote-extend' : 'vote-fail'">
+                                    {{discussApp.test.totalScore || discussApp.test.totalScore >= 0 ? discussApp.test.totalScore + '/20' : 'incomplete'}}
+                                </span>
+                            </p>
                             <h5 class="text-shadow mb-2">Consensus:
                                 <span v-if="discussApp.consensus" :class="'vote-' + discussApp.consensus">{{discussApp.consensus}}</span>
                                 <span v-else>none</span>
@@ -64,6 +68,19 @@
                                     @click="setConsensus('fail', $event);"
                                 >Set Fail</button>
                             </h5>
+                            <div v-if="discussApp.consensus">
+                                <hr>
+                                <p class="text-shadow min-spacing mb-2">Application feedback: <button class="btn btn-sm btn-nat" @click="setFeedback($event);">Generate Feedback PM</button></p>
+                                <div class="form-group">
+                                    <textarea class="form-control dark-textarea" style="white-space: pre-line;" v-model="feedback"></textarea>
+                                </div>
+                                <div id="feedback" class="copy-paste">
+                                    <samp class="small">Hello! You've been {{discussApp.consensus == 'pass' ? 'accepted into' : 'rejected from'}} the Beatmap Nominators!</samp><br>
+                                    <samp class="small">There's more to write here probably. Here's some feedback:</samp><br>
+                                    <samp class="small">{{discussApp.feedback}}</samp><br>
+                                    <samp class="small">Good luck!</samp><br>
+                                </div>
+                            </div>
                             <hr>
                         </div>
                         <div v-else class="col-sm-12">
@@ -172,6 +189,20 @@
                                     </table>
                                 </div>
                             </div>
+
+                            <div v-if="discussRound.consensus">
+                                <hr>
+                                <p class="text-shadow min-spacing mb-2">Application feedback: <button class="btn btn-sm btn-nat" @click="setFeedback($event);">Generate Feedback PM</button></p>
+                                <div class="form-group">
+                                    <textarea class="form-control dark-textarea" style="white-space: pre-line;" v-model="feedback"></textarea>
+                                </div>
+                                <div id="feedback" class="copy-paste">
+                                    <samp class="small">Hello! You've been {{discussRound.consensus == 'pass' ? 'accepted into' : 'rejected from'}} the Beatmap Nominators!</samp><br>
+                                    <samp class="small">There's more to write here probably. Here's some feedback:</samp><br>
+                                    <samp class="small">{{discussRound.feedback}}</samp><br>
+                                    <samp class="small">Good luck!</samp><br>
+                                </div>
+                            </div>
                             
                             <div v-if="relevantReports.length">
                                 <hr>
@@ -207,7 +238,6 @@
                                 </div>
                             </div>
                         </div>
-
 
                         <div class="col-sm-12" v-if="!readOnly">
                             <hr>
@@ -311,7 +341,7 @@ export default {
         },
         findRelevantActivity: function() {
             axios
-                .get('/nat/bnEval/userActivity/' + this.discussRound.bn.osuId)
+                .get('/nat/bnEval/userActivity/' + this.discussRound.bn.osuId + '/' + this.discussRound.mode)
                 .then(response => {
                     this.noms = response.data.noms;
                     this.nomsDqd = response.data.nomsDqd;
@@ -408,6 +438,29 @@ export default {
                     }
                 }
             }
+        },
+        setFeedback: async function(e){
+            if(this.discussApp){
+                const a = await this.executePost(
+                    '/nat/appEval/setFeedback/' + this.discussApp.id, {feedback: this.feedback}, e);
+                if (a) {
+                    if (a.error) {
+                        this.info = a.error;
+                    } else {
+                        await this.$emit('update-application', a);
+                    }
+                }
+            }else{
+                const er = await this.executePost(
+                    '/nat/bnEval/setFeedback/' + this.discussRound.id, {feedback: this.feedback}, e);
+                if (er) {
+                    if (er.error) {
+                        this.info = er.error;
+                    } else {
+                        await this.$emit('update-eval-round', er);
+                    }
+                }
+            }
         }
     },
     data() {
@@ -416,6 +469,7 @@ export default {
             behaviorComment: '',
             moddingComment: '',
             vote: 0,
+            feedback: '',
             relevantReports: [],
             info: '',
             confirm: '',

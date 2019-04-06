@@ -40,6 +40,7 @@
                         v-for="application in applications"
                         :application="application"
                         :evaluator="evaluator"
+                        :all-checked="allChecked"
                         :key="application.id"
                         @update:selectedApplication="selectedApplication = $event"
                     ></eval-card>
@@ -60,6 +61,7 @@
                         v-for="discussApp in discussApps"
                         :discuss-app="discussApp"
                         :evaluator="evaluator"
+                        :all-checked="allChecked"
                         :key="discussApp.id"
                         @update:selectedDiscussApp="selectedDiscussApp = $event"
                     ></discuss-card>
@@ -111,6 +113,10 @@ export default {
                 return true;
             }
             return false;
+        },
+        separateObjs: function() {
+            this.applications = this.pageObjs.filter(v => !v.discussion);
+            this.discussApps = this.pageObjs.filter(v => v.discussion);
         },
         updateApplication: function (application) {
 			const i = this.allObjs.findIndex(a => a.id == application.id);
@@ -176,29 +182,20 @@ export default {
         selectAll: function() {
             var checkBoxes = $("input[name='evalTypeCheck'");
                 checkBoxes.prop("checked", !checkBoxes.prop("checked"));
+            this.allChecked = !this.allChecked;
         }
     },
     computed: {
-        applications: function() {
-            if (this.pageObjs) {
-                return this.pageObjs.filter(e => {
-                    return !e.discussion
-                });
-            }
-        },
-        discussApps: function() {
-            if (this.pageObjs) {
-                return this.pageObjs.filter(e => {
-                    return e.discussion
-                });
-            }
-        },
+        
     },
     data() {
         return {
             allObjs: null,
             filteredObjs: null,
             pageObjs: null,
+            applications: null,
+            discussApps: null,
+            allChecked: false,
             selectedApplication: null,
             selectedDiscussApp: null,
             evaluator: null,
@@ -212,6 +209,7 @@ export default {
                 this.allObjs = response.data.a;
                 this.evaluator = response.data.evaluator;
                 this.hasPagination = false;
+                this.hasSeparation = true;
                 this.filter();
             }).then(function(){
                 $("#loading").fadeOut();

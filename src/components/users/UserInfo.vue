@@ -28,7 +28,8 @@
                     </button>
                 </p>
                 <hr>
-                <button 
+                <button
+                    v-if="userGroup == 'nat'"
                     class="btn btn-nat btn-sm justify-content-center"
                     @click="user.group == 'bn' ? switchGroup('nat', $event) : switchGroup('bn', $event)">
                     {{user.group == 'bn' ? 'Move to NAT' : 'Move to BN'}}
@@ -46,7 +47,7 @@ import postData from "../../mixins/postData.js";
 
 export default {
     name: 'user-info',
-    props: [ 'user', 'user-id' ],
+    props: [ 'user', 'user-id', 'user-group' ],
     mixins: [ postData ],
     methods: {
         //display

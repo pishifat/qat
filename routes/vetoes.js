@@ -2,6 +2,7 @@ const express = require('express');
 const api = require('../models/api');
 const vetoesService = require('../models/veto').service;
 const usersService = require('../models/user').service;
+const usersModel = require('../models/user').User;
 const mediationsService = require('../models/mediation').service;
 const logsService = require('../models/log').service;
 
@@ -70,13 +71,14 @@ router.post('/submit', async (req, res, next) => {
         req.body.mode
     );
     res.json(v);
-    logsService.create(req.session.mongoId, `Submitted a veto for mediation`);
+    logsService.create(req.session.mongoId, `Submitted a veto for mediation on "${v.beatmapTitle}"`);
 });
 
 /* POST set status upheld or withdrawn. */
 router.post('/selectMediators', async (req, res, next) => {
-    const allUsers = await usersService.User.aggregate([
-        { $match: { group: { $ne: 'user' }, vetoMediator: true } },
+    const allUsers = await usersModel.aggregate([
+        //{ $match: { group: { $ne: 'user' }, vetoMediator: true, mode: {$in: req.body.mode}, probation: {$in: req.body.mode}, username: {$nin: req.body.excludeUsers} } },
+        { $match: { group: { $ne: 'user' }, vetoMediator: true} },
         { $sample: { size: 1000 } },
     ]);
     let usernames = [];
@@ -106,6 +108,10 @@ router.post('/beginMediation/:id', async (req, res, next) => {
     }
     let v = await vetoesService.query({ _id: req.params.id }, defaultPopulate);
     res.json(v);
+    logsService.create(
+        req.session.mongoId,
+        `Started veto mediation for "${v.beatmapTitle}"`
+    );
 });
 
 /* POST submit mediation */
@@ -113,6 +119,10 @@ router.post('/submitMediation/:id', async (req, res, next) => {
     await mediationsService.update(req.body.mediationId, { comment: req.body.comment, vote: req.body.vote });
     let v = await vetoesService.query({ _id: req.params.id }, defaultPopulate);
     res.json(v);
+    logsService.create(
+        req.session.mongoId,
+        `Submitted "${req.body.vote == 1 ? 'agree' : req.body.vote == 2 ? 'neutral' : 'disagree'}" vote for veto on "${v.beatmapTitle}"`
+    );
 });
 
 /* POST submit mediation */
@@ -120,6 +130,10 @@ router.post('/concludeMediation/:id', async (req, res, next) => {
     await vetoesService.update(req.params.id, { status: req.body.majority ? 'upheld' : 'withdrawn' });
     let v = await vetoesService.query({ _id: req.params.id }, defaultPopulate);
     res.json(v);
+    logsService.create(
+        req.session.mongoId,
+        `${v.status.charAt(0).toUpperCase() + v.status.slice(1)} veto mediation for "${v.beatmapTitle}"`
+    );
 });
 
 module.exports = router;

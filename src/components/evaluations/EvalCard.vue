@@ -1,6 +1,8 @@
 <template>
 <div class='col-lg-2 col-md-3 col-sm-6 my-2' @click="application ? selectApplication() : selectEvalRound()" >
-    <div class="card custom-bg-dark border-outline" :class="'border-' + findRelevantEval()" style="height: 100%" data-toggle='modal' data-target='#evaluationInfo' :data-user="application ? application.id : evalRound.id">
+    <div class="card custom-bg-dark border-outline" 
+    :class="[isSelected ? 'selected-card' : '', 'border-' + findRelevantEval()]" style="height: 100%;" 
+    data-toggle='modal' data-target='#evaluationInfo' :data-user="application ? application.id : evalRound.id">
         <div class='card-body eval-card-spacing mx-1'>
             <p v-if="application" class='card-text text-shadow'>
                 <a @click.stop :href="'https://osu.ppy.sh/users/' + application.applicant.osuId" target="_blank">{{application.applicant.username}}</a> 
@@ -22,11 +24,13 @@
                 Deadline: 
                 <span v-if="application" class="errors">
                     {{createDeadline(application.createdAt)}}
-                    <input @click.stop class="form-check-input bottom-right-checkbox" type="checkbox" name="evalTypeCheck" :value="application.id">
+                    <input @click.stop="checkSelection()" class="form-check-input bottom-right-checkbox" 
+                    :id="application.id + '-check'" type="checkbox" name="evalTypeCheck" :value="application.id">
                 </span>
                 <span v-else class="errors">
                     {{new Date(evalRound.deadline).toString().slice(4,10)}}
-                    <input @click.stop class="form-check-input bottom-right-checkbox" type="checkbox" name="evalTypeCheck" :value="evalRound.id">
+                    <input @click.stop="checkSelection()" class="form-check-input bottom-right-checkbox"
+                    :id="evalRound.id + '-check'" type="checkbox" name="evalTypeCheck" :value="evalRound.id">
                 </span>
                 
             </p>
@@ -39,7 +43,12 @@
 <script>
 export default {
     name: 'eval-card',
-    props: ['application', 'evalRound', 'evaluator'],
+    props: ['application', 'evalRound', 'evaluator', 'all-checked'],
+    watch: {
+        allChecked: function() {
+            this.checkSelection();
+        }
+    },
     methods: {
         selectApplication: function () {
             this.$emit('update:selectedApplication', this.application);
@@ -82,6 +91,20 @@ export default {
             date = new Date(date.setDate (date.getDate() + 7)).toString().slice(4,10);
             return date;
         },
+        checkSelection: function() {
+            if (this.application && $(`#${this.application.id}-check`).is(':checked')) {
+                this.isSelected = true;
+            }else if (this.evalRound && $(`#${this.evalRound.id}-check`).is(':checked')) {
+                this.isSelected = true;
+            }else{
+                this.isSelected = false;
+            }
+        }
+    },
+    data() {
+        return {
+            isSelected: false,
+        };
     },
 }
 </script>

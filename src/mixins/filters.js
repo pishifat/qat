@@ -3,8 +3,10 @@ const filters = {
         return {
             filterValue: '',
             filterMode: '',
+            filterVote: '',
             isFiltered: false,
             hasPagination: true,
+            hasSeparation: false,
 
             sortBy: null,
             asc: false
@@ -17,15 +19,19 @@ const filters = {
         filterMode: function(v) {
             this.filter();
         },
+        filterVote: function(v) {
+            this.filter();
+        },
     },
     methods: {
         filter: function() {
             this.pageObjs = this.allObjs;
 
             this.filterByMode();
+            this.filterByVote();
             this.filterBySearchValue();
 
-            this.isFiltered = this.filterValue.length > 2 || this.filterMode.length;
+            this.isFiltered = this.filterValue.length > 2 || this.filterMode.length || this.filterVote.length;
             if (this.sortBy) {
                 this.sort(this.sortBy, true);
             }
@@ -36,6 +42,9 @@ const filters = {
             } else {
                 if (this.isFiltered) this.pageObjs = this.filteredObjs;
                 else this.pageObjs = this.allObjs;
+            }
+            if (this.hasSeparation) {
+                this.separateObjs();
             }
         },
         filterByMode: function() {
@@ -57,6 +66,19 @@ const filters = {
                 });
             }
         },
+        filterByVote: function() {
+            if (this.filterVote.length) {
+                this.filteredObjs = this.allObjs.filter(v => {
+                    if (v.valid == this.filterVote) {
+                        return true;
+                    }
+                    if (this.filterVote == 'none' && !v.valid && !v.vote) {
+                        return true;
+                    }
+                    return false;
+                });
+            }
+        },
         filterBySearchValue: function() {
             if (this.filterValue.length > 2) {
                 if (this.filterMode.length) {
@@ -70,6 +92,7 @@ const filters = {
                 }
             }
         },
+        
         
         sort: function (field, keepOrder) {
             this.sortBy = field;

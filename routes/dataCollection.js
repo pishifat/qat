@@ -23,19 +23,13 @@ router.get('/', async (req, res, next) => {
 router.get('/relevantInfo', async (req, res, next) => {
     let date = new Date();
     date.setDate(date.getDate() - 90);
-    let dqs = await aiessService.query(
-        { eventType: 'Disqualified', timestamp: { $gte: date } },
+    let data = await aiessService.query(
+        { $or: [{eventType: 'Disqualified'}, {eventType: 'Popped'}], timestamp: { $gte: date } },
         {},
         { timestamp: 1 },
         true
     );
-    let pops = await aiessService.query(
-        { eventType: 'Popped', timestamp: { $gte: date } },
-        {},
-        { timestamp: 1 },
-        true
-    );
-    res.json({ dqs: dqs, pops: pops });
+    res.json(data);
 });
 
 /* POST edit reason for dq/pop */

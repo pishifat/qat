@@ -47,6 +47,7 @@
                         v-for="evalRound in evalRounds"
                         :eval-round="evalRound"
                         :evaluator="evaluator"
+                        :all-checked="allChecked"
                         :key="evalRound.id"
                         @update:selectedEvalRound="selectedEvalRound = $event"
                     ></eval-card>
@@ -67,6 +68,7 @@
                         v-for="discussRound in discussRounds"
                         :discuss-round="discussRound"
                         :evaluator="evaluator"
+                        :all-checked="allChecked"
                         :key="discussRound.id"
                         @update:selectedDiscussRound="selectedDiscussRound = $event"
                     ></discuss-card>
@@ -127,6 +129,10 @@ export default {
                 return true;
             }
             return false;
+        },
+        separateObjs: function() {
+            this.evalRounds = this.pageObjs.filter(v => !v.discussion);
+            this.discussRounds = this.pageObjs.filter(v => v.discussion);
         },
         updateEvalRound: function (evalRound) {
 			const i = this.allObjs.findIndex(er => er.id == evalRound.id);
@@ -199,31 +205,22 @@ export default {
         selectAll: function() {
             var checkBoxes = $("input[name='evalTypeCheck'");
                 checkBoxes.prop("checked", !checkBoxes.prop("checked"));
+            this.allChecked = !this.allChecked;
         }
     },
     computed: {
-        evalRounds: function() {
-            if (this.pageObjs) {
-                return this.pageObjs.filter(e => {
-                    return !e.discussion
-                });
-            }
-        },
-        discussRounds: function() {
-            if (this.pageObjs) {
-                return this.pageObjs.filter(e => {
-                    return e.discussion
-                });
-            }
-        },
+        
     },
     data() {
         return {
             allObjs: null,
             filteredObjs: null,
             pageObjs: null,
+            evalRounds: null,
+            discussRounds: null,
             selectedEvalRound: null,
             selectedDiscussRound: null,
+            allChecked: false,
             reports: null,
             evaluator: null,
             info: '',
@@ -237,6 +234,7 @@ export default {
                 this.reports = response.data.r;
                 this.evaluator = response.data.evaluator;
                 this.hasPagination = false;
+                this.hasSeparation = true;
                 this.filter();
             }).then(function(){
                 $("#loading").fadeOut();

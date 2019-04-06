@@ -42,6 +42,7 @@ header {
     margin-bottom: -100px;
     padding-top: 100px;
     z-index: -1;
+    border-bottom: 5px solid black;
 }
 
 .header-img {
@@ -269,8 +270,8 @@ input[type='text']:focus {
 }
 
 .custom-select {
-    min-width: 7rem;
-    width: 7rem;
+    min-width: 7.5rem;
+    width: 7.5rem;
     height: 2.5em;
     background-color: var(--darker);
     color: white;
@@ -489,6 +490,10 @@ input[type="radio"] + .fas { cursor: pointer; }
     border-right: solid 1px var(--dark);
 }
 
+.selected-card {
+    background-color: rgb(65, 65, 65);
+}
+
 .card:hover {
     transform: scale(1.03);
     opacity: 1;
@@ -562,4 +567,11 @@ input[type="radio"] + .fas { cursor: pointer; }
     padding: 7px;
     border-radius: 9px;
     color: var(--clicked);
+}
+
+.copy-paste {
+    background-color: darkslategray;
+    margin: 0.75rem 0.75rem 0.75rem 0.75rem;
+    padding: 0.75rem 0.75rem 0.75rem 0.75rem;
+    box-shadow: 1px 1px 2px 1px black;
 }

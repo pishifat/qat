@@ -1,6 +1,8 @@
 <template>
 <div class='col-lg-2 col-md-3 col-sm-6 my-2' @click="discussApp ? selectDiscussApp() : selectDiscussRound()" >
-    <div class="card custom-bg-dark border-outline" :class="'border-' + findRelevantEval()" style="height: 100%" data-toggle='modal' data-target='#discussionInfo' :data-user="discussApp ? discussApp.id : discussRound.id">
+    <div class="card custom-bg-dark border-outline" 
+    :class="[isSelected ? 'selected-card' : '', 'border-' + findRelevantEval()]" style="height: 100%" 
+    data-toggle='modal' data-target='#discussionInfo' :data-user="discussApp ? discussApp.id : discussRound.id">
         <div class='card-body eval-card-spacing mx-1'>
             <div v-if="discussApp">
                 <div
@@ -42,14 +44,15 @@
                 Deadline: 
                 <span v-if="discussApp" class="errors">
                     {{createDeadline(discussApp.createdAt)}}
-                    <input @click.stop class="form-check-input bottom-right-checkbox" type="checkbox" name="evalTypeCheck" :value="discussApp.id">
+                    <input @click.stop="checkSelection()" class="form-check-input bottom-right-checkbox"
+                    :id="discussApp.id + '-check'" type="checkbox" name="evalTypeCheck" :value="discussApp.id">
                 </span>
                 <span v-else class="errors">
                     {{new Date(discussRound.deadline).toString().slice(4,10)}}
-                    <input @click.stop class="form-check-input bottom-right-checkbox" type="checkbox" name="evalTypeCheck" :value="discussRound.id">
+                    <input @click.stop="checkSelection()" class="form-check-input bottom-right-checkbox"
+                    :id="discussRound.id + '-check'" type="checkbox" name="evalTypeCheck" :value="discussRound.id">
                 </span>
             </p>
-            
         </div>
     </div>
 </div>
@@ -58,13 +61,16 @@
 <script>
 export default {
     name: 'discuss-card',
-    props: ['discuss-app', 'discuss-round', 'evaluator'],
+    props: ['discuss-app', 'discuss-round', 'evaluator', 'all-checked'],
     watch: {
         discussApp: function(v){
             this.addVotes();
         },
         discussRound: function(v){
             this.addVotes();
+        },
+        allChecked: function() {
+            this.checkSelection();
         }
     },
     methods: {
@@ -137,6 +143,15 @@ export default {
             date = new Date(date.setDate (date.getDate() + 14)).toString().slice(4,10);
             return date;
         },
+        checkSelection: function() {
+            if (this.discussApp && $(`#${this.discussApp.id}-check`).is(':checked')) {
+                this.isSelected = true;
+            }else if (this.discussRound && $(`#${this.discussRound.id}-check`).is(':checked')) {
+                this.isSelected = true;
+            }else{
+                this.isSelected = false;
+            }
+        },
     },
     data() {
         return {
@@ -144,6 +159,7 @@ export default {
             neutral: 0,
             extend: 0,
             fail: 0,
+            isSelected: false,
         };
     },
     created() {

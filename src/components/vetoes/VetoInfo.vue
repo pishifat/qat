@@ -50,7 +50,7 @@
                                 <samp class="small">Due to the veto being withdrawn, the beatmap may now be re-nominated.</samp>
                             </div>
                         </div>
-                        <button v-if="mediationId" class="btn btn-sm" :class="majority ? 'btn-nat' : 'btn-nat-red'" @click="concludeMediation($event)">{{majority ? 'Uphold Veto' : 'Withdraw Veto'}}</button>
+                        <button v-if="mediationId && !(veto.status == 'upheld' || veto.status =='withdrawn')" class="btn btn-sm" :class="majority ? 'btn-nat' : 'btn-nat-red'" @click="concludeMediation($event)">{{majority ? 'Uphold Veto' : 'Withdraw Veto'}}</button>
                     </div>
                     <div v-else>
                         <button class="btn btn-sm btn-nat mb-2" @click="selectMediators($event)">{{mediators ? 'Re-select Mediators' : 'Select Mediators'}}</button> 
@@ -243,10 +243,5 @@ export default {
     .bg-withdrawn {
         background-color: var(--withdrawn);
     }
-    .copy-paste {
-    background-color: darkslategray;
-    margin: 0.75rem 0.75rem 0.75rem 0.75rem;
-    padding: 0.75rem 0.75rem 0.75rem 0.75rem;
-    box-shadow: 1px 1px 2px 1px black;
-}
+    
 </style>
