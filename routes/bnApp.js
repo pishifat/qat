@@ -7,18 +7,9 @@ const testSubmissionService = require('../models/bnTest/testSubmission').service
 const router = express.Router();
 
 router.use(api.isLoggedIn);
-const axios = require('axios');
+
 /* GET bn app page */
 router.get('/', async (req, res, next) => {
-    // let baseUrl = 'https://osu.ppy.sh/beatmapsets/events?types[]=kudosu_gain&types[]=kudosu_loss';
-    // baseUrl += `&user=lasse`;
-    // baseUrl += `&min_date=2019-02-04&max_date=2019-04-05`;
-    // try {
-    //     await axios.get('&min_date=2019-02-04&max_date=2019-04-05#events')
-    // } catch (error) {
-        
-    // }
-
     const test = await testSubmissionService.query({
         applicant: req.session.mongoId,
         status: { $ne: 'finished' },
@@ -35,12 +26,21 @@ router.get('/', async (req, res, next) => {
     });
 });
 
+router.get('/mods', async (req, res, next) => {
+    const modCount = await api.getUserModsCount(req.session.username);
+    return res.json({ modCount: modCount });
+});
+
 /* POST a bn application */
 router.post('/apply', async (req, res, next) => {
     if (req.session.mongoId) {
-        // Check user kudosu total count
-        // const info = await api.getUserInfo(req.session.accessToken);
-        // console.log(info.kudosu.total);
+        // Check user kudosu total count & mod score
+        const info = await api.getUserInfo(req.session.accessToken);
+        const modScore = await api.getUserModsCount(req.session.username, req.body.mode);
+        if (modScore >= 0 && ((req.body.mode == 'osu' && info.kudosu.total >= 200) || (req.body.mode != 'osu' && info.kudosu.total >= 150))) {
+            return res.json({ error: `You don't meet the minimum score or total kudosu requirement. 
+                Your mod score needs to be higher or equal than 0, currently is ${modScore}` });
+        }
         
         let cooldownDate = new Date();
         cooldownDate.setDate(cooldownDate.getDate() - 90);
