@@ -1,6 +1,6 @@
 function calculateMonthScore(modCount, modeValue) {
     if (!modCount) modCount = 0;
-    return score = Math.log(1 + modCount) / Math.log(Math.sqrt(1 + modeValue)) - (2 * (1 + modeValue)) / (1 + modCount);
+    return Math.log(1 + modCount) / Math.log(Math.sqrt(1 + modeValue)) - (2 * (1 + modeValue)) / (1 + modCount);
 }
 
 $(function() {
@@ -21,6 +21,20 @@ $(function() {
         });
         totalScore = totalScore.toFixed(2);
         $('#totalScore').text(totalScore.toString());
+    });
+
+    $('#calculateScore').click(async function () {
+        $('#totalScore').text('retrieving info, may take a while');
+        const res = await axios.get(`/nat/bnapps/mods`);
+        $('#totalScore').text('');
+        if (res.data.error) {
+            $('#errors').text(res.data.error);
+        } else {
+            const modCount = res.data.modCount;
+            $('#modCount1').val(modCount[0]);
+            $('#modCount2').val(modCount[1]);
+            $('#modCount3').val(modCount[2]).change(); // Triggers .change function above
+        }
     });
 
     $('#apply').click(async function() {
