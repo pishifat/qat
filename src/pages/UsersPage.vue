@@ -107,7 +107,7 @@ export default {
             const mode = $('#mode').val();
             const group = $('#group').val();
             const probation = $('#probation').val();
-            const u = await this.executePost('/nat/users/tempCreate/', {username: username, osuId: osuId, mode: mode, group: group, probation: probation}, e);
+            const u = await this.executePost('/users/tempCreate/', {username: username, osuId: osuId, mode: mode, group: group, probation: probation}, e);
             if(u){
                 console.log("ye");
             }
@@ -118,7 +118,7 @@ export default {
             const group = $('#group').val();
             const probation = $('#probation').val();
             const date = new Date($('#date').val());
-            const u = await this.executePost('/nat/users/tempUpdate/', {username: username, group: group, mode: mode, probation: probation, date: date}, e);
+            const u = await this.executePost('/users/tempUpdate/', {username: username, group: group, mode: mode, probation: probation, date: date}, e);
             if(u){
                 console.log("yeeeee");
             }
@@ -136,7 +136,7 @@ export default {
     },
     created() {
         axios
-            .get('/nat/users/relevantInfo')
+            .get('/users/relevantInfo')
             .then(response => {
                 this.allObjs = response.data.users;
                 this.userId = response.data.userId;
@@ -150,7 +150,7 @@ export default {
     mounted () {
         setInterval(() => {
             axios
-                .get('/nat/users/relevantInfo')
+                .get('/users/relevantInfo')
                 .then(response => {
                     this.allObjs = response.data.users;
                     if(this.isFiltered){

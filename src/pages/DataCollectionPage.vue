@@ -179,7 +179,7 @@ export default {
             if(!reason || !reason.length){
                 this.info = "Must enter a reason!"
             }else{
-                const result = await this.executePost('/nat/dataCollection/updateReason/' + this.selectedEntry.id, { reason: reason }, e);
+                const result = await this.executePost('/dataCollection/updateReason/' + this.selectedEntry.id, { reason: reason }, e);
                 if (result) {
                     if (result.error) {
                         this.info = result.error;
@@ -190,7 +190,7 @@ export default {
             }
         },
         updateValidity: async function(entryId, validity) {
-            const result = await this.executePost('/nat/dataCollection/updateValidity/' + entryId, { validity: validity });
+            const result = await this.executePost('/dataCollection/updateValidity/' + entryId, { validity: validity });
             if (result) {
                 if (result.error) {
                     this.info = result.error;
@@ -212,7 +212,7 @@ export default {
     },
     created() {
         axios
-            .get('/nat/dataCollection/relevantInfo')
+            .get('/dataCollection/relevantInfo')
             .then(response => {
                 this.allObjs = response.data;
                 this.hasPagination = false;

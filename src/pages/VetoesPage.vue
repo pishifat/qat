@@ -125,7 +125,7 @@ export default {
     },
     created() {
         axios
-            .get('/nat/vetoes/relevantInfo')
+            .get('/vetoes/relevantInfo')
             .then(response => {
                 this.allObjs = response.data.vetoes;
                 this.userId = response.data.userId;
@@ -142,7 +142,7 @@ export default {
     },
     mounted() {
         setInterval(() => {
-            axios.get('/nat/vetoes/relevantInfo').then(response => {
+            axios.get('/vetoes/relevantInfo').then(response => {
                 this.allObjs = response.data.vetoes;
                 if (this.isFiltered) {
                     this.filter();

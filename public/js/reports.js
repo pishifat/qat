@@ -13,7 +13,7 @@ $(function() {
             $('#errors').text('Cannot leave fields blank!');
         }else{
             try {
-                const res = await axios.post(`/nat/reports/submitReport`, { username: username, reason: reason });
+                const res = await axios.post(`/reports/submitReport`, { username: username, reason: reason });
                 if (res.data.error) {
                     $('#errors').text(res.data.error);
                 } else {

@@ -24,20 +24,20 @@
         <div class="collapse navbar-collapse" id="navbar">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
-                    <a class="nav-link text-shadow {{#unless isBnApp}}inactive{{/unless}}" href="/nat/bnapps">BN Application</a>
+                    <a class="nav-link text-shadow {{#unless isBnApp}}inactive{{/unless}}" href="/bnapps">BN Application</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-shadow {{#unless isReports}}inactive{{/unless}}" href="/nat/reports">Report a BN/NAT</a>
+                    <a class="nav-link text-shadow {{#unless isReports}}inactive{{/unless}}" href="/reports">Report a BN/NAT</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-shadow {{#unless isUsers}}inactive{{/unless}}" href="/nat/users">Users</a>
+                    <a class="nav-link text-shadow {{#unless isUsers}}inactive{{/unless}}" href="/users">Users</a>
                 </li>
                 {{#if isBnOrNat}}
                 <li class="nav-item">
-                    <a class="nav-link text-shadow {{#unless isVetoes}}inactive{{/unless}}" href="/nat/vetoes">Vetoes</a>
+                    <a class="nav-link text-shadow {{#unless isVetoes}}inactive{{/unless}}" href="/vetoes">Vetoes</a>
                 </li>
                 <!--<li class="nav-item">
-                    <a class="nav-link text-shadow {{#unless isBnScore}}inactive{{/unless}}" href="/nat/bnscore">BN Score</a>
+                    <a class="nav-link text-shadow {{#unless isBnScore}}inactive{{/unless}}" href="/bnscore">BN Score</a>
                 </li>-->
                 {{/if}}
                 {{#if isNat}}
@@ -46,26 +46,26 @@
                         Evaluations
                     </a>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" href="/nat/appeval">Applications</a>
-                        <a class="dropdown-item" href="/nat/bneval">Current BNs</a>
-                        <a class="dropdown-item" href="/nat/datacollection">Data Collection</a>
-                        <a class="dropdown-item" href="/nat/evalarchive">Archive</a>
+                        <a class="dropdown-item" href="/appeval">Applications</a>
+                        <a class="dropdown-item" href="/bneval">Current BNs</a>
+                        <a class="dropdown-item" href="/datacollection">Data Collection</a>
+                        <a class="dropdown-item" href="/evalarchive">Archive</a>
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-shadow {{#unless isManageReports}}inactive{{/unless}}" href="/nat/managereports">Manage Reports</a>
+                    <a class="nav-link text-shadow {{#unless isManageReports}}inactive{{/unless}}" href="/managereports">Manage Reports</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link text-shadow dropdown-toggle {{#unless isManageTest}}inactive{{/unless}}" href="#" data-toggle="dropdown">
                         RC Test
                     </a>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" href="/nat/managetest">Questions</a>
-                        <a class="dropdown-item" href="/nat/testresults">Results</a>
+                        <a class="dropdown-item" href="/managetest">Questions</a>
+                        <a class="dropdown-item" href="/testresults">Results</a>
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-shadow {{#unless isLogs}}inactive{{/unless}}" href="/nat/logs">Logs</a>
+                    <a class="nav-link text-shadow {{#unless isLogs}}inactive{{/unless}}" href="/logs">Logs</a>
                 </li>
                 {{/if}}
             </ul>

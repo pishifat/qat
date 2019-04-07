@@ -20,15 +20,24 @@
             </small>
         </section>
         <section class="row segment segment-solid my-1 mx-4">
-            <small>Mark selected as:
-                <button class="btn btn-nat btn-sm ml-2" @click="setGroupEval($event)">Group evaluation</button>
-            </small>
-            <small>
-                <button class="btn btn-nat btn-sm ml-2" @click="setIndividualEval($event)">Individual evaluation</button>
-            </small>
-            <small>
-                <button class="btn btn-nat-red btn-sm ml-2" @click="setComplete($event)">Archive</button>
-            </small>
+            <div class="col-lg-3 mt-1">
+                <small>Mark selected as:</small>
+            </div>
+            <div class="col-lg-3">
+                <small>
+                    <button class="btn btn-nat btn-sm w-100 mt-1" @click="setGroupEval($event)">Group evaluation</button>
+                </small>
+            </div>
+            <div class="col-lg-3">
+                <small>
+                    <button class="btn btn-nat btn-sm w-100 mt-1" @click="setIndividualEval($event)">Individual evaluation</button>
+                </small>
+            </div>
+            <div class="col-lg-3">
+                <small>
+                    <button class="btn btn-nat-red btn-sm w-100 mt-1" @click="setComplete($event)">Archive</button>
+                </small>
+            </div>
         </section>
         <hr>
         <section class="row segment mx-1 px-0">
@@ -131,7 +140,7 @@ export default {
                 checkedApps.push( $(this).val() );
             });
             if(checkedApps.length){
-                const ers = await this.executePost('/nat/appEval/setGroupEval/', { checkedApps: checkedApps}, e);
+                const ers = await this.executePost('/appEval/setGroupEval/', { checkedApps: checkedApps}, e);
                 if (ers) {
                     if (ers.error) {
                         this.info = ers.error;
@@ -148,7 +157,7 @@ export default {
                 checkedApps.push( $(this).val() );
             });
             if(checkedApps.length){
-                const ers = await this.executePost('/nat/appEval/setIndividualEval/', { checkedApps: checkedApps}, e);
+                const ers = await this.executePost('/appEval/setIndividualEval/', { checkedApps: checkedApps}, e);
                 if (ers) {
                     if (ers.error) {
                         this.info = ers.error;
@@ -167,7 +176,7 @@ export default {
             if(checkedApps.length){
                 const result = confirm(`Are you sure? The consensus of any evaluation will affect its respective user.\n\nOnly do this after feedback PMs have been sent.`);
                 if(result){
-                    const ers = await this.executePost('/nat/appEval/setComplete/', { checkedApps: checkedApps}, e);
+                    const ers = await this.executePost('/appEval/setComplete/', { checkedApps: checkedApps}, e);
                     if (ers) {
                         if (ers.error) {
                             this.info = ers.error;
@@ -204,7 +213,7 @@ export default {
     },
     created() {
         axios
-            .get('/nat/appEval/relevantInfo')
+            .get('/appEval/relevantInfo')
             .then(response => {
                 this.allObjs = response.data.a;
                 this.evaluator = response.data.evaluator;
@@ -219,7 +228,7 @@ export default {
     mounted () {
         setInterval(() => {
             axios
-                .get('/nat/appEval/relevantInfo')
+                .get('/appEval/relevantInfo')
                 .then(response => {
                     this.allObjs = response.data.a;
                     this.filter();

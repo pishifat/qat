@@ -82,7 +82,7 @@ export default {
             if(!username || !username.length){
                 this.info = "Must enter a username!"
             }else{
-                const result = await this.executePost('/nat/evalArchive/search/', { username: username }, e);
+                const result = await this.executePost('/evalArchive/search/', { username: username }, e);
                 if (result) {
                     if (result.error) {
                         this.info = result.error;
@@ -108,7 +108,7 @@ export default {
     },
     created() {
         axios
-            .get('/nat/evalArchive/relevantInfo')
+            .get('/evalArchive/relevantInfo')
             .then(response => {
                 this.evaluator = response.data.evaluator;
             }).then(function(){

@@ -337,7 +337,7 @@ export default {
         },
         findRelevantActivity: function() {
             axios
-                .get('/nat/bnEval/userActivity/' + this.discussRound.bn.osuId + '/' + this.discussRound.mode)
+                .get('/bnEval/userActivity/' + this.discussRound.bn.osuId + '/' + this.discussRound.mode)
                 .then(response => {
                     this.noms = response.data.noms;
                     this.nomsDqd = response.data.nomsDqd;
@@ -369,7 +369,7 @@ export default {
             }else{
                 if(this.discussApp){
                     const a = await this.executePost(
-                        '/nat/appEval/submitEval/' + this.discussApp.id, 
+                        '/appEval/submitEval/' + this.discussApp.id, 
                         { evaluationId: this.evaluationId, 
                         vote: vote, 
                         behaviorComment: this.behaviorComment, 
@@ -390,7 +390,7 @@ export default {
                     }
                 }else{
                     const er = await this.executePost(
-                        '/nat/bnEval/submitEval/' + this.discussRound.id, 
+                        '/bnEval/submitEval/' + this.discussRound.id, 
                         { evaluationId: this.evaluationId, 
                         vote: vote, 
                         behaviorComment: this.behaviorComment, 
@@ -415,7 +415,7 @@ export default {
         setConsensus: async function(consensus, e){
             if(this.discussApp){
                 const a = await this.executePost(
-                    '/nat/appEval/setConsensus/' + this.discussApp.id, {consensus: consensus}, e);
+                    '/appEval/setConsensus/' + this.discussApp.id, {consensus: consensus}, e);
                 if (a) {
                     if (a.error) {
                         this.info = a.error;
@@ -425,7 +425,7 @@ export default {
                 }
             }else{
                 const er = await this.executePost(
-                    '/nat/bnEval/setConsensus/' + this.discussRound.id, {consensus: consensus}, e);
+                    '/bnEval/setConsensus/' + this.discussRound.id, {consensus: consensus}, e);
                 if (er) {
                     if (er.error) {
                         this.info = er.error;
@@ -438,7 +438,7 @@ export default {
         setFeedback: async function(e){
             if(this.discussApp){
                 const a = await this.executePost(
-                    '/nat/appEval/setFeedback/' + this.discussApp.id, {feedback: this.feedback}, e);
+                    '/appEval/setFeedback/' + this.discussApp.id, {feedback: this.feedback}, e);
                 if (a) {
                     if (a.error) {
                         this.info = a.error;
@@ -448,7 +448,7 @@ export default {
                 }
             }else{
                 const er = await this.executePost(
-                    '/nat/bnEval/setFeedback/' + this.discussRound.id, {feedback: this.feedback}, e);
+                    '/bnEval/setFeedback/' + this.discussRound.id, {feedback: this.feedback}, e);
                 if (er) {
                     if (er.error) {
                         this.info = er.error;

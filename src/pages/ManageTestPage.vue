@@ -106,7 +106,7 @@ export default {
             e.target.disabled = true;
             let questionType = $('#questionType').val();
             axios
-                .get('/nat/manageTest/load/' + questionType)
+                .get('/manageTest/load/' + questionType)
                 .then(response => {
                     this.questions = response.data;
                     this.category = $("#questionType option:selected").text();

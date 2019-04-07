@@ -109,7 +109,7 @@ export default {
     },
     created() {
         axios
-            .get('/nat/manageReports/relevantInfo')
+            .get('/manageReports/relevantInfo')
             .then(response => {
                 this.allObjs = response.data.r;
                 this.hasPagination = false;
@@ -122,7 +122,7 @@ export default {
     mounted () {
         setInterval(() => {
             axios
-                .get('/nat/manageReports/relevantInfo')
+                .get('/manageReports/relevantInfo')
                 .then(response => {
                     this.allObjs = response.data.r;
                 });

@@ -25,7 +25,7 @@ $(function() {
 
     $('#calculateScore').click(async function () {
         $('#calcWait').text('Retrieving info... (this will take a few seconds)');
-        const res = await axios.get(`/nat/bnapps/mods`);
+        const res = await axios.get(`/bnapps/mods`);
         $('#calcWait').text('');
         if (res.data.error) {
             $('#errors').text(res.data.error);
@@ -57,12 +57,12 @@ $(function() {
         } else {
             $('#submitting').text(`Submitting & calculating mod score... (this will take a few seconds)`);
             try {
-                const res = await axios.post(`/nat/bnapps/apply`, { mode: mode, mods: mods });
+                const res = await axios.post(`/bnapps/apply`, { mode: mode, mods: mods });
                 if (res.data.error) {
                     $('#errors').text(res.data.error);
                 } else {
                     $('#applyBlock').hide();
-                    $('#startTest').html(`<a href="/nat/testsubmission" class="btn btn-lg btn-nat" type="submit">Begin Ranking Criteria Test</a>
+                    $('#startTest').html(`<a href="/testsubmission" class="btn btn-lg btn-nat" type="submit">Begin Ranking Criteria Test</a>
                         <p class="small pt-2 confirm">Your application has been submitted!</p>
                         <p class="small">Before your application can be reviewed, you must take a short test.</p>`);
                 }

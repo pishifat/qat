@@ -61,7 +61,7 @@ export default {
             if(!newQuestion || !newQuestion.length || !questionType || !questionType.length){
                 this.info = "Cannot leave fields blank!"
             }else{
-                const question = await this.executePost('/nat/manageTest/addQuestion', {questionType: questionType, newQuestion: newQuestion.trim(), category: this.rawCategory}, e);
+                const question = await this.executePost('/manageTest/addQuestion', {questionType: questionType, newQuestion: newQuestion.trim(), category: this.rawCategory}, e);
                 if (question) {
                     if (question.error) {
                         this.info = question.error;

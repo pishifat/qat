@@ -146,7 +146,7 @@ export default {
             }
 
             const result = await this.executePost(
-                '/nat/bnEval/addEvalRounds/',
+                '/bnEval/addEvalRounds/',
                 {
                     osu: osu,
                     taiko: taiko,

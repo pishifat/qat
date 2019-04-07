@@ -71,7 +71,7 @@ export default {
                 this.info = 'At least one field must have input!'
             }else{
                 const r = await this.executePost(
-                    '/nat/manageReports/submitReportEval/' + this.report.id, 
+                    '/manageReports/submitReportEval/' + this.report.id, 
                     { valid: valid, feedback: this.feedback }, e);
                 if (r) {
                     if (r.error) {

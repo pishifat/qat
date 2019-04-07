@@ -110,7 +110,7 @@ export default {
         },
         loadTest: async function (e) {
             if (this.selectedTest) {
-                const test = await this.executePost('/nat/testSubmission/loadTest', { testId: this.selectedTest }, e);
+                const test = await this.executePost('/testSubmission/loadTest', { testId: this.selectedTest }, e);
                 if (test) {
                     if (test.error) this.info = test.error;
                     this.test = test;
@@ -134,7 +134,7 @@ export default {
                 checkedOptions.push( $(this).val() );
             });
             $('.test-question').hide();
-            const res = await this.executePost('/nat/testSubmission/submit', { 
+            const res = await this.executePost('/testSubmission/submit', { 
                 testId: this.selectedTest, checkedOptions: checkedOptions,
                 title: title, titleUnicode: titleUnicode,
                 artist: artist, artistUnicode: artistUnicode,
@@ -152,7 +152,7 @@ export default {
     },
     created() {
         axios
-            .get('/nat/testSubmission/tests')
+            .get('/testSubmission/tests')
             .then(async response => {
                 if(response.data.testList){
                     this.testList = response.data.testList;

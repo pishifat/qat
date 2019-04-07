@@ -113,7 +113,7 @@ export default {
             if(!newQuestion || !newQuestion.length || !questionType || !questionType.length){
                 this.info = "Cannot leave question fields blank!"
             }else{
-                const question = await this.executePost('/nat/manageTest/updateQuestion/' + this.question.id, {questionType: questionType, newQuestion: newQuestion}, e);
+                const question = await this.executePost('/manageTest/updateQuestion/' + this.question.id, {questionType: questionType, newQuestion: newQuestion}, e);
                 if (question) {
                     if (question.error) {
                         this.info = question.error;
@@ -125,7 +125,7 @@ export default {
             }
         },
         toggleActive: async function(e) {
-            const question = await this.executePost('/nat/manageTest/toggleActive/' + this.question.id, {status: !this.question.active}, e);
+            const question = await this.executePost('/manageTest/toggleActive/' + this.question.id, {status: !this.question.active}, e);
             if (question) {
                 if (question.error) {
                     this.info = question.error;
@@ -138,7 +138,7 @@ export default {
         deleteQuestion: async function(e) {
             const result = confirm(`Are you sure?`);
             if(result){
-                const success = await this.executePost('/nat/manageTest/deleteQuestion/' + this.question.id, {}, e);
+                const success = await this.executePost('/manageTest/deleteQuestion/' + this.question.id, {}, e);
                 if (success) {
                     this.$emit('delete-question', this.question.id);
                     $('#editQuestion').modal('hide');
@@ -154,7 +154,7 @@ export default {
             if(!option || !option.length || (!score && score != 0)){
                 this.info = "Cannot leave option fields blank!"
             }else{
-                const question = await this.executePost('/nat/manageTest/addOption/' + this.question.id, {option: option, score: score, metadataType: metadataType}, e);
+                const question = await this.executePost('/manageTest/addOption/' + this.question.id, {option: option, score: score, metadataType: metadataType}, e);
                 if (question) {
                     if (question.error) {
                         this.info = question.error;
@@ -177,7 +177,7 @@ export default {
             }else if(!option || !option.length || (!score && score != 0)){
                 this.info = "Cannot leave option fields blank!"
             }else{
-                const question = await this.executePost('/nat/manageTest/updateOption/' + id, {option: option, score: score, questionId: this.question.id}, e);
+                const question = await this.executePost('/manageTest/updateOption/' + id, {option: option, score: score, questionId: this.question.id}, e);
                 if (question) {
                     if (question.error) {
                         this.info = question.error;
@@ -198,7 +198,7 @@ export default {
             if(!checkedOptions.length){
                 this.info = 'Must select options!'
             }else{
-                const question = await this.executePost('/nat/manageTest/deleteOption/', {checkedOptions: checkedOptions, questionId: this.question.id}, e);
+                const question = await this.executePost('/manageTest/deleteOption/', {checkedOptions: checkedOptions, questionId: this.question.id}, e);
                 if (question) {
                     if (question.error) {
                         this.info = question.error;

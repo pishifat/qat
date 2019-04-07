@@ -79,7 +79,7 @@ export default {
                 this.info = 'Cannot leave fields blank!';
             } else {
                 const veto = await this.executePost(
-                    '/nat/vetoes/submit',
+                    '/vetoes/submit',
                     {
                         discussionLink: this.discussionLink,
                         shortReason: this.shortReason,

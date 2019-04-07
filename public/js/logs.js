@@ -7,7 +7,7 @@ $(function () {
 
     $('#showMore').click(function () {
         $('#showMore').prop("disabled", true);
-        $.getJSON(`/nat/logs/more/${skip}`).done(function (logs) {
+        $.getJSON(`/logs/more/${skip}`).done(function (logs) {
             skip += 100;
             $('#showMore').prop("disabled", false);
 

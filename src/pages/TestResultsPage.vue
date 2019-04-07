@@ -119,7 +119,7 @@ export default {
             if(!username || !username.length){
                 this.info = "Must enter a username!"
             }else{
-                const result = await this.executePost('/nat/testResults/search/', { username: username }, e);
+                const result = await this.executePost('/testResults/search/', { username: username }, e);
                 if (result) {
                     if (result.error) {
                         this.info = result.error;

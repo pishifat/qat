@@ -151,7 +151,7 @@ export default {
             for (let i = 0; i < excludeUsers.length; i++) {
                 excludeUsers[i] = excludeUsers[i].trim().toLowerCase();
             }
-            const r = await this.executePost('/nat/vetoes/selectMediators', {mode: this.veto.mode, excludeUsers: excludeUsers}, e);
+            const r = await this.executePost('/vetoes/selectMediators', {mode: this.veto.mode, excludeUsers: excludeUsers}, e);
             if (r) {
                 if (r.error) {
                     this.info = r.error;
@@ -161,7 +161,7 @@ export default {
             }
         },
         beginMediation: async function(e) {
-            const r = await this.executePost('/nat/vetoes/beginMediation/' + this.veto.id, {mediators: this.mediators}, e);
+            const r = await this.executePost('/vetoes/beginMediation/' + this.veto.id, {mediators: this.mediators}, e);
             if (r) {
                 if (r.error) {
                     this.info = r.error;
@@ -178,7 +178,7 @@ export default {
                 this.info = 'Cannot leave fields blank!'
             }else{
                 const v = await this.executePost(
-                    '/nat/vetoes/submitMediation/' + this.veto.id, 
+                    '/vetoes/submitMediation/' + this.veto.id, 
                     { mediationId: this.mediationId, 
                     vote: vote, 
                     comment: this.comment
@@ -198,7 +198,7 @@ export default {
             this.info = '';
             this.confirm = '';
             const v = await this.executePost(
-                '/nat/vetoes/concludeMediation/' + this.veto.id, 
+                '/vetoes/concludeMediation/' + this.veto.id, 
                 { majority: this.majority }, e);
             if (v) {
                 if (v.error) {

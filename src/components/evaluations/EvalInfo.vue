@@ -236,7 +236,7 @@ export default {
         },
         findRelevantActivity: function() {
             axios
-                .get('/nat/bnEval/userActivity/' + this.evalRound.bn.osuId + '/' + this.evalRound.mode)
+                .get('/bnEval/userActivity/' + this.evalRound.bn.osuId + '/' + this.evalRound.mode)
                 .then(response => {
                     this.noms = response.data.noms;
                     this.nomsDqd = response.data.nomsDqd;
@@ -268,7 +268,7 @@ export default {
             }else{
                 if(this.application){
                     const a = await this.executePost(
-                        '/nat/appEval/submitEval/' + this.application.id, 
+                        '/appEval/submitEval/' + this.application.id, 
                         { evaluationId: this.evaluationId, 
                         vote: vote, 
                         behaviorComment: this.behaviorComment, 
@@ -289,7 +289,7 @@ export default {
                     }
                 }else{
                     const er = await this.executePost(
-                        '/nat/bnEval/submitEval/' + this.evalRound.id, 
+                        '/bnEval/submitEval/' + this.evalRound.id, 
                         { evaluationId: this.evaluationId, 
                         vote: vote, 
                         behaviorComment: this.behaviorComment, 

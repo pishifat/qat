@@ -54,20 +54,20 @@ app.use(
 );
 
 app.use('/', indexRouter);
-app.use('/nat/bnApps', bnAppRouter);
-app.use('/nat/reports', reportsRouter);
-app.use('/nat/appEval', appEvalRouter);
-app.use('/nat/bnEval', bnEvalRouter);
-app.use('/nat/dataCollection', dataCollectionRouter);
-app.use('/nat/evalArchive', evalArchiveRouter);
-app.use('/nat/manageReports', manageReportsRouter);
-app.use('/nat/users', usersRouter);
-app.use('/nat/vetoes', vetoesRouter);
-app.use('/nat/testSubmission', testSubmissionRouter);
-app.use('/nat/managetest', manageTestRouter);
-app.use('/nat/testresults', testResultsRouter);
-app.use('/nat/bnscore', bnScoreRouter);
-app.use('/nat/logs', logsRouter);
+app.use('/bnApps', bnAppRouter);
+app.use('/reports', reportsRouter);
+app.use('/appEval', appEvalRouter);
+app.use('/bnEval', bnEvalRouter);
+app.use('/dataCollection', dataCollectionRouter);
+app.use('/evalArchive', evalArchiveRouter);
+app.use('/manageReports', manageReportsRouter);
+app.use('/users', usersRouter);
+app.use('/vetoes', vetoesRouter);
+app.use('/testSubmission', testSubmissionRouter);
+app.use('/managetest', manageTestRouter);
+app.use('/testresults', testResultsRouter);
+app.use('/bnscore', bnScoreRouter);
+app.use('/logs', logsRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

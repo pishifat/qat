@@ -82,7 +82,7 @@ export default {
         },
         //real
         switchMediator: async function(e){
-            const u = await this.executePost('/nat/users/switchMediator/', {}, e);
+            const u = await this.executePost('/users/switchMediator/', {}, e);
             if(u){
                 if (u.error) {
                     this.info = u.error
@@ -92,7 +92,7 @@ export default {
             }
         },
         switchGroup: async function(group, e){
-            const u = await this.executePost('/nat/users/switchGroup/' + this.user.id, {group: group}, e);
+            const u = await this.executePost('/users/switchGroup/' + this.user.id, {group: group}, e);
             if(u){
                 if (u.error) {
                     this.info = u.error

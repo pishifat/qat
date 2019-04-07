@@ -19,16 +19,25 @@
                 <button class="btn btn-nat btn-sm ml-2" @click="selectAll($event)">Select all</button>
             </small>
         </section>
-        <section class="row segment segment-solid my-1 mx-4">
-            <small>Mark selected as:
-                <button class="btn btn-nat btn-sm ml-2" @click="setGroupEval($event)">Group evaluation</button>
-            </small>
-            <small>
-                <button class="btn btn-nat btn-sm ml-2" @click="setIndividualEval($event)">Individual evaluation</button>
-            </small>
-            <small>
-                <button class="btn btn-nat-red btn-sm ml-2" @click="setComplete($event)">Archive</button>
-            </small>
+        <section class="row segment segment-solid my-1 mx-4 px-0">
+            <div class="col-lg-3 mt-1">
+                <small class="mt-1 col-md-1">Mark selected as:</small>
+            </div>
+            <div class="col-lg-3">
+                <small>
+                    <button class="btn btn-nat btn-sm mt-1 w-100" @click="setGroupEval($event)">Group evaluation</button>
+                </small>
+            </div>
+            <div class="col-lg-3">
+                <small>
+                    <button class="btn btn-nat btn-sm mt-1 w-100" @click="setIndividualEval($event)">Individual evaluation</button>
+                </small>
+            </div>
+            <div class="col-lg-3">
+                <small>
+                    <button class="btn btn-nat-red btn-sm mt-1 w-100" @click="setComplete($event)">Archive</button>
+                </small>
+            </div>
         </section>
         <hr>
         <section class="row segment mx-1 px-0">
@@ -156,7 +165,7 @@ export default {
                 checkedRounds.push( $(this).val() );
             });
             if(checkedRounds.length){
-                const ers = await this.executePost('/nat/bnEval/setGroupEval/', { checkedRounds: checkedRounds}, e);
+                const ers = await this.executePost('/bnEval/setGroupEval/', { checkedRounds: checkedRounds}, e);
                 if (ers) {
                     if (ers.error) {
                         this.info = ers.error;
@@ -173,7 +182,7 @@ export default {
                 checkedRounds.push( $(this).val() );
             });
             if(checkedRounds.length){
-                const ers = await this.executePost('/nat/bnEval/setIndividualEval/', { checkedRounds: checkedRounds}, e);
+                const ers = await this.executePost('/bnEval/setIndividualEval/', { checkedRounds: checkedRounds}, e);
                 if (ers) {
                     if (ers.error) {
                         this.info = ers.error;
@@ -192,7 +201,7 @@ export default {
             if(checkedRounds.length){
                 const result = confirm(`Are you sure? The consensus of any evaluation will affect its respective user.\n\nOnly do this after feedback PMs have been sent.`);
                 if(result){
-                    const ers = await this.executePost('/nat/bnEval/setComplete/', { checkedRounds: checkedRounds}, e);
+                    const ers = await this.executePost('/bnEval/setComplete/', { checkedRounds: checkedRounds}, e);
                     if (ers) {
                         if (ers.error) {
                             this.info = ers.error;
@@ -230,7 +239,7 @@ export default {
     },
     created() {
         axios
-            .get('/nat/bnEval/relevantInfo')
+            .get('/bnEval/relevantInfo')
             .then(response => {
                 this.allObjs = response.data.er;
                 this.reports = response.data.r;
@@ -246,7 +255,7 @@ export default {
     mounted () {
         setInterval(() => {
             axios
-                .get('/nat/bnEval/relevantInfo')
+                .get('/bnEval/relevantInfo')
                 .then(response => {
                     this.allObjs = response.data.er;
                     this.reports = response.data.r;
