@@ -349,9 +349,11 @@ router.get('/userActivity/:id/:mode', async (req, res) => {
         { beatmapsetId: 1 },
         true
     );
+ 
     for (let i = 1; i < noms.length; i++) {
         if (noms[i].beatmapsetId == noms[i - 1].beatmapsetId) {
-            noms.splice(i, 1); //show only unique nominations
+            noms.splice(i-1, 1); //show only unique nominations
+            i--;
         }
     }
 
@@ -364,7 +366,7 @@ router.get('/userActivity/:id/:mode', async (req, res) => {
     );
     allDqs.forEach(dq => {
         noms.forEach(nom => {
-            if (nom.beatmapsetId == dq.beatmapsetId) {
+            if (nom.beatmapsetId == dq.beatmapsetId && nom.timestamp < dq.timestamp) {
                 nomsDqd.push(dq);
             }
         });

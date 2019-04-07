@@ -1,22 +1,36 @@
 <div class="segment segment-solid">
-    <p>by applying to the beatmap nominators youre a dumbo blablabla</p>
+    <p>The <a href="https://osu.ppy.sh/help/wiki/People/Beatmap_Nominators" target="_blank">Beatmap Nominators</a> (BN) are a group of users in charge of promoting Ranked beatmaps.</p>
+    <p>Requirements for joining the BN:</p>
+    <ul style="list-style-type: disc;">
+        <li>At least 200 Kudosu earned for osu! modders</li>
+        <li>At least 150 Kudosu earned for osu!taiko/osu!catch/osu!mania modders</li>
+        <li>A positive mod score (evaluated through your modding activity in the last 3 months, see calculator below)</li>
+        <li>Competent modding abilities/behavior (evaluated by members of the NAT through your submitted mods, other modding history, and community interaction)</li>
+    </ul>
 </div>
 
 <hr>
 
 {{#if loggedInAs}}
 <div class="segment">
-    <h4>Mod score: <small id="totalScore" class="ml-1"></small> <button class="btn btn-sm btn-nat ml-2" id="calculateScore">Auto calculate!</button></h4>
+    <h4>Mod score: 
+        <small id="totalScore" class="ml-1"></small> 
+        <button class="btn btn-sm btn-nat ml-2" id="calculateScore"
+            data-toggle="tooltip" data-placement="top" title="Automatically detect your mod score based on your modding history">Auto-calculate
+        </button>
+        <small id="calcWait" class="ml-2" style="font-size: 10pt;"></small>
+    </h4>
+    <p class="small ml-4 mb-3">Scores over 0 are passing. A "mod" is counted for each beatmapset through which you've received at least one Kudosu. </p>
     <div class="form-group row">
         <div class="pl-4">
             <div class="input-group mb-3">
-                <input class="modCount text-input" id="modCount1" type="number" class="form-control text-input" placeholder="count1">
+                <input class="modCount text-input" id="modCount1" type="number" class="form-control text-input" placeholder="first month...">
             </div>
             <div class="input-group mb-3">
-                <input class="modCount text-input" id="modCount2" type="number" class="form-control text-input" placeholder="count2">
+                <input class="modCount text-input" id="modCount2" type="number" class="form-control text-input" placeholder="second month...">
             </div>
             <div class="input-group mb-3">
-                <input class="modCount text-input" id="modCount3" type="number" class="form-control text-input" placeholder="count3">
+                <input class="modCount text-input" id="modCount3" type="number" class="form-control text-input" placeholder="third month...">
             </div>
         </div>
     </div>

@@ -27,18 +27,6 @@ export default {
 </script>
 
 <style>
-    .avatar-mini-thumb{
-        height:40px;
-        width:40px;
-        object-fit:cover;
-        filter: drop-shadow(1px 1px 1px #000000);
-    }
-
-    .pseudo-float-right-avatar{
-        position:absolute;
-        top:0.5rem;
-        right:0.75rem;
-    }
 
     .user-card-spacing{
         margin: 0;

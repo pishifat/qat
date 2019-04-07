@@ -151,13 +151,6 @@ export default {
     watch: { 
         allObjs: function(){
             this.filter();
-            if(this.isFiltered){
-
-            }else{
-                this.dqs = this.pageObjs.filter(v => v.eventType == 'Disqualified');
-                this.pops = this.pageObjs.filter(v => v.eventType == 'Popped');
-            }
-            
         }
     },
     methods: {
@@ -172,15 +165,11 @@ export default {
             this.dqs = this.pageObjs.filter(v => v.eventType == 'Disqualified');
             this.pops = this.pageObjs.filter(v => v.eventType == 'Popped');
         },
-        updateDq: function (dq) {
-			const i = this.dqs.findIndex(d => d.id == dq.id);
-            this.dqs[i] = dq;
-            this.selectedEntry = dq;
-        },
-        updatePop: function (pop) {
-			const i = this.pops.findIndex(p => p.id == pop.id);
-            this.pops[i] = pop;
-            this.selectedEntry = pop;
+        updateEntry: function (obj) {
+			const i = this.allObjs.findIndex(o => o.id == obj.id);
+            this.allObjs[i] = obj;
+            this.selectedEntry = obj;
+            this.filter();
         },
         selectEntry: function (entry) {
             this.selectedEntry = entry;
@@ -195,7 +184,7 @@ export default {
                     if (result.error) {
                         this.info = result.error;
                     } else {
-                        result.eventType == "Disqualified" ? this.updateDq(result) : this.updatePop(result);
+                        this.updateEntry(result);
                     }
                 }
             }
@@ -206,7 +195,7 @@ export default {
                 if (result.error) {
                     this.info = result.error;
                 } else {
-                    result.eventType == "Disqualified" ? this.updateDq(result) : this.updatePop(result);
+                    this.updateEntry(result);
                 }
             }
         }
@@ -237,15 +226,5 @@ export default {
 </script>
 
 <style>
-    .vote-border-fail {
-        border-left: 3px solid var(--fail);
-    }
-
-    .vote-border-extend {
-        border-left: 3px solid var(--extend);
-    }
-
-    .vote-border-pass {
-        border-left: 3px solid var(--pass);
-    }
+    
 </style>

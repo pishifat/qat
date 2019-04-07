@@ -24,7 +24,7 @@ router.get('/relevantInfo', async (req, res, next) => {
     let u = await usersService.query(
         { $or: [{ group: 'nat' }, { group: 'bn' }] },
         {},
-        { createdAt: 1 },
+        { username: 1 },
         true
     );
     res.json({ users: u, userId: req.session.mongoId, userGroup: res.locals.userRequest.group });

@@ -15,9 +15,18 @@
                 </button>
             </div>
             <div class="modal-body" style="overflow: hidden">
-                <p class="text-shadow">BN Score: coming soon</p>
-                <p class="text-shadow">Time as BN: {{calculateDuration('bn')}}</p>
-                <p class="text-shadow">Time as NAT: {{calculateDuration('nat')}}</p>
+                <p class="text-shadow min-spacing mb-2">Time as BN: {{calculateDuration('bn')}}</p>
+                <div class="text-shadow">
+                    <ul style="list-style-type: none">
+                        <li class="small" v-for="(date, i) in user.bnDuration" :key="date">{{i % 2 == 0 ? 'Joined' : 'Left'}}: {{date.slice(0,10)}}</li>
+                    </ul>
+                </div>
+                <p class="text-shadow min-spacing mb-2">Time as NAT: {{calculateDuration('nat')}}</p>
+                <div class="text-shadow">
+                    <ul style="list-style-type: none">
+                        <li class="small" v-for="(date, i) in user.natDuration" :key="date">{{i % 2 == 0 ? 'Joined' : 'Left'}}: {{date.slice(0,10)}}</li>
+                    </ul>
+                </div>
                 <p v-if="user.id == userId" class="text-shadow">Veto Mediation: 
                     <button 
                         class="btn btn-sm justify-content-center" 

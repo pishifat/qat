@@ -1,17 +1,6 @@
 <template>
 <div class="row">
     <div class="col-md-12">
-        <small>temp
-            <input id="username" placeholder="username"/>
-            <input id="osuId" placeholder="osu id"/>
-            <input id="mode" placeholder="mode (just 1)"/> 
-            <input id="group" placeholder="bn/nat"/> 
-            <input id="probation" placeholder="probation mode"/> | 
-            <input id="date" placeholder="date" @keyup.enter="tempUpdate()"/>
-            <button @click="tempCreate()">temp create</button>
-            <button @click="tempUpdate()">temp update</button>
-        </small>
-        <hr>
         <section class="row segment segment-solid my-1 mx-4">
             <small>Search: 
                 <input id="search" class="text-input" v-model="filterValue" type="text" placeholder="username... (3+ characters)" /> 

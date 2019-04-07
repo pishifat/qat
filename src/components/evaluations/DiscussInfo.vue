@@ -107,17 +107,13 @@
                                             <td scope="col">Date</td>
                                             <td scope="col">Mapset</td>
                                             <td scope="col">Reason</td>
-                                            <td scope="col">Validity</td>
                                         </thead>
                                         <tbody>
-                                            <tr v-for="dq in nomsDqd" :key="dq.id">
+                                            <tr v-for="dq in nomsDqd" :key="dq.id" 
+                                            :class="dq.valid == 1 ? 'vote-border-pass' : dq.valid == 2 ? 'vote-border-extend' : dq.valid == 3 ? 'vote-border-fail' : ''">
                                                 <td scope="row">{{new Date(dq.timestamp).toString().slice(4,15)}}</td>
                                                 <td scope="row"><a :href="'https://osu.ppy.sh/beatmapsets/' + dq.beatmapsetId + '/discussion'" target="_blank">{{dq.metadata}}</a></td>
-                                                <td scope="row">{{dq.content.slice(0, dq.content.indexOf('.')+1 || 50)}}</td>
-                                                <td scope="row"
-                                                    :class="dq.valid == 1 ? 'vote-pass' : dq.valid == 2 ? 'vote-extend' : dq.valid == 3 ? 'vote-fail' : ''">
-                                                    {{dq.valid == 1 ? 'valid' : dq.valid == 2 ? 'partially valid' : dq.valid == 3 ? 'invalid' : 'none'}}
-                                                </td>
+                                                <td scope="row">{{dq.content.slice(0, dq.content.indexOf('.')+1) || dq.content}}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -129,17 +125,13 @@
                                             <td scope="col">Date</td>
                                             <td scope="col">Mapset</td>
                                             <td scope="col">Reason</td>
-                                            <td scope="col">Validity</td>
                                         </thead>
                                         <tbody>
-                                            <tr v-for="pop in nomsPopped" :key="pop.id">
+                                            <tr v-for="pop in nomsPopped" :key="pop.id" 
+                                            :class="pop.valid == 1 ? 'vote-border-pass' : pop.valid == 2 ? 'vote-border-extend' : pop.valid == 3 ? 'vote-border-fail' : ''">
                                                 <td scope="row">{{new Date(pop.timestamp).toString().slice(4,15)}}</td>
                                                 <td scope="row"><a :href="'https://osu.ppy.sh/beatmapsets/' + pop.beatmapsetId + '/discussion'" target="_blank">{{pop.metadata}}</a></td>
-                                                <td scope="row">{{pop.content.slice(0, pop.content.indexOf('.')+1 || 50)}}</td>
-                                                <td scope="row"
-                                                    :class="pop.valid == 1 ? 'vote-pass' : pop.valid == 2 ? 'vote-extend' : pop.valid == 3 ? 'vote-fail' : ''">
-                                                    {{pop.valid == 1 ? 'valid' : pop.valid == 2 ? 'partially valid' : pop.valid == 3 ? 'invalid' : 'none'}}
-                                                </td>
+                                                <td scope="row">{{pop.content.slice(0, pop.content.indexOf('.')+1) || pop.content}}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -151,17 +143,13 @@
                                             <td scope="col">Date</td>
                                             <td scope="col">Mapset</td>
                                             <td scope="col">Reason</td>
-                                            <td scope="col">Validity</td>
                                         </thead>
                                         <tbody>
-                                            <tr v-for="dq in dqs" :key="dq.id">
+                                            <tr v-for="dq in dqs" :key="dq.id"
+                                            :class="dq.valid == 1 ? 'vote-border-pass' : dq.valid == 2 ? 'vote-border-extend' : dq.valid == 3 ? 'vote-border-fail' : ''">
                                                 <td scope="row">{{new Date(dq.timestamp).toString().slice(4,15)}}</td>
                                                 <td scope="row"><a :href="'https://osu.ppy.sh/beatmapsets/' + dq.beatmapsetId + '/discussion'" target="_blank">{{dq.metadata}}</a></td>
-                                                <td scope="row">{{dq.content.slice(0, dq.content.indexOf('.')+1 || 50)}}</td>
-                                                <td scope="row"
-                                                    :class="dq.valid == 1 ? 'vote-pass' : dq.valid == 2 ? 'vote-extend' : dq.valid == 3 ? 'vote-fail' : ''">
-                                                    {{dq.valid == 1 ? 'valid' : dq.valid == 2 ? 'partially valid' : dq.valid == 3 ? 'invalid' : 'none'}}
-                                                </td>
+                                                <td scope="row">{{dq.content.slice(0, dq.content.indexOf('.')+1) || dq.content}}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -173,17 +161,13 @@
                                             <td scope="col">Date</td>
                                             <td scope="col">Mapset</td>
                                             <td scope="col">Reason</td>
-                                            <td scope="col">Validity</td>
                                         </thead>
                                         <tbody>
-                                            <tr v-for="pop in pops" :key="pop.id">
+                                            <tr v-for="pop in pops" :key="pop.id"
+                                            :class="pop.valid == 1 ? 'vote-border-pass' : pop.valid == 2 ? 'vote-border-extend' : pop.valid == 3 ? 'vote-border-fail' : ''">
                                                 <td scope="row">{{new Date(pop.timestamp).toString().slice(4,15)}}</td>
                                                 <td scope="row"><a :href="'https://osu.ppy.sh/beatmapsets/' + pop.beatmapsetId + '/discussion'" target="_blank">{{pop.metadata}}</a></td>
-                                                <td scope="row">{{pop.content.slice(0, pop.content.indexOf('.')+1 || 50)}}</td>
-                                                <td scope="row"
-                                                    :class="pop.valid == 1 ? 'vote-pass' : pop.valid == 2 ? 'vote-extend' : pop.valid == 3 ? 'vote-fail' : ''">
-                                                    {{pop.valid == 1 ? 'valid' : pop.valid == 2 ? 'partially valid' : pop.valid == 3 ? 'invalid' : 'none'}}
-                                                </td>
+                                                <td scope="row">{{pop.content.slice(0, pop.content.indexOf('.')+1) || pop.content}}</td>
                                             </tr>
                                         </tbody>
                                     </table>

@@ -37,7 +37,7 @@ router.post('/apply', async (req, res, next) => {
         // Check user kudosu total count & mod score
         const info = await api.getUserInfo(req.session.accessToken);
         const modScore = await api.getUserModsCount(req.session.username, req.body.mode);
-        if (modScore >= 0 && ((req.body.mode == 'osu' && info.kudosu.total >= 200) || (req.body.mode != 'osu' && info.kudosu.total >= 150))) {
+        if (modScore <= 0 && ((req.body.mode == 'osu' && info.kudosu.total >= 200) || (req.body.mode != 'osu' && info.kudosu.total >= 150))) {
             return res.json({ error: `You don't meet the minimum score or total kudosu requirement. 
                 Your mod score needs to be higher or equal than 0, currently is ${modScore}` });
         }
@@ -50,9 +50,6 @@ router.post('/apply', async (req, res, next) => {
             createdAt: { $gte: cooldownDate },
         });
 
-        if (currentBnApp.error) {
-            return res.json(currentBnApp.error);
-        }
 
         if (!currentBnApp) {
             // Create app & test
@@ -68,7 +65,9 @@ router.post('/apply', async (req, res, next) => {
                 return res.json('pass');
             }
         } else {
-            if (currentBnApp.active) {
+            if (currentBnApp.error) {
+                return res.json(currentBnApp.error);
+            } else if (currentBnApp.active) {
                 return res.json({ error: 'Your application is still being evaluated!' });
             } else {
                 return res.json({

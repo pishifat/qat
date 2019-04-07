@@ -12,20 +12,24 @@
 
     <div v-if="test" id="fullTest">
         <div class="segment segment-solid test-question">
-            <p>this is the test</p>
-            <p>take it, then u become bn!</p>
+            <p>The purpose of this test is to show your understanding of the 
+                <a href="https://osu.ppy.sh/wiki/Ranking_Criteria" target="_blank">Ranking Criteria</a>, the 
+                <a href="https://osu.ppy.sh/help/wiki/People/Beatmap_Nominators/Rules" target="_blank">Beatmap Nominator Rules</a>, and the 
+                <a href="https://osu.ppy.sh/help/wiki/Ranking_Criteria/Code_of_Conduct" target="_blank">Code of Conduct</a>.
+            </p>
+            <p>Feel free to reference those pages while taking this test. Maybe you'll learn something you didn't already know, which will make you more prepared than you would be otherwise!</p>
+            <br>
+            <p>There are 18 questions total, all of which require you to select all applicable answers, aside from the fill-in-the-blank metadata question. Categories of questions are listed in the upper right for you to reference on their respective wiki pages.</p>
+            <p>The test has no time limit. If you close this page, your answers will not be saved, however you can still take the test at a later time.</p>
+            <p>After submitting your answers, you will see a score out of 20 possible points. When your application is fully evaluated, you will be able to view which questions you answered correctly/incorrectly.</p>
+            <p class="min-spacing">Good luck!</p>
         </div>
+
+        <hr>
         
-        <p class="text-center segment">
+        <p class="text-center segment segment-solid">
             User: {{ test.applicant.username }} - 
-            Mode: {{ test.mode }}<!-- - 
-            Time remaining: 
-                <span 
-                    v-if="timeRemaining" 
-                    :class="(timeRemaining < 5 ? 'text-danger' : timeRemaining < 30 ? 'text-warning' : '')"
-                >
-                    {{ timeRemaining }} minutes
-                </span>-->
+            Mode: {{ test.mode }}
         </p>
 
         <div class="segment test-question" v-for="(answer, i) in test.answers" :key="answer.id">
@@ -48,15 +52,15 @@
                     and provide a reliable source or links.</h5>
                 <h5 class="pl-4"><a :href="answer.question.content" target="_blank">{{ answer.question.content }}</a></h5>
                 <div class="mb-2"> <!-- only metadata questions for now -->
-                    <input id="title" class="form-control" type="text" placeholder="Title...">
-                    <input id="titleUnicode" class="form-control" type="text" placeholder="Unicode Title (if same as Title, copy that here)...">
-                    <input id="artist" class="form-control" type="text" placeholder="Artist...">
-                    <input id="artistUnicode" class="form-control" type="text" placeholder="Unicode Artist (if same as Artist, copy that here)...">
-                    <input id="source" class="form-control" type="text" placeholder="Source (if unclear or non-existent, leave empty)...">
+                    <input id="title" class="form-control mb-1" type="text" placeholder="Title...">
+                    <input id="titleUnicode" class="form-control mb-1" type="text" placeholder="Unicode Title (if same as Title, copy that here)...">
+                    <input id="artist" class="form-control mb-1" type="text" placeholder="Artist...">
+                    <input id="artistUnicode" class="form-control mb-1" type="text" placeholder="Unicode Artist (if same as Artist, copy that here)...">
+                    <input id="source" class="form-control mb-1" type="text" placeholder="Source (if unclear or non-existent, leave empty)...">
                     <small class="pl-4">Link sources for the song information (only one link is necessary, but more could help you!):</small>
-                    <input id="reference1" class="form-control" type="text" placeholder="Reference 1">
-                    <input id="reference2" class="form-control" type="text" placeholder="Reference 2">
-                    <input id="reference3" class="form-control" type="text" placeholder="Reference 3">
+                    <input id="reference1" class="form-control mb-1" type="text" placeholder="Reference 1">
+                    <input id="reference2" class="form-control mb-1" type="text" placeholder="Reference 2">
+                    <input id="reference3" class="form-control mb-1" type="text" placeholder="Reference 3">
                 </div>
             </div>
             
@@ -69,10 +73,10 @@
     </div>
 </div>
 <div v-else>
-    <div v-if="displayScore || displayScore == 0" class="segment">
+    <div v-if="displayScore || displayScore == 0" class="segment segment-solid">
         <p>Your test has been submitted! Your score is {{displayScore}}/20, but that may change when someone manually reviews your score.</p>
     </div>
-    <p v-else class="text-center">Nothing to see here...</p>
+    <p v-else class="text-center">You have no pending test...</p>
 </div>
 </template>
 
@@ -93,11 +97,6 @@ export default {
         };
     },
     methods: {
-        // getCategories: function () {
-        //     this.test.answers.filter(a => {
-        //         a.question.category == 
-        //     });
-        // },
         getActiveOptions: function (options) {
             var currentIndex = options.length, temporaryValue, randomIndex;
             while (0 !== currentIndex) {
@@ -119,16 +118,9 @@ export default {
             } else {
                 this.info = 'Select the test to answer';
             }
-
-            let startTime = new Date(this.test.startedAt);
-            let timeLimit = new Date(this.test.startedAt);
-            timeLimit.setHours(startTime.getHours() + 1);
-            /*setInterval(() => {
-                this.timeRemaining = new Date(timeLimit - Date.now()).getMinutes();
-            }, 1000);*/
         },
         submit: async function (e) {
-            this.info = 'Submitting... (this can take a few seconds)'
+            this.info = 'Submitting... (this will take a few seconds)'
             let title = $('#title').val();
             let titleUnicode = $('#titleUnicode').val();
             let artist = $('#artist').val();

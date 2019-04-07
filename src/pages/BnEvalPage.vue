@@ -191,13 +191,15 @@ export default {
             });
             if(checkedRounds.length){
                 const result = confirm(`Are you sure? The consensus of any evaluation will affect its respective user.\n\nOnly do this after feedback PMs have been sent.`);
-                const ers = await this.executePost('/nat/bnEval/setComplete/', { checkedRounds: checkedRounds}, e);
-                if (ers) {
-                    if (ers.error) {
-                        this.info = ers.error;
-                    } else {
-                        this.allObjs = ers;
-                        this.filter();
+                if(result){
+                    const ers = await this.executePost('/nat/bnEval/setComplete/', { checkedRounds: checkedRounds}, e);
+                    if (ers) {
+                        if (ers.error) {
+                            this.info = ers.error;
+                        } else {
+                            this.allObjs = ers;
+                            this.filter();
+                        }
                     }
                 }
             }

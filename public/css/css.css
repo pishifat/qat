@@ -442,6 +442,18 @@ input[type=number] {
     color: var(--fail);
 }
 
+.vote-border-fail {
+    border-left: 3px solid var(--fail);
+}
+
+.vote-border-extend {
+    border-left: 3px solid var(--extend);
+}
+
+.vote-border-pass {
+    border-left: 3px solid var(--pass);
+}
+
 .badge-pass {
     background-color: var(--pass);
     color: #111;

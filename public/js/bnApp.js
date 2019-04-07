@@ -24,9 +24,9 @@ $(function() {
     });
 
     $('#calculateScore').click(async function () {
-        $('#totalScore').text('retrieving info, may take a while');
+        $('#calcWait').text('Retrieving info... (this will take a few seconds)');
         const res = await axios.get(`/nat/bnapps/mods`);
-        $('#totalScore').text('');
+        $('#calcWait').text('');
         if (res.data.error) {
             $('#errors').text(res.data.error);
         } else {
@@ -55,10 +55,9 @@ $(function() {
         } else if (mods.length < 2) {
             $('#errors').text('You must enter at least two mods!');
         } else {
-            $('#submitting').text(`Submitting... (this can take a few seconds)`);
+            $('#submitting').text(`Submitting & calculating mod score... (this will take a few seconds)`);
             try {
                 const res = await axios.post(`/nat/bnapps/apply`, { mode: mode, mods: mods });
-                // temporary while test doesnt exist
                 if (res.data.error) {
                     $('#errors').text(res.data.error);
                 } else {
