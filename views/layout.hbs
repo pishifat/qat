@@ -28,25 +28,25 @@
         <div class="collapse navbar-collapse" id="navbar">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
-                    <a class="nav-link text-shadow {{#unless isBnApp}}inactive{{/unless}}" href="/bnapps">BN Application</a>
+                    <a class="nav-link text-shadow {{#if isBnApp}}main-text{{/if}}" href="/bnapps">BN Application</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-shadow {{#unless isReports}}inactive{{/unless}}" href="/reports">Report a BN/NAT</a>
+                    <a class="nav-link text-shadow {{#if isReports}}main-text{{/if}}" href="/reports">Report a BN/NAT</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-shadow {{#unless isUsers}}inactive{{/unless}}" href="/users">Users</a>
+                    <a class="nav-link text-shadow {{#if isUsers}}main-text{{/if}}" href="/users">Users</a>
                 </li>
                 {{#if isBnOrNat}}
                 <li class="nav-item">
-                    <a class="nav-link text-shadow {{#unless isVetoes}}inactive{{/unless}}" href="/vetoes">Vetoes</a>
+                    <a class="nav-link text-shadow {{#if isVetoes}}main-text{{/if}}" href="/vetoes">Vetoes</a>
                 </li>
                 <!--<li class="nav-item">
-                    <a class="nav-link text-shadow {{#unless isBnScore}}inactive{{/unless}}" href="/bnscore">BN Score</a>
+                    <a class="nav-link text-shadow {{#if isBnScore}}main-text{{/if}}" href="/bnscore">BN Score</a>
                 </li>-->
                 {{/if}}
                 {{#if isNat}}
                 <li class="nav-item dropdown">
-                    <a class="nav-link text-shadow dropdown-toggle {{#unless isEval}}inactive{{/unless}}" href="#" data-toggle="dropdown">
+                    <a class="nav-link text-shadow dropdown-toggle {{#if isEval}}main-text{{/if}}" href="#" data-toggle="dropdown">
                         Evaluations
                     </a>
                     <div class="dropdown-menu">
@@ -57,10 +57,10 @@
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-shadow {{#unless isManageReports}}inactive{{/unless}}" href="/managereports">Manage Reports</a>
+                    <a class="nav-link text-shadow {{#if isManageReports}}main-text{{/if}}" href="/managereports">Manage Reports</a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link text-shadow dropdown-toggle {{#unless isManageTest}}inactive{{/unless}}" href="#" data-toggle="dropdown">
+                    <a class="nav-link text-shadow dropdown-toggle {{#if isManageTest}}main-text{{/if}}" href="#" data-toggle="dropdown">
                         RC Test
                     </a>
                     <div class="dropdown-menu">
@@ -69,7 +69,7 @@
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-shadow {{#unless isLogs}}inactive{{/unless}}" href="/logs">Logs</a>
+                    <a class="nav-link text-shadow {{#if isLogs}}main-text{{/if}}" href="/logs">Logs</a>
                 </li>
                 {{/if}}
             </ul>

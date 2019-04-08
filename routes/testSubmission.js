@@ -2,6 +2,7 @@ const express = require('express');
 const api = require('../models/api');
 const testSubmissionService = require('../models/bnTest/testSubmission').service;
 const logsService = require('../models/log').service;
+const bnAppsService = require('../models/bnApp').service;
 
 const router = express.Router();
 router.use(api.isLoggedIn);
@@ -153,6 +154,12 @@ router.post('/submit', async (req, res, next) => {
         status: 'finished',
         totalScore: displayScore,
     });
+    const currentBnApp = await bnAppsService.query({
+        applicant: req.session.mongoId,
+        mode: test.mode,
+        active: true 
+    });
+    await bnAppsService.update(currentBnApp.id, {test: test._id});
     res.json(displayScore);
     logsService.create(req.session.mongoId, `Completed ${test.mode} BN app test`);
 });

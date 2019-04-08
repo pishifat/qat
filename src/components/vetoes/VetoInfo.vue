@@ -35,22 +35,22 @@
                             </li>
                         </ul>
                         <div id="conclusion" class="copy-paste">
-                            <samp class="small">Hello! This beatmap has undergone veto mediation by the Beatmap Nominators. The veto post can be found here: {{veto.discussionLink}}</samp><br>
-                            <samp class="small">After an anonymous vote, it has been decided that the veto will be {{majority ? 'upheld' : 'dismissed'}}. The following are reasons why Beatmap Nominators {{majority ? 'agree' : 'disagree'}} with the veto:</samp><br>
+                            <samp class="small">Hello! This beatmap has undergone veto mediation by the Beatmap Nominators. The veto post can be found here: {{veto.discussionLink}}</samp><br><br>
+                            <samp class="small">After an anonymous vote, it has been decided that the veto will be {{majority ? 'upheld' : 'dismissed'}}. The following are reasons why Beatmap Nominators {{majority ? 'agree' : 'disagree'}} with the veto:</samp><br><br>
                             <div v-if="majority">
                                 <span v-for="(mediation, i) in upholdMediations" :key="mediation.id">
                                     <samp><pre class="small">({{i+1}}): {{mediation.comment}}</pre></samp><br>
                                 </span>
-                                <samp class="small">The beatmap cannot be nominated until changes are made that address the veto's concerns and the veto-ing nominator(s) are satisfied.</samp>
+                                <samp class="small">This beatmap cannot be nominated until changes are made that address the veto's concerns and the veto-ing nominator(s) are satisfied.</samp>
                             </div>
                             <div v-else>
                                 <span v-for="(mediation, i) in withdrawMediations" :key="mediation.id">
                                     <samp><pre class="small">({{i+1}}): {{mediation.comment}}</pre></samp><br>
                                 </span>
-                                <samp class="small">Due to the veto being withdrawn, the beatmap may now be re-nominated.</samp>
+                                <samp class="small">Due to the veto being withdrawn, this beatmap may now be re-nominated.</samp>
                             </div>
                         </div>
-                        <button v-if="mediationId && !(veto.status == 'upheld' || veto.status =='withdrawn')" class="btn btn-sm" :class="majority ? 'btn-nat' : 'btn-nat-red'" @click="concludeMediation($event)">{{majority ? 'Uphold Veto' : 'Withdraw Veto'}}</button>
+                        <button v-if="veto.status != 'upheld' && veto.status !='withdrawn'" class="btn btn-sm" :class="majority ? 'btn-nat' : 'btn-nat-red'" @click="concludeMediation($event)">{{majority ? 'Uphold Veto' : 'Withdraw Veto'}}</button>
                     </div>
                     <div v-else>
                         <button class="btn btn-sm btn-nat mb-2" @click="selectMediators($event)">{{mediators ? 'Re-select Mediators' : 'Select Mediators'}}</button> 
@@ -68,10 +68,14 @@
                             </div>
                             <p>Forum message:</p>
                             <div id="forumMessage" class="copy-paste">
-                                <samp class="small">Hello! You have been selected as a veto mediator for [url=https://osu.ppy.sh/beatmapsets/{{veto.beatmapId}}]{{ veto.beatmapTitle }}[/url].</samp><br>
-                                <samp class="small">The map is currently vetoed for the following reason: [code]{{veto.shortReason}}[/code]</samp><br>
-                                <samp class="small">Veto discussion can be found [url={{veto.discussionLink}}]here[/url].</samp><br>
-                                <samp class="small">Please respond to the veto with your opinion on the [url=#]NAT website[/url] in less than one week. If you wish to opt-out of future veto mediations, do so [url=#]here[/url].</samp>
+                                <samp class="small">Hello!</samp><br><br>
+                                <samp class="small">You have been selected as a veto mediator for [url=https://osu.ppy.sh/beatmapsets/{{veto.beatmapId}}]{{ veto.beatmapTitle }}[/url].</samp><br><br>
+                                <samp class="small">[notice]The map is currently vetoed for the following reason:</samp><br><br>
+                                <samp class="small">[code]{{veto.shortReason}}[/code]</samp><br><br>
+                                <samp class="small">Veto discussion can be found [url={{veto.discussionLink}}]here[/url].[/notice]</samp><br><br>
+                                <samp class="small">Please post your opinion regarding the veto on the [url=http://bn.mappersguild.com/vetoes]BN/NAT website[/url] in [b]one week[/b]. Your decision will be anonymous to everyone but members of the NAT.</samp><br><br>
+                                <samp class="small">If you do not participate in this veto mediation, the NAT will question your standing as a Beatmap Nominator. If you do not want to participate in future veto mediations, opt-out from the [url=http://bn.mappersguild.com/users]users page[/url].</samp><br><br>
+                                <samp class="small">Thank you for your hard work!</samp><br><br>
                             </div>
                         </div>
                     </div>

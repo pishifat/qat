@@ -15,7 +15,7 @@
     --upheld: var(--extend);
     --fail: #ff9b9b;
     --withdrawn: var(--fail);
-    --main-text: #ffffffde;
+    --main-text: rgba(255, 255, 255, 0.871);
     --secondary-text: #b9bbbe;
 
     --dark: #252525;
@@ -97,7 +97,7 @@ a {
 }
 
 .main-text {
-    color: var(--main-text);
+    color: var(--main-text) !important;
 }
 
 a:hover {

@@ -77,7 +77,6 @@ router.post('/submit', async (req, res, next) => {
 /* POST set status upheld or withdrawn. */
 router.post('/selectMediators', async (req, res, next) => {
     const allUsers = await usersModel.aggregate([
-        //{ $match: { group: { $ne: 'user' }, vetoMediator: true, mode: {$in: req.body.mode}, probation: {$in: req.body.mode}, username: {$nin: req.body.excludeUsers} } },
         { $match: { group: { $ne: 'user' }, vetoMediator: true} },
         { $sample: { size: 1000 } },
     ]);
@@ -85,13 +84,12 @@ router.post('/selectMediators', async (req, res, next) => {
     for (let i = 0; i < allUsers.length; i++) {
         let user = allUsers[i];
         if (
-            user.modes.indexOf(req.body.mode) >= -1 && //should be 0 but testing
+            user.modes.indexOf(req.body.mode) >= 0 &&
             user.probation.indexOf(req.body.mode) < 0 &&
             req.body.excludeUsers.indexOf(user.username.toLowerCase()) < 0
         ) {
             usernames.push(user);
-            if (usernames.length >= 5) {
-                //don't know this number yet
+            if (usernames.length >= 12) {
                 break;
             }
         }
