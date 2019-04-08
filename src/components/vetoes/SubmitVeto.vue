@@ -10,23 +10,7 @@
                 </div>
                 <div class="modal-body" style="overflow: hidden">
                     <div class="container">
-                        <div class="row mb-2">
-                            <input
-                                type="text"
-                                class="form-control text-input"
-                                placeholder="Beatmap Link"
-                                v-model="discussionLink"
-                            />
-                        </div>
-                        <div class="row mb-2">
-                            <input
-                                type="text"
-                                class="form-control text-input"
-                                placeholder="Reason for veto"
-                                v-model="shortReason"
-                            />
-                        </div>
-                        <div class="row mt-3 text-shadow">
+                        <div class="row text-shadow">
                             <p>Game mode:</p>
                             <div class="row ml-4">
                                 <label class="mx-1">
@@ -46,6 +30,24 @@
                                     <i class="fas fa-stream fa-lg"></i>
                                 </label>
                             </div>
+                        </div>
+                        <div class="row mb-2">
+                            <small class="text-shadow mb-1">Permalink to the veto post on the modding discussion page</small>
+                            <input
+                                type="text"
+                                class="form-control text-input"
+                                placeholder="beatmap link..."
+                                v-model="discussionLink"
+                            />
+                        </div>
+                        <div class="row mb-2">
+                            <small class="text-shadow mb-1">Summarize the reason for the veto. If your summary is inappropriate, the veto will not be mediated</small>
+                            <input
+                                type="text"
+                                class="form-control text-input"
+                                placeholder="reason for veto..."
+                                v-model="shortReason"
+                            />
                         </div>
                         <p class="errors text-shadow">{{ info }}</p>
                         <hr />

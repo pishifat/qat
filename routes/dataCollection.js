@@ -13,7 +13,7 @@ router.get('/', async (req, res, next) => {
     res.render('evaluations/datacollection', {
         title: 'Data Collection',
         script: '../javascripts/dataCollection.js',
-        isEval: true,
+        isDataCollection: true,
         isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat',
         isNat: res.locals.userRequest.group == 'nat',
     });
@@ -26,7 +26,7 @@ router.get('/relevantInfo', async (req, res, next) => {
     let data = await aiessService.query(
         { $or: [{eventType: 'Disqualified'}, {eventType: 'Popped'}], timestamp: { $gte: date } },
         {},
-        { timestamp: 1 },
+        { timestamp: -1 },
         true
     );
     res.json(data);

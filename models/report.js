@@ -6,7 +6,8 @@ const reportSchema = new mongoose.Schema({
     culprit: { type: 'ObjectId', ref: 'User', required: true },
     reason: { type: String, required: true },
     valid: { type: Number, enum: [1, 2, 3] },
-    feedback: { type: String }
+    feedback: { type: String },
+    isActive: { type: Boolean, default: true }
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 const Report = mongoose.model('Report', reportSchema);

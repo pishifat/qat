@@ -31,9 +31,8 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
     }
     await reportsService.create(req.session.mongoId, u.id, req.body.reason);
     res.json({});
-    let anon = await usersService.query({ username: 'Anonymous' });
     logsService.create(
-        anon.id,
+        null,
         `Reported "${u.username}" for reason "${
             req.body.reason.length > 50 ? req.body.reason.slice(0, 50) + '...' : req.body.reason
         }"`

@@ -8,22 +8,18 @@
         <li>A positive mod score (evaluated through your modding activity in the last 3 months, see calculator below)</li>
         <li>Competent modding abilities/behavior (evaluated by members of the NAT through your submitted mods, other modding history, and community interaction)</li>
     </ul>
-    <p>Below is a form to test mod scores and apply to the Beatmap Nominators. After clicking apply, you'll have the option to begin the test. This test can be completed at any time after your application.</p>
-    <p>When your application is evaluated, you'll receive an osu! forum PM with the results. If you're rejected from the BN, you cannot apply to the same game mode again for 90 days.</p>
+    <p>Below is a form to test mod scores and apply to the Beatmap Nominators. After clicking apply, you'll have the option to begin the test. This test can be completed at any time after your application. You cannot apply to other game modes while a test is incomplete.</p>
+    <p>When your application is evaluated, you'll receive an osu! forum PM with the results. If your application is denied or you're removed from the BN, you cannot apply to the same game mode again for 90 days.</p>
 </div>
 
-<hr>
-
-{{#if loggedInAs}}
 <div class="segment segment-image">
-    <h4>Mod score: 
+    <h4>Mod score calculator: 
         <small id="totalScore" class="ml-1"></small> 
         <button class="btn btn-sm btn-nat ml-2" id="calculateScore"
             data-toggle="tooltip" data-placement="top" title="Automatically detect your mod score based on your modding history">Auto-calculate
         </button>
         <small id="calcWait" class="ml-2" style="font-size: 10pt;"></small>
     </h4>
-    <p class="small ml-4 mb-3">Scores over 0 are passing. A "mod" is counted for each beatmapset through which you've received at least one Kudosu. </p>
     <div class="form-group row">
         <div class="pl-4">
             <div class="input-group mb-3">
@@ -32,12 +28,22 @@
             <div class="input-group mb-3">
                 <input class="modCount text-input" id="modCount2" type="number" class="form-control text-input" placeholder="second month...">
             </div>
-            <div class="input-group mb-3">
+            <div class="input-group">
                 <input class="modCount text-input" id="modCount3" type="number" class="form-control text-input" placeholder="third month...">
             </div>
         </div>
     </div>
+    <ul style="list-style-type: disc;">
+        <li class="small">This calculator is only for your own reference. You do not need to input your mod count to apply for BN</li>
+        <li class="small">A "mod" is counted for each beatmapset through which you've received at least one Kudosu ("thumbs up" on discussion page)</li>
+        <li class="small">Scores over 0 are passing</li>
+        <li class="small">Selecting a different game mode below will impact your mod score</li>
+    </ul>
+</div>
 
+<hr>
+
+<div class="segment segment-image">
     <h4>Game-mode:</h4>
     <div class="form-group row">
         <div class="pl-4">
@@ -65,16 +71,16 @@
     <div class="form-group row">
         <div class="pl-4" style="width: 95%">
             <div class="input-group mb-3">
-                <input id="mod0" type="text" class="form-control text-input" placeholder="link to mod">
+                <input id="mod0" type="text" class="form-control text-input" placeholder="link to mod...">
             </div>
             <div class="input-group mb-3">
-                <input id="mod1" type="text" class="form-control text-input" placeholder="link to mod">
+                <input id="mod1" type="text" class="form-control text-input" placeholder="link to mod...">
             </div>
             <div class="input-group mb-3">
-                <input id="mod2" type="text" class="form-control text-input" placeholder="link to mod">
+                <input id="mod2" type="text" class="form-control text-input" placeholder="link to mod...">
             </div>
             <div class="input-group mb-3 ">
-                <input id="mod3" type="text" class="form-control text-input" placeholder="link to mod">
+                <input id="mod3" type="text" class="form-control text-input" placeholder="link to mod...">
             </div>
         </div>
     </div>
@@ -96,4 +102,3 @@
     </div>
     
 </div>
-{{/if}}

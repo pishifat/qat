@@ -82,14 +82,14 @@
                                     <samp class="small">[*]At the end of your probation period, your activity/attitude/nomination quality will be evaluated by members of the NAT. If each of these areas are satisfactory, your probation period will be complete. If not, your probation will be extended for another month. or you'll be dismissed from the BN. In that second case, you will not be able to re-apply for another 90 days.</samp><br><br>
                                     <samp class="small">[*]Read [url=https://osu.ppy.sh/help/wiki/People/Beatmap_Nominators/Rules]this page[/url] and follow the golden rule: [i]don't fuck up[/i].[/list][/notice]</samp><br><br>
                                     <samp class="small">Additional feedback from the NAT:</samp><br><br>
-                                    <samp class="small">[code]{{discussApp.feedback}}[/code]</samp><br><br>
+                                    <samp class="small">[notice]{{discussApp.feedback}}[/notice]</samp><br><br>
                                     <samp class="small">We hope you have fun as a Beatmap Nominator!</samp>
                                 </div>
                                 <div v-else class="copy-paste">
                                     <samp class="small">Hello!</samp><br><br>
                                     <samp class="small">Following an evaluation of your {{discussApp.mode}} BN application, we've decided not to admit you into the Beatmap Nominators.</samp><br><br>
                                     <samp class="small">Additional feedback regarding why you were rejected and what you could potentially improve in your next application:</samp><br><br>
-                                    <samp class="small">[code]{{discussApp.feedback}}[/code]</samp><br><br>
+                                    <samp class="small">[notice]{{discussApp.feedback}}[/notice]</samp><br><br>
                                     <samp class="small">You may apply for BN in this game mode again after 90 days. Good luck!</samp>
                                 </div>
                             </div>
@@ -202,7 +202,7 @@
                                         <samp class="small">After evaluating the work of you (and many other BNs), we'd just like to let you know that you're doing well. Thanks!</samp><br><br>
                                     </span>
                                     <samp class="small">Additional feedback from the NAT:</samp><br><br>
-                                    <samp class="small">[code]{{discussRound.feedback}}[/code]</samp><br><br>
+                                    <samp class="small">[notice]{{discussRound.feedback}}[/notice]</samp><br><br>
                                     <samp class="small">We hope you have fun as a Beatmap Nominator!</samp>
                                 </div>
                                 <div v-else-if="discussRound.consensus == 'extend'" class="copy-paste">
@@ -216,7 +216,7 @@
                                     </span>
                                     <samp class="small">If you have any questions regarding this decision, please do not hesitate to ask any member of the NAT at your earliest convenience.</samp><br><br>
                                     <samp class="small">Additional feedback from the NAT:</samp><br><br>
-                                    <samp class="small">[code]{{discussRound.feedback}}[/code]</samp><br><br>
+                                    <samp class="small">[notice]{{discussRound.feedback}}[/notice]</samp><br><br>
                                     <samp class="small">We hope to see you off of probation soon!</samp>
                                 </div>
                                 <div v-else class="copy-paste">
@@ -225,7 +225,7 @@
                                     <samp class="small">Despite this decision, we would like to thank you for your service to the mapping and modding communities and wish you the best of luck in your future endeavours. Should you wish to apply for the Beatmap Nominators in the future, you may do so after 90 days, provided you meet the normal required activity requirements and have shown improvement in the areas mentioned.</samp><br><br>
                                     <samp class="small">If you have any questions regarding this decision, please do not hesitate to ask any member of the NAT at your earliest convenience.</samp><br><br>
                                     <samp class="small">Additional feedback from the NAT:</samp><br><br>
-                                    <samp class="small">[code]{{discussRound.feedback}}[/code]</samp><br><br>
+                                    <samp class="small">[notice]{{discussRound.feedback}}[/notice]</samp><br><br>
                                     <samp class="small">Good luck!</samp>
                                 </div>
                             </div>

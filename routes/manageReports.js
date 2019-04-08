@@ -20,7 +20,10 @@ router.get('/', async (req, res, next) => {
 });
 
 //population
-const defaultPopulate = [{ populate: 'culprit', display: 'username osuId' }];
+const defaultPopulate = [
+    { populate: 'culprit', display: 'username osuId' },
+    { populate: 'reporter', display: 'username osuId' }
+];
 
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res, next) => {
@@ -35,6 +38,9 @@ router.post('/submitReportEval/:id', async (req, res) => {
     }
     if (req.body.valid) {
         await reportsService.update(req.params.id, { valid: req.body.valid });
+    }
+    if (req.body.close) {
+        await reportsService.update(req.params.id, { isActive: false });
     }
     let r = await reportsService.query({ _id: req.params.id }, defaultPopulate);
 

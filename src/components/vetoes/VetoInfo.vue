@@ -50,14 +50,19 @@
                                 <samp class="small">Due to the veto being withdrawn, this beatmap may now be re-nominated.</samp>
                             </div>
                         </div>
-                        <button v-if="veto.status != 'upheld' && veto.status !='withdrawn'" class="btn btn-sm" :class="majority ? 'btn-nat' : 'btn-nat-red'" @click="concludeMediation($event)">{{majority ? 'Uphold Veto' : 'Withdraw Veto'}}</button>
+                        <span v-if="veto.status != 'upheld' && veto.status != 'withdrawn'">
+                            <button class="btn btn-sm" :class="majority ? 'btn-nat' : 'btn-nat-red'" @click="concludeMediation($event)">{{majority ? 'Uphold Veto' : 'Withdraw Veto'}}</button>
+                            <button class="btn btn-sm btn-nat" @click="concludeMediation($event, true)">Dismiss Without Mediation</button>
+                        </span>
                     </div>
-                    <div v-else>
+                    <div v-else-if="veto.status != 'upheld' && veto.status != 'withdrawn'">
                         <button class="btn btn-sm btn-nat mb-2" @click="selectMediators($event)">{{mediators ? 'Re-select Mediators' : 'Select Mediators'}}</button> 
                         <button v-if="mediators" class="btn btn-sm btn-nat-red mb-2" @click="beginMediation($event)">Begin Mediation</button>
+                        <button class="btn btn-sm btn-nat mb-2" @click="concludeMediation($event, true)">Dismiss Without Mediation</button>
                         <div class="mb-2">
                             <span class="text-shadow">Exclude specific user(s):</span> 
-                            <input id="excludeUsers" class="text-input ml-1 w-75 small" type="text" placeholder="username1, username2, username3..." /> 
+                            <input id="excludeUsers" class="text-input ml-1 w-75 small" type="text" placeholder="username1, username2, username3..." /><br>
+                            <small class="ml-2 text-shadow">The mapper and veto submitter are automatically excluded</small>
                         </div>
                         <div class="mt-2" v-if="mediators">
                             <p>Users:</p>
@@ -70,14 +75,17 @@
                             <div id="forumMessage" class="copy-paste">
                                 <samp class="small">Hello!</samp><br><br>
                                 <samp class="small">You have been selected as a veto mediator for [url=https://osu.ppy.sh/beatmapsets/{{veto.beatmapId}}]{{ veto.beatmapTitle }}[/url].</samp><br><br>
-                                <samp class="small">[notice]The map is currently vetoed for the following reason:</samp><br><br>
-                                <samp class="small">[code]{{veto.shortReason}}[/code]</samp><br><br>
-                                <samp class="small">Veto discussion can be found [url={{veto.discussionLink}}]here[/url].[/notice]</samp><br><br>
+                                <samp class="small">The map is currently vetoed for the following reason:</samp><br><br>
+                                <samp class="small">[notice]{{veto.shortReason}}[/notice]</samp><br><br>
+                                <samp class="small">Veto discussion can be found [url={{veto.discussionLink}}]here[/url].</samp><br><br>
                                 <samp class="small">Please post your opinion regarding the veto on the [url=http://bn.mappersguild.com/vetoes]BN/NAT website[/url] in [b]one week[/b]. Your decision will be anonymous to everyone but members of the NAT.</samp><br><br>
                                 <samp class="small">If you do not participate in this veto mediation, the NAT will question your standing as a Beatmap Nominator. If you do not want to participate in future veto mediations, opt-out from the [url=http://bn.mappersguild.com/users]users page[/url].</samp><br><br>
                                 <samp class="small">Thank you for your hard work!</samp><br><br>
                             </div>
                         </div>
+                    </div>
+                    <div v-else>
+                        <p class="text-shadow min-spacing">This veto's mediation was dismissed due to being invalid, inappropriate, or resolved by the mapper.</p>
                     </div>
                 </div>
                 <div v-if="mediationId && veto.status == 'wip'">
@@ -155,6 +163,7 @@ export default {
             for (let i = 0; i < excludeUsers.length; i++) {
                 excludeUsers[i] = excludeUsers[i].trim().toLowerCase();
             }
+            excludeUsers.push(this.veto.beatmapMapper.toLowerCase(), this.veto.vetoer.username.toLowerCase());
             const r = await this.executePost('/vetoes/selectMediators', {mode: this.veto.mode, excludeUsers: excludeUsers}, e);
             if (r) {
                 if (r.error) {
@@ -198,12 +207,12 @@ export default {
                 }
             }
         },
-        concludeMediation: async function (e) {
+        concludeMediation: async function (e, dismiss) {
             this.info = '';
             this.confirm = '';
             const v = await this.executePost(
                 '/vetoes/concludeMediation/' + this.veto.id, 
-                { majority: this.majority }, e);
+                { majority: this.majority, dismiss: dismiss }, e);
             if (v) {
                 if (v.error) {
                     this.info = v.error;

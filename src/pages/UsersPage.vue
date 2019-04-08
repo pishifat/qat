@@ -141,7 +141,7 @@ export default {
                 this.allObjs = response.data.users;
                 this.userId = response.data.userId;
                 this.userGroup = response.data.userGroup;
-                this.limit = 16;
+                this.limit = 24;
             }).then(function(){
                 $("#loading").fadeOut();
                 $('#main').attr("style", "visibility: visible").hide().fadeIn();

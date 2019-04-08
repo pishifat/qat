@@ -60,7 +60,7 @@ router.post('/submit', async (req, res, next) => {
         return res.json(bmInfo);
     }
 
-    const v = await vetoesService.create(
+    let v = await vetoesService.create(
         req.session.mongoId,
         req.body.discussionLink,
         bmInfo.beatmapset_id,
@@ -70,6 +70,7 @@ router.post('/submit', async (req, res, next) => {
         req.body.shortReason,
         req.body.mode
     );
+    v = await vetoesService.query({_id: v._id}, defaultPopulate);
     res.json(v);
     logsService.create(req.session.mongoId, `Submitted a veto for mediation on "${v.beatmapTitle}"`);
 });
@@ -89,7 +90,7 @@ router.post('/selectMediators', async (req, res, next) => {
             req.body.excludeUsers.indexOf(user.username.toLowerCase()) < 0
         ) {
             usernames.push(user);
-            if (usernames.length >= 12) {
+            if (usernames.length >= (req.body.mode == 'osu' ? 12 : 6)) {
                 break;
             }
         }
@@ -125,12 +126,16 @@ router.post('/submitMediation/:id', async (req, res, next) => {
 
 /* POST submit mediation */
 router.post('/concludeMediation/:id', async (req, res, next) => {
-    await vetoesService.update(req.params.id, { status: req.body.majority ? 'upheld' : 'withdrawn' });
+    if(req.body.dismiss || !req.body.majority){
+        await vetoesService.update(req.params.id, { status: 'withdrawn' });
+    }else{
+        await vetoesService.update(req.params.id, { status: 'upheld' });
+    }
     let v = await vetoesService.query({ _id: req.params.id }, defaultPopulate);
     res.json(v);
     logsService.create(
         req.session.mongoId,
-        `${v.status.charAt(0).toUpperCase() + v.status.slice(1)} veto mediation for "${v.beatmapTitle}"`
+        `Veto ${v.status.charAt(0).toUpperCase() + v.status.slice(1)} for "${v.beatmapTitle}" ${req.body.dismiss ? 'without mediation' : ''}`
     );
 });
 

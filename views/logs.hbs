@@ -10,7 +10,7 @@
                 {{#each logs}}
                 <tr>
                     <td scope="row">{{shortDate createdAt}} GMT</td>
-                    <td scope="row">{{user.username}}</td>
+                    <td scope="row">{{#if user}}{{user.username}}{{else}}Anonymous{{/if}}</td>
                     <td scope="row" class="main-text">{{shortAction action}}</td>
                 </tr>
                 {{/each}}

@@ -37,7 +37,7 @@ const filters = {
             }
 
             if (this.hasPagination) {
-                this.limit = 16.01; //resets to first page
+                this.limit = (this.count + 0.01); //resets to first page
                 this.canShowOlder = true;
             } else {
                 if (this.isFiltered) this.pageObjs = this.filteredObjs;
@@ -193,7 +193,7 @@ const filters = {
             }
 
             if (this.hasPagination) {
-                this.limit = 16.01;
+                this.limit = (this.count + 0.01);
                 this.canShowOlder = true;
             }
         },

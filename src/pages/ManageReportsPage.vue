@@ -87,8 +87,8 @@ export default {
             }
         },
         separateObjs: function() {
-            this.openReports = this.pageObjs.filter( report => !report.feedback || !report.valid);
-            this.closedReports = this.pageObjs.filter( report => report.feedback && report.valid);
+            this.openReports = this.pageObjs.filter( report => report.isActive);
+            this.closedReports = this.pageObjs.filter( report => !report.isActive);
         },
         updateReport: function (report) {
 			const i = this.allObjs.findIndex(r => r.id == report.id);

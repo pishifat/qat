@@ -52,9 +52,11 @@
                     <div class="dropdown-menu">
                         <a class="dropdown-item" href="/appeval">Applications</a>
                         <a class="dropdown-item" href="/bneval">Current BNs</a>
-                        <a class="dropdown-item" href="/datacollection">Data Collection</a>
                         <a class="dropdown-item" href="/evalarchive">Archive</a>
                     </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-shadow {{#if isDataCollection}}main-text{{/if}}" href="/datacollection">Data Collection</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link text-shadow {{#if isManageReports}}main-text{{/if}}" href="/managereports">Manage Reports</a>
