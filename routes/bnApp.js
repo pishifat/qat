@@ -3,10 +3,88 @@ const api = require('../models/api');
 const bnAppsService = require('../models/bnApp.js').service;
 const logsService = require('../models/log.js').service;
 const testSubmissionService = require('../models/bnTest/testSubmission').service;
+const cheerio = require('cheerio');
+const helper = require('../routes/helper');
 
 const router = express.Router();
 
 router.use(api.isLoggedIn);
+
+/**
+ * Returns array with values per month ex: [1,1,1] or the calculated score ex: 7,77
+ * @param {string} username 
+ * @param {string} mode To calculate and return the score, pass this argument
+ */
+async function getUserModsCount(username, mode) {
+    let baseUrl = `https://osu.ppy.sh/beatmapsets/events?limit=50&types[]=kudosu_gain&types[]=kudosu_lost&user=${username}`;
+    let maxDate = new Date();
+    let minDate = new Date();
+    minDate.setDate(minDate.getDate() - 30);
+    let modCount = [];
+    let modScore = 0;
+    let expectedMods = (mode && mode == 'osu' ? 4 : 3);
+    // Loops for months
+    for (let i = 0; i < 3; i++) {
+        const maxDateStr = `${maxDate.getFullYear()}-${maxDate.getMonth() + 1}-${maxDate.getDate()}`;
+        const minDateStr = `${minDate.getFullYear()}-${minDate.getMonth() + 1}-${minDate.getDate()}`;
+        let urlWithDate = baseUrl + `&min_date=${minDateStr}&max_date=${maxDateStr}`;
+        let monthMods = [];
+        let hasEvents = true;
+        let pageNumber = 1;
+        // Loops through pages of a month
+        while (hasEvents) {
+            let finalUrl = urlWithDate + `&page=${pageNumber}`
+            try {
+                const historyHtml = await axios.get(finalUrl);
+                const $ = cheerio.load(historyHtml.data);
+                if (!$('.beatmapset-event').length) {
+                    hasEvents = false;
+                } else {
+                    let pageMods = [];
+                    $('.beatmapset-event').each(function(k, v) {            
+                        const url = $(v).find('a').first().attr('href');
+                        let mod = { 
+                            beatmapset: helper.getBeatmapsetIdFromUrl(url),
+                            url: url
+                        };
+                        
+                        if ($(v).find('.beatmapset-event__icon--kudosu-gain').length) {
+                            mod.isGain = true;
+                        } else {
+                            mod.isGain = false;
+                        }
+                        
+                        pageMods.push(mod);
+                    });
+                    
+                    // Filters repeated sets and checks for denied KDs
+                    pageMods.forEach(mod => {
+                        if (mod.isGain && 
+                            pageMods.findIndex(m => m.url == mod.url && !m.isGain) === -1 && 
+                            monthMods.findIndex(m => m.beatmapset == mod.beatmapset) === -1) {
+                                monthMods.push(mod);
+                        }
+                    });
+                }
+            } catch (error) {
+                return res.json({ error: error._message });
+            }
+    
+            pageNumber ++;
+        }
+        
+        modScore += Math.log(1 + monthMods.length) / Math.log(Math.sqrt(1 + expectedMods)) - (2 * (1 + expectedMods)) / (1 + monthMods.length);
+        modCount.push(monthMods.length);
+        minDate.setDate(minDate.getDate() - 30);
+        maxDate.setDate(maxDate.getDate() - 30);
+    }
+
+    if (mode) {
+        return modScore.toFixed(2);
+    } else {
+        return modCount;
+    }
+}
 
 /* GET bn app page */
 router.get('/', async (req, res, next) => {
@@ -27,7 +105,7 @@ router.get('/', async (req, res, next) => {
 });
 
 router.get('/mods', async (req, res, next) => {
-    const modCount = await api.getUserModsCount(req.session.username);
+    const modCount = await getUserModsCount(req.session.username);
     return res.json({ modCount: modCount });
 });
 
@@ -41,7 +119,7 @@ router.post('/apply', async (req, res, next) => {
         // Check user kudosu total count & mod score
         const [userInfo, modScore] = await Promise.all([
             await api.getUserInfo(req.session.accessToken),
-            await api.getUserModsCount(req.session.username, req.body.mode),
+            await getUserModsCount(req.session.username, req.body.mode),
         ]);
         if (modScore <= 0 || ((req.body.mode == 'osu' && userInfo.kudosu.total <= 200) || (req.body.mode != 'osu' && userInfo.kudosu.total <= 150))) {
             return res.json({ error: `You don't meet the minimum score or total kudosu requirement. 

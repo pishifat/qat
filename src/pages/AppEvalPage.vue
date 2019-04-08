@@ -3,39 +3,36 @@
 <div class="row">
     <div class="col-md-12">
         <section class="row segment my-1 mx-4">
-            <small>Search: 
-                <input id="search" class="text-input" v-model="filterValue" type="text" placeholder="username... (3+ characters)" /> 
-            </small>
-            <small>
-                <select class="custom-select inline-custom-select ml-2" id="mode" v-model="filterMode">
-                    <option value="" selected>All modes</option>
-                    <option value="osu">osu!</option>
-                    <option value="taiko">osu!taiko</option>
-                    <option value="catch">osu!catch</option>
-                    <option value="mania">osu!mania</option>
-                </select>
-            </small>
-            <small>
-                <button class="btn btn-nat btn-sm ml-2" @click="selectAll($event)">Select all</button>
-            </small>
+            <div class="d-flex align-items-md-center align-items-stretch justify-content-start flex-md-row flex-column">
+                <small>Search: </small>
+                <small class="ml-2 mt-1 mt-md-0">
+                    <input id="search" class="text-input" v-model="filterValue" type="text" placeholder="username... (3+ characters)" />
+                </small>
+                <small class="ml-2 mt-1 mt-md-0">
+                    <select class="custom-select inline-custom-select w-100" id="mode" v-model="filterMode">
+                        <option value="" selected>All modes</option>
+                        <option value="osu">osu!</option>
+                        <option value="taiko">osu!taiko</option>
+                        <option value="catch">osu!catch</option>
+                        <option value="mania">osu!mania</option>
+                    </select>
+                </small>
+                <small class="ml-2 mt-1 mt-md-0">
+                    <button class="btn btn-nat btn-sm w-100" @click="selectAll($event)">Select all</button>
+                </small>
+            </div>
         </section>
         <section class="row segment my-1 mx-4">
-            <div class="col-lg-3 mt-1">
+            <div class="d-flex align-items-md-center align-items-stretch justify-content-start flex-md-row flex-column">
                 <small>Mark selected as:</small>
-            </div>
-            <div class="col-lg-3">
-                <small>
-                    <button class="btn btn-nat btn-sm w-100 mt-1" @click="setGroupEval($event)">Group evaluation</button>
+                <small class="ml-2 mt-1 mt-md-0">
+                    <button class="btn btn-nat btn-sm w-100" @click="setGroupEval($event)">Group evaluation</button>
                 </small>
-            </div>
-            <div class="col-lg-3">
-                <small>
-                    <button class="btn btn-nat btn-sm w-100 mt-1" @click="setIndividualEval($event)">Individual evaluation</button>
+                <small class="ml-2 mt-1 mt-md-0">
+                    <button class="btn btn-nat btn-sm w-100" @click="setIndividualEval($event)">Individual evaluation</button>
                 </small>
-            </div>
-            <div class="col-lg-3">
-                <small>
-                    <button class="btn btn-nat-red btn-sm w-100 mt-1" @click="setComplete($event)">Archive</button>
+                <small class="ml-2 mt-1 mt-md-0">
+                    <button class="btn btn-nat-red btn-sm w-100" @click="setComplete($event)">Archive</button>
                 </small>
             </div>
         </section>
