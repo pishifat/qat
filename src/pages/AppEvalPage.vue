@@ -2,7 +2,7 @@
 
 <div class="row">
     <div class="col-md-12">
-        <section class="row segment segment-solid my-1 mx-4">
+        <section class="row segment my-1 mx-4">
             <small>Search: 
                 <input id="search" class="text-input" v-model="filterValue" type="text" placeholder="username... (3+ characters)" /> 
             </small>
@@ -19,7 +19,7 @@
                 <button class="btn btn-nat btn-sm ml-2" @click="selectAll($event)">Select all</button>
             </small>
         </section>
-        <section class="row segment segment-solid my-1 mx-4">
+        <section class="row segment my-1 mx-4">
             <div class="col-lg-3 mt-1">
                 <small>Mark selected as:</small>
             </div>
@@ -40,7 +40,7 @@
             </div>
         </section>
         <hr>
-        <section class="row segment mx-1 px-0">
+        <section class="row segment segment-image mx-1 px-0">
             <div class="col-sm-12">
                 <h2>Individual Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="only you can see these">?</sup></h2> 
 
@@ -61,7 +61,7 @@
             </div>
         </section>
         <hr>
-        <section class="row segment mx-1 px-0">
+        <section class="row segment segment-image mx-1 px-0">
             <div class="col-sm-12">
                 <h2>Group Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="everyone can see these">?</sup></h2>
 

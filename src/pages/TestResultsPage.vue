@@ -1,7 +1,7 @@
 <template>
 
 <div class="row">
-   <section class="row mb-4 segment segment-solid">
+   <section class="row mb-4 segment">
        <div class="input-group input-group-sm">
             <input class="form-control form-control-sm" type="text" placeholder="username" id="search" 
                 style="filter: drop-shadow(1px 1px 1px #000000); border-radius: 100px 0 0 100px" 
@@ -13,7 +13,7 @@
         <p v-if="info" class="errors mt-1">{{info}}</p> 
     </section>
 
-    <section class="col-md-12 segment" v-if="allTests">
+    <section class="col-md-12 segment segment-image" v-if="allTests">
         <transition-group name="list" tag="div" class="row">
             <result-card
                 v-for="test in allTests"
@@ -31,7 +31,7 @@
             Score: {{ selectedTest.totalScore }}
         </p>
 
-        <div class="segment" v-for="(answer, i) in selectedTest.answers" :key="answer.id">
+        <div class="segment segment-image" v-for="(answer, i) in selectedTest.answers" :key="answer.id">
             <small class="float-right">Q{{ ++i }} -- {{ answer.question.category }}</small>
             <div v-if="answer.question.questionType === 'text' || answer.question.questionType === 'image'">
                 <h5 style="width: 90%">{{ answer.question.content }}</h5>

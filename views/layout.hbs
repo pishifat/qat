@@ -16,10 +16,14 @@
 </head>
 
 <body class="text-light px-0">
-    <nav id="top" class="navbar navbar-expand-md navbar-nat" style="position:absolute; width:100%">
+    <nav id="top" class="navbar navbar-expand-md navbar-dark navbar-nat" style="position:absolute; width:100%">
         <a class="navbar-brand" href="/">
             <img src="../images/qatlogo.png" width="48" height="48" style="border-radius: 32px 32px 32px 32px; filter: drop-shadow(1px 1px 1px #000000);" alt="">
         </a>
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
         
         <div class="collapse navbar-collapse" id="navbar">
             <ul class="navbar-nav mr-auto">
@@ -70,10 +74,6 @@
                 {{/if}}
             </ul>
         </div>
-
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar">
-            <span class="navbar-toggler-icon"></span>
-        </button>
     </nav>
     
     <div id="loading">

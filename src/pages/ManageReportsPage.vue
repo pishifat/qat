@@ -2,7 +2,7 @@
 
 <div class="row">
     <div class="col-md-12">
-        <section class="segment segment-solid my-1">
+        <section class="segment my-1">
             <small
                 >Search:
                 <input
@@ -23,7 +23,7 @@
                 </select>
             </small>
         </section>
-        <section class="col-md-12 segment mx-0">
+        <section class="col-md-12 segment segment-image mx-0">
             <h2>Open Reports</h2>
             <transition-group name="list" tag="div" class="row">
                 <report-card
@@ -37,7 +37,7 @@
             <p v-if="!openReports || openReports.length == 0" class="ml-4">No open reports...</p>
         </section>
 
-        <section class="col-md-12 segment mx-0">
+        <section class="col-md-12 segment segment-image mx-0">
             <h2>Closed Reports</h2>
             <transition-group name="list" tag="div" class="row">
                 <report-card

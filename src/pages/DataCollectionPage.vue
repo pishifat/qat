@@ -2,7 +2,7 @@
 
 <div class="row">
     <div class="col-md-12">
-        <section class="segment segment-solid my-1">
+        <section class="segment my-1">
             <small
                 >Search:
                 <input
@@ -32,7 +32,7 @@
                 </select>
             </small>
         </section>
-        <section class="segment segment-solid mx-0">
+        <section class="segment segment-image mx-0">
             <h2>Disqualifications</h2>
             <table class="table table-sm table-dark table-hover col-md-12 mt-2">
                 <thead>
@@ -73,7 +73,7 @@
             </table>
         </section>
 
-        <section class="col-md-12 segment segment-solid mx-0">
+        <section class="col-md-12 segment segment-image mx-0">
             <h2>Pops</h2>
             <table class="table table-sm table-dark table-hover col-md-12 mt-2">
                 <thead>

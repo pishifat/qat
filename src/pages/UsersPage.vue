@@ -23,7 +23,7 @@
             </small>
         </section>
 
-        <section class="row segment mx-0 px-0">
+        <section class="row segment segment-image mx-0 px-0">
             <div class="col-sm-12">
                 <div class="row mx-auto">
                     <button :disabled="!(pre > 0)" class="btn btn-sm btn-nat mx-auto text-center my-2" type="button" @click="showNewer()">

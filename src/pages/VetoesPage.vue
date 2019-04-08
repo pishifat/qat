@@ -27,7 +27,7 @@
                 </button>
             </section>
             
-            <section class="row segment mx-0 px-0">
+            <section class="row segment segment-image mx-0 px-0">
                 <div class="col-sm-12">
                     <div class="row mx-auto">
                         <button

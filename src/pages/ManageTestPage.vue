@@ -1,7 +1,7 @@
 <template>
 
 <div class="row">
-    <section class="row segment segment-solid mb-4">
+    <section class="row segment mb-4">
        <div class="input-group input-group-sm" style="width: 400px">
             <select class="custom-select select-arrow small" id="questionType" style="border-radius: 100px 0 0 100px">
                 <option value='codeOfConduct'>Code of Conduct</option>
@@ -25,7 +25,7 @@
         </div>
         <p v-if="info" class="errors mt-1">{{info}}</p>
     </section>
-    <section v-if="category" class="col-md-12 segment">
+    <section v-if="category" class="col-md-12 segment segment-image">
         <h2>{{category}} Questions 
             <button
             class="btn btn-nat"

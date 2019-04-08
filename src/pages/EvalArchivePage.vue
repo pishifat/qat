@@ -1,7 +1,7 @@
 <template>
 
 <div class="row">
-    <section class="row segment segment-solid mb-4">
+    <section class="row segment mb-4">
         <div class="input-group input-group-sm">
             <input class="form-control form-control-sm" type="text" placeholder="username" id="search" 
                 style="filter: drop-shadow(1px 1px 1px #000000); border-radius: 100px 0 0 100px" 
@@ -12,7 +12,7 @@
         </div>
         <p v-if="info" class="errors mt-1">{{info}}</p> 
     </section>
-    <section class="col-md-12 segment" v-if="queried">
+    <section class="col-md-12 segment segment-image" v-if="queried">
         <h2>Application Evaluations</h2>
         
         <div v-if="appEvals.length">
@@ -30,7 +30,7 @@
         </div>
         <p v-else class="ml-4">None...</p>
     </section>
-    <section class="col-md-12 segment" v-if="queried">
+    <section class="col-md-12 segment segment-image" v-if="queried">
         <h2>BN Evaluations</h2>
         
         <div v-if="bnEvals.length">

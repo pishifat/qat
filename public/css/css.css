@@ -115,7 +115,7 @@ a:hover {
 
 #main {
     visibility: hidden;
-    padding-bottom: 100px;
+    padding-bottom: 50px;
 }
 
 #loading {
@@ -224,23 +224,31 @@ hr {
 }
 
 .segment {
-    background-color: var(--dark-alpha);
+    background-color: var(--dark);
     margin: 1rem 1rem 1rem 1rem;
     padding: 1rem 1rem 1rem 1rem;
     box-shadow: 5px 5px 10px 5px black;
+}
+
+.segment-image {
     background-image: url('../images/footer-triangles.png');
     background-repeat: repeat-x;
     background-position: bottom left;
 }
 
-.segment-solid {
-    background-color: var(--dark);
-    background-image: url();
-}
-
 .navbar-nat {
     background-image: linear-gradient(#226161d1, transparent);
     padding-bottom: 20px;
+    z-index: 1;
+}
+
+@media (max-width: 768px) {
+    .navbar-nat {
+        background-color: #363636;
+        background-image: none;
+        border-bottom: 3px solid #226161d1;
+        padding-bottom: 0;
+    }
 }
 
 .text-input,

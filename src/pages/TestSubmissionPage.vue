@@ -11,7 +11,7 @@
     </div>
 
     <div v-if="test" id="fullTest">
-        <div class="segment segment-solid test-question">
+        <div class="segment segment-image test-question">
             <p>The purpose of this test is to show your understanding of the 
                 <a href="https://osu.ppy.sh/wiki/Ranking_Criteria" target="_blank">Ranking Criteria</a>, the 
                 <a href="https://osu.ppy.sh/help/wiki/People/Beatmap_Nominators/Rules" target="_blank">Beatmap Nominator Rules</a>, and the 
@@ -27,12 +27,12 @@
 
         <hr>
         
-        <p class="text-center segment segment-solid">
+        <p class="text-center segment">
             User: {{ test.applicant.username }} - 
             Mode: {{ test.mode }}
         </p>
 
-        <div class="segment test-question" v-for="(answer, i) in test.answers" :key="answer.id">
+        <div class="segment segment-image test-question" v-for="(answer, i) in test.answers" :key="answer.id">
             <small class="float-right">Q{{ ++i }} -- {{ answer.question.category }}</small>
             <div v-if="answer.question.questionType === 'text' || answer.question.questionType === 'image'">
                 <h5 style="width: 90%">{{ answer.question.content }}</h5>
