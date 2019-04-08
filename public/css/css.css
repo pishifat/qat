@@ -375,6 +375,14 @@ input[type=number] {
     border-color: var(--nat-logo);
 }
 
+/* 
+// TODO maybe
+.btn-nat:hover {
+    background-color: var(--available);
+    border-color: var(--available);
+} 
+*/
+
 .btn-nat-red {
     background-color: var(--nat-light);
     border-color: var(--nat-light);
