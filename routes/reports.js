@@ -26,9 +26,12 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
     if (!u) {
         return res.json({ error: 'Cannot find user! Make sure you spelled it correctly' });
     }
+    if (u.group == 'user') {
+        return res.json({ error: 'User is not a member of the BN/NAT!' });
+    }
     await reportsService.create(req.session.mongoId, u.id, req.body.reason);
     res.json({});
-    let anon = await usersService.query({ username: 'pishifat' });
+    let anon = await usersService.query({ username: 'Anonymous' });
     logsService.create(
         anon.id,
         `Reported "${u.username}" for reason "${
