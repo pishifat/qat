@@ -4,6 +4,7 @@ const bnAppsService = require('../models/bnApp.js').service;
 const evalRoundsService = require('../models/evalRound').service;
 const logsService = require('../models/log.js').service;
 const testSubmissionService = require('../models/bnTest/testSubmission').service;
+const axios = require('axios');
 const cheerio = require('cheerio');
 const helper = require('../routes/helper');
 

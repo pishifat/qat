@@ -96,10 +96,6 @@ a {
     font-weight: bold;
 }
 
-.main-text {
-    color: var(--main-text) !important;
-}
-
 a:hover {
     color: var(--clicked);
     text-decoration: none;
@@ -211,7 +207,7 @@ hr {
 /* SPECIFICS */
 
 .main-text{
-    color: var(--main-text);
+    color: var(--main-text) !important;
 }
 
 .secondary-text{

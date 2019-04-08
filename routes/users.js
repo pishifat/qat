@@ -31,7 +31,7 @@ router.get('/relevantInfo', async (req, res, next) => {
 });
 
 /* POST submit or edit eval */
-router.post('/switchMediator/', api.isLoggedIn, async (req, res) => {
+router.post('/switchMediator/', api.isBnOrNat, async (req, res) => {
     let u = await usersService.update(req.session.mongoId, {
         vetoMediator: !res.locals.userRequest.vetoMediator,
     });
@@ -40,7 +40,7 @@ router.post('/switchMediator/', api.isLoggedIn, async (req, res) => {
 });
 
 /* POST switch usergroup */
-router.post('/switchGroup/:id', api.isLoggedIn, async (req, res) => {
+router.post('/switchGroup/:id', api.isNat, async (req, res) => {
     let u = await usersService.update(req.params.id, { group: req.body.group,  probation: [], $push: {bnDuration: new Date(), natDuration: new Date()} });
     res.json(u);
     logsService.create(

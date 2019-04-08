@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema({
     vetoMediator: { type: Boolean, default: true },
     bnDuration: [{ type: Date }],
     natDuration: [{ type: Date }],
+    isLeader: { type: Boolean }
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 const User = mongoose.model('User', userSchema);

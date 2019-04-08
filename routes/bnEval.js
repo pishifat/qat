@@ -33,7 +33,7 @@ const defaultPopulate = [
     },
     {
         innerPopulate: 'evaluations',
-        populate: { path: 'evaluator', select: 'username osuId' },
+        populate: { path: 'evaluator', select: 'username osuId isLeader' },
     },
 ];
 

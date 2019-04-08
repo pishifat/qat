@@ -3,7 +3,7 @@
 <div class="row">
     <div class="col-md-12">
         <section class="row segment my-1 mx-4">
-            <div class="d-flex align-items-md-center align-items-stretch justify-content-start flex-md-row flex-column">
+            <div class="d-flex align-items-md-center align-items-stretch flex-md-row flex-column">
                 <small>Search: </small>
                 <small class="ml-2 mt-1 mt-md-0">
                     <input id="search" class="text-input" v-model="filterValue" type="text" placeholder="username... (3+ characters)" />
@@ -22,8 +22,8 @@
                 </small>
             </div>
         </section>
-        <section class="row segment my-1 mx-4">
-            <div class="d-flex align-items-md-center align-items-stretch justify-content-start flex-md-row flex-column">
+        <section class="row segment my-1 mx-4" v-if="evaluator && evaluator.isLeader">
+            <div class="d-flex align-items-md-center align-items-stretch flex-md-row flex-column">
                 <small>Mark selected as:</small>
                 <small class="ml-2 mt-1 mt-md-0">
                     <button class="btn btn-nat btn-sm w-100" @click="setGroupEval($event)">Group evaluation</button>

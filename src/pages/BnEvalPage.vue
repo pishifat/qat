@@ -17,12 +17,12 @@
                         <option value="mania">osu!mania</option>
                     </select>
                 </small> 
-                <small>
-                    <button class="btn btn-nat btn-sm ml-2" @click="selectAll($event)">Select all</button>
+                <small class="ml-2 mt-1 mt-md-0">
+                    <button class="btn btn-nat btn-sm w-100" @click="selectAll($event)">Select all</button>
                 </small>
             </div>
         </section>
-        <section class="row segment my-1 mx-4 px-0">
+        <section class="row segment my-1 mx-4" v-if="evaluator && evaluator.isLeader">
             <div class="d-flex align-items-md-center align-items-stretch flex-md-row flex-column">
                 <small>Mark selected as:</small>
                 <small class="ml-2 mt-1 mt-md-0">
