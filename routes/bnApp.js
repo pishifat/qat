@@ -34,6 +34,10 @@ router.get('/mods', async (req, res, next) => {
 /* POST a bn application */
 router.post('/apply', async (req, res, next) => {
     if (req.session.mongoId) {
+        if(res.locals.userRequest.modes.indexOf(req.body.mode) >= 0){
+            return res.json({ error: `You're already a BN for this game mode!`});
+        }
+
         // Check user kudosu total count & mod score
         const [userInfo, modScore] = await Promise.all([
             await api.getUserInfo(req.session.accessToken),
