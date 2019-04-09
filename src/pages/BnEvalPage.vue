@@ -9,7 +9,7 @@
                     <input id="search" class="text-input" v-model="filterValue" type="text" placeholder="username... (3+ characters)" /> 
                 </small>
                 <small class="ml-2 mt-1 mt-md-0">
-                    <select class="custom-select inline-custom-select w-100" id="mode" v-model="filterMode">
+                    <select class="custom-select w-100" id="mode" v-model="filterMode">
                         <option value="" selected>All modes</option>
                         <option value="osu">osu!</option>
                         <option value="taiko">osu!taiko</option>
@@ -17,9 +17,8 @@
                         <option value="mania">osu!mania</option>
                     </select>
                 </small> 
-                <small class="ml-2 mt-1 mt-md-0">
+                <small class="ml-2 mt-1 mt-md-0" v-if="evaluator && evaluator.isLeader">
                     <button
-                        v-if="evaluator && evaluator.isLeader"
                         class="btn btn-nat btn-sm w-100" 
                         @click="selectAll($event)"
                     >Select all</button>

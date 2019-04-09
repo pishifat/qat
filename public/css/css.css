@@ -125,38 +125,20 @@ a:hover {
 }
 
 @-moz-keyframes loading {
-    from {
-        width: 120px;
-        height: 120px;
-    }
     to {
-        width: 150px;
-        height: 150px;
         box-shadow: 10px 10px 15px 0px #333;
         -webkit-transform: rotate(360deg);
     }
 }
 
 @-webkit-keyframes loading {
-    from {
-        width: 120px;
-        height: 120px;
-    }
     to {
-        width: 150px;
-        height: 150px;
         box-shadow: 10px 10px 15px 0px #333;
         -webkit-transform: rotate(360deg);
     }
 }
 @keyframes loading {
-    from {
-        width: 120px;
-        height: 120px;
-    }
     to {
-        width: 150px;
-        height: 150px;
         box-shadow: 10px 10px 15px 0px #333;
         transform:rotate(360deg);
     }
@@ -165,8 +147,8 @@ a:hover {
 #loading img {
     vertical-align: middle;
     border-radius: 100%; 
-    width: 100px;
-    height: 100px;
+    width: 200px;
+    height: 200px;
     -moz-animation: loading 1.5s ease-out infinite alternate;
     -webkit-animation: loading 1.5s ease-out infinite alternate;
     animation: loading 1.5s ease-out infinite alternate;
@@ -249,9 +231,10 @@ hr {
 
 .text-input,
 .text-input:focus {
+    height: 2.5em;
     min-width: 200px;
     background-color: var(--darker);
-    color: #f8f9fa;
+    color: var(--main-text);
     border-color: var(--dark);
     border-width: 1px;
     filter: drop-shadow(1px 1px 1px #000000);
@@ -270,8 +253,9 @@ hr {
 
 input[type='text'],
 input[type='text']:focus {
+    height: 2.5em;
     background-color: var(--darker);
-    color: white;
+    color: var(--main-text);
     border-color: var(--dark);
     border-width: 1px;
     filter: drop-shadow(1px 1px 1px #000000);
@@ -293,23 +277,10 @@ input[type=number] {
     width: 7.5rem;
     height: 2.5em;
     background-color: var(--darker);
-    color: white;
+    color: var(--main-text);
     border-color: var(--dark);
     border-radius: 100px;
     filter: drop-shadow(1px 1px 1px #000000);
-    /* arrow */
-    background-image: linear-gradient(45deg, transparent 50%, gray 50%),
-        linear-gradient(135deg, gray 50%, transparent 50%);
-    background-position: calc(100% - 10px) calc(0.75em), calc(100% - 5px) calc(0.75em),
-        calc(100% - 2.5em) 0.5em;
-    background-size: 5px 5px, 5px 5px, 1px 1.5em;
-    background-repeat: no-repeat;
-}
-
-.inline-custom-select {
-    height: 26px;
-    padding: 0 0 0 0.75rem;
-    padding-right: 2rem
 }
 
 .text-shadow {

@@ -13,7 +13,7 @@
                     />
                 </small>
                 <small class="ml-1">
-                    <select class="custom-select inline-custom-select" id="mode" v-model="filterMode">
+                    <select class="custom-select" id="mode" v-model="filterMode">
                         <option class="ml-2" value="" selected>All modes</option>
                         <option class="ml-2" value="osu">osu!</option>
                         <option class="ml-2" value="taiko">osu!taiko</option>

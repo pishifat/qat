@@ -6,7 +6,7 @@
                 <input id="search" class="text-input" v-model="filterValue" type="text" placeholder="username... (3+ characters)" /> 
             </small>
             <small>
-                <select class="custom-select inline-custom-select ml-2" id="mode" v-model="filterMode">
+                <select class="custom-select ml-2" id="mode" v-model="filterMode">
                     <option value="" selected>All modes</option>
                     <option value="osu">osu!</option>
                     <option value="taiko">osu!taiko</option>

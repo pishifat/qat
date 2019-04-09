@@ -125,4 +125,14 @@ async function isNat(req, res, next) {
     }
 }
 
-module.exports = { isLoggedIn, getToken, getUserInfo, beatmapsetInfo, isBnOrNat, isNat };
+async function isLeader(req, res, next) {
+    const u = res.locals.userRequest;
+    
+    if (u.isLeader) {
+        next();
+    } else {
+        res.redirect('/');
+    }
+}
+
+module.exports = { isLoggedIn, getToken, getUserInfo, beatmapsetInfo, isBnOrNat, isNat, isLeader };

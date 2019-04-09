@@ -14,7 +14,7 @@
                 />
             </small>
             <small class="ml-1">
-                <select class="custom-select inline-custom-select" id="validity" v-model="filterVote">
+                <select class="custom-select" id="validity" v-model="filterVote">
                     <option class="ml-2" value="" selected>All statuses</option>
                     <option class="ml-2" value="1">Valid</option>
                     <option class="ml-2" value="2">Partial</option>

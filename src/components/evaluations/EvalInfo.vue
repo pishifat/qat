@@ -151,19 +151,19 @@
                         <div class="col-sm-12 mb-2">
                             <span class="mr-3 text-shadow">Vote:</span>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="vote" id="1" value="1" :checked="vote == 1">
+                                <input class="form-check-input" type="radio" name="vote" id="1" value="1" v-model="vote">
                                 <label class="form-check-label text-shadow vote-pass" for="1">Pass</label>
                             </div>
                             <div v-if="application" class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="vote" id="2" value="2" :checked="vote == 2">
+                                <input class="form-check-input" type="radio" name="vote" id="2" value="2" v-model="vote">
                                 <label class="form-check-label text-shadow vote-neutral" for="2">Neutral</label>
                             </div>
                             <div v-else class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="vote" id="2" value="2" :checked="vote == 2">
+                                <input class="form-check-input" type="radio" name="vote" id="2" value="2" v-model="vote">
                                 <label class="form-check-label text-shadow vote-extend" for="2">Extend</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="vote" id="3" value="3" :checked="vote == 3">
+                                <input class="form-check-input" type="radio" name="vote" id="3" value="3" v-model="vote">
                                 <label class="form-check-label text-shadow vote-fail" for="3">Fail</label>
                             </div>
                         </div>
@@ -207,7 +207,7 @@ export default {
             this.behaviorComment = '';
             this.moddingComment = '';
             this.vote = 0;
-            $("input[name=vote]").prop("checked",false);
+            // $("input[name=vote]").prop("checked",false);
 
             if(this.application){
                 this.application.evaluations.forEach(ev => {
@@ -262,15 +262,14 @@ export default {
 
         //action
         submitEval: async function (e) {
-            const vote = $('input[name=vote]:checked').val();
-            if(!vote || !this.behaviorComment.length || !this.moddingComment.length){
+            if(!this.vote || !this.behaviorComment.length || !this.moddingComment.length){
                 this.info = 'Cannot leave fields blank!'
             }else{
                 if(this.application){
                     const a = await this.executePost(
                         '/appEval/submitEval/' + this.application.id, 
                         { evaluationId: this.evaluationId, 
-                        vote: vote, 
+                        vote: this.vote, 
                         behaviorComment: this.behaviorComment, 
                         moddingComment: this.moddingComment
                         }, e);
@@ -291,7 +290,7 @@ export default {
                     const er = await this.executePost(
                         '/bnEval/submitEval/' + this.evalRound.id, 
                         { evaluationId: this.evaluationId, 
-                        vote: vote, 
+                        vote: this.vote, 
                         behaviorComment: this.behaviorComment, 
                         moddingComment: this.moddingComment
                         }, e);

@@ -70,11 +70,16 @@
                             </h5>
                             <div v-if="discussApp.consensus && !readOnly">
                                 <hr>
-                                <p class="text-shadow min-spacing mb-2">Application feedback: <button class="btn btn-sm btn-nat" @click="setFeedback($event);">Generate Feedback PM</button></p>
+                                <p class="text-shadow min-spacing mb-2">
+                                    Application feedback: <button class="btn btn-sm btn-nat" @click="setFeedback($event);">Generate Feedback PM</button>
+                                    <button class="btn btn-sm btn-nat float-right" data-toggle="collapse" data-target="#forumPmBox">
+                                        See full message <i class="fas fa-angle-down"></i>
+                                    </button>
+                                </p>
                                 <div class="form-group">
                                     <textarea class="form-control dark-textarea" style="white-space: pre-line;" v-model="feedback"></textarea>
                                 </div>
-                                <div v-if="discussApp.consensus == 'pass'" class="copy-paste">
+                                <div v-if="discussApp.consensus == 'pass'" id="forumPmBox" class="copy-paste collapse">
                                     <samp class="small">Hello!</samp><br><br>
                                     <samp class="small">Following a positive evaluation of your {{discussApp.mode}} BN application, you've been invited to join the Beatmap Nominators. Congratulations!</samp><br><br>
                                     <samp class="small">[notice][b]Important information:[/b]</samp><br>

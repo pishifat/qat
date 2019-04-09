@@ -2,7 +2,7 @@
 <div v-if="testList">
     <div v-if="!test">
         <small>
-            <select class="custom-select inline-custom-select" v-model="selectedTest">
+            <select class="custom-select" v-model="selectedTest">
                 <option v-for="pendingTest in testList" :key="pendingTest.id" :value="pendingTest.id">{{ pendingTest.mode }}</option>
             </select>
         </small>

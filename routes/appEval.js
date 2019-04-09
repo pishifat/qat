@@ -74,7 +74,7 @@ router.post('/submitEval/:id', async (req, res) => {
 });
 
 /* POST set group eval */
-router.post('/setGroupEval/', async (req, res) => {
+router.post('/setGroupEval/', api.isLeader, async (req, res) => {
     for (let i = 0; i < req.body.checkedApps.length; i++) {
         await bnAppsService.update(req.body.checkedApps[i], { discussion: true });
     }
@@ -88,7 +88,7 @@ router.post('/setGroupEval/', async (req, res) => {
 });
 
 /* POST set invidivual eval */
-router.post('/setIndividualEval/', async (req, res) => {
+router.post('/setIndividualEval/', api.isLeader, async (req, res) => {
     for (let i = 0; i < req.body.checkedApps.length; i++) {
         await bnAppsService.update(req.body.checkedApps[i], { discussion: false });
     }

@@ -14,7 +14,7 @@
                 />
             </small>
             <small class="ml-1">
-                <select class="custom-select inline-custom-select" id="mode" v-model="filterMode">
+                <select class="custom-select" id="mode" v-model="filterMode">
                     <option class="ml-2" value="" selected>All modes</option>
                     <option class="ml-2" value="osu">osu!</option>
                     <option class="ml-2" value="taiko">osu!taiko</option>
@@ -23,7 +23,7 @@
                 </select>
             </small>
             <small class="ml-1">
-                <select class="custom-select inline-custom-select" id="validity" v-model="filterVote">
+                <select class="custom-select" id="validity" v-model="filterVote">
                     <option class="ml-2" value="" selected>All statuses</option>
                     <option class="ml-2" value="1">Valid</option>
                     <option class="ml-2" value="2">Partial</option>
@@ -121,7 +121,7 @@
                         <p class="text-shadow small ml-4">{{selectedEntry.content}}</p>
                         <p class="text-shadow" for="newReason">New reason:</p>
                         <small>
-                            <select class="custom-select inline-custom-select w-100" id="reasonSelect">
+                            <select class="custom-select w-100" id="reasonSelect">
                                 <option class="ml-2" value="" selected>Reason selection...</option>
                                 <option class="ml-2" value="">GENERAL</option>
                                 <option class="ml-2 text-secondary" value="reason">Requested</option>

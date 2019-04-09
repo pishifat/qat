@@ -72,7 +72,7 @@
                         />
                     </div>
                     <small v-if="question.category == 'metadata'">
-                        <select class="custom-select inline-custom-select" id="metadataType" style="min-width: 150px">
+                        <select class="custom-select" id="metadataType" style="min-width: 150px">
                             <option value="title" selected>Title</option>
                             <option value="titleUnicode" selected>Unicode Title</option>
                             <option value="artist" selected>Artist</option>
