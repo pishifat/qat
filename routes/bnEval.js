@@ -40,7 +40,7 @@ const defaultPopulate = [
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res, next) => {
     const [er, r] = await Promise.all([
-        await evalRoundsService.query({ active: true }, defaultPopulate, { createdAt: 1 }, true),
+        await evalRoundsService.query({ active: true }, defaultPopulate, { deadline: -1 }, true),
         await reportsService.query(
             { valid: { $exists: true, $ne: 3 }, feedback: { $exists: true, $nin: '' } },
             {},
@@ -213,7 +213,7 @@ router.post('/addEvalRounds/', async (req, res) => {
             );
         }
     }
-    let ers = await evalRoundsService.query({ active: true }, defaultPopulate, { createdAt: 1 }, true);
+    let ers = await evalRoundsService.query({ active: true }, defaultPopulate, { deadline: -1 }, true);
     res.json({ ers: ers, failed: failed });
     logsService.create(
         req.session.mongoId,
@@ -252,7 +252,7 @@ router.post('/setGroupEval/', async (req, res) => {
         await evalRoundsService.update(req.body.checkedRounds[i], { discussion: true });
     }
 
-    let ev = await evalRoundsService.query({ active: true }, defaultPopulate, { createdAt: 1 }, true);
+    let ev = await evalRoundsService.query({ active: true }, defaultPopulate, { deadline: 1 }, true);
     res.json(ev);
     logsService.create(
         req.session.mongoId,
@@ -266,7 +266,7 @@ router.post('/setIndividualEval/', async (req, res) => {
         await evalRoundsService.update(req.body.checkedRounds[i], { discussion: false });
     }
 
-    let ev = await evalRoundsService.query({ active: true }, defaultPopulate, { createdAt: 1 }, true);
+    let ev = await evalRoundsService.query({ active: true }, defaultPopulate, { deadline: 1 }, true);
     res.json(ev);
     logsService.create(
         req.session.mongoId,
@@ -289,8 +289,13 @@ router.post('/setComplete/', async (req, res) => {
             }
         }
 
-        if (er.consensus == 'extend' && u.probation.indexOf(er.mode) < 0) {
-            await usersService.update(u.id, { $push: { probation: er.mode } });
+        if (er.consensus == 'extend') {
+            if(u.probation.indexOf(er.mode) < 0){
+                await usersService.update(u.id, { $push: { probation: er.mode } });
+            }
+            let deadline = new Date();
+            deadline.setDate(deadline.getDate() + 40);
+            await evalRoundsService.create(er.bn, er.mode, deadline);
         }
 
         if (er.consensus == 'pass') {
@@ -304,7 +309,7 @@ router.post('/setComplete/', async (req, res) => {
         );
     }
 
-    let ev = await evalRoundsService.query({ active: true }, defaultPopulate, { createdAt: 1 }, true);
+    let ev = await evalRoundsService.query({ active: true }, defaultPopulate, { deadline: 1 }, true);
     res.json(ev);
     logsService.create(
         req.session.mongoId,

@@ -137,7 +137,7 @@ export default {
             }
 
             let y = new Date().getFullYear();
-            let m = $('#month').val();
+            let m = $('#month').val() - 1;
             let d = $('#day').val();
             let deadline = new Date(y, m, d);
             if (!(deadline instanceof Date) || isNaN(deadline)) {
@@ -167,15 +167,19 @@ export default {
                 } else {
                     this.$emit('update-all-eval-rounds', result.ers);
                     this.$parent.allEvalRounds = result.ers;
-                    this.confirm = 'Eval rounds added! ';
-                    if (result.failed.length) {
-                        this.confirm += 'However, the following usernames could not be processed: ';
-                        for (let i = 0; i < result.failed.length; i++) {
-                            this.confirm += result.failed[i];
-                            if (i + 1 != result.failed.length) {
-                                this.confirm += ', ';
+                    if(result.ers.length){
+                        this.confirm = 'Eval rounds added! ';
+                        if (result.failed.length) {
+                            this.confirm += 'However, the following usernames could not be processed: ';
+                            for (let i = 0; i < result.failed.length; i++) {
+                                this.confirm += result.failed[i];
+                                if (i + 1 != result.failed.length) {
+                                    this.confirm += ', ';
+                                }
                             }
                         }
+                    }else{
+                        this.confirm = 'No eval rounds were added! If you were trying to add specific users, re-check your spelling.';
                     }
                 }
             }

@@ -2,6 +2,7 @@ const express = require('express');
 const api = require('../models/api');
 const bnAppsService = require('../models/bnApp').service;
 const evalsService = require('../models/evaluation').service;
+const evalRoundsService = require('../models/evalRound').service;
 const usersService = require('../models/user').service;
 const logsService = require('../models/log').service;
 
@@ -78,7 +79,7 @@ router.post('/setGroupEval/', async (req, res) => {
         await bnAppsService.update(req.body.checkedApps[i], { discussion: true });
     }
 
-    let a = await bnAppsService.query({ active: true }, defaultPopulate, { createdAt: 1 }, true);
+    let a = await bnAppsService.query({ active: true }, defaultPopulate, { deadline: 1 }, true);
     res.json(a);
     logsService.create(
         req.session.mongoId,
@@ -92,7 +93,7 @@ router.post('/setIndividualEval/', async (req, res) => {
         await bnAppsService.update(req.body.checkedApps[i], { discussion: false });
     }
 
-    let a = await bnAppsService.query({ active: true }, defaultPopulate, { createdAt: 1 }, true);
+    let a = await bnAppsService.query({ active: true }, defaultPopulate, { deadline: 1 }, true);
     res.json(a);
     logsService.create(
         req.session.mongoId,
@@ -108,6 +109,9 @@ router.post('/setComplete/', async (req, res) => {
         if (a.consensus == 'pass') {
             await usersService.update(u.id, { $push: { modes: a.mode } });
             await usersService.update(u.id, { $push: { probation: a.mode } });
+            let deadline = new Date();
+            deadline.setDate(deadline.getDate() + 40);
+            await evalRoundsService.create(a.applicant, a.mode, deadline);
             if (u.group == 'user') {
                 await usersService.update(u.id, { group: 'bn' });
                 await usersService.update(u.id, { $push: {bnDuration: new Date() }});
@@ -120,7 +124,7 @@ router.post('/setComplete/', async (req, res) => {
         );
     }
 
-    let a = await bnAppsService.query({ active: true }, defaultPopulate, { createdAt: 1 }, true);
+    let a = await bnAppsService.query({ active: true }, defaultPopulate, { deadline: 1 }, true);
     res.json(a);
     logsService.create(
         req.session.mongoId,
