@@ -66,7 +66,7 @@ async function cycleModes(userId, modes, deadline, osu, taiko, ctb, mania) {
 }
 
 /* POST submit or edit eval */
-router.post('/addEvalRounds/', async (req, res) => {
+router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
     let fullBns = [];
     let probationBns = [];
     let nat = [];
@@ -247,7 +247,7 @@ router.post('/submitEval/:id', async (req, res) => {
 });
 
 /* POST set group eval */
-router.post('/setGroupEval/', async (req, res) => {
+router.post('/setGroupEval/', api.isLeader, async (req, res) => {
     for (let i = 0; i < req.body.checkedRounds.length; i++) {
         await evalRoundsService.update(req.body.checkedRounds[i], { discussion: true });
     }
@@ -261,7 +261,7 @@ router.post('/setGroupEval/', async (req, res) => {
 });
 
 /* POST set invidivual eval */
-router.post('/setIndividualEval/', async (req, res) => {
+router.post('/setIndividualEval/', api.isLeader, async (req, res) => {
     for (let i = 0; i < req.body.checkedRounds.length; i++) {
         await evalRoundsService.update(req.body.checkedRounds[i], { discussion: false });
     }
@@ -275,7 +275,7 @@ router.post('/setIndividualEval/', async (req, res) => {
 });
 
 /* POST set evals as complete */
-router.post('/setComplete/', async (req, res) => {
+router.post('/setComplete/', api.isLeader, async (req, res) => {
     for (let i = 0; i < req.body.checkedRounds.length; i++) {
         let er = await evalRoundsService.query({ _id: req.body.checkedRounds[i] });
         let u = await usersService.query({ _id: er.bn });
@@ -318,7 +318,7 @@ router.post('/setComplete/', async (req, res) => {
 });
 
 /* POST set consensus of eval */
-router.post('/setConsensus/:id', async (req, res) => {
+router.post('/setConsensus/:id', api.isLeader, async (req, res) => {
     await evalRoundsService.update(req.params.id, { consensus: req.body.consensus });
     let ev = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(ev);

@@ -101,6 +101,7 @@ router.get('/', async (req, res, next) => {
         isBnApp: true,
         loggedInAs: req.session.mongoId,
         isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat',
+        isBnEvaluator: res.locals.userRequest.group == 'bn' && res.locals.userRequest.isBnEvaluator,
         isNat: res.locals.userRequest.group == 'nat',
         pendingTest: test,
     });

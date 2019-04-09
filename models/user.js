@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
     modes: [{ type: String, enum: ["osu", "taiko", "catch", "mania"] }],
     probation: [{ type: String, enum: ["osu", "taiko", "catch", "mania"] }],
     vetoMediator: { type: Boolean, default: true },
+    isBnEvaluator: { type: Boolean, default: true },
     bnDuration: [{ type: Date }],
     natDuration: [{ type: Date }],
     isLeader: { type: Boolean }

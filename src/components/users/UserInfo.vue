@@ -27,7 +27,8 @@
                         <li class="small" v-for="(date, i) in user.natDuration" :key="date">{{i % 2 == 0 ? 'Joined' : 'Left'}}: {{date.slice(0,10)}}</li>
                     </ul>
                 </div>
-                <p v-if="user.id == userId" class="text-shadow">Veto Mediation: 
+                <span v-if="user.id == userId">
+                <p class="text-shadow">Veto Mediation: 
                     <button 
                         class="btn btn-sm justify-content-center" 
                         :class="{ 'btn-nat': !user.vetoMediator, 'btn-nat-red': user.vetoMediator }" 
@@ -36,6 +37,16 @@
                         {{user.vetoMediator ? 'Opt-out' : 'Opt-in'}}
                     </button>
                 </p>
+                <p v-if="user.group != 'nat'" class="text-shadow">BN Evaluation: 
+                    <button 
+                        class="btn btn-sm justify-content-center" 
+                        :class="{ 'btn-nat': !user.isBnEvaluator, 'btn-nat-red': user.isBnEvaluator }" 
+                        @click="switchBnEvaluator($event)"
+                    >
+                        {{user.isBnEvaluator ? 'Opt-out' : 'Opt-in'}}
+                    </button>
+                </p>
+                </span>
                 <hr>
                 <span v-if="isLeader">
                 <button
@@ -84,6 +95,17 @@ export default {
         //real
         switchMediator: async function(e){
             const u = await this.executePost('/users/switchMediator/', {}, e);
+            if(u){
+                if (u.error) {
+                    this.info = u.error
+                } else {
+                    this.$emit('update-user', u);
+                }
+            }
+        },
+        switchBnEvaluator: async function(e){
+            const u = await this.executePost('/users/switchBnEvaluator/', {}, e);
+            console.log(u)
             if(u){
                 if (u.error) {
                     this.info = u.error

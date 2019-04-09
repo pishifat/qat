@@ -16,6 +16,7 @@ router.get('/', async (req, res, next) => {
         script: '../js/reports.js',
         isReports: true,
         isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat',
+        isBnEvaluator: res.locals.userRequest.group == 'bn' && res.locals.userRequest.isBnEvaluator,
         isNat: res.locals.userRequest.group == 'nat',
     });
 });

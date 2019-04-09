@@ -15,6 +15,7 @@ router.get('/', async (req, res, next) => {
         script: '../javascripts/users.js',
         isUsers: true,
         isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat',
+        isBnEvaluator: res.locals.userRequest.group == 'bn' && res.locals.userRequest.isBnEvaluator,
         isNat: res.locals.userRequest.group == 'nat',
     });
 });
@@ -36,11 +37,20 @@ router.post('/switchMediator/', api.isBnOrNat, async (req, res) => {
         vetoMediator: !res.locals.userRequest.vetoMediator,
     });
     res.json(u);
-    logsService.create(req.session.mongoId, `Opted ${u.vetoMediator ? 'in to' : 'out of'}  veto mediation`);
+    logsService.create(req.session.mongoId, `Opted ${u.vetoMediator ? 'in to' : 'out of'} veto mediation`);
+});
+
+/* POST submit or edit eval */
+router.post('/switchBnEvaluator/', api.isBnOrNat, async (req, res) => {
+    let u = await usersService.update(req.session.mongoId, {
+        isBnEvaluator: !res.locals.userRequest.isBnEvaluator,
+    });
+    res.json(u);
+    logsService.create(req.session.mongoId, `Opted ${u.isBnEvaluator ? 'in to' : 'out of'} optional BN app evaluation input`);
 });
 
 /* POST switch usergroup */
-router.post('/switchGroup/:id', api.isNat, async (req, res) => {
+router.post('/switchGroup/:id', api.isLeader, async (req, res) => {
     let u = await usersService.update(req.params.id, { group: req.body.group,  probation: [], $push: {bnDuration: new Date(), natDuration: new Date()} });
     res.json(u);
     logsService.create(

@@ -135,4 +135,14 @@ async function isLeader(req, res, next) {
     }
 }
 
-module.exports = { isLoggedIn, getToken, getUserInfo, beatmapsetInfo, isBnOrNat, isNat, isLeader };
+async function isBnEvaluator(req, res, next) {
+    const u = res.locals.userRequest;
+    
+    if (u.isBnEvaluator || u.group == 'nat') {
+        next();
+    } else {
+        res.redirect('/');
+    }
+}
+
+module.exports = { isLoggedIn, getToken, getUserInfo, beatmapsetInfo, isBnOrNat, isNat, isLeader, isBnEvaluator };

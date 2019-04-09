@@ -33,6 +33,27 @@
                                     {{application.test.totalScore || application.test.totalScore >= 0 ? application.test.totalScore + '/20' : 'incomplete'}}
                                 </span>
                             </p>
+                            <p class="text-shadow" v-if="application.bnEvaluators.length && evaluator.group == 'nat'">BN Evaluators: {{application.bnEvaluators.length}}</p>
+                            <div v-if="evaluator.isLeader && !application.bnEvaluators.length">
+                                <button class="btn btn-sm btn-nat mb-2" @click="selectBnEvaluators($event)">{{tempBnEvaluators ? 'Re-select BN Evaluators' : 'Select BN Evaluators'}}</button> 
+                                <button v-if="tempBnEvaluators" class="btn btn-sm btn-nat-red mb-2" @click="enableBnEvaluators($event)">Enable BN Evaluations</button>
+                                <div v-if="tempBnEvaluators" class="text-shadow">
+                                    <p>Users:</p>
+                                    <div id="usernames" class="copy-paste mb-4" style="width: 25%">
+                                        <ul style="list-style-type: none; padding: 0">
+                                            <li v-for="user in tempBnEvaluators" :key="user.id"><samp class="small">{{user.username}}</samp></li>
+                                        </ul>
+                                    </div>
+                                    <p>Forum message:</p>
+                                    <div id="forumMessage" class="copy-paste">
+                                        <samp class="small">Hello!</samp><br><br>
+                                        <samp class="small">You have been selected to help evaluate the {{application.mode}} BN application for [url=https://osu.ppy.sh/users/{{application.applicant.osuId}}]{{ application.applicant.username }}[/url].</samp><br><br>
+                                        <samp class="small">Please post your opinion regarding the applicant's behavior and modding quality (based on submitted mods and anything else you may know) on the [url=http://bn.mappersguild.com/appeval]BN/NAT website[/url] in [b]one week[/b]. Your decision will be anonymous to everyone but members of the NAT.</samp><br><br>
+                                        <samp class="small">If you do not want to participate in BN application evaluations, opt-out from the [url=http://bn.mappersguild.com/users]users page[/url].</samp><br><br>
+                                        <samp class="small">Thank you for your hard work!</samp><br><br>
+                                    </div>
+                                </div>
+                            </div>
                             <hr>
                         </div>
 
@@ -190,6 +211,7 @@ export default {
         application: function() {
             this.info = '';
             this.confirm = '';
+            this.tempBnEvaluators = null;
             this.findRelevantEval();
         },
         evalRound: function() {
@@ -309,6 +331,27 @@ export default {
                 }
                 
             }
+        },
+        selectBnEvaluators: async function(e) {
+            const r = await this.executePost('/appeval/selectBnEvaluators', {mode: this.application.mode}, e);
+            if (r) {
+                if (r.error) {
+                    this.info = r.error;
+                } else {
+                    this.tempBnEvaluators = r;
+                }
+            }
+        },
+        enableBnEvaluators: async function (e) {
+            const a = await this.executePost('/appEval/enableBnEvaluators/' + this.application.id, { bnEvaluators: this.tempBnEvaluators }, e);
+            if (a) {
+                if (a.error) {
+                    this.info = a.error;
+                } else {
+                    await this.$emit('update-application', a);
+                    this.confirm = "Evaluations by selected BNs have been enabled!"
+                }
+            }
 		},
     },
     data() {
@@ -324,7 +367,8 @@ export default {
             pops: null,
             dqs: null,
             nomsPopped: null,
-            nomsDqd: null
+            nomsDqd: null,
+            tempBnEvaluators: null,
         };
     },
 }

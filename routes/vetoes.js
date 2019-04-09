@@ -23,6 +23,7 @@ router.get('/', async (req, res, next) => {
         script: '../javascripts/vetoes.js',
         isVetoes: true,
         isBnOrNat: true,
+        isBnEvaluator: res.locals.userRequest.group == 'bn' && res.locals.userRequest.isBnEvaluator,
         isNat: res.locals.userRequest.group == 'nat',
     });
 });
@@ -99,7 +100,7 @@ router.post('/selectMediators', async (req, res, next) => {
 });
 
 /* POST begin mediation */
-router.post('/beginMediation/:id', async (req, res, next) => {
+router.post('/beginMediation/:id', api.isLeader, async (req, res, next) => {
     for (let i = 0; i < req.body.mediators.length; i++) {
         let mediator = req.body.mediators[i];
         let m = await mediationsService.create(mediator._id);
@@ -125,7 +126,7 @@ router.post('/submitMediation/:id', async (req, res, next) => {
 });
 
 /* POST submit mediation */
-router.post('/concludeMediation/:id', async (req, res, next) => {
+router.post('/concludeMediation/:id', api.isLeader, async (req, res, next) => {
     if(req.body.dismiss || !req.body.majority){
         await vetoesService.update(req.params.id, { status: 'withdrawn' });
     }else{

@@ -3,13 +3,14 @@ const api = require('../models/api');
 const bnAppsService = require('../models/bnApp').service;
 const evalsService = require('../models/evaluation').service;
 const evalRoundsService = require('../models/evalRound').service;
+const usersModel = require('../models/user').User;
 const usersService = require('../models/user').service;
 const logsService = require('../models/log').service;
 
 const router = express.Router();
 
 router.use(api.isLoggedIn);
-router.use(api.isNat);
+router.use(api.isBnOrNat);
 
 /* GET bn app page */
 router.get('/', async (req, res, next) => {
@@ -18,6 +19,7 @@ router.get('/', async (req, res, next) => {
         script: '../javascripts/appEval.js',
         isEval: true,
         isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat',
+        isBnEvaluator: res.locals.userRequest.group == 'bn' && res.locals.userRequest.isBnEvaluator,
         isNat: res.locals.userRequest.group == 'nat',
     });
 });
@@ -102,7 +104,7 @@ router.post('/setIndividualEval/', api.isLeader, async (req, res) => {
 });
 
 /* POST set evals as complete */
-router.post('/setComplete/', async (req, res) => {
+router.post('/setComplete/', api.isLeader, async (req, res) => {
     for (let i = 0; i < req.body.checkedApps.length; i++) {
         let a = await bnAppsService.query({ _id: req.body.checkedApps[i] });
         let u = await usersService.query({ _id: a.applicant });
@@ -133,7 +135,7 @@ router.post('/setComplete/', async (req, res) => {
 });
 
 /* POST set consensus of eval */
-router.post('/setConsensus/:id', async (req, res) => {
+router.post('/setConsensus/:id', api.isLeader, async (req, res) => {
     await bnAppsService.update(req.params.id, { consensus: req.body.consensus });
     let a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(a);
@@ -151,6 +153,43 @@ router.post('/setFeedback/:id', async (req, res) => {
     logsService.create(
         req.session.mongoId,
         `Edited feedback of ${a.applicant.username}'s ${a.mode} BN app`
+    );
+});
+
+/* POST set status upheld or withdrawn. */
+router.post('/selectBnEvaluators', async (req, res, next) => {
+    const allUsers = await usersModel.aggregate([
+        { $match: { group: { $eq: 'bn' }, isBnEvaluator: true} },
+        { $sample: { size: 1000 } },
+    ]);
+    let usernames = [];
+    for (let i = 0; i < allUsers.length; i++) {
+        let user = allUsers[i];
+        if (
+            user.modes.indexOf(req.body.mode) >= 0 &&
+            user.probation.indexOf(req.body.mode) < 0
+        ) {
+            usernames.push(user);
+            if (usernames.length >= (req.body.mode == 'osu' ? 6 : 3)) {
+                break;
+            }
+        }
+    }
+    res.json(usernames);
+});
+
+/* POST begin BN evaluations */
+router.post('/enableBnEvaluators/:id', api.isLeader, async (req, res, next) => {
+    for (let i = 0; i < req.body.bnEvaluators.length; i++) {
+        let bn = req.body.bnEvaluators[i];
+        await bnAppsService.update(req.params.id, { $push: { bnEvaluators: bn._id } });
+    }
+    let a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
+    console.log(a)
+    res.json(a);
+    logsService.create(
+        req.session.mongoId,
+        `Opened a BN app to evaluation from ${req.body.bnEvaluators.length} current BNs.`
     );
 });
 

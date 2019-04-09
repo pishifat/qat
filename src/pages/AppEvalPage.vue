@@ -57,8 +57,8 @@
                 </div>
             </div>
         </section>
-        <hr>
-        <section class="row segment segment-image mx-1 px-0">
+        <hr v-if="evaluator && evaluator.group == 'nat'">
+        <section class="row segment segment-image mx-1 px-0" v-if="evaluator && evaluator.group == 'nat'">
             <div class="col-sm-12">
                 <h2>Group Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="After individual evals are completed, their responses are made visible to allow discussion and form a consensus">?</sup></h2>
 
@@ -121,7 +121,11 @@ export default {
             return false;
         },
         separateObjs: function() {
-            this.applications = this.pageObjs.filter(v => !v.discussion);
+            if(this.evaluator.group == 'nat'){
+                this.applications = this.pageObjs.filter(v => !v.discussion);
+            }else{
+                this.applications = this.pageObjs.filter(v => !v.discussion && v.bnEvaluators && v.bnEvaluators.indexOf(this.evaluator.id) >= 0);
+            }
             this.discussApps = this.pageObjs.filter(v => v.discussion);
         },
         updateApplication: function (application) {
