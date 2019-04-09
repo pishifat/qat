@@ -36,7 +36,7 @@
                     </div>
                     <button type="submit" class="btn btn-nat-red float-right ml-2" @click="deleteQuestion($event)">Delete Question</button>
                     <button type="submit" class="btn btn-nat float-right ml-2" @click="updateQuestion($event)">Update Question</button>
-                    <button type="submit" class="btn float-right ml-2" :class="question.active ? 'btn-nat-red' : 'btn-nat'" @click="toggleActive($event)">{{question.active ? "Mark as inactive" : "Mark as active"}}</button>
+                    <button type="submit" class="btn float-right ml-2" :class="question.active ? 'btn-nat-red' : 'btn-nat'" @click="toggleActive($event)" data-toggle="tooltip" data-placement="top" title="Changes whether or not question appears on newly generated tests">{{question.active ? "Mark as inactive" : "Mark as active"}}</button>
                 </div>
                 <br class="mb-2">
                 <hr>

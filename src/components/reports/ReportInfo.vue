@@ -54,8 +54,8 @@
 
             </div>
             <div v-if="report.isActive" class="modal-footer" style="overflow: hidden;">
-                <button class="btn btn-sm btn-nat" @click="submitReportEval($event);">Save Report Evaluation</button>
-                <button class="btn btn-sm btn-nat-red" @click="submitReportEval($event, true)">Close Report</button>
+                <button class="btn btn-sm btn-nat" @click="submitReportEval($event);" data-toggle="tooltip" data-placement="top" title="Generates feedback PM and stores feedback/validity inputs">Save Report Evaluation</button>
+                <button v-if="isLeader" class="btn btn-sm btn-nat-red" @click="submitReportEval($event, true)" data-toggle="tooltip" data-placement="top" title="Disables feedback/validity inputs and reveals reporter">Close Report</button>
             </div>
         </div>
     </div>
@@ -69,7 +69,7 @@ import postData from '../../mixins/postData.js';
 export default {
     name: 'report-info',
     mixins: [postData],
-    props: [ 'report' ],
+    props: [ 'report', 'is-leader' ],
     watch: {
         report: function(v) {
             if(v){

@@ -36,7 +36,7 @@
                         :key="user.id"
                         :user="user"
                         :userId="userId"
-                        :userGroup="userGroup"
+                        :isLeader="isLeader"
                         @update:selectedUser="selectedUser = $event"
                     ></user-card>
                 </transition-group>
@@ -55,7 +55,7 @@
     <user-info
         :user="selectedUser"
         :user-id="userId"
-        :user-group="userGroup"
+        :is-leader="isLeader"
         @update-user="updateUser($event)"
     ></user-info>
 
@@ -101,28 +101,6 @@ export default {
             }
             return days;
         },
-        tempCreate: async function(e){
-            const username = $('#username').val();
-            const osuId = $('#osuId').val();
-            const mode = $('#mode').val();
-            const group = $('#group').val();
-            const probation = $('#probation').val();
-            const u = await this.executePost('/users/tempCreate/', {username: username, osuId: osuId, mode: mode, group: group, probation: probation}, e);
-            if(u){
-                console.log("ye");
-            }
-        },
-        tempUpdate: async function(e){
-            const username = $('#username').val();
-            const mode = $('#mode').val();
-            const group = $('#group').val();
-            const probation = $('#probation').val();
-            const date = new Date($('#date').val());
-            const u = await this.executePost('/users/tempUpdate/', {username: username, group: group, mode: mode, probation: probation, date: date}, e);
-            if(u){
-                console.log("yeeeee");
-            }
-        },
     },
     data() {
         return {
@@ -130,7 +108,7 @@ export default {
             allObjs: null,
             filteredObjs: null,
             userId: null,
-            userGroup: null,
+            isLeader: null,
             selectedUser: null,
         }
     },
@@ -140,7 +118,7 @@ export default {
             .then(response => {
                 this.allObjs = response.data.users;
                 this.userId = response.data.userId;
-                this.userGroup = response.data.userGroup;
+                this.isLeader = response.data.isLeader;
                 this.limit = 24;
             }).then(function(){
                 $("#loading").fadeOut();

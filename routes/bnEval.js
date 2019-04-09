@@ -48,7 +48,7 @@ router.get('/relevantInfo', async (req, res, next) => {
             true
         ),
     ]);
-    res.json({ er: er, r: r, evaluator: req.session.mongoId });
+    res.json({ er: er, r: r, evaluator: res.locals.userRequest });
 });
 
 async function cycleModes(userId, modes, deadline, osu, taiko, ctb, mania) {

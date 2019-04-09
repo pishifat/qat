@@ -31,7 +31,7 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="row mb-2">
+                        <div class="row mb-3">
                             <small class="text-shadow mb-1">Permalink to the veto post on the modding discussion page</small>
                             <input
                                 type="text"

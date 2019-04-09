@@ -24,7 +24,7 @@
                 <p class="min-spacing text-shadow">Consensus: {{
                     veto.status == 'upheld' || veto.status == 'withdrawn' ? 'Veto ' + veto.status : 'none' 
                 }}</p>
-                <div class="text-shadow" v-if="userGroup == 'nat'">
+                <div class="text-shadow" v-if="isLeader">
                     <hr>
                     <div v-if="veto.mediations.length">
                         <ul style="list-style-type: none; padding-left: 0.5rem">
@@ -128,7 +128,7 @@ import postData from "../../mixins/postData.js";
 
 export default {
     name: 'veto-info',
-    props: [ 'veto', 'user-id', 'user-group' ],
+    props: [ 'veto', 'user-id', 'is-leader' ],
     mixins: [ postData ],
     watch: {
         veto: function() {

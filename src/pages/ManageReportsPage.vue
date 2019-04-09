@@ -54,6 +54,7 @@
     
    <report-info
         :report="selectedReport"
+        :is-leader="isLeader"
         @update-report="updateReport($event)"
     ></report-info>
 
@@ -104,6 +105,7 @@ export default {
             openReports: null,
             closedReports: null,
             selectedReport: null,
+            isLeader: null,
             info: '',
         }
     },
@@ -114,6 +116,7 @@ export default {
                 this.allObjs = response.data.r;
                 this.hasPagination = false;
                 this.hasSeparation = true;
+                this.isLeader = response.data.isLeader;
             }).then(function(){
                 $("#loading").fadeOut();
                 $("#main").attr("style", "visibility: visible").hide().fadeIn();

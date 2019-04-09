@@ -18,7 +18,11 @@
                     </select>
                 </small> 
                 <small class="ml-2 mt-1 mt-md-0">
-                    <button class="btn btn-nat btn-sm w-100" @click="selectAll($event)">Select all</button>
+                    <button
+                        v-if="evaluator && evaluator.isLeader"
+                        class="btn btn-nat btn-sm w-100" 
+                        @click="selectAll($event)"
+                    >Select all</button>
                 </small>
             </div>
         </section>
@@ -32,15 +36,16 @@
                     <button class="btn btn-nat btn-sm w-100" @click="setIndividualEval($event)">Individual evaluation</button>
                 </small>
                 <small class="ml-2 mt-1 mt-md-0">
-                    <button class="btn btn-nat-red btn-sm w-100" @click="setComplete($event)">Archive</button>
+                    <button class="btn btn-nat-red btn-sm w-100" @click="setComplete($event)" data-toggle="tooltip" data-placement="top" title="Moves an evaluation to archives and applies its consensus to its user">Archive</button>
                 </small>
             </div>
         </section>
         <hr>
         <section class="row segment segment-image mx-1 px-0">
             <div class="col-sm-12">
-                <h2>Individual Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="only you can see these">?</sup> 
+                <h2>Individual Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="Evaluations are hidden from others to avoid confirmation bias">?</sup> 
                     <button
+                        v-if="evaluator && evaluator.isLeader"
                         class="btn btn-nat"
                         data-toggle="modal"
                         data-target="#addEvalRounds"
@@ -67,7 +72,7 @@
         <hr>
         <section class="row segment segment-image mx-1 px-0">
             <div class="col-sm-12">
-                <h2>Group Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="everyone can see these">?</sup></h2>
+                <h2>Group Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="After individual evals are completed, their responses are made visible to allow discussion and form a consensus">?</sup></h2>
                 
                 <transition-group name="list" tag="div" class="row">
                     <discuss-card

@@ -44,7 +44,7 @@ router.get('/relevantInfo', async (req, res, next) => {
             { createdAt: 1 },
             true
         );
-    res.json({ a: a, evaluator: req.session.mongoId });
+    res.json({ a: a, evaluator: res.locals.userRequest });
 });
 
 /* POST submit or edit eval */

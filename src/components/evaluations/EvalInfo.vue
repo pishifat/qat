@@ -211,7 +211,7 @@ export default {
 
             if(this.application){
                 this.application.evaluations.forEach(ev => {
-                    if(ev.evaluator.id == this.evaluator){
+                    if(ev.evaluator.id == this.evaluator.id){
                         this.evaluationId = ev.id;
                         this.behaviorComment = ev.behaviorComment;
                         this.moddingComment = ev.moddingComment;
@@ -220,7 +220,7 @@ export default {
                 });
             }else{
                 this.evalRound.evaluations.forEach(ev => {
-                    if(ev.evaluator.id == this.evaluator){
+                    if(ev.evaluator.id == this.evaluator.id){
                         this.evaluationId = ev.id;
                         this.behaviorComment = ev.behaviorComment;
                         this.moddingComment = ev.moddingComment;

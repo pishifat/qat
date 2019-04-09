@@ -46,8 +46,6 @@
                             :key="veto.id"
                             :veto="veto"
                             :userId="userId"
-                            :userGroup="userGroup"
-                            :filterMode="filterMode"
                             @update:selectedVeto="selectedVeto = $event"
                         ></veto-card>
                     </transition-group>
@@ -71,7 +69,7 @@
         <veto-info
             :veto="selectedVeto"
             :user-id="userId"
-            :user-group="userGroup"
+            :is-leader="isLeader"
             @update-veto="updateVeto($event)"
         ></veto-info>
         <submit-veto @submit-veto="SubmitVeto($event)"></submit-veto>
@@ -119,7 +117,7 @@ export default {
             pageObjs: null,
             filteredObjs: null,
             userId: null,
-            userGroup: null,
+            isLeader: null,
             selectedVeto: null,
         };
     },
@@ -129,7 +127,7 @@ export default {
             .then(response => {
                 this.allObjs = response.data.vetoes;
                 this.userId = response.data.userId;
-                this.userGroup = response.data.userGroup;
+                this.isLeader = response.data.isLeader;
                 this.limit = 24;
             })
             .then(function() {

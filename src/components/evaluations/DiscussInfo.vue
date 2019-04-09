@@ -355,7 +355,7 @@ export default {
             
             if(this.discussApp){
                 this.discussApp.evaluations.forEach(ev => {
-                    if(ev.evaluator.id == this.evaluator){
+                    if(ev.evaluator.id == this.evaluator.id){
                         this.evaluationId = ev.id;
                         this.behaviorComment = ev.behaviorComment;
                         this.moddingComment = ev.moddingComment;
@@ -364,7 +364,7 @@ export default {
                 }); 
             }else{
                 this.discussRound.evaluations.forEach(ev => {
-                    if(ev.evaluator.id == this.evaluator){
+                    if(ev.evaluator.id == this.evaluator.id){
                         this.evaluationId = ev.id;
                         this.behaviorComment = ev.behaviorComment;
                         this.moddingComment = ev.moddingComment;

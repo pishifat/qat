@@ -44,12 +44,12 @@
                 Deadline: 
                 <span v-if="discussApp" class="errors">
                     {{createDeadline(discussApp.createdAt)}}
-                    <input v-if="!readOnly" @click.stop="checkSelection()" class="form-check-input bottom-right-checkbox"
+                    <input v-if="!readOnly && evaluator && evaluator.isLeader" @click.stop="checkSelection()" class="form-check-input bottom-right-checkbox"
                     :id="discussApp.id + '-check'" type="checkbox" name="evalTypeCheck" :value="discussApp.id">
                 </span>
                 <span v-else class="errors">
                     {{new Date(discussRound.deadline).toString().slice(4,10)}}
-                    <input v-if="!readOnly" @click.stop="checkSelection()" class="form-check-input bottom-right-checkbox"
+                    <input v-if="!readOnly && evaluator && evaluator.isLeader" @click.stop="checkSelection()" class="form-check-input bottom-right-checkbox"
                     :id="discussRound.id + '-check'" type="checkbox" name="evalTypeCheck" :value="discussRound.id">
                 </span>
             </p>
@@ -86,7 +86,7 @@ export default {
             let vote;
             if(this.discussApp && this.discussApp.evaluations){
                 this.discussApp.evaluations.forEach(ev => {
-                    if(ev.evaluator.id == this.evaluator){
+                    if(ev.evaluator.id == this.evaluator.id){
                         if(ev.vote == 1){
                             vote = 'pass';
                         }else if(ev.vote == 2){
@@ -98,7 +98,7 @@ export default {
                 });
             }else if(this.discussRound && this.discussRound.evaluations){
                 this.discussRound.evaluations.forEach(ev => {
-                    if(ev.evaluator.id == this.evaluator){
+                    if(ev.evaluator.id == this.evaluator.id){
                         if(ev.vote == 1){
                             vote = 'pass';
                         }else if(ev.vote == 2){

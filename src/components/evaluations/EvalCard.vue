@@ -24,12 +24,12 @@
                 Deadline: 
                 <span v-if="application" class="errors">
                     {{createDeadline(application.createdAt)}}
-                    <input @click.stop="checkSelection()" class="form-check-input bottom-right-checkbox" 
+                    <input v-if="evaluator && evaluator.isLeader" @click.stop="checkSelection()" class="form-check-input bottom-right-checkbox" 
                     :id="application.id + '-check'" type="checkbox" name="evalTypeCheck" :value="application.id">
                 </span>
                 <span v-else class="errors">
                     {{new Date(evalRound.deadline).toString().slice(4,10)}}
-                    <input @click.stop="checkSelection()" class="form-check-input bottom-right-checkbox"
+                    <input v-if="evaluator && evaluator.isLeader" @click.stop="checkSelection()" class="form-check-input bottom-right-checkbox"
                     :id="evalRound.id + '-check'" type="checkbox" name="evalTypeCheck" :value="evalRound.id">
                 </span>
                 
@@ -60,7 +60,7 @@ export default {
             let vote;
             if(this.application){
                 this.application.evaluations.forEach(ev => {
-                    if(ev.evaluator.id == this.evaluator){
+                    if(ev.evaluator.id == this.evaluator.id){
                         if(ev.vote == 1){
                             vote = 'pass';
                         }else if(ev.vote == 2){
@@ -73,7 +73,7 @@ export default {
                 return vote;
             }else{
                 this.evalRound.evaluations.forEach(ev => {
-                    if(ev.evaluator.id == this.evaluator){
+                    if(ev.evaluator.id == this.evaluator.id){
                         if(ev.vote == 1){
                             vote = 'pass';
                         }else if(ev.vote == 2){

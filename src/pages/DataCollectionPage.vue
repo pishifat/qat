@@ -39,7 +39,7 @@
                     <td scope="col">Date</td>
                     <td scope="col">Mapset</td>
                     <td scope="col">Reason</td>
-                    <td scope="col">Validity</td>
+                    <td scope="col" data-toggle="tooltip" data-placement="top" title="Marks objectivity/subjectivity of issue for reference in BN Evaluations">Validity</td>
                     <td scope="col"></td>
                 </thead>
                 <tbody>
@@ -48,7 +48,7 @@
                     >
                         <td scope="row">{{new Date(dq.timestamp).toString().slice(4,15)}}</td>
                         <td scope="row">
-                            <a :href="'https://osu.ppy.sh/beatmapsets/' + dq.beatmapsetId + '/discussion'" target="_blank">{{dq.metadata}}</a>
+                            <a :href="'https://osu.ppy.sh/beatmapsets/' + dq.beatmapsetId + '/discussion/-/events'" target="_blank">{{dq.metadata}}</a>
                         </td>
                         <td scope="row">
                             {{dq.content.slice(0, dq.content.indexOf('.')+1) || dq.content}} 
@@ -119,17 +119,48 @@
                     <div class="container">
                         <p class="text-shadow">Current reason: </p>
                         <p class="text-shadow small ml-4">{{selectedEntry.content}}</p>
-                        <p class="text-shadow" for="newReason">New reason: </p>
-                        <div class="input-group input-group-sm mb-3">
-                            <input class="form-control form-control-sm" type="text" placeholder="Keep it short..." id="newReason" 
-                                style="filter: drop-shadow(1px 1px 1px #000000); border-radius: 100px 0 0 100px" 
+                        <p class="text-shadow" for="newReason">New reason:</p>
+                        <small>
+                            <select class="custom-select inline-custom-select w-100" id="reasonSelect">
+                                <option class="ml-2" value="" selected>Reason selection...</option>
+                                <option class="ml-2" value="">GENERAL</option>
+                                <option class="ml-2 text-secondary" value="reason">Requested</option>
+                                <option class="ml-2 text-secondary" value="reason">Map reaches Ranked soon without mod replies</option>
+                                <option class="ml-2 text-secondary" value="reason">Unused file(s)</option>
+                                <option class="ml-2 text-secondary" value="reason">Nominated by two probation BNs</option>
+                                <option class="ml-2 text-secondary" value="reason">Difficulty settings mistake</option>
+                                <option class="ml-2 text-secondary" value="reason">NSFW content in bg/video</option>
+                                <option class="ml-2" value="">SNAPPING</option>
+                                <option class="ml-2 text-secondary" value="reason">Object wrongly snapped</option>
+                                <option class="ml-2 text-secondary" value="reason">Section of objects wrongly snapped</option>
+                                <option class="ml-2" value="">SPREAD</option>
+                                <option class="ml-2 text-secondary" value="reason">Inappropriate difficulty elements for intended diff</option>
+                                <option class="ml-2 text-secondary" value="reason">Does not meet minimum drain time</option>
+                                <option class="ml-2" value="">TIMING</option>
+                                <option class="ml-2 text-secondary" value="reason">Offset incorrect by more than 10ms</option>
+                                <option class="ml-2 text-secondary" value="reason">Offset incorrect by less than 10ms</option>
+                                <option class="ml-2 text-secondary" value="reason">Multiple incorrect offsets (complex timing)</option>
+                                <option class="ml-2 text-secondary" value="reason">Incorrect time signature(s)</option>
+                                <option class="ml-2" value="">METADATA</option>
+                                <option class="ml-2 text-secondary" value="reason">Incorrect metadata (artist or title or source)</option>
+                                <option class="ml-2 text-secondary" value="reason">Missing username in tags</option>
+                                <option class="ml-2" value="">AUDIO</option>
+                                <option class="ml-2 text-secondary" value="reason">Muted hitobject(s)</option>
+                                <option class="ml-2 text-secondary" value="reason">Hitsound volume too low</option>
+                                <option class="ml-2 text-secondary" value="reason">Section unhitsounded</option>
+                            </select>
+                        </small>
+                        <div class="input-group input-group-sm my-3">
+                            <input class="form-control form-control-sm" type="text" placeholder="Manual input... (prioritize dropdown)" id="newReason" 
+                                style="filter: drop-shadow(1px 1px 1px #000000); border-radius: 100px 100px 100px 100px" 
                                 @keyup.enter="updateReason($event)" maxlength="50"/>
-                            <div class="input-group-append">
-                                <button style="border-radius: 0 100px 100px 0;" class="btn btn-nat" @click="updateReason($event)" type="submit"><span class="append-button-padding">Save reason</span></button>
-                            </div>
                         </div>
+                        
                     </div>
                     <p id="errors">{{info}}</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-nat" @click="updateReason($event)" type="submit"><span class="append-button-padding">Save reason</span></button>
                 </div>
             </div>
         </div>
@@ -175,7 +206,12 @@ export default {
             this.selectedEntry = entry;
         },
         updateReason: async function(e) {
-            let reason = $("#newReason").val();
+            let reason;
+            if($("#reasonSelect option:selected").val().length){
+                reason = $("#reasonSelect option:selected").text();
+            }else{
+                reason = $("#newReason").val();
+            }
             if(!reason || !reason.length){
                 this.info = "Must enter a reason!"
             }else{

@@ -37,12 +37,13 @@
                     </button>
                 </p>
                 <hr>
+                <span v-if="isLeader">
                 <button
-                    v-if="userGroup == 'nat'"
                     class="btn btn-nat btn-sm justify-content-center"
                     @click="user.group == 'bn' ? switchGroup('nat', $event) : switchGroup('bn', $event)">
                     {{user.group == 'bn' ? 'Move to NAT' : 'Move to BN'}}
                 </button>
+                </span>
                 <p class="text-shadow float-right">Joined: {{user.createdAt.slice(0,10)}}</p>
             </div>
         </div>
@@ -56,7 +57,7 @@ import postData from "../../mixins/postData.js";
 
 export default {
     name: 'user-info',
-    props: [ 'user', 'user-id', 'user-group' ],
+    props: [ 'user', 'user-id', 'is-leader' ],
     mixins: [ postData ],
     methods: {
         //display
@@ -92,12 +93,15 @@ export default {
             }
         },
         switchGroup: async function(group, e){
-            const u = await this.executePost('/users/switchGroup/' + this.user.id, {group: group}, e);
-            if(u){
-                if (u.error) {
-                    this.info = u.error
-                } else {
-                    this.$emit('update-user', u);
+            const result = confirm(`Are you sure? This will affect join/leave dates and potentially reveal hidden pages.`);
+            if(result) {
+                const u = await this.executePost('/users/switchGroup/' + this.user.id, {group: group}, e);
+                if(u){
+                    if (u.error) {
+                        this.info = u.error
+                    } else {
+                        this.$emit('update-user', u);
+                    }
                 }
             }
         },
