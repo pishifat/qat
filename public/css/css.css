@@ -229,37 +229,29 @@ hr {
     }
 }
 
-.text-input,
-.text-input:focus {
-    height: 2.5em;
-    min-width: 200px;
-    background-color: var(--darker);
-    color: var(--main-text);
-    border-color: var(--dark);
-    border-width: 1px;
-    filter: drop-shadow(1px 1px 1px #000000);
-    padding-left: 0.75rem;
-    border-radius: 100px 100px 100px 100px;
-}
-
-.text-input:focus {
-    outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
-}
-
-.text-input-r-border {
-    border-radius: 0 100px 100px 0;
+.input-group-sm>.form-control:not(textarea):focus {
+    height: inherit;
 }
 
 input[type='text'],
-input[type='text']:focus {
+input[type='number'],
+input[type='text']:focus,
+input[type='number']:focus {
     height: 2.5em;
     background-color: var(--darker);
+    min-width: 200px;
+    padding-left: 0.75rem;
     color: var(--main-text);
     border-color: var(--dark);
     border-width: 1px;
     filter: drop-shadow(1px 1px 1px #000000);
     border-radius: 100px 100px 100px 100px;
+}
+
+input[type='text']:focus,
+input[type='number']:focus {
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(128,189,255,.5);
 }
 
 input::-webkit-outer-spin-button,
@@ -281,6 +273,10 @@ input[type=number] {
     border-color: var(--dark);
     border-radius: 100px;
     filter: drop-shadow(1px 1px 1px #000000);
+}
+
+.custom-select:focus {
+    border-color: transparent;
 }
 
 .text-shadow {

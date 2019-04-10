@@ -35,7 +35,7 @@
                             <small class="text-shadow mb-1">Permalink to the veto post on the modding discussion page</small>
                             <input
                                 type="text"
-                                class="form-control text-input"
+                                class="form-control"
                                 placeholder="beatmap link..."
                                 v-model="discussionLink"
                             />
@@ -44,7 +44,7 @@
                             <small class="text-shadow mb-1">Summarize the reason for the veto. If your summary is inappropriate, the veto will not be mediated</small>
                             <input
                                 type="text"
-                                class="form-control text-input"
+                                class="form-control"
                                 placeholder="reason for veto..."
                                 v-model="shortReason"
                             />

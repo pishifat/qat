@@ -61,7 +61,7 @@
                         <button class="btn btn-sm btn-nat mb-2" @click="concludeMediation($event, true)">Dismiss Without Mediation</button>
                         <div class="mb-2">
                             <span class="text-shadow">Exclude specific user(s):</span> 
-                            <input id="excludeUsers" class="text-input ml-1 w-75 small" type="text" placeholder="username1, username2, username3..." /><br>
+                            <input id="excludeUsers" class="ml-1 w-75 small" type="text" placeholder="username1, username2, username3..." /><br>
                             <small class="ml-2 text-shadow">The mapper and veto submitter are automatically excluded</small>
                         </div>
                         <div class="mt-2" v-if="mediators">

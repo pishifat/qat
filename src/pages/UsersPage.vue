@@ -3,7 +3,7 @@
     <div class="col-md-12">
         <section class="row segment segment-solid my-1 mx-4">
             <small>Search: 
-                <input id="search" class="text-input" v-model="filterValue" type="text" placeholder="username... (3+ characters)" /> 
+                <input id="search" v-model="filterValue" type="text" placeholder="username... (3+ characters)" /> 
             </small>
             <small>
                 <select class="custom-select ml-2" id="mode" v-model="filterMode">

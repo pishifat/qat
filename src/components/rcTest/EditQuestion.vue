@@ -64,10 +64,10 @@
                     </table>
 
                     <div class="row col-md-12">
-                        <input id="option" class="form-control-sm text-input col-md-9 mb-2" 
+                        <input id="option" class="form-control-sm col-md-9 mb-2" 
                             type="text" maxlength="150" placeholder="potential answer... (if image, post link)"
                         />
-                        <input id="score" class="form-control-sm text-input col-md-1 ml-1 mb-2"
+                        <input id="score" class="form-control-sm col-md-1 ml-1 mb-2"
                             type="text" maxlength="5" placeholder="points..." style="min-width: 80px; width: 80;"
                         />
                     </div>

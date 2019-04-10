@@ -6,7 +6,7 @@
             <div class="d-flex align-items-md-center align-items-stretch flex-md-row flex-column">
                 <small>Search: </small>
                 <small class="ml-2 mt-1 mt-md-0">
-                    <input id="search" class="text-input" v-model="filterValue" type="text" placeholder="username... (3+ characters)" /> 
+                    <input id="search" v-model="filterValue" type="text" placeholder="username... (3+ characters)" /> 
                 </small>
                 <small class="ml-2 mt-1 mt-md-0">
                     <select class="custom-select w-100" id="mode" v-model="filterMode">

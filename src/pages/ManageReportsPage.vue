@@ -7,7 +7,7 @@
                 >Search:
                 <input
                     id="search"
-                    class="text-input text-input ml-1"
+                    class="ml-1"
                     v-model="filterValue"
                     type="text"
                     placeholder="username..."

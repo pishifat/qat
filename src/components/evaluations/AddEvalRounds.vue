@@ -54,7 +54,7 @@
                         <span class="text-shadow">Include specific user(s):</span>
                         <input
                             id="includeUsers"
-                            class="text-input ml-1 w-75"
+                            class="ml-1 w-75"
                             type="text"
                             placeholder="username1, username2, username3..."
                         />
@@ -63,7 +63,7 @@
                         <span class="text-shadow">Exclude specific user(s):</span>
                         <input
                             id="excludeUsers"
-                            class="text-input ml-1 w-75"
+                            class="ml-1 w-75"
                             type="text"
                             placeholder="username1, username2, username3..."
                         />
@@ -75,7 +75,7 @@
                         <span class="text-shadow">Deadline:</span>
                         <input
                             id="month"
-                            class="text-input text ml-1"
+                            class="text ml-1"
                             type="text"
                             placeholder="MM"
                             maxlength="2"
@@ -83,7 +83,7 @@
                         />
                         <input
                             id="day"
-                            class="text-input text"
+                            class="text"
                             type="text"
                             placeholder="DD"
                             maxlength="2"
