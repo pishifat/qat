@@ -32,6 +32,12 @@
             Mode: {{ test.mode }}
         </p>
 
+        <div v-if="!test.answers.length">
+            <p>Something went wrong and your test was not generated. Contact <a href="https://osu.ppy.sh/users/3178418" target="_blank">pishifat</a> to fix this.</p>
+        </div>
+
+        
+
         <div class="segment segment-image test-question" v-for="(answer, i) in test.answers" :key="answer.id">
             <small class="float-right">Q{{ ++i }} -- {{ answer.question.category }}</small>
             <div v-if="answer.question.questionType === 'text' || answer.question.questionType === 'image'">

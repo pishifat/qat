@@ -34,9 +34,9 @@
                             maxlength="300" rows="2" @keyup.enter="editQuestion($event)" v-model="question.content">
                         </textarea>    
                     </div>
-                    <button type="submit" class="btn btn-nat-red float-right ml-2" @click="deleteQuestion($event)">Delete Question</button>
-                    <button type="submit" class="btn btn-nat float-right ml-2" @click="updateQuestion($event)">Update Question</button>
-                    <button type="submit" class="btn float-right ml-2" :class="question.active ? 'btn-nat-red' : 'btn-nat'" @click="toggleActive($event)" data-toggle="tooltip" data-placement="top" title="Changes whether or not question appears on newly generated tests">{{question.active ? "Mark as inactive" : "Mark as active"}}</button>
+                    <button type="submit" class="btn btn-sm btn-nat-red float-right ml-2" @click="deleteQuestion($event)">Delete Question</button>
+                    <button type="submit" class="btn btn-sm btn-nat float-right ml-2" @click="updateQuestion($event)">Update Question</button>
+                    <button type="submit" class="btn btn-sm float-right ml-2" :class="question.active ? 'btn-nat-red' : 'btn-nat'" @click="toggleActive($event)" data-toggle="tooltip" data-placement="top" title="Changes whether or not question appears on newly generated tests">{{question.active ? "Mark as inactive" : "Mark as active"}}</button>
                 </div>
                 <br class="mb-2">
                 <hr>
@@ -85,9 +85,9 @@
                 <hr>
                 <span class="errors text-shadow" id="addEvalRoundsErrors">{{ info }}</span>
                 <span class="confirm text-shadow" id="addEvalRoundsConfirm">{{ confirm }}</span>
-                <button type="submit" class="btn btn-nat-red float-right ml-2" @click="deleteOption($event)">Delete Selected Option</button>
-                <button type="submit" class="btn btn-nat float-right ml-2" @click="updateOption($event)">Update Selected Option</button>
-                <button type="submit" class="btn btn-nat float-right ml-2" @click="addOption($event)">Add Option</button>
+                <button type="submit" class="btn btn-sm btn-nat-red float-right ml-2" @click="deleteOption($event)">Delete Selected Option</button>
+                <button type="submit" class="btn btn-sm btn-nat float-right ml-2" @click="updateOption($event)">Update Selected Option</button>
+                <button type="submit" class="btn btn-sm btn-nat float-right ml-2" @click="addOption($event)">Add Option</button>
                 
             </div>
         </div>

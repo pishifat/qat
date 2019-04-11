@@ -146,9 +146,12 @@ export default {
         },
         updateEvalRound: function (evalRound) {
 			const i = this.allObjs.findIndex(er => er.id == evalRound.id);
-			this.allObjs[i] = evalRound;
-            this.selectedEvalRound = evalRound;
-            this.selectedDiscussRound = evalRound;
+            this.allObjs[i] = evalRound;
+            if(evalRound.discussion){
+                this.selectedDiscussRound = evalRound;
+            }else{
+                this.selectedEvalRound = evalRound;
+            }
             this.filter();
         },
         updateAllEvalRounds: function (evalRounds) {

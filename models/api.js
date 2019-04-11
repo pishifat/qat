@@ -71,12 +71,27 @@ async function getUserInfo(token) {
     }
 }
 
-async function beatmapsetInfo(setId) {
+async function beatmapsetOwnerInfo(userId) {
+    const url = `https://osu.ppy.sh/api/get_user?k=${config.v1token}&u=${userId}`;
+    
+    try {
+        const res = await axios.get(url);
+        return res.data;
+    } catch (error) {
+        return { error: 'Something went wrong!' };
+    }
+}
+
+async function beatmapsetInfo(setId, allDiffs) {
     const url = `https://osu.ppy.sh/api/get_beatmaps?k=${config.v1token}&s=${setId}`;
     
     try {
         const res = await axios.get(url);
-        return res.data[0];
+        if(!allDiffs){
+            return res.data[0];
+        }else{
+            return res.data;
+        }
     } catch (error) {
         return { error: 'Something went wrong!' };
     }
@@ -145,4 +160,4 @@ async function isBnEvaluator(req, res, next) {
     }
 }
 
-module.exports = { isLoggedIn, getToken, getUserInfo, beatmapsetInfo, isBnOrNat, isNat, isLeader, isBnEvaluator };
+module.exports = { isLoggedIn, getToken, getUserInfo, beatmapsetInfo, beatmapsetOwnerInfo, isBnOrNat, isNat, isLeader, isBnEvaluator };

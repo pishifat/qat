@@ -130,9 +130,12 @@ export default {
         },
         updateApplication: function (application) {
 			const i = this.allObjs.findIndex(a => a.id == application.id);
-			this.allObjs[i] = application;
-            this.selectedApplication = application;
-            this.selectedDiscussApp = application;
+            this.allObjs[i] = application;
+            if(application.discussion){
+                this.selectedDiscussApp = application;
+            }else{
+                this.selectedApplication = application;
+            }
             this.filter();
         },
         setGroupEval: async function(e) {

@@ -81,7 +81,7 @@ small, .small {
     color: var(--main-text) !important;
 }
 
-.table-dark thead {
+.table-dark thead, .sub-header {
     background-color: #1f2022c4;
 }
 
@@ -89,6 +89,15 @@ small, .small {
     font-weight: 600;
     color: hsla(0,0%,100%,.8);
     text-transform: uppercase;
+}
+
+.sub-header td {
+    font-weight: 600;
+    color: hsla(0,0%,100%,.8);
+}
+
+.sub-header:hover {
+    cursor: pointer;
 }
 
 a {
@@ -429,8 +438,16 @@ input[type=number] {
     border-left: 3px solid var(--extend);
 }
 
+.vote-border-neutral {
+    border-left: 3px solid var(--neutral);
+}
+
 .vote-border-pass {
     border-left: 3px solid var(--pass);
+}
+
+.vote-border-invis {
+    border-left: 3px solid transparent;
 }
 
 .badge-pass {
