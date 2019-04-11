@@ -86,9 +86,14 @@ router.post('/search', async (req, res) => {
                     await aiessService.update(event.id, {isBnOrNat: true});
                 }
                 
-                let userInfo = await api.getUserInfo(req.session.accessToken);
-                //await aiessService.update(event.id, {mapperTotalRanked: userInfo.ranked_and_approved_beatmapset_count});
-
+                let userMaps = await api.beatmapsetOwnerMaps(mapperId);
+                let uniqueMapIds = [];
+                userMaps.forEach(map => {
+                    if(map.approved_date && uniqueMapIds.indexOf(map.beatmapset_id) == -1){
+                        uniqueMapIds.push(map.beatmapset_id);
+                    }
+                });
+                await aiessService.update(event.id, {mapperTotalRanked: uniqueMapIds.length});
             }
         
             let uniqueMapperThreshold = new Date();
