@@ -8,6 +8,7 @@ const qatConfig =  {
         bnEval: './src/bnEval.js',
         dataCollection: './src/dataCollection.js',
         evalArchive: './src/evalArchive.js',
+        bnScore: './src/bnScore.js',
         manageReports: './src/manageReports.js',
         users: './src/users.js',
         vetoes: './src/vetoes.js',

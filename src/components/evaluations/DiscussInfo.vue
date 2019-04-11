@@ -24,7 +24,7 @@
                         <h5 v-if="discussRound" class="text-shadow mb-3 ml-1 mt-1">Consensus:
                             <span v-if="discussRound.consensus" :class="'vote-' + discussRound.consensus">{{discussRound.consensus}}</span>
                             <span v-else>none</span>
-                            <span v-if="!readOnly">
+                            <span v-if="!readOnly && evaluator.isLeader">
                             <button
                                 class="btn btn-sm btn-nat-pass"
                                 :disabled="discussRound.consensus == 'pass' "
@@ -57,16 +57,18 @@
                             <h5 class="text-shadow mb-2" v-if="!readOnly">Consensus:
                                 <span v-if="discussApp.consensus" :class="'vote-' + discussApp.consensus">{{discussApp.consensus}}</span>
                                 <span v-else>none</span>
-                                <button
-                                    class="btn btn-sm btn-nat-pass"
-                                    :disabled="discussApp.consensus == 'pass' "
-                                    @click="setConsensus('pass', $event);"
-                                >Set Pass</button>
-                                <button
-                                    class="btn btn-sm btn-nat-fail"
-                                    :disabled="discussApp.consensus == 'fail'"
-                                    @click="setConsensus('fail', $event);"
-                                >Set Fail</button>
+                                <span v-if="evaluator.isLeader">
+                                    <button
+                                        class="btn btn-sm btn-nat-pass"
+                                        :disabled="discussApp.consensus == 'pass' "
+                                        @click="setConsensus('pass', $event);"
+                                    >Set Pass</button>
+                                    <button
+                                        class="btn btn-sm btn-nat-fail"
+                                        :disabled="discussApp.consensus == 'fail'"
+                                        @click="setConsensus('fail', $event);"
+                                    >Set Fail</button>
+                                </span>
                             </h5>
                             <div v-if="discussApp.consensus && !readOnly">
                                 <hr>
