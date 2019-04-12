@@ -51,174 +51,84 @@ router.get('/relevantInfo', async (req, res, next) => {
     res.json({ er: er, r: r, evaluator: res.locals.userRequest });
 });
 
-async function cycleModes(userId, modes, deadline, osu, taiko, ctb, mania) {
-    for (let i = 0; i < modes.length; i++) {
-        if ((modes[i] == 'osu' && osu) ||
-            (modes[i] == 'taiko' && taiko) ||
-            (modes[i] == 'catch' && ctb) ||
-            (modes[i] == 'mania' && mania)) {
-            let er = await evalRoundsService.query({
-                bn: userId, mode: modes[i], active: true,
-            });
-            if (!er) await evalRoundsService.create(userId, modes[i], deadline);
-        }
-    }
+function isValidMode(modeToCheck, isOsu, isTaiko, isCatch, isMania) {
+    return ((modeToCheck == 'osu' && isOsu) ||
+        (modeToCheck == 'taiko' && isTaiko) ||
+        (modeToCheck == 'catch' && isCatch) ||
+        (modeToCheck == 'mania' && isMania));
 }
 
 /* POST submit or edit eval */
 router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
-    let fullBns = [];
-    let probationBns = [];
-    let nat = [];
-
-    if (req.body.probation) {
-        probationBns = await usersService.query(
-            {
-                $and: [
-                    { group: 'bn' },
-                    {
-                        $or: [
-                            { probation: { $elemMatch: { $eq: req.body.osu && 'osu' } } },
-                            { probation: { $elemMatch: { $eq: req.body.taiko && 'taiko' } } },
-                            { probation: { $elemMatch: { $eq: req.body.catch && 'catch' } } },
-                            { probation: { $elemMatch: { $eq: req.body.mania && 'mania' } } },
-                        ],
-                    },
-                    {
-                        modes: {
-                            $in: [
-                                req.body.osu && 'osu',
-                                req.body.taiko && 'taiko',
-                                req.body.catch && 'catch',
-                                req.body.mania && 'mania',
-                            ],
-                        },
-                    },
-                ],
-            },
-            {},
-            {},
-            true
-        );
-    }
-    if (req.body.bn) {
-        fullBns = await usersService.query(
-            {
-                $and: [
-                    { group: 'bn' },
-                    {
-                        probation: {
-                            $nin: [
-                                req.body.osu && 'osu',
-                                req.body.taiko && 'taiko',
-                                req.body.catch && 'catch',
-                                req.body.mania && 'mania',
-                            ],
-                        },
-                    },
-                    {
-                        modes: {
-                            $in: [
-                                req.body.osu && 'osu',
-                                req.body.taiko && 'taiko',
-                                req.body.catch && 'catch',
-                                req.body.mania && 'mania',
-                            ],
-                        },
-                    },
-                ],
-            },
-            {},
-            {},
-            true
-        );
-    }
-
-    if (req.body.nat) {
-        nat = await usersService.query(
-            {
-                $and: [
-                    { group: 'nat' },
-                    {
-                        modes: {
-                            $in: [
-                                req.body.osu && 'osu',
-                                req.body.taiko && 'taiko',
-                                req.body.catch && 'catch',
-                                req.body.mania && 'mania',
-                            ],
-                        },
-                    },
-                ],
-            },
-            {},
-            {},
-            true
-        );
-    }
-    let allUsers = probationBns.concat(fullBns.concat(nat));
-
+    let allUsersByMode = await usersService.getAllByMode(req.body.bn, req.body.probation, req.body.nat);
+    let allEvalsToCreate = [];
     let failed = [];
-    if (req.body.excludeUsers) {
-        let excludeUsers = req.body.excludeUsers.split(',');
-        for (let i = 0; i < excludeUsers.length; i++) {
-            let u = await usersService.query({
-                username: new RegExp('^' + helper.escapeUsername(excludeUsers[i].trim()) + '$', 'i'),
-            });
-
-            if (u) {
-                allUsers.forEach(function(user, index) {
-                    if (user.id == u.id) {
-                        allUsers.splice(index, 1);
-                    }
+    const deadline = req.body.deadline;
+    
+    if (allUsersByMode) {
+        allUsersByMode = allUsersByMode.filter(m => {
+            return isValidMode(m._id, req.body.osu, req.body.taiko, req.body.catch, req.body.mania);
+        });
+        
+        if (req.body.excludeUsers) {
+            const excludeUsers = req.body.excludeUsers.split(',');
+            allUsersByMode.forEach(m => {
+                m.users = m.users.filter(u => {
+                    return !excludeUsers.include(u.username) || !excludeUsers.include(u.osuId);
                 });
-            } else {
-                failed.push(excludeUsers[i].trim());
-            }
+            });
         }
+
+        allUsersByMode.forEach(m => {
+            m.users.forEach(u => {
+                allEvalsToCreate.push({ bn: u.id, mode: m._id, deadline: deadline });
+            });
+        });
     }
 
     if (req.body.includeUsers) {
-        let includeUsers = req.body.includeUsers.split(',');
+        const includeUsers = req.body.includeUsers.split(',');
         for (let i = 0; i < includeUsers.length; i++) {
             let u = await usersService.query({
-                username: new RegExp('^' + helper.escapeUsername(includeUsers[i].trim()) + '$', 'i'),
+                $or: [
+                    { username: new RegExp('^' + helper.escapeUsername(includeUsers[i].trim()) + '$', 'i') },
+                    { osuId: includeUsers[i].trim() }
+                ],
             });
             if (u) {
-                await cycleModes(
-                    u.id,
-                    u.modes,
-                    req.body.deadline,
-                    req.body.osu,
-                    req.body.taiko,
-                    req.body.catch,
-                    req.body.mania
-                );
+                if (u.modes) {
+                    u.modes.forEach(m => {
+                        if (isValidMode(m, req.body.osu, req.body.taiko, req.body.catch, req.body.mania)) {
+                            allEvalsToCreate.push({ bn: u._id, mode: m, deadline: deadline });
+                        }
+                    });
+                }
+                if (u.probation) {
+                    u.probation.forEach(m => {
+                        if (isValidMode(m, req.body.osu, req.body.taiko, req.body.catch, req.body.mania)) {
+                            allEvalsToCreate.push({ bn: u._id, mode: m, deadline: deadline });
+                        }
+                    });
+                }
             } else {
                 failed.push(includeUsers[i].trim());
             }
         }
     }
+    
+    if (allEvalsToCreate.length) {
+        const result = await evalRoundsService.createMany(allEvalsToCreate);
+        if (result.error) return res.json(result);
 
-    if (allUsers.length) {
-        for (let i = 0; i < allUsers.length; i++) {
-            await cycleModes(
-                allUsers[i].id,
-                allUsers[i].modes,
-                req.body.deadline,
-                req.body.osu,
-                req.body.taiko,
-                req.body.catch,
-                req.body.mania
-            );
-        }
+        let ers = await evalRoundsService.query({ active: true }, defaultPopulate, { deadline: -1 }, true);
+        res.json({ ers: ers, failed: failed });
+        logsService.create(
+            req.session.mongoId,
+            `Added BN evaluations for ${allEvalsToCreate.length} user${allEvalsToCreate.length == 1 ? '' : 's'}`
+        );
+    } else {
+        return res.json({ errors: 'Nothing changed...' });
     }
-    let ers = await evalRoundsService.query({ active: true }, defaultPopulate, { deadline: -1 }, true);
-    res.json({ ers: ers, failed: failed });
-    logsService.create(
-        req.session.mongoId,
-        `Added BN evaluations for ${allUsers.length} user${allUsers.length == 1 ? '' : 's'}`
-    );
 });
 
 /* POST submit or edit eval */

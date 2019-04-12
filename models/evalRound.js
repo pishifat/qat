@@ -33,6 +33,19 @@ class EvalRoundService extends BaseService
             return { error: error._message }
         }
     }
+
+    /**
+     * 
+     * @param {Array} evalRounds 
+     */
+    async createMany(evalRounds) {
+        try {
+            return await EvalRound.insertMany(evalRounds);
+        } catch(error) {
+            console.log(error);
+            return { error: 'Something went wrong!' }
+        }
+    }
 }
 
 const service = new EvalRoundService();

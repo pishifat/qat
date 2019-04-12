@@ -8,6 +8,8 @@ const router = express.Router();
 
 /* GET bn app page */
 router.get('/', async (req, res, next) => {
+    const allUsersByMode = await usersService.getAllByMode(true, true, true);
+    
     let user;
 
     if (req.session.mongoId) {
@@ -26,6 +28,7 @@ router.get('/', async (req, res, next) => {
         loggedInAs: req.session.mongoId,
         isBnOrNat: isBnOrNat,
         isBn: isBn,
+        allUsersByMode: allUsersByMode,
     });
 });
 

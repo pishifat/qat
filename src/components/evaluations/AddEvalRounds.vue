@@ -75,7 +75,7 @@
                         <span class="text-shadow">Deadline:</span>
                         <input
                             id="month"
-                            class="text ml-1"
+                            class="ml-1"
                             type="text"
                             placeholder="MM"
                             maxlength="2"
@@ -83,7 +83,6 @@
                         />
                         <input
                             id="day"
-                            class="text"
                             type="text"
                             placeholder="DD"
                             maxlength="2"
@@ -140,7 +139,7 @@ export default {
             let m = $('#month').val() - 1;
             let d = $('#day').val();
             let deadline = new Date(y, m, d);
-            if (!(deadline instanceof Date) || isNaN(deadline)) {
+            if (!(deadline instanceof Date) || isNaN(deadline) || !m || !d) {
                 this.info = 'Invalid Date!';
                 return;
             }
@@ -161,6 +160,7 @@ export default {
                 },
                 e
             );
+            
             if (result) {
                 if (result.errors) {
                     this.info = result.errors;

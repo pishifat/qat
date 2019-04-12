@@ -67,6 +67,35 @@
         {{/if}}
     </div>
 
+    <section class="row segment segment-image mx-auto" style="max-width: 900px">
+        <p>The QAT is gone and has been replaced by the new <a href="https://osu.ppy.sh/groups/7">Nominator Administration Team</a></p>
+        <ul>
+            <li>The <a href="https://osu.ppy.sh/groups/28">Beatmap Nominators</a> (BN) are responsible for disqualifying beatmaps and mediating vetoes from now on, in addition to their task of pushing beatmaps towards the ranked category.</li>
+            <li>The <a href="https://osu.ppy.sh/groups/7">Nominator Administration Team</a> (NAT) are the moderators of the Beatmap Nominators. They are responsible for BN Applications, creating tests for the applicants and for evaluating the current members. They will still have their moderation privileges although it is not their primary focus. </li>
+            <li>Beatmaps that have been vetoed will be mediated by a random jury made up of members of the BN. The NAT will oversee these mediations.</li>
+        </ul>
+    </section>
+    <section class="segment segment-image mx-auto" style="max-width: 900px">
+        <div class="row">
+            <h4 class="mx-auto">Current BNs</h4>
+        </div>
+        <div class="row mx-auto">
+            {{#each allUsersByMode}}
+            <table class="table table-sm table-dark table-hover col-6">
+                <thead>
+                    <td>{{this._id}}</td>
+                </thead>
+                <tbody>
+                    {{#each this.users}}
+                    <tr><td style="{{#if this.isProbation}}border-left: 3px solid var(--probation){{/if}}"
+                    ><a href="https://osu.ppy.sh/users/{{this.osuId}}" target="_blank">{{this.username}}</a></td></tr>
+                    {{/each}}
+                </tbody>
+            </table>
+            {{/each}}
+        </div>
+    </section>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
         integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
