@@ -106,14 +106,24 @@ export default {
         findPoints: function(event) {
             if(event.eventType == 'Ranked'){
                 let total = 10;
-                total += Math.round(event.effortBonus*10)/10;
+                let bonus = 1;
+                total += event.effortBonus;
                 if(!event.isUnique){
                     total *= 0.5;
                 }
                 if(event.isBnOrNat){
                     total *= 0.5;
                 }
-                return total;
+                if(event.mapperTotalRanked <= 3){
+                    bonus = -0.33 * event.mapperTotalRanked + 3;
+                }else if(event.mapperTotalRanked <= 10){
+                    bonus = -0.15 * event.mapperTotalRanked + 2.5;
+                }else if(event.mapperTotalRanked <= 100){
+                    bonus = -0.006 * event.mapperTotalRanked + 1.006;
+                }else{
+                    bonus = 0.5;
+                }
+                return Math.round(total*bonus*10)/10;
             }else if(event.eventType == 'Disqualified' && event.valid == 1){
                 return -5;
             }else{

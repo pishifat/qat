@@ -71,8 +71,8 @@ async function getUserInfo(token) {
     }
 }
 
-async function beatmapsetOwnerInfo(userId) {
-    const url = `https://osu.ppy.sh/api/get_user?k=${config.v1token}&u=${userId}`;
+async function beatmapsetOwnerMaps(userId) {
+    const url = `https://osu.ppy.sh/api/get_beatmaps?k=${config.v1token}&u=${userId}`;
     
     try {
         const res = await axios.get(url);
@@ -160,4 +160,4 @@ async function isBnEvaluator(req, res, next) {
     }
 }
 
-module.exports = { isLoggedIn, getToken, getUserInfo, beatmapsetInfo, beatmapsetOwnerInfo, isBnOrNat, isNat, isLeader, isBnEvaluator };
+module.exports = { isLoggedIn, getToken, getUserInfo, beatmapsetInfo, beatmapsetOwnerMaps, isBnOrNat, isNat, isLeader, isBnEvaluator };

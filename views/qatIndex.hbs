@@ -57,10 +57,19 @@
                     <h3 class="col-md-6"><a href="/users" class="lead">BN/NAT Listing</a></h3>
                     {{else}}
                     <h3 class="col-md-4"><a href="/vetoes" class="lead">Vetoes</a></h3>
-                    <h3 class="col-md-4"><a href="/appeval" class="lead">BN Evaluations</a></h3>
-                    <h3 class="col-md-4"><a href="/managereports" class="lead">Manage Reports</a></h3>
+                    <h3 class="col-md-4"><a href="/bneval" class="lead">Current BN Evals</a></h3>
+                    <h3 class="col-md-4"><a href="/appeval" class="lead">BN App Evals</a></h3>
                     {{/if}}
                 </div>
+                {{/if}}
+                {{#if isBnOrNat}}
+                    {{#unless isBn}}
+                        <div class="row">
+                            <h3 class="col-md-4"><a href="/managereports" class="lead">Manage Reports</a></h3>
+                            <h3 class="col-md-4"><a href="/managetest" class="lead">RC Test</a></h3>
+                            <h3 class="col-md-4"><a href="/datacollection" class="lead">Data Collection</a></h3>
+                        </div>
+                    {{/unless}}
                 {{/if}}
             </div>
         </div>

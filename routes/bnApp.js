@@ -139,10 +139,10 @@ router.post('/apply', async (req, res, next) => {
                 await api.getUserInfo(req.session.accessToken),
                 await getUserModsCount(req.session.username, req.body.mode),
             ]);
-            if (modScore <= 0 || ((req.body.mode == 'osu' && userInfo.kudosu.total <= 200) || (req.body.mode != 'osu' && userInfo.kudosu.total <= 150))) {
+            /*if (modScore <= 0 || ((req.body.mode == 'osu' && userInfo.kudosu.total <= 200) || (req.body.mode != 'osu' && userInfo.kudosu.total <= 150))) {
                 return res.json({ error: `You don't meet the minimum score or total kudosu requirement. 
                     Your mod score needs to be higher or equal than 0, currently is ${modScore}` });
-            }
+            }*/
             // Create app & test
             const [newBnApp, test] = await Promise.all([
                 await testSubmissionService.create(req.session.mongoId, req.body.mode),
