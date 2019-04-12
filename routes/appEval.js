@@ -27,6 +27,7 @@ router.get('/', async (req, res, next) => {
 //population
 const defaultPopulate = [
     { populate: 'applicant', display: 'username osuId' },
+    { populate: 'bnEvaluators', display: 'username osuId' },
     { populate: 'test', display: 'totalScore' },
     {
         populate: 'evaluations',
@@ -185,7 +186,6 @@ router.post('/enableBnEvaluators/:id', api.isLeader, async (req, res, next) => {
         await bnAppsService.update(req.params.id, { $push: { bnEvaluators: bn._id } });
     }
     let a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
-    console.log(a)
     res.json(a);
     logsService.create(
         req.session.mongoId,

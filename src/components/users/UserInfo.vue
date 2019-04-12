@@ -27,17 +27,17 @@
                         <li class="small" v-for="(date, i) in user.natDuration" :key="date">{{i % 2 == 0 ? 'Joined' : 'Left'}}: {{date.slice(0,10)}}</li>
                     </ul>
                 </div>
-                <span v-if="user.id == userId">
-                <p class="text-shadow">Veto Mediation: 
+                <p class="text-shadow">Veto Mediation: {{user.vetoMediator ? 'Active' : 'Inactive'}}
                     <button 
+                        v-if="isLeader"
                         class="btn btn-sm justify-content-center" 
                         :class="{ 'btn-nat': !user.vetoMediator, 'btn-nat-red': user.vetoMediator }" 
                         @click="switchMediator($event)"
                     >
-                        {{user.vetoMediator ? 'Opt-out' : 'Opt-in'}}
+                        {{user.vetoMediator ? 'Mark as inactive' : 'Mark as active'}}
                     </button>
                 </p>
-                <p v-if="user.group != 'nat'" class="text-shadow">BN Evaluation: 
+                <p v-if="user.group != 'nat' && user.id == userId" class="text-shadow">BN Evaluation: 
                     <button 
                         class="btn btn-sm justify-content-center" 
                         :class="{ 'btn-nat': !user.isBnEvaluator, 'btn-nat-red': user.isBnEvaluator }" 
@@ -46,7 +46,6 @@
                         {{user.isBnEvaluator ? 'Opt-out' : 'Opt-in'}}
                     </button>
                 </p>
-                </span>
                 <hr>
                 <span v-if="isLeader">
                 <button
@@ -94,7 +93,7 @@ export default {
         },
         //real
         switchMediator: async function(e){
-            const u = await this.executePost('/users/switchMediator/', {}, e);
+            const u = await this.executePost('/users/switchMediator/', {userId: this.user.id, vetoMediator: this.user.vetoMediator}, e);
             if(u){
                 if (u.error) {
                     this.info = u.error
@@ -105,7 +104,6 @@ export default {
         },
         switchBnEvaluator: async function(e){
             const u = await this.executePost('/users/switchBnEvaluator/', {}, e);
-            console.log(u)
             if(u){
                 if (u.error) {
                     this.info = u.error

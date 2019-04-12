@@ -22,18 +22,23 @@
                 <div class="container">
                     <div class="row">
                         <div v-if="application" class="col-sm-12">
-                            <p class="text-shadow">Submitted mods:</p>
-                            <ul style="list-style-type: none;">
+                            <p class="text-shadow">Modding:</p>
+                            <ul style="list-style-type: disc;">
                                 <li class="small text-shadow" v-for="(mod, i) in application.mods" :key="i">
                                     <a :href="modUrl(mod)" target="_blank">{{modUrl(mod)}}</a>
                                 </li>
+                                <li class="small text-shadow"><a :href="'https://osu.ppy.sh/users/' + application.applicant.osuId + '/modding/events?types%5B%5D=kudosu_gain&types%5B%5D=kudosu_lost&min_date=&max_date='" target="_blank">All history</a></li>
                             </ul>
                             <p class="text-shadow">Test results: 
-                                <span :class="application.test.totalScore > 15 ? 'vote-pass' : application.test.totalScore > 12.5 ? 'vote-extend' : 'vote-fail'">
+                                <a href="http://bn.mappersguild.com/testresults" target="_blank" 
+                                :class="application.test.totalScore > 15 ? 'vote-pass' : application.test.totalScore > 12.5 ? 'vote-extend' : 'vote-fail'">
                                     {{application.test.totalScore || application.test.totalScore >= 0 ? application.test.totalScore + '/20' : 'incomplete'}}
-                                </span>
+                                </a>
                             </p>
-                            <p class="text-shadow" v-if="application.bnEvaluators.length && evaluator.group == 'nat'">BN Evaluators: {{application.bnEvaluators.length}}</p>
+                            <p class="text-shadow" v-if="application.bnEvaluators.length && evaluator.group == 'nat'">BN Evaluators ({{application.bnEvaluators.length}}): </p>
+                            <ul>
+                                <li class="small text-shadow" v-for="evaluator in application.bnEvaluators" :key="evaluator.id">{{evaluator.username}}</li>
+                            </ul>
                             <div v-if="evaluator.isLeader && !application.bnEvaluators.length">
                                 <button class="btn btn-sm btn-nat mb-2" @click="selectBnEvaluators($event)">{{tempBnEvaluators ? 'Re-select BN Evaluators' : 'Select BN Evaluators'}}</button> 
                                 <button v-if="tempBnEvaluators" class="btn btn-sm btn-nat-red mb-2" @click="enableBnEvaluators($event)">Enable BN Evaluations</button>
@@ -273,7 +278,7 @@ export default {
             return date;
         },
         modUrl: function(mod){
-            if (mod.indexOf('https://osu.ppy.sh/beatmapsets/') == 0 && mod.indexOf("#") < 0) {
+            if (mod.indexOf('https://osu.ppy.sh/beatmapsets/') == 0 && (mod.indexOf("#") < 0 || mod.indexOf("#") > 40)) {
                 mod = mod.slice(31);
                 let indexEnd = mod.indexOf('/');
                 return `https://osu.ppy.sh/beatmapsets/${mod.slice(0, indexEnd)}/discussion/timeline?user=${this.application.applicant.osuId}`;

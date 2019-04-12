@@ -32,12 +32,12 @@ router.get('/relevantInfo', async (req, res, next) => {
 });
 
 /* POST submit or edit eval */
-router.post('/switchMediator/', api.isBnOrNat, async (req, res) => {
-    let u = await usersService.update(req.session.mongoId, {
-        vetoMediator: !res.locals.userRequest.vetoMediator,
+router.post('/switchMediator/', api.isLeader, async (req, res) => {
+    let u = await usersService.update(req.body.userId, {
+        vetoMediator: !req.body.vetoMediator,
     });
     res.json(u);
-    logsService.create(req.session.mongoId, `Opted ${u.vetoMediator ? 'in to' : 'out of'} veto mediation`);
+    logsService.create(req.session.mongoId, `Opted ${u.username} ${u.vetoMediator ? 'in to' : 'out of'} veto mediation`);
 });
 
 /* POST submit or edit eval */

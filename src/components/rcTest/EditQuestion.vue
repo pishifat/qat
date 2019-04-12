@@ -34,7 +34,6 @@
                             maxlength="300" rows="2" @keyup.enter="editQuestion($event)" v-model="question.content">
                         </textarea>    
                     </div>
-                    <button type="submit" class="btn btn-sm btn-nat-red float-right ml-2" @click="deleteQuestion($event)">Delete Question</button>
                     <button type="submit" class="btn btn-sm btn-nat float-right ml-2" @click="updateQuestion($event)">Update Question</button>
                     <button type="submit" class="btn btn-sm float-right ml-2" :class="question.active ? 'btn-nat-red' : 'btn-nat'" @click="toggleActive($event)" data-toggle="tooltip" data-placement="top" title="Changes whether or not question appears on newly generated tests">{{question.active ? "Mark as inactive" : "Mark as active"}}</button>
                 </div>
@@ -49,6 +48,7 @@
                             <td scope="col">Option</td>
                             <td scope="col">Score</td>
                             <td scope="col">Select</td>
+                            <td scope="col">Active</td>
                         </thead>
                         <tbody>
                             <tr v-for="option in question.options" :key="option.id">
@@ -59,6 +59,7 @@
                                     </td>
                                 <td scope="row">{{option.score}}</td>
                                 <td scope="row"><input type="checkbox" name="optionList" :value="option.id"></td>
+                                <td scope="row" :class="option.active ? 'vote-pass' : 'vote-fail'">{{option.active ? 'active' : 'inactive'}}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -85,7 +86,7 @@
                 <hr>
                 <span class="errors text-shadow" id="addEvalRoundsErrors">{{ info }}</span>
                 <span class="confirm text-shadow" id="addEvalRoundsConfirm">{{ confirm }}</span>
-                <button type="submit" class="btn btn-sm btn-nat-red float-right ml-2" @click="deleteOption($event)">Delete Selected Option</button>
+                <button type="submit" class="btn btn-sm btn-nat-red float-right ml-2" @click="toggleActiveOption($event)">Mark as opposite activity</button>
                 <button type="submit" class="btn btn-sm btn-nat float-right ml-2" @click="updateOption($event)">Update Selected Option</button>
                 <button type="submit" class="btn btn-sm btn-nat float-right ml-2" @click="addOption($event)">Add Option</button>
                 
@@ -135,16 +136,6 @@ export default {
                 }
             }
         },
-        deleteQuestion: async function(e) {
-            const result = confirm(`Are you sure?`);
-            if(result){
-                const success = await this.executePost('/manageTest/deleteQuestion/' + this.question.id, {}, e);
-                if (success) {
-                    this.$emit('delete-question', this.question.id);
-                    $('#editQuestion').modal('hide');
-                }
-            }
-        },
         addOption: async function(e) {
             this.info = '';
             this.confirm = '';
@@ -188,7 +179,7 @@ export default {
                 }
             }
         },
-        deleteOption: async function(e) {
+        toggleActiveOption: async function(e) {
             this.info = '';
             this.confirm = '';
             let checkedOptions = [];
@@ -198,13 +189,13 @@ export default {
             if(!checkedOptions.length){
                 this.info = 'Must select options!'
             }else{
-                const question = await this.executePost('/manageTest/deleteOption/', {checkedOptions: checkedOptions, questionId: this.question.id}, e);
+                const question = await this.executePost('/manageTest/toggleActiveOption/', {checkedOptions: checkedOptions, questionId: this.question.id}, e);
                 if (question) {
                     if (question.error) {
                         this.info = question.error;
                     } else {
                         this.$emit('update-question', question);
-                        this.confirm = checkedOptions.length > 1 ? 'Options deleted!' : 'Option deleted!';
+                        this.confirm = checkedOptions.length > 1 ? 'Options edited!' : 'Option edited!';
                     }
                 }
             }

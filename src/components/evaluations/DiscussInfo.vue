@@ -44,15 +44,17 @@
                         </h5>
                         <div v-if="discussApp" class="col-sm-12">
                             <p class="text-shadow">Submitted mods:</p>
-                            <ul style="list-style-type: none;">
+                            <ul style="list-style-type: disc;">
                                 <li class="small text-shadow" v-for="(mod, i) in discussApp.mods" :key="i">
                                     <a :href="modUrl(mod)" target="_blank">{{modUrl(mod)}}</a>
                                 </li>
+                                <li class="small text-shadow"><a :href="'https://osu.ppy.sh/users/' + discussApp.applicant.osuId + '/modding/events?types%5B%5D=kudosu_gain&types%5B%5D=kudosu_lost&min_date=&max_date='" target="_blank">All history</a></li>
                             </ul>
                             <p class="text-shadow">Test results: 
-                                <span :class="discussApp.test.totalScore > 15 ? 'vote-pass' : discussApp.test.totalScore > 12.5 ? 'vote-extend' : 'vote-fail'">
+                                <a href="http://bn.mappersguild.com/testresults" target="_blank" 
+                                :class="discussApp.test.totalScore > 15 ? 'vote-pass' : discussApp.test.totalScore > 12.5 ? 'vote-extend' : 'vote-fail'">
                                     {{discussApp.test.totalScore || discussApp.test.totalScore >= 0 ? discussApp.test.totalScore + '/20' : 'incomplete'}}
-                                </span>
+                                </a>
                             </p>
                             <h5 class="text-shadow mb-2" v-if="!readOnly">Consensus:
                                 <span v-if="discussApp.consensus" :class="'vote-' + discussApp.consensus">{{discussApp.consensus}}</span>

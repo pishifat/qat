@@ -89,13 +89,19 @@ router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
     if (req.body.includeUsers) {
         const includeUsers = req.body.includeUsers.split(',');
         for (let i = 0; i < includeUsers.length; i++) {
-            let u = await usersService.query({
-                $or: [
-                    { username: new RegExp('^' + helper.escapeUsername(includeUsers[i].trim()) + '$', 'i') },
-                    { osuId: includeUsers[i].trim() }
-                ],
-            });
-            if (u) {
+            let userToSearch = includeUsers[i].trim();
+            let u;
+            if (!isNaN(userToSearch)) {
+                userToSearch = parseInt(userToSearch);
+                u = await usersService.query({
+                    osuId: userToSearch
+                });
+            } else {
+                u = await usersService.query({
+                    username: new RegExp('^' + helper.escapeUsername(includeUsers[i].trim()) + '$', 'i')
+                });
+            }
+            if (u && !u.error) {
                 if (u.modes) {
                     u.modes.forEach(m => {
                         if (isValidMode(m, req.body.osu, req.body.taiko, req.body.catch, req.body.mania)) {

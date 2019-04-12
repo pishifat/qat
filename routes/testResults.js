@@ -25,7 +25,7 @@ router.get('/', async (req, res, next) => {
 const defaultPopulate = [{ populate: 'options', display: 'content score metadataType' }];
 
 const defaultTestPopulate = [
-    { populate: 'applicant', display: 'username' },
+    { populate: 'applicant', display: 'username osuId' },
     { populate: 'answers', display: 'question optionsChosen' },
     {
         innerPopulate: 'answers',

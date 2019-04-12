@@ -22,7 +22,7 @@ router.get('/', async (req, res, next) => {
 
 //population
 const defaultPopulate = [
-    { populate: 'options', display: 'content score metadataType' },
+    { populate: 'options', display: 'content score metadataType active' },
 ];
 
 /* GET applicant listing. */
@@ -113,32 +113,19 @@ router.post('/updateOption/:id', async (req, res) => {
     );
 });
 
-/* POST delete option */
-router.post('/deleteOption/', async (req, res) => {
+/* POST edit option activity */
+router.post('/toggleActiveOption/', async (req, res) => {
     for (let i = 0; i < req.body.checkedOptions.length; i++) {
-        await optionsService.remove(req.body.checkedOptions[i]);
+        let o = await optionsService.query({_id: req.body.checkedOptions[i]});
+        await optionsService.update(req.body.checkedOptions[i], {active: !o.active});
     }
     let q = await questionsService.query({ _id: req.body.questionId }, defaultPopulate);
     res.json(q);
     logsService.create(
         req.session.mongoId,
-        `Deleted ${req.body.checkedOptions.length} RC test question option${
+        `Changed active status of ${req.body.checkedOptions.length} RC test question option${
             req.body.checkedOptions.length == 1 ? '' : 's'
         }`
-    );
-});
-
-/* POST delete question */
-router.post('/deleteQuestion/:id', async (req, res) => {
-    let q = await questionsService.query({ _id: req.params.id });
-    for (let i = 0; i < q.options.length; i++) {
-        await optionsService.remove(q.options[i]);
-    }
-    await questionsService.remove(req.params.id);
-    res.json(true);
-    logsService.create(
-        req.session.mongoId,
-        `Deleted RC test question: "${q.content.length > 50 ? q.content.slice(0, 50) + '...' : q.content}"`
     );
 });
 

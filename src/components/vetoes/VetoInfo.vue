@@ -41,14 +41,18 @@
                                 <span v-for="(mediation, i) in upholdMediations" :key="mediation.id">
                                     <samp><pre class="small">({{i+1}}): {{mediation.comment}}</pre></samp><br>
                                 </span>
-                                <samp class="small">This beatmap cannot be nominated until changes are made that address the veto's concerns and the veto-ing nominator(s) are satisfied.</samp>
+                                <samp class="small">This beatmap cannot be nominated until changes are made that address the veto's concerns and the veto-ing nominator is satisfied (within reasonable limits).</samp>
                             </div>
                             <div v-else>
                                 <span v-for="(mediation, i) in withdrawMediations" :key="mediation.id">
                                     <samp><pre class="small">({{i+1}}): {{mediation.comment}}</pre></samp><br>
                                 </span>
-                                <samp class="small">Due to the veto being withdrawn, this beatmap may now be re-nominated.</samp>
+                                <samp class="small">Due to the veto being withdrawn, this beatmap may now be re-nominated.</samp><br><br>
                             </div>
+                            <samp class="small">Users involved in this veto's mediation:</samp><br>
+                            <ul style="list-style-type: none; padding: 0">
+                                <li v-for="mediation in alphabeticalMediations" :key="mediation.id"><samp class="small">- {{mediation.mediator.username}}</samp></li>
+                            </ul>
                         </div>
                         <span v-if="veto.status != 'upheld' && veto.status != 'withdrawn'">
                             <button class="btn btn-sm" :class="majority ? 'btn-nat' : 'btn-nat-red'" @click="concludeMediation($event)">{{majority ? 'Uphold Veto' : 'Withdraw Veto'}}</button>
@@ -79,7 +83,7 @@
                                 <samp class="small">[notice]{{veto.shortReason}}[/notice]</samp><br><br>
                                 <samp class="small">Veto discussion can be found [url={{veto.discussionLink}}]here[/url].</samp><br><br>
                                 <samp class="small">Please post your opinion regarding the veto on the [url=http://bn.mappersguild.com/vetoes]BN/NAT website[/url] in [b]one week[/b]. Your decision will be anonymous to everyone but members of the NAT.</samp><br><br>
-                                <samp class="small">If you do not participate in this veto mediation, the NAT will question your standing as a Beatmap Nominator. If you do not want to participate in future veto mediations, opt-out from the [url=http://bn.mappersguild.com/users]users page[/url].</samp><br><br>
+                                <samp class="small">If you have a good reason not to participate in veto mediations, reply to this message.</samp><br><br>
                                 <samp class="small">Thank you for your hard work!</samp><br><br>
                             </div>
                         </div>
@@ -238,6 +242,10 @@ export default {
         },
         withdrawMediations: function(){
             return this.veto.mediations.filter(mediation => mediation.vote == 3);
+        },
+        alphabeticalMediations: function(){
+            let sorted = this.veto.mediations;
+            return sorted.sort((a,b) => (a.mediator.username > b.mediator.username) ? 1 : ((b.mediator.username > a.mediator.username) ? -1 : 0)); ;
         }
     },
 }

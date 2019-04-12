@@ -64,7 +64,7 @@ class UserService extends BaseService
                         } 
                     }
                 ]);
-            } else if (includeFullBns) {
+            } else if (includeFullBns && !includeNat) {
                 fullUsers = await User.aggregate([
                     {
                         $unwind: '$modes',
@@ -72,6 +72,23 @@ class UserService extends BaseService
                     { 
                         $match: { 
                             group: 'bn',
+                            osuId: { $ne: 1052994 } 
+                        } 
+                    },
+                    { 
+                        $group: {
+                            _id: '$modes', users: { $push: { id: '$_id', username: '$username', osuId: '$osuId' } }
+                        } 
+                    }
+                ]);
+            } else if(!includeFullBns && includeNat) {
+                fullUsers = await User.aggregate([
+                    {
+                        $unwind: '$modes',
+                    },
+                    { 
+                        $match: { 
+                            group: 'nat',
                             osuId: { $ne: 1052994 } 
                         } 
                     },
@@ -103,15 +120,13 @@ class UserService extends BaseService
                     }
                 ]);
             }
-            
-            if (includeFullBns && includeProbation) {
+            if ((includeFullBns || includeNat) && includeProbation) {
                 probationUsers.forEach(u => {
                     let i = fullUsers.findIndex(fullUser => fullUser._id === u._id);
                     if (i != -1) fullUsers[i].users = fullUsers[i].users.concat(u.users);
                 });
-                
                 return fullUsers;
-            } else if (includeFullBns) {
+            } else if (includeFullBns || includeNat) {
                 return fullUsers;
             } else {
                 return probationUsers;

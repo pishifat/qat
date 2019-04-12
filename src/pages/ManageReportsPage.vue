@@ -88,8 +88,21 @@ export default {
             }
         },
         separateObjs: function() {
-            this.openReports = this.pageObjs.filter( report => report.isActive);
-            this.closedReports = this.pageObjs.filter( report => !report.isActive);
+            this.openReports = this.pageObjs.filter( report =>{
+                if(this.isLeader){
+                    return report.isActive;
+                }else{
+                    return report.isActive && report.culprit.group != 'nat';
+                }
+                
+            });
+            this.closedReports = this.pageObjs.filter( report =>{
+                if(this.isLeader){
+                    return !report.isActive;
+                }else{
+                    return !report.isActive && report.culprit.group != 'nat';
+                }
+            });
         },
         updateReport: function (report) {
 			const i = this.allObjs.findIndex(r => r.id == report.id);

@@ -94,13 +94,16 @@ router.post('/submit', async (req, res, next) => {
     let option;
     for (let i = 0; i < test.answers.length; i++) {
         answer = test.answers[i];
+        let questionScore = 0;
         for (let j = 0; j < answer.question.options.length; j++) {
             option = answer.question.options[j];
             if (req.body.checkedOptions.indexOf(option.id) >= 0) {
                 await testSubmissionService.updateAnswer(answer.id, { $push: { optionsChosen: option.id } });
-                displayScore += option.score;
+                questionScore += option.score;
             }
         }
+        if(questionScore < 0) questionScore = 0;
+        displayScore += questionScore;
     }
     let metadataInput = await testSubmissionService.createMetadataInput(
         req.body.title,
@@ -129,6 +132,11 @@ router.post('/submit', async (req, res, next) => {
         if (test.answers[i].question.category == 'metadata') {
             answer = test.answers[i];
             await testSubmissionService.updateAnswer(answer.id, { $push: { metadataInput: metadataInput } });
+            let notEmpty = [];
+            answer.question.options.forEach(option => {
+                notEmpty.push(option.metadataType);
+            });
+            let occupiedEmptyCategories = [];
             for (let j = 0; j < answer.question.options.length && !escape; j++) {
                 option = answer.question.options[j];
                 for (let k = 0; k < inputObject.length && !escape; k++) {
@@ -142,6 +150,9 @@ router.post('/submit', async (req, res, next) => {
                                 escape = true;
                             }
                         }
+                    }else if(!inputObject[k].length && notEmpty.indexOf(inputObject[k].category) < 0 && occupiedEmptyCategories.indexOf(inputObject[k].category) < 0){
+                        displayScore += 0.5;
+                        occupiedEmptyCategories.push(inputObject[k].category);
                     }
                 }
             }
