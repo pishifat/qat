@@ -256,74 +256,65 @@ router.post('/setFeedback/:id', async (req, res) => {
 
 /* GET aiess info */
 router.get('/userActivity/:id/:mode', async (req, res) => {
-    let date = new Date();
-    date.setDate(date.getDate() - 90);
-
-    let noms = await aiessService.query(
-        {
-            userId: req.params.id,
-            timestamp: { $gte: date },
-            $or: [{ eventType: 'Bubbled' }, { eventType: 'Qualified' }],
-            modes: { $elemMatch: { $eq: req.params.mode }}
-        },
-        {},
-        { beatmapsetId: 1 },
-        true
-    );
- 
-    for (let i = 1; i < noms.length; i++) {
-        if (noms[i].beatmapsetId == noms[i - 1].beatmapsetId) {
-            noms.splice(i-1, 1); //show only unique nominations
-            i--;
-        }
+    if (isNaN(req.params.id)) {
+        return res.json({ error: 'Something went wrong!' });
     }
 
+    let limitDate = new Date();
+    limitDate.setDate(limitDate.getDate() - 90);
+    const [allUserEvents, allEvents] = await Promise.all([
+        aiessService.getByEventTypeAndUser(parseInt(req.params.id), limitDate, req.params.mode),
+        aiessService.getAllByEventType(limitDate, req.params.mode)
+    ]);
+
+    if (allUserEvents.error || allEvents.error) return res.json({ error: 'Something went wrong!' });
+    
+    let uniqueNominations = [];
+    let dqs = [];
+    let pops = [];
+
+    allUserEvents.forEach(userEvent => {
+        const eventType = userEvent._id;
+        const events = userEvent.events;
+
+        if (eventType == 'Qualified' || eventType == 'Bubbled') {
+            events.forEach(event => {
+                if (uniqueNominations.length == 0) {
+                    uniqueNominations.push(event);
+                } else if (!uniqueNominations.find(n => n.beatmapsetId == event.beatmapsetId)) {
+                    uniqueNominations.push(event);
+                }
+            });
+        } else if (eventType == 'Disqualified') {
+            dqs = events;
+        } else if (eventType == 'Popped') {
+            pops = events;
+        }
+    });
+    
     let nomsDqd = [];
-    let allDqs = await aiessService.query(
-        { eventType: 'Disqualified', timestamp: { $gte: date } },
-        {},
-        { timestamp: 1 },
-        true
-    );
-    allDqs.forEach(dq => {
-        noms.forEach(nom => {
-            if (nom.beatmapsetId == dq.beatmapsetId && nom.timestamp < dq.timestamp) {
-                nomsDqd.push(dq);
-            }
-        });
-    });
-
     let nomsPopped = [];
-    let allPops = await aiessService.query(
-        { eventType: 'Popped', timestamp: { $gte: date } },
-        {},
-        { timestamp: 1 },
-        true
-    );
-    allPops.forEach(pop => {
-        noms.forEach(nom => {
-            if (nom.beatmapsetId == pop.beatmapsetId) {
-                nomsPopped.push(pop);
-            }
-        });
+
+    allEvents.forEach(e => {
+        const eventType = e._id;
+        const events = e.events;
+
+        if (eventType == 'Disqualified') {
+            events.forEach(event => {
+                if (uniqueNominations.find(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
+                    nomsDqd.push(event);
+                }
+            });
+        } else if (eventType == 'Popped') {
+            events.forEach(event => {
+                if (uniqueNominations.find(n => n.beatmapsetId == event.beatmapsetId)) {
+                    nomsDqd.push(event);
+                }
+            });
+        }
     });
 
-    let dqs =
-        (await aiessService.query(
-            { userId: req.params.id, eventType: 'Disqualified', timestamp: { $gte: date } },
-            {},
-            { timestamp: 1 },
-            true
-        )) || [];
-    let pops =
-        (await aiessService.query(
-            { userId: req.params.id, eventType: 'Popped', timestamp: { $gte: date } },
-            {},
-            { timestamp: 1 },
-            true
-        )) || [];
-
-    res.json({ noms: noms, nomsDqd: nomsDqd, nomsPopped: nomsPopped, dqs: dqs, pops: pops });
+    res.json({ noms: uniqueNominations, nomsDqd: nomsDqd, nomsPopped: nomsPopped, dqs: dqs, pops: pops });
 });
 
 module.exports = router;

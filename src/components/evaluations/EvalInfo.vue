@@ -63,7 +63,10 @@
                         </div>
 
                         <div v-if="evalRound" class="col-sm-12">
-                            <p class="text-shadow"><a :href="noms && '#noms'" data-toggle="collapse">Show unique nominations</a> ({{noms ? noms.length: '0'}})</p>
+                            <p class="text-shadow">
+                                <a :href="noms && '#noms'" data-toggle="collapse">Show unique nominations</a> 
+                                ({{ loading ? '...' : noms ? noms.length: '0' }})
+                            </p>
                             <div v-if="noms" class="collapse" id="noms">
                                 <table class="table table-sm table-dark table-hover col-md-12 mt-2">
                                     <thead>
@@ -78,7 +81,10 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <p class="text-shadow"><a :href="nomsDqd && '#nomsDqd'" data-toggle="collapse">Show disqualified nominations</a> ({{nomsDqd ? nomsDqd.length : '0'}})</p>
+                            <p class="text-shadow">
+                                <a :href="nomsDqd && '#nomsDqd'" data-toggle="collapse">Show disqualified nominations</a> 
+                                ({{ loading ? '...' : nomsDqd ? nomsDqd.length : '0' }})
+                            </p>
                             <div v-if="nomsDqd" class="collapse" id="nomsDqd">
                                 <table class="table table-sm table-dark table-hover col-md-12 mt-2">
                                     <thead>
@@ -95,7 +101,10 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <p class="text-shadow"><a :href="nomsPopped && '#nomsPopped'" data-toggle="collapse">Show popped nominations</a> ({{nomsPopped ? nomsPopped.length : '0'}})</p>
+                            <p class="text-shadow">
+                                <a :href="nomsPopped && '#nomsPopped'" data-toggle="collapse">Show popped nominations</a> 
+                                ({{ loading ? '...' : nomsPopped ? nomsPopped.length : '0' }})
+                            </p>
                             <div v-if="nomsPopped" class="collapse" id="nomsPopped">
                                 <table class="table table-sm table-dark table-hover col-md-12 mt-2">
                                     <thead>
@@ -113,7 +122,10 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <p class="text-shadow"><a :href="dqs && '#dqs'" data-toggle="collapse">Show disqualifications done by user</a> ({{dqs ? dqs.length : '0'}})</p>
+                            <p class="text-shadow">
+                                <a :href="dqs && '#dqs'" data-toggle="collapse">Show disqualifications done by user</a> 
+                                ({{ loading ? '...' : dqs ? dqs.length : '0' }})
+                            </p>
                             <div v-if="dqs" class="collapse" id="dqs">
                                 <table class="table table-sm table-dark table-hover col-md-12 mt-2">
                                     <thead>
@@ -131,7 +143,10 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <p class="text-shadow"><a :href="pops && '#pops'" data-toggle="collapse">Show pops done by user</a> ({{pops ? pops.length : '0'}})</p>
+                            <p class="text-shadow">
+                                <a :href="pops && '#pops'" data-toggle="collapse">Show pops done by user</a> 
+                                ({{ loading ? '...' : pops ? pops.length : '0' }})
+                            </p>
                             <div v-if="pops" class="collapse" id="pops">
                                 <table class="table table-sm table-dark table-hover col-md-12 mt-2">
                                     <thead>
@@ -262,6 +277,7 @@ export default {
                 report.culprit == this.evalRound.bn.id);
         },
         findRelevantActivity: function() {
+            this.loading = true;
             axios
                 .get('/bnEval/userActivity/' + this.evalRound.bn.osuId + '/' + this.evalRound.mode)
                 .then(response => {
@@ -270,7 +286,8 @@ export default {
                     this.nomsPopped = response.data.nomsPopped;
                     this.dqs = response.data.dqs;
                     this.pops = response.data.pops;
-                });
+                    this.loading = false;
+                })
         },
         createDeadline: function(date){
             date = new Date(date);
@@ -374,6 +391,7 @@ export default {
             nomsPopped: null,
             nomsDqd: null,
             tempBnEvaluators: null,
+            loading: true,
         };
     },
 }
