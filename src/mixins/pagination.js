@@ -1,29 +1,55 @@
 const pagination = {
     data() {
         return {
-            limit: 24,
+            pre: null,
+            limit: null,
+            pages: null,
+            currentPage: null,
+            canShowOlder: true,
+            count: 24,
         }
     },
     watch: {
         limit: function() {
-            if (this.allObjs) this.pageObjs = this.allObjs.slice(0, this.limit);
-        },
-        allObjs: function() {
-            if (this.allObjs) this.pageObjs = this.allObjs.slice(0, this.limit);
+            this.changePage();
         },
     },
     methods: {
-        scroll: function() {
-            window.onscroll = () => {
-                let scrolled = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
-                if (scrolled + window.innerHeight === document.documentElement.offsetHeight) {
-                    this.limit += 16;
+		changePage: function() {
+			this.limit = Math.round(this.limit);
+            this.pre = this.limit - this.count;
+            if (this.allObjs) {
+                if (this.isFiltered) {
+                    if (this.limit >= this.filteredObjs.length) {
+                        this.canShowOlder = false;
+                    }
+                    this.pageObjs = this.filteredObjs.slice(this.pre, this.limit);
+                    this.pages = Math.ceil(this.filteredObjs.length / this.count);
+                } else {
+                    if (this.limit >= this.allObjs.length) {
+                        this.canShowOlder = false;
+                    }
+                    this.pageObjs = this.allObjs.slice(this.pre, this.limit);
+                    this.pages = Math.ceil(this.allObjs.length / this.count);
                 }
             }
+            if (this.pages > 0) {
+                this.currentPage = this.limit / this.count;
+            } else {
+                this.currentPage = this.pages;
+            }
         },
-    },
-    mounted() {
-        this.scroll();
+        showOlder: function() {
+            if (this.canShowOlder) {
+                this.limit += this.count;
+            }
+        },
+        showNewer: function() {
+            if (this.pre > 0) {
+                this.limit -= this.count;
+                this.canShowOlder = true;
+            }
+        },
     }
 }
 
