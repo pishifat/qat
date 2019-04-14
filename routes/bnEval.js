@@ -72,9 +72,16 @@ router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
         
         if (req.body.excludeUsers) {
             const excludeUsers = req.body.excludeUsers.split(',');
+            for (let i = 0; i < excludeUsers.length; i++) {
+                if(parseInt(excludeUsers[i])){
+                    excludeUsers[i] = parseInt(excludeUsers[i]);
+                }else{
+                    excludeUsers[i] = excludeUsers[i].trim().toLowerCase();
+                }
+            }
             allUsersByMode.forEach(m => {
                 m.users = m.users.filter(u => {
-                    return !excludeUsers.include(u.username) || !excludeUsers.include(u.osuId);
+                    return !excludeUsers.includes(u.username.toLowerCase()) && !excludeUsers.includes(u.osuId);
                 });
             });
         }
