@@ -29,17 +29,24 @@
             
             <section class="row segment segment-image mx-0 px-0">
                 <div class="col-sm-12">
-                    <div class="row mx-auto">
-                        <button
-                            :disabled="!(pre > 0)"
-                            class="btn btn-sm btn-nat mx-auto my-2"
-                            style="display:block"
-                            type="button"
-                            @click="showNewer()"
-                        >
-                            <i class="fas fa-angle-up mr-1"></i> show next <i class="fas fa-angle-up ml-1"></i>
-                        </button>
-                    </div>
+                    <button
+                        v-if="!(pre > 0)"
+                        class="btn btn-sm btn-nat mx-auto my-2"
+                        style="
+                            display: block;
+                            position: absolute;
+                            left: -5px;
+                            top: 0;
+                            height: 100%;
+                            border-radius: 0;
+                            padding: 0;
+                            margin: 0;
+                            padding-right: 5px;"
+                        type="button"
+                        @click="showNewer()"
+                    >
+                        <i class="fas fa-angle-left"></i>
+                    </button>
                     <transition-group name="list" tag="div" class="row mx-auto">
                         <veto-card
                             v-for="veto in pageObjs"
@@ -52,17 +59,24 @@
                     <div class="row d-flex justify-content-center mt-2">
                         <div class="small text-center mx-auto">{{ currentPage }} of {{ pages }}</div>
                     </div>
-                    <div class="row d-flex justify-content-center">
-                        <button
-                            :disabled="!canShowOlder"
-                            class="btn btn-sm btn-nat mx-auto my-2"
-                            style="display:block"
-                            type="button"
-                            @click="showOlder()"
-                        >
-                            <i class="fas fa-angle-down mr-1"></i> show previous <i class="fas fa-angle-down ml-1"></i>
-                        </button>
-                    </div>
+                    <button
+                        v-if="!canShowOlder"
+                        class="btn btn-sm btn-nat"
+                        style="
+                            display: block;
+                            position: absolute;
+                            right: -5px;
+                            top: 0;
+                            height: 100%;
+                            border-radius: 0;
+                            padding: 0;
+                            margin: 0;
+                            padding-right: 5px;"
+                        type="button"
+                        @click="showOlder()"
+                    >
+                        <i class="fas fa-angle-right"></i>
+                    </button>
                 </div>
             </section>
         </div>

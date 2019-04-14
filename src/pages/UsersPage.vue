@@ -23,34 +23,16 @@
             </small>
         </section>
 
-        <section class="row segment segment-image mx-0 px-0">
-            <div class="col-sm-12">
-                <div class="row mx-auto">
-                    <button :disabled="!(pre > 0)" class="btn btn-sm btn-nat mx-auto text-center my-2" type="button" @click="showNewer()">
-                        <i class="fas fa-angle-up mr-1"></i> show next <i class="fas fa-angle-up ml-1"></i>
-                    </button>
-                </div>
-                <transition-group name="list" tag="div" class="row mx-auto">
-                    <user-card
-                        v-for="user in pageObjs"
-                        :key="user.id"
-                        :user="user"
-                        :userId="userId"
-                        :isLeader="isLeader"
-                        @update:selectedUser="selectedUser = $event"
-                    ></user-card>
-                </transition-group>
-                <div class="row d-flex justify-content-center mt-2">
-                    <p class="small">{{currentPage}} of {{pages}}</p>
-                </div>
-                <div class="row d-flex justify-content-center">
-                    <button :disabled="!canShowOlder" class="btn btn-sm btn-nat text-center mb-2" type="button" @click="showOlder()">
-                        <i class="fas fa-angle-down mr-1"></i> show previous <i class="fas fa-angle-down ml-1"></i>
-                    </button>
-                </div>
-            </div>
-        </section>
-
+        <transition-group name="list" tag="div" class="row segment segment-image mx-auto mx-0 px-0">
+            <user-card
+                v-for="user in pageObjs"
+                :key="user.id"
+                :user="user"
+                :userId="userId"
+                :isLeader="isLeader"
+                @update:selectedUser="selectedUser = $event"
+            ></user-card>
+        </transition-group>
     </div>
     <user-info
         :user="selectedUser"
@@ -119,7 +101,6 @@ export default {
                 this.allObjs = response.data.users;
                 this.userId = response.data.userId;
                 this.isLeader = response.data.isLeader;
-                this.limit = 24;
             }).then(function(){
                 $("#loading").fadeOut();
                 $('#main').attr("style", "visibility: visible").hide().fadeIn();
@@ -141,5 +122,7 @@ export default {
 </script>
 
 <style>
-
+    .card {
+        min-height: 84px;
+    }
 </style>
