@@ -67,7 +67,7 @@ class BaseService {
             if (typeof filter === 'string') {
                 return await this.model.findByIdAndUpdate(filter, update, { 'new': true });
             } else {
-                return await this.model.findAndUpdate(filter, update, { 'new': true });
+                return await this.model.findOneAndUpdate(filter, update, { 'new': true });
             }
         } catch(error) {
             return { error: error._message };

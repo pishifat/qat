@@ -38,7 +38,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 //natdb
-mongoose.connect(config.connection, { useNewUrlParser: true });
+mongoose.connect(config.connection, { useFindAndModify: false, useNewUrlParser: true });
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'db connection error:'));
 db.once('open', function() {

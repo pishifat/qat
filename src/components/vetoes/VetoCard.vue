@@ -11,7 +11,7 @@
             <img :src="'https://assets.ppy.sh/beatmaps/' + veto.beatmapId + '/covers/card.jpg'" class="card-img" style="opacity: 0.25; overflow: hidden;">
             <div class="card-body veto-card-spacing">
                 <p class="text-shadow">
-                    <a :href="'https://osu.ppy.sh/beatmapsets/' + veto.beatmapId" target="_blank" @click.stop>{{ veto.beatmapTitle }}</a>
+                    <a :href="'https://osu.ppy.sh/beatmapsets/' + veto.beatmapId" target="_blank" @click.stop>{{ fullTitle }}</a>
                     <i v-if="veto.mode.indexOf('osu') >= 0" class="far fa-circle"></i>
                     <i v-if="veto.mode.indexOf('taiko') >= 0" class="fas fa-drum"></i>
                     <i v-if="veto.mode.indexOf('catch') >= 0" class="fas fa-apple-alt"></i>
@@ -36,9 +36,10 @@ export default {
     computed: {
         fullTitle: function() {
             if (this.veto.beatmapTitle) {
-                return this.veto.beatmapTitle + ' by ' + this.veto.beatmapMapper;
+                if (this.veto.beatmapTitle.length > 53) return this.veto.beatmapTitle.slice(0, 53) + '...';
+                else return this.veto.beatmapTitle;
             } else {
-                return 'something';
+                return '...';
             }
         },
     },
