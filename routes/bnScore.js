@@ -13,19 +13,6 @@ router.use(api.isBnOrNat);
 
 /* GET bn app page */
 router.get('/', async (req, res, next) => {
-    /*const url = `https://osu.ppy.sh/api/get_beatmaps?k=${config.v1token}&since=2019-04-01`;
-    try {
-        const res = await axios.get(url);
-        let average = 0;
-        console.log(res.data[0]);
-        for (let i = 0; i < res.data.length; i++) {
-            let map = res.data[i];
-            average += parseInt(map.hit_length);
-        }
-        console.log(average/500);
-    } catch (error) {
-        console.log(error);
-    }*/
     res.render('bnscore', {
         title: 'Beatmap Nominator Score',
         script: '../javascripts/bnScore.js',
