@@ -116,7 +116,7 @@
                                         <tbody>
                                             <tr v-for="nom in noms" :key="nom.id">
                                                 <td scope="row">{{new Date(nom.timestamp).toString().slice(4,15)}}</td>
-                                                <td scope="row"><a :href="'https://osu.ppy.sh/beatmapsets/' + nom.beatmapsetId + '/discussion'" target="_blank">{{nom.metadata}}</a></td>
+                                                <td scope="row"><a :href="'https://osu.ppy.sh/beatmapsets/' + nom.beatmapsetId + '/discussion/-/events'" target="_blank">{{nom.metadata}}</a></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -133,7 +133,7 @@
                                             <tr v-for="dq in nomsDqd" :key="dq.id" 
                                             :class="dq.valid == 1 ? 'vote-border-pass' : dq.valid == 2 ? 'vote-border-extend' : dq.valid == 3 ? 'vote-border-fail' : ''">
                                                 <td scope="row">{{new Date(dq.timestamp).toString().slice(4,15)}}</td>
-                                                <td scope="row"><a :href="'https://osu.ppy.sh/beatmapsets/' + dq.beatmapsetId + '/discussion'" target="_blank">{{dq.metadata}}</a></td>
+                                                <td scope="row"><a :href="'https://osu.ppy.sh/beatmapsets/' + dq.beatmapsetId + '/discussion/-/events'" target="_blank">{{dq.metadata}}</a></td>
                                                 <td scope="row">{{dq.content.slice(0, dq.content.indexOf('.')+1) || dq.content}}</td>
                                             </tr>
                                         </tbody>
@@ -151,7 +151,7 @@
                                             <tr v-for="pop in nomsPopped" :key="pop.id" 
                                             :class="pop.valid == 1 ? 'vote-border-pass' : pop.valid == 2 ? 'vote-border-extend' : pop.valid == 3 ? 'vote-border-fail' : ''">
                                                 <td scope="row">{{new Date(pop.timestamp).toString().slice(4,15)}}</td>
-                                                <td scope="row"><a :href="'https://osu.ppy.sh/beatmapsets/' + pop.beatmapsetId + '/discussion'" target="_blank">{{pop.metadata}}</a></td>
+                                                <td scope="row"><a :href="'https://osu.ppy.sh/beatmapsets/' + pop.beatmapsetId + '/discussion/-/events'" target="_blank">{{pop.metadata}}</a></td>
                                                 <td scope="row">{{pop.content.slice(0, pop.content.indexOf('.')+1) || pop.content}}</td>
                                             </tr>
                                         </tbody>
@@ -169,7 +169,7 @@
                                             <tr v-for="dq in dqs" :key="dq.id"
                                             :class="dq.valid == 1 ? 'vote-border-pass' : dq.valid == 2 ? 'vote-border-extend' : dq.valid == 3 ? 'vote-border-fail' : ''">
                                                 <td scope="row">{{new Date(dq.timestamp).toString().slice(4,15)}}</td>
-                                                <td scope="row"><a :href="'https://osu.ppy.sh/beatmapsets/' + dq.beatmapsetId + '/discussion'" target="_blank">{{dq.metadata}}</a></td>
+                                                <td scope="row"><a :href="'https://osu.ppy.sh/beatmapsets/' + dq.beatmapsetId + '/discussion/-/events'" target="_blank">{{dq.metadata}}</a></td>
                                                 <td scope="row">{{dq.content.slice(0, dq.content.indexOf('.')+1) || dq.content}}</td>
                                             </tr>
                                         </tbody>
@@ -187,7 +187,7 @@
                                             <tr v-for="pop in pops" :key="pop.id"
                                             :class="pop.valid == 1 ? 'vote-border-pass' : pop.valid == 2 ? 'vote-border-extend' : pop.valid == 3 ? 'vote-border-fail' : ''">
                                                 <td scope="row">{{new Date(pop.timestamp).toString().slice(4,15)}}</td>
-                                                <td scope="row"><a :href="'https://osu.ppy.sh/beatmapsets/' + pop.beatmapsetId + '/discussion'" target="_blank">{{pop.metadata}}</a></td>
+                                                <td scope="row"><a :href="'https://osu.ppy.sh/beatmapsets/' + pop.beatmapsetId + '/discussion/-/events'" target="_blank">{{pop.metadata}}</a></td>
                                                 <td scope="row">{{pop.content.slice(0, pop.content.indexOf('.')+1) || pop.content}}</td>
                                             </tr>
                                         </tbody>

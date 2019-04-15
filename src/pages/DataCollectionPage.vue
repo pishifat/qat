@@ -54,7 +54,7 @@
                             {{dq.content.slice(0, dq.content.indexOf('.')+1) || dq.content}} 
                             <a href="#" data-toggle="modal" data-target="#editReason" :data-entry="dq.id" @click.prevent="selectEntry(dq)">edit</a>
                             </td>
-                        <td scope="row">
+                        <td scope="row" style="width: 72px;">
                             <a href="#" @click.prevent="updateValidity(dq.id, 1);"
                                 data-toggle="tooltip" data-placement="top" title="valid"
                             ><i class="fas fa-square vote-pass"></i></a>
@@ -64,6 +64,9 @@
                             <a href="#" @click.prevent="updateValidity(dq.id, 3);"
                                 data-toggle="tooltip" data-placement="top" title="invalid"
                             ><i class="fas fa-square vote-fail"></i></a>
+                            <a href="#" @click.prevent="updateValidity(dq.id, null);"
+                                data-toggle="tooltip" data-placement="top" title="unmarked"
+                            ><i class="fas fa-square"></i></a>
                         </td>
                         <td scope="row">
                             
@@ -80,7 +83,7 @@
                     <td scope="col">Date</td>
                     <td scope="col">Mapset</td>
                     <td scope="col">Reason</td>
-                    <td scope="col">Validity</td>
+                    <td scope="col" data-toggle="tooltip" data-placement="top" title="Marks objectivity/subjectivity of issue for reference in BN Evaluations">Validity</td>
                     <td scope="col"></td>
                 </thead>
                 <tbody>
@@ -95,10 +98,19 @@
                             {{pop.content.slice(0, pop.content.indexOf('.')+1) || pop.content}} 
                             <a href="#" data-toggle="modal" data-target="#editReason" :data-entry="pop.id" @click.prevent="selectEntry(pop)">edit</a>
                         </td>
-                        <td scope="row">
-                            <a href="#" @click.prevent="updateValidity(pop.id, 1);"><i class="fas fa-square vote-pass"></i></a>
-                            <a href="#" @click.prevent="updateValidity(pop.id, 2);"><i class="fas fa-square vote-extend"></i></a>
-                            <a href="#" @click.prevent="updateValidity(pop.id, 3);"><i class="fas fa-square vote-fail"></i></a>
+                        <td scope="row" style="width: 72px;">
+                            <a href="#" @click.prevent="updateValidity(pop.id, 1);"
+                                data-toggle="tooltip" data-placement="top" title="valid"
+                            ><i class="fas fa-square vote-pass"></i></a>
+                            <a href="#" @click.prevent="updateValidity(pop.id, 2);"
+                                data-toggle="tooltip" data-placement="top" title="partially valid"
+                            ><i class="fas fa-square vote-extend"></i></a>
+                            <a href="#" @click.prevent="updateValidity(pop.id, 3);"
+                                data-toggle="tooltip" data-placement="top" title="invalid"
+                            ><i class="fas fa-square vote-fail"></i></a>
+                            <a href="#" @click.prevent="updateValidity(pop.id, null);"
+                                data-toggle="tooltip" data-placement="top" title="unmarked"
+                            ><i class="fas fa-square"></i></a>
                         </td>
                     </tr>
                 </tbody>
@@ -250,7 +262,8 @@ export default {
         axios
             .get('/dataCollection/relevantInfo')
             .then(response => {
-                this.allObjs = response.data;
+                this.allObjs = response.data.events;
+                this.filterMode = response.data.mode;
                 this.hasPagination = false;
                 this.hasSeparation = true;
             }).then(function(){

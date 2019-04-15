@@ -60,7 +60,7 @@ class AiessService extends BaseService
                 },
                 {
                     $sort: {
-                        timestamp: -1,
+                        timestamp: 1,
                         beatmapsetId: -1,
                     }
                 },
@@ -96,7 +96,7 @@ class AiessService extends BaseService
                 },
                 {
                     $sort: {
-                        timestamp: -1,
+                        timestamp: 1,
                         beatmapsetId: -1,
                     }
                 },

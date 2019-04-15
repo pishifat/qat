@@ -218,6 +218,7 @@ export default {
             .then(response => {
                 this.allObjs = response.data.a;
                 this.evaluator = response.data.evaluator;
+                this.filterMode = response.data.evaluator.modes[0];
                 this.hasPagination = false;
                 this.hasSeparation = true;
                 this.filter();

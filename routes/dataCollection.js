@@ -29,7 +29,7 @@ router.get('/relevantInfo', async (req, res, next) => {
         { timestamp: -1 },
         true
     );
-    res.json(data);
+    res.json({events: data, mode: res.locals.userRequest.modes[0]});
 });
 
 /* POST edit reason for dq/pop */
@@ -53,7 +53,7 @@ router.post('/updateValidity/:id', async (req, res) => {
         logsService.create(
             req.session.mongoId,
             `Updated validity of s/${a.beatmapsetId} to 
-            "${req.body.validity == 1 ? 'valid' : req.body.validity == 2 ? 'partially valid' : 'invalid'}"`
+            "${req.body.validity == 1 ? 'valid' : req.body.validity == 2 ? 'partially valid' : req.body.validity == 3 ? 'invalid' : 'unmarked'}"`
         );
     }
 });

@@ -314,8 +314,8 @@ router.get('/userActivity/:id/:mode', async (req, res) => {
             });
         } else if (eventType == 'Popped') {
             events.forEach(event => {
-                if (uniqueNominations.find(n => n.beatmapsetId == event.beatmapsetId)) {
-                    nomsDqd.push(event);
+                if (uniqueNominations.find(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
+                    nomsPopped.push(event);
                 }
             });
         }
