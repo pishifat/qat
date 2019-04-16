@@ -302,24 +302,38 @@ router.get('/userActivity/:id/:mode', async (req, res) => {
     let nomsDqd = [];
     let nomsPopped = [];
 
-    allEvents.forEach(e => {
-        const eventType = e._id;
-        const events = e.events;
-
+    for (let i = 0; i < allEvents.length; i++) {
+        const eventType = allEvents[i]._id;
+        const events = allEvents[i].events;
+        
         if (eventType == 'Disqualified') {
-            events.forEach(event => {
+            for (let j = 0; j < events.length; j++) {
+                let event = events[j];
                 if (uniqueNominations.find(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
+                    if(!event.responsibleNominators || !event.responsibleNominators.length) {
+                        let a = await aiessService.query({beatmapsetId: event.beatmapsetId, timestamp: { $lte: event.timestamp }}, {}, {timestamp: -1}, true, 3);
+                        await aiessService.update(a[0].id, {$push: {responsibleNominators: {$each: [a[1].userId, a[2].userId]} } } );
+                    }
                     nomsDqd.push(event);
                 }
-            });
+            }
         } else if (eventType == 'Popped') {
-            events.forEach(event => {
+            for (let j = 0; j < events.length; j++) {
+                let event = events[j];
                 if (uniqueNominations.find(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
-                    nomsPopped.push(event);
+                    if(!event.responsibleNominators || !event.responsibleNominators.length){
+                        let a = await aiessService.query({beatmapsetId: event.beatmapsetId, timestamp: { $lte: event.timestamp }}, {}, {timestamp: -1}, true, 2);
+                        await aiessService.update(a[0].id, {$push: {responsibleNominators: a[1].userId} });
+                        if(a[1].userId == parseInt(req.params.id)){
+                            nomsPopped.push(event);
+                        }
+                    }else if(event.responsibleNominators.indexOf(parseInt(req.params.id)) >= 0){
+                        nomsPopped.push(event);
+                    }
                 }
-            });
+            }
         }
-    });
+    }
 
     res.json({ noms: uniqueNominations, nomsDqd: nomsDqd, nomsPopped: nomsPopped, dqs: dqs, pops: pops });
 });

@@ -16,6 +16,7 @@ const aiessSchema = new mongoose.Schema({
     isBnOrNat:  { type: Boolean, default: false },
     isUnique: { type: Boolean, default: false },
     effortBonus: { type: Number }, //multiplier combining drain per diff, # diffs, and difficulty of each diff
+    responsibleNominators: [{ type: Number }]
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 const Aiess = mongoose.model('aiess', aiessSchema, 'aiess');
