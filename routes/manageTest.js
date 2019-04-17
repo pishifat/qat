@@ -27,7 +27,7 @@ const defaultPopulate = [
 
 /* GET applicant listing. */
 router.get('/load/:type', async (req, res, next) => {
-    let q = await questionsService.query({ category: req.params.type }, defaultPopulate, {}, true);
+    let q = await questionsService.query({ category: req.params.type }, defaultPopulate, {createdAt: -1}, true);
     res.json(q);
 });
 

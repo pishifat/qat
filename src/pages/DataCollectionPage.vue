@@ -32,6 +32,23 @@
                 </select>
             </small>
         </section>
+        <section class="segment my-1">
+            <a data-toggle="collapse" href="#howToUse">How do I use this page? <i class="fas fa-angle-down"></i></a> 
+            <div id="howToUse" class="collapse mt-4 mx-2">
+                <p class="mx-2">This page is used to make BN evaluations more consistent and convenient. As a member of the NAT, your roles here are to...</p>
+                <h5>Shorten "reason" information</h5>
+                <p class="mx-2">DQ/reset reasons are inconsistent, too wordy, and can be misleading (especially when written by BNs). By editing the reason, you'll be able to fix those problems.</p>
+                <p class="mx-2">Each reason should be as concise as possible. For common reasons, select an option from the dropdown so that evaluators don't need to interpret repeated reasons in multiple ways. If you believe a reason is common enough to deserve placement in the dropdown, tell pishifat. For less common reasons, write a summary in the input box below. There's a low character limit forcing you to keep it short.</p>
+                <h5>Decide relevancy of DQs/resets</h5>
+                <p class="mx-2">All events are accounted for in a BN's performance evaluation. Many events resulting from minor or subjective issues aren't important enough to require punishment. "Validity" serves as a way to mark which DQs/resets are applicable for judgment on a BN's evaluations.</p>
+                <p class="mx-2"><span class="vote-pass">Valid</span>: Objective issues, direct violations of the Ranking Criteria</p>
+                <p class="mx-2"><span class="vote-extend">Partially valid</span>: Major subjective issues whose importance should be judged by evaluators individually</p>
+                <p class="mx-2"><span class="vote-fail">Invalid</span>: Anything else</p>
+                <p class="mx-2">If you're unsure how to mark something, ask another NAT member for their opinion</p>
+                <h5>Keep up to date with this page</h5>
+                <p class="mx-2">It's necessary to track DQ/reset information before reasons become impossible to interpret. A mapper could change the map and involved parties could forget details of the issue. BN evaluations rely on understanding a user's mistakes, so falling behind on data collection will affect future BN evaluations!</p>
+            </div>
+        </section>
         <section class="segment segment-image mx-0">
             <h2>Disqualifications</h2>
             <table class="table table-sm table-dark table-hover col-md-12 mt-2">
@@ -194,7 +211,7 @@ export default {
     watch: { 
         allObjs: function(){
             this.filter();
-        }
+        },
     },
     methods: {
         filterBySearchValueContext: function(o) {
@@ -246,7 +263,7 @@ export default {
                     this.updateEntry(result);
                 }
             }
-        }
+        },
     },
     data() {
         return {
