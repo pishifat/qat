@@ -44,16 +44,16 @@ router.post('/updateReason/:id', async (req, res) => {
 });
 
 /* POST edit validity */
-router.post('/updateValidity/:id', async (req, res) => {
-    let a = await aiessService.update(req.params.id, { valid: req.body.validity });
+router.post('/updateNotability/:id', async (req, res) => {
+    let a = await aiessService.update(req.params.id, { valid: req.body.notability });
     if (!a) {
         res.json({ error: 'Something went wrong' });
     } else {
         res.json(a);
         logsService.create(
             req.session.mongoId,
-            `Updated validity of s/${a.beatmapsetId} to 
-            "${req.body.validity == 1 ? 'valid' : req.body.validity == 2 ? 'partially valid' : req.body.validity == 3 ? 'invalid' : 'unmarked'}"`
+            `Updated notability of s/${a.beatmapsetId} to 
+            "${req.body.notability == 1 ? 'notable' : req.body.notability == 2 ? 'semi-notable' : req.body.notability == 3 ? 'not notable' : 'unmarked'}"`
         );
     }
 });

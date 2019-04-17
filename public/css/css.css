@@ -17,7 +17,6 @@
     --withdrawn: var(--fail);
     --main-text: rgba(255, 255, 255, 0.871);
     --secondary-text: #b9bbbe;
-
     --dark: #252525;
     --darker: #141414;
     --dark-alpha: #252525a6;
@@ -434,8 +433,16 @@ input[type=number] {
     border-left: 3px solid var(--fail);
 }
 
+.vote-border-fail-wide {
+    border-left: 5px solid var(--fail);
+}
+
 .vote-border-extend {
     border-left: 3px solid var(--extend);
+}
+
+.vote-border-extend-wide {
+    border-left: 5px solid var(--extend);
 }
 
 .vote-border-neutral {
@@ -444,6 +451,10 @@ input[type=number] {
 
 .vote-border-pass {
     border-left: 3px solid var(--pass);
+}
+
+.vote-border-pass-wide {
+    border-left: 5px solid var(--pass);
 }
 
 .vote-border-invis {
