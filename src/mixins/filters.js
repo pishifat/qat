@@ -68,20 +68,32 @@ const filters = {
         },
         filterByVote: function() {
             if (this.filterVote.length) {
-                this.filteredObjs = this.allObjs.filter(v => {
-                    if (v.valid == this.filterVote) {
-                        return true;
-                    }
-                    if (this.filterVote == 'none' && !v.valid && !v.vote) {
-                        return true;
-                    }
-                    return false;
-                });
+                if(this.filterMode.length){
+                    this.filteredObjs = this.filteredObjs.filter(v => {
+                        if (v.valid == this.filterVote) {
+                            return true;
+                        }
+                        if (this.filterVote == 'none' && !v.valid && !v.vote) {
+                            return true;
+                        }
+                        return false;
+                    });
+                }else{
+                    this.filteredObjs = this.allObjs.filter(v => {
+                        if (v.valid == this.filterVote) {
+                            return true;
+                        }
+                        if (this.filterVote == 'none' && !v.valid && !v.vote) {
+                            return true;
+                        }
+                        return false;
+                    });
+                }
             }
         },
         filterBySearchValue: function() {
             if (this.filterValue.length > 2) {
-                if (this.filterMode.length) {
+                if (this.filterMode.length || this.filterVote.length) {
                     this.filteredObjs = this.allObjs.filter(o => {
                         return this.filterBySearchValueContext(o);
                     });
