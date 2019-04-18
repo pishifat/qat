@@ -2,10 +2,9 @@
 <div class="row">
     <div class="col-md-12">
         <section class="row segment segment-solid my-1 mx-4">
-            <small>Search: 
-                <input id="search" v-model="filterValue" type="text" placeholder="username... (3+ characters)" /> 
-            </small>
-            <small>
+            <div class="small filter-box">
+                <span class="filter-header">Search</span>
+                <input id="search" class="ml-2" v-model="filterValue" type="text" placeholder="username... (3+ characters)" autocomplete="off" /> 
                 <select class="custom-select ml-2" id="mode" v-model="filterMode">
                     <option value="" selected>All modes</option>
                     <option value="osu">osu!</option>
@@ -13,23 +12,19 @@
                     <option value="catch">osu!catch</option>
                     <option value="mania">osu!mania</option>
                 </select>
-            </small>
+            </div>
         </section>
         <section class="row segment segment-solid my-1 mx-4">
-            <small>Sort by:
-                <a :class="sortBy === 'username' ? 'sorted' : ''" href="#" @click.prevent="sort('username')">Name</a> | 
-                <a :class="sortBy === 'bnDuration' ? 'sorted' : ''" href="#" @click.prevent="sort('bnDuration')">BN Tenure</a> | 
-                <a :class="sortBy === 'natDuration' ? 'sorted' : ''" href="#" @click.prevent="sort('natDuration')">NAT Tenure</a>
-            </small>
+            <div class="small">
+                <span class="filter-header">Sort by</span>
+                <a :class="sortBy === 'username' ? 'sorted' : 'unsorted'" href="#" @click.prevent="sort('username')">Name</a>
+                <a :class="sortBy === 'bnDuration' ? 'sorted' : 'unsorted'" href="#" @click.prevent="sort('bnDuration')">Time as BN</a>
+                <a :class="sortBy === 'natDuration' ? 'sorted' : 'unsorted'" href="#" @click.prevent="sort('natDuration')">Time as NAT</a>
+            </div>
         </section>
 
         <section class="row segment segment-image mx-0 px-0">
             <div class="col-sm-12">
-                <div class="row mx-auto">
-                    <button :disabled="!(pre > 0)" class="btn btn-sm btn-nat mx-auto text-center my-2" type="button" @click="showNewer()">
-                        <i class="fas fa-angle-up mr-1"></i> show next <i class="fas fa-angle-up ml-1"></i>
-                    </button>
-                </div>
                 <transition-group name="list" tag="div" class="row mx-auto">
                     <user-card
                         v-for="user in pageObjs"
@@ -40,14 +35,12 @@
                         @update:selectedUser="selectedUser = $event"
                     ></user-card>
                 </transition-group>
-                <div class="row d-flex justify-content-center mt-2">
-                    <p class="small">{{currentPage}} of {{pages}}</p>
-                </div>
-                <div class="row d-flex justify-content-center">
-                    <button :disabled="!canShowOlder" class="btn btn-sm btn-nat text-center mb-2" type="button" @click="showOlder()">
-                        <i class="fas fa-angle-down mr-1"></i> show previous <i class="fas fa-angle-down ml-1"></i>
-                    </button>
-                </div>
+                <button v-if="pre > 0" class="btn btn-sm btn-pags btn-pags-left" type="button" @click="showNewer()">
+                    <i class="fas fa-angle-left px-1"></i>
+                </button>
+                <button v-if="canShowOlder" class="btn btn-sm btn-pags btn-pags-right" type="button" @click="showOlder()">
+                    <i class="fas fa-angle-right px-1"></i>
+                </button>
             </div>
         </section>
 

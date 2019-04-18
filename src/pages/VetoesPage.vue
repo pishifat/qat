@@ -2,44 +2,32 @@
     <div class="row">
         <div class="col-md-12">
             <section class="row segment segment-solid my-1 mb-3">
-                <small
-                    >Search:
+                <div class="small filter-box">
+                    <span class="filter-header">Search</span>
                     <input
                         id="search"
-                        class="ml-1"
+                        class="ml-2"
                         v-model="filterValue"
                         type="text"
                         placeholder="beatmap..."
+                        autocomplete="off"
                     />
-                </small>
-                <small class="ml-1">
-                    <select class="custom-select" id="mode" v-model="filterMode">
-                        <option class="ml-2" value="" selected>All modes</option>
-                        <option class="ml-2" value="osu">osu!</option>
-                        <option class="ml-2" value="taiko">osu!taiko</option>
-                        <option class="ml-2" value="catch">osu!catch</option>
-                        <option class="ml-2" value="mania">osu!mania</option>
+                    <select class="custom-select ml-2" id="mode" v-model="filterMode">
+                        <option value="" selected>All modes</option>
+                        <option value="osu">osu!</option>
+                        <option value="taiko">osu!taiko</option>
+                        <option value="catch">osu!catch</option>
+                        <option value="mania">osu!mania</option>
                     </select>
-                </small>
 
-                <button class="btn btn-sm btn-nat ml-3" data-toggle="modal" data-target="#addVeto">
-                    Submit veto
-                </button>
+                    <button class="btn btn-sm btn-nat ml-2" data-toggle="modal" data-target="#addVeto">
+                        Submit veto
+                    </button>
+                </div>
             </section>
             
             <section class="row segment segment-image mx-0 px-0">
                 <div class="col-sm-12">
-                    <div class="row mx-auto">
-                        <button
-                            :disabled="!(pre > 0)"
-                            class="btn btn-sm btn-nat mx-auto my-2"
-                            style="display:block"
-                            type="button"
-                            @click="showNewer()"
-                        >
-                            <i class="fas fa-angle-up mr-1"></i> show next <i class="fas fa-angle-up ml-1"></i>
-                        </button>
-                    </div>
                     <transition-group name="list" tag="div" class="row mx-auto">
                         <veto-card
                             v-for="veto in pageObjs"
@@ -49,20 +37,6 @@
                             @update:selectedVeto="selectedVeto = $event"
                         ></veto-card>
                     </transition-group>
-                    <div class="row d-flex justify-content-center mt-2">
-                        <div class="small text-center mx-auto">{{ currentPage }} of {{ pages }}</div>
-                    </div>
-                    <div class="row d-flex justify-content-center">
-                        <button
-                            :disabled="!canShowOlder"
-                            class="btn btn-sm btn-nat mx-auto my-2"
-                            style="display:block"
-                            type="button"
-                            @click="showOlder()"
-                        >
-                            <i class="fas fa-angle-down mr-1"></i> show previous <i class="fas fa-angle-down ml-1"></i>
-                        </button>
-                    </div>
                 </div>
             </section>
         </div>
