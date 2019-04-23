@@ -111,13 +111,13 @@ class UserService extends BaseService
             }else if(!includeNat && includeProbation && includeFullBns){
                 return allBns;
             }else if(includeProbation && !includeFullBns){
-                allUsers = allBns.filter(u => u.probation.length);
+                allUsers = allBns.filter(u => u.probation && u.probation.length);
                 if(includeNat){
                     allUsers.concat(allNats);
                 }
                 return allUsers;
             }else if(!includeProbation && includeFullBns){
-                allUsers = allBns.filter(u => !u.probation.length);
+                allUsers = allBns.filter(u => !u.probation || (u.probation && !u.probation.length));
                 if(includeNat){
                     allUsers.concat(allNats);
                 }
