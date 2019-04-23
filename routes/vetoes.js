@@ -31,7 +31,12 @@ router.get('/', async (req, res, next) => {
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res, next) => {
     let v = await vetoesService.query({}, defaultPopulate, { createdAt: -1 }, true);
-    res.json({ vetoes: v, userId: req.session.mongoId, isNat: res.locals.userRequest.group == 'nat', isSpectator: res.locals.userRequest.isSpectator });
+    res.json({ 
+        vetoes: v, 
+        userId: req.session.mongoId, 
+        isNat: res.locals.userRequest.group == 'nat', 
+        isSpectator: res.locals.userRequest.isSpectator 
+    });
 });
 
 /* POST create a new veto. */

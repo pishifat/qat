@@ -96,7 +96,16 @@
                 </thead>
                 <tbody>
                     {{#each this.users}}
-                    <tr><td style="{{#if this.isProbation}}border-left: 3px solid var(--probation){{/if}}"
+                    <tr><td style="
+                    {{#if this.probation}}
+                        border-left: 3px solid var(--probation);
+                    {{else}} 
+                        {{#ifCond this.group 'nat'}}
+                            border-left: 3px solid var(--nat);
+                        {{else}}
+                            border-left: 3px solid var(--bn);
+                        {{/ifCond}}
+                    {{/if}}"
                     ><a href="https://osu.ppy.sh/users/{{this.osuId}}" target="_blank">{{this.username}}</a></td></tr>
                     {{/each}}
                 </tbody>
