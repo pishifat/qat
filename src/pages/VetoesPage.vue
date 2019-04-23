@@ -43,7 +43,7 @@
         <veto-info
             :veto="selectedVeto"
             :user-id="userId"
-            :is-nat="isNat"
+            :is-nat="isNat || isSpectator"
             :is-spectator="isSpectator"
             @update-veto="updateVeto($event)"
         ></veto-info>

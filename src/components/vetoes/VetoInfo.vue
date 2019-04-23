@@ -26,7 +26,7 @@
                 }}</p>
 
                 <!--nat options-->
-                <div class="text-shadow" v-if="isNat">
+                <div class="text-shadow" v-if="isNat || isSpectator">
                     <hr>
                     <div v-if="veto.mediations.length">
                         <ul style="list-style-type: none; padding-left: 0.5rem">

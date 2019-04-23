@@ -23,8 +23,8 @@ router.get('/', async (req, res, next) => {
         script: '../javascripts/vetoes.js',
         isVetoes: true,
         isBnOrNat: true,
-        isBnEvaluator: res.locals.userRequest.group == 'bn' && res.locals.userRequest.isBnEvaluator,
-        isNat: res.locals.userRequest.group == 'nat',        
+        isBnEvaluator: res.locals.userRequest.group == 'bn' && res.locals.userRequest.isBnEvaluator  && !res.locals.userRequest.isSpectator,
+        isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,        
     });
 });
 
@@ -34,7 +34,7 @@ router.get('/relevantInfo', async (req, res, next) => {
     res.json({ 
         vetoes: v, 
         userId: req.session.mongoId, 
-        isNat: res.locals.userRequest.group == 'nat', 
+        isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator, 
         isSpectator: res.locals.userRequest.isSpectator 
     });
 });

@@ -122,7 +122,7 @@ async function isLoggedIn(req, res, next) {
 async function isBnOrNat(req, res, next) {
     const u = res.locals.userRequest;
     
-    if (u.group == 'bn' || u.group == 'nat') {
+    if (u.group == 'bn' || u.group == 'nat' || u.isSpectator) {
         next();
     } else {
         res.redirect('/');
@@ -132,7 +132,7 @@ async function isBnOrNat(req, res, next) {
 async function isNat(req, res, next) {
     const u = res.locals.userRequest;
     
-    if (u.group == 'nat') {
+    if (u.group == 'nat' || u.isSpectator) {
         next();
     } else {
         res.redirect('/');

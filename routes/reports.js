@@ -15,9 +15,9 @@ router.get('/', async (req, res, next) => {
         title: 'Report a BN/NAT',
         script: '../js/reports.js',
         isReports: true,
-        isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat',
-        isBnEvaluator: res.locals.userRequest.group == 'bn' && res.locals.userRequest.isBnEvaluator,
-        isNat: res.locals.userRequest.group == 'nat',
+        isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
+        isBnEvaluator: res.locals.userRequest.group == 'bn' && res.locals.userRequest.isBnEvaluator && !res.locals.userRequest.isSpectator,
+        isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
     });
 });
 

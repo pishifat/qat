@@ -41,7 +41,7 @@
                                     <li class="small text-shadow" v-for="evaluation in application.evaluations" :key="evaluation.id">{{evaluation.evaluator.username}}</li>
                                 </ul>
                             </div>
-                            <p class="text-shadow" v-if="application.bnEvaluators.length && evaluator.group == 'nat'">BN Evaluators ({{application.bnEvaluators.length}}): </p>
+                            <p class="text-shadow" v-if="application.bnEvaluators.length && (evaluator.group == 'nat' || evaluator.isSpectator)">BN Evaluators ({{application.bnEvaluators.length}}): </p>
                             <ul>
                                 <li class="small text-shadow" v-for="evaluator in application.bnEvaluators" :key="evaluator.id">{{evaluator.username}}</li>
                             </ul>

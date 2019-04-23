@@ -14,9 +14,9 @@ router.get('/', async (req, res, next) => {
         title: 'BN/NAT Listing',
         script: '../javascripts/users.js',
         isUsers: true,
-        isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat',
-        isBnEvaluator: res.locals.userRequest.group == 'bn' && res.locals.userRequest.isBnEvaluator,
-        isNat: res.locals.userRequest.group == 'nat',
+        isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
+        isBnEvaluator: res.locals.userRequest.group == 'bn' && res.locals.userRequest.isBnEvaluator  && !res.locals.userRequest.isSpectator,
+        isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
     });
 });
 
@@ -68,7 +68,6 @@ router.post('/removeGroup/:id', api.isLeader, async (req, res) => {
     }else if(u.group == 'nat'){
         u = await usersService.update(req.params.id, { group: 'user',  probation: [], modes: [], $push: {natDuration: new Date()} });
     }
-    console.log(u);
     res.json(u);
     logsService.create(
         req.session.mongoId,

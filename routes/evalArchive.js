@@ -16,8 +16,8 @@ router.get('/', async (req, res, next) => {
         title: 'Evaluation Archives',
         script: '../javascripts/evalArchive.js',
         isEval: true,
-        isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat',
-        isNat: res.locals.userRequest.group == 'nat',
+        isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
+        isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
     });
 });
 

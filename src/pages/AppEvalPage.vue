@@ -45,8 +45,8 @@
                 </div>
             </div>
         </section>
-        <hr v-if="evaluator && evaluator.group == 'nat'">
-        <section class="row segment segment-image mx-1 px-0" v-if="evaluator && evaluator.group == 'nat'">
+        <hr v-if="evaluator && (evaluator.group == 'nat' || evaluator.isSpectator)">
+        <section class="row segment segment-image mx-1 px-0" v-if="evaluator && (evaluator.group == 'nat' || evaluator.isSpectator)">
             <div class="col-sm-12">
                 <h2>Group Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="After individual evals are completed, their responses are made visible to allow discussion and form a consensus">?</sup></h2>
 

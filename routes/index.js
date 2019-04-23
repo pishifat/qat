@@ -18,7 +18,7 @@ router.get('/', async (req, res, next) => {
 
     let isBnOrNat;
     let isBn;
-    if (user && (user.group == 'bn' || user.group == 'nat')) {
+    if (user && (user.group == 'bn' || user.group == 'nat' || user.isSpectator)) {
         isBnOrNat = true;
         if (user.group == 'bn') isBn = true;
     }
