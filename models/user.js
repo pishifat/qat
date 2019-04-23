@@ -58,8 +58,12 @@ class UserService extends BaseService
                     },
                     { 
                         $match: { 
-                            $or: [{ group: 'bn' }, { group: 'nat' }],
-                            isSpectator: { $ne: true } 
+                            $or: [{ group: 'bn' }, 
+                                {$and:  
+                                    [{ group: 'nat', 
+                                    isSpectator: {$ne: true} 
+                                }]
+                            }],
                         } 
                     },
                     { 
@@ -76,7 +80,6 @@ class UserService extends BaseService
                     { 
                         $match: { 
                             group: 'bn',
-                            isSpectator: { $ne: true } 
                         } 
                     },
                     { 
