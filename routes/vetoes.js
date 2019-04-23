@@ -83,10 +83,16 @@ router.post('/submit', async (req, res, next) => {
 
 /* POST set status upheld or withdrawn. */
 router.post('/selectMediators', async (req, res, next) => {
-    const allUsers = await usersModel.aggregate([
-        { $match: { group: { $ne: 'user' }, vetoMediator: true, isSpectator: false} },
-        { $sample: { size: 1000 } },
-    ]);
+    let allUsers;
+    try{
+        allUsers = await usersModel.aggregate([
+            { $match: { group: { $ne: 'user' }, vetoMediator: true, isSpectator: {$ne: true}} },
+            { $sample: { size: 1000 } },
+        ]);
+    }catch (error) {
+        return { error: error._message };
+    }
+
     let usernames = [];
     for (let i = 0; i < allUsers.length; i++) {
         let user = allUsers[i];
@@ -156,7 +162,7 @@ router.post('/replaceMediator/:id', api.isNat, async (req, res, next) => {
     });
 
     const allUsers = await usersModel.aggregate([
-        { $match: { group: { $ne: 'user' }, vetoMediator: true, isSpectator: false} },
+        { $match: { group: { $ne: 'user' }, vetoMediator: true, isSpectator: {$ne: true}} },
         { $sample: { size: 1000 } },
     ]);
     for (let i = 0; i < allUsers.length; i++) {
