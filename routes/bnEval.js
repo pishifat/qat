@@ -226,10 +226,12 @@ router.post('/setComplete/', api.isLeader, async (req, res) => {
         }
         
         await evalRoundsService.update(req.body.checkedRounds[i], { active: false });
-        logsService.create(
-            req.session.mongoId,
-            `Set ${u.username}'s ${er.mode} BN eval as "${er.consensus}"`
-        );
+        if(er.consensus){
+            logsService.create(
+                req.session.mongoId,
+                `Set ${u.username}'s ${er.mode} BN eval as "${er.consensus}"`
+            );
+        }
     }
 
     let ev = await evalRoundsService.query({ active: true }, defaultPopulate, { deadline: 1 }, true);
@@ -245,9 +247,11 @@ router.post('/setConsensus/:id', api.isLeader, async (req, res) => {
     await evalRoundsService.update(req.params.id, { consensus: req.body.consensus });
     let ev = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(ev);
-    logsService.create(
-        req.session.mongoId,`Set consensus of ${ev.bn.username}'s ${ev.mode} BN eval as ${req.body.consensus}`
-    );
+    if(req.body.consensus){
+        logsService.create(
+            req.session.mongoId,`Set consensus of ${ev.bn.username}'s ${ev.mode} BN eval as ${req.body.consensus}`
+        );
+    }
 });
 
 /* POST set feedback of eval */

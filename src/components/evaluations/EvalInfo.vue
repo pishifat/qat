@@ -69,107 +69,12 @@
                         </div>
 
                         <div v-if="evalRound" class="col-sm-12">
-                            <p class="text-shadow">
-                                <a :href="noms && '#noms'" data-toggle="collapse">Show unique nominations</a> 
-                                ({{ loading ? '...' : noms ? noms.length: '0' }})
-                            </p>
-                            <div v-if="noms" class="collapse" id="noms">
-                                <table class="table table-sm table-dark table-hover col-md-12 mt-2">
-                                    <thead>
-                                        <td scope="col">Date</td>
-                                        <td scope="col">Mapset</td>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="nom in noms" :key="nom.id">
-                                            <td scope="row">{{new Date(nom.timestamp).toString().slice(4,15)}}</td>
-                                            <td scope="row"><a :href="'https://osu.ppy.sh/beatmapsets/' + nom.beatmapsetId + '/discussion/-/events'" target="_blank">{{nom.metadata}}</a></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <p class="text-shadow">
-                                <a :href="nomsDqd && '#nomsDqd'" data-toggle="collapse">Show disqualified nominations</a> 
-                                ({{ loading ? '...' : nomsDqd ? nomsDqd.length : '0' }})
-                            </p>
-                            <div v-if="nomsDqd" class="collapse" id="nomsDqd">
-                                <table class="table table-sm table-dark table-hover col-md-12 mt-2">
-                                    <thead>
-                                        <td scope="col">Date</td>
-                                        <td scope="col">Mapset</td>
-                                        <td scope="col">Reason</td>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="dq in nomsDqd" :key="dq.id" :class="dq.valid == 1 ? 'vote-border-pass' : dq.valid == 2 ? 'vote-border-extend' : dq.valid == 3 ? 'vote-border-fail' : ''">
-                                            <td scope="row">{{new Date(dq.timestamp).toString().slice(4,15)}}</td>
-                                            <td scope="row"><a :href="'https://osu.ppy.sh/beatmapsets/' + dq.beatmapsetId + '/discussion/-/events'" target="_blank">{{dq.metadata}}</a></td>
-                                            <td scope="row">{{dq.content.slice(0, dq.content.indexOf('.')+1) || dq.content}}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <p class="text-shadow">
-                                <a :href="nomsPopped && '#nomsPopped'" data-toggle="collapse">Show popped nominations</a> 
-                                ({{ loading ? '...' : nomsPopped ? nomsPopped.length : '0' }})
-                            </p>
-                            <div v-if="nomsPopped" class="collapse" id="nomsPopped">
-                                <table class="table table-sm table-dark table-hover col-md-12 mt-2">
-                                    <thead>
-                                        <td scope="col">Date</td>
-                                        <td scope="col">Mapset</td>
-                                        <td scope="col">Reason</td>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="pop in nomsPopped" :key="pop.id"
-                                        :class="pop.valid == 1 ? 'vote-border-pass' : pop.valid == 2 ? 'vote-border-extend' : pop.valid == 3 ? 'vote-border-fail' : ''">
-                                            <td scope="row">{{new Date(pop.timestamp).toString().slice(4,15)}}</td>
-                                            <td scope="row"><a :href="'https://osu.ppy.sh/beatmapsets/' + pop.beatmapsetId + '/discussion/-/events'" target="_blank">{{pop.metadata}}</a></td>
-                                            <td scope="row">{{pop.content.slice(0, pop.content.indexOf('.')+1) || pop.content}}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <p class="text-shadow">
-                                <a :href="dqs && '#dqs'" data-toggle="collapse">Show disqualifications done by user</a> 
-                                ({{ loading ? '...' : dqs ? dqs.length : '0' }})
-                            </p>
-                            <div v-if="dqs" class="collapse" id="dqs">
-                                <table class="table table-sm table-dark table-hover col-md-12 mt-2">
-                                    <thead>
-                                        <td scope="col">Date</td>
-                                        <td scope="col">Mapset</td>
-                                        <td scope="col">Reason</td>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="dq in dqs" :key="dq.id"
-                                        :class="dq.valid == 1 ? 'vote-border-pass' : dq.valid == 2 ? 'vote-border-extend' : dq.valid == 3 ? 'vote-border-fail' : ''">
-                                            <td scope="row">{{new Date(dq.timestamp).toString().slice(4,15)}}</td>
-                                            <td scope="row"><a :href="'https://osu.ppy.sh/beatmapsets/' + dq.beatmapsetId + '/discussion/-/events'" target="_blank">{{dq.metadata}}</a></td>
-                                            <td scope="row">{{dq.content.slice(0, dq.content.indexOf('.')+1) || dq.content}}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <p class="text-shadow">
-                                <a :href="pops && '#pops'" data-toggle="collapse">Show pops done by user</a> 
-                                ({{ loading ? '...' : pops ? pops.length : '0' }})
-                            </p>
-                            <div v-if="pops" class="collapse" id="pops">
-                                <table class="table table-sm table-dark table-hover col-md-12 mt-2">
-                                    <thead>
-                                        <td scope="col">Date</td>
-                                        <td scope="col">Mapset</td>
-                                        <td scope="col">Reason</td>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="pop in pops" :key="pop.id"
-                                        :class="pop.valid == 1 ? 'vote-border-pass' : pop.valid == 2 ? 'vote-border-extend' : pop.valid == 3 ? 'vote-border-fail' : ''">
-                                            <td scope="row">{{new Date(pop.timestamp).toString().slice(4,15)}}</td>
-                                            <td scope="row"><a :href="'https://osu.ppy.sh/beatmapsets/' + pop.beatmapsetId + '/discussion/-/events'" target="_blank">{{pop.metadata}}</a></td>
-                                            <td scope="row">{{pop.content.slice(0, pop.content.indexOf('.')+1) || pop.content}}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+
+                            <user-activity
+                                :eval-round="evalRound"
+                                :is-spectator="evaluator.isSpectator">
+                            </user-activity>
+
                             <div class="mt-4">
                                 <p class="text-shadow">Total Evaluations: {{evalRound.evaluations.length}}</p>
                                 <ul>
@@ -234,10 +139,14 @@
 
 <script>
 import postData from '../../mixins/postData.js'
+import UserActivity from './UserActivity.vue'
 
 export default {
     name: 'eval-info',
     props: [ 'application', 'evalRound', 'reports', 'evaluator' ],
+    components: {
+        UserActivity
+    },
     mixins: [ postData ],
     watch: {
         application: function() {
@@ -251,7 +160,6 @@ export default {
             this.confirm = '';
             this.findRelevantEval();
             if(this.reports && this.reports.length) this.findRelevantReports();
-            this.findRelevantActivity();
         },
     },
     methods: {
@@ -288,19 +196,6 @@ export default {
             this.relevantReports = this.reports.filter( report => 
                 report.culprit == this.evalRound.bn.id);
         },
-        findRelevantActivity: function() {
-            this.loading = true;
-            axios
-                .get('/bnEval/userActivity/' + this.evalRound.bn.osuId + '/' + this.evalRound.mode)
-                .then(response => {
-                    this.noms = response.data.noms;
-                    this.nomsDqd = response.data.nomsDqd;
-                    this.nomsPopped = response.data.nomsPopped;
-                    this.dqs = response.data.dqs;
-                    this.pops = response.data.pops;
-                    this.loading = false;
-                })
-        },
         createDeadline: function(date){
             date = new Date(date);
             date = new Date(date.setDate (date.getDate() + 7)).toString().slice(4,10);
@@ -320,6 +215,8 @@ export default {
         submitEval: async function (e) {
             if(!this.vote || !this.behaviorComment.length || !this.moddingComment.length){
                 this.info = 'Cannot leave fields blank!'
+            }else if(this.evaluator.isSpectator){
+                this.info = "You're not allowed to do that"
             }else{
                 if(this.application){
                     const a = await this.executePost(
@@ -397,13 +294,7 @@ export default {
             vote: 0,
             info: '',
             confirm: '',
-            noms: null,
-            pops: null,
-            dqs: null,
-            nomsPopped: null,
-            nomsDqd: null,
             tempBnEvaluators: null,
-            loading: true,
         };
     },
 }

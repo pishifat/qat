@@ -93,8 +93,8 @@ hbs.registerHelper('shortDate', function(date) {
 });
 
 hbs.registerHelper('shortAction', function(action) {
-  if(action.length > 120){
-      return action.toString().slice(0, 120) + "...";
+  if(action.length > 90){
+      return action.toString().slice(0, 90) + "...";
   }else{
       return action;
   }

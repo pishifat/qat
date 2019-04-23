@@ -59,12 +59,14 @@
     <add-question
         :category="category"
         :raw-category="rawCategory"
+        :is-spectator="isSpectator"
         @add-question="addQuestionToList($event)"
     ></add-question>
 
     <edit-question
         :question="selectedQuestion"
         :category="category"
+        :is-spectator="isSpectator"
         @update-question="updateQuestion($event)"
         @delete-question="deleteQuestion($event)"
     ></edit-question>
@@ -108,7 +110,8 @@ export default {
             axios
                 .get('/manageTest/load/' + questionType)
                 .then(response => {
-                    this.questions = response.data;
+                    this.questions = response.data.questions;
+                    this.isSpectator = response.data.isSpectator;
                     this.category = $("#questionType option:selected").text();
                     this.rawCategory = $("#questionType").val();
                     e.target.disabled = false;
@@ -127,6 +130,7 @@ export default {
             rawCategory: null,
             questions: [],
             selectedQuestion: null,
+            isSpectator: false,
             info: '',
         }
     },

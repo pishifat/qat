@@ -24,44 +24,44 @@
                 <p class="min-spacing text-shadow">Consensus: {{
                     veto.status == 'upheld' || veto.status == 'withdrawn' ? 'Veto ' + veto.status : 'none' 
                 }}</p>
-                <div class="text-shadow" v-if="isLeader">
+
+                <!--nat options-->
+                <div class="text-shadow" v-if="isNat">
                     <hr>
                     <div v-if="veto.mediations.length">
                         <ul style="list-style-type: none; padding-left: 0.5rem">
                             <li v-for="mediation in veto.mediations" :key="mediation.id">
                                 <span class="small" :class="mediation.vote == 1 ? 'vote-pass' : mediation.vote == 2 ? 'vote-neutral' : mediation.vote == 3 ? 'vote-fail' : ''">
+                                    <a href="#" v-if="!mediation.comment" @click.prevent="replaceMediator(mediation.id);" data-toggle="tooltip" data-placement="top" title="replace mediator">
+                                        <i class="fas fa-redo-alt vote-pass"></i>
+                                    </a>
                                     {{mediation.mediator.username}}: {{mediation.comment ? mediation.comment : '...'}}
                                 </span>    
                             </li>
                         </ul>
-                        <div id="conclusion" class="copy-paste">
-                            <samp class="small">Hello! This beatmap has undergone veto mediation by the Beatmap Nominators. The veto post can be found here: {{veto.discussionLink}}</samp><br><br>
-                            <samp class="small">After an anonymous vote, it has been decided that the veto will be {{majority ? 'upheld' : 'dismissed'}}. The following are reasons why Beatmap Nominators {{majority ? 'agree' : 'disagree'}} with the veto:</samp><br><br>
-                            <div v-if="majority">
-                                <span v-for="(mediation, i) in upholdMediations" :key="mediation.id">
-                                    <samp><pre class="small">({{i+1}}): {{mediation.comment}}</pre></samp><br>
-                                </span>
-                                <samp class="small">This beatmap cannot be nominated until changes are made that address the veto's concerns and the veto-ing nominator is satisfied (within reasonable limits).</samp>
-                            </div>
-                            <div v-else>
-                                <span v-for="(mediation, i) in withdrawMediations" :key="mediation.id">
-                                    <samp><pre class="small">({{i+1}}): {{mediation.comment}}</pre></samp><br>
-                                </span>
-                                <samp class="small">Due to the veto being withdrawn, this beatmap may now be re-nominated.</samp><br><br>
-                            </div>
-                            <samp class="small">Users involved in this veto's mediation:</samp><br>
-                            <ul style="list-style-type: none; padding: 0">
-                                <li v-for="mediation in alphabeticalMediations" :key="mediation.id"><samp class="small">- {{mediation.mediator.username}}</samp></li>
-                            </ul>
-                        </div>
                         <span v-if="veto.status != 'upheld' && veto.status != 'withdrawn'">
                             <button class="btn btn-sm" :class="majority ? 'btn-nat' : 'btn-nat-red'" @click="concludeMediation($event)">{{majority ? 'Uphold Veto' : 'Withdraw Veto'}}</button>
                             <button class="btn btn-sm btn-nat" @click="concludeMediation($event, true)">Dismiss Without Mediation</button>
                         </span>
+                        <span v-else>
+                            <button class="btn btn-sm btn-nat" @click="continueMediation($event, true)">Re-initiate Veto Mediation</button>
+                        </span>
+                        <button class="btn btn-sm btn-nat float-right" data-toggle="collapse" data-target="#conclusion">
+                            See full conclusion post <i class="fas fa-angle-down"></i>
+                        </button>
+                        <button class="btn btn-sm btn-nat float-right mr-1" data-toggle="collapse" data-target="#forumMessage">
+                            See full forum PM <i class="fas fa-angle-down"></i>
+                        </button>
+                        <veto-conclusion-post
+                            :veto="veto"
+                            :majority="majority">
+                        </veto-conclusion-post>
+                        <veto-forum-pm
+                            :veto="veto">
+                        </veto-forum-pm>
                     </div>
                     <div v-else-if="veto.status != 'upheld' && veto.status != 'withdrawn'">
                         <button class="btn btn-sm btn-nat mb-2" @click="selectMediators($event)">{{mediators ? 'Re-select Mediators' : 'Select Mediators'}}</button> 
-                        <button v-if="mediators" class="btn btn-sm btn-nat-red mb-2" @click="beginMediation($event)">Begin Mediation</button>
                         <button class="btn btn-sm btn-nat mb-2" @click="concludeMediation($event, true)">Dismiss Without Mediation</button>
                         <div class="mb-2">
                             <span class="text-shadow">Exclude specific user(s):</span> 
@@ -75,23 +75,23 @@
                                     <li v-for="user in mediators" :key="user.id"><samp class="small">{{user.username}}</samp></li>
                                 </ul>
                             </div>
-                            <p>Forum message:</p>
-                            <div id="forumMessage" class="copy-paste">
-                                <samp class="small">Hello!</samp><br><br>
-                                <samp class="small">You have been selected as a veto mediator for [url=https://osu.ppy.sh/beatmapsets/{{veto.beatmapId}}]{{ veto.beatmapTitle }}[/url].</samp><br><br>
-                                <samp class="small">The map is currently vetoed for the following reason:</samp><br><br>
-                                <samp class="small">[notice]{{veto.shortReason}}[/notice]</samp><br><br>
-                                <samp class="small">Veto discussion can be found [url={{veto.discussionLink}}]here[/url].</samp><br><br>
-                                <samp class="small">Please post your opinion regarding the veto on the [url=http://bn.mappersguild.com/vetoes]BN/NAT website[/url] in [b]one week[/b]. Your decision will be anonymous to everyone but members of the NAT.</samp><br><br>
-                                <samp class="small">If you have a good reason not to participate in veto mediations, reply to this message.</samp><br><br>
-                                <samp class="small">Thank you for your hard work!</samp><br><br>
-                            </div>
+                            <p>
+                                <button v-if="mediators" class="btn btn-sm btn-nat-red mb-2" @click="beginMediation($event)">Begin Mediation</button>
+                                <button class="btn btn-sm btn-nat float-right" data-toggle="collapse" data-target="#forumMessage">
+                                    See full forum PM <i class="fas fa-angle-down"></i>
+                                </button>
+                            </p>
+                            <veto-forum-pm
+                                :veto="veto">
+                            </veto-forum-pm>
                         </div>
                     </div>
                     <div v-else>
                         <p class="text-shadow min-spacing">This veto's mediation was dismissed due to being invalid, inappropriate, or resolved by the mapper.</p>
                     </div>
                 </div>
+
+                <!--mediator options-->
                 <div v-if="mediationId && veto.status == 'wip'">
                     <hr>
                     <p class="text-shadow min-spacing mb-2">Reason for vote:</p>
@@ -116,6 +116,7 @@
                     </div>
                     <div :class="info.length ? 'errors' : 'confirm'" class="text-shadow ml-2" style="min-height: 24px;">{{info}} {{confirm}}</div>
                 </div>
+
             </div>
             <div class="modal-footer">
                 <button v-if="mediationId && veto.status == 'wip'" class="btn btn-sm btn-nat" @click="submitMediation($event)">Submit Mediation</button>
@@ -129,10 +130,16 @@
 
 <script>
 import postData from "../../mixins/postData.js";
+import VetoForumPm from "./VetoForumPm.vue";
+import VetoConclusionPost from "./VetoConclusionPost.vue";
 
 export default {
     name: 'veto-info',
-    props: [ 'veto', 'user-id', 'is-leader' ],
+    props: [ 'veto', 'user-id', 'is-nat', 'is-spectator' ],
+    components: {
+        VetoForumPm,
+        VetoConclusionPost
+    },
     mixins: [ postData ],
     watch: {
         veto: function() {
@@ -159,6 +166,7 @@ export default {
             comment: '',
             vote: null,
             mediationId: null,
+            newMediator: null,
         }
     },
     methods: {
@@ -178,12 +186,15 @@ export default {
             }
         },
         beginMediation: async function(e) {
-            const r = await this.executePost('/vetoes/beginMediation/' + this.veto.id, {mediators: this.mediators}, e);
-            if (r) {
-                if (r.error) {
-                    this.info = r.error;
-                } else {
-                    this.$emit('update-veto', r);
+            const result = confirm(`Are you sure?`);
+            if(result && !this.isSpectator){
+                const r = await this.executePost('/vetoes/beginMediation/' + this.veto.id, {mediators: this.mediators}, e);
+                if (r) {
+                    if (r.error) {
+                        this.info = r.error;
+                    } else {
+                        this.$emit('update-veto', r);
+                    }
                 }
             }
         },
@@ -214,18 +225,51 @@ export default {
         concludeMediation: async function (e, dismiss) {
             this.info = '';
             this.confirm = '';
-            const v = await this.executePost(
-                '/vetoes/concludeMediation/' + this.veto.id, 
-                { majority: this.majority, dismiss: dismiss }, e);
-            if (v) {
-                if (v.error) {
-                    this.info = v.error;
-                } else {
-                    await this.$emit('update-veto', v);
-                    this.confirm = "Mediation concluded!"
+            const result = confirm(`Are you sure?`);
+            if(result && !this.isSpectator){
+                const v = await this.executePost(
+                    '/vetoes/concludeMediation/' + this.veto.id, 
+                    { majority: this.majority, dismiss: dismiss }, e);
+                if (v) {
+                    if (v.error) {
+                        this.info = v.error;
+                    } else {
+                        await this.$emit('update-veto', v);
+                        this.confirm = "Mediation concluded!"
+                    }
                 }
             }
-            
+        },
+        continueMediation: async function (e) {
+            this.info = '';
+            this.confirm = '';
+            const result = confirm(`Are you sure? This should only be done if a mistake was made.`);
+            if(result && !isSpectator){
+                const v = await this.executePost(
+                    '/vetoes/continueMediation/' + this.veto.id, {}, e);
+                if (v) {
+                    if (v.error) {
+                        this.info = v.error;
+                    } else {
+                        await this.$emit('update-veto', v);
+                        this.confirm = "Mediation re-opened!"
+                    }
+                }
+            }
+        },
+        replaceMediator: async function (mediationId) {
+            const result = confirm(`Are you sure? This should only be done if a mistake was made.`);
+            if(result && !this.isSpectator){
+                const v = await this.executePost(
+                    '/vetoes/replaceMediator/' + this.veto.id, {mediationId: mediationId});
+                if (v) {
+                    if (v.error) {
+                        this.info = v.error;
+                    } else {
+                        await this.$emit('update-veto', v);
+                    }
+                }
+            }
         },
     },
     computed: {
@@ -237,16 +281,6 @@ export default {
             });
             return total > 0 ? true : false;
         },
-        upholdMediations: function(){
-            return this.veto.mediations.filter(mediation => mediation.vote == 1);
-        },
-        withdrawMediations: function(){
-            return this.veto.mediations.filter(mediation => mediation.vote == 3);
-        },
-        alphabeticalMediations: function(){
-            let sorted = this.veto.mediations;
-            return sorted.sort((a,b) => (a.mediator.username > b.mediator.username) ? 1 : ((b.mediator.username > a.mediator.username) ? -1 : 0)); ;
-        }
     },
 }
 </script>

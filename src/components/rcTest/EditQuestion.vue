@@ -102,17 +102,17 @@ import postData from '../../mixins/postData.js'
 export default {
     name: 'edit-question',
     mixins: [ postData ],
-    props: ['question', 'category'],
+    props: ['question', 'category', 'is-spectator'],
     methods: {
         updateQuestion: async function (e) {
             this.info = '';
             this.confirm = '';
             let questionType = $('input[name=questionTypeEdit]:checked').val();
             let newQuestion = $('#newQuestionEdit').val();
-            console.log(newQuestion)
-            console.log(questionType)
             if(!newQuestion || !newQuestion.length || !questionType || !questionType.length){
                 this.info = "Cannot leave question fields blank!"
+            }else if(this.isSpectator){
+                this.info = "You're not allowed to do that"
             }else{
                 const question = await this.executePost('/manageTest/updateQuestion/' + this.question.id, {questionType: questionType, newQuestion: newQuestion}, e);
                 if (question) {
@@ -126,13 +126,15 @@ export default {
             }
         },
         toggleActive: async function(e) {
-            const question = await this.executePost('/manageTest/toggleActive/' + this.question.id, {status: !this.question.active}, e);
-            if (question) {
-                if (question.error) {
-                    this.info = question.error;
-                } else {
-                    this.$emit('update-question', question);
-                    this.confirm = 'Question updated! ';
+            if(!this.isSpectator){
+                const question = await this.executePost('/manageTest/toggleActive/' + this.question.id, {status: !this.question.active}, e);
+                if (question) {
+                    if (question.error) {
+                        this.info = question.error;
+                    } else {
+                        this.$emit('update-question', question);
+                        this.confirm = 'Question updated! ';
+                    }
                 }
             }
         },
@@ -144,6 +146,8 @@ export default {
             let metadataType = $('#metadataType').val();
             if(!option || !option.length || (!score && score != 0)){
                 this.info = "Cannot leave option fields blank!"
+            }else if(this.isSpectator){
+                this.info = "You're not allowed to do that"
             }else{
                 const question = await this.executePost('/manageTest/addOption/' + this.question.id, {option: option, score: score, metadataType: metadataType}, e);
                 if (question) {
@@ -167,6 +171,8 @@ export default {
                 this.info = 'You must select only one option to edit!';
             }else if(!option || !option.length || (!score && score != 0)){
                 this.info = "Cannot leave option fields blank!"
+            }else if(this.isSpectator){
+                this.info = "You're not allowed to do that"
             }else{
                 const question = await this.executePost('/manageTest/updateOption/' + id, {option: option, score: score, questionId: this.question.id}, e);
                 if (question) {
@@ -188,6 +194,8 @@ export default {
             });
             if(!checkedOptions.length){
                 this.info = 'Must select options!'
+            }else if(this.isSpectator){
+                this.info = "You're not allowed to do that"
             }else{
                 const question = await this.executePost('/manageTest/toggleActiveOption/', {checkedOptions: checkedOptions, questionId: this.question.id}, e);
                 if (question) {

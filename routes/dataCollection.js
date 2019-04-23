@@ -29,7 +29,10 @@ router.get('/relevantInfo', async (req, res, next) => {
         { timestamp: -1 },
         true
     );
-    res.json({events: data, mode: res.locals.userRequest.modes[0]});
+    res.json({
+        events: data, 
+        mode: res.locals.userRequest.modes[0],
+        isSpectator: res.locals.userRequest.isSpectator});
 });
 
 /* POST edit reason for dq/pop */

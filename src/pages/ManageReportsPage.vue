@@ -55,6 +55,7 @@
    <report-info
         :report="selectedReport"
         :is-leader="isLeader"
+        :is-spectator="isSpectator"
         @update-report="updateReport($event)"
     ></report-info>
 
@@ -118,6 +119,7 @@ export default {
             openReports: null,
             closedReports: null,
             selectedReport: null,
+            isSpectator: false,
             isLeader: null,
             info: '',
         }
@@ -129,6 +131,7 @@ export default {
                 this.allObjs = response.data.r;
                 this.hasPagination = false;
                 this.hasSeparation = true;
+                this.isSpectator = response.data.isSpectator;
                 this.isLeader = response.data.isLeader;
             }).then(function(){
                 $("#loading").fadeOut();

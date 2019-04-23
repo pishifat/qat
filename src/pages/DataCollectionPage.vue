@@ -72,18 +72,10 @@
                             <a href="#" class="float-right" data-toggle="modal" data-target="#editReason" :data-entry="dq.id" @click.prevent="selectEntry(dq)">edit</a>
                             </td>
                         <td scope="row" style="width: 72px;">
-                            <a href="#" @click.prevent="updateNotability(dq.id, 1);"
-                                data-toggle="tooltip" data-placement="top" title="notable"
-                            ><i class="fas fa-square vote-pass"></i></a>
-                            <a href="#" @click.prevent="updateNotability(dq.id, 2);"
-                                data-toggle="tooltip" data-placement="top" title="semi-notable"
-                            ><i class="fas fa-square vote-extend"></i></a>
-                            <a href="#" @click.prevent="updateNotability(dq.id, 3);"
-                                data-toggle="tooltip" data-placement="top" title="not notable"
-                            ><i class="fas fa-square vote-fail"></i></a>
-                            <a href="#" @click.prevent="updateNotability(dq.id, null);"
-                                data-toggle="tooltip" data-placement="top" title="unmarked"
-                            ><i class="fas fa-square"></i></a>
+                            <notability
+                                :selected-entry="dq"
+                                :is-spectator="isSpectator"
+                            ></notability>
                         </td>
                         <td scope="row">
                             
@@ -135,50 +127,10 @@
         </section>
     </div>
 
-    <div id="editReason" class="modal fade" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content custom-bg-dark" v-if="selectedEntry">
-                <div class="modal-header text-dark" :class="selectedEntry.valid == 1 ? 'badge-pass' : selectedEntry.valid == 2 ? 'badge-extend' : selectedEntry.valid == 3 ? 'badge-fail' : 'bg-nat-logo'">
-                    <h5 class="modal-title">Edit DQ/Reset</h5>
-                    <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="container">
-                        <p class="text-shadow">Mapset: <a :href="'https://osu.ppy.sh/beatmapsets/' + selectedEntry.beatmapsetId + '/discussion/-/events'" target="_blank">{{selectedEntry.metadata}}</a></p>
-                        <p class="text-shadow">Current reason: </p>
-                        <p class="text-shadow small ml-4">{{selectedEntry.content}}</p>
-                        <p class="text-shadow" for="newReason">New reason:</p>
-                        <div class="input-group input-group-sm">
-                            <input class="form-control form-control-sm" type="text" placeholder="Reason..." id="newReason" 
-                                style="filter: drop-shadow(1px 1px 1px #000000); border-radius: 100px 100px 100px 100px" 
-                                @keyup.enter="updateReason($event)" maxlength="50" v-model="reasonInput"/>
-                        </div>
-                        <p class="text-shadow mt-4">Notability:
-                            <a href="#" @click.prevent="updateNotability(selectedEntry.id, 1);"
-                                data-toggle="tooltip" data-placement="top" title="notable"
-                            ><i class="fas fa-square vote-pass"></i></a>
-                            <a href="#" @click.prevent="updateNotability(selectedEntry.id, 2);"
-                                data-toggle="tooltip" data-placement="top" title="semi-notable"
-                            ><i class="fas fa-square vote-extend"></i></a>
-                            <a href="#" @click.prevent="updateNotability(selectedEntry.id, 3);"
-                                data-toggle="tooltip" data-placement="top" title="not notable"
-                            ><i class="fas fa-square vote-fail"></i></a>
-                            <a href="#" @click.prevent="updateNotability(selectedEntry.id, null);"
-                                data-toggle="tooltip" data-placement="top" title="unmarked"
-                            ><i class="fas fa-square"></i></a>
-                        </p>
-                        
-                    </div>
-                    <p id="errors">{{info}}</p>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-nat" @click="updateReason($event)" type="submit"><span class="append-button-padding">Save reason</span></button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <data-collection-info
+        :selected-entry="selectedEntry"
+        :is-spectator="isSpectator"
+    ></data-collection-info>
 
 </div>
 
@@ -189,17 +141,20 @@
 <script>
 import postData from '../mixins/postData.js';
 import filters from '../mixins/filters.js';
+import DataCollectionInfo from '../components/dataCollection/DataCollectionInfo.vue';
+import Notability from '../components/dataCollection/Notability.vue';
 
 export default {
     name: 'data-collection-page',
+    components: {
+        DataCollectionInfo,
+        Notability
+    },
     mixins: [postData, filters],
     watch: { 
         allObjs: function(){
             this.filter();
         },
-        selectedEntry: function() {
-            this.reasonInput = '';
-        }
     },
     methods: {
         filterBySearchValueContext: function(o) {
@@ -222,30 +177,6 @@ export default {
         selectEntry: function (entry) {
             this.selectedEntry = entry;
         },
-        updateReason: async function(e) {
-            if(!this.reasonInput || !this.reasonInput.length){
-                this.info = "Must enter a reason!"
-            }else{
-                const result = await this.executePost('/dataCollection/updateReason/' + this.selectedEntry.id, { reason: this.reasonInput }, e);
-                if (result) {
-                    if (result.error) {
-                        this.info = result.error;
-                    } else {
-                        this.updateEntry(result);
-                    }
-                }
-            }
-        },
-        updateNotability: async function(entryId, notability) {
-            const result = await this.executePost('/dataCollection/updateNotability/' + entryId, { notability: notability });
-            if (result) {
-                if (result.error) {
-                    this.info = result.error;
-                } else {
-                    this.updateEntry(result);
-                }
-            }
-        },
     },
     data() {
         return {
@@ -254,8 +185,8 @@ export default {
             dqs: null,
             pops: null,
             selectedEntry: null,
-            reasonInput: '',
             info: '',
+            isSpectator: false,
         }
     },
     created() {
@@ -264,6 +195,7 @@ export default {
             .then(response => {
                 this.allObjs = response.data.events;
                 this.filterMode = response.data.mode;
+                this.isSpectator = response.data.isSpectator;
                 this.hasPagination = false;
                 this.hasSeparation = true;
             }).then(function(){

@@ -15,6 +15,7 @@
     --neutral: #a0c6ff;
     --wip: var(--neutral);
     --extend: #fff9aa;
+    --extend-secondary: #b1ad78;
     --upheld: var(--extend);
     --fail: #ff9b9b;
     --withdrawn: var(--fail);
@@ -112,6 +113,14 @@ a {
 a:hover {
     color: var(--clicked);
     text-decoration: none;
+}
+
+.fa-redo-alt:hover {
+    color: lightgray;
+}
+
+.fa-redo-alt:hover:active {
+    color: gray;
 }
 
 .fa-square:hover {
@@ -349,32 +358,6 @@ input[type=number] {
     padding-right: 30px;
 }
 
-.btn-nat-pass {
-    background-color: var(--pass);
-    border-color: var(--pass);
-    filter: drop-shadow(1px 1px 1px #000000);
-    border-radius: 10000px;
-    padding: 3px 20px;
-}
-
-
-.btn-nat-extend {
-    background-color: var(--extend);
-    border-color: var(--extend);
-    filter: drop-shadow(1px 1px 1px #000000);
-    border-radius: 10000px;
-    padding: 3px 20px;
-}
-
-
-.btn-nat-fail {
-    background-color: var(--fail);
-    border-color: var(--fail);
-    filter: drop-shadow(1px 1px 1px #000000);
-    border-radius: 10000px;
-    padding: 3px 20px;
-}
-
 .btn-nat {
     border-color: hsla(0,0%,100%,.3);
 }
@@ -385,22 +368,32 @@ input[type=number] {
     box-shadow: 0 9px 30px 0 rgba(35,38,42,.1);
 }
 
-.btn-nat-red {
+.btn-nat-red, .btn-nat-fail {
     border-color: var(--nat-secondary);
 }
 
-.btn-nat-red:hover {
+.btn-nat-red:hover, .btn-nat-fail {
     border-color: var(--nat-light);
     -webkit-box-shadow: 0 9px 30px 0 rgba(35,38,42,.1);
     box-shadow: 0 9px 30px 0 rgba(35,38,42,.1);
 }
 
-.btn-green {
+.btn-nat-green {
     border-color: var(--green-secondary);
 }
 
-.btn-green:hover {
+.btn-nat-green:hover {
     border-color: var(--green);
+    -webkit-box-shadow: 0 9px 30px 0 rgba(35,38,42,.1);
+    box-shadow: 0 9px 30px 0 rgba(35,38,42,.1);
+}
+
+.btn-nat-yellow {
+    border-color: var(--extend-secondary);
+}
+
+.btn-nat-yellow:hover {
+    border-color: var(--extend);
     -webkit-box-shadow: 0 9px 30px 0 rgba(35,38,42,.1);
     box-shadow: 0 9px 30px 0 rgba(35,38,42,.1);
 }
@@ -648,6 +641,7 @@ input[type="radio"] + .fas { cursor: pointer; }
 
 .modal-content {
     background-color: var(--dark);
+    overflow: hidden;
 }
 
 .inactive {

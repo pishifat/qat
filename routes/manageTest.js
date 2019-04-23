@@ -28,7 +28,7 @@ const defaultPopulate = [
 /* GET applicant listing. */
 router.get('/load/:type', async (req, res, next) => {
     let q = await questionsService.query({ category: req.params.type }, defaultPopulate, {createdAt: -1}, true);
-    res.json(q);
+    res.json({questions: q, isSpectator: res.locals.userRequest.isSpectator});
 });
 
 /* POST add question */

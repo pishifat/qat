@@ -100,8 +100,7 @@ async function beatmapsetInfo(setId, allDiffs) {
 async function isLoggedIn(req, res, next) {
     if (req.session.mongoId) {
         const u = await users.service.query({ _id: req.session.mongoId });
-        // If hidden, shouldn't be able to do anything
-        if (!u || u.group == 'hidden') {
+        if (!u) {
             return res.redirect('/');
         }
 

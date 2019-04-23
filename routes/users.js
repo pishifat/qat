@@ -23,7 +23,7 @@ router.get('/', async (req, res, next) => {
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res, next) => {
     let u = await usersService.query(
-        { $or: [{ group: 'nat' }, { group: 'bn' }], osuId: { $ne: 1052994 } },
+        { $or: [{ group: 'nat' }, { group: 'bn' }], isSpectator: { $ne: true }  },
         {},
         { username: 1 },
         true
@@ -56,6 +56,22 @@ router.post('/switchGroup/:id', api.isLeader, async (req, res) => {
     logsService.create(
         req.session.mongoId,
         `Changed usergroup of "${u.username}" to "${req.body.group.toUpperCase()}"`
+    );
+});
+
+/* POST remove from BN/NAT without evaluation */
+router.post('/removeGroup/:id', api.isLeader, async (req, res) => {
+    let u = await usersService.query({_id: req.params.id});
+    let logGroup = u.group;
+    if(u.group == 'bn'){
+        u = await usersService.update(req.params.id, { group: 'user',  probation: [], bnDuration: new Date() });
+    }else if(u.group == 'nat'){
+        u = await usersService.update(req.params.id, { group: 'user',  probation: [], natDuration: new Date() });
+    }
+    res.json(u);
+    logsService.create(
+        req.session.mongoId,
+        `Removed "${u.username}" from the ${logGroup.toUpperCase()}`
     );
 });
 

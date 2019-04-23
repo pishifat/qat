@@ -24,14 +24,14 @@ router.get('/', async (req, res, next) => {
         isVetoes: true,
         isBnOrNat: true,
         isBnEvaluator: res.locals.userRequest.group == 'bn' && res.locals.userRequest.isBnEvaluator,
-        isNat: res.locals.userRequest.group == 'nat',
+        isNat: res.locals.userRequest.group == 'nat',        
     });
 });
 
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res, next) => {
-    let v = await vetoesService.query({}, defaultPopulate, { createdAt: 1 }, true);
-    res.json({ vetoes: v, userId: req.session.mongoId, isLeader: res.locals.userRequest.isLeader });
+    let v = await vetoesService.query({}, defaultPopulate, { createdAt: -1 }, true);
+    res.json({ vetoes: v, userId: req.session.mongoId, isNat: res.locals.userRequest.group == 'nat', isSpectator: res.locals.userRequest.isSpectator });
 });
 
 /* POST create a new veto. */
@@ -79,7 +79,7 @@ router.post('/submit', async (req, res, next) => {
 /* POST set status upheld or withdrawn. */
 router.post('/selectMediators', async (req, res, next) => {
     const allUsers = await usersModel.aggregate([
-        { $match: { group: { $ne: 'user' }, vetoMediator: true} },
+        { $match: { group: { $ne: 'user' }, vetoMediator: true, isSpectator: false} },
         { $sample: { size: 1000 } },
     ]);
     let usernames = [];
@@ -91,7 +91,7 @@ router.post('/selectMediators', async (req, res, next) => {
             req.body.excludeUsers.indexOf(user.username.toLowerCase()) < 0
         ) {
             usernames.push(user);
-            if (usernames.length >= (req.body.mode == 'osu' ? 12 : 6)) {
+            if (usernames.length >= (req.body.mode == 'osu' ? 11 : 5)) {
                 break;
             }
         }
@@ -100,7 +100,7 @@ router.post('/selectMediators', async (req, res, next) => {
 });
 
 /* POST begin mediation */
-router.post('/beginMediation/:id', api.isLeader, async (req, res, next) => {
+router.post('/beginMediation/:id', api.isNat, async (req, res, next) => {
     for (let i = 0; i < req.body.mediators.length; i++) {
         let mediator = req.body.mediators[i];
         let m = await mediationsService.create(mediator._id);
@@ -125,8 +125,8 @@ router.post('/submitMediation/:id', async (req, res, next) => {
     );
 });
 
-/* POST submit mediation */
-router.post('/concludeMediation/:id', api.isLeader, async (req, res, next) => {
+/* POST conclude mediation */
+router.post('/concludeMediation/:id', api.isNat, async (req, res, next) => {
     if(req.body.dismiss || !req.body.majority){
         await vetoesService.update(req.params.id, { status: 'withdrawn' });
     }else{
@@ -137,6 +137,40 @@ router.post('/concludeMediation/:id', api.isLeader, async (req, res, next) => {
     logsService.create(
         req.session.mongoId,
         `Veto ${v.status.charAt(0).toUpperCase() + v.status.slice(1)} for "${v.beatmapTitle}" ${req.body.dismiss ? 'without mediation' : ''}`
+    );
+});
+
+/* POST continue mediation */
+router.post('/replaceMediator/:id', api.isNat, async (req, res, next) => {
+    let v = await vetoesService.query({ _id: req.params.id }, defaultPopulate);
+    let currentMediators = [];
+    v.mediations.forEach(mediation => {
+        if(mediation.id != req.body.mediationId){
+            currentMediators.push(mediation.mediator.id);
+        }
+    });
+
+    const allUsers = await usersModel.aggregate([
+        { $match: { group: { $ne: 'user' }, vetoMediator: true, isSpectator: false} },
+        { $sample: { size: 1000 } },
+    ]);
+    for (let i = 0; i < allUsers.length; i++) {
+        let user = allUsers[i];
+        if (
+            user.modes.indexOf(v.mode) >= 0 &&
+            user.probation.indexOf(v.mode) < 0 &&
+            user.osuId != v.vetoer.osuId &&
+            user.osuId != v.beatmapMapperId
+        ) {
+            await mediationsService.update(req.body.mediationId, { mediator: user._id });
+            break;
+        }
+    }
+    v = await vetoesService.query({ _id: req.params.id }, defaultPopulate);
+    res.json(v);
+    logsService.create(
+        req.session.mongoId,
+        `Re-selected a single veto mediator`
     );
 });
 

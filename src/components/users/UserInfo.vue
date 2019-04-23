@@ -39,7 +39,7 @@
                     <button
                         v-if="isLeader"
                         class="btn btn-sm ml-2"
-                        :class="{ 'btn-green': !user.vetoMediator, 'btn-nat-red': user.vetoMediator }"
+                        :class="{ 'btn-nat-green': !user.vetoMediator, 'btn-nat-red': user.vetoMediator }"
                         @click="switchMediator($event)"
                     >
                         {{ user.vetoMediator ? 'Mark as inactive' : 'Mark as active' }}
@@ -49,7 +49,7 @@
                     BN Evaluation:
                     <button
                         class="btn btn-sm"
-                        :class="{ 'btn-green': !user.isBnEvaluator, 'btn-nat-red': user.isBnEvaluator }"
+                        :class="{ 'btn-nat-green': !user.isBnEvaluator, 'btn-nat-red': user.isBnEvaluator }"
                         @click="switchBnEvaluator($event)"
                     >
                         {{ user.isBnEvaluator ? 'Opt-out' : 'Opt-in' }}
@@ -59,11 +59,15 @@
                 <span v-if="isLeader">
                     <button
                         class="btn btn-nat-red btn-sm"
-                        @click="
-                            user.group == 'bn' ? switchGroup('nat', $event) : switchGroup('bn', $event)
-                        "
+                        @click="user.group == 'bn' ? switchGroup('nat', $event) : switchGroup('bn', $event)"
                     >
                         {{ user.group == 'bn' ? 'Move to NAT' : 'Move to BN' }}
+                    </button>
+                    <button
+                        class="btn btn-nat-red btn-sm"
+                        @click="removeGroup();"
+                    >
+                        Remove from {{user.group.toUpperCase()}}
                     </button>
                 </span>
                 <p class="text-shadow float-right">Joined: {{ user.createdAt.slice(0, 10) }}</p>
@@ -138,6 +142,22 @@ export default {
                         this.info = u.error;
                     } else {
                         this.$emit('update-user', u);
+                    }
+                }
+            }
+        },
+        removeGroup: async function(e) {
+            const result = confirm(
+                `Are you sure?`
+            );
+            if (result) {
+                const u = await this.executePost('/users/removeGroup/' + this.user.id, {}, e);
+                if (u) {
+                    if (u.error) {
+                        this.info = u.error;
+                    } else {
+                        this.$emit('update-user', u);
+                        $('#extendedInfo').modal('hide');
                     }
                 }
             }

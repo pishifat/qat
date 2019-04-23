@@ -43,7 +43,8 @@
         <veto-info
             :veto="selectedVeto"
             :user-id="userId"
-            :is-leader="isLeader"
+            :is-nat="isNat"
+            :is-spectator="isSpectator"
             @update-veto="updateVeto($event)"
         ></veto-info>
         <submit-veto @submit-veto="SubmitVeto($event)"></submit-veto>
@@ -75,7 +76,7 @@ export default {
             }
         },
         SubmitVeto: function(v) {
-            this.allObjs.push(v);
+            this.allObjs.unshift(v);
             this.filter();
         },
         updateVeto: function(v) {
@@ -91,7 +92,8 @@ export default {
             pageObjs: null,
             filteredObjs: null,
             userId: null,
-            isLeader: null,
+            isNat: false,
+            isSpectator: false,
             selectedVeto: null,
         };
     },
@@ -101,7 +103,8 @@ export default {
             .then(response => {
                 this.allObjs = response.data.vetoes;
                 this.userId = response.data.userId;
-                this.isLeader = response.data.isLeader;
+                this.isNat = response.data.isNat;
+                this.isSpectator = response.data.isSpectator;
                 this.limit = 24;
             })
             .then(function() {

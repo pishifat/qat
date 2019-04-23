@@ -15,7 +15,7 @@ $(function () {
                 $(`<tr>
                     <td scope="row">${new Date(log.createdAt).toString().slice(4,24)} GMT</td>
                     <td scope="row">${log.user.username}</td>
-                    <td scope="row">${log.action.length > 120 ? log.action.slice(0,120) + "..." : log.action}</td>
+                    <td scope="row">${log.action.length > 90 ? log.action.slice(0,90) + "..." : log.action}</td>
                 </tr>`).hide().appendTo('tbody').fadeIn();
             });
         });

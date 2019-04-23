@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
     probation: [{ type: String, enum: ["osu", "taiko", "catch", "mania"] }],
     vetoMediator: { type: Boolean, default: true },
     isBnEvaluator: { type: Boolean, default: true },
+    isSpectator: { type: Boolean, default: false },
     bnDuration: [{ type: Date }],
     natDuration: [{ type: Date }],
     isLeader: { type: Boolean }
@@ -55,7 +56,7 @@ class UserService extends BaseService
                     { 
                         $match: { 
                             $or: [{ group: 'bn' }, { group: 'nat' }],
-                            osuId: { $ne: 1052994 } 
+                            isSpectator: { $ne: true } 
                         } 
                     },
                     { 
@@ -72,7 +73,7 @@ class UserService extends BaseService
                     { 
                         $match: { 
                             group: 'bn',
-                            osuId: { $ne: 1052994 } 
+                            isSpectator: { $ne: true } 
                         } 
                     },
                     { 
@@ -89,7 +90,7 @@ class UserService extends BaseService
                     { 
                         $match: { 
                             group: 'nat',
-                            osuId: { $ne: 1052994 } 
+                            isSpectator: { $ne: true } 
                         } 
                     },
                     { 
@@ -110,7 +111,7 @@ class UserService extends BaseService
                     { 
                         $match: { 
                             group: 'bn',
-                            osuId: { $ne: 1052994 } 
+                            isSpectator: { $ne: true } 
                         } 
                     },
                     { 

@@ -13,7 +13,7 @@
                     <option value="catch">osu!catch</option>
                     <option value="mania">osu!mania</option>
                 </select>
-                <button class="btn btn-nat btn-sm ml-2" @click="selectAll($event)">Select all</button>
+                <button class="btn btn-nat btn-sm ml-2" @click="selectAll($event)" v-if="evaluator && evaluator.isLeader">Select all</button>
             </div>
         </section>
         <section class="row segment my-1 mx-4" v-if="evaluator && evaluator.isLeader">

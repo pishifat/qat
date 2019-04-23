@@ -69,7 +69,7 @@ import postData from '../../mixins/postData.js';
 export default {
     name: 'report-info',
     mixins: [postData],
-    props: [ 'report', 'is-leader' ],
+    props: [ 'report', 'is-leader', 'is-spectator' ],
     watch: {
         report: function(v) {
             if(v){
@@ -86,6 +86,8 @@ export default {
                 this.info = 'Cannot leave fields blank!'
             }else if(!valid && (!this.feedback || !this.feedback.length)){
                 this.info = 'At least one field must have input!'
+            }else if(this.isSpectator){
+                this.info = "You're not allowed to do that"
             }else{
                 let r;
                 if(close){
