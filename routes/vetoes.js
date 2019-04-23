@@ -85,10 +85,7 @@ router.post('/submit', async (req, res, next) => {
 router.post('/selectMediators', async (req, res, next) => {
     let allUsers;
     try{
-        allUsers = await usersModel.aggregate([
-            { $match: { group: { $ne: 'user' }, vetoMediator: true, isSpectator: {$ne: true}} },
-            { $sample: { size: 1000 } },
-        ]);
+        allUsers = await usersService.getAllMediators();
     }catch (error) {
         return { error: error._message };
     }
@@ -161,10 +158,7 @@ router.post('/replaceMediator/:id', api.isNat, async (req, res, next) => {
         }
     });
 
-    const allUsers = await usersModel.aggregate([
-        { $match: { group: { $ne: 'user' }, vetoMediator: true, isSpectator: {$ne: true}} },
-        { $sample: { size: 1000 } },
-    ]);
+    const allUsers = await usersService.getAllMediators();
     for (let i = 0; i < allUsers.length; i++) {
         let user = allUsers[i];
         if (

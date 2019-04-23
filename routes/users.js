@@ -64,9 +64,9 @@ router.post('/removeGroup/:id', api.isLeader, async (req, res) => {
     let u = await usersService.query({_id: req.params.id});
     let logGroup = u.group;
     if(u.group == 'bn'){
-        u = await usersService.update(req.params.id, { group: 'user',  probation: [], modes: [], bnDuration: new Date() });
+        u = await usersService.update(req.params.id, { group: 'user',  probation: [], modes: [], $push: {bnDuration: new Date()} });
     }else if(u.group == 'nat'){
-        u = await usersService.update(req.params.id, { group: 'user',  probation: [], modes: [], natDuration: new Date() });
+        u = await usersService.update(req.params.id, { group: 'user',  probation: [], modes: [], $push: {natDuration: new Date()} });
     }
     console.log(u);
     res.json(u);

@@ -127,6 +127,17 @@ class UserService extends BaseService
             return { error: error._message };
         }
     }
+
+    async getAllMediators() {
+        try{
+            return await User.aggregate([
+                { $match: { group: { $ne: 'user' }, vetoMediator: true, isSpectator: {$ne: true}} },
+                { $sample: { size: 1000 } },
+            ]);
+        }catch (error) {
+            return { error: error._message };
+        }
+    }
 }
 
 const service = new UserService();
