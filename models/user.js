@@ -86,7 +86,7 @@ class UserService extends BaseService
                     }
                 ]);
             }
-            if(includeNat){
+            if(includeNat && (!includeFullBns || !includeProbation)){
                 allNats = await User.aggregate([
                     {
                         $unwind: '$modes',
