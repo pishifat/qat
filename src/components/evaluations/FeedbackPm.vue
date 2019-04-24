@@ -10,7 +10,7 @@
             <samp class="small">[*]At the end of your probation period, your activity/attitude/nomination quality will be evaluated by members of the NAT. If each of these areas are satisfactory, your probation period will be complete. If not, your probation will be extended for another month. or you'll be dismissed from the BN. In that second case, you will not be able to re-apply for another 90 days.</samp><br><br>
             <samp class="small">[*]Read [url=https://osu.ppy.sh/help/wiki/People/Beatmap_Nominators/Rules]this page[/url] and follow the golden rule: [i]don't fuck up[/i].[/list][/notice]</samp><br><br>
             <samp class="small">Additional feedback from the NAT:</samp><br><br>
-            <samp class="small">[notice]{{discussApp.feedback}}[/notice]</samp><br><br>
+            <samp><pre class="small">[notice]{{discussApp.feedback}}[/notice]</pre></samp><br><br>
             <samp class="small">We hope you have fun as a Beatmap Nominator!</samp>
         </div>
         <div v-else id="forumPmBox" class="copy-paste collapse">
