@@ -20,7 +20,7 @@
                     <small class="text-shadow ml-2">This will be sent to the reporter in a forum PM. Include the consensus and any actions being taken.</small>
                     
                     <div class="form-group mt-2">
-                        <textarea class="form-control dark-textarea" id="feedback" rows="4" v-model="feedback"></textarea>
+                        <textarea class="form-control dark-textarea" style="white-space: pre-line;" id="feedback" rows="4" v-model="feedback"></textarea>
                     </div>
                 </span>
 
@@ -30,7 +30,7 @@
                     <samp class="small">[notice]{{report.reason}}[/notice]</samp><br><br>
                     <samp class="small">After investigating this, we've decided that the report is [b]{{report.valid == 1 ? 'valid' : report.valid == 2 ? 'partially valid' : 'invalid'}}[/b].</samp><br><br>
                     <samp class="small">Additional feedback from the NAT:</samp><br><br>
-                    <samp class="small">[notice]{{report.feedback}}[/notice]</samp><br><br>
+                    <samp><pre class="small">[notice]{{report.feedback}}[/notice]</pre></samp><br><br>
                     <samp class="small">Regards, the Nominator Administration Team</samp><br><br>
                 </div>
 

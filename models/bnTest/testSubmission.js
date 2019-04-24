@@ -98,8 +98,8 @@ class TestSubmissionService extends BaseService
             const categoriesObject = [
                 {name: 'bn', total: 2},
                 {name: 'codeOfConduct', total: 3},
-                {name: 'general', total: 1},
-                {name: 'spread', total: 3},
+                {name: 'general', total: 2},
+                {name: 'spread', total: 2},
                 {name: 'metadata', total: 1},
                 {name: 'timing', total: 1},
                 {name: 'audio', total: 1},

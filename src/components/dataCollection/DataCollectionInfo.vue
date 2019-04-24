@@ -16,8 +16,8 @@
                     <p class="text-shadow small ml-4">{{selectedEntry.content}}</p>
                     <p class="text-shadow" for="newReason">New reason:</p>
                     <div class="input-group input-group-sm">
-                        <input class="form-control form-control-sm" type="text" placeholder="Reason..." id="newReason" 
-                            style="filter: drop-shadow(1px 1px 1px #000000); border-radius: 100px 100px 100px 100px" 
+                        <input type="text" placeholder="reason..." id="newReason" 
+                            style="filter: drop-shadow(1px 1px 1px #000000); width: 100%"
                             @keyup.enter="updateReason($event)" maxlength="50" v-model="reasonInput"/>
                     </div>
                     <p class="text-shadow mt-4">Notability:
@@ -51,8 +51,11 @@ export default {
         Notability
     },
     watch: {
-        selectedEntry: function() {
-            this.reasonInput = '';
+        selectedEntry: function(v) {
+            if(this.tempId != this.selectedEntry.id){
+                this.reasonInput = '';
+            }
+            this.tempId = this.selectedEntry.id;
         }
     },
     methods: {
@@ -91,6 +94,7 @@ export default {
             reasonInput: '',
             confirm: '',
             info: '',
+            tempId: null,
         };
     },
 }

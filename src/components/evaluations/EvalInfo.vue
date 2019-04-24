@@ -97,13 +97,13 @@
                         <div class="col-sm-6">
                             <p class="text-shadow">Behavior/attitude comments:</p>
                             <div class="form-group">
-                                <textarea class="form-control dark-textarea" id="behaviorComments" rows="4" v-model="behaviorComment"></textarea>
+                                <textarea class="form-control dark-textarea" style="white-space: pre-line;" id="behaviorComments" rows="4" v-model="behaviorComment"></textarea>
                             </div>
                         </div>
                         <div class="col-sm-6">
                             <p class="text-shadow">Modding comments:</p>
                             <div class="form-group">
-                                <textarea class="form-control dark-textarea" id="moddingComments" rows="4" v-model="moddingComment"></textarea>
+                                <textarea class="form-control dark-textarea" style="white-space: pre-line;" id="moddingComments" rows="4" v-model="moddingComment"></textarea>
                             </div>
                         </div>
                         <div class="col-sm-12 mb-2">

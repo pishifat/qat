@@ -105,6 +105,10 @@ small, .small {
     cursor: pointer;
 }
 
+pre{
+    white-space: pre-wrap;
+}
+
 a {
     color: var(--main-text);
     font-weight: bold;
@@ -220,6 +224,10 @@ hr {
 
 .secondary-text{
     color: var(--secondary-text);
+}
+
+.pre-font{
+    font-family: 'Helvetica Neue', Helvetica, sans-serif;
 }
 
 .min-spacing{

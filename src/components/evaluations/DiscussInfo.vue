@@ -125,23 +125,23 @@
                         
                         <div v-if="discussApp" class="col-sm-12 row text-shadow">
                             <div class="col-sm-12 row text-shadow" v-for="evaluation in discussApp.evaluations" :key="evaluation.id">
-                                <div :class="evaluation.evaluator.username.length > 10 ? 'col-sm-3' : 'col-sm-2'">
+                                <div :class="evaluation.evaluator.username.length > 12 ? 'col-sm-3' : 'col-sm-2'">
                                     <p :class=" evaluation.vote == 1 ? 'vote-pass' : evaluation.vote == 2 ? 'vote-neutral' : 'vote-fail'">{{evaluation.evaluator.username}}</p> 
                                 </div>
-                                <div class="small" :class="evaluation.evaluator.username.length > 10 ? 'col-sm-9' : 'col-sm-10'">
-                                    <p class="mb-1">Behavior: {{evaluation.behaviorComment}}</p> 
-                                    <p>Modding: {{evaluation.moddingComment}}</p>
+                                <div :class="evaluation.evaluator.username.length > 12 ? 'col-sm-9' : 'col-sm-10'">
+                                    <p class="mb-1">Behavior: <pre class="secondary-text pre-font small">{{evaluation.behaviorComment}}</pre></p> 
+                                    <p>Modding: <pre class="secondary-text pre-font small">{{evaluation.moddingComment}}</pre></p>
                                 </div>
                             </div>
                         </div>
                         <div v-else class="col-sm-12 row text-shadow">
                             <div class="col-sm-12 row text-shadow" v-for="evaluation in discussRound.evaluations" :key="evaluation.id">
-                                <div :class="evaluation.evaluator.username.length > 10 ? 'col-sm-3' : 'col-sm-2'">
+                                <div :class="evaluation.evaluator.username.length > 12 ? 'col-sm-3' : 'col-sm-2'">
                                     <p :class=" evaluation.vote == 1 ? 'vote-pass' : evaluation.vote == 2 ? 'vote-extend' : 'vote-fail'">{{evaluation.evaluator.username}}</p> 
                                 </div>
-                                <div class="small" :class="evaluation.evaluator.username.length > 10 ? 'col-sm-9' : 'col-sm-10'">
-                                    <p class="mb-1">Behavior: {{evaluation.behaviorComment}}</p> 
-                                    <p>Modding: {{evaluation.moddingComment}}</p>
+                                <div :class="evaluation.evaluator.username.length > 12 ? 'col-sm-9' : 'col-sm-10'">
+                                    <p class="mb-1">Behavior: <pre class="secondary-text pre-font small">{{evaluation.behaviorComment}}</pre></p> 
+                                    <p>Modding: <pre class="secondary-text pre-font small">{{evaluation.moddingComment}}</pre></p>
                                 </div>
                             </div>
                         </div>
@@ -173,13 +173,13 @@
                         <div class="col-sm-6" v-if="!readOnly">
                             <p class="text-shadow">Behavior/attitude comments:</p>
                             <div class="form-group">
-                                <textarea class="form-control dark-textarea" id="behaviorComments" rows="4" v-model="behaviorComment"></textarea>
+                                <textarea class="form-control dark-textarea" style="white-space: pre-line;" id="behaviorComments" rows="4" v-model="behaviorComment"></textarea>
                             </div>
                         </div>
                         <div class="col-sm-6" v-if="!readOnly">
                             <p class="text-shadow">Modding comments:</p>
                             <div class="form-group">
-                                <textarea class="form-control dark-textarea" id="moddingComments" rows="4" v-model="moddingComment"></textarea>
+                                <textarea class="form-control dark-textarea" style="white-space: pre-line;" id="moddingComments" rows="4" v-model="moddingComment"></textarea>
                             </div>
                         </div>
                         <div class="col-sm-12 mb-2" v-if="!readOnly">
