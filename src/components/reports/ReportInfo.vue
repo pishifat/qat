@@ -4,13 +4,17 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content" v-if="report">
             <div class="modal-header text-dark bg-nat-logo">
-                <h5 class="modal-title"><a class="text-dark" :href="'https://osu.ppy.sh/users/' + report.culprit.osuId" target="_blank">{{report.culprit.username}}</a></h5>
+                <h5 class="modal-title">
+                    <a class="text-dark" v-if="report.culprit" :href="'https://osu.ppy.sh/users/' + report.culprit.osuId" target="_blank">{{report.culprit.username}}</a>
+                    <span v-else class="text-dark">Report details</span>
+                </h5>
                 <button type="button" class="close" data-dismiss="modal">
                     <span>&times;</span>
                 </button>
             </div>
             <div class="modal-body" style="overflow: hidden">
                 <p class="text-shadow">Reason: <pre class="small pre-font ml-4">{{report.reason}}</pre></p>
+                <p v-if="report.link" class="text-shadow">Relevant link: <a :href="report.link" target="_blank" @click.stop>{{report.link}}</a></p>
                 <p class="text-shadow">Reported: {{report.createdAt.slice(0,10)}}</p>
                 <p v-if="!report.isActive" class="text-shadow">Reported by: <a :href="'https://osu.ppy.sh/users/' + report.reporter.osuId" target="_blank">{{report.reporter.username}}</a></p>
                 <hr>
@@ -26,7 +30,8 @@
 
                 <div id="forumMessage" class="copy-paste">
                     <samp class="small">Hello!</samp><br><br>
-                    <samp class="small">You recently reported [url=https://osu.ppy.sh/users/{{report.culprit.osuId}}]{{report.culprit.username}}[/url] for the following reason:</samp><br><br>
+                    <samp v-if="report.culprit" class="small">You recently reported [url=https://osu.ppy.sh/users/{{report.culprit.osuId}}]{{report.culprit.username}}[/url] for the following reason:</samp>
+                    <samp v-else class="small">You recently reported [url={{report.link}}]this link[/url] for the following reason:</samp><br><br>
                     <samp class="small">[notice]{{report.reason}}[/notice]</samp><br><br>
                     <samp class="small">After investigating this, we've decided that the report is [b]{{report.valid == 1 ? 'valid' : report.valid == 2 ? 'partially valid' : 'invalid'}}[/b].</samp><br><br>
                     <samp class="small">Additional feedback from the NAT:</samp><br><br>

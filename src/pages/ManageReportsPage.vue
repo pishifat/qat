@@ -82,7 +82,7 @@ export default {
     },
     methods: {
         filterBySearchValueContext: function(o) {
-            if (o.culprit.username.toLowerCase().indexOf(this.filterValue.toLowerCase()) >= 0) {
+            if (o.culprit && o.culprit.username.toLowerCase().indexOf(this.filterValue.toLowerCase()) >= 0) {
                 return true;
             } else {
                 return false;

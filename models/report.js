@@ -3,7 +3,8 @@ const BaseService = require('./baseService');
 
 const reportSchema = new mongoose.Schema({
     reporter: { type: 'ObjectId', ref: 'User', required: true },
-    culprit: { type: 'ObjectId', ref: 'User', required: true },
+    culprit: { type: 'ObjectId', ref: 'User' },
+    link: { type: String },
     reason: { type: String, required: true },
     simplifiedReason: { type: String },
     display: { type: Boolean, default: true },
@@ -26,9 +27,9 @@ class ReportService extends BaseService
      * @param {object} culpritId UserId who is being reported
      * @param {string} reason 
      */
-    async create(reporter, culpritId, reason) {
+    async create(reporter, culpritId, reason, link) {
         try {
-            return await Report.create({reporter: reporter, culprit: culpritId, reason: reason});
+            return await Report.create({reporter: reporter, culprit: culpritId, reason: reason, link: link});
         } catch(error) {
             return { error: error._message }
         }

@@ -23,21 +23,34 @@ router.get('/', async (req, res, next) => {
 
 /* POST submit or edit eval */
 router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
-    let u = await usersService.query({ username: new RegExp('^' + helper.escapeUsername(req.body.username) + '$', 'i') });
-    if (!u) {
-        return res.json({ error: 'Cannot find user! Make sure you spelled it correctly' });
+    if(!req.body.username && !req.body.username.length && !req.body.link && !req.body.link.length){
+        return res.json({ error: 'You must include a username or a link' });
     }
-    if (u.group == 'user') {
-        return res.json({ error: 'User is not a member of the BN/NAT!' });
+    if(req.body.username){
+        let u = await usersService.query({ username: new RegExp('^' + helper.escapeUsername(req.body.username) + '$', 'i') });
+        if (!u) {
+            return res.json({ error: 'Cannot find user! Make sure you spelled it correctly' });
+        }
+        if (u.group == 'user') {
+            return res.json({ error: 'User is not a member of the BN/NAT!' });
+        }
+        await reportsService.create(req.session.mongoId, u.id, req.body.reason, req.body.link);
+        res.json({});
+        logsService.create(
+            null,
+            `Reported "${u.username}" for reason "${
+                req.body.reason.length > 50 ? req.body.reason.slice(0, 50) + '...' : req.body.reason
+            }"`
+        );
+    }else{
+        await reportsService.create(req.session.mongoId, null, req.body.reason, req.body.link);
+        res.json({});
+        logsService.create(
+            null,
+            `Reported something without a username included`
+        );
     }
-    await reportsService.create(req.session.mongoId, u.id, req.body.reason);
-    res.json({});
-    logsService.create(
-        null,
-        `Reported "${u.username}" for reason "${
-            req.body.reason.length > 50 ? req.body.reason.slice(0, 50) + '...' : req.body.reason
-        }"`
-    );
+    
 });
 
 module.exports = router;
