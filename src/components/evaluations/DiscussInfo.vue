@@ -115,8 +115,8 @@
                                 <hr>
                                 <p class="text-shadow">Reports:</p>
                                 <div v-for="report in relevantReports" :key="report.id">
-                                    <p class="text-shadow small pl-2" :class="report.valid == 1 ? 'vote-pass' : 'vote-extend'">
-                                        {{report.createdAt.slice(0,10)}}: {{report.reason}}
+                                    <p class="text-shadow pl-2">
+                                        <pre class="pre-font small" :class="report.valid == 1 ? 'vote-pass' : 'vote-extend'">{{report.createdAt.slice(0,10)}}: {{report.simplifiedReason || report.reason}}</pre>
                                     </p>
                                 </div>
                             </div>
@@ -274,7 +274,7 @@ export default {
         },
         findRelevantReports: function() {
             this.relevantReports = this.reports.filter( report => 
-                report.culprit == this.discussRound.bn.id);
+                report.culprit == this.discussRound.bn.id && report.display);
         },
         findRelevantActivity: function() {
             axios

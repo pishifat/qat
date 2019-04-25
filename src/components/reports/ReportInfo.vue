@@ -10,7 +10,7 @@
                 </button>
             </div>
             <div class="modal-body" style="overflow: hidden">
-                <p class="text-shadow">Reason: <span class="small">{{report.reason}}</span></p>
+                <p class="text-shadow">Reason: <pre class="small pre-font ml-4">{{report.reason}}</pre></p>
                 <p class="text-shadow">Reported: {{report.createdAt.slice(0,10)}}</p>
                 <p v-if="!report.isActive" class="text-shadow">Reported by: <a :href="'https://osu.ppy.sh/users/' + report.reporter.osuId" target="_blank">{{report.reporter.username}}</a></p>
                 <hr>
@@ -30,7 +30,7 @@
                     <samp class="small">[notice]{{report.reason}}[/notice]</samp><br><br>
                     <samp class="small">After investigating this, we've decided that the report is [b]{{report.valid == 1 ? 'valid' : report.valid == 2 ? 'partially valid' : 'invalid'}}[/b].</samp><br><br>
                     <samp class="small">Additional feedback from the NAT:</samp><br><br>
-                    <samp><pre class="small">[notice]{{report.feedback}}[/notice]</pre></samp><br><br>
+                    <samp><pre class="small">[notice]{{report.feedback}}[/notice]</pre></samp>
                     <samp class="small">Regards, the Nominator Administration Team</samp><br><br>
                 </div>
 
@@ -49,13 +49,26 @@
                         <label class="form-check-label text-shadow vote-fail" for="3">Invalid</label>
                     </div>
                 </span>
+                <span v-else-if="report.valid != 3">
+                    <hr>
+                    <p class="text-shadow"><span data-toggle="tooltip" data-placement="top" title="This will be displayed on evaluation pages">Simplified reason:</span> <pre class="small pre-font ml-4">{{report.simplifiedReason || "..."}}</pre></p>
+                    <div class="form-group">
+                        <textarea class="form-control dark-textarea" style="white-space: pre-line;" id="behaviorComments" rows="2" placeholder="simplified reason for convenient display on evaluations..." v-model="simplifiedReason"></textarea>
+                    </div>
+                </span>
 
                  <div :class="info.length ? 'errors' : 'confirm'" class="text-shadow ml-2" style="min-height: 24px;">{{info}} {{confirm}}</div>
 
             </div>
-            <div v-if="report.isActive" class="modal-footer" style="overflow: hidden;">
-                <button class="btn btn-sm btn-nat" @click="submitReportEval($event);" data-toggle="tooltip" data-placement="top" title="Generates feedback PM and stores feedback/validity inputs">Save Report Evaluation</button>
-                <button v-if="isLeader" class="btn btn-sm btn-nat-red" @click="submitReportEval($event, true)" data-toggle="tooltip" data-placement="top" title="Disables feedback/validity inputs and reveals reporter">Close Report</button>
+            <div class="modal-footer" style="overflow: hidden;">
+                <span v-if="report.isActive">
+                    <button class="btn btn-sm btn-nat" @click="submitReportEval($event);" data-toggle="tooltip" data-placement="top" title="Generates feedback PM and stores feedback/validity inputs">Save Report Evaluation</button>
+                    <button v-if="isLeader" class="btn btn-sm btn-nat-red" @click="submitReportEval($event, true)" data-toggle="tooltip" data-placement="top" title="Disables feedback/validity inputs and reveals reporter">Close Report</button>
+                </span>
+                <span v-else>
+                    <button class="btn btn-sm btn-nat" @click="changeEvalDisplay($event);" data-toggle="tooltip" data-placement="top" title="Avoid displaying repeat reports on evaluations">{{report.display ? "Hide report on evaluations" : "Show report on evaluations"}}</button>
+                    <button class="btn btn-sm btn-nat" @click="submitSimplifiedReason($event);" data-toggle="tooltip" data-placement="top" title="Saves shortened reason for evaluation page display">Save Simplified Reason</button>
+                </span>
             </div>
         </div>
     </div>
@@ -76,6 +89,7 @@ export default {
                 this.info = '';
                 this.confirm = '';
                 this.feedback = this.report.feedback;
+                this.simplifiedReason = this.report.simplifiedReason;
             }
         },
     },
@@ -112,10 +126,39 @@ export default {
                 }
             }
         },
+        submitSimplifiedReason: async function (e) {
+            if(!this.simplifiedReason || !this.simplifiedReason.length){
+                this.info = 'Simplified reason cannot be blank!'
+            }else if(this.isSpectator){
+                this.info = "You're not allowed to do that"
+            }else{
+                let r = await this.executePost('/manageReports/submitSimplifiedReason/' + this.report.id, { simplifiedReason: this.simplifiedReason }, e);
+                if (r) {
+                    if (r.error) {
+                        this.info = r.error;
+                    } else {
+                        await this.$emit('update-report', r);
+                        this.confirm = 'Report updated!'
+                    }
+                }
+            }
+        },
+        changeEvalDisplay: async function (e) {
+            let r = await this.executePost('/manageReports/changeEvalDisplay/' + this.report.id, { display: this.report.display }, e);
+            if (r) {
+                if (r.error) {
+                    this.info = r.error;
+                } else {
+                    await this.$emit('update-report', r);
+                    this.confirm = 'Report updated!'
+                }
+            }
+        }
     },
     data() {
         return {
             feedback: '',
+            simplifiedReason: '',
             confirm: '',
             info: '',
         };

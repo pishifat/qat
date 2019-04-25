@@ -66,4 +66,28 @@ router.post('/submitReportEval/:id', async (req, res) => {
     }
 });
 
+/* POST submit simplified reason */
+router.post('/submitSimplifiedReason/:id', async (req, res) => {
+    await reportsService.update(req.params.id, { simplifiedReason: req.body.simplifiedReason });
+    let r = await reportsService.query({ _id: req.params.id }, defaultPopulate);
+    res.json(r);
+
+    logsService.create(
+        req.session.mongoId,
+        `Set display reason of report to "${req.body.simplifiedReason}"`
+    );
+});
+
+/* POST change display of report on evals */
+router.post('/changeEvalDisplay/:id', async (req, res) => {
+    await reportsService.update(req.params.id, { display: !req.body.display });
+    let r = await reportsService.query({ _id: req.params.id }, defaultPopulate);
+    res.json(r);
+
+    logsService.create(
+        req.session.mongoId,
+        `Set report to ${req.body.display ? "be hidden" : "display"}  on evaluations`
+    );
+});
+
 module.exports = router;

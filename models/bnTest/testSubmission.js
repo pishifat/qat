@@ -95,9 +95,9 @@ class TestSubmissionService extends BaseService
             } 
             */
             
-            const categoriesObject = [
-                {name: 'bn', total: 2},
-                {name: 'codeOfConduct', total: 3},
+            let categoriesObject = [
+                {name: 'bn', total: 3},
+                {name: 'codeOfConduct', total: 2},
                 {name: 'general', total: 2},
                 {name: 'spread', total: 2},
                 {name: 'metadata', total: 1},
