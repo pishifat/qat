@@ -108,18 +108,10 @@
                             <a href="#" class="float-right" data-toggle="modal" data-target="#editReason" :data-entry="pop.id" @click.prevent="selectEntry(pop)">edit</a>
                         </td>
                         <td scope="row" style="width: 72px;">
-                            <a href="#" @click.prevent="updateNotability(pop.id, 1);"
-                                data-toggle="tooltip" data-placement="top" title="notable"
-                            ><i class="fas fa-square vote-pass"></i></a>
-                            <a href="#" @click.prevent="updateNotability(pop.id, 2);"
-                                data-toggle="tooltip" data-placement="top" title="semi-notable"
-                            ><i class="fas fa-square vote-extend"></i></a>
-                            <a href="#" @click.prevent="updateNotability(pop.id, 3);"
-                                data-toggle="tooltip" data-placement="top" title="not notable"
-                            ><i class="fas fa-square vote-fail"></i></a>
-                            <a href="#" @click.prevent="updateNotability(pop.id, null);"
-                                data-toggle="tooltip" data-placement="top" title="unmarked"
-                            ><i class="fas fa-square"></i></a>
+                            <notability
+                                :selected-entry="pop"
+                                :is-spectator="isSpectator"
+                            ></notability>
                         </td>
                     </tr>
                 </tbody>
