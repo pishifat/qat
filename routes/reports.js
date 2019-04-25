@@ -12,7 +12,7 @@ router.use(api.isLoggedIn);
 /* GET reports page */
 router.get('/', async (req, res, next) => {
     res.render('reports', {
-        title: 'Report a BN/NAT',
+        title: 'Reports',
         script: '../js/reports.js',
         isReports: true,
         isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
