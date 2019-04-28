@@ -35,7 +35,8 @@ router.get('/relevantInfo', async (req, res, next) => {
         vetoes: v, 
         userId: req.session.mongoId, 
         isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator, 
-        isSpectator: res.locals.userRequest.isSpectator 
+        isSpectator: res.locals.userRequest.isSpectator,
+        userOsuId: req.session.osuId
     });
 });
 

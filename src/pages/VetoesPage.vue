@@ -43,6 +43,7 @@
         <veto-info
             :veto="selectedVeto"
             :user-id="userId"
+            :user-osu-id="userOsuId"
             :is-nat="isNat || isSpectator"
             :is-spectator="isSpectator"
             @update-veto="updateVeto($event)"
@@ -92,6 +93,7 @@ export default {
             pageObjs: null,
             filteredObjs: null,
             userId: null,
+            userOsuId: null,
             isNat: false,
             isSpectator: false,
             selectedVeto: null,
@@ -103,6 +105,7 @@ export default {
             .then(response => {
                 this.allObjs = response.data.vetoes;
                 this.userId = response.data.userId;
+                this.userOsuId = response.data.userOsuId;
                 this.isNat = response.data.isNat;
                 this.isSpectator = response.data.isSpectator;
                 this.limit = 24;

@@ -26,7 +26,7 @@
                 }}</p>
 
                 <!--nat options-->
-                <div class="text-shadow" v-if="isNat || isSpectator">
+                <div class="text-shadow" v-if="(isNat || isSpectator) && currentMediators.indexOf(userId) == -1">
                     <hr>
                     <div v-if="veto.mediations.length">
                         <ul style="list-style-type: none; padding-left: 0.5rem">
@@ -135,7 +135,7 @@ import VetoConclusionPost from "./VetoConclusionPost.vue";
 
 export default {
     name: 'veto-info',
-    props: [ 'veto', 'user-id', 'is-nat', 'is-spectator' ],
+    props: [ 'veto', 'user-id', 'user-osu-id', 'is-nat', 'is-spectator' ],
     components: {
         VetoForumPm,
         VetoConclusionPost
@@ -281,6 +281,16 @@ export default {
             });
             return total > 0 ? true : false;
         },
+        currentMediators: function() {
+            let userIds = [];
+            this.veto.mediations.forEach(mediation => {
+                userIds.push(mediation.mediator.id);
+            });
+            if(this.veto.beatmapMapperId == this.userOsuId){
+                userIds.push(this.userId);
+            }
+            return userIds;
+        }
     },
 }
 </script>
