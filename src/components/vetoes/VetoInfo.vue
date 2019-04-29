@@ -31,12 +31,11 @@
                     <div v-if="veto.mediations.length">
                         <ul style="list-style-type: none; padding-left: 0.5rem">
                             <li v-for="mediation in veto.mediations" :key="mediation.id">
-                                <span class="small" :class="mediation.vote == 1 ? 'vote-pass' : mediation.vote == 2 ? 'vote-neutral' : mediation.vote == 3 ? 'vote-fail' : ''">
-                                    <a href="#" v-if="!mediation.comment" @click.prevent="replaceMediator(mediation.id);" data-toggle="tooltip" data-placement="top" title="replace mediator">
-                                        <i class="fas fa-redo-alt vote-pass"></i>
-                                    </a>
-                                    {{mediation.mediator.username}}: {{mediation.comment ? mediation.comment : '...'}}
-                                </span>    
+                                <a href="#" v-if="!mediation.comment" @click.prevent="replaceMediator(mediation.id);" data-toggle="tooltip" data-placement="top" title="replace mediator">
+                                    <i class="fas fa-redo-alt vote-pass"></i>
+                                </a>
+                                {{mediation.mediator.username}}:
+                                <pre class="pre-font small" :class="mediation.vote == 1 ? 'vote-pass' : mediation.vote == 2 ? 'vote-neutral' : mediation.vote == 3 ? 'vote-fail' : ''">{{mediation.comment ? mediation.comment.trim() : '...'}}</pre>
                             </li>
                         </ul>
                         <span v-if="veto.status != 'upheld' && veto.status != 'withdrawn'">
