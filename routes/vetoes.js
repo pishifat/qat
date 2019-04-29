@@ -130,7 +130,7 @@ router.post('/submitMediation/:id', async (req, res, next) => {
     res.json(v);
     logsService.create(
         req.session.mongoId,
-        `Submitted "${req.body.vote == 1 ? 'agree' : req.body.vote == 2 ? 'neutral' : 'disagree'}" vote for veto on "${v.beatmapTitle}"`
+        `Submitted vote for a veto`
     );
 });
 
