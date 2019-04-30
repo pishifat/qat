@@ -114,6 +114,7 @@ router.get('/mods', async (req, res, next) => {
 
 /* POST a bn application */
 router.post('/apply', async (req, res, next) => {
+    return res.json({ error: `You're not supposed to apply until this is officially announced, buddy ;)`})
     if (req.session.mongoId) {
         if(res.locals.userRequest.modes.indexOf(req.body.mode) >= 0){
             return res.json({ error: `You're already a BN for this game mode!`});
