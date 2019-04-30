@@ -1,16 +1,13 @@
 <template>
 
 <div class="row">
-   <section class="row mb-4 segment">
-       <div class="input-group input-group-sm">
-            <input class="form-control form-control-sm" type="text" placeholder="username" id="search" 
-                style="filter: drop-shadow(1px 1px 1px #000000); border-radius: 100px 0 0 100px" 
+   <section class="col-md-12 mb-4 segment">
+        <div class="input-group input-group-sm">
+            <input type="text" placeholder="username..." id="search" 
                 @keyup.enter="query($event)" maxlength="18"/>
-            <div class="input-group-append">
-                <button style="border-radius: 0 100px 100px 0;" class="btn btn-nat" @click="query($event)" type="submit">Search tests</button>
-            </div>
+            <button class="btn btn-nat ml-2" @click="query($event)" type="submit">Search tests</button>
+            <span v-if="info" class="errors ml-4 mt-2">Error: {{info}}</span>
         </div>
-        <p v-if="info" class="errors mt-1">{{info}}</p> 
     </section>
 
     <section class="col-md-12 segment segment-image" v-if="allTests">
@@ -54,15 +51,15 @@
                     and provide a reliable source or links.</h5>
                 <h5 class="pl-4"><a :href="answer.question.content" target="_blank">{{ answer.question.content }}</a></h5>
                 <div class="mb-2"> <!-- only metadata questions for now -->
-                    <input id="title" class="form-control" type="text" placeholder="Title..." v-model="answer.metadataInput.title">
-                    <input id="titleUnicode" class="form-control" type="text" placeholder="Unicode Title (if same as Title, copy that here)..." v-model="answer.metadataInput.titleUnicode">
-                    <input id="artist" class="form-control" type="text" placeholder="Artist..." v-model="answer.metadataInput.artist">
-                    <input id="artistUnicode" class="form-control" type="text" placeholder="Unicode Artist (if same as Artist, copy that here)..." v-model="answer.metadataInput.artistUnicode">
-                    <input id="source" class="form-control" type="text" placeholder="Source (if unclear or non-existent, leave empty)..." v-model="answer.metadataInput.source">
+                    <input id="title" class="form-control mb-1" type="text" placeholder="Title..." v-model="answer.metadataInput.title">
+                    <input id="titleUnicode" class="form-control mb-1" type="text" placeholder="Unicode Title (if same as Title, copy that here)..." v-model="answer.metadataInput.titleUnicode">
+                    <input id="artist" class="form-control mb-1" type="text" placeholder="Artist..." v-model="answer.metadataInput.artist">
+                    <input id="artistUnicode" class="form-control mb-1" type="text" placeholder="Unicode Artist (if same as Artist, copy that here)..." v-model="answer.metadataInput.artistUnicode">
+                    <input id="source" class="form-control mb-2" type="text" placeholder="Source (if unclear or non-existent, leave empty)..." v-model="answer.metadataInput.source">
                     <small class="pl-4">Link sources for the song information (only one link is necessary, but more could help you!):</small>
-                    <input id="reference1" class="form-control" type="text" placeholder="Reference 1" v-model="answer.metadataInput.reference1">
-                    <input id="reference2" class="form-control" type="text" placeholder="Reference 2" v-model="answer.metadataInput.reference2">
-                    <input id="reference3" class="form-control" type="text" placeholder="Reference 3" v-model="answer.metadataInput.reference3">
+                    <input id="reference1" class="form-control mb-1" type="text" placeholder="Reference 1" v-model="answer.metadataInput.reference1">
+                    <input id="reference2" class="form-control mb-1" type="text" placeholder="Reference 2" v-model="answer.metadataInput.reference2">
+                    <input id="reference3" class="form-control mb-1" type="text" placeholder="Reference 3" v-model="answer.metadataInput.reference3">
                 </div>
             </div>
         </div>

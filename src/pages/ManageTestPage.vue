@@ -1,29 +1,25 @@
 <template>
 
 <div class="row">
-    <section class="row segment mb-4">
-       <div class="input-group input-group-sm" style="width: 400px">
-            <select class="custom-select select-arrow small" id="questionType" style="border-radius: 100px 0 0 100px">
-                <option value='codeOfConduct'>Code of Conduct</option>
-                <option value='general'>General</option>
-                <option value='spread'>Spread</option>
-                <option value='metadata'>Metadata</option>
-                <option value='timing'>Timing</option>
-                <option value='audio'>Audio</option>
-                <option value='videoBackground'>Video/BG</option>
-                <option value='skinning'>Skinning</option>
-                <option value='storyboarding'>Storyboarding</option>
-                <option value='osu'>osu!</option>
-                <option value='taiko'>osu!taiko</option>
-                <option value='catch'>osu!catch</option>
-                <option value='mania'>osu!mania</option>
-                <option value='bn'>BN Rules</option>
-            </select>
-            <div class="input-group-append">
-                <button style="border-radius: 0 100px 100px 0;" class="rounded-circle-left btn btn-nat" id="artistButton" @click="loadContent($event);">Load test content</button>
-            </div>
-        </div>
-        <p v-if="info" class="errors mt-1">{{info}}</p>
+    <section class="col-md-12 segment mb-4">
+        <select class="custom-select small" id="questionType" style="width: 200px;">
+            <option value='codeOfConduct'>Code of Conduct</option>
+            <option value='general'>General</option>
+            <option value='spread'>Spread</option>
+            <option value='metadata'>Metadata</option>
+            <option value='timing'>Timing</option>
+            <option value='audio'>Audio</option>
+            <option value='videoBackground'>Video/BG</option>
+            <option value='skinning'>Skinning</option>
+            <option value='storyboarding'>Storyboarding</option>
+            <option value='osu'>osu!</option>
+            <option value='taiko'>osu!taiko</option>
+            <option value='catch'>osu!catch</option>
+            <option value='mania'>osu!mania</option>
+            <option value='bn'>BN Rules</option>
+        </select>
+        <button class="btn btn-nat btn-sm ml-2" id="artistButton" @click="loadContent($event);">Load test content</button>
+        <span v-if="info" class="errors mt-1">{{info}}</span>
     </section>
     <section v-if="category" class="col-md-12 segment segment-image">
         <h2>{{category}} Questions 

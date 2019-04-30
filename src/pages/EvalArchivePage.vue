@@ -1,16 +1,13 @@
 <template>
 
 <div class="row">
-    <section class="row segment mb-4">
+    <section class="col-md-12 segment mb-4">
         <div class="input-group input-group-sm">
-            <input class="form-control form-control-sm" type="text" placeholder="username" id="search" 
-                style="filter: drop-shadow(1px 1px 1px #000000); border-radius: 100px 0 0 100px" 
-                @keyup.enter="query($event)" maxlength="18"/>
-            <div class="input-group-append">
-                <button style="border-radius: 0 100px 100px 0;" class="btn btn-nat" @click="query($event)" type="submit">Search archives</button>
-            </div>
+            <input type="text" placeholder="username..." id="search" 
+                @keyup.enter="query($event)" maxlength="18" autocomplete="off"/>
+            <button class="btn btn-nat ml-2" @click="query($event)" type="submit">Search archives</button>
+            <span v-if="info" class="errors ml-4 mt-2">Error: {{info}}</span>
         </div>
-        <p v-if="info" class="errors mt-1">{{info}}</p> 
     </section>
     <section class="col-md-12 segment segment-image" v-if="queried">
         <h2>Application Evaluations</h2>

@@ -62,7 +62,7 @@
                     <input id="titleUnicode" class="form-control mb-1" type="text" placeholder="Unicode Title (if same as Title, copy that here)...">
                     <input id="artist" class="form-control mb-1" type="text" placeholder="Artist...">
                     <input id="artistUnicode" class="form-control mb-1" type="text" placeholder="Unicode Artist (if same as Artist, copy that here)...">
-                    <input id="source" class="form-control mb-1" type="text" placeholder="Source (if unclear or non-existent, leave empty)...">
+                    <input id="source" class="form-control mb-2" type="text" placeholder="Source (if unclear or non-existent, leave empty)...">
                     <small class="pl-4">Link sources for the song information (only one link is necessary, but more could help you!):</small>
                     <input id="reference1" class="form-control mb-1" type="text" placeholder="Reference 1">
                     <input id="reference2" class="form-control mb-1" type="text" placeholder="Reference 2">

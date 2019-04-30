@@ -65,7 +65,7 @@
                  <div :class="info.length ? 'errors' : 'confirm'" class="text-shadow ml-2" style="min-height: 24px;">{{info}} {{confirm}}</div>
 
             </div>
-            <div class="modal-footer" style="overflow: hidden;">
+            <div v-if="report.valid != 3" class="modal-footer" style="overflow: hidden;">
                 <span v-if="report.isActive">
                     <button class="btn btn-sm btn-nat" @click="submitReportEval($event);" data-toggle="tooltip" data-placement="top" title="Generates feedback PM and stores feedback/validity inputs">Save Report Evaluation</button>
                     <button v-if="isLeader" class="btn btn-sm btn-nat-red" @click="submitReportEval($event, true)" data-toggle="tooltip" data-placement="top" title="Disables feedback/validity inputs and reveals reporter">Close Report</button>
