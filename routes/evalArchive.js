@@ -30,7 +30,7 @@ const defaultAppPopulate = [
 ];
 
 const defaultBnPopulate = [
-    { populate: 'bn', display: 'username osuId' },
+    { populate: 'bn', display: 'username osuId probation' },
     { populate: 'evaluations', display: 'evaluator behaviorComment moddingComment vote' },
     { innerPopulate: 'evaluations', populate: { path: 'evaluator', select: 'username osuId' } },
 ];
@@ -47,13 +47,13 @@ router.post('/search/', async (req, res) => {
         return res.json({ error: 'Cannot find user!' });
     }
     let a = await bnAppsService.query(
-        { applicant: u.id, active: false },
+        { applicant: u.id, active: false, consensus: {$exists: true} },
         defaultAppPopulate,
         { createdAt: 1 },
         true
     );
     let b = await evalRoundsService.query(
-        { bn: u.id, active: false },
+        { bn: u.id, active: false, consensus: {$exists: true} },
         defaultBnPopulate,
         { createdAt: 1 },
         true

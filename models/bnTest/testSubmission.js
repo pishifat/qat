@@ -8,7 +8,8 @@ const testSubmission = new mongoose.Schema({
     status: { type: String, enum: ['tbd', 'wip', 'finished'], default: 'tbd' },
     startedAt: { type: Date },
     submittedAt: { type: Date },
-    totalScore: { type: Number } //better to store this than populate full test for each application
+    totalScore: { type: Number }, //better to store this than populate full test for each application
+    additionalPoints: { type: Number, default: 0 }
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 testSubmission.virtual('answers', {

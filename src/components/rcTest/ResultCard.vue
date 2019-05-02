@@ -9,7 +9,7 @@
                 <i v-else-if="selectedTest.mode == 'taiko'" class="fas fa-drum"></i>
                 <i v-else-if="selectedTest.mode == 'catch'" class="fas fa-apple-alt"></i>
                 <i v-else-if="selectedTest.mode == 'mania'" class="fas fa-stream"></i>
-            <p class="small ml-1 text-shadow">Score: {{selectedTest.totalScore}}/20</p>
+            <p class="small ml-1 text-shadow">Score: {{selectedTest.totalScore + selectedTest.additionalPoints}}/20</p>
             <p class="small ml-1 text-shadow">Date: {{selectedTest.submittedAt.slice(0,10)}}</p>
             
         </div>
