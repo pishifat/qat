@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const logsService = require('./log').service;
 const BaseService = require('./baseService');
 
 const reportSchema = new mongoose.Schema({
@@ -31,7 +32,8 @@ class ReportService extends BaseService
         try {
             return await Report.create({reporter: reporter, culprit: culpritId, reason: reason, link: link});
         } catch(error) {
-            return { error: error._message }
+            logsService.create(null, JSON.stringify(error), true);
+            return { error: error._message };
         }
     }
 }

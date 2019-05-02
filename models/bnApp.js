@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const logsService = require('./log').service;
 const BaseService = require('./baseService');
 
 const bnAppSchema = new mongoose.Schema({
@@ -32,6 +33,7 @@ class BnAppService extends BaseService
         try {
             return await BnApp.create({ applicant: userId, mode: mode, mods: mods });
         } catch(error) {
+            logsService.create(null, JSON.stringify(error), true);
             return { error: error._message }
         }
     }

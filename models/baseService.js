@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const logsService = require('./log').service;
 
 class BaseService {
 
@@ -53,6 +54,7 @@ class BaseService {
         try {
             return await query.exec();
         } catch(error) {
+            logsService.create(null, JSON.stringify(error), true);
             return { error: error._message };
         }
     }
@@ -70,6 +72,7 @@ class BaseService {
                 return await this.model.findOneAndUpdate(filter, update, { 'new': true });
             }
         } catch(error) {
+            logsService.create(null, JSON.stringify(error), true);
             return { error: error._message };
         }
     }

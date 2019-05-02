@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const logsService = require('./log').service;
 const BaseService = require('./baseService');
 
 const evaluationSchema = new mongoose.Schema({
@@ -27,7 +28,8 @@ class EvaluationService extends BaseService
         try {
             return await Evaluation.create({evaluator: evaluatorId, behaviorComment: behaviorComment, moddingComment: moddingComment, vote: vote});
         } catch(error) {
-            return { error: error._message }
+            logsService.create(null, JSON.stringify(error), true);
+            return { error: error._message };
         }
     }
 }

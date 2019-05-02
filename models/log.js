@@ -1,19 +1,63 @@
 const mongoose = require('mongoose');
-const BaseService = require('./baseService');
 
 var logSchema = new mongoose.Schema({
     user: { type: 'ObjectId', ref: 'User'},
     action: { type: String, required: true },
+    isError: { type: Boolean, default: false },
     //modified: { type: 'ObjectId', refPath: 'modifiedModel' },
     //modifiedModel: { type: String, enum: ['user', 'bnApp', 'error'], required: true },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 var Log = mongoose.model('Log', logSchema);
 
-class LogService extends BaseService
+class LogService
 {
-    constructor() {
-        super(Log);
+    /**
+     * 
+     * @param {string} params ex: 'x: y'
+     * @param {string} populate ex: 'populate: x, display: y' or 'innerPopulate: x, populate: y'
+     * @param {string} sorting ex: 'x: -1'
+     * @param {boolean} getAll 
+     */
+    async query(params, populate, sorting, getAll, limit, skip) {
+        let query;
+        
+        if (getAll) {
+            query = Log.find(params);
+        } else {
+            query = Log.findOne(params);
+        }
+
+        if (populate) {
+            for (let i = 0; i < populate.length; i++) {
+                const p = populate[i];
+
+                if (p.innerPopulate) {
+                    query.populate({ path: p.innerPopulate, populate: p.populate });
+                } else {
+                    query.populate(p.populate, p.display);
+                }
+            }
+        }
+
+        if (sorting) {
+            query.sort(sorting);
+        }
+
+        if(limit) {
+            query.limit(limit);
+        }
+
+        if (skip) {
+            query.skip(skip);
+        }
+
+        try {
+            return await query.exec();
+        } catch(error) {
+            logsService.create(null, JSON.stringify(error), true);
+            return { error: error._message };
+        }
     }
 
     /**
@@ -21,8 +65,8 @@ class LogService extends BaseService
      * @param {object} userId UserId of the action
      * @param {string} action short comment
      */
-    async create(userId, action) {
-        const log = new Log({ user: userId, action: action });
+    async create(userId, action, isError) {
+        const log = new Log({ user: userId, action: action, isError: isError });
         try {
             return await log.save();
         } catch(err) {

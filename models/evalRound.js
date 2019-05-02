@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const logsService = require('./log').service;
 const BaseService = require('./baseService');
 
 const evalRoundSchema = new mongoose.Schema({
@@ -30,6 +31,7 @@ class EvalRoundService extends BaseService
         try {
             return await EvalRound.create({bn: bnId, mode: mode, deadline: deadline});
         } catch(error) {
+            logsService.create(null, JSON.stringify(error), true);
             return { error: error._message }
         }
     }
@@ -42,7 +44,7 @@ class EvalRoundService extends BaseService
         try {
             return await EvalRound.insertMany(evalRounds);
         } catch(error) {
-            console.log(error);
+            logsService.create(null, JSON.stringify(error), true);
             return { error: 'Something went wrong!' }
         }
     }

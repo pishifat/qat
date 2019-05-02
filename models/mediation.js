@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const logsService = require('./log').service;
 const BaseService = require('./baseService');
 
 const mediationSchema = new mongoose.Schema({
@@ -23,7 +24,8 @@ class MediationService extends BaseService
         try {
             return await Mediation.create({mediator: mediatorId});
         } catch(error) {
-            return { error: error._message }
+            logsService.create(null, JSON.stringify(error), true);
+            return { error: error._message };
         }
     }
 }

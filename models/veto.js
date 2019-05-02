@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const logsService = require('./log').service;
 const BaseService = require('./baseService');
 
 const vetoesSchema = new mongoose.Schema({
@@ -51,7 +52,8 @@ class VetoService extends BaseService
                 mode: mode 
             });
         } catch(error) {
-            return { error: 'could not create veto' }
+            logsService.create(null, JSON.stringify(error), true);
+            return { error: 'could not create veto' };
         }
     }
 }

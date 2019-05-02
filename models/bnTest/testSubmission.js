@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const logsService = require('../log').service;
 const questions = require('./question');
 const BaseService = require('../baseService');
 
@@ -51,6 +52,7 @@ class TestSubmissionService extends BaseService
         try {
             return await TestAnswer.findByIdAndUpdate(id, update, { 'new': true });
         } catch(error) {
+            logsService.create(null, JSON.stringify(error), true);
             return { error: error._message };
         }
     }
@@ -136,6 +138,7 @@ class TestSubmissionService extends BaseService
 
             return test;
         } catch(error) {
+            logsService.create(null, JSON.stringify(error), true);
             return { error: 'could not create the test' };
         }
     }
@@ -149,6 +152,7 @@ class TestSubmissionService extends BaseService
                 refernece2: reference2, reference3: reference3
             });
         } catch(error) {
+            logsService.create(null, JSON.stringify(error), true);
             return { error: error._message }
         }
     }
