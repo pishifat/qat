@@ -57,6 +57,7 @@ router.get(
             } else {
                 if (u.username != req.session.username) {
                     await usersService.update(u._id, { username: req.session.username });
+                    logsService.create(u._id, `Username changed from "${u.username}" to "${req.session.username}"`);
                 }
                 req.session.mongoId = u._id;
                 return next();
