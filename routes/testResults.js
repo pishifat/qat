@@ -8,15 +8,15 @@ const usersService = require('../models/user').service;
 const router = express.Router();
 
 router.use(api.isLoggedIn);
-router.use(api.isNat);
 
 /* GET bn app page */
 router.get('/', async (req, res, next) => {
     res.render('rcTest/testresults', {
-        title: 'RC Test Results',
+        title: 'Ranking Criteria Test Results',
         script: '../javascripts/testResults.js',
-        isManageTest: true,
+        isTest: true,
         isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
+        isBnEvaluator: res.locals.userRequest.group == 'bn' && res.locals.userRequest.isBnEvaluator,
         isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
     });
 });
@@ -44,8 +44,24 @@ const defaultTestPopulate = [
     },
 ];
 
+/* GET relevant info. */
+router.get('/relevantInfo', async (req, res, next) => {
+    let tests = await testSubmissionService.query(
+        {
+            applicant: req.session.mongoId,
+            status: 'finished',
+        },
+        defaultTestPopulate,
+        {},
+        true
+    );
+
+    res.json({tests: tests, isNat: res.locals.userRequest.group == 'nat'});
+});
+
+
 /* POST search for test */
-router.post('/search/', async (req, res) => {
+router.post('/search/', api.isNat, async (req, res) => {
     let u = await usersService.query({ username: new RegExp('^' + helper.escapeUsername(req.body.username) + '$', 'i') });
     if (!u) {
         return res.json({ error: 'Cannot find user!' });
@@ -67,10 +83,11 @@ router.post('/search/', async (req, res) => {
     res.json(tests);
 });
 
-/* GET applicant listing. */
-router.get('/load/:type', async (req, res, next) => {
-    let q = await questionsService.query({ category: req.params.type }, defaultPopulate, {}, true);
-    res.json(q);
+/* POST edit additional points because metadata is unreliable */
+router.post('/updateAdditionalPoints/:id', api.isNat, async (req, res) => {
+    await testSubmissionService.update(req.params.id, { additionalPoints: req.body.points });
+    let t = await testSubmissionService.query({_id: req.params.id}, defaultTestPopulate);
+    res.json(t);
 });
 
 module.exports = router;

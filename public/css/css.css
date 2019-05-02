@@ -22,6 +22,7 @@
     --main-text: rgba(255, 255, 255, 0.871);
     --secondary-text: #b9bbbe;
     --secondary: #4e514f;
+    --highlight: #fbff001e;
 
     --dark: #252525;
     --darker: #141414;
@@ -252,6 +253,15 @@ hr {
     background-image: linear-gradient(#226161d1, transparent);
     padding-bottom: 20px;
     z-index: 1;
+}
+
+.selected-answer {
+    background-color: var(--highlight);
+}
+
+.selected-image-answer {
+    background-color: var(--highlight);
+    box-shadow: 5px 5px 5px 5px var(--highlight);
 }
 
 @media (max-width: 768px) {

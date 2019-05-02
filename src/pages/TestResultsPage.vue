@@ -1,7 +1,7 @@
 <template>
 
 <div class="row">
-   <section class="col-md-12 mb-4 segment">
+   <section class="col-md-12 mb-4 segment" v-if="isNat">
         <div class="input-group input-group-sm">
             <input type="text" placeholder="username..." id="search" 
                 @keyup.enter="query($event)" maxlength="18"/>
@@ -19,13 +19,14 @@
                 @update:selected-test="selectedTest = $event"
             ></result-card>
         </transition-group>
+        <p v-if="!allTests.length" class="text-center min-spacing">You have no test results saved...</p>
     </section>
 
     <section v-if="selectedTest">
         <p class="text-center segment">
             User: {{ selectedTest.applicant.username }} - 
             Mode: {{ selectedTest.mode }} - 
-            Score: {{ selectedTest.totalScore }}
+            Score: {{ selectedTest.totalScore + selectedTest.additionalPoints }}
         </p>
 
         <div class="segment segment-image" v-for="(answer, i) in selectedTest.answers" :key="answer.id">
@@ -35,13 +36,15 @@
                 <div v-for="option in getActiveOptions(answer.question.options)" :key="option.id">
                     <div class="form-check mb-2 ml-2" v-if="answer.question.questionType === 'text' || answer.question.questionType === 'image'">
                         <input class="form-check-input" type="checkbox" :value="option.id" :id="option.id" :checked="answer.optionsChosen.indexOf(option.id) >= 0"> 
-                        <label class="form-check-label" 
-                            :class="answer.optionsChosen.indexOf(option.id) >= 0 && option.score > 0 ? 'vote-pass' : answer.optionsChosen.indexOf(option.id) >= 0 ? 'vote-fail' : ''" 
-                            v-if="answer.question.questionType === 'text'" :for="option.id">
+                        <label class="form-check-label" v-if="answer.question.questionType === 'text'" :for="option.id"
+                            :class="[option.score > 0 ? 'vote-pass' : 'vote-fail', answer.optionsChosen.indexOf(option.id) >= 0 ? 'selected-answer' : '']">
                             {{ option.content }}
                         </label>
-                        <label :for="option.id"><img :src="option.content" v-if="answer.question.questionType === 'image'" class="test-image"></label>
-                        <small class="float-right">{{ option.score }}</small>
+                        <label v-else :for="option.id" :class="answer.optionsChosen.indexOf(option.id) >= 0 ? 'selected-image-answer' : ''">
+                            <img :src="option.content" class="test-image">
+                            <span :class="option.score > 0 ? 'vote-pass' : 'vote-fail'">{{option.score > 0 ? 'Correct' : 'Incorrect'}}</span>
+                            </label>
+                        <small class="float-right" v-if="isNat">{{ option.score }}</small>
                     </div>
                 </div>
             </div>
@@ -60,6 +63,16 @@
                     <input id="reference1" class="form-control mb-1" type="text" placeholder="Reference 1" v-model="answer.metadataInput.reference1">
                     <input id="reference2" class="form-control mb-1" type="text" placeholder="Reference 2" v-model="answer.metadataInput.reference2">
                     <input id="reference3" class="form-control mb-1" type="text" placeholder="Reference 3" v-model="answer.metadataInput.reference3">
+                </div>
+                <div v-if="isNat">
+                    <h5 class="mt-4">Correct possibilities:</h5>
+                    <p v-for="option in answer.question.options" :key="option.id" class="ml-2 min-spacing small">{{option.metadataType}}: {{option.content}}</p>
+                    Add to/subtract from total score: 
+                    <input id="score" class="form-control-sm col-md-1 ml-1 mb-2"
+                        type="text" maxlength="5" placeholder="points..." style="min-width: 80px; width: 80;" v-model="additionalPoints"
+                    />
+                    <button type="submit" class="btn btn-sm btn-nat mx-2" @click="updateAdditionalPoints($event)">Update Additional Points</button>
+                    <span v-if="confirm.length" class="confirm small">{{confirm}}</span>
                 </div>
             </div>
         </div>
@@ -84,6 +97,9 @@ export default {
         selectedTest: function(v) {
             if(v){
                 this.getOptionIds();
+                this.additionalPoints = this.selectedTest.additionalPoints;
+                this.confirm = '';
+                this.info = '';
             }
         }
     },
@@ -128,20 +144,53 @@ export default {
                     }
                 }
             }
-        }
+        },
+        updateAdditionalPoints: async function(e) {
+            let points = parseFloat(this.additionalPoints);
+            if(points || points == 0){
+                const result = await this.executePost('/testResults/updateAdditionalPoints/' + this.selectedTest.id, { points: points }, e);
+                if (result) {
+                    if (result.error) {
+                        this.info = result.error;
+                    } else {
+                        this.updateTest(result);
+                        this.confirm = points + ' point(s) added'
+                    }
+                }
+            }
+        },
+        updateTest: function(t) {
+			const i = this.allTests.findIndex(test => test.id == t.id);
+			this.allTests[i] = t;
+            this.selectedTest = t;
+        },
     },
     data() {
         return {
             info: '',
+            confirm: '',
+            isNat: false,
+            additionalPoints: null,
             allTests: null,
             selectedTest: null,
             selectedOptionIds: [],
         }
     },
     created() {
-        $("#loading").hide(); //this is temporary
-        $("#main").attr("style", "visibility: visible");
-    }
+        axios
+            .get('/testResults/relevantInfo')
+            .then(response => {
+                this.isNat = response.data.isNat;
+                this.allTests = response.data.tests;
+                if(this.allTests.length == 1){
+                    this.selectedTest = this.allTests[0];
+                }
+                
+            }).then(function(){
+                $("#loading").fadeOut();
+                $("#main").attr("style", "visibility: visible").hide().fadeIn();
+            });
+    },
 }
 </script>
 

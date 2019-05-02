@@ -14,7 +14,7 @@ router.get('/', async (req, res, next) => {
     res.render('rcTest/managetest', {
         title: 'Manage RC Test',
         script: '../javascripts/manageTest.js',
-        isManageTest: true,
+        isTest: true,
         isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
         isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
     });
