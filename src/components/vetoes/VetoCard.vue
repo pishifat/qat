@@ -2,23 +2,26 @@
     <div class="col-md-6 col-lg-4 my-2" @click="selectVeto()">
         <div
             class="card"
-            :class="'border-' + veto.status"
-            style="height: 100%"
             data-toggle="modal"
             data-target="#extendedInfo"
             :data-veto="veto.id"
         >
-            <img :src="'https://assets.ppy.sh/beatmaps/' + veto.beatmapId + '/covers/card.jpg'" class="card-img" style="opacity: 0.25; overflow: hidden;">
-            <div class="card-body veto-card-spacing">
-                <p class="text-shadow">
-                    <a :href="'https://osu.ppy.sh/beatmapsets/' + veto.beatmapId" target="_blank" @click.stop>{{ fullTitle }}</a>
+            <img :src="'https://assets.ppy.sh/beatmaps/' + veto.beatmapId + '/covers/card.jpg'" class="card-img">
+            <div class="card-body">
+                <p class="text-shadow wrap-text">
+                    <a :href="'https://osu.ppy.sh/beatmapsets/' + veto.beatmapId" target="_blank" @click.stop>{{ veto.beatmapTitle || '...' }}</a>
+                    
+                </p>
+                <p class="small text-shadow">Hosted by <a :href="'https://osu.ppy.sh/users/' + veto.beatmapMapperId" target="_blank" @click.stop>{{ veto.beatmapMapper }}</a></p>
+                
+                <div class="veto-status my-auto" :class="`status-bar-${veto.status}`"></div>
+                <div class="card-icons">
+                    <span class="small text-shadow float-left">{{ veto.createdAt.slice(0, 10) }}</span>
                     <i v-if="veto.mode.indexOf('osu') >= 0" class="far fa-circle"></i>
                     <i v-if="veto.mode.indexOf('taiko') >= 0" class="fas fa-drum"></i>
                     <i v-if="veto.mode.indexOf('catch') >= 0" class="fas fa-apple-alt"></i>
                     <i v-if="veto.mode.indexOf('mania') >= 0" class="fas fa-stream"></i>
-                </p>
-                <p class="small text-shadow">Hosted by <a :href="'https://osu.ppy.sh/users/' + veto.beatmapMapperId" target="_blank" @click.stop>{{ veto.beatmapMapper }}</a></p>
-                <p class="small text-shadow">{{ veto.createdAt.slice(0, 10) }}</p>
+                </div>
             </div>
         </div>
     </div>
@@ -33,44 +36,34 @@ export default {
             this.$emit('update:selectedVeto', this.veto);
         },
     },
-    computed: {
-        fullTitle: function() {
-            if (this.veto.beatmapTitle) {
-                if (this.veto.beatmapTitle.length > 53) return this.veto.beatmapTitle.slice(0, 53) + '...';
-                else return this.veto.beatmapTitle;
-            } else {
-                return '...';
-            }
-        },
-    },
 };
 </script>
 
 <style>
-.border-available {
-    border-top: 5px solid var(--available);
+.status-bar-available {
+    background: radial-gradient(var(--available), transparent 70%);
 }
-.border-wip {
-    border-top: 5px solid var(--wip);
+.status-bar-wip {
+    background: radial-gradient(var(--wip), transparent 70%);
 }
-.border-upheld {
-    border-top: 5px solid var(--upheld);
+.status-bar-upheld {
+    background: radial-gradient(var(--upheld), transparent 70%);
 }
-.border-withdrawn {
-    border-top: 5px solid var(--withdrawn);
-}
-
-.veto-card-spacing{
-    margin: 0;
-    padding: 0.5rem 0.75rem 0.75rem 0.75rem;
-    position: absolute; 
+.status-bar-withdrawn {
+    background: radial-gradient(var(--withdrawn), transparent 70%);
 }
 
-.card-img{
-    min-width: 100%;
-    position: relative;
-    opacity: 0.5;
-    object-fit: cover;
+.veto-status {
+    height: 5px;
+    margin: 5px 0;
+}
+
+.card-icons {
+    text-align: right;
+}
+
+.card {
+    overflow: hidden;
 }
 
 </style>

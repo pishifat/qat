@@ -2,20 +2,15 @@
 
 <div class="row">
     <div class="col-md-12">
-        <section class="row segment my-1 mx-4">
-            <div class="small filter-box">
-                <span class="filter-header">Search</span>
-                <input id="search" class="ml-2" v-model="filterValue" type="text" placeholder="username... (3+ characters)" />
-                <select class="custom-select ml-2" id="mode" v-model="filterMode">
-                    <option value="" selected>All modes</option>
-                    <option value="osu">osu!</option>
-                    <option value="taiko">osu!taiko</option>
-                    <option value="catch">osu!catch</option>
-                    <option value="mania">osu!mania</option>
-                </select>
+        <filter-box 
+            :filterMode.sync="filterMode"
+            :filterValue.sync="filterValue"
+            :placeholder="'username... (3+ characters)'"
+        >
+            <slot>
                 <button class="btn btn-nat btn-sm ml-2" @click="selectAll($event)" v-if="evaluator && evaluator.isLeader">Select all</button>
-            </div>
-        </section>
+            </slot>
+        </filter-box>
         <section class="row segment my-1 mx-4" v-if="evaluator && evaluator.isLeader">
             <div class="small filter-box">
                 <span class="filter-header" style="width: 110px;">Mark selected as</span>
@@ -35,6 +30,8 @@
                         :application="application"
                         :evaluator="evaluator"
                         :all-checked="allChecked"
+                        :user-to-evaluate="application.applicant"
+                        :mode="application.mode"
                         :key="application.id"
                         @update:selectedApplication="selectedApplication = $event"
                     ></eval-card>
@@ -89,6 +86,7 @@ import EvalCard from '../components/evaluations/EvalCard.vue';
 import EvalInfo from '../components/evaluations/EvalInfo.vue';
 import DiscussCard from '../components/evaluations/DiscussCard.vue';
 import DiscussInfo from '../components/evaluations/DiscussInfo.vue';
+import FilterBox from '../components/FilterBox.vue';
 import filters from '../mixins/filters.js';
 import postData from '../mixins/postData.js';
 
@@ -98,7 +96,8 @@ export default {
         EvalCard,
         EvalInfo,
         DiscussCard,
-        DiscussInfo
+        DiscussInfo,
+        FilterBox,
     },
     mixins: [ postData, filters ],
     methods: {

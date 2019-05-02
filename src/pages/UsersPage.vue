@@ -1,19 +1,12 @@
 <template>
 <div class="row">
     <div class="col-md-12">
-        <section class="row segment segment-solid my-1 mx-4">
-            <div class="small filter-box">
-                <span class="filter-header">Search</span>
-                <input id="search" class="ml-2" v-model="filterValue" type="text" placeholder="username... (3+ characters)" autocomplete="off" /> 
-                <select class="custom-select ml-2" id="mode" v-model="filterMode">
-                    <option value="" selected>All modes</option>
-                    <option value="osu">osu!</option>
-                    <option value="taiko">osu!taiko</option>
-                    <option value="catch">osu!catch</option>
-                    <option value="mania">osu!mania</option>
-                </select>
-            </div>
-        </section>
+        <filter-box 
+            :filterMode.sync="filterMode" 
+            :filterValue.sync="filterValue"
+            :placeholder="'username... (3+ characters)'"
+        >
+        </filter-box>
         <section class="row segment segment-solid my-1 mx-4">
             <div class="small">
                 <span class="filter-header">Sort by</span>
@@ -58,6 +51,7 @@
 <script>
 import UserCard from '../components/users/UserCard.vue';
 import UserInfo from '../components/users/UserInfo.vue';
+import FilterBox from '../components/FilterBox.vue';
 import pagination from '../mixins/pagination.js';
 import filters from '../mixins/filters.js';
 import postData from '../mixins/postData.js';
@@ -66,7 +60,8 @@ export default {
     name: 'users-page',
     components: {
         UserCard,
-        UserInfo, 
+        UserInfo,
+        FilterBox,
     },
     mixins: [postData, pagination, filters],
     methods: {

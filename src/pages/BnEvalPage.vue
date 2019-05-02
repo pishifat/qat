@@ -2,41 +2,21 @@
 
 <div class="row">
     <div class="col-md-12">
-        <section class="row segment my-1 mx-4">
-            <div class="d-flex align-items-md-center align-items-stretch flex-md-row flex-column">
-                <small>Search: </small>
-                <small class="ml-2 mt-1 mt-md-0">
-                    <input id="search" v-model="filterValue" type="text" placeholder="username... (3+ characters)" /> 
-                </small>
-                <small class="ml-2 mt-1 mt-md-0">
-                    <select class="custom-select w-100" id="mode" v-model="filterMode">
-                        <option value="" selected>All modes</option>
-                        <option value="osu">osu!</option>
-                        <option value="taiko">osu!taiko</option>
-                        <option value="catch">osu!catch</option>
-                        <option value="mania">osu!mania</option>
-                    </select>
-                </small> 
-                <small class="ml-2 mt-1 mt-md-0" v-if="evaluator && evaluator.isLeader">
-                    <button
-                        class="btn btn-nat btn-sm w-100" 
-                        @click="selectAll($event)"
-                    >Select all</button>
-                </small>
-            </div>
-        </section>
+        <filter-box 
+            :filterMode.sync="filterMode" 
+            :filterValue.sync="filterValue"
+            :placeholder="'username... (3+ characters)'"
+        >
+            <slot>
+                <button class="btn btn-nat btn-sm ml-2" @click="selectAll($event)" v-if="evaluator && evaluator.isLeader">Select all</button>
+            </slot>
+        </filter-box>
         <section class="row segment my-1 mx-4" v-if="evaluator && evaluator.isLeader">
-            <div class="d-flex align-items-md-center align-items-stretch flex-md-row flex-column">
-                <small>Mark selected as:</small>
-                <small class="ml-2 mt-1 mt-md-0">
-                    <button class="btn btn-nat btn-sm w-100" @click="setGroupEval($event)">Group evaluation</button>
-                </small>
-                <small class="ml-2 mt-1 mt-md-0">
-                    <button class="btn btn-nat btn-sm w-100" @click="setIndividualEval($event)">Individual evaluation</button>
-                </small>
-                <small class="ml-2 mt-1 mt-md-0">
-                    <button class="btn btn-nat-red btn-sm w-100" @click="setComplete($event)" data-toggle="tooltip" data-placement="top" title="Moves an evaluation to archives and applies its consensus to its user">Archive</button>
-                </small>
+            <div class="small filter-box">
+                <span class="filter-header" style="width: 110px;">Mark selected as</span>
+                <button class="btn btn-nat btn-sm ml-2" @click="setGroupEval($event)">Group evaluation</button>
+                <button class="btn btn-nat btn-sm ml-2" @click="setIndividualEval($event)">Individual evaluation</button>
+                <button class="btn btn-nat-red btn-sm ml-2" @click="setComplete($event)" data-toggle="tooltip" data-placement="top" title="Moves an evaluation to archives and applies its consensus to its user">Archive</button>
             </div>
         </section>
         <hr>
@@ -58,6 +38,8 @@
                         :eval-round="evalRound"
                         :evaluator="evaluator"
                         :all-checked="allChecked"
+                        :user-to-evaluate="evalRound.bn"
+                        :mode="evalRound.mode"
                         :key="evalRound.id"
                         @update:selectedEvalRound="selectedEvalRound = $event"
                     ></eval-card>
@@ -120,6 +102,7 @@ import EvalCard from '../components/evaluations/EvalCard.vue';
 import EvalInfo from '../components/evaluations/EvalInfo.vue';
 import DiscussCard from '../components/evaluations/DiscussCard.vue';
 import DiscussInfo from '../components/evaluations/DiscussInfo.vue';
+import FilterBox from '../components/FilterBox.vue';
 import postData from '../mixins/postData.js';
 import filters from '../mixins/filters.js';
 
@@ -130,7 +113,8 @@ export default {
         EvalCard,
         EvalInfo,
         DiscussCard,
-        DiscussInfo
+        DiscussInfo,
+        FilterBox,
     },
     mixins: [ postData, filters ],
     methods: {

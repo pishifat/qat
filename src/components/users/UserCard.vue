@@ -47,11 +47,6 @@ export default {
 </script>
 
 <style>
-.card {
-    min-height: 110px;
-    background-color: #1e2422;
-    filter: drop-shadow(0 2px 1rem #111);
-}
 .card-avatar-img {
     position: absolute;
     top: calc(50% - 40px);
@@ -70,7 +65,5 @@ export default {
 }
 .card-body {
     padding: 0.5rem 1rem 0.5rem 3.5rem;
-    display: flex;
-    flex-direction: column;
 }
 </style>

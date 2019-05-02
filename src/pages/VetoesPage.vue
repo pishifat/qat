@@ -1,30 +1,15 @@
 <template>
     <div class="row">
         <div class="col-md-12">
-            <section class="row segment segment-solid my-1 mb-3">
-                <div class="small filter-box">
-                    <span class="filter-header">Search</span>
-                    <input
-                        id="search"
-                        class="ml-2"
-                        v-model="filterValue"
-                        type="text"
-                        placeholder="beatmap..."
-                        autocomplete="off"
-                    />
-                    <select class="custom-select ml-2" id="mode" v-model="filterMode">
-                        <option value="" selected>All modes</option>
-                        <option value="osu">osu!</option>
-                        <option value="taiko">osu!taiko</option>
-                        <option value="catch">osu!catch</option>
-                        <option value="mania">osu!mania</option>
-                    </select>
-
-                    <button class="btn btn-sm btn-nat ml-2" data-toggle="modal" data-target="#addVeto">
-                        Submit veto
-                    </button>
-                </div>
-            </section>
+            <filter-box 
+                :filterMode.sync="filterMode" 
+                :filterValue.sync="filterValue"
+                :placeholder="'beatmap...'"
+            >
+                <button class="btn btn-sm btn-nat ml-2" data-toggle="modal" data-target="#addVeto">
+                    Submit veto
+                </button>
+            </filter-box>
             
             <section class="row segment segment-image mx-0 px-0">
                 <div class="col-sm-12">
@@ -56,6 +41,7 @@
 import VetoCard from '../components/vetoes/VetoCard.vue';
 import VetoInfo from '../components/vetoes/VetoInfo.vue';
 import SubmitVeto from '../components/vetoes/SubmitVeto.vue';
+import FilterBox from '../components/FilterBox.vue';
 import pagination from '../mixins/pagination.js';
 import filters from '../mixins/filters.js';
 
@@ -65,16 +51,15 @@ export default {
         VetoCard,
         VetoInfo,
         SubmitVeto,
+        FilterBox,
     },
     mixins: [pagination, filters],
     methods: {
-        filterBySearchValueContext: function() {
-            //something with bm
-            if (this.filterValue != '1111') {
+        filterBySearchValueContext: function(v) {
+            if(v.beatmapTitle.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1){
                 return true;
-            } else {
-                return false;
             }
+            return false;
         },
         SubmitVeto: function(v) {
             this.allObjs.unshift(v);
