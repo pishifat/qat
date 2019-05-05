@@ -44,7 +44,7 @@ router.get('/tests', async (req, res, next) => {
     );
 
     if (!tests || !tests.length || tests.error) {
-        return res.redirect('/qat');
+        return res.redirect('/');
     }
 
     return res.json({ testList: tests });
@@ -63,7 +63,7 @@ router.post('/loadTest', async (req, res, next) => {
     );
 
     if (!test || test.error) {
-        return res.redirect('/qat');
+        return res.redirect('/');
     }
 
     if (!test.startedAt) {

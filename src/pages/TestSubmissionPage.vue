@@ -73,7 +73,7 @@
         </div>
         <hr>
         <div class="mx-auto text-center mb-4">
-            <a href="#top"><button type="submit" class="btn btn-lg btn-nat" @click="submit($event)">Submit</button></a>
+            <a href="#top"><button type="submit" class="btn btn-lg btn-nat w-50" @click="submit($event)">Submit</button></a>
             <p class="small pt-2">{{ info }}</p>
         </div>
     </div>
