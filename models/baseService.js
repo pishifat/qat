@@ -61,16 +61,12 @@ class BaseService {
 
     /**
      * 
-     * @param {(string | object)} filter id | '{ x: y }'
+     * @param {(string | object)} id id
      * @param {object} update ex: '{ x: y }'
      */
-    async update(filter, update) {
+    async update(id, update) {
         try {
-            if (typeof filter === 'string') {
-                return await this.model.findByIdAndUpdate(filter, update, { 'new': true });
-            } else {
-                return await this.model.findOneAndUpdate(filter, update, { 'new': true });
-            }
+            return await this.model.findByIdAndUpdate(id, update, { 'new': true });
         } catch(error) {
             logsService.create(null, JSON.stringify(error), true);
             return { error: error._message };
