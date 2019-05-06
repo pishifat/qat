@@ -45,14 +45,14 @@
                     <table class="table table-sm table-dark table-hover col-md-12 mt-2">
                         <thead>
                             <td v-if="question.category == 'metadata'" scope="col">Field</td>
-                            <td scope="col">Option</td>
+                            <td scope="col" :class="question.category == 'metadata' ? 'w-50' : ''">Option</td>
                             <td scope="col">Score</td>
                             <td scope="col">Select</td>
                             <td scope="col">Active</td>
                         </thead>
                         <tbody>
                             <tr v-for="option in question.options" :key="option.id">
-                                <td v-if="question.category == 'metadata'" scope="row">{{option.metadataType}}</td>
+                                <td v-if="question.category == 'metadata'" class="text-capitalize" scope="row">{{option.metadataType}}</td>
                                 <td scope="row">
                                     <a v-if="question.questionType == 'image'" :href="option.content" target="_blank">{{option.content}}</a>
                                     <span v-else>{{option.content}}</span>
@@ -219,5 +219,9 @@ export default {
 </script>
 
 <style>
+
+td {
+    word-break: break-word;
+}
 
 </style>

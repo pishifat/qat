@@ -32,19 +32,17 @@
         <table v-if="questions && questions.length" class="table table-sm table-dark table-hover col-md-12 mt-2">
             <thead>
                 <td scope="col">Question</td>
-                <td scope="col">Active</td>
-                <td scope="col">Edit</td>
+                <td scope="col"></td>
             </thead>
             <tbody>
-                <tr v-for="question in questions" :key="question.id">
+                <tr v-for="question in questions" :key="question.id" :class="question.active ? 'border-active' : 'border-inactive'">
                     <td scope="row">
                         {{question.content}}
                     </td>
-                    <td scope="row" :class="question.active ? 'vote-pass' : 'vote-fail'">
-                        {{question.active ? 'active' : 'inactive'}}
-                    </td>
-                    <td scope="row">
-                        <a href="#" data-toggle="modal" data-target="#editQuestion" :data-entry="question.id" @click.prevent="selectQuestion(question)">edit</a>
+                    <td scope="row" class="text-right">
+                        <a href="#" data-toggle="modal" data-target="#editQuestion" :data-entry="question.id" @click.prevent="selectQuestion(question)">
+                            <i class="fas fa-edit"></i>
+                        </a>
                     </td>
                 </tr>
             </tbody>
@@ -136,3 +134,13 @@ export default {
     }
 }
 </script>
+
+<style>
+.border-active {
+    border-left: 5px solid var(--pass);
+}
+
+.border-inactive {
+    border-left: 5px solid var(--fail);
+}
+</style>
