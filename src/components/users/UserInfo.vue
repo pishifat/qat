@@ -45,7 +45,7 @@
                         {{ user.vetoMediator ? 'Mark as inactive' : 'Mark as active' }}
                     </button>
                 </p>
-                <p v-if="user.group != 'nat' && user.id == userId" class="text-shadow">
+                <!--<p v-if="user.group != 'nat' && user.id == userId" class="text-shadow">
                     BN Evaluation:
                     <button
                         class="btn btn-sm"
@@ -54,7 +54,7 @@
                     >
                         {{ user.isBnEvaluator ? 'Opt-out' : 'Opt-in' }}
                     </button>
-                </p>
+                </p>-->
                 <hr />
                 <span v-if="isLeader">
                     <button
