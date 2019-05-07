@@ -10,7 +10,7 @@ const logsService = require('../models/log').service;
 const router = express.Router();
 
 router.use(api.isLoggedIn);
-router.use(api.isBnOrNat);
+router.use(api.isNat);
 
 /* GET bn app page */
 router.get('/', async (req, res, next) => {
@@ -18,8 +18,6 @@ router.get('/', async (req, res, next) => {
         title: 'BN Application Evaluations',
         script: '../javascripts/appEval.js',
         isEval: true,
-        isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
-        isBnEvaluator: res.locals.userRequest.group == 'bn' && res.locals.userRequest.isBnEvaluator && !res.locals.userRequest.isSpectator,
         isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
     });
 });

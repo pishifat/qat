@@ -23,7 +23,6 @@ router.get('/', async (req, res, next) => {
         script: '../javascripts/vetoes.js',
         isVetoes: true,
         isBnOrNat: true,
-        isBnEvaluator: res.locals.userRequest.group == 'bn' && res.locals.userRequest.isBnEvaluator  && !res.locals.userRequest.isSpectator,
         isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,        
     });
 });
