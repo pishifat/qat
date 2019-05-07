@@ -36,7 +36,7 @@
                     <samp class="small">After investigating this, we've decided that the report is [b]{{report.valid == 1 ? 'valid' : report.valid == 2 ? 'partially valid' : 'invalid'}}[/b].</samp><br><br>
                     <samp class="small">Additional feedback from the NAT:</samp><br><br>
                     <samp><pre class="small">[notice]{{report.feedback}}[/notice]</pre></samp>
-                    <samp class="small">Regards, the Nominator Administration Team</samp><br><br>
+                    <samp class="small">Regards, the Nomination Assessment Team</samp><br><br>
                 </div>
 
                 <span v-if="report.isActive">
