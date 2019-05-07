@@ -1,7 +1,6 @@
 const express = require('express');
 const api = require('../models/api');
 const helper = require('./helper');
-const questionsService = require('../models/bnTest/question').service;
 const testSubmissionService = require('../models/bnTest/testSubmission').service;
 const usersService = require('../models/user').service;
 
@@ -60,15 +59,23 @@ router.get('/relevantInfo', async (req, res, next) => {
 });
 
 
-/* POST search for test */
-router.post('/search/', api.isNat, async (req, res) => {
-    let u = await usersService.query({ username: new RegExp('^' + helper.escapeUsername(req.body.username) + '$', 'i') });
-    if (!u) {
-        return res.json({ error: 'Cannot find user!' });
+/* GET search for test */
+router.get('/search/:user', api.isNat, async (req, res) => {
+    let user;
+    const userToSearch = helper.safeParam(req.params.user);
+    if (isNaN(userToSearch)) {
+        user = await usersService.query({ username: new RegExp('^' + helper.escapeUsername(userToSearch) + '$', 'i') });
+    } else {
+        user = await usersService.query({ osuId: parseInt(userToSearch) });
     }
-    let tests = await testSubmissionService.query(
+
+    if (!user) {
+        return res.json({ error: 'Cannot find user!', isNat: res.locals.userRequest.group == 'nat' });
+    }
+
+    const tests = await testSubmissionService.query(
         {
-            applicant: u.id,
+            applicant: user.id,
             status: 'finished',
         },
         defaultTestPopulate,
@@ -77,10 +84,10 @@ router.post('/search/', api.isNat, async (req, res) => {
     );
 
     if (!tests.length) {
-        return res.json({ error: 'No tests saved for that user!' });
+        return res.json({ error: 'No tests saved for that user!', isNat: res.locals.userRequest.group == 'nat' });
     }
 
-    res.json(tests);
+    res.json({ tests: tests, isNat: res.locals.userRequest.group == 'nat' });
 });
 
 /* POST edit additional points because metadata is unreliable */

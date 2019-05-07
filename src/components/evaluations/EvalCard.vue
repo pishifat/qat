@@ -16,42 +16,40 @@
                     </a>
                 </p>
             </div>
-            <div class="card-footer">
-                <div class="small">
-                    <i v-if="mode == 'osu'" class="far fa-circle"></i>
-                    <i v-else-if="mode == 'taiko'" class="fas fa-drum"></i>
-                    <i v-else-if="mode == 'catch'" class="fas fa-apple-alt"></i>
-                    <i v-else-if="mode == 'mania'" class="fas fa-stream"></i>
-                    <i class="fas fa-clock mx-1"></i>
-                    <span v-if="application">
-                        <span class="errors">
-                            {{ createDeadline(application.createdAt) }}
-                        </span>
-                        <input
-                            v-if="evaluator && evaluator.isLeader"
-                            @click.stop="checkSelection()"
-                            class="float-right"
-                            :id="application.id + '-check'"
-                            type="checkbox"
-                            name="evalTypeCheck"
-                            :value="application.id"
-                        />
+            <div class="card-footer small">
+                <i v-if="mode == 'osu'" class="far fa-circle"></i>
+                <i v-else-if="mode == 'taiko'" class="fas fa-drum"></i>
+                <i v-else-if="mode == 'catch'" class="fas fa-apple-alt"></i>
+                <i v-else-if="mode == 'mania'" class="fas fa-stream"></i>
+                <i class="fas fa-clock mx-1"></i>
+                <span v-if="application">
+                    <span class="errors">
+                        {{ createDeadline(application.createdAt) }}
                     </span>
-                    <span v-else>
-                        <span class="errors">
-                            {{ new Date(evalRound.deadline).toString().slice(4, 10) }}
-                        </span>
-                        <input
-                            v-if="evaluator && evaluator.isLeader"
-                            @click.stop="checkSelection()"
-                            class="float-right"
-                            :id="evalRound.id + '-check'"
-                            type="checkbox"
-                            name="evalTypeCheck"
-                            :value="evalRound.id"
-                        />
+                    <input
+                        v-if="evaluator && evaluator.isLeader"
+                        @click.stop="checkSelection()"
+                        class="float-right"
+                        :id="application.id + '-check'"
+                        type="checkbox"
+                        name="evalTypeCheck"
+                        :value="application.id"
+                    />
+                </span>
+                <span v-else>
+                    <span class="errors">
+                        {{ new Date(evalRound.deadline).toString().slice(4, 10) }}
                     </span>
-                </div>
+                    <input
+                        v-if="evaluator && evaluator.isLeader"
+                        @click.stop="checkSelection()"
+                        class="float-right"
+                        :id="evalRound.id + '-check'"
+                        type="checkbox"
+                        name="evalTypeCheck"
+                        :value="evalRound.id"
+                    />
+                </span>
             </div>
         </div>
     </div>

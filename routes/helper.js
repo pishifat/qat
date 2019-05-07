@@ -1,3 +1,5 @@
+const qs = require('querystring');
+
 /**
  * Just replaces () and [] for now..
  * @param {string} username 
@@ -25,4 +27,12 @@ function getBeatmapsetIdFromUrl(url) {
     return bmId;
 }
 
-module.exports = { escapeUsername, getBeatmapsetIdFromUrl };
+/**
+ * escape a query parameter
+ * @param {string} param
+ */
+function safeParam(param) {
+    return qs.escape(param);
+}
+
+module.exports = { escapeUsername, getBeatmapsetIdFromUrl, safeParam };

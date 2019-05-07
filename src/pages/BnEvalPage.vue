@@ -61,6 +61,8 @@
                         :discuss-round="discussRound"
                         :evaluator="evaluator"
                         :all-checked="allChecked"
+                        :user-to-evaluate="discussRound.bn"
+                        :mode="discussRound.mode"
                         :key="discussRound.id"
                         @update:selectedDiscussRound="selectedDiscussRound = $event"
                     ></discuss-card>

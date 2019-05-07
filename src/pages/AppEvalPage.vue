@@ -53,6 +53,8 @@
                         :discuss-app="discussApp"
                         :evaluator="evaluator"
                         :all-checked="allChecked"
+                        :user-to-evaluate="discussApp.applicant"
+                        :mode="discussApp.mode"
                         :key="discussApp.id"
                         @update:selectedDiscussApp="selectedDiscussApp = $event"
                     ></discuss-card>

@@ -30,7 +30,7 @@
                                 <li class="small text-shadow"><a :href="'https://osu.ppy.sh/users/' + application.applicant.osuId + '/modding/events?types%5B%5D=kudosu_gain&types%5B%5D=kudosu_lost&min_date=&max_date='" target="_blank">All history</a></li>
                             </ul>
                             <p class="text-shadow">Test results: 
-                                <a href="http://bn.mappersguild.com/testresults" target="_blank" 
+                                <a :href="`http://bn.mappersguild.com/testresults?user=${application.applicant.osuId}`" target="_blank" 
                                 :class="application.test.totalScore > 15 ? 'vote-pass' : application.test.totalScore > 12.5 ? 'vote-extend' : 'vote-fail'">
                                     {{application.test.totalScore || application.test.totalScore >= 0 ? application.test.totalScore + '/20' : 'incomplete'}}
                                 </a>
