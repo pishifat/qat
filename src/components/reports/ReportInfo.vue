@@ -65,12 +65,12 @@
                  <div :class="info.length ? 'errors' : 'confirm'" class="text-shadow ml-2" style="min-height: 24px;">{{info}} {{confirm}}</div>
 
             </div>
-            <div v-if="report.valid != 3" class="modal-footer" style="overflow: hidden;">
+            <div class="modal-footer" style="overflow: hidden;">
                 <span v-if="report.isActive">
                     <button class="btn btn-sm btn-nat" @click="submitReportEval($event);" data-toggle="tooltip" data-placement="top" title="Generates feedback PM and stores feedback/validity inputs">Save Report Evaluation</button>
-                    <button v-if="isLeader" class="btn btn-sm btn-nat-red" @click="submitReportEval($event, true)" data-toggle="tooltip" data-placement="top" title="Disables feedback/validity inputs and reveals reporter">Close Report</button>
+                    <button class="btn btn-sm btn-nat-red" @click="submitReportEval($event, true)" data-toggle="tooltip" data-placement="top" title="Disables feedback/validity inputs and reveals reporter">Close Report</button>
                 </span>
-                <span v-else>
+                <span v-else-if="report.valid != 3">
                     <button class="btn btn-sm btn-nat" @click="changeEvalDisplay($event);" data-toggle="tooltip" data-placement="top" title="Avoid displaying repeat reports on evaluations">{{report.display ? "Hide report on evaluations" : "Show report on evaluations"}}</button>
                     <button class="btn btn-sm btn-nat" @click="submitSimplifiedReason($event);" data-toggle="tooltip" data-placement="top" title="Saves shortened reason for evaluation page display">Save Simplified Reason</button>
                 </span>
