@@ -4,6 +4,7 @@ const BaseService = require('./baseService');
 const aiessSchema = new mongoose.Schema({
     beatmapsetId: { type: Number },
     userId: { type: Number },
+    postId: { type: Number },
     metadata: { type: String },
     modes: [{ type: String, enum: ['osu', 'taiko', 'catch', 'mania'] }],
     eventType: { type: String, enum: ['Bubbled', 'Qualified', 'Disqualified', 'Popped', 'Ranked'] },

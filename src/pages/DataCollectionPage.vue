@@ -65,7 +65,9 @@
                     >
                         <td scope="row">{{new Date(dq.timestamp).toString().slice(4,15)}}</td>
                         <td scope="row">
-                            <a :href="'https://osu.ppy.sh/beatmapsets/' + dq.beatmapsetId + '/discussion/-/events'" target="_blank">{{dq.metadata.length > 50 ? dq.metadata.slice(0, 50) + '...' : dq.metadata}}</a>
+                            <a :href="dq.postId ? 'https://osu.ppy.sh/beatmapsets/' + dq.beatmapsetId + '/discussion/-/generalAll#/' + dq.postId : 'https://osu.ppy.sh/beatmapsets/' + dq.beatmapsetId + '/discussion/-/events'" target="_blank">
+                                {{dq.metadata.length > 50 ? dq.metadata.slice(0, 50) + '...' : dq.metadata}}
+                            </a>
                         </td>
                         <td scope="row">
                             {{dq.content.length > 50 ? dq.content.slice(0, 50) + '...' : dq.content}} 
@@ -101,7 +103,9 @@
                     >
                         <td scope="row">{{new Date(pop.timestamp).toString().slice(4,15)}}</td>
                         <td scope="row">
-                            <a :href="'https://osu.ppy.sh/beatmapsets/' + pop.beatmapsetId + '/discussion/-/events'" target="_blank">{{pop.metadata.length > 50 ? pop.metadata.slice(0, 50) + '...' : pop.metadata}}</a>
+                            <a :href="pop.postId ? 'https://osu.ppy.sh/beatmapsets/' + pop.beatmapsetId + '/discussion/-/generalAll#/' + pop.postId : 'https://osu.ppy.sh/beatmapsets/' + pop.beatmapsetId + '/discussion/-/events'" target="_blank">
+                                {{pop.metadata.length > 50 ? pop.metadata.slice(0, 50) + '...' : pop.metadata}}
+                            </a>
                         </td>
                         <td scope="row">
                             {{pop.content.length > 50 ? pop.content.slice(0, 50) + '...' : pop.content}} 

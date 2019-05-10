@@ -38,7 +38,7 @@
                 <tr v-for="dq in nomsDqd" :key="dq.id" :class="dq.valid == 1 ? 'vote-border-pass' : dq.valid == 2 ? 'vote-border-extend' : dq.valid == 3 ? 'vote-border-fail' : ''">
                     <td scope="row">{{new Date(dq.timestamp).toString().slice(4,10)}}</td>
                     <td scope="row">
-                        <a :href="'https://osu.ppy.sh/beatmapsets/' + dq.beatmapsetId + '/discussion/-/events'" target="_blank">
+                        <a :href="dq.postId ? 'https://osu.ppy.sh/beatmapsets/' + dq.beatmapsetId + '/discussion/-/generalAll#/' + dq.postId : 'https://osu.ppy.sh/beatmapsets/' + dq.beatmapsetId + '/discussion/-/events'" target="_blank">
                             {{dq.metadata.length > 35 ? dq.metadata.slice(0,35) + "..." : dq.metadata}}
                         </a>
                     </td>
@@ -71,9 +71,10 @@
                 :class="pop.valid == 1 ? 'vote-border-pass' : pop.valid == 2 ? 'vote-border-extend' : pop.valid == 3 ? 'vote-border-fail' : ''">
                     <td scope="row">{{new Date(pop.timestamp).toString().slice(4,10)}}</td>
                     <td scope="row">
-                        <a :href="'https://osu.ppy.sh/beatmapsets/' + pop.beatmapsetId + '/discussion/-/events'" target="_blank">
+                        <a :href="pop.postId ? 'https://osu.ppy.sh/beatmapsets/' + pop.beatmapsetId + '/discussion/-/generalAll#/' + pop.postId : 'https://osu.ppy.sh/beatmapsets/' + pop.beatmapsetId + '/discussion/-/events'" target="_blank">
                             {{pop.metadata.length > 35 ? pop.metadata.slice(0,35) + "..." : pop.metadata}}
-                        </a></td>
+                        </a>
+                    </td>
                     <td v-if="!editing" scope="row">{{pop.content}}</td>
                     <td v-else scope="row">
                         <input :class="'input-' + pop._id" type="text" :placeholder="pop.content.length > 35 ? pop.content.slice(0,35) + '...' : pop.content" maxlength="50"/>
@@ -103,7 +104,7 @@
                 :class="dq.valid == 1 ? 'vote-border-pass' : dq.valid == 2 ? 'vote-border-extend' : dq.valid == 3 ? 'vote-border-fail' : ''">
                     <td scope="row">{{new Date(dq.timestamp).toString().slice(4,10)}}</td>
                     <td scope="row">
-                        <a :href="'https://osu.ppy.sh/beatmapsets/' + dq.beatmapsetId + '/discussion/-/events'" target="_blank">
+                        <a :href="dq.postId ? 'https://osu.ppy.sh/beatmapsets/' + dq.beatmapsetId + '/discussion/-/generalAll#/' + dq.postId : 'https://osu.ppy.sh/beatmapsets/' + dq.beatmapsetId + '/discussion/-/events'" target="_blank">
                             {{dq.metadata.length > 35 ? dq.metadata.slice(0,35) + "..." : dq.metadata}}
                         </a>
                     </td>
@@ -136,7 +137,7 @@
                 :class="pop.valid == 1 ? 'vote-border-pass' : pop.valid == 2 ? 'vote-border-extend' : pop.valid == 3 ? 'vote-border-fail' : ''">
                     <td scope="row">{{new Date(pop.timestamp).toString().slice(4,10)}}</td>
                     <td scope="row">
-                        <a :href="'https://osu.ppy.sh/beatmapsets/' + pop.beatmapsetId + '/discussion/-/events'" target="_blank">
+                        <a :href="pop.postId ? 'https://osu.ppy.sh/beatmapsets/' + pop.beatmapsetId + '/discussion/-/generalAll#/' + pop.postId : 'https://osu.ppy.sh/beatmapsets/' + pop.beatmapsetId + '/discussion/-/events'" target="_blank">
                             {{pop.metadata.length > 35 ? pop.metadata.slice(0,35) + "..." : pop.metadata}}
                         </a>
                     </td>

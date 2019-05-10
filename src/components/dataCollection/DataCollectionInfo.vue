@@ -11,7 +11,11 @@
             </div>
             <div class="modal-body">
                 <div class="container">
-                    <p class="text-shadow">Mapset: <a :href="'https://osu.ppy.sh/beatmapsets/' + selectedEntry.beatmapsetId + '/discussion/-/events'" target="_blank">{{selectedEntry.metadata}}</a></p>
+                    <p class="text-shadow">Mapset: 
+                        <a :href="selectedEntry.postId ? 'https://osu.ppy.sh/beatmapsets/' + selectedEntry.beatmapsetId + '/discussion/-/generalAll#/' + selectedEntry.postId : 'https://osu.ppy.sh/beatmapsets/' + selectedEntry.beatmapsetId + '/discussion/-/events'" target="_blank">
+                            {{selectedEntry.metadata}}
+                        </a>
+                    </p>
                     <p class="text-shadow">Current reason: </p>
                     <p class="text-shadow small ml-4">{{selectedEntry.content}}</p>
                     <p class="text-shadow" for="newReason">New reason:</p>

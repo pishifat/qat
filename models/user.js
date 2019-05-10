@@ -115,15 +115,21 @@ class UserService extends BaseService
             }else if(!includeNat && includeProbation && includeFullBns){
                 return allBns;
             }else if(includeProbation && !includeFullBns){
-                allUsers = allBns.filter(u => u.probation && u.probation.length);
+                for (let i = 0; i < allBns.length; i++) {
+                    allBns[i].users = allBns[i].users.filter(u => u.probation && u.probation.length);
+                }
+                allUsers = allBns;
                 if(includeNat){
-                    allUsers.concat(allNats);
+                    allUsers = allUsers.concat(allNats);
                 }
                 return allUsers;
             }else if(!includeProbation && includeFullBns){
-                allUsers = allBns.filter(u => !u.probation || (u.probation && !u.probation.length));
+                for (let i = 0; i < allBns.length; i++) {
+                    allBns[i].users = allBns[i].users.filter(u => !u.probation || (u.probation && !u.probation.length));
+                }
+                allUsers = allBns;
                 if(includeNat){
-                    allUsers.concat(allNats);
+                    allUsers = allUsers.concat(allNats);
                 }
                 return allUsers;
             }
