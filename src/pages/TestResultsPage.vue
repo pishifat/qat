@@ -34,7 +34,10 @@
             </p>
 
             <div class="segment segment-image" v-for="(answer, i) in selectedTest.answers" :key="answer.id">
-                <small class="float-right">Q{{ ++i }} -- {{ answer.question.category }}</small>
+                <small class="float-right">
+                    Q{{ ++i }} -- {{ answer.question.category }}
+                    <span v-if="isNat && answer.question.questionType != 'fill'"> -- total: {{calculateQuestionScore(answer)}}</span>
+                </small>
                 <div
                     v-if="answer.question.questionType === 'text' || answer.question.questionType === 'image'"
                 >
@@ -56,6 +59,7 @@
                             />
                             <label
                                 class="form-check-label"
+                                style="width: 90%"
                                 v-if="answer.question.questionType === 'text'"
                                 :for="option.id"
                                 :class="[
@@ -93,35 +97,49 @@
                         <a :href="answer.question.content" target="_blank">{{ answer.question.content }}</a>
                     </h5>
                     <div class="mb-2">
-                        <!-- only metadata questions for now -->
+                        <small class="pl-2">
+                            Romanised Title:
+                        </small>
                         <input
                             id="title"
                             class="form-control mb-1"
                             type="text"
-                            placeholder="Title..."
+                            placeholder="Romanised Title..."
                             v-model="answer.metadataInput.title"
                         />
+                        <small class="pl-2">
+                            Unicode Title:
+                        </small>
                         <input
                             id="titleUnicode"
                             class="form-control mb-1"
                             type="text"
-                            placeholder="Unicode Title (if same as Title, copy that here)..."
+                            placeholder="Unicode Title (if same as Romanised Title, copy that here)..."
                             v-model="answer.metadataInput.titleUnicode"
                         />
+                        <small class="pl-2">
+                            Romanised Artist:
+                        </small>
                         <input
                             id="artist"
                             class="form-control mb-1"
                             type="text"
-                            placeholder="Artist..."
+                            placeholder="Romanised Artist..."
                             v-model="answer.metadataInput.artist"
                         />
+                        <small class="pl-2">
+                            Unicode Artist:
+                        </small>
                         <input
                             id="artistUnicode"
                             class="form-control mb-1"
                             type="text"
-                            placeholder="Unicode Artist (if same as Artist, copy that here)..."
+                            placeholder="Unicode Artist (if same as Romanised Artist, copy that here)..."
                             v-model="answer.metadataInput.artistUnicode"
                         />
+                        <small class="pl-2">
+                            Source:
+                        </small>
                         <input
                             id="source"
                             class="form-control mb-2"
@@ -129,10 +147,9 @@
                             placeholder="Source (if unclear or non-existent, leave empty)..."
                             v-model="answer.metadataInput.source"
                         />
-                        <small class="pl-4"
-                            >Link sources for the song information (only one link is necessary, but more could
-                            help you!):</small
-                        >
+                        <small class="pl-2">
+                            References:
+                        </small>
                         <input
                             id="reference1"
                             class="form-control mb-1"
@@ -181,6 +198,9 @@
                         >
                             Update Additional Points
                         </button>
+                        <p class="ml-2 min-spacing small">
+                            Each input is worth 0.5 points. Additional points are added when an answer correct, but is not listed in the question's available correct answers
+                        </p>
                         <span v-if="confirm.length" class="confirm small">{{ confirm }}</span>
                     </div>
                 </div>
@@ -220,6 +240,16 @@ export default {
                 });
             });
             return Math.round(displayScore * 10) / 10;
+        },
+        calculateQuestionScore: function(answer) {
+            let score = 0;
+            answer.question.options.forEach(option => {
+                if(answer.optionsChosen.indexOf(option.id) >= 0){
+                    score += option.score;
+                }
+            });
+            if(score < 0) score = 0;
+            return score;
         },
         getActiveOptions: function(options) {
             return options.filter(o => o.active);

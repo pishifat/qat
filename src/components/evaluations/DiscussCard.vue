@@ -58,7 +58,7 @@
                     title="fail"
                     >{{ fail }}</span
                 >
-                <i class="fas fa-clock"></i>
+                <i class="fas fa-clock mx-1"></i>
                 <span v-if="discussApp" class="errors">
                     {{ createDeadline(discussApp.createdAt) }}
                     <input

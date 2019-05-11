@@ -26,8 +26,21 @@ $(function () {
             $.each(logs, function (k, log) {
                 $(`<tr>
                     <td scope="row">${new Date(log.createdAt).toString().slice(4,24)} GMT</td>
+                    <td scope="row">~</td>
                     <td scope="row">${log.action}</td>
-                </tr>`).hide().appendTo('#errorsTable').fadeIn();
+                </tr>`).hide().prependTo('tbody').fadeIn();
+            });
+        });
+    });
+
+    $('#showActivity').click(function () {
+        $.getJSON(`/logs/getNatActivity`).done(function (info) {
+            $.each(info, function (k, info) {
+                $(`<tr>
+                    <td scope="row">${info.username}</td>
+                    <td scope="row">Total evaluations: ${info.totalEvaluations}</td>
+                    <td scope="row">~</td>
+                </tr>`).hide().prependTo('tbody').fadeIn();
             });
         });
     });

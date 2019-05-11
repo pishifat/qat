@@ -48,10 +48,9 @@
                             <td scope="col" :class="question.category == 'metadata' ? 'w-50' : ''">Option</td>
                             <td scope="col">Score</td>
                             <td scope="col">Select</td>
-                            <td scope="col">Active</td>
                         </thead>
                         <tbody>
-                            <tr v-for="option in question.options" :key="option.id">
+                            <tr v-for="option in sortedOptions" :key="option.id" :class="option.active ? 'border-active' : 'border-inactive'">
                                 <td v-if="question.category == 'metadata'" class="text-capitalize" scope="row">{{option.metadataType}}</td>
                                 <td scope="row">
                                     <a v-if="question.questionType == 'image'" :href="option.content" target="_blank">{{option.content}}</a>
@@ -59,7 +58,6 @@
                                     </td>
                                 <td scope="row">{{option.score}}</td>
                                 <td scope="row"><input type="checkbox" name="optionList" :value="option.id"></td>
-                                <td scope="row" :class="option.active ? 'vote-pass' : 'vote-fail'">{{option.active ? 'active' : 'inactive'}}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -74,9 +72,9 @@
                     </div>
                     <small v-if="question.category == 'metadata'">
                         <select class="custom-select" id="metadataType" style="min-width: 150px">
-                            <option value="title" selected>Title</option>
+                            <option value="title" selected>Romanised Title</option>
                             <option value="titleUnicode" selected>Unicode Title</option>
-                            <option value="artist" selected>Artist</option>
+                            <option value="artist" selected>Romanised Artist</option>
                             <option value="artistUnicode" selected>Unicode Artist</option>
                             <option value="source" selected>Source</option>
                             <option value="reference" selected>Link/Reference</option>
@@ -86,7 +84,7 @@
                 <hr>
                 <span class="errors text-shadow" id="addEvalRoundsErrors">{{ info }}</span>
                 <span class="confirm text-shadow" id="addEvalRoundsConfirm">{{ confirm }}</span>
-                <button type="submit" class="btn btn-sm btn-nat-red float-right ml-2" @click="toggleActiveOption($event)">Mark as opposite activity</button>
+                <button type="submit" class="btn btn-sm btn-nat-red float-right ml-2" @click="toggleActiveOption($event)">Toggle activity</button>
                 <button type="submit" class="btn btn-sm btn-nat float-right ml-2" @click="updateOption($event)">Update Selected Option</button>
                 <button type="submit" class="btn btn-sm btn-nat float-right ml-2" @click="addOption($event)">Add Option</button>
                 
@@ -103,6 +101,18 @@ export default {
     name: 'edit-question',
     mixins: [ postData ],
     props: ['question', 'category', 'is-spectator'],
+    computed: {
+        sortedOptions: function() {
+            let sorted = this.question.options;
+            for (let i = 0; i < sorted.length; i++) {
+                let option = sorted[i];
+                if(!option.active){
+                    sorted.splice(sorted.length, 0, sorted.splice(i, 1)[0]);
+                }
+            }
+            return sorted;
+        }
+    },
     methods: {
         updateQuestion: async function (e) {
             this.info = '';

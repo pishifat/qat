@@ -159,4 +159,18 @@ async function isBnEvaluator(req, res, next) {
     }
 }
 
-module.exports = { isLoggedIn, getToken, getUserInfo, beatmapsetInfo, beatmapsetOwnerMaps, isBnOrNat, isNat, isLeader, isBnEvaluator };
+function webhookPost(message, mode) {
+    let url;
+    if(mode == 'osu') url = `https://discordapp.com/api/webhooks/${config.standardWebhook.id}/${config.standardWebhook.token}`;
+    if(mode == 'taiko') url = `https://discordapp.com/api/webhooks/${config.taikoWebhook.id}/${config.taikoWebhook.token}`;
+    if(mode == 'catch') url = `https://discordapp.com/api/webhooks/${config.catchWebhook.id}/${config.catchWebhook.token}`;
+    if(mode == 'mania') url = `https://discordapp.com/api/webhooks/${config.maniaWebhook.id}/${config.maniaWebhook.token}`;
+    axios.post(url, {
+        embeds: message
+    })
+    .catch(error => {
+        logs.service.create(null, error, null, 'error');
+    });
+}
+
+module.exports = { isLoggedIn, getToken, getUserInfo, beatmapsetInfo, beatmapsetOwnerMaps, isBnOrNat, isNat, isLeader, isBnEvaluator, webhookPost };

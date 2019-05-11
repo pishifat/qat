@@ -1,6 +1,8 @@
 const express = require('express');
 const api = require('../models/api');
 const logsService = require('../models/log').service;
+const usersService = require('../models/user').service;
+const evalsService = require('../models/evaluation').service;
 
 const router = express.Router();
 
@@ -24,7 +26,7 @@ router.get('/', async (req, res, next) => {
         ),
         isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
         isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
-        isAdmin: req.session.osuId == 1052994 || req.session.osuId == 3178418,
+        isAdmin: req.session.osuId == 1052994 || req.session.osuId == 3178418 || res.locals.userRequest.isLeader,
     });
 });
 
@@ -42,6 +44,35 @@ router.get('/showErrors', async (req, res, next) => {
     } else {
         res.redirect('/');
     }
+});
+
+router.get('/getNatActivity', async (req, res, next) => {
+    let users = await usersService.query({ group: 'nat' }, {}, {}, true);
+    let evaluations = await evalsService.query({}, {}, {}, true);
+
+    class obj 
+    {
+        constructor(username, totalEvaluations) 
+        {
+            this.username = username;
+            this.totalEvaluations = totalEvaluations;
+        }
+    }
+
+    let info = [];
+    users.forEach(user => {
+        let count = 0;
+        evaluations.forEach(evaluation => {
+            if(evaluation.evaluator.toString() == user.id){
+                count++;
+            }     
+        });
+        info.push(new obj(user.username, count));
+    });
+    
+    //this is not done yet
+
+    res.json(info);
 });
 
 module.exports = router;

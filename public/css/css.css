@@ -570,6 +570,11 @@ input[type=number] {
     color: #111;
 }
 
+.badge-none {
+    background-color: var(--secondary-text);
+    color: #111;
+}
+
 /* RADIO MODES */
 .hide-default {
     display: none;

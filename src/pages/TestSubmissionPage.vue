@@ -58,10 +58,10 @@
                     and provide a reliable source or links.</h5>
                 <h5 class="pl-4"><a :href="answer.question.content" target="_blank">{{ answer.question.content }}</a></h5>
                 <div class="mb-2"> <!-- only metadata questions for now -->
-                    <input id="title" class="form-control mb-1" type="text" placeholder="Title...">
-                    <input id="titleUnicode" class="form-control mb-1" type="text" placeholder="Unicode Title (if same as Title, copy that here)...">
-                    <input id="artist" class="form-control mb-1" type="text" placeholder="Artist...">
-                    <input id="artistUnicode" class="form-control mb-1" type="text" placeholder="Unicode Artist (if same as Artist, copy that here)...">
+                    <input id="title" class="form-control mb-1" type="text" placeholder="Romanised Title...">
+                    <input id="titleUnicode" class="form-control mb-1" type="text" placeholder="Unicode Title (if same as Romanised Title, copy that here)...">
+                    <input id="artist" class="form-control mb-1" type="text" placeholder="Romanised Artist...">
+                    <input id="artistUnicode" class="form-control mb-1" type="text" placeholder="Unicode Artist (if same as Romanised Artist, copy that here)...">
                     <input id="source" class="form-control mb-2" type="text" placeholder="Source (if unclear or non-existent, leave empty)...">
                     <small class="pl-4">Link sources for the song information (only one link is necessary, but more could help you!):</small>
                     <input id="reference1" class="form-control mb-1" type="text" placeholder="Reference 1">

@@ -27,10 +27,10 @@ export default {
     props: ['veto', 'majority'],
     computed: {
         upholdMediations: function(){
-            return this.veto.mediations.filter(mediation => mediation.vote == 1);
+            return this.veto.mediations.filter(mediation => mediation.vote != 3);
         },
         withdrawMediations: function(){
-            return this.veto.mediations.filter(mediation => mediation.vote == 3);
+            return this.veto.mediations.filter(mediation => mediation.vote != 1);
         },
         shuffledMediations: function(){
             let shuffled = this.veto.mediations;

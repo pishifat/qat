@@ -162,8 +162,9 @@ router.post('/apply', async (req, res, next) => {
             return res.json({ error: 'Failed to process application!' });
         } else {
             await bnAppsService.update(newBnApp.id, { test: test._id });
+            res.json('pass');
+
             logsService.create(req.session.mongoId, `Applied for ${req.body.mode} BN`);
-            return res.json('pass');
         }
     } else {
         if (currentBnApp){

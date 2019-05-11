@@ -2,7 +2,6 @@ const express = require('express');
 const api = require('../models/api');
 const vetoesService = require('../models/veto').service;
 const usersService = require('../models/user').service;
-const usersModel = require('../models/user').User;
 const mediationsService = require('../models/mediation').service;
 const logsService = require('../models/log').service;
 
@@ -79,6 +78,23 @@ router.post('/submit', async (req, res, next) => {
     v = await vetoesService.query({_id: v._id}, defaultPopulate);
     res.json(v);
     logsService.create(req.session.mongoId, `Submitted a veto for mediation on "${v.beatmapTitle}"`);
+    api.webhookPost([{
+        author: {
+            name: `New veto: ${bmInfo.artist} - ${bmInfo.title}`,
+            url: `https://osu.ppy.sh/beatmapsets/${bmInfo.beatmapset_id}`
+        },
+        thumbnail: {
+            url: `https://assets.ppy.sh/beatmaps/${bmId}/covers/list.jpg`
+        },
+        color: '7335382',
+        fields:[
+            {
+                name: `Veto reason`,
+                value: req.body.shortReason
+            }
+        ]
+    }], 
+    req.body.mode);
 });
 
 /* POST set status upheld or withdrawn. */

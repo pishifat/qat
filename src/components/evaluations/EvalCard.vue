@@ -21,8 +21,15 @@
                 <i v-else-if="mode == 'taiko'" class="fas fa-drum"></i>
                 <i v-else-if="mode == 'catch'" class="fas fa-apple-alt"></i>
                 <i v-else-if="mode == 'mania'" class="fas fa-stream"></i>
-                <i class="fas fa-clock mx-1"></i>
                 <span v-if="application">
+                    <span
+                        class="badge badge-none mx-1"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="pass"
+                        >{{ application.evaluations.length }}
+                    </span>
+                    <i class="fas fa-clock mx-1"></i>
                     <span class="errors">
                         {{ createDeadline(application.createdAt) }}
                     </span>
@@ -37,6 +44,14 @@
                     />
                 </span>
                 <span v-else>
+                    <span
+                        class="badge badge-none mx-1"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="pass"
+                        >{{ evalRound.evaluations.length }}
+                    </span>
+                    <i class="fas fa-clock mx-1"></i>
                     <span class="errors">
                         {{ new Date(evalRound.deadline).toString().slice(4, 10) }}
                     </span>

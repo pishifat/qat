@@ -3,6 +3,7 @@ const api = require('../models/api');
 const testSubmissionService = require('../models/bnTest/testSubmission').service;
 const logsService = require('../models/log').service;
 const bnAppsService = require('../models/bnApp').service;
+const usersService = require('../models/user').service;
 
 const router = express.Router();
 router.use(api.isLoggedIn);
@@ -173,6 +174,16 @@ router.post('/submit', async (req, res, next) => {
     await bnAppsService.update(currentBnApp.id, {test: test._id});
     res.json(displayScore);
     logsService.create(req.session.mongoId, `Completed ${test.mode} BN app test`);
+    let u = await usersService.query({_id: req.session.mongoId});
+    api.webhookPost([{
+        author: {
+            name: `New BN application: ${u.username}`,
+            icon_url: `https://a.ppy.sh/${u.osuId}`,
+            url: `https://osu.ppy.sh/users/${u.osuId}`
+        },
+        color: '7335382',
+    }], 
+    test.mode);
 });
 
 module.exports = router;
