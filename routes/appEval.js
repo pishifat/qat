@@ -135,7 +135,7 @@ router.post('/setComplete/', api.isLeader, async (req, res) => {
 });
 
 /* POST set consensus of eval */
-router.post('/setConsensus/:id', api.isLeader, async (req, res) => {
+router.post('/setConsensus/:id', async (req, res) => {
     await bnAppsService.update(req.params.id, { consensus: req.body.consensus });
     let a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(a);
