@@ -9,19 +9,23 @@
             <samp class="small">[list][*]You will be on probation for your first month as a BN. This means you can only nominate beatmaps that have been nominated by non-probation BNs, and you cannot disqualify beatmaps.</samp><br><br>
             <samp class="small">[*]At the end of your probation period, your activity/attitude/nomination quality will be evaluated by members of the NAT. If each of these areas are satisfactory, your probation period will be complete. If not, your probation will be extended for another month. or you'll be dismissed from the BN. In that second case, you will not be able to re-apply for another 90 days.</samp><br><br>
             <samp class="small">[*]Read [url=https://osu.ppy.sh/help/wiki/People/Beatmap_Nominators/Rules]this page[/url] and follow the golden rule: [i]don't fuck up[/i].[/list][/notice]</samp><br><br>
+            <samp class="small">Your test results can be found here: http://bn.mappersguild.com/testresults</samp><br><br>
             <samp class="small">Additional feedback from the NAT:</samp><br><br>
             <samp><pre class="small">[notice]{{discussApp.feedback}}[/notice]</pre></samp>
-            <samp class="small">We hope you have fun as a Beatmap Nominator!</samp>
+            <samp class="small">We hope you have fun as a Beatmap Nominator! Link to the BN Discord Server: {{discordLink || 'expired link'}}</samp><br><br>
+            <samp class="small">Regards, the Nomination Assessment Team</samp>
         </div>
         <div v-else id="forumPmBox" class="copy-paste collapse">
             <samp class="small">Hello!</samp><br><br>
             <samp class="small">Following an evaluation of your {{discussApp.mode}} BN application, we've decided not to admit you into the Beatmap Nominators.</samp><br><br>
+            <samp class="small">Your test results can be found here: http://bn.mappersguild.com/testresults</samp><br><br>
             <samp class="small">Additional feedback regarding why you were rejected and what you could potentially improve in your next application:</samp><br><br>
             <samp><pre class="small">[notice]{{discussApp.feedback}}[/notice]</pre></samp>
             <samp class="small">For further feedback or to appeal this decision, contact any of these users:
                 <span v-for="(evaluation, i) in discussApp.evaluations" :key="i">[url=https://osu.ppy.sh/users/{{evaluation.evaluator.osuId}}]{{evaluation.evaluator.username}}[/url]{{i+1 != discussApp.evaluations.length ? ", " : ""}}</span>
             </samp><br><br>
-            <samp class="small">You may apply for BN in this game mode again after 90 days. Good luck!</samp>
+            <samp class="small">You may apply for BN in this game mode again after 90 days. Good luck!</samp><br><br>
+            <samp class="small">Regards, the Nomination Assessment Team</samp>
         </div>
     </div>
     <div v-else-if="discussRound">
@@ -52,7 +56,8 @@
             <samp class="small">For further feedback or to appeal this decision, contact any of these users:
                 <span v-for="(evaluation, i) in discussRound.evaluations" :key="i">[url=https://osu.ppy.sh/users/{{evaluation.evaluator.osuId}}]{{evaluation.evaluator.username}}[/url]{{i+1 != discussRound.evaluations.length ? ", " : ""}}</span>
             </samp><br><br>
-            <samp class="small">We hope to see you off of probation soon!</samp>
+            <samp class="small">We hope to see you off of probation soon!</samp><br><br>
+            <samp class="small">Regards, the Nomination Assessment Team</samp>
         </div>
         <div v-else id="currentBnForumPmBox" class="copy-paste collapse">
             <samp class="small">Hello!</samp><br><br>
@@ -63,7 +68,8 @@
             <samp class="small">For further feedback or to appeal this decision, contact any of these users:
                 <span v-for="(evaluation, i) in discussRound.evaluations" :key="i">[url=https://osu.ppy.sh/users/{{evaluation.evaluator.osuId}}]{{evaluation.evaluator.username}}[/url]{{i+1 != discussRound.evaluations.length ? ", " : ""}}</span>
             </samp><br><br>
-            <samp class="small">Good luck!</samp>
+            <samp class="small">Good luck!</samp><br><br>
+            <samp class="small">Regards, the Nomination Assessment Team</samp>
         </div>
     </div>
     
@@ -75,6 +81,6 @@
 
 export default {
     name: 'feedback-pm',
-    props: [ 'discuss-app', 'discuss-round' ],
+    props: [ 'discuss-app', 'discuss-round', 'discord-link' ],
 }
 </script>

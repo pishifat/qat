@@ -35,6 +35,20 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
         }
         await reportsService.create(req.session.mongoId, u.id, req.body.reason, req.body.link);
         res.json({});
+        api.webhookPost([{
+            author: {
+                name: `User report: ${u.username}`,
+                icon_url: `https://a.ppy.sh/${u.osuId}`,
+                url: `https://osu.ppy.sh/users/${u.osuId}`
+            },
+            color: '12184229',
+            fields:[
+                {
+                    name: `Report reason`,
+                    value: req.body.reason
+                }
+            ]
+        }]);
         logsService.create(
             null,
             `Reported "${u.username}" for reason "${
@@ -44,6 +58,19 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
     }else{
         await reportsService.create(req.session.mongoId, null, req.body.reason, req.body.link);
         res.json({});
+        api.webhookPost([{
+            author: {
+                name: `Non-user report`,
+                url: req.body.link
+            },
+            color: '15386534',
+            fields:[
+                {
+                    name: `Report reason`,
+                    value: req.body.reason
+                }
+            ]
+        }]);
         logsService.create(
             null,
             `Reported something without a username included`

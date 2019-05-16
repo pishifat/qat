@@ -165,6 +165,7 @@ function webhookPost(message, mode) {
     if(mode == 'taiko') url = `https://discordapp.com/api/webhooks/${config.taikoWebhook.id}/${config.taikoWebhook.token}`;
     if(mode == 'catch') url = `https://discordapp.com/api/webhooks/${config.catchWebhook.id}/${config.catchWebhook.token}`;
     if(mode == 'mania') url = `https://discordapp.com/api/webhooks/${config.maniaWebhook.id}/${config.maniaWebhook.token}`;
+    if(!mode) url = `https://discordapp.com/api/webhooks/${config.reportWebhook.id}/${config.reportWebhook.token}`;
     axios.post(url, {
         embeds: message
     })

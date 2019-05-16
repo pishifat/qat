@@ -38,18 +38,16 @@
                             <h5 class="text-shadow mb-2" v-if="!readOnly">Consensus:
                                 <span v-if="discussApp.consensus" :class="'vote-' + discussApp.consensus">{{discussApp.consensus}}</span>
                                 <span v-else>none</span>
-                                <span v-if="evaluator.isLeader">
-                                    <button
-                                        class="btn btn-sm btn-nat-green"
-                                        :disabled="discussApp.consensus == 'pass' "
-                                        @click="setConsensus('pass', $event);"
-                                    >Set Pass</button>
-                                    <button
-                                        class="btn btn-sm btn-nat-red"
-                                        :disabled="discussApp.consensus == 'fail'"
-                                        @click="setConsensus('fail', $event);"
-                                    >Set Fail</button>
-                                </span>
+                                <button
+                                    class="btn btn-sm btn-nat-green"
+                                    :disabled="discussApp.consensus == 'pass' "
+                                    @click="setConsensus('pass', $event);"
+                                >Set Pass</button>
+                                <button
+                                    class="btn btn-sm btn-nat-red"
+                                    :disabled="discussApp.consensus == 'fail'"
+                                    @click="setConsensus('fail', $event);"
+                                >Set Fail</button>
                             </h5>
                             <div v-if="discussApp.consensus && !readOnly">
                                 <hr>
@@ -62,8 +60,12 @@
                                 <div class="form-group">
                                     <textarea class="form-control dark-textarea" style="white-space: pre-line;" v-model="feedback"></textarea>
                                 </div>
+                                <div v-if="discussApp.consensus == 'pass'" class="input-group mb-3">
+                                    <input class="form-control" type="text" v-model="discordLink" placeholder="discord invite link...">
+                                </div>
                                 <feedback-pm
-                                    :discuss-app="discussApp">
+                                    :discuss-app="discussApp"
+                                    :discord-link="discordLink">
                                 </feedback-pm>
                             </div>
                             <hr>
@@ -76,7 +78,7 @@
                             <h5 v-if="discussRound" class="text-shadow mb-3 ml-1 mt-1">Consensus:
                                 <span v-if="discussRound.consensus" :class="'vote-' + discussRound.consensus">{{discussRound.consensus}}</span>
                                 <span v-else>none</span>
-                                <span v-if="!readOnly && evaluator.isLeader">
+                                <span v-if="!readOnly">
                                 <button
                                     class="btn btn-sm btn-nat-green"
                                     :disabled="discussRound.consensus == 'pass' "
@@ -420,7 +422,8 @@ export default {
             pops: null,
             dqs: null,
             nomsPopped: null,
-            nomsDqd: null
+            nomsDqd: null,
+            discordLink: null,
         };
     },
 }
