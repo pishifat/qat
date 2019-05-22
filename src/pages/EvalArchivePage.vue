@@ -8,6 +8,11 @@
             <button class="btn btn-nat ml-2" @click="query($event)" type="submit">Search archives</button>
             <span v-if="info" class="errors ml-4 mt-2">Error: {{info}}</span>
         </div>
+        <div class="input-group input-group-sm my-2">
+            <input type="text" placeholder="# entries..." id="limit"
+                @keyup.enter="queryRecent($event)" maxlength="3" autocomplete="off"/>
+            <button class="btn btn-nat ml-2" @click="queryRecent($event)" type="submit">Show recent</button>
+        </div>
     </section>
     <section class="col-md-12 segment segment-image" v-if="queried">
         <h2>Application Evaluations</h2>
@@ -93,6 +98,24 @@ export default {
                         this.bnEvals = result.b; 
                     }
                 }
+            }
+        },
+        queryRecent: async function(e) {
+            this.info = '';
+            let limit = $('#limit').val();
+            if(parseInt(limit)){
+                const result = await this.executePost('/evalArchive/searchRecent/', {limit: limit}, e);
+                if (result) {
+                    if (result.error) {
+                        this.info = result.error;
+                    } else {
+                        this.queried = true;
+                        this.appEvals = result.a;
+                        this.bnEvals = result.b; 
+                    }
+                }
+            }else{
+                this.info = "Invalid number"
             }
         }
     },

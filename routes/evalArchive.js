@@ -61,4 +61,28 @@ router.post('/search/', async (req, res) => {
     res.json({ a: a, b: b });
 });
 
+/* POST search for user */
+router.post('/searchRecent/', async (req, res) => {
+    if(!req.body.limit){
+        req.body.limit = 12;
+    }else{
+        req.body.limit = parseInt(req.body.limit);
+    }
+    let a = await bnAppsService.query(
+        { active: false, consensus: {$exists: true} },
+        defaultAppPopulate,
+        { createdAt: 1 },
+        true,
+        req.body.limit
+    );
+    let b = await evalRoundsService.query(
+        { active: false, consensus: {$exists: true} },
+        defaultBnPopulate,
+        { createdAt: 1 },
+        true,
+        req.body.limit
+    );
+    res.json({ a: a, b: b });
+});
+
 module.exports = router;

@@ -26,10 +26,14 @@
                         class="badge badge-none mx-1"
                         data-toggle="tooltip"
                         data-placement="top"
-                        title="pass"
+                        title="total evaluations"
                         >{{ application.evaluations.length }}
                     </span>
-                    <i class="fas fa-clock mx-1"></i>
+                    <i class="fas fa-clock mx-1"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="deadline">
+                    </i>
                     <span class="errors">
                         {{ createDeadline(application.createdAt) }}
                     </span>
@@ -51,7 +55,11 @@
                         title="pass"
                         >{{ evalRound.evaluations.length }}
                     </span>
-                    <i class="fas fa-clock mx-1"></i>
+                    <i class="fas fa-clock mx-1"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="deadline">
+                    </i>
                     <span class="errors">
                         {{ new Date(evalRound.deadline).toString().slice(4, 10) }}
                     </span>

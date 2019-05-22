@@ -58,18 +58,27 @@
                     title="fail"
                     >{{ fail }}</span
                 >
-                <i class="fas fa-clock mx-1"></i>
-                <span v-if="discussApp" class="errors">
-                    {{ createDeadline(discussApp.createdAt) }}
+                <i class="fas fa-clock mx-1"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="deadline">
+                </i>
+                <span v-if="discussApp">
+                    <span class="errors">{{ createDeadline(discussApp.createdAt) }}</span>
                     <input
                         v-if="!readOnly && evaluator && evaluator.isLeader"
                         @click.stop="checkSelection()"
-                        class="float-right"
+                        class="float-right ml-2"
                         :id="discussApp.id + '-check'"
                         type="checkbox"
                         name="evalTypeCheck"
                         :value="discussApp.id"
                     />
+                    <i v-if="discussApp.feedback" 
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="feedback written" 
+                    class="fas fa-comment float-right"></i>
                 </span>
                 <span v-else class="errors">
                     {{ new Date(discussRound.deadline).toString().slice(4, 10) }}

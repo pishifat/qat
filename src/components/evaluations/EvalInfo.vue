@@ -17,6 +17,9 @@
                     <i v-else-if="evalRound.mode == 'catch'" class="fas fa-apple-alt"></i>
                     <i v-else-if="evalRound.mode == 'mania'" class="fas fa-stream"></i>
                 </h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
             </div>
             <div class="modal-body" style="overflow: hidden;">
                 <div class="container">
