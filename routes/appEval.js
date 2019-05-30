@@ -65,7 +65,10 @@ router.post('/submitEval/:id', async (req, res) => {
             req.body.moddingComment,
             req.body.vote
         );
-        await bnAppsService.update(req.params.id, { $push: { evaluations: ev._id } });
+        let app = await bnAppsService.update(req.params.id, { $push: { evaluations: ev._id } });
+        if((app.mode == 'osu' && app.evaluations.length > 2) || (app.mode != 'osu' && app.evaluations.length > 1)){
+            await bnAppsService.update(req.params.id, { discussion: true });
+        }
     }
     let a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(a);

@@ -88,6 +88,7 @@
                             maxlength="2"
                             style="min-width: 55px; width: 55px;"
                         />
+                        <p class="small pl-2 pt-2">Only deadlines within the next 2 weeks will be displayed</p>
                     </div>
                 </div>
 

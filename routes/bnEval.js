@@ -39,8 +39,10 @@ const defaultPopulate = [
 
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res, next) => {
+    let minDate = new Date();
+    minDate.setDate(minDate.getDate() + 14);
     const [er, r] = await Promise.all([
-        await evalRoundsService.query({ active: true }, defaultPopulate, { deadline: -1 }, true),
+        await evalRoundsService.query({ active: true, deadline: { $lte: minDate }, }, defaultPopulate, { deadline: 1 }, true),
         await reportsService.query(
             { valid: { $exists: true, $ne: 3 }, feedback: { $exists: true, $nin: '' } },
             {},
