@@ -24,6 +24,7 @@ const manageTestRouter = require('./routes/manageTest');
 const testResultsRouter = require('./routes/testResults');
 const bnScoreRouter = require('./routes/bnScore');
 const logsRouter = require('./routes/logs');
+const rcVoteRouter = require('./routes/rcVote');
 
 var app = express();
 
@@ -68,6 +69,7 @@ app.use('/managetest', manageTestRouter);
 app.use('/testresults', testResultsRouter);
 app.use('/bnscore', bnScoreRouter);
 app.use('/logs', logsRouter);
+app.use('/rcVote', rcVoteRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

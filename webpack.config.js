@@ -15,6 +15,7 @@ const qatConfig =  {
         manageTest: './src/manageTest.js',
         testResults: './src/testResults.js',
         testSubmission: './src/testSubmission.js',
+        rcVote: './src/rcVote.js',
     },
     output: {
         filename: '[name].js',
