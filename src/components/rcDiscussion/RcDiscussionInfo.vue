@@ -30,19 +30,19 @@
                 <!--leader options-->
                 <div v-if="isLeader">
                     <hr>
-                    <p class="min-spacing my-2 text-shadow">{{agreeMediations.length}} "Agree" {{agreeMediations.length == 1 ? 'vote' : 'votes'}} ({{(agreeMediations.length/rcDiscussion.mediations.length)*100 || 0}}%)</p>
+                    <p class="min-spacing my-2 text-shadow">{{agreeMediations.length}} "Agree" {{agreeMediations.length == 1 ? 'vote' : 'votes'}} ({{Math.round((agreeMediations.length/rcDiscussion.mediations.length)*100) || 0}}%)</p>
                     <p class="small min-spacing ml-2" v-for="mediation in agreeMediations" :key="mediation.id">{{mediation.mediator.username}}</p>
-                    <p class="min-spacing my-2 text-shadow">{{neutralMediations.length}} "Neutral" {{neutralMediations.length == 1 ? 'vote' : 'votes'}} ({{(neutralMediations.length/rcDiscussion.mediations.length)*100 || 0}}%)</p>
+                    <p class="min-spacing my-2 text-shadow">{{neutralMediations.length}} "Neutral" {{neutralMediations.length == 1 ? 'vote' : 'votes'}} ({{Math.round((neutralMediations.length/rcDiscussion.mediations.length)*100) || 0}}%)</p>
                     <p class="small min-spacing ml-2" v-for="mediation in neutralMediations" :key="mediation.id">{{mediation.mediator.username}}</p>
-                    <p class="min-spacing my-2 text-shadow">{{disagreeMediations.length}} "Disagree" {{disagreeMediations.length == 1 ? 'vote' : 'votes'}} ({{(disagreeMediations.length/rcDiscussion.mediations.length)*100 || 0}}%)</p>
+                    <p class="min-spacing my-2 text-shadow">{{disagreeMediations.length}} "Disagree" {{disagreeMediations.length == 1 ? 'vote' : 'votes'}} ({{Math.round((disagreeMediations.length/rcDiscussion.mediations.length)*100) || 0}}%)</p>
                     <p class="small min-spacing ml-2" v-for="mediation in disagreeMediations" :key="mediation.id">{{mediation.mediator.username}}</p>
                     <button v-if="rcDiscussion.isActive" class="btn btn-sm btn-nat mt-3" @click="concludeMediation($event)">Conclude Vote</button>
                 </div>
                 <div v-else-if="!rcDiscussion.isActive">
                     <hr>
-                    <p class="min-spacing my-2 text-shadow">{{agreeMediations.length}} "Agree" {{agreeMediations.length == 1 ? 'vote' : 'votes'}} ({{(agreeMediations.length/rcDiscussion.mediations.length)*100 || 0}}%)</p>
-                    <p class="min-spacing my-2 text-shadow">{{neutralMediations.length}} "Neutral" {{neutralMediations.length == 1 ? 'vote' : 'votes'}} ({{(neutralMediations.length/rcDiscussion.mediations.length)*100 || 0}}%)</p>
-                    <p class="min-spacing my-2 text-shadow">{{disagreeMediations.length}} "Disagree" {{disagreeMediations.length == 1 ? 'vote' : 'votes'}} ({{(disagreeMediations.length/rcDiscussion.mediations.length)*100 || 0}}%)</p>
+                    <p class="min-spacing my-2 text-shadow">{{agreeMediations.length}} "Agree" {{agreeMediations.length == 1 ? 'vote' : 'votes'}} ({{Math.round((agreeMediations.length/rcDiscussion.mediations.length)*100) || 0}}%)</p>
+                    <p class="min-spacing my-2 text-shadow">{{neutralMediations.length}} "Neutral" {{neutralMediations.length == 1 ? 'vote' : 'votes'}} ({{Math.round((neutralMediations.length/rcDiscussion.mediations.length)*100) || 0}}%)</p>
+                    <p class="min-spacing my-2 text-shadow">{{disagreeMediations.length}} "Disagree" {{disagreeMediations.length == 1 ? 'vote' : 'votes'}} ({{Math.round((disagreeMediations.length/rcDiscussion.mediations.length)*100) || 0}}%)</p>
                 </div>
 
                 <!--mediator options-->

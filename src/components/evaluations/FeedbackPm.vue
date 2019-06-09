@@ -36,7 +36,7 @@
                 <samp class="small">You may now nominate maps that are nominated by other probation BNs, and you may disqualify maps when applicable.</samp><br><br>
             </span>
             <span v-else>
-                <samp class="small">After evaluating the work of you (and many other BNs), we'd just like to let you know that you're doing well. Thanks!</samp><br><br>
+                <samp class="small">After evaluating your work as a BN, we'd just like to let you know that you're doing well. Thanks!</samp><br><br>
             </span>
             <samp class="small">Additional feedback from the NAT:</samp><br><br>
             <samp><pre class="small">[notice]{{discussRound.feedback}}[/notice]</pre></samp>
@@ -45,11 +45,11 @@
         <div v-else-if="discussRound.consensus == 'extend'" id="currentBnForumPmBox" class="copy-paste collapse">
             <samp class="small">Hello!</samp><br><br>
             <span v-if="discussRound.bn.probation.indexOf(discussRound.mode) >= 0">
-                <samp class="small">After reviewing your activity, proficiency and behaviour in our recent {{discussRound.mode}} BN evaluations, we have decided to [b]extend your probation period[/b].</samp><br><br>
+                <samp class="small">After reviewing your work as a BN in our recent {{discussRound.mode}} BN evaluations, we have decided to [b]extend your probation period[/b].</samp><br><br>
                 <samp class="small">We will evaluate you again in [b]one month[/b] to determine if the mentioned issues have been overcome. Assuming this is the case, you will be promoted to full Nominator status. Should these issues persist without substantial improvement however, you will be removed from the Beatmap Nominators.</samp><br><br>
             </span>
             <span v-else>
-                <samp class="small">After reviewing your activity, proficiency and behaviour in our recent {{discussRound.mode}} BN evaluations, we have decided to [b]place you on probation[/b]. After one month, we will re-evaluate your work as a BN to determine if your probation should be lifted or if you should be removed from the Beatmap Nominators.</samp><br><br>
+                <samp class="small">After reviewing your work as a BN in our recent {{discussRound.mode}} BN evaluations, we have decided to [b]place you on probation[/b]. After one month, we will re-evaluate your work as a BN to determine if your probation should be lifted or if you should be removed from the Beatmap Nominators.</samp><br><br>
             </span>
             <samp class="small">Additional feedback from the NAT:</samp><br><br>
             <samp><pre class="small">[notice]{{discussRound.feedback}}[/notice]</pre></samp>
@@ -61,7 +61,7 @@
         </div>
         <div v-else id="currentBnForumPmBox" class="copy-paste collapse">
             <samp class="small">Hello!</samp><br><br>
-            <samp class="small">After reviewing your activity, proficiency and behaviour in our recent {{discussRound.mode}} BN evaluations, we have decided to [b]remove you from the Beatmap Nominators[/b].</samp><br><br>
+            <samp class="small">After reviewing your work as a BN in our recent {{discussRound.mode}} BN evaluations, we have decided to [b]remove you from the Beatmap Nominators[/b].</samp><br><br>
             <samp class="small">Despite this decision, we would like to thank you for your service to the mapping and modding communities and wish you the best of luck in your future endeavours. Should you wish to apply for the Beatmap Nominators in the future, you may do so after 90 days, provided you meet the normal required activity requirements and have shown improvement in the areas mentioned.</samp><br><br>
             <samp class="small">Additional feedback from the NAT:</samp><br><br>
             <samp><pre class="small">[notice]{{discussRound.feedback}}[/notice]</pre></samp>
