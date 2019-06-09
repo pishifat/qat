@@ -165,6 +165,17 @@ router.post('/concludeMediation/:id', api.isNat, async (req, res, next) => {
 });
 
 /* POST continue mediation */
+router.post('/continueMediation/:id', api.isNat, async (req, res, next) => {
+    await vetoesService.update(req.params.id, { status: 'wip' });
+    let v = await vetoesService.query({ _id: req.params.id }, defaultPopulate);
+    res.json(v);
+    logsService.create(
+        req.session.mongoId,
+        `Veto mediation for "${v.beatmapTitle}" re-initiated`
+    );
+});
+
+/* POST replace mediator */
 router.post('/replaceMediator/:id', api.isNat, async (req, res, next) => {
     let v = await vetoesService.query({ _id: req.params.id }, defaultPopulate);
     let currentMediators = [];

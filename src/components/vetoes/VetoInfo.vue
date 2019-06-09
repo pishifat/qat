@@ -31,7 +31,7 @@
                     <div v-if="veto.mediations.length">
                         <ul style="list-style-type: none; padding-left: 0.5rem">
                             <li v-for="mediation in veto.mediations" :key="mediation.id">
-                                <a href="#" v-if="!mediation.comment" @click.prevent="replaceMediator(mediation.id);" data-toggle="tooltip" data-placement="top" title="replace mediator">
+                                <a href="#" v-if="!mediation.comment && veto.status == 'wip'" @click.prevent="replaceMediator(mediation.id);" data-toggle="tooltip" data-placement="top" title="replace mediator">
                                     <i class="fas fa-redo-alt vote-pass"></i>
                                 </a>
                                 {{mediation.mediator.username}}:
@@ -243,7 +243,7 @@ export default {
             this.info = '';
             this.confirm = '';
             const result = confirm(`Are you sure? This should only be done if a mistake was made.`);
-            if(result && !isSpectator){
+            if(result && !this.isSpectator){
                 const v = await this.executePost(
                     '/vetoes/continueMediation/' + this.veto.id, {}, e);
                 if (v) {

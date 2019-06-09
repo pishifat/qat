@@ -13,9 +13,24 @@
             
             <section class="row segment segment-image mx-0 px-0">
                 <div class="col-sm-12">
+                    <h2>Active Vetoes <small v-if="activeVetoes">({{activeVetoes.length}})</small></h2>
                     <transition-group name="list" tag="div" class="row mx-auto">
                         <veto-card
-                            v-for="veto in pageObjs"
+                            v-for="veto in activeVetoes"
+                            :key="veto.id"
+                            :veto="veto"
+                            :userId="userId"
+                            @update:selectedVeto="selectedVeto = $event"
+                        ></veto-card>
+                    </transition-group>
+                </div>
+            </section>
+            <section class="row segment segment-image mx-0 px-0">
+                <div class="col-sm-12">
+                    <h2>Resolved Vetoes <small v-if="resolvedVetoes">({{resolvedVetoes.length}})</small></h2>
+                    <transition-group name="list" tag="div" class="row mx-auto">
+                        <veto-card
+                            v-for="veto in resolvedVetoes"
                             :key="veto.id"
                             :veto="veto"
                             :userId="userId"
@@ -61,6 +76,10 @@ export default {
             }
             return false;
         },
+        separateObjs: function() {
+            this.activeVetoes = this.pageObjs.filter(v => v.status == 'wip');
+            this.resolvedVetoes = this.pageObjs.filter(v => v.status != 'wip');
+        },
         SubmitVeto: function(v) {
             this.allObjs.unshift(v);
             this.filter();
@@ -76,6 +95,8 @@ export default {
         return {
             allObjs: null,
             pageObjs: null,
+            activeVetoes: null,
+            resolvedVetoes: null,
             filteredObjs: null,
             userId: null,
             userOsuId: null,
@@ -93,7 +114,9 @@ export default {
                 this.userOsuId = response.data.userOsuId;
                 this.isNat = response.data.isNat;
                 this.isSpectator = response.data.isSpectator;
-                this.limit = 24;
+                this.hasPagination = false;
+                this.hasSeparation = true;
+                this.filter();
             })
             .then(function() {
                 $('#loading').fadeOut();

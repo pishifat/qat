@@ -52,7 +52,7 @@
                         class="badge badge-none mx-1"
                         data-toggle="tooltip"
                         data-placement="top"
-                        title="pass"
+                        title="total evaluations"
                         >{{ evalRound.evaluations.length }}
                     </span>
                     <i class="fas fa-clock mx-1"

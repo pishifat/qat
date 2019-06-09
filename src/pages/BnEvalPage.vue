@@ -22,7 +22,7 @@
         <hr>
         <section class="row segment segment-image mx-1 px-0">
             <div class="col-sm-12">
-                <h2>Individual Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="Evaluations are hidden from others to avoid confirmation bias">?</sup> 
+                <h2>Individual Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="Evaluations are hidden from others to avoid confirmation bias">?</sup> <small v-if="evalRounds">({{evalRounds.length}})</small>
                     <button
                         v-if="evaluator && evaluator.isLeader"
                         class="btn btn-nat"
@@ -53,7 +53,7 @@
         <hr>
         <section class="row segment segment-image mx-1 px-0">
             <div class="col-sm-12">
-                <h2>Group Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="After individual evals are completed, their responses are made visible to allow discussion and form a consensus">?</sup></h2>
+                <h2>Group Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="After individual evals are completed, their responses are made visible to allow discussion and form a consensus">?</sup> <small v-if="discussRounds">({{discussRounds.length}})</small></h2>
                 
                 <transition-group name="list" tag="div" class="row">
                     <discuss-card

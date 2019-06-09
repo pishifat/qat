@@ -32,12 +32,16 @@
         <table v-if="questions && questions.length" class="table table-sm table-dark table-hover col-md-12 mt-2">
             <thead>
                 <td scope="col">Question</td>
+                <td scope="col">Updated</td>
                 <td scope="col"></td>
             </thead>
             <tbody>
                 <tr v-for="question in questions" :key="question.id" :class="question.active ? 'border-active' : 'border-inactive'">
                     <td scope="row">
                         {{question.content}}
+                    </td>
+                    <td scope="row" style="white-space: nowrap;">
+                        {{question.updatedAt.slice(0,10)}}
                     </td>
                     <td scope="row" class="text-right">
                         <a href="#" data-toggle="modal" data-target="#editQuestion" :data-entry="question.id" @click.prevent="selectQuestion(question)">
