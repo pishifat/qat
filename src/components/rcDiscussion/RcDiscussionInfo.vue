@@ -3,7 +3,7 @@
 <div id="extendedInfo" class="modal fade" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content" v-if="rcDiscussion">
-            <div class="modal-header text-dark" :class="rcDiscussion.isActive ? 'bg-active' : 'bg-inactive'">
+            <div class="modal-header text-dark bg-nat-logo">
                 <h5 class="modal-title">
                     <a class="text-dark" :href="rcDiscussion.discussionLink" target="_blank">{{ rcDiscussion.title }}</a>
                     <i v-if="rcDiscussion.mode.indexOf('osu') >= 0" class="far fa-circle"></i>
@@ -25,11 +25,11 @@
                 <div class="text-shadow mb-4">
                     <p class="min-spacing"><a :href="rcDiscussion.discussionLink" target="_blank">Read and contribute to the full Ranking Criteria discussion here</a></p>
                     <small class="ml-2">Proposal: <i>{{ rcDiscussion.shortReason }}</i></small>
-                    <hr>
                 </div>
 
                 <!--leader options-->
                 <div v-if="isLeader">
+                    <hr>
                     <p class="min-spacing my-2 text-shadow">{{agreeMediations.length}} "Agree" {{agreeMediations.length == 1 ? 'vote' : 'votes'}} ({{(agreeMediations.length/rcDiscussion.mediations.length)*100 || 0}}%)</p>
                     <p class="small min-spacing ml-2" v-for="mediation in agreeMediations" :key="mediation.id">{{mediation.mediator.username}}</p>
                     <p class="min-spacing my-2 text-shadow">{{neutralMediations.length}} "Neutral" {{neutralMediations.length == 1 ? 'vote' : 'votes'}} ({{(neutralMediations.length/rcDiscussion.mediations.length)*100 || 0}}%)</p>
@@ -39,6 +39,7 @@
                     <button v-if="rcDiscussion.isActive" class="btn btn-sm btn-nat mt-3" @click="concludeMediation($event)">Conclude Vote</button>
                 </div>
                 <div v-else-if="!rcDiscussion.isActive">
+                    <hr>
                     <p class="min-spacing my-2 text-shadow">{{agreeMediations.length}} "Agree" {{agreeMediations.length == 1 ? 'vote' : 'votes'}} ({{(agreeMediations.length/rcDiscussion.mediations.length)*100 || 0}}%)</p>
                     <p class="min-spacing my-2 text-shadow">{{neutralMediations.length}} "Neutral" {{neutralMediations.length == 1 ? 'vote' : 'votes'}} ({{(neutralMediations.length/rcDiscussion.mediations.length)*100 || 0}}%)</p>
                     <p class="min-spacing my-2 text-shadow">{{disagreeMediations.length}} "Disagree" {{disagreeMediations.length == 1 ? 'vote' : 'votes'}} ({{(disagreeMediations.length/rcDiscussion.mediations.length)*100 || 0}}%)</p>
