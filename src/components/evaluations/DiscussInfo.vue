@@ -134,8 +134,8 @@
                                     <p :class=" evaluation.vote == 1 ? 'vote-pass' : evaluation.vote == 2 ? 'vote-neutral' : 'vote-fail'">{{evaluation.evaluator.username}}</p> 
                                 </div>
                                 <div :class="evaluation.evaluator.username.length > 12 ? 'col-sm-9' : 'col-sm-10'">
-                                    <p class="mb-1">Behavior: <pre class="secondary-text pre-font small">{{evaluation.behaviorComment}}</pre></p> 
-                                    <p>Modding: <pre class="secondary-text pre-font small">{{evaluation.moddingComment}}</pre></p>
+                                    <p class="mb-1">Behavior: <pre class="secondary-text pre-font small" v-html="filterLinks(evaluation.behaviorComment)"></pre></p> 
+                                    <p>Modding: <pre class="secondary-text pre-font small" v-html="filterLinks(evaluation.moddingComment)"></pre></p>
                                 </div>
                             </div>
                         </div>
@@ -145,8 +145,8 @@
                                     <p :class=" evaluation.vote == 1 ? 'vote-pass' : evaluation.vote == 2 ? 'vote-extend' : 'vote-fail'">{{evaluation.evaluator.username}}</p> 
                                 </div>
                                 <div :class="evaluation.evaluator.username.length > 12 ? 'col-sm-9' : 'col-sm-10'">
-                                    <p class="mb-1">Behavior: <pre class="secondary-text pre-font small">{{evaluation.behaviorComment}}</pre></p> 
-                                    <p>Modding: <pre class="secondary-text pre-font small">{{evaluation.moddingComment}}</pre></p>
+                                    <p class="mb-1">Behavior: <pre class="secondary-text pre-font small" v-html="filterLinks(evaluation.behaviorComment)"></pre></p> 
+                                    <p>Modding: <pre class="secondary-text pre-font small" v-html="filterLinks(evaluation.moddingComment)"></pre></p>
                                 </div>
                             </div>
                         </div>
@@ -217,13 +217,14 @@
 
 <script>
 import postData from "../../mixins/postData.js";
+import filterLinks from '../../mixins/filterLinks.js';
 import UserActivity from './UserActivity.vue'
 import FeedbackPm from './FeedbackPm.vue'
 
 export default {
     name: 'discuss-info',
     props: [ 'discuss-app', 'discuss-round', 'evaluator', 'reports', 'read-only' ],
-    mixins: [ postData ],
+    mixins: [ postData, filterLinks ],
     components: {
         UserActivity,
         FeedbackPm

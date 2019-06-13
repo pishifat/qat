@@ -42,7 +42,7 @@
                             {{dq.metadata.length > 35 ? dq.metadata.slice(0,35) + "..." : dq.metadata}}
                         </a>
                     </td>
-                    <td v-if="!editing" scope="row">{{dq.content}}</td>
+                    <td v-if="!editing" scope="row" v-html="filterLinks(dq.content)"></td>
                     <td v-else scope="row">
                         <input :class="'input-' + dq._id" type="text" :placeholder="dq.content.length > 35 ? dq.content.slice(0,35) + '...' : dq.content" maxlength="50"/>
                         <button class="btn btn-sm btn-nat" @click="updateReason(dq._id, $event);">Save</button>
@@ -75,7 +75,7 @@
                             {{pop.metadata.length > 35 ? pop.metadata.slice(0,35) + "..." : pop.metadata}}
                         </a>
                     </td>
-                    <td v-if="!editing" scope="row">{{pop.content}}</td>
+                    <td v-if="!editing" scope="row" v-html="filterLinks(pop.content)"></td>
                     <td v-else scope="row">
                         <input :class="'input-' + pop._id" type="text" :placeholder="pop.content.length > 35 ? pop.content.slice(0,35) + '...' : pop.content" maxlength="50"/>
                         <button class="btn btn-sm btn-nat" @click="updateReason(pop._id, $event);">Save</button>
@@ -108,7 +108,7 @@
                             {{dq.metadata.length > 35 ? dq.metadata.slice(0,35) + "..." : dq.metadata}}
                         </a>
                     </td>
-                    <td v-if="!editing" scope="row">{{dq.content}}</td>
+                    <td v-if="!editing" scope="row" v-html="filterLinks(dq.content)"></td>
                     <td v-else scope="row">
                         <input :class="'input-' + dq._id" type="text" :placeholder="dq.content.length > 35 ? dq.content.slice(0,35) + '...' : dq.content" maxlength="50"/>
                         <button class="btn btn-sm btn-nat" @click="updateReason(dq._id, $event);">Save</button>
@@ -141,7 +141,7 @@
                             {{pop.metadata.length > 35 ? pop.metadata.slice(0,35) + "..." : pop.metadata}}
                         </a>
                     </td>
-                    <td v-if="!editing" scope="row">{{pop.content}}</td>
+                    <td v-if="!editing" scope="row" v-html="filterLinks(pop.content)"></td>
                     <td v-else scope="row">
                         <input :class="'input-' + pop._id" type="text" :placeholder="pop.content.length > 35 ? pop.content.slice(0,35) + '...' : pop.content" maxlength="50"/>
                         <button class="btn btn-sm btn-nat" @click="updateReason(pop._id, $event);">Save</button>
@@ -161,12 +161,13 @@
 
 <script>
 import postData from '../../mixins/postData.js'
+import filterLinks from '../../mixins/filterLinks.js'
 import Notability from '../dataCollection/Notability.vue'
 
 export default {
     name: 'user-activity',
     props: [ 'eval-round', 'is-spectator' ],
-    mixins: [ postData ],
+    mixins: [ postData, filterLinks ],
     components: {
         Notability
     },

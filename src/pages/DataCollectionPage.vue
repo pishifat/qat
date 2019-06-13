@@ -137,6 +137,7 @@
 <script>
 import postData from '../mixins/postData.js';
 import filters from '../mixins/filters.js';
+import filterLinks from '../mixins/filterLinks.js';
 import DataCollectionInfo from '../components/dataCollection/DataCollectionInfo.vue';
 import Notability from '../components/dataCollection/Notability.vue';
 
@@ -146,7 +147,7 @@ export default {
         DataCollectionInfo,
         Notability
     },
-    mixins: [postData, filters],
+    mixins: [postData, filters, filterLinks],
     watch: { 
         allObjs: function(){
             this.filter();

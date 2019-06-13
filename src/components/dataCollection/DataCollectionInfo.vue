@@ -17,7 +17,7 @@
                         </a>
                     </p>
                     <p class="text-shadow">Current reason: </p>
-                    <p class="text-shadow small ml-4">{{selectedEntry.content}}</p>
+                    <p class="text-shadow small ml-4" v-html="filterLinks(selectedEntry.content)"></p>
                     <p class="text-shadow" for="newReason">New reason:</p>
                     <div class="input-group input-group-sm">
                         <input type="text" placeholder="reason..." id="newReason" 
@@ -45,11 +45,12 @@
 
 <script>
 import postData from '../../mixins/postData.js';
+import filterLinks from '../../mixins/filterLinks.js';
 import Notability from './Notability.vue';
 
 export default {
     name: 'data-collection-info',
-    mixins: [postData],
+    mixins: [postData, filterLinks],
     props: [ 'selected-entry', 'is-spectator' ],
     components: {
         Notability

@@ -83,10 +83,11 @@
 
 <script>
 import postData from '../../mixins/postData.js';
+import filterLinks from '../../mixins/filterLinks.js';
 
 export default {
     name: 'report-info',
-    mixins: [postData],
+    mixins: [postData, filterLinks],
     props: [ 'report', 'is-leader', 'is-spectator' ],
     watch: {
         report: function(v) {
@@ -99,18 +100,6 @@ export default {
         },
     },
     methods: {
-        filterLinks: function (text) {
-            return (text || "...").replace(
-                /([^\S]|^)(((https?\:\/\/)|(www\.))(\S+))/gi,
-                function(match, space, url){
-                    var hyperlink = url;
-                    if (!hyperlink.match('^https?:\/\/')) {
-                        hyperlink = 'http://' + hyperlink;
-                    }
-                    return space + '<a href="' + hyperlink + '" target="_blank">' + url + '</a>';
-                }
-            );
-        },
         submitReportEval: async function (e, close) {
             const valid = $('input[name=vote]:checked').val();
             if(close && (!valid || (!this.feedback || !this.feedback.length))){
