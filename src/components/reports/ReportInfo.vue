@@ -13,8 +13,8 @@
                 </button>
             </div>
             <div class="modal-body" style="overflow: hidden">
-                <p class="text-shadow">Reason: <pre class="small pre-font ml-4">{{report.reason}}</pre></p>
-                <p v-if="report.link" class="text-shadow">Relevant link: <a :href="report.link" target="_blank" @click.stop>{{report.link}}</a></p>
+                <p class="text-shadow">Reason: <pre class="small pre-font ml-4" v-html="filterLinks(report.reason)"></pre></p>
+                <p v-if="report.link" class="text-shadow">Relevant link: <span v-html="filterLinks(report.link)"></span></p>
                 <p class="text-shadow">Reported: {{report.createdAt.slice(0,10)}}</p>
                 <p v-if="!report.isActive" class="text-shadow">Reported by: <a :href="'https://osu.ppy.sh/users/' + report.reporter.osuId" target="_blank">{{report.reporter.username}}</a></p>
                 <hr>
@@ -99,6 +99,18 @@ export default {
         },
     },
     methods: {
+        filterLinks: function (text) {
+            return (text || "...").replace(
+                /([^\S]|^)(((https?\:\/\/)|(www\.))(\S+))/gi,
+                function(match, space, url){
+                    var hyperlink = url;
+                    if (!hyperlink.match('^https?:\/\/')) {
+                        hyperlink = 'http://' + hyperlink;
+                    }
+                    return space + '<a href="' + hyperlink + '" target="_blank">' + url + '</a>';
+                }
+            );
+        },
         submitReportEval: async function (e, close) {
             const valid = $('input[name=vote]:checked').val();
             if(close && (!valid || (!this.feedback || !this.feedback.length))){
