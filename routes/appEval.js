@@ -44,7 +44,7 @@ router.get('/relevantInfo', async (req, res, next) => {
         await bnAppsService.query(
             { active: true, test: { $exists: true } },
             defaultPopulate,
-            { createdAt: 1 },
+            { createdAt: 1, consensus: 1, feedback: 1  },
             true
         );
     res.json({ a: a, evaluator: res.locals.userRequest });
