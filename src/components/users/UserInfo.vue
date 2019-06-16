@@ -70,7 +70,7 @@
                         Remove from {{user.group.toUpperCase()}}
                     </button>
                 </span>
-                <p class="text-shadow float-right">Joined: {{ user.createdAt.slice(0, 10) }}</p>
+                <p class="text-shadow float-right">Joined: {{ user.bnDuration.length ? user.bnDuration[0].slice(0, 10) : user.natDuration[0].slice(0, 10) }}</p>
             </div>
         </div>
     </div>

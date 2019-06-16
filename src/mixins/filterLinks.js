@@ -1,7 +1,6 @@
 const filterLinks = {
     methods: {
         filterLinks: function (text) {
-            console.log('test')
             return (text || "...").replace(
                 /([^\S]|^)(((https?\:\/\/)|(www\.))(\S+))/gi,
                 function(match, space, url){

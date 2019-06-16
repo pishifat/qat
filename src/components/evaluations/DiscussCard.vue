@@ -80,17 +80,22 @@
                     title="feedback written" 
                     class="fas fa-comment float-right"></i>
                 </span>
-                <span v-else class="errors">
-                    {{ new Date(discussRound.deadline).toString().slice(4, 10) }}
+                <span v-else>
+                    <span class="errors"> {{ new Date(discussRound.deadline).toString().slice(4, 10) }}</span>
                     <input
                         v-if="!readOnly && evaluator && evaluator.isLeader"
                         @click.stop="checkSelection()"
-                        class="float-right"
+                        class="float-right ml-2"
                         :id="discussRound.id + '-check'"
                         type="checkbox"
                         name="evalTypeCheck"
                         :value="discussRound.id"
                     />
+                    <i v-if="discussRound.feedback" 
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="feedback written" 
+                    class="fas fa-comment float-right"></i>
                 </span>
             </div>
         </div>
