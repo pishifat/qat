@@ -77,8 +77,8 @@ export default {
             return false;
         },
         separateObjs: function() {
-            this.activeVetoes = this.pageObjs.filter(v => v.status == 'wip');
-            this.resolvedVetoes = this.pageObjs.filter(v => v.status != 'wip');
+            this.activeVetoes = this.pageObjs.filter(v => v.status == 'wip' || v.status == 'available');
+            this.resolvedVetoes = this.pageObjs.filter(v => v.status != 'wip' && v.status != 'available');
         },
         SubmitVeto: function(v) {
             this.allObjs.unshift(v);

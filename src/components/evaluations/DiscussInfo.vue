@@ -55,7 +55,7 @@
                             <div v-if="discussApp.consensus && !readOnly">
                                 <hr>
                                 <p class="text-shadow min-spacing mb-2">
-                                    Application feedback: <button class="btn btn-sm btn-nat" @click="setFeedback($event);">Generate Feedback PM</button>
+                                    Application feedback: <button class="btn btn-sm btn-nat" @click="setFeedback($event);">Update Feedback PM</button>
                                     <button class="btn btn-sm btn-nat float-right" data-toggle="collapse" data-target="#forumPmBox">
                                         See full message <i class="fas fa-angle-down"></i>
                                     </button>
@@ -103,7 +103,7 @@
                             <div v-if="discussRound.consensus">
                                 <hr>
                                 <p class="text-shadow min-spacing mb-2">Application feedback: 
-                                    <button class="btn btn-sm btn-nat" @click="setFeedback($event);">Generate Feedback PM</button>
+                                    <button class="btn btn-sm btn-nat" @click="setFeedback($event);">Update Feedback PM</button>
                                     <button class="btn btn-sm btn-nat float-right" data-toggle="collapse" data-target="#currentBnForumPmBox">
                                         See full message <i class="fas fa-angle-down"></i>
                                     </button>
