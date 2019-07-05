@@ -111,6 +111,13 @@ router.get('/mods', async (req, res, next) => {
     return res.json({ modCount: modCount });
 });
 
+/* GET mod count from current BNs */
+router.get('/currentBnMods/:username', async (req, res, next) => {
+    const modCount = await getUserModsCount(req.params.username);
+    return res.json({ modCount: modCount });
+});
+
+
 /* POST a bn application */
 router.post('/apply', async (req, res, next) => {
     if (!req.body.mods || !req.body.mode || !req.session.mongoId) {

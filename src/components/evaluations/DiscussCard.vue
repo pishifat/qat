@@ -4,8 +4,8 @@
         @click="discussApp ? selectDiscussApp() : selectDiscussRound()"
     >
         <div
-            class="card custom-bg-dark border-outline"
-            :class="[isSelected ? 'selected-card' : '', 'border-' + findRelevantEval()]"
+            class="card border-outline"
+            :class="[isSelected ? 'selected-card' : '', 'border-' + findRelevantEval(), (discussApp && discussApp.isPriority) || (discussRound && discussRound.isPriority) ? 'card-bg-priority' : 'custom-bg-dark']"
             data-toggle="modal"
             data-target="#discussionInfo"
             :data-user="discussApp ? discussApp.id : discussRound.id"

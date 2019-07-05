@@ -2,7 +2,7 @@
 <div id="discussionInfo" class="modal fade" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content custom-bg-dark" v-if="discussApp || discussRound">
-            <div class="modal-header text-dark bg-nat-logo">
+            <div class="modal-header text-dark" :class="(discussApp && discussApp.isPriority) || (discussRound && discussRound.isPriority) ? 'bg-priority' : 'bg-nat-logo'">
                 <h5 v-if="discussApp" class="modal-title">
                     Application Evaluation: <a @click.stop :href="'https://osu.ppy.sh/users/' + discussApp.applicant.osuId" class="text-dark" target="_blank">{{discussApp.applicant.username}}</a>
                     <i v-if="discussApp.mode == 'osu'" class="far fa-circle"></i>
@@ -51,6 +51,9 @@
                                     :disabled="discussApp.consensus == 'fail'"
                                     @click="setConsensus('fail', $event);"
                                 >Set Fail</button>
+                                <a href="#" class="float-right small vote-pass ml-2" data-toggle="tooltip" data-placement="top" :title="discussApp.isPriority ? 'mark evaluation as low priority' : 'mark evaluation as high priority'" @click.prevent.stop="toggleIsPriority()">
+                                    <i class="fas" :class="discussApp.isPriority ? 'fa-arrow-down' : 'fa-arrow-up'"></i>
+                                </a>
                             </h5>
                             <div v-if="discussApp.consensus && !readOnly">
                                 <hr>
@@ -98,6 +101,9 @@
                                     @click="setConsensus('fail', $event);"
                                 >Set Fail</button>
                                 </span>
+                                <a href="#" class="float-right small vote-pass ml-2 mt-2" data-toggle="tooltip" data-placement="top" :title="discussRound.isPriority ? 'mark evaluation as low priority' : 'mark evaluation as high priority'" @click.prevent.stop="toggleIsPriority()">
+                                    <i class="fas" :class="discussRound.isPriority ? 'fa-arrow-down' : 'fa-arrow-up'"></i>
+                                </a>
                             </h5>
 
                             <div v-if="discussRound.consensus">
@@ -245,7 +251,6 @@ export default {
                 this.feedback = this.discussRound.feedback;
                 this.findRelevantEval();
                 if(this.reports && this.reports.length) this.findRelevantReports();
-                this.findRelevantActivity();
             }
         },
     },
@@ -281,17 +286,6 @@ export default {
         findRelevantReports: function() {
             this.relevantReports = this.reports.filter( report => 
                 report.culprit == this.discussRound.bn.id && report.display);
-        },
-        findRelevantActivity: function() {
-            axios
-                .get('/bnEval/userActivity/' + this.discussRound.bn.osuId + '/' + this.discussRound.mode)
-                .then(response => {
-                    this.noms = response.data.noms;
-                    this.nomsDqd = response.data.nomsDqd;
-                    this.nomsPopped = response.data.nomsPopped;
-                    this.dqs = response.data.dqs;
-                    this.pops = response.data.pops;
-                });
         },
         createDeadline: function(date){
             date = new Date(date);
@@ -410,6 +404,29 @@ export default {
                         }
                     }
                 }
+            }
+        },
+        toggleIsPriority: async function() {
+            if (this.discussApp){
+               const a = await this.executePost(
+                        '/appEval/toggleIsPriority/' + this.discussApp.id, {isPriority: this.discussApp.isPriority});
+                    if (a) {
+                        if (a.error) {
+                            this.info = a.error;
+                        } else {
+                            await this.$emit('update-application', a);
+                        }
+                    } 
+            }else{
+                const er = await this.executePost(
+                        '/bnEval/toggleIsPriority/' + this.discussRound.id, {isPriority: this.discussRound.isPriority});
+                    if (er) {
+                        if (er.error) {
+                            this.info = er.error;
+                        } else {
+                            await this.$emit('update-eval-round', er);
+                        }
+                    } 
             }
         }
     },

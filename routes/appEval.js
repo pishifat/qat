@@ -159,6 +159,17 @@ router.post('/setFeedback/:id', async (req, res) => {
     );
 });
 
+/* POST toggle priority */
+router.post('/toggleIsPriority/:id', async (req, res) => {
+    await bnAppsService.update(req.params.id, { isPriority: !req.body.isPriority });
+    let a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
+    res.json(a);
+    logsService.create(
+        req.session.mongoId,
+        `Toggled priority for ${a.applicant.username}'s ${a.mode} BN app`
+    );
+});
+
 /* POST set status upheld or withdrawn. */
 router.post('/selectBnEvaluators', async (req, res, next) => {
     const allUsers = await usersModel.aggregate([

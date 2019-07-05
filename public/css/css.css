@@ -492,6 +492,10 @@ input[type=number] {
     background-color: var(--probation-light);
 }
 
+.bg-priority {
+    background-color: rgb(110, 124, 248);
+}
+
 .dark-textarea,
 .dark-textarea:focus {
     background-color: var(--darker);
@@ -615,6 +619,10 @@ input[type="radio"] + .fas { cursor: pointer; }
 }
 .card-bg-probation {
     background: url('../images/probation.png') no-repeat left;
+}
+
+.card-bg-priority {
+    background-color: rgb(38, 48, 63)!important;
 }
 
 .card {

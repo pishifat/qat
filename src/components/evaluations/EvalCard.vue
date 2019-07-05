@@ -4,8 +4,8 @@
         @click="application ? selectApplication() : selectEvalRound()"
     >
         <div
-            class="card custom-bg-dark border-outline"
-            :class="[isSelected ? 'selected-card' : '', 'border-' + findRelevantEval()]"
+            class="card border-outline"
+            :class="[isSelected ? 'selected-card' : '', 'border-' + findRelevantEval(),  (application && application.isPriority) || (evalRound && evalRound.isPriority) ? 'card-bg-priority' : 'custom-bg-dark']"
             data-toggle="modal"
             data-target="#evaluationInfo"
         >

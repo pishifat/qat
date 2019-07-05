@@ -267,13 +267,24 @@ router.post('/setFeedback/:id', async (req, res) => {
     );
 });
 
+/* POST toggle priority */
+router.post('/toggleIsPriority/:id', async (req, res) => {
+    await evalRoundsService.update(req.params.id, { isPriority: !req.body.isPriority });
+    let er = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
+    res.json(er);
+    logsService.create(
+        req.session.mongoId,
+        `Toggled priority for ${er.bn.username}'s ${er.mode} BN evaluation`
+    );
+});
+
 /* GET aiess info */
-router.get('/userActivity/:id/:mode', async (req, res) => {
+router.get('/userActivity/:id/:mode/:deadline', async (req, res) => {
     if (isNaN(req.params.id)) {
         return res.json({ error: 'Something went wrong!' });
     }
 
-    let limitDate = new Date();
+    let limitDate = new Date(req.params.deadline);
     limitDate.setDate(limitDate.getDate() - 90);
     const [allUserEvents, allEvents] = await Promise.all([
         aiessService.getByEventTypeAndUser(parseInt(req.params.id), limitDate, req.params.mode),

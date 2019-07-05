@@ -2,7 +2,7 @@
 <div id="evaluationInfo" class="modal fade" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content custom-bg-dark" v-if="application || evalRound">
-            <div class="modal-header text-dark bg-nat-logo">
+            <div class="modal-header text-dark" :class="(application && application.isPriority) || (evalRound && evalRound.isPriority) ? 'bg-priority' : 'bg-nat-logo'">
                 <h5 v-if="application" class="modal-title">
                     Application Evaluation: <a @click.stop :href="'https://osu.ppy.sh/users/' + application.applicant.osuId" class="text-dark" target="_blank">{{application.applicant.username}}</a>
                     <i v-if="application.mode == 'osu'" class="far fa-circle"></i>
@@ -39,7 +39,12 @@
                                 </a>
                             </p>
                             <div class="mt-4">
-                                <p class="text-shadow">Total Evaluations: {{application.evaluations.length}}</p>
+                                <p class="text-shadow">
+                                    Total Evaluations: {{application.evaluations.length}}
+                                    <a href="#" class="float-right small vote-pass ml-2" data-toggle="tooltip" data-placement="top" :title="application.isPriority ? 'mark evaluation as low priority' : 'mark evaluation as high priority'" @click.prevent.stop="toggleIsPriority()">
+                                        <i class="fas" :class="application.isPriority ? 'fa-arrow-down' : 'fa-arrow-up'"></i>
+                                    </a>
+                                </p>
                                 <ul>
                                     <li class="small text-shadow" v-for="evaluation in application.evaluations" :key="evaluation.id">{{evaluation.evaluator.username}}</li>
                                 </ul>
@@ -48,7 +53,7 @@
                             <ul>
                                 <li class="small text-shadow" v-for="evaluator in application.bnEvaluators" :key="evaluator.id">{{evaluator.username}}</li>
                             </ul>
-                            <div v-if="evaluator.isLeader && !application.bnEvaluators.length">
+                            <!--<div v-if="evaluator.isLeader && !application.bnEvaluators.length">
                                 <button class="btn btn-sm btn-nat mb-2" @click="selectBnEvaluators($event)">{{tempBnEvaluators ? 'Re-select BN Evaluators' : 'Select BN Evaluators'}}</button> 
                                 <button v-if="tempBnEvaluators" class="btn btn-sm btn-nat-red mb-2" @click="enableBnEvaluators($event)">Enable BN Evaluations</button>
                                 <div v-if="tempBnEvaluators" class="text-shadow">
@@ -67,7 +72,7 @@
                                         <samp class="small">Thank you for your hard work!</samp><br><br>
                                     </div>
                                 </div>
-                            </div>
+                            </div>-->
                             <hr>
                         </div>
 
@@ -79,10 +84,18 @@
                             </user-activity>
 
                             <div class="mt-4">
-                                <p class="text-shadow">Total Evaluations: {{evalRound.evaluations.length}}</p>
+                                <p class="text-shadow">
+                                    Total Evaluations: {{evalRound.evaluations.length}}
+                                    <a href="#" class="float-right small vote-pass ml-2" data-toggle="tooltip" data-placement="top" :title="evalRound.isPriority ? 'mark evaluation as low priority' : 'mark evaluation as high priority'" @click.prevent.stop="toggleIsPriority()">
+                                        <i class="fas" :class="evalRound.isPriority ? 'fa-arrow-down' : 'fa-arrow-up'"></i>
+                                    </a>
+                                </p>
                                 <ul>
                                     <li class="small text-shadow" v-for="evaluation in evalRound.evaluations" :key="evaluation.id">{{evaluation.evaluator.username}}</li>
                                 </ul>
+                            </div>
+                            <div>
+                                
                             </div>
                             <div v-if="relevantReports.length">
                                 <hr>
@@ -265,6 +278,29 @@ export default {
                     }
                 }
                 
+            }
+        },
+        toggleIsPriority: async function() {
+            if (this.application){
+               const a = await this.executePost(
+                        '/appEval/toggleIsPriority/' + this.application.id, {isPriority: this.application.isPriority});
+                    if (a) {
+                        if (a.error) {
+                            this.info = a.error;
+                        } else {
+                            await this.$emit('update-application', a);
+                        }
+                    } 
+            }else{
+                const er = await this.executePost(
+                        '/bnEval/toggleIsPriority/' + this.evalRound.id, {isPriority: this.evalRound.isPriority});
+                    if (er) {
+                        if (er.error) {
+                            this.info = er.error;
+                        } else {
+                            await this.$emit('update-eval-round', er);
+                        }
+                    } 
             }
         },
         selectBnEvaluators: async function(e) {
