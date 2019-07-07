@@ -24,7 +24,7 @@
             <div class="modal-body" style="overflow: hidden">
                 <div class="text-shadow mb-4">
                     <p class="min-spacing"><a :href="rcDiscussion.discussionLink" target="_blank">Read and contribute to the full Ranking Criteria discussion here</a></p>
-                    <small class="ml-2">Proposal: <i>{{ rcDiscussion.shortReason }}</i></small>
+                    <small class="ml-2">Proposal: <i v-html="filterLinks(rcDiscussion.shortReason)"></i></small>
                 </div>
 
                 <!--leader options-->
@@ -80,11 +80,12 @@
 
 <script>
 import postData from "../../mixins/postData.js";
+import filterLinks from '../../mixins/filterLinks.js';
 
 export default {
     name: 'rc-discussion-info',
     props: [ 'rc-discussion', 'user-id', 'user-modes', 'is-leader' ],
-    mixins: [ postData ],
+    mixins: [ postData, filterLinks ],
     watch: {
         rcDiscussion: function() {
             this.mediators = null;
