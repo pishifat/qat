@@ -154,11 +154,11 @@ export default {
             let option = $('#option').val();
             let score = parseFloat($('#score').val());
             let metadataType = $('#metadataType').val();
-            if(!option || !option.length || (!score && score != 0)){
+            if (((!option || !option.length) && metadataType != 'source') || (!score && score != 0)) {
                 this.info = "Cannot leave option fields blank!"
-            }else if(this.isSpectator){
+            } else if(this.isSpectator) {
                 this.info = "You're not allowed to do that"
-            }else{
+            } else {
                 const question = await this.executePost('/manageTest/addOption/' + this.question.id, {option: option, score: score, metadataType: metadataType}, e);
                 if (question) {
                     if (question.error) {

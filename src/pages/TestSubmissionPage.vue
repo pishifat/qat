@@ -42,38 +42,48 @@
             <small class="float-right">Q{{ ++i }} -- {{ answer.question.category }}</small>
             <div v-if="answer.question.questionType === 'text' || answer.question.questionType === 'image'">
                 <h5 style="width: 90%">{{ answer.question.content }}</h5>
-                <div v-for="option in getActiveOptions(answer.question.options)" :key="option.id">
-                    <div class="form-check mb-2 ml-2" v-if="answer.question.questionType === 'text' || answer.question.questionType === 'image'">
-                        <input class="form-check-input" type="checkbox" :value="option.id" :id="option.id">
-                        <label class="form-check-label" v-if="answer.question.questionType === 'text'" :for="option.id">
-                            {{ option.content }}
+                <div v-for="option in answer.question.options" :key="option.id">
+                    <div class="form-check mb-2 ml-2">
+                        <input 
+                            v-model="checkedOptions[answer.id]" 
+                            @change="submitAnswer(answer.id, $event)" 
+                            :checked="checkedOptions[answer.id].includes(answer.id)"
+                            :value="option.id"
+                            :id="option.id"
+                            class="form-check-input"
+                            type="checkbox"
+                        >
+                        <label class="form-check-label" :for="option.id">
+                            <img v-if="answer.question.questionType === 'image'" :src="option.content" class="test-image">
+                            <span v-if="answer.question.questionType === 'text'">{{ option.content }}</span>
                         </label>
-                        <label :for="option.id"><img :src="option.content" v-if="answer.question.questionType === 'image'" class="test-image"></label>
                     </div>
                 </div>
             </div>
 
             <div v-else>
-                <h5>Find the correct metadata of the following song (based on the current standards described in the Ranking Criteria) 
-                    and provide a reliable source or links.</h5>
+                <h5>
+                    Find the correct metadata of the following song (based on the current standards described in the Ranking Criteria) 
+                    and provide a reliable source or links.
+                </h5>
                 <h5 class="pl-4"><a :href="answer.question.content" target="_blank">{{ answer.question.content }}</a></h5>
                 <div class="mb-2"> <!-- only metadata questions for now -->
-                    <input id="title" class="form-control mb-1" type="text" placeholder="Romanised Title...">
-                    <input id="titleUnicode" class="form-control mb-1" type="text" placeholder="Unicode Title (if same as Romanised Title, copy that here)...">
-                    <input id="artist" class="form-control mb-1" type="text" placeholder="Romanised Artist...">
-                    <input id="artistUnicode" class="form-control mb-1" type="text" placeholder="Unicode Artist (if same as Romanised Artist, copy that here)...">
-                    <input id="source" class="form-control mb-2" type="text" placeholder="Source (if unclear or non-existent, leave empty)...">
+                    <input v-model.trim="checkedOptions[answer.id].title" @change="submitAnswer(answer.id, $event, true)" class="form-control mb-1" type="text" placeholder="Romanised Title...">
+                    <input v-model.trim="checkedOptions[answer.id].titleUnicode" @change="submitAnswer(answer.id, $event, true)" class="form-control mb-1" type="text" placeholder="Unicode Title (if same as Romanised Title, copy that here)...">
+                    <input v-model.trim="checkedOptions[answer.id].artist" @change="submitAnswer(answer.id, $event, true)" class="form-control mb-1" type="text" placeholder="Romanised Artist...">
+                    <input v-model.trim="checkedOptions[answer.id].artistUnicode" @change="submitAnswer(answer.id, $event, true)" class="form-control mb-1" type="text" placeholder="Unicode Artist (if same as Romanised Artist, copy that here)...">
+                    <input v-model.trim="checkedOptions[answer.id].source" @change="submitAnswer(answer.id, $event, true)" class="form-control mb-2" type="text" placeholder="Source (if unclear or non-existent, leave empty)...">
                     <small class="pl-4">Link sources for the song information (only one link is necessary, but more could help you!):</small>
-                    <input id="reference1" class="form-control mb-1" type="text" placeholder="Reference 1">
-                    <input id="reference2" class="form-control mb-1" type="text" placeholder="Reference 2">
-                    <input id="reference3" class="form-control mb-1" type="text" placeholder="Reference 3">
+                    <input v-model.trim="checkedOptions[answer.id].reference1" @change="submitAnswer(answer.id, $event, true)" class="form-control mb-1" type="text" placeholder="Reference 1">
+                    <input v-model.trim="checkedOptions[answer.id].reference2" @change="submitAnswer(answer.id, $event, true)" class="form-control mb-1" type="text" placeholder="Reference 2">
+                    <input v-model.trim="checkedOptions[answer.id].reference3" @change="submitAnswer(answer.id, $event, true)" class="form-control mb-1" type="text" placeholder="Reference 3">
                 </div>
             </div>
             
         </div>
         <hr>
         <div class="mx-auto text-center mb-4">
-            <a href="#top"><button type="submit" class="btn btn-lg btn-nat w-50" @click="submit($event)">Submit</button></a>
+            <a href="#top"><button type="submit" class="btn btn-lg btn-nat w-50" @click="submitTest($event)">Submit</button></a>
             <p class="small pt-2">{{ info }}</p>
         </div>
     </div>
@@ -101,11 +111,13 @@ export default {
             info: null,
             timeRemaining: null,
             displayScore: null,
+            checkedOptions: {},
         };
     },
     methods: {
         getActiveOptions: function (options) {
-            var currentIndex = options.length, temporaryValue, randomIndex;
+            let currentIndex = options.length;
+            let temporaryValue, randomIndex;
             while (0 !== currentIndex) {
                 randomIndex = Math.floor(Math.random() * currentIndex);
                 currentIndex -= 1;
@@ -118,41 +130,51 @@ export default {
         loadTest: async function (e) {
             if (this.selectedTest) {
                 const test = await this.executePost('/testSubmission/loadTest', { testId: this.selectedTest }, e);
+                
                 if (test) {
                     if (test.error) this.info = test.error;
+
+                    test.answers.forEach(a => {
+                        if (a.question.category == 'metadata') this.checkedOptions[a.id] = a.metadataInput || {};
+                        else this.checkedOptions[a.id] = a.optionsChosen;
+
+                        a.question.options = this.getActiveOptions(a.question.options);
+                    });
                     this.test = test;
                 }
             } else {
                 this.info = 'Select the test to answer';
             }
         },
-        submit: async function (e) {
-            this.info = 'Submitting... (this will take a few seconds)'
-            let title = $('#title').val();
-            let titleUnicode = $('#titleUnicode').val();
-            let artist = $('#artist').val();
-            let artistUnicode = $('#artistUnicode').val();
-            let source = $('#source').val();
-            let reference1 = $('#reference1').val();
-            let reference2 = $('#reference2').val();
-            let reference3 = $('#reference3').val();
-            let checkedOptions = [];
-            $("input:checked").each( function () {
-                checkedOptions.push( $(this).val() );
-            });
+        submitTest: async function (e) {
+            this.info = 'Submitting... (this will take a few seconds)';
             $('.test-question').hide();
-            const res = await this.executePost('/testSubmission/submit', { 
-                testId: this.selectedTest, checkedOptions: checkedOptions,
-                title: title, titleUnicode: titleUnicode,
-                artist: artist, artistUnicode: artistUnicode,
-                source: source, reference1: reference1, reference2: reference2, reference3: reference3
+            const res = await this.executePost('/testSubmission/submitTest', { 
+                testId: this.selectedTest,
             }, e);
             if (res || res == 0) {
-                if (res.error) this.info = res.error;
-                else{
+                if (res.error) {
+                    this.info = res.error;
+                    this.loadTest();
+                    $('.test-question').show();
+                } else {
                     this.selectedTest = null;
                     this.testList = null;
                     this.displayScore = res;
+                }
+            }
+        },
+        submitAnswer: async function (answerId, e, isMetadata) {
+            const res = await this.executePost('/testSubmission/submitAnswer', { 
+                testId: this.selectedTest, 
+                answerId: answerId,
+                checkedOptions: this.checkedOptions[answerId],
+                isMetadata: isMetadata,
+            }, e);
+            if (res) {
+                if (res.error) {
+                    this.loadTest();
+                    this.info = res.error;
                 }
             }
         }

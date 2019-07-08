@@ -77,12 +77,13 @@ router.post('/toggleActive/:id', async (req, res) => {
 /* POST add option */
 router.post('/addOption/:id', async (req, res) => {
     let o = await optionsService.create(req.body.option, req.body.score);
-    if (!o) {
+    if (!o || o.error) {
         return res.json({ error: 'Something went wrong!' });
     }
     if (req.body.metadataType) {
         o = await optionsService.update(o.id, { metadataType: req.body.metadataType });
     }
+
     let q = await questionsService.update(req.params.id, { $push: { options: o.id } });
     q = await questionsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(q);

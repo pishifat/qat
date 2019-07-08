@@ -3,7 +3,6 @@ const api = require('../models/api');
 const testSubmissionService = require('../models/bnTest/testSubmission').service;
 const logsService = require('../models/log').service;
 const bnAppsService = require('../models/bnApp').service;
-const usersService = require('../models/user').service;
 
 const router = express.Router();
 router.use(api.isLoggedIn);
@@ -18,6 +17,12 @@ const defaultPopulate = [
             populate: {
                 path: 'options',
             },
+        },
+    },
+    {
+        innerPopulate: 'answers',
+        populate: {
+            path: 'metadataInput',
         },
     },
 ];
@@ -76,8 +81,34 @@ router.post('/loadTest', async (req, res, next) => {
 });
 
 /* POST submit answers */
-router.post('/submit', async (req, res, next) => {
-    let test = await testSubmissionService.query(
+router.post('/submitAnswer', async (req, res, next) => {
+    if (!req.body.answerId || !req.body.checkedOptions) return res.json({ error: 'Something went wrong!' });
+
+    let answer;
+    if (req.body.isMetadata) {
+        const metadataInput = await testSubmissionService.createMetadataInput(
+            req.body.answerId,
+            req.body.checkedOptions.title || '',
+            req.body.checkedOptions.titleUnicode || '',
+            req.body.checkedOptions.artist || '',
+            req.body.checkedOptions.artistUnicode || '',
+            req.body.checkedOptions.source || '',
+            req.body.checkedOptions.reference1 || '',
+            req.body.checkedOptions.reference2 || '',
+            req.body.checkedOptions.reference3 || ''
+        );
+        answer = await testSubmissionService.updateAnswer(req.body.answerId, { metadataInput: metadataInput });
+    } else {
+        answer = await testSubmissionService.updateAnswer(req.body.answerId, { optionsChosen: req.body.checkedOptions });
+    }
+
+    if (!answer || answer.error) return res.json({ error: 'Something went wrong!' });
+    else return res.json({ success: 'ok' });
+});
+
+/* POST submit test */
+router.post('/submitTest', async (req, res, next) => {
+    const test = await testSubmissionService.query(
         {
             _id: req.body.testId,
             applicant: req.session.mongoId,
@@ -85,105 +116,70 @@ router.post('/submit', async (req, res, next) => {
         },
         defaultPopulate
     );
-
-    if (!test || test.error) {
-        return res.json({ error: 'Something went wrong!' });
-    }
-
-    let displayScore = 0;
-    let answer;
-    let option;
-    for (let i = 0; i < test.answers.length; i++) {
-        answer = test.answers[i];
-        let questionScore = 0;
-        for (let j = 0; j < answer.question.options.length; j++) {
-            option = answer.question.options[j];
-            if (req.body.checkedOptions.indexOf(option.id) >= 0) {
-                await testSubmissionService.updateAnswer(answer.id, { $push: { optionsChosen: option.id } });
-                questionScore += option.score;
-            }
-        }
-        if(questionScore < 0) questionScore = 0;
-        displayScore += questionScore;
-    }
-    let metadataInput = await testSubmissionService.createMetadataInput(
-        req.body.title,
-        req.body.titleUnicode,
-        req.body.artist,
-        req.body.artistUnicode,
-        req.body.source,
-        req.body.reference1,
-        req.body.reference2,
-        req.body.reference3
-    );
-
-    let inputObject = [
-        { category: 'title', input: req.body.title },
-        { category: 'titleUnicode', input: req.body.titleUnicode },
-        { category: 'artist', input: req.body.artist },
-        { category: 'artistUnicode', input: req.body.artistUnicode },
-        { category: 'source', input: req.body.source },
-        { category: 'reference', input: req.body.reference1 },
-        { category: 'reference', input: req.body.reference2 },
-        { category: 'reference', input: req.body.reference3 },
-    ];
-
-    let escape;
-    for (let i = 0; i < test.answers.length && !escape; i++) {
-        if (test.answers[i].question.category == 'metadata') {
-            answer = test.answers[i];
-            await testSubmissionService.updateAnswer(answer.id, { $push: { metadataInput: metadataInput } });
-            let notEmpty = [];
-            answer.question.options.forEach(option => {
-                notEmpty.push(option.metadataType);
-            });
-            let occupiedEmptyCategories = [];
-            for (let j = 0; j < answer.question.options.length && !escape; j++) {
-                option = answer.question.options[j];
-                for (let k = 0; k < inputObject.length && !escape; k++) {
-                    if (option.metadataType == inputObject[k].category) {
-                        if (option.content == inputObject[k].input.trim()) {
-                            await testSubmissionService.updateAnswer(answer.id, {
-                                $push: { optionsChosen: option.id },
-                            });
-                            displayScore += option.score;
-                            if (option.metadataType == 'reference') {
-                                escape = true;
-                            }
-                        }
-                    }else if(!inputObject[k].length && notEmpty.indexOf(inputObject[k].category) < 0 && occupiedEmptyCategories.indexOf(inputObject[k].category) < 0){
-                        displayScore += 0.5;
-                        occupiedEmptyCategories.push(inputObject[k].category);
-                    }
-                }
-            }
-            escape = true;
-        }
-    }
-    displayScore = Math.round(displayScore * 10) / 10;
-    await testSubmissionService.update(req.body.testId, {
-        submittedAt: Date.now(),
-        status: 'finished',
-        totalScore: displayScore,
-    });
     const currentBnApp = await bnAppsService.query({
         applicant: req.session.mongoId,
         mode: test.mode,
         active: true 
     });
-    await bnAppsService.update(currentBnApp.id, {test: test._id});
+
+    if (!test || test.error || !currentBnApp || currentBnApp.error) return res.json({ error: 'Something went wrong!' });
+    let displayScore = 0;
+
+    for (const answer of test.answers) {
+        let questionScore = 0;
+        let isReferenceAdded = false;
+
+        for (const option of answer.question.options) {
+            if (answer.question.category == 'metadata' && answer.metadataInput) {
+                for (const [k, v] of Object.entries(answer.metadataInput.toObject())) {
+                    // .slice because reference == reference1
+                    if ((option.metadataType == k || (option.metadataType == k.slice(0, -1) && !isReferenceAdded)) && option.content == v) {
+                        if (answer.optionsChosen.indexOf(option.id) == -1) {
+                            const updatedAnswer = await testSubmissionService.updateAnswer(answer.id, {
+                                $push: { optionsChosen: option.id },
+                            });
+                            if (!updatedAnswer || updatedAnswer.error) return res.json({ error: 'Something went wrong!' });
+                        }
+
+                        displayScore += option.score;
+                        if (option.metadataType == 'reference') isReferenceAdded = true;
+                    }
+                }
+            } else if (answer.optionsChosen.indexOf(option.id) != -1) {
+                questionScore += option.score;
+            }
+        }
+
+        if (questionScore < 0) questionScore = 0;
+        displayScore += questionScore;
+    }
+
+    displayScore = displayScore.toFixed(1);
+    const [updatedTest, updatedApp] = await Promise.all([
+        testSubmissionService.update(req.body.testId, {
+            submittedAt: Date.now(),
+            status: 'finished',
+            totalScore: displayScore,
+        }),
+        bnAppsService.update(currentBnApp.id, {test: test._id})
+    ]);
+
+    if (!updatedTest || updatedTest.error || !updatedApp || updatedApp.error) return res.json({ error: 'Something went wrong!' });
+
     res.json(displayScore);
     logsService.create(req.session.mongoId, `Completed ${test.mode} BN app test`);
-    let u = await usersService.query({_id: req.session.mongoId});
-    api.webhookPost([{
-        author: {
-            name: `New BN application: ${u.username}`,
-            icon_url: `https://a.ppy.sh/${u.osuId}`,
-            url: `https://osu.ppy.sh/users/${u.osuId}`
-        },
-        color: '7335382',
-    }], 
-    test.mode);
+    let u = res.locals.userRequest;
+    api.webhookPost(
+        [{
+            author: {
+                name: `New BN application: ${u.username}`,
+                icon_url: `https://a.ppy.sh/${u.osuId}`,
+                url: `https://osu.ppy.sh/users/${u.osuId}`
+            },
+            color: '7335382',
+        }], 
+        test.mode
+    );
 });
 
 module.exports = router;

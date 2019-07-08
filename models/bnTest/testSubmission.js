@@ -38,9 +38,9 @@ const testMetadataInput = new mongoose.Schema({
     reference3: { type: String }
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
+const TestMetadataInput = mongoose.model('TestMetadataInput', testMetadataInput);
 const TestAnswer = mongoose.model('TestAnswer', testAnswer);
 const TestSubmission = mongoose.model('TestSubmission', testSubmission);
-const TestMetadataInput = mongoose.model('TestMetadataInput', testMetadataInput);
 
 class TestSubmissionService extends BaseService
 {
@@ -143,13 +143,32 @@ class TestSubmissionService extends BaseService
         }
     }
 
-    async createMetadataInput(title, titleUnicode, artist, artistUnicode, source, reference1, reference2, reference3) {
+    async createMetadataInput(answerId, title, titleUnicode, artist, artistUnicode, source, reference1, reference2, reference3) {
         try {
+            const answer = await TestAnswer.findById(answerId);
+
+            if (answer.metadataInput) {
+                return await TestMetadataInput.findByIdAndUpdate(answer.metadataInput, {
+                    title: title, 
+                    titleUnicode: titleUnicode, 
+                    artist: artist, 
+                    artistUnicode: artistUnicode, 
+                    source: source, 
+                    reference1: reference1, 
+                    reference2: reference2, 
+                    reference3: reference3
+                });
+            }
+
             return await TestMetadataInput.create({
-                title: title, titleUnicode: titleUnicode, 
-                artist: artist, artistUnicode: artistUnicode, 
-                source: source, reference1: reference1, 
-                refernece2: reference2, reference3: reference3
+                title: title, 
+                titleUnicode: titleUnicode, 
+                artist: artist, 
+                artistUnicode: artistUnicode, 
+                source: source, 
+                reference1: reference1, 
+                reference2: reference2, 
+                reference3: reference3
             });
         } catch(error) {
             logsService.create(null, JSON.stringify(error), true);
