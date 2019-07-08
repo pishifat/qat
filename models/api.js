@@ -104,10 +104,17 @@ async function isLoggedIn(req, res, next) {
             return res.redirect('/');
         }
 
-        // Refresh if less than 30 sec left
-        if (req.session.cookie.maxAge < 30000) {
-            const response = await refreshToken();
-            req.session.cookie.maxAge = response.expires_in * 1000;
+        // Refresh if less than 10 hours left
+        if (new Date() > new Date(req.session.expireDate - (10 * 3600 * 1000))) {
+            const response = await refreshToken(req.session.refreshToken);
+            if (!response || response.error) {
+                req.session.destroy();
+                res.redirect('/');
+            }
+            
+            // *1000 because maxAge is miliseconds, oauth is seconds
+            req.session.cookie.maxAge = response.expires_in * 2 * 1000;
+            req.session.expireDate = Date.now() + (response.expires_in * 1000);
             req.session.accessToken = response.access_token;
             req.session.refreshToken = response.refresh_token;
         }

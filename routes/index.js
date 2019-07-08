@@ -9,7 +9,6 @@ const router = express.Router();
 /* GET bn app page */
 router.get('/', async (req, res, next) => {
     const allUsersByMode = await usersService.getAllByMode(true, true, true);
-    
     let user;
 
     if (req.session.mongoId) {
@@ -103,7 +102,8 @@ router.get('/callback', async (req, res) => {
         res.status(500).render('error', { message: response.error });
     } else {
         // *1000 because maxAge is miliseconds, oauth is seconds
-        req.session.cookie.maxAge = response.expires_in * 1000;
+        req.session.cookie.maxAge = response.expires_in * 2 * 1000;
+        req.session.expireDate = Date.now() + (response.expires_in * 1000);
         req.session.accessToken = response.access_token;
         req.session.refreshToken = response.refresh_token;
 
