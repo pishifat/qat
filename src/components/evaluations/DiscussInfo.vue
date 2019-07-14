@@ -76,11 +76,10 @@
                             </div>
                             <hr>
                         </div>
-                        <div v-else-if="!readOnly" class="col-sm-12">
+                        <div v-else class="col-sm-12">
                             <user-activity
                                 :eval-round="discussRound">
                             </user-activity>
-
                             <h5 v-if="discussRound" class="text-shadow mb-3 ml-1 mt-1">Consensus:
                                 <span v-if="discussRound.consensus" :class="'vote-' + discussRound.consensus">{{discussRound.consensus}}</span>
                                 <span v-else>none</span>
