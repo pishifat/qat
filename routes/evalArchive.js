@@ -71,14 +71,14 @@ router.post('/searchRecent/', async (req, res) => {
     let a = await bnAppsService.query(
         { active: false, consensus: {$exists: true} },
         defaultAppPopulate,
-        { createdAt: 1 },
+        { createdAt: -1 },
         true,
         req.body.limit
     );
     let b = await evalRoundsService.query(
         { active: false, consensus: {$exists: true} },
         defaultBnPopulate,
-        { createdAt: 1 },
+        { createdAt: -1 },
         true,
         req.body.limit
     );

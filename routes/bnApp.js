@@ -135,7 +135,7 @@ router.post('/apply', async (req, res, next) => {
         await bnAppsService.query({
             applicant: req.session.mongoId,
             mode: req.body.mode,
-            updatedAt: { $gte: cooldownDate },
+            createdAt: { $gte: cooldownDate },
         }),
         await evalRoundsService.query({
             bn: req.session.mongoId,

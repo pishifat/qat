@@ -167,7 +167,6 @@ export default {
                     this.info = result.errors;
                 } else {
                     this.$emit('update-all-eval-rounds', result.ers);
-                    this.$parent.allEvalRounds = result.ers;
                     if(result.ers.length){
                         this.confirm = 'Eval rounds added! ';
                         if (result.failed.length) {

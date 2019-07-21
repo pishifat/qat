@@ -58,20 +58,23 @@
                             <div v-if="discussApp.consensus && !readOnly">
                                 <hr>
                                 <p class="text-shadow min-spacing mb-2">
-                                    Application feedback: <button class="btn btn-sm btn-nat" @click="setFeedback($event);">Update Feedback PM</button>
-                                    <button class="btn btn-sm btn-nat float-right" data-toggle="collapse" data-target="#forumPmBox">
-                                        See full message <i class="fas fa-angle-down"></i>
-                                    </button>
+                                    Application feedback: 
                                 </p>
                                 <div class="form-group">
-                                    <textarea class="form-control dark-textarea" style="white-space: pre-line;" v-model="feedback"></textarea>
+                                    <textarea class="form-control dark-textarea" style="white-space: pre-line;" @change="setFeedback($event)" v-model="feedback"></textarea>
                                 </div>
                                 <div v-if="discussApp.consensus == 'pass'" class="input-group mb-3">
                                     <input class="form-control" type="text" v-model="discordLink" placeholder="discord invite link...">
                                 </div>
+                                <div>
+                                    <button class="btn btn-sm btn-nat" data-toggle="collapse" data-target="#forumPmBox">
+                                        See full message <i class="fas fa-angle-down"></i>
+                                    </button>
+                                </div>
                                 <feedback-pm
                                     :discuss-app="discussApp"
-                                    :discord-link="discordLink">
+                                    :discord-link="discordLink"
+                                    :feedback="feedback">
                                 </feedback-pm>
                             </div>
                             <hr>
@@ -99,25 +102,31 @@
                                     :disabled="discussRound.consensus == 'fail'"
                                     @click="setConsensus('fail', $event);"
                                 >Set Fail</button>
-                                </span>
                                 <a href="#" class="float-right small vote-pass ml-2 mt-2" data-toggle="tooltip" data-placement="top" :title="discussRound.isPriority ? 'mark evaluation as low priority' : 'mark evaluation as high priority'" @click.prevent.stop="toggleIsPriority()">
                                     <i class="fas" :class="discussRound.isPriority ? 'fa-arrow-down' : 'fa-arrow-up'"></i>
                                 </a>
+                                </span>
                             </h5>
 
-                            <div v-if="discussRound.consensus">
+                            <div v-if="discussRound.consensus && !readOnly">
                                 <hr>
                                 <p class="text-shadow min-spacing mb-2">Application feedback: 
-                                    <button class="btn btn-sm btn-nat" @click="setFeedback($event);">Update Feedback PM</button>
-                                    <button class="btn btn-sm btn-nat float-right" data-toggle="collapse" data-target="#currentBnForumPmBox">
-                                        See full message <i class="fas fa-angle-down"></i>
-                                    </button>
+                                    <span v-if="discussRound.consensus == 'pass'">
+                                        <button v-if="!discussRound.isLowActivity" class="btn btn-sm btn-nat" @click="toggleLowActivity($event);">Use inactivity template</button>
+                                        <button v-else class="btn btn-sm btn-nat" @click="toggleLowActivity($event);">Use normal template</button>
+                                    </span>
                                 </p>
                                 <div class="form-group">
-                                    <textarea class="form-control dark-textarea" style="white-space: pre-line;" v-model="feedback"></textarea>
+                                    <textarea class="form-control dark-textarea" style="white-space: pre-line;" @change="setFeedback($event)" v-model="feedback"></textarea>
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm btn-nat" data-toggle="collapse" data-target="#currentBnForumPmBox">
+                                        See full message <i class="fas fa-angle-down"></i>
+                                    </button>
                                 </div>
                                 <feedback-pm
-                                    :discuss-round="discussRound">
+                                    :discuss-round="discussRound"
+                                    :feedback="feedback">
                                 </feedback-pm>
                             </div>
                             
@@ -158,20 +167,22 @@
 
                         <div class="col-sm-12 text-shadow" v-if="readOnly">
                             <hr>
-                            <p v-if="discussApp">Forum PM Feedback: 
-                                <button class="btn btn-sm btn-nat float-right" data-toggle="collapse" data-target="#forumPmBox">
-                                    See full message <i class="fas fa-angle-down"></i>
+                            <p v-if="discussApp">
+                                <button class="btn btn-sm btn-nat" data-toggle="collapse" data-target="#forumPmBox">
+                                    See full Forum PM feedback message <i class="fas fa-angle-down"></i>
                                 </button>
                                 <feedback-pm
-                                    :discuss-app="discussApp">
+                                    :discuss-app="discussApp"
+                                    :feedback="feedback">
                                 </feedback-pm>
                             </p>
-                            <p v-else>Forum PM Feedback: 
-                                <button class="btn btn-sm btn-nat float-right" data-toggle="collapse" data-target="#currentBnForumPmBox">
-                                    See full message <i class="fas fa-angle-down"></i>
+                            <p v-else>
+                                <button class="btn btn-sm btn-nat" data-toggle="collapse" data-target="#currentBnForumPmBox">
+                                    See full Forum PM feedback message <i class="fas fa-angle-down"></i>
                                 </button>
                                 <feedback-pm
-                                    :discuss-round="discussRound">
+                                    :discuss-round="discussRound"
+                                    :feedback="feedback">
                                 </feedback-pm>
                             </p>
                             
@@ -408,25 +419,36 @@ export default {
         toggleIsPriority: async function() {
             if (this.discussApp){
                const a = await this.executePost(
-                        '/appEval/toggleIsPriority/' + this.discussApp.id, {isPriority: this.discussApp.isPriority});
-                    if (a) {
-                        if (a.error) {
-                            this.info = a.error;
-                        } else {
-                            await this.$emit('update-application', a);
-                        }
-                    } 
+                    '/appEval/toggleIsPriority/' + this.discussApp.id, {isPriority: this.discussApp.isPriority});
+                if (a) {
+                    if (a.error) {
+                        this.info = a.error;
+                    } else {
+                        await this.$emit('update-application', a);
+                    }
+                } 
             }else{
                 const er = await this.executePost(
-                        '/bnEval/toggleIsPriority/' + this.discussRound.id, {isPriority: this.discussRound.isPriority});
-                    if (er) {
-                        if (er.error) {
-                            this.info = er.error;
-                        } else {
-                            await this.$emit('update-eval-round', er);
-                        }
-                    } 
+                    '/bnEval/toggleIsPriority/' + this.discussRound.id, {isPriority: this.discussRound.isPriority});
+                if (er) {
+                    if (er.error) {
+                        this.info = er.error;
+                    } else {
+                        await this.$emit('update-eval-round', er);
+                    }
+                } 
             }
+        },
+        toggleLowActivity: async function(e) {
+            const er = await this.executePost(
+                '/bnEval/toggleIsLowActivity/' + this.discussRound.id, {isLowActivity: this.discussRound.isLowActivity}, e);
+            if (er) {
+                if (er.error) {
+                    this.info = er.error;
+                } else {
+                    await this.$emit('update-eval-round', er);
+                }
+            } 
         }
     },
     data() {

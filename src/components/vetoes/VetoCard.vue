@@ -18,9 +18,15 @@
                 <div class="card-icons">
                     <span class="small text-shadow float-left">{{ veto.createdAt.slice(0, 10) }}</span>
                     <i v-if="veto.mode.indexOf('osu') >= 0" class="far fa-circle"></i>
-                    <i v-if="veto.mode.indexOf('taiko') >= 0" class="fas fa-drum"></i>
-                    <i v-if="veto.mode.indexOf('catch') >= 0" class="fas fa-apple-alt"></i>
-                    <i v-if="veto.mode.indexOf('mania') >= 0" class="fas fa-stream"></i>
+                    <i v-else-if="veto.mode.indexOf('taiko') >= 0" class="fas fa-drum"></i>
+                    <i v-else-if="veto.mode.indexOf('catch') >= 0" class="fas fa-apple-alt"></i>
+                    <i v-else-if="veto.mode.indexOf('mania') >= 0" class="fas fa-stream"></i>
+                    <span v-else>
+                        <i class="far fa-circle"></i>
+                        <i class="fas fa-drum"></i>
+                        <i class="fas fa-apple-alt"></i>
+                        <i  class="fas fa-stream"></i>
+                    </span>
                 </div>
             </div>
         </div>

@@ -13,21 +13,25 @@
                         <div class="row text-shadow">
                             <p>Game mode:</p>
                             <div class="row ml-4">
-                                <label class="mx-1">
+                                <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!">
                                     <input type="radio" class="osu-radio hide-default" name="osu" value="osu" v-model="mode" checked />
                                     <i class="fas fa-circle fa-lg"></i>
                                 </label>
-                                <label class="mx-1">
+                                <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!taiko">
                                     <input type="radio" class="taiko-radio hide-default" name="taiko" value="taiko" v-model="mode" />
                                     <i class="fas fa-drum fa-lg"></i>
                                 </label>
-                                <label class="mx-1">
+                                <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!catch">
                                     <input type="radio" class="catch-radio hide-default" name="catch" value="catch" v-model="mode" />
                                     <i class="fas fa-apple-alt fa-lg"></i>
                                 </label>
-                                <label class="mx-1">
+                                <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!mania">
                                     <input type="radio" class="mania-radio hide-default" name="mania" value="mania" v-model="mode" />
                                     <i class="fas fa-stream fa-lg"></i>
+                                </label>
+                                <label class="mx-1" data-toggle="tooltip" data-placement="top" title="all game modes">
+                                    <input type="radio" class="all-radio hide-default" name="all" value="all" v-model="mode" />
+                                    <i class="fas fa-globe fa-lg"></i>
                                 </label>
                             </div>
                         </div>
@@ -89,7 +93,6 @@ export default {
                     },
                     e
                 );
-
                 if (veto) {
                     if (veto.error) {
                         this.info = veto.error;

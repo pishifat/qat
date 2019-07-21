@@ -8,9 +8,15 @@
                     <a class="text-dark" :href="'https://osu.ppy.sh/beatmapsets/' + veto.beatmapId" target="_blank">{{ veto.beatmapTitle }}</a> by 
                     <a class="text-dark" :href="'https://osu.ppy.sh/users/' + veto.beatmapMapperId" target="_blank">{{ veto.beatmapMapper }}</a>
                     <i v-if="veto.mode.indexOf('osu') >= 0" class="far fa-circle"></i>
-                    <i v-if="veto.mode.indexOf('taiko') >= 0" class="fas fa-drum"></i>
-                    <i v-if="veto.mode.indexOf('catch') >= 0" class="fas fa-apple-alt"></i>
-                    <i v-if="veto.mode.indexOf('mania') >= 0" class="fas fa-stream"></i>
+                    <i v-else-if="veto.mode.indexOf('taiko') >= 0" class="fas fa-drum"></i>
+                    <i v-else-if="veto.mode.indexOf('catch') >= 0" class="fas fa-apple-alt"></i>
+                    <i v-else-if="veto.mode.indexOf('mania') >= 0" class="fas fa-stream"></i>
+                    <span v-else>
+                        <i class="far fa-circle"></i>
+                        <i class="fas fa-drum"></i>
+                        <i class="fas fa-apple-alt"></i>
+                        <i  class="fas fa-stream"></i>
+                    </span>
                 </h5>
                 <button type="button" class="close" data-dismiss="modal">
                     <span>&times;</span>

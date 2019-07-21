@@ -42,11 +42,12 @@ class AiessService extends BaseService
 
     /**
      * Group all data by event
-     * @param {date} limitDate 
+     * @param {date} minDate 
+     * @param {date} maxDate 
      * @param {string} mode 
      */
-    async getAllByEventType(limitDate, mode) {
-        if (!limitDate && !mode) return null;
+    async getAllByEventType(minDate, maxDate, mode) {
+        if (!minDate && !maxDate && !mode) return null;
 
         try {
             return await Aiess.aggregate([
@@ -56,7 +57,8 @@ class AiessService extends BaseService
                             { eventType: 'Disqualified' },
                             { eventType: 'Popped' },
                         ],
-                        timestamp: { $gte: limitDate },
+                        timestamp: { $gte: minDate },
+                        timestamp: { $lte: maxDate },
                         modes: mode
                     } 
                 },
@@ -80,18 +82,20 @@ class AiessService extends BaseService
     /**
      * Group data of a user by event
      * @param {number} userId 
-     * @param {date} limitDate 
+     * @param {date} minDate
+     * @param {date} maxDate 
      * @param {string} mode 
      */
-    async getByEventTypeAndUser(userId, limitDate, mode) {
-        if (!userId && !limitDate && !mode) return null;
+    async getByEventTypeAndUser(userId, minDate, maxDate, mode) {
+        if (!userId && !minDate && !maxDate && !mode) return null;
 
         try {
             return await Aiess.aggregate([
                 { 
                     $match: { 
                         userId: userId,
-                        timestamp: { $gte: limitDate },
+                        timestamp: { $gte: minDate },
+                        timestamp: { $lte: maxDate },
                         eventType: { $ne: 'Ranked' },
                         modes: mode
                     } 

@@ -4,7 +4,7 @@ const BaseService = require('./baseService');
 
 const vetoesSchema = new mongoose.Schema({
     vetoer: { type: 'ObjectId', ref: 'User', required: true },
-    mode: { type: String, enum: ['osu', 'taiko', 'catch', 'mania'] },
+    mode: { type: String, enum: ['osu', 'taiko', 'catch', 'mania', 'all'] },
     discussionLink: { type: String, required: true },
     beatmapId: { type: String },
     beatmapTitle: { type: String },

@@ -12,6 +12,7 @@ const evalRoundSchema = new mongoose.Schema({
     consensus: { type: String, enum: ['pass', 'extend', 'fail'] },
     feedback: { type: String },
     isPriority: { type: Boolean, default: false },
+    isLowActivity: { type: Boolean, default: false}
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 const EvalRound = mongoose.model('EvalRound', evalRoundSchema);

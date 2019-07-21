@@ -110,12 +110,12 @@ router.post('/selectMediators', async (req, res, next) => {
     for (let i = 0; i < allUsers.length; i++) {
         let user = allUsers[i];
         if (
-            user.modes.indexOf(req.body.mode) >= 0 &&
-            user.probation.indexOf(req.body.mode) < 0 &&
+            (user.modes.indexOf(req.body.mode) >= 0 || req.body.mode == 'all') &&
+            !user.probation.length &&
             req.body.excludeUsers.indexOf(user.username.toLowerCase()) < 0
         ) {
             usernames.push(user);
-            if (usernames.length >= (req.body.mode == 'osu' ? 11 : 5)) {
+            if (usernames.length >= (req.body.mode == 'osu' || req.body.mode == 'all' ? 11 : 5)) {
                 break;
             }
         }

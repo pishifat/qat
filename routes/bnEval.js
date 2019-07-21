@@ -135,7 +135,9 @@ router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
         const result = await evalRoundsService.createMany(allEvalsToCreate);
         if (result.error) return res.json(result);
 
-        let ers = await evalRoundsService.query({ active: true }, defaultPopulate, { deadline: -1 }, true);
+        let minDate = new Date();
+        minDate.setDate(minDate.getDate() + 14);
+        let ers = await evalRoundsService.query({ active: true, deadline: { $lte: minDate }, }, defaultPopulate, { deadline: 1, consensus: 1, feedback: 1 }, true);
         res.json({ ers: ers, failed: failed });
         logsService.create(
             req.session.mongoId,
@@ -177,7 +179,9 @@ router.post('/setGroupEval/', api.isLeader, async (req, res) => {
         await evalRoundsService.update(req.body.checkedRounds[i], { discussion: true });
     }
 
-    let ev = await evalRoundsService.query({ active: true }, defaultPopulate, { deadline: 1 }, true);
+    let minDate = new Date();
+    minDate.setDate(minDate.getDate() + 14);
+    let ev = await evalRoundsService.query({ active: true, deadline: { $lte: minDate }, }, defaultPopulate, { deadline: 1, consensus: 1, feedback: 1 }, true);
     res.json(ev);
     logsService.create(
         req.session.mongoId,
@@ -191,7 +195,9 @@ router.post('/setIndividualEval/', api.isLeader, async (req, res) => {
         await evalRoundsService.update(req.body.checkedRounds[i], { discussion: false });
     }
 
-    let ev = await evalRoundsService.query({ active: true }, defaultPopulate, { deadline: 1 }, true);
+    let minDate = new Date();
+    minDate.setDate(minDate.getDate() + 14);
+    let ev = await evalRoundsService.query({ active: true, deadline: { $lte: minDate }, }, defaultPopulate, { deadline: 1, consensus: 1, feedback: 1 }, true);
     res.json(ev);
     logsService.create(
         req.session.mongoId,
@@ -225,6 +231,11 @@ router.post('/setComplete/', api.isLeader, async (req, res) => {
 
         if (er.consensus == 'pass') {
             await usersService.update(u.id, { $pull: { probation: er.mode } });
+            if(er.isLowActivity){
+                let deadline = new Date();
+                deadline.setDate(deadline.getDate() + 40);
+                await evalRoundsService.create(er.bn, er.mode, deadline);
+            }
         }
         
         await evalRoundsService.update(req.body.checkedRounds[i], { active: false });
@@ -236,7 +247,9 @@ router.post('/setComplete/', api.isLeader, async (req, res) => {
         }
     }
 
-    let ev = await evalRoundsService.query({ active: true }, defaultPopulate, { deadline: 1 }, true);
+    let minDate = new Date();
+    minDate.setDate(minDate.getDate() + 14);
+    let ev = await evalRoundsService.query({ active: true, deadline: { $lte: minDate }, }, defaultPopulate, { deadline: 1, consensus: 1, feedback: 1 }, true);
     res.json(ev);
     logsService.create(
         req.session.mongoId,
@@ -278,17 +291,29 @@ router.post('/toggleIsPriority/:id', async (req, res) => {
     );
 });
 
+/* POST toggle low activity */
+router.post('/toggleIsLowActivity/:id', async (req, res) => {
+    await evalRoundsService.update(req.params.id, { isLowActivity: !req.body.isLowActivity });
+    let er = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
+    res.json(er);
+    logsService.create(
+        req.session.mongoId,
+        `Toggled inactivity for ${er.bn.username}'s ${er.mode} BN evaluation`
+    );
+});
+
 /* GET aiess info */
 router.get('/userActivity/:id/:mode/:deadline', async (req, res) => {
     if (isNaN(req.params.id)) {
         return res.json({ error: 'Something went wrong!' });
     }
 
-    let limitDate = new Date(req.params.deadline);
-    limitDate.setDate(limitDate.getDate() - 90);
+    let minDate = new Date(req.params.deadline);
+    minDate.setDate(minDate.getDate() - 90);
+    let maxDate = new Date(req.params.deadline);
     const [allUserEvents, allEvents] = await Promise.all([
-        aiessService.getByEventTypeAndUser(parseInt(req.params.id), limitDate, req.params.mode),
-        aiessService.getAllByEventType(limitDate, req.params.mode)
+        aiessService.getByEventTypeAndUser(parseInt(req.params.id), minDate, maxDate, req.params.mode),
+        aiessService.getAllByEventType(minDate, maxDate, req.params.mode)
     ]);
 
     if (allUserEvents.error || allEvents.error) return res.json({ error: 'Something went wrong!' });
@@ -314,6 +339,14 @@ router.get('/userActivity/:id/:mode/:deadline', async (req, res) => {
         } else if (eventType == 'Popped') {
             pops = events;
         }
+    });
+
+    uniqueNominations.sort(function(a, b){
+        let keyA = new Date(a.timestamp);
+        let keyB = new Date(b.timestamp);
+        if(keyA < keyB) return -1;
+        if(keyA > keyB) return 1;
+        return 0;
     });
     
     let nomsDqd = [];

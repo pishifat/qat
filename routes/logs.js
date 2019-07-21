@@ -59,11 +59,13 @@ router.get('/getNatActivity', async (req, res, next) => {
         }
     }
 
+    let minDate = new Date();
+    minDate.setDate(minDate.getDate() - 60);
     let info = [];
     users.forEach(user => {
         let count = 0;
         evaluations.forEach(evaluation => {
-            if(evaluation.evaluator.toString() == user.id){
+            if(evaluation.evaluator.toString() == user.id && evaluation.createdAt > minDate){
                 count++;
             }     
         });
