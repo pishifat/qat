@@ -318,6 +318,7 @@ router.get('/userActivity/:id/:mode/:deadline', async (req, res) => {
 
     if (allUserEvents.error || allEvents.error) return res.json({ error: 'Something went wrong!' });
     
+    let nominations = [];
     let uniqueNominations = [];
     let dqs = [];
     let pops = [];
@@ -328,11 +329,7 @@ router.get('/userActivity/:id/:mode/:deadline', async (req, res) => {
 
         if (eventType == 'Qualified' || eventType == 'Bubbled') {
             events.forEach(event => {
-                if (uniqueNominations.length == 0) {
-                    uniqueNominations.push(event);
-                } else if (!uniqueNominations.find(n => n.beatmapsetId == event.beatmapsetId)) {
-                    uniqueNominations.push(event);
-                }
+                nominations.push(event);
             });
         } else if (eventType == 'Disqualified') {
             dqs = events;
@@ -341,14 +338,22 @@ router.get('/userActivity/:id/:mode/:deadline', async (req, res) => {
         }
     });
 
-    uniqueNominations.sort(function(a, b){
+    nominations.sort(function(a, b){
         let keyA = new Date(a.timestamp);
         let keyB = new Date(b.timestamp);
         if(keyA < keyB) return -1;
         if(keyA > keyB) return 1;
         return 0;
     });
-    
+
+    nominations.forEach(event => {
+        if (uniqueNominations.length == 0) {
+            uniqueNominations.push(event);
+        } else if (!uniqueNominations.find(n => n.beatmapsetId == event.beatmapsetId)) {
+            uniqueNominations.push(event);
+        }
+    });
+
     let nomsDqd = [];
     let nomsPopped = [];
 

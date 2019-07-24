@@ -25,7 +25,7 @@
             <div class="modal-body" style="overflow: hidden">
                 <div class="text-shadow mb-2">
                     <p class="min-spacing"><a :href="veto.discussionLink" target="_blank">Read the veto discussion here</a></p>
-                    <small class="ml-2">Veto reason: <i>{{ veto.shortReason }}</i></small>
+                    <small class="ml-2">Veto reason: <i v-html="filterLinks(veto.shortReason)"></i></small>
                 </div>
                 <p class="min-spacing text-shadow">Consensus: {{
                     veto.status == 'upheld' || veto.status == 'withdrawn' ? 'Veto ' + veto.status : 'none' 
@@ -41,7 +41,8 @@
                                     <i class="fas fa-redo-alt vote-pass"></i>
                                 </a>
                                 {{mediation.mediator.username}}:
-                                <pre class="pre-font small" :class="mediation.vote == 1 ? 'vote-pass' : mediation.vote == 2 ? 'vote-neutral' : mediation.vote == 3 ? 'vote-fail' : ''">{{mediation.comment ? mediation.comment.trim() : '...'}}</pre>
+                                <pre v-if="!mediation.comment" class="pre-font small">...</pre>
+                                <pre v-else class="pre-font small" :class="mediation.vote == 1 ? 'vote-pass' : mediation.vote == 2 ? 'vote-neutral' : mediation.vote == 3 ? 'vote-fail' : ''" v-html="filterLinks(mediation.comment.trim())"></pre>
                             </li>
                         </ul>
                         <span v-if="veto.status != 'upheld' && veto.status != 'withdrawn'">
@@ -135,6 +136,7 @@
 
 <script>
 import postData from "../../mixins/postData.js";
+import filterLinks from '../../mixins/filterLinks.js';
 import VetoForumPm from "./VetoForumPm.vue";
 import VetoConclusionPost from "./VetoConclusionPost.vue";
 
@@ -145,7 +147,7 @@ export default {
         VetoForumPm,
         VetoConclusionPost
     },
-    mixins: [ postData ],
+    mixins: [ postData, filterLinks ],
     watch: {
         veto: function() {
             this.mediators = null;
