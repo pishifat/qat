@@ -16,7 +16,15 @@
                 
                 <div class="veto-status my-auto" :class="`status-bar-${veto.status}`"></div>
                 <div class="card-icons">
-                    <span class="small text-shadow float-left">{{ veto.createdAt.slice(0, 10) }}</span>
+                    <span v-if="veto.status == 'wip'" class="small text-shadow float-left">
+                        <i class="fas fa-clock mx-1"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            title="deadline">
+                        </i>
+                        <span class="errors">{{ veto.deadline.slice(0, 10) }}</span>
+                    </span>
+                    <span v-else class="small text-shadow float-left">{{ veto.createdAt.slice(0, 10) }}</span>
                     <i v-if="veto.mode.indexOf('osu') >= 0" class="far fa-circle"></i>
                     <i v-else-if="veto.mode.indexOf('taiko') >= 0" class="fas fa-drum"></i>
                     <i v-else-if="veto.mode.indexOf('catch') >= 0" class="fas fa-apple-alt"></i>

@@ -56,6 +56,7 @@ class AiessService extends BaseService
                         $or: [
                             { eventType: 'Disqualified' },
                             { eventType: 'Popped' },
+                            { eventType: 'Reported'}
                         ],
                         timestamp: { $gte: minDate },
                         timestamp: { $lte: maxDate },

@@ -13,6 +13,7 @@ const vetoesSchema = new mongoose.Schema({
     shortReason: { type: String, required: true },
     status: { type: String, enum: ['available', 'wip', 'upheld', 'withdrawn'], default: 'available' },
     mediations: [{ type: 'ObjectId', ref: 'Mediation' }],
+    deadline: { type: Date },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 vetoesSchema.pre('findByIdAndUpdate', function (next) {

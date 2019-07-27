@@ -135,7 +135,8 @@
                                 <p class="text-shadow">Reports:</p>
                                 <div v-for="report in relevantReports" :key="report.id">
                                     <p class="text-shadow pl-2">
-                                        <pre class="pre-font small" :class="report.valid == 1 ? 'vote-pass' : 'vote-extend'">{{report.createdAt.slice(0,10)}}: {{report.simplifiedReason || report.reason}}</pre>
+                                        <span class="small">{{report.createdAt.slice(0,10)}}:</span>
+                                        <pre class="pre-font small ml-2" :class="report.valid == 1 ? 'vote-pass' : 'vote-extend'"> <span v-html="filterLinks(report.reason)"></span></pre>
                                     </p>
                                 </div>
                             </div>

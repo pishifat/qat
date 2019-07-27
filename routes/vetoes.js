@@ -130,6 +130,9 @@ router.post('/beginMediation/:id', api.isNat, async (req, res, next) => {
         let m = await mediationsService.create(mediator._id);
         await vetoesService.update(req.params.id, { $push: { mediations: m }, status: 'wip' });
     }
+    let date = new Date();
+    date.setDate(date.getDate() + 7);
+    await vetoesService.update(req.params.id, {deadline: date});
     let v = await vetoesService.query({ _id: req.params.id }, defaultPopulate);
     res.json(v);
     logsService.create(

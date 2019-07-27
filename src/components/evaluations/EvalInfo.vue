@@ -101,8 +101,9 @@
                                 <hr>
                                 <p class="text-shadow">Reports:</p>
                                 <div v-for="report in relevantReports" :key="report.id">
-                                    <p class="text-shadow small pl-2" :class="report.valid == 1 ? 'vote-pass' : 'vote-extend'">
-                                        {{report.createdAt.slice(0,10)}}: {{report.simplifiedReason || report.reason}}
+                                    <p class="text-shadow pl-2">
+                                        <span class="small">{{report.createdAt.slice(0,10)}}:</span>
+                                        <pre class="pre-font small ml-2" :class="report.valid == 1 ? 'vote-pass' : 'vote-extend'"> <span v-html="filterLinks(report.reason)"></span></pre>
                                     </p>
                                 </div>
                             </div>
@@ -155,6 +156,7 @@
 
 <script>
 import postData from '../../mixins/postData.js'
+import filterLinks from '../../mixins/filterLinks.js';
 import UserActivity from './UserActivity.vue'
 
 export default {
@@ -163,7 +165,7 @@ export default {
     components: {
         UserActivity
     },
-    mixins: [ postData ],
+    mixins: [ postData, filterLinks ],
     watch: {
         application: function() {
             this.info = '';

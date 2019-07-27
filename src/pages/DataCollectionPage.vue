@@ -121,6 +121,41 @@
                 </tbody>
             </table>
         </section>
+
+        <section class="col-md-12 segment segment-image mx-0">
+            <h2>Reported Beatmaps</h2>
+            <table class="table table-sm table-dark table-hover col-md-12 mt-2">
+                <thead>
+                    <td scope="col">Date</td>
+                    <td scope="col">Mapset</td>
+                    <td scope="col">Reason</td>
+                    <td scope="col" data-toggle="tooltip" data-placement="top" title="Marks objectivity/subjectivity of issue for reference in BN Evaluations">Notability</td>
+                    <td scope="col"></td>
+                </thead>
+                <tbody>
+                    <tr v-for="report in reports" :key="report.id"
+                        :class="report.valid == 1 ? 'vote-border-pass-wide' : report.valid == 2 ? 'vote-border-extend-wide' : report.valid == 3 ? 'vote-border-fail-wide' : ''"
+                    >
+                        <td scope="row">{{new Date(report.timestamp).toString().slice(4,15)}}</td>
+                        <td scope="row">
+                            <a :href="'https://osu.ppy.sh/beatmapsets/' + report.beatmapsetId + '/discussion/-/events'" target="_blank">
+                                {{report.metadata.length > 50 ? report.metadata.slice(0, 50) + '...' : report.metadata}}
+                            </a>
+                        </td>
+                        <td scope="row">
+                            {{report.content.length > 50 ? report.content.slice(0, 50) + '...' : report.content}} 
+                            <a href="#" class="float-right" data-toggle="modal" data-target="#editReason" :data-entry="report.id" @click.prevent="selectEntry(report)">edit</a>
+                        </td>
+                        <td scope="row" style="width: 72px;">
+                            <notability
+                                :selected-entry="report"
+                                :is-spectator="isSpectator"
+                            ></notability>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
     </div>
 
     <data-collection-info
@@ -164,6 +199,7 @@ export default {
         separateObjs: function() {
             this.dqs = this.pageObjs.filter(v => v.eventType == 'Disqualified');
             this.pops = this.pageObjs.filter(v => v.eventType == 'Popped');
+            this.reports = this.pageObjs.filter(v => v.eventType == 'Reported');
         },
         updateEntry: function (obj) {
 			const i = this.allObjs.findIndex(o => o.id == obj.id);
@@ -181,6 +217,7 @@ export default {
             pageObjs: null,
             dqs: null,
             pops: null,
+            reports: null,
             selectedEntry: null,
             info: '',
             isSpectator: false,

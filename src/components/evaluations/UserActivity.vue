@@ -154,6 +154,39 @@
             </tbody>
         </table>
     </div>
+    <p class="text-shadow">
+        <a :href="reports && '#reports'" data-toggle="collapse">Show reports done by user</a> 
+        ({{ loading ? '...' : reports ? reports.length : '0' }})
+    </p>
+    <div v-if="reports" class="collapse" id="reports">
+        <table class="table table-sm table-dark table-hover col-md-12 mt-2">
+            <thead>
+                <td scope="col">Date</td>
+                <td scope="col">Mapset</td>
+                <td scope="col">Reason</td>
+            </thead>
+            <tbody>
+                <tr v-for="report in reports" :key="report.id"
+                :class="report.valid == 1 ? 'vote-border-pass' : report.valid == 2 ? 'vote-border-extend' : report.valid == 3 ? 'vote-border-fail' : ''">
+                    <td scope="row">{{new Date(report.timestamp).toString().slice(4,10)}}</td>
+                    <td scope="row">
+                        <a :href="'https://osu.ppy.sh/beatmapsets/' + report.beatmapsetId + '/discussion/-/events'" target="_blank">
+                            {{report.metadata.length > 35 ? report.metadata.slice(0,35) + "..." : report.metadata}}
+                        </a>
+                    </td>
+                    <td v-if="!editing" scope="row" v-html="filterLinks(report.content)"></td>
+                    <td v-else scope="row">
+                        <input :class="'input-' + report._id" type="text" :placeholder="report.content.length > 35 ? report.content.slice(0,35) + '...' : report.content" maxlength="50"/>
+                        <button class="btn btn-sm btn-nat" @click="updateReason(report._id, $event);">Save</button>
+                        <notability
+                            :selected-entry="report"
+                            :is-spectator="isSpectator"
+                        ></notability>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
     <button class="btn btn-sm btn-nat mx-2 mb-2 w-25" id="calculateScore" @click="findModCount()"
         data-toggle="tooltip" data-placement="top" title="Finds unique mod count in the last 90 days. Only use on BNs with low activity">Load modding activity
     </button>
@@ -199,6 +232,7 @@ export default {
                     this.nomsPopped = response.data.nomsPopped;
                     this.dqs = response.data.dqs;
                     this.pops = response.data.pops;
+                    this.reports = response.data.reports;
                     this.loading = false;
                 });
         },
@@ -236,6 +270,7 @@ export default {
             noms: null,
             pops: null,
             dqs: null,
+            reports: null,
             nomsPopped: null,
             nomsDqd: null,
             loading: true,
