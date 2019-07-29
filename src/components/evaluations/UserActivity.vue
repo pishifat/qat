@@ -170,7 +170,7 @@
                 :class="report.valid == 1 ? 'vote-border-pass' : report.valid == 2 ? 'vote-border-extend' : report.valid == 3 ? 'vote-border-fail' : ''">
                     <td scope="row">{{new Date(report.timestamp).toString().slice(4,10)}}</td>
                     <td scope="row">
-                        <a :href="'https://osu.ppy.sh/beatmapsets/' + report.beatmapsetId + '/discussion/-/events'" target="_blank">
+                        <a :href="report.forumPostId > 0 ? 'https://osu.ppy.sh/community/forums/topics/447428?start=' + report.forumPostId : 'https://osu.ppy.sh/beatmapsets/' + report.beatmapsetId + '/discussion/-/events'" target="_blank">
                             {{report.metadata.length > 35 ? report.metadata.slice(0,35) + "..." : report.metadata}}
                         </a>
                     </td>

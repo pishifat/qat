@@ -138,7 +138,7 @@
                     >
                         <td scope="row">{{new Date(report.timestamp).toString().slice(4,15)}}</td>
                         <td scope="row">
-                            <a :href="'https://osu.ppy.sh/beatmapsets/' + report.beatmapsetId + '/discussion/-/events'" target="_blank">
+                            <a :href="report.forumPostId > 0 ? 'https://osu.ppy.sh/community/forums/topics/447428?start=' + report.forumPostId : 'https://osu.ppy.sh/beatmapsets/' + report.beatmapsetId + '/discussion/-/events'" target="_blank">
                                 {{report.metadata.length > 50 ? report.metadata.slice(0, 50) + '...' : report.metadata}}
                             </a>
                         </td>
