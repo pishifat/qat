@@ -2,6 +2,7 @@ const querystring = require('querystring');
 const config = require('../config.json');
 const users = require('./user.js');
 const axios = require('axios');
+const logsService = require('./log').service;
 
 async function getToken(code) {
     const postData = querystring.stringify({
@@ -177,7 +178,7 @@ function webhookPost(message, mode) {
         embeds: message
     })
     .catch(error => {
-        logs.service.create(null, error, null, 'error');
+        logsService.create(null, error, null, 'error');
     });
 }
 
