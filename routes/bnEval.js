@@ -255,7 +255,7 @@ router.post('/setGroupEval/', api.isLeader, async (req, res) => {
                     }
                 ]
             }], 
-            a.mode
+            er.mode
         );
     }
 
