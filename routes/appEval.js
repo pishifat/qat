@@ -65,9 +65,56 @@ router.post('/submitEval/:id', async (req, res) => {
             req.body.moddingComment,
             req.body.vote
         );
-        let app = await bnAppsService.update(req.params.id, { $push: { evaluations: ev._id } });
-        if((app.mode == 'osu' && app.evaluations.length > 2) || (app.mode != 'osu' && app.evaluations.length > 1)){
+        await bnAppsService.update(req.params.id, { $push: { evaluations: ev._id } });
+        let a = await bnAppsService.query({_id: req.params.id}, defaultPopulate);
+        api.webhookPost(
+            [{
+                author: {
+                    name: `${req.session.username}`,
+                    icon_url: `https://a.ppy.sh/${req.session.osuId}`,
+                    url: `https://osu.ppy.sh/users/${req.session.osuId}`
+            },
+                color: '10404095',
+                fields:[
+                    {
+                        name: `http://bn.mappersguild.com/appeval`,
+                        value: `submitted BN app eval for **${a.applicant.username}**`
+                    }
+                ]
+            }], 
+            a.mode
+        );
+        if((a.mode == 'osu' && a.evaluations.length > 2) || (a.mode != 'osu' && a.evaluations.length > 1)){
             await bnAppsService.update(req.params.id, { discussion: true });
+            let pass = 0;
+            let neutral = 0;
+            let fail = 0;
+            a.evaluations.forEach(evaluation => {
+                if(evaluation.vote == 1) pass++;
+                else if(evaluation.vote == 2) neutral++;
+                else if(evaluation.vote == 3) fail++;
+            })
+            api.webhookPost(
+                [{
+                    author: {
+                        name: `${a.applicant.username}`,
+                        icon_url: `https://a.ppy.sh/${a.applicant.osuId}`,
+                        url: `https://osu.ppy.sh/users/${a.applicant.osuId}`
+                },
+                    color: '14855903',
+                    fields:[
+                        {
+                            name: `http://bn.mappersguild.com/appeval`,
+                            value: `Moved BN app to group discussion`
+                        },
+                        {
+                            name: `Votes`,
+                            value: `Pass: **${pass}**, Neutral: **${neutral}**, Fail: **${fail}**`
+                        }
+                    ]
+                }], 
+                a.mode
+            );
         }
     }
     let a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
@@ -82,6 +129,36 @@ router.post('/submitEval/:id', async (req, res) => {
 router.post('/setGroupEval/', api.isLeader, async (req, res) => {
     for (let i = 0; i < req.body.checkedApps.length; i++) {
         await bnAppsService.update(req.body.checkedApps[i], { discussion: true });
+        let a = await bnAppsService.query({_id: req.body.checkedApps[i]}, defaultPopulate);
+        let pass = 0;
+        let neutral = 0;
+        let fail = 0;
+        a.evaluations.forEach(evaluation => {
+            if(evaluation.vote == 1) pass++;
+            else if(evaluation.vote == 2) neutral++;
+            else if(evaluation.vote == 3) fail++;
+        })
+        api.webhookPost(
+            [{
+                author: {
+                    name: `${a.applicant.username}`,
+                    icon_url: `https://a.ppy.sh/${a.applicant.osuId}`,
+                    url: `https://osu.ppy.sh/users/${a.applicant.osuId}`
+            },
+                color: '14855903',
+                fields:[
+                    {
+                        name: `http://bn.mappersguild.com/appeval`,
+                        value: `Moved BN app to group discussion`
+                    },
+                    {
+                        name: `Votes`,
+                        value: `Pass: **${pass}**, Neutral: **${neutral}**, Fail: **${fail}**`
+                    }
+                ]
+            }], 
+            a.mode
+        );
     }
 
     let a = await bnAppsService.query({ active: true }, defaultPopulate, { deadline: 1 }, true);
@@ -146,6 +223,23 @@ router.post('/setConsensus/:id', async (req, res) => {
         req.session.mongoId,
         `Set consensus of ${a.applicant.username}'s ${a.mode} BN app as ${req.body.consensus}`
     );
+    api.webhookPost(
+        [{
+            author: {
+                name: `${req.session.username}`,
+                icon_url: `https://a.ppy.sh/${req.session.osuId}`,
+                url: `https://osu.ppy.sh/users/${req.session.osuId}`
+        },
+            color: '12025268',
+            fields:[
+                {
+                    name: `http://bn.mappersguild.com/appeval`,
+                    value: `**${a.applicant.username}**'s BN app set to **${req.body.consensus}**`
+                }
+            ]
+        }], 
+        ev.mode
+    );
 });
 
 /* POST set feedback of eval */
@@ -156,6 +250,23 @@ router.post('/setFeedback/:id', async (req, res) => {
     logsService.create(
         req.session.mongoId,
         `Edited feedback of ${a.applicant.username}'s ${a.mode} BN app`
+    );
+    api.webhookPost(
+        [{
+            author: {
+                name: `${req.session.username}`,
+                icon_url: `https://a.ppy.sh/${req.session.osuId}`,
+                url: `https://osu.ppy.sh/users/${req.session.osuId}`
+        },
+            color: '7044532',
+            fields:[
+                {
+                    name: `BN app feedback submitted (${a.consensus})`,
+                    value: `**${a.applicant.username}**: ${req.body.feedback}`
+                }
+            ]
+        }], 
+        a.mode
     );
 });
 

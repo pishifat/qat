@@ -125,12 +125,21 @@ async function loopWebhooks() {
       {},
       true
     );
+
+    let osuHighlight;
+    let taikoHighlight;
+    let catchHighlight;
+    let maniaHighlight;
     
     activeApps.forEach(app => {
       let addition = 7;
       if(app.discussion) addition += 7;
       let deadline = new Date(app.createdAt.setDate(app.createdAt.getDate() + addition));
       if (date > deadline){
+        if(!osuHighlight && app.mode == 'osu') osuHighlight = true;
+        if(!taikoHighlight && app.mode == 'taiko') taikoHighlight = true;
+        if(!catchHighlight && app.mode == 'catch') catchHighlight = true;
+        if(!maniaHighlight && app.mode == 'mania') maniaHighlight = true;
         api.webhookPost(
           [{
             author: {
@@ -159,10 +168,15 @@ async function loopWebhooks() {
 
     activeRounds.forEach(round => {
       if (date > round.deadline){
+        if(!osuHighlight && round.mode == 'osu') osuHighlight = true;
+        if(!taikoHighlight && round.mode == 'taiko') taikoHighlight = true;
+        if(!catchHighlight && round.mode == 'catch') catchHighlight = true;
+        if(!maniaHighlight && round.mode == 'mania') maniaHighlight = true;
+
         api.webhookPost(
           [{
             author: {
-                name: `<@&263445780474363904> Current BN eval for ${round.bn.username} is overdue!`,
+                name: `Current BN eval for ${round.bn.username} is overdue!`,
                 icon_url: `https://a.ppy.sh/${round.bn.osuId}`,
                 url: `https://osu.ppy.sh/users/${round.bn.osuId}`
             },
@@ -184,5 +198,12 @@ async function loopWebhooks() {
         );
       }
     });
+    setTimeout(function(){
+      if(osuHighlight) api.highlightWebhookPost('do shit', 'osu');
+      if(taikoHighlight) api.highlightWebhookPost('I, bnsite, formally request you to do shit', 'taiko');
+      if(catchHighlight) api.highlightWebhookPost('fat yoshi', 'catch');
+      if(maniaHighlight) api.highlightWebhookPost('do shit', 'mania');
+    }, 5000)
+    
   }, 86400000);
 }

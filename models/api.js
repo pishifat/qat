@@ -182,4 +182,31 @@ function webhookPost(message, mode) {
     });
 }
 
-module.exports = { isLoggedIn, getToken, getUserInfo, beatmapsetInfo, beatmapsetOwnerMaps, isBnOrNat, isNat, isLeader, isBnEvaluator, webhookPost };
+function highlightWebhookPost(message, mode) {
+    let url;
+    let role;
+    if(mode == 'osu'){
+        url = `https://discordapp.com/api/webhooks/${config.standardWebhook.id}/${config.standardWebhook.token}`;
+        role = "<@" + config.standardWebhook.role + ">";
+    }if(mode == 'taiko'){
+        url = `https://discordapp.com/api/webhooks/${config.taikoWebhook.id}/${config.taikoWebhook.token}`;
+        role = "<@" + config.taikoWebhook.role + ">";
+    }
+    if(mode == 'catch'){
+        url = `https://discordapp.com/api/webhooks/${config.catchWebhook.id}/${config.catchWebhook.token}`;
+        role = "<@" + config.catchWebhook.role + ">";
+    }
+    if(mode == 'mania'){
+        url = `https://discordapp.com/api/webhooks/${config.maniaWebhook.id}/${config.maniaWebhook.token}`;
+        role = "<@" + config.maniaWebhook.role + ">";
+    }
+    if(!mode) url = `https://discordapp.com/api/webhooks/${config.reportWebhook.id}/${config.reportWebhook.token}`;
+    axios.post(url, {
+        content: role + " " + message
+    })
+    .catch(error => {
+        logsService.create(null, error, null, 'error');
+    });
+}
+
+module.exports = { isLoggedIn, getToken, getUserInfo, beatmapsetInfo, beatmapsetOwnerMaps, isBnOrNat, isNat, isLeader, isBnEvaluator, webhookPost, highlightWebhookPost };

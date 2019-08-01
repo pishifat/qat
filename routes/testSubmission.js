@@ -169,14 +169,31 @@ router.post('/submitTest', async (req, res, next) => {
     res.json(displayScore);
     logsService.create(req.session.mongoId, `Completed ${test.mode} BN app test`);
     let u = res.locals.userRequest;
+    let modsList = '';
+    for (let i = 0; i < currentBnApp.mods.length; i++) {
+        modsList += currentBnApp.mods[i];
+        if(i + 1 < currentBnApp.mods.length){
+            modsList += ", "
+        }
+    }
     api.webhookPost(
         [{
             author: {
-                name: `New BN application: ${u.username}`,
+                name: `${u.username}`,
                 icon_url: `https://a.ppy.sh/${u.osuId}`,
                 url: `https://osu.ppy.sh/users/${u.osuId}`
             },
             color: '7335382',
+            fields:[
+                {
+                    name: `New BN application`,
+                    value: `Test score: **${displayScore}**`
+                },
+                {
+                    name: `Mods`,
+                    value: modsList
+                }
+            ]
         }], 
         test.mode
     );
