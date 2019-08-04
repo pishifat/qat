@@ -183,7 +183,7 @@ router.post('/apply', async (req, res, next) => {
                 return res.json({
                     error: `Your previous application was rejected (check your osu! forum PMs for details). 
                         You may apply for this game mode again on 
-                        ${new Date(currentBnApp.updatedAt.setDate(currentBnApp.updatedAt.getDate() + 90))
+                        ${new Date(currentBnApp.createdAt.setDate(currentBnApp.createdAt.getDate() + 90))
                             .toString()
                             .slice(4, 15)}.`,
                 });

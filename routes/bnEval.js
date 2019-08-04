@@ -324,6 +324,27 @@ router.post('/setComplete/', api.isLeader, async (req, res) => {
                 req.session.mongoId,
                 `Set ${u.username}'s ${er.mode} BN eval as "${er.consensus}"`
             );
+            api.webhookPost(
+                [{
+                    author: {
+                        name: `${u.username}`,
+                        icon_url: `https://a.ppy.sh/${u.osuId}`,
+                        url: `https://osu.ppy.sh/users/${u.osuId}`
+                },
+                    color: '14855903',
+                    fields:[
+                        {
+                            name: `http://bn.mappersguild.com/bneval`,
+                            value: `Current BN eval archived`
+                        },
+                        {
+                            name: `Consensus`,
+                            value: `${er.consensus == 'pass' ? 'Pass' : er.consensus == 'extend' ? 'Extend' : 'Fail'}`
+                        }
+                    ]
+                }], 
+                er.mode
+            );
         }
     }
 

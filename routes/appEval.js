@@ -10,7 +10,7 @@ const logsService = require('../models/log').service;
 const router = express.Router();
 
 router.use(api.isLoggedIn);
-router.use(api.isNat);
+router.use(api.isBnOrNat);
 
 /* GET bn app page */
 router.get('/', async (req, res, next) => {
@@ -34,7 +34,7 @@ const defaultPopulate = [
     },
     {
         innerPopulate: 'evaluations',
-        populate: { path: 'evaluator', select: 'username osuId' },
+        populate: { path: 'evaluator', select: 'username osuId group' },
     },
 ];
 
@@ -84,37 +84,42 @@ router.post('/submitEval/:id', async (req, res) => {
             }], 
             a.mode
         );
+        
         if((a.mode == 'osu' && a.evaluations.length > 2) || (a.mode != 'osu' && a.evaluations.length > 1)){
-            await bnAppsService.update(req.params.id, { discussion: true });
             let pass = 0;
             let neutral = 0;
             let fail = 0;
+            let nat = 0;
             a.evaluations.forEach(evaluation => {
+                if(evaluation.evaluator.group == 'nat') nat++;
                 if(evaluation.vote == 1) pass++;
                 else if(evaluation.vote == 2) neutral++;
                 else if(evaluation.vote == 3) fail++;
-            })
-            api.webhookPost(
-                [{
-                    author: {
-                        name: `${a.applicant.username}`,
-                        icon_url: `https://a.ppy.sh/${a.applicant.osuId}`,
-                        url: `https://osu.ppy.sh/users/${a.applicant.osuId}`
-                },
-                    color: '14855903',
-                    fields:[
-                        {
-                            name: `http://bn.mappersguild.com/appeval`,
-                            value: `Moved BN app to group discussion`
-                        },
-                        {
-                            name: `Votes`,
-                            value: `Pass: **${pass}**, Neutral: **${neutral}**, Fail: **${fail}**`
-                        }
-                    ]
-                }], 
-                a.mode
-            );
+            });
+            if((a.mode == 'osu' && nat > 2) || (a.mode != 'osu' && nat > 1)){
+                await bnAppsService.update(req.params.id, { discussion: true });
+                api.webhookPost(
+                    [{
+                        author: {
+                            name: `${a.applicant.username}`,
+                            icon_url: `https://a.ppy.sh/${a.applicant.osuId}`,
+                            url: `https://osu.ppy.sh/users/${a.applicant.osuId}`
+                    },
+                        color: '14855903',
+                        fields:[
+                            {
+                                name: `http://bn.mappersguild.com/appeval`,
+                                value: `Moved BN app to group discussion`
+                            },
+                            {
+                                name: `Votes`,
+                                value: `Pass: **${pass}**, Neutral: **${neutral}**, Fail: **${fail}**`
+                            }
+                        ]
+                    }], 
+                    a.mode
+                );
+            }
         }
     }
     let a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
@@ -200,6 +205,27 @@ router.post('/setComplete/', api.isLeader, async (req, res) => {
             }
         }
         await bnAppsService.update(a.id, { active: false });
+        api.webhookPost(
+            [{
+                author: {
+                    name: `${u.username}`,
+                    icon_url: `https://a.ppy.sh/${u.osuId}`,
+                    url: `https://osu.ppy.sh/users/${u.osuId}`
+            },
+                color: '14855903',
+                fields:[
+                    {
+                        name: `http://bn.mappersguild.com/appeval`,
+                        value: `BN app archived`
+                    },
+                    {
+                        name: `Consensus`,
+                        value: `${a.consensus == 'pass' ? 'Pass' : 'Fail'}`
+                    }
+                ]
+            }], 
+            a.mode
+        );
         logsService.create(
             req.session.mongoId,
             `Set ${u.username}'s ${a.mode} application eval as "${a.consensus}"`

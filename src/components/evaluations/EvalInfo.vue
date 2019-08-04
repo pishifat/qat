@@ -53,7 +53,7 @@
                             <ul>
                                 <li class="small text-shadow" v-for="evaluator in application.bnEvaluators" :key="evaluator.id">{{evaluator.username}}</li>
                             </ul>
-                            <!--<div v-if="evaluator.isLeader && !application.bnEvaluators.length">
+                            <div v-if="evaluator.isLeader && !application.bnEvaluators.length">
                                 <button class="btn btn-sm btn-nat mb-2" @click="selectBnEvaluators($event)">{{tempBnEvaluators ? 'Re-select BN Evaluators' : 'Select BN Evaluators'}}</button> 
                                 <button v-if="tempBnEvaluators" class="btn btn-sm btn-nat-red mb-2" @click="enableBnEvaluators($event)">Enable BN Evaluations</button>
                                 <div v-if="tempBnEvaluators" class="text-shadow">
@@ -72,7 +72,7 @@
                                         <samp class="small">Thank you for your hard work!</samp><br><br>
                                     </div>
                                 </div>
-                            </div>-->
+                            </div>
                             <hr>
                         </div>
 
