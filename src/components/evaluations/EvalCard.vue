@@ -2,7 +2,6 @@
     <div
         class="col-lg-3 col-md-4 col-sm-6 my-2"
         @click="application ? selectApplication() : selectEvalRound()"
-        v-if="isBnEvaluator() || evaluator.group == 'nat'"
     >
         <div
             class="card border-outline"
