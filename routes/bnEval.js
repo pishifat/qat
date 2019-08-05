@@ -437,6 +437,17 @@ router.post('/toggleIsLowActivity/:id', async (req, res) => {
     );
 });
 
+/* POST find previous evaluations */
+router.get('/findPreviousEvaluations/:id', async (req, res) => {
+    let evals;
+    evals = await evalRoundsService.query({ bn: req.params.id, active: false });
+    if(!evals){
+        //find app feedback
+    }
+    console.log(evals);
+    res.json(evals);
+});
+
 /* GET aiess info */
 router.get('/userActivity/:id/:mode/:deadline', async (req, res) => {
     if (isNaN(req.params.id)) {

@@ -58,8 +58,10 @@ class AiessService extends BaseService
                             { eventType: 'Popped' },
                             { eventType: 'Reported'}
                         ],
-                        timestamp: { $gte: minDate },
-                        timestamp: { $lte: maxDate },
+                        $and: [
+                            { timestamp: { $gte: minDate} },
+                            { timestamp: { $lte: maxDate} },
+                        ],
                         modes: mode
                     } 
                 },
@@ -95,8 +97,10 @@ class AiessService extends BaseService
                 { 
                     $match: { 
                         userId: userId,
-                        timestamp: { $gte: minDate },
-                        timestamp: { $lte: maxDate },
+                        $and: [
+                            { timestamp: { $gte: minDate} },
+                            { timestamp: { $lte: maxDate} },
+                        ],
                         eventType: { $ne: 'Ranked' },
                         modes: mode
                     } 
