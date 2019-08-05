@@ -38,7 +38,7 @@
                                     {{application.test.totalScore || application.test.totalScore >= 0 ? application.test.totalScore + '/20' : 'incomplete'}}
                                 </a>
                             </p>
-                            <div class="mt-4">
+                            <div class="mt-4" v-if="evaluator.group == 'nat'">
                                 <p class="text-shadow">
                                     Total Evaluations: {{application.evaluations.length}}
                                     <a href="#" class="float-right small vote-pass ml-2" data-toggle="tooltip" data-placement="top" :title="application.isPriority ? 'mark evaluation as low priority' : 'mark evaluation as high priority'" @click.prevent.stop="toggleIsPriority()">
@@ -49,10 +49,12 @@
                                     <li class="small text-shadow" v-for="evaluation in application.evaluations" :key="evaluation.id">{{evaluation.evaluator.username}}</li>
                                 </ul>
                             </div>
-                            <p class="text-shadow" v-if="application.bnEvaluators.length && (evaluator.group == 'nat' || evaluator.isSpectator)">BN Evaluators ({{application.bnEvaluators.length}}): </p>
-                            <ul>
-                                <li class="small text-shadow" v-for="evaluator in application.bnEvaluators" :key="evaluator.id">{{evaluator.username}}</li>
-                            </ul>
+                            <div v-if="application.bnEvaluators.length && evaluator.isLeader">
+                                <p class="text-shadow">BN Evaluators ({{application.bnEvaluators.length}}): </p>
+                                <ul>
+                                    <li class="small text-shadow" v-for="evaluator in application.bnEvaluators" :key="evaluator.id">{{evaluator.username}}</li>
+                                </ul>
+                            </div>
                             <div v-if="evaluator.isLeader && !application.bnEvaluators.length">
                                 <button class="btn btn-sm btn-nat mb-2" @click="selectBnEvaluators($event)">{{tempBnEvaluators ? 'Re-select BN Evaluators' : 'Select BN Evaluators'}}</button> 
                                 <button v-if="tempBnEvaluators" class="btn btn-sm btn-nat-red mb-2" @click="enableBnEvaluators($event)">Enable BN Evaluations</button>
