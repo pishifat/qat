@@ -61,7 +61,7 @@
                                     Application feedback: 
                                 </p>
                                 <div class="form-group">
-                                    <textarea class="form-control dark-textarea" style="white-space: pre-line;" @change="setFeedback($event)" v-model="feedback"></textarea>
+                                    <textarea class="form-control dark-textarea" style="white-space: pre-line;" v-model="feedback"></textarea>
                                 </div>
                                 <div v-if="discussApp.consensus == 'pass'" class="input-group mb-3">
                                     <input class="form-control" type="text" v-model="discordLink" placeholder="discord invite link...">
@@ -69,6 +69,9 @@
                                 <div>
                                     <button class="btn btn-sm btn-nat" data-toggle="collapse" data-target="#forumPmBox">
                                         See full message <i class="fas fa-angle-down"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-nat float-right" @click="setFeedback($event)">
+                                        Save
                                     </button>
                                 </div>
                                 <feedback-pm
@@ -117,11 +120,14 @@
                                     </span>
                                 </p>
                                 <div class="form-group">
-                                    <textarea class="form-control dark-textarea" style="white-space: pre-line;" @change="setFeedback($event)" v-model="feedback"></textarea>
+                                    <textarea class="form-control dark-textarea" style="white-space: pre-line;" v-model="feedback"></textarea>
                                 </div>
                                 <div>
                                     <button class="btn btn-sm btn-nat" data-toggle="collapse" data-target="#currentBnForumPmBox">
                                         See full message <i class="fas fa-angle-down"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-nat float-right" @click="setFeedback($event)">
+                                        Save
                                     </button>
                                 </div>
                                 <feedback-pm

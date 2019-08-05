@@ -203,7 +203,9 @@
             data-toggle="tooltip" data-placement="top" title="Finds previous evaluation results">Load old evaluations
         </button>
         <ul v-if="previousEvaluations">
-
+            <li class="small text-shadow" v-for="evaluation in previousEvaluations" :key="evaluation.id">
+                <b>{{evaluation.updatedAt.slice(0,10)}} - {{evaluation.consensus.toUpperCase()}}</b>: {{evaluation.feedback}}
+            </li>
         </ul>
     </div>
 
@@ -229,6 +231,7 @@ export default {
             this.loading = true;
             this.loadingModCount = false;
             this.modCount = null;
+            this.previousEvaluations = null;
             this.findRelevantActivity();
         },
     },

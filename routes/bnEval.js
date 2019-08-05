@@ -5,6 +5,7 @@ const logsService = require('../models/log').service;
 const evalsService = require('../models/evaluation').service;
 const reportsService = require('../models/report').service;
 const evalRoundsService = require('../models/evalRound').service;
+const bnAppsService = require('../models/bnApp').service;
 const usersService = require('../models/user').service;
 const aiessService = require('../models/aiess').service;
 
@@ -440,12 +441,11 @@ router.post('/toggleIsLowActivity/:id', async (req, res) => {
 /* POST find previous evaluations */
 router.get('/findPreviousEvaluations/:id', async (req, res) => {
     let evals;
-    evals = await evalRoundsService.query({ bn: req.params.id, active: false });
-    if(!evals){
-        //find app feedback
+    evals = await evalRoundsService.query({ bn: req.params.id, active: false, consensus: { $exists: true }, feedback: { $exists: true } }, {}, {}, true);
+    if(!evals.length){
+        evals = await bnAppsService.query({ applicant: req.params.id, active: false, consensus: { $exists: true }, feedback: { $exists: true } }, {}, {}, true);
     }
-    console.log(evals);
-    res.json(evals);
+    res.json({previousEvaluations: evals});
 });
 
 /* GET aiess info */
