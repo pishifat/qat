@@ -320,7 +320,7 @@ router.post('/toggleIsPriority/:id', async (req, res) => {
 /* POST set status upheld or withdrawn. */
 router.post('/selectBnEvaluators', async (req, res, next) => {
     const allUsers = await usersModel.aggregate([
-        { $match: { group: { $eq: 'bn' }, isBnEvaluator: true} },
+        { $match: { group: { $eq: 'bn' }, isBnEvaluator: true, probation: { $size: 0 }},  },
         { $sample: { size: 1000 } },
     ]);
     let usernames = [];
