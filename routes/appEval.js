@@ -40,13 +40,25 @@ const defaultPopulate = [
 
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res, next) => {
-    const a = 
+    let a;
+    if(res.locals.userRequest.group == 'nat'){
+        a = 
         await bnAppsService.query(
             { active: true, test: { $exists: true } },
             defaultPopulate,
             { createdAt: 1, consensus: 1, feedback: 1  },
             true
         );
+    }else{
+        a = 
+        await bnAppsService.query(
+            { active: true, test: { $exists: true }, bnEvaluators: { $elemMatch: { $in: res.locals.userRequest.id } } },
+            defaultPopulate,
+            { createdAt: 1, consensus: 1, feedback: 1  },
+            true
+        );
+    }
+    
     res.json({ a: a, evaluator: res.locals.userRequest });
 });
 
