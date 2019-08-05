@@ -33,10 +33,13 @@
                                 <li class="small text-shadow"><a :href="'https://osu.ppy.sh/users/' + application.applicant.osuId + '/modding/events?types%5B%5D=kudosu_gain&types%5B%5D=kudosu_lost&min_date=&max_date='" target="_blank">All history</a></li>
                             </ul>
                             <p class="text-shadow">Test results: 
-                                <a :href="`http://bn.mappersguild.com/testresults?user=${application.applicant.osuId}`" target="_blank" 
+                                <a v-if="evaluator.group == 'nat' ":href="`http://bn.mappersguild.com/testresults?user=${application.applicant.osuId}`" target="_blank" 
                                 :class="application.test.totalScore > 15 ? 'vote-pass' : application.test.totalScore > 12.5 ? 'vote-extend' : 'vote-fail'">
                                     {{application.test.totalScore || application.test.totalScore >= 0 ? application.test.totalScore + '/20' : 'incomplete'}}
                                 </a>
+                                <span v-else :class="application.test.totalScore > 15 ? 'vote-pass' : application.test.totalScore > 12.5 ? 'vote-extend' : 'vote-fail'">
+                                    {{application.test.totalScore || application.test.totalScore >= 0 ? application.test.totalScore + '/20' : 'incomplete'}}
+                                </span>
                             </p>
                             <div class="mt-4" v-if="evaluator.group == 'nat'">
                                 <p class="text-shadow">
@@ -68,9 +71,9 @@
                                     <p>Forum message:</p>
                                     <div id="forumMessage" class="copy-paste">
                                         <samp class="small">Hello!</samp><br><br>
-                                        <samp class="small">You have been selected to help evaluate the {{application.mode}} BN application for [url=https://osu.ppy.sh/users/{{application.applicant.osuId}}]{{ application.applicant.username }}[/url].</samp><br><br>
-                                        <samp class="small">Please post your opinion regarding the applicant's behavior and modding quality (based on submitted mods and anything else you may know) on the [url=http://bn.mappersguild.com/appeval]BN/NAT website[/url] in [b]one week[/b]. Your decision will be anonymous to everyone but members of the NAT.</samp><br><br>
-                                        <samp class="small">If you do not want to participate in BN application evaluations, opt-out from the [url=http://bn.mappersguild.com/users]users page[/url].</samp><br><br>
+                                        <samp class="small">You have been selected to help evaluate the [i]{{application.mode}}[/i] mode BN application for [url=https://osu.ppy.sh/users/{{application.applicant.osuId}}]{{ application.applicant.username }}[/url].</samp><br><br>
+                                        <samp class="small">Please post your thoughts on the applicant's behavior and modding quality (based on submitted mods and anything else you may know) on the [url=http://bn.mappersguild.com/appeval]BN/NAT website[/url] in [b]one week[/b]. Your decision will be anonymous to everyone but members of the NAT.</samp><br><br>
+                                        <samp class="small">Keep in mind that this is a 100% optional activity. If you do not want to participate in BN application evaluations, opt-out from your card on the [url=http://bn.mappersguild.com/users]users page[/url]. Failing to finish on time has no penalty.</samp><br><br>
                                         <samp class="small">Thank you for your hard work!</samp><br><br>
                                     </div>
                                 </div>
