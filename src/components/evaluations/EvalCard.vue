@@ -94,17 +94,6 @@ export default {
         selectEvalRound: function() {
             this.$emit('update:selectedEvalRound', this.evalRound);
         },
-        isBnEvaluator: function() {
-            if (
-                this.application &&
-                this.application.bnEvaluators &&
-                this.application.bnEvaluators.indexOf(this.evaluator.id) >= 0
-            ) {
-                return true;
-            } else {
-                return false;
-            }
-        },
         findRelevantEval: function() {
             let vote;
             if (this.application) {

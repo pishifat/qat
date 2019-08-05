@@ -110,11 +110,7 @@ export default {
             return false;
         },
         separateObjs: function() {
-            if(this.evaluator.group == 'nat'){
-                this.applications = this.pageObjs.filter(v => !v.discussion);
-            }else{
-                this.applications = this.pageObjs.filter(v => !v.discussion && v.bnEvaluators && v.bnEvaluators.indexOf(this.evaluator.id) >= 0);
-            }
+            this.applications = this.pageObjs.filter(v => !v.discussion);
             this.discussApps = this.pageObjs.filter(v => v.discussion);
         },
         updateApplication: function (application) {

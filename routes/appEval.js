@@ -58,6 +58,7 @@ router.get('/relevantInfo', async (req, res, next) => {
             true
         );
     }
+    console.log(a);
     
     res.json({ a: a, evaluator: res.locals.userRequest });
 });
