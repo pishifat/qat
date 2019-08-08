@@ -106,14 +106,13 @@ router.get('/', async (req, res, next) => {
     });
 });
 
-router.get('/mods', async (req, res, next) => {
-    const modCount = await getUserModsCount(req.session.username);
-    return res.json({ modCount: modCount });
-});
-
-/* GET mod count from current BNs */
-router.get('/currentBnMods/:username', async (req, res, next) => {
-    const modCount = await getUserModsCount(req.params.username);
+/* GET mod count from specified user */
+router.get('/modsCount/:user', async (req, res, next) => {
+    if (!req.params.user || req.params.user.trim() == '') {
+        return res.json({ error: 'Missing user input' });
+    }
+    
+    const modCount = await getUserModsCount(req.params.user);
     return res.json({ modCount: modCount });
 });
 

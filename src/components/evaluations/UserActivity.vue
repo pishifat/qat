@@ -254,7 +254,7 @@ export default {
         findModCount: async function() {
             this.loadingModCount = true;
             axios
-                .get('/bnapps/currentBnMods/' + this.evalRound.bn.username)
+                .get('/bnapps/modsCount/' + this.evalRound.bn.username)
                 .then(response => {
                     this.loadingModCount = false;
                     this.modCount = response.data.modCount;

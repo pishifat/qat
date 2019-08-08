@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
         integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
     <link rel="stylesheet" href="../css/css.css">
     <link rel="icon" type="image/png" href="../images/qatlogo.png">
 </head>
@@ -91,13 +92,80 @@
             <li>A new usergroup has been added for <a href="https://osu.ppy.sh/groups/32">probationary Beatmap Nominators</a>.</li>
         </ul>
     </section>
+
+    <section class="row segment segment-image mx-auto" style="max-width: 900px">
+        <div class="col">
+
+            <h4>Mod score calculator: 
+                <small id="totalScore" class="ml-1"></small>
+                <small id="calcWait" class="ml-2" style="font-size: 10pt;"></small>
+            </h4>
+
+            <div class="form-inline mb-3 justify-content-around">
+                <div class="form-group">
+                    <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!"/>
+                        <input type="radio" class="osu-radio hide-default" name="mode" value="osu" checked/>
+                        <i class="fas fa-circle fa-lg"></i>
+                    </label>
+                    <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!taiko">
+                        <input type="radio" class="taiko-radio hide-default" name="mode" value="taiko"/>
+                        <i class="fas fa-drum fa-lg"></i>
+                    </label>
+                    <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!catch">
+                        <input type="radio" class="catch-radio hide-default" name="mode" value="catch"/>
+                        <i class="fas fa-apple-alt fa-lg"></i>
+                    </label>
+                    <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!mania">
+                        <input type="radio" class="mania-radio hide-default" name="mode" value="mania"/>
+                        <i class="fas fa-stream fa-lg"></i>
+                    </label>
+                </div>
+
+                <div class="input-group input-group-sm">
+                    <input class="form-control" type="text" id="userId" placeholder="username / id">
+                    <div class="input-group-append">
+                        <button
+                            class="btn btn-sm btn-nat"
+                            id="calculateScore"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            title="Automatically detect your mod score based on your modding history"
+                        >
+                            Auto-calculate
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="input-group mb-3">
+                    <input class="modCount form-control" id="modCount1" type="number" placeholder="# mods in month 1...">
+                </div>
+                <div class="input-group mb-3">
+                    <input class="modCount form-control" id="modCount2" type="number" placeholder="# mods in month 2...">
+                </div>
+                <div class="input-group">
+                    <input class="modCount form-control" id="modCount3" type="number" placeholder="# mods in month 3...">
+                </div>
+            </div>
+
+            <ul style="list-style-type: disc;">
+                <li class="small">You can either write your username and auto-calculate your score, or manually write your mods count in the boxes above</li>
+                <li class="small">This calculator is only for your own reference. You do not need to input your mod count to apply for BN</li>
+                <li class="small">A "mod" is counted for each beatmapset through which you have received at least one Kudosu ("thumbs up" on discussion page)</li>
+                <li class="small">Scores 0 or higher are passing</li>
+                <li class="small">Selecting a different game mode above may impact your mod score (osu! has stricter requirements than taiko/catch/mania)</li>
+            </ul>
+        </div>
+    </section>
+
     <section class="segment segment-image mx-auto" style="max-width: 900px">
-        <div class="row">
+        <div class="row mb-3">
             <h4 class="mx-auto">Current BNs</h4>
         </div>
-        <div class="row mx-auto">
+        <div class="row">
             {{#each allUsersByMode}}
-            <table class="table table-sm table-dark table-hover col-3">
+            <table class="table table-sm table-dark table-hover col-6 col-md-3">
                 <thead>
                     <td>{{this._id}}</td>
                 </thead>
@@ -128,6 +196,8 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
         integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
         crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="../js/index.js"></script>
 </body>
 
 </html>
