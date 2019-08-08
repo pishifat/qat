@@ -3,6 +3,8 @@ const helper = require('./helper');
 const api = require('../models/api');
 const usersService = require('../models/user').service;
 const logsService = require('../models/log').service;
+const evalsService = require('../models/evaluation').service;
+const aiessService = require('../models/aiess').service;
 
 const router = express.Router();
 
@@ -27,7 +29,7 @@ router.get('/relevantInfo', async (req, res, next) => {
         { username: 1 },
         true
     );
-    res.json({ users: u, userId: req.session.mongoId, isLeader: res.locals.userRequest.isLeader });
+    res.json({ users: u, userId: req.session.mongoId, isLeader: res.locals.userRequest.isLeader, isNat: res.locals.userRequest.group == 'nat' });
 });
 
 /* POST submit or edit eval */
@@ -72,6 +74,143 @@ router.post('/removeGroup/:id', api.isLeader, async (req, res) => {
         req.session.mongoId,
         `Removed "${u.username}" from the ${logGroup.toUpperCase()}`
     );
+});
+
+/* GET all users with badge info */
+router.get('/findUserBadgeInfo', async (req, res, next) => {
+    let u = await usersService.query(
+        { $or: [{ 'bnDuration.0': { $exists: true } }, { 'natDuration.0': { $exists: true } }] },
+        {},
+        { username: 1 },
+        true
+    );
+    res.json(u);
+});
+
+/* POST remove from BN/NAT without evaluation */
+router.post('/editBadgeValue/:id', api.isLeader, async (req, res) => {
+    let u = await usersService.query({ _id: req.params.id });
+    if(res.locals.userRequest.osuId == '3178418'){ //i dont want anyone else messing with this
+        let years;
+        let num = req.body.add ? 1 : -1
+        if(req.body.group == 'bn'){
+            years = u.bnProfileBadge + num;
+            await usersService.update(req.params.id, { bnProfileBadge: years });
+        }else{
+            years = u.natProfileBadge + num;
+            await usersService.update(req.params.id, { natProfileBadge: years });
+        }
+    }
+    u = await usersService.query({ _id: req.params.id });
+    res.json(u);
+    
+});
+
+router.get('/findNatActivity/:days', async (req, res, next) => {
+    const [users, evaluations] = await Promise.all([
+        usersService.query({ 
+            group: 'nat', 
+            $or: [
+                { isSpectator: false }, 
+                { isSpectator: { $exists: false } }
+            ] }, 
+            {}, {username: 1}, true),
+            await evalsService.query({}, {}, {}, true)
+    ]);
+
+    class obj 
+    {
+        constructor(username, osuId, mode, totalEvaluations) 
+        {
+            this.username = username;
+            this.osuId = osuId;
+            this.mode = mode;
+            this.totalEvaluations = totalEvaluations;
+        }
+    }
+
+    let minDate = new Date();
+    minDate.setDate(minDate.getDate() - req.params.days);
+    let info = [];
+    users.forEach(user => {
+        let count = 0;
+        evaluations.forEach(evaluation => {
+            if(evaluation.evaluator.toString() == user.id && evaluation.createdAt > minDate){
+                count++;
+            }     
+        });
+        info.push(new obj(user.username, user.osuId, user.modes[0], count));
+    });
+
+    res.json(info);
+});
+
+router.get('/findBnActivity/:days', async (req, res, next) => {
+    class obj 
+    {
+        constructor(username, osuId, modes, uniqueNominations, nominationResets, beatmapReports) 
+        {
+            this.username = username;
+            this.osuId = osuId;
+            this.modes = modes;
+            this.uniqueNominations = uniqueNominations;
+            this.nominationResets = nominationResets;
+            this.beatmapReports = beatmapReports;
+        }
+    }
+
+    let minDate = new Date();
+    minDate.setDate(minDate.getDate() - req.params.days);
+    let maxDate = new Date();
+    const [users, allEvents] = await Promise.all([
+        usersService.query({ 
+            group: 'bn', 
+            $or: [
+                { isSpectator: false }, 
+                { isSpectator: { $exists: false } }
+            ] }, 
+            {}, {username: 1}, true),
+        aiessService.getAllActivity(minDate, maxDate)
+    ]);
+
+    let info = [];
+    users.forEach(user => {
+        let uniqueNominations = [];
+        let nominationResets = 0;
+        let beatmapReports = 0;
+        for (let i = 0; i < allEvents.length; i++) {
+            const eventType = allEvents[i]._id;
+            const events = allEvents[i].events;
+    
+            if (eventType == 'Bubbled' || eventType == 'Qualified') {
+                for (let j = 0; j < events.length; j++) {
+                    let event = events[j];
+                    if(event.userId == user.osuId){
+                        if (uniqueNominations.length == 0) {
+                            uniqueNominations.push(events);
+                        } else if (!uniqueNominations.find(n => n.beatmapsetId == event.beatmapsetId)) {
+                            uniqueNominations.push(event);
+                        }
+                    }
+                }
+            } else if (eventType == 'Popped' || eventType == 'Disqualified') {
+                for (let j = 0; j < events.length; j++) {
+                    if(events[j].userId == user.osuId){
+                        nominationResets++;
+                    }
+                }
+            } else if (eventType == 'Reported'){
+                for (let j = 0; j < events.length; j++) {
+                    if(events[j].userId == user.osuId){
+                        beatmapReports++;
+                    }
+                }
+            }
+        }
+        info.push(new obj(user.username, user.osuId, user.modes, uniqueNominations.length, nominationResets, beatmapReports));
+    });
+
+    res.json(info);
 });
 
 module.exports = router;

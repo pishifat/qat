@@ -81,6 +81,42 @@ class AiessService extends BaseService
             return { error: error._message };
         }
     }
+
+    /**
+     * Group all data by event without mode and including nominations
+     * @param {date} minDate 
+     * @param {date} maxDate 
+     */
+    async getAllActivity(minDate, maxDate) {
+        if (!minDate && !maxDate) return null;
+
+        try {
+            return await Aiess.aggregate([
+                { 
+                    $match: {
+                        $and: [
+                            { timestamp: { $gte: minDate} },
+                            { timestamp: { $lte: maxDate} },
+                        ],
+                        eventType: { $ne: 'Ranked' },
+                    } 
+                },
+                {
+                    $sort: {
+                        timestamp: 1,
+                        beatmapsetId: -1,
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$eventType', events: { $push: '$$ROOT' }
+                    }
+                },
+            ]);
+        } catch (error) {            
+            return { error: error._message };
+        }
+    }
     
     /**
      * Group data of a user by event

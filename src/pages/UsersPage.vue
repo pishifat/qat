@@ -36,6 +36,71 @@
                 </button>
             </div>
         </section>
+        <!-- admin tools -->
+        <section v-if="isNat" class="segment segment-solid my-1 mx-4">
+            <div class="my-2">
+                <button class="btn btn-sm btn-nat minw-200 my-1" @click="findNatActivity()"
+                    data-toggle="tooltip" data-placement="right" title="Finds NAT eval activity, defaults to 30 days">Load NAT activity
+                </button>
+                <input type="text" placeholder="days of activity..."
+                    style="filter: drop-shadow(1px 1px 1px #000000);"
+                    @keyup.enter="findNatActivity()" maxlength="3" v-model="natDays"/>
+                <div v-if="natActivity">
+                    <div v-for="user in natActivity.data" :key="user.username" class="small min-spacing mb-1">
+                        <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a> ({{user.mode}})
+                        <p v-if="user.mode == 'osu'" class="min-spacing" :style="user.totalEvaluations < natDays/3 ? 'background-color: rgb(255,50,50,0.25);' : user.totalEvaluations < natDays/2 ? 'background-color: rgb(255,255,0,0.25);' : 'background-color: rgb(50,255,50,0.25);'">
+                            Total evaluations: {{ user.totalEvaluations }}
+                        </p>
+                        <p v-else class="min-spacing" :style="user.totalEvaluations < natDays/6 ? 'background-color: rgb(255,50,50,0.25);' : user.totalEvaluations < natDays/4 ? 'background-color: rgb(255,255,0,0.25);' : 'background-color: rgb(50,255,50,0.25);'">
+                            Total evaluations: {{ user.totalEvaluations }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="my-2">
+                <button class="btn btn-sm btn-nat minw-200 my-1" @click="findBnActivity()"
+                    data-toggle="tooltip" data-placement="right" title="Finds BN nomination, pop/dq, and report activity, defaults to 30 days">Load BN activity
+                </button>
+                <input type="text" placeholder="days of activity..."
+                    style="filter: drop-shadow(1px 1px 1px #000000);"
+                    @keyup.enter="findBnActivity()" maxlength="3" v-model="bnDays"/>
+                <div v-if="bnActivity">
+                    <div v-for="user in bnActivity.data" :key="user.username" class="small min-spacing mb-1">
+                        <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a> ({{printModes(user.modes)}})
+                        <p class="min-spacing" :style="user.uniqueNominations < bnDays/10 ? 'background-color: rgb(255,50,50,0.25);' : user.uniqueNominations < bnDays/6 ? 'background-color: rgb(255,255,0,0.25);' : 'background-color: rgb(50,255,50,0.25);'">
+                            Nominations: {{ user.uniqueNominations }}
+                        </p>
+                        <p class="min-spacing">
+                            Nomination resets: {{ user.nominationResets }}
+                        </p>
+                        <p class="min-spacing">
+                            Beatmap Reports: {{ user.beatmapReports }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="my-2">
+                <button class="btn btn-sm btn-nat minw-200 my-1" @click="findUserBadgeInfo()"
+                    data-toggle="tooltip" data-placement="right" title="Finds relevant yearly profile badge info">Load badge info
+                </button>
+                <div v-if="badgeUsers.length">
+                    <p class="min-spacing small my-2">only pishifat can edit this section</p>
+                    <div v-for="user in badgeUsers" :key="user.id" class="small min-spacing mb-1">
+                        <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a>
+                        <p class="min-spacing" :style="user.bnProfileBadge != calculateDuration(user.bnDuration) && calculateDuration(user.bnDuration) >= 2 ? 'background-color: rgb(255,50,50,0.25);' : ''">
+                            BN: {{ calculateDuration(user.bnDuration) }} -- badge: {{user.bnProfileBadge}}
+                            <a href="#" @click.prevent="editBadgeValue(user.id, 'bn', true)"><i class="fas fa-plus"></i></a>
+                            <a href="#" @click.prevent="editBadgeValue(user.id, 'bn', false)"><i class="fas fa-minus"></i></a>
+                        </p>
+                        <p class="min-spacing" :style="user.natProfileBadge != calculateDuration(user.natDuration) && calculateDuration(user.natDuration) >= 3 ? 'background-color: rgb(255,50,50,0.25);' : ''">
+                            NAT: {{ calculateDuration(user.natDuration) }} -- badge: {{user.natProfileBadge}}
+                            <a href="#" @click.prevent="editBadgeValue(user.id, 'nat', true)"><i class="fas fa-plus"></i></a>
+                            <a href="#" @click.prevent="editBadgeValue(user.id, 'nat', false)"><i class="fas fa-minus"></i></a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
     </div>
     <user-info
@@ -89,6 +154,69 @@ export default {
             }
             return days;
         },
+        findUserBadgeInfo: function() {
+            axios
+                .get('/users/findUserBadgeInfo')
+                .then(response => {
+                    this.badgeUsers = [];
+                    let users = response.data;
+                    users.forEach(user => {
+                        if((this.calculateDuration(user.bnDuration) >= 2) || (this.calculateDuration(user.natDuration) >= 2)){
+                            this.badgeUsers.push(user);
+                        }
+                    });
+                });
+        },
+        calculateDuration: function(dateArray) {
+            let days = 0;
+            for (let i = 0; i < dateArray.length; i += 2) {
+                let a = new Date(dateArray[i]);
+                let b = new Date(dateArray[i + 1]);
+                if (dateArray[i + 1]) {
+                    days += Math.abs(b.getTime() - a.getTime()) / (1000 * 3600 * 24);
+                } else {
+                    days += Math.abs(new Date().getTime() - a.getTime()) / (1000 * 3600 * 24);
+                }
+            }
+            let years = Math.floor(days / 365);
+            return years;
+        },
+        editBadgeValue: async function(id, group, add) {
+            const u = await this.executePost(
+                '/users/editBadgeValue/' + id,
+                { group: group, add: add }
+            );
+            if (u && !u.error) {
+                const i = this.badgeUsers.findIndex(user => user.id == u.id);
+			    group == 'bn' ? this.badgeUsers[i].bnProfileBadge = u.bnProfileBadge : this.badgeUsers[i].natProfileBadge = u.natProfileBadge;
+            }
+        },
+        findNatActivity: function() {
+            if(!this.natDays.length) this.natDays = 30;
+            axios
+                .get('/users/findNatActivity/' + this.natDays)
+                .then(response => {
+                    this.natActivity = response;
+                });
+        },
+        findBnActivity: function() {
+            if(!this.bnDays.length) this.bnDays = 30;
+            axios
+                .get('/users/findBnActivity/' + this.bnDays)
+                .then(response => {
+                    this.bnActivity = response;
+                });
+        },
+        printModes: function(modes) {
+            let text = '';
+            for (let i = 0; i < modes.length; i++) {
+                text += modes[i];
+                if(i < modes.length - 1){
+                    text += ", "
+                }
+            }
+            return text;
+        }
     },
     data() {
         return {
@@ -97,7 +225,13 @@ export default {
             filteredObjs: null,
             userId: null,
             isLeader: null,
+            isNat: null,
             selectedUser: null,
+            badgeUsers: [],
+            natActivity: null,
+            natDays: '',
+            bnActivity: null,
+            bnDays: '',
         }
     },
     created() {
@@ -107,6 +241,7 @@ export default {
                 this.allObjs = response.data.users;
                 this.userId = response.data.userId;
                 this.isLeader = response.data.isLeader;
+                this.isNat = response.data.isNat;
                 this.limit = 24;
             }).then(function(){
                 $("#loading").fadeOut();

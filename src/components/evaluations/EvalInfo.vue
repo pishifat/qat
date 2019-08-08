@@ -72,7 +72,7 @@
                                     <div id="forumMessage" class="copy-paste">
                                         <samp class="small">Hello!</samp><br><br>
                                         <samp class="small">You have been selected to help evaluate the [i]{{application.mode}}[/i] mode BN application for [url=https://osu.ppy.sh/users/{{application.applicant.osuId}}]{{ application.applicant.username }}[/url].</samp><br><br>
-                                        <samp class="small">Please post your thoughts on the applicant's behavior and modding quality (based on submitted mods and anything else you may know) on the [url=http://bn.mappersguild.com/appeval]BN/NAT website[/url] in [b]one week[/b]. Your decision will be anonymous to everyone but members of the NAT.</samp><br><br>
+                                        <samp class="small">Please post your thoughts on the applicant's behavior and modding quality (based on submitted mods and anything else you may know) on the [url=http://bn.mappersguild.com/appeval]BN/NAT website[/url] in [b]one week[/b]. Your decision will be anonymous to everyone but members of the NAT. If the user's application is not visible, that means it has received enough evaluations for a consensus to be reached.</samp><br><br>
                                         <samp class="small">Keep in mind that this is a 100% optional activity. If you do not want to participate in BN application evaluations, opt-out from your card on the [url=http://bn.mappersguild.com/users]users page[/url]. Failing to finish on time has no penalty.</samp><br><br>
                                         <samp class="small">Thank you for your hard work!</samp><br><br>
                                     </div>

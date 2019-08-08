@@ -7,7 +7,7 @@
                 :class="user.probation.length && user.group != 'nat' ? 'bg-probation' : 'bg-' + user.group"
             >
                 <h5 class="modal-title">
-                    {{ user.username }}
+                    <a class="text-dark" :href="'https://osu.ppy.sh/users/' + user.osuId">{{ user.username }}</a>
                     <i v-if="user.modes.indexOf('osu') >= 0" class="far fa-circle"></i>
                     <i v-if="user.modes.indexOf('taiko') >= 0" class="fas fa-drum"></i>
                     <i v-if="user.modes.indexOf('catch') >= 0" class="fas fa-apple-alt"></i>
@@ -18,16 +18,16 @@
                 </button>
             </div>
             <div class="modal-body">
-                <p class="text-shadow mb-2">Time as BN: {{ calculateDuration('bn') }}</p>
-                <div class="text-shadow">
+                <p v-if="user.bnDuration.length" class="text-shadow mb-2">Time as BN: {{ calculateDuration('bn') }}</p>
+                <div v-if="user.bnDuration.length" class="text-shadow">
                     <ul style="list-style-type: none">
                         <li class="small" v-for="(date, i) in user.bnDuration" :key="date">
                             {{ i % 2 == 0 ? 'Joined' : 'Left' }}: {{ date.slice(0, 10) }}
                         </li>
                     </ul>
                 </div>
-                <p class="text-shadow mb-2">Time as NAT: {{ calculateDuration('nat') }}</p>
-                <div class="text-shadow">
+                <p v-if="user.natDuration.length" class="text-shadow mb-2">Time as NAT: {{ calculateDuration('nat') }}</p>
+                <div v-if="user.natDuration.length" class="text-shadow">
                     <ul style="list-style-type: none">
                         <li class="small" v-for="(date, i) in user.natDuration" :key="date">
                             {{ i % 2 == 0 ? 'Joined' : 'Left' }}: {{ date.slice(0, 10) }}
@@ -42,29 +42,30 @@
                         :class="{ 'btn-nat-green': !user.vetoMediator, 'btn-nat-red': user.vetoMediator }"
                         @click="switchMediator($event)"
                     >
-                        {{ user.vetoMediator ? 'Mark as inactive' : 'Mark as active' }}
+                        {{ user.vetoMediator ? 'Deactivate' : 'Activate' }}
                     </button>
                 </p>
                 <p v-if="user.group != 'nat' && user.id == userId" class="text-shadow">
-                    BN Evaluation:
+                    BN Evaluation: {{ user.isBnEvaluator ? 'Active' : 'Inactive' }}
                     <button
-                        class="btn btn-sm"
+                        class="btn btn-sm ml-2"
                         :class="{ 'btn-nat-green': !user.isBnEvaluator, 'btn-nat-red': user.isBnEvaluator }"
                         @click="switchBnEvaluator($event)"
+                        data-toggle="tooltip" data-placement="top" title="Toggle ability to give input on BN applications"
                     >
-                        {{ user.isBnEvaluator ? 'Opt-out' : 'Opt-in' }}
+                        {{ user.isBnEvaluator ? 'Deactivate' : 'Activate' }}
                     </button>
                 </p>
                 <hr />
                 <span v-if="isLeader">
                     <button
-                        class="btn btn-nat-red btn-sm"
+                        class="btn btn-nat-red btn-sm minw-150"
                         @click="user.group == 'bn' ? switchGroup('nat', $event) : switchGroup('bn', $event)"
                     >
                         {{ user.group == 'bn' ? 'Move to NAT' : 'Move to BN' }}
                     </button>
                     <button
-                        class="btn btn-nat-red btn-sm"
+                        class="btn btn-nat-red btn-sm minw-200"
                         @click="removeGroup();"
                     >
                         Remove from {{user.group.toUpperCase()}}

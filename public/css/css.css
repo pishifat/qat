@@ -238,6 +238,14 @@ hr {
     padding: 0px; 
 }
 
+.minw-200{
+    min-width: 200px;
+}
+
+.minw-150{
+    min-width: 150px;
+}
+
 .segment {
     background-color: var(--dark);
     margin: 1rem 1rem 1rem 1rem;

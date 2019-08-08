@@ -188,25 +188,27 @@
         </table>
     </div>
     <div>
-        <button class="btn btn-sm btn-nat mx-2 mb-2 w-25" @click="findModCount()"
-            data-toggle="tooltip" data-placement="top" title="Finds unique mod count in the last 90 days. Only use on BNs with low activity">Load modding activity
-        </button>
-        <span v-if="loadingModCount" class="small">Finding mods (this will take a few seconds...)</span>
-        <ul v-if="modCount" class="text-shadow">
-            <li class="min-spacing small">Month 1: {{modCount[0]}}</li>
-            <li class="min-spacing small">Month 2: {{modCount[1]}}</li>
-            <li class="min-spacing small">Month 3: {{modCount[2]}}</li>
-        </ul>
-    </div>
-    <div>
-        <button class="btn btn-sm btn-nat mx-2 mb-2 w-25" @click="findPreviousEvaluations()"
-            data-toggle="tooltip" data-placement="top" title="Finds previous evaluation results">Load old evaluations
-        </button>
-        <ul v-if="previousEvaluations">
-            <li class="small text-shadow" v-for="evaluation in previousEvaluations" :key="evaluation.id">
-                <b>{{evaluation.updatedAt.slice(0,10)}} - {{evaluation.consensus.toUpperCase()}}</b>: {{evaluation.feedback}}
-            </li>
-        </ul>
+        <div>
+            <button class="btn btn-sm btn-nat mx-2 mb-2 minw-200" @click="findModCount()"
+                data-toggle="tooltip" data-placement="right" title="Finds unique mod count in the last 90 days. Only use on BNs with low activity">Load modding activity
+            </button>
+            <span v-if="loadingModCount" class="small">Finding mods (this will take a few seconds...)</span>
+            <ul v-if="modCount" class="text-shadow">
+                <li class="min-spacing small">Month 1: {{modCount[0]}}</li>
+                <li class="min-spacing small">Month 2: {{modCount[1]}}</li>
+                <li class="min-spacing small">Month 3: {{modCount[2]}}</li>
+            </ul>
+        </div>
+        <div>
+            <button class="btn btn-sm btn-nat mx-2 mb-2 minw-200" @click="findPreviousEvaluations()"
+                data-toggle="tooltip" data-placement="right" title="Finds previous evaluation results">Load old evaluations
+            </button>
+            <ul v-if="previousEvaluations">
+                <li class="small text-shadow" v-for="evaluation in previousEvaluations" :key="evaluation.id">
+                    <b>{{evaluation.updatedAt.slice(0,10)}} - {{evaluation.consensus.toUpperCase()}}</b>: {{evaluation.feedback}}
+                </li>
+            </ul>
+        </div>
     </div>
 
 </div>

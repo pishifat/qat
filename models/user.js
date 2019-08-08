@@ -13,7 +13,9 @@ const userSchema = new mongoose.Schema({
     isSpectator: { type: Boolean, default: false },
     bnDuration: [{ type: Date }],
     natDuration: [{ type: Date }],
-    isLeader: { type: Boolean }
+    isLeader: { type: Boolean },
+    bnProfileBadge: { type: Number, default: 0 },
+    natProfileBadge: { type: Number, default: 0 }
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 const User = mongoose.model('User', userSchema);

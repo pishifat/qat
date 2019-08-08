@@ -46,35 +46,4 @@ router.get('/showErrors', async (req, res, next) => {
     }
 });
 
-router.get('/getNatActivity', async (req, res, next) => {
-    let users = await usersService.query({ group: 'nat' }, {}, {}, true);
-    let evaluations = await evalsService.query({}, {}, {}, true);
-
-    class obj 
-    {
-        constructor(username, totalEvaluations) 
-        {
-            this.username = username;
-            this.totalEvaluations = totalEvaluations;
-        }
-    }
-
-    let minDate = new Date();
-    minDate.setDate(minDate.getDate() - 60);
-    let info = [];
-    users.forEach(user => {
-        let count = 0;
-        evaluations.forEach(evaluation => {
-            if(evaluation.evaluator.toString() == user.id && evaluation.createdAt > minDate){
-                count++;
-            }     
-        });
-        info.push(new obj(user.username, count));
-    });
-    
-    //this is not done yet
-
-    res.json(info);
-});
-
 module.exports = router;

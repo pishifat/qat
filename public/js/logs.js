@@ -32,16 +32,4 @@ $(function () {
             });
         });
     });
-
-    $('#showActivity').click(function () {
-        $.getJSON(`/logs/getNatActivity`).done(function (info) {
-            $.each(info, function (k, info) {
-                $(`<tr>
-                    <td scope="row">${info.username}</td>
-                    <td scope="row">Total evaluations: ${info.totalEvaluations}</td>
-                    <td scope="row">~</td>
-                </tr>`).hide().prependTo('tbody').fadeIn();
-            });
-        });
-    });
 });
