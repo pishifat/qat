@@ -2,6 +2,7 @@ const express = require('express');
 const api = require('../helpers/api');
 const usersService = require('../models/user').service;
 const logsService = require('../models/log').service;
+const bnAppsService = require('../models/bnApp').service;
 const evalsService = require('../models/evaluation').service;
 const aiessService = require('../models/aiess').service;
 
@@ -207,6 +208,61 @@ router.get('/findBnActivity/:days', async (req, res) => {
             }
         }
         info.push(new obj(user.username, user.osuId, user.modes, uniqueNominations.length, nominationResets, beatmapReports));
+    });
+
+    res.json(info);
+});
+
+/* GET potential NAT info */
+router.get('/findPotentialNatInfo/', async (req, res, next) => {
+    class obj 
+    {
+        constructor(username, osuId, modes, evaluatedApps) 
+        {
+            this.username = username;
+            this.osuId = osuId;
+            this.modes = modes;
+            this.evaluatedApps = evaluatedApps;
+        }
+    }
+
+    const appPopulate = [
+        { populate: 'applicant', display: 'username osuId' },
+        { populate: 'bnEvaluators', display: 'username osuId' },
+        { populate: 'test', display: 'totalScore' },
+        {
+            populate: 'evaluations',
+            display: 'evaluator behaviorComment moddingComment vote',
+        },
+        {
+            innerPopulate: 'evaluations',
+            populate: { path: 'evaluator', select: 'username osuId group' },
+        },
+    ];
+
+    const [users, applications] = await Promise.all([
+        usersService.query({ 
+            group: 'bn', 
+            $or: [
+                { isSpectator: false }, 
+                { isSpectator: { $exists: false } },
+            ],
+            isBnEvaluator: true }, 
+        {}, { username: 1 }, true),
+        bnAppsService.query({ bnEvaluators: { $exists: true, $not: { $size: 0 } }, active: false }, appPopulate, {}, true),
+    ]);
+
+    let info = [];
+    users.forEach(user => {
+        let evaluatedApps = [];
+        applications.forEach(app => {
+            app.evaluations.forEach(evaluation => {
+                if(evaluation.evaluator.id == user.id){
+                    evaluatedApps.push(app);
+                }
+            });
+        });
+        info.push(new obj(user.username, user.osuId, user.modes, evaluatedApps));
     });
 
     res.json(info);
