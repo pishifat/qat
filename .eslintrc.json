@@ -54,6 +54,7 @@
             "error",
             "always"
         ],
+        "object-shorthand": "error",
         "require-await": "error",
         "vue/html-indent": [
             "error", 

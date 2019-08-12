@@ -17,14 +17,16 @@ router.get('/', async (req, res) => {
 
     let isBnOrNat = user && user.isBnOrNat;
     let isBn = user && user.isBn;
+    let isNat = user && user.isNat;
     
     res.render('qatIndex', {
         title: 'NAT',
         layout: false,
         loggedInAs: req.session.mongoId,
-        isBnOrNat: isBnOrNat,
-        isBn: isBn,
-        allUsersByMode: allUsersByMode,
+        isBnOrNat,
+        isBn,
+        isNat,
+        allUsersByMode,
     });
 });
 

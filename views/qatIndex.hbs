@@ -39,45 +39,34 @@
         </div>
         {{/unless}}
         {{#if loggedInAs}}
-        <div class="text-center mt-3 segment mx-auto" style="max-width: 600px">
-            <div class="col-md-12">
-                <div class="row">
-                    {{#if isBn}}
-                    <h3 class="col-md-6"><a href="/bnapps" class="lead">BN Applications</a></h3>
-                    <h3 class="col-md-6"><a href="/reports" class="lead">Reports</a></h3>
-                    {{else}}
-                    <h3 class="col-md-4"><a href="/bnapps" class="lead">BN Applications</a></h3>
-                    <h3 class="col-md-4"><a href="/reports" class="lead">Reports</a></h3>
-                    <h3 class="col-md-4"><a href="/users" class="lead">BN/NAT Listing</a></h3>
-                    {{/if}}
-                </div>
-                {{#if isBnOrNat}}
-                <div class="row">
-                    {{#if isBn}}
-                    <h3 class="col-md-6"><a href="/vetoes" class="lead">Vetoes</a></h3>
-                    <h3 class="col-md-6"><a href="/users" class="lead">BN/NAT Listing</a></h3>
-                    {{else}}
-                    <h3 class="col-md-4"><a href="/appeval" class="lead">BN App Evals</a></h3>
-                    <h3 class="col-md-4"><a href="/bneval" class="lead">Current BN Evals</a></h3>
-                    <h3 class="col-md-4"><a href="/evalarchive" class="lead">Eval Archive</a></h3>
-                    {{/if}}
-                </div>
-                {{/if}}
-                {{#if isBnOrNat}}
-                    {{#unless isBn}}
-                        <div class="row">
-                            <h3 class="col-md-4"><a href="/managetest" class="lead">Test Questions</a></h3>
-                            <h3 class="col-md-4"><a href="/testresults" class="lead">Test Results</a></h3>
-                            <h3 class="col-md-4"><a href="/managereports" class="lead">Manage Reports</a></h3>
-                        </div>
-                        <div class="row">
-                            <h3 class="col-md-4"><a href="/vetoes" class="lead">Vetoes</a></h3>
-                            <h3 class="col-md-4"><a href="/rcvote" class="lead">RC Vote</a></h3>
-                            <h3 class="col-md-4"><a href="/datacollection" class="lead">Data Collection</a></h3>
-                        </div>
-                    {{/unless}}
-                {{/if}}
-            </div>
+        <div class="text-center mt-3 segment mx-auto row" style="max-width: 600px">
+            
+            {{#unless isBnOrNat}}
+            <h3 class="col-md-12"><a href="/bnapps" class="lead">BN Applications</a></h3>
+            <h3 class="col-md-12"><a href="/reports" class="lead">Reports</a></h3>
+            <h3 class="col-md-12"><a href="/users" class="lead">BN/NAT Listing</a></h3>
+            {{/unless}}
+
+            {{#if isBn}}
+            <h3 class="col-md-4"><a href="/bnapps" class="lead">BN Applications</a></h3>
+            <h3 class="col-md-4"><a href="/reports" class="lead">Reports</a></h3>
+            <h3 class="col-md-4"><a href="/users" class="lead">BN/NAT Listing</a></h3>
+
+            <h3 class="col-md-6"><a href="/vetoes" class="lead">Vetoes</a></h3>
+            <h3 class="col-md-6"><a href="/rcvote" class="lead">RC Vote</a></h3>
+            {{else if isNat}}
+            <h3 class="col-md-4"><a href="/vetoes" class="lead">Vetoes</a></h3>
+            <h3 class="col-md-4"><a href="/rcvote" class="lead">RC Vote</a></h3>
+            <h3 class="col-md-4"><a href="/managereports" class="lead">Manage Reports</a></h3>
+
+            <h3 class="col-md-4"><a href="/appeval" class="lead">BN App Evals</a></h3>
+            <h3 class="col-md-4"><a href="/bneval" class="lead">Current BN Evals</a></h3>
+            <h3 class="col-md-4"><a href="/evalarchive" class="lead">Eval Archive</a></h3>
+            
+            <h3 class="col-md-4"><a href="/datacollection" class="lead">Data Collection</a></h3>
+            <h3 class="col-md-4"><a href="/managetest" class="lead">Test Questions</a></h3>
+            <h3 class="col-md-4"><a href="/testresults" class="lead">Test Results</a></h3>
+            {{/if}}
         </div>
         {{/if}}
     </div>
