@@ -1,5 +1,5 @@
 const express = require('express');
-const api = require('../models/api');
+const api = require('../helpers/api');
 const questionsService = require('../models/bnTest/question').service;
 const optionsService = require('../models/bnTest/option').service;
 const logsService = require('../models/log').service;
@@ -10,13 +10,13 @@ router.use(api.isLoggedIn);
 router.use(api.isNat);
 
 /* GET bn app page */
-router.get('/', async (req, res, next) => {
+router.get('/', (req, res) => {
     res.render('rcTest/managetest', {
         title: 'Manage RC Test',
         script: '../javascripts/manageTest.js',
         isTest: true,
-        isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
-        isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
+        isBnOrNat: res.locals.userRequest.isBnOrNat,
+        isNat: res.locals.userRequest.isNat,
     });
 });
 
@@ -26,9 +26,9 @@ const defaultPopulate = [
 ];
 
 /* GET applicant listing. */
-router.get('/load/:type', async (req, res, next) => {
-    let q = await questionsService.query({ category: req.params.type }, defaultPopulate, {createdAt: -1}, true);
-    res.json({questions: q, isSpectator: res.locals.userRequest.isSpectator});
+router.get('/load/:type', async (req, res) => {
+    let q = await questionsService.query({ category: req.params.type }, defaultPopulate, { createdAt: -1 }, true);
+    res.json({ questions: q, isSpectator: res.locals.userRequest.isSpectator });
 });
 
 /* POST add question */
@@ -117,8 +117,8 @@ router.post('/updateOption/:id', async (req, res) => {
 /* POST edit option activity */
 router.post('/toggleActiveOption/', async (req, res) => {
     for (let i = 0; i < req.body.checkedOptions.length; i++) {
-        let o = await optionsService.query({_id: req.body.checkedOptions[i]});
-        await optionsService.update(req.body.checkedOptions[i], {active: !o.active});
+        let o = await optionsService.query({ _id: req.body.checkedOptions[i] });
+        await optionsService.update(req.body.checkedOptions[i], { active: !o.active });
     }
     let q = await questionsService.query({ _id: req.body.questionId }, defaultPopulate);
     res.json(q);

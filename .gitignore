@@ -25,5 +25,5 @@ jspm_packages/
 .env
 
 config.json
+dist/
 public/javascripts/
-.prettierrc

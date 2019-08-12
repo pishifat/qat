@@ -6,7 +6,7 @@ const evaluationSchema = new mongoose.Schema({
     evaluator: { type: 'ObjectId', ref: 'User', required: true },
     behaviorComment: { type: String, required: true },
     moddingComment: { type: String, required: true },
-    vote: { type: Number, enum: [1, 2, 3] }
+    vote: { type: Number, enum: [1, 2, 3] },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 const Evaluation = mongoose.model('Evaluation', evaluationSchema);
@@ -26,7 +26,7 @@ class EvaluationService extends BaseService
      */
     async create(evaluatorId, behaviorComment, moddingComment, vote) {
         try {
-            return await Evaluation.create({evaluator: evaluatorId, behaviorComment: behaviorComment, moddingComment: moddingComment, vote: vote});
+            return await Evaluation.create({ evaluator: evaluatorId, behaviorComment: behaviorComment, moddingComment: moddingComment, vote: vote });
         } catch(error) {
             logsService.create(null, JSON.stringify(error), true);
             return { error: error._message };

@@ -1,8 +1,8 @@
 const querystring = require('querystring');
 const config = require('../config.json');
-const users = require('./user.js');
+const users = require('../models/user.js');
 const axios = require('axios');
-const logsService = require('./log').service;
+const logsService = require('../models/log').service;
 
 async function getToken(code) {
     const postData = querystring.stringify({
@@ -10,7 +10,7 @@ async function getToken(code) {
         code: code,
         redirect_uri: config.redirect,
         client_id: config.id,
-        client_secret: config.secret
+        client_secret: config.secret,
     });
 
     const options = {
@@ -19,7 +19,7 @@ async function getToken(code) {
         headers: { 
             'Content-Type': 'application/x-www-form-urlencoded',
         },
-        data: postData
+        data: postData,
     };
 
     try {
@@ -35,7 +35,7 @@ async function refreshToken(refreshToken) {
         grant_type: 'refresh_token',
         client_id: config.id,
         client_secret: config.secret,
-        refresh_token: refreshToken
+        refresh_token: refreshToken,
     });
 
     const options = { 
@@ -44,7 +44,7 @@ async function refreshToken(refreshToken) {
         headers: { 
             'Content-Type': 'application/x-www-form-urlencoded',
         },
-        data: postData
+        data: postData,
     };
 
     try {
@@ -61,7 +61,7 @@ async function getUserInfo(token) {
         url: 'https://osu.ppy.sh/api/v2/me',
         headers: {
             Authorization: `Bearer ${token}`,
-        }
+        },
     };
 
     try {
@@ -127,7 +127,7 @@ async function isLoggedIn(req, res, next) {
     }
 }
 
-async function isBnOrNat(req, res, next) {
+function isBnOrNat(req, res, next) {
     const u = res.locals.userRequest;
     
     if (u.group == 'bn' || u.group == 'nat' || u.isSpectator) {
@@ -137,7 +137,7 @@ async function isBnOrNat(req, res, next) {
     }
 }
 
-async function isNat(req, res, next) {
+function isNat(req, res, next) {
     const u = res.locals.userRequest;
     
     if (u.group == 'nat' || u.isSpectator) {
@@ -147,7 +147,7 @@ async function isNat(req, res, next) {
     }
 }
 
-async function isLeader(req, res, next) {
+function isLeader(req, res, next) {
     const u = res.locals.userRequest;
     
     if (u.isLeader) {
@@ -157,7 +157,7 @@ async function isLeader(req, res, next) {
     }
 }
 
-async function isBnEvaluator(req, res, next) {
+function isBnEvaluator(req, res, next) {
     const u = res.locals.userRequest;
     
     if (u.isBnEvaluator || u.group == 'nat') {
@@ -167,46 +167,69 @@ async function isBnEvaluator(req, res, next) {
     }
 }
 
-function webhookPost(message, mode) {
-    let url;
-    if(mode == 'osu') url = `https://discordapp.com/api/webhooks/${config.standardWebhook.id}/${config.standardWebhook.token}`;
-    if(mode == 'taiko') url = `https://discordapp.com/api/webhooks/${config.taikoWebhook.id}/${config.taikoWebhook.token}`;
-    if(mode == 'catch') url = `https://discordapp.com/api/webhooks/${config.catchWebhook.id}/${config.catchWebhook.token}`;
-    if(mode == 'mania') url = `https://discordapp.com/api/webhooks/${config.maniaWebhook.id}/${config.maniaWebhook.token}`;
-    if(!mode) url = `https://discordapp.com/api/webhooks/${config.reportWebhook.id}/${config.reportWebhook.token}`;
-    axios.post(url, {
-        embeds: message
-    })
-    .catch(error => {
-        logsService.create(null, error, null, 'error');
-    });
+async function webhookPost(message, mode) {
+    let url = 'https://discordapp.com/api/webhooks/';
+
+    switch (mode) {
+        case 'osu':
+            url += `${config.standardWebhook.id}/${config.standardWebhook.token}`;
+            break;
+        case 'taiko':
+            url += `${config.taikoWebhook.id}/${config.taikoWebhook.token}`;
+            break;
+        case 'catch':
+            url += `${config.catchWebhook.id}/${config.catchWebhook.token}`;
+            break;
+        case 'mania':
+            url += `${config.maniaWebhook.id}/${config.maniaWebhook.token}`;
+            break;
+        default:
+            url += `${config.reportWebhook.id}/${config.reportWebhook.token}`;
+            break;
+    }
+
+    try {
+        await axios.post(url, {
+            embeds: message,
+        });
+    } catch (error) {
+        logsService.create(null, JSON.stringify(error), true);
+    }
 }
 
-function highlightWebhookPost(message, mode) {
-    let url;
+async function highlightWebhookPost(message, mode) {
+    let url = 'https://discordapp.com/api/webhooks/';
     let role;
-    if(mode == 'osu'){
-        url = `https://discordapp.com/api/webhooks/${config.standardWebhook.id}/${config.standardWebhook.token}`;
-        role = "<@" + config.standardWebhook.role + ">";
-    }if(mode == 'taiko'){
-        url = `https://discordapp.com/api/webhooks/${config.taikoWebhook.id}/${config.taikoWebhook.token}`;
-        role = "<@" + config.taikoWebhook.role + ">";
+
+    switch (mode) {
+        case 'osu':
+            url += `${config.standardWebhook.id}/${config.standardWebhook.token}`;
+            role = '<@' + config.standardWebhook.role + '>';
+            break;
+        case 'taiko':
+            url += `${config.taikoWebhook.id}/${config.taikoWebhook.token}`;
+            role = '<@' + config.taikoWebhook.role + '>';
+            break;
+        case 'catch':
+            url += `${config.catchWebhook.id}/${config.catchWebhook.token}`;
+            role = '<@' + config.catchWebhook.role + '>';
+            break;
+        case 'mania':
+            url += `${config.maniaWebhook.id}/${config.maniaWebhook.token}`;
+            role = '<@' + config.maniaWebhook.role + '>';
+            break;
+        default:
+            url += `${config.reportWebhook.id}/${config.reportWebhook.token}`;
+            break;
     }
-    if(mode == 'catch'){
-        url = `https://discordapp.com/api/webhooks/${config.catchWebhook.id}/${config.catchWebhook.token}`;
-        role = "<@" + config.catchWebhook.role + ">";
+
+    try {
+        await axios.post(url, {
+            content: role + ' ' + message,
+        });
+    } catch (error) {
+        logsService.create(null, JSON.stringify(error), true);
     }
-    if(mode == 'mania'){
-        url = `https://discordapp.com/api/webhooks/${config.maniaWebhook.id}/${config.maniaWebhook.token}`;
-        role = "<@" + config.maniaWebhook.role + ">";
-    }
-    if(!mode) url = `https://discordapp.com/api/webhooks/${config.reportWebhook.id}/${config.reportWebhook.token}`;
-    axios.post(url, {
-        content: role + " " + message
-    })
-    .catch(error => {
-        logsService.create(null, error, null, 'error');
-    });
 }
 
 module.exports = { isLoggedIn, getToken, getUserInfo, beatmapsetInfo, beatmapsetOwnerMaps, isBnOrNat, isNat, isLeader, isBnEvaluator, webhookPost, highlightWebhookPost };

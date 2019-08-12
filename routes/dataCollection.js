@@ -1,5 +1,5 @@
 const express = require('express');
-const api = require('../models/api');
+const api = require('../helpers/api');
 const aiessService = require('../models/aiess').service;
 const logsService = require('../models/log').service;
 
@@ -9,22 +9,22 @@ router.use(api.isLoggedIn);
 router.use(api.isNat);
 
 /* GET eval archive page */
-router.get('/', async (req, res, next) => {
+router.get('/', (req, res) => {
     res.render('evaluations/datacollection', {
         title: 'Data Collection',
         script: '../javascripts/dataCollection.js',
         isDataCollection: true,
-        isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
-        isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
+        isBnOrNat: res.locals.userRequest.isBnOrNat,
+        isNat: res.locals.userRequest.isNat,
     });
 });
 
 /* GET dq/pop listing */
-router.get('/relevantInfo', async (req, res, next) => {
+router.get('/relevantInfo', async (req, res) => {
     let date = new Date();
     date.setDate(date.getDate() - 30);
     let data = await aiessService.query(
-        { $or: [{eventType: 'Disqualified'}, {eventType: 'Popped'}, {eventType: 'Reported'}], timestamp: { $gte: date } },
+        { $or: [{ eventType: 'Disqualified' }, { eventType: 'Popped' }, { eventType: 'Reported' }], timestamp: { $gte: date } },
         {},
         { timestamp: -1 },
         true
@@ -32,7 +32,8 @@ router.get('/relevantInfo', async (req, res, next) => {
     res.json({
         events: data, 
         mode: res.locals.userRequest.modes[0],
-        isSpectator: res.locals.userRequest.isSpectator});
+        isSpectator: res.locals.userRequest.isSpectator, 
+    });
 });
 
 /* POST edit reason for dq/pop */

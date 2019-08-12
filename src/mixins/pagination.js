@@ -7,7 +7,7 @@ const pagination = {
             currentPage: null,
             canShowOlder: true,
             count: 24,
-        }
+        };
     },
     watch: {
         limit: function() {
@@ -15,8 +15,8 @@ const pagination = {
         },
     },
     methods: {
-		changePage: function() {
-			this.limit = Math.round(this.limit);
+        changePage: function() {
+            this.limit = Math.round(this.limit);
             this.pre = this.limit - this.count;
             if (this.allObjs) {
                 if (this.isFiltered) {
@@ -50,7 +50,7 @@ const pagination = {
                 this.canShowOlder = true;
             }
         },
-    }
-}
+    },
+};
 
 export default pagination;

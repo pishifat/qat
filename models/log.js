@@ -1,14 +1,14 @@
 const mongoose = require('mongoose');
 
-var logSchema = new mongoose.Schema({
-    user: { type: 'ObjectId', ref: 'User'},
+let logSchema = new mongoose.Schema({
+    user: { type: 'ObjectId', ref: 'User' },
     action: { type: String, required: true },
     isError: { type: Boolean, default: false },
     //modified: { type: 'ObjectId', refPath: 'modifiedModel' },
     //modifiedModel: { type: String, enum: ['user', 'bnApp', 'error'], required: true },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-var Log = mongoose.model('Log', logSchema);
+let Log = mongoose.model('Log', logSchema);
 
 class LogService
 {
@@ -55,7 +55,7 @@ class LogService
         try {
             return await query.exec();
         } catch(error) {
-            logsService.create(null, JSON.stringify(error), true);
+            this.create(null, JSON.stringify(error), true);
             return { error: error._message };
         }
     }
@@ -71,10 +71,11 @@ class LogService
             return await log.save();
         } catch(err) {
             console.log(err);
+            return undefined;
         }
     }
 }
 
-var service = new LogService();
+let service = new LogService();
 
 module.exports = { service, Log };

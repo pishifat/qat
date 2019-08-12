@@ -1,6 +1,5 @@
 const express = require('express');
-const helper = require('./helper');
-const api = require('../models/api');
+const api = require('../helpers/api');
 const usersService = require('../models/user').service;
 const logsService = require('../models/log').service;
 const evalsService = require('../models/evaluation').service;
@@ -11,18 +10,18 @@ const router = express.Router();
 router.use(api.isLoggedIn);
 
 /* GET bn app page */
-router.get('/', async (req, res, next) => {
+router.get('/', (req, res) => {
     res.render('users', {
         title: 'BN/NAT Listing',
         script: '../javascripts/users.js',
         isUsers: true,
-        isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
-        isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
+        isBnOrNat: res.locals.userRequest.isBnOrNat,
+        isNat: res.locals.userRequest.isNat,
     });
 });
 
 /* GET applicant listing. */
-router.get('/relevantInfo', async (req, res, next) => {
+router.get('/relevantInfo', async (req, res) => {
     let u = await usersService.query(
         { $or: [{ group: 'nat' }, { group: 'bn' }], isSpectator: { $ne: true }  },
         {},
@@ -52,7 +51,7 @@ router.post('/switchBnEvaluator/', api.isBnOrNat, async (req, res) => {
 
 /* POST switch usergroup */
 router.post('/switchGroup/:id', api.isLeader, async (req, res) => {
-    let u = await usersService.update(req.params.id, { group: req.body.group,  probation: [], $push: {bnDuration: new Date(), natDuration: new Date()} });
+    let u = await usersService.update(req.params.id, { group: req.body.group,  probation: [], $push: { bnDuration: new Date(), natDuration: new Date() } });
     res.json(u);
     logsService.create(
         req.session.mongoId,
@@ -62,12 +61,12 @@ router.post('/switchGroup/:id', api.isLeader, async (req, res) => {
 
 /* POST remove from BN/NAT without evaluation */
 router.post('/removeGroup/:id', api.isLeader, async (req, res) => {
-    let u = await usersService.query({_id: req.params.id});
+    let u = await usersService.query({ _id: req.params.id });
     let logGroup = u.group;
     if(u.group == 'bn'){
-        u = await usersService.update(req.params.id, { group: 'user',  probation: [], modes: [], $push: {bnDuration: new Date()} });
+        u = await usersService.update(req.params.id, { group: 'user',  probation: [], modes: [], $push: { bnDuration: new Date() } });
     }else if(u.group == 'nat'){
-        u = await usersService.update(req.params.id, { group: 'user',  probation: [], modes: [], $push: {natDuration: new Date()} });
+        u = await usersService.update(req.params.id, { group: 'user',  probation: [], modes: [], $push: { natDuration: new Date() } });
     }
     res.json(u);
     logsService.create(
@@ -77,7 +76,7 @@ router.post('/removeGroup/:id', api.isLeader, async (req, res) => {
 });
 
 /* GET all users with badge info */
-router.get('/findUserBadgeInfo', async (req, res, next) => {
+router.get('/findUserBadgeInfo', async (req, res) => {
     let u = await usersService.query(
         { $or: [{ 'bnDuration.0': { $exists: true } }, { 'natDuration.0': { $exists: true } }] },
         {},
@@ -92,7 +91,7 @@ router.post('/editBadgeValue/:id', api.isLeader, async (req, res) => {
     let u = await usersService.query({ _id: req.params.id });
     if(res.locals.userRequest.osuId == '3178418'){ //i dont want anyone else messing with this
         let years;
-        let num = req.body.add ? 1 : -1
+        let num = req.body.add ? 1 : -1;
         if(req.body.group == 'bn'){
             years = u.bnProfileBadge + num;
             await usersService.update(req.params.id, { bnProfileBadge: years });
@@ -106,16 +105,16 @@ router.post('/editBadgeValue/:id', api.isLeader, async (req, res) => {
     
 });
 
-router.get('/findNatActivity/:days', async (req, res, next) => {
+router.get('/findNatActivity/:days', async (req, res) => {
     const [users, evaluations] = await Promise.all([
         usersService.query({ 
             group: 'nat', 
             $or: [
                 { isSpectator: false }, 
-                { isSpectator: { $exists: false } }
+                { isSpectator: { $exists: false } },
             ] }, 
-            {}, {username: 1}, true),
-            await evalsService.query({}, {}, {}, true)
+        {}, { username: 1 }, true),
+        await evalsService.query({}, {}, {}, true),
     ]);
 
     class obj 
@@ -145,7 +144,7 @@ router.get('/findNatActivity/:days', async (req, res, next) => {
     res.json(info);
 });
 
-router.get('/findBnActivity/:days', async (req, res, next) => {
+router.get('/findBnActivity/:days', async (req, res) => {
     class obj 
     {
         constructor(username, osuId, modes, uniqueNominations, nominationResets, beatmapReports) 
@@ -167,10 +166,10 @@ router.get('/findBnActivity/:days', async (req, res, next) => {
             group: 'bn', 
             $or: [
                 { isSpectator: false }, 
-                { isSpectator: { $exists: false } }
+                { isSpectator: { $exists: false } },
             ] }, 
-            {}, {username: 1}, true),
-        aiessService.getAllActivity(minDate, maxDate)
+        {}, { username: 1 }, true),
+        aiessService.getAllActivity(minDate, maxDate),
     ]);
 
     let info = [];

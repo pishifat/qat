@@ -1,6 +1,6 @@
 const express = require('express');
-const api = require('../models/api');
-const helper = require('./helper');
+const api = require('../helpers/api');
+const helper = require('../helpers/helpers');
 const logsService = require('../models/log').service;
 const evalsService = require('../models/evaluation').service;
 const reportsService = require('../models/report').service;
@@ -15,13 +15,13 @@ router.use(api.isLoggedIn);
 router.use(api.isNat);
 
 /* GET bn app page */
-router.get('/', async (req, res, next) => {
+router.get('/', (req, res) => {
     res.render('evaluations/bneval', {
         title: 'Current BN Evaluations',
         script: '../javascripts/bnEval.js',
         isEval: true,
-        isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
-        isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
+        isBnOrNat: res.locals.userRequest.isBnOrNat,
+        isNat: res.locals.userRequest.isNat,
     });
 });
 
@@ -39,11 +39,11 @@ const defaultPopulate = [
 ];
 
 /* GET applicant listing. */
-router.get('/relevantInfo', async (req, res, next) => {
+router.get('/relevantInfo', async (req, res) => {
     let minDate = new Date();
     minDate.setDate(minDate.getDate() + 14);
     const [er, r] = await Promise.all([
-        await evalRoundsService.query({ active: true, deadline: { $lte: minDate }, }, defaultPopulate, { deadline: 1, consensus: 1, feedback: 1 }, true),
+        await evalRoundsService.query({ active: true, deadline: { $lte: minDate } }, defaultPopulate, { deadline: 1, consensus: 1, feedback: 1 }, true),
         await reportsService.query(
             { valid: { $exists: true, $ne: 3 }, feedback: { $exists: true, $nin: '' } },
             {},
@@ -104,11 +104,11 @@ router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
             if (!isNaN(userToSearch)) {
                 userToSearch = parseInt(userToSearch);
                 u = await usersService.query({
-                    osuId: userToSearch
+                    osuId: userToSearch,
                 });
             } else {
                 u = await usersService.query({
-                    username: new RegExp('^' + helper.escapeUsername(includeUsers[i].trim()) + '$', 'i')
+                    username: new RegExp('^' + helper.escapeUsername(includeUsers[i].trim()) + '$', 'i'),
                 });
             }
             if (u && !u.error) {
@@ -138,7 +138,7 @@ router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
 
         let minDate = new Date();
         minDate.setDate(minDate.getDate() + 14);
-        let ers = await evalRoundsService.query({ active: true, deadline: { $lte: minDate }, }, defaultPopulate, { deadline: 1, consensus: 1, feedback: 1 }, true);
+        let ers = await evalRoundsService.query({ active: true, deadline: { $lte: minDate } }, defaultPopulate, { deadline: 1, consensus: 1, feedback: 1 }, true);
         res.json({ ers: ers, failed: failed });
         logsService.create(
             req.session.mongoId,
@@ -165,21 +165,21 @@ router.post('/submitEval/:id', async (req, res) => {
             req.body.vote
         );
         await evalRoundsService.update(req.params.id, { $push: { evaluations: ev._id } });
-        let er = await evalRoundsService.query({_id: req.params.id}, defaultPopulate);
+        let er = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
         api.webhookPost(
             [{
                 author: {
                     name: `${req.session.username}`,
                     icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                    url: `https://osu.ppy.sh/users/${req.session.osuId}`
-            },
+                    url: `https://osu.ppy.sh/users/${req.session.osuId}`,
+                },
                 color: '7864218',
                 fields:[
                     {
-                        name: `http://bn.mappersguild.com/bneval`,
-                        value: `submitted current BN eval for **${er.bn.username}**`
-                    }
-                ]
+                        name: 'http://bn.mappersguild.com/bneval',
+                        value: `submitted current BN eval for **${er.bn.username}**`,
+                    },
+                ],
             }], 
             er.mode
         );
@@ -192,25 +192,25 @@ router.post('/submitEval/:id', async (req, res) => {
                 if(evaluation.vote == 1) pass++;
                 else if(evaluation.vote == 2) extend++;
                 else if(evaluation.vote == 3) fail++;
-            })
+            });
             api.webhookPost(
                 [{
                     author: {
                         name: `${er.bn.username}`,
                         icon_url: `https://a.ppy.sh/${er.bn.osuId}`,
-                        url: `https://osu.ppy.sh/users/${er.bn.osuId}`
-                },
+                        url: `https://osu.ppy.sh/users/${er.bn.osuId}`,
+                    },
                     color: '14855903',
                     fields:[
                         {
-                            name: `http://bn.mappersguild.com/bneval`,
-                            value: `Moved current BN eval to group discussion`
+                            name: 'http://bn.mappersguild.com/bneval',
+                            value: 'Moved current BN eval to group discussion',
                         },
                         {
-                            name: `Votes`,
-                            value: `Pass: **${pass}**, Extend: **${extend}**, Fail: **${fail}**`
-                        }
-                    ]
+                            name: 'Votes',
+                            value: `Pass: **${pass}**, Extend: **${extend}**, Fail: **${fail}**`,
+                        },
+                    ],
                 }], 
                 er.mode
             );
@@ -228,7 +228,7 @@ router.post('/submitEval/:id', async (req, res) => {
 router.post('/setGroupEval/', api.isLeader, async (req, res) => {
     for (let i = 0; i < req.body.checkedRounds.length; i++) {
         await evalRoundsService.update(req.body.checkedRounds[i], { discussion: true });
-        let er = await evalRoundsService.query({_id: req.body.checkedRounds[i]}, defaultPopulate);
+        let er = await evalRoundsService.query({ _id: req.body.checkedRounds[i] }, defaultPopulate);
         let pass = 0;
         let extend = 0;
         let fail = 0;
@@ -236,25 +236,25 @@ router.post('/setGroupEval/', api.isLeader, async (req, res) => {
             if(evaluation.vote == 1) pass++;
             else if(evaluation.vote == 2) extend++;
             else if(evaluation.vote == 3) fail++;
-        })
+        });
         api.webhookPost(
             [{
                 author: {
                     name: `${er.bn.username}`,
                     icon_url: `https://a.ppy.sh/${er.bn.osuId}`,
-                    url: `https://osu.ppy.sh/users/${er.bn.osuId}`
-            },
+                    url: `https://osu.ppy.sh/users/${er.bn.osuId}`,
+                },
                 color: '14855903',
                 fields:[
                     {
-                        name: `http://bn.mappersguild.com/bneval`,
-                        value: `Moved current BN eval to group discussion`
+                        name: 'http://bn.mappersguild.com/bneval',
+                        value: 'Moved current BN eval to group discussion',
                     },
                     {
-                        name: `Votes`,
-                        value: `Pass: **${pass}**, Extend: **${extend}**, Fail: **${fail}**`
-                    }
-                ]
+                        name: 'Votes',
+                        value: `Pass: **${pass}**, Extend: **${extend}**, Fail: **${fail}**`,
+                    },
+                ],
             }], 
             er.mode
         );
@@ -262,7 +262,7 @@ router.post('/setGroupEval/', api.isLeader, async (req, res) => {
 
     let minDate = new Date();
     minDate.setDate(minDate.getDate() + 14);
-    let ev = await evalRoundsService.query({ active: true, deadline: { $lte: minDate }, }, defaultPopulate, { deadline: 1, consensus: 1, feedback: 1 }, true);
+    let ev = await evalRoundsService.query({ active: true, deadline: { $lte: minDate } }, defaultPopulate, { deadline: 1, consensus: 1, feedback: 1 }, true);
     res.json(ev);
     logsService.create(
         req.session.mongoId,
@@ -278,7 +278,7 @@ router.post('/setIndividualEval/', api.isLeader, async (req, res) => {
 
     let minDate = new Date();
     minDate.setDate(minDate.getDate() + 14);
-    let ev = await evalRoundsService.query({ active: true, deadline: { $lte: minDate }, }, defaultPopulate, { deadline: 1, consensus: 1, feedback: 1 }, true);
+    let ev = await evalRoundsService.query({ active: true, deadline: { $lte: minDate } }, defaultPopulate, { deadline: 1, consensus: 1, feedback: 1 }, true);
     res.json(ev);
     logsService.create(
         req.session.mongoId,
@@ -297,7 +297,7 @@ router.post('/setComplete/', api.isLeader, async (req, res) => {
             await usersService.update(u.id, { $pull: { probation: er.mode } });
             if (!u.modes.length) {
                 await usersService.update(u.id, { group: 'user' });
-                await usersService.update(u.id, { $push: {bnDuration: new Date() }});
+                await usersService.update(u.id, { $push: { bnDuration: new Date() } });
             }
         }
 
@@ -330,19 +330,19 @@ router.post('/setComplete/', api.isLeader, async (req, res) => {
                     author: {
                         name: `${u.username}`,
                         icon_url: `https://a.ppy.sh/${u.osuId}`,
-                        url: `https://osu.ppy.sh/users/${u.osuId}`
-                },
+                        url: `https://osu.ppy.sh/users/${u.osuId}`,
+                    },
                     color: '14855903',
                     fields:[
                         {
-                            name: `http://bn.mappersguild.com/bneval`,
-                            value: `Current BN eval archived`
+                            name: 'http://bn.mappersguild.com/bneval',
+                            value: 'Current BN eval archived',
                         },
                         {
-                            name: `Consensus`,
-                            value: `${er.consensus == 'pass' ? 'Pass' : er.consensus == 'extend' ? 'Extend' : 'Fail'}`
-                        }
-                    ]
+                            name: 'Consensus',
+                            value: `${er.consensus == 'pass' ? 'Pass' : er.consensus == 'extend' ? 'Extend' : 'Fail'}`,
+                        },
+                    ],
                 }], 
                 er.mode
             );
@@ -351,7 +351,7 @@ router.post('/setComplete/', api.isLeader, async (req, res) => {
 
     let minDate = new Date();
     minDate.setDate(minDate.getDate() + 14);
-    let ev = await evalRoundsService.query({ active: true, deadline: { $lte: minDate }, }, defaultPopulate, { deadline: 1, consensus: 1, feedback: 1 }, true);
+    let ev = await evalRoundsService.query({ active: true, deadline: { $lte: minDate } }, defaultPopulate, { deadline: 1, consensus: 1, feedback: 1 }, true);
     res.json(ev);
     logsService.create(
         req.session.mongoId,
@@ -373,15 +373,15 @@ router.post('/setConsensus/:id', async (req, res) => {
                 author: {
                     name: `${req.session.username}`,
                     icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                    url: `https://osu.ppy.sh/users/${req.session.osuId}`
-            },
+                    url: `https://osu.ppy.sh/users/${req.session.osuId}`,
+                },
                 color: '12025268',
                 fields:[
                     {
-                        name: `http://bn.mappersguild.com/bneval`,
-                        value: `**${ev.bn.username}**'s current BN eval set to **${req.body.consensus}**`
-                    }
-                ]
+                        name: 'http://bn.mappersguild.com/bneval',
+                        value: `**${ev.bn.username}**'s current BN eval set to **${req.body.consensus}**`,
+                    },
+                ],
             }], 
             ev.mode
         );
@@ -402,15 +402,15 @@ router.post('/setFeedback/:id', async (req, res) => {
             author: {
                 name: `${req.session.username}`,
                 icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                url: `https://osu.ppy.sh/users/${req.session.osuId}`
-        },
+                url: `https://osu.ppy.sh/users/${req.session.osuId}`,
+            },
             color: '7044532',
             fields:[
                 {
                     name: `Current BN eval feedback submitted (${er.consensus})`,
-                    value: `**${er.bn.username}**: ${req.body.feedback}`
-                }
-            ]
+                    value: `**${er.bn.username}**: ${req.body.feedback}`,
+                },
+            ],
         }], 
         er.mode
     );
@@ -445,7 +445,7 @@ router.get('/findPreviousEvaluations/:id', async (req, res) => {
     if(!evals.length){
         evals = await bnAppsService.query({ applicant: req.params.id, active: false, consensus: { $exists: true }, feedback: { $exists: true } }, {}, {}, true);
     }
-    res.json({previousEvaluations: evals});
+    res.json({ previousEvaluations: evals });
 });
 
 /* GET aiess info */
@@ -459,7 +459,7 @@ router.get('/userActivity/:id/:mode/:deadline', async (req, res) => {
     let maxDate = new Date(req.params.deadline);
     const [allUserEvents, allEvents] = await Promise.all([
         aiessService.getByEventTypeAndUser(parseInt(req.params.id), minDate, maxDate, req.params.mode),
-        aiessService.getAllByEventType(minDate, maxDate, req.params.mode)
+        aiessService.getAllByEventType(minDate, maxDate, req.params.mode),
     ]);
 
     if (allUserEvents.error || allEvents.error) return res.json({ error: 'Something went wrong!' });

@@ -9,17 +9,17 @@ const filters = {
             hasSeparation: false,
 
             sortBy: null,
-            asc: false
-        }
+            asc: false,
+        };
     },
     watch: {
-        filterValue: function(v) {
+        filterValue: function() {
             this.filter();
         },
-        filterMode: function(v) {
+        filterMode: function() {
             this.filter();
         },
-        filterVote: function(v) {
+        filterVote: function() {
             this.filter();
         },
     },
@@ -108,8 +108,8 @@ const filters = {
         
         sort: function (field, keepOrder) {
             this.sortBy = field;
-			if (!keepOrder) {
-				this.asc = !this.asc;
+            if (!keepOrder) {
+                this.asc = !this.asc;
             }
             if (this.sortBy == 'username') {
                 if(this.isFiltered){
@@ -137,7 +137,7 @@ const filters = {
                             if (a.createdAt < b.createdAt) return -1;
                         } else {
                             if (a.createdAt < b.createdAt) return 1;
-                            if (a.createdAt > b.createdAt) return -1
+                            if (a.createdAt > b.createdAt) return -1;
                         }
                         return 0;
                     });
@@ -148,7 +148,7 @@ const filters = {
                             if (a.createdAt < b.createdAt) return -1;
                         } else {
                             if (a.createdAt < b.createdAt) return 1;
-                            if (a.createdAt > b.createdAt) return -1
+                            if (a.createdAt > b.createdAt) return -1;
                         }
                         return 0;
                     });
@@ -162,7 +162,7 @@ const filters = {
                             if (this.sortDuration(a.bnDuration) < this.sortDuration(b.bnDuration)) return 1;
                         } else {
                             if (this.sortDuration(a.bnDuration) < this.sortDuration(b.bnDuration)) return -1;
-                            if (this.sortDuration(a.bnDuration) > this.sortDuration(b.bnDuration)) return 1
+                            if (this.sortDuration(a.bnDuration) > this.sortDuration(b.bnDuration)) return 1;
                         }
                         return 0;
                     });
@@ -173,7 +173,7 @@ const filters = {
                             if (this.sortDuration(a.bnDuration) < this.sortDuration(b.bnDuration)) return 1;
                         } else {
                             if (this.sortDuration(a.bnDuration) < this.sortDuration(b.bnDuration)) return -1;
-                            if (this.sortDuration(a.bnDuration) > this.sortDuration(b.bnDuration)) return 1
+                            if (this.sortDuration(a.bnDuration) > this.sortDuration(b.bnDuration)) return 1;
                         }
                         return 0;
                     });
@@ -186,7 +186,7 @@ const filters = {
                             if (this.sortDuration(a.natDuration) < this.sortDuration(b.natDuration)) return 1;
                         } else {
                             if (this.sortDuration(a.natDuration) < this.sortDuration(b.natDuration)) return -1;
-                            if (this.sortDuration(a.natDuration) > this.sortDuration(b.natDuration)) return 1
+                            if (this.sortDuration(a.natDuration) > this.sortDuration(b.natDuration)) return 1;
                         }
                         return 0;
                     });
@@ -197,7 +197,7 @@ const filters = {
                             if (this.sortDuration(a.natDuration) < this.sortDuration(b.natDuration)) return 1;
                         } else {
                             if (this.sortDuration(a.natDuration) < this.sortDuration(b.natDuration)) return -1;
-                            if (this.sortDuration(a.natDuration) > this.sortDuration(b.natDuration)) return 1
+                            if (this.sortDuration(a.natDuration) > this.sortDuration(b.natDuration)) return 1;
                         }
                         return 0;
                     });
@@ -209,7 +209,7 @@ const filters = {
                 this.canShowOlder = true;
             }
         },
-    }
-}
+    },
+};
 
 export default filters;

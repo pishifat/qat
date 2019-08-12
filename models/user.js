@@ -5,9 +5,9 @@ const BaseService = require('./baseService');
 const userSchema = new mongoose.Schema({
     osuId: { type: Number, required: true },
     username: { type: String, required: true },
-    group: { type: String, enum: ["bn", "nat", 'user'], default: 'user' },
-    modes: [{ type: String, enum: ["osu", "taiko", "catch", "mania"] }],
-    probation: [{ type: String, enum: ["osu", "taiko", "catch", "mania"] }],
+    group: { type: String, enum: ['bn', 'nat', 'user'], default: 'user' },
+    modes: [{ type: String, enum: ['osu', 'taiko', 'catch', 'mania'] }],
+    probation: [{ type: String, enum: ['osu', 'taiko', 'catch', 'mania'] }],
     vetoMediator: { type: Boolean, default: true },
     isBnEvaluator: { type: Boolean, default: true },
     isSpectator: { type: Boolean, default: false },
@@ -15,8 +15,20 @@ const userSchema = new mongoose.Schema({
     natDuration: [{ type: Date }],
     isLeader: { type: Boolean },
     bnProfileBadge: { type: Number, default: 0 },
-    natProfileBadge: { type: Number, default: 0 }
+    natProfileBadge: { type: Number, default: 0 },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
+
+userSchema.virtual('isBnOrNat').get(function() {
+    return this.group == 'bn' || this.group == 'nat' || this.isSpectator;
+});
+
+userSchema.virtual('isNat').get(function() {
+    return this.group == 'nat' || this.isSpectator;
+});
+
+userSchema.virtual('isBn').get(function() {
+    return this.group == 'bn' || this.isSpectator;
+});
 
 const User = mongoose.model('User', userSchema);
 
@@ -34,9 +46,9 @@ class UserService extends BaseService
      */
     async create(osuId, username, group) {
         try {
-            return await User.create({osuId: osuId, username: username, group: group});
+            return await User.create({ osuId: osuId, username: username, group: group });
         } catch(error) {
-            return { error: error._message }
+            return { error: error._message };
         }
     }
 
@@ -62,18 +74,18 @@ class UserService extends BaseService
                     { 
                         $match: { 
                             $or: [{ group: 'bn' }, 
-                                {$and:  
+                                { $and:  
                                     [{ group: 'nat', 
-                                    isSpectator: {$ne: true} 
-                                }]
-                            }],
-                        } 
+                                        isSpectator: { $ne: true }, 
+                                    }],
+                                }],
+                        }, 
                     },
                     { 
                         $group: {
-                            _id: '$modes', users: { $push: { id: '$_id', username: '$username', osuId: '$osuId', probation: '$probation', group: '$group' } }
-                        } 
-                    }
+                            _id: '$modes', users: { $push: { id: '$_id', username: '$username', osuId: '$osuId', probation: '$probation', group: '$group' } },
+                        }, 
+                    },
                 ]);
             }else if(includeFullBns || includeProbation){
                 allBns = await User.aggregate([
@@ -83,13 +95,13 @@ class UserService extends BaseService
                     { 
                         $match: { 
                             group: 'bn',
-                        } 
+                        }, 
                     },
                     { 
                         $group: {
-                            _id: '$modes', users: { $push: { id: '$_id', username: '$username', osuId: '$osuId', probation: '$probation', group: '$group' } }
-                        } 
-                    }
+                            _id: '$modes', users: { $push: { id: '$_id', username: '$username', osuId: '$osuId', probation: '$probation', group: '$group' } },
+                        }, 
+                    },
                 ]);
             }
             if(includeNat && (!includeFullBns || !includeProbation)){
@@ -100,14 +112,14 @@ class UserService extends BaseService
                     { 
                         $match: { 
                             group: 'nat',
-                            isSpectator: { $ne: true } 
-                        } 
+                            isSpectator: { $ne: true }, 
+                        }, 
                     },
                     { 
                         $group: {
-                            _id: '$modes', users: { $push: { id: '$_id', username: '$username', osuId: '$osuId', group: '$group' } }
-                        } 
-                    }
+                            _id: '$modes', users: { $push: { id: '$_id', username: '$username', osuId: '$osuId', group: '$group' } },
+                        }, 
+                    },
                 ]);
             }
             if(includeFullBns && includeProbation && includeNat){
@@ -144,7 +156,7 @@ class UserService extends BaseService
     async getAllMediators() {
         try{
             return await User.aggregate([
-                { $match: { group: { $ne: 'user' }, vetoMediator: true, isSpectator: {$ne: true}} },
+                { $match: { group: { $ne: 'user' }, vetoMediator: true, isSpectator: { $ne: true } } },
                 { $sample: { size: 1000 } },
             ]);
         }catch (error) {

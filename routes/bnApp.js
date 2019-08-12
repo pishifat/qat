@@ -1,12 +1,12 @@
 const express = require('express');
-const api = require('../models/api');
+const api = require('../helpers/api');
 const bnAppsService = require('../models/bnApp.js').service;
 const evalRoundsService = require('../models/evalRound').service;
 const logsService = require('../models/log.js').service;
 const testSubmissionService = require('../models/bnTest/testSubmission').service;
 const axios = require('axios');
 const cheerio = require('cheerio');
-const helper = require('../routes/helper');
+const helper = require('../helpers/helpers');
 
 const router = express.Router();
 
@@ -16,6 +16,7 @@ router.use(api.isLoggedIn);
  * Returns array with values per month ex: [1,1,1] or the calculated score ex: 7,77
  * @param {string} username 
  * @param {string} mode To calculate and return the score, pass this argument
+ * @returns {number|number[]|object}
  */
 async function getUserModsCount(username, mode) {
     let baseUrl = `https://osu.ppy.sh/beatmapsets/events?limit=50&types[]=kudosu_gain&types[]=kudosu_lost&user=${username}`;
@@ -35,7 +36,7 @@ async function getUserModsCount(username, mode) {
         let pageNumber = 1;
         // Loops through pages of a month
         while (hasEvents) {
-            let finalUrl = urlWithDate + `&page=${pageNumber}`
+            let finalUrl = urlWithDate + `&page=${pageNumber}`;
             try {
                 const historyHtml = await axios.get(finalUrl);
                 const $ = cheerio.load(historyHtml.data);
@@ -47,7 +48,7 @@ async function getUserModsCount(username, mode) {
                         const url = $(v).find('a').first().attr('href');
                         let mod = { 
                             beatmapset: helper.getBeatmapsetIdFromUrl(url),
-                            url: url
+                            url: url,
                         };
                         
                         if ($(v).find('.beatmapset-event__icon--kudosu-gain').length) {
@@ -64,12 +65,12 @@ async function getUserModsCount(username, mode) {
                         if (mod.isGain && 
                             pageMods.findIndex(m => m.url == mod.url && !m.isGain) === -1 && 
                             monthMods.findIndex(m => m.beatmapset == mod.beatmapset) === -1) {
-                                monthMods.push(mod);
+                            monthMods.push(mod);
                         }
                     });
                 }
             } catch (error) {
-                return res.json({ error: error._message });
+                return { error: `Couldn't calculate your score` };
             }
     
             pageNumber ++;
@@ -89,7 +90,7 @@ async function getUserModsCount(username, mode) {
 }
 
 /* GET bn app page */
-router.get('/', async (req, res, next) => {
+router.get('/', async (req, res) => {
     const test = await testSubmissionService.query({
         applicant: req.session.mongoId,
         status: { $ne: 'finished' },
@@ -100,32 +101,33 @@ router.get('/', async (req, res, next) => {
         script: '../js/bnApp.js',
         isBnApp: true,
         loggedInAs: req.session.mongoId,
-        isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
-        isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
+        isBnOrNat: res.locals.userRequest.isBnOrNat,
+        isNat: res.locals.userRequest.isNat,
         pendingTest: test,
     });
 });
 
 /* GET mod count from specified user */
-router.get('/modsCount/:user', async (req, res, next) => {
+router.get('/modsCount/:user', async (req, res) => {
     if (!req.params.user || req.params.user.trim() == '') {
         return res.json({ error: 'Missing user input' });
     }
     
     const modCount = await getUserModsCount(req.params.user);
+    if (modCount.error) return res.json(modCount.error);
     return res.json({ modCount: modCount });
 });
 
 
 /* POST a bn application */
-router.post('/apply', async (req, res, next) => {
+router.post('/apply', async (req, res) => {
     if (!req.body.mods || !req.body.mode || !req.session.mongoId) {
         return res.json({ error: 'Missing mode or mods' });
     }
 
     //return res.json({ error: `You're not supposed to apply until this is officially announced, buddy ;)`})
     if(res.locals.userRequest.modes.indexOf(req.body.mode) >= 0){
-        return res.json({ error: `You're already a BN for this game mode!`});
+        return res.json({ error: 'You\'re already a BN for this game mode!' });
     }
     
     let cooldownDate = new Date();
@@ -140,7 +142,7 @@ router.post('/apply', async (req, res, next) => {
             bn: req.session.mongoId,
             mode: req.body.mode,
             updatedAt: { $gte: cooldownDate },
-        })
+        }),
     ]);
 
     if (!currentBnApp && !currentBnEval) {
@@ -178,13 +180,13 @@ router.post('/apply', async (req, res, next) => {
                 return res.json(currentBnApp.error);
             } else if (currentBnApp.active) {
                 return res.json({ error: 'Your application is still being evaluated!' });
-                }else {
+            }else {
                 return res.json({
                     error: `Your previous application was rejected (check your osu! forum PMs for details). 
                         You may apply for this game mode again on 
                         ${new Date(currentBnApp.createdAt.setDate(currentBnApp.createdAt.getDate() + 90))
-                            .toString()
-                            .slice(4, 15)}.`,
+        .toString()
+        .slice(4, 15)}.`,
                 });
             }
         } else if (currentBnEval) {
@@ -195,8 +197,8 @@ router.post('/apply', async (req, res, next) => {
                     error: `You were recently removed from the Beatmap Nominators in this game mode. 
                         You may apply for this game mode again on 
                         ${new Date(currentBnEval.updatedAt.setDate(currentBnEval.updatedAt.getDate() + 90))
-                            .toString()
-                            .slice(4, 15)}.`,
+        .toString()
+        .slice(4, 15)}.`,
                 });
             }
         }

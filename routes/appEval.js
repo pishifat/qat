@@ -1,5 +1,5 @@
 const express = require('express');
-const api = require('../models/api');
+const api = require('../helpers/api');
 const bnAppsService = require('../models/bnApp').service;
 const evalsService = require('../models/evaluation').service;
 const evalRoundsService = require('../models/evalRound').service;
@@ -13,13 +13,13 @@ router.use(api.isLoggedIn);
 router.use(api.isBnOrNat);
 
 /* GET bn app page */
-router.get('/', async (req, res, next) => {
+router.get('/', (req, res) => {
     res.render('evaluations/appeval', {
         title: 'BN Application Evaluations',
         script: '../javascripts/appEval.js',
         isEval: true,
-        isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
-        isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
+        isBnOrNat: res.locals.userRequest.isBnOrNat,
+        isNat: res.locals.userRequest.isNat,
     });
 });
 
@@ -39,7 +39,7 @@ const defaultPopulate = [
 ];
 
 /* GET applicant listing. */
-router.get('/relevantInfo', async (req, res, next) => {
+router.get('/relevantInfo', async (req, res) => {
     let a;
     if(res.locals.userRequest.group == 'nat'){
         a = await bnAppsService.query(
@@ -76,21 +76,21 @@ router.post('/submitEval/:id', async (req, res) => {
             req.body.vote
         );
         await bnAppsService.update(req.params.id, { $push: { evaluations: ev._id } });
-        let a = await bnAppsService.query({_id: req.params.id}, defaultPopulate);
+        let a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
         api.webhookPost(
             [{
                 author: {
                     name: `${req.session.username}`,
                     icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                    url: `https://osu.ppy.sh/users/${req.session.osuId}`
-            },
+                    url: `https://osu.ppy.sh/users/${req.session.osuId}`,
+                },
                 color: '10404095',
                 fields:[
                     {
-                        name: `http://bn.mappersguild.com/appeval`,
-                        value: `submitted BN app eval for **${a.applicant.username}**`
-                    }
-                ]
+                        name: 'http://bn.mappersguild.com/appeval',
+                        value: `submitted BN app eval for **${a.applicant.username}**`,
+                    },
+                ],
             }], 
             a.mode
         );
@@ -113,19 +113,19 @@ router.post('/submitEval/:id', async (req, res) => {
                         author: {
                             name: `${a.applicant.username}`,
                             icon_url: `https://a.ppy.sh/${a.applicant.osuId}`,
-                            url: `https://osu.ppy.sh/users/${a.applicant.osuId}`
-                    },
+                            url: `https://osu.ppy.sh/users/${a.applicant.osuId}`,
+                        },
                         color: '14855903',
                         fields:[
                             {
-                                name: `http://bn.mappersguild.com/appeval`,
-                                value: `Moved BN app to group discussion`
+                                name: 'http://bn.mappersguild.com/appeval',
+                                value: 'Moved BN app to group discussion',
                             },
                             {
-                                name: `Votes`,
-                                value: `Pass: **${pass}**, Neutral: **${neutral}**, Fail: **${fail}**`
-                            }
-                        ]
+                                name: 'Votes',
+                                value: `Pass: **${pass}**, Neutral: **${neutral}**, Fail: **${fail}**`,
+                            },
+                        ],
                     }], 
                     a.mode
                 );
@@ -144,7 +144,7 @@ router.post('/submitEval/:id', async (req, res) => {
 router.post('/setGroupEval/', api.isLeader, async (req, res) => {
     for (let i = 0; i < req.body.checkedApps.length; i++) {
         await bnAppsService.update(req.body.checkedApps[i], { discussion: true });
-        let a = await bnAppsService.query({_id: req.body.checkedApps[i]}, defaultPopulate);
+        let a = await bnAppsService.query({ _id: req.body.checkedApps[i] }, defaultPopulate);
         let pass = 0;
         let neutral = 0;
         let fail = 0;
@@ -152,25 +152,25 @@ router.post('/setGroupEval/', api.isLeader, async (req, res) => {
             if(evaluation.vote == 1) pass++;
             else if(evaluation.vote == 2) neutral++;
             else if(evaluation.vote == 3) fail++;
-        })
+        });
         api.webhookPost(
             [{
                 author: {
                     name: `${a.applicant.username}`,
                     icon_url: `https://a.ppy.sh/${a.applicant.osuId}`,
-                    url: `https://osu.ppy.sh/users/${a.applicant.osuId}`
-            },
+                    url: `https://osu.ppy.sh/users/${a.applicant.osuId}`,
+                },
                 color: '14855903',
                 fields:[
                     {
-                        name: `http://bn.mappersguild.com/appeval`,
-                        value: `Moved BN app to group discussion`
+                        name: 'http://bn.mappersguild.com/appeval',
+                        value: 'Moved BN app to group discussion',
                     },
                     {
-                        name: `Votes`,
-                        value: `Pass: **${pass}**, Neutral: **${neutral}**, Fail: **${fail}**`
-                    }
-                ]
+                        name: 'Votes',
+                        value: `Pass: **${pass}**, Neutral: **${neutral}**, Fail: **${fail}**`,
+                    },
+                ],
             }], 
             a.mode
         );
@@ -211,7 +211,7 @@ router.post('/setComplete/', api.isLeader, async (req, res) => {
             await evalRoundsService.create(a.applicant, a.mode, deadline);
             if (u.group == 'user') {
                 await usersService.update(u.id, { group: 'bn' });
-                await usersService.update(u.id, { $push: {bnDuration: new Date() }});
+                await usersService.update(u.id, { $push: { bnDuration: new Date() } });
             }
         }
         await bnAppsService.update(a.id, { active: false });
@@ -220,19 +220,19 @@ router.post('/setComplete/', api.isLeader, async (req, res) => {
                 author: {
                     name: `${u.username}`,
                     icon_url: `https://a.ppy.sh/${u.osuId}`,
-                    url: `https://osu.ppy.sh/users/${u.osuId}`
-            },
+                    url: `https://osu.ppy.sh/users/${u.osuId}`,
+                },
                 color: '14855903',
                 fields:[
                     {
-                        name: `http://bn.mappersguild.com/appeval`,
-                        value: `BN app archived`
+                        name: 'http://bn.mappersguild.com/appeval',
+                        value: 'BN app archived',
                     },
                     {
-                        name: `Consensus`,
-                        value: `${a.consensus == 'pass' ? 'Pass' : 'Fail'}`
-                    }
-                ]
+                        name: 'Consensus',
+                        value: `${a.consensus == 'pass' ? 'Pass' : 'Fail'}`,
+                    },
+                ],
             }], 
             a.mode
         );
@@ -264,17 +264,17 @@ router.post('/setConsensus/:id', async (req, res) => {
             author: {
                 name: `${req.session.username}`,
                 icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                url: `https://osu.ppy.sh/users/${req.session.osuId}`
-        },
+                url: `https://osu.ppy.sh/users/${req.session.osuId}`,
+            },
             color: '12025268',
             fields:[
                 {
-                    name: `http://bn.mappersguild.com/appeval`,
-                    value: `**${a.applicant.username}**'s BN app set to **${req.body.consensus}**`
-                }
-            ]
+                    name: 'http://bn.mappersguild.com/appeval',
+                    value: `**${a.applicant.username}**'s BN app set to **${req.body.consensus}**`,
+                },
+            ],
         }], 
-        ev.mode
+        a.mode
     );
 });
 
@@ -292,15 +292,15 @@ router.post('/setFeedback/:id', async (req, res) => {
             author: {
                 name: `${req.session.username}`,
                 icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                url: `https://osu.ppy.sh/users/${req.session.osuId}`
-        },
+                url: `https://osu.ppy.sh/users/${req.session.osuId}`,
+            },
             color: '7044532',
             fields:[
                 {
                     name: `BN app feedback submitted (${a.consensus})`,
-                    value: `**${a.applicant.username}**: ${req.body.feedback}`
-                }
-            ]
+                    value: `**${a.applicant.username}**: ${req.body.feedback}`,
+                },
+            ],
         }], 
         a.mode
     );
@@ -318,9 +318,9 @@ router.post('/toggleIsPriority/:id', async (req, res) => {
 });
 
 /* POST set status upheld or withdrawn. */
-router.post('/selectBnEvaluators', async (req, res, next) => {
+router.post('/selectBnEvaluators', async (req, res) => {
     const allUsers = await usersModel.aggregate([
-        { $match: { group: { $eq: 'bn' }, isBnEvaluator: true, probation: { $size: 0 }},  },
+        { $match: { group: { $eq: 'bn' }, isBnEvaluator: true, probation: { $size: 0 } }  },
         { $sample: { size: 1000 } },
     ]);
     let usernames = [];
@@ -340,7 +340,7 @@ router.post('/selectBnEvaluators', async (req, res, next) => {
 });
 
 /* POST begin BN evaluations */
-router.post('/enableBnEvaluators/:id', api.isLeader, async (req, res, next) => {
+router.post('/enableBnEvaluators/:id', api.isLeader, async (req, res) => {
     for (let i = 0; i < req.body.bnEvaluators.length; i++) {
         let bn = req.body.bnEvaluators[i];
         await bnAppsService.update(req.params.id, { $push: { bnEvaluators: bn._id } });

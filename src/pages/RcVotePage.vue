@@ -2,8 +2,8 @@
     <div class="row">
         <div class="col-md-12">
             <filter-box 
-                :filterMode.sync="filterMode" 
-                :filterValue.sync="filterValue"
+                :filter-mode.sync="filterMode" 
+                :filter-value.sync="filterValue"
                 :placeholder="'content...'"
             >
                 <button v-if="isLeader" class="btn btn-sm btn-nat ml-2" data-toggle="modal" data-target="#addRcDiscussion">
@@ -17,10 +17,10 @@
                         <rc-discussion-card
                             v-for="rcDiscussion in pageObjs"
                             :key="rcDiscussion.id"
-                            :rcDiscussion="rcDiscussion"
-                            :userId="userId"
+                            :rc-discussion="rcDiscussion"
+                            :user-id="userId"
                             @update:selectedRcDiscussion="selectedRcDiscussion = $event"
-                        ></rc-discussion-card>
+                        />
                     </transition-group>
                 </div>
             </section>
@@ -31,8 +31,8 @@
             :user-modes="userModes"
             :is-leader="isLeader"
             @update-rc-discussion="updateRcDiscussion($event)"
-        ></rc-discussion-info>
-        <submit-rc-discussion @submit-rc-discussion="SubmitRcDiscussion($event)"></submit-rc-discussion>
+        />
+        <submit-rc-discussion @submit-rc-discussion="SubmitRcDiscussion($event)" />
     </div>
 </template>
 
@@ -45,7 +45,7 @@ import pagination from '../mixins/pagination.js';
 import filters from '../mixins/filters.js';
 
 export default {
-    name: 'rc-page',
+    name: 'RcPage',
     components: {
         RcDiscussionCard,
         RcDiscussionInfo,
@@ -53,24 +53,6 @@ export default {
         FilterBox,
     },
     mixins: [pagination, filters],
-    methods: {
-        filterBySearchValueContext: function(v) {
-            if(v.title.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1){
-                return true;
-            }
-            return false;
-        },
-        SubmitRcDiscussion: function(v) {
-            this.allObjs.unshift(v);
-            this.filter();
-        },
-        updateRcDiscussion: function(rc) {
-            const i = this.allObjs.findIndex(rcDiscussion => rcDiscussion.id == rc.id);
-            this.allObjs[i] = rc;
-            this.selectedRcDiscussion = rc;
-            this.filter();
-        },
-    },
     data() {
         return {
             allObjs: null,
@@ -111,6 +93,24 @@ export default {
                 }
             });
         }, 300000);
+    },
+    methods: {
+        filterBySearchValueContext: function(v) {
+            if(v.title.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1){
+                return true;
+            }
+            return false;
+        },
+        SubmitRcDiscussion: function(v) {
+            this.allObjs.unshift(v);
+            this.filter();
+        },
+        updateRcDiscussion: function(rc) {
+            const i = this.allObjs.findIndex(rcDiscussion => rcDiscussion.id == rc.id);
+            this.allObjs[i] = rc;
+            this.selectedRcDiscussion = rc;
+            this.filter();
+        },
     },
 };
 </script>

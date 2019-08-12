@@ -35,4 +35,20 @@ function safeParam(param) {
     return qs.escape(param);
 }
 
-module.exports = { escapeUsername, getBeatmapsetIdFromUrl, safeParam };
+/**
+ * check if it's a valid url
+ * @param {string} url
+ * @param {string} contain url must contain ...
+ * @returns {object} error | success
+ */
+function isValidUrl(url, contain) {
+    // eslint-disable-next-line no-useless-escape
+    const regexp = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+    if (!regexp.test(url) || url.indexOf(contain) == -1) {
+        return { error: 'Not a valid URL' };
+    } else {
+        return { success: 'ok' };
+    }
+}
+
+module.exports = { escapeUsername, getBeatmapsetIdFromUrl, safeParam, isValidUrl };

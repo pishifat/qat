@@ -4,7 +4,7 @@ function calculateMonthScore(modCount, modeValue) {
 }
 
 $(function() {
-    $('body').tooltip({ selector: '[data-toggle=tooltip]', trigger: 'hover', });
+    $('body').tooltip({ selector: '[data-toggle=tooltip]', trigger: 'hover' });
     let to = new Date();
 
     for (let i = 1; i < 4; i++) {

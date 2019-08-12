@@ -17,7 +17,7 @@ const aiessSchema = new mongoose.Schema({
     isBnOrNat:  { type: Boolean, default: false },
     isUnique: { type: Boolean, default: false },
     effortBonus: { type: Number }, //multiplier combining drain per diff, # diffs, and difficulty of each diff
-    responsibleNominators: [{ type: Number }]
+    responsibleNominators: [{ type: Number }],
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 const Aiess = mongoose.model('aiess', aiessSchema, 'aiess');
@@ -34,9 +34,9 @@ class AiessService extends BaseService
      */
     async create(osuId) {
         try {
-            return await Aiess.create({userId: osuId});
+            return await Aiess.create({ userId: osuId });
         } catch(error) {
-            return { error: error._message }
+            return { error: error._message };
         }
     }
 
@@ -56,25 +56,25 @@ class AiessService extends BaseService
                         $or: [
                             { eventType: 'Disqualified' },
                             { eventType: 'Popped' },
-                            { eventType: 'Reported'}
+                            { eventType: 'Reported' },
                         ],
                         $and: [
-                            { timestamp: { $gte: minDate} },
-                            { timestamp: { $lte: maxDate} },
+                            { timestamp: { $gte: minDate } },
+                            { timestamp: { $lte: maxDate } },
                         ],
-                        modes: mode
-                    } 
+                        modes: mode,
+                    }, 
                 },
                 {
                     $sort: {
                         timestamp: 1,
                         beatmapsetId: -1,
-                    }
+                    },
                 },
                 {
                     $group: {
-                        _id: '$eventType', events: { $push: '$$ROOT' }
-                    }
+                        _id: '$eventType', events: { $push: '$$ROOT' },
+                    },
                 },
             ]);
         } catch (error) {            
@@ -95,22 +95,22 @@ class AiessService extends BaseService
                 { 
                     $match: {
                         $and: [
-                            { timestamp: { $gte: minDate} },
-                            { timestamp: { $lte: maxDate} },
+                            { timestamp: { $gte: minDate } },
+                            { timestamp: { $lte: maxDate } },
                         ],
                         eventType: { $ne: 'Ranked' },
-                    } 
+                    }, 
                 },
                 {
                     $sort: {
                         timestamp: 1,
                         beatmapsetId: -1,
-                    }
+                    },
                 },
                 {
                     $group: {
-                        _id: '$eventType', events: { $push: '$$ROOT' }
-                    }
+                        _id: '$eventType', events: { $push: '$$ROOT' },
+                    },
                 },
             ]);
         } catch (error) {            
@@ -134,23 +134,23 @@ class AiessService extends BaseService
                     $match: { 
                         userId: userId,
                         $and: [
-                            { timestamp: { $gte: minDate} },
-                            { timestamp: { $lte: maxDate} },
+                            { timestamp: { $gte: minDate } },
+                            { timestamp: { $lte: maxDate } },
                         ],
                         eventType: { $ne: 'Ranked' },
-                        modes: mode
-                    } 
+                        modes: mode,
+                    }, 
                 },
                 {
                     $sort: {
                         timestamp: 1,
                         beatmapsetId: -1,
-                    }
+                    },
                 },
                 {
                     $group: {
-                        _id: '$eventType', events: { $push: '$$ROOT' }
-                    }
+                        _id: '$eventType', events: { $push: '$$ROOT' },
+                    },
                 },
             ]);
         } catch (error) {            

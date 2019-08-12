@@ -1,116 +1,143 @@
 <template>
-<div class="row">
-    <div class="col-md-12">
-        <filter-box 
-            :filterMode.sync="filterMode" 
-            :filterValue.sync="filterValue"
-            :placeholder="'username... (3+ characters)'"
-        >
-        </filter-box>
-        <section class="row segment segment-solid my-1 mx-4">
-            <div class="small">
-                <span class="filter-header">Sort by</span>
-                <a :class="sortBy === 'username' ? 'sorted' : 'unsorted'" href="#" @click.prevent="sort('username')">Name</a>
-                <a :class="sortBy === 'bnDuration' ? 'sorted' : 'unsorted'" href="#" @click.prevent="sort('bnDuration')">Time as BN</a>
-                <a :class="sortBy === 'natDuration' ? 'sorted' : 'unsorted'" href="#" @click.prevent="sort('natDuration')">Time as NAT</a>
-            </div>
-        </section>
+    <div class="row">
+        <div class="col-md-12">
+            <filter-box 
+                :filter-mode.sync="filterMode" 
+                :filter-value.sync="filterValue"
+                :placeholder="'username... (3+ characters)'"
+            />
+            <section class="row segment segment-solid my-1 mx-4">
+                <div class="small">
+                    <span class="filter-header">Sort by</span>
+                    <a :class="sortBy === 'username' ? 'sorted' : 'unsorted'" href="#" @click.prevent="sort('username')">Name</a>
+                    <a :class="sortBy === 'bnDuration' ? 'sorted' : 'unsorted'" href="#" @click.prevent="sort('bnDuration')">Time as BN</a>
+                    <a :class="sortBy === 'natDuration' ? 'sorted' : 'unsorted'" href="#" @click.prevent="sort('natDuration')">Time as NAT</a>
+                </div>
+            </section>
 
-        <section class="row segment segment-image mx-0 px-0">
-            <div class="col-sm-12">
-                <transition-group name="list" tag="div" class="row mx-auto">
-                    <user-card
-                        v-for="user in pageObjs"
-                        :key="user.id"
-                        :user="user"
-                        :userId="userId"
-                        :isLeader="isLeader"
-                        @update:selectedUser="selectedUser = $event"
-                    ></user-card>
-                </transition-group>
-                <button v-if="pre > 0" class="btn btn-sm btn-pags btn-pags-left" type="button" @click="showNewer()">
-                    <i class="fas fa-angle-left px-1"></i>
-                </button>
-                <button v-if="canShowOlder" class="btn btn-sm btn-pags btn-pags-right" type="button" @click="showOlder()">
-                    <i class="fas fa-angle-right px-1"></i>
-                </button>
-            </div>
-        </section>
-        <!-- admin tools -->
-        <section v-if="isNat" class="segment segment-solid my-1 mx-4">
-            <div class="my-2">
-                <button class="btn btn-sm btn-nat minw-200 my-1" @click="findNatActivity()"
-                    data-toggle="tooltip" data-placement="right" title="Finds NAT eval activity, defaults to 30 days">Load NAT activity
-                </button>
-                <input type="text" placeholder="days of activity..."
-                    style="filter: drop-shadow(1px 1px 1px #000000);"
-                    @keyup.enter="findNatActivity()" maxlength="3" v-model="natDays"/>
-                <div v-if="natActivity">
-                    <div v-for="user in natActivity.data" :key="user.username" class="small min-spacing mb-1">
-                        <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a> ({{user.mode}})
-                        <p v-if="user.mode == 'osu'" class="min-spacing" :style="user.totalEvaluations < natDays/3 ? 'background-color: rgb(255,50,50,0.25);' : user.totalEvaluations < natDays/2 ? 'background-color: rgb(255,255,0,0.25);' : 'background-color: rgb(50,255,50,0.25);'">
-                            Total evaluations: {{ user.totalEvaluations }}
-                        </p>
-                        <p v-else class="min-spacing" :style="user.totalEvaluations < natDays/6 ? 'background-color: rgb(255,50,50,0.25);' : user.totalEvaluations < natDays/4 ? 'background-color: rgb(255,255,0,0.25);' : 'background-color: rgb(50,255,50,0.25);'">
-                            Total evaluations: {{ user.totalEvaluations }}
-                        </p>
+            <section class="row segment segment-image mx-0 px-0">
+                <div class="col-sm-12">
+                    <transition-group name="list" tag="div" class="row mx-auto">
+                        <user-card
+                            v-for="user in pageObjs"
+                            :key="user.id"
+                            :user="user"
+                            :user-id="userId"
+                            :is-leader="isLeader"
+                            @update:selectedUser="selectedUser = $event"
+                        />
+                    </transition-group>
+                    <button v-if="pre > 0" class="btn btn-sm btn-pags btn-pags-left" type="button" @click="showNewer()">
+                        <i class="fas fa-angle-left px-1" />
+                    </button>
+                    <button v-if="canShowOlder" class="btn btn-sm btn-pags btn-pags-right" type="button" @click="showOlder()">
+                        <i class="fas fa-angle-right px-1" />
+                    </button>
+                </div>
+            </section>
+            <!-- admin tools -->
+            <section v-if="isNat" class="segment segment-solid my-1 mx-4">
+                <div class="my-2">
+                    <button
+                        class="btn btn-sm btn-nat minw-200 my-1"
+                        data-toggle="tooltip"
+                        data-placement="right"
+                        title="Finds NAT eval activity, defaults to 30 days"
+                        @click="findNatActivity()"
+                    >
+                        Load NAT activity
+                    </button>
+                    <input
+                        v-model="natDays"
+                        type="text"
+                        placeholder="days of activity..."
+                        style="filter: drop-shadow(1px 1px 1px #000000);"
+                        maxlength="3"
+                        @keyup.enter="findNatActivity()"
+                    >
+                    <div v-if="natActivity">
+                        <div v-for="user in natActivity.data" :key="user.username" class="small min-spacing mb-1">
+                            <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a> ({{ user.mode }})
+                            <p v-if="user.mode == 'osu'" class="min-spacing" :style="user.totalEvaluations < natDays/3 ? 'background-color: rgb(255,50,50,0.25);' : user.totalEvaluations < natDays/2 ? 'background-color: rgb(255,255,0,0.25);' : 'background-color: rgb(50,255,50,0.25);'">
+                                Total evaluations: {{ user.totalEvaluations }}
+                            </p>
+                            <p v-else class="min-spacing" :style="user.totalEvaluations < natDays/6 ? 'background-color: rgb(255,50,50,0.25);' : user.totalEvaluations < natDays/4 ? 'background-color: rgb(255,255,0,0.25);' : 'background-color: rgb(50,255,50,0.25);'">
+                                Total evaluations: {{ user.totalEvaluations }}
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="my-2">
-                <button class="btn btn-sm btn-nat minw-200 my-1" @click="findBnActivity()"
-                    data-toggle="tooltip" data-placement="right" title="Finds BN nomination, pop/dq, and report activity, defaults to 30 days">Load BN activity
-                </button>
-                <input type="text" placeholder="days of activity..."
-                    style="filter: drop-shadow(1px 1px 1px #000000);"
-                    @keyup.enter="findBnActivity()" maxlength="3" v-model="bnDays"/>
-                <div v-if="bnActivity">
-                    <div v-for="user in bnActivity.data" :key="user.username" class="small min-spacing mb-1">
-                        <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a> ({{printModes(user.modes)}})
-                        <p class="min-spacing" :style="user.uniqueNominations < bnDays/10 ? 'background-color: rgb(255,50,50,0.25);' : user.uniqueNominations < bnDays/6 ? 'background-color: rgb(255,255,0,0.25);' : 'background-color: rgb(50,255,50,0.25);'">
-                            Nominations: {{ user.uniqueNominations }}
-                        </p>
-                        <p class="min-spacing">
-                            Nomination resets: {{ user.nominationResets }}
-                        </p>
-                        <p class="min-spacing">
-                            Beatmap Reports: {{ user.beatmapReports }}
-                        </p>
+                <div class="my-2">
+                    <button
+                        class="btn btn-sm btn-nat minw-200 my-1"
+                        data-toggle="tooltip"
+                        data-placement="right"
+                        title="Finds BN nomination, pop/dq, and report activity, defaults to 30 days"
+                        @click="findBnActivity()"
+                    >
+                        Load BN activity
+                    </button>
+                    <input
+                        v-model="bnDays"
+                        type="text"
+                        placeholder="days of activity..."
+                        style="filter: drop-shadow(1px 1px 1px #000000);"
+                        maxlength="3"
+                        @keyup.enter="findBnActivity()"
+                    >
+                    <div v-if="bnActivity">
+                        <div v-for="user in bnActivity.data" :key="user.username" class="small min-spacing mb-1">
+                            <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a> ({{ printModes(user.modes) }})
+                            <p class="min-spacing" :style="user.uniqueNominations < bnDays/10 ? 'background-color: rgb(255,50,50,0.25);' : user.uniqueNominations < bnDays/6 ? 'background-color: rgb(255,255,0,0.25);' : 'background-color: rgb(50,255,50,0.25);'">
+                                Nominations: {{ user.uniqueNominations }}
+                            </p>
+                            <p class="min-spacing">
+                                Nomination resets: {{ user.nominationResets }}
+                            </p>
+                            <p class="min-spacing">
+                                Beatmap Reports: {{ user.beatmapReports }}
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="my-2">
-                <button class="btn btn-sm btn-nat minw-200 my-1" @click="findUserBadgeInfo()"
-                    data-toggle="tooltip" data-placement="right" title="Finds relevant yearly profile badge info">Load badge info
-                </button>
-                <div v-if="badgeUsers.length">
-                    <p class="min-spacing small my-2">only pishifat can edit this section</p>
-                    <div v-for="user in badgeUsers" :key="user.id" class="small min-spacing mb-1">
-                        <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a>
-                        <p class="min-spacing" :style="user.bnProfileBadge != calculateDuration(user.bnDuration) && calculateDuration(user.bnDuration) >= 2 ? 'background-color: rgb(255,50,50,0.25);' : ''">
-                            BN: {{ calculateDuration(user.bnDuration) }} -- badge: {{user.bnProfileBadge}}
-                            <a href="#" @click.prevent="editBadgeValue(user.id, 'bn', true)"><i class="fas fa-plus"></i></a>
-                            <a href="#" @click.prevent="editBadgeValue(user.id, 'bn', false)"><i class="fas fa-minus"></i></a>
+                <div class="my-2">
+                    <button
+                        class="btn btn-sm btn-nat minw-200 my-1"
+                        data-toggle="tooltip"
+                        data-placement="right"
+                        title="Finds relevant yearly profile badge info"
+                        @click="findUserBadgeInfo()"
+                    >
+                        Load badge info
+                    </button>
+                    <div v-if="badgeUsers.length">
+                        <p class="min-spacing small my-2">
+                            only pishifat can edit this section
                         </p>
-                        <p class="min-spacing" :style="user.natProfileBadge != calculateDuration(user.natDuration) && calculateDuration(user.natDuration) >= 3 ? 'background-color: rgb(255,50,50,0.25);' : ''">
-                            NAT: {{ calculateDuration(user.natDuration) }} -- badge: {{user.natProfileBadge}}
-                            <a href="#" @click.prevent="editBadgeValue(user.id, 'nat', true)"><i class="fas fa-plus"></i></a>
-                            <a href="#" @click.prevent="editBadgeValue(user.id, 'nat', false)"><i class="fas fa-minus"></i></a>
-                        </p>
+                        <div v-for="user in badgeUsers" :key="user.id" class="small min-spacing mb-1">
+                            <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a>
+                            <p class="min-spacing" :style="user.bnProfileBadge != calculateDuration(user.bnDuration) && calculateDuration(user.bnDuration) >= 2 ? 'background-color: rgb(255,50,50,0.25);' : ''">
+                                BN: {{ calculateDuration(user.bnDuration) }} -- badge: {{ user.bnProfileBadge }}
+                                <a href="#" @click.prevent="editBadgeValue(user.id, 'bn', true)"><i class="fas fa-plus" /></a>
+                                <a href="#" @click.prevent="editBadgeValue(user.id, 'bn', false)"><i class="fas fa-minus" /></a>
+                            </p>
+                            <p class="min-spacing" :style="user.natProfileBadge != calculateDuration(user.natDuration) && calculateDuration(user.natDuration) >= 3 ? 'background-color: rgb(255,50,50,0.25);' : ''">
+                                NAT: {{ calculateDuration(user.natDuration) }} -- badge: {{ user.natProfileBadge }}
+                                <a href="#" @click.prevent="editBadgeValue(user.id, 'nat', true)"><i class="fas fa-plus" /></a>
+                                <a href="#" @click.prevent="editBadgeValue(user.id, 'nat', false)"><i class="fas fa-minus" /></a>
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
-
+            </section>
+        </div>
+        <user-info
+            :user="selectedUser"
+            :user-id="userId"
+            :is-leader="isLeader"
+            @update-user="updateUser($event)"
+        />
     </div>
-    <user-info
-        :user="selectedUser"
-        :user-id="userId"
-        :is-leader="isLeader"
-        @update-user="updateUser($event)"
-    ></user-info>
-
-</div>
 </template>
 
 <script>
@@ -122,13 +149,55 @@ import filters from '../mixins/filters.js';
 import postData from '../mixins/postData.js';
 
 export default {
-    name: 'users-page',
+    name: 'UsersPage',
     components: {
         UserCard,
         UserInfo,
         FilterBox,
     },
     mixins: [postData, pagination, filters],
+    data() {
+        return {
+            pageObjs: null,
+            allObjs: null,
+            filteredObjs: null,
+            userId: null,
+            isLeader: null,
+            isNat: null,
+            selectedUser: null,
+            badgeUsers: [],
+            natActivity: null,
+            natDays: '',
+            bnActivity: null,
+            bnDays: '',
+        };
+    },
+    created() {
+        axios
+            .get('/users/relevantInfo')
+            .then(response => {
+                this.allObjs = response.data.users;
+                this.userId = response.data.userId;
+                this.isLeader = response.data.isLeader;
+                this.isNat = response.data.isNat;
+                this.limit = 24;
+            }).then(function(){
+                $('#loading').fadeOut();
+                $('#main').attr('style', 'visibility: visible').hide().fadeIn();
+            });
+    },
+    mounted () {
+        setInterval(() => {
+            axios
+                .get('/users/relevantInfo')
+                .then(response => {
+                    this.allObjs = response.data.users;
+                    if(this.isFiltered){
+                        this.filter();
+                    }
+                });
+        }, 300000);
+    },
     methods: {
         filterBySearchValueContext: function(u) {
             if(u.username.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1){
@@ -137,11 +206,11 @@ export default {
             return false;
         },
         updateUser: function(u) {
-			const i = this.pageObjs.findIndex(user => user.id == u.id);
-			this.pageObjs[i] = u;
+            const i = this.pageObjs.findIndex(user => user.id == u.id);
+            this.pageObjs[i] = u;
             this.selectedUser = u;
         },
-        sortDuration: function(dateArray, user) {
+        sortDuration: function(dateArray) {
             let days = 0;
             for (let i = 0; i < dateArray.length; i+=2) {
                 let a = new Date(dateArray[i]);
@@ -188,7 +257,7 @@ export default {
             );
             if (u && !u.error) {
                 const i = this.badgeUsers.findIndex(user => user.id == u.id);
-			    group == 'bn' ? this.badgeUsers[i].bnProfileBadge = u.bnProfileBadge : this.badgeUsers[i].natProfileBadge = u.natProfileBadge;
+                group == 'bn' ? this.badgeUsers[i].bnProfileBadge = u.bnProfileBadge : this.badgeUsers[i].natProfileBadge = u.natProfileBadge;
             }
         },
         findNatActivity: function() {
@@ -212,55 +281,13 @@ export default {
             for (let i = 0; i < modes.length; i++) {
                 text += modes[i];
                 if(i < modes.length - 1){
-                    text += ", "
+                    text += ', ';
                 }
             }
             return text;
-        }
+        },
     },
-    data() {
-        return {
-            pageObjs: null,
-            allObjs: null,
-            filteredObjs: null,
-            userId: null,
-            isLeader: null,
-            isNat: null,
-            selectedUser: null,
-            badgeUsers: [],
-            natActivity: null,
-            natDays: '',
-            bnActivity: null,
-            bnDays: '',
-        }
-    },
-    created() {
-        axios
-            .get('/users/relevantInfo')
-            .then(response => {
-                this.allObjs = response.data.users;
-                this.userId = response.data.userId;
-                this.isLeader = response.data.isLeader;
-                this.isNat = response.data.isNat;
-                this.limit = 24;
-            }).then(function(){
-                $("#loading").fadeOut();
-                $('#main').attr("style", "visibility: visible").hide().fadeIn();
-            });
-    },
-    mounted () {
-        setInterval(() => {
-            axios
-                .get('/users/relevantInfo')
-                .then(response => {
-                    this.allObjs = response.data.users;
-                    if(this.isFiltered){
-                        this.filter();
-                    }
-                });
-        }, 300000);
-    }
-}
+};
 </script>
 
 <style>

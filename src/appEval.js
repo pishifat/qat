@@ -2,7 +2,7 @@ import Vue from 'vue';
 import AppEvalPage from './pages/AppEvalPage.vue';
 
 $(document).ready(function() {
-    $("body").tooltip({ selector: '[data-toggle=tooltip]', trigger: 'hover', });
+    $('body').tooltip({ selector: '[data-toggle=tooltip]', trigger: 'hover' });
 });
 
 new Vue({

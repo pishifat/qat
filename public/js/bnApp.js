@@ -1,7 +1,7 @@
 $(function() {
     $('#loading').hide();
     $('#main').attr('style', 'visibility: visible');
-    $("body").tooltip({ selector: '[data-toggle=tooltip]', trigger: 'hover', });
+    $('body').tooltip({ selector: '[data-toggle=tooltip]', trigger: 'hover' });
     
     $('#apply').click(async function() {
         $('#apply').attr('disabled', true);
@@ -9,6 +9,7 @@ $(function() {
         $('#errors').text('');
         const mode = $('input[name=mode]:checked').val();
         let mods = [];
+        // eslint-disable-next-line no-useless-escape
         const regexp = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
         for (let i = 0; i < 4; i++) {
             let mod = $(`#mod${i}`).val().trim();

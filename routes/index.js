@@ -1,13 +1,13 @@
 const express = require('express');
 const config = require('../config.json');
 const crypto = require('crypto');
-const api = require('../models/api');
+const api = require('../helpers/api');
 const usersService = require('../models/user').service;
 const logsService = require('../models/log').service;
 const router = express.Router();
 
 /* GET bn app page */
-router.get('/', async (req, res, next) => {
+router.get('/', async (req, res) => {
     const allUsersByMode = await usersService.getAllByMode(true, true, true);
     let user;
 
@@ -15,12 +15,9 @@ router.get('/', async (req, res, next) => {
         user = await usersService.query({ _id: req.session.mongoId });
     }
 
-    let isBnOrNat;
-    let isBn;
-    if (user && (user.group == 'bn' || user.group == 'nat' || user.isSpectator)) {
-        isBnOrNat = true;
-        if (user.group == 'bn' && !user.isSpectator) isBn = true;
-    }
+    let isBnOrNat = user && user.isBnOrNat;
+    let isBn = user && user.isBn;
+    
     res.render('qatIndex', {
         title: 'NAT',
         layout: false,
@@ -48,7 +45,7 @@ router.get(
 
                 if (user && !user.error) {
                     req.session.mongoId = user._id;
-                    logsService.create(req.session.mongoId, `Verified their account for the first time`);
+                    logsService.create(req.session.mongoId, 'Verified their account for the first time');
                     return next();
                 } else {
                     return res.status(500).render('error', { message: 'Something went wrong!' });

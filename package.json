@@ -3,39 +3,38 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www",
-    "build": "webpack --mode production",
-    "devstart": "nodemon ./bin/www",
-    "devstart-client": "webpack-dev-server --mode development --port 8080 --watch --progress --colors --config-name qat"
+    "dev": "set NODE_ENV=development&& set PORT=8080&& nodemon ./app.js",
+    "build": "webpack --mode production --config webpack.config.js",
+    "prod": "set NODE_ENV=production&& node ./app.js"
   },
   "dependencies": {
+    "@babel/core": "^7.4.5",
+    "@babel/preset-env": "^7.4.5",
     "axios": "^0.18.1",
+    "babel-loader": "^8.0.6",
+    "babel-plugin-transform-regenerator": "^6.26.0",
     "cheerio": "^1.0.0-rc.3",
     "connect-mongo": "^2.0.3",
     "cookie-parser": "^1.4.4",
-    "debug": "~2.6.9",
+    "core-js": "^3.2.0",
+    "css-loader": "^2.1.1",
     "express": "~4.16.0",
     "express-session": "^1.16.1",
-    "handlebars": "^4.1.2",
+    "file-loader": "^3.0.1",
     "hbs": "^4.0.4",
-    "http-errors": "~1.6.2",
     "mongoose": "^5.5.14",
     "morgan": "~1.9.0",
-    "vue": "^2.6.10"
+    "vue": "^2.6.10",
+    "vue-loader": "^15.7.1",
+    "vue-template-compiler": "^2.6.10",
+    "webpack": "^4.39.1",
+    "webpack-cli": "^3.3.6"
   },
   "devDependencies": {
-    "@babel/core": "^7.4.5",
-    "@babel/preset-env": "^7.4.5",
-    "babel-loader": "^8.0.6",
-    "babel-plugin-transform-regenerator": "^6.26.0",
-    "css-loader": "^2.1.1",
-    "file-loader": "^3.0.1",
+    "eslint": "^6.1.0",
+    "eslint-plugin-vue": "^5.2.3",
     "nodemon": "^1.19.1",
-    "vue-loader": "^15.7.0",
-    "vue-template-compiler": "^2.6.10",
-    "webpack": "^4.33.0",
-    "webpack-cli": "^3.3.3",
-    "webpack-dev-server": "^3.7.1"
+    "webpack-dev-middleware": "^3.7.0"
   },
   "nodemonConfig": {
     "ignore": [

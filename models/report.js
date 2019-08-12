@@ -11,7 +11,7 @@ const reportSchema = new mongoose.Schema({
     display: { type: Boolean, default: true },
     valid: { type: Number, enum: [1, 2, 3] },
     feedback: { type: String },
-    isActive: { type: Boolean, default: true }
+    isActive: { type: Boolean, default: true },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 const Report = mongoose.model('Report', reportSchema);
@@ -30,7 +30,7 @@ class ReportService extends BaseService
      */
     async create(reporter, culpritId, reason, link) {
         try {
-            return await Report.create({reporter: reporter, culprit: culpritId, reason: reason, link: link});
+            return await Report.create({ reporter: reporter, culprit: culpritId, reason: reason, link: link });
         } catch(error) {
             logsService.create(null, JSON.stringify(error), true);
             return { error: error._message };

@@ -1,6 +1,6 @@
 const express = require('express');
-const api = require('../models/api.js');
-const helper = require('./helper');
+const api = require('../helpers/api');
+const helper = require('../helpers/helpers');
 const reportsService = require('../models/report').service;
 const usersService = require('../models/user').service;
 const logsService = require('../models/log').service;
@@ -10,13 +10,13 @@ const router = express.Router();
 router.use(api.isLoggedIn);
 
 /* GET reports page */
-router.get('/', async (req, res, next) => {
+router.get('/', (req, res) => {
     res.render('reports', {
         title: 'Reports',
         script: '../js/reports.js',
         isReports: true,
-        isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
-        isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
+        isBnOrNat: res.locals.userRequest.isBnOrNat,
+        isNat: res.locals.userRequest.isNat,
     });
 });
 
@@ -40,15 +40,15 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
                 author: {
                     name: `User report: ${u.username}`,
                     icon_url: `https://a.ppy.sh/${u.osuId}`,
-                    url: `https://osu.ppy.sh/users/${u.osuId}`
+                    url: `https://osu.ppy.sh/users/${u.osuId}`,
                 },
                 color: '12184229',
                 fields:[
                     {
-                        name: `Report reason`,
-                        value: req.body.reason
-                    }
-                ]
+                        name: 'Report reason',
+                        value: req.body.reason,
+                    },
+                ],
             }]);
             logsService.create(
                 null,
@@ -62,20 +62,20 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
         res.json({});
         api.webhookPost([{
             author: {
-                name: `Non-user report`,
-                url: req.body.link
+                name: 'Non-user report',
+                url: req.body.link,
             },
             color: '15386534',
             fields:[
                 {
-                    name: `Report reason`,
-                    value: req.body.reason
-                }
-            ]
+                    name: 'Report reason',
+                    value: req.body.reason,
+                },
+            ],
         }]);
         logsService.create(
             null,
-            `Reported something without a username included`
+            'Reported something without a username included'
         );
     }
     

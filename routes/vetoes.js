@@ -1,5 +1,6 @@
 const express = require('express');
-const api = require('../models/api');
+const api = require('../helpers/api');
+const helpers = require('../helpers/helpers');
 const vetoesService = require('../models/veto').service;
 const usersService = require('../models/user').service;
 const mediationsService = require('../models/mediation').service;
@@ -16,7 +17,7 @@ router.use(api.isLoggedIn);
 router.use(api.isBnOrNat);
 
 /* GET bn app page */
-router.get('/', async (req, res, next) => {
+router.get('/', (req, res) => {
     res.render('vetoes', {
         title: 'Vetoes',
         script: '../javascripts/vetoes.js',
@@ -27,28 +28,26 @@ router.get('/', async (req, res, next) => {
 });
 
 /* GET applicant listing. */
-router.get('/relevantInfo', async (req, res, next) => {
+router.get('/relevantInfo', async (req, res) => {
     let v = await vetoesService.query({}, defaultPopulate, { createdAt: -1 }, true);
     res.json({ 
         vetoes: v, 
         userId: req.session.mongoId, 
         isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator, 
         isSpectator: res.locals.userRequest.isSpectator,
-        userOsuId: req.session.osuId
+        userOsuId: req.session.osuId,
     });
 });
 
 /* POST create a new veto. */
-router.post('/submit', async (req, res, next) => {
+router.post('/submit', async (req, res) => {
     let url = req.body.discussionLink;
     if (url.length == 0) {
         url = undefined;
     }
 
-    const regexp = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
-    if (!regexp.test(url) || url.indexOf('osu.ppy.sh/beatmapsets/') == -1) {
-        return res.json({ error: 'Not a valid URL' });
-    }
+    const validUrl = helpers.isValidUrl(url, 'osu.ppy.sh/beatmapsets');
+    if (validUrl.error) return res.json(validUrl.error);
 
     let indexStart = url.indexOf('beatmapsets/') + 'beatmapsets/'.length;
     let indexEnd = url.indexOf('#');
@@ -75,30 +74,30 @@ router.post('/submit', async (req, res, next) => {
         req.body.shortReason,
         req.body.mode
     );
-    v = await vetoesService.query({_id: v._id}, defaultPopulate);
+    v = await vetoesService.query({ _id: v._id }, defaultPopulate);
     res.json(v);
     logsService.create(req.session.mongoId, `Submitted a veto for mediation on "${v.beatmapTitle}"`);
     api.webhookPost([{
         author: {
             name: `New veto: ${bmInfo.artist} - ${bmInfo.title}`,
-            url: `https://osu.ppy.sh/beatmapsets/${bmInfo.beatmapset_id}`
+            url: `https://osu.ppy.sh/beatmapsets/${bmInfo.beatmapset_id}`,
         },
         thumbnail: {
-            url: `https://assets.ppy.sh/beatmaps/${bmId}/covers/list.jpg`
+            url: `https://assets.ppy.sh/beatmaps/${bmId}/covers/list.jpg`,
         },
         color: '7335382',
         fields:[
             {
-                name: `Veto reason`,
-                value: req.body.shortReason
-            }
-        ]
+                name: 'Veto reason',
+                value: req.body.shortReason,
+            },
+        ],
     }], 
     req.body.mode);
 });
 
 /* POST set status upheld or withdrawn. */
-router.post('/selectMediators', async (req, res, next) => {
+router.post('/selectMediators', async (req, res) => {
     let allUsers;
     try{
         allUsers = await usersService.getAllMediators();
@@ -124,7 +123,7 @@ router.post('/selectMediators', async (req, res, next) => {
 });
 
 /* POST begin mediation */
-router.post('/beginMediation/:id', api.isNat, async (req, res, next) => {
+router.post('/beginMediation/:id', api.isNat, async (req, res) => {
     for (let i = 0; i < req.body.mediators.length; i++) {
         let mediator = req.body.mediators[i];
         let m = await mediationsService.create(mediator._id);
@@ -132,7 +131,7 @@ router.post('/beginMediation/:id', api.isNat, async (req, res, next) => {
     }
     let date = new Date();
     date.setDate(date.getDate() + 7);
-    await vetoesService.update(req.params.id, {deadline: date});
+    await vetoesService.update(req.params.id, { deadline: date });
     let v = await vetoesService.query({ _id: req.params.id }, defaultPopulate);
     res.json(v);
     logsService.create(
@@ -142,18 +141,18 @@ router.post('/beginMediation/:id', api.isNat, async (req, res, next) => {
 });
 
 /* POST submit mediation */
-router.post('/submitMediation/:id', async (req, res, next) => {
+router.post('/submitMediation/:id', async (req, res) => {
     await mediationsService.update(req.body.mediationId, { comment: req.body.comment, vote: req.body.vote });
     let v = await vetoesService.query({ _id: req.params.id }, defaultPopulate);
     res.json(v);
     logsService.create(
         req.session.mongoId,
-        `Submitted vote for a veto`
+        'Submitted vote for a veto'
     );
 });
 
 /* POST conclude mediation */
-router.post('/concludeMediation/:id', api.isNat, async (req, res, next) => {
+router.post('/concludeMediation/:id', api.isNat, async (req, res) => {
     if(req.body.dismiss || !req.body.majority){
         await vetoesService.update(req.params.id, { status: 'withdrawn' });
     }else{
@@ -168,7 +167,7 @@ router.post('/concludeMediation/:id', api.isNat, async (req, res, next) => {
 });
 
 /* POST continue mediation */
-router.post('/continueMediation/:id', api.isNat, async (req, res, next) => {
+router.post('/continueMediation/:id', api.isNat, async (req, res) => {
     await vetoesService.update(req.params.id, { status: 'wip' });
     let v = await vetoesService.query({ _id: req.params.id }, defaultPopulate);
     res.json(v);
@@ -179,7 +178,7 @@ router.post('/continueMediation/:id', api.isNat, async (req, res, next) => {
 });
 
 /* POST replace mediator */
-router.post('/replaceMediator/:id', api.isNat, async (req, res, next) => {
+router.post('/replaceMediator/:id', api.isNat, async (req, res) => {
     let v = await vetoesService.query({ _id: req.params.id }, defaultPopulate);
     let currentMediators = [];
     v.mediations.forEach(mediation => {
@@ -205,7 +204,7 @@ router.post('/replaceMediator/:id', api.isNat, async (req, res, next) => {
     res.json(v);
     logsService.create(
         req.session.mongoId,
-        `Re-selected a single veto mediator`
+        'Re-selected a single veto mediator'
     );
 });
 

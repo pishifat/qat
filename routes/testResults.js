@@ -1,6 +1,6 @@
 const express = require('express');
-const api = require('../models/api');
-const helper = require('./helper');
+const api = require('../helpers/api');
+const helper = require('../helpers/helpers');
 const testSubmissionService = require('../models/bnTest/testSubmission').service;
 const usersService = require('../models/user').service;
 
@@ -9,19 +9,16 @@ const router = express.Router();
 router.use(api.isLoggedIn);
 
 /* GET bn app page */
-router.get('/', async (req, res, next) => {
+router.get('/', (req, res) => {
     res.render('rcTest/testresults', {
         title: 'Ranking Criteria Test Results',
         script: '../javascripts/testResults.js',
         isTest: true,
-        isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
+        isBnOrNat: res.locals.userRequest.isBnOrNat,
+        isNat: res.locals.userRequest.isNat,
         isBnEvaluator: res.locals.userRequest.group == 'bn' && res.locals.userRequest.isBnEvaluator,
-        isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
     });
 });
-
-//population
-const defaultPopulate = [{ populate: 'options', display: 'content score metadataType' }];
 
 const defaultTestPopulate = [
     { populate: 'applicant', display: 'username osuId' },
@@ -44,7 +41,7 @@ const defaultTestPopulate = [
 ];
 
 /* GET relevant info. */
-router.get('/relevantInfo', async (req, res, next) => {
+router.get('/relevantInfo', async (req, res) => {
     let tests = await testSubmissionService.query(
         {
             applicant: req.session.mongoId,
@@ -55,7 +52,7 @@ router.get('/relevantInfo', async (req, res, next) => {
         true
     );
 
-    res.json({tests: tests, isNat: res.locals.userRequest.group == 'nat'});
+    res.json({ tests: tests, isNat: res.locals.userRequest.isNat });
 });
 
 
@@ -93,7 +90,7 @@ router.get('/search/:user', api.isNat, async (req, res) => {
 /* POST edit additional points because metadata is unreliable */
 router.post('/updateAdditionalPoints/:id', api.isNat, async (req, res) => {
     await testSubmissionService.update(req.params.id, { additionalPoints: req.body.points });
-    let t = await testSubmissionService.query({_id: req.params.id}, defaultTestPopulate);
+    let t = await testSubmissionService.query({ _id: req.params.id }, defaultTestPopulate);
     res.json(t);
 });
 

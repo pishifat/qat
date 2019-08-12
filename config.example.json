@@ -1,0 +1,33 @@
+{
+    "session": "",
+    "standardWebhook": {
+        "id": "",
+        "token": "",
+        "role": ""
+    },
+    "catchWebhook": {
+        "id": "",
+        "token": "",
+        "role": ""
+    },
+    "taikoWebhook": {
+        "id": "",
+        "token": "",
+        "role": ""
+    },
+    "maniaWebhook": {
+        "id": "",
+        "token": "",
+        "role": ""
+    },
+    "reportWebhook": {
+        "id": "",
+        "token": "",
+        "role": ""
+    },
+    "v1token": "",
+    "id": 0,
+    "secret": "",
+    "redirect": "http://localhost:8080/callback",
+    "connection": ""
+}

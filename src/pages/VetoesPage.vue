@@ -2,8 +2,8 @@
     <div class="row">
         <div class="col-md-12">
             <filter-box 
-                :filterMode.sync="filterMode" 
-                :filterValue.sync="filterValue"
+                :filter-mode.sync="filterMode" 
+                :filter-value.sync="filterValue"
                 :placeholder="'beatmap...'"
             >
                 <button class="btn btn-sm btn-nat ml-2" data-toggle="modal" data-target="#addVeto">
@@ -13,29 +13,29 @@
             
             <section class="row segment segment-image mx-0 px-0">
                 <div class="col-sm-12">
-                    <h2>Active Vetoes <small v-if="activeVetoes">({{activeVetoes.length}})</small></h2>
+                    <h2>Active Vetoes <small v-if="activeVetoes">({{ activeVetoes.length }})</small></h2>
                     <transition-group name="list" tag="div" class="row mx-auto">
                         <veto-card
                             v-for="veto in activeVetoes"
                             :key="veto.id"
                             :veto="veto"
-                            :userId="userId"
+                            :user-id="userId"
                             @update:selectedVeto="selectedVeto = $event"
-                        ></veto-card>
+                        />
                     </transition-group>
                 </div>
             </section>
             <section class="row segment segment-image mx-0 px-0">
                 <div class="col-sm-12">
-                    <h2>Resolved Vetoes <small v-if="resolvedVetoes">({{resolvedVetoes.length}})</small></h2>
+                    <h2>Resolved Vetoes <small v-if="resolvedVetoes">({{ resolvedVetoes.length }})</small></h2>
                     <transition-group name="list" tag="div" class="row mx-auto">
                         <veto-card
                             v-for="veto in resolvedVetoes"
                             :key="veto.id"
                             :veto="veto"
-                            :userId="userId"
+                            :user-id="userId"
                             @update:selectedVeto="selectedVeto = $event"
-                        ></veto-card>
+                        />
                     </transition-group>
                 </div>
             </section>
@@ -47,8 +47,8 @@
             :is-nat="isNat || isSpectator"
             :is-spectator="isSpectator"
             @update-veto="updateVeto($event)"
-        ></veto-info>
-        <submit-veto @submit-veto="SubmitVeto($event)"></submit-veto>
+        />
+        <submit-veto @submit-veto="SubmitVeto($event)" />
     </div>
 </template>
 
@@ -61,7 +61,7 @@ import pagination from '../mixins/pagination.js';
 import filters from '../mixins/filters.js';
 
 export default {
-    name: 'vetoes-page',
+    name: 'VetoesPage',
     components: {
         VetoCard,
         VetoInfo,
@@ -69,28 +69,6 @@ export default {
         FilterBox,
     },
     mixins: [pagination, filters],
-    methods: {
-        filterBySearchValueContext: function(v) {
-            if(v.beatmapTitle.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1){
-                return true;
-            }
-            return false;
-        },
-        separateObjs: function() {
-            this.activeVetoes = this.pageObjs.filter(v => v.status == 'wip' || v.status == 'available');
-            this.resolvedVetoes = this.pageObjs.filter(v => v.status != 'wip' && v.status != 'available');
-        },
-        SubmitVeto: function(v) {
-            this.allObjs.unshift(v);
-            this.filter();
-        },
-        updateVeto: function(v) {
-            const i = this.allObjs.findIndex(veto => veto.id == v.id);
-            this.allObjs[i] = v;
-            this.selectedVeto = v;
-            this.filter();
-        },
-    },
     data() {
         return {
             allObjs: null,
@@ -135,6 +113,28 @@ export default {
                 }
             });
         }, 300000);
+    },
+    methods: {
+        filterBySearchValueContext: function(v) {
+            if(v.beatmapTitle.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1){
+                return true;
+            }
+            return false;
+        },
+        separateObjs: function() {
+            this.activeVetoes = this.pageObjs.filter(v => v.status == 'wip' || v.status == 'available');
+            this.resolvedVetoes = this.pageObjs.filter(v => v.status != 'wip' && v.status != 'available');
+        },
+        SubmitVeto: function(v) {
+            this.allObjs.unshift(v);
+            this.filter();
+        },
+        updateVeto: function(v) {
+            const i = this.allObjs.findIndex(veto => veto.id == v.id);
+            this.allObjs[i] = v;
+            this.selectedVeto = v;
+            this.filter();
+        },
     },
 };
 </script>

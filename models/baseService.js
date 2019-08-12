@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 const mongoose = require('mongoose');
 const logsService = require('./log').service;
 

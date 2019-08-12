@@ -1,6 +1,6 @@
 const express = require('express');
-const api = require('../models/api');
-const helper = require('./helper');
+const api = require('../helpers/api');
+const helper = require('../helpers/helpers');
 const bnAppsService = require('../models/bnApp').service;
 const evalRoundsService = require('../models/evalRound').service;
 const usersService = require('../models/user').service;
@@ -11,13 +11,13 @@ router.use(api.isLoggedIn);
 router.use(api.isNat);
 
 /* GET eval archive page */
-router.get('/', async (req, res, next) => {
+router.get('/', (req, res) => {
     res.render('evaluations/evalarchive', {
         title: 'Evaluation Archives',
         script: '../javascripts/evalArchive.js',
         isEval: true,
-        isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
-        isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
+        isBnOrNat: res.locals.userRequest.isBnOrNat,
+        isNat: res.locals.userRequest.isNat,
     });
 });
 
@@ -36,7 +36,7 @@ const defaultBnPopulate = [
 ];
 
 /* GET applicant listing. */
-router.get('/relevantInfo', async (req, res, next) => {
+router.get('/relevantInfo', (req, res) => {
     res.json({ evaluator: req.session.mongoId });
 });
 
@@ -47,13 +47,13 @@ router.post('/search/', async (req, res) => {
         return res.json({ error: 'Cannot find user!' });
     }
     let a = await bnAppsService.query(
-        { applicant: u.id, active: false, consensus: {$exists: true} },
+        { applicant: u.id, active: false, consensus: { $exists: true } },
         defaultAppPopulate,
         { createdAt: 1 },
         true
     );
     let b = await evalRoundsService.query(
-        { bn: u.id, active: false, consensus: {$exists: true} },
+        { bn: u.id, active: false, consensus: { $exists: true } },
         defaultBnPopulate,
         { createdAt: 1 },
         true
@@ -69,14 +69,14 @@ router.post('/searchRecent/', async (req, res) => {
         req.body.limit = parseInt(req.body.limit);
     }
     let a = await bnAppsService.query(
-        { active: false, consensus: {$exists: true} },
+        { active: false, consensus: { $exists: true } },
         defaultAppPopulate,
         { createdAt: -1 },
         true,
         req.body.limit
     );
     let b = await evalRoundsService.query(
-        { active: false, consensus: {$exists: true} },
+        { active: false, consensus: { $exists: true } },
         defaultBnPopulate,
         { createdAt: -1 },
         true,

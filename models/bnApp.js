@@ -3,13 +3,13 @@ const logsService = require('./log').service;
 const BaseService = require('./baseService');
 
 const bnAppSchema = new mongoose.Schema({
-    applicant: {type: 'ObjectId', ref: 'User', required: true},
+    applicant: { type: 'ObjectId', ref: 'User', required: true },
     mode: { type: String, enum: ['osu', 'taiko', 'catch', 'mania'], required: true },
     mods: [{ type: String, required: true }],
-    evaluations: [{type: 'ObjectId', ref: 'Evaluation'}],
+    evaluations: [{ type: 'ObjectId', ref: 'Evaluation' }],
     active: { type: Boolean, default: true },
     discussion: { type: Boolean, default: false },
-    consensus: { type: String, enum: ["pass", "fail"] },
+    consensus: { type: String, enum: ['pass', 'fail'] },
     feedback: { type: String },
     isPriority: { type: Boolean, default: false },
     test: { type: 'ObjectId', ref: 'TestSubmission' },
@@ -35,7 +35,7 @@ class BnAppService extends BaseService
             return await BnApp.create({ applicant: userId, mode: mode, mods: mods });
         } catch(error) {
             logsService.create(null, JSON.stringify(error), true);
-            return { error: error._message }
+            return { error: error._message };
         }
     }
 }

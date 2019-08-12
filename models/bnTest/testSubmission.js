@@ -10,7 +10,7 @@ const testSubmission = new mongoose.Schema({
     startedAt: { type: Date },
     submittedAt: { type: Date },
     totalScore: { type: Number }, //better to store this than populate full test for each application
-    additionalPoints: { type: Number, default: 0 }
+    additionalPoints: { type: Number, default: 0 },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 testSubmission.virtual('answers', {
@@ -35,7 +35,7 @@ const testMetadataInput = new mongoose.Schema({
     source: { type: String },
     reference1: { type: String },
     reference2: { type: String },
-    reference3: { type: String }
+    reference3: { type: String },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 const TestMetadataInput = mongoose.model('TestMetadataInput', testMetadataInput);
@@ -66,7 +66,7 @@ class TestSubmissionService extends BaseService
         try {
             const test = await TestSubmission.create({ 
                 applicant: applicant,
-                mode: mode
+                mode: mode,
             });
             
             /* Dumb stuff that may revisit someday
@@ -99,18 +99,18 @@ class TestSubmissionService extends BaseService
             */
             
             let categoriesObject = [
-                {name: 'bn', total: 3},
-                {name: 'codeOfConduct', total: 2},
-                {name: 'general', total: 2},
-                {name: 'spread', total: 2},
-                {name: 'metadata', total: 1},
-                {name: 'timing', total: 1},
-                {name: 'audio', total: 1},
-                {name: 'videoBackground', total: 1},
-                {name: 'skinning', total: 1},
-                {name: 'storyboarding', total: 1},
+                { name: 'bn', total: 3 },
+                { name: 'codeOfConduct', total: 2 },
+                { name: 'general', total: 2 },
+                { name: 'spread', total: 2 },
+                { name: 'metadata', total: 1 },
+                { name: 'timing', total: 1 },
+                { name: 'audio', total: 1 },
+                { name: 'videoBackground', total: 1 },
+                { name: 'skinning', total: 1 },
+                { name: 'storyboarding', total: 1 },
             ];
-            categoriesObject.push({name: mode, total: 3});
+            categoriesObject.push({ name: mode, total: 3 });
             
             let qs = [];
             for (let i = 0; i < categoriesObject.length; i++) {
@@ -156,7 +156,7 @@ class TestSubmissionService extends BaseService
                     source: source, 
                     reference1: reference1, 
                     reference2: reference2, 
-                    reference3: reference3
+                    reference3: reference3,
                 });
             }
 
@@ -168,11 +168,11 @@ class TestSubmissionService extends BaseService
                 source: source, 
                 reference1: reference1, 
                 reference2: reference2, 
-                reference3: reference3
+                reference3: reference3,
             });
         } catch(error) {
             logsService.create(null, JSON.stringify(error), true);
-            return { error: error._message }
+            return { error: error._message };
         }
     }
 }

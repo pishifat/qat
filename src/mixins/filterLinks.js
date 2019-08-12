@@ -1,10 +1,10 @@
 const filterLinks = {
     methods: {
         filterLinks: function (text) {
-            return (text || "...").replace(
+            return (text || '...').replace(
                 /([^\S]|^)(((https?\:\/\/)|(www\.))(\S+))/gi,
                 function(match, space, url){
-                    var hyperlink = url;
+                    let hyperlink = url;
                     if (!hyperlink.match('^https?:\/\/')) {
                         hyperlink = 'http://' + hyperlink;
                     }
@@ -12,7 +12,7 @@ const filterLinks = {
                 }
             );
         },
-    }
-}
+    },
+};
 
 export default filterLinks;

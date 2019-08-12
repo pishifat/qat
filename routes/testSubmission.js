@@ -1,5 +1,5 @@
 const express = require('express');
-const api = require('../models/api');
+const api = require('../helpers/api');
 const testSubmissionService = require('../models/bnTest/testSubmission').service;
 const logsService = require('../models/log').service;
 const bnAppsService = require('../models/bnApp').service;
@@ -28,7 +28,7 @@ const defaultPopulate = [
 ];
 
 /* GET test page */
-router.get('/', async (req, res, next) => {
+router.get('/', (req, res) => {
     res.render('testsubmission', {
         title: 'Test Submission',
         script: '../javascripts/testSubmission.js',
@@ -38,7 +38,7 @@ router.get('/', async (req, res, next) => {
 });
 
 /* GET pending tests by user */
-router.get('/tests', async (req, res, next) => {
+router.get('/tests', async (req, res) => {
     const tests = await testSubmissionService.query(
         {
             applicant: req.session.mongoId,
@@ -57,7 +57,7 @@ router.get('/tests', async (req, res, next) => {
 });
 
 /* POST test by user */
-router.post('/loadTest', async (req, res, next) => {
+router.post('/loadTest', async (req, res) => {
     let test = await testSubmissionService.query(
         {
             _id: req.body.testId,
@@ -81,7 +81,7 @@ router.post('/loadTest', async (req, res, next) => {
 });
 
 /* POST submit answers */
-router.post('/submitAnswer', async (req, res, next) => {
+router.post('/submitAnswer', async (req, res) => {
     if (!req.body.answerId || !req.body.checkedOptions) return res.json({ error: 'Something went wrong!' });
 
     let answer;
@@ -107,7 +107,7 @@ router.post('/submitAnswer', async (req, res, next) => {
 });
 
 /* POST submit test */
-router.post('/submitTest', async (req, res, next) => {
+router.post('/submitTest', async (req, res) => {
     const test = await testSubmissionService.query(
         {
             _id: req.body.testId,
@@ -119,7 +119,7 @@ router.post('/submitTest', async (req, res, next) => {
     const currentBnApp = await bnAppsService.query({
         applicant: req.session.mongoId,
         mode: test.mode,
-        active: true 
+        active: true, 
     });
 
     if (!test || test.error || !currentBnApp || currentBnApp.error) return res.json({ error: 'Something went wrong!' });
@@ -161,7 +161,7 @@ router.post('/submitTest', async (req, res, next) => {
             status: 'finished',
             totalScore: displayScore,
         }),
-        bnAppsService.update(currentBnApp.id, {test: test._id})
+        bnAppsService.update(currentBnApp.id, { test: test._id }),
     ]);
 
     if (!updatedTest || updatedTest.error || !updatedApp || updatedApp.error) return res.json({ error: 'Something went wrong!' });
@@ -173,7 +173,7 @@ router.post('/submitTest', async (req, res, next) => {
     for (let i = 0; i < currentBnApp.mods.length; i++) {
         modsList += currentBnApp.mods[i];
         if(i + 1 < currentBnApp.mods.length){
-            modsList += ", "
+            modsList += ', ';
         }
     }
     api.webhookPost(
@@ -181,19 +181,19 @@ router.post('/submitTest', async (req, res, next) => {
             author: {
                 name: `${u.username}`,
                 icon_url: `https://a.ppy.sh/${u.osuId}`,
-                url: `https://osu.ppy.sh/users/${u.osuId}`
+                url: `https://osu.ppy.sh/users/${u.osuId}`,
             },
             color: '7335382',
             fields:[
                 {
-                    name: `New BN application`,
-                    value: `Test score: **${displayScore}**`
+                    name: 'New BN application',
+                    value: `Test score: **${displayScore}**`,
                 },
                 {
-                    name: `Mods`,
-                    value: modsList
-                }
-            ]
+                    name: 'Mods',
+                    value: modsList,
+                },
+            ],
         }], 
         test.mode
     );

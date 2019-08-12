@@ -32,7 +32,7 @@ class RcDiscussionService extends BaseService
                 discussionLink: discussionLink, 
                 title: title,
                 shortReason: shortReason, 
-                mode: mode 
+                mode: mode, 
             });
         } catch(error) {
             logsService.create(null, JSON.stringify(error), true);

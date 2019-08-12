@@ -50,7 +50,7 @@ class VetoService extends BaseService
                 beatmapMapper: beatmapMapper,
                 beatmapMapperId: beatmapMapperId,
                 shortReason: shortReason, 
-                mode: mode 
+                mode: mode, 
             });
         } catch(error) {
             logsService.create(null, JSON.stringify(error), true);

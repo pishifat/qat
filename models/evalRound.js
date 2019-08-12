@@ -12,7 +12,7 @@ const evalRoundSchema = new mongoose.Schema({
     consensus: { type: String, enum: ['pass', 'extend', 'fail'] },
     feedback: { type: String },
     isPriority: { type: Boolean, default: false },
-    isLowActivity: { type: Boolean, default: false}
+    isLowActivity: { type: Boolean, default: false },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 const EvalRound = mongoose.model('EvalRound', evalRoundSchema);
@@ -31,10 +31,10 @@ class EvalRoundService extends BaseService
      */
     async create(bnId, mode, deadline) {
         try {
-            return await EvalRound.create({bn: bnId, mode: mode, deadline: deadline});
+            return await EvalRound.create({ bn: bnId, mode: mode, deadline: deadline });
         } catch(error) {
             logsService.create(null, JSON.stringify(error), true);
-            return { error: error._message }
+            return { error: error._message };
         }
     }
 
@@ -47,7 +47,7 @@ class EvalRoundService extends BaseService
             return await EvalRound.insertMany(evalRounds);
         } catch(error) {
             logsService.create(null, JSON.stringify(error), true);
-            return { error: 'Something went wrong!' }
+            return { error: 'Something went wrong!' };
         }
     }
 }

@@ -1,30 +1,34 @@
 <template>
     <div class="row">
-        <section class="col-md-12 mb-4 segment" v-if="isNat">
+        <section v-if="isNat" class="col-md-12 mb-4 segment">
             <div class="input-group input-group-sm">
                 <input
+                    v-model="searchValue"
                     type="text"
                     placeholder="username..."
-                    v-model="searchValue"
-                    @keyup.enter="query($event)"
                     maxlength="18"
                     autocomplete="off"
-                />
-                <button class="btn btn-nat ml-2" @click="query($event)" type="submit">Search tests</button>
+                    @keyup.enter="query($event)"
+                >
+                <button class="btn btn-nat ml-2" type="submit" @click="query($event)">
+                    Search tests
+                </button>
                 <span v-if="info" class="errors ml-4 mt-2">Error: {{ info }}</span>
             </div>
         </section>
 
-        <section class="col-md-12 segment segment-image" v-if="allTests">
+        <section v-if="allTests" class="col-md-12 segment segment-image">
             <transition-group name="list" tag="div" class="row">
                 <result-card
                     v-for="test in allTests"
                     :key="test.id"
                     :selected-test="test"
                     @update:selected-test="selectedTest = $event"
-                ></result-card>
+                />
             </transition-group>
-            <p v-if="!allTests.length" class="text-center min-spacing">You have no test results saved...</p>
+            <p v-if="!allTests.length" class="text-center min-spacing">
+                You have no test results saved...
+            </p>
         </section>
 
         <section v-if="selectedTest">
@@ -33,34 +37,36 @@
                 {{ selectedTest.totalScore + selectedTest.additionalPoints }}
             </p>
 
-            <div class="segment segment-image" v-for="(answer, i) in selectedTest.answers" :key="answer.id">
+            <div v-for="(answer, i) in selectedTest.answers" :key="answer.id" class="segment segment-image">
                 <small class="float-right">
                     Q{{ ++i }} -- {{ answer.question.category }}
-                    <span v-if="isNat && answer.question.questionType != 'fill'"> -- total: {{calculateQuestionScore(answer)}}</span>
+                    <span v-if="isNat && answer.question.questionType != 'fill'"> -- total: {{ calculateQuestionScore(answer) }}</span>
                 </small>
                 <div
                     v-if="answer.question.questionType === 'text' || answer.question.questionType === 'image'"
                 >
-                    <h5 style="width: 90%">{{ answer.question.content }}</h5>
+                    <h5 style="width: 90%">
+                        {{ answer.question.content }}
+                    </h5>
                     <div v-for="option in getActiveOptions(answer.question.options)" :key="option.id">
                         <div
-                            class="form-check mb-2 ml-2"
                             v-if="
                                 answer.question.questionType === 'text' ||
                                     answer.question.questionType === 'image'
                             "
+                            class="form-check mb-2 ml-2"
                         >
                             <input
+                                :id="option.id"
                                 class="form-check-input"
                                 type="checkbox"
                                 :value="option.id"
-                                :id="option.id"
                                 :checked="answer.optionsChosen.indexOf(option.id) >= 0"
-                            />
+                            >
                             <label
+                                v-if="answer.question.questionType === 'text'"
                                 class="form-check-label"
                                 style="width: 90%"
-                                v-if="answer.question.questionType === 'text'"
                                 :for="option.id"
                                 :class="[
                                     option.score > 0 ? 'vote-pass' : 'vote-fail',
@@ -78,12 +84,12 @@
                                         : ''
                                 "
                             >
-                                <img :src="option.content" class="test-image" />
+                                <img :src="option.content" class="test-image">
                                 <span :class="option.score > 0 ? 'vote-pass' : 'vote-fail'">{{
                                     option.score > 0 ? 'Correct' : 'Incorrect'
                                 }}</span>
                             </label>
-                            <small class="float-right" v-if="isNat">{{ option.score }}</small>
+                            <small v-if="isNat" class="float-right">{{ option.score }}</small>
                         </div>
                     </div>
                 </div>
@@ -102,78 +108,80 @@
                         </small>
                         <input
                             id="title"
+                            v-model="answer.metadataInput.title"
                             class="form-control mb-1"
                             type="text"
                             placeholder="Romanised Title..."
-                            v-model="answer.metadataInput.title"
-                        />
+                        >
                         <small class="pl-2">
                             Unicode Title:
                         </small>
                         <input
                             id="titleUnicode"
+                            v-model="answer.metadataInput.titleUnicode"
                             class="form-control mb-1"
                             type="text"
                             placeholder="Unicode Title (if same as Romanised Title, copy that here)..."
-                            v-model="answer.metadataInput.titleUnicode"
-                        />
+                        >
                         <small class="pl-2">
                             Romanised Artist:
                         </small>
                         <input
                             id="artist"
+                            v-model="answer.metadataInput.artist"
                             class="form-control mb-1"
                             type="text"
                             placeholder="Romanised Artist..."
-                            v-model="answer.metadataInput.artist"
-                        />
+                        >
                         <small class="pl-2">
                             Unicode Artist:
                         </small>
                         <input
                             id="artistUnicode"
+                            v-model="answer.metadataInput.artistUnicode"
                             class="form-control mb-1"
                             type="text"
                             placeholder="Unicode Artist (if same as Romanised Artist, copy that here)..."
-                            v-model="answer.metadataInput.artistUnicode"
-                        />
+                        >
                         <small class="pl-2">
                             Source:
                         </small>
                         <input
                             id="source"
+                            v-model="answer.metadataInput.source"
                             class="form-control mb-2"
                             type="text"
                             placeholder="Source (if unclear or non-existent, leave empty)..."
-                            v-model="answer.metadataInput.source"
-                        />
+                        >
                         <small class="pl-2">
                             References:
                         </small>
                         <input
                             id="reference1"
+                            v-model="answer.metadataInput.reference1"
                             class="form-control mb-1"
                             type="text"
                             placeholder="Reference 1"
-                            v-model="answer.metadataInput.reference1"
-                        />
+                        >
                         <input
                             id="reference2"
+                            v-model="answer.metadataInput.reference2"
                             class="form-control mb-1"
                             type="text"
                             placeholder="Reference 2"
-                            v-model="answer.metadataInput.reference2"
-                        />
+                        >
                         <input
                             id="reference3"
+                            v-model="answer.metadataInput.reference3"
                             class="form-control mb-1"
                             type="text"
                             placeholder="Reference 3"
-                            v-model="answer.metadataInput.reference3"
-                        />
+                        >
                     </div>
                     <div v-if="isNat">
-                        <h5 class="mt-4">Correct possibilities:</h5>
+                        <h5 class="mt-4">
+                            Correct possibilities:
+                        </h5>
                         <p
                             v-for="option in answer.question.options"
                             :key="option.id"
@@ -184,13 +192,13 @@
                         Add to/subtract from total score:
                         <input
                             id="score"
+                            v-model="additionalPoints"
                             class="form-control-sm col-md-1 ml-1 mb-2"
                             type="text"
                             maxlength="5"
                             placeholder="points..."
                             style="min-width: 80px; width: 80;"
-                            v-model="additionalPoints"
-                        />
+                        >
                         <button
                             type="submit"
                             class="btn btn-sm btn-nat mx-2"
@@ -216,11 +224,23 @@ import postData from '../mixins/postData.js';
 import ResultCard from '../components/rcTest/ResultCard.vue';
 
 export default {
-    name: 'test-results-page',
+    name: 'TestResultsPage',
     components: {
         ResultCard,
     },
     mixins: [postData],
+    data() {
+        return {
+            info: '',
+            confirm: '',
+            isNat: false,
+            additionalPoints: null,
+            allTests: null,
+            selectedTest: null,
+            selectedOptionIds: [],
+            searchValue: null,
+        };
+    },
     watch: {
         selectedTest: function(v) {
             if (v) {
@@ -230,6 +250,44 @@ export default {
                 this.info = '';
             }
         },
+    },
+    created() {
+        const params = new URLSearchParams(document.location.search.substring(1));
+        if (params.get('user') && params.get('user').length) {
+            axios
+                .get(`/testResults/search/${params.get('user')}`)
+                .then(response => {
+                    this.isNat = response.data.isNat;
+                    this.allTests = response.data.tests;
+                    if (this.allTests && this.allTests.length == 1) {
+                        this.selectedTest = this.allTests[0];
+                    }
+                })
+                .then(function() {
+                    $('#loading').fadeOut();
+                    $('#main')
+                        .attr('style', 'visibility: visible')
+                        .hide()
+                        .fadeIn();
+                });
+        } else {
+            axios
+                .get('/testResults/relevantInfo')
+                .then(response => {
+                    this.isNat = response.data.isNat;
+                    this.allTests = response.data.tests;
+                    if (this.allTests && this.allTests.length == 1) {
+                        this.selectedTest = this.allTests[0];
+                    }
+                })
+                .then(function() {
+                    $('#loading').fadeOut();
+                    $('#main')
+                        .attr('style', 'visibility: visible')
+                        .hide()
+                        .fadeIn();
+                });
+        }
     },
     methods: {
         calculateTotalScore: function() {
@@ -307,56 +365,6 @@ export default {
             this.allTests[i] = t;
             this.selectedTest = t;
         },
-    },
-    data() {
-        return {
-            info: '',
-            confirm: '',
-            isNat: false,
-            additionalPoints: null,
-            allTests: null,
-            selectedTest: null,
-            selectedOptionIds: [],
-            searchValue: null,
-        };
-    },
-    created() {
-        const params = new URLSearchParams(document.location.search.substring(1));
-        if (params.get('user') && params.get('user').length) {
-            axios
-                .get(`/testResults/search/${params.get('user')}`)
-                .then(response => {
-                    this.isNat = response.data.isNat;
-                    this.allTests = response.data.tests;
-                    if (this.allTests && this.allTests.length == 1) {
-                        this.selectedTest = this.allTests[0];
-                    }
-                })
-                .then(function() {
-                    $('#loading').fadeOut();
-                    $('#main')
-                        .attr('style', 'visibility: visible')
-                        .hide()
-                        .fadeIn();
-                });
-        } else {
-            axios
-                .get('/testResults/relevantInfo')
-                .then(response => {
-                    this.isNat = response.data.isNat;
-                    this.allTests = response.data.tests;
-                    if (this.allTests && this.allTests.length == 1) {
-                        this.selectedTest = this.allTests[0];
-                    }
-                })
-                .then(function() {
-                    $('#loading').fadeOut();
-                    $('#main')
-                        .attr('style', 'visibility: visible')
-                        .hide()
-                        .fadeIn();
-                });
-        }
     },
 };
 </script>

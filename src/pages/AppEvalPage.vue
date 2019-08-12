@@ -1,86 +1,110 @@
 <template>
-
-<div class="row">
-    <div class="col-md-12">
-        <filter-box 
-            :filterMode.sync="filterMode"
-            :filterValue.sync="filterValue"
-            :placeholder="'username... (3+ characters)'"
-        >
-            <slot>
-                <button class="btn btn-nat btn-sm ml-2" @click="selectAll($event)" v-if="evaluator && evaluator.isLeader">Select all</button>
-            </slot>
-        </filter-box>
-        <section class="row segment my-1 mx-4" v-if="evaluator && evaluator.isLeader">
-            <div class="small filter-box">
-                <span class="filter-header" style="width: 110px;">Mark selected as</span>
-                <button class="btn btn-nat btn-sm ml-2" @click="setGroupEval($event)">Group evaluation</button>
-                <button class="btn btn-nat btn-sm ml-2" @click="setIndividualEval($event)">Individual evaluation</button>
-                <button class="btn btn-nat-red btn-sm ml-2" @click="setComplete($event)" data-toggle="tooltip" data-placement="top" title="Moves an evaluation to archives and applies its consensus to its user">Archive</button>
-            </div>
-        </section>
-        <hr>
-        <section class="row segment segment-image mx-1 px-0">
-            <div class="col-sm-12">
-                <h2>Individual Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="Evaluations are hidden from others to avoid confirmation bias">?</sup> <small v-if="applications">({{applications.length}})</small></h2> 
-
-                <transition-group name="list" tag="div" class="row">
-                    <eval-card
-                        v-for="application in applications"
-                        :application="application"
-                        :evaluator="evaluator"
-                        :all-checked="allChecked"
-                        :user-to-evaluate="application.applicant"
-                        :mode="application.mode"
-                        :key="application.id"
-                        @update:selectedApplication="selectedApplication = $event"
-                    ></eval-card>
-                </transition-group>
-
-                <div class="row">
-                    <p v-if="!applications || applications.length == 0" class="ml-4">No applications to evaluate...</p>
+    <div class="row">
+        <div class="col-md-12">
+            <filter-box 
+                :filter-mode.sync="filterMode"
+                :filter-value.sync="filterValue"
+                :placeholder="'username... (3+ characters)'"
+            >
+                <slot>
+                    <button v-if="evaluator && evaluator.isLeader" class="btn btn-nat btn-sm ml-2" @click="selectAll($event)">
+                        Select all
+                    </button>
+                </slot>
+            </filter-box>
+            <section v-if="evaluator && evaluator.isLeader" class="row segment my-1 mx-4">
+                <div class="small filter-box">
+                    <span class="filter-header" style="width: 110px;">Mark selected as</span>
+                    <button class="btn btn-nat btn-sm ml-2" @click="setGroupEval($event)">
+                        Group evaluation
+                    </button>
+                    <button class="btn btn-nat btn-sm ml-2" @click="setIndividualEval($event)">
+                        Individual evaluation
+                    </button>
+                    <button
+                        class="btn btn-nat-red btn-sm ml-2"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="Moves an evaluation to archives and applies its consensus to its user"
+                        @click="setComplete($event)"
+                    >
+                        Archive
+                    </button>
                 </div>
-            </div>
-        </section>
-        <hr v-if="evaluator && (evaluator.group == 'nat' || evaluator.isSpectator)">
-        <section class="row segment segment-image mx-1 px-0" v-if="evaluator && (evaluator.group == 'nat' || evaluator.isSpectator)">
-            <div class="col-sm-12">
-                <h2>Group Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="After individual evals are completed, their responses are made visible to allow discussion and form a consensus">?</sup> <small v-if="discussApps">({{discussApps.length}})</small></h2>
+            </section>
+            <hr>
+            <section class="row segment segment-image mx-1 px-0">
+                <div class="col-sm-12">
+                    <h2>Individual Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="Evaluations are hidden from others to avoid confirmation bias">?</sup> <small v-if="applications">({{ applications.length }})</small></h2> 
 
-                <transition-group name="list" tag="div" class="row">
-                    <discuss-card
-                        v-for="discussApp in discussApps"
-                        :discuss-app="discussApp"
-                        :evaluator="evaluator"
-                        :all-checked="allChecked"
-                        :user-to-evaluate="discussApp.applicant"
-                        :mode="discussApp.mode"
-                        :key="discussApp.id"
-                        @update:selectedDiscussApp="selectedDiscussApp = $event"
-                    ></discuss-card>
-                </transition-group>
+                    <transition-group name="list" tag="div" class="row">
+                        <eval-card
+                            v-for="application in applications"
+                            :key="application.id"
+                            :application="application"
+                            :evaluator="evaluator"
+                            :all-checked="allChecked"
+                            :user-to-evaluate="application.applicant"
+                            :mode="application.mode"
+                            @update:selectedApplication="selectedApplication = $event"
+                        />
+                    </transition-group>
+
+                    <div class="row">
+                        <p v-if="!applications || applications.length == 0" class="ml-4">
+                            No applications to evaluate...
+                        </p>
+                    </div>
+                </div>
+            </section>
+            <hr v-if="evaluator && (evaluator.group == 'nat' || evaluator.isSpectator)">
+            <section v-if="evaluator && (evaluator.group == 'nat' || evaluator.isSpectator)" class="row segment segment-image mx-1 px-0">
+                <div class="col-sm-12">
+                    <h2>
+                        Group Evaluations
+                        <sup
+                            style="font-size: 12pt"
+                            data-toggle="tooltip"
+                            data-placement="top" 
+                            title="After individual evals are completed, their responses are made visible to allow discussion and form a consensus"
+                        >?</sup>
+                        <small v-if="discussApps">({{ discussApps.length }})</small>
+                    </h2>
+
+                    <transition-group name="list" tag="div" class="row">
+                        <discuss-card
+                            v-for="discussApp in discussApps"
+                            :key="discussApp.id"
+                            :discuss-app="discussApp"
+                            :evaluator="evaluator"
+                            :all-checked="allChecked"
+                            :user-to-evaluate="discussApp.applicant"
+                            :mode="discussApp.mode"
+                            @update:selectedDiscussApp="selectedDiscussApp = $event"
+                        />
+                    </transition-group>
                 
-                <div class="row">
-                    <p v-if="!discussApps || discussApps.length == 0" class="ml-4">No applications to evaluate...</p>
+                    <div class="row">
+                        <p v-if="!discussApps || discussApps.length == 0" class="ml-4">
+                            No applications to evaluate...
+                        </p>
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </div>
+
+        <eval-info
+            :application="selectedApplication"
+            :evaluator="evaluator"
+            @update-application="updateApplication($event)"
+        />
+
+        <discuss-info
+            :discuss-app="selectedDiscussApp"
+            :evaluator="evaluator"
+            @update-application="updateApplication($event)"
+        />
     </div>
-
-    <eval-info
-        :application="selectedApplication"
-        :evaluator="evaluator"
-        @update-application="updateApplication($event)"
-    ></eval-info>
-
-    <discuss-info
-        :discussApp="selectedDiscussApp"
-        :evaluator="evaluator"
-        @update-application="updateApplication($event)"
-    ></discuss-info>
-
-</div>
-
 </template>
 
 <script>
@@ -93,7 +117,7 @@ import filters from '../mixins/filters.js';
 import postData from '../mixins/postData.js';
 
 export default {
-    name: 'app-eval-page',
+    name: 'AppEvalPage',
     components: {
         EvalCard,
         EvalInfo,
@@ -102,87 +126,6 @@ export default {
         FilterBox,
     },
     mixins: [ postData, filters ],
-    methods: {
-        filterBySearchValueContext: function(a) {
-            if(a.applicant.username.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1){
-                return true;
-            }
-            return false;
-        },
-        separateObjs: function() {
-            this.applications = this.pageObjs.filter(v => !v.discussion);
-            this.discussApps = this.pageObjs.filter(v => v.discussion);
-        },
-        updateApplication: function (application) {
-			const i = this.allObjs.findIndex(a => a.id == application.id);
-            this.allObjs[i] = application;
-            if(application.discussion){
-                this.selectedDiscussApp = application;
-            }else{
-                this.selectedApplication = application;
-            }
-            this.filter();
-        },
-        setGroupEval: async function(e) {
-            let checkedApps = [];
-            $("input[name='evalTypeCheck']:checked").each( function () {
-                checkedApps.push( $(this).val() );
-            });
-            if(checkedApps.length){
-                const ers = await this.executePost('/appEval/setGroupEval/', { checkedApps: checkedApps}, e);
-                if (ers) {
-                    if (ers.error) {
-                        this.info = ers.error;
-                    } else {
-                        this.allObjs = ers;
-                        this.filter();
-                    }
-                }
-            }
-        },
-        setIndividualEval: async function(e) {
-            let checkedApps = [];
-            $("input[name='evalTypeCheck']:checked").each( function () {
-                checkedApps.push( $(this).val() );
-            });
-            if(checkedApps.length){
-                const ers = await this.executePost('/appEval/setIndividualEval/', { checkedApps: checkedApps}, e);
-                if (ers) {
-                    if (ers.error) {
-                        this.info = ers.error;
-                    } else {
-                        this.allObjs = ers;
-                        this.filter();
-                    }
-                }
-            }
-        },
-        setComplete: async function(e) {
-            let checkedApps = [];
-            $("input[name='evalTypeCheck']:checked").each( function () {
-                checkedApps.push( $(this).val() );
-            });
-            if(checkedApps.length){
-                const result = confirm(`Are you sure? The consensus of any evaluation will affect its respective user.\n\nOnly do this after feedback PMs have been sent.`);
-                if(result){
-                    const ers = await this.executePost('/appEval/setComplete/', { checkedApps: checkedApps}, e);
-                    if (ers) {
-                        if (ers.error) {
-                            this.info = ers.error;
-                        } else {
-                            this.allObjs = ers;
-                            this.filter();
-                        }
-                    }
-                }
-            }
-        },
-        selectAll: function() {
-            var checkBoxes = $("input[name='evalTypeCheck'");
-                checkBoxes.prop("checked", !checkBoxes.prop("checked"));
-            this.allChecked = !this.allChecked;
-        }
-    },
     data() {
         return {
             allObjs: null,
@@ -195,7 +138,7 @@ export default {
             selectedDiscussApp: null,
             evaluator: null,
             info: '',
-        }
+        };
     },
     created() {
         axios
@@ -208,8 +151,8 @@ export default {
                 this.hasSeparation = true;
                 this.filter();
             }).then(function(){
-                $("#loading").fadeOut();
-                $("#main").attr("style", "visibility: visible").hide().fadeIn();
+                $('#loading').fadeOut();
+                $('#main').attr('style', 'visibility: visible').hide().fadeIn();
             });
     },
     mounted () {
@@ -221,6 +164,87 @@ export default {
                     this.filter();
                 });
         }, 300000);
-    }
-}
+    },
+    methods: {
+        filterBySearchValueContext: function(a) {
+            if(a.applicant.username.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1){
+                return true;
+            }
+            return false;
+        },
+        separateObjs: function() {
+            this.applications = this.pageObjs.filter(v => !v.discussion);
+            this.discussApps = this.pageObjs.filter(v => v.discussion);
+        },
+        updateApplication: function (application) {
+            const i = this.allObjs.findIndex(a => a.id == application.id);
+            this.allObjs[i] = application;
+            if(application.discussion){
+                this.selectedDiscussApp = application;
+            }else{
+                this.selectedApplication = application;
+            }
+            this.filter();
+        },
+        setGroupEval: async function(e) {
+            let checkedApps = [];
+            $('input[name=\'evalTypeCheck\']:checked').each( function () {
+                checkedApps.push( $(this).val() );
+            });
+            if(checkedApps.length){
+                const ers = await this.executePost('/appEval/setGroupEval/', { checkedApps: checkedApps }, e);
+                if (ers) {
+                    if (ers.error) {
+                        this.info = ers.error;
+                    } else {
+                        this.allObjs = ers;
+                        this.filter();
+                    }
+                }
+            }
+        },
+        setIndividualEval: async function(e) {
+            let checkedApps = [];
+            $('input[name=\'evalTypeCheck\']:checked').each( function () {
+                checkedApps.push( $(this).val() );
+            });
+            if(checkedApps.length){
+                const ers = await this.executePost('/appEval/setIndividualEval/', { checkedApps: checkedApps }, e);
+                if (ers) {
+                    if (ers.error) {
+                        this.info = ers.error;
+                    } else {
+                        this.allObjs = ers;
+                        this.filter();
+                    }
+                }
+            }
+        },
+        setComplete: async function(e) {
+            let checkedApps = [];
+            $('input[name=\'evalTypeCheck\']:checked').each( function () {
+                checkedApps.push( $(this).val() );
+            });
+            if(checkedApps.length){
+                const result = confirm(`Are you sure? The consensus of any evaluation will affect its respective user.\n\nOnly do this after feedback PMs have been sent.`);
+                if(result){
+                    const ers = await this.executePost('/appEval/setComplete/', { checkedApps: checkedApps }, e);
+                    if (ers) {
+                        if (ers.error) {
+                            this.info = ers.error;
+                        } else {
+                            this.allObjs = ers;
+                            this.filter();
+                        }
+                    }
+                }
+            }
+        },
+        selectAll: function() {
+            let checkBoxes = $('input[name=\'evalTypeCheck\'');
+            checkBoxes.prop('checked', !checkBoxes.prop('checked'));
+            this.allChecked = !this.allChecked;
+        },
+    },
+};
 </script>

@@ -3,7 +3,8 @@ const path = require('path');
 
 const config =  {
     name: 'qat',
-    mode: 'production',
+    mode: 'development',
+    devtool: 'inline-source-map',
     entry: {
         appEval: './src/appEval.js',
         bnEval: './src/bnEval.js',
@@ -55,10 +56,9 @@ const config =  {
     ],
     resolve: {
         alias: {
-            vue: 'vue/dist/vue.min.js',
+            vue: 'vue/dist/vue.js',
         },
     },
-    stats: 'minimal',
 };
 
 module.exports = config;
