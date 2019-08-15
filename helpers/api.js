@@ -7,7 +7,7 @@ const logsService = require('../models/log').service;
 async function getToken(code) {
     const postData = querystring.stringify({
         grant_type: 'authorization_code',
-        code: code,
+        code,
         redirect_uri: config.redirect,
         client_id: config.id,
         client_secret: config.secret,
@@ -26,7 +26,7 @@ async function getToken(code) {
         const res = await axios(options);
         return res.data;
     } catch (error) {
-        return { error: error };
+        return { error };
     }
 }
 
@@ -51,7 +51,7 @@ async function refreshToken(refreshToken) {
         const res = await axios(options);
         return res.data;
     } catch (error) {
-        return { error: error };
+        return { error };
     }
 }
 
@@ -68,7 +68,7 @@ async function getUserInfo(token) {
         const res = await axios(options);
         return res.data;
     } catch (error) {
-        return { error: error };
+        return { error };
     }
 }
 
@@ -193,7 +193,7 @@ async function webhookPost(message, mode) {
             embeds: message,
         });
     } catch (error) {
-        logsService.create(null, JSON.stringify(error), true);
+        logsService.create(null, error, true);
     }
 }
 
@@ -228,7 +228,7 @@ async function highlightWebhookPost(message, mode) {
             content: role + ' ' + message,
         });
     } catch (error) {
-        logsService.create(null, JSON.stringify(error), true);
+        logsService.create(null, error, true);
     }
 }
 

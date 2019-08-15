@@ -32,7 +32,7 @@ class BnAppService extends BaseService
      */
     async create(userId, mode, mods) {
         try {
-            return await BnApp.create({ applicant: userId, mode: mode, mods: mods });
+            return await BnApp.create({ applicant: userId, mode, mods });
         } catch(error) {
             logsService.create(null, JSON.stringify(error), true);
             return { error: error._message };

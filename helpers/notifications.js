@@ -1,16 +1,16 @@
 const api = require('./api');
-const bnAppsService = require('../models/bnApp');
-const evalRoundsService = require('../models/evalRound');
+const bnAppsService = require('../models/bnApp').service;
+const evalRoundsService = require('../models/evalRound').service;
 
-const defaultAppPopulate = {
-    path: 'applicant',
-    select: 'username osuId',
-};
+const defaultAppPopulate = [{
+    populate: 'applicant',
+    display: 'username osuId',
+}];
 
-const defaultRoundPopulate = {
-    path: 'bn',
-    select: 'username osuId probation',
-};
+const defaultRoundPopulate = [{
+    populate: 'bn',
+    display: 'username osuId probation',
+}];
 
 function notifyDeadlines() {
     setInterval(async () => {
@@ -20,7 +20,6 @@ function notifyDeadlines() {
 
         const activeApps = await bnAppsService.query(
             { active: true, test: { $exists: true } },
-            undefined,
             defaultAppPopulate,
             {},
             true,
@@ -28,7 +27,6 @@ function notifyDeadlines() {
 
         const activeRounds = await evalRoundsService.query(
             { active: true },
-            undefined,
             defaultRoundPopulate,
             {},
             true,
