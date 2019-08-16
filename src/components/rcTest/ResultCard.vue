@@ -6,16 +6,15 @@
                     :href="'https://osu.ppy.sh/users/' + selectedTest.applicant.osuId"
                     target="_blank"
                     @click.stop
-                    >{{ selectedTest.applicant.username }}</a
-                >
+                >{{ selectedTest.applicant.username }}</a>
             </div>
             <div class="card-footer small">
-                <i class="fas fa-trophy mr-1"></i> {{ selectedTest.totalScore + selectedTest.additionalPoints }}/20
-                <i class="fas fa-clock mx-1"></i> {{ selectedTest.submittedAt.slice(0, 10) }}
-                <i v-if="selectedTest.mode == 'osu'" class="far fa-circle float-right"></i>
-                <i v-else-if="selectedTest.mode == 'taiko'" class="fas fa-drum float-right"></i>
-                <i v-else-if="selectedTest.mode == 'catch'" class="fas fa-apple-alt float-right"></i>
-                <i v-else-if="selectedTest.mode == 'mania'" class="fas fa-stream float-right"></i>
+                <i class="fas fa-trophy mr-1" /> {{ selectedTest.totalScore + selectedTest.additionalPoints }}/20
+                <i class="fas fa-clock mx-1" /> {{ selectedTest.submittedAt.slice(0, 10) }}
+                <i v-if="selectedTest.mode == 'osu'" class="far fa-circle float-right" />
+                <i v-else-if="selectedTest.mode == 'taiko'" class="fas fa-drum float-right" />
+                <i v-else-if="selectedTest.mode == 'catch'" class="fas fa-apple-alt float-right" />
+                <i v-else-if="selectedTest.mode == 'mania'" class="fas fa-stream float-right" />
             </div>
         </div>
     </div>
@@ -23,10 +22,10 @@
 
 <script>
 export default {
-    name: 'result-card',
-    props: ['selected-test'],
+    name: 'ResultCard',
+    props: ['selectedTest'],
     methods: {
-        selectTest: function() {
+        selectTest() {
             this.$emit('update:selected-test', this.selectedTest);
         },
     },

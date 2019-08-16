@@ -46,7 +46,7 @@ class UserService extends BaseService
      */
     async create(osuId, username, group) {
         try {
-            return await User.create({ osuId: osuId, username: username, group: group });
+            return await User.create({ osuId, username, group });
         } catch(error) {
             return { error: error._message };
         }

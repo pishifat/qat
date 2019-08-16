@@ -57,7 +57,7 @@ router.get('/relevantInfo', async (req, res) => {
         );
     }
     
-    res.json({ a: a, evaluator: res.locals.userRequest });
+    res.json({ a, evaluator: res.locals.userRequest });
 });
 
 /* POST submit or edit eval */

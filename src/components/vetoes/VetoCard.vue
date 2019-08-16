@@ -10,30 +10,32 @@
             <div class="card-body">
                 <p class="text-shadow wrap-text">
                     <a :href="'https://osu.ppy.sh/beatmapsets/' + veto.beatmapId" target="_blank" @click.stop>{{ veto.beatmapTitle || '...' }}</a>
-                    
                 </p>
-                <p class="small text-shadow">Hosted by <a :href="'https://osu.ppy.sh/users/' + veto.beatmapMapperId" target="_blank" @click.stop>{{ veto.beatmapMapper }}</a></p>
+                <p class="small text-shadow">
+                    Hosted by <a :href="'https://osu.ppy.sh/users/' + veto.beatmapMapperId" target="_blank" @click.stop>{{ veto.beatmapMapper }}</a>
+                </p>
                 
-                <div class="veto-status my-auto" :class="`status-bar-${veto.status}`"></div>
+                <div class="veto-status my-auto" :class="`status-bar-${veto.status}`" />
                 <div class="card-icons">
                     <span v-if="veto.status == 'wip'" class="small text-shadow float-left">
-                        <i class="fas fa-clock mx-1"
+                        <i
+                            class="fas fa-clock mx-1"
                             data-toggle="tooltip"
                             data-placement="top"
-                            title="deadline">
-                        </i>
+                            title="deadline"
+                        />
                         <span class="errors">{{ veto.deadline.slice(0, 10) }}</span>
                     </span>
                     <span v-else class="small text-shadow float-left">{{ veto.createdAt.slice(0, 10) }}</span>
-                    <i v-if="veto.mode.indexOf('osu') >= 0" class="far fa-circle"></i>
-                    <i v-else-if="veto.mode.indexOf('taiko') >= 0" class="fas fa-drum"></i>
-                    <i v-else-if="veto.mode.indexOf('catch') >= 0" class="fas fa-apple-alt"></i>
-                    <i v-else-if="veto.mode.indexOf('mania') >= 0" class="fas fa-stream"></i>
+                    <i v-if="veto.mode.indexOf('osu') >= 0" class="far fa-circle" />
+                    <i v-else-if="veto.mode.indexOf('taiko') >= 0" class="fas fa-drum" />
+                    <i v-else-if="veto.mode.indexOf('catch') >= 0" class="fas fa-apple-alt" />
+                    <i v-else-if="veto.mode.indexOf('mania') >= 0" class="fas fa-stream" />
                     <span v-else>
-                        <i class="far fa-circle"></i>
-                        <i class="fas fa-drum"></i>
-                        <i class="fas fa-apple-alt"></i>
-                        <i  class="fas fa-stream"></i>
+                        <i class="far fa-circle" />
+                        <i class="fas fa-drum" />
+                        <i class="fas fa-apple-alt" />
+                        <i class="fas fa-stream" />
                     </span>
                 </div>
             </div>
@@ -43,10 +45,10 @@
 
 <script>
 export default {
-    name: 'veto-card',
-    props: ['veto', 'user-id'],
+    name: 'VetoCard',
+    props: ['veto', 'userId'],
     methods: {
-        selectVeto: function() {
+        selectVeto() {
             this.$emit('update:selectedVeto', this.veto);
         },
     },

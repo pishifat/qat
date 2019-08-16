@@ -1,84 +1,151 @@
 <template>
-
-<div id="reportInfo" class="modal fade" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content" v-if="report">
-            <div class="modal-header text-dark bg-nat-logo">
-                <h5 class="modal-title">
-                    <a class="text-dark" v-if="report.culprit" :href="'https://osu.ppy.sh/users/' + report.culprit.osuId" target="_blank">{{report.culprit.username}}</a>
-                    <span v-else class="text-dark">Report details</span>
-                </h5>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
-            </div>
-            <div class="modal-body" style="overflow: hidden">
-                <p class="text-shadow">Reason: <pre class="small pre-font ml-4" v-html="filterLinks(report.reason)"></pre></p>
-                <p v-if="report.link" class="text-shadow">Relevant link: <span v-html="filterLinks(report.link)"></span></p>
-                <p class="text-shadow">Reported: {{report.createdAt.slice(0,10)}}</p>
-                <p v-if="!report.isActive" class="text-shadow">Reported by: <a :href="'https://osu.ppy.sh/users/' + report.reporter.osuId" target="_blank">{{report.reporter.username}}</a></p>
-                <hr>
-
-                <p class="text-shadow min-spacing mb-1">Feedback:</p>
-                <span v-if="report.isActive">
-                    <small class="text-shadow ml-2">This will be sent to the reporter in a forum PM. Include the consensus and any actions being taken.</small>
-                    
-                    <div class="form-group mt-2">
-                        <textarea class="form-control dark-textarea" style="white-space: pre-line;" id="feedback" rows="4" v-model="feedback"></textarea>
-                    </div>
-                </span>
-
-                <div id="forumMessage" class="copy-paste">
-                    <samp class="small">Hello!</samp><br><br>
-                    <samp v-if="report.culprit" class="small">You recently reported [url=https://osu.ppy.sh/users/{{report.culprit.osuId}}]{{report.culprit.username}}[/url] for the following reason:</samp>
-                    <samp v-else class="small">You recently reported [url={{report.link}}]this link[/url] for the following reason:</samp><br><br>
-                    <samp class="small">[notice]{{report.reason}}[/notice]</samp><br><br>
-                    <samp class="small">After investigating this, we've decided that the report is [b]{{report.valid == 1 ? 'valid' : report.valid == 2 ? 'partially valid' : 'invalid'}}[/b].</samp><br><br>
-                    <samp class="small">Additional feedback from the NAT:</samp><br><br>
-                    <samp><pre class="small">[notice]{{report.feedback}}[/notice]</pre></samp>
-                    <samp class="small">Regards, the Nomination Assessment Team</samp><br><br>
+    <div id="reportInfo" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div v-if="report" class="modal-content">
+                <div class="modal-header text-dark bg-nat-logo">
+                    <h5 class="modal-title">
+                        <a v-if="report.culprit" class="text-dark" :href="'https://osu.ppy.sh/users/' + report.culprit.osuId" target="_blank">{{ report.culprit.username }}</a>
+                        <span v-else class="text-dark">Report details</span>
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
                 </div>
-
-                <span v-if="report.isActive">
-                    <span class="mr-3 text-shadow">Validity:</span>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="vote" id="1" value="1" :checked="report.valid == 1">
-                        <label class="form-check-label text-shadow vote-pass" for="1">Valid</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="vote" id="2" value="2" :checked="report.valid == 2">
-                        <label class="form-check-label text-shadow vote-extend" for="2">Partially valid</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="vote" id="3" value="3" :checked="report.valid == 3">
-                        <label class="form-check-label text-shadow vote-fail" for="3">Invalid</label>
-                    </div>
-                </span>
-                <span v-else-if="report.valid != 3">
+                <div class="modal-body" style="overflow: hidden">
+                    <p class="text-shadow">
+                        Reason: <pre class="small pre-font ml-4" v-html="filterLinks(report.reason)" />
+                    </p>
+                    <p v-if="report.link" class="text-shadow">
+                        Relevant link: <span v-html="filterLinks(report.link)" />
+                    </p>
+                    <p class="text-shadow">
+                        Reported: {{ report.createdAt.slice(0,10) }}
+                    </p>
+                    <p v-if="!report.isActive" class="text-shadow">
+                        Reported by: <a :href="'https://osu.ppy.sh/users/' + report.reporter.osuId" target="_blank">{{ report.reporter.username }}</a>
+                    </p>
                     <hr>
-                    <p class="text-shadow"><span data-toggle="tooltip" data-placement="top" title="This will be displayed on evaluation pages">Simplified reason:</span> <pre class="small pre-font ml-4">{{report.simplifiedReason || "..."}}</pre></p>
-                    <div class="form-group">
-                        <textarea class="form-control dark-textarea" style="white-space: pre-line;" id="behaviorComments" rows="2" placeholder="simplified reason for convenient display on evaluations..." v-model="simplifiedReason"></textarea>
+
+                    <p class="text-shadow min-spacing mb-1">
+                        Feedback:
+                    </p>
+                    <span v-if="report.isActive">
+                        <small class="text-shadow ml-2">This will be sent to the reporter in a forum PM. Include the consensus and any actions being taken.</small>
+                    
+                        <div class="form-group mt-2">
+                            <textarea
+                                id="feedback"
+                                v-model="feedback"
+                                class="form-control dark-textarea"
+                                style="white-space: pre-line;"
+                                rows="4"
+                            />
+                        </div>
+                    </span>
+
+                    <div id="forumMessage" class="copy-paste">
+                        <samp class="small">Hello!</samp><br><br>
+                        <samp v-if="report.culprit" class="small">You recently reported [url=https://osu.ppy.sh/users/{{ report.culprit.osuId }}]{{ report.culprit.username }}[/url] for the following reason:</samp>
+                        <samp v-else class="small">You recently reported [url={{ report.link }}]this link[/url] for the following reason:</samp><br><br>
+                        <samp class="small">[notice]{{ report.reason }}[/notice]</samp><br><br>
+                        <samp class="small">After investigating this, we've decided that the report is [b]{{ report.valid == 1 ? 'valid' : report.valid == 2 ? 'partially valid' : 'invalid' }}[/b].</samp><br><br>
+                        <samp class="small">Additional feedback from the NAT:</samp><br><br>
+                        <samp><pre class="small">[notice]{{ report.feedback }}[/notice]</pre></samp>
+                        <samp class="small">Regards, the Nomination Assessment Team</samp><br><br>
                     </div>
-                </span>
 
-                 <div :class="info.length ? 'errors' : 'confirm'" class="text-shadow ml-2" style="min-height: 24px;">{{info}} {{confirm}}</div>
+                    <span v-if="report.isActive">
+                        <span class="mr-3 text-shadow">Validity:</span>
+                        <div class="form-check form-check-inline">
+                            <input
+                                id="1"
+                                class="form-check-input"
+                                type="radio"
+                                name="vote"
+                                value="1"
+                                :checked="report.valid == 1"
+                            >
+                            <label class="form-check-label text-shadow vote-pass" for="1">Valid</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input
+                                id="2"
+                                class="form-check-input"
+                                type="radio"
+                                name="vote"
+                                value="2"
+                                :checked="report.valid == 2"
+                            >
+                            <label class="form-check-label text-shadow vote-extend" for="2">Partially valid</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input
+                                id="3"
+                                class="form-check-input"
+                                type="radio"
+                                name="vote"
+                                value="3"
+                                :checked="report.valid == 3"
+                            >
+                            <label class="form-check-label text-shadow vote-fail" for="3">Invalid</label>
+                        </div>
+                    </span>
+                    <span v-else-if="report.valid != 3">
+                        <hr>
+                        <p class="text-shadow"><span data-toggle="tooltip" data-placement="top" title="This will be displayed on evaluation pages">Simplified reason:</span> <pre class="small pre-font ml-4">{{ report.simplifiedReason || "..." }}</pre></p>
+                        <div class="form-group">
+                            <textarea
+                                id="behaviorComments"
+                                v-model="simplifiedReason"
+                                class="form-control dark-textarea"
+                                style="white-space: pre-line;"
+                                rows="2"
+                                placeholder="simplified reason for convenient display on evaluations..." 
+                            />
+                        </div>
+                    </span>
 
-            </div>
-            <div class="modal-footer" style="overflow: hidden;">
-                <span v-if="report.isActive">
-                    <button class="btn btn-sm btn-nat" @click="submitReportEval($event);" data-toggle="tooltip" data-placement="top" title="Generates feedback PM and stores feedback/validity inputs">Save Report Evaluation</button>
-                    <button class="btn btn-sm btn-nat-red" @click="submitReportEval($event, true)" data-toggle="tooltip" data-placement="top" title="Disables feedback/validity inputs and reveals reporter">Close Report</button>
-                </span>
-                <span v-else-if="report.valid != 3">
-                    <button class="btn btn-sm btn-nat" @click="changeEvalDisplay($event);" data-toggle="tooltip" data-placement="top" title="Avoid displaying repeat reports on evaluations">{{report.display ? "Hide report on evaluations" : "Show report on evaluations"}}</button>
-                    <button class="btn btn-sm btn-nat" @click="submitSimplifiedReason($event);" data-toggle="tooltip" data-placement="top" title="Saves shortened reason for evaluation page display">Save Simplified Reason</button>
-                </span>
+                    <div :class="info.length ? 'errors' : 'confirm'" class="text-shadow ml-2" style="min-height: 24px;">
+                        {{ info }} {{ confirm }}
+                    </div>
+                </div>
+                <div class="modal-footer" style="overflow: hidden;">
+                    <span v-if="report.isActive">
+                        <button
+                            class="btn btn-sm btn-nat"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            title="Generates feedback PM and stores feedback/validity inputs"
+                            @click="submitReportEval($event);"
+                        >Save Report Evaluation</button>
+                        <button
+                            class="btn btn-sm btn-nat-red"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            title="Disables feedback/validity inputs and reveals reporter"
+                            @click="submitReportEval($event, true)"
+                        >Close Report</button>
+                    </span>
+                    <span v-else-if="report.valid != 3">
+                        <button
+                            class="btn btn-sm btn-nat"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            title="Avoid displaying repeat reports on evaluations"
+                            @click="changeEvalDisplay($event);"
+                        >{{ report.display ? "Hide report on evaluations" : "Show report on evaluations" }}</button>
+                        <button
+                            class="btn btn-sm btn-nat"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            title="Saves shortened reason for evaluation page display"
+                            @click="submitSimplifiedReason($event);"
+                        >Save Simplified Reason</button>
+                    </span>
+                </div>
             </div>
         </div>
     </div>
-</div>
-
 </template>
 
 <script>
@@ -86,11 +153,19 @@ import postData from '../../mixins/postData.js';
 import filterLinks from '../../mixins/filterLinks.js';
 
 export default {
-    name: 'report-info',
+    name: 'ReportInfo',
     mixins: [postData, filterLinks],
-    props: [ 'report', 'is-leader', 'is-spectator' ],
+    props: [ 'report', 'isLeader', 'isSpectator' ],
+    data() {
+        return {
+            feedback: '',
+            simplifiedReason: '',
+            confirm: '',
+            info: '',
+        };
+    },
     watch: {
-        report: function(v) {
+        report(v) {
             if(v){
                 this.info = '';
                 this.confirm = '';
@@ -100,43 +175,43 @@ export default {
         },
     },
     methods: {
-        submitReportEval: async function (e, close) {
+        async submitReportEval (e, close) {
             const valid = $('input[name=vote]:checked').val();
             if(close && (!valid || (!this.feedback || !this.feedback.length))){
-                this.info = 'Cannot leave fields blank!'
+                this.info = 'Cannot leave fields blank!';
             }else if(!valid && (!this.feedback || !this.feedback.length)){
-                this.info = 'At least one field must have input!'
+                this.info = 'At least one field must have input!';
             }else if(this.isSpectator){
-                this.info = "You're not allowed to do that"
+                this.info = 'You\'re not allowed to do that';
             }else{
                 let r;
                 if(close){
                     const result = confirm(`Are you sure? Report feedback cannot be edited after closing. Doing this will reveal the reporter.`);
                     if(result){
                         r = await this.executePost(
-                        '/manageReports/submitReportEval/' + this.report.id, 
-                        { valid: valid, feedback: this.feedback, close: close }, e);
+                            '/manageReports/submitReportEval/' + this.report.id, 
+                            { valid, feedback: this.feedback, close }, e);
                     }
                 }else{
                     r = await this.executePost(
-                    '/manageReports/submitReportEval/' + this.report.id, 
-                    { valid: valid, feedback: this.feedback, close: close }, e);
+                        '/manageReports/submitReportEval/' + this.report.id, 
+                        { valid, feedback: this.feedback, close }, e);
                 }
                 if (r) {
                     if (r.error) {
                         this.info = r.error;
                     } else {
                         await this.$emit('update-report', r);
-                        this.confirm = 'Report updated!'
+                        this.confirm = 'Report updated!';
                     }
                 }
             }
         },
-        submitSimplifiedReason: async function (e) {
+        async submitSimplifiedReason (e) {
             if(!this.simplifiedReason || !this.simplifiedReason.length){
-                this.info = 'Simplified reason cannot be blank!'
+                this.info = 'Simplified reason cannot be blank!';
             }else if(this.isSpectator){
-                this.info = "You're not allowed to do that"
+                this.info = 'You\'re not allowed to do that';
             }else{
                 let r = await this.executePost('/manageReports/submitSimplifiedReason/' + this.report.id, { simplifiedReason: this.simplifiedReason }, e);
                 if (r) {
@@ -144,30 +219,22 @@ export default {
                         this.info = r.error;
                     } else {
                         await this.$emit('update-report', r);
-                        this.confirm = 'Report updated!'
+                        this.confirm = 'Report updated!';
                     }
                 }
             }
         },
-        changeEvalDisplay: async function (e) {
+        async changeEvalDisplay (e) {
             let r = await this.executePost('/manageReports/changeEvalDisplay/' + this.report.id, { display: this.report.display }, e);
             if (r) {
                 if (r.error) {
                     this.info = r.error;
                 } else {
                     await this.$emit('update-report', r);
-                    this.confirm = 'Report updated!'
+                    this.confirm = 'Report updated!';
                 }
             }
-        }
+        },
     },
-    data() {
-        return {
-            feedback: '',
-            simplifiedReason: '',
-            confirm: '',
-            info: '',
-        };
-    },
-}
+};
 </script>

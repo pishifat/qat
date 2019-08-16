@@ -263,7 +263,7 @@ export default {
         };
     },
     watch: { 
-        allObjs: function(){
+        allObjs(){
             this.filter();
         },
     },
@@ -282,25 +282,25 @@ export default {
             });
     },
     methods: {
-        filterBySearchValueContext: function(o) {
+        filterBySearchValueContext(o) {
             if (o.metadata.toLowerCase().indexOf(this.filterValue.toLowerCase()) >= 0) {
                 return true;
             } else {
                 return false;
             }
         },
-        separateObjs: function() {
+        separateObjs() {
             this.dqs = this.pageObjs.filter(v => v.eventType == 'Disqualified');
             this.pops = this.pageObjs.filter(v => v.eventType == 'Popped');
             this.reports = this.pageObjs.filter(v => v.eventType == 'Reported');
         },
-        updateEntry: function (obj) {
+        updateEntry (obj) {
             const i = this.allObjs.findIndex(o => o.id == obj.id);
             this.allObjs[i] = obj;
             this.selectedEntry = obj;
             this.filter();
         },
-        selectEntry: function (entry) {
+        selectEntry (entry) {
             this.selectedEntry = entry;
         },
     },

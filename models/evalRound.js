@@ -31,7 +31,7 @@ class EvalRoundService extends BaseService
      */
     async create(bnId, mode, deadline) {
         try {
-            return await EvalRound.create({ bn: bnId, mode: mode, deadline: deadline });
+            return await EvalRound.create({ bn: bnId, mode, deadline });
         } catch(error) {
             logsService.create(null, JSON.stringify(error), true);
             return { error: error._message };

@@ -26,13 +26,13 @@ const defaultAppPopulate = [
     { populate: 'applicant', display: 'username osuId' },
     { populate: 'test', display: 'totalScore' },
     { populate: 'evaluations', display: 'evaluator behaviorComment moddingComment vote' },
-    { innerPopulate: 'evaluations', populate: { path: 'evaluator', select: 'username osuId' } },
+    { innerPopulate: 'evaluations', populate: { path: 'evaluator', select: 'username osuId group' } },
 ];
 
 const defaultBnPopulate = [
     { populate: 'bn', display: 'username osuId probation' },
     { populate: 'evaluations', display: 'evaluator behaviorComment moddingComment vote' },
-    { innerPopulate: 'evaluations', populate: { path: 'evaluator', select: 'username osuId' } },
+    { innerPopulate: 'evaluations', populate: { path: 'evaluator', select: 'username osuId group' } },
 ];
 
 /* GET applicant listing. */
@@ -58,7 +58,7 @@ router.post('/search/', async (req, res) => {
         { createdAt: 1 },
         true
     );
-    res.json({ a: a, b: b });
+    res.json({ a, b });
 });
 
 /* POST search for user */
@@ -82,7 +82,7 @@ router.post('/searchRecent/', async (req, res) => {
         true,
         req.body.limit
     );
-    res.json({ a: a, b: b });
+    res.json({ a, b });
 });
 
 module.exports = router;

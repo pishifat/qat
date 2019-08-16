@@ -95,17 +95,17 @@ export default {
         }, 300000);
     },
     methods: {
-        filterBySearchValueContext: function(v) {
+        filterBySearchValueContext(v) {
             if(v.title.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1){
                 return true;
             }
             return false;
         },
-        SubmitRcDiscussion: function(v) {
+        SubmitRcDiscussion(v) {
             this.allObjs.unshift(v);
             this.filter();
         },
-        updateRcDiscussion: function(rc) {
+        updateRcDiscussion(rc) {
             const i = this.allObjs.findIndex(rcDiscussion => rcDiscussion.id == rc.id);
             this.allObjs[i] = rc;
             this.selectedRcDiscussion = rc;

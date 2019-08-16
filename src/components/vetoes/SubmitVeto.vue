@@ -3,7 +3,9 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header bg-nat">
-                    <h5 class="modal-title text-dark">Submit a veto for mediation</h5>
+                    <h5 class="modal-title text-dark">
+                        Submit a veto for mediation
+                    </h5>
                     <button type="button" class="close" data-dismiss="modal">
                         <span>&times;</span>
                     </button>
@@ -14,47 +16,80 @@
                             <p>Game mode:</p>
                             <div class="row ml-4">
                                 <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!">
-                                    <input type="radio" class="osu-radio hide-default" name="osu" value="osu" v-model="mode" checked />
-                                    <i class="fas fa-circle fa-lg"></i>
+                                    <input
+                                        v-model="mode"
+                                        type="radio"
+                                        class="osu-radio hide-default"
+                                        name="osu"
+                                        value="osu"
+                                        checked
+                                    >
+                                    <i class="fas fa-circle fa-lg" />
                                 </label>
                                 <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!taiko">
-                                    <input type="radio" class="taiko-radio hide-default" name="taiko" value="taiko" v-model="mode" />
-                                    <i class="fas fa-drum fa-lg"></i>
+                                    <input
+                                        v-model="mode"
+                                        type="radio"
+                                        class="taiko-radio hide-default"
+                                        name="taiko"
+                                        value="taiko"
+                                    >
+                                    <i class="fas fa-drum fa-lg" />
                                 </label>
                                 <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!catch">
-                                    <input type="radio" class="catch-radio hide-default" name="catch" value="catch" v-model="mode" />
-                                    <i class="fas fa-apple-alt fa-lg"></i>
+                                    <input
+                                        v-model="mode"
+                                        type="radio"
+                                        class="catch-radio hide-default"
+                                        name="catch"
+                                        value="catch"
+                                    >
+                                    <i class="fas fa-apple-alt fa-lg" />
                                 </label>
                                 <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!mania">
-                                    <input type="radio" class="mania-radio hide-default" name="mania" value="mania" v-model="mode" />
-                                    <i class="fas fa-stream fa-lg"></i>
+                                    <input
+                                        v-model="mode"
+                                        type="radio"
+                                        class="mania-radio hide-default"
+                                        name="mania"
+                                        value="mania"
+                                    >
+                                    <i class="fas fa-stream fa-lg" />
                                 </label>
                                 <label class="mx-1" data-toggle="tooltip" data-placement="top" title="all game modes">
-                                    <input type="radio" class="all-radio hide-default" name="all" value="all" v-model="mode" />
-                                    <i class="fas fa-globe fa-lg"></i>
+                                    <input
+                                        v-model="mode"
+                                        type="radio"
+                                        class="all-radio hide-default"
+                                        name="all"
+                                        value="all"
+                                    >
+                                    <i class="fas fa-globe fa-lg" />
                                 </label>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <small class="text-shadow mb-1">Permalink to the veto post on the modding discussion page</small>
                             <input
+                                v-model="discussionLink"
                                 type="text"
                                 class="form-control"
                                 placeholder="beatmap link..."
-                                v-model="discussionLink"
-                            />
+                            >
                         </div>
                         <div class="row mb-2">
                             <small class="text-shadow mb-1">Summarize the reason for the veto. If your summary is inappropriate, the veto will not be mediated</small>
                             <input
+                                v-model="shortReason"
                                 type="text"
                                 class="form-control"
                                 placeholder="reason for veto..."
-                                v-model="shortReason"
-                            />
+                            >
                         </div>
-                        <p class="errors text-shadow">{{ info }}</p>
-                        <hr />
+                        <p class="errors text-shadow">
+                            {{ info }}
+                        </p>
+                        <hr>
                         <button type="submit" class="btn btn-nat float-right" @click="submitVeto($event)">
                             Submit
                         </button>
@@ -69,7 +104,7 @@
 import postData from '../../mixins/postData.js';
 
 export default {
-    name: 'submit-veto',
+    name: 'SubmitVeto',
     mixins: [postData],
     data() {
         return {
@@ -80,7 +115,7 @@ export default {
         };
     },
     methods: {
-        submitVeto: async function(e) {
+        async submitVeto(e) {
             if (!this.discussionLink || !this.shortReason || !this.mode) {
                 this.info = 'Cannot leave fields blank!';
             } else {

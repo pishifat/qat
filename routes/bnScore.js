@@ -56,7 +56,7 @@ router.post('/search', async (req, res) => {
                 let bmInfo = await api.beatmapsetInfo(event.beatmapsetId, true);
 
                 mapperId = parseInt(bmInfo[0].creator_id);
-                await aiessService.update(event.id, { mapperId: mapperId });
+                await aiessService.update(event.id, { mapperId });
 
                 let effort = 0;
                 bmInfo.forEach(diff => {

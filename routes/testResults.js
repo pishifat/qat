@@ -52,7 +52,7 @@ router.get('/relevantInfo', async (req, res) => {
         true
     );
 
-    res.json({ tests: tests, isNat: res.locals.userRequest.isNat });
+    res.json({ tests, isNat: res.locals.userRequest.isNat });
 });
 
 
@@ -84,7 +84,7 @@ router.get('/search/:user', api.isNat, async (req, res) => {
         return res.json({ error: 'No tests saved for that user!', isNat: res.locals.userRequest.group == 'nat' });
     }
 
-    res.json({ tests: tests, isNat: res.locals.userRequest.group == 'nat' });
+    res.json({ tests, isNat: res.locals.userRequest.group == 'nat' });
 });
 
 /* POST edit additional points because metadata is unreliable */

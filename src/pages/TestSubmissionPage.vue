@@ -200,7 +200,7 @@ export default {
             });
     },
     methods: {
-        getActiveOptions: function (options) {
+        getActiveOptions (options) {
             let currentIndex = options.length;
             let temporaryValue, randomIndex;
             while (0 !== currentIndex) {
@@ -212,7 +212,7 @@ export default {
             }
             return options.filter(o => o.active);
         },
-        loadTest: async function (e) {
+        async loadTest (e) {
             if (this.selectedTest) {
                 const test = await this.executePost('/testSubmission/loadTest', { testId: this.selectedTest }, e);
                 
@@ -231,7 +231,7 @@ export default {
                 this.info = 'Select the test to answer';
             }
         },
-        submitTest: async function (e) {
+        async submitTest (e) {
             this.info = 'Submitting... (this will take a few seconds)';
             $('.test-question').hide();
             const res = await this.executePost('/testSubmission/submitTest', { 
@@ -249,12 +249,12 @@ export default {
                 }
             }
         },
-        submitAnswer: async function (answerId, e, isMetadata) {
+        async submitAnswer (answerId, e, isMetadata) {
             const res = await this.executePost('/testSubmission/submitAnswer', { 
                 testId: this.selectedTest, 
-                answerId: answerId,
+                answerId,
                 checkedOptions: this.checkedOptions[answerId],
-                isMetadata: isMetadata,
+                isMetadata,
             }, e);
             if (res) {
                 if (res.error) {

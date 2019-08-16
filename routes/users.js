@@ -214,7 +214,7 @@ router.get('/findBnActivity/:days', async (req, res) => {
 });
 
 /* GET potential NAT info */
-router.get('/findPotentialNatInfo/', async (req, res, next) => {
+router.get('/findPotentialNatInfo/', async (req, res) => {
     class obj 
     {
         constructor(username, osuId, modes, evaluatedApps) 

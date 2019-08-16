@@ -43,14 +43,14 @@ class VetoService extends BaseService
     async create(vetoer, discussionLink, beatmapId, beatmapTitle, beatmapMapper, beatmapMapperId, shortReason, mode) {
         try {
             return await Veto.create({ 
-                vetoer: vetoer, 
-                discussionLink: discussionLink, 
-                beatmapId: beatmapId, 
-                beatmapTitle: beatmapTitle, 
-                beatmapMapper: beatmapMapper,
-                beatmapMapperId: beatmapMapperId,
-                shortReason: shortReason, 
-                mode: mode, 
+                vetoer, 
+                discussionLink, 
+                beatmapId, 
+                beatmapTitle, 
+                beatmapMapper,
+                beatmapMapperId,
+                shortReason, 
+                mode, 
             });
         } catch(error) {
             logsService.create(null, JSON.stringify(error), true);

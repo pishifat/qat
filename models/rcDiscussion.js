@@ -29,10 +29,10 @@ class RcDiscussionService extends BaseService
     async create(discussionLink, title, shortReason, mode) {
         try {
             return await RcDiscussion.create({ 
-                discussionLink: discussionLink, 
-                title: title,
-                shortReason: shortReason, 
-                mode: mode, 
+                discussionLink, 
+                title,
+                shortReason, 
+                mode, 
             });
         } catch(error) {
             logsService.create(null, JSON.stringify(error), true);

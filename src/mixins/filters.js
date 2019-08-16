@@ -13,18 +13,18 @@ const filters = {
         };
     },
     watch: {
-        filterValue: function() {
+        filterValue() {
             this.filter();
         },
-        filterMode: function() {
+        filterMode() {
             this.filter();
         },
-        filterVote: function() {
+        filterVote() {
             this.filter();
         },
     },
     methods: {
-        filter: function() {
+        filter() {
             this.pageObjs = this.allObjs;
 
             this.filterByMode();
@@ -47,7 +47,7 @@ const filters = {
                 this.separateObjs();
             }
         },
-        filterByMode: function() {
+        filterByMode() {
             if (this.filterMode.length) {
                 this.filteredObjs = this.allObjs.filter(v => {
                     if (this.filterMode == 'osu' && ((v.mode && v.mode.indexOf('osu') !== -1) || (v.modes && v.modes.indexOf('osu') !== -1))) {
@@ -66,7 +66,7 @@ const filters = {
                 });
             }
         },
-        filterByVote: function() {
+        filterByVote() {
             if (this.filterVote.length) {
                 if(this.filterMode.length){
                     this.filteredObjs = this.filteredObjs.filter(v => {
@@ -91,7 +91,7 @@ const filters = {
                 }
             }
         },
-        filterBySearchValue: function() {
+        filterBySearchValue() {
             if (this.filterValue.length > 2) {
                 if (this.filterMode.length || this.filterVote.length) {
                     this.filteredObjs = this.allObjs.filter(o => {
@@ -106,7 +106,7 @@ const filters = {
         },
         
         
-        sort: function (field, keepOrder) {
+        sort (field, keepOrder) {
             this.sortBy = field;
             if (!keepOrder) {
                 this.asc = !this.asc;

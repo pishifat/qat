@@ -88,7 +88,7 @@ export default {
         };
     },
     watch: {
-        allObjs: function(v){
+        allObjs(){
             this.filter();
         },
     },
@@ -116,14 +116,14 @@ export default {
         }, 300000);
     },
     methods: {
-        filterBySearchValueContext: function(o) {
+        filterBySearchValueContext(o) {
             if (o.culprit && o.culprit.username.toLowerCase().indexOf(this.filterValue.toLowerCase()) >= 0) {
                 return true;
             } else {
                 return false;
             }
         },
-        separateObjs: function() {
+        separateObjs() {
             this.openReports = this.pageObjs.filter( report =>{
                 if(this.isLeader){
                     return report.isActive;
@@ -140,7 +140,7 @@ export default {
                 }
             });
         },
-        updateReport: function (report) {
+        updateReport (report) {
             const i = this.allObjs.findIndex(r => r.id == report.id);
             this.allObjs[i] = report;
             this.selectedReport = report;

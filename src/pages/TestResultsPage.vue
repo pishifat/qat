@@ -242,7 +242,7 @@ export default {
         };
     },
     watch: {
-        selectedTest: function(v) {
+        selectedTest(v) {
             if (v) {
                 this.getOptionIds();
                 this.additionalPoints = this.selectedTest.additionalPoints;
@@ -290,7 +290,7 @@ export default {
         }
     },
     methods: {
-        calculateTotalScore: function() {
+        calculateTotalScore() {
             let displayScore = 0;
             this.selectedTest.answers.forEach(answer => {
                 answer.optionsChosen.forEach(option => {
@@ -299,7 +299,7 @@ export default {
             });
             return Math.round(displayScore * 10) / 10;
         },
-        calculateQuestionScore: function(answer) {
+        calculateQuestionScore(answer) {
             let score = 0;
             answer.question.options.forEach(option => {
                 if(answer.optionsChosen.indexOf(option.id) >= 0){
@@ -309,10 +309,10 @@ export default {
             if(score < 0) score = 0;
             return score;
         },
-        getActiveOptions: function(options) {
+        getActiveOptions(options) {
             return options.filter(o => o.active);
         },
-        getOptionIds: function() {
+        getOptionIds() {
             this.selectedOptionIds = [];
             this.selectedTest.answers.forEach(answer => {
                 answer.optionsChosen.forEach(option => {
@@ -320,7 +320,7 @@ export default {
                 });
             });
         },
-        query: async function(e) {
+        async query(e) {
             this.allTests = null;
             this.selectedTest = null;
             this.info = '';
@@ -342,12 +342,12 @@ export default {
                 }
             }
         },
-        updateAdditionalPoints: async function(e) {
+        async updateAdditionalPoints(e) {
             let points = parseFloat(this.additionalPoints);
             if (points || points == 0) {
                 const result = await this.executePost(
                     '/testResults/updateAdditionalPoints/' + this.selectedTest.id,
-                    { points: points },
+                    { points },
                     e
                 );
                 if (result) {
@@ -360,7 +360,7 @@ export default {
                 }
             }
         },
-        updateTest: function(t) {
+        updateTest(t) {
             const i = this.allTests.findIndex(test => test.id == t.id);
             this.allTests[i] = t;
             this.selectedTest = t;

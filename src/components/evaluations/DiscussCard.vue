@@ -11,91 +11,91 @@
             :data-user="discussApp ? discussApp.id : discussRound.id"
         >
             <div class="card-body">
-                <div class="card-status" :class="'card-status-' + consensus"></div>
+                <div class="card-status" :class="'card-status-' + consensus" />
                 <p class="card-text text-shadow">
                     <a
-                        @click.stop
                         :href="'https://osu.ppy.sh/users/' + userToEvaluate.osuId"
                         target="_blank"
-                        >{{ userToEvaluate.username }}</a
-                    >
+                        @click.stop
+                    >{{ userToEvaluate.username }}</a>
                 </p>
             </div>
             <div class="card-footer small">
-                <i v-if="mode == 'osu'" class="far fa-circle"></i>
-                <i v-else-if="mode == 'taiko'" class="fas fa-drum"></i>
-                <i v-else-if="mode == 'catch'" class="fas fa-apple-alt"></i>
-                <i v-else-if="mode == 'mania'" class="fas fa-stream"></i>
+                <i v-if="mode == 'osu'" class="far fa-circle" />
+                <i v-else-if="mode == 'taiko'" class="fas fa-drum" />
+                <i v-else-if="mode == 'catch'" class="fas fa-apple-alt" />
+                <i v-else-if="mode == 'mania'" class="fas fa-stream" />
                 <span
                     v-if="pass"
                     class="badge badge-pass mx-1"
                     data-toggle="tooltip"
                     data-placement="top"
                     title="pass"
-                    >{{ pass }}</span
-                >
+                >{{ pass }}</span>
                 <span
                     v-if="neutral"
                     class="badge badge-neutral mx-1"
                     data-toggle="tooltip"
                     data-placement="top"
                     title="neutral"
-                    >{{ neutral }}</span
-                >
+                >{{ neutral }}</span>
                 <span
                     v-if="extend"
                     class="badge badge-extend mx-1"
                     data-toggle="tooltip"
                     data-placement="top"
                     title="extend"
-                    >{{ extend }}</span
-                >
+                >{{ extend }}</span>
                 <span
                     v-if="fail"
                     class="badge badge-fail mx-1"
                     data-toggle="tooltip"
                     data-placement="top"
                     title="fail"
-                    >{{ fail }}</span
-                >
-                <i class="fas fa-clock mx-1"
+                >{{ fail }}</span>
+                <i
+                    class="fas fa-clock mx-1"
                     data-toggle="tooltip"
                     data-placement="top"
-                    title="deadline">
-                </i>
+                    title="deadline"
+                />
                 <span v-if="discussApp">
                     <span class="errors">{{ createDeadline(discussApp.createdAt) }}</span>
                     <input
                         v-if="!readOnly && evaluator && evaluator.isLeader"
-                        @click.stop="checkSelection()"
-                        class="float-right ml-2"
                         :id="discussApp.id + '-check'"
+                        class="float-right ml-2"
                         type="checkbox"
                         name="evalTypeCheck"
                         :value="discussApp.id"
+                        @click.stop="checkSelection()"
+                    >
+                    <i
+                        v-if="discussApp.feedback" 
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="feedback written" 
+                        class="fas fa-comment float-right"
                     />
-                    <i v-if="discussApp.feedback" 
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="feedback written" 
-                    class="fas fa-comment float-right"></i>
                 </span>
                 <span v-else>
                     <span class="errors"> {{ new Date(discussRound.deadline).toString().slice(4, 10) }}</span>
                     <input
                         v-if="!readOnly && evaluator && evaluator.isLeader"
-                        @click.stop="checkSelection()"
-                        class="float-right ml-2"
                         :id="discussRound.id + '-check'"
+                        class="float-right ml-2"
                         type="checkbox"
                         name="evalTypeCheck"
                         :value="discussRound.id"
+                        @click.stop="checkSelection()"
+                    >
+                    <i
+                        v-if="discussRound.feedback" 
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="feedback written" 
+                        class="fas fa-comment float-right"
                     />
-                    <i v-if="discussRound.feedback" 
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="feedback written" 
-                    class="fas fa-comment float-right"></i>
                 </span>
             </div>
         </div>
@@ -104,35 +104,47 @@
 
 <script>
 export default {
-    name: 'discuss-card',
-    props: ['discuss-app', 'discuss-round', 'evaluator', 'all-checked', 'read-only', 'user-to-evaluate', 'mode'],
+    name: 'DiscussCard',
+    props: ['discussApp', 'discussRound', 'evaluator', 'allChecked', 'readOnly', 'userToEvaluate', 'mode'],
+    data() {
+        return {
+            pass: 0,
+            neutral: 0,
+            extend: 0,
+            fail: 0,
+            isSelected: false,
+        };
+    },
+    computed: {
+        consensus() {
+            if (this.discussApp) return this.discussApp.consensus;
+            else return this.discussRound.consensus;
+        },
+    },
     watch: {
-        discussApp: function(v) {
+        discussApp() {
             this.addVotes();
         },
-        discussRound: function(v) {
+        discussRound() {
             this.addVotes();
         },
-        allChecked: function() {
+        allChecked() {
             this.checkSelection();
         },
     },
-    computed: {
-        consensus: function() {
-            if (this.discussApp) return this.discussApp.consensus;
-            else if (this.discussRound) return this.discussRound.consensus;
-        }
+    created() {
+        this.addVotes();
     },
     methods: {
-        selectDiscussApp: function() {
+        selectDiscussApp() {
             this.$emit('update:selectedDiscussApp', this.discussApp);
             this.$emit('update:selectedDiscussRound', null);
         },
-        selectDiscussRound: function() {
+        selectDiscussRound() {
             this.$emit('update:selectedDiscussRound', this.discussRound);
             this.$emit('update:selectedDiscussApp', null);
         },
-        findRelevantEval: function() {
+        findRelevantEval() {
             let vote;
             if (this.discussApp && this.discussApp.evaluations) {
                 this.discussApp.evaluations.forEach(ev => {
@@ -161,7 +173,7 @@ export default {
             }
             return vote;
         },
-        addVotes: function() {
+        addVotes() {
             this.pass = 0;
             this.neutral = 0;
             this.extend = 0;
@@ -188,12 +200,12 @@ export default {
                 });
             }
         },
-        createDeadline: function(date) {
+        createDeadline(date) {
             date = new Date(date);
             date = new Date(date.setDate(date.getDate() + 14)).toString().slice(4, 10);
             return date;
         },
-        checkSelection: function() {
+        checkSelection() {
             if (this.discussApp && $(`#${this.discussApp.id}-check`).is(':checked')) {
                 this.isSelected = true;
             } else if (this.discussRound && $(`#${this.discussRound.id}-check`).is(':checked')) {
@@ -202,18 +214,6 @@ export default {
                 this.isSelected = false;
             }
         },
-    },
-    data() {
-        return {
-            pass: 0,
-            neutral: 0,
-            extend: 0,
-            fail: 0,
-            isSelected: false,
-        };
-    },
-    created() {
-        this.addVotes();
     },
 };
 </script>

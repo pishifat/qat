@@ -97,7 +97,7 @@ router.post('/submitAnswer', async (req, res) => {
             req.body.checkedOptions.reference2 || '',
             req.body.checkedOptions.reference3 || ''
         );
-        answer = await testSubmissionService.updateAnswer(req.body.answerId, { metadataInput: metadataInput });
+        answer = await testSubmissionService.updateAnswer(req.body.answerId, { metadataInput });
     } else {
         answer = await testSubmissionService.updateAnswer(req.body.answerId, { optionsChosen: req.body.checkedOptions });
     }

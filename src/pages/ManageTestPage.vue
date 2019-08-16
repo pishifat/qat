@@ -143,20 +143,20 @@ export default {
         $('#main').attr('style', 'visibility: visible');
     },
     methods: {
-        updateQuestion: function (question) {
+        updateQuestion (question) {
             const i = this.questions.findIndex(q => q.id == question.id);
             this.questions[i] = question;
             this.selectedQuestion = question;
         },
-        deleteQuestion: function (question) {
+        deleteQuestion (question) {
             const i = this.questions.findIndex(q => q.id == question);
             this.questions.splice(i, 1);
             this.selectedQuestion = null;
         },
-        selectQuestion: function(q){
+        selectQuestion(q){
             this.selectedQuestion = q;
         },
-        loadContent: function (e) {
+        loadContent (e) {
             e.target.disabled = true;
             let questionType = $('#questionType').val();
             axios
@@ -169,10 +169,10 @@ export default {
                     e.target.disabled = false;
                 });
         },
-        resetInput: function() {
+        resetInput() {
             $('#optionList').text('');
         },
-        addQuestionToList: function(q) {
+        addQuestionToList(q) {
             this.questions.unshift(q);
         },
     },

@@ -132,7 +132,7 @@ class AiessService extends BaseService
             return await Aiess.aggregate([
                 { 
                     $match: { 
-                        userId: userId,
+                        userId,
                         $and: [
                             { timestamp: { $gte: minDate } },
                             { timestamp: { $lte: maxDate } },

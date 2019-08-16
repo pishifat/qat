@@ -48,7 +48,7 @@ async function getUserModsCount(username, mode) {
                         const url = $(v).find('a').first().attr('href');
                         let mod = { 
                             beatmapset: helper.getBeatmapsetIdFromUrl(url),
-                            url: url,
+                            url,
                         };
                         
                         if ($(v).find('.beatmapset-event__icon--kudosu-gain').length) {
@@ -115,7 +115,7 @@ router.get('/modsCount/:user', async (req, res) => {
     
     const modCount = await getUserModsCount(req.params.user);
     if (modCount.error) return res.json(modCount.error);
-    return res.json({ modCount: modCount });
+    return res.json({ modCount });
 });
 
 

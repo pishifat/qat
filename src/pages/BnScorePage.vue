@@ -112,14 +112,14 @@ export default {
 
     },
     methods: {
-        query: async function(e) {
+        async query(e) {
             this.info = '';
             let username = $('#search').val();
             //if(!username || !username.length) username = 'neilperry'
             if(!username || !username.length){
                 this.info = 'Must enter a username!';
             }else{
-                const result = await this.executePost('/bnScore/search/', { username: username }, e);
+                const result = await this.executePost('/bnScore/search/', { username }, e);
                 if (result) {
                     if (result.error) {
                         this.info = result.error;
@@ -131,20 +131,20 @@ export default {
                 }
             }
         },
-        manualCollapse: function(id) {
+        manualCollapse(id) {
             $(`.row-${id}`).each( function () {
                 $(this).toggleClass('collapse');
             });
             $(`.arrow-${id}`).toggleClass('fa-angle-right fa-angle-down');
         },
-        findTotalTotalPoints: function(){
+        findTotalTotalPoints(){
             let total = 0;
             for (let i = 0; i < this.events.length; i++) {
                 total += this.findTotalPoints(this.events[i]);
             }
             return Math.round(total*10)/10;
         },
-        findTotalPoints: function(events) {
+        findTotalPoints(events) {
             let total = 0;
             for (let i = 0; i < events.length; i++) {
                 let event = events[i];
@@ -152,7 +152,7 @@ export default {
             }
             return total;
         },
-        findPoints: function(event) {
+        findPoints(event) {
             if(event.eventType == 'Ranked'){
                 let total = 10;
                 let bonus = 1;

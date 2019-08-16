@@ -34,7 +34,7 @@ const defaultPopulate = [
     },
     {
         innerPopulate: 'evaluations',
-        populate: { path: 'evaluator', select: 'username osuId isLeader' },
+        populate: { path: 'evaluator', select: 'username osuId group isLeader' },
     },
 ];
 
@@ -51,7 +51,7 @@ router.get('/relevantInfo', async (req, res) => {
             true
         ),
     ]);
-    res.json({ er: er, r: r, evaluator: res.locals.userRequest });
+    res.json({ er, r, evaluator: res.locals.userRequest });
 });
 
 function isValidMode(modeToCheck, isOsu, isTaiko, isCatch, isMania) {
@@ -91,7 +91,7 @@ router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
 
         allUsersByMode.forEach(m => {
             m.users.forEach(u => {
-                allEvalsToCreate.push({ bn: u.id, mode: m._id, deadline: deadline });
+                allEvalsToCreate.push({ bn: u.id, mode: m._id, deadline });
             });
         });
     }
@@ -115,14 +115,14 @@ router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
                 if (u.modes) {
                     u.modes.forEach(m => {
                         if (isValidMode(m, req.body.osu, req.body.taiko, req.body.catch, req.body.mania)) {
-                            allEvalsToCreate.push({ bn: u._id, mode: m, deadline: deadline });
+                            allEvalsToCreate.push({ bn: u._id, mode: m, deadline });
                         }
                     });
                 }
                 if (u.probation) {
                     u.probation.forEach(m => {
                         if (isValidMode(m, req.body.osu, req.body.taiko, req.body.catch, req.body.mania)) {
-                            allEvalsToCreate.push({ bn: u._id, mode: m, deadline: deadline });
+                            allEvalsToCreate.push({ bn: u._id, mode: m, deadline });
                         }
                     });
                 }
@@ -139,7 +139,7 @@ router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
         let minDate = new Date();
         minDate.setDate(minDate.getDate() + 14);
         let ers = await evalRoundsService.query({ active: true, deadline: { $lte: minDate } }, defaultPopulate, { deadline: 1, consensus: 1, feedback: 1 }, true);
-        res.json({ ers: ers, failed: failed });
+        res.json({ ers, failed });
         logsService.create(
             req.session.mongoId,
             `Added BN evaluations for ${allEvalsToCreate.length} user${allEvalsToCreate.length == 1 ? '' : 's'}`
@@ -541,7 +541,7 @@ router.get('/userActivity/:id/:mode/:deadline', async (req, res) => {
         }
     }
 
-    res.json({ noms: uniqueNominations, nomsDqd: nomsDqd, nomsPopped: nomsPopped, dqs: dqs, pops: pops, reports: reports });
+    res.json({ noms: uniqueNominations, nomsDqd, nomsPopped, dqs, pops, reports });
 });
 
 module.exports = router;

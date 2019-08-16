@@ -244,18 +244,18 @@ export default {
         }, 300000);
     },
     methods: {
-        filterBySearchValueContext: function(u) {
+        filterBySearchValueContext(u) {
             if(u.username.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1){
                 return true;
             }
             return false;
         },
-        updateUser: function(u) {
+        updateUser(u) {
             const i = this.pageObjs.findIndex(user => user.id == u.id);
             this.pageObjs[i] = u;
             this.selectedUser = u;
         },
-        sortDuration: function(dateArray) {
+        sortDuration(dateArray) {
             let days = 0;
             for (let i = 0; i < dateArray.length; i+=2) {
                 let a = new Date(dateArray[i]);
@@ -268,7 +268,7 @@ export default {
             }
             return days;
         },
-        findUserBadgeInfo: function() {
+        findUserBadgeInfo() {
             axios
                 .get('/users/findUserBadgeInfo')
                 .then(response => {
@@ -281,7 +281,7 @@ export default {
                     });
                 });
         },
-        calculateDuration: function(dateArray) {
+        calculateDuration(dateArray) {
             let days = 0;
             for (let i = 0; i < dateArray.length; i += 2) {
                 let a = new Date(dateArray[i]);
@@ -295,17 +295,17 @@ export default {
             let years = Math.floor(days / 365);
             return years;
         },
-        editBadgeValue: async function(id, group, add) {
+        async editBadgeValue(id, group, add) {
             const u = await this.executePost(
                 '/users/editBadgeValue/' + id,
-                { group: group, add: add }
+                { group, add }
             );
             if (u && !u.error) {
                 const i = this.badgeUsers.findIndex(user => user.id == u.id);
                 group == 'bn' ? this.badgeUsers[i].bnProfileBadge = u.bnProfileBadge : this.badgeUsers[i].natProfileBadge = u.natProfileBadge;
             }
         },
-        findNatActivity: function() {
+        findNatActivity() {
             if(!this.natDays.length) this.natDays = 30;
             axios
                 .get('/users/findNatActivity/' + this.natDays)
@@ -313,7 +313,7 @@ export default {
                     this.natActivity = response;
                 });
         },
-        findBnActivity: function() {
+        findBnActivity() {
             if(!this.bnDays.length) this.bnDays = 30;
             axios
                 .get('/users/findBnActivity/' + this.bnDays)
@@ -321,7 +321,7 @@ export default {
                     this.bnActivity = response;
                 });
         },
-        printModes: function(modes) {
+        printModes(modes) {
             let text = '';
             for (let i = 0; i < modes.length; i++) {
                 text += modes[i];
@@ -331,7 +331,7 @@ export default {
             }
             return text;
         },
-        findPotentialNatInfo: function() {
+        findPotentialNatInfo() {
             axios
                 .get('/users/findPotentialNatInfo/')
                 .then(response => {
@@ -343,7 +343,7 @@ export default {
                     });
                 });
         },
-        findVote: function(evaluations, osuId) {
+        findVote(evaluations, osuId) {
             let vote = 'none';
             evaluations.forEach(evaluation => {
                 if(evaluation.evaluator.osuId == osuId){
@@ -354,7 +354,7 @@ export default {
             });
             return vote;
         },
-        findBehaviorComment: function(evaluations, osuId) {
+        findBehaviorComment(evaluations, osuId) {
             let behaviorComment = 'none';
             evaluations.forEach(evaluation => {
                 if(evaluation.evaluator.osuId == osuId){
@@ -363,7 +363,7 @@ export default {
             });
             return behaviorComment;
         },
-        findModdingComment: function(evaluations, osuId) {
+        findModdingComment(evaluations, osuId) {
             let moddingComment = 'none';
             evaluations.forEach(evaluation => {
                 if(evaluation.evaluator.osuId == osuId){

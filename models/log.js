@@ -66,7 +66,7 @@ class LogService
      * @param {string} action short comment
      */
     async create(userId, action, isError) {
-        const log = new Log({ user: userId, action: action, isError: isError });
+        const log = new Log({ user: userId, action, isError });
         try {
             return await log.save();
         } catch(err) {

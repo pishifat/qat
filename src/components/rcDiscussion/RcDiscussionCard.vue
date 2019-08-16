@@ -11,19 +11,21 @@
                 <p class="text-shadow wrap-text">
                     <a :href="rcDiscussion.discussionLink" target="_blank" @click.stop>{{ rcDiscussion.title }}</a>
                 </p>
-                <p class="small text-shadow">{{rcDiscussion.isActive ? 'Open for voting' : 'Voting concluded'}}</p>
-                <div class="rc-discussion-status my-auto" :class="rcDiscussion.isActive ? 'status-bar-active' : 'status-bar-inactive'"></div>
+                <p class="small text-shadow">
+                    {{ rcDiscussion.isActive ? 'Open for voting' : 'Voting concluded' }}
+                </p>
+                <div class="rc-discussion-status my-auto" :class="rcDiscussion.isActive ? 'status-bar-active' : 'status-bar-inactive'" />
                 <div class="card-icons">
                     <span class="small text-shadow float-left">{{ rcDiscussion.createdAt.slice(0, 10) }}</span>
-                    <i v-if="rcDiscussion.mode.indexOf('osu') >= 0" class="far fa-circle"></i>
-                    <i v-if="rcDiscussion.mode.indexOf('taiko') >= 0" class="fas fa-drum"></i>
-                    <i v-if="rcDiscussion.mode.indexOf('catch') >= 0" class="fas fa-apple-alt"></i>
-                    <i v-if="rcDiscussion.mode.indexOf('mania') >= 0" class="fas fa-stream"></i>
+                    <i v-if="rcDiscussion.mode.indexOf('osu') >= 0" class="far fa-circle" />
+                    <i v-if="rcDiscussion.mode.indexOf('taiko') >= 0" class="fas fa-drum" />
+                    <i v-if="rcDiscussion.mode.indexOf('catch') >= 0" class="fas fa-apple-alt" />
+                    <i v-if="rcDiscussion.mode.indexOf('mania') >= 0" class="fas fa-stream" />
                     <span v-if="rcDiscussion.mode.indexOf('all') >= 0">
-                        <i class="far fa-circle"></i>
-                        <i class="fas fa-drum"></i>
-                        <i class="fas fa-apple-alt"></i>
-                        <i class="fas fa-stream"></i>
+                        <i class="far fa-circle" />
+                        <i class="fas fa-drum" />
+                        <i class="fas fa-apple-alt" />
+                        <i class="fas fa-stream" />
                     </span>
                 </div>
             </div>
@@ -33,13 +35,13 @@
 
 <script>
 export default {
-    name: 'rc-discussion-card',
-    props: ['rc-discussion', 'user-id'],
+    name: 'RcDiscussionCard',
+    props: ['rcDiscussion', 'userId'],
     methods: {
-        selectRcDiscussion: function() {
+        selectRcDiscussion() {
             this.$emit('update:selectedRcDiscussion', this.rcDiscussion);
         },
-        findRelevantMediation: function() {
+        findRelevantMediation() {
             let vote;
             this.rcDiscussion.mediations.forEach(m => {
                 if (m.mediator.id == this.userId) {

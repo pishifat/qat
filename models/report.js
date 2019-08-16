@@ -30,7 +30,7 @@ class ReportService extends BaseService
      */
     async create(reporter, culpritId, reason, link) {
         try {
-            return await Report.create({ reporter: reporter, culprit: culpritId, reason: reason, link: link });
+            return await Report.create({ reporter, culprit: culpritId, reason, link });
         } catch(error) {
             logsService.create(null, JSON.stringify(error), true);
             return { error: error._message };

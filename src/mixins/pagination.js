@@ -10,12 +10,12 @@ const pagination = {
         };
     },
     watch: {
-        limit: function() {
+        limit() {
             this.changePage();
         },
     },
     methods: {
-        changePage: function() {
+        changePage() {
             this.limit = Math.round(this.limit);
             this.pre = this.limit - this.count;
             if (this.allObjs) {
@@ -39,12 +39,12 @@ const pagination = {
                 this.currentPage = this.pages;
             }
         },
-        showOlder: function() {
+        showOlder() {
             if (this.canShowOlder) {
                 this.limit += this.count;
             }
         },
-        showNewer: function() {
+        showNewer() {
             if (this.pre > 0) {
                 this.limit -= this.count;
                 this.canShowOlder = true;

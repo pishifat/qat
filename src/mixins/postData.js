@@ -1,6 +1,6 @@
 const postData = {
     methods: {
-        executePost: async function(path, data, e) {
+        async executePost(path, data, e) {
             if (e) e.target.disabled = true;
 
             try {
@@ -12,7 +12,7 @@ const postData = {
                 return { error: 'Something went wrong' };
             }
         },
-        executeGet: async function(path, e) {
+        async executeGet(path, e) {
             if (e) e.target.disabled = true;
 
             try {

@@ -7,7 +7,7 @@
             :data-user="user.osuId"
             :class="`card-bg-${user.probation.length && user.group != 'nat' ? 'probation' : user.group}`"
         >
-            <img :src="'https://a.ppy.sh/' + user.osuId" class="card-avatar-img" />
+            <img :src="'https://a.ppy.sh/' + user.osuId" class="card-avatar-img">
             <div class="card-body">
                 <a
                     :href="'https://osu.ppy.sh/users/' + user.osuId"
@@ -17,17 +17,17 @@
                 >
                     {{ user.username }}
                 </a>
-                <p class="small ml-1 text-shadow" v-if="user.bnDuration.length">
+                <p v-if="user.bnDuration.length" class="small ml-1 text-shadow">
                     Joined BN: {{ user.bnDuration[0].slice(0, 10) }}
                 </p>
-                <p class="card-text small ml-1 text-shadow" v-if="user.natDuration.length">
+                <p v-if="user.natDuration.length" class="card-text small ml-1 text-shadow">
                     Joined NAT: {{ user.natDuration[0].slice(0, 10) }}
                 </p>
                 <div class="card-icons">
-                    <i v-if="user.modes.indexOf('osu') >= 0" class="far fa-circle text-shadow"></i>
-                    <i v-if="user.modes.indexOf('taiko') >= 0" class="fas fa-drum text-shadow"></i>
-                    <i v-if="user.modes.indexOf('catch') >= 0" class="fas fa-apple-alt text-shadow"></i>
-                    <i v-if="user.modes.indexOf('mania') >= 0" class="fas fa-stream text-shadow"></i>
+                    <i v-if="user.modes.indexOf('osu') >= 0" class="far fa-circle text-shadow" />
+                    <i v-if="user.modes.indexOf('taiko') >= 0" class="fas fa-drum text-shadow" />
+                    <i v-if="user.modes.indexOf('catch') >= 0" class="fas fa-apple-alt text-shadow" />
+                    <i v-if="user.modes.indexOf('mania') >= 0" class="fas fa-stream text-shadow" />
                 </div>
             </div>
         </div>
@@ -36,10 +36,10 @@
 
 <script>
 export default {
-    name: 'user-card',
-    props: ['user', 'user-id'],
+    name: 'UserCard',
+    props: ['user', 'userId'],
     methods: {
-        selectUser: function() {
+        selectUser() {
             this.$emit('update:selectedUser', this.user);
         },
     },

@@ -115,21 +115,21 @@ export default {
         }, 300000);
     },
     methods: {
-        filterBySearchValueContext: function(v) {
+        filterBySearchValueContext(v) {
             if(v.beatmapTitle.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1){
                 return true;
             }
             return false;
         },
-        separateObjs: function() {
+        separateObjs() {
             this.activeVetoes = this.pageObjs.filter(v => v.status == 'wip' || v.status == 'available');
             this.resolvedVetoes = this.pageObjs.filter(v => v.status != 'wip' && v.status != 'available');
         },
-        SubmitVeto: function(v) {
+        SubmitVeto(v) {
             this.allObjs.unshift(v);
             this.filter();
         },
-        updateVeto: function(v) {
+        updateVeto(v) {
             const i = this.allObjs.findIndex(veto => veto.id == v.id);
             this.allObjs[i] = v;
             this.selectedVeto = v;

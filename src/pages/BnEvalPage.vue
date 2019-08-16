@@ -178,17 +178,17 @@ export default {
         }, 300000);
     },
     methods: {
-        filterBySearchValueContext: function(e) {
+        filterBySearchValueContext(e) {
             if(e.bn.username.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1){
                 return true;
             }
             return false;
         },
-        separateObjs: function() {
+        separateObjs() {
             this.evalRounds = this.pageObjs.filter(v => !v.discussion);
             this.discussRounds = this.pageObjs.filter(v => v.discussion);
         },
-        updateEvalRound: function (evalRound) {
+        updateEvalRound (evalRound) {
             const i = this.allObjs.findIndex(er => er.id == evalRound.id);
             this.allObjs[i] = evalRound;
             if(evalRound.discussion){
@@ -198,22 +198,22 @@ export default {
             }
             this.filter();
         },
-        updateAllEvalRounds: function (evalRounds) {
+        updateAllEvalRounds (evalRounds) {
             this.allObjs = evalRounds;
             this.filter();
         },
-        openAddEvalRounds: function() {
+        openAddEvalRounds() {
             $('input[type=checkbox]').each(function() {
                 this.checked = false;
             });
         },
-        setGroupEval: async function(e) {
+        async setGroupEval(e) {
             let checkedRounds = [];
             $('input[name=\'evalTypeCheck\']:checked').each( function () {
                 checkedRounds.push( $(this).val() );
             });
             if(checkedRounds.length){
-                const ers = await this.executePost('/bnEval/setGroupEval/', { checkedRounds: checkedRounds }, e);
+                const ers = await this.executePost('/bnEval/setGroupEval/', { checkedRounds }, e);
                 if (ers) {
                     if (ers.error) {
                         this.info = ers.error;
@@ -224,13 +224,13 @@ export default {
                 }
             }
         },
-        setIndividualEval: async function(e) {
+        async setIndividualEval(e) {
             let checkedRounds = [];
             $('input[name=\'evalTypeCheck\']:checked').each( function () {
                 checkedRounds.push( $(this).val() );
             });
             if(checkedRounds.length){
-                const ers = await this.executePost('/bnEval/setIndividualEval/', { checkedRounds: checkedRounds }, e);
+                const ers = await this.executePost('/bnEval/setIndividualEval/', { checkedRounds }, e);
                 if (ers) {
                     if (ers.error) {
                         this.info = ers.error;
@@ -241,7 +241,7 @@ export default {
                 }
             }
         },
-        setComplete: async function(e) {
+        async setComplete(e) {
             let checkedRounds = [];
             $('input[name=\'evalTypeCheck\']:checked').each( function () {
                 checkedRounds.push( $(this).val() );
@@ -249,7 +249,7 @@ export default {
             if(checkedRounds.length){
                 const result = confirm(`Are you sure? The consensus of any evaluation will affect its respective user.\n\nOnly do this after feedback PMs have been sent.`);
                 if(result){
-                    const ers = await this.executePost('/bnEval/setComplete/', { checkedRounds: checkedRounds }, e);
+                    const ers = await this.executePost('/bnEval/setComplete/', { checkedRounds }, e);
                     if (ers) {
                         if (ers.error) {
                             this.info = ers.error;
@@ -261,7 +261,7 @@ export default {
                 }
             }
         },
-        selectAll: function() {
+        selectAll() {
             let checkBoxes = $('input[name=\'evalTypeCheck\'');
             checkBoxes.prop('checked', !checkBoxes.prop('checked'));
             this.allChecked = !this.allChecked;

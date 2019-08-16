@@ -29,7 +29,7 @@ const defaultPopulate = [
 router.get('/relevantInfo', async (req, res) => {
     let r = await reportsService.query({}, defaultPopulate, { createdAt: 1 }, true);
     res.json({ 
-        r: r, 
+        r, 
         isLeader: res.locals.userRequest.isLeader,
         isSpectator: res.locals.userRequest.isSpectator,
     });

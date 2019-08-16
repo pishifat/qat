@@ -1,117 +1,127 @@
 <template>
-<div id="addEvalRounds" class="modal fade" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-nat-logo">
-                <h5 class="modal-title text-dark">Add BNs to evaluate</h5>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
-            </div>
-            <div class="modal-body" style="overflow: hidden">
-                <div class="container">
-                    <div class="form-check form-check-inline text-shadow">
-                        <input class="form-check-input" type="checkbox" id="osu" value="osu" />
-                        <label class="form-check-label" for="osu">osu!</label>
-                    </div>
-                    <div class="form-check form-check-inline text-shadow">
-                        <input class="form-check-input" type="checkbox" id="taiko" value="taiko" />
-                        <label class="form-check-label" for="taiko">osu!taiko</label>
-                    </div>
-                    <div class="form-check form-check-inline text-shadow">
-                        <input class="form-check-input" type="checkbox" id="catch" value="catch" />
-                        <label class="form-check-label" for="catch">osu!catch</label>
-                    </div>
-                    <div class="form-check form-check-inline text-shadow">
-                        <input class="form-check-input" type="checkbox" id="mania" value="mania" />
-                        <label class="form-check-label" for="mania">osu!mania</label>
-                    </div>
-
-                    <hr />
-
-                    <div class="form-check text-shadow mb-2">
-                        <input class="form-check-input" type="checkbox" value="" id="probationBns" />
-                        <label class="form-check-label" for="probationBns">
-                            Probation BNs
-                        </label>
-                    </div>
-                    <div class="form-check text-shadow mb-2">
-                        <input class="form-check-input" type="checkbox" value="" id="fullBns" />
-                        <label class="form-check-label" for="fullBns">
-                            Full BNs
-                        </label>
-                    </div>
-                    <div class="form-check text-shadow mb-2">
-                        <input class="form-check-input" type="checkbox" value="" id="nat" />
-                        <label class="form-check-label" for="nat">
-                            NAT
-                        </label>
-                    </div>
-
-                    <hr />
-
-                    <div class="mb-2">
-                        <span class="text-shadow">Include specific user(s):</span>
-                        <input
-                            id="includeUsers"
-                            class="ml-1 w-75"
-                            type="text"
-                            placeholder="username1, username2, username3..."
-                        />
-                    </div>
-                    <div class="mb-2">
-                        <span class="text-shadow">Exclude specific user(s):</span>
-                        <input
-                            id="excludeUsers"
-                            class="ml-1 w-75"
-                            type="text"
-                            placeholder="username1, username2, username3..."
-                        />
-                    </div>
-
-                    <hr />
-
-                    <div class="mb-2">
-                        <span class="text-shadow">Deadline:</span>
-                        <input
-                            id="month"
-                            class="ml-1"
-                            type="text"
-                            placeholder="MM"
-                            maxlength="2"
-                            style="min-width: 55px; width: 55px;"
-                        />
-                        <input
-                            id="day"
-                            type="text"
-                            placeholder="DD"
-                            maxlength="2"
-                            style="min-width: 55px; width: 55px;"
-                        />
-                        <p class="small pl-2 pt-2">Only deadlines within the next 2 weeks will be displayed</p>
-                    </div>
+    <div id="addEvalRounds" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-nat-logo">
+                    <h5 class="modal-title text-dark">
+                        Add BNs to evaluate
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
                 </div>
+                <div class="modal-body" style="overflow: hidden">
+                    <div class="container">
+                        <div class="form-check form-check-inline text-shadow">
+                            <input id="osu" class="form-check-input" type="checkbox" value="osu">
+                            <label class="form-check-label" for="osu">osu!</label>
+                        </div>
+                        <div class="form-check form-check-inline text-shadow">
+                            <input id="taiko" class="form-check-input" type="checkbox" value="taiko">
+                            <label class="form-check-label" for="taiko">osu!taiko</label>
+                        </div>
+                        <div class="form-check form-check-inline text-shadow">
+                            <input id="catch" class="form-check-input" type="checkbox" value="catch">
+                            <label class="form-check-label" for="catch">osu!catch</label>
+                        </div>
+                        <div class="form-check form-check-inline text-shadow">
+                            <input id="mania" class="form-check-input" type="checkbox" value="mania">
+                            <label class="form-check-label" for="mania">osu!mania</label>
+                        </div>
 
-                <hr />
-                <span class="errors text-shadow" id="addEvalRoundsErrors">{{ info }}</span>
-                <span class="confirm text-shadow" id="addEvalRoundsConfirm">{{ confirm }}</span>
-                <button type="submit" class="btn btn-nat float-right" @click="addEvalRounds($event)">
-                    Add BNs
-                </button>
+                        <hr>
+
+                        <div class="form-check text-shadow mb-2">
+                            <input id="probationBns" class="form-check-input" type="checkbox" value="">
+                            <label class="form-check-label" for="probationBns">
+                                Probation BNs
+                            </label>
+                        </div>
+                        <div class="form-check text-shadow mb-2">
+                            <input id="fullBns" class="form-check-input" type="checkbox" value="">
+                            <label class="form-check-label" for="fullBns">
+                                Full BNs
+                            </label>
+                        </div>
+                        <div class="form-check text-shadow mb-2">
+                            <input id="nat" class="form-check-input" type="checkbox" value="">
+                            <label class="form-check-label" for="nat">
+                                NAT
+                            </label>
+                        </div>
+
+                        <hr>
+
+                        <div class="mb-2">
+                            <span class="text-shadow">Include specific user(s):</span>
+                            <input
+                                id="includeUsers"
+                                class="ml-1 w-75"
+                                type="text"
+                                placeholder="username1, username2, username3..."
+                            >
+                        </div>
+                        <div class="mb-2">
+                            <span class="text-shadow">Exclude specific user(s):</span>
+                            <input
+                                id="excludeUsers"
+                                class="ml-1 w-75"
+                                type="text"
+                                placeholder="username1, username2, username3..."
+                            >
+                        </div>
+
+                        <hr>
+
+                        <div class="mb-2">
+                            <span class="text-shadow">Deadline:</span>
+                            <input
+                                id="month"
+                                class="ml-1"
+                                type="text"
+                                placeholder="MM"
+                                maxlength="2"
+                                style="min-width: 55px; width: 55px;"
+                            >
+                            <input
+                                id="day"
+                                type="text"
+                                placeholder="DD"
+                                maxlength="2"
+                                style="min-width: 55px; width: 55px;"
+                            >
+                            <p class="small pl-2 pt-2">
+                                Only deadlines within the next 2 weeks will be displayed
+                            </p>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <span id="addEvalRoundsErrors" class="errors text-shadow">{{ info }}</span>
+                    <span id="addEvalRoundsConfirm" class="confirm text-shadow">{{ confirm }}</span>
+                    <button type="submit" class="btn btn-nat float-right" @click="addEvalRounds($event)">
+                        Add BNs
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 </template>
 
 <script>
 import postData from '../../mixins/postData.js';
 
 export default {
-    name: 'add-eval-rounds',
+    name: 'AddEvalRounds',
     mixins: [postData],
+    data() {
+        return {
+            info: '',
+            confirm: '',
+        };
+    },
     methods: {
-        addEvalRounds: async function(e) {
+        async addEvalRounds(e) {
             this.info = '';
             this.confirm = '';
 
@@ -148,16 +158,16 @@ export default {
             const result = await this.executePost(
                 '/bnEval/addEvalRounds/',
                 {
-                    osu: osu,
-                    taiko: taiko,
+                    osu,
+                    taiko,
                     catch: ctb,
-                    mania: mania,
-                    probation: probation,
-                    bn: bn,
-                    nat: nat,
-                    includeUsers: includeUsers,
-                    excludeUsers: excludeUsers,
-                    deadline: deadline,
+                    mania,
+                    probation,
+                    bn,
+                    nat,
+                    includeUsers,
+                    excludeUsers,
+                    deadline,
                 },
                 e
             );
@@ -184,12 +194,6 @@ export default {
                 }
             }
         },
-    },
-    data() {
-        return {
-            info: '',
-            confirm: '',
-        };
     },
 };
 </script>

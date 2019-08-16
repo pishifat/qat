@@ -3,7 +3,9 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header bg-nat">
-                    <h5 class="modal-title text-dark">Submit a Ranking Criteria thread for vote</h5>
+                    <h5 class="modal-title text-dark">
+                        Submit a Ranking Criteria thread for vote
+                    </h5>
                     <button type="button" class="close" data-dismiss="modal">
                         <span>&times;</span>
                     </button>
@@ -14,52 +16,79 @@
                             <p>Game mode:</p>
                             <div class="row ml-4">
                                 <label class="mx-1">
-                                    <input type="radio" class="osu-radio hide-default" name="osu" value="osu" v-model="mode" checked />
-                                    <i class="fas fa-circle fa-lg"></i>
+                                    <input
+                                        v-model="mode"
+                                        type="radio"
+                                        class="osu-radio hide-default"
+                                        name="osu"
+                                        value="osu"
+                                        checked
+                                    >
+                                    <i class="fas fa-circle fa-lg" />
                                 </label>
                                 <label class="mx-1">
-                                    <input type="radio" class="taiko-radio hide-default" name="taiko" value="taiko" v-model="mode" />
-                                    <i class="fas fa-drum fa-lg"></i>
+                                    <input
+                                        v-model="mode"
+                                        type="radio"
+                                        class="taiko-radio hide-default"
+                                        name="taiko"
+                                        value="taiko"
+                                    >
+                                    <i class="fas fa-drum fa-lg" />
                                 </label>
                                 <label class="mx-1">
-                                    <input type="radio" class="catch-radio hide-default" name="catch" value="catch" v-model="mode" />
-                                    <i class="fas fa-apple-alt fa-lg"></i>
+                                    <input
+                                        v-model="mode"
+                                        type="radio"
+                                        class="catch-radio hide-default"
+                                        name="catch"
+                                        value="catch"
+                                    >
+                                    <i class="fas fa-apple-alt fa-lg" />
                                 </label>
                                 <label class="mx-1">
-                                    <input type="radio" class="mania-radio hide-default" name="mania" value="mania" v-model="mode" />
-                                    <i class="fas fa-stream fa-lg"></i>
+                                    <input
+                                        v-model="mode"
+                                        type="radio"
+                                        class="mania-radio hide-default"
+                                        name="mania"
+                                        value="mania"
+                                    >
+                                    <i class="fas fa-stream fa-lg" />
                                 </label>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <small class="text-shadow mb-1">Link to the Ranking Criteria thread</small>
                             <input
+                                v-model="discussionLink"
                                 type="text"
                                 class="form-control"
                                 placeholder="thread link..."
-                                v-model="discussionLink"
-                            />
+                            >
                         </div>
                         <div class="row mb-3">
                             <small class="text-shadow mb-1">Title for Ranking Criteria vote</small>
                             <input
+                                v-model="title"
                                 type="text"
                                 class="form-control"
                                 placeholder="title..."
-                                v-model="title"
-                            />
+                            >
                         </div>
                         <div class="row mb-2">
                             <small class="text-shadow mb-1">Summarize the Ranking Criteria change</small>
                             <input
+                                v-model="shortReason"
                                 type="text"
                                 class="form-control"
                                 placeholder="rc change..."
-                                v-model="shortReason"
-                            />
+                            >
                         </div>
-                        <p class="errors text-shadow">{{ info }}</p>
-                        <hr />
+                        <p class="errors text-shadow">
+                            {{ info }}
+                        </p>
+                        <hr>
                         <button type="submit" class="btn btn-nat float-right" @click="submitRcDiscussion($event)">
                             Submit
                         </button>
@@ -74,7 +103,7 @@
 import postData from '../../mixins/postData.js';
 
 export default {
-    name: 'submit-rc-discussion',
+    name: 'SubmitRcDiscussion',
     mixins: [postData],
     data() {
         return {
@@ -86,7 +115,7 @@ export default {
         };
     },
     methods: {
-        submitRcDiscussion: async function(e) {
+        async submitRcDiscussion(e) {
             if (!this.discussionLink || !this.shortReason || !this.title) {
                 this.info = 'Cannot leave fields blank!';
             } else {

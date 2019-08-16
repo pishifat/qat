@@ -77,6 +77,11 @@
                     <a class="nav-link text-shadow {{#if isLogs}}main-text{{/if}}" href="/logs">Logs</a>
                 </li>
                 {{/if}}
+                {{#else}}
+                <li class="nav-item">
+                    <a class="nav-link text-shadow {{#if isEval}}main-text{{/if}}" href="/appeval">BN Application Evaluations</a>
+                </li>
+                {{/else}}
             </ul>
         </div>
     </nav>

@@ -26,7 +26,7 @@ class EvaluationService extends BaseService
      */
     async create(evaluatorId, behaviorComment, moddingComment, vote) {
         try {
-            return await Evaluation.create({ evaluator: evaluatorId, behaviorComment: behaviorComment, moddingComment: moddingComment, vote: vote });
+            return await Evaluation.create({ evaluator: evaluatorId, behaviorComment, moddingComment, vote });
         } catch(error) {
             logsService.create(null, JSON.stringify(error), true);
             return { error: error._message };

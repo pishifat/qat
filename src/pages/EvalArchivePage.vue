@@ -120,13 +120,13 @@ export default {
             });
     },
     methods: {
-        query: async function(e) {
+        async query(e) {
             this.info = '';
             let username = $('#search').val();
             if(!username || !username.length){
                 this.info = 'Must enter a username!';
             }else{
-                const result = await this.executePost('/evalArchive/search/', { username: username }, e);
+                const result = await this.executePost('/evalArchive/search/', { username }, e);
                 if (result) {
                     if (result.error) {
                         this.info = result.error;
@@ -138,11 +138,11 @@ export default {
                 }
             }
         },
-        queryRecent: async function(e) {
+        async queryRecent(e) {
             this.info = '';
             let limit = $('#limit').val();
             if(parseInt(limit)){
-                const result = await this.executePost('/evalArchive/searchRecent/', { limit: limit }, e);
+                const result = await this.executePost('/evalArchive/searchRecent/', { limit }, e);
                 if (result) {
                     if (result.error) {
                         this.info = result.error;
