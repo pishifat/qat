@@ -1,6 +1,7 @@
 #!/bin/bash
 echo "stopping container"
 docker stop qat
+docker rm qat
 echo "pulling changes"
 git pull
 echo "building"
