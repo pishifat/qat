@@ -3,6 +3,7 @@ const api = require('../helpers/api');
 const usersService = require('../models/user').service;
 const logsService = require('../models/log').service;
 const bnAppsService = require('../models/bnApp').service;
+const evalRoundsService = require('../models/evalRound').service;
 const evalsService = require('../models/evaluation').service;
 const aiessService = require('../models/aiess').service;
 
@@ -106,53 +107,63 @@ router.post('/editBadgeValue/:id', api.isLeader, async (req, res) => {
     
 });
 
-router.get('/findNatActivity/:days', async (req, res) => {
-    const [users, evaluations] = await Promise.all([
+router.get('/findNatActivity/:days/:mode', async (req, res) => {
+    let minDate = new Date();
+    minDate.setDate(minDate.getDate() - req.params.days);
+    let minAppDate = new Date();
+    minAppDate.setDate(minAppDate.getDate() - (req.params.days - 7));
+    let maxAppDate = new Date();
+    maxAppDate.setDate(maxAppDate.getDate() - 7);
+    const [users, evaluations, writtenFeedbacks, bnApps, bnRounds] = await Promise.all([
         usersService.query({ 
             group: 'nat', 
-            $or: [
-                { isSpectator: false }, 
-                { isSpectator: { $exists: false } },
-            ] }, 
+            modes: req.params.mode,
+            isSpectator: { $ne: true } },
         {}, { username: 1 }, true),
-        await evalsService.query({}, {}, {}, true),
+        await evalsService.query({ createdAt: { $gte: minDate } }, {}, {}, true),
+        await logsService.query({ isFeedbackActivity: true, createdAt: { $gte: minDate }  }, {}, {}, true),
+        await bnAppsService.query({ mode: req.params.mode, createdAt: { $gte: minAppDate, $lte: maxAppDate }  }, {}, {}, true),
+        await evalRoundsService.query({ mode: req.params.mode, deadline: { $gte: minAppDate, $lte: maxAppDate }  }, {}, {}, true),
     ]);
 
     class obj 
     {
-        constructor(username, osuId, mode, totalEvaluations) 
+        constructor(username, osuId, totalEvaluations, totalWrittenFeedbacks) 
         {
             this.username = username;
             this.osuId = osuId;
-            this.mode = mode;
             this.totalEvaluations = totalEvaluations;
+            this.totalWrittenFeedbacks = totalWrittenFeedbacks;
         }
     }
 
-    let minDate = new Date();
-    minDate.setDate(minDate.getDate() - req.params.days);
     let info = [];
     users.forEach(user => {
-        let count = 0;
+        let evalCount = 0;
+        let feedbackCount = 0;
         evaluations.forEach(evaluation => {
-            if(evaluation.evaluator.toString() == user.id && evaluation.createdAt > minDate){
-                count++;
+            if(evaluation.evaluator.toString() == user.id){
+                evalCount++;
             }     
         });
-        info.push(new obj(user.username, user.osuId, user.modes[0], count));
+        writtenFeedbacks.forEach(log => {
+            if(log.user == user.id){
+                feedbackCount++;
+            }
+        });
+        info.push(new obj(user.username, user.osuId, evalCount, feedbackCount));
     });
 
-    res.json(info);
+    res.json({ info, total: bnApps.length + bnRounds.length });
 });
 
-router.get('/findBnActivity/:days', async (req, res) => {
+router.get('/findBnActivity/:days/:mode', async (req, res) => {
     class obj 
     {
-        constructor(username, osuId, modes, uniqueNominations, nominationResets, beatmapReports) 
+        constructor(username, osuId, uniqueNominations, nominationResets, beatmapReports) 
         {
             this.username = username;
             this.osuId = osuId;
-            this.modes = modes;
             this.uniqueNominations = uniqueNominations;
             this.nominationResets = nominationResets;
             this.beatmapReports = beatmapReports;
@@ -165,12 +176,10 @@ router.get('/findBnActivity/:days', async (req, res) => {
     const [users, allEvents] = await Promise.all([
         usersService.query({ 
             group: 'bn', 
-            $or: [
-                { isSpectator: false }, 
-                { isSpectator: { $exists: false } },
-            ] }, 
+            modes: req.params.mode,
+            isSpectator: { $ne: true } },
         {}, { username: 1 }, true),
-        aiessService.getAllActivity(minDate, maxDate),
+        aiessService.getAllActivity(minDate, maxDate, req.params.mode),
     ]);
 
     let info = [];
@@ -207,7 +216,7 @@ router.get('/findBnActivity/:days', async (req, res) => {
                 }
             }
         }
-        info.push(new obj(user.username, user.osuId, user.modes, uniqueNominations.length, nominationResets, beatmapReports));
+        info.push(new obj(user.username, user.osuId, uniqueNominations.length, nominationResets, beatmapReports));
     });
 
     res.json(info);
@@ -243,10 +252,7 @@ router.get('/findPotentialNatInfo/', async (req, res) => {
     const [users, applications] = await Promise.all([
         usersService.query({ 
             group: 'bn', 
-            $or: [
-                { isSpectator: false }, 
-                { isSpectator: { $exists: false } },
-            ],
+            isSpectator: { $ne: true },
             isBnEvaluator: true }, 
         {}, { username: 1 }, true),
         bnAppsService.query({ bnEvaluators: { $exists: true, $not: { $size: 0 } }, active: false }, appPopulate, {}, true),

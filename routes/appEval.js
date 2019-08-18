@@ -27,6 +27,7 @@ router.get('/', (req, res) => {
 const defaultPopulate = [
     { populate: 'applicant', display: 'username osuId' },
     { populate: 'bnEvaluators', display: 'username osuId' },
+    { populate: 'natEvaluators', display: 'username osuId' },
     { populate: 'test', display: 'totalScore' },
     {
         populate: 'evaluations',
@@ -283,10 +284,19 @@ router.post('/setFeedback/:id', async (req, res) => {
     await bnAppsService.update(req.params.id, { feedback: req.body.feedback });
     let a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(a);
-    logsService.create(
-        req.session.mongoId,
-        `Edited feedback of ${a.applicant.username}'s ${a.mode} BN app`
-    );
+    if(!req.body.hasFeedback){
+        logsService.create(
+            req.session.mongoId,
+            `Created feedback for ${a.applicant.username}'s ${a.mode} BN app`,
+            false,
+            true
+        );
+    }else{
+        logsService.create(
+            req.session.mongoId,
+            `Edited feedback of ${a.applicant.username}'s ${a.mode} BN app`
+        );
+    }
     api.webhookPost(
         [{
             author: {
@@ -317,7 +327,7 @@ router.post('/toggleIsPriority/:id', async (req, res) => {
     );
 });
 
-/* POST set status upheld or withdrawn. */
+/* POST select BN evaluators */
 router.post('/selectBnEvaluators', async (req, res) => {
     const allUsers = await usersModel.aggregate([
         { $match: { group: { $eq: 'bn' }, isBnEvaluator: true, probation: { $size: 0 } }  },

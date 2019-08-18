@@ -3,6 +3,7 @@ const api = require('../helpers/api');
 const testSubmissionService = require('../models/bnTest/testSubmission').service;
 const logsService = require('../models/log').service;
 const bnAppsService = require('../models/bnApp').service;
+const usersModel = require('../models/user').User;
 
 const router = express.Router();
 router.use(api.isLoggedIn);
@@ -176,6 +177,20 @@ router.post('/submitTest', async (req, res) => {
             modsList += ', ';
         }
     }
+    let invalids = [8129817, 3178418, 2204515, 2202163, 318565];
+    const assignedNat = await usersModel.aggregate([
+        { $match: { group: 'nat', isSpectator: { $ne: true }, modes: test.mode, osuId: { $nin: invalids } } },
+        { $sample: { size: test.mode == 'osu' ? 3 : 2 } },
+    ]);
+    let natList = '';
+    for (let i = 0; i < assignedNat.length; i++) {
+        let user = assignedNat[i];
+        await bnAppsService.update(currentBnApp.id, { $push: { natEvaluators: user._id } });
+        natList += user.username;
+        if(i + 1 < assignedNat.length){
+            natList += ', ';
+        }
+    }
     api.webhookPost(
         [{
             author: {
@@ -192,6 +207,10 @@ router.post('/submitTest', async (req, res) => {
                 {
                     name: 'Mods',
                     value: modsList,
+                },
+                {
+                    name: 'Assigned NAT',
+                    value: natList,
                 },
             ],
         }], 

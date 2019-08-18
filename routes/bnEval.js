@@ -393,10 +393,20 @@ router.post('/setFeedback/:id', async (req, res) => {
     await evalRoundsService.update(req.params.id, { feedback: req.body.feedback });
     let er = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(er);
-    logsService.create(
-        req.session.mongoId,
-        `Edited feedback of ${er.bn.username}'s ${er.mode} BN evaluation`
-    );
+    if(!req.body.hasFeedback){
+        logsService.create(
+            req.session.mongoId,
+            `Created feedback for ${er.bn.username}'s ${er.mode} BN evaluation`,
+            false,
+            true
+        );
+    }else{
+        logsService.create(
+            req.session.mongoId,
+            `Edited feedback of ${er.bn.username}'s ${er.mode} BN evaluation`
+        );
+    }
+    
     api.webhookPost(
         [{
             author: {

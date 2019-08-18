@@ -5,7 +5,7 @@
     >
         <div
             class="card border-outline"
-            :class="[isSelected ? 'selected-card' : '', 'border-' + findRelevantEval(), (discussApp && discussApp.isPriority) || (discussRound && discussRound.isPriority) ? 'card-bg-priority' : 'custom-bg-dark']"
+            :class="[isSelected ? 'selected-card' : '', 'border-' + findRelevantEval(), (discussApp && (discussApp.isPriority || isNatEvaluator())) || (discussRound && discussRound.isPriority) ? 'card-bg-priority' : 'custom-bg-dark']"
             data-toggle="modal"
             data-target="#discussionInfo"
             :data-user="discussApp ? discussApp.id : discussRound.id"
@@ -213,6 +213,15 @@ export default {
             } else {
                 this.isSelected = false;
             }
+        },
+        isNatEvaluator() {
+            for (let i = 0; i < this.discussApp.natEvaluators.length; i++) {
+                let user = this.discussApp.natEvaluators[i];
+                if(user.id == this.evaluator.id){
+                    return true;
+                }
+            }
+            return false;
         },
     },
 };

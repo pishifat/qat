@@ -49,20 +49,43 @@
                     </button>
                     <input
                         v-model="natDays"
+                        class="small"
                         type="text"
+                        autocomplete="off"
                         placeholder="days of activity..."
-                        style="filter: drop-shadow(1px 1px 1px #000000);"
                         maxlength="3"
                         @keyup.enter="findNatActivity()"
                     >
+                    <small class="ml-1">
+                        <select v-model="natMode" class="custom-select">
+                            <option class="ml-2" value="osu" selected>osu!</option>
+                            <option class="ml-2" value="taiko">osu!taiko</option>
+                            <option class="ml-2" value="catch">osu!catch</option>
+                            <option class="ml-2" value="mania">osu!mania</option>
+                        </select>
+                    </small>
                     <div v-if="natActivity">
-                        <div v-for="user in natActivity.data" :key="user.username" class="small min-spacing mb-1">
-                            <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a> ({{ user.mode }})
-                            <p v-if="user.mode == 'osu'" class="min-spacing" :style="user.totalEvaluations < natDays/3 ? 'background-color: rgb(255,50,50,0.25);' : user.totalEvaluations < natDays/2 ? 'background-color: rgb(255,255,0,0.25);' : 'background-color: rgb(50,255,50,0.25);'">
+                        <div v-for="user in natActivity" :key="user.username" class="small min-spacing mb-1">
+                            <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a>
+                            <p 
+                                class="min-spacing" 
+                                :style="user.totalEvaluations > natTotal/2 ? 
+                                    'background-color: rgb(50,255,50,0.25);' 
+                                    : user.totalEvaluations > natTotal/3 ? 
+                                        'background-color: rgb(255,255,0,0.25);' :
+                                        'background-color: rgb(255,50,50,0.25);'"
+                            >
                                 Total evaluations: {{ user.totalEvaluations }}
                             </p>
-                            <p v-else class="min-spacing" :style="user.totalEvaluations < natDays/6 ? 'background-color: rgb(255,50,50,0.25);' : user.totalEvaluations < natDays/4 ? 'background-color: rgb(255,255,0,0.25);' : 'background-color: rgb(50,255,50,0.25);'">
-                                Total evaluations: {{ user.totalEvaluations }}
+                            <p
+                                class="min-spacing"
+                                :style="user.totalWrittenFeedbacks > natTotal/6 ? 
+                                    'background-color: rgb(50,255,50,0.25);' : 
+                                    user.totalWrittenFeedbacks > natTotal/9 ? 
+                                        'background-color: rgb(255,255,0,0.25);' : 
+                                        'background-color: rgb(255,50,50,0.25);'"
+                            >
+                                Total written feedback: {{ user.totalWrittenFeedbacks }}
                             </p>
                         </div>
                     </div>
@@ -79,15 +102,24 @@
                     </button>
                     <input
                         v-model="bnDays"
+                        class="small"
                         type="text"
+                        autocomplete="off"
                         placeholder="days of activity..."
-                        style="filter: drop-shadow(1px 1px 1px #000000);"
                         maxlength="3"
                         @keyup.enter="findBnActivity()"
                     >
+                    <small class="ml-1">
+                        <select v-model="bnMode" class="custom-select">
+                            <option class="ml-2" value="osu" selected>osu!</option>
+                            <option class="ml-2" value="taiko">osu!taiko</option>
+                            <option class="ml-2" value="catch">osu!catch</option>
+                            <option class="ml-2" value="mania">osu!mania</option>
+                        </select>
+                    </small>
                     <div v-if="bnActivity">
-                        <div v-for="user in bnActivity.data" :key="user.username" class="small min-spacing mb-1">
-                            <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a> ({{ printModes(user.modes) }})
+                        <div v-for="user in bnActivity" :key="user.username" class="small min-spacing mb-1">
+                            <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a>
                             <p class="min-spacing" :style="user.uniqueNominations < bnDays/10 ? 'background-color: rgb(255,50,50,0.25);' : user.uniqueNominations < bnDays/6 ? 'background-color: rgb(255,255,0,0.25);' : 'background-color: rgb(50,255,50,0.25);'">
                                 Nominations: {{ user.uniqueNominations }}
                             </p>
@@ -212,8 +244,11 @@ export default {
             badgeUsers: [],
             natActivity: null,
             natDays: '',
+            natMode: 'osu',
+            natTotal: null,
             bnActivity: null,
             bnDays: '',
+            bnMode: 'osu',
             potentialNatInfo: [],
         };
     },
@@ -308,28 +343,19 @@ export default {
         findNatActivity() {
             if(!this.natDays.length) this.natDays = 30;
             axios
-                .get('/users/findNatActivity/' + this.natDays)
+                .get('/users/findNatActivity/' + this.natDays + '/' + this.natMode)
                 .then(response => {
-                    this.natActivity = response;
+                    this.natActivity = response.data.info;
+                    this.natTotal = response.data.total;
                 });
         },
         findBnActivity() {
             if(!this.bnDays.length) this.bnDays = 30;
             axios
-                .get('/users/findBnActivity/' + this.bnDays)
+                .get('/users/findBnActivity/' + this.bnDays + '/' + this.bnMode)
                 .then(response => {
-                    this.bnActivity = response;
+                    this.bnActivity = response.data;
                 });
-        },
-        printModes(modes) {
-            let text = '';
-            for (let i = 0; i < modes.length; i++) {
-                text += modes[i];
-                if(i < modes.length - 1){
-                    text += ', ';
-                }
-            }
-            return text;
         },
         findPotentialNatInfo() {
             axios

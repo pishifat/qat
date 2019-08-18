@@ -2,7 +2,7 @@
     <div id="discussionInfo" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div v-if="discussApp || discussRound" class="modal-content custom-bg-dark">
-                <div class="modal-header text-dark" :class="(discussApp && discussApp.isPriority) || (discussRound && discussRound.isPriority) ? 'bg-priority' : 'bg-nat-logo'">
+                <div class="modal-header text-dark" :class="(discussApp && (discussApp.isPriority || isNatEvaluator())) || (discussRound && discussRound.isPriority) ? 'bg-priority' : 'bg-nat-logo'">
                     <h5 v-if="discussApp" class="modal-title">
                         Application Evaluation: <a :href="'https://osu.ppy.sh/users/' + discussApp.applicant.osuId" class="text-dark" target="_blank" @click.stop>{{ discussApp.applicant.username }}</a>
                         <i v-if="discussApp.mode == 'osu'" class="far fa-circle" />
@@ -183,7 +183,7 @@
                             <div v-if="discussApp" class="col-sm-12 row text-shadow">
                                 <div v-for="evaluation in natEvaluations" :key="evaluation.id" class="col-sm-12 row text-shadow">
                                     <div :class="evaluation.evaluator.username.length > 12 ? 'col-sm-3' : 'col-sm-2'">
-                                        <p :class=" evaluation.vote == 1 ? 'vote-pass' : evaluation.vote == 2 ? 'vote-neutral' : 'vote-fail'">
+                                        <p :class="evaluation.vote == 1 ? 'vote-pass' : evaluation.vote == 2 ? 'vote-neutral' : 'vote-fail'">
                                             {{ evaluation.evaluator.username }}
                                         </p> 
                                     </div>
@@ -445,6 +445,15 @@ export default {
                 return mod;
             }
         },
+        isNatEvaluator() {
+            for (let i = 0; i < this.discussApp.natEvaluators.length; i++) {
+                let user = this.discussApp.natEvaluators[i];
+                if(user.id == this.evaluator.id){
+                    return true;
+                }
+            }
+            return false;
+        },
 
         //action
         async submitEval (e) {
@@ -528,7 +537,7 @@ export default {
             if(!this.evaluator.isSpectator){
                 if(this.discussApp){
                     const a = await this.executePost(
-                        '/appEval/setFeedback/' + this.discussApp.id, { feedback: this.feedback }, e);
+                        '/appEval/setFeedback/' + this.discussApp.id, { feedback: this.feedback, hasFeedback: this.discussApp.feedback }, e);
                     if (a) {
                         if (a.error) {
                             this.info = a.error;
@@ -538,7 +547,7 @@ export default {
                     }
                 }else{
                     const er = await this.executePost(
-                        '/bnEval/setFeedback/' + this.discussRound.id, { feedback: this.feedback }, e);
+                        '/bnEval/setFeedback/' + this.discussRound.id, { feedback: this.feedback, hasFeedback: this.discussRound.feedback }, e);
                     if (er) {
                         if (er.error) {
                             this.info = er.error;
@@ -589,5 +598,9 @@ export default {
 
 <style>
 
+.eval-bg-priority {
+    background-color: rgb(38, 48, 63)!important;
+    box-shadow: 5px 5px 5px 5px rgb(38, 48, 63);
+}
 
 </style>

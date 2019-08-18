@@ -87,7 +87,7 @@ class AiessService extends BaseService
      * @param {date} minDate 
      * @param {date} maxDate 
      */
-    async getAllActivity(minDate, maxDate) {
+    async getAllActivity(minDate, maxDate, mode) {
         if (!minDate && !maxDate) return null;
 
         try {
@@ -99,6 +99,7 @@ class AiessService extends BaseService
                             { timestamp: { $lte: maxDate } },
                         ],
                         eventType: { $ne: 'Ranked' },
+                        modes: mode,
                     }, 
                 },
                 {

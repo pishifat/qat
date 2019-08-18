@@ -5,7 +5,7 @@
     >
         <div
             class="card border-outline"
-            :class="[isSelected ? 'selected-card' : '', 'border-' + findRelevantEval(), (application && application.isPriority) || (evalRound && evalRound.isPriority) ? 'card-bg-priority' : 'custom-bg-dark']"
+            :class="[isSelected ? 'selected-card' : '', 'border-' + findRelevantEval(), (application && (application.isPriority || isNatEvaluator())) || (evalRound && evalRound.isPriority) ? 'card-bg-priority' : 'custom-bg-dark']"
             data-toggle="modal"
             data-target="#evaluationInfo"
         >
@@ -145,6 +145,15 @@ export default {
             } else {
                 this.isSelected = false;
             }
+        },
+        isNatEvaluator() {
+            for (let i = 0; i < this.application.natEvaluators.length; i++) {
+                let user = this.application.natEvaluators[i];
+                if(user.id == this.evaluator.id){
+                    return true;
+                }
+            }
+            return false;
         },
     },
 };

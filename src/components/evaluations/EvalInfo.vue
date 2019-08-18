@@ -2,7 +2,7 @@
     <div id="evaluationInfo" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div v-if="application || evalRound" class="modal-content custom-bg-dark">
-                <div class="modal-header text-dark" :class="(application && application.isPriority) || (evalRound && evalRound.isPriority) ? 'bg-priority' : 'bg-nat-logo'">
+                <div class="modal-header text-dark" :class="(application && (application.isPriority || isNatEvaluator())) || (evalRound && evalRound.isPriority) ? 'bg-priority' : 'bg-nat-logo'">
                     <h5 v-if="application" class="modal-title">
                         Application Evaluation: <a :href="'https://osu.ppy.sh/users/' + application.applicant.osuId" class="text-dark" target="_blank" @click.stop>{{ application.applicant.username }}</a>
                         <i v-if="application.mode == 'osu'" class="far fa-circle" />
@@ -46,35 +46,47 @@
                                         {{ application.test.totalScore || application.test.totalScore >= 0 ? application.test.totalScore + '/20' : 'incomplete' }}
                                     </a>
                                 </p>
-                                <div v-if="evaluator.group == 'nat'" class="mt-4">
-                                    <p class="text-shadow">
-                                        Total Evaluations: {{ application.evaluations.length }}
-                                        <a
-                                            href="#"
-                                            class="float-right small vote-pass ml-2"
-                                            data-toggle="tooltip"
-                                            data-placement="top"
-                                            :title="application.isPriority ? 'mark evaluation as low priority' : 'mark evaluation as high priority'"
-                                            @click.prevent.stop="toggleIsPriority()"
-                                        >
-                                            <i class="fas" :class="application.isPriority ? 'fa-arrow-down' : 'fa-arrow-up'" />
-                                        </a>
-                                    </p>
-                                    <ul>
-                                        <li v-for="evaluation in application.evaluations" :key="evaluation.id" class="small text-shadow">
-                                            {{ evaluation.evaluator.username }}
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div v-if="application.bnEvaluators.length && evaluator.isLeader">
-                                    <p class="text-shadow">
-                                        BN Evaluators ({{ application.bnEvaluators.length }}):
-                                    </p>
-                                    <ul>
-                                        <li v-for="evaluator in application.bnEvaluators" :key="evaluator.id" class="small text-shadow">
-                                            {{ evaluator.username }}
-                                        </li>
-                                    </ul>
+                                <div v-if="evaluator.group == 'nat'" class="mt-4 row col-sm-12">
+                                    <div :class="application.bnEvaluators.length ? 'col-sm-4' : 'col-sm-6'">
+                                        <p class="text-shadow">
+                                            Assigned NAT: 
+                                        </p>
+                                        <ul>
+                                            <li v-for="user in application.natEvaluators" :key="user.id" class="small text-shadow">
+                                                {{ user.username }}
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div v-if="application.bnEvaluators.length && evaluator.isLeader" class="col-sm-4">
+                                        <p class="text-shadow">
+                                            Assigned BN: ({{ application.bnEvaluators.length }}):
+                                        </p>
+                                        <ul>
+                                            <li v-for="user in application.bnEvaluators" :key="user.id" class="small text-shadow">
+                                                {{ user.username }}
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div :class="application.bnEvaluators.length ? 'col-sm-4' : 'col-sm-6'">
+                                        <p class="text-shadow">
+                                            Total Evaluations: {{ application.evaluations.length }}
+                                            <a
+                                                href="#"
+                                                class="float-right small vote-pass ml-2"
+                                                data-toggle="tooltip"
+                                                data-placement="top"
+                                                :title="application.isPriority ? 'mark evaluation as low priority' : 'mark evaluation as high priority'"
+                                                @click.prevent.stop="toggleIsPriority()"
+                                            >
+                                                <i class="fas" :class="application.isPriority ? 'fa-arrow-down' : 'fa-arrow-up'" />
+                                            </a>
+                                        </p>
+                                        <ul>
+                                            <li v-for="evaluation in application.evaluations" :key="evaluation.id" class="small text-shadow">
+                                                {{ evaluation.evaluator.username }}
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
                                 <div v-if="evaluator.isLeader && !application.bnEvaluators.length">
                                     <button class="btn btn-sm btn-nat mb-2" @click="selectBnEvaluators($event)">
@@ -326,6 +338,15 @@ export default {
                 return mod;
             }
         },
+        isNatEvaluator() {
+            for (let i = 0; i < this.application.natEvaluators.length; i++) {
+                let user = this.application.natEvaluators[i];
+                if(user.id == this.evaluator.id){
+                    return true;
+                }
+            }
+            return false;
+        },
 
         //action
         async submitEval (e) {
@@ -403,7 +424,7 @@ export default {
             }
         },
         async selectBnEvaluators(e) {
-            const r = await this.executePost('/appeval/selectBnEvaluators', { mode: this.application.mode }, e);
+            const r = await this.executePost('/appeval/selectBnEvaluators', { mode: this.application.mode, id: this.application.id }, e);
             if (r) {
                 if (r.error) {
                     this.info = r.error;
