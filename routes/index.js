@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const api = require('../helpers/api');
 const usersService = require('../models/user').service;
 const logsService = require('../models/log').service;
+const getUserModsCount = require('../helpers/helpers').getUserModsCount;
 const router = express.Router();
 
 /* GET bn app page */
@@ -28,6 +29,17 @@ router.get('/', async (req, res) => {
         isNat,
         allUsersByMode,
     });
+});
+
+/* GET mod count from specified user */
+router.get('/modsCount/:user', async (req, res) => {
+    if (!req.params.user || req.params.user.trim() == '') {
+        return res.json({ error: 'Missing user input' });
+    }
+    
+    const modCount = await getUserModsCount(req.params.user);
+    if (modCount.error) return res.json(modCount.error);
+    return res.json({ modCount });
 });
 
 /*-------below this line is the intimidating code that i never want to look at----------*/
