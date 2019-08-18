@@ -6,11 +6,12 @@ function calculateMonthScore(modCount, modeValue) {
 $(function() {
     $('body').tooltip({ selector: '[data-toggle=tooltip]', trigger: 'hover' });
     let to = new Date();
+    let from = new Date();
 
     for (let i = 1; i < 4; i++) {
-        let from = to;
         to.setMonth(to.getMonth() - 1);
         $(`#modCount${i}`).attr('placeholder', `# mods from ${from.toLocaleDateString()} to ${to.toLocaleDateString()}`);
+        from.setMonth(from.getMonth() - 1);
     }
     
     $('.modCount').change(function() {
@@ -35,9 +36,11 @@ $(function() {
             return;
         }
 
+        $('#calculateScore').attr('disabled', true);
         $('#calcWait').text('Retrieving info... (this will take a few seconds)');
-        const res = await axios.get(`/bnapps/modsCount/${userId}`);
+        const res = await axios.get(`/modsCount/${userId}`);
         $('#calcWait').text('');
+        $('#calculateScore').attr('disabled', false);
         if (res.data.error) {
             $('#errors').text(res.data.error);
         } else {
