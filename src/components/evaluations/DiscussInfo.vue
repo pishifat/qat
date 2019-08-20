@@ -98,6 +98,7 @@
                                         :discuss-app="discussApp"
                                         :discord-link="discordLink"
                                         :feedback="feedback"
+                                        :nat-evaluations="natEvaluations"
                                     />
                                 </div>
                                 <hr>
@@ -162,6 +163,7 @@
                                     <feedback-pm
                                         :discuss-round="discussRound"
                                         :feedback="feedback"
+                                        :nat-evaluations="natEvaluations"
                                     />
                                 </div>
                                 
@@ -233,6 +235,7 @@
                                     <feedback-pm
                                         :discuss-app="discussApp"
                                         :feedback="feedback"
+                                        :nat-evaluations="natEvaluations"
                                     />
                                 </p>
                                 <p v-else>
@@ -242,6 +245,7 @@
                                     <feedback-pm
                                         :discuss-round="discussRound"
                                         :feedback="feedback"
+                                        :nat-evaluations="natEvaluations"
                                     />
                                 </p>
                             </div>

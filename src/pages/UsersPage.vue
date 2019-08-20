@@ -36,7 +36,7 @@
                 </div>
             </section>
             <!-- admin tools -->
-            <section v-if="isNat" class="segment segment-solid my-1 mx-4">
+            <section v-if="isNat || isBn" class="segment segment-solid my-1 mx-4">
                 <div class="my-2">
                     <button
                         class="btn btn-sm btn-nat minw-200 my-1"
@@ -88,6 +88,9 @@
                                 Total written feedback: {{ user.totalWrittenFeedbacks }}
                             </p>
                         </div>
+                        <p class="small min-spacing ml-2">
+                            Note: "written feedback" field only accounts for work after August 17th
+                        </p>
                     </div>
                 </div>
                 <div class="my-2">
@@ -132,7 +135,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="my-2">
+                <div v-if="isNat" class="my-2">
                     <button
                         class="btn btn-sm btn-nat minw-200 my-1"
                         data-toggle="tooltip"
@@ -161,7 +164,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="my-2">
+                <div v-if="isNat" class="my-2">
                     <button
                         class="btn btn-sm btn-nat minw-200 my-1"
                         data-toggle="tooltip"
@@ -240,6 +243,7 @@ export default {
             userId: null,
             isLeader: null,
             isNat: null,
+            isBn: null,
             selectedUser: null,
             badgeUsers: [],
             natActivity: null,
@@ -260,6 +264,7 @@ export default {
                 this.userId = response.data.userId;
                 this.isLeader = response.data.isLeader;
                 this.isNat = response.data.isNat;
+                this.isBn = response.data.isBn;
                 this.limit = 24;
             }).then(function(){
                 $('#loading').fadeOut();
@@ -346,7 +351,7 @@ export default {
                 .get('/users/findNatActivity/' + this.natDays + '/' + this.natMode)
                 .then(response => {
                     this.natActivity = response.data.info;
-                    this.natTotal = response.data.total;
+                    this.natTotal = this.natMode == 'osu' ? response.data.total : this.natMode == 'taiko' ? response.data.total*1.5 : response.data.total*2;
                 });
         },
         findBnActivity() {

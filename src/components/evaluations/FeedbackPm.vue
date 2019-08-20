@@ -21,7 +21,7 @@
                 <samp class="small">Additional feedback regarding why you were rejected and what you could potentially improve in your next application:</samp><br><br>
                 <samp><pre class="small">[notice]{{ feedback }}[/notice]</pre></samp>
                 <samp class="small">For further feedback or to appeal this decision, contact any of these users:
-                    <span v-for="(evaluation, i) in discussApp.evaluations" :key="i">[url=https://osu.ppy.sh/users/{{ evaluation.evaluator.osuId }}]{{ evaluation.evaluator.username }}[/url]{{ i+1 != discussApp.evaluations.length ? ", " : "" }}</span>
+                    <span v-for="(evaluation, i) in natEvaluations" :key="i">[url=https://osu.ppy.sh/users/{{ evaluation.evaluator.osuId }}]{{ evaluation.evaluator.username }}[/url]{{ i+1 != natEvaluations.length ? ", " : "" }}</span>
                 </samp><br><br>
                 <samp class="small">You may apply for BN in this game mode again on {{ defineDate(discussApp.createdAt) }}. Good luck!</samp><br><br>
                 <samp class="small">Regards, the Nomination Assessment Team</samp>
@@ -56,7 +56,7 @@
                 <samp class="small">Additional feedback from the NAT:</samp><br><br>
                 <samp><pre class="small">[notice]{{ feedback }}[/notice]</pre></samp>
                 <samp class="small">For further feedback or to appeal this decision, contact any of these users:
-                    <span v-for="(evaluation, i) in discussRound.evaluations" :key="i">[url=https://osu.ppy.sh/users/{{ evaluation.evaluator.osuId }}]{{ evaluation.evaluator.username }}[/url]{{ i+1 != discussRound.evaluations.length ? ", " : "" }}</span>
+                    <span v-for="(evaluation, i) in natEvaluations" :key="i">[url=https://osu.ppy.sh/users/{{ evaluation.evaluator.osuId }}]{{ evaluation.evaluator.username }}[/url]{{ i+1 != natEvaluations.length ? ", " : "" }}</span>
                 </samp><br><br>
                 <samp class="small">We hope to see you off of probation soon!</samp><br><br>
                 <samp class="small">Regards, the Nomination Assessment Team</samp>
@@ -68,7 +68,7 @@
                 <samp class="small">Additional feedback from the NAT:</samp><br><br>
                 <samp><pre class="small">[notice]{{ feedback }}[/notice]</pre></samp>
                 <samp class="small">For further feedback or to appeal this decision, contact any of these users:
-                    <span v-for="(evaluation, i) in discussRound.evaluations" :key="i">[url=https://osu.ppy.sh/users/{{ evaluation.evaluator.osuId }}]{{ evaluation.evaluator.username }}[/url]{{ i+1 != discussRound.evaluations.length ? ", " : "" }}</span>
+                    <span v-for="(evaluation, i) in natEvaluations" :key="i">[url=https://osu.ppy.sh/users/{{ evaluation.evaluator.osuId }}]{{ evaluation.evaluator.username }}[/url]{{ i+1 != natEvaluations.length ? ", " : "" }}</span>
                 </samp><br><br>
                 <samp class="small">Good luck!</samp><br><br>
                 <samp class="small">Regards, the Nomination Assessment Team</samp>
@@ -81,7 +81,7 @@
 
 export default {
     name: 'FeedbackPm',
-    props: [ 'discussApp', 'discussRound', 'discordLink', 'feedback' ],
+    props: [ 'discussApp', 'discussRound', 'discordLink', 'feedback', 'natEvaluations' ],
     methods: {
         defineDate(date){
             date = new Date(date);

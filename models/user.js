@@ -156,7 +156,7 @@ class UserService extends BaseService
     async getAllMediators() {
         try{
             return await User.aggregate([
-                { $match: { group: { $ne: 'user' }, vetoMediator: true, isSpectator: { $ne: true } } },
+                { $match: { group: { $ne: 'user' }, vetoMediator: true, isSpectator: { $ne: true }, probation: { $size: 0 } } },
                 { $sample: { size: 1000 } },
             ]);
         }catch (error) {

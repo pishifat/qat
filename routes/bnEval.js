@@ -520,32 +520,25 @@ router.get('/userActivity/:id/:mode/:deadline', async (req, res) => {
         const eventType = allEvents[i]._id;
         const events = allEvents[i].events;
         
+        //this part is slow but necessary for accurate dq responsibility
         if (eventType == 'Disqualified') {
             for (let j = 0; j < events.length; j++) {
                 let event = events[j];
                 if (uniqueNominations.find(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
-                    /*if(!event.responsibleNominators || !event.responsibleNominators.length) {
-                        let a = await aiessService.query({beatmapsetId: event.beatmapsetId, timestamp: { $lte: event.timestamp }}, {}, {timestamp: -1}, true, 3);
-                        await aiessService.update(a[0].id, {$push: {responsibleNominators: {$each: [a[1].userId, a[2].userId]} } } );
-                    }*/
-                    //these commented sections are for bn score
-                    nomsDqd.push(event);
+                    let a = await aiessService.query({ beatmapsetId: event.beatmapsetId, timestamp: { $lte: event.timestamp } }, {}, { timestamp: -1 }, true, 3);
+                    if(a[1].userId == parseInt(req.params.id) || a[2].userId == parseInt(req.params.id)){
+                        nomsDqd.push(event);
+                    }
                 }
             }
         } else if (eventType == 'Popped') {
             for (let j = 0; j < events.length; j++) {
                 let event = events[j];
                 if (uniqueNominations.find(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
-                    /*if(!event.responsibleNominators || !event.responsibleNominators.length){
-                        let a = await aiessService.query({beatmapsetId: event.beatmapsetId, timestamp: { $lte: event.timestamp }}, {}, {timestamp: -1}, true, 2);
-                        await aiessService.update(a[0].id, {$push: {responsibleNominators: a[1].userId} });
-                        if(a[1].userId == parseInt(req.params.id)){
-                            nomsPopped.push(event);
-                        }
-                    }else if(event.responsibleNominators.indexOf(parseInt(req.params.id)) >= 0){
+                    let a = await aiessService.query({ beatmapsetId: event.beatmapsetId, timestamp: { $lte: event.timestamp } }, {}, { timestamp: -1 }, true, 2);
+                    if(a[1].userId == parseInt(req.params.id)){
                         nomsPopped.push(event);
-                    }*/
-                    nomsPopped.push(event);
+                    }
                 }
             }
         }

@@ -30,7 +30,13 @@ router.get('/relevantInfo', async (req, res) => {
         { username: 1 },
         true
     );
-    res.json({ users: u, userId: req.session.mongoId, isLeader: res.locals.userRequest.isLeader, isNat: res.locals.userRequest.group == 'nat' });
+    res.json({ 
+        users: u, 
+        userId: req.session.mongoId, 
+        isLeader: res.locals.userRequest.isLeader, 
+        isNat: res.locals.userRequest.group == 'nat', 
+        isBn: res.locals.userRequest.group == 'bn', 
+    });
 });
 
 /* POST submit or edit eval */
@@ -137,21 +143,24 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
         }
     }
 
+    let invalids = [8129817, 3178418, 2204515, 2202163, 318565];
     let info = [];
     users.forEach(user => {
-        let evalCount = 0;
-        let feedbackCount = 0;
-        evaluations.forEach(evaluation => {
-            if(evaluation.evaluator.toString() == user.id){
-                evalCount++;
-            }     
-        });
-        writtenFeedbacks.forEach(log => {
-            if(log.user == user.id){
-                feedbackCount++;
-            }
-        });
-        info.push(new obj(user.username, user.osuId, evalCount, feedbackCount));
+        if(invalids.indexOf(user.osuId) == -1){
+            let evalCount = 0;
+            let feedbackCount = 0;
+            evaluations.forEach(evaluation => {
+                if(evaluation.evaluator.toString() == user.id){
+                    evalCount++;
+                }     
+            });
+            writtenFeedbacks.forEach(log => {
+                if(log.user == user.id){
+                    feedbackCount++;
+                }
+            });
+            info.push(new obj(user.username, user.osuId, evalCount, feedbackCount));
+        }
     });
 
     res.json({ info, total: bnApps.length + bnRounds.length });

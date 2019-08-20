@@ -14,8 +14,8 @@
     --available: var(--pass);
     --neutral: #a0c6ff;
     --wip: var(--neutral);
-    --extend: #fff9aa;
-    --extend-secondary: #b1ad78;
+    --extend: #f0e770;
+    --extend-secondary: #979243;
     --upheld: var(--extend);
     --fail: #ff9b9b;
     --withdrawn: var(--fail);
