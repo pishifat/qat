@@ -35,8 +35,8 @@
                     </button>
                 </div>
             </section>
-            <!-- admin tools -->
-            <section v-if="isNat || isBn" class="segment segment-solid my-1 mx-4">
+            <!-- other tools -->
+            <section class="segment segment-solid my-1 mx-4">
                 <div class="my-2">
                     <button
                         class="btn btn-sm btn-nat minw-200 my-1"
@@ -69,21 +69,21 @@
                             <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a>
                             <p 
                                 class="min-spacing" 
-                                :style="user.totalEvaluations > natTotal/2 ? 
-                                    'background-color: rgb(50,255,50,0.25);' 
+                                :class="user.totalEvaluations > natTotal/2 ? 
+                                    'background-pass' 
                                     : user.totalEvaluations > natTotal/3 ? 
-                                        'background-color: rgb(255,255,0,0.25);' :
-                                        'background-color: rgb(255,50,50,0.25);'"
+                                        'background-warn' :
+                                        'background-fail'"
                             >
                                 Total evaluations: {{ user.totalEvaluations }}
                             </p>
                             <p
                                 class="min-spacing"
-                                :style="user.totalWrittenFeedbacks > natTotal/6 ? 
-                                    'background-color: rgb(50,255,50,0.25);' : 
+                                :class="user.totalWrittenFeedbacks > natTotal/6 ? 
+                                    'background-pass' : 
                                     user.totalWrittenFeedbacks > natTotal/9 ? 
-                                        'background-color: rgb(255,255,0,0.25);' : 
-                                        'background-color: rgb(255,50,50,0.25);'"
+                                        'background-warn' : 
+                                        'background-fail'"
                             >
                                 Total written feedback: {{ user.totalWrittenFeedbacks }}
                             </p>
@@ -123,7 +123,13 @@
                     <div v-if="bnActivity">
                         <div v-for="user in bnActivity" :key="user.username" class="small min-spacing mb-1">
                             <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a>
-                            <p class="min-spacing" :style="user.uniqueNominations < bnDays/10 ? 'background-color: rgb(255,50,50,0.25);' : user.uniqueNominations < bnDays/6 ? 'background-color: rgb(255,255,0,0.25);' : 'background-color: rgb(50,255,50,0.25);'">
+                            <p 
+                                class="min-spacing" 
+                                :class="user.uniqueNominations < bnDaysDisplay/10 ? 
+                                    'background-fail' : 
+                                    user.uniqueNominations < bnDaysDisplay/6 ? 
+                                        'background-warn' : 
+                                        'background-pass'">
                                 Nominations: {{ user.uniqueNominations }}
                             </p>
                             <p class="min-spacing">
@@ -151,12 +157,12 @@
                         </p>
                         <div v-for="user in badgeUsers" :key="user.id" class="small min-spacing mb-1">
                             <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a>
-                            <p class="min-spacing" :style="user.bnProfileBadge != calculateDuration(user.bnDuration) && calculateDuration(user.bnDuration) >= 2 ? 'background-color: rgb(255,50,50,0.25);' : ''">
+                            <p class="min-spacing" :class="user.bnProfileBadge != calculateDuration(user.bnDuration) && calculateDuration(user.bnDuration) >= 2 ? 'background-fail' : ''">
                                 BN: {{ calculateDuration(user.bnDuration) }} -- badge: {{ user.bnProfileBadge }}
                                 <a href="#" @click.prevent="editBadgeValue(user.id, 'bn', true)"><i class="fas fa-plus" /></a>
                                 <a href="#" @click.prevent="editBadgeValue(user.id, 'bn', false)"><i class="fas fa-minus" /></a>
                             </p>
-                            <p class="min-spacing" :style="user.natProfileBadge != calculateDuration(user.natDuration) && calculateDuration(user.natDuration) >= 3 ? 'background-color: rgb(255,50,50,0.25);' : ''">
+                            <p class="min-spacing" :class="user.natProfileBadge != calculateDuration(user.natDuration) && calculateDuration(user.natDuration) >= 3 ? 'background-fail' : ''">
                                 NAT: {{ calculateDuration(user.natDuration) }} -- badge: {{ user.natProfileBadge }}
                                 <a href="#" @click.prevent="editBadgeValue(user.id, 'nat', true)"><i class="fas fa-plus" /></a>
                                 <a href="#" @click.prevent="editBadgeValue(user.id, 'nat', false)"><i class="fas fa-minus" /></a>
@@ -252,6 +258,7 @@ export default {
             natTotal: null,
             bnActivity: null,
             bnDays: '',
+            bnDaysDisplay: '',
             bnMode: 'osu',
             potentialNatInfo: [],
         };
@@ -360,6 +367,7 @@ export default {
                 .get('/users/findBnActivity/' + this.bnDays + '/' + this.bnMode)
                 .then(response => {
                     this.bnActivity = response.data;
+                    this.bnDaysDisplay = this.bnDays;
                 });
         },
         findPotentialNatInfo() {
@@ -408,5 +416,17 @@ export default {
 </script>
 
 <style>
+
+.background-pass {
+    background-color: rgb(50,255,50,0.25);
+}
+
+.background-warn {
+    background-color: rgb(255,255,0,0.25);
+}
+
+.background-fail {
+    background-color: rgb(255,50,50,0.25);
+}
 
 </style>

@@ -128,7 +128,7 @@ export default {
                 if(this.isLeader){
                     return report.isActive;
                 }else{
-                    return report.isActive && report.culprit.group != 'nat';
+                    return report.isActive && (!report.culprit || report.culprit.group != 'nat');
                 }
                 
             });
@@ -136,7 +136,7 @@ export default {
                 if(this.isLeader){
                     return !report.isActive;
                 }else{
-                    return !report.isActive && report.culprit.group != 'nat';
+                    return !report.isActive && (!report.culprit || report.culprit.group != 'nat');
                 }
             });
         },

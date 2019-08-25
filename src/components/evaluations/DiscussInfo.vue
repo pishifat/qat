@@ -375,11 +375,15 @@ export default {
             return e;
         },
         natEvaluations() {
-            let e = [];
-            this.discussApp.evaluations.forEach(evaluation => {
-                if(evaluation.evaluator.group == 'nat') e.push(evaluation);
-            });
-            return e;
+            if(this.discussApp){
+                let e = [];
+                this.discussApp.evaluations.forEach(evaluation => {
+                    if(evaluation.evaluator.group == 'nat') e.push(evaluation);
+                });
+                return e;
+            }else{
+                return this.discussRound.evaluations;
+            }
         },
     },
     watch: {
