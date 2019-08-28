@@ -134,12 +134,13 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
 
     class obj 
     {
-        constructor(username, osuId, totalEvaluations, totalWrittenFeedbacks) 
+        constructor(username, osuId, totalEvaluations, totalWrittenFeedbacks, joinDate) 
         {
             this.username = username;
             this.osuId = osuId;
             this.totalEvaluations = totalEvaluations;
             this.totalWrittenFeedbacks = totalWrittenFeedbacks;
+            this.joinDate = joinDate;
         }
     }
 
@@ -159,7 +160,7 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
                     feedbackCount++;
                 }
             });
-            info.push(new obj(user.username, user.osuId, evalCount, feedbackCount));
+            info.push(new obj(user.username, user.osuId, evalCount, feedbackCount, user.natDuration[user.natDuration.length - 1]));
         }
     });
 
@@ -169,13 +170,14 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
 router.get('/findBnActivity/:days/:mode', async (req, res) => {
     class obj 
     {
-        constructor(username, osuId, uniqueNominations, nominationResets, beatmapReports) 
+        constructor(username, osuId, uniqueNominations, nominationResets, beatmapReports, joinDate) 
         {
             this.username = username;
             this.osuId = osuId;
             this.uniqueNominations = uniqueNominations;
             this.nominationResets = nominationResets;
             this.beatmapReports = beatmapReports;
+            this.joinDate = joinDate;
         }
     }
 
@@ -225,7 +227,7 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
                 }
             }
         }
-        info.push(new obj(user.username, user.osuId, uniqueNominations.length, nominationResets, beatmapReports));
+        info.push(new obj(user.username, user.osuId, uniqueNominations.length, nominationResets, beatmapReports, user.bnDuration[user.bnDuration.length - 1]));
     });
 
     res.json(info);

@@ -123,6 +123,18 @@ class UserService extends BaseService
                 ]);
             }
             if(includeFullBns && includeProbation && includeNat){
+                for (let i = 0; i < allUsers.length; i++) {
+                    allUsers[i].users.sort(function(a, b){
+                        if(a.username.toLowerCase() < b.username.toLowerCase()) return -1;
+                        if(a.username.toLowerCase() > b.username.toLowerCase()) return 1;
+                        return 0;
+                    });
+                    allUsers[i].users.sort(function(a, b){
+                        if(a.group < b.group) return 1;
+                        if(a.group > b.group) return -1;
+                        return 0;
+                    });
+                }
                 return allUsers;
             }else if(!includeFullBns && !includeProbation){
                 return allNats;

@@ -66,7 +66,7 @@
                     </small>
                     <div v-if="natActivity">
                         <div v-for="user in natActivity" :key="user.username" class="small min-spacing mb-1">
-                            <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a>
+                            <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a> (joined {{user.joinDate.toString().slice(0, 10)}})
                             <p 
                                 class="min-spacing" 
                                 :class="user.totalEvaluations > natTotal/2 ? 
@@ -89,7 +89,7 @@
                             </p>
                         </div>
                         <p class="small min-spacing ml-2">
-                            Note: "written feedback" field only accounts for work after August 17th
+                            Note: Evaluations only counted after May 5th. Written feedback only counted after August 17th
                         </p>
                     </div>
                 </div>
@@ -122,7 +122,7 @@
                     </small>
                     <div v-if="bnActivity">
                         <div v-for="user in bnActivity" :key="user.username" class="small min-spacing mb-1">
-                            <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a>
+                            <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a> (joined {{user.joinDate.toString().slice(0, 10)}})
                             <p 
                                 class="min-spacing" 
                                 :class="user.uniqueNominations < bnDaysDisplay/10 ? 
@@ -139,6 +139,9 @@
                                 Beatmap Reports: {{ user.beatmapReports }}
                             </p>
                         </div>
+                        <p class="small min-spacing ml-2">
+                            Note: Nominations only accounted for after March 31st. Beatmap reports only accounted for after July 27th
+                        </p>
                     </div>
                 </div>
                 <div v-if="isNat" class="my-2">
