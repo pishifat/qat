@@ -293,7 +293,8 @@
                 </button>
                 <ul v-if="previousEvaluations">
                     <li v-for="evaluation in previousEvaluations" :key="evaluation.id" class="small text-shadow">
-                        <b>{{ evaluation.updatedAt.slice(0,10) }} - {{ evaluation.consensus.toUpperCase() }}</b>: {{ evaluation.feedback }}
+                        <b>{{ evaluation.updatedAt.slice(0,10) }} - {{evaluation.applicant ? "APP" : "BN EVAL"}} - <span :class="'vote-' + evaluation.consensus">{{ evaluation.consensus.toUpperCase() }}</span></b>
+                        <pre class="secondary-text pre-font ml-2">{{ evaluation.feedback }}</pre>
                     </li>
                 </ul>
             </div>
@@ -358,7 +359,7 @@ export default {
         async findModCount() {
             this.loadingModCount = true;
             axios
-                .get('/bnapps/modsCount/' + this.evalRound.bn.username)
+                .get('/modsCount/' + this.evalRound.bn.username)
                 .then(response => {
                     this.loadingModCount = false;
                     this.modCount = response.data.modCount;

@@ -1,7 +1,7 @@
 const express = require('express');
 const api = require('../helpers/api');
 const helpers = require('../helpers/helpers');
-const rcDiscussionsService = require('../models/rcDiscussion').service;
+const discussionsService = require('../models/discussion').service;
 const mediationsService = require('../models/mediation').service;
 const logsService = require('../models/log').service;
 
@@ -16,10 +16,10 @@ router.use(api.isBnOrNat);
 
 /* GET bn app page */
 router.get('/', (req, res) => {
-    res.render('rcvote', {
-        title: 'Ranking Criteria Vote',
-        script: '../javascripts/rcVote.js',
-        isRcVote: true,
+    res.render('discussionvote', {
+        title: 'Discussion Vote',
+        script: '../javascripts/discussionVote.js',
+        isDiscussionVote: true,
         isBnOrNat: res.locals.userRequest.isBnOrNat,
         isNat: res.locals.userRequest.isNat,     
     });
@@ -27,13 +27,19 @@ router.get('/', (req, res) => {
 
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res) => {
-    let rc = await rcDiscussionsService.query({}, defaultPopulate, { createdAt: -1 }, true);
+    let d;
+    if(res.locals.userRequest.isNat){
+        d = await discussionsService.query({}, defaultPopulate, { createdAt: -1 }, true);
+    }else{
+        d = await discussionsService.query({ isNatOnly: { $ne: true } }, defaultPopulate, { createdAt: -1 }, true);
+    }
     res.json({ 
-        rcDiscussions: rc, 
+        discussions: d, 
         userId: req.session.mongoId,
         userModes: res.locals.userRequest.modes,
         isSpectator: res.locals.userRequest.isSpectator,
         isLeader: res.locals.userRequest.isLeader,
+        isNat: res.locals.userRequest.isNat,
     });
 });
 
@@ -43,48 +49,50 @@ router.post('/submit', async (req, res) => {
     if (url.length == 0) {
         url = undefined;
     }
+    
+    if(req.body.discussionLink.length){
+        const validUrl = helpers.isValidUrl(url, 'osu.ppy.sh');
+        if (validUrl.error) return res.json({ error: validUrl.error });
+    }
 
-    const validUrl = helpers.isValidUrl(url, 'osu.ppy.sh/community/forums');
-    if (validUrl.error) return res.json(validUrl.error);
-
-    if(!req.body.mode) req.body.mode = 'all';
-
-    let rc = await rcDiscussionsService.create(
+    let d = await discussionsService.create(
         req.body.discussionLink,
         req.body.title,
         req.body.shortReason,
-        req.body.mode
+        req.body.mode,
+        req.body.isNatOnly
     );
-    res.json(rc);
-    logsService.create(req.session.mongoId, 'Submitted a RC proposal for voting');
+    res.json(d);
+    logsService.create(req.session.mongoId, 'Submitted a discussion for voting');
 });
 
 /* POST submit mediation */
 router.post('/submitMediation/:id', async (req, res) => {
     let m;
+    console.log(req.body.vote);
     if(req.body.mediationId){
         m = await mediationsService.query({ _id: req.body.mediationId });
     }else{
         m = await mediationsService.create(req.session.mongoId);
-        await rcDiscussionsService.update(req.params.id, { $push: { mediations: m } });
-    }
+        await discussionsService.update(req.params.id, { $push: { mediations: m } });
+    }    
     await mediationsService.update(m._id, { comment: req.body.comment, vote: req.body.vote });
-    m = await rcDiscussionsService.query({ _id: req.params.id }, defaultPopulate);
+    m = await discussionsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(m);
     logsService.create(
         req.session.mongoId,
-        'Submitted vote for a RC proposal'
+        'Submitted vote for a discussion'
     );
 });
 
 /* POST submit mediation */
 router.post('/concludeMediation/:id', async (req, res) => {
-    await rcDiscussionsService.update(req.params.id, { isActive: false });
-    let m = await rcDiscussionsService.query({ _id: req.params.id }, defaultPopulate);
+    await discussionsService.update(req.params.id, { isActive: false });
+    let m = await discussionsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(m);
     logsService.create(
         req.session.mongoId,
-        'Concluded vote for RC proposal'
+        'Concluded vote for a discussion'
     );
 });
 

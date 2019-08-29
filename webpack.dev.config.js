@@ -17,7 +17,7 @@ const config =  {
         manageTest: './src/manageTest.js',
         testResults: './src/testResults.js',
         testSubmission: './src/testSubmission.js',
-        rcVote: './src/rcVote.js',
+        discussionVote: './src/discussionVote.js',
     },
     output: {
         filename: '[name].js',

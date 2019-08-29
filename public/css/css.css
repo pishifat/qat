@@ -600,6 +600,8 @@ input[type="radio"] + .fas { cursor: pointer; }
 .catch-radio + .fa-apple-alt:before { content: "\f5d1"; }
 .mania-radio + .fa-stream:before { content: "\f550"; }
 .all-radio + .fa-globe:before { content: "\f0ac"; }
+.checkmark-radio + .fa-check:before { content: "\f00c"; }
+.cross-radio + .fa-check:before { content: "\f00d"; }
 
 /* Checked */
 .osu-radio:checked + .fa-circle:before { 
@@ -621,6 +623,14 @@ input[type="radio"] + .fas { cursor: pointer; }
 .all-radio:checked + .fa-globe:before { 
     color: var(--clicked);
     content: "\f0ac"; 
+}
+.checkmark-radio:checked + .fa-check:before { 
+    color: var(--clicked);
+    content: "\f00c"; 
+}
+.cross-radio:checked + .fa-times:before { 
+    color: var(--clicked);
+    content: "\f00d"; 
 }
 /* END RADIO MODES */
 

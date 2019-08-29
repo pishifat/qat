@@ -1,10 +1,10 @@
 <template>
-    <div id="addRcDiscussion" class="modal fade" tabindex="-1">
+    <div id="addDiscussion" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header bg-nat">
                     <h5 class="modal-title text-dark">
-                        Submit a Ranking Criteria thread for vote
+                        Submit a topic for vote
                     </h5>
                     <button type="button" class="close" data-dismiss="modal">
                         <span>&times;</span>
@@ -15,7 +15,7 @@
                         <div class="row text-shadow">
                             <p>Game mode:</p>
                             <div class="row ml-4">
-                                <label class="mx-1">
+                                <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!">
                                     <input
                                         v-model="mode"
                                         type="radio"
@@ -26,7 +26,7 @@
                                     >
                                     <i class="fas fa-circle fa-lg" />
                                 </label>
-                                <label class="mx-1">
+                                <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!taiko">
                                     <input
                                         v-model="mode"
                                         type="radio"
@@ -36,7 +36,7 @@
                                     >
                                     <i class="fas fa-drum fa-lg" />
                                 </label>
-                                <label class="mx-1">
+                                <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!catch">
                                     <input
                                         v-model="mode"
                                         type="radio"
@@ -46,7 +46,7 @@
                                     >
                                     <i class="fas fa-apple-alt fa-lg" />
                                 </label>
-                                <label class="mx-1">
+                                <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!mania">
                                     <input
                                         v-model="mode"
                                         type="radio"
@@ -56,10 +56,45 @@
                                     >
                                     <i class="fas fa-stream fa-lg" />
                                 </label>
+                                <label class="mx-1" data-toggle="tooltip" data-placement="top" title="all game modes">
+                                    <input
+                                        v-model="mode"
+                                        type="radio"
+                                        class="all-radio hide-default"
+                                        name="all"
+                                        value="all"
+                                    >
+                                    <i class="fas fa-globe fa-lg" />
+                                </label>
+                            </div>
+                        </div>
+                        <div class="row text-shadow">
+                            <p>NAT only vote:</p>
+                            <div class="row ml-4">
+                                <label class="mx-1" data-toggle="tooltip" data-placement="top" title="BN + NAT vote">
+                                    <input
+                                        v-model="group"
+                                        type="radio"
+                                        class="cross-radio hide-default"
+                                        name="bn"
+                                        value="bn"
+                                    >
+                                    <i class="fas fa-times fa-lg"></i>
+                                </label>
+                                <label class="mx-1" data-toggle="tooltip" data-placement="top" title="NAT only vote">
+                                    <input
+                                        v-model="group"
+                                        type="radio"
+                                        class="checkmark-radio hide-default"
+                                        name="nat"
+                                        value="nat"
+                                    >
+                                    <i class="fas fa-check fa-lg"></i>
+                                </label>
                             </div>
                         </div>
                         <div class="row mb-3">
-                            <small class="text-shadow mb-1">Link to the Ranking Criteria thread</small>
+                            <small class="text-shadow mb-1">Link to relevant discussion (optional)</small>
                             <input
                                 v-model="discussionLink"
                                 type="text"
@@ -68,7 +103,7 @@
                             >
                         </div>
                         <div class="row mb-3">
-                            <small class="text-shadow mb-1">Title for Ranking Criteria vote</small>
+                            <small class="text-shadow mb-1">Title for discussion vote</small>
                             <input
                                 v-model="title"
                                 type="text"
@@ -77,19 +112,19 @@
                             >
                         </div>
                         <div class="row mb-2">
-                            <small class="text-shadow mb-1">Summarize the Ranking Criteria change</small>
+                            <small class="text-shadow mb-1">Summarize the discussion's proposed change(s)</small>
                             <input
                                 v-model="shortReason"
                                 type="text"
                                 class="form-control"
-                                placeholder="rc change..."
+                                placeholder="change..."
                             >
                         </div>
                         <p class="errors text-shadow">
                             {{ info }}
                         </p>
                         <hr>
-                        <button type="submit" class="btn btn-nat float-right" @click="submitRcDiscussion($event)">
+                        <button type="submit" class="btn btn-nat float-right" @click="submitDiscussion($event)">
                             Submit
                         </button>
                     </div>
@@ -103,7 +138,7 @@
 import postData from '../../mixins/postData.js';
 
 export default {
-    name: 'SubmitRcDiscussion',
+    name: 'SubmitDiscussion',
     mixins: [postData],
     data() {
         return {
@@ -111,31 +146,34 @@ export default {
             title: null,
             shortReason: null,
             mode: null,
+            group: "bn",
             info: null,
         };
     },
     methods: {
-        async submitRcDiscussion(e) {
-            if (!this.discussionLink || !this.shortReason || !this.title) {
-                this.info = 'Cannot leave fields blank!';
+        async submitDiscussion(e) {
+            if (!this.shortReason || !this.title || !this.mode) {
+                this.info = 'Required fields are missing!';
             } else {
-                const rcDiscussion = await this.executePost(
-                    '/rcVote/submit',
+                if(!this.discussionLink) this.discussionLink = '';
+                const discussion = await this.executePost(
+                    '/discussionVote/submit',
                     {
                         discussionLink: this.discussionLink,
                         title: this.title,
                         shortReason: this.shortReason,
                         mode: this.mode,
+                        isNatOnly: this.group == 'nat'
                     },
                     e
                 );
 
-                if (rcDiscussion) {
-                    if (rcDiscussion.error) {
-                        this.info = rcDiscussion.error;
+                if (discussion) {
+                    if (discussion.error) {
+                        this.info = discussion.error;
                     } else {
-                        $('#addRcDiscussion').modal('hide');
-                        this.$emit('submit-rc-discussion', rcDiscussion);
+                        $('#addDiscussion').modal('hide');
+                        this.$emit('submit-discussion', discussion);
                     }
                 }
             }

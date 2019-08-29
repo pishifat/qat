@@ -46,6 +46,22 @@
                                         {{ discussApp.test.totalScore || discussApp.test.totalScore >= 0 ? discussApp.test.totalScore + '/20' : 'incomplete' }}
                                     </a>
                                 </p>
+                                <button
+                                    class="btn btn-sm btn-nat mb-3 minw-200"
+                                    data-toggle="tooltip"
+                                    data-placement="right"
+                                    title="Finds previous evaluation results"
+                                    @click="findPreviousEvaluations()"
+                                >
+                                    Load old evaluations
+                                </button>
+                                <ul v-if="previousEvaluations">
+                                    <li v-if="!previousEvaluations.length" class="small min-spacing">User has no previous evaluations</li>
+                                    <li v-else v-for="evaluation in previousEvaluations" :key="evaluation.id" class="small text-shadow">
+                                        <b>{{ evaluation.updatedAt.slice(0,10) }} - {{evaluation.applicant ? "APPLICATION" : "BN EVAL"}} - <span :class="'vote-' + evaluation.consensus">{{ evaluation.consensus.toUpperCase() }}</span></b>
+                                        <pre class="secondary-text pre-font ml-2">{{ evaluation.feedback }}</pre>
+                                    </li>
+                                </ul>
                                 <h5 v-if="!readOnly" class="text-shadow mb-2">
                                     Consensus:
                                     <span v-if="discussApp.consensus" :class="'vote-' + discussApp.consensus">{{ discussApp.consensus }}</span>
@@ -356,6 +372,7 @@ export default {
             vote: 0,
             feedback: '',
             relevantReports: [],
+            previousEvaluations: null,
             info: '',
             confirm: '',
             noms: null,
@@ -392,6 +409,7 @@ export default {
                 this.info = '';
                 this.confirm = '';
                 this.findRelevantEval();
+                this.previousEvaluations = null;
             }
             if(this.discussApp) this.feedback = this.discussApp.feedback;
         },
@@ -437,6 +455,13 @@ export default {
         findRelevantReports() {
             this.relevantReports = this.reports.filter( report => 
                 report.culprit == this.discussRound.bn.id && report.display);
+        },
+        async findPreviousEvaluations() {
+            axios
+                .get('/bnEval/findPreviousEvaluations/' + this.discussApp.applicant.id)
+                .then(response => {
+                    this.previousEvaluations = response.data.previousEvaluations;
+                });
         },
         createDeadline(date){
             date = new Date(date);

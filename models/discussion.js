@@ -2,21 +2,22 @@ const mongoose = require('mongoose');
 const logsService = require('./log').service;
 const BaseService = require('./baseService');
 
-const rcDiscussionSchema = new mongoose.Schema({
+const discussionSchema = new mongoose.Schema({
     mode: { type: String, enum: ['osu', 'taiko', 'catch', 'mania', 'all'] },
     title: { type: String, required: true },
-    discussionLink: { type: String, required: true },
+    discussionLink: { type: String },
     shortReason: { type: String, required: true },
     isActive: { type: Boolean, default: true },
     mediations: [{ type: 'ObjectId', ref: 'Mediation' }],
+    isNatOnly: { type: Boolean, default: false },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-const RcDiscussion = mongoose.model('RcDiscussion', rcDiscussionSchema);
+const Discussion = mongoose.model('Discussion', discussionSchema);
 
-class RcDiscussionService extends BaseService
+class DiscussionService extends BaseService
 {
     constructor() {
-        super(RcDiscussion);
+        super(Discussion);
     }
 
     /**
@@ -24,23 +25,25 @@ class RcDiscussionService extends BaseService
      * @param {string} discussionLink 
      * @param {string} title
      * @param {string} shortReason 
-     * @param {string} mode 'osu', 'taiko', 'catch', 'mania'
+     * @param {string} mode 'osu', 'taiko', 'catch', 'mania', 'all'
+     * @param {Boolean} isNatOnly
      */
-    async create(discussionLink, title, shortReason, mode) {
+    async create(discussionLink, title, shortReason, mode, isNatOnly) {
         try {
-            return await RcDiscussion.create({ 
+            return await Discussion.create({ 
                 discussionLink, 
                 title,
                 shortReason, 
                 mode, 
+                isNatOnly,
             });
         } catch(error) {
             logsService.create(null, JSON.stringify(error), true);
-            return { error: 'could not create rcDiscussion' };
+            return { error: 'could not create Discussion' };
         }
     }
 }
 
-const service = new RcDiscussionService();
+const service = new DiscussionService();
 
-module.exports = { service, RcDiscussion };
+module.exports = { service, Discussion };

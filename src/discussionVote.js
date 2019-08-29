@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import RcVotePage from './pages/RcVotePage.vue';
+import DiscussionVotePage from './pages/DiscussionVotePage.vue';
 
 $(document).ready(function() {
     $('body').tooltip({ selector: '[data-toggle=tooltip]', trigger: 'hover' });
@@ -8,6 +8,6 @@ $(document).ready(function() {
 new Vue({
     el: '#app',
     components: {
-        RcVotePage,
+        DiscussionVotePage,
     },
 });

@@ -218,7 +218,6 @@ export default {
             comment: '',
             vote: null,
             mediationId: null,
-            newMediator: null,
         };
     },
     computed: {

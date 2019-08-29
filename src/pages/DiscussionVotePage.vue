@@ -6,40 +6,41 @@
                 :filter-value.sync="filterValue"
                 :placeholder="'content...'"
             >
-                <button v-if="isLeader" class="btn btn-sm btn-nat ml-2" data-toggle="modal" data-target="#addRcDiscussion">
-                    Submit RC thread for vote
+                <button v-if="isNat" class="btn btn-sm btn-nat ml-2" data-toggle="modal" data-target="#addDiscussion">
+                    Submit topic for vote
                 </button>
             </filter-box>
             
             <section class="row segment segment-image mx-0 px-0">
                 <div class="col-sm-12">
                     <transition-group name="list" tag="div" class="row mx-auto">
-                        <rc-discussion-card
-                            v-for="rcDiscussion in pageObjs"
-                            :key="rcDiscussion.id"
-                            :rc-discussion="rcDiscussion"
+                        <discussion-card
+                            v-for="discussion in pageObjs"
+                            :key="discussion.id"
+                            :discussion="discussion"
                             :user-id="userId"
-                            @update:selectedRcDiscussion="selectedRcDiscussion = $event"
+                            @update:selectedDiscussion="selectedDiscussion = $event"
                         />
                     </transition-group>
                 </div>
             </section>
         </div>
-        <rc-discussion-info
-            :rc-discussion="selectedRcDiscussion"
+        <discussion-info
+            :discussion="selectedDiscussion"
             :user-id="userId"
             :user-modes="userModes"
             :is-leader="isLeader"
-            @update-rc-discussion="updateRcDiscussion($event)"
+            :is-nat="isNat"
+            @update-discussion="updateDiscussion($event)"
         />
-        <submit-rc-discussion @submit-rc-discussion="SubmitRcDiscussion($event)" />
+        <submit-discussion @submit-discussion="SubmitDiscussion($event)" />
     </div>
 </template>
 
 <script>
-import RcDiscussionCard from '../components/rcDiscussion/RcDiscussionCard.vue';
-import RcDiscussionInfo from '../components/rcDiscussion/RcDiscussionInfo.vue';
-import SubmitRcDiscussion from '../components/rcDiscussion/SubmitRcDiscussion.vue';
+import DiscussionCard from '../components/discussion/DiscussionCard.vue';
+import DiscussionInfo from '../components/discussion/DiscussionInfo.vue';
+import SubmitDiscussion from '../components/discussion/SubmitDiscussion.vue';
 import FilterBox from '../components/FilterBox.vue';
 import pagination from '../mixins/pagination.js';
 import filters from '../mixins/filters.js';
@@ -47,9 +48,9 @@ import filters from '../mixins/filters.js';
 export default {
     name: 'RcPage',
     components: {
-        RcDiscussionCard,
-        RcDiscussionInfo,
-        SubmitRcDiscussion,
+        DiscussionCard,
+        DiscussionInfo,
+        SubmitDiscussion,
         FilterBox,
     },
     mixins: [pagination, filters],
@@ -61,19 +62,21 @@ export default {
             userId: null,
             userModes: null,
             isLeader: false,
+            isNat: false,
             isSpectator: false,
-            selectedRcDiscussion: null,
+            selectedDiscussion: null,
         };
     },
     created() {
         axios
-            .get('/rcVote/relevantInfo')
+            .get('/discussionVote/relevantInfo')
             .then(response => {
-                this.allObjs = response.data.rcDiscussions;
+                this.allObjs = response.data.discussions;
                 this.userId = response.data.userId;
                 this.userModes = response.data.userModes;
                 this.isSpectator = response.data.isSpectator;
                 this.isLeader = response.data.isLeader;
+                this.isNat = response.data.isNat;
                 this.limit = 24;
             })
             .then(function() {
@@ -86,8 +89,8 @@ export default {
     },
     mounted() {
         setInterval(() => {
-            axios.get('/rcVote/relevantInfo').then(response => {
-                this.allObjs = response.data.rcDiscussions;
+            axios.get('/discussionVote/relevantInfo').then(response => {
+                this.allObjs = response.data.discussions;
                 if (this.isFiltered) {
                     this.filter();
                 }
@@ -101,14 +104,14 @@ export default {
             }
             return false;
         },
-        SubmitRcDiscussion(v) {
+        SubmitDiscussion(v) {
             this.allObjs.unshift(v);
             this.filter();
         },
-        updateRcDiscussion(rc) {
-            const i = this.allObjs.findIndex(rcDiscussion => rcDiscussion.id == rc.id);
+        updateDiscussion(rc) {
+            const i = this.allObjs.findIndex(discussion => discussion.id == rc.id);
             this.allObjs[i] = rc;
-            this.selectedRcDiscussion = rc;
+            this.selectedDiscussion = rc;
             this.filter();
         },
     },

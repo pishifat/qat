@@ -36,17 +36,35 @@
                                         <a :href="'https://osu.ppy.sh/users/' + application.applicant.osuId + '/modding/events?types%5B%5D=kudosu_gain&types%5B%5D=kudosu_lost&min_date=&max_date='" target="_blank">All history</a>
                                     </li>
                                 </ul>
-                                <p v-if="evaluator.group == 'nat'" class="text-shadow">
-                                    Test results: 
-                                    <a
-                                        :href="`http://bn.mappersguild.com/testresults?user=${application.applicant.osuId}`"
-                                        target="_blank" 
-                                        :class="application.test.totalScore > 15 ? 'vote-pass' : application.test.totalScore > 12.5 ? 'vote-extend' : 'vote-fail'"
-                                    >
-                                        {{ application.test.totalScore || application.test.totalScore >= 0 ? application.test.totalScore + '/20' : 'incomplete' }}
-                                    </a>
-                                </p>
-                                <div v-if="evaluator.group == 'nat'" class="mt-4 row col-sm-12">
+                                <div v-if="evaluator.group == 'nat'" class="row col-sm-12">
+                                    <p class="text-shadow">
+                                        Test results: 
+                                        <a
+                                            :href="`http://bn.mappersguild.com/testresults?user=${application.applicant.osuId}`"
+                                            target="_blank" 
+                                            :class="application.test.totalScore > 15 ? 'vote-pass' : application.test.totalScore > 12.5 ? 'vote-extend' : 'vote-fail'"
+                                        >
+                                            {{ application.test.totalScore || application.test.totalScore >= 0 ? application.test.totalScore + '/20' : 'incomplete' }}
+                                        </a>
+                                    </p>
+                                    <div class="col-sm-12">
+                                        <button
+                                            class="btn btn-sm btn-nat mb-3 minw-200"
+                                            data-toggle="tooltip"
+                                            data-placement="right"
+                                            title="Finds previous evaluation results"
+                                            @click="findPreviousEvaluations()"
+                                        >
+                                            Load old evaluations
+                                        </button>
+                                        <ul v-if="previousEvaluations">
+                                            <li v-if="!previousEvaluations.length" class="small min-spacing">User has no previous evaluations</li>
+                                            <li v-else v-for="evaluation in previousEvaluations" :key="evaluation.id" class="small text-shadow">
+                                                <b>{{ evaluation.updatedAt.slice(0,10) }} - {{evaluation.applicant ? "APPLICATION" : "BN EVAL"}} - <span :class="'vote-' + evaluation.consensus">{{ evaluation.consensus.toUpperCase() }}</span></b>
+                                                <pre class="secondary-text pre-font ml-2">{{ evaluation.feedback }}</pre>
+                                            </li>
+                                        </ul>
+                                    </div>
                                     <div :class="application.bnEvaluators.length ? 'col-sm-4' : 'col-sm-6'">
                                         <p class="text-shadow">
                                             Assigned NAT: 
@@ -269,6 +287,7 @@ export default {
             behaviorComment: '',
             moddingComment: '',
             relevantReports: [],
+            previousEvaluations: null,
             vote: 0,
             info: '',
             confirm: '',
@@ -281,6 +300,7 @@ export default {
             this.confirm = '';
             this.tempBnEvaluators = null;
             this.findRelevantEval();
+            this.previousEvaluations = null;
         },
         evalRound() {
             this.info = '';
@@ -322,6 +342,13 @@ export default {
         findRelevantReports() {
             this.relevantReports = this.reports.filter( report => 
                 report.culprit == this.evalRound.bn.id && report.display);
+        },
+        async findPreviousEvaluations() {
+            axios
+                .get('/bnEval/findPreviousEvaluations/' + this.application.applicant.id)
+                .then(response => {
+                    this.previousEvaluations = response.data.previousEvaluations;
+                });
         },
         createDeadline(date){
             date = new Date(date);
