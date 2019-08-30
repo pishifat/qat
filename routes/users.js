@@ -144,7 +144,7 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
         }
     }
 
-    let invalids = [8129817, 3178418, 2204515, 2202163, 318565];
+    let invalids = [8129817, 3178418, 2204515, 2202163];
     let info = [];
     users.forEach(user => {
         if(invalids.indexOf(user.osuId) == -1){

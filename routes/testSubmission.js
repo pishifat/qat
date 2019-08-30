@@ -177,7 +177,7 @@ router.post('/submitTest', async (req, res) => {
             modsList += ', ';
         }
     }
-    let invalids = [8129817, 3178418, 2204515, 2202163, 318565];
+    let invalids = [8129817, 3178418, 2204515, 2202163];
     const assignedNat = await usersModel.aggregate([
         { $match: { group: 'nat', isSpectator: { $ne: true }, modes: test.mode, osuId: { $nin: invalids } } },
         { $sample: { size: test.mode == 'osu' ? 3 : 2 } },
