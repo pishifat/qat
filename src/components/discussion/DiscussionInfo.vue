@@ -220,6 +220,8 @@ export default {
     },
     watch: {
         discussion() {
+            this.vote = null;
+            this.comment = '';
             this.mediators = null;
             this.mediationId = null;
             if (this.discussion.mediations.length) {

@@ -223,6 +223,7 @@
             :user="selectedUser"
             :user-id="userId"
             :is-leader="isLeader"
+            :is-nat="isNat"
             @update-user="updateUser($event)"
         />
     </div>

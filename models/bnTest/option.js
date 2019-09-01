@@ -26,7 +26,7 @@ class OptionService extends BaseService
 
     async create(content, score) {
         try {
-            return await Option.create({ content: content, score: score });
+            return await Option.create({ content, score });
         } catch(error) {
             return { error: error._message };
         }

@@ -6,10 +6,16 @@ const bnAppsService = require('../models/bnApp').service;
 const evalRoundsService = require('../models/evalRound').service;
 const evalsService = require('../models/evaluation').service;
 const aiessService = require('../models/aiess').service;
+const notesService = require('../models/note').service;
 
 const router = express.Router();
 
 router.use(api.isLoggedIn);
+
+const defaultNotePopulate = [
+    { populate: 'author', display: 'username' },
+    { populate: 'user', display: 'username' },
+];
 
 /* GET bn app page */
 router.get('/', (req, res) => {
@@ -80,6 +86,44 @@ router.post('/removeGroup/:id', api.isLeader, async (req, res) => {
     logsService.create(
         req.session.mongoId,
         `Removed "${u.username}" from the ${logGroup.toUpperCase()}`
+    );
+});
+
+/* GET user notes */
+router.get('/loadUserNotes/:id', api.isNat, async (req, res) => {
+    let notes = await notesService.query(
+        { user: req.params.id, isHidden: { $ne: true } },
+        defaultNotePopulate,
+        { createdAt: -1 },
+        true
+    );
+    res.json(notes);
+});
+
+/* POST save note */
+router.post('/saveNote/:id', api.isNat, async (req, res) => {
+    let note = await notesService.create(
+        req.session.mongoId,
+        req.params.id,
+        req.body.comment
+    );
+    note = await notesService.query({ _id: note._id }, defaultNotePopulate);
+    res.json(note);
+    let u = await usersService.query({ _id: req.params.id });
+    logsService.create(
+        req.session.mongoId,
+        `Added user note to "${u.username}"`
+    );
+});
+
+/* POST save note */
+router.post('/hideNote/:id', api.isNat, async (req, res) => {
+    await notesService.update(req.params.id, { isHidden: true } );
+    res.json({});
+    let u = await usersService.query({ _id: req.body.userId });
+    logsService.create(
+        req.session.mongoId,
+        `Removed user note from "${u.username}"`
     );
 });
 

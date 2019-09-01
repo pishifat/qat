@@ -49,6 +49,43 @@
                             {{ user.vetoMediator ? 'Deactivate' : 'Activate' }}
                         </button>
                     </p>
+                    <div v-if="isNat">
+                        <hr>
+                        <div class="form-group">
+                            <textarea
+                                v-model="comment"
+                                placeholder="new user note..."
+                                class="form-control dark-textarea"
+                                style="white-space: pre-line;"
+                                rows="2"
+                            />
+                        </div>
+                        <div>
+                            <button
+                                class="btn btn-sm ml-2 btn-nat"
+                                @click="loadUserNotes()"
+                            >
+                                Load user notes
+                            </button>
+                            <button class="btn btn-sm btn-nat float-right" @click="saveNote($event)">
+                                Save
+                            </button>
+                        </div>
+                        <ul v-if="notes" class="mt-2">
+                            <li v-if="!notes.length" class="small min-spacing">User has no notes</li>
+                            <li v-else v-for="note in notes" :key="note.id" class="small text-shadow">
+                                <b>{{ note.createdAt.slice(0,10) }} - {{ note.author.username }}</b>
+                                <a href="#" @click.prevent="hideNote(note.id);" class="vote-fail" data-toggle="tooltip" data-placement="top" title="delete note">&times;</a>
+                                <pre class="secondary-text pre-font ml-2">{{ note.comment }}</pre>
+                            </li>
+                        </ul>
+                        <p v-if="info.length" class="errors text-shadow mt-2">
+                            {{ info }}
+                        </p>
+                        <p v-if="confirm.length" class="confirm text-shadow mt-2">
+                            {{ confirm }}
+                        </p>
+                    </div>
                     <p v-if="user.group != 'nat' && user.id == userId" class="text-shadow">
                         BN Evaluation: {{ user.isBnEvaluator ? 'Active' : 'Inactive' }}
                         <button
@@ -92,7 +129,23 @@ import postData from '../../mixins/postData.js';
 export default {
     name: 'UserInfo',
     mixins: [postData],
-    props: ['user', 'userId', 'isLeader'],
+    props: ['user', 'userId', 'isLeader', 'isNat'],
+    data() {
+        return {
+            notes: null,
+            comment: '',
+            info: '',
+            confirm: '',
+        };
+    },
+    watch: {
+        user() {
+            this.notes = null;
+            this.comment = '';
+            this.info = '';
+            this.confirm = '';
+        },
+    },
     methods: {
         //display
         calculateDuration(group) {
@@ -170,6 +223,36 @@ export default {
                     }
                 }
             }
+        },
+        async loadUserNotes() {
+            axios
+                .get('/users/loadUserNotes/' + this.user.id)
+                .then(response => {
+                    this.notes = response.data;
+                });
+        },
+        async saveNote(e) {
+            if(this.comment.length){
+                const n = await this.executePost('/users/saveNote/' + this.user.id, { comment: this.comment }, e);
+                if (n) {
+                    if (n.error) {
+                        this.info = n.error;
+                    } else {
+                        if(this.notes){
+                            this.notes.unshift(n)
+                        }
+                        this.confirm = 'Note added!'
+                    }
+                }
+            }
+        },
+        async hideNote(noteId) {
+            const n = await this.executePost('/users/hideNote/' + noteId, { userId: this.user.id });
+            if(this.notes){
+                const i = this.notes.findIndex(note => note.id == noteId);
+                this.notes.splice(i, 1);
+            }
+            this.confirm = 'Note removed!' 
         },
     },
 };

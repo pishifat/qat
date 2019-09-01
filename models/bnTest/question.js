@@ -30,7 +30,7 @@ class QuestionService extends BaseService
 
     async create(category, content, questionType) {
         try {
-            return await Question.create({ category: category, content: content, questionType: questionType });
+            return await Question.create({ category, content, questionType });
         } catch(error) {
             return { error: error._message };
         }
