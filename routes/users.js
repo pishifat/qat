@@ -13,8 +13,8 @@ const router = express.Router();
 router.use(api.isLoggedIn);
 
 const defaultNotePopulate = [
-    { populate: 'author', display: 'username' },
-    { populate: 'user', display: 'username' },
+    { populate: 'author', display: 'username osuId' },
+    { populate: 'user', display: 'username osuId' },
 ];
 
 /* GET bn app page */
@@ -113,6 +113,27 @@ router.post('/saveNote/:id', api.isNat, async (req, res) => {
     logsService.create(
         req.session.mongoId,
         `Added user note to "${u.username}"`
+    );
+    api.webhookPost(
+        [{
+            author: {
+                name: `${note.author.username}`,
+                icon_url: `https://a.ppy.sh/${note.author.osuId}`,
+                url: `https://osu.ppy.sh/users/${note.author.osuId}`,
+            },
+            color: '14855903',
+            fields:[
+                {
+                    name: 'http://bn.mappersguild.com/users',
+                    value: `Added note to **${note.user.username}**'s profile`,
+                },
+                {
+                    name: 'Note',
+                    value: req.body.comment,
+                },
+            ],
+        }], 
+        u.modes[0]
     );
 });
 
