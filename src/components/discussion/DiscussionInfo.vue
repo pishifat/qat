@@ -229,6 +229,7 @@ export default {
                     let mediation = this.discussion.mediations[i];
                     if(mediation.mediator.id == this.userId){
                         if(mediation.vote) this.vote = mediation.vote;
+                        if(mediation.comment) this.comment = mediation.comment;
                         this.mediationId = mediation.id;
                         break;
                     }

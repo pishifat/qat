@@ -525,7 +525,8 @@ router.get('/userActivity/:id/:mode/:deadline', async (req, res) => {
             for (let j = 0; j < events.length; j++) {
                 let event = events[j];
                 if (uniqueNominations.find(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
-                    let a = await aiessService.query({ beatmapsetId: event.beatmapsetId, timestamp: { $lte: event.timestamp } }, {}, { timestamp: -1 }, true, 3);
+                    let a = await aiessService.query({ beatmapsetId: event.beatmapsetId, timestamp: { $lte: event.timestamp }, eventType: { $ne: 'Reported' } }, {}, { timestamp: -1 }, true, 3);
+                    console.log(a);
                     if(a[1].userId == parseInt(req.params.id) || a[2].userId == parseInt(req.params.id)){
                         nomsDqd.push(event);
                     }
@@ -535,7 +536,7 @@ router.get('/userActivity/:id/:mode/:deadline', async (req, res) => {
             for (let j = 0; j < events.length; j++) {
                 let event = events[j];
                 if (uniqueNominations.find(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
-                    let a = await aiessService.query({ beatmapsetId: event.beatmapsetId, timestamp: { $lte: event.timestamp } }, {}, { timestamp: -1 }, true, 2);
+                    let a = await aiessService.query({ beatmapsetId: event.beatmapsetId, timestamp: { $lte: event.timestamp }, eventType: { $ne: 'Reported' } }, {}, { timestamp: -1 }, true, 2);
                     if(a[1].userId == parseInt(req.params.id)){
                         nomsPopped.push(event);
                     }

@@ -69,7 +69,6 @@ router.post('/submit', async (req, res) => {
 /* POST submit mediation */
 router.post('/submitMediation/:id', async (req, res) => {
     let m;
-    console.log(req.body.vote);
     if(req.body.mediationId){
         m = await mediationsService.query({ _id: req.body.mediationId });
     }else{
