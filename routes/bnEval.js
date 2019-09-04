@@ -526,7 +526,6 @@ router.get('/userActivity/:id/:mode/:deadline', async (req, res) => {
                 let event = events[j];
                 if (uniqueNominations.find(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
                     let a = await aiessService.query({ beatmapsetId: event.beatmapsetId, timestamp: { $lte: event.timestamp }, eventType: { $ne: 'Reported' } }, {}, { timestamp: -1 }, true, 3);
-                    console.log(a);
                     if(a[1].userId == parseInt(req.params.id) || a[2].userId == parseInt(req.params.id)){
                         nomsDqd.push(event);
                     }
