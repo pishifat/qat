@@ -24,7 +24,7 @@ router.get('/', (req, res) => {
         script: '../javascripts/users.js',
         isUsers: true,
         isBnOrNat: res.locals.userRequest.isBnOrNat,
-        isNat: res.locals.userRequest.isNat,
+        isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
     });
 });
 
@@ -40,7 +40,7 @@ router.get('/relevantInfo', async (req, res) => {
         users: u, 
         userId: req.session.mongoId, 
         isLeader: res.locals.userRequest.isLeader, 
-        isNat: res.locals.userRequest.group == 'nat', 
+        isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator, 
         isBn: res.locals.userRequest.group == 'bn', 
     });
 });

@@ -21,14 +21,14 @@ router.get('/', (req, res) => {
         script: '../javascripts/discussionVote.js',
         isDiscussionVote: true,
         isBnOrNat: res.locals.userRequest.isBnOrNat,
-        isNat: res.locals.userRequest.isNat,     
+        isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,     
     });
 });
 
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res) => {
     let d;
-    if(res.locals.userRequest.isNat){
+    if(res.locals.userRequest.isNat || res.locals.userRequest.isSpectator){
         d = await discussionsService.query({}, defaultPopulate, { createdAt: -1 }, true);
     }else{
         d = await discussionsService.query({ isNatOnly: { $ne: true } }, defaultPopulate, { createdAt: -1 }, true);
@@ -39,7 +39,7 @@ router.get('/relevantInfo', async (req, res) => {
         userModes: res.locals.userRequest.modes,
         isSpectator: res.locals.userRequest.isSpectator,
         isLeader: res.locals.userRequest.isLeader,
-        isNat: res.locals.userRequest.isNat,
+        isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
     });
 });
 
