@@ -140,7 +140,7 @@ export default {
             .then(response => {
                 this.allObjs = response.data.a;
                 this.evaluator = response.data.evaluator;
-                this.filterMode = response.data.evaluator.modes[0];
+                this.filterMode = response.data.evaluator.modes[0] || 'osu';
                 this.hasPagination = false;
                 this.hasSeparation = true;
                 this.filter();

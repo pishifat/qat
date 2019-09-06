@@ -19,7 +19,7 @@ router.get('/', (req, res) => {
         script: '../javascripts/appEval.js',
         isEval: true,
         isBnOrNat: res.locals.userRequest.isBnOrNat,
-        isNat: res.locals.userRequest.isNat,
+        isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
     });
 });
 
@@ -42,7 +42,7 @@ const defaultPopulate = [
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res) => {
     let a;
-    if(res.locals.userRequest.group == 'nat'){
+    if(res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator){
         a = await bnAppsService.query(
             { active: true, test: { $exists: true } },
             defaultPopulate,

@@ -21,7 +21,7 @@ router.get('/', (req, res) => {
         script: '../javascripts/bnEval.js',
         isEval: true,
         isBnOrNat: res.locals.userRequest.isBnOrNat,
-        isNat: res.locals.userRequest.isNat,
+        isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
     });
 });
 
