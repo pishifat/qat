@@ -11,6 +11,7 @@ const bnAppSchema = new mongoose.Schema({
     discussion: { type: Boolean, default: false },
     consensus: { type: String, enum: ['pass', 'fail'] },
     feedback: { type: String },
+    feedbackAuthor: { type: 'ObjectId', ref: 'User' },
     isPriority: { type: Boolean, default: false },
     test: { type: 'ObjectId', ref: 'TestSubmission' },
     bnEvaluators: [{ type: 'ObjectId', ref: 'User' }],

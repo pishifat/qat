@@ -4,7 +4,6 @@ let logSchema = new mongoose.Schema({
     user: { type: 'ObjectId', ref: 'User' },
     action: { type: String, required: true },
     isError: { type: Boolean, default: false },
-    isFeedbackActivity: { type: Boolean, default: false },
     //modified: { type: 'ObjectId', refPath: 'modifiedModel' },
     //modifiedModel: { type: String, enum: ['user', 'bnApp', 'error'], required: true },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
@@ -66,8 +65,8 @@ class LogService
      * @param {object} userId UserId of the action
      * @param {string} action short comment
      */
-    async create(userId, action, isError, isFeedbackActivity) {
-        const log = new Log({ user: userId, action, isError, isFeedbackActivity });
+    async create(userId, action, isError) {
+        const log = new Log({ user: userId, action, isError });
         try {
             return await log.save();
         } catch(err) {

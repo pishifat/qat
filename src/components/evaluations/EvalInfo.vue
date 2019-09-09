@@ -42,9 +42,9 @@
                                         <a
                                             :href="`http://bn.mappersguild.com/testresults?user=${application.applicant.osuId}`"
                                             target="_blank" 
-                                            :class="application.test.totalScore > 15 ? 'vote-pass' : application.test.totalScore > 12.5 ? 'vote-extend' : 'vote-fail'"
+                                            :class="testPoints > 15 ? 'vote-pass' : testPoints > 12.5 ? 'vote-extend' : 'vote-fail'"
                                         >
-                                            {{ application.test.totalScore || application.test.totalScore >= 0 ? application.test.totalScore + '/20' : 'incomplete' }}
+                                            {{ testPoints + '/20' }}
                                         </a>
                                     </p>
                                     <p class="col-md-12 text-shadow">
@@ -66,7 +66,7 @@
                                         </p>
                                         <div class="col-sm-12">
                                             <button
-                                                class="btn btn-sm btn-nat mb-3 minw-200"
+                                                class="btn btn-sm btn-nat mb-2 minw-200"
                                                 data-toggle="tooltip"
                                                 data-placement="right"
                                                 title="Finds previous evaluation results"
@@ -84,7 +84,7 @@
                                         </div>
                                         <div class="col-sm-12">
                                             <button
-                                                class="btn btn-sm btn-nat mb-3 minw-200"
+                                                class="btn btn-sm btn-nat mb-2 minw-200"
                                                 data-toggle="tooltip"
                                                 data-placement="right"
                                                 title="Finds NAT notes on user"
@@ -121,7 +121,7 @@
                                             </ul>
                                         </div>
                                         <div :class="application.bnEvaluators.length ? 'col-sm-4' : 'col-sm-6'">
-                                            <p class="text-shadow">
+                                            <p class="text-shadow min-spacing">
                                                 Total Evaluations: {{ application.evaluations.length }}
                                             </p>
                                             <ul>
@@ -166,28 +166,6 @@
                                     :eval-round="evalRound"
                                     :is-spectator="evaluator.isSpectator"
                                 />
-
-                                <div class="mt-4">
-                                    <p class="text-shadow">
-                                        Total Evaluations: {{ evalRound.evaluations.length }}
-                                        <a
-                                            href="#"
-                                            class="float-right small vote-pass ml-2"
-                                            data-toggle="tooltip"
-                                            data-placement="top"
-                                            :title="evalRound.isPriority ? 'mark evaluation as low priority' : 'mark evaluation as high priority'"
-                                            @click.prevent.stop="toggleIsPriority()"
-                                        >
-                                            <i class="fas" :class="evalRound.isPriority ? 'fa-arrow-down' : 'fa-arrow-up'" />
-                                        </a>
-                                    </p>
-                                    <ul>
-                                        <li v-for="evaluation in evalRound.evaluations" :key="evaluation.id" class="small text-shadow">
-                                            {{ evaluation.evaluator.username }}
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div />
                                 <div v-if="relevantReports.length">
                                     <hr>
                                     <p class="text-shadow">
@@ -320,6 +298,11 @@ export default {
             confirm: '',
             tempBnEvaluators: null,
         };
+    },
+    computed: {
+        testPoints() {
+            return this.application.test.totalScore + this.application.test.additionalPoints;
+        }
     },
     watch: {
         application() {

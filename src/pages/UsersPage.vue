@@ -57,7 +57,7 @@
                         @keyup.enter="findNatActivity()"
                     >
                     <small class="ml-1">
-                        <select v-model="natMode" class="custom-select">
+                        <select v-model="natMode" class="custom-select" @change="findNatActivity()">
                             <option class="ml-2" value="osu" selected>osu!</option>
                             <option class="ml-2" value="taiko">osu!taiko</option>
                             <option class="ml-2" value="catch">osu!catch</option>
@@ -69,9 +69,9 @@
                             <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a> (joined {{user.joinDate.toString().slice(0, 10)}})
                             <p 
                                 class="min-spacing" 
-                                :class="user.totalEvaluations > natTotal/2 ? 
+                                :class="user.totalEvaluations >= natTotal/(natActivity.length / (natMode == 'osu' || natMode == 'catch' ? 3 : 2)) - 1 ? 
                                     'background-pass' 
-                                    : user.totalEvaluations > natTotal/3 ? 
+                                    : user.totalEvaluations >= natTotal/(natActivity.length * 2 / (natMode == 'osu' || natMode == 'catch' ? 3 : 2)) - 1 ? 
                                         'background-warn' :
                                         'background-fail'"
                             >
@@ -79,9 +79,9 @@
                             </p>
                             <p
                                 class="min-spacing"
-                                :class="user.totalWrittenFeedbacks > natTotal/6 ? 
+                                :class="user.totalWrittenFeedbacks >= natTotal/natActivity.length - 1 ? 
                                     'background-pass' : 
-                                    user.totalWrittenFeedbacks > natTotal/9 ? 
+                                    user.totalWrittenFeedbacks >= natTotal/(natActivity.length * 2) - 1 ? 
                                         'background-warn' : 
                                         'background-fail'"
                             >
@@ -89,7 +89,10 @@
                             </p>
                         </div>
                         <p class="small min-spacing ml-2">
-                            Note: Evaluations only counted after May 5th. Written feedback only counted after August 17th
+                            Total BN evaluations: {{ natTotal }}
+                        </p>
+                        <p class="small min-spacing ml-2">
+                            Note: Evaluations only counted after May 5th. Written feedback only counted after September 9th
                         </p>
                     </div>
                 </div>
@@ -113,7 +116,7 @@
                         @keyup.enter="findBnActivity()"
                     >
                     <small class="ml-1">
-                        <select v-model="bnMode" class="custom-select">
+                        <select v-model="bnMode" class="custom-select" @change="findBnActivity()">
                             <option class="ml-2" value="osu" selected>osu!</option>
                             <option class="ml-2" value="taiko">osu!taiko</option>
                             <option class="ml-2" value="catch">osu!catch</option>
@@ -362,7 +365,7 @@ export default {
                 .get('/users/findNatActivity/' + this.natDays + '/' + this.natMode)
                 .then(response => {
                     this.natActivity = response.data.info;
-                    this.natTotal = this.natMode == 'osu' ? response.data.total : this.natMode == 'taiko' ? response.data.total*1.5 : response.data.total*2;
+                    this.natTotal = response.data.total;
                 });
         },
         findBnActivity() {

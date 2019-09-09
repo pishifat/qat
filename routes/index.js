@@ -121,7 +121,7 @@ router.get('/callback', async (req, res) => {
         response = await api.getUserInfo(req.session.accessToken);
         if (response.error) {
             res.status(500).render('error');
-        } else if (response.is_qat) {
+        } else if (response.is_nat) {
             req.session.group = 'nat';
         } else if (response.is_bng) {
             req.session.group = 'bn';

@@ -43,7 +43,7 @@
                                         target="_blank" 
                                         :class="discussApp.test.totalScore > 15 ? 'vote-pass' : discussApp.test.totalScore > 12.5 ? 'vote-extend' : 'vote-fail'"
                                     >
-                                        {{ discussApp.test.totalScore || discussApp.test.totalScore >= 0 ? discussApp.test.totalScore + '/20' : 'incomplete' }}
+                                        {{ discussApp.test.totalScore + discussApp.test.additionalPoints + '/20' }}
                                     </a>
                                 </p>
                                 <p class="text-shadow">
@@ -65,7 +65,7 @@
                                     </p>
                                     <div class="col-sm-12">
                                         <button
-                                            class="btn btn-sm btn-nat mb-3 minw-200"
+                                            class="btn btn-sm btn-nat mb-2 minw-200"
                                             data-toggle="tooltip"
                                             data-placement="right"
                                             title="Finds previous evaluation results"
@@ -83,7 +83,7 @@
                                     </div>
                                     <div class="col-sm-12">
                                         <button
-                                            class="btn btn-sm btn-nat mb-3 minw-200"
+                                            class="btn btn-sm btn-nat mb-2 minw-200"
                                             data-toggle="tooltip"
                                             data-placement="right"
                                             title="Finds NAT notes on user"
@@ -431,6 +431,9 @@ export default {
                 return this.discussRound.evaluations;
             }
         },
+        testPoints() {
+            return this.discussApp.test.totalScore + this.discussApp.test.additionalPoints;
+        }
     },
     watch: {
         discussApp() {

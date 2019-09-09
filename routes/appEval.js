@@ -28,7 +28,7 @@ const defaultPopulate = [
     { populate: 'applicant', display: 'username osuId' },
     { populate: 'bnEvaluators', display: 'username osuId' },
     { populate: 'natEvaluators', display: 'username osuId' },
-    { populate: 'test', display: 'totalScore comment' },
+    { populate: 'test', display: 'totalScore additionalPoints comment' },
     {
         populate: 'evaluations',
         display: 'evaluator behaviorComment moddingComment vote',
@@ -85,7 +85,7 @@ router.post('/submitEval/:id', async (req, res) => {
                     icon_url: `https://a.ppy.sh/${req.session.osuId}`,
                     url: `https://osu.ppy.sh/users/${req.session.osuId}`,
                 },
-                color: '10404095',
+                color: '3800465',
                 fields:[
                     {
                         name: 'http://bn.mappersguild.com/appeval',
@@ -116,7 +116,7 @@ router.post('/submitEval/:id', async (req, res) => {
                             icon_url: `https://a.ppy.sh/${a.applicant.osuId}`,
                             url: `https://osu.ppy.sh/users/${a.applicant.osuId}`,
                         },
-                        color: '14855903',
+                        color: '3773329',
                         fields:[
                             {
                                 name: 'http://bn.mappersguild.com/appeval',
@@ -161,7 +161,7 @@ router.post('/setGroupEval/', api.isLeader, async (req, res) => {
                     icon_url: `https://a.ppy.sh/${a.applicant.osuId}`,
                     url: `https://osu.ppy.sh/users/${a.applicant.osuId}`,
                 },
-                color: '14855903',
+                color: '3773329',
                 fields:[
                     {
                         name: 'http://bn.mappersguild.com/appeval',
@@ -223,7 +223,7 @@ router.post('/setComplete/', api.isLeader, async (req, res) => {
                     icon_url: `https://a.ppy.sh/${u.osuId}`,
                     url: `https://osu.ppy.sh/users/${u.osuId}`,
                 },
-                color: '14855903',
+                color: '6579298',
                 fields:[
                     {
                         name: 'http://bn.mappersguild.com/appeval',
@@ -267,7 +267,7 @@ router.post('/setConsensus/:id', async (req, res) => {
                 icon_url: `https://a.ppy.sh/${req.session.osuId}`,
                 url: `https://osu.ppy.sh/users/${req.session.osuId}`,
             },
-            color: '12025268',
+            color: '13272813',
             fields:[
                 {
                     name: 'http://bn.mappersguild.com/appeval',
@@ -287,10 +287,9 @@ router.post('/setFeedback/:id', async (req, res) => {
     if(!req.body.hasFeedback){
         logsService.create(
             req.session.mongoId,
-            `Created feedback for ${a.applicant.username}'s ${a.mode} BN app`,
-            false,
-            true
+            `Created feedback for ${a.applicant.username}'s ${a.mode} BN app`
         );
+        bnAppsService.update(req.params.id, { feedbackAuthor: req.session.mongoId });
     }else{
         logsService.create(
             req.session.mongoId,
@@ -304,7 +303,7 @@ router.post('/setFeedback/:id', async (req, res) => {
                 icon_url: `https://a.ppy.sh/${req.session.osuId}`,
                 url: `https://osu.ppy.sh/users/${req.session.osuId}`,
             },
-            color: '7044532',
+            color: '5762129',
             fields:[
                 {
                     name: `BN app feedback submitted (${a.consensus})`,

@@ -15,7 +15,7 @@ router.get('/', (req, res) => {
         title: 'Reports',
         script: '../js/reports.js',
         isReports: true,
-        isBnOrNat: res.locals.userRequest.isBnOrNat,
+        isBn: res.locals.userRequest.isBn,
         isNat: res.locals.userRequest.isNat,
     });
 });
@@ -42,7 +42,7 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
                     icon_url: `https://a.ppy.sh/${u.osuId}`,
                     url: `https://osu.ppy.sh/users/${u.osuId}`,
                 },
-                color: '12184229',
+                color: '16697937',
                 fields:[
                     {
                         name: 'Report reason',
@@ -65,7 +65,7 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
                 name: 'Non-user report',
                 url: req.body.link,
             },
-            color: '15386534',
+            color: '16698019',
             fields:[
                 {
                     name: 'Report reason',

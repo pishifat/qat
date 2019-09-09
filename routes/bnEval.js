@@ -178,7 +178,7 @@ router.post('/submitEval/:id', async (req, res) => {
                     icon_url: `https://a.ppy.sh/${req.session.osuId}`,
                     url: `https://osu.ppy.sh/users/${req.session.osuId}`,
                 },
-                color: '7864218',
+                color: '3800465',
                 fields:[
                     {
                         name: 'http://bn.mappersguild.com/bneval',
@@ -205,7 +205,7 @@ router.post('/submitEval/:id', async (req, res) => {
                         icon_url: `https://a.ppy.sh/${er.bn.osuId}`,
                         url: `https://osu.ppy.sh/users/${er.bn.osuId}`,
                     },
-                    color: '14855903',
+                    color: '3773329',
                     fields:[
                         {
                             name: 'http://bn.mappersguild.com/bneval',
@@ -249,7 +249,7 @@ router.post('/setGroupEval/', api.isLeader, async (req, res) => {
                     icon_url: `https://a.ppy.sh/${er.bn.osuId}`,
                     url: `https://osu.ppy.sh/users/${er.bn.osuId}`,
                 },
-                color: '14855903',
+                color: '3773329',
                 fields:[
                     {
                         name: 'http://bn.mappersguild.com/bneval',
@@ -337,7 +337,7 @@ router.post('/setComplete/', api.isLeader, async (req, res) => {
                         icon_url: `https://a.ppy.sh/${u.osuId}`,
                         url: `https://osu.ppy.sh/users/${u.osuId}`,
                     },
-                    color: '14855903',
+                    color: '6579298',
                     fields:[
                         {
                             name: 'http://bn.mappersguild.com/bneval',
@@ -380,7 +380,7 @@ router.post('/setConsensus/:id', async (req, res) => {
                     icon_url: `https://a.ppy.sh/${req.session.osuId}`,
                     url: `https://osu.ppy.sh/users/${req.session.osuId}`,
                 },
-                color: '12025268',
+                color: '13272813',
                 fields:[
                     {
                         name: 'http://bn.mappersguild.com/bneval',
@@ -401,10 +401,9 @@ router.post('/setFeedback/:id', async (req, res) => {
     if(!req.body.hasFeedback){
         logsService.create(
             req.session.mongoId,
-            `Created feedback for ${er.bn.username}'s ${er.mode} BN evaluation`,
-            false,
-            true
+            `Created feedback for ${er.bn.username}'s ${er.mode} BN evaluation`
         );
+        evalRoundsService.update(req.params.id, { feedbackAuthor: req.session.mongoId });
     }else{
         logsService.create(
             req.session.mongoId,
@@ -419,7 +418,7 @@ router.post('/setFeedback/:id', async (req, res) => {
                 icon_url: `https://a.ppy.sh/${req.session.osuId}`,
                 url: `https://osu.ppy.sh/users/${req.session.osuId}`,
             },
-            color: '7044532',
+            color: '5762129',
             fields:[
                 {
                     name: `Current BN eval feedback submitted (${er.consensus})`,

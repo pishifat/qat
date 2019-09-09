@@ -259,7 +259,17 @@
         </div>
         <div>
             <p class="text-shadow">
-                <a href="#additionalInfo" data-toggle="collapse">Additional Info <i class="fas fa-angle-down" /></a>
+                <a href="#additionalInfo" data-toggle="collapse">Additional Info <i class="fas fa-angle-down" /></a> 
+                <a
+                    href="#"
+                    class="float-right small vote-pass ml-2"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    :title="evalRound.isPriority ? 'mark evaluation as low priority' : 'mark evaluation as high priority'"
+                    @click.prevent.stop="toggleIsPriority()"
+                >
+                    <i class="fas" :class="evalRound.isPriority ? 'fa-arrow-down' : 'fa-arrow-up'" />
+                </a>
             </p>
             <div id="additionalInfo" class="collapse row col-sm-12 mx-2 pt-1">
                 <div class="col-sm-12">
@@ -317,6 +327,16 @@
                         <li v-else v-for="note in userNotes" :key="note.id" class="small text-shadow">
                             <b>{{ note.updatedAt.slice(0,10) }} - {{ note.author.username }}</b>
                             <pre class="secondary-text pre-font ml-2">{{ note.comment }}</pre>
+                        </li>
+                    </ul>
+                </div>
+                <div v-if="!evalRound.discuss" class="col-sm-12">
+                    <p class="text-shadow min-spacing">
+                        Total Evaluations: {{ evalRound.evaluations.length }}
+                    </p>
+                    <ul>
+                        <li v-for="evaluation in evalRound.evaluations" :key="evaluation.id" class="small text-shadow">
+                            {{ evaluation.evaluator.username }}
                         </li>
                     </ul>
                 </div>

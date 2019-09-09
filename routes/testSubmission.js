@@ -199,7 +199,7 @@ router.post('/submitTest', async (req, res) => {
                 icon_url: `https://a.ppy.sh/${u.osuId}`,
                 url: `https://osu.ppy.sh/users/${u.osuId}`,
             },
-            color: '7335382',
+            color: '9884159',
             fields:[
                 {
                     name: 'New BN application',

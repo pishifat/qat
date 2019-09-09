@@ -85,7 +85,7 @@ router.post('/submit', async (req, res) => {
         thumbnail: {
             url: `https://assets.ppy.sh/beatmaps/${bmId}/covers/list.jpg`,
         },
-        color: '7335382',
+        color: '16731997',
         fields:[
             {
                 name: 'Veto reason',

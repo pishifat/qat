@@ -4,7 +4,6 @@ const usersService = require('../models/user').service;
 const logsService = require('../models/log').service;
 const bnAppsService = require('../models/bnApp').service;
 const evalRoundsService = require('../models/evalRound').service;
-const evalsService = require('../models/evaluation').service;
 const aiessService = require('../models/aiess').service;
 const notesService = require('../models/note').service;
 
@@ -15,6 +14,27 @@ router.use(api.isLoggedIn);
 const defaultNotePopulate = [
     { populate: 'author', display: 'username osuId' },
     { populate: 'user', display: 'username osuId' },
+];
+
+const evaluationsPopulate = [
+    {
+        populate: 'evaluations',
+        display: 'evaluator',
+    },
+];
+
+const appPopulate = [
+    { populate: 'applicant', display: 'username osuId' },
+    { populate: 'bnEvaluators', display: 'username osuId' },
+    { populate: 'test', display: 'totalScore' },
+    {
+        populate: 'evaluations',
+        display: 'evaluator behaviorComment moddingComment vote',
+    },
+    {
+        innerPopulate: 'evaluations',
+        populate: { path: 'evaluator', select: 'username osuId group' },
+    },
 ];
 
 /* GET bn app page */
@@ -121,7 +141,7 @@ router.post('/saveNote/:id', api.isNat, async (req, res) => {
                 icon_url: `https://a.ppy.sh/${note.author.osuId}`,
                 url: `https://osu.ppy.sh/users/${note.author.osuId}`,
             },
-            color: '14855903',
+            color: '7952450',
             fields:[
                 {
                     name: 'http://bn.mappersguild.com/users',
@@ -175,26 +195,20 @@ router.post('/editBadgeValue/:id', api.isLeader, async (req, res) => {
     }
     u = await usersService.query({ _id: req.params.id });
     res.json(u);
-    
 });
 
 router.get('/findNatActivity/:days/:mode', async (req, res) => {
     let minDate = new Date();
-    minDate.setDate(minDate.getDate() - req.params.days);
-    let minAppDate = new Date();
-    minAppDate.setDate(minAppDate.getDate() - (req.params.days - 7));
-    let maxAppDate = new Date();
-    maxAppDate.setDate(maxAppDate.getDate() - 7);
-    const [users, evaluations, writtenFeedbacks, bnApps, bnRounds] = await Promise.all([
+    minDate.setDate(minDate.getDate() - (req.params.days));
+    let maxDate = new Date();
+    const [users, bnApps, bnRounds] = await Promise.all([
         usersService.query({ 
             group: 'nat', 
             modes: req.params.mode,
             isSpectator: { $ne: true } },
         {}, { username: 1 }, true),
-        await evalsService.query({ createdAt: { $gte: minDate } }, {}, {}, true),
-        await logsService.query({ isFeedbackActivity: true, createdAt: { $gte: minDate }  }, {}, {}, true),
-        await bnAppsService.query({ mode: req.params.mode, createdAt: { $gte: minAppDate, $lte: maxAppDate }  }, {}, {}, true),
-        await evalRoundsService.query({ mode: req.params.mode, deadline: { $gte: minAppDate, $lte: maxAppDate }  }, {}, {}, true),
+        bnAppsService.query({ mode: req.params.mode, updatedAt: { $gte: minDate, $lte: maxDate }, discussion: true }, evaluationsPopulate, {}, true),
+        evalRoundsService.query({ mode: req.params.mode, deadline: { $gte: minDate, $lte: maxDate }, discussion: true }, evaluationsPopulate, {}, true),
     ]);
 
     class obj 
@@ -209,19 +223,20 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
         }
     }
 
+    let rounds = bnApps.concat(bnRounds);
     let invalids = [8129817, 3178418, 2204515, 2202163];
     let info = [];
     users.forEach(user => {
         if(invalids.indexOf(user.osuId) == -1){
             let evalCount = 0;
             let feedbackCount = 0;
-            evaluations.forEach(evaluation => {
-                if(evaluation.evaluator.toString() == user.id){
-                    evalCount++;
-                }     
-            });
-            writtenFeedbacks.forEach(log => {
-                if(log.user == user.id){
+            rounds.forEach(round => {
+                round.evaluations.forEach(evaluation => {
+                    if(evaluation.evaluator == user.id){
+                        evalCount++;
+                    }    
+                });
+                if(round.feedbackAuthor == user.id){
                     feedbackCount++;
                 }
             });
@@ -229,7 +244,7 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
         }
     });
 
-    res.json({ info, total: bnApps.length + bnRounds.length });
+    res.json({ info, total: rounds.length });
 });
 
 router.get('/findBnActivity/:days/:mode', async (req, res) => {
@@ -310,20 +325,6 @@ router.get('/findPotentialNatInfo/', async (req, res) => {
             this.evaluatedApps = evaluatedApps;
         }
     }
-
-    const appPopulate = [
-        { populate: 'applicant', display: 'username osuId' },
-        { populate: 'bnEvaluators', display: 'username osuId' },
-        { populate: 'test', display: 'totalScore' },
-        {
-            populate: 'evaluations',
-            display: 'evaluator behaviorComment moddingComment vote',
-        },
-        {
-            innerPopulate: 'evaluations',
-            populate: { path: 'evaluator', select: 'username osuId group' },
-        },
-    ];
 
     const [users, applications] = await Promise.all([
         usersService.query({ 
