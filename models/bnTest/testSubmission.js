@@ -11,6 +11,7 @@ const testSubmission = new mongoose.Schema({
     submittedAt: { type: Date },
     totalScore: { type: Number }, //better to store this than populate full test for each application
     additionalPoints: { type: Number, default: 0 },
+    comment: { type: String },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 testSubmission.virtual('answers', {
@@ -65,8 +66,8 @@ class TestSubmissionService extends BaseService
     async create(applicant, mode) {
         try {
             const test = await TestSubmission.create({ 
-                applicant: applicant,
-                mode: mode,
+                applicant,
+                mode,
             });
             
             /* Dumb stuff that may revisit someday
@@ -149,26 +150,26 @@ class TestSubmissionService extends BaseService
 
             if (answer.metadataInput) {
                 return await TestMetadataInput.findByIdAndUpdate(answer.metadataInput, {
-                    title: title, 
-                    titleUnicode: titleUnicode, 
-                    artist: artist, 
-                    artistUnicode: artistUnicode, 
-                    source: source, 
-                    reference1: reference1, 
-                    reference2: reference2, 
-                    reference3: reference3,
+                    title, 
+                    titleUnicode, 
+                    artist, 
+                    artistUnicode, 
+                    source, 
+                    reference1, 
+                    reference2, 
+                    reference3,
                 });
             }
 
             return await TestMetadataInput.create({
-                title: title, 
-                titleUnicode: titleUnicode, 
-                artist: artist, 
-                artistUnicode: artistUnicode, 
-                source: source, 
-                reference1: reference1, 
-                reference2: reference2, 
-                reference3: reference3,
+                title, 
+                titleUnicode, 
+                artist, 
+                artistUnicode, 
+                source, 
+                reference1, 
+                reference2, 
+                reference3,
             });
         } catch(error) {
             logsService.create(null, JSON.stringify(error), true);

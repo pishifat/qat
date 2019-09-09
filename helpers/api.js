@@ -137,6 +137,16 @@ function isBnOrNat(req, res, next) {
     }
 }
 
+function isBn(req, res, next) {
+    const u = res.locals.userRequest;
+    
+    if (u.group == 'bn') {
+        next();
+    } else {
+        res.redirect('/');
+    }
+}
+
 function isNat(req, res, next) {
     const u = res.locals.userRequest;
     
@@ -232,4 +242,4 @@ async function highlightWebhookPost(message, mode) {
     }
 }
 
-module.exports = { isLoggedIn, getToken, getUserInfo, beatmapsetInfo, beatmapsetOwnerMaps, isBnOrNat, isNat, isLeader, isBnEvaluator, webhookPost, highlightWebhookPost };
+module.exports = { isLoggedIn, getToken, getUserInfo, beatmapsetInfo, beatmapsetOwnerMaps, isBnOrNat, isBn, isNat, isLeader, isBnEvaluator, webhookPost, highlightWebhookPost };

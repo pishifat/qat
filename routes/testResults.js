@@ -14,8 +14,8 @@ router.get('/', (req, res) => {
         title: 'Ranking Criteria Test Results',
         script: '../javascripts/testResults.js',
         isTest: true,
-        isBnOrNat: res.locals.userRequest.isBnOrNat,
-        isNat: res.locals.userRequest.isNat,
+        isBn: res.locals.userRequest.isBn,
+        isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
         isBnEvaluator: res.locals.userRequest.group == 'bn' && res.locals.userRequest.isBnEvaluator,
     });
 });

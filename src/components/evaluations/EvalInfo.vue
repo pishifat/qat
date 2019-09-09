@@ -36,8 +36,8 @@
                                         <a :href="'https://osu.ppy.sh/users/' + application.applicant.osuId + '/modding/events?types%5B%5D=kudosu_gain&types%5B%5D=kudosu_lost&min_date=&max_date='" target="_blank">All history</a>
                                     </li>
                                 </ul>
-                                <div v-if="evaluator.group == 'nat'" class="row col-sm-12">
-                                    <p class="text-shadow">
+                                <div v-if="evaluator.group == 'nat'" class="row">
+                                    <p class="text-shadow col-sm-12">
                                         Test results: 
                                         <a
                                             :href="`http://bn.mappersguild.com/testresults?user=${application.applicant.osuId}`"
@@ -47,88 +47,114 @@
                                             {{ application.test.totalScore || application.test.totalScore >= 0 ? application.test.totalScore + '/20' : 'incomplete' }}
                                         </a>
                                     </p>
-                                    <div class="col-sm-12">
-                                        <button
-                                            class="btn btn-sm btn-nat mb-3 minw-200"
+                                    <p class="col-md-12 text-shadow">
+                                        <a href="#additionalInfo" data-toggle="collapse">Additional Info <i class="fas fa-angle-down" /></a>
+                                        <a
+                                            href="#"
+                                            class="float-right small vote-pass ml-2"
                                             data-toggle="tooltip"
-                                            data-placement="right"
-                                            title="Finds previous evaluation results"
-                                            @click="findPreviousEvaluations()"
+                                            data-placement="top"
+                                            :title="application.isPriority ? 'mark evaluation as low priority' : 'mark evaluation as high priority'"
+                                            @click.prevent.stop="toggleIsPriority()"
                                         >
-                                            Load old evaluations
-                                        </button>
-                                        <ul v-if="previousEvaluations">
-                                            <li v-if="!previousEvaluations.length" class="small min-spacing">User has no previous evaluations</li>
-                                            <li v-else v-for="evaluation in previousEvaluations" :key="evaluation.id" class="small text-shadow">
-                                                <b>{{ evaluation.updatedAt.slice(0,10) }} - {{evaluation.applicant ? "APPLICATION" : "BN EVAL"}} - <span :class="'vote-' + evaluation.consensus">{{ evaluation.consensus.toUpperCase() }}</span></b>
-                                                <pre class="secondary-text pre-font ml-2">{{ evaluation.feedback }}</pre>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div :class="application.bnEvaluators.length ? 'col-sm-4' : 'col-sm-6'">
-                                        <p class="text-shadow">
-                                            Assigned NAT: 
+                                            <i class="fas" :class="application.isPriority ? 'fa-arrow-down' : 'fa-arrow-up'" />
+                                        </a>
+                                    </p>
+                                    <div id="additionalInfo" class="collapse row col-sm-12 mx-2 pt-1">
+                                        <p v-if="application.test.comment && application.test.comment.length" class="text-shadow col-sm-12">
+                                            Applicant comment: <span class="small">{{ application.test.comment }}</span>
                                         </p>
-                                        <ul>
-                                            <li v-for="user in application.natEvaluators" :key="user.id" class="small text-shadow">
-                                                {{ user.username }}
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div v-if="application.bnEvaluators.length && evaluator.isLeader" class="col-sm-4">
-                                        <p class="text-shadow">
-                                            Assigned BN: ({{ application.bnEvaluators.length }}):
-                                        </p>
-                                        <ul>
-                                            <li v-for="user in application.bnEvaluators" :key="user.id" class="small text-shadow">
-                                                {{ user.username }}
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div :class="application.bnEvaluators.length ? 'col-sm-4' : 'col-sm-6'">
-                                        <p class="text-shadow">
-                                            Total Evaluations: {{ application.evaluations.length }}
-                                            <a
-                                                href="#"
-                                                class="float-right small vote-pass ml-2"
+                                        <div class="col-sm-12">
+                                            <button
+                                                class="btn btn-sm btn-nat mb-3 minw-200"
                                                 data-toggle="tooltip"
-                                                data-placement="top"
-                                                :title="application.isPriority ? 'mark evaluation as low priority' : 'mark evaluation as high priority'"
-                                                @click.prevent.stop="toggleIsPriority()"
+                                                data-placement="right"
+                                                title="Finds previous evaluation results"
+                                                @click="findPreviousEvaluations()"
                                             >
-                                                <i class="fas" :class="application.isPriority ? 'fa-arrow-down' : 'fa-arrow-up'" />
-                                            </a>
-                                        </p>
-                                        <ul>
-                                            <li v-for="evaluation in application.evaluations" :key="evaluation.id" class="small text-shadow">
-                                                {{ evaluation.evaluator.username }}
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div v-if="evaluator.isLeader && !application.bnEvaluators.length">
-                                    <button class="btn btn-sm btn-nat mb-2" @click="selectBnEvaluators($event)">
-                                        {{ tempBnEvaluators ? 'Re-select BN Evaluators' : 'Select BN Evaluators' }}
-                                    </button> 
-                                    <button v-if="tempBnEvaluators" class="btn btn-sm btn-nat-red mb-2" @click="enableBnEvaluators($event)">
-                                        Enable BN Evaluations
-                                    </button>
-                                    <div v-if="tempBnEvaluators" class="text-shadow">
-                                        <p>Users:</p>
-                                        <div id="usernames" class="copy-paste mb-4" style="width: 25%">
-                                            <ul style="list-style-type: none; padding: 0">
-                                                <li v-for="user in tempBnEvaluators" :key="user.id">
-                                                    <samp class="small">{{ user.username }}</samp>
+                                                Load old evaluations
+                                            </button>
+                                            <ul v-if="previousEvaluations">
+                                                <li v-if="!previousEvaluations.length" class="small min-spacing">User has no previous evaluations</li>
+                                                <li v-else v-for="evaluation in previousEvaluations" :key="evaluation.id" class="small text-shadow">
+                                                    <b>{{ evaluation.updatedAt.slice(0,10) }} - {{evaluation.applicant ? "APPLICATION" : "BN EVAL"}} - <span :class="'vote-' + evaluation.consensus">{{ evaluation.consensus.toUpperCase() }}</span></b>
+                                                    <pre class="secondary-text pre-font ml-2">{{ evaluation.feedback }}</pre>
                                                 </li>
                                             </ul>
                                         </div>
-                                        <p>Forum message:</p>
-                                        <div id="forumMessage" class="copy-paste">
-                                            <samp class="small">Hello!</samp><br><br>
-                                            <samp class="small">You have been selected to help evaluate the [i]{{ application.mode }}[/i] mode BN application for [url=https://osu.ppy.sh/users/{{ application.applicant.osuId }}]{{ application.applicant.username }}[/url].</samp><br><br>
-                                            <samp class="small">Please post your thoughts on the applicant's behavior and modding quality (based on submitted mods and anything else you may know) on the [url=http://bn.mappersguild.com/appeval]BN/NAT website[/url] in [b]one week[/b]. Your decision will be anonymous to everyone but members of the NAT. If the user's application is not visible, that means it has received enough evaluations for a consensus to be reached.</samp><br><br>
-                                            <samp class="small">Keep in mind that this is a 100% optional activity. If you do not want to participate in BN application evaluations, opt-out from your card on the [url=http://bn.mappersguild.com/users]users page[/url]. Failing to finish on time has no penalty.</samp><br><br>
-                                            <samp class="small">Thank you for your hard work!</samp><br><br>
+                                        <div class="col-sm-12">
+                                            <button
+                                                class="btn btn-sm btn-nat mb-3 minw-200"
+                                                data-toggle="tooltip"
+                                                data-placement="right"
+                                                title="Finds NAT notes on user"
+                                                @click="findUserNotes()"
+                                            >
+                                                Load user notes
+                                            </button>
+                                            <ul v-if="userNotes">
+                                                <li v-if="!userNotes.length" class="small min-spacing">User has no notes</li>
+                                                <li v-else v-for="note in userNotes" :key="note.id" class="small text-shadow">
+                                                    <b>{{ note.updatedAt.slice(0,10) }} - {{ note.author.username }}</b>
+                                                    <pre class="secondary-text pre-font ml-2">{{ note.comment }}</pre>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div :class="application.bnEvaluators.length ? 'col-sm-4' : 'col-sm-6'">
+                                            <p class="text-shadow">
+                                                Assigned NAT: 
+                                            </p>
+                                            <ul>
+                                                <li v-for="user in application.natEvaluators" :key="user.id" class="small text-shadow">
+                                                    {{ user.username }}
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div v-if="application.bnEvaluators.length && evaluator.isLeader" class="col-sm-4">
+                                            <p class="text-shadow">
+                                                Assigned BN: ({{ application.bnEvaluators.length }}):
+                                            </p>
+                                            <ul>
+                                                <li v-for="user in application.bnEvaluators" :key="user.id" class="small text-shadow">
+                                                    {{ user.username }}
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div :class="application.bnEvaluators.length ? 'col-sm-4' : 'col-sm-6'">
+                                            <p class="text-shadow">
+                                                Total Evaluations: {{ application.evaluations.length }}
+                                            </p>
+                                            <ul>
+                                                <li v-for="evaluation in application.evaluations" :key="evaluation.id" class="small text-shadow">
+                                                    {{ evaluation.evaluator.username }}
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div v-if="evaluator.isLeader && !application.bnEvaluators.length" class="col-sm-12">
+                                            <button class="btn btn-sm btn-nat mb-2" @click="selectBnEvaluators($event)">
+                                                {{ tempBnEvaluators ? 'Re-select BN Evaluators' : 'Select BN Evaluators' }}
+                                            </button> 
+                                            <button v-if="tempBnEvaluators" class="btn btn-sm btn-nat-red mb-2" @click="enableBnEvaluators($event)">
+                                                Enable BN Evaluations
+                                            </button>
+                                            <div v-if="tempBnEvaluators" class="text-shadow">
+                                                <p>Users:</p>
+                                                <div id="usernames" class="copy-paste mb-4" style="width: 25%">
+                                                    <ul style="list-style-type: none; padding: 0">
+                                                        <li v-for="user in tempBnEvaluators" :key="user.id">
+                                                            <samp class="small">{{ user.username }}</samp>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <p>Forum message:</p>
+                                                <div id="forumMessage" class="copy-paste">
+                                                    <samp class="small">Hello!</samp><br><br>
+                                                    <samp class="small">You have been selected to help evaluate the [i]{{ application.mode }}[/i] mode BN application for [url=https://osu.ppy.sh/users/{{ application.applicant.osuId }}]{{ application.applicant.username }}[/url].</samp><br><br>
+                                                    <samp class="small">Please post your thoughts on the applicant's behavior and modding quality (based on submitted mods and anything else you may know) on the [url=http://bn.mappersguild.com/appeval]BN/NAT website[/url] in [b]one week[/b]. Your decision will be anonymous to everyone but members of the NAT. If the user's application is not visible, that means it has received enough evaluations for a consensus to be reached.</samp><br><br>
+                                                    <samp class="small">Keep in mind that this is a 100% optional activity. If you do not want to participate in BN application evaluations, opt-out from your card on the [url=http://bn.mappersguild.com/users]users page[/url]. Failing to finish on time has no penalty.</samp><br><br>
+                                                    <samp class="small">Thank you for your hard work!</samp><br><br>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -288,6 +314,7 @@ export default {
             moddingComment: '',
             relevantReports: [],
             previousEvaluations: null,
+            userNotes: null,
             vote: 0,
             info: '',
             confirm: '',
@@ -301,6 +328,7 @@ export default {
             this.tempBnEvaluators = null;
             this.findRelevantEval();
             this.previousEvaluations = null;
+            this.userNotes = null;
         },
         evalRound() {
             this.info = '';
@@ -348,6 +376,13 @@ export default {
                 .get('/bnEval/findPreviousEvaluations/' + this.application.applicant.id)
                 .then(response => {
                     this.previousEvaluations = response.data.previousEvaluations;
+                });
+        },
+        async findUserNotes() {
+            axios
+                .get('/bnEval/findUserNotes/' + this.application.applicant.id)
+                .then(response => {
+                    this.userNotes = response.data.userNotes;
                 });
         },
         createDeadline(date){

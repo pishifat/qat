@@ -22,7 +22,7 @@ router.get('/', (req, res) => {
         title: 'Vetoes',
         script: '../javascripts/vetoes.js',
         isVetoes: true,
-        isBnOrNat: true,
+        isBn: res.locals.userRequest.isBn,
         isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,        
     });
 });

@@ -22,9 +22,9 @@ router.get('/', async (req, res) => {
             true,
             100
         ),
-        isBnOrNat: res.locals.userRequest.isBnOrNat,
-        isNat: res.locals.userRequest.isNat,
-        isAdmin: req.session.osuId == 1052994 || req.session.osuId == 3178418 || res.locals.userRequest.isLeader,
+        isBn: res.locals.userRequest.isBn,
+        isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
+        isAdmin: req.session.osuId == 1052994 || req.session.osuId == 3178418,
     });
 });
 

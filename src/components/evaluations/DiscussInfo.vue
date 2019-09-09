@@ -26,7 +26,7 @@
                         <div class="row">
                             <div v-if="discussApp" class="col-sm-12">
                                 <p class="text-shadow">
-                                    Submitted mods:
+                                    Modding:
                                 </p>
                                 <ul style="list-style-type: disc;">
                                     <li v-for="(mod, i) in discussApp.mods" :key="i" class="small text-shadow">
@@ -46,22 +46,60 @@
                                         {{ discussApp.test.totalScore || discussApp.test.totalScore >= 0 ? discussApp.test.totalScore + '/20' : 'incomplete' }}
                                     </a>
                                 </p>
-                                <button
-                                    class="btn btn-sm btn-nat mb-3 minw-200"
-                                    data-toggle="tooltip"
-                                    data-placement="right"
-                                    title="Finds previous evaluation results"
-                                    @click="findPreviousEvaluations()"
-                                >
-                                    Load old evaluations
-                                </button>
-                                <ul v-if="previousEvaluations">
-                                    <li v-if="!previousEvaluations.length" class="small min-spacing">User has no previous evaluations</li>
-                                    <li v-else v-for="evaluation in previousEvaluations" :key="evaluation.id" class="small text-shadow">
-                                        <b>{{ evaluation.updatedAt.slice(0,10) }} - {{evaluation.applicant ? "APPLICATION" : "BN EVAL"}} - <span :class="'vote-' + evaluation.consensus">{{ evaluation.consensus.toUpperCase() }}</span></b>
-                                        <pre class="secondary-text pre-font ml-2">{{ evaluation.feedback }}</pre>
-                                    </li>
-                                </ul>
+                                <p class="text-shadow">
+                                    <a href="#additionalInfo" data-toggle="collapse">Additional Info <i class="fas fa-angle-down" /></a>
+                                    <a
+                                        href="#"
+                                        class="float-right small vote-pass ml-2"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        :title="discussApp.isPriority ? 'mark evaluation as low priority' : 'mark evaluation as high priority'"
+                                        @click.prevent.stop="toggleIsPriority()"
+                                    >
+                                        <i class="fas" :class="discussApp.isPriority ? 'fa-arrow-down' : 'fa-arrow-up'" />
+                                    </a>
+                                </p>
+                                <div id="additionalInfo" class="collapse row col-sm-12 mx-2 pt-1">
+                                    <p v-if="discussApp.test.comment && discussApp.test.comment.length" class="text-shadow col-sm-12">
+                                        Applicant comment: <span class="small">{{ discussApp.test.comment }}</span>
+                                    </p>
+                                    <div class="col-sm-12">
+                                        <button
+                                            class="btn btn-sm btn-nat mb-3 minw-200"
+                                            data-toggle="tooltip"
+                                            data-placement="right"
+                                            title="Finds previous evaluation results"
+                                            @click="findPreviousEvaluations()"
+                                        >
+                                            Load old evaluations
+                                        </button>
+                                        <ul v-if="previousEvaluations">
+                                            <li v-if="!previousEvaluations.length" class="small min-spacing">User has no previous evaluations</li>
+                                            <li v-else v-for="evaluation in previousEvaluations" :key="evaluation.id" class="small text-shadow">
+                                                <b>{{ evaluation.updatedAt.slice(0,10) }} - {{evaluation.applicant ? "APPLICATION" : "BN EVAL"}} - <span :class="'vote-' + evaluation.consensus">{{ evaluation.consensus.toUpperCase() }}</span></b>
+                                                <pre class="secondary-text pre-font ml-2">{{ evaluation.feedback }}</pre>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <button
+                                            class="btn btn-sm btn-nat mb-3 minw-200"
+                                            data-toggle="tooltip"
+                                            data-placement="right"
+                                            title="Finds NAT notes on user"
+                                            @click="findUserNotes()"
+                                        >
+                                            Load user notes
+                                        </button>
+                                        <ul v-if="userNotes">
+                                            <li v-if="!userNotes.length" class="small min-spacing">User has no notes</li>
+                                            <li v-else v-for="note in userNotes" :key="note.id" class="small text-shadow">
+                                                <b>{{ note.updatedAt.slice(0,10) }} - {{ note.author.username }}</b>
+                                                <pre class="secondary-text pre-font ml-2">{{ note.comment }}</pre>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
                                 <h5 v-if="!readOnly" class="text-shadow mb-2">
                                     Consensus:
                                     <span v-if="discussApp.consensus" :class="'vote-' + discussApp.consensus">{{ discussApp.consensus }}</span>
@@ -80,16 +118,6 @@
                                     >
                                         Set Fail
                                     </button>
-                                    <a 
-                                        href="#"
-                                        class="float-right small vote-pass ml-2"
-                                        data-toggle="tooltip"
-                                        data-placement="top" 
-                                        :title="discussApp.isPriority ? 'mark evaluation as low priority' : 'mark evaluation as high priority'"
-                                        @click.prevent.stop="toggleIsPriority()"
-                                    >
-                                        <i class="fas" :class="discussApp.isPriority ? 'fa-arrow-down' : 'fa-arrow-up'" />
-                                    </a>
                                 </h5>
                                 <div v-if="discussApp.consensus && !readOnly">
                                     <hr>
@@ -373,6 +401,7 @@ export default {
             feedback: '',
             relevantReports: [],
             previousEvaluations: null,
+            userNotes: null,
             info: '',
             confirm: '',
             noms: null,
@@ -410,6 +439,7 @@ export default {
                 this.confirm = '';
                 this.findRelevantEval();
                 this.previousEvaluations = null;
+                this.userNotes = null;
             }
             if(this.discussApp) this.feedback = this.discussApp.feedback;
         },
@@ -461,6 +491,13 @@ export default {
                 .get('/bnEval/findPreviousEvaluations/' + this.discussApp.applicant.id)
                 .then(response => {
                     this.previousEvaluations = response.data.previousEvaluations;
+                });
+        },
+        async findUserNotes() {
+            axios
+                .get('/bnEval/findUserNotes/' + this.discussApp.applicant.id)
+                .then(response => {
+                    this.userNotes = response.data.userNotes;
                 });
         },
         createDeadline(date){

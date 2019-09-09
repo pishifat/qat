@@ -20,7 +20,7 @@ router.get('/', (req, res) => {
         title: 'Discussion Vote',
         script: '../javascripts/discussionVote.js',
         isDiscussionVote: true,
-        isBnOrNat: res.locals.userRequest.isBnOrNat,
+        isBn: res.locals.userRequest.isBn,
         isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,     
     });
 });

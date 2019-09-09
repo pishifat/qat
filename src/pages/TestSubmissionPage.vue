@@ -141,12 +141,17 @@
                 </div>
             </div>
             <hr>
-            <div class="mx-auto text-center mb-4">
-                <a href="#top"><button type="submit" class="btn btn-lg btn-nat w-50" @click="submitTest($event)">Submit</button></a>
-                <p class="small pt-2">
-                    {{ info }}
-                </p>
+            <div class="segment segment-image">
+                <p class="small min-spacing mb-1">If you have anything to say to the NAT members evaluating your application, write it here! (optional): </p>
+                <input v-model="comment" class="form-control mb-4" type="text" maxlength="1000" placeholder="comment...">
+                <div class="mx-auto text-center">
+                    <a href="#top"><button type="submit" class="btn btn-lg btn-nat w-50" @click="submitTest($event)">Submit</button></a>
+                    <p class="small pt-2">
+                        {{ info }}
+                    </p>
+                </div>
             </div>
+            
         </div>
     </div>
     <div v-else>
@@ -177,6 +182,7 @@ export default {
             timeRemaining: null,
             displayScore: null,
             checkedOptions: {},
+            comment: '',
         };
     },
     created() {
@@ -236,6 +242,7 @@ export default {
             $('.test-question').hide();
             const res = await this.executePost('/testSubmission/submitTest', { 
                 testId: this.selectedTest,
+                comment: this.comment
             }, e);
             if (res || res == 0) {
                 if (res.error) {

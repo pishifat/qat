@@ -14,8 +14,7 @@ router.get('/', (req, res) => {
         title: 'Manage Reports',
         script: '../javascripts/manageReports.js',
         isManageReports: true,
-        isBnOrNat: res.locals.userRequest.isBnOrNat,
-        isNat: res.locals.userRequest.isNat,
+        isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
     });
 });
 

@@ -8,6 +8,7 @@ const evalRoundsService = require('../models/evalRound').service;
 const bnAppsService = require('../models/bnApp').service;
 const usersService = require('../models/user').service;
 const aiessService = require('../models/aiess').service;
+const notesService = require('../models/note').service;
 
 const router = express.Router();
 
@@ -20,7 +21,7 @@ router.get('/', (req, res) => {
         title: 'Current BN Evaluations',
         script: '../javascripts/bnEval.js',
         isEval: true,
-        isBnOrNat: res.locals.userRequest.isBnOrNat,
+        isBn: res.locals.userRequest.isBn,
         isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
     });
 });
@@ -36,6 +37,10 @@ const defaultPopulate = [
         innerPopulate: 'evaluations',
         populate: { path: 'evaluator', select: 'username osuId group isLeader' },
     },
+];
+
+const notesPopulate = [
+    { populate: 'author', display: 'username' },
 ];
 
 /* GET applicant listing. */
@@ -448,7 +453,7 @@ router.post('/toggleIsLowActivity/:id', async (req, res) => {
     );
 });
 
-/* POST find previous evaluations */
+/* GET find previous evaluations */
 router.get('/findPreviousEvaluations/:id', async (req, res) => {
     let evals;
     evals = await evalRoundsService.query({ bn: req.params.id, active: false, consensus: { $exists: true }, feedback: { $exists: true } }, {}, {}, true);
@@ -456,6 +461,12 @@ router.get('/findPreviousEvaluations/:id', async (req, res) => {
         evals = await bnAppsService.query({ applicant: req.params.id, active: false, consensus: { $exists: true }, feedback: { $exists: true } }, {}, {}, true);
     }
     res.json({ previousEvaluations: evals });
+});
+
+/* GET find user notes */
+router.get('/findUserNotes/:id', async (req, res) => {
+    let notes = await notesService.query({ user: req.params.id, isHidden: { $ne: true } }, notesPopulate, {}, true);
+    res.json({ userNotes: notes });
 });
 
 /* GET aiess info */

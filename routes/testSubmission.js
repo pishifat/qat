@@ -33,8 +33,8 @@ router.get('/', (req, res) => {
     res.render('testsubmission', {
         title: 'Test Submission',
         script: '../javascripts/testSubmission.js',
-        isBnOrNat: res.locals.userRequest.group == 'bn' || res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
-        isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
+        isBn: res.locals.userRequest.isBn,
+        isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
     });
 });
 
@@ -161,6 +161,7 @@ router.post('/submitTest', async (req, res) => {
             submittedAt: Date.now(),
             status: 'finished',
             totalScore: displayScore,
+            comment: req.body.comment,
         }),
         bnAppsService.update(currentBnApp.id, { test: test._id }),
     ]);

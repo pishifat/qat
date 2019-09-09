@@ -15,8 +15,8 @@ router.get('/', (req, res) => {
         title: 'Beatmap Nominator Score',
         script: '../javascripts/bnScore.js',
         isBnScore: true,
-        isBnOrNat: res.locals.userRequest.isBnOrNat,
-        isNat: res.locals.userRequest.isNat,
+        isBn: res.locals.userRequest.isBn,
+        isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
     });
 });
 

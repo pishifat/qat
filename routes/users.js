@@ -23,7 +23,7 @@ router.get('/', (req, res) => {
         title: 'BN/NAT Listing',
         script: '../javascripts/users.js',
         isUsers: true,
-        isBnOrNat: res.locals.userRequest.isBnOrNat,
+        isBn: res.locals.userRequest.isBn,
         isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
     });
 });

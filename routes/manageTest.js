@@ -15,8 +15,7 @@ router.get('/', (req, res) => {
         title: 'Manage RC Test',
         script: '../javascripts/manageTest.js',
         isTest: true,
-        isBnOrNat: res.locals.userRequest.isBnOrNat,
-        isNat: res.locals.userRequest.isNat,
+        isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
     });
 });
 

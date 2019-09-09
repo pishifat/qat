@@ -258,45 +258,68 @@
             </table>
         </div>
         <div>
-            <div>
-                <button
-                    class="btn btn-sm btn-nat mx-2 mb-2 minw-200"
-                    data-toggle="tooltip"
-                    data-placement="right"
-                    title="Finds unique mod count in the last 90 days. Only use on BNs with low activity"
-                    @click="findModCount()"
-                >
-                    Load modding activity
-                </button>
-                <span v-if="loadingModCount" class="small">Finding mods (this will take a few seconds...)</span>
-                <ul v-if="modCount" class="text-shadow">
-                    <li class="min-spacing small">
-                        Month 1: {{ modCount[0] }}
-                    </li>
-                    <li class="min-spacing small">
-                        Month 2: {{ modCount[1] }}
-                    </li>
-                    <li class="min-spacing small">
-                        Month 3: {{ modCount[2] }}
-                    </li>
-                </ul>
-            </div>
-            <div>
-                <button
-                    class="btn btn-sm btn-nat mx-2 mb-2 minw-200"
-                    data-toggle="tooltip"
-                    data-placement="right"
-                    title="Finds previous evaluation results"
-                    @click="findPreviousEvaluations()"
-                >
-                    Load old evaluations
-                </button>
-                <ul v-if="previousEvaluations">
-                    <li v-for="evaluation in previousEvaluations" :key="evaluation.id" class="small text-shadow">
-                        <b>{{ evaluation.updatedAt.slice(0,10) }} - {{evaluation.applicant ? "APP" : "BN EVAL"}} - <span :class="'vote-' + evaluation.consensus">{{ evaluation.consensus.toUpperCase() }}</span></b>
-                        <pre class="secondary-text pre-font ml-2">{{ evaluation.feedback }}</pre>
-                    </li>
-                </ul>
+            <p class="text-shadow">
+                <a href="#additionalInfo" data-toggle="collapse">Additional Info <i class="fas fa-angle-down" /></a>
+            </p>
+            <div id="additionalInfo" class="collapse row col-sm-12 mx-2 pt-1">
+                <div class="col-sm-12">
+                    <button
+                        class="btn btn-sm btn-nat mx-2 mb-2 minw-200"
+                        data-toggle="tooltip"
+                        data-placement="right"
+                        title="Finds unique mod count in the last 90 days. Only use on BNs with low activity"
+                        @click="findModCount()"
+                    >
+                        Load modding activity
+                    </button>
+                    <span v-if="loadingModCount" class="small">Finding mods (this will take a few seconds...)</span>
+                    <ul v-if="modCount" class="text-shadow">
+                        <li class="min-spacing small">
+                            Month 1: {{ modCount[0] }}
+                        </li>
+                        <li class="min-spacing small">
+                            Month 2: {{ modCount[1] }}
+                        </li>
+                        <li class="min-spacing small">
+                            Month 3: {{ modCount[2] }}
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-sm-12">
+                    <button
+                        class="btn btn-sm btn-nat mx-2 mb-2 minw-200"
+                        data-toggle="tooltip"
+                        data-placement="right"
+                        title="Finds previous evaluation results"
+                        @click="findPreviousEvaluations()"
+                    >
+                        Load old evaluations
+                    </button>
+                    <ul v-if="previousEvaluations">
+                        <li v-for="evaluation in previousEvaluations" :key="evaluation.id" class="small text-shadow">
+                            <b>{{ evaluation.updatedAt.slice(0,10) }} - {{evaluation.applicant ? "APP" : "BN EVAL"}} - <span :class="'vote-' + evaluation.consensus">{{ evaluation.consensus.toUpperCase() }}</span></b>
+                            <pre class="secondary-text pre-font ml-2">{{ evaluation.feedback }}</pre>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-sm-12">
+                    <button
+                        class="btn btn-sm btn-nat mx-2 mb-2 minw-200"
+                        data-toggle="tooltip"
+                        data-placement="right"
+                        title="Finds NAT notes on user"
+                        @click="findUserNotes()"
+                    >
+                        Load user notes
+                    </button>
+                    <ul v-if="userNotes">
+                        <li v-if="!userNotes.length" class="small min-spacing">User has no notes</li>
+                        <li v-else v-for="note in userNotes" :key="note.id" class="small text-shadow">
+                            <b>{{ note.updatedAt.slice(0,10) }} - {{ note.author.username }}</b>
+                            <pre class="secondary-text pre-font ml-2">{{ note.comment }}</pre>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
@@ -327,6 +350,7 @@ export default {
             loadingModCount: false,
             modCount: null,
             previousEvaluations: null,
+            userNotes: null,
         };
     },
     watch: {
@@ -337,6 +361,7 @@ export default {
             this.modCount = null;
             this.previousEvaluations = null;
             this.findRelevantActivity();
+            this.userNotes = null;
         },
     },
     mounted () {
@@ -370,6 +395,13 @@ export default {
                 .get('/bnEval/findPreviousEvaluations/' + this.evalRound.bn.id)
                 .then(response => {
                     this.previousEvaluations = response.data.previousEvaluations;
+                });
+        },
+        async findUserNotes() {
+            axios
+                .get('/bnEval/findUserNotes/' + this.evalRound.bn.id)
+                .then(response => {
+                    this.userNotes = response.data.userNotes;
                 });
         },
         updateEntry () {

@@ -14,8 +14,7 @@ router.get('/', (req, res) => {
         title: 'Data Collection',
         script: '../javascripts/dataCollection.js',
         isDataCollection: true,
-        isBnOrNat: res.locals.userRequest.isBnOrNat,
-        isNat: res.locals.userRequest.isNat,
+        isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
     });
 });
 

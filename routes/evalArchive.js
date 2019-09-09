@@ -16,8 +16,7 @@ router.get('/', (req, res) => {
         title: 'Evaluation Archives',
         script: '../javascripts/evalArchive.js',
         isEval: true,
-        isBnOrNat: res.locals.userRequest.isBnOrNat,
-        isNat: res.locals.userRequest.isNat,
+        isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
     });
 });
 

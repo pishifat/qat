@@ -18,7 +18,7 @@ router.get('/', (req, res) => {
         title: 'BN Application Evaluations',
         script: '../javascripts/appEval.js',
         isEval: true,
-        isBnOrNat: res.locals.userRequest.isBnOrNat,
+        isBn: res.locals.userRequest.isBn,
         isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
     });
 });
@@ -28,7 +28,7 @@ const defaultPopulate = [
     { populate: 'applicant', display: 'username osuId' },
     { populate: 'bnEvaluators', display: 'username osuId' },
     { populate: 'natEvaluators', display: 'username osuId' },
-    { populate: 'test', display: 'totalScore' },
+    { populate: 'test', display: 'totalScore comment' },
     {
         populate: 'evaluations',
         display: 'evaluator behaviorComment moddingComment vote',

@@ -22,8 +22,8 @@ router.get('/', async (req, res) => {
         script: '../js/bnApp.js',
         isBnApp: true,
         loggedInAs: req.session.mongoId,
-        isBnOrNat: res.locals.userRequest.isBnOrNat,
-        isNat: res.locals.userRequest.isNat,
+        isBn: res.locals.userRequest.isBn,
+        isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
         pendingTest: test,
     });
 });
