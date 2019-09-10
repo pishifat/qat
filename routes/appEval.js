@@ -307,7 +307,7 @@ router.post('/setFeedback/:id', async (req, res) => {
             fields:[
                 {
                     name: `BN app feedback submitted (${a.consensus})`,
-                    value: `**${a.applicant.username}**: ${req.body.feedback}`,
+                    value: `**${a.applicant.username}**: ${req.body.feedback.length > 990 ? req.body.feedback.slice(0,990) + '... *(truncated)*' : req.body.feedback}`,
                 },
             ],
         }], 

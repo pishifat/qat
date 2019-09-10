@@ -422,7 +422,7 @@ router.post('/setFeedback/:id', async (req, res) => {
             fields:[
                 {
                     name: `Current BN eval feedback submitted (${er.consensus})`,
-                    value: `**${er.bn.username}**: ${req.body.feedback}`,
+                    value: `**${er.bn.username}**: ${req.body.feedback.length > 990 ? req.body.feedback.slice(0,990) + '... *(truncated)*' : req.body.feedback}`,
                 },
             ],
         }], 
