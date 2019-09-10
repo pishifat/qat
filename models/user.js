@@ -27,7 +27,7 @@ userSchema.virtual('isNat').get(function() {
 });
 
 userSchema.virtual('isBn').get(function() {
-    return this.group == 'bn' || this.isSpectator;
+    return this.group == 'bn';
 });
 
 const User = mongoose.model('User', userSchema);
