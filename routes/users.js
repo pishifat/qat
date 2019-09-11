@@ -179,7 +179,7 @@ router.get('/findUserBadgeInfo', async (req, res) => {
     res.json(u);
 });
 
-/* POST remove from BN/NAT without evaluation */
+/* POST edit badge value */
 router.post('/editBadgeValue/:id', api.isLeader, async (req, res) => {
     let u = await usersService.query({ _id: req.params.id });
     if(res.locals.userRequest.osuId == '3178418'){ //i dont want anyone else messing with this

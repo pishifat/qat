@@ -188,7 +188,7 @@ router.post('/submitEval/:id', async (req, res) => {
             }], 
             er.mode
         );
-        if(!er.discussion && (((er.mode == 'osu' || er.mode == 'catch') && er.evaluations.length > 2) || ((er.mode == 'taiko' || er.mode == 'mania') && er.evaluations.length > 1))){
+        if(!er.discussion && ((er.mode == 'osu' && er.evaluations.length > 2) || (er.mode != 'osu' && er.evaluations.length > 1))){
             await evalRoundsService.update(req.params.id, { discussion: true });
             let pass = 0;
             let extend = 0;

@@ -96,7 +96,7 @@ router.post('/submitEval/:id', async (req, res) => {
             a.mode
         );
         
-        if(!a.discussion && (((a.mode == 'osu' || a.mode == 'catch') && a.evaluations.length > 2) || ((a.mode == 'taiko' || a.mode == 'mania') && a.evaluations.length > 1))){
+        if(!a.discussion && ((a.mode == 'osu' && a.evaluations.length > 2) || (a.mode != 'osu' && a.evaluations.length > 1))){
             let pass = 0;
             let neutral = 0;
             let fail = 0;

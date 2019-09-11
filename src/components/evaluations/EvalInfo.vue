@@ -101,7 +101,7 @@
                                             </ul>
                                         </div>
                                         <div :class="application.bnEvaluators.length ? 'col-sm-4' : 'col-sm-6'">
-                                            <p class="text-shadow">
+                                            <p class="text-shadow min-spacing">
                                                 Assigned NAT: 
                                             </p>
                                             <ul>
@@ -111,7 +111,7 @@
                                             </ul>
                                         </div>
                                         <div v-if="application.bnEvaluators.length && evaluator.isLeader" class="col-sm-4">
-                                            <p class="text-shadow">
+                                            <p class="text-shadow min-spacing">
                                                 Assigned BN: ({{ application.bnEvaluators.length }}):
                                             </p>
                                             <ul>

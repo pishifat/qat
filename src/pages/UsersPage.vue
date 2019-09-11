@@ -69,9 +69,9 @@
                             <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a> (joined {{user.joinDate.toString().slice(0, 10)}})
                             <p 
                                 class="min-spacing" 
-                                :class="user.totalEvaluations >= natTotal/(natActivity.length / (natMode == 'osu' || natMode == 'catch' ? 3 : 2)) - 1 ? 
+                                :class="user.totalEvaluations >= natTotal/(natActivity.length / natMode == 'osu' ? 3 : 2) - 1 ? 
                                     'background-pass' 
-                                    : user.totalEvaluations >= natTotal/(natActivity.length * 2 / (natMode == 'osu' || natMode == 'catch' ? 3 : 2)) - 1 ? 
+                                    : user.totalEvaluations >= natTotal/(natActivity.length * 2 / natMode == 'osu' ? 3 : 2) - 1 ? 
                                         'background-warn' :
                                         'background-fail'"
                             >
