@@ -23,7 +23,7 @@ router.get('/', (req, res) => {
 //population
 const defaultAppPopulate = [
     { populate: 'applicant', display: 'username osuId' },
-    { populate: 'test', display: 'totalScore' },
+    { populate: 'test', display: 'totalScore additionalPoints comment' },
     { populate: 'evaluations', display: 'evaluator behaviorComment moddingComment vote' },
     { innerPopulate: 'evaluations', populate: { path: 'evaluator', select: 'username osuId group' } },
 ];
