@@ -20,6 +20,7 @@
                         <option class="ml-2" value="none">Unmarked</option>
                     </select>
                 </small>
+                <span class="errors">{{ info }}</span>
             </section>
             <section class="col-md-12 segment segment-image mx-0">
                 <h2>Open Reports</h2>
@@ -101,6 +102,16 @@ export default {
                 this.hasSeparation = true;
                 this.isSpectator = response.data.isSpectator;
                 this.isLeader = response.data.isLeader;
+                const params = new URLSearchParams(document.location.search.substring(1));
+                if (params.get('report') && params.get('report').length) {
+                    const i = this.allObjs.findIndex(r => r.id == params.get('report'));
+                    if(i >= 0){
+                        this.selectedReport = this.allObjs[i];
+                        $('#reportInfo').modal('show');
+                    }else{
+                        this.info = "Cannot find report!"
+                    }
+                }
             }).then(function(){
                 $('#loading').fadeOut();
                 $('#main').attr('style', 'visibility: visible').hide().fadeIn();

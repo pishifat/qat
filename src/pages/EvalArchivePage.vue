@@ -3,9 +3,9 @@
         <section class="col-md-12 segment mb-4">
             <div class="input-group input-group-sm">
                 <input
-                    id="search"
+                    v-model="searchValue"
                     type="text"
-                    placeholder="username..." 
+                    placeholder="username or osuID..." 
                     maxlength="18"
                     autocomplete="off"
                     @keyup.enter="query($event)" 
@@ -100,33 +100,92 @@ export default {
     mixins: [postData],
     data() {
         return {
-            appEvals: null,
+            appEvals: [],
             selectedDiscussApp: null,
-            bnEvals: null,
+            bnEvals: [],
             selectedDiscussRound: null,
             queried: false,
             info: '',
             evaluator: null,
+            searchValue: null,
         };
     },
     created() {
-        axios
-            .get('/evalArchive/relevantInfo')
-            .then(response => {
-                this.evaluator = response.data.evaluator;
-            }).then(function(){
-                $('#loading').fadeOut();
-                $('#main').attr('style', 'visibility: visible').hide().fadeIn();
-            });
+        const params = new URLSearchParams(document.location.search.substring(1));
+        if (params.get('user') && params.get('user').length) {
+            axios
+                .get(`/evalArchive/search/${params.get('user')}`)
+                .then(response => {
+                    if (response.data.error) {
+                        this.info = response.data.error;
+                    } else {
+                        this.evaluator = response.data.evaluator;
+                        this.queried = true;
+                        this.appEvals = response.data.a;
+                        this.bnEvals = response.data.b; 
+                    }
+                })
+                .then(function() {
+                    $('#loading').fadeOut();
+                    $('#main')
+                        .attr('style', 'visibility: visible')
+                        .hide()
+                        .fadeIn();
+                });
+        } else if(params.get('eval') && params.get('eval').length){
+            axios
+                .get(`/evalArchive/searchById/${params.get('eval')}`)
+                .then(response => {
+                    if (response.data.error) {
+                        this.info = response.data.error;
+                    } else {
+                        this.evaluator = response.data.evaluator;
+                        if(response.data.round){
+                            console.log(response.data.round)
+                            this.queried = true;
+                            if(response.data.round.applicant){
+                                this.selectedDiscussApp = response.data.round;
+                                this.appEvals.push(response.data.round);
+                            } else {
+                                this.selectedDiscussRound = response.data.round;
+                                this.bnEvals.push(response.data.round);
+                            }
+                            $('#discussionInfo').modal('show');
+                        }
+                        
+                    }
+                })
+                .then(function() {
+                    $('#loading').fadeOut();
+                    $('#main')
+                        .attr('style', 'visibility: visible')
+                        .hide()
+                        .fadeIn();
+                });
+        } else {
+            axios
+                .get('/evalArchive/relevantInfo')
+                .then(response => {
+                    this.evaluator = response.data.evaluator;
+                })
+                .then(function() {
+                    $('#loading').fadeOut();
+                    $('#main')
+                        .attr('style', 'visibility: visible')
+                        .hide()
+                        .fadeIn();
+                });
+        }
     },
     methods: {
         async query(e) {
             this.info = '';
-            let username = $('#search').val();
-            if(!username || !username.length){
-                this.info = 'Must enter a username!';
+            let user = this.searchValue;
+            if(!user || !user.length){
+                this.info = 'Must enter a username or osu ID!';
             }else{
-                const result = await this.executePost('/evalArchive/search/', { username }, e);
+                history.pushState(null, 'Evaluation Archives', `/evalArchive?user=${user}`);
+                const result = await this.executeGet('/evalArchive/search/' + user, e);
                 if (result) {
                     if (result.error) {
                         this.info = result.error;
@@ -142,7 +201,7 @@ export default {
             this.info = '';
             let limit = $('#limit').val();
             if(parseInt(limit)){
-                const result = await this.executePost('/evalArchive/searchRecent/', { limit }, e);
+                const result = await this.executeGet('/evalArchive/searchRecent/' + limit, e);
                 if (result) {
                     if (result.error) {
                         this.info = result.error;

@@ -47,16 +47,8 @@ const notesPopulate = [
 router.get('/relevantInfo', async (req, res) => {
     let minDate = new Date();
     minDate.setDate(minDate.getDate() + 14);
-    const [er, r] = await Promise.all([
-        await evalRoundsService.query({ active: true, deadline: { $lte: minDate } }, defaultPopulate, { deadline: 1, consensus: 1, feedback: 1 }, true),
-        await reportsService.query(
-            { valid: { $exists: true, $ne: 3 }, feedback: { $exists: true, $nin: '' } },
-            {},
-            {},
-            true
-        ),
-    ]);
-    res.json({ er, r, evaluator: res.locals.userRequest });
+    let er = await evalRoundsService.query({ active: true, deadline: { $lte: minDate } }, defaultPopulate, { deadline: 1, consensus: 1, feedback: 1 }, true);
+    res.json({ er, evaluator: res.locals.userRequest });
 });
 
 function isValidMode(modeToCheck, isOsu, isTaiko, isCatch, isMania) {
@@ -181,7 +173,7 @@ router.post('/submitEval/:id', async (req, res) => {
                 color: '3800465',
                 fields:[
                     {
-                        name: 'http://bn.mappersguild.com/bneval',
+                        name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
                         value: `submitted current BN eval for **${er.bn.username}**`,
                     },
                 ],
@@ -208,7 +200,7 @@ router.post('/submitEval/:id', async (req, res) => {
                     color: '3773329',
                     fields:[
                         {
-                            name: 'http://bn.mappersguild.com/bneval',
+                            name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
                             value: 'Moved current BN eval to group discussion',
                         },
                         {
@@ -252,7 +244,7 @@ router.post('/setGroupEval/', api.isLeader, async (req, res) => {
                 color: '3773329',
                 fields:[
                     {
-                        name: 'http://bn.mappersguild.com/bneval',
+                        name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
                         value: 'Moved current BN eval to group discussion',
                     },
                     {
@@ -340,7 +332,7 @@ router.post('/setComplete/', api.isLeader, async (req, res) => {
                     color: '6579298',
                     fields:[
                         {
-                            name: 'http://bn.mappersguild.com/bneval',
+                            name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
                             value: 'Current BN eval archived',
                         },
                         {
@@ -367,11 +359,11 @@ router.post('/setComplete/', api.isLeader, async (req, res) => {
 /* POST set consensus of eval */
 router.post('/setConsensus/:id', async (req, res) => {
     await evalRoundsService.update(req.params.id, { consensus: req.body.consensus });
-    let ev = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
-    res.json(ev);
+    let er = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
+    res.json(er);
     if(req.body.consensus){
         logsService.create(
-            req.session.mongoId,`Set consensus of ${ev.bn.username}'s ${ev.mode} BN eval as ${req.body.consensus}`
+            req.session.mongoId,`Set consensus of ${er.bn.username}'s ${er.mode} BN eval as ${req.body.consensus}`
         );
         api.webhookPost(
             [{
@@ -383,12 +375,12 @@ router.post('/setConsensus/:id', async (req, res) => {
                 color: '13272813',
                 fields:[
                     {
-                        name: 'http://bn.mappersguild.com/bneval',
-                        value: `**${ev.bn.username}**'s current BN eval set to **${req.body.consensus}**`,
+                        name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
+                        value: `**${er.bn.username}**'s current BN eval set to **${req.body.consensus}**`,
                     },
                 ],
             }], 
-            ev.mode
+            er.mode
         );
     }
 });
@@ -421,8 +413,8 @@ router.post('/setFeedback/:id', async (req, res) => {
             color: '5762129',
             fields:[
                 {
-                    name: `Current BN eval feedback submitted (${er.consensus})`,
-                    value: `**${er.bn.username}**: ${req.body.feedback.length > 990 ? req.body.feedback.slice(0,990) + '... *(truncated)*' : req.body.feedback}`,
+                    name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
+                    value: `**${er.bn.username}'s feedback**: ${req.body.feedback.length > 990 ? req.body.feedback.slice(0,990) + '... *(truncated)*' : req.body.feedback}`,
                 },
             ],
         }], 
@@ -466,6 +458,12 @@ router.get('/findPreviousEvaluations/:id', async (req, res) => {
 router.get('/findUserNotes/:id', async (req, res) => {
     let notes = await notesService.query({ user: req.params.id, isHidden: { $ne: true } }, notesPopulate, {}, true);
     res.json({ userNotes: notes });
+});
+
+/* GET find user reports */
+router.get('/findUserReports/:id', async (req, res) => {
+    let reports = await reportsService.query({ culprit: req.params.id, isActive: { $ne: true } }, {}, {}, true);
+    res.json({ userReports: reports });
 });
 
 /* GET aiess info */

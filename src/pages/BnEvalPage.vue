@@ -11,6 +11,7 @@
                         Select all
                     </button>
                 </slot>
+                <span class="errors">{{ info }}</span>
             </filter-box>
             <section v-if="evaluator && evaluator.isLeader" class="row segment my-1 mx-4">
                 <div class="small filter-box">
@@ -95,14 +96,12 @@
         <eval-info
             :eval-round="selectedEvalRound"
             :evaluator="evaluator"
-            :reports="reports"
             @update-eval-round="updateEvalRound($event)"
         />
 
         <discuss-info
             :discuss-round="selectedDiscussRound"
             :evaluator="evaluator"
-            :reports="reports"
             @update-eval-round="updateEvalRound($event)"
         />
 
@@ -143,7 +142,6 @@ export default {
             selectedEvalRound: null,
             selectedDiscussRound: null,
             allChecked: false,
-            reports: null,
             evaluator: null,
             info: '',
         };
@@ -156,12 +154,26 @@ export default {
             .get('/bnEval/relevantInfo')
             .then(response => {
                 this.allObjs = response.data.er;
-                this.reports = response.data.r;
                 this.evaluator = response.data.evaluator;
                 this.filterMode = response.data.evaluator.modes[0] || 'osu';
                 this.hasPagination = false;
                 this.hasSeparation = true;
                 this.filter();
+                const params = new URLSearchParams(document.location.search.substring(1));
+                if (params.get('eval') && params.get('eval').length) {
+                    const i = this.allObjs.findIndex(a => a.id == params.get('eval'));
+                    if(i >= 0){
+                        if(!this.allObjs[i].discussion){
+                            this.selectedEvalRound = this.allObjs[i];
+                            $('#evaluationInfo').modal('show');
+                        }else{
+                            this.selectedDiscussRound = this.allObjs[i];
+                            $('#discussionInfo').modal('show');
+                        }
+                    }else{
+                        window.location = "/evalArchive?eval=" + params.get('eval');
+                    }
+                }
             }).then(function(){
                 $('#loading').fadeOut();
                 $('#main').attr('style', 'visibility: visible').hide().fadeIn();
@@ -173,7 +185,6 @@ export default {
                 .get('/bnEval/relevantInfo')
                 .then(response => {
                     this.allObjs = response.data.er;
-                    this.reports = response.data.r;
                 });
         }, 300000);
     },

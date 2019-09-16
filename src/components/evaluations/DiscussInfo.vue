@@ -25,7 +25,7 @@
                     <div class="container">
                         <div class="row">
                             <div v-if="discussApp" class="col-sm-12">
-                                <p class="text-shadow">
+                                <p class="text-shadow min-spacing">
                                     Modding:
                                 </p>
                                 <ul style="list-style-type: disc;">
@@ -49,6 +49,7 @@
                                 <p class="text-shadow">
                                     <a href="#additionalInfo" data-toggle="collapse">Additional Info <i class="fas fa-angle-down" /></a>
                                     <a
+                                        v-if="!readOnly"
                                         href="#"
                                         class="float-right small vote-pass ml-2"
                                         data-toggle="tooltip"
@@ -64,35 +65,23 @@
                                         Applicant comment: <span class="small">{{ discussApp.test.comment }}</span>
                                     </p>
                                     <div class="col-sm-12">
-                                        <button
-                                            class="btn btn-sm btn-nat mb-2 minw-200"
-                                            data-toggle="tooltip"
-                                            data-placement="right"
-                                            title="Finds previous evaluation results"
-                                            @click="findPreviousEvaluations()"
-                                        >
-                                            Load old evaluations
-                                        </button>
+                                        <p class="min-spacing text-shadow">
+                                                Previous evaluations:
+                                            </p>
                                         <ul v-if="previousEvaluations">
-                                            <li v-if="!previousEvaluations.length" class="small min-spacing">User has no previous evaluations</li>
+                                            <li v-if="!previousEvaluations.length" class="small min-spacing text-shadow">User has no previous evaluations</li>
                                             <li v-else v-for="evaluation in previousEvaluations" :key="evaluation.id" class="small text-shadow">
-                                                <b>{{ evaluation.updatedAt.slice(0,10) }} - {{evaluation.applicant ? "APPLICATION" : "BN EVAL"}} - <span :class="'vote-' + evaluation.consensus">{{ evaluation.consensus.toUpperCase() }}</span></b>
+                                                <a :href="'http://bn.mappersguild.com/evalarchive?eval=' + evaluation.id">{{ evaluation.updatedAt.slice(0,10) }} - {{evaluation.applicant ? "APPLICATION" : "BN EVAL"}}</a> - <span :class="'vote-' + evaluation.consensus">{{ evaluation.consensus.toUpperCase() }}</span>
                                                 <pre class="secondary-text pre-font ml-2">{{ evaluation.feedback }}</pre>
                                             </li>
                                         </ul>
                                     </div>
                                     <div class="col-sm-12">
-                                        <button
-                                            class="btn btn-sm btn-nat mb-2 minw-200"
-                                            data-toggle="tooltip"
-                                            data-placement="right"
-                                            title="Finds NAT notes on user"
-                                            @click="findUserNotes()"
-                                        >
-                                            Load user notes
-                                        </button>
+                                        <p class="min-spacing text-shadow">
+                                                NAT user notes:
+                                            </p>
                                         <ul v-if="userNotes">
-                                            <li v-if="!userNotes.length" class="small min-spacing">User has no notes</li>
+                                            <li v-if="!userNotes.length" class="small min-spacing text-shadow">User has no notes</li>
                                             <li v-else v-for="note in userNotes" :key="note.id" class="small text-shadow">
                                                 <b>{{ note.updatedAt.slice(0,10) }} - {{ note.author.username }}</b>
                                                 <pre class="secondary-text pre-font ml-2">{{ note.comment }}</pre>
@@ -211,18 +200,6 @@
                                     />
                                 </div>
                                 
-                                <div v-if="relevantReports.length">
-                                    <hr>
-                                    <p class="text-shadow">
-                                        Reports:
-                                    </p>
-                                    <div v-for="report in relevantReports" :key="report.id">
-                                        <p class="text-shadow pl-2">
-                                            <span class="small">{{ report.createdAt.slice(0,10) }}:</span>
-                                            <pre class="pre-font small ml-2" :class="report.valid == 1 ? 'vote-pass' : 'vote-extend'"> <span v-html="filterLinks(report.reason)" /></pre>
-                                        </p>
-                                    </div>
-                                </div>
                                 <hr> 
                             </div>
                             
@@ -399,7 +376,6 @@ export default {
             moddingComment: '',
             vote: 0,
             feedback: '',
-            relevantReports: [],
             previousEvaluations: null,
             userNotes: null,
             info: '',
@@ -443,15 +419,24 @@ export default {
                 this.findRelevantEval();
                 this.previousEvaluations = null;
                 this.userNotes = null;
+                history.pushState(null, 'BN Application Evaluations', `/appeval?eval=${this.discussApp.id}`);
+            }else{
+                if(this.discussApp) history.pushState(null, 'Evaluation Archives', `/evalArchive?eval=${this.discussApp.id}`);
             }
-            if(this.discussApp) this.feedback = this.discussApp.feedback;
+            if(this.discussApp){
+                this.feedback = this.discussApp.feedback;
+                this.findPreviousEvaluations();
+                this.findUserNotes();
+            } 
         },
         discussRound() {
             if(!this.readOnly){
                 this.info = '';
                 this.confirm = '';
                 this.findRelevantEval();
-                if(this.reports && this.reports.length) this.findRelevantReports();
+                history.pushState(null, 'BN Application Evaluations', `/bneval?eval=${this.discussRound.id}`);
+            }else{
+                if(this.discussRound) history.pushState(null, 'Evaluation Archives', `/evalArchive?eval=${this.discussRound.id}`);
             }
             if(this.discussRound) this.feedback = this.discussRound.feedback;
         },
@@ -484,10 +469,6 @@ export default {
                     }
                 }); 
             }
-        },
-        findRelevantReports() {
-            this.relevantReports = this.reports.filter( report => 
-                report.culprit == this.discussRound.bn.id && report.display);
         },
         async findPreviousEvaluations() {
             axios

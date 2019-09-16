@@ -261,6 +261,7 @@
             <p class="text-shadow">
                 <a href="#additionalInfo" data-toggle="collapse">Additional Info <i class="fas fa-angle-down" /></a> 
                 <a
+                    v-if="!evalRound.discussion"
                     href="#"
                     class="float-right small vote-pass ml-2"
                     data-toggle="tooltip"
@@ -273,15 +274,50 @@
             </p>
             <div id="additionalInfo" class="collapse row col-sm-12 mx-2 pt-1">
                 <div class="col-sm-12">
-                    <button
-                        class="btn btn-sm btn-nat mx-2 mb-2 minw-200"
-                        data-toggle="tooltip"
-                        data-placement="right"
-                        title="Finds unique mod count in the last 90 days. Only use on BNs with low activity"
-                        @click="findModCount()"
-                    >
-                        Load modding activity
-                    </button>
+                    <p class="min-spacing text-shadow">
+                        Previous evaluations:
+                    </p>
+                    <ul v-if="previousEvaluations">
+                        <li v-for="evaluation in previousEvaluations" :key="evaluation.id" class="small text-shadow">
+                            <a :href="'http://bn.mappersguild.com/evalarchive?eval=' + evaluation.id">{{ evaluation.updatedAt.slice(0,10) }} - {{evaluation.applicant ? "APP" : "BN EVAL"}}</a> - <span :class="'vote-' + evaluation.consensus">{{ evaluation.consensus.toUpperCase() }}</span>
+                            <pre class="secondary-text pre-font ml-2">{{ evaluation.feedback }}</pre>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-sm-12">
+                    <p class="min-spacing text-shadow">
+                        NAT user notes:
+                    </p>
+                    <ul v-if="userNotes">
+                        <li v-if="!userNotes.length" class="small min-spacing text-shadow">User has no notes</li>
+                        <li v-else v-for="note in userNotes" :key="note.id" class="small text-shadow">
+                            <b>{{ note.updatedAt.slice(0,10) }} - {{ note.author.username }}</b>
+                            <pre class="secondary-text pre-font ml-2">{{ note.comment }}</pre>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-sm-12">
+                    <p class="min-spacing text-shadow">
+                        Reports:
+                    </p>
+                    <ul v-if="userReports">
+                        <li v-if="!userReports.length" class="small min-spacing text-shadow">User has no reports</li>
+                        <li v-else v-for="report in userReports" :key="report.id" class="small text-shadow">
+                            <a :href="'http://bn.mappersguild.com/managereports?report=' + report.id">{{ report.createdAt.slice(0,10) }}</a>
+                            <pre class="secondary-text pre-font ml-2" :class="report.valid == 1 ? 'vote-pass' : 'vote-extend'"> <span v-html="filterLinks(report.reason)" /></pre>
+                        </li>
+                    </ul>
+                </div>
+                <button
+                    class="btn btn-sm btn-nat mx-2 mb-2 minw-200"
+                    data-toggle="tooltip"
+                    data-placement="right"
+                    title="Finds unique mod count in the last 90 days. Only use on BNs with low activity"
+                    @click="findModCount()"
+                >
+                    Load modding activity
+                </button>
+                <div class="col-sm-12">
                     <span v-if="loadingModCount" class="small">Finding mods (this will take a few seconds...)</span>
                     <ul v-if="modCount" class="text-shadow">
                         <li class="min-spacing small">
@@ -295,42 +331,7 @@
                         </li>
                     </ul>
                 </div>
-                <div class="col-sm-12">
-                    <button
-                        class="btn btn-sm btn-nat mx-2 mb-2 minw-200"
-                        data-toggle="tooltip"
-                        data-placement="right"
-                        title="Finds previous evaluation results"
-                        @click="findPreviousEvaluations()"
-                    >
-                        Load old evaluations
-                    </button>
-                    <ul v-if="previousEvaluations">
-                        <li v-for="evaluation in previousEvaluations" :key="evaluation.id" class="small text-shadow">
-                            <b>{{ evaluation.updatedAt.slice(0,10) }} - {{evaluation.applicant ? "APP" : "BN EVAL"}} - <span :class="'vote-' + evaluation.consensus">{{ evaluation.consensus.toUpperCase() }}</span></b>
-                            <pre class="secondary-text pre-font ml-2">{{ evaluation.feedback }}</pre>
-                        </li>
-                    </ul>
-                </div>
-                <div class="col-sm-12">
-                    <button
-                        class="btn btn-sm btn-nat mx-2 mb-2 minw-200"
-                        data-toggle="tooltip"
-                        data-placement="right"
-                        title="Finds NAT notes on user"
-                        @click="findUserNotes()"
-                    >
-                        Load user notes
-                    </button>
-                    <ul v-if="userNotes">
-                        <li v-if="!userNotes.length" class="small min-spacing">User has no notes</li>
-                        <li v-else v-for="note in userNotes" :key="note.id" class="small text-shadow">
-                            <b>{{ note.updatedAt.slice(0,10) }} - {{ note.author.username }}</b>
-                            <pre class="secondary-text pre-font ml-2">{{ note.comment }}</pre>
-                        </li>
-                    </ul>
-                </div>
-                <div v-if="!evalRound.discuss" class="col-sm-12">
+                <div v-if="!evalRound.discussion" class="col-sm-12">
                     <p class="text-shadow min-spacing">
                         Total Evaluations: {{ evalRound.evaluations.length }}
                     </p>
@@ -371,6 +372,7 @@ export default {
             modCount: null,
             previousEvaluations: null,
             userNotes: null,
+            userReports: null,
         };
     },
     watch: {
@@ -380,12 +382,18 @@ export default {
             this.loadingModCount = false;
             this.modCount = null;
             this.previousEvaluations = null;
-            this.findRelevantActivity();
             this.userNotes = null;
+            this.findRelevantActivity();
+            this.findPreviousEvaluations();
+            this.findUserNotes();
+            this.findUserReports();
         },
     },
     mounted () {
         this.findRelevantActivity();
+        this.findPreviousEvaluations();
+        this.findUserNotes();
+        this.findUserReports();
     },
     methods: {
         async findRelevantActivity(){
@@ -422,6 +430,13 @@ export default {
                 .get('/bnEval/findUserNotes/' + this.evalRound.bn.id)
                 .then(response => {
                     this.userNotes = response.data.userNotes;
+                });
+        },
+        async findUserReports() {
+            axios
+                .get('/bnEval/findUserReports/' + this.evalRound.bn.id)
+                .then(response => {
+                    this.userReports = response.data.userReports;
                 });
         },
         updateEntry () {

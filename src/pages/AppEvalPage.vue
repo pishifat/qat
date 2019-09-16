@@ -1,5 +1,6 @@
 <template>
     <div class="row">
+        <p class="errors mx-auto">{{ info }}</p>
         <div class="col-md-12">
             <filter-box 
                 :filter-mode.sync="filterMode"
@@ -144,6 +145,21 @@ export default {
                 this.hasPagination = false;
                 this.hasSeparation = true;
                 this.filter();
+                const params = new URLSearchParams(document.location.search.substring(1));
+                if (params.get('eval') && params.get('eval').length) {
+                    const i = this.allObjs.findIndex(a => a.id == params.get('eval'));
+                    if(i >= 0){
+                        if(!this.allObjs[i].discussion){
+                            this.selectedApplication = this.allObjs[i];
+                            $('#evaluationInfo').modal('show');
+                        }else{
+                            this.selectedDiscussApp = this.allObjs[i];
+                            $('#discussionInfo').modal('show');
+                        }
+                    }else{
+                        window.location = "/evalArchive?eval=" + params.get('eval');
+                    }
+                }
             }).then(function(){
                 $('#loading').fadeOut();
                 $('#main').attr('style', 'visibility: visible').hide().fadeIn();
@@ -158,6 +174,14 @@ export default {
                     this.filter();
                 });
         }, 300000);
+    },
+    watch: {
+        selectedApplication() {
+            this.info = '';
+        },
+        selectedDiscussApp() {
+            this.info = '';
+        },
     },
     methods: {
         filterBySearchValueContext(a) {

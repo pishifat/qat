@@ -88,7 +88,7 @@ router.post('/submitEval/:id', async (req, res) => {
                 color: '3800465',
                 fields:[
                     {
-                        name: 'http://bn.mappersguild.com/appeval',
+                        name: `http://bn.mappersguild.com/appeval?eval=${a.id}`,
                         value: `submitted BN app eval for **${a.applicant.username}**`,
                     },
                 ],
@@ -119,7 +119,7 @@ router.post('/submitEval/:id', async (req, res) => {
                         color: '3773329',
                         fields:[
                             {
-                                name: 'http://bn.mappersguild.com/appeval',
+                                name: `http://bn.mappersguild.com/appeval?eval=${a.id}`,
                                 value: 'Moved BN app to group discussion',
                             },
                             {
@@ -164,7 +164,7 @@ router.post('/setGroupEval/', api.isLeader, async (req, res) => {
                 color: '3773329',
                 fields:[
                     {
-                        name: 'http://bn.mappersguild.com/appeval',
+                        name: `http://bn.mappersguild.com/appeval?eval=${a.id}`,
                         value: 'Moved BN app to group discussion',
                     },
                     {
@@ -226,7 +226,7 @@ router.post('/setComplete/', api.isLeader, async (req, res) => {
                 color: '6579298',
                 fields:[
                     {
-                        name: 'http://bn.mappersguild.com/appeval',
+                        name: `http://bn.mappersguild.com/appeval?eval=${a.id}`,
                         value: 'BN app archived',
                     },
                     {
@@ -270,7 +270,7 @@ router.post('/setConsensus/:id', async (req, res) => {
             color: '13272813',
             fields:[
                 {
-                    name: 'http://bn.mappersguild.com/appeval',
+                    name: `http://bn.mappersguild.com/appeval?eval=${a.id}`,
                     value: `**${a.applicant.username}**'s BN app set to **${req.body.consensus}**`,
                 },
             ],
@@ -306,8 +306,8 @@ router.post('/setFeedback/:id', async (req, res) => {
             color: '5762129',
             fields:[
                 {
-                    name: `BN app feedback submitted (${a.consensus})`,
-                    value: `**${a.applicant.username}**: ${req.body.feedback.length > 990 ? req.body.feedback.slice(0,990) + '... *(truncated)*' : req.body.feedback}`,
+                    name: `http://bn.mappersguild.com/appeval?eval=${a.id}`,
+                    value: `**${a.applicant.username}'s feedback**: ${req.body.feedback.length > 990 ? req.body.feedback.slice(0,990) + '... *(truncated)*' : req.body.feedback}`,
                 },
             ],
         }], 

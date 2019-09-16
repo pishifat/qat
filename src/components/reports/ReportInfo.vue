@@ -171,6 +171,7 @@ export default {
                 this.confirm = '';
                 this.feedback = this.report.feedback;
                 this.simplifiedReason = this.report.simplifiedReason;
+                history.pushState(null, 'Manage Reports', `/managereports?report=${this.report.id}`);
             }
         },
     },

@@ -39,9 +39,15 @@ router.get('/relevantInfo', (req, res) => {
     res.json({ evaluator: req.session.mongoId });
 });
 
-/* POST search for user */
-router.post('/search/', async (req, res) => {
-    let u = await usersService.query({ username: new RegExp('^' + helper.escapeUsername(req.body.username) + '$', 'i') });
+/* GET search for user */
+router.get('/search/:user', async (req, res) => {
+    let u;
+    const userToSearch = helper.safeParam(req.params.user);
+    if (isNaN(userToSearch)) {
+        u = await usersService.query({ username: new RegExp('^' + helper.escapeUsername(userToSearch) + '$', 'i') });
+    } else {
+        u = await usersService.query({ osuId: parseInt(userToSearch) });
+    }
     if (!u) {
         return res.json({ error: 'Cannot find user!' });
     }
@@ -57,29 +63,51 @@ router.post('/search/', async (req, res) => {
         { createdAt: 1 },
         true
     );
-    res.json({ a, b });
+    res.json({ a, b, evaluator: req.session.mongoId });
 });
 
-/* POST search for user */
-router.post('/searchRecent/', async (req, res) => {
-    if(!req.body.limit){
-        req.body.limit = 12;
+/* GET search for user */
+router.get('/searchById/:id', async (req, res) => {
+    let round;
+    const idToSearch = helper.safeParam(req.params.id);
+    round = await bnAppsService.query(
+        { _id: idToSearch, active: false, consensus: { $exists: true } },
+        defaultAppPopulate
+    );
+    
+    if(!round){
+        round = await evalRoundsService.query(
+            { _id: idToSearch, active: false, consensus: { $exists: true } },
+            defaultBnPopulate
+        );
+    }
+    if(!round.consensus){ //consensus because undefined round results in { error: undefined }, and that says !round is false
+        return res.json({ error: 'Cannot find evaluation!' });
+    }
+    
+    res.json({ round, evaluator: req.session.mongoId });
+});
+
+/* GET search by number of rounds */
+router.get('/searchRecent/:limit', async (req, res) => {
+    if(!req.params.limit){
+        req.params.limit = 12;
     }else{
-        req.body.limit = parseInt(req.body.limit);
+        req.params.limit = parseInt(req.params.limit);
     }
     let a = await bnAppsService.query(
         { active: false, consensus: { $exists: true } },
         defaultAppPopulate,
         { createdAt: -1 },
         true,
-        req.body.limit
+        req.params.limit
     );
     let b = await evalRoundsService.query(
         { active: false, consensus: { $exists: true } },
         defaultBnPopulate,
         { createdAt: -1 },
         true,
-        req.body.limit
+        req.params.limit
     );
     res.json({ a, b });
 });

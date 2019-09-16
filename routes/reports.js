@@ -33,14 +33,14 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
         if (u.group == 'user') {
             return res.json({ error: 'User is not a member of the BN/NAT!' });
         }
-        await reportsService.create(req.session.mongoId, u.id, req.body.reason, req.body.link);
+        let r = await reportsService.create(req.session.mongoId, u.id, req.body.reason, req.body.link);
         res.json({});
         if(u.group != 'nat'){
             api.webhookPost([{
                 author: {
                     name: `User report: ${u.username}`,
                     icon_url: `https://a.ppy.sh/${u.osuId}`,
-                    url: `https://osu.ppy.sh/users/${u.osuId}`,
+                    url: `http://bn.mappersguild.com/managereports?report=${r.id}`,
                 },
                 color: '16697937',
                 fields:[
@@ -58,12 +58,12 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
             );
         }
     }else{
-        await reportsService.create(req.session.mongoId, null, req.body.reason, req.body.link);
+        let r = await reportsService.create(req.session.mongoId, null, req.body.reason, req.body.link);
         res.json({});
         api.webhookPost([{
             author: {
                 name: 'Non-user report',
-                url: req.body.link,
+                url: `http://bn.mappersguild.com/managereports?report=${r.id}`,
             },
             color: '16698019',
             fields:[

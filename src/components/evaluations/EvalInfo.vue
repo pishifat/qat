@@ -25,7 +25,7 @@
                     <div class="container">
                         <div class="row">
                             <div v-if="application" class="col-sm-12">
-                                <p class="text-shadow">
+                                <p class="text-shadow min-spacing">
                                     Modding:
                                 </p>
                                 <ul style="list-style-type: disc;">
@@ -65,35 +65,23 @@
                                             Applicant comment: <span class="small">{{ application.test.comment }}</span>
                                         </p>
                                         <div class="col-sm-12">
-                                            <button
-                                                class="btn btn-sm btn-nat mb-2 minw-200"
-                                                data-toggle="tooltip"
-                                                data-placement="right"
-                                                title="Finds previous evaluation results"
-                                                @click="findPreviousEvaluations()"
-                                            >
-                                                Load old evaluations
-                                            </button>
+                                            <p class="min-spacing text-shadow">
+                                                Previous evaluations:
+                                            </p>
                                             <ul v-if="previousEvaluations">
-                                                <li v-if="!previousEvaluations.length" class="small min-spacing">User has no previous evaluations</li>
+                                                <li v-if="!previousEvaluations.length" class="small min-spacing text-shadow">User has no previous evaluations</li>
                                                 <li v-else v-for="evaluation in previousEvaluations" :key="evaluation.id" class="small text-shadow">
-                                                    <b>{{ evaluation.updatedAt.slice(0,10) }} - {{evaluation.applicant ? "APPLICATION" : "BN EVAL"}} - <span :class="'vote-' + evaluation.consensus">{{ evaluation.consensus.toUpperCase() }}</span></b>
+                                                    <a :href="'http://bn.mappersguild.com/evalarchive?eval=' + evaluation.id">{{ evaluation.updatedAt.slice(0,10) }} - {{evaluation.applicant ? "APPLICATION" : "BN EVAL"}}</a> - <span :class="'vote-' + evaluation.consensus">{{ evaluation.consensus.toUpperCase() }}</span>
                                                     <pre class="secondary-text pre-font ml-2">{{ evaluation.feedback }}</pre>
                                                 </li>
                                             </ul>
                                         </div>
                                         <div class="col-sm-12">
-                                            <button
-                                                class="btn btn-sm btn-nat mb-2 minw-200"
-                                                data-toggle="tooltip"
-                                                data-placement="right"
-                                                title="Finds NAT notes on user"
-                                                @click="findUserNotes()"
-                                            >
-                                                Load user notes
-                                            </button>
+                                            <p class="min-spacing text-shadow">
+                                                NAT user notes:
+                                            </p>
                                             <ul v-if="userNotes">
-                                                <li v-if="!userNotes.length" class="small min-spacing">User has no notes</li>
+                                                <li v-if="!userNotes.length" class="small min-spacing text-shadow">User has no notes</li>
                                                 <li v-else v-for="note in userNotes" :key="note.id" class="small text-shadow">
                                                     <b>{{ note.updatedAt.slice(0,10) }} - {{ note.author.username }}</b>
                                                     <pre class="secondary-text pre-font ml-2">{{ note.comment }}</pre>
@@ -166,18 +154,6 @@
                                     :eval-round="evalRound"
                                     :is-spectator="evaluator.isSpectator"
                                 />
-                                <div v-if="relevantReports.length">
-                                    <hr>
-                                    <p class="text-shadow">
-                                        Reports:
-                                    </p>
-                                    <div v-for="report in relevantReports" :key="report.id">
-                                        <p class="text-shadow pl-2">
-                                            <span class="small">{{ report.createdAt.slice(0,10) }}:</span>
-                                            <pre class="pre-font small ml-2" :class="report.valid == 1 ? 'vote-pass' : 'vote-extend'"> <span v-html="filterLinks(report.reason)" /></pre>
-                                        </p>
-                                    </div>
-                                </div>
                                 <hr>
                             </div>
                         
@@ -284,13 +260,12 @@ export default {
         UserActivity,
     },
     mixins: [ postData, filterLinks ],
-    props: [ 'application', 'evalRound', 'reports', 'evaluator' ],
+    props: [ 'application', 'evalRound', 'evaluator' ],
     data() {
         return {
             evaluationId: '',
             behaviorComment: '',
             moddingComment: '',
-            relevantReports: [],
             previousEvaluations: null,
             userNotes: null,
             vote: 0,
@@ -312,12 +287,15 @@ export default {
             this.findRelevantEval();
             this.previousEvaluations = null;
             this.userNotes = null;
+            this.findPreviousEvaluations();
+            this.findUserNotes();
+            history.pushState(null, 'BN Application Evaluations', `/appeval?eval=${this.application.id}`);
         },
         evalRound() {
             this.info = '';
             this.confirm = '';
             this.findRelevantEval();
-            if(this.reports && this.reports.length) this.findRelevantReports();
+            history.pushState(null, 'BN Application Evaluations', `/bneval?eval=${this.evalRound.id}`);
         },
     },
     methods: {
@@ -349,10 +327,6 @@ export default {
                 });
             }
             
-        },
-        findRelevantReports() {
-            this.relevantReports = this.reports.filter( report => 
-                report.culprit == this.evalRound.bn.id && report.display);
         },
         async findPreviousEvaluations() {
             axios

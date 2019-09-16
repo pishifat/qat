@@ -197,7 +197,7 @@ router.post('/submitTest', async (req, res) => {
             author: {
                 name: `${u.username}`,
                 icon_url: `https://a.ppy.sh/${u.osuId}`,
-                url: `https://osu.ppy.sh/users/${u.osuId}`,
+                url: `http://bn.mappersguild.com/appeval?eval=${currentBnApp.id}`,
             },
             color: '9884159',
             fields:[
