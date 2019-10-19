@@ -8,7 +8,7 @@
             </button>
         </p>
         <div v-if="noms" id="noms" class="collapse">
-            <table class="table table-sm table-dark table-hover col-md-12 mt-2">
+            <table v-if="noms.length" class="table table-sm table-dark table-hover col-md-12 mt-2">
                 <thead>
                     <td scope="col">
                         Date
@@ -17,51 +17,54 @@
                         Mapset
                     </td>
                 </thead>
-                <tbody>
+                <tbody class="small">
                     <tr v-for="nom in noms" :key="nom.id">
                         <td scope="row">
                             {{ new Date(nom.timestamp).toString().slice(4,10) }}
                         </td>
                         <td scope="row">
                             <a :href="'https://osu.ppy.sh/beatmapsets/' + nom.beatmapsetId + '/discussion/-/events'" target="_blank">
-                                {{ nom.metadata.length > 70 ? nom.metadata.slice(0,70) + '...' : nom.metadata }}
+                                {{ nom.metadata.length > 90 ? nom.metadata.slice(0,90) + '...' : nom.metadata }}
                             </a>
                         </td>
                     </tr>
                 </tbody>
             </table>
+            <p v-else class="small text-shadow ml-4">
+                None...
+            </p>
         </div>
         <p class="text-shadow">
             <a :href="nomsDqd && '#nomsDqd'" data-toggle="collapse">Show disqualified nominations</a> 
             ({{ loading ? '...' : nomsDqd ? nomsDqd.length : '0' }})
         </p>
         <div v-if="nomsDqd" id="nomsDqd" class="collapse">
-            <table class="table table-sm table-dark table-hover col-md-12 mt-2">
+            <table v-if="nomsDqd.length" class="table table-sm table-dark table-hover col-md-12 mt-2">
                 <thead>
-                    <td scope="col">
+                    <td scope="col" class="w-10">
                         Date
                     </td>
-                    <td scope="col">
+                    <td scope="col" class="w-30">
                         Mapset
                     </td>
-                    <td scope="col">
+                    <td scope="col" class="w-60">
                         Reason
                     </td>
                 </thead>
-                <tbody>
+                <tbody class="small">
                     <tr v-for="dq in nomsDqd" :key="dq.id" :class="dq.valid == 1 ? 'vote-border-pass' : dq.valid == 2 ? 'vote-border-extend' : dq.valid == 3 ? 'vote-border-fail' : ''">
                         <td scope="row">
                             {{ new Date(dq.timestamp).toString().slice(4,10) }}
                         </td>
                         <td scope="row">
                             <a :href="dq.postId ? 'https://osu.ppy.sh/beatmapsets/' + dq.beatmapsetId + '/discussion/-/generalAll#/' + dq.postId : 'https://osu.ppy.sh/beatmapsets/' + dq.beatmapsetId + '/discussion/-/events'" target="_blank">
-                                {{ dq.metadata.length > 35 ? dq.metadata.slice(0,35) + "..." : dq.metadata }}
+                                {{ dq.metadata.length > 30 ? dq.metadata.slice(0,30).trim() + "..." : dq.metadata }}
                             </a>
                         </td>
                         <td v-if="!editing" scope="row" v-html="filterLinks(dq.content)" />
                         <td v-else scope="row">
-                            <input :class="'input-' + dq._id" type="text" :placeholder="dq.content.length > 35 ? dq.content.slice(0,35) + '...' : dq.content" maxlength="50">
-                            <button class="btn btn-sm btn-nat" @click="updateReason(dq._id, $event);">
+                            <input class="w-60" :class="'input-' + dq._id" type="text" :placeholder="dq.content.length > 40 ? dq.content.slice(0,40) + '...' : dq.content" maxlength="100">
+                            <button class="btn btn-xs btn-nat" @click="updateReason(dq._id, $event);">
                                 Save
                             </button>
                             <notability
@@ -72,25 +75,28 @@
                     </tr>
                 </tbody>
             </table>
+            <p v-else class="small text-shadow ml-4">
+                None...
+            </p>
         </div>
         <p class="text-shadow">
             <a :href="nomsPopped && '#nomsPopped'" data-toggle="collapse">Show popped nominations</a> 
             ({{ loading ? '...' : nomsPopped ? nomsPopped.length : '0' }})
         </p>
         <div v-if="nomsPopped" id="nomsPopped" class="collapse">
-            <table class="table table-sm table-dark table-hover col-md-12 mt-2">
+            <table v-if="nomsPopped.length" class="table table-sm table-dark table-hover col-md-12 mt-2">
                 <thead>
-                    <td scope="col">
+                    <td scope="col" class="w-10">
                         Date
                     </td>
-                    <td scope="col">
+                    <td scope="col" class="w-30">
                         Mapset
                     </td>
-                    <td scope="col">
+                    <td scope="col" class="w-60">
                         Reason
                     </td>
                 </thead>
-                <tbody>
+                <tbody class="small">
                     <tr
                         v-for="pop in nomsPopped"
                         :key="pop.id"
@@ -101,13 +107,13 @@
                         </td>
                         <td scope="row">
                             <a :href="pop.postId ? 'https://osu.ppy.sh/beatmapsets/' + pop.beatmapsetId + '/discussion/-/generalAll#/' + pop.postId : 'https://osu.ppy.sh/beatmapsets/' + pop.beatmapsetId + '/discussion/-/events'" target="_blank">
-                                {{ pop.metadata.length > 35 ? pop.metadata.slice(0,35) + "..." : pop.metadata }}
+                                {{ pop.metadata.length > 30 ? pop.metadata.slice(0,30).trim() + "..." : pop.metadata }}
                             </a>
                         </td>
                         <td v-if="!editing" scope="row" v-html="filterLinks(pop.content)" />
                         <td v-else scope="row">
-                            <input :class="'input-' + pop._id" type="text" :placeholder="pop.content.length > 35 ? pop.content.slice(0,35) + '...' : pop.content" maxlength="50">
-                            <button class="btn btn-sm btn-nat" @click="updateReason(pop._id, $event);">
+                            <input class="w-60" :class="'input-' + pop._id" type="text" :placeholder="pop.content.length > 40 ? pop.content.slice(0,40) + '...' : pop.content" maxlength="100">
+                            <button class="btn btn-xs btn-nat" @click="updateReason(pop._id, $event);">
                                 Save
                             </button>
                             <notability
@@ -118,25 +124,28 @@
                     </tr>
                 </tbody>
             </table>
+            <p v-else class="small text-shadow ml-4">
+                None...
+            </p>
         </div>
         <p class="text-shadow">
             <a :href="dqs && '#dqs'" data-toggle="collapse">Show disqualifications done by user</a> 
             ({{ loading ? '...' : dqs ? dqs.length : '0' }})
         </p>
         <div v-if="dqs" id="dqs" class="collapse">
-            <table class="table table-sm table-dark table-hover col-md-12 mt-2">
+            <table v-if="dqs.length" class="table table-sm table-dark table-hover col-md-12 mt-2">
                 <thead>
-                    <td scope="col">
+                    <td scope="col" class="w-10">
                         Date
                     </td>
-                    <td scope="col">
+                    <td scope="col" class="w-30">
                         Mapset
                     </td>
-                    <td scope="col">
+                    <td scope="col" class="w-60">
                         Reason
                     </td>
                 </thead>
-                <tbody>
+                <tbody class="small">
                     <tr
                         v-for="dq in dqs"
                         :key="dq.id"
@@ -147,13 +156,13 @@
                         </td>
                         <td scope="row">
                             <a :href="dq.postId ? 'https://osu.ppy.sh/beatmapsets/' + dq.beatmapsetId + '/discussion/-/generalAll#/' + dq.postId : 'https://osu.ppy.sh/beatmapsets/' + dq.beatmapsetId + '/discussion/-/events'" target="_blank">
-                                {{ dq.metadata.length > 35 ? dq.metadata.slice(0,35) + "..." : dq.metadata }}
+                                {{ dq.metadata.length > 30 ? dq.metadata.slice(0,30).trim() + "..." : dq.metadata }}
                             </a>
                         </td>
                         <td v-if="!editing" scope="row" v-html="filterLinks(dq.content)" />
                         <td v-else scope="row">
-                            <input :class="'input-' + dq._id" type="text" :placeholder="dq.content.length > 35 ? dq.content.slice(0,35) + '...' : dq.content" maxlength="50">
-                            <button class="btn btn-sm btn-nat" @click="updateReason(dq._id, $event);">
+                            <input class="w-60" :class="'input-' + dq._id" type="text" :placeholder="dq.content.length > 40 ? dq.content.slice(0,40) + '...' : dq.content" maxlength="100">
+                            <button class="btn btn-xs btn-nat" @click="updateReason(dq._id, $event);">
                                 Save
                             </button>
                             <notability
@@ -164,25 +173,28 @@
                     </tr>
                 </tbody>
             </table>
+            <p v-else class="small text-shadow ml-4">
+                None...
+            </p>
         </div>
         <p class="text-shadow">
             <a :href="pops && '#pops'" data-toggle="collapse">Show pops done by user</a> 
             ({{ loading ? '...' : pops ? pops.length : '0' }})
         </p>
         <div v-if="pops" id="pops" class="collapse">
-            <table class="table table-sm table-dark table-hover col-md-12 mt-2">
+            <table v-if="pops.length" class="table table-sm table-dark table-hover col-md-12 mt-2">
                 <thead>
-                    <td scope="col">
+                    <td scope="col" class="w-10">
                         Date
                     </td>
-                    <td scope="col">
+                    <td scope="col" class="w-30">
                         Mapset
                     </td>
-                    <td scope="col">
+                    <td scope="col" class="w-60">
                         Reason
                     </td>
                 </thead>
-                <tbody>
+                <tbody class="small">
                     <tr
                         v-for="pop in pops"
                         :key="pop.id"
@@ -193,13 +205,13 @@
                         </td>
                         <td scope="row">
                             <a :href="pop.postId ? 'https://osu.ppy.sh/beatmapsets/' + pop.beatmapsetId + '/discussion/-/generalAll#/' + pop.postId : 'https://osu.ppy.sh/beatmapsets/' + pop.beatmapsetId + '/discussion/-/events'" target="_blank">
-                                {{ pop.metadata.length > 35 ? pop.metadata.slice(0,35) + "..." : pop.metadata }}
+                                {{ pop.metadata.length > 30 ? pop.metadata.slice(0,30).trim() + "..." : pop.metadata }}
                             </a>
                         </td>
                         <td v-if="!editing" scope="row" v-html="filterLinks(pop.content)" />
                         <td v-else scope="row">
-                            <input :class="'input-' + pop._id" type="text" :placeholder="pop.content.length > 35 ? pop.content.slice(0,35) + '...' : pop.content" maxlength="50">
-                            <button class="btn btn-sm btn-nat" @click="updateReason(pop._id, $event);">
+                            <input class="w-60" :class="'input-' + pop._id" type="text" :placeholder="pop.content.length > 40 ? pop.content.slice(0,40) + '...' : pop.content" maxlength="100">
+                            <button class="btn btn-xs btn-nat" @click="updateReason(pop._id, $event);">
                                 Save
                             </button>
                             <notability
@@ -210,52 +222,9 @@
                     </tr>
                 </tbody>
             </table>
-        </div>
-        <p class="text-shadow">
-            <a :href="reports && '#reports'" data-toggle="collapse">Show reports done by user</a> 
-            ({{ loading ? '...' : reports ? reports.length : '0' }})
-        </p>
-        <div v-if="reports" id="reports" class="collapse">
-            <table class="table table-sm table-dark table-hover col-md-12 mt-2">
-                <thead>
-                    <td scope="col">
-                        Date
-                    </td>
-                    <td scope="col">
-                        Mapset
-                    </td>
-                    <td scope="col">
-                        Reason
-                    </td>
-                </thead>
-                <tbody>
-                    <tr
-                        v-for="report in reports"
-                        :key="report.id"
-                        :class="report.valid == 1 ? 'vote-border-pass' : report.valid == 2 ? 'vote-border-extend' : report.valid == 3 ? 'vote-border-fail' : ''"
-                    >
-                        <td scope="row">
-                            {{ new Date(report.timestamp).toString().slice(4,10) }}
-                        </td>
-                        <td scope="row">
-                            <a :href="report.forumPostId > 0 ? 'https://osu.ppy.sh/community/forums/topics/447428?start=' + report.forumPostId : 'https://osu.ppy.sh/beatmapsets/' + report.beatmapsetId + '/discussion/-/events'" target="_blank">
-                                {{ report.metadata.length > 35 ? report.metadata.slice(0,35) + "..." : report.metadata }}
-                            </a>
-                        </td>
-                        <td v-if="!editing" scope="row" v-html="filterLinks(report.content)" />
-                        <td v-else scope="row">
-                            <input :class="'input-' + report._id" type="text" :placeholder="report.content.length > 35 ? report.content.slice(0,35) + '...' : report.content" maxlength="50">
-                            <button class="btn btn-sm btn-nat" @click="updateReason(report._id, $event);">
-                                Save
-                            </button>
-                            <notability
-                                :selected-entry="report"
-                                :is-spectator="isSpectator"
-                            />
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <p v-else class="small text-shadow ml-4">
+                None...
+            </p>
         </div>
         <div>
             <p class="text-shadow">
@@ -363,7 +332,6 @@ export default {
             noms: null,
             pops: null,
             dqs: null,
-            reports: null,
             nomsPopped: null,
             nomsDqd: null,
             loading: true,
@@ -405,7 +373,6 @@ export default {
                     this.nomsPopped = response.data.nomsPopped;
                     this.dqs = response.data.dqs;
                     this.pops = response.data.pops;
-                    this.reports = response.data.reports;
                     this.loading = false;
                 });
         },
@@ -442,6 +409,17 @@ export default {
         updateEntry () {
             this.findRelevantActivity();
         },
+        async toggleIsPriority() {
+            const er = await this.executePost(
+                '/bnEval/toggleIsPriority/' + this.evalRound.id, { isPriority: this.evalRound.isPriority });
+            if (er) {
+                if (er.error) {
+                    this.info = er.error;
+                } else {
+                    await this.$parent.$emit('update-eval-round', er);
+                }
+            } 
+        },
         async updateReason(entryId, e) {
             this.$parent.info = '';
             let reasonInput = $(`.input-${entryId}`).val();
@@ -463,5 +441,15 @@ export default {
 </script>
 
 <style>
+.w-10 {
+    width: 10%;
+}
 
+.w-30 {
+    width: 30%;
+}
+
+.w-60 {
+    width: 60%;
+}
 </style>

@@ -276,7 +276,7 @@ export default {
     },
     computed: {
         testPoints() {
-            return this.application.test.totalScore + this.application.test.additionalPoints;
+            return this.application.test.totalScore;
         }
     },
     watch: {

@@ -32,12 +32,6 @@ const defaultTestPopulate = [
             },
         },
     },
-    {
-        innerPopulate: 'answers',
-        populate: {
-            path: 'metadataInput',
-        },
-    },
 ];
 
 /* GET relevant info. */

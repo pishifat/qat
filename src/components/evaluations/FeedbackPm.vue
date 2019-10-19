@@ -1,7 +1,10 @@
 <template>
     <div>
-        <div v-if="discussApp">
-            <div v-if="discussApp.consensus == 'pass'" id="forumPmBox" class="copy-paste collapse">
+        <div v-if="discussApp" id="forumPmBox" class="collapse">
+            <div class="copy-paste">
+                <samp class="small">BN Application Results ({{ discussApp.mode == 'osu' ? 'osu!' : 'osu!' + discussApp.mode }})</samp>
+            </div>
+            <div v-if="discussApp.consensus == 'pass'" class="copy-paste">
                 <samp class="small">Hello!</samp><br><br>
                 <samp class="small">Following a positive evaluation of your BN application for the [i]{{ discussApp.mode == 'osu' ? 'osu!' : 'osu!' + discussApp.mode }}[/i] game mode, you've been invited to join the Beatmap Nominators. Congratulations!</samp><br><br>
                 <samp class="small">[notice][b]Important information:[/b]</samp><br>
@@ -11,10 +14,10 @@
                 <samp class="small">Your test results can be found here: http://bn.mappersguild.com/testresults</samp><br><br>
                 <samp class="small">Additional feedback from the NAT:</samp><br><br>
                 <samp><pre class="small">[notice]{{ feedback }}[/notice]</pre></samp>
-                <samp class="small">We hope you have fun as a Beatmap Nominator! Link to the BN Discord Server: {{ discordLink || 'expired link' }}</samp><br><br>
+                <samp class="small">Link to the BN Discord Server: {{ discordLink || 'expired link' }}</samp><br><br>
                 <samp class="small">Regards, the Nomination Assessment Team</samp>
             </div>
-            <div v-else id="forumPmBox" class="copy-paste collapse">
+            <div v-else class="copy-paste">
                 <samp class="small">Hello!</samp><br><br>
                 <samp class="small">Following an evaluation of your BN application for the [i]{{ discussApp.mode == 'osu' ? 'osu!' : 'osu!' + discussApp.mode }}[/i] game mode, we've decided not to admit you into the Beatmap Nominators.</samp><br><br>
                 <samp class="small">Your test results can be found here: http://bn.mappersguild.com/testresults</samp><br><br>
@@ -27,8 +30,11 @@
                 <samp class="small">Regards, the Nomination Assessment Team</samp>
             </div>
         </div>
-        <div v-else-if="discussRound">
-            <div v-if="discussRound.consensus == 'pass'" id="currentBnForumPmBox" class="copy-paste collapse">
+        <div v-else-if="discussRound" id="currentBnForumPmBox" class="collapse">
+            <div class="copy-paste">
+                <samp class="small">Current BN Evaluation Results ({{ discussRound.mode == 'osu' ? 'osu!' : 'osu!' + discussRound.mode }})</samp>
+            </div>
+            <div v-if="discussRound.consensus == 'pass'" class="copy-paste">
                 <samp class="small">Hello!</samp><br><br>
                 <span v-if="discussRound.bn.probation.indexOf(discussRound.mode) >= 0">
                     <samp class="small">Following a positive evaluation of your work as a BN for the [i]{{ discussRound.mode == 'osu' ? 'osu!' : 'osu!' + discussRound.mode }}[/i] game mode, we've decided to conclude your probation period and promote you to a full Beatmap Nominator. Congratulations!</samp><br><br>
@@ -42,9 +48,9 @@
                 </span>
                 <samp class="small">Additional feedback from the NAT:</samp><br><br>
                 <samp><pre class="small">[notice]{{ feedback }}[/notice]</pre></samp>
-                <samp class="small">We hope you have fun as a Beatmap Nominator!</samp>
+                <samp class="small">Regards, the Nomination Assessment Team</samp>
             </div>
-            <div v-else-if="discussRound.consensus == 'extend'" id="currentBnForumPmBox" class="copy-paste collapse">
+            <div v-else-if="discussRound.consensus == 'extend'" class="copy-paste">
                 <samp class="small">Hello!</samp><br><br>
                 <span v-if="discussRound.bn.probation.indexOf(discussRound.mode) >= 0">
                     <samp class="small">After reviewing your work as a BN for the [i]{{ discussRound.mode == 'osu' ? 'osu!' : 'osu!' + discussRound.mode }}[/i] game mode, we have decided to [b]extend your probation period[/b].</samp><br><br>
@@ -61,7 +67,7 @@
                 <samp class="small">We hope to see you off of probation soon!</samp><br><br>
                 <samp class="small">Regards, the Nomination Assessment Team</samp>
             </div>
-            <div v-else id="currentBnForumPmBox" class="copy-paste collapse">
+            <div v-else class="copy-paste">
                 <samp class="small">Hello!</samp><br><br>
                 <samp class="small">After reviewing your work as a BN for the [i]{{ discussRound.mode == 'osu' ? 'osu!' : 'osu!' + discussRound.mode }}[/i] game mode, we have decided to [b]remove you from the Beatmap Nominators[/b].</samp><br><br>
                 <samp class="small">Despite this decision, we would like to thank you for your service to the mapping and modding communities and wish you the best of luck in your future endeavours. Should you wish to apply for the Beatmap Nominators in the future, you may do so on {{ defineDate(discussRound.updatedAt) }}, provided you meet the normal required activity requirements and have shown improvement in the areas mentioned.</samp><br><br>

@@ -14,20 +14,7 @@
                     <div class="container mb-2">
                         <div class="text-shadow mb-2">
                             <p>Question:</p>
-                            <div v-if="question.category == 'metadata'">
-                                <div class="form-check form-check-inline">
-                                    <input
-                                        id="fill"
-                                        class="form-check-input"
-                                        type="radio"
-                                        name="questionTypeEdit"
-                                        value="fill"
-                                        :checked="question.questionType == 'fill'"
-                                    >
-                                    <label class="form-check-label text-shadow" for="fill">Fill in the blank</label>
-                                </div>
-                            </div>
-                            <div v-else>
+                            <div>
                                 <div class="form-check form-check-inline ml-2">
                                     <input
                                         id="text"
@@ -57,7 +44,7 @@
                                 id="newQuestionEdit"
                                 v-model="question.content" 
                                 class="form-control dark-textarea" 
-                                :placeholder="question.category == 'metadata' ? 'link to mapset with incorrect metadata...' : 'avoid confusing wording...'"
+                                placeholder="question..."
                                 maxlength="300"
                                 rows="2"
                                 @keyup.enter="editQuestion($event)"
@@ -87,10 +74,7 @@
 
                         <table class="table table-sm table-dark table-hover col-md-12 mt-2">
                             <thead>
-                                <td v-if="question.category == 'metadata'" scope="col">
-                                    Field
-                                </td>
-                                <td scope="col" :class="question.category == 'metadata' ? 'w-50' : ''">
+                                <td scope="col">
                                     Option
                                 </td>
                                 <td scope="col">
@@ -102,9 +86,6 @@
                             </thead>
                             <tbody>
                                 <tr v-for="option in sortedOptions" :key="option.id" :class="option.active ? 'border-active' : 'border-inactive'">
-                                    <td v-if="question.category == 'metadata'" class="text-capitalize" scope="row">
-                                        {{ option.metadataType }}
-                                    </td>
                                     <td scope="row">
                                         <a v-if="question.questionType == 'image'" :href="option.content" target="_blank">{{ option.content }}</a>
                                         <span v-else>{{ option.content }}</span>
@@ -136,16 +117,6 @@
                                 style="min-width: 80px; width: 80;"
                             >
                         </div>
-                        <small v-if="question.category == 'metadata'">
-                            <select id="metadataType" class="custom-select" style="min-width: 150px">
-                                <option value="title" selected>Romanised Title</option>
-                                <option value="titleUnicode" selected>Unicode Title</option>
-                                <option value="artist" selected>Romanised Artist</option>
-                                <option value="artistUnicode" selected>Unicode Artist</option>
-                                <option value="source" selected>Source</option>
-                                <option value="reference" selected>Link/Reference</option>
-                            </select>
-                        </small>
                     </div>
                     <hr>
                     <span id="addEvalRoundsErrors" class="errors text-shadow">{{ info }}</span>
@@ -230,13 +201,12 @@ export default {
             this.confirm = '';
             let option = $('#option').val();
             let score = parseFloat($('#score').val());
-            let metadataType = $('#metadataType').val();
-            if (((!option || !option.length) && metadataType != 'source') || (!score && score != 0)) {
+            if ((!option || !option.length) || (!score && score != 0)) {
                 this.info = 'Cannot leave option fields blank!';
             } else if(this.isSpectator) {
                 this.info = 'You\'re not allowed to do that';
             } else {
-                const question = await this.executePost('/manageTest/addOption/' + this.question.id, { option, score, metadataType }, e);
+                const question = await this.executePost('/manageTest/addOption/' + this.question.id, { option, score }, e);
                 if (question) {
                     if (question.error) {
                         this.info = question.error;

@@ -20,12 +20,6 @@ const defaultPopulate = [
             },
         },
     },
-    {
-        innerPopulate: 'answers',
-        populate: {
-            path: 'metadataInput',
-        },
-    },
 ];
 
 /* GET test page */
@@ -85,23 +79,7 @@ router.post('/loadTest', async (req, res) => {
 router.post('/submitAnswer', async (req, res) => {
     if (!req.body.answerId || !req.body.checkedOptions) return res.json({ error: 'Something went wrong!' });
 
-    let answer;
-    if (req.body.isMetadata) {
-        const metadataInput = await testSubmissionService.createMetadataInput(
-            req.body.answerId,
-            req.body.checkedOptions.title || '',
-            req.body.checkedOptions.titleUnicode || '',
-            req.body.checkedOptions.artist || '',
-            req.body.checkedOptions.artistUnicode || '',
-            req.body.checkedOptions.source || '',
-            req.body.checkedOptions.reference1 || '',
-            req.body.checkedOptions.reference2 || '',
-            req.body.checkedOptions.reference3 || ''
-        );
-        answer = await testSubmissionService.updateAnswer(req.body.answerId, { metadataInput });
-    } else {
-        answer = await testSubmissionService.updateAnswer(req.body.answerId, { optionsChosen: req.body.checkedOptions });
-    }
+    let answer = await testSubmissionService.updateAnswer(req.body.answerId, { optionsChosen: req.body.checkedOptions });
 
     if (!answer || answer.error) return res.json({ error: 'Something went wrong!' });
     else return res.json({ success: 'ok' });
@@ -128,25 +106,9 @@ router.post('/submitTest', async (req, res) => {
 
     for (const answer of test.answers) {
         let questionScore = 0;
-        let isReferenceAdded = false;
 
         for (const option of answer.question.options) {
-            if (answer.question.category == 'metadata' && answer.metadataInput) {
-                for (const [k, v] of Object.entries(answer.metadataInput.toObject())) {
-                    // .slice because reference == reference1
-                    if ((option.metadataType == k || (option.metadataType == k.slice(0, -1) && !isReferenceAdded)) && option.content == v) {
-                        if (answer.optionsChosen.indexOf(option.id) == -1) {
-                            const updatedAnswer = await testSubmissionService.updateAnswer(answer.id, {
-                                $push: { optionsChosen: option.id },
-                            });
-                            if (!updatedAnswer || updatedAnswer.error) return res.json({ error: 'Something went wrong!' });
-                        }
-
-                        displayScore += option.score;
-                        if (option.metadataType == 'reference') isReferenceAdded = true;
-                    }
-                }
-            } else if (answer.optionsChosen.indexOf(option.id) != -1) {
+            if (answer.optionsChosen.indexOf(option.id) != -1) {
                 questionScore += option.score;
             }
         }

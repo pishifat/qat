@@ -4,7 +4,7 @@
             <div class="modal-content">
                 <div class="modal-header bg-nat-logo">
                     <h5 class="modal-title text-dark">
-                        Add "{{ category }}" question
+                        Add question: {{category}}
                     </h5>
                     <button type="button" class="close" data-dismiss="modal">
                         <span>&times;</span>
@@ -14,19 +14,7 @@
                     <div class="container">
                         <div class="text-shadow mb-2">
                             <p>Question:</p>
-                            <div v-if="rawCategory == 'metadata'">
-                                <div class="form-check form-check-inline">
-                                    <input
-                                        id="fill"
-                                        class="form-check-input"
-                                        type="radio"
-                                        name="questionType"
-                                        value="fill"
-                                    >
-                                    <label class="form-check-label text-shadow" for="fill">Fill in the blank</label>
-                                </div>
-                            </div>
-                            <div v-else>
+                            <div>
                                 <div class="form-check form-check-inline ml-2">
                                     <input
                                         id="text"
@@ -53,7 +41,7 @@
                             <textarea
                                 id="newQuestion"
                                 class="form-control dark-textarea" 
-                                :placeholder="rawCategory == 'metadata' ? 'link to mapset with incorrect metadata...' : 'avoid confusing wording...'" 
+                                placeholder="question..." 
                                 maxlength="300"
                                 rows="2"
                                 @keyup.enter="addQuestion($event)"

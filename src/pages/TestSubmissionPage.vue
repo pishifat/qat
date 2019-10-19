@@ -24,7 +24,7 @@
                 </p>
                 <p>Feel free to reference those pages while taking this test. Maybe you'll learn something you didn't already know, which will make you more prepared than you would be otherwise!</p>
                 <br>
-                <p>There are 18 questions total, all of which require you to select all applicable answers, aside from the fill-in-the-blank metadata question. Categories of questions are listed in the upper right for you to reference on their respective wiki pages.</p>
+                <p>There are 20 questions total, all of which require you to select all applicable answers. Categories of questions are listed in the upper right for you to reference on their respective wiki pages.</p>
                 <p>The test has no time limit. If you close this page, your answers will not be saved, however you can still take the test at a later time.</p>
                 <p>After submitting your answers, you will see a score out of 20 possible points. When your application is fully evaluated, you will be able to view which questions you answered correctly/incorrectly.</p>
                 <p class="min-spacing">
@@ -47,7 +47,7 @@
 
             <div v-for="(answer, i) in test.answers" :key="answer.id" class="segment segment-image test-question">
                 <small class="float-right">Q{{ ++i }} -- {{ answer.question.category }}</small>
-                <div v-if="answer.question.questionType === 'text' || answer.question.questionType === 'image'">
+                <div>
                     <h5 style="width: 90%">
                         {{ answer.question.content }}
                     </h5>
@@ -67,76 +67,6 @@
                                 <span v-if="answer.question.questionType === 'text'">{{ option.content }}</span>
                             </label>
                         </div>
-                    </div>
-                </div>
-
-                <div v-else>
-                    <h5>
-                        Find the correct metadata of the following song (based on the current standards described in the Ranking Criteria) 
-                        and provide a reliable source or links.
-                    </h5>
-                    <h5 class="pl-4">
-                        <a :href="answer.question.content" target="_blank">{{ answer.question.content }}</a>
-                    </h5>
-                    <div class="mb-2">
-                        <!-- only metadata questions for now -->
-                        <input
-                            v-model.trim="checkedOptions[answer.id].title"
-                            class="form-control mb-1"
-                            type="text"
-                            placeholder="Romanised Title..."
-                            @change="submitAnswer(answer.id, $event, true)"
-                        >
-                        <input
-                            v-model.trim="checkedOptions[answer.id].titleUnicode"
-                            class="form-control mb-1"
-                            type="text"
-                            placeholder="Unicode Title (if same as Romanised Title, copy that here)..."
-                            @change="submitAnswer(answer.id, $event, true)"
-                        >
-                        <input
-                            v-model.trim="checkedOptions[answer.id].artist"
-                            class="form-control mb-1"
-                            type="text"
-                            placeholder="Romanised Artist..."
-                            @change="submitAnswer(answer.id, $event, true)"
-                        >
-                        <input
-                            v-model.trim="checkedOptions[answer.id].artistUnicode"
-                            class="form-control mb-1"
-                            type="text"
-                            placeholder="Unicode Artist (if same as Romanised Artist, copy that here)..."
-                            @change="submitAnswer(answer.id, $event, true)"
-                        >
-                        <input
-                            v-model.trim="checkedOptions[answer.id].source"
-                            class="form-control mb-2"
-                            type="text"
-                            placeholder="Source (if unclear or non-existent, leave empty)..."
-                            @change="submitAnswer(answer.id, $event, true)"
-                        >
-                        <small class="pl-4">Link sources for the song information (only one link is necessary, but more could help you!):</small>
-                        <input
-                            v-model.trim="checkedOptions[answer.id].reference1"
-                            class="form-control mb-1"
-                            type="text"
-                            placeholder="Reference 1"
-                            @change="submitAnswer(answer.id, $event, true)"
-                        >
-                        <input
-                            v-model.trim="checkedOptions[answer.id].reference2"
-                            class="form-control mb-1"
-                            type="text"
-                            placeholder="Reference 2"
-                            @change="submitAnswer(answer.id, $event, true)"
-                        >
-                        <input
-                            v-model.trim="checkedOptions[answer.id].reference3"
-                            class="form-control mb-1"
-                            type="text"
-                            placeholder="Reference 3"
-                            @change="submitAnswer(answer.id, $event, true)"
-                        >
                     </div>
                 </div>
             </div>
@@ -226,8 +156,7 @@ export default {
                     if (test.error) this.info = test.error;
 
                     test.answers.forEach(a => {
-                        if (a.question.category == 'metadata') this.checkedOptions[a.id] = a.metadataInput || {};
-                        else this.checkedOptions[a.id] = a.optionsChosen;
+                        this.checkedOptions[a.id] = a.optionsChosen;
 
                         a.question.options = this.getActiveOptions(a.question.options);
                     });
@@ -256,12 +185,11 @@ export default {
                 }
             }
         },
-        async submitAnswer (answerId, e, isMetadata) {
+        async submitAnswer (answerId, e) {
             const res = await this.executePost('/testSubmission/submitAnswer', { 
                 testId: this.selectedTest, 
                 answerId,
                 checkedOptions: this.checkedOptions[answerId],
-                isMetadata,
             }, e);
             if (res) {
                 if (res.error) {

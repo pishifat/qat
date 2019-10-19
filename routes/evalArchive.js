@@ -36,7 +36,7 @@ const defaultBnPopulate = [
 
 /* GET applicant listing. */
 router.get('/relevantInfo', (req, res) => {
-    res.json({ evaluator: req.session.mongoId });
+    res.json({ evaluator: res.locals.userRequest });
 });
 
 /* GET search for user */
@@ -85,7 +85,7 @@ router.get('/searchById/:id', async (req, res) => {
         return res.json({ error: 'Cannot find evaluation!' });
     }
     
-    res.json({ round, evaluator: req.session.mongoId });
+    res.json({ round, evaluator: res.locals.userRequest });
 });
 
 /* GET search by number of rounds */

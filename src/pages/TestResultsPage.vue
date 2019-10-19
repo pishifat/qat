@@ -34,7 +34,7 @@
         <section v-if="selectedTest">
             <p class="text-center segment">
                 User: {{ selectedTest.applicant.username }} - Mode: {{ selectedTest.mode }} - Score:
-                {{ selectedTest.totalScore + selectedTest.additionalPoints }}
+                {{ selectedTest.totalScore }}
             </p>
 
             <div v-for="(answer, i) in selectedTest.answers" :key="answer.id" class="segment segment-image">
@@ -42,20 +42,12 @@
                     Q{{ ++i }} -- {{ answer.question.category }}
                     <span v-if="isNat && answer.question.questionType != 'fill'"> -- total: {{ calculateQuestionScore(answer) }}</span>
                 </small>
-                <div
-                    v-if="answer.question.questionType === 'text' || answer.question.questionType === 'image'"
-                >
+                <div>
                     <h5 style="width: 90%">
                         {{ answer.question.content }}
                     </h5>
                     <div v-for="option in getActiveOptions(answer.question.options)" :key="option.id">
-                        <div
-                            v-if="
-                                answer.question.questionType === 'text' ||
-                                    answer.question.questionType === 'image'
-                            "
-                            class="form-check mb-2 ml-2"
-                        >
+                        <div class="form-check mb-2 ml-2">
                             <input
                                 :id="option.id"
                                 class="form-check-input"
@@ -93,125 +85,6 @@
                         </div>
                     </div>
                 </div>
-
-                <div v-else>
-                    <h5>
-                        Find the correct metadata of the following song (based on the current standards
-                        described in the Ranking Criteria) and provide a reliable source or links.
-                    </h5>
-                    <h5 class="pl-4">
-                        <a :href="answer.question.content" target="_blank">{{ answer.question.content }}</a>
-                    </h5>
-                    <div class="mb-2">
-                        <small class="pl-2">
-                            Romanised Title:
-                        </small>
-                        <input
-                            id="title"
-                            v-model="answer.metadataInput.title"
-                            class="form-control mb-1"
-                            type="text"
-                            placeholder="Romanised Title..."
-                        >
-                        <small class="pl-2">
-                            Unicode Title:
-                        </small>
-                        <input
-                            id="titleUnicode"
-                            v-model="answer.metadataInput.titleUnicode"
-                            class="form-control mb-1"
-                            type="text"
-                            placeholder="Unicode Title (if same as Romanised Title, copy that here)..."
-                        >
-                        <small class="pl-2">
-                            Romanised Artist:
-                        </small>
-                        <input
-                            id="artist"
-                            v-model="answer.metadataInput.artist"
-                            class="form-control mb-1"
-                            type="text"
-                            placeholder="Romanised Artist..."
-                        >
-                        <small class="pl-2">
-                            Unicode Artist:
-                        </small>
-                        <input
-                            id="artistUnicode"
-                            v-model="answer.metadataInput.artistUnicode"
-                            class="form-control mb-1"
-                            type="text"
-                            placeholder="Unicode Artist (if same as Romanised Artist, copy that here)..."
-                        >
-                        <small class="pl-2">
-                            Source:
-                        </small>
-                        <input
-                            id="source"
-                            v-model="answer.metadataInput.source"
-                            class="form-control mb-2"
-                            type="text"
-                            placeholder="Source (if unclear or non-existent, leave empty)..."
-                        >
-                        <small class="pl-2">
-                            References:
-                        </small>
-                        <input
-                            id="reference1"
-                            v-model="answer.metadataInput.reference1"
-                            class="form-control mb-1"
-                            type="text"
-                            placeholder="Reference 1"
-                        >
-                        <input
-                            id="reference2"
-                            v-model="answer.metadataInput.reference2"
-                            class="form-control mb-1"
-                            type="text"
-                            placeholder="Reference 2"
-                        >
-                        <input
-                            id="reference3"
-                            v-model="answer.metadataInput.reference3"
-                            class="form-control mb-1"
-                            type="text"
-                            placeholder="Reference 3"
-                        >
-                    </div>
-                    <div v-if="isNat">
-                        <h5 class="mt-4">
-                            Correct possibilities:
-                        </h5>
-                        <p
-                            v-for="option in answer.question.options"
-                            :key="option.id"
-                            class="ml-2 min-spacing small"
-                        >
-                            {{ option.metadataType }}: {{ option.content }}
-                        </p>
-                        Add to/subtract from total score:
-                        <input
-                            id="score"
-                            v-model="additionalPoints"
-                            class="form-control-sm col-md-1 ml-1 mb-2"
-                            type="text"
-                            maxlength="5"
-                            placeholder="points..."
-                            style="min-width: 80px; width: 80;"
-                        >
-                        <button
-                            type="submit"
-                            class="btn btn-sm btn-nat mx-2"
-                            @click="updateAdditionalPoints($event)"
-                        >
-                            Update Additional Points
-                        </button>
-                        <p class="ml-2 min-spacing small">
-                            Each input is worth 0.5 points. Additional points are added when an answer correct, but is not listed in the question's available correct answers
-                        </p>
-                        <span v-if="confirm.length" class="confirm small">{{ confirm }}</span>
-                    </div>
-                </div>
             </div>
         </section>
     </div>
@@ -234,7 +107,6 @@ export default {
             info: '',
             confirm: '',
             isNat: false,
-            additionalPoints: null,
             allTests: null,
             selectedTest: null,
             selectedOptionIds: [],
@@ -245,7 +117,6 @@ export default {
         selectedTest(v) {
             if (v) {
                 this.getOptionIds();
-                this.additionalPoints = this.selectedTest.additionalPoints;
                 this.confirm = '';
                 this.info = '';
             }
@@ -338,24 +209,6 @@ export default {
                         if (this.allTests.length == 1) {
                             this.selectedTest = result[0];
                         }
-                    }
-                }
-            }
-        },
-        async updateAdditionalPoints(e) {
-            let points = parseFloat(this.additionalPoints);
-            if (points || points == 0) {
-                const result = await this.executePost(
-                    '/testResults/updateAdditionalPoints/' + this.selectedTest.id,
-                    { points },
-                    e
-                );
-                if (result) {
-                    if (result.error) {
-                        this.info = result.error;
-                    } else {
-                        this.updateTest(result);
-                        this.confirm = points + ' point(s) added';
                     }
                 }
             }

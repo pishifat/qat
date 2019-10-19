@@ -486,7 +486,6 @@ router.get('/userActivity/:id/:mode/:deadline', async (req, res) => {
     let uniqueNominations = [];
     let dqs = [];
     let pops = [];
-    let reports = [];
 
     allUserEvents.forEach(userEvent => {
         const eventType = userEvent._id;
@@ -500,8 +499,6 @@ router.get('/userActivity/:id/:mode/:deadline', async (req, res) => {
             dqs = events;
         } else if (eventType == 'Popped') {
             pops = events;
-        } else if (eventType == 'Reported') {
-            reports = events;
         }
     });
 
@@ -552,7 +549,7 @@ router.get('/userActivity/:id/:mode/:deadline', async (req, res) => {
         }
     }
 
-    res.json({ noms: uniqueNominations, nomsDqd, nomsPopped, dqs, pops, reports });
+    res.json({ noms: uniqueNominations, nomsDqd, nomsPopped, dqs, pops });
 });
 
 module.exports = router;

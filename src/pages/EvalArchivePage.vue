@@ -141,7 +141,6 @@ export default {
                     } else {
                         this.evaluator = response.data.evaluator;
                         if(response.data.round){
-                            console.log(response.data.round)
                             this.queried = true;
                             if(response.data.round.applicant){
                                 this.selectedDiscussApp = response.data.round;

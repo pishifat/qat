@@ -60,13 +60,7 @@
                                 rows="2"
                             />
                         </div>
-                        <div>
-                            <button
-                                class="btn btn-sm ml-2 btn-nat"
-                                @click="loadUserNotes()"
-                            >
-                                Load user notes
-                            </button>
+                        <div class="mb-4">
                             <button class="btn btn-sm btn-nat float-right" @click="saveNote($event)">
                                 Save
                             </button>
@@ -76,7 +70,7 @@
                             <li v-else v-for="note in notes" :key="note.id" class="small text-shadow">
                                 <b>{{ note.createdAt.slice(0,10) }} - {{ note.author.username }}</b>
                                 <a href="#" @click.prevent="hideNote(note.id);" class="vote-fail" data-toggle="tooltip" data-placement="top" title="delete note">&times;</a>
-                                <pre class="secondary-text pre-font ml-2">{{ note.comment }}</pre>
+                                <pre class="secondary-text pre-font ml-2" v-html="filterLinks(note.comment)"></pre>
                             </li>
                         </ul>
                         <p v-if="info.length" class="errors text-shadow mt-2">
@@ -125,10 +119,11 @@
 
 <script>
 import postData from '../../mixins/postData.js';
+import filterLinks from '../../mixins/filterLinks.js';
 
 export default {
     name: 'UserInfo',
-    mixins: [postData],
+    mixins: [postData, filterLinks],
     props: ['user', 'userId', 'isLeader', 'isNat'],
     data() {
         return {
@@ -144,6 +139,7 @@ export default {
             this.comment = '';
             this.info = '';
             this.confirm = '';
+            this.loadUserNotes();
         },
     },
     methods: {

@@ -9,7 +9,7 @@
                 >{{ selectedTest.applicant.username }}</a>
             </div>
             <div class="card-footer small">
-                <i class="fas fa-trophy mr-1" /> {{ selectedTest.totalScore + selectedTest.additionalPoints }}/20
+                <i class="fas fa-trophy mr-1" /> {{ selectedTest.totalScore }}/20
                 <i class="fas fa-clock mx-1" /> {{ selectedTest.submittedAt.slice(0, 10) }}
                 <i v-if="selectedTest.mode == 'osu'" class="far fa-circle float-right" />
                 <i v-else-if="selectedTest.mode == 'taiko'" class="fas fa-drum float-right" />

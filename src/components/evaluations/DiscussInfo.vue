@@ -43,7 +43,7 @@
                                         target="_blank" 
                                         :class="discussApp.test.totalScore > 15 ? 'vote-pass' : discussApp.test.totalScore > 12.5 ? 'vote-extend' : 'vote-fail'"
                                     >
-                                        {{ discussApp.test.totalScore + discussApp.test.additionalPoints + '/20' }}
+                                        {{ discussApp.test.totalScore + '/20' }}
                                     </a>
                                 </p>
                                 <p class="text-shadow">
@@ -123,6 +123,11 @@
                                         <button class="btn btn-sm btn-nat" data-toggle="collapse" data-target="#forumPmBox">
                                             See full message <i class="fas fa-angle-down" />
                                         </button>
+                                        <a :href="'https://osu.ppy.sh/forum/ucp.php?i=pm&mode=compose&u=' + discussApp.applicant.osuId" target="_blank">
+                                            <button class="btn btn-sm btn-nat">
+                                                Open osu! PM
+                                            </button>
+                                        </a>
                                         <button class="btn btn-sm btn-nat float-right" @click="setFeedback($event)">
                                             Save
                                         </button>
@@ -189,6 +194,11 @@
                                         <button class="btn btn-sm btn-nat" data-toggle="collapse" data-target="#currentBnForumPmBox">
                                             See full message <i class="fas fa-angle-down" />
                                         </button>
+                                        <a :href="'https://osu.ppy.sh/forum/ucp.php?i=pm&mode=compose&u=' + discussRound.bn.osuId" target="_blank">
+                                            <button class="btn btn-sm btn-nat">
+                                                Open osu! PM
+                                            </button>
+                                        </a>
                                         <button class="btn btn-sm btn-nat float-right" @click="setFeedback($event)">
                                             Save
                                         </button>
@@ -408,7 +418,7 @@ export default {
             }
         },
         testPoints() {
-            return this.discussApp.test.totalScore + this.discussApp.test.additionalPoints;
+            return this.discussApp.test.totalScore;
         }
     },
     watch: {

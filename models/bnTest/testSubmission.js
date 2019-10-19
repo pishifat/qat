@@ -10,7 +10,6 @@ const testSubmission = new mongoose.Schema({
     startedAt: { type: Date },
     submittedAt: { type: Date },
     totalScore: { type: Number }, //better to store this than populate full test for each application
-    additionalPoints: { type: Number, default: 0 },
     comment: { type: String },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
@@ -24,22 +23,9 @@ const testAnswer = new mongoose.Schema({
     test: { type: 'ObjectId', ref: 'TestSubmission', required: true },
     question: { type: 'ObjectId', ref: 'Question', required: true },
     optionsChosen: [{ type: 'ObjectId', ref: 'Option' }],
-    metadataInput: { type: 'ObjectId', ref: 'TestMetadataInput' },
     feedback: { type: String },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-const testMetadataInput = new mongoose.Schema({
-    title: { type: String },
-    titleUnicode: { type: String },
-    artist: { type: String },
-    artistUnicode: { type: String },
-    source: { type: String },
-    reference1: { type: String },
-    reference2: { type: String },
-    reference3: { type: String },
-}, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
-
-const TestMetadataInput = mongoose.model('TestMetadataInput', testMetadataInput);
 const TestAnswer = mongoose.model('TestAnswer', testAnswer);
 const TestSubmission = mongoose.model('TestSubmission', testSubmission);
 
@@ -100,10 +86,10 @@ class TestSubmissionService extends BaseService
             */
             
             let categoriesObject = [
-                { name: 'bn', total: 3 },
-                { name: 'codeOfConduct', total: 2 },
-                { name: 'general', total: 2 },
-                { name: 'spread', total: 2 },
+                { name: 'bn', total: 5 },
+                { name: 'codeOfConduct', total: 1 },
+                { name: 'general', total: 1 },
+                { name: 'spread', total: 1 },
                 { name: 'metadata', total: 1 },
                 { name: 'timing', total: 1 },
                 { name: 'audio', total: 1 },
@@ -111,7 +97,7 @@ class TestSubmissionService extends BaseService
                 { name: 'skinning', total: 1 },
                 { name: 'storyboarding', total: 1 },
             ];
-            categoriesObject.push({ name: mode, total: 3 });
+            categoriesObject.push({ name: mode, total: 6 });
             
             let qs = [];
             for (let i = 0; i < categoriesObject.length; i++) {
@@ -143,41 +129,8 @@ class TestSubmissionService extends BaseService
             return { error: 'could not create the test' };
         }
     }
-
-    async createMetadataInput(answerId, title, titleUnicode, artist, artistUnicode, source, reference1, reference2, reference3) {
-        try {
-            const answer = await TestAnswer.findById(answerId);
-
-            if (answer.metadataInput) {
-                return await TestMetadataInput.findByIdAndUpdate(answer.metadataInput, {
-                    title, 
-                    titleUnicode, 
-                    artist, 
-                    artistUnicode, 
-                    source, 
-                    reference1, 
-                    reference2, 
-                    reference3,
-                });
-            }
-
-            return await TestMetadataInput.create({
-                title, 
-                titleUnicode, 
-                artist, 
-                artistUnicode, 
-                source, 
-                reference1, 
-                reference2, 
-                reference3,
-            });
-        } catch(error) {
-            logsService.create(null, JSON.stringify(error), true);
-            return { error: error._message };
-        }
-    }
 }
 
 const service = new TestSubmissionService();
 
-module.exports = { service, TestSubmission, TestAnswer, TestMetadataInput };
+module.exports = { service, TestSubmission, TestAnswer };

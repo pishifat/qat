@@ -21,7 +21,7 @@ router.get('/', (req, res) => {
 
 //population
 const defaultPopulate = [
-    { populate: 'options', display: 'content score metadataType active' },
+    { populate: 'options', display: 'content score active' },
 ];
 
 /* GET applicant listing. */
@@ -79,9 +79,6 @@ router.post('/addOption/:id', async (req, res) => {
     if (!o || o.error) {
         return res.json({ error: 'Something went wrong!' });
     }
-    if (req.body.metadataType) {
-        o = await optionsService.update(o.id, { metadataType: req.body.metadataType });
-    }
 
     let q = await questionsService.update(req.params.id, { $push: { options: o.id } });
     q = await questionsService.query({ _id: req.params.id }, defaultPopulate);
@@ -99,9 +96,6 @@ router.post('/updateOption/:id', async (req, res) => {
     let o = await optionsService.update(req.params.id, { content: req.body.option, score: req.body.score });
     if (!o) {
         return res.json({ error: 'Something went wrong!' });
-    }
-    if (req.body.metadataType) {
-        o = await optionsService.update(o.id, { metadataType: req.body.metadataType });
     }
     let q = await questionsService.query({ _id: req.body.questionId }, defaultPopulate);
     res.json(q);
