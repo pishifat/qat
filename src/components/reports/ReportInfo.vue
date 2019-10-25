@@ -90,20 +90,6 @@
                             <label class="form-check-label text-shadow vote-fail" for="3">Invalid</label>
                         </div>
                     </span>
-                    <span v-else-if="report.valid != 3">
-                        <hr>
-                        <p class="text-shadow"><span data-toggle="tooltip" data-placement="top" title="This will be displayed on evaluation pages">Simplified reason:</span> <pre class="small pre-font ml-4">{{ report.simplifiedReason || "..." }}</pre></p>
-                        <div class="form-group">
-                            <textarea
-                                id="behaviorComments"
-                                v-model="simplifiedReason"
-                                class="form-control dark-textarea"
-                                style="white-space: pre-line;"
-                                rows="2"
-                                placeholder="simplified reason for convenient display on evaluations..." 
-                            />
-                        </div>
-                    </span>
 
                     <div :class="info.length ? 'errors' : 'confirm'" class="text-shadow ml-2" style="min-height: 24px;">
                         {{ info }} {{ confirm }}
@@ -134,13 +120,6 @@
                             title="Avoid displaying repeat reports on evaluations"
                             @click="changeEvalDisplay($event);"
                         >{{ report.display ? "Hide report on evaluations" : "Show report on evaluations" }}</button>
-                        <button
-                            class="btn btn-sm btn-nat"
-                            data-toggle="tooltip"
-                            data-placement="top"
-                            title="Saves shortened reason for evaluation page display"
-                            @click="submitSimplifiedReason($event);"
-                        >Save Simplified Reason</button>
                     </span>
                 </div>
             </div>
@@ -159,7 +138,6 @@ export default {
     data() {
         return {
             feedback: '',
-            simplifiedReason: '',
             confirm: '',
             info: '',
         };
@@ -170,7 +148,6 @@ export default {
                 this.info = '';
                 this.confirm = '';
                 this.feedback = this.report.feedback;
-                this.simplifiedReason = this.report.simplifiedReason;
                 history.pushState(null, 'Manage Reports', `/managereports?report=${this.report.id}`);
             }
         },
@@ -198,23 +175,6 @@ export default {
                         '/manageReports/submitReportEval/' + this.report.id, 
                         { valid, feedback: this.feedback, close }, e);
                 }
-                if (r) {
-                    if (r.error) {
-                        this.info = r.error;
-                    } else {
-                        await this.$emit('update-report', r);
-                        this.confirm = 'Report updated!';
-                    }
-                }
-            }
-        },
-        async submitSimplifiedReason (e) {
-            if(!this.simplifiedReason || !this.simplifiedReason.length){
-                this.info = 'Simplified reason cannot be blank!';
-            }else if(this.isSpectator){
-                this.info = 'You\'re not allowed to do that';
-            }else{
-                let r = await this.executePost('/manageReports/submitSimplifiedReason/' + this.report.id, { simplifiedReason: this.simplifiedReason }, e);
                 if (r) {
                     if (r.error) {
                         this.info = r.error;

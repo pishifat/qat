@@ -27,7 +27,7 @@
                         class="badge badge-none mx-1"
                         data-toggle="tooltip"
                         data-placement="top"
-                        title="total evaluations"
+                        :title="separateEvals()"
                     >{{ application.evaluations.length }}
                     </span>
                     <i
@@ -155,6 +155,15 @@ export default {
             }
             return false;
         },
+        separateEvals() {
+            let bn = 0;
+            let nat = 0;
+            this.application.evaluations.forEach(e => {
+                if(e.evaluator.group == 'bn') bn++;
+                else nat++;
+            });
+            return bn + (bn == 1 ? ' BN eval, ' : ' BN evals, ') + nat + (nat == 1 ? ' NAT eval' : ' NAT evals');
+        }
     },
 };
 </script>

@@ -81,11 +81,4 @@ router.get('/search/:user', api.isNat, async (req, res) => {
     res.json({ tests, isNat: res.locals.userRequest.group == 'nat' });
 });
 
-/* POST edit additional points because metadata is unreliable */
-router.post('/updateAdditionalPoints/:id', api.isNat, async (req, res) => {
-    await testSubmissionService.update(req.params.id, { additionalPoints: req.body.points });
-    let t = await testSubmissionService.query({ _id: req.params.id }, defaultTestPopulate);
-    res.json(t);
-});
-
 module.exports = router;

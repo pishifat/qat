@@ -39,8 +39,10 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
             api.webhookPost([{
                 author: {
                     name: `User report: ${u.username}`,
-                    icon_url: `https://a.ppy.sh/${u.osuId}`,
                     url: `http://bn.mappersguild.com/managereports?report=${r.id}`,
+                },
+                thumbnail: {
+                    url: `https://a.ppy.sh/${u.osuId}`,
                 },
                 color: '16697937',
                 fields:[

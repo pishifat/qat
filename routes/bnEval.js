@@ -194,14 +194,16 @@ router.post('/submitEval/:id', async (req, res) => {
                 [{
                     author: {
                         name: `${er.bn.username}`,
-                        icon_url: `https://a.ppy.sh/${er.bn.osuId}`,
                         url: `https://osu.ppy.sh/users/${er.bn.osuId}`,
+                    },
+                    thumbnail: {
+                        url: `https://a.ppy.sh/${er.bn.osuId}`,
                     },
                     color: '3773329',
                     fields:[
                         {
                             name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
-                            value: 'Moved current BN eval to group discussion',
+                            value: 'Current BN eval moved to group discussion',
                         },
                         {
                             name: 'Votes',
@@ -237,15 +239,15 @@ router.post('/setGroupEval/', api.isLeader, async (req, res) => {
         api.webhookPost(
             [{
                 author: {
-                    name: `${er.bn.username}`,
-                    icon_url: `https://a.ppy.sh/${er.bn.osuId}`,
-                    url: `https://osu.ppy.sh/users/${er.bn.osuId}`,
+                    name: `${req.session.username}`,
+                    icon_url: `https://a.ppy.sh/${req.session.osuId}`,
+                    url: `https://osu.ppy.sh/users/${req.session.osuId}`,
                 },
                 color: '3773329',
                 fields:[
                     {
                         name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
-                        value: 'Moved current BN eval to group discussion',
+                        value: `Moved **${er.bn.username}**'s current BN eval to group discussion`,
                     },
                     {
                         name: 'Votes',
@@ -325,15 +327,15 @@ router.post('/setComplete/', api.isLeader, async (req, res) => {
             api.webhookPost(
                 [{
                     author: {
-                        name: `${u.username}`,
-                        icon_url: `https://a.ppy.sh/${u.osuId}`,
-                        url: `https://osu.ppy.sh/users/${u.osuId}`,
+                        name: `${req.session.username}`,
+                        icon_url: `https://a.ppy.sh/${req.session.osuId}`,
+                        url: `https://osu.ppy.sh/users/${req.session.osuId}`,
                     },
                     color: '6579298',
                     fields:[
                         {
                             name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
-                            value: 'Current BN eval archived',
+                            value: `**${u.username}**'s current BN eval archived`,
                         },
                         {
                             name: 'Consensus',

@@ -7,7 +7,6 @@ const reportSchema = new mongoose.Schema({
     culprit: { type: 'ObjectId', ref: 'User' },
     link: { type: String },
     reason: { type: String, required: true },
-    simplifiedReason: { type: String },
     display: { type: Boolean, default: true },
     valid: { type: Number, enum: [1, 2, 3] },
     feedback: { type: String },
