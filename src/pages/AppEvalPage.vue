@@ -156,7 +156,7 @@ export default {
                             this.selectedDiscussApp = this.allObjs[i];
                             $('#discussionInfo').modal('show');
                         }
-                    }else{
+                    }else if(this.evaluator.isNat){
                         window.location = "/evalArchive?eval=" + params.get('eval');
                     }
                 }

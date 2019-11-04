@@ -51,7 +51,7 @@ router.get('/relevantInfo', async (req, res) => {
         );
     }else{
         a = await bnAppsService.query(
-            { active: true, test: { $exists: true }, bnEvaluators: { $elemMatch: { $in: res.locals.userRequest.id } } },
+            { active: true, test: { $exists: true }, bnEvaluators: { $elemMatch: { $in: res.locals.userRequest.id } }, discussion: false },
             defaultPopulate,
             { createdAt: 1, consensus: 1, feedback: 1  },
             true
@@ -122,7 +122,7 @@ router.post('/submitEval/:id', async (req, res) => {
                         fields:[
                             {
                                 name: `http://bn.mappersguild.com/appeval?eval=${a.id}`,
-                                value: 'Moved BN app to group discussion',
+                                value: 'BN app moved to group discussion',
                             },
                             {
                                 name: 'Votes',
