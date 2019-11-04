@@ -183,7 +183,7 @@ function isNotSpectator(req, res, next) {
     if (!u.isSpectator) {
         next();
     } else {
-        return res.json({ error: 'Spectators cannot do this actiion!' });
+        return res.json({ error: 'Spectators cannot perform this action!' });
     }
 }
 

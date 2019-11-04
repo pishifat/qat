@@ -23,7 +23,7 @@
                 <i v-else-if="mode == 'mania'" class="fas fa-stream" />
                 <span v-if="application">
                     <span
-                        v-if="evaluator.group == 'nat'"
+                        v-if="evaluator.isNat"
                         class="badge badge-none mx-1"
                         data-toggle="tooltip"
                         data-placement="top"

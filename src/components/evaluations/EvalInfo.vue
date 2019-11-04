@@ -36,7 +36,7 @@
                                         <a :href="'https://osu.ppy.sh/users/' + application.applicant.osuId + '/modding/events?types%5B%5D=kudosu_gain&types%5B%5D=kudosu_lost&min_date=&max_date='" target="_blank">All history</a>
                                     </li>
                                 </ul>
-                                <div v-if="evaluator.group == 'nat'" class="row">
+                                <div v-if="evaluator.isNat" class="row">
                                     <p class="text-shadow col-sm-12">
                                         Test results: 
                                         <a

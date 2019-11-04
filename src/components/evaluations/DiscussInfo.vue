@@ -402,7 +402,7 @@ export default {
         bnEvaluations() {
             let e = [];
             this.discussApp.evaluations.forEach(evaluation => {
-                if(evaluation.evaluator.group == 'bn') e.push(evaluation);
+                if(evaluation.evaluator.isBn) e.push(evaluation);
             });
             return e;
         },
@@ -410,7 +410,7 @@ export default {
             if(this.discussApp){
                 let e = [];
                 this.discussApp.evaluations.forEach(evaluation => {
-                    if(evaluation.evaluator.group == 'nat') e.push(evaluation);
+                    if(evaluation.evaluator.isNat) e.push(evaluation);
                 });
                 return e;
             }else{

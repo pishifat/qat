@@ -43,7 +43,7 @@
                             />
                         </p>
                     </div>
-                    <p id="errors">
+                    <p id="errors" class="errors">
                         {{ info }}
                     </p>
                 </div>

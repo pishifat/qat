@@ -58,8 +58,8 @@
                     </div>
                 </div>
             </section>
-            <hr v-if="evaluator && (evaluator.group == 'nat')">
-            <section v-if="evaluator && (evaluator.group == 'nat')" class="row segment segment-image mx-1 px-0">
+            <hr v-if="evaluator && (evaluator.isNat)">
+            <section v-if="evaluator && (evaluator.isNat)" class="row segment segment-image mx-1 px-0">
                 <div class="col-sm-12">
                     <h2>
                         Group Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="After individual evals are completed, their responses are made visible to allow discussion and form a consensus">?</sup>
