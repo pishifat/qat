@@ -7,4 +7,4 @@ git pull
 echo "building"
 docker build -t pishifat/qat .
 echo "running"
-docker run --name qat -p 80:3001 -d pishifat/qat
+docker run --name qat -p 80:3000 -d pishifat/qat
