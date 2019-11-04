@@ -134,7 +134,7 @@ import filterLinks from '../../mixins/filterLinks.js';
 export default {
     name: 'ReportInfo',
     mixins: [postData, filterLinks],
-    props: [ 'report', 'isLeader', 'isSpectator' ],
+    props: [ 'report', 'isLeader' ],
     data() {
         return {
             feedback: '',
@@ -159,8 +159,6 @@ export default {
                 this.info = 'Cannot leave fields blank!';
             }else if(!valid && (!this.feedback || !this.feedback.length)){
                 this.info = 'At least one field must have input!';
-            }else if(this.isSpectator){
-                this.info = 'You\'re not allowed to do that';
             }else{
                 let r;
                 if(close){

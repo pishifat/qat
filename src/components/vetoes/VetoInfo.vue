@@ -35,7 +35,7 @@
                     </p>
 
                     <!--nat options-->
-                    <div v-if="(isNat || isSpectator) && currentMediators.indexOf(userId) == -1 && veto.vetoer.id != userId" class="text-shadow">
+                    <div v-if="isNat && currentMediators.indexOf(userId) == -1 && veto.vetoer.id != userId" class="text-shadow">
                         <hr>
                         <div v-if="veto.mediations.length">
                             <ul style="list-style-type: none; padding-left: 0.5rem">
@@ -208,7 +208,6 @@ export default {
         userId: String,
         userOsuId: Number,
         isNat: Boolean,
-        isSpectator: Boolean,
     },
     data() {
         return {
@@ -275,7 +274,7 @@ export default {
         },
         async beginMediation(e) {
             const result = confirm(`Are you sure?`);
-            if(result && !this.isSpectator){
+            if(result){
                 const r = await this.executePost('/vetoes/beginMediation/' + this.veto.id, { mediators: this.mediators }, e);
                 if (r) {
                     if (r.error) {
@@ -314,7 +313,7 @@ export default {
             this.info = '';
             this.confirm = '';
             const result = confirm(`Are you sure?`);
-            if(result && !this.isSpectator){
+            if(result){
                 const v = await this.executePost(
                     '/vetoes/concludeMediation/' + this.veto.id, 
                     { majority: this.majority, dismiss }, e);
@@ -332,7 +331,7 @@ export default {
             this.info = '';
             this.confirm = '';
             const result = confirm(`Are you sure? This should only be done if a mistake was made.`);
-            if(result && !this.isSpectator){
+            if(result){
                 const v = await this.executePost(
                     '/vetoes/continueMediation/' + this.veto.id, {}, e);
                 if (v) {
@@ -347,7 +346,7 @@ export default {
         },
         async replaceMediator (mediationId) {
             const result = confirm(`Are you sure? This should only be done if a mistake was made.`);
-            if(result && !this.isSpectator){
+            if(result){
                 const v = await this.executePost(
                     '/vetoes/replaceMediator/' + this.veto.id, { mediationId });
                 if (v) {

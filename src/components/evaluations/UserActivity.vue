@@ -69,7 +69,6 @@
                             </button>
                             <notability
                                 :selected-entry="dq"
-                                :is-spectator="isSpectator"
                             />
                         </td>
                     </tr>
@@ -118,7 +117,6 @@
                             </button>
                             <notability
                                 :selected-entry="pop"
-                                :is-spectator="isSpectator"
                             />
                         </td>
                     </tr>
@@ -167,7 +165,6 @@
                             </button>
                             <notability
                                 :selected-entry="dq"
-                                :is-spectator="isSpectator"
                             />
                         </td>
                     </tr>
@@ -216,7 +213,6 @@
                             </button>
                             <notability
                                 :selected-entry="pop"
-                                :is-spectator="isSpectator"
                             />
                         </td>
                     </tr>
@@ -326,7 +322,7 @@ export default {
         Notability,
     },
     mixins: [ postData, filterLinks ],
-    props: [ 'evalRound', 'isSpectator' ],
+    props: [ 'evalRound' ],
     data() {
         return {
             noms: null,
@@ -425,7 +421,7 @@ export default {
             let reasonInput = $(`.input-${entryId}`).val();
             if(!reasonInput || !reasonInput.length){
                 this.$parent.info = 'Must enter a reason!';
-            }else if(!this.isSpectator){
+            }else{
                 const result = await this.executePost('/dataCollection/updateReason/' + entryId, { reason: reasonInput }, e);
                 if (result) {
                     if (result.error) {

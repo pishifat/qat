@@ -111,7 +111,6 @@
                             <td scope="row" style="width: 72px;">
                                 <notability
                                     :selected-entry="dq"
-                                    :is-spectator="isSpectator"
                                 />
                             </td>
                             <td scope="row" />
@@ -166,7 +165,6 @@
                             <td scope="row" style="width: 72px;">
                                 <notability
                                     :selected-entry="pop"
-                                    :is-spectator="isSpectator"
                                 />
                             </td>
                         </tr>
@@ -220,7 +218,6 @@
                             <td scope="row" style="width: 72px;">
                                 <notability
                                     :selected-entry="report"
-                                    :is-spectator="isSpectator"
                                 />
                             </td>
                         </tr>
@@ -231,7 +228,6 @@
 
         <data-collection-info
             :selected-entry="selectedEntry"
-            :is-spectator="isSpectator"
         />
     </div>
 </template>
@@ -259,7 +255,6 @@ export default {
             reports: null,
             selectedEntry: null,
             info: '',
-            isSpectator: false,
         };
     },
     watch: { 
@@ -273,7 +268,6 @@ export default {
             .then(response => {
                 this.allObjs = response.data.events;
                 this.filterMode = response.data.mode;
-                this.isSpectator = response.data.isSpectator;
                 this.hasPagination = false;
                 this.hasSeparation = true;
             }).then(function(){

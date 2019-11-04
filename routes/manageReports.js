@@ -30,12 +30,11 @@ router.get('/relevantInfo', async (req, res) => {
     res.json({ 
         r, 
         isLeader: res.locals.userRequest.isLeader,
-        isSpectator: res.locals.userRequest.isSpectator,
     });
 });
 
 /* POST submit or edit eval */
-router.post('/submitReportEval/:id', async (req, res) => {
+router.post('/submitReportEval/:id', api.isNotSpectator, async (req, res) => {
     if (req.body.feedback && req.body.feedback.length) {
         await reportsService.update(req.params.id, { feedback: req.body.feedback });
     }
@@ -66,7 +65,7 @@ router.post('/submitReportEval/:id', async (req, res) => {
 });
 
 /* POST change display of report on evals */
-router.post('/changeEvalDisplay/:id', async (req, res) => {
+router.post('/changeEvalDisplay/:id', api.isNotSpectator, async (req, res) => {
     await reportsService.update(req.params.id, { display: !req.body.display });
     let r = await reportsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(r);

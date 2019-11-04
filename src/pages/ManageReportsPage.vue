@@ -58,7 +58,6 @@
         <report-info
             :report="selectedReport"
             :is-leader="isLeader"
-            :is-spectator="isSpectator"
             @update-report="updateReport($event)"
         />
     </div>
@@ -83,7 +82,6 @@ export default {
             openReports: null,
             closedReports: null,
             selectedReport: null,
-            isSpectator: false,
             isLeader: null,
             info: '',
         };
@@ -100,7 +98,6 @@ export default {
                 this.allObjs = response.data.r;
                 this.hasPagination = false;
                 this.hasSeparation = true;
-                this.isSpectator = response.data.isSpectator;
                 this.isLeader = response.data.isLeader;
                 const params = new URLSearchParams(document.location.search.substring(1));
                 if (params.get('report') && params.get('report').length) {

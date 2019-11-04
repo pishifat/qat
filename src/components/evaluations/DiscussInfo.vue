@@ -524,8 +524,6 @@ export default {
             const vote = $('input[name=vote]:checked').val();
             if(!vote || !this.behaviorComment.length || !this.moddingComment.length){
                 this.info = 'Cannot leave fields blank!';
-            }else if(this.evaluator.isSpectator){
-                this.info = 'You\'re not allowed to do that';
             }else{
                 if(this.discussApp){
                     const a = await this.executePost(
@@ -573,51 +571,47 @@ export default {
             }
         },
         async setConsensus(consensus, e){
-            if(!this.evaluator.isSpectator){
-                if(this.discussApp){
-                    const a = await this.executePost(
-                        '/appEval/setConsensus/' + this.discussApp.id, { consensus }, e);
-                    if (a) {
-                        if (a.error) {
-                            this.info = a.error;
-                        } else {
-                            await this.$emit('update-application', a);
-                        }
+            if(this.discussApp){
+                const a = await this.executePost(
+                    '/appEval/setConsensus/' + this.discussApp.id, { consensus }, e);
+                if (a) {
+                    if (a.error) {
+                        this.info = a.error;
+                    } else {
+                        await this.$emit('update-application', a);
                     }
-                }else{
-                    const er = await this.executePost(
-                        '/bnEval/setConsensus/' + this.discussRound.id, { consensus }, e);
-                    if (er) {
-                        if (er.error) {
-                            this.info = er.error;
-                        } else {
-                            await this.$emit('update-eval-round', er);
-                        }
+                }
+            }else{
+                const er = await this.executePost(
+                    '/bnEval/setConsensus/' + this.discussRound.id, { consensus }, e);
+                if (er) {
+                    if (er.error) {
+                        this.info = er.error;
+                    } else {
+                        await this.$emit('update-eval-round', er);
                     }
                 }
             }
         },
         async setFeedback(e){
-            if(!this.evaluator.isSpectator){
-                if(this.discussApp){
-                    const a = await this.executePost(
-                        '/appEval/setFeedback/' + this.discussApp.id, { feedback: this.feedback, hasFeedback: this.discussApp.feedback }, e);
-                    if (a) {
-                        if (a.error) {
-                            this.info = a.error;
-                        } else {
-                            await this.$emit('update-application', a);
-                        }
+            if(this.discussApp){
+                const a = await this.executePost(
+                    '/appEval/setFeedback/' + this.discussApp.id, { feedback: this.feedback, hasFeedback: this.discussApp.feedback }, e);
+                if (a) {
+                    if (a.error) {
+                        this.info = a.error;
+                    } else {
+                        await this.$emit('update-application', a);
                     }
-                }else{
-                    const er = await this.executePost(
-                        '/bnEval/setFeedback/' + this.discussRound.id, { feedback: this.feedback, hasFeedback: this.discussRound.feedback }, e);
-                    if (er) {
-                        if (er.error) {
-                            this.info = er.error;
-                        } else {
-                            await this.$emit('update-eval-round', er);
-                        }
+                }
+            }else{
+                const er = await this.executePost(
+                    '/bnEval/setFeedback/' + this.discussRound.id, { feedback: this.feedback, hasFeedback: this.discussRound.feedback }, e);
+                if (er) {
+                    if (er.error) {
+                        this.info = er.error;
+                    } else {
+                        await this.$emit('update-eval-round', er);
                     }
                 }
             }

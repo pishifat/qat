@@ -31,12 +31,11 @@ router.get('/relevantInfo', async (req, res) => {
     res.json({
         events: data, 
         mode: res.locals.userRequest.modes[0],
-        isSpectator: res.locals.userRequest.isSpectator, 
     });
 });
 
 /* POST edit reason for dq/pop */
-router.post('/updateReason/:id', async (req, res) => {
+router.post('/updateReason/:id', api.isNotSpectator, async (req, res) => {
     let a = await aiessService.update(req.params.id, { content: req.body.reason });
     if (!a) {
         res.json({ error: 'Something went wrong' });
@@ -47,7 +46,7 @@ router.post('/updateReason/:id', async (req, res) => {
 });
 
 /* POST edit validity */
-router.post('/updateNotability/:id', async (req, res) => {
+router.post('/updateNotability/:id', api.isNotSpectator, async (req, res) => {
     let a = await aiessService.update(req.params.id, { valid: req.body.notability });
     if (!a) {
         res.json({ error: 'Something went wrong' });

@@ -142,7 +142,7 @@ import postData from '../../mixins/postData.js';
 export default {
     name: 'EditQuestion',
     mixins: [ postData ],
-    props: ['question', 'category', 'isSpectator'],
+    props: ['question', 'category'],
     data() {
         return {
             info: '',
@@ -169,8 +169,6 @@ export default {
             let newQuestion = $('#newQuestionEdit').val();
             if(!newQuestion || !newQuestion.length || !questionType || !questionType.length){
                 this.info = 'Cannot leave question fields blank!';
-            }else if(this.isSpectator){
-                this.info = 'You\'re not allowed to do that';
             }else{
                 const question = await this.executePost('/manageTest/updateQuestion/' + this.question.id, { questionType, newQuestion }, e);
                 if (question) {
@@ -184,15 +182,13 @@ export default {
             }
         },
         async toggleActive(e) {
-            if(!this.isSpectator){
-                const question = await this.executePost('/manageTest/toggleActive/' + this.question.id, { status: !this.question.active }, e);
-                if (question) {
-                    if (question.error) {
-                        this.info = question.error;
-                    } else {
-                        this.$emit('update-question', question);
-                        this.confirm = 'Question updated! ';
-                    }
+            const question = await this.executePost('/manageTest/toggleActive/' + this.question.id, { status: !this.question.active }, e);
+            if (question) {
+                if (question.error) {
+                    this.info = question.error;
+                } else {
+                    this.$emit('update-question', question);
+                    this.confirm = 'Question updated! ';
                 }
             }
         },
@@ -203,8 +199,6 @@ export default {
             let score = parseFloat($('#score').val());
             if ((!option || !option.length) || (!score && score != 0)) {
                 this.info = 'Cannot leave option fields blank!';
-            } else if(this.isSpectator) {
-                this.info = 'You\'re not allowed to do that';
             } else {
                 const question = await this.executePost('/manageTest/addOption/' + this.question.id, { option, score }, e);
                 if (question) {
@@ -228,8 +222,6 @@ export default {
                 this.info = 'You must select only one option to edit!';
             }else if(!option || !option.length || (!score && score != 0)){
                 this.info = 'Cannot leave option fields blank!';
-            }else if(this.isSpectator){
-                this.info = 'You\'re not allowed to do that';
             }else{
                 const question = await this.executePost('/manageTest/updateOption/' + id, { option, score, questionId: this.question.id }, e);
                 if (question) {
@@ -251,8 +243,6 @@ export default {
             });
             if(!checkedOptions.length){
                 this.info = 'Must select options!';
-            }else if(this.isSpectator){
-                this.info = 'You\'re not allowed to do that';
             }else{
                 const question = await this.executePost('/manageTest/toggleActiveOption/', { checkedOptions, questionId: this.question.id }, e);
                 if (question) {

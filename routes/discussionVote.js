@@ -37,14 +37,13 @@ router.get('/relevantInfo', async (req, res) => {
         discussions: d, 
         userId: req.session.mongoId,
         userModes: res.locals.userRequest.modes,
-        isSpectator: res.locals.userRequest.isSpectator,
         isLeader: res.locals.userRequest.isLeader,
         isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
     });
 });
 
-/* POST create a new veto. */
-router.post('/submit', async (req, res) => {
+/* POST create a new discussion vote. */
+router.post('/submit', api.isNat, async (req, res) => {
     let url = req.body.discussionLink;
     if (url.length == 0) {
         url = undefined;
@@ -85,7 +84,7 @@ router.post('/submitMediation/:id', async (req, res) => {
 });
 
 /* POST submit mediation */
-router.post('/concludeMediation/:id', async (req, res) => {
+router.post('/concludeMediation/:id', api.isLeader, async (req, res) => {
     await discussionsService.update(req.params.id, { isActive: false });
     let m = await discussionsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(m);

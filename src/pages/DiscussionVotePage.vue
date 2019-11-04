@@ -63,7 +63,6 @@ export default {
             userModes: null,
             isLeader: false,
             isNat: false,
-            isSpectator: false,
             selectedDiscussion: null,
         };
     },
@@ -74,7 +73,6 @@ export default {
                 this.allObjs = response.data.discussions;
                 this.userId = response.data.userId;
                 this.userModes = response.data.userModes;
-                this.isSpectator = response.data.isSpectator;
                 this.isLeader = response.data.isLeader;
                 this.isNat = response.data.isNat;
                 this.limit = 24;

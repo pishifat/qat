@@ -153,7 +153,6 @@
                             <div v-if="evalRound" class="col-sm-12">
                                 <user-activity
                                     :eval-round="evalRound"
-                                    :is-spectator="evaluator.isSpectator"
                                 />
                                 <hr>
                             </div>
@@ -372,8 +371,6 @@ export default {
         async submitEval (e) {
             if(!this.vote || !this.behaviorComment.length || !this.moddingComment.length){
                 this.info = 'Cannot leave fields blank!';
-            }else if(this.evaluator.isSpectator){
-                this.info = 'You\'re not allowed to do that';
             }else{
                 if(this.application){
                     const a = await this.executePost(

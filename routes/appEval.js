@@ -62,7 +62,7 @@ router.get('/relevantInfo', async (req, res) => {
 });
 
 /* POST submit or edit eval */
-router.post('/submitEval/:id', async (req, res) => {
+router.post('/submitEval/:id', api.isNotSpectator, async (req, res) => {
     if (req.body.evaluationId) {
         await evalsService.update(req.body.evaluationId, {
             behaviorComment: req.body.behaviorComment,
@@ -254,7 +254,7 @@ router.post('/setComplete/', api.isLeader, async (req, res) => {
 });
 
 /* POST set consensus of eval */
-router.post('/setConsensus/:id', async (req, res) => {
+router.post('/setConsensus/:id', api.isNat, api.isNotSpectator, async (req, res) => {
     await bnAppsService.update(req.params.id, { consensus: req.body.consensus });
     let a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(a);
@@ -282,7 +282,7 @@ router.post('/setConsensus/:id', async (req, res) => {
 });
 
 /* POST set feedback of eval */
-router.post('/setFeedback/:id', async (req, res) => {
+router.post('/setFeedback/:id', api.isNat, api.isNotSpectator, async (req, res) => {
     await bnAppsService.update(req.params.id, { feedback: req.body.feedback });
     let a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(a);
@@ -318,7 +318,7 @@ router.post('/setFeedback/:id', async (req, res) => {
 });
 
 /* POST toggle priority */
-router.post('/toggleIsPriority/:id', async (req, res) => {
+router.post('/toggleIsPriority/:id', api.isNat, api.isNotSpectator, async (req, res) => {
     await bnAppsService.update(req.params.id, { isPriority: !req.body.isPriority });
     let a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(a);
@@ -329,7 +329,7 @@ router.post('/toggleIsPriority/:id', async (req, res) => {
 });
 
 /* POST select BN evaluators */
-router.post('/selectBnEvaluators', async (req, res) => {
+router.post('/selectBnEvaluators', api.isLeader, async (req, res) => {
     const allUsers = await usersModel.aggregate([
         { $match: { group: { $eq: 'bn' }, isBnEvaluator: true, probation: { $size: 0 } }  },
         { $sample: { size: 1000 } },

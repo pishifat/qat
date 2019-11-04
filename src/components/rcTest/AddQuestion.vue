@@ -66,7 +66,7 @@ import postData from '../../mixins/postData.js';
 export default {
     name: 'AddQuestion',
     mixins: [ postData ],
-    props: ['category', 'rawCategory', 'isSpectator'],
+    props: ['category', 'rawCategory'],
     data() {
         return {
             info: '',
@@ -82,8 +82,6 @@ export default {
             let newQuestion = $('#newQuestion').val();
             if(!newQuestion || !newQuestion.length || !questionType || !questionType.length){
                 this.info = 'Cannot leave fields blank!';
-            }else if(this.isSpectator){
-                this.info = 'You\'re not allowed to do that';
             }else{
                 const question = await this.executePost('/manageTest/addQuestion', { questionType, newQuestion: newQuestion.trim(), category: this.rawCategory }, e);
                 if (question) {

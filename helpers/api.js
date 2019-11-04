@@ -177,6 +177,16 @@ function isBnEvaluator(req, res, next) {
     }
 }
 
+function isNotSpectator(req, res, next) {
+    const u = res.locals.userRequest;
+    
+    if (!u.isSpectator) {
+        next();
+    } else {
+        return res.json({ error: 'Spectators cannot do this actiion!' });
+    }
+}
+
 async function webhookPost(message, mode) {
     let url = 'https://discordapp.com/api/webhooks/';
 
@@ -242,4 +252,4 @@ async function highlightWebhookPost(message, mode) {
     }
 }
 
-module.exports = { isLoggedIn, getToken, getUserInfo, beatmapsetInfo, beatmapsetOwnerMaps, isBnOrNat, isBn, isNat, isLeader, isBnEvaluator, webhookPost, highlightWebhookPost };
+module.exports = { isLoggedIn, getToken, getUserInfo, beatmapsetInfo, beatmapsetOwnerMaps, isBnOrNat, isBn, isNat, isLeader, isBnEvaluator, isNotSpectator, webhookPost, highlightWebhookPost };

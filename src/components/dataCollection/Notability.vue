@@ -37,17 +37,15 @@ import postData from '../../mixins/postData.js';
 export default {
     name: 'Notability',
     mixins: [postData],
-    props: [ 'selectedEntry', 'isSpectator' ],
+    props: [ 'selectedEntry' ],
     methods: {
         async updateNotability(entryId, notability) {
-            if(!this.isSpectator){
-                const result = await this.executePost('/dataCollection/updateNotability/' + entryId, { notability });
-                if (result) {
-                    if (result.error) {
-                        this.info = result.error;
-                    } else {
-                        this.$parent.updateEntry(result);
-                    }
+            const result = await this.executePost('/dataCollection/updateNotability/' + entryId, { notability });
+            if (result) {
+                if (result.error) {
+                    this.info = result.error;
+                } else {
+                    this.$parent.updateEntry(result);
                 }
             }
         },

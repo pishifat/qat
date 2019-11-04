@@ -34,13 +34,12 @@ router.get('/relevantInfo', async (req, res) => {
         vetoes: v, 
         userId: req.session.mongoId, 
         isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator, 
-        isSpectator: res.locals.userRequest.isSpectator,
         userOsuId: req.session.osuId,
     });
 });
 
 /* POST create a new veto. */
-router.post('/submit', async (req, res) => {
+router.post('/submit', api.isNotSpectator, async (req, res) => {
     let url = req.body.discussionLink;
     if (url.length == 0) {
         url = undefined;
@@ -97,7 +96,7 @@ router.post('/submit', async (req, res) => {
 });
 
 /* POST set status upheld or withdrawn. */
-router.post('/selectMediators', async (req, res) => {
+router.post('/selectMediators', api.isNat, api.isNotSpectator, async (req, res) => {
     let allUsers;
     try{
         allUsers = await usersService.getAllMediators();
@@ -123,7 +122,7 @@ router.post('/selectMediators', async (req, res) => {
 });
 
 /* POST begin mediation */
-router.post('/beginMediation/:id', api.isNat, async (req, res) => {
+router.post('/beginMediation/:id', api.isNat, api.isNotSpectator, async (req, res) => {
     for (let i = 0; i < req.body.mediators.length; i++) {
         let mediator = req.body.mediators[i];
         let m = await mediationsService.create(mediator._id);
@@ -141,7 +140,7 @@ router.post('/beginMediation/:id', api.isNat, async (req, res) => {
 });
 
 /* POST submit mediation */
-router.post('/submitMediation/:id', async (req, res) => {
+router.post('/submitMediation/:id', api.isNat, api.isNotSpectator, async (req, res) => {
     await mediationsService.update(req.body.mediationId, { comment: req.body.comment, vote: req.body.vote });
     let v = await vetoesService.query({ _id: req.params.id }, defaultPopulate);
     res.json(v);
@@ -152,7 +151,7 @@ router.post('/submitMediation/:id', async (req, res) => {
 });
 
 /* POST conclude mediation */
-router.post('/concludeMediation/:id', api.isNat, async (req, res) => {
+router.post('/concludeMediation/:id', api.isNat, api.isNotSpectator, async (req, res) => {
     if(req.body.dismiss || !req.body.majority){
         await vetoesService.update(req.params.id, { status: 'withdrawn' });
     }else{
@@ -167,7 +166,7 @@ router.post('/concludeMediation/:id', api.isNat, async (req, res) => {
 });
 
 /* POST continue mediation */
-router.post('/continueMediation/:id', api.isNat, async (req, res) => {
+router.post('/continueMediation/:id', api.isNat, api.isNotSpectator, async (req, res) => {
     await vetoesService.update(req.params.id, { status: 'wip' });
     let v = await vetoesService.query({ _id: req.params.id }, defaultPopulate);
     res.json(v);
@@ -178,7 +177,7 @@ router.post('/continueMediation/:id', api.isNat, async (req, res) => {
 });
 
 /* POST replace mediator */
-router.post('/replaceMediator/:id', api.isNat, async (req, res) => {
+router.post('/replaceMediator/:id', api.isNat, api.isNotSpectator, async (req, res) => {
     let v = await vetoesService.query({ _id: req.params.id }, defaultPopulate);
     let currentMediators = [];
     v.mediations.forEach(mediation => {

@@ -44,8 +44,7 @@
             :veto="selectedVeto"
             :user-id="userId"
             :user-osu-id="userOsuId"
-            :is-nat="isNat || isSpectator"
-            :is-spectator="isSpectator"
+            :is-nat="isNat"
             @update-veto="updateVeto($event)"
         />
         <submit-veto @submit-veto="SubmitVeto($event)" />
@@ -79,7 +78,6 @@ export default {
             userId: null,
             userOsuId: null,
             isNat: false,
-            isSpectator: false,
             selectedVeto: null,
         };
     },
@@ -91,7 +89,6 @@ export default {
                 this.userId = response.data.userId;
                 this.userOsuId = response.data.userOsuId;
                 this.isNat = response.data.isNat;
-                this.isSpectator = response.data.isSpectator;
                 this.hasPagination = false;
                 this.hasSeparation = true;
                 this.filter();

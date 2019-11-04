@@ -40,7 +40,6 @@
                             Notability:
                             <notability
                                 :selected-entry="selectedEntry"
-                                :is-spectator="isSpectator"
                             />
                         </p>
                     </div>
@@ -69,7 +68,7 @@ export default {
         Notability,
     },
     mixins: [postData, filterLinks],
-    props: [ 'selectedEntry', 'isSpectator' ],
+    props: [ 'selectedEntry' ],
     data() {
         return {
             reasonInput: '',
@@ -88,21 +87,19 @@ export default {
     },
     methods: {
         async updateNotability(entryId, notability) {
-            if(!this.isSpectator){
-                const result = await this.executePost('/dataCollection/updateNotability/' + entryId, { notability });
-                if (result) {
-                    if (result.error) {
-                        this.info = result.error;
-                    } else {
-                        this.$parent.updateEntry(result);
-                    }
+            const result = await this.executePost('/dataCollection/updateNotability/' + entryId, { notability });
+            if (result) {
+                if (result.error) {
+                    this.info = result.error;
+                } else {
+                    this.$parent.updateEntry(result);
                 }
             }
         },
         async updateReason(e) {
             if(!this.reasonInput || !this.reasonInput.length){
                 this.info = 'Must enter a reason!';
-            }else if(!this.isSpectator){
+            }else{
                 const result = await this.executePost('/dataCollection/updateReason/' + this.selectedEntry.id, { reason: this.reasonInput }, e);
                 if (result) {
                     if (result.error) {

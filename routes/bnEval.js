@@ -147,7 +147,7 @@ router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
 });
 
 /* POST submit or edit eval */
-router.post('/submitEval/:id', async (req, res) => {
+router.post('/submitEval/:id', api.isNotSpectator, async (req, res) => {
     if (req.body.evaluationId) {
         await evalsService.update(req.body.evaluationId, {
             behaviorComment: req.body.behaviorComment,
@@ -359,7 +359,7 @@ router.post('/setComplete/', api.isLeader, async (req, res) => {
 });
 
 /* POST set consensus of eval */
-router.post('/setConsensus/:id', async (req, res) => {
+router.post('/setConsensus/:id', api.isNotSpectator, async (req, res) => {
     await evalRoundsService.update(req.params.id, { consensus: req.body.consensus });
     let er = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(er);
@@ -388,7 +388,7 @@ router.post('/setConsensus/:id', async (req, res) => {
 });
 
 /* POST set feedback of eval */
-router.post('/setFeedback/:id', async (req, res) => {
+router.post('/setFeedback/:id', api.isNotSpectator, async (req, res) => {
     await evalRoundsService.update(req.params.id, { feedback: req.body.feedback });
     let er = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(er);
@@ -425,7 +425,7 @@ router.post('/setFeedback/:id', async (req, res) => {
 });
 
 /* POST toggle priority */
-router.post('/toggleIsPriority/:id', async (req, res) => {
+router.post('/toggleIsPriority/:id', api.isNotSpectator, async (req, res) => {
     await evalRoundsService.update(req.params.id, { isPriority: !req.body.isPriority });
     let er = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(er);
@@ -436,7 +436,7 @@ router.post('/toggleIsPriority/:id', async (req, res) => {
 });
 
 /* POST toggle low activity */
-router.post('/toggleIsLowActivity/:id', async (req, res) => {
+router.post('/toggleIsLowActivity/:id', api.isNotSpectator, async (req, res) => {
     await evalRoundsService.update(req.params.id, { isLowActivity: !req.body.isLowActivity });
     let er = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(er);
