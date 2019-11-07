@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
 
     let isBnOrNat = user && user.isBnOrNat;
     let isBn = user && user.isBn;
-    let isNat = user && user.isNat;
+    let isNat = user && (user.isNat || user.isSpectator);
     
     res.render('qatIndex', {
         title: 'NAT',
