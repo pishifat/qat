@@ -54,7 +54,8 @@ router.get(
                 const user = await usersService.create(
                     req.session.osuId,
                     req.session.username,
-                    req.session.group
+                    req.session.group,
+                    req.session.isSpectator
                 );
 
                 if (user && !user.error) {
@@ -68,6 +69,14 @@ router.get(
                 if (u.username != req.session.username) {
                     await usersService.update(u._id, { username: req.session.username });
                     logsService.create(u._id, `Username changed from "${u.username}" to "${req.session.username}"`);
+                }
+                if (u.isSpectator != req.session.isSpectator) {
+                    await usersService.update(u._id, { isSpectator: req.session.isSpectator });
+                    logsService.create(u._id, `User toggled spectator role`);
+                }
+                if (u.group != req.session.group) {
+                    await usersService.update(u._id, { group: req.session.group });
+                    logsService.create(u._id, `User group changed to ${req.session.group}`);
                 }
                 req.session.mongoId = u._id;
                 return next();
@@ -123,10 +132,14 @@ router.get('/callback', async (req, res) => {
             res.status(500).render('error');
         } else if (response.is_nat) {
             req.session.group = 'nat';
-        } else if (response.is_bng) {
-            req.session.group = 'bn';
+            req.session.isSpectator = false;
         } else {
-            req.session.group = 'user';
+            req.session.isSpectator = response.is_gmt;
+            if (response.is_bng) {
+                req.session.group = 'bn';
+            } else {
+                req.session.group = 'user';
+            }
         }
         req.session.username = response.username;
         req.session.osuId = response.id;

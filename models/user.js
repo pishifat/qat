@@ -44,9 +44,9 @@ class UserService extends BaseService
      * @param {string} username 
      * @param {string} group Options: bn, nat, user
      */
-    async create(osuId, username, group) {
+    async create(osuId, username, group, isSpectator) {
         try {
-            return await User.create({ osuId, username, group });
+            return await User.create({ osuId, username, group, isSpectator });
         } catch(error) {
             return { error: error._message };
         }
