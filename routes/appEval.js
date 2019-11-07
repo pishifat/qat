@@ -107,7 +107,7 @@ router.post('/submitEval/:id', api.isNotSpectator, async (req, res) => {
                 else if(evaluation.vote == 2) neutral++;
                 else if(evaluation.vote == 3) fail++;
             });
-            if((a.mode == 'osu' && nat > 1) || (a.mode != 'osu' && nat > 1)){
+            if((a.mode == 'osu' && nat > 2) || (a.mode != 'osu' && nat > 1)){
                 await bnAppsService.update(req.params.id, { discussion: true });
                 api.webhookPost(
                     [{
