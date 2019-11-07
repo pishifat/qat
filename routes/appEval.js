@@ -309,7 +309,7 @@ router.post('/setFeedback/:id', api.isNat, api.isNotSpectator, async (req, res) 
             fields:[
                 {
                     name: `http://bn.mappersguild.com/appeval?eval=${a.id}`,
-                    value: `**${a.applicant.username}'s feedback**: ${req.body.feedback.length > 990 ? req.body.feedback.slice(0,990) + '... *(truncated)*' : req.body.feedback}`,
+                    value: `**${a.applicant.username}'s feedback**: ${req.body.feedback.length > 975 ? req.body.feedback.slice(0,975) + '... *(truncated)*' : req.body.feedback}`,
                 },
             ],
         }], 

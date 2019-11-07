@@ -61,7 +61,7 @@ function notifyDeadlines() {
                         author: {
                             name: title,
                             icon_url: `https://a.ppy.sh/${app.applicant.osuId}`,
-                            url: `https://osu.ppy.sh/users/${app.applicant.osuId}`,
+                            url: `http://bn.mappersguild.com/appeval?eval=${app.id}`,
                         },
                         color: '14427693',
                     }],
@@ -90,7 +90,7 @@ function notifyDeadlines() {
                         author: {
                             name: title,
                             icon_url: `https://a.ppy.sh/${round.bn.osuId}`,
-                            url: `https://osu.ppy.sh/users/${round.bn.osuId}`,
+                            url: `http://bn.mappersguild.com/bneval?eval=${round.id}`,
                         },
                         color: '14427693',
                     }],

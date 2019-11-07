@@ -51,7 +51,7 @@ router.get('/', (req, res) => {
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res) => {
     let u = await usersService.query(
-        { $or: [{ group: 'nat' }, { group: 'bn' }], isSpectator: { $ne: true }  },
+        { $or: [{ group: 'nat' }, { group: 'bn' }], isSpectator: { $ne: true } },
         {},
         { username: 1 },
         true

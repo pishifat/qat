@@ -416,7 +416,7 @@ router.post('/setFeedback/:id', api.isNotSpectator, async (req, res) => {
             fields:[
                 {
                     name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
-                    value: `**${er.bn.username}'s feedback**: ${req.body.feedback.length > 990 ? req.body.feedback.slice(0,990) + '... *(truncated)*' : req.body.feedback}`,
+                    value: `**${er.bn.username}'s feedback**: ${req.body.feedback.length > 975 ? req.body.feedback.slice(0,975) + '... *(truncated)*' : req.body.feedback}`,
                 },
             ],
         }], 
