@@ -140,7 +140,7 @@ router.post('/beginMediation/:id', api.isNat, api.isNotSpectator, async (req, re
 });
 
 /* POST submit mediation */
-router.post('/submitMediation/:id', api.isNat, api.isNotSpectator, async (req, res) => {
+router.post('/submitMediation/:id', api.isNotSpectator, async (req, res) => {
     await mediationsService.update(req.body.mediationId, { comment: req.body.comment, vote: req.body.vote });
     let v = await vetoesService.query({ _id: req.params.id }, defaultPopulate);
     res.json(v);
