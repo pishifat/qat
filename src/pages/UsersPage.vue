@@ -138,12 +138,9 @@
                             <p class="min-spacing">
                                 Nomination resets: {{ user.nominationResets }}
                             </p>
-                            <p class="min-spacing">
-                                Beatmap Reports: {{ user.beatmapReports }}
-                            </p>
                         </div>
                         <p class="small min-spacing ml-2">
-                            Note: Nominations only accounted for after March 31st. Beatmap reports only accounted for after July 27th
+                            Note: Nominations only accounted for after March 31st.
                         </p>
                     </div>
                 </div>
