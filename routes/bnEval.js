@@ -424,17 +424,6 @@ router.post('/setFeedback/:id', api.isNotSpectator, async (req, res) => {
     );
 });
 
-/* POST toggle priority */
-router.post('/toggleIsPriority/:id', api.isNotSpectator, async (req, res) => {
-    await evalRoundsService.update(req.params.id, { isPriority: !req.body.isPriority });
-    let er = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
-    res.json(er);
-    logsService.create(
-        req.session.mongoId,
-        `Toggled priority for ${er.bn.username}'s ${er.mode} BN evaluation`
-    );
-});
-
 /* POST toggle low activity */
 router.post('/toggleIsLowActivity/:id', api.isNotSpectator, async (req, res) => {
     await evalRoundsService.update(req.params.id, { isLowActivity: !req.body.isLowActivity });

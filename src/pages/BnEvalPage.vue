@@ -50,7 +50,7 @@
                     </h2>
                 
                     <transition-group name="list" tag="div" class="row">
-                        <eval-card
+                        <current-bn-individual-card
                             v-for="evalRound in evalRounds"
                             :key="evalRound.id"
                             :eval-round="evalRound"
@@ -99,6 +99,12 @@
             @update-eval-round="updateEvalRound($event)"
         />
 
+        <current-bn-individual-info
+            :eval-round="selectedEvalRound"
+            :evaluator="evaluator"
+            @update-eval-round="updateEvalRound($event)"
+        />
+
         <discuss-info
             :discuss-round="selectedDiscussRound"
             :evaluator="evaluator"
@@ -114,7 +120,9 @@
 <script>
 import AddEvalRounds from '../components/evaluations/AddEvalRounds.vue';
 import EvalCard from '../components/evaluations/EvalCard.vue';
+import CurrentBnIndividualCard from '../components/evaluations/currentBnEvaluations/CurrentBnIndividualCard.vue';
 import EvalInfo from '../components/evaluations/EvalInfo.vue';
+import CurrentBnIndividualInfo from '../components/evaluations/currentBnEvaluations/CurrentBnIndividualInfo.vue';
 import DiscussCard from '../components/evaluations/DiscussCard.vue';
 import DiscussInfo from '../components/evaluations/DiscussInfo.vue';
 import FilterBox from '../components/FilterBox.vue';
@@ -126,7 +134,9 @@ export default {
     components: {
         AddEvalRounds,
         EvalCard,
+        CurrentBnIndividualCard,
         EvalInfo,
+        CurrentBnIndividualInfo,
         DiscussCard,
         DiscussInfo,
         FilterBox,

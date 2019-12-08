@@ -12,7 +12,6 @@ const bnAppSchema = new mongoose.Schema({
     consensus: { type: String, enum: ['pass', 'fail'] },
     feedback: { type: String },
     feedbackAuthor: { type: 'ObjectId', ref: 'User' },
-    isPriority: { type: Boolean, default: false },
     test: { type: 'ObjectId', ref: 'TestSubmission' },
     bnEvaluators: [{ type: 'ObjectId', ref: 'User' }],
     natEvaluators: [{ type: 'ObjectId', ref: 'User' }],

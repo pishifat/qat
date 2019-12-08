@@ -39,7 +39,7 @@
                     <h2>Individual Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="Evaluations are hidden from others to avoid confirmation bias">?</sup> <small v-if="applications">({{ applications.length }})</small></h2> 
 
                     <transition-group name="list" tag="div" class="row">
-                        <eval-card
+                        <application-individual-card
                             v-for="application in applications"
                             :key="application.id"
                             :application="application"
@@ -94,6 +94,12 @@
             @update-application="updateApplication($event)"
         />
 
+        <application-individual-info
+            :application="selectedApplication"
+            :evaluator="evaluator"
+            @update-application="updateApplication($event)"
+        />
+
         <discuss-info
             :discuss-app="selectedDiscussApp"
             :evaluator="evaluator"
@@ -104,7 +110,9 @@
 
 <script>
 import EvalCard from '../components/evaluations/EvalCard.vue';
+import ApplicationIndividualCard from '../components/evaluations/applications/ApplicationIndividualCard.vue';
 import EvalInfo from '../components/evaluations/EvalInfo.vue';
+import ApplicationIndividualInfo from '../components/evaluations/applications/ApplicationIndividualInfo.vue';
 import DiscussCard from '../components/evaluations/DiscussCard.vue';
 import DiscussInfo from '../components/evaluations/DiscussInfo.vue';
 import FilterBox from '../components/FilterBox.vue';
@@ -115,7 +123,9 @@ export default {
     name: 'AppEvalPage',
     components: {
         EvalCard,
+        ApplicationIndividualCard,
         EvalInfo,
+        ApplicationIndividualInfo,
         DiscussCard,
         DiscussInfo,
         FilterBox,

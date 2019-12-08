@@ -252,7 +252,7 @@
 <script>
 import postData from '../../mixins/postData.js';
 import filterLinks from '../../mixins/filterLinks.js';
-import UserActivity from './UserActivity.vue';
+import UserActivity from './currentBnEvaluations/currentBnInfo/UserActivity.vue';
 
 export default {
     name: 'EvalInfo',

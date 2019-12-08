@@ -12,7 +12,6 @@ const evalRoundSchema = new mongoose.Schema({
     consensus: { type: String, enum: ['pass', 'extend', 'fail'] },
     feedback: { type: String },
     feedbackAuthor: { type: 'ObjectId', ref: 'User' },
-    isPriority: { type: Boolean, default: false },
     isLowActivity: { type: Boolean, default: false },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
