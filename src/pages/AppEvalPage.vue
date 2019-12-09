@@ -47,7 +47,7 @@
                             :all-checked="allChecked"
                             :user-to-evaluate="application.applicant"
                             :mode="application.mode"
-                            @update:selectedApplication="selectedApplication = $event"
+                            @update:selected-application="selectedApplication = $event"
                         />
                     </transition-group>
 
@@ -67,15 +67,13 @@
                     </h2>
 
                     <transition-group name="list" tag="div" class="row">
-                        <discuss-card
-                            v-for="discussApp in discussApps"
-                            :key="discussApp.id"
-                            :discuss-app="discussApp"
+                        <application-discussion-card
+                            v-for="application in discussApps"
+                            :key="application.id"
+                            :application="application"
                             :evaluator="evaluator"
                             :all-checked="allChecked"
-                            :user-to-evaluate="discussApp.applicant"
-                            :mode="discussApp.mode"
-                            @update:selectedDiscussApp="selectedDiscussApp = $event"
+                            @update:selected-application="selectedDiscussApp = $event"
                         />
                     </transition-group>
                 
@@ -88,20 +86,14 @@
             </section>
         </div>
 
-        <eval-info
-            :application="selectedApplication"
-            :evaluator="evaluator"
-            @update-application="updateApplication($event)"
-        />
-
         <application-individual-info
             :application="selectedApplication"
             :evaluator="evaluator"
             @update-application="updateApplication($event)"
         />
 
-        <discuss-info
-            :discuss-app="selectedDiscussApp"
+        <application-discussion-info
+            :application="selectedDiscussApp"
             :evaluator="evaluator"
             @update-application="updateApplication($event)"
         />
@@ -109,12 +101,10 @@
 </template>
 
 <script>
-import EvalCard from '../components/evaluations/EvalCard.vue';
 import ApplicationIndividualCard from '../components/evaluations/applications/ApplicationIndividualCard.vue';
-import EvalInfo from '../components/evaluations/EvalInfo.vue';
 import ApplicationIndividualInfo from '../components/evaluations/applications/ApplicationIndividualInfo.vue';
-import DiscussCard from '../components/evaluations/DiscussCard.vue';
-import DiscussInfo from '../components/evaluations/DiscussInfo.vue';
+import ApplicationDiscussionCard from '../components/evaluations/applications/ApplicationDiscussionCard.vue';
+import ApplicationDiscussionInfo from '../components/evaluations/applications/ApplicationDiscussionInfo.vue';
 import FilterBox from '../components/FilterBox.vue';
 import filters from '../mixins/filters.js';
 import postData from '../mixins/postData.js';
@@ -122,12 +112,10 @@ import postData from '../mixins/postData.js';
 export default {
     name: 'AppEvalPage',
     components: {
-        EvalCard,
         ApplicationIndividualCard,
-        EvalInfo,
         ApplicationIndividualInfo,
-        DiscussCard,
-        DiscussInfo,
+        ApplicationDiscussionCard,
+        ApplicationDiscussionInfo,
         FilterBox,
     },
     mixins: [ postData, filters ],
@@ -161,10 +149,10 @@ export default {
                     if(i >= 0){
                         if(!this.allObjs[i].discussion){
                             this.selectedApplication = this.allObjs[i];
-                            $('#evaluationInfo').modal('show');
+                            $('#applicationIndividualInfo').modal('show');
                         }else{
                             this.selectedDiscussApp = this.allObjs[i];
-                            $('#discussionInfo').modal('show');
+                            $('#applicationDiscussionInfo').modal('show');
                         }
                     }else if(this.evaluator.isNat){
                         window.location = "/evalArchive?eval=" + params.get('eval');

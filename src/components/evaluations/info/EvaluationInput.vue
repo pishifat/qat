@@ -1,28 +1,28 @@
 <template>
     <div>
         <div class="row">
-            <div class="col-sm-6">
-                <p class="text-shadow">
-                    Behavior/attitude comments:
-                </p>
-                <div class="form-group">
-                    <textarea
-                        id="behaviorComments"
-                        v-model="behaviorComment"
-                        class="form-control dark-textarea"
-                        style="white-space: pre-line;"
-                        rows="4"
-                    />
-                </div>
-            </div>
-            <div class="col-sm-6">
-                <p class="text-shadow">
+            <div class="col-sm-8">
+                <p class="text-shadow min-spacing mb-1">
                     Modding comments:
                 </p>
                 <div class="form-group">
                     <textarea
                         id="moddingComments"
                         v-model="moddingComment"
+                        class="form-control dark-textarea"
+                        style="white-space: pre-line;"
+                        rows="4"
+                    />
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <p class="text-shadow min-spacing mb-1">
+                    Behavior comments:
+                </p>
+                <div class="form-group">
+                    <textarea
+                        id="behaviorComments"
+                        v-model="behaviorComment"
                         class="form-control dark-textarea"
                         style="white-space: pre-line;"
                         rows="4"
@@ -95,8 +95,8 @@ export default {
     },
     data() {
         return {
-            behaviorComment: '',
             moddingComment: '',
+            behaviorComment: '',
             vote: 0,
             evaluationId: null,
             info: '',
@@ -110,8 +110,8 @@ export default {
         findUserEvaluation() {
             this.info = '',
             this.confirm = '',
-            this.behaviorComment = '';
             this.moddingComment = '';
+            this.behaviorComment = '';
             this.vote = 0;
             this.evaluationId = null;
             this.evaluations.forEach(evaluation => {
@@ -124,7 +124,7 @@ export default {
             });
         },
         async submitEval (e) {
-            if(!this.vote || !this.behaviorComment.length || !this.moddingComment.length){
+            if(!this.vote || !this.moddingComment.length || !this.behaviorComment.length){
                 this.info = 'Cannot leave fields blank!';
                 this.confirm = '';
             }else{
@@ -132,8 +132,8 @@ export default {
                     `/${this.isApplication ? 'appEval' : 'bnEval'}/submitEval/${this.nominatorAssessmentMongoId}`, {
                         evaluationId: this.evaluationId, 
                         vote: this.vote, 
-                        behaviorComment: this.behaviorComment, 
                         moddingComment: this.moddingComment,
+                        behaviorComment: this.behaviorComment
                     }, e);
                 if (r) {
                     if (r.error) {

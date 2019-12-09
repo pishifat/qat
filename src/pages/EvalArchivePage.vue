@@ -34,16 +34,14 @@
         
             <div v-if="appEvals.length">
                 <transition-group name="list" tag="div" class="row">
-                    <discuss-card
-                        v-for="discussApp in appEvals"
-                        :key="discussApp.id"
-                        :discuss-app="discussApp"
+                    <application-discussion-card
+                        v-for="application in appEvals"
+                        :key="application.id"
+                        :application="application"
                         :evaluator="evaluator"
-                        :read-only="true"
-                        :user-to-evaluate="discussApp.applicant"
-                        :mode="discussApp.mode"
-                        @update:selectedDiscussApp="selectedDiscussApp = $event"
-                        @update:selectedDiscussRound="selectedDiscussRound = $event"
+                        :mode="application.mode"
+                        :is-archive="true"
+                        @update:selected-application="selectedDiscussApp = $event"
                     />
                 </transition-group>
             </div>
@@ -56,16 +54,13 @@
         
             <div v-if="bnEvals.length">
                 <transition-group name="list" tag="div" class="row">
-                    <discuss-card
-                        v-for="discussRound in bnEvals"
-                        :key="discussRound.id"
-                        :discuss-round="discussRound"
+                    <current-bn-discussion-card
+                        v-for="evalRound in bnEvals"
+                        :key="evalRound.id"
+                        :eval-round="evalRound"
                         :evaluator="evaluator"
-                        :read-only="true"
-                        :user-to-evaluate="discussRound.bn"
-                        :mode="discussRound.mode"
-                        @update:selectedDiscussApp="selectedDiscussApp = $event"
-                        @update:selectedDiscussRound="selectedDiscussRound = $event"
+                        :is-archive="true"
+                        @update:selected-discuss-round="selectedDiscussRound = $event"
                     />
                 </transition-group>
             </div>
@@ -74,11 +69,15 @@
             </p>
         </section>
 
-        <discuss-info
-            :discuss-app="selectedDiscussApp"
-            :discuss-round="selectedDiscussRound"
+        <application-archive-info
+            :application="selectedDiscussApp"
             :evaluator="evaluator"
-            :read-only="true"
+            @update-application="updateApplication($event)"
+        />
+
+        <current-bn-archive-info
+            :eval-round="selectedDiscussRound"
+            :evaluator="evaluator"
             @update-eval-round="updateEvalRound($event)"
         />
     </div>
@@ -87,15 +86,19 @@
 
 
 <script>
-import DiscussCard from '../components/evaluations/DiscussCard.vue';
-import DiscussInfo from '../components/evaluations/DiscussInfo.vue';
+import ApplicationDiscussionCard from '../components/evaluations/applications/ApplicationDiscussionCard.vue';
+import CurrentBnDiscussionCard from '../components/evaluations/currentBnEvaluations/CurrentBnDiscussionCard.vue';
+import ApplicationArchiveInfo from '../components/evaluations/applications/ApplicationArchiveInfo.vue';
+import CurrentBnArchiveInfo from '../components/evaluations/currentBnEvaluations/CurrentBnArchiveInfo.vue';
 import postData from '../mixins/postData.js';
 
 export default {
     name: 'EvalArchivePage',
     components: {
-        DiscussCard,
-        DiscussInfo,
+        ApplicationDiscussionCard,
+        CurrentBnDiscussionCard,
+        ApplicationArchiveInfo,
+        CurrentBnArchiveInfo,
     },
     mixins: [postData],
     data() {
@@ -145,11 +148,13 @@ export default {
                             if(response.data.round.applicant){
                                 this.selectedDiscussApp = response.data.round;
                                 this.appEvals.push(response.data.round);
+                                $('#applicationArchiveInfo').modal('show');
                             } else {
                                 this.selectedDiscussRound = response.data.round;
                                 this.bnEvals.push(response.data.round);
+                                $('#currentBnArchiveInfo').modal('show');
                             }
-                            $('#discussionInfo').modal('show');
+                            
                         }
                         
                     }

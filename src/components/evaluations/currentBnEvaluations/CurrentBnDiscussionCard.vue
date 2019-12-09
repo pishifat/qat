@@ -4,14 +4,16 @@
         @click="selectEvalRound()"
     >
         <div
-            class="card border-outline custom-bg-dark"
+            class="card border-outline"
             :class="[isSelected ? 'selected-card' : '', 'border-' + findRelevantEval()]"
             data-toggle="modal"
-            data-target="#currentBnIndividualInfo"
+            :data-target="isArchive ? '#currentBnArchiveInfo' : '#currentBnDiscussionInfo'"
+            :data-user="evalRound.id"
         >
             <card-header
                 :username="evalRound.bn.username"
                 :osuId="evalRound.bn.osuId"
+                :consensus="evalRound.consensus"
             />
             <card-footer
                 :mode="evalRound.mode"
@@ -19,8 +21,9 @@
                 :is-leader="evaluator.isLeader"
                 :nominator-assessment-mongo-id="evalRound.id"
                 :evaluations="evalRound.evaluations"
-                :is-discuss="false"
+                :is-discuss="true"
                 :date="evalRound.deadline"
+                :is-archive="isArchive"
                 @check-selection="checkSelection()"
             />
         </div>
@@ -32,7 +35,7 @@ import CardHeader from '../card/CardHeader.vue';
 import CardFooter from '../card/CardFooter.vue';
 
 export default {
-    name: 'current-bn-individual-card',
+    name: 'current-bn-discussion-card',
     components: {
         CardHeader,
         CardFooter
@@ -41,6 +44,7 @@ export default {
         evalRound: Object,
         evaluator: Object,
         allChecked: Boolean,
+        isArchive: Boolean,
     },
     data() {
         return {
@@ -54,7 +58,7 @@ export default {
     },
     methods: {
         selectEvalRound() {
-            this.$emit('update:selected-eval-round', this.evalRound);
+            this.$emit('update:selected-discuss-round', this.evalRound);
         },
         findRelevantEval() {
             let vote;
@@ -63,7 +67,7 @@ export default {
                     if (ev.vote == 1) {
                         vote = 'pass';
                     } else if (ev.vote == 2) {
-                        vote = 'neutral';
+                        vote = 'extend';
                     } else {
                         vote = 'fail';
                     }
@@ -71,8 +75,13 @@ export default {
             });
             return vote;
         },
+        createDeadline(date) {
+            date = new Date(date);
+            date = new Date(date.setDate(date.getDate() + 14)).toString().slice(4, 10);
+            return date;
+        },
         checkSelection() {
-            if (this.evalRound && $(`#${this.evalRound.id}-check`).is(':checked')) {
+            if ($(`#${this.evalRound.id}-check`).is(':checked')) {
                 this.isSelected = true;
             } else {
                 this.isSelected = false;

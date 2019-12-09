@@ -64,8 +64,6 @@
 </template>
 
 <script>
-import postData from '../../../mixins/postData.js';
-import filterLinks from '../../../mixins/filterLinks.js';
 import ModalHeader from '../info/ModalHeader.vue';
 import Mods from './applicationInfo/Mods.vue';
 import TestResults from './applicationInfo/TestResults.vue';
@@ -85,7 +83,6 @@ export default {
         EvaluatorAssignments,
         EvaluationInput,
     },
-    mixins: [ postData, filterLinks ],
     props: {
         application: Object,
         evaluator: Object,

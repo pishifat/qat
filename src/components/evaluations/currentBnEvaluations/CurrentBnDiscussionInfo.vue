@@ -1,5 +1,5 @@
 <template>
-    <div id="currentBnIndividualInfo" class="modal fade" tabindex="-1">
+    <div id="currentBnDiscussionInfo" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div v-if="evalRound" class="modal-content custom-bg-dark">
                 <modal-header
@@ -38,6 +38,30 @@
                             />
                         </div>
                         <hr>
+                        <consensus
+                            :consensus="evalRound.consensus"
+                            :nominator-assessment-mongo-id="evalRound.id"
+                            :is-application="false"
+                            :is-low-activity="evalRound.isLowActivity"
+                            @update-nominator-assessment="$emit('update-eval-round', $event);"
+                        />
+                        <feedback-info
+                            v-if="evalRound.consensus"
+                            :consensus="evalRound.consensus"
+                            :osu-id="evalRound.bn.osuId"
+                            :date="evalRound.updatedAt"
+                            :evaluations="evalRound.evaluations"
+                            :probation="evalRound.bn.probation"
+                            :is-low-activity="evalRound.isLowActivity"
+                            :mode="evalRound.mode"
+                            :saved-feedback="evalRound.feedback"
+                            :nominator-assessment-mongo-id="evalRound.id"
+                            @update-nominator-assessment="$emit('update-eval-round', $event);"
+                        />
+                        <hr v-if="evalRound.consensus">
+                        <evaluations
+                            :evaluations="evalRound.evaluations"
+                        />
                         <evaluation-input
                             :isApplication="false"
                             :nominator-assessment-mongo-id="evalRound.id"
@@ -61,9 +85,12 @@ import UserReports from './currentBnInfo/UserReports.vue';
 import ModdingActivity from './currentBnInfo/ModdingActivity.vue';
 import UserList from '../info/UserList.vue';
 import EvaluationInput from '../info/EvaluationInput.vue';
+import Consensus from '../info/Consensus.vue';
+import FeedbackInfo from '../info/FeedbackInfo.vue';
+import Evaluations from '../info/Evaluations.vue';
 
 export default {
-    name: 'current-bn-individual-info',
+    name: 'current-bn-discussion-info',
     components: {
         UserActivity,
         ModalHeader,
@@ -73,10 +100,13 @@ export default {
         ModdingActivity,
         UserList,
         EvaluationInput,
+        Consensus,
+        FeedbackInfo,
+        Evaluations,
     },
     props: {
         evalRound: Object,
-        evaluator: Object
+        evaluator: Object,
     },
     computed: {
         submittedEvaluators() {
@@ -87,10 +117,8 @@ export default {
             return evaluators;
         },
     },
-    watch: {
-        evalRound() {
-            history.pushState(null, 'Current BN Evaluations', `/bneval?eval=${this.evalRound.id}`);
-        },
+    evalRound() {
+        history.pushState(null, 'Current BN Evaluations', `/bneval?eval=${this.evalRound.id}`);
     },
 };
 </script>

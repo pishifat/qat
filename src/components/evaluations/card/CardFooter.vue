@@ -1,17 +1,21 @@
 <template>
     <div class="card-footer small d-flex justify-content-start align-items-center">
         <i v-if="mode == 'osu'" class="far fa-circle mx-1" />
-        <i v-else-if="mode == 'taiko'" class="fas fa-drum" />
-        <i v-else-if="mode == 'catch'" class="fas fa-apple-alt" />
-        <i v-else-if="mode == 'mania'" class="fas fa-stream" />
+        <i v-else-if="mode == 'taiko'" class="fas fa-drum mx-1" />
+        <i v-else-if="mode == 'catch'" class="fas fa-apple-alt mx-1" />
+        <i v-else-if="mode == 'mania'" class="fas fa-stream mx-1" />
         <span
-            v-if="isNat"
+            v-if="isNat && !isDiscuss"
             class="badge badge-none mx-1"
             data-toggle="tooltip"
             data-placement="top"
             :title="separateEvals()"
         >{{ evaluations.length }}
         </span>
+        <add-votes
+            v-else-if="isNat && isDiscuss"
+            :evaluations="evaluations"
+        />
         <i
             class="fas fa-clock mx-1"
             data-toggle="tooltip"
@@ -22,7 +26,7 @@
             {{ createDeadline() }}
         </span>
         <input
-            v-if="isLeader"
+            v-if="isLeader && !isArchive"
             :id="nominatorAssessmentMongoId + '-check'"
             class="mx-1 ml-auto"
             type="checkbox"
@@ -34,6 +38,8 @@
 </template>
 
 <script>
+import AddVotes from '../card/AddVotes.vue';
+
 export default {
     name: 'card-footer',
     props: {
@@ -44,7 +50,11 @@ export default {
         evaluations: Array,
         isDiscuss: Boolean,
         date: String,
-        isExactDeadline: Boolean,
+        isApplication: Boolean,
+        isArchive: Boolean,
+    },
+    components: {
+        AddVotes,
     },
     methods: {
         separateEvals() {
@@ -58,9 +68,13 @@ export default {
         },
         createDeadline() {
             let deadline = new Date(this.date);
-            let delay = this.isExactDeadline ? 0 : 7;
-            deadline = new Date(deadline.setDate(deadline.getDate() + delay)).toString().slice(4, 10);
-            return deadline;
+            if(this.isApplication){
+                let delay = this.isDiscuss ? 14 : 7;
+                deadline = new Date(deadline.setDate(deadline.getDate() + delay)).toString().slice(4,10);
+                return deadline;
+            }else{
+                return deadline.toString().slice(4,10);
+            }
         },
     }
 };
