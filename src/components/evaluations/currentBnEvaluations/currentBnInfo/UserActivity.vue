@@ -12,7 +12,7 @@
             :header="'Nominations disqualified'"
             :loading="loading"
             :editing="editing"
-            @update-entry="updateEntry()"
+            @update-entry="updateEntry($event)"
         />
         <nomination-resets
             :events="nominationsPopped"
@@ -20,7 +20,7 @@
             :header="'Nominations popped'"
             :loading="loading"
             :editing="editing"
-            @update-entry="updateEntry()"
+            @update-entry="updateEntry($event)"
         />
         <nomination-resets
             :events="disqualifications"
@@ -28,7 +28,7 @@
             :header="'Disqualifications done by user'"
             :loading="loading"
             :editing="editing"
-            @update-entry="updateEntry()"
+            @update-entry="updateEntry($event)"
         />
         <nomination-resets
             :events="pops"
@@ -36,7 +36,7 @@
             :header="'Pops done by user'"
             :loading="loading"
             :editing="editing"
-            @update-entry="updateEntry()"
+            @update-entry="updateEntry($event)"
         />
     </div>
 </template>
@@ -91,8 +91,25 @@ export default {
                     this.loading = false;
                 });
         },
-        updateEntry () {
-            this.findRelevantActivity();
+        updateEntry (event) {
+            let i;
+            if(event.eventType == 'Disqualified'){
+                i = this.disqualifications.findIndex(e => e._id == event.id);
+                if(i >= 0){
+                    this.disqualifications[i] = event;
+                }else{
+                    i = this.nominationsDisqualified.findIndex(e => e._id == event.id);
+                    this.nominationsDisqualified[i] = event;
+                }
+            }else if(event.eventType == 'Popped'){
+                i = this.pops.findIndex(e => e._id == event.id);
+                if(i >= 0){
+                    this.pops[i] = event;
+                }else{
+                    i = this.nominationsPopped.findIndex(e => e._id == event.id);
+                    this.nominationsPopped[i] = event;
+                }
+            }
         },
     },
 };

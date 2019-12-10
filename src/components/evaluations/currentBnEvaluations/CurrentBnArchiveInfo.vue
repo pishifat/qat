@@ -68,9 +68,11 @@ export default {
             return evaluators;
         },
     },
-    evalRound() {
-        history.pushState(null, 'Current BN Evaluations', `/bneval?eval=${this.evalRound.id}`);
-    },
+    watch: {
+        evalRound() {
+            history.pushState(null, 'Current BN Evaluations', `/evalarchive?eval=${this.evalRound.id}`);
+        }
+    }
 };
 </script>
 
