@@ -1,0 +1,81 @@
+<template>
+    <div class="card-footer small d-flex justify-content-start align-items-center">
+        <i v-if="mode == 'osu'" class="far fa-circle mx-1" />
+        <i v-else-if="mode == 'taiko'" class="fas fa-drum mx-1" />
+        <i v-else-if="mode == 'catch'" class="fas fa-apple-alt mx-1" />
+        <i v-else-if="mode == 'mania'" class="fas fa-stream mx-1" />
+        <span
+            v-if="isNat && !isDiscuss"
+            class="badge badge-none mx-1"
+            data-toggle="tooltip"
+            data-placement="top"
+            :title="separateEvals()"
+        >{{ evaluations.length }}
+        </span>
+        <add-votes
+            v-else-if="isNat && isDiscuss"
+            :evaluations="evaluations"
+        />
+        <i
+            class="fas fa-clock mx-1"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="deadline"
+        />
+        <span class="errors mx-1">
+            {{ createDeadline() }}
+        </span>
+        <input
+            v-if="isLeader && !isArchive"
+            :id="nominatorAssessmentMongoId + '-check'"
+            class="mx-1 ml-auto"
+            type="checkbox"
+            name="evalTypeCheck"
+            :value="nominatorAssessmentMongoId"
+            @click.stop="$emit('check-selection')"
+        >
+    </div>
+</template>
+
+<script>
+import AddVotes from '../card/AddVotes.vue';
+
+export default {
+    name: 'card-footer',
+    props: {
+        mode: String,
+        isNat: Boolean,
+        isLeader: Boolean,
+        nominatorAssessmentMongoId: String,
+        evaluations: Array,
+        isDiscuss: Boolean,
+        date: String,
+        isApplication: Boolean,
+        isArchive: Boolean,
+    },
+    components: {
+        AddVotes,
+    },
+    methods: {
+        separateEvals() {
+            let bn = 0;
+            let nat = 0;
+            this.evaluations.forEach(e => {
+                if(e.evaluator.group == 'bn') bn++;
+                else nat++;
+            });
+            return bn + (bn == 1 ? ' BN eval, ' : ' BN evals, ') + nat + (nat == 1 ? ' NAT eval' : ' NAT evals');
+        },
+        createDeadline() {
+            let deadline = new Date(this.date);
+            if(this.isApplication){
+                let delay = this.isDiscuss ? 14 : 7;
+                deadline = new Date(deadline.setDate(deadline.getDate() + delay)).toString().slice(4,10);
+                return deadline;
+            }else{
+                return deadline.toString().slice(4,10);
+            }
+        },
+    }
+};
+</script>

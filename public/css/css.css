@@ -13,6 +13,7 @@
     --pass: #90f3aa;
     --available: var(--pass);
     --neutral: #a0c6ff;
+    --neutral-secondary: #556986;
     --wip: var(--neutral);
     --extend: #f0e770;
     --extend-secondary: #979243;
@@ -433,6 +434,16 @@ input[type=number] {
     box-shadow: 0 9px 30px 0 rgba(35,38,42,.1);
 }
 
+.btn-nat-blue {
+    border-color: var(--neutral-secondary);
+}
+
+.btn-nat-blue:hover {
+    border-color: var(--neutral);
+    -webkit-box-shadow: 0 9px 30px 0 rgba(35,38,42,.1);
+    box-shadow: 0 9px 30px 0 rgba(35,38,42,.1);
+}
+
 .btn-pags {
     position: absolute;
     top: calc(50% - 65px);
@@ -714,6 +725,10 @@ input[type="radio"] + .fas { cursor: pointer; }
 
 .card-status-extend {
     border-right: 15px solid var(--extend);
+}
+
+.card-status-neutral {
+    border-right: 15px solid var(--neutral);
 }
 
 .card-status-fail {

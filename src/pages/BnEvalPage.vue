@@ -50,7 +50,7 @@
                     </h2>
                 
                     <transition-group name="list" tag="div" class="row">
-                        <eval-card
+                        <current-bn-individual-card
                             v-for="evalRound in evalRounds"
                             :key="evalRound.id"
                             :eval-round="evalRound"
@@ -58,7 +58,7 @@
                             :all-checked="allChecked"
                             :user-to-evaluate="evalRound.bn"
                             :mode="evalRound.mode"
-                            @update:selectedEvalRound="selectedEvalRound = $event"
+                            @update:selected-eval-round="selectedEvalRound = $event"
                         />
                     </transition-group>
                 
@@ -73,15 +73,13 @@
                     <h2>Group Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="After individual evals are completed, their responses are made visible to allow discussion and form a consensus">?</sup> <small v-if="discussRounds">({{ discussRounds.length }})</small></h2>
                 
                     <transition-group name="list" tag="div" class="row">
-                        <discuss-card
-                            v-for="discussRound in discussRounds"
-                            :key="discussRound.id"
-                            :discuss-round="discussRound"
+                        <current-bn-discussion-card
+                            v-for="evalRound in discussRounds"
+                            :key="evalRound.id"
+                            :eval-round="evalRound"
                             :evaluator="evaluator"
                             :all-checked="allChecked"
-                            :user-to-evaluate="discussRound.bn"
-                            :mode="discussRound.mode"
-                            @update:selectedDiscussRound="selectedDiscussRound = $event"
+                            @update:selected-discuss-round="selectedDiscussRound = $event"
                         />
                     </transition-group>
                 
@@ -91,16 +89,15 @@
                 </div>
             </section>
         </div>
-    
 
-        <eval-info
+        <current-bn-individual-info
             :eval-round="selectedEvalRound"
             :evaluator="evaluator"
             @update-eval-round="updateEvalRound($event)"
         />
 
-        <discuss-info
-            :discuss-round="selectedDiscussRound"
+        <current-bn-discussion-info
+            :eval-round="selectedDiscussRound"
             :evaluator="evaluator"
             @update-eval-round="updateEvalRound($event)"
         />
@@ -113,10 +110,10 @@
 
 <script>
 import AddEvalRounds from '../components/evaluations/AddEvalRounds.vue';
-import EvalCard from '../components/evaluations/EvalCard.vue';
-import EvalInfo from '../components/evaluations/EvalInfo.vue';
-import DiscussCard from '../components/evaluations/DiscussCard.vue';
-import DiscussInfo from '../components/evaluations/DiscussInfo.vue';
+import CurrentBnIndividualCard from '../components/evaluations/currentBnEvaluations/CurrentBnIndividualCard.vue';
+import CurrentBnIndividualInfo from '../components/evaluations/currentBnEvaluations/CurrentBnIndividualInfo.vue';
+import CurrentBnDiscussionCard from '../components/evaluations/currentBnEvaluations/CurrentBnDiscussionCard.vue';
+import CurrentBnDiscussionInfo from '../components/evaluations/currentBnEvaluations/CurrentBnDiscussionInfo.vue';
 import FilterBox from '../components/FilterBox.vue';
 import postData from '../mixins/postData.js';
 import filters from '../mixins/filters.js';
@@ -125,10 +122,10 @@ export default {
     name: 'BnEvalPage',
     components: {
         AddEvalRounds,
-        EvalCard,
-        EvalInfo,
-        DiscussCard,
-        DiscussInfo,
+        CurrentBnIndividualCard,
+        CurrentBnIndividualInfo,
+        CurrentBnDiscussionCard,
+        CurrentBnDiscussionInfo,
         FilterBox,
     },
     mixins: [ postData, filters ],
@@ -165,10 +162,10 @@ export default {
                     if(i >= 0){
                         if(!this.allObjs[i].discussion){
                             this.selectedEvalRound = this.allObjs[i];
-                            $('#evaluationInfo').modal('show');
+                            $('#currentBnIndividualInfo').modal('show');
                         }else{
                             this.selectedDiscussRound = this.allObjs[i];
-                            $('#discussionInfo').modal('show');
+                            $('#currentBnDiscussionInfo').modal('show');
                         }
                     }else{
                         window.location = "/evalArchive?eval=" + params.get('eval');

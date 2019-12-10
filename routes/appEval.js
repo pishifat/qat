@@ -317,17 +317,6 @@ router.post('/setFeedback/:id', api.isNat, api.isNotSpectator, async (req, res) 
     );
 });
 
-/* POST toggle priority */
-router.post('/toggleIsPriority/:id', api.isNat, api.isNotSpectator, async (req, res) => {
-    await bnAppsService.update(req.params.id, { isPriority: !req.body.isPriority });
-    let a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
-    res.json(a);
-    logsService.create(
-        req.session.mongoId,
-        `Toggled priority for ${a.applicant.username}'s ${a.mode} BN app`
-    );
-});
-
 /* POST select BN evaluators */
 router.post('/selectBnEvaluators', api.isLeader, async (req, res) => {
     const allUsers = await usersModel.aggregate([

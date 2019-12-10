@@ -360,7 +360,9 @@ router.post('/setComplete/', api.isLeader, async (req, res) => {
 
 /* POST set consensus of eval */
 router.post('/setConsensus/:id', api.isNotSpectator, async (req, res) => {
-    await evalRoundsService.update(req.params.id, { consensus: req.body.consensus });
+    await evalRoundsService.update(req.params.id, { 
+        consensus: req.body.consensus, 
+        isLowActivity: req.body.isLowActivity ? true : false });
     let er = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(er);
     if(req.body.consensus){
@@ -378,7 +380,7 @@ router.post('/setConsensus/:id', api.isNotSpectator, async (req, res) => {
                 fields:[
                     {
                         name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
-                        value: `**${er.bn.username}**'s current BN eval set to **${req.body.consensus}**`,
+                        value: `**${er.bn.username}**'s current BN eval set to **${req.body.consensus}**${req.body.isLowActivity ? ' + low activity warning' : ''}`,
                     },
                 ],
             }], 
@@ -421,28 +423,6 @@ router.post('/setFeedback/:id', api.isNotSpectator, async (req, res) => {
             ],
         }], 
         er.mode
-    );
-});
-
-/* POST toggle priority */
-router.post('/toggleIsPriority/:id', api.isNotSpectator, async (req, res) => {
-    await evalRoundsService.update(req.params.id, { isPriority: !req.body.isPriority });
-    let er = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
-    res.json(er);
-    logsService.create(
-        req.session.mongoId,
-        `Toggled priority for ${er.bn.username}'s ${er.mode} BN evaluation`
-    );
-});
-
-/* POST toggle low activity */
-router.post('/toggleIsLowActivity/:id', api.isNotSpectator, async (req, res) => {
-    await evalRoundsService.update(req.params.id, { isLowActivity: !req.body.isLowActivity });
-    let er = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
-    res.json(er);
-    logsService.create(
-        req.session.mongoId,
-        `Toggled inactivity for ${er.bn.username}'s ${er.mode} BN evaluation`
     );
 });
 
