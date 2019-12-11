@@ -102,10 +102,11 @@
                             {{ user.group == 'bn' ? 'Move to NAT' : 'Move to BN' }}
                         </button>
                         <button
+                            v-if="user.group == 'nat'"
                             class="btn btn-nat-red btn-sm minw-200"
-                            @click="removeGroup();"
+                            @click="removeNat();"
                         >
-                            Remove from {{ user.group.toUpperCase() }}
+                            Remove from NAT
                         </button>
                     </span>
                     <p class="text-shadow float-right">
@@ -204,12 +205,12 @@ export default {
                 }
             }
         },
-        async removeGroup(e) {
+        async removeNat(e) {
             const result = confirm(
                 `Are you sure?`
             );
             if (result) {
-                const u = await this.executePost('/users/removeGroup/' + this.user.id, {}, e);
+                const u = await this.executePost('/users/removeNat/' + this.user.id, {}, e);
                 if (u) {
                     if (u.error) {
                         this.info = u.error;

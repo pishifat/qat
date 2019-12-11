@@ -45,7 +45,7 @@ router.post('/apply', async (req, res) => {
             applicant: req.session.mongoId,
             mode: req.body.mode,
             consensus: 'fail',
-            $or: [ { cooldownDate: { $gte: cooldownDate } }, { active: true }] 
+            $or: [ { cooldownDate: { $gte: cooldownDate } }, { active: true }],
         }),
         await evalRoundsService.query({
             bn: req.session.mongoId,

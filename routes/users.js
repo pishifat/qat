@@ -94,18 +94,12 @@ router.post('/switchGroup/:id', api.isLeader, async (req, res) => {
 });
 
 /* POST remove from BN/NAT without evaluation */
-router.post('/removeGroup/:id', api.isLeader, async (req, res) => {
-    let u = await usersService.query({ _id: req.params.id });
-    let logGroup = u.group;
-    if(u.group == 'bn'){
-        u = await usersService.update(req.params.id, { group: 'user',  probation: [], modes: [], $push: { bnDuration: new Date() } });
-    }else if(u.group == 'nat'){
-        u = await usersService.update(req.params.id, { group: 'user',  probation: [], modes: [], $push: { natDuration: new Date() } });
-    }
+router.post('/removeNat/:id', api.isLeader, async (req, res) => {
+    let u = await usersService.update(req.params.id, { group: 'user',  probation: [], modes: [], $push: { natDuration: new Date() } });
     res.json(u);
     logsService.create(
         req.session.mongoId,
-        `Removed "${u.username}" from the ${logGroup.toUpperCase()}`
+        `Removed "${u.username}" from the NAT`
     );
 });
 
