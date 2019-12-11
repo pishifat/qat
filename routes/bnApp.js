@@ -55,20 +55,24 @@ router.post('/apply', async (req, res) => {
         }),
     ]);
 
+
     if (!currentBnApp && !currentBnEval) {
         // Check user kudosu total count & mod score
-        const [userInfo, modScore] = await Promise.all([
-            await api.getUserInfo(req.session.accessToken),
-            await getUserModsCount(req.session.username, req.body.mode),
-        ]);
-
-        if (!userInfo || userInfo.error || !modScore || modScore.error) {
-            return res.json({ error: 'Something went wrong! Please retry again.' });
-        }
-
-        if (modScore <= 0 || ((req.body.mode == 'osu' && userInfo.kudosu.total <= 200) || (req.body.mode != 'osu' && userInfo.kudosu.total <= 150))) {
-            return res.json({ error: `You don't meet the minimum score or total kudosu requirement. 
-                Your mod score needs to be higher or equal than 0. Currently it is ${modScore}` });
+        let invalids = [920861, 654108, 8693851, 1980256, 1623405, 4154071, 3611370, 626907, 2239480]; //temporary exceptions to mod score
+        if(invalids.indexOf(req.session.osuId) < 0){
+            const [userInfo, modScore] = await Promise.all([
+                await api.getUserInfo(req.session.accessToken),
+                await getUserModsCount(req.session.username, req.body.mode),
+            ]);
+    
+            if (!userInfo || userInfo.error || !modScore || modScore.error) {
+                return res.json({ error: 'Something went wrong! Please retry again.' });
+            }
+    
+            if (modScore <= 0 || ((req.body.mode == 'osu' && userInfo.kudosu.total <= 200) || (req.body.mode != 'osu' && userInfo.kudosu.total <= 150))) {
+                return res.json({ error: `You don't meet the minimum score or total kudosu requirement. 
+                    Your mod score needs to be higher or equal than 0. Currently it is ${modScore}` });
+            }
         }
         
         // Create app & test

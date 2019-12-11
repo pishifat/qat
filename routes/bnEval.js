@@ -373,7 +373,7 @@ router.post('/setConsensus/:id', api.isNotSpectator, async (req, res) => {
     res.json(er);
     if(req.body.consensus){
         logsService.create(
-            req.session.mongoId,`Set consensus of ${er.bn.username}'s ${er.mode} BN eval as ${req.body.consensus}`
+            req.session.mongoId,`Set consensus of ${er.bn.username}'s ${er.mode} BN eval as ${req.body.consensus == 'extend' ? 'probation' : req.body.consensus}`
         );
         api.webhookPost(
             [{
