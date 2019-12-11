@@ -45,6 +45,14 @@
                             :is-low-activity="evalRound.isLowActivity"
                             @update-nominator-assessment="$emit('update-eval-round', $event);"
                         />
+                        <cooldown
+                            v-if="evalRound.consensus == 'fail'"
+                            :cooldown-date="evalRound.cooldownDate"
+                            :originDate="evalRound.updatedAt"
+                            :nominator-assessment-mongo-id="evalRound.id"
+                            :is-application="false"
+                            @update-nominator-assessment="$emit('update-eval-round', $event);"
+                        />
                         <feedback-info
                             v-if="evalRound.consensus"
                             :consensus="evalRound.consensus"
@@ -86,6 +94,7 @@ import ModdingActivity from './currentBnInfo/ModdingActivity.vue';
 import UserList from '../info/UserList.vue';
 import EvaluationInput from '../info/EvaluationInput.vue';
 import Consensus from '../info/Consensus.vue';
+import Cooldown from '../info/Cooldown.vue';
 import FeedbackInfo from '../info/FeedbackInfo.vue';
 import Evaluations from '../info/Evaluations.vue';
 
@@ -101,6 +110,7 @@ export default {
         UserList,
         EvaluationInput,
         Consensus,
+        Cooldown, 
         FeedbackInfo,
         Evaluations,
     },
@@ -117,9 +127,12 @@ export default {
             return evaluators;
         },
     },
-    evalRound() {
-        history.pushState(null, 'Current BN Evaluations', `/bneval?eval=${this.evalRound.id}`);
-    },
+    watch: {
+        evalRound() {
+            history.pushState(null, 'Current BN Evaluations', `/bneval?eval=${this.evalRound.id}`);
+        },
+    }
+    
 };
 </script>
 

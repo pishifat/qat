@@ -360,10 +360,16 @@ router.post('/setComplete/', api.isLeader, async (req, res) => {
 
 /* POST set consensus of eval */
 router.post('/setConsensus/:id', api.isNotSpectator, async (req, res) => {
-    await evalRoundsService.update(req.params.id, { 
+    let er = await evalRoundsService.update(req.params.id, { 
         consensus: req.body.consensus, 
         isLowActivity: req.body.isLowActivity ? true : false });
-    let er = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
+    if(req.body.consensus == 'fail'){
+        let date = new Date(er.updatedAt);
+        date.setDate(date.getDate() + 90);
+        await evalRoundsService.update(req.params.id, { cooldownDate: date });
+    }
+    
+    er = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(er);
     if(req.body.consensus){
         logsService.create(
@@ -387,6 +393,34 @@ router.post('/setConsensus/:id', api.isNotSpectator, async (req, res) => {
             er.mode
         );
     }
+});
+
+/* POST set cooldown */
+router.post('/setCooldownDate/:id', api.isNotSpectator, async (req, res) => {
+    await evalRoundsService.update(req.params.id, { cooldownDate: req.body.cooldownDate });
+    let er = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
+    res.json(er);
+    logsService.create(
+        req.session.mongoId,
+        `Changed cooldown date to ${req.body.cooldownDate.toString().slice(0,10)} for ${er.bn.username}'s ${er.mode} current BN evaluation`
+    );
+    api.webhookPost(
+        [{
+            author: {
+                name: `${req.session.username}`,
+                icon_url: `https://a.ppy.sh/${req.session.osuId}`,
+                url: `https://osu.ppy.sh/users/${req.session.osuId}`,
+            },
+            color: '16631799',
+            fields:[
+                {
+                    name: `http://bn.mappersguild.com/appeval?eval=${er.id}`,
+                    value: `**${er.bn.username}**'s re-application date set to **${req.body.cooldownDate.toString().slice(0,10)}**`,
+                },
+            ],
+        }], 
+        er.mode
+    );
 });
 
 /* POST set feedback of eval */

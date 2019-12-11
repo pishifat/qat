@@ -302,7 +302,7 @@ export default {
                     if (v.error) {
                         this.info = v.error;
                     } else {
-                        await this.$emit('update-veto', v);
+                        this.$emit('update-veto', v);
                         this.confirm = 'Mediation submitted!';
                         this.vote = vote;
                     }
@@ -321,7 +321,7 @@ export default {
                     if (v.error) {
                         this.info = v.error;
                     } else {
-                        await this.$emit('update-veto', v);
+                        this.$emit('update-veto', v);
                         this.confirm = 'Mediation concluded!';
                     }
                 }
@@ -338,7 +338,7 @@ export default {
                     if (v.error) {
                         this.info = v.error;
                     } else {
-                        await this.$emit('update-veto', v);
+                        this.$emit('update-veto', v);
                         this.confirm = 'Mediation re-opened!';
                     }
                 }
@@ -353,7 +353,7 @@ export default {
                     if (v.error) {
                         this.info = v.error;
                     } else {
-                        await this.$emit('update-veto', v);
+                        this.$emit('update-veto', v);
                     }
                 }
             }

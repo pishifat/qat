@@ -259,7 +259,7 @@ export default {
                     if (d.error) {
                         this.info = d.error;
                     } else {
-                        await this.$emit('update-discussion', d);
+                        this.$emit('update-discussion', d);
                         this.confirm = 'Vote submitted!';
                         this.vote = vote;
                     }
@@ -277,7 +277,7 @@ export default {
                     if (d.error) {
                         this.info = d.error;
                     } else {
-                        await this.$emit('update-discussion', d);
+                        this.$emit('update-discussion', d);
                         this.confirm = 'Discussion concluded!';
                     }
                 }

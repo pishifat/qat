@@ -255,8 +255,13 @@ router.post('/setComplete/', api.isLeader, async (req, res) => {
 
 /* POST set consensus of eval */
 router.post('/setConsensus/:id', api.isNat, api.isNotSpectator, async (req, res) => {
-    await bnAppsService.update(req.params.id, { consensus: req.body.consensus });
-    let a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
+    let a = await bnAppsService.update(req.params.id, { consensus: req.body.consensus });
+    if(req.body.consensus == 'fail'){
+        let date = new Date(a.createdAt);
+        date.setDate(date.getDate() + 90);
+        await bnAppsService.update(req.params.id, { cooldownDate: date });
+    }
+    a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(a);
     logsService.create(
         req.session.mongoId,
@@ -274,6 +279,34 @@ router.post('/setConsensus/:id', api.isNat, api.isNotSpectator, async (req, res)
                 {
                     name: `http://bn.mappersguild.com/appeval?eval=${a.id}`,
                     value: `**${a.applicant.username}**'s BN app set to **${req.body.consensus}**`,
+                },
+            ],
+        }], 
+        a.mode
+    );
+});
+
+/* POST set cooldown */
+router.post('/setCooldownDate/:id', api.isNotSpectator, async (req, res) => {
+    await bnAppsService.update(req.params.id, { cooldownDate: req.body.cooldownDate });
+    let a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
+    res.json(a);
+    logsService.create(
+        req.session.mongoId,
+        `Changed cooldown date to ${req.body.cooldownDate.toString().slice(0,10)} for ${a.applicant.username}'s ${a.mode} BN app`
+    );
+    api.webhookPost(
+        [{
+            author: {
+                name: `${req.session.username}`,
+                icon_url: `https://a.ppy.sh/${req.session.osuId}`,
+                url: `https://osu.ppy.sh/users/${req.session.osuId}`,
+            },
+            color: '16631799',
+            fields:[
+                {
+                    name: `http://bn.mappersguild.com/appeval?eval=${a.id}`,
+                    value: `**${a.applicant.username}**'s re-application date set to **${req.body.cooldownDate.toString().slice(0,10)}**`,
                 },
             ],
         }], 

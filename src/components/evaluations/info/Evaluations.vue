@@ -1,11 +1,11 @@
 <template>
     <div class="text-shadow mt-3">
         <div v-for="evaluation in natEvaluations" :key="evaluation.id" class="row border-bottom border-dark my-2">
-            <div class="col-sm-2 d-flex flex-column ml-auto text-center">
-                <img :src="'https://a.ppy.sh/' + evaluation.evaluator.osuId" class="card-avatar-img mx-auto">
-                <span class="small" :class="voteColor(evaluation.vote)">
+            <div class="col-sm-2">
+                <a :href="'https://osu.ppy.sh/users/' +  evaluation.evaluator.osuId" class="small d-flex flex-column ml-auto font-weight-bold text-center" :class="voteColor(evaluation.vote)">
+                    <img :src="'https://a.ppy.sh/' + evaluation.evaluator.osuId" class="card-avatar-img mx-auto">
                     {{ evaluation.evaluator.username }}
-                </span> 
+                </a> 
             </div>
             <div class="col-sm-7">
                 <p class="min-spacing">
@@ -21,11 +21,11 @@
             </div>
         </div>
         <div v-for="evaluation in bnEvaluations" :key="evaluation.id" class="row border-bottom border-dark my-2">
-            <div class="col-sm-2 d-flex flex-column ml-auto text-center">
-                <img :src="'https://a.ppy.sh/' + evaluation.evaluator.osuId" class="card-avatar-img mx-auto">
-                <span class="small" :class="voteColor(evaluation.vote)">
+            <div class="col-sm-2">
+                <a :href="'https://osu.ppy.sh/users/' +  evaluation.evaluator.osuId" class="small d-flex flex-column ml-auto font-weight-bold text-center" :class="voteColor(evaluation.vote)">
+                    <img :src="'https://a.ppy.sh/' + evaluation.evaluator.osuId" class="card-avatar-img mx-auto">
                     {{ evaluation.evaluator.username }}
-                </span> 
+                </a>
             </div>
             <div class="col-sm-7">
                 <p class="min-spacing">

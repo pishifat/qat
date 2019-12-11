@@ -85,7 +85,7 @@ export default {
                 if (result.error) {
                     this.info = result.error;
                 } else {
-                    await this.$emit('update-nominator-assessment', result);
+                    this.$emit('update-nominator-assessment', result);
                 }
             }
         },

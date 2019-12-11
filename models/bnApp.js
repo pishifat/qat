@@ -15,6 +15,7 @@ const bnAppSchema = new mongoose.Schema({
     test: { type: 'ObjectId', ref: 'TestSubmission' },
     bnEvaluators: [{ type: 'ObjectId', ref: 'User' }],
     natEvaluators: [{ type: 'ObjectId', ref: 'User' }],
+    cooldownDate: { type: Date },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 const BnApp = mongoose.model('BnApp', bnAppSchema);

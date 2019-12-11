@@ -13,6 +13,7 @@ const evalRoundSchema = new mongoose.Schema({
     feedback: { type: String },
     feedbackAuthor: { type: 'ObjectId', ref: 'User' },
     isLowActivity: { type: Boolean, default: false },
+    cooldownDate: { type: Date },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 const EvalRound = mongoose.model('EvalRound', evalRoundSchema);

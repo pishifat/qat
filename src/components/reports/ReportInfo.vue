@@ -177,7 +177,7 @@ export default {
                     if (r.error) {
                         this.info = r.error;
                     } else {
-                        await this.$emit('update-report', r);
+                        this.$emit('update-report', r);
                         this.confirm = 'Report updated!';
                     }
                 }
@@ -189,7 +189,7 @@ export default {
                 if (r.error) {
                     this.info = r.error;
                 } else {
-                    await this.$emit('update-report', r);
+                    this.$emit('update-report', r);
                     this.confirm = 'Report updated!';
                 }
             }

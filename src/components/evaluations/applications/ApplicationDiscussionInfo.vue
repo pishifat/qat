@@ -42,6 +42,14 @@
                             :is-application="true"
                             @update-nominator-assessment="$emit('update-application', $event);"
                         />
+                        <cooldown
+                            v-if="application.consensus == 'fail'"
+                            :cooldown-date="application.cooldownDate"
+                            :originDate="application.createdAt"
+                            :nominator-assessment-mongo-id="application.id"
+                            :is-application="true"
+                            @update-nominator-assessment="$emit('update-application', $event);"
+                        />
                         <feedback-info
                             v-if="application.consensus"
                             :consensus="application.consensus"
@@ -79,6 +87,7 @@ import TestResults from './applicationInfo/TestResults.vue';
 import PreviousEvaluations from '../info/PreviousEvaluations.vue';
 import UserNotes from '../info/UserNotes.vue';
 import Consensus from '../info/Consensus.vue';
+import Cooldown from '../info/Cooldown.vue';
 import FeedbackInfo from '../info/FeedbackInfo.vue';
 import Evaluations from '../info/Evaluations.vue';
 import EvaluationInput from '../info/EvaluationInput.vue';
@@ -92,6 +101,7 @@ export default {
         PreviousEvaluations,
         UserNotes,
         Consensus,
+        Cooldown,
         FeedbackInfo,
         Evaluations,
         EvaluationInput

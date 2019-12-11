@@ -89,7 +89,7 @@
             <p class="small">
                 If you see nonsense below this line, you'll need to visit the <a href="http://bn.mappersguild.com/bnapps">BN Application page</a> and re-submit your test. Sorry!
             </p>
-            <p>Your test has been submitted! Your score is {{ displayScore }}/20, but that may change when someone manually reviews your score.</p>
+            <p>Your test has been submitted! Your score is {{ displayScore }}/20.</p>
         </div>
         <p v-else class="text-center">
             You have no pending test...

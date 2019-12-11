@@ -40,17 +40,18 @@ router.post('/apply', async (req, res) => {
     }
     
     let cooldownDate = new Date();
-    cooldownDate.setDate(cooldownDate.getDate() - 90);
     const [currentBnApp, currentBnEval] = await Promise.all([
         await bnAppsService.query({
             applicant: req.session.mongoId,
             mode: req.body.mode,
-            createdAt: { $gte: cooldownDate },
+            consensus: 'fail',
+            $or: [ { cooldownDate: { $gte: cooldownDate } }, { active: true }] 
         }),
         await evalRoundsService.query({
             bn: req.session.mongoId,
             mode: req.body.mode,
-            updatedAt: { $gte: cooldownDate },
+            consensus: 'fail',
+            cooldownDate: { $gte: cooldownDate },
         }),
     ]);
 
@@ -93,9 +94,7 @@ router.post('/apply', async (req, res) => {
                 return res.json({
                     error: `Your previous application was rejected (check your osu! forum PMs for details). 
                         You may apply for this game mode again on 
-                        ${new Date(currentBnApp.createdAt.setDate(currentBnApp.createdAt.getDate() + 90))
-        .toString()
-        .slice(4, 15)}.`,
+                        ${new Date(currentBnApp.cooldownDate).toString().slice(4, 15)}.`,
                 });
             }
         } else if (currentBnEval) {
@@ -105,9 +104,7 @@ router.post('/apply', async (req, res) => {
                 return res.json({
                     error: `You were recently removed from the Beatmap Nominators in this game mode. 
                         You may apply for this game mode again on 
-                        ${new Date(currentBnEval.updatedAt.setDate(currentBnEval.updatedAt.getDate() + 90))
-        .toString()
-        .slice(4, 15)}.`,
+                        ${new Date(currentBnEval.cooldownDate).toString().slice(4, 15)}.`,
                 });
             }
         }
