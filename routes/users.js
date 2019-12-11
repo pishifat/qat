@@ -250,13 +250,12 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
 router.get('/findBnActivity/:days/:mode', async (req, res) => {
     class obj 
     {
-        constructor(username, osuId, uniqueNominations, nominationResets, beatmapReports, joinDate) 
+        constructor(username, osuId, uniqueNominations, nominationResets, joinDate) 
         {
             this.username = username;
             this.osuId = osuId;
             this.uniqueNominations = uniqueNominations;
             this.nominationResets = nominationResets;
-            this.beatmapReports = beatmapReports;
             this.joinDate = joinDate;
         }
     }
@@ -277,7 +276,6 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
     users.forEach(user => {
         let uniqueNominations = [];
         let nominationResets = 0;
-        let beatmapReports = 0;
         for (let i = 0; i < allEvents.length; i++) {
             const eventType = allEvents[i]._id;
             const events = allEvents[i].events;
@@ -299,15 +297,9 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
                         nominationResets++;
                     }
                 }
-            } else if (eventType == 'Reported'){
-                for (let j = 0; j < events.length; j++) {
-                    if(events[j].userId == user.osuId){
-                        beatmapReports++;
-                    }
-                }
             }
         }
-        info.push(new obj(user.username, user.osuId, uniqueNominations.length, nominationResets, beatmapReports, user.bnDuration[user.bnDuration.length - 1]));
+        info.push(new obj(user.username, user.osuId, uniqueNominations.length, nominationResets, user.bnDuration[user.bnDuration.length - 1]));
     });
 
     res.json(info);

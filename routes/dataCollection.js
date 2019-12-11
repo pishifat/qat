@@ -23,7 +23,7 @@ router.get('/relevantInfo', async (req, res) => {
     let date = new Date();
     date.setDate(date.getDate() - 30);
     let data = await aiessService.query(
-        { $or: [{ eventType: 'Disqualified' }, { eventType: 'Popped' }, { eventType: 'Reported' }], timestamp: { $gte: date } },
+        { $or: [{ eventType: 'Disqualified' }, { eventType: 'Popped' }], timestamp: { $gte: date } },
         {},
         { timestamp: -1 },
         true
