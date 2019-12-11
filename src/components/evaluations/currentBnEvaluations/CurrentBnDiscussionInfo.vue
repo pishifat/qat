@@ -57,7 +57,7 @@
                             v-if="evalRound.consensus"
                             :consensus="evalRound.consensus"
                             :osu-id="evalRound.bn.osuId"
-                            :date="evalRound.updatedAt"
+                            :cooldown-date="evalRound.cooldownDate"
                             :evaluations="evalRound.evaluations"
                             :probation="evalRound.bn.probation"
                             :is-low-activity="evalRound.isLowActivity"

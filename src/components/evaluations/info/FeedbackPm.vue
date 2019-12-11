@@ -26,7 +26,7 @@
                 <samp class="small">For further feedback or to appeal this decision, contact any of these users:
                     <span v-for="(evaluation, i) in natEvaluations" :key="i">[url=https://osu.ppy.sh/users/{{ evaluation.evaluator.osuId }}]{{ evaluation.evaluator.username }}[/url]{{ i+1 != natEvaluations.length ? ", " : "" }}</span>
                 </samp><br><br>
-                <samp class="small">You may apply for BN in this game mode again on {{ defineDate(date) }}. Good luck!</samp><br><br>
+                <samp class="small">You may apply for BN in this game mode again on {{ defineDate(cooldownDate) }}. Good luck!</samp><br><br>
                 <samp class="small">Regards, the Nomination Assessment Team</samp>
             </div>
         </div>
@@ -70,7 +70,7 @@
             <div v-else class="copy-paste">
                 <samp class="small">Hello!</samp><br><br>
                 <samp class="small">After reviewing your work as a BN for the [i]{{ mode == 'osu' ? 'osu!' : 'osu!' + mode }}[/i] game mode, we have decided to [b]remove you from the Beatmap Nominators[/b].</samp><br><br>
-                <samp class="small">Despite this decision, we would like to thank you for your service to the mapping and modding communities and wish you the best of luck in your future endeavours. Should you wish to apply for the Beatmap Nominators in the future, you may do so on {{ defineDate(date) }}, provided you meet the normal required activity requirements and have shown improvement in the areas mentioned.</samp><br><br>
+                <samp class="small">Despite this decision, we would like to thank you for your service to the mapping and modding communities and wish you the best of luck in your future endeavours. Should you wish to apply for the Beatmap Nominators in the future, you may do so on {{ defineDate(cooldownDate) }}, provided you meet the normal required activity requirements and have shown improvement in the areas mentioned.</samp><br><br>
                 <samp class="small">Additional feedback from the NAT:</samp><br><br>
                 <samp><pre class="small">[notice]{{ feedback }}[/notice]</pre></samp>
                 <samp class="small">For further feedback or to appeal this decision, contact any of these users:
@@ -90,7 +90,7 @@ export default {
     props: {
         isApplication: Boolean,
         consensus: String,
-        date: String,
+        cooldownDate: String,
         mode: String,
         evaluations: Array,
         probation: Array,
@@ -109,9 +109,7 @@ export default {
     },
     methods: {
         defineDate(date){
-            date = new Date(date);
-            let reapply = new Date(date.setDate(date.getDate() + 90)).toString().slice(4, 15);
-            return reapply;
+            return new Date(this.cooldownDate).toString().slice(4, 15);
         },
     },
 };

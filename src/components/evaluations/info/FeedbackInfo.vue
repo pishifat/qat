@@ -25,7 +25,7 @@
         <feedback-pm
             :is-application="isApplication"
             :consensus="consensus"
-            :date="date"
+            :cooldown-date="cooldownDate"
             :mode="mode"
             :probation="probation"
             :feedback="savedFeedback"
@@ -49,7 +49,7 @@ export default {
         consensus: String,
         isApplication: Boolean,
         osuId: Number,
-        date: String,
+        cooldownDate: String,
         mode: String,
         evaluations: Array,
         probation: Array,

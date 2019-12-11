@@ -55,7 +55,7 @@
                             :consensus="application.consensus"
                             :is-application="true"
                             :osu-id="application.applicant.osuId"
-                            :date="application.createdAt"
+                            :cooldown-date="application.cooldownDate"
                             :evaluations="application.evaluations"
                             :mode="application.mode"
                             :saved-feedback="application.feedback"
