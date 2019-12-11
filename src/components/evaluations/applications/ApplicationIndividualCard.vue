@@ -22,6 +22,7 @@
                 :is-discuss="false"
                 :date="application.createdAt"
                 :is-application="true"
+                :feedback="application.feedback"
                 @check-selection="checkSelection()"
             />
         </div>

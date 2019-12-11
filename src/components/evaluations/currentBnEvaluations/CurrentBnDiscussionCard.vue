@@ -24,6 +24,7 @@
                 :is-discuss="true"
                 :date="evalRound.deadline"
                 :is-archive="isArchive"
+                :feedback="evalRound.feedback"
                 @check-selection="checkSelection()"
             />
         </div>

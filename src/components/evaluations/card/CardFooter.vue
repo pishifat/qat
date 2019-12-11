@@ -17,12 +17,19 @@
             :evaluations="evaluations"
         />
         <i
-            class="fas fa-clock mx-1"
+            v-if="feedback" 
             data-toggle="tooltip"
             data-placement="top"
-            title="deadline"
+            title="feedback written" 
+            class="fas fa-comment mx-1"
         />
-        <span class="errors mx-1">
+        <span class="errors mx-1 ml-auto">
+            <i
+                class="fas fa-clock mr-1"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="deadline"
+            />
             {{ createDeadline() }}
         </span>
         <input
@@ -52,6 +59,7 @@ export default {
         date: String,
         isApplication: Boolean,
         isArchive: Boolean,
+        feedback: String,
     },
     components: {
         AddVotes,
