@@ -277,6 +277,14 @@ export default {
                 this.isNat = response.data.isNat;
                 this.isBn = response.data.isBn;
                 this.limit = 24;
+                const params = new URLSearchParams(document.location.search.substring(1));
+                if (params.get('id') && params.get('id').length) {
+                    const i = this.allObjs.findIndex(u => u.id == params.get('id'));
+                    if(i >= 0){
+                        this.selectedUser = this.allObjs[i];
+                        $('#extendedInfo').modal('show');
+                    }
+                }
             }).then(function(){
                 $('#loading').fadeOut();
                 $('#main').attr('style', 'visibility: visible').hide().fadeIn();

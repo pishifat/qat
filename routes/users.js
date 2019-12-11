@@ -65,16 +65,7 @@ router.get('/relevantInfo', async (req, res) => {
     });
 });
 
-/* POST submit or edit eval */
-router.post('/switchMediator/', api.isLeader, async (req, res) => {
-    let u = await usersService.update(req.body.userId, {
-        vetoMediator: !req.body.vetoMediator,
-    });
-    res.json(u);
-    logsService.create(req.session.mongoId, `Opted ${u.username} ${u.vetoMediator ? 'in to' : 'out of'} veto mediation`);
-});
-
-/* POST submit or edit eval */
+/* POST switch bn evaluator */
 router.post('/switchBnEvaluator/', api.isBnOrNat, async (req, res) => {
     let u = await usersService.update(req.session.mongoId, {
         isBnEvaluator: !res.locals.userRequest.isBnEvaluator,
