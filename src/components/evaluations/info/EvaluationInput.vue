@@ -140,9 +140,9 @@ export default {
                         this.info = r.error;
                         this.confirm = '';
                     } else {
-                        this.$emit('update-nominator-assessment', r);
-                        this.info = '';
-                        this.confirm = this.evaluationId ? 'Updated!' : 'Submitted!';
+                        await this.$emit('update-nominator-assessment', r);
+                        this.findUserEvaluation();
+                        this.confirm = 'Submitted!';
                     }
                 }
             }
