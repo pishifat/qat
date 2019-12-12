@@ -13,7 +13,10 @@
                 <div class="modal-body" style="overflow: hidden;">
                     <div class="container">
                         <user-activity
-                            :eval-round="evalRound"
+                            :osu-id="evalRound.bn.osuId"
+                            :mode="evalRound.mode"
+                            :deadline="evalRound.deadline"
+                            :is-nat="evaluator.isNat"
                         />
                         <hr>
                         <consensus

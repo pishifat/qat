@@ -4,6 +4,7 @@
             :nominations="nominations"
             :loading="loading"
             :editing="editing"
+            :is-nat="isNat"
             @update-editing="editing = !editing"
         />
         <nomination-resets
@@ -12,6 +13,7 @@
             :header="'Nominations disqualified'"
             :loading="loading"
             :editing="editing"
+            :is-nat="isNat"
             @update-entry="updateEntry($event)"
         />
         <nomination-resets
@@ -20,6 +22,7 @@
             :header="'Nominations popped'"
             :loading="loading"
             :editing="editing"
+            :is-nat="isNat"
             @update-entry="updateEntry($event)"
         />
         <nomination-resets
@@ -28,6 +31,7 @@
             :header="'Disqualifications done by user'"
             :loading="loading"
             :editing="editing"
+            :is-nat="isNat"
             @update-entry="updateEntry($event)"
         />
         <nomination-resets
@@ -36,6 +40,7 @@
             :header="'Pops done by user'"
             :loading="loading"
             :editing="editing"
+            :is-nat="isNat"
             @update-entry="updateEntry($event)"
         />
     </div>
@@ -56,7 +61,12 @@ export default {
         NominationResets,
     },
     mixins: [ postData, filterLinks ],
-    props: [ 'evalRound' ],
+    props: {
+        osuId: Number,
+        mode: String,
+        deadline: String,
+        isNat: Boolean
+    },
     data() {
         return {
             nominations: null,
@@ -69,7 +79,7 @@ export default {
         };
     },
     watch: {
-        evalRound() {
+        osuId() {
             this.editing = false;
             this.loading = true;
             this.findRelevantActivity();
@@ -81,7 +91,7 @@ export default {
     methods: {
         async findRelevantActivity(){
             axios
-                .get('/bnEval/userActivity/' + this.evalRound.bn.osuId + '/' + this.evalRound.mode + '/' + this.evalRound.deadline)
+                .get('/bnEval/userActivity/' + this.osuId + '/' + this.mode + '/' + this.deadline)
                 .then(response => {
                     this.nominations = response.data.noms;
                     this.nominationsDisqualified = response.data.nomsDqd;

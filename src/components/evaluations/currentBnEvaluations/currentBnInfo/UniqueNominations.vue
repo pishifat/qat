@@ -1,9 +1,9 @@
 <template>
     <div>
-        <p class="text-shadow">
+        <p class="text-shadow min-spacing">
             <a :href="nominations && '#nominations'" data-toggle="collapse">Unique nominations <i class="fas fa-angle-down" /></a> 
             ({{ loading ? '...' : nominations ? nominations.length: '0' }})
-            <button class="btn btn-sm btn-nat float-right" @click="$emit('update-editing');">
+            <button v-if="isNat" class="btn btn-sm btn-nat float-right" @click="$emit('update-editing');">
                 {{ editing ? 'Disable reason editing' : 'Enable reason editing' }}
             </button>
         </p>
@@ -45,6 +45,7 @@ export default {
         nominations: Array,
         loading: Boolean,
         editing: Boolean,
+        isNat: Boolean,
     },
 };
 </script>

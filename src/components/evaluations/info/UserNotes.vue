@@ -7,7 +7,7 @@
             <li v-if="!userNotes.length" class="small min-spacing text-shadow">User has no notes</li>
             <li v-else v-for="note in userNotes" :key="note.id" class="small text-shadow">
                 <b>{{ note.updatedAt.slice(0,10) }} - {{ note.author.username }}</b>
-                <pre class="secondary-text pre-font ml-2">{{ note.comment }}</pre>
+                <pre class="secondary-text pre-font ml-2" v-html="filterLinks(note.comment)"></pre>
             </li>
         </ul>
     </div>

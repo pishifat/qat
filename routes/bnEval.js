@@ -13,7 +13,6 @@ const notesService = require('../models/note').service;
 const router = express.Router();
 
 router.use(api.isLoggedIn);
-router.use(api.isNat);
 
 /* GET bn app page */
 router.get('/', (req, res) => {
@@ -147,7 +146,7 @@ router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
 });
 
 /* POST submit or edit eval */
-router.post('/submitEval/:id', api.isNotSpectator, async (req, res) => {
+router.post('/submitEval/:id', api.isBnOrNat, async (req, res) => {
     if (req.body.evaluationId) {
         await evalsService.update(req.body.evaluationId, {
             behaviorComment: req.body.behaviorComment,
@@ -359,7 +358,7 @@ router.post('/setComplete/', api.isLeader, async (req, res) => {
 });
 
 /* POST set consensus of eval */
-router.post('/setConsensus/:id', api.isNotSpectator, async (req, res) => {
+router.post('/setConsensus/:id', api.isNat, async (req, res) => {
     let er = await evalRoundsService.update(req.params.id, { 
         consensus: req.body.consensus, 
         isLowActivity: req.body.isLowActivity ? true : false });
@@ -396,7 +395,7 @@ router.post('/setConsensus/:id', api.isNotSpectator, async (req, res) => {
 });
 
 /* POST set cooldown */
-router.post('/setCooldownDate/:id', api.isNotSpectator, async (req, res) => {
+router.post('/setCooldownDate/:id', api.isNat, async (req, res) => {
     await evalRoundsService.update(req.params.id, { cooldownDate: req.body.cooldownDate });
     let er = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(er);
@@ -424,7 +423,7 @@ router.post('/setCooldownDate/:id', api.isNotSpectator, async (req, res) => {
 });
 
 /* POST set feedback of eval */
-router.post('/setFeedback/:id', api.isNotSpectator, async (req, res) => {
+router.post('/setFeedback/:id', api.isNat, async (req, res) => {
     await evalRoundsService.update(req.params.id, { feedback: req.body.feedback });
     let er = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(er);
@@ -461,7 +460,7 @@ router.post('/setFeedback/:id', api.isNotSpectator, async (req, res) => {
 });
 
 /* GET find previous evaluations */
-router.get('/findPreviousEvaluations/:id', async (req, res) => {
+router.get('/findPreviousEvaluations/:id', api.isNat, async (req, res) => {
     let evals;
     evals = await evalRoundsService.query({ bn: req.params.id, active: false, consensus: { $exists: true }, feedback: { $exists: true } }, {}, {}, true);
     if(!evals.length){
@@ -471,13 +470,13 @@ router.get('/findPreviousEvaluations/:id', async (req, res) => {
 });
 
 /* GET find user notes */
-router.get('/findUserNotes/:id', async (req, res) => {
+router.get('/findUserNotes/:id', api.isNat, async (req, res) => {
     let notes = await notesService.query({ user: req.params.id, isHidden: { $ne: true } }, notesPopulate, {}, true);
     res.json({ userNotes: notes });
 });
 
 /* GET find user reports */
-router.get('/findUserReports/:id', async (req, res) => {
+router.get('/findUserReports/:id', api.isNat, async (req, res) => {
     let reports = await reportsService.query({ culprit: req.params.id, isActive: { $ne: true } }, {}, {}, true);
     res.json({ userReports: reports });
 });

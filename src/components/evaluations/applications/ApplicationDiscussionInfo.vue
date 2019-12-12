@@ -22,7 +22,7 @@
                             :osuId="application.applicant.osuId"
                         />
                         <p class="text-shadow">
-                            <a href="#additionalInfo" data-toggle="collapse">Additional Info <i class="fas fa-angle-down" /></a>
+                            <a href="#additionalInfo" data-toggle="collapse">Additional info <i class="fas fa-angle-down" /></a>
                         </p>
                         <div id="additionalInfo" class="collapse container">
                             <p v-if="application.test.comment" class="text-shadow">

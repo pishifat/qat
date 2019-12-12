@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p class="text-shadow">
+        <p class="text-shadow min-spacing">
             <a :href="events && `#${eventsId}`" data-toggle="collapse">{{ header }} <i class="fas fa-angle-down" /></a> 
             ({{ loading ? '...' : events ? events.length : '0' }})
         </p>
@@ -18,7 +18,7 @@
                     </td>
                 </thead>
                 <tbody class="small">
-                    <tr v-for="event in events" :key="event.id" :class="event.valid == 1 ? 'vote-border-pass' : event.valid == 2 ? 'vote-border-extend' : event.valid == 3 ? 'vote-border-fail' : ''">
+                    <tr v-for="event in events" :key="event.id" :class="!isNat ? '' : event.valid == 1 ? 'vote-border-pass' : event.valid == 2 ? 'vote-border-extend' : event.valid == 3 ? 'vote-border-fail' : ''">
                         <td scope="row">
                             {{ new Date(event.timestamp).toString().slice(4,10) }}
                         </td>
@@ -63,6 +63,7 @@ export default {
         header: String,
         loading: Boolean,
         editing: Boolean,
+        isNat: Boolean,
     },
     components: {
         Notability

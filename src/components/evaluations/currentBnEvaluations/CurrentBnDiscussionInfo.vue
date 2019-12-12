@@ -13,10 +13,13 @@
                 <div class="modal-body" style="overflow: hidden;">
                     <div class="container">
                         <user-activity
-                            :eval-round="evalRound"
+                            :osu-id="evalRound.bn.osuId"
+                            :mode="evalRound.mode"
+                            :deadline="evalRound.deadline"
+                            :is-nat="evaluator.isNat"
                         />
                         <p class="text-shadow">
-                            <a href="#additionalInfo" data-toggle="collapse">Additional Info <i class="fas fa-angle-down" /></a> 
+                            <a href="#additionalInfo" data-toggle="collapse">Additional info <i class="fas fa-angle-down" /></a> 
                         </p>
                         <div id="additionalInfo" class="collapse container">
                             <previous-evaluations
