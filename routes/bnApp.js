@@ -44,7 +44,6 @@ router.post('/apply', async (req, res) => {
         await bnAppsService.query({
             applicant: req.session.mongoId,
             mode: req.body.mode,
-            consensus: 'fail',
             $or: [ { cooldownDate: { $gte: cooldownDate } }, { active: true }],
         }),
         await evalRoundsService.query({
