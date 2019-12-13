@@ -1,8 +1,8 @@
 <template>
     <div class="row">
         <div class="col-md-12">
-            <filter-box 
-                :filter-mode.sync="filterMode" 
+            <filter-box
+                :filter-mode.sync="filterMode"
                 :filter-value.sync="filterValue"
                 :placeholder="'beatmap...'"
             >
@@ -10,7 +10,7 @@
                     Submit veto
                 </button>
             </filter-box>
-            
+
             <section class="row segment segment-image mx-0 px-0">
                 <div class="col-sm-12">
                     <h2>Active Vetoes <small v-if="activeVetoes">({{ activeVetoes.length }})</small></h2>
@@ -47,7 +47,7 @@
             :is-nat="isNat"
             @update-veto="updateVeto($event)"
         />
-        <submit-veto @submit-veto="SubmitVeto($event)" />
+        <submit-veto @submit-veto="submitVeto($event)" />
     </div>
 </template>
 
@@ -81,7 +81,7 @@ export default {
             selectedVeto: null,
         };
     },
-    created() {
+    created () {
         axios
             .get('/vetoes/relevantInfo')
             .then(response => {
@@ -101,7 +101,7 @@ export default {
                     .fadeIn();
             });
     },
-    mounted() {
+    mounted () {
         setInterval(() => {
             axios.get('/vetoes/relevantInfo').then(response => {
                 this.allObjs = response.data.vetoes;
@@ -113,21 +113,25 @@ export default {
     },
     methods: {
         filterBySearchValueContext(v) {
-            if(v.beatmapTitle.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1){
+            if (v.beatmapTitle.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1) {
                 return true;
             }
+
             return false;
         },
-        separateObjs() {
-            this.activeVetoes = this.pageObjs.filter(v => v.status == 'wip' || v.status == 'available');
-            this.resolvedVetoes = this.pageObjs.filter(v => v.status != 'wip' && v.status != 'available');
+
+        separateObjs () {
+            this.activeVetoes = this.pageObjs.filter(v => v.status === 'wip' || v.status === 'available');
+            this.resolvedVetoes = this.pageObjs.filter(v => v.status !== 'wip' && v.status !== 'available');
         },
-        SubmitVeto(v) {
+
+        submitVeto (v) {
             this.allObjs.unshift(v);
             this.filter();
         },
-        updateVeto(v) {
-            const i = this.allObjs.findIndex(veto => veto.id == v.id);
+
+        updateVeto (v) {
+            const i = this.allObjs.findIndex(veto => veto.id === v.id);
             this.allObjs[i] = v;
             this.selectedVeto = v;
             this.filter();
@@ -135,6 +139,3 @@ export default {
     },
 };
 </script>
-
-<style>
-</style>

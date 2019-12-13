@@ -115,7 +115,7 @@ export default {
         };
     },
     methods: {
-        async submitVeto(e) {
+        async submitVeto (e) {
             if (!this.discussionLink || !this.shortReason || !this.mode) {
                 this.info = 'Cannot leave fields blank!';
             } else {
@@ -128,19 +128,15 @@ export default {
                     },
                     e
                 );
-                if (veto) {
-                    if (veto.error) {
-                        this.info = veto.error;
-                    } else {
-                        $('#addVeto').modal('hide');
-                        this.$emit('submit-veto', veto);
-                    }
+
+                if (veto.error) {
+                    this.info = veto.error;
+                } else {
+                    $('#addVeto').modal('hide');
+                    this.$emit('submit-veto', veto);
                 }
             }
-        },
-    },
+        }
+    }
 };
 </script>
-
-<style>
-</style>

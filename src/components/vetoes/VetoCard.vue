@@ -6,18 +6,18 @@
             data-target="#extendedInfo"
             :data-veto="veto.id"
         >
-            <img :src="'https://assets.ppy.sh/beatmaps/' + veto.beatmapId + '/covers/card.jpg'" class="card-img">
+            <img :src="`https://assets.ppy.sh/beatmaps/${veto.beatmapId}/covers/card.jpg`" class="card-img">
             <div class="card-body">
                 <p class="text-shadow wrap-text">
-                    <a :href="'https://osu.ppy.sh/beatmapsets/' + veto.beatmapId" target="_blank" @click.stop>{{ veto.beatmapTitle || '...' }}</a>
+                    <a :href="`https://osu.ppy.sh/beatmapsets/${veto.beatmapId}`" target="_blank" @click.stop>{{ veto.beatmapTitle || '...' }}</a>
                 </p>
                 <p class="small text-shadow">
-                    Hosted by <a :href="'https://osu.ppy.sh/users/' + veto.beatmapMapperId" target="_blank" @click.stop>{{ veto.beatmapMapper }}</a>
+                    Hosted by <a :href="`https://osu.ppy.sh/users/${veto.beatmapMapperId}`" target="_blank" @click.stop>{{ veto.beatmapMapper }}</a>
                 </p>
-                
+
                 <div class="veto-status my-auto" :class="`status-bar-${veto.status}`" />
                 <div class="card-icons">
-                    <span v-if="veto.status == 'wip'" class="small text-shadow float-left">
+                    <span v-if="veto.status === 'wip'" class="small text-shadow float-left">
                         <i
                             class="fas fa-clock mx-1"
                             data-toggle="tooltip"
@@ -45,26 +45,50 @@
 
 <script>
 export default {
-    name: 'VetoCard',
-    props: ['veto', 'userId'],
-    methods: {
-        selectVeto() {
-            this.$emit('update:selectedVeto', this.veto);
-        },
+    name: 'veto-card',
+    props: {
+        userId: String,
+        veto: {
+            beatmapId: Number,
+            beatmapMapper: String,
+            beatmapMapperId: Number,
+            beatmapTitle: String,
+            createdAt: Date,
+            deadline: Date,
+            id: String,
+            mode: String,
+            status: String
+        }
     },
+    methods: {
+        selectVeto () {
+            this.$emit('update:selectedVeto', this.veto);
+        }
+    }
 };
 </script>
 
 <style>
+.card {
+    overflow: hidden;
+}
+
+.card-icons {
+    text-align: right;
+}
+
 .status-bar-available {
     background: radial-gradient(var(--available), transparent 70%);
 }
-.status-bar-wip {
-    background: radial-gradient(var(--wip), transparent 70%);
-}
+
 .status-bar-upheld {
     background: radial-gradient(var(--upheld), transparent 70%);
 }
+
+.status-bar-wip {
+    background: radial-gradient(var(--wip), transparent 70%);
+}
+
 .status-bar-withdrawn {
     background: radial-gradient(var(--withdrawn), transparent 70%);
 }
@@ -73,13 +97,4 @@ export default {
     height: 5px;
     margin: 5px 0;
 }
-
-.card-icons {
-    text-align: right;
-}
-
-.card {
-    overflow: hidden;
-}
-
 </style>
