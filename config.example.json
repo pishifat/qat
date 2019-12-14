@@ -49,5 +49,6 @@
     "id": 0,
     "secret": "",
     "redirect": "http://localhost:8080/callback",
-    "connection": ""
+    "connection": "",
+    "interOpSecret": ""
 }
