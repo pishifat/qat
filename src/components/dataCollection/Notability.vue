@@ -41,12 +41,11 @@ export default {
     methods: {
         async updateNotability(entryId, notability) {
             const result = await this.executePost('/dataCollection/updateNotability/' + entryId, { notability });
-            if (result) {
-                if (result.error) {
-                    this.info = result.error;
-                } else {
-                    this.$parent.updateEntry(result);
-                }
+
+            if (result.error) {
+                this.info = result.error;
+            } else {
+                this.$parent.updateEntry(result);
             }
         },
     },

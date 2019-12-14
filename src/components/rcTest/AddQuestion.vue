@@ -40,8 +40,8 @@
                         <div class="form-group">
                             <textarea
                                 id="newQuestion"
-                                class="form-control dark-textarea" 
-                                placeholder="question..." 
+                                class="form-control dark-textarea"
+                                placeholder="question..."
                                 maxlength="300"
                                 rows="2"
                                 @keyup.enter="addQuestion($event)"
@@ -84,20 +84,15 @@ export default {
                 this.info = 'Cannot leave fields blank!';
             }else{
                 const question = await this.executePost('/manageTest/addQuestion', { questionType, newQuestion: newQuestion.trim(), category: this.rawCategory }, e);
-                if (question) {
-                    if (question.error) {
-                        this.info = question.error;
-                    } else {
-                        this.$emit('add-question', question);
-                        this.confirm = 'Question added! ';
-                    }
+
+                if (question.error) {
+                    this.info = question.error;
+                } else {
+                    this.$emit('add-question', question);
+                    this.confirm = 'Question added! ';
                 }
             }
         },
     },
 };
 </script>
-
-<style>
-
-</style>

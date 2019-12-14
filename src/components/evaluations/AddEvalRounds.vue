@@ -113,7 +113,7 @@ import postData from '../../mixins/postData.js';
 
 export default {
     name: 'AddEvalRounds',
-    mixins: [postData],
+    mixins: [ postData ],
     data() {
         return {
             info: '',
@@ -171,32 +171,27 @@ export default {
                 },
                 e
             );
-            
-            if (result) {
-                if (result.errors) {
-                    this.info = result.errors;
-                } else {
-                    this.$emit('update-all-eval-rounds', result.ers);
-                    if(result.ers.length){
-                        this.confirm = 'Eval rounds added! ';
-                        if (result.failed.length) {
-                            this.confirm += 'However, the following usernames could not be processed: ';
-                            for (let i = 0; i < result.failed.length; i++) {
-                                this.confirm += result.failed[i];
-                                if (i + 1 != result.failed.length) {
-                                    this.confirm += ', ';
-                                }
+
+            if (result.errors) {
+                this.info = result.errors;
+            } else {
+                this.$emit('update-all-eval-rounds', result.ers);
+                if(result.ers.length){
+                    this.confirm = 'Eval rounds added! ';
+                    if (result.failed.length) {
+                        this.confirm += 'However, the following usernames could not be processed: ';
+                        for (let i = 0; i < result.failed.length; i++) {
+                            this.confirm += result.failed[i];
+                            if (i + 1 != result.failed.length) {
+                                this.confirm += ', ';
                             }
                         }
-                    }else{
-                        this.confirm = 'No eval rounds were added! If you were trying to add specific users, re-check your spelling.';
                     }
+                }else{
+                    this.confirm = 'No eval rounds were added! If you were trying to add specific users, re-check your spelling.';
                 }
             }
-        },
+    },
     },
 };
 </script>
-
-<style>
-</style>

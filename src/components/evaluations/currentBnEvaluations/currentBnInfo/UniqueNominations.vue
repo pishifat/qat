@@ -1,7 +1,7 @@
 <template>
     <div>
         <p class="text-shadow min-spacing">
-            <a :href="nominations && '#nominations'" data-toggle="collapse">Unique nominations <i class="fas fa-angle-down" /></a> 
+            <a :href="nominations && '#nominations'" data-toggle="collapse">Unique nominations <i class="fas fa-angle-down" /></a>
             ({{ loading ? '...' : nominations ? nominations.length: '0' }})
             <button v-if="isNat" class="btn btn-sm btn-nat float-right" @click="$emit('update-editing');">
                 {{ editing ? 'Disable reason editing' : 'Enable reason editing' }}
@@ -38,7 +38,6 @@
 </template>
 
 <script>
-
 export default {
     name: 'unique-nominations-table',
     props: {

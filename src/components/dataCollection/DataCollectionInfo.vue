@@ -13,7 +13,7 @@
                 <div class="modal-body">
                     <div class="container">
                         <p class="text-shadow">
-                            Mapset: 
+                            Mapset:
                             <a :href="selectedEntry.postId ? 'https://osu.ppy.sh/beatmapsets/' + selectedEntry.beatmapsetId + '/discussion/-/generalAll#/' + selectedEntry.postId : 'https://osu.ppy.sh/beatmapsets/' + selectedEntry.beatmapsetId + '/discussion/-/events'" target="_blank">
                                 {{ selectedEntry.metadata }}
                             </a>
@@ -29,7 +29,7 @@
                             <input
                                 id="newReason"
                                 v-model="reasonInput"
-                                type="text" 
+                                type="text"
                                 placeholder="reason..."
                                 style="filter: drop-shadow(1px 1px 1px #000000); width: 100%"
                                 maxlength="50"
@@ -88,12 +88,11 @@ export default {
     methods: {
         async updateNotability(entryId, notability) {
             const result = await this.executePost('/dataCollection/updateNotability/' + entryId, { notability });
-            if (result) {
-                if (result.error) {
-                    this.info = result.error;
-                } else {
-                    this.$parent.updateEntry(result);
-                }
+
+            if (result.error) {
+                this.info = result.error;
+            } else {
+                this.$parent.updateEntry(result);
             }
         },
         async updateReason(e) {
@@ -101,12 +100,11 @@ export default {
                 this.info = 'Must enter a reason!';
             }else{
                 const result = await this.executePost('/dataCollection/updateReason/' + this.selectedEntry.id, { reason: this.reasonInput }, e);
-                if (result) {
-                    if (result.error) {
-                        this.info = result.error;
-                    } else {
-                        this.updateEntry(result);
-                    }
+
+                if (result.error) {
+                    this.info = result.error;
+                } else {
+                    this.updateEntry(result);
                 }
             }
         },

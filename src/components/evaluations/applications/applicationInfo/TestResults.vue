@@ -1,10 +1,10 @@
 <template>
     <div>
         <p class="text-shadow">
-            Test results: 
+            Test results:
             <a
                 :href="`http://bn.mappersguild.com/testresults?user=${osuId}`"
-                target="_blank" 
+                target="_blank"
                 :class="scoreColor()"
             >
                 {{ testScore + '/20' }}
@@ -14,7 +14,6 @@
 </template>
 
 <script>
-
 export default {
     name: 'test-results',
     props: {

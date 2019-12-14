@@ -41,7 +41,7 @@ export default {
     props: {
         userId: String,
     },
-    mixins: [postData, filterLinks],
+    mixins: [ postData, filterLinks ],
     data() {
         return {
             notes: [],
@@ -73,15 +73,14 @@ export default {
         async saveNote(e) {
             if(this.comment.length){
                 const n = await this.executePost('/users/saveNote/' + this.userId, { comment: this.comment }, e);
-                if (n) {
-                    if (n.error) {
-                        this.info = n.error;
-                    } else {
-                        if(this.notes){
-                            this.notes.unshift(n)
-                        }
-                        this.confirm = 'Note added!'
+
+                if (n.error) {
+                    this.info = n.error;
+                } else {
+                    if(this.notes){
+                        this.notes.unshift(n)
                     }
+                    this.confirm = 'Note added!'
                 }
             }
         },
@@ -93,7 +92,7 @@ export default {
                     const i = this.notes.findIndex(note => note.id == noteId);
                     this.notes.splice(i, 1);
                 }
-                this.confirm = 'Note removed!' 
+                this.confirm = 'Note removed!'
             }
         },
     },

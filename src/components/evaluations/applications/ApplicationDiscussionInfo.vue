@@ -119,10 +119,8 @@ export default {
 </script>
 
 <style>
-
 .eval-bg-priority {
     background-color: rgb(38, 48, 63)!important;
     box-shadow: 5px 5px 5px 5px rgb(38, 48, 63);
 }
-
 </style>

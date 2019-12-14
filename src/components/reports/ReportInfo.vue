@@ -31,7 +31,7 @@
                     </p>
                     <span v-if="report.isActive">
                         <small class="text-shadow ml-2">This will be sent to the reporter in a forum PM. Include the consensus and any actions being taken.</small>
-                    
+
                         <div class="form-group mt-2">
                             <textarea
                                 id="feedback"
@@ -133,7 +133,7 @@ import filterLinks from '../../mixins/filterLinks.js';
 
 export default {
     name: 'ReportInfo',
-    mixins: [postData, filterLinks],
+    mixins: [ postData, filterLinks ],
     props: [ 'report', 'isLeader' ],
     data() {
         return {
@@ -165,33 +165,31 @@ export default {
                     const result = confirm(`Are you sure? Report feedback cannot be edited after closing. Doing this will reveal the reporter.`);
                     if(result){
                         r = await this.executePost(
-                            '/manageReports/submitReportEval/' + this.report.id, 
+                            '/manageReports/submitReportEval/' + this.report.id,
                             { valid, feedback: this.feedback, close }, e);
                     }
                 }else{
                     r = await this.executePost(
-                        '/manageReports/submitReportEval/' + this.report.id, 
+                        '/manageReports/submitReportEval/' + this.report.id,
                         { valid, feedback: this.feedback, close }, e);
                 }
-                if (r) {
-                    if (r.error) {
-                        this.info = r.error;
-                    } else {
-                        this.$emit('update-report', r);
-                        this.confirm = 'Report updated!';
-                    }
-                }
-            }
-        },
-        async changeEvalDisplay (e) {
-            let r = await this.executePost('/manageReports/changeEvalDisplay/' + this.report.id, { display: this.report.display }, e);
-            if (r) {
+
                 if (r.error) {
                     this.info = r.error;
                 } else {
                     this.$emit('update-report', r);
                     this.confirm = 'Report updated!';
                 }
+            }
+        },
+        async changeEvalDisplay (e) {
+            let r = await this.executePost('/manageReports/changeEvalDisplay/' + this.report.id, { display: this.report.display }, e);
+
+            if (r.error) {
+                this.info = r.error;
+            } else {
+                this.$emit('update-report', r);
+                this.confirm = 'Report updated!';
             }
         },
     },

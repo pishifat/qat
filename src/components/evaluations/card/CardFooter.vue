@@ -17,10 +17,10 @@
             :evaluations="evaluations"
         />
         <i
-            v-if="feedback" 
+            v-if="feedback"
             data-toggle="tooltip"
             data-placement="top"
-            title="feedback written" 
+            title="feedback written"
             class="fas fa-comment mx-1"
         />
         <span class="errors mx-1 ml-auto">

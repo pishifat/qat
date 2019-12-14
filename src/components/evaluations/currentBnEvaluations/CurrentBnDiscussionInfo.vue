@@ -19,7 +19,7 @@
                             :is-nat="evaluator.isNat"
                         />
                         <p class="text-shadow">
-                            <a href="#additionalInfo" data-toggle="collapse">Additional info <i class="fas fa-angle-down" /></a> 
+                            <a href="#additionalInfo" data-toggle="collapse">Additional info <i class="fas fa-angle-down" /></a>
                         </p>
                         <div id="additionalInfo" class="collapse container">
                             <previous-evaluations
@@ -113,7 +113,7 @@ export default {
         UserList,
         EvaluationInput,
         Consensus,
-        Cooldown, 
+        Cooldown,
         FeedbackInfo,
         Evaluations,
     },
@@ -135,10 +135,5 @@ export default {
             history.pushState(null, 'Current BN Evaluations', `/bneval?eval=${this.evalRound.id}`);
         },
     }
-    
 };
 </script>
-
-<style>
-
-</style>

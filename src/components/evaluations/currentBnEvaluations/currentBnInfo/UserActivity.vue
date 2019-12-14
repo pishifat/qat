@@ -47,7 +47,6 @@
 </template>
 
 <script>
-import postData from '../../../../mixins/postData.js';
 import filterLinks from '../../../../mixins/filterLinks.js';
 import Notability from '../../../dataCollection/Notability.vue';
 import UniqueNominations from './UniqueNominations.vue';
@@ -60,7 +59,7 @@ export default {
         UniqueNominations,
         NominationResets,
     },
-    mixins: [ postData, filterLinks ],
+    mixins: [ filterLinks ],
     props: {
         osuId: Number,
         mode: String,

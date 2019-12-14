@@ -1,7 +1,7 @@
 <template>
     <div>
         <p class="text-shadow min-spacing">
-            <a :href="events && `#${eventsId}`" data-toggle="collapse">{{ header }} <i class="fas fa-angle-down" /></a> 
+            <a :href="events && `#${eventsId}`" data-toggle="collapse">{{ header }} <i class="fas fa-angle-down" /></a>
             ({{ loading ? '...' : events ? events.length : '0' }})
         </p>
         <div v-if="events" :id="eventsId" class="collapse">
@@ -73,7 +73,7 @@ export default {
             info: null,
         };
     },
-    watch: { 
+    watch: {
         editing() {
             this.info = null;
         }
@@ -83,12 +83,11 @@ export default {
         async updateReason(entryId, e) {
             let reasonInput = $(`.input-${entryId}`).val();
             const result = await this.executePost('/dataCollection/updateReason/' + entryId, { reason: reasonInput }, e);
-            if (result) {
-                if (result.error) {
-                    this.info = result.error;
-                } else {
-                    this.$emit('update-entry', result);
-                }
+
+            if (result.error) {
+                this.info = result.error;
+            } else {
+                this.$emit('update-entry', result);
             }
         },
     }

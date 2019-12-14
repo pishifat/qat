@@ -42,13 +42,13 @@
                         <div class="form-group">
                             <textarea
                                 id="newQuestionEdit"
-                                v-model="question.content" 
-                                class="form-control dark-textarea" 
+                                v-model="question.content"
+                                class="form-control dark-textarea"
                                 placeholder="question..."
                                 maxlength="300"
                                 rows="2"
                                 @keyup.enter="editQuestion($event)"
-                            />    
+                            />
                         </div>
                         <button type="submit" class="btn btn-sm btn-nat float-right ml-2" @click="updateQuestion($event)">
                             Update Question
@@ -103,7 +103,7 @@
                         <div class="row col-md-12">
                             <input
                                 id="option"
-                                class="form-control-sm col-md-9 mb-2" 
+                                class="form-control-sm col-md-9 mb-2"
                                 type="text"
                                 maxlength="200"
                                 placeholder="potential answer... (if image, post link)"
@@ -171,25 +171,23 @@ export default {
                 this.info = 'Cannot leave question fields blank!';
             }else{
                 const question = await this.executePost('/manageTest/updateQuestion/' + this.question.id, { questionType, newQuestion }, e);
-                if (question) {
-                    if (question.error) {
-                        this.info = question.error;
-                    } else {
-                        this.$emit('update-question', question);
-                        this.confirm = 'Question updated! ';
-                    }
-                }
-            }
-        },
-        async toggleActive(e) {
-            const question = await this.executePost('/manageTest/toggleActive/' + this.question.id, { status: !this.question.active }, e);
-            if (question) {
+
                 if (question.error) {
                     this.info = question.error;
                 } else {
                     this.$emit('update-question', question);
                     this.confirm = 'Question updated! ';
                 }
+            }
+        },
+        async toggleActive(e) {
+            const question = await this.executePost('/manageTest/toggleActive/' + this.question.id, { status: !this.question.active }, e);
+
+            if (question.error) {
+                this.info = question.error;
+            } else {
+                this.$emit('update-question', question);
+                this.confirm = 'Question updated! ';
             }
         },
         async addOption(e) {
@@ -201,13 +199,12 @@ export default {
                 this.info = 'Cannot leave option fields blank!';
             } else {
                 const question = await this.executePost('/manageTest/addOption/' + this.question.id, { option, score }, e);
-                if (question) {
-                    if (question.error) {
-                        this.info = question.error;
-                    } else {
-                        this.$emit('update-question', question);
-                        this.confirm = 'Option added! ';
-                    }
+
+                if (question.error) {
+                    this.info = question.error;
+                } else {
+                    this.$emit('update-question', question);
+                    this.confirm = 'Option added! ';
                 }
             }
         },
@@ -224,13 +221,12 @@ export default {
                 this.info = 'Cannot leave option fields blank!';
             }else{
                 const question = await this.executePost('/manageTest/updateOption/' + id, { option, score, questionId: this.question.id }, e);
-                if (question) {
-                    if (question.error) {
-                        this.info = question.error;
-                    } else {
-                        this.$emit('update-question', question);
-                        this.confirm = 'Option updated!';
-                    }
+
+                if (question.error) {
+                    this.info = question.error;
+                } else {
+                    this.$emit('update-question', question);
+                    this.confirm = 'Option updated!';
                 }
             }
         },
@@ -245,13 +241,12 @@ export default {
                 this.info = 'Must select options!';
             }else{
                 const question = await this.executePost('/manageTest/toggleActiveOption/', { checkedOptions, questionId: this.question.id }, e);
-                if (question) {
-                    if (question.error) {
-                        this.info = question.error;
-                    } else {
-                        this.$emit('update-question', question);
-                        this.confirm = checkedOptions.length > 1 ? 'Options edited!' : 'Option edited!';
-                    }
+
+                if (question.error) {
+                    this.info = question.error;
+                } else {
+                    this.$emit('update-question', question);
+                    this.confirm = checkedOptions.length > 1 ? 'Options edited!' : 'Option edited!';
                 }
             }
         },
@@ -260,9 +255,7 @@ export default {
 </script>
 
 <style>
-
 td {
     word-break: break-word;
 }
-
 </style>

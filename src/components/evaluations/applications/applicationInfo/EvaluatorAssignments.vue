@@ -21,7 +21,7 @@
         <div v-if="isLeader && !bnEvaluators.length" class="col-sm-12">
             <button class="btn btn-sm btn-nat mb-2" @click="selectBnEvaluators($event)">
                 {{ potentialBnEvaluators ? 'Re-select BN Evaluators' : 'Select BN Evaluators' }}
-            </button> 
+            </button>
             <button v-if="potentialBnEvaluators" class="btn btn-sm btn-nat-red mb-2" @click="enableBnEvaluators($event)">
                 Enable BN Evaluations
             </button>
@@ -95,22 +95,20 @@ export default {
     methods: {
         async selectBnEvaluators(e) {
             const r = await this.executePost('/appeval/selectBnEvaluators', { mode: this.mode, id: this.applicationId }, e);
-            if (r) {
-                if (r.error) {
-                    this.info = r.error;
-                } else {
-                    this.potentialBnEvaluators = r;
-                }
+
+            if (r.error) {
+                this.info = r.error;
+            } else {
+                this.potentialBnEvaluators = r;
             }
         },
         async enableBnEvaluators (e) {
             const a = await this.executePost('/appEval/enableBnEvaluators/' + this.applicationId, { bnEvaluators: this.potentialBnEvaluators }, e);
-            if (a) {
-                if (a.error) {
-                    this.info = a.error;
-                } else {
-                    this.$emit('update-application', a);
-                }
+
+            if (a.error) {
+                this.info = a.error;
+            } else {
+                this.$emit('update-application', a);
             }
         },
     },

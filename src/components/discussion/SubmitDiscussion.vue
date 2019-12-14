@@ -168,19 +168,14 @@ export default {
                     e
                 );
 
-                if (discussion) {
-                    if (discussion.error) {
-                        this.info = discussion.error;
-                    } else {
-                        $('#addDiscussion').modal('hide');
-                        this.$emit('submit-discussion', discussion);
-                    }
+                if (discussion.error) {
+                    this.info = discussion.error;
+                } else {
+                    $('#addDiscussion').modal('hide');
+                    this.$emit('submit-discussion', discussion);
                 }
             }
         },
     },
 };
 </script>
-
-<style>
-</style>

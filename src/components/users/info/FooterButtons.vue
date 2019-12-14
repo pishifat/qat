@@ -17,7 +17,7 @@
             </button>
         </p>
         <p v-else-if="isCurrentUser && group != 'nat'" class="text-shadow min-spacing">
-            BN evaluation: 
+            BN evaluation:
             <span :class="{ 'vote-fail': !isBnEvaluator, 'vote-pass': isBnEvaluator }">
                 {{ isBnEvaluator ? 'active' : 'inactive' }}
             </span>
@@ -47,16 +47,15 @@ export default {
         isCurrentUser: Boolean,
         userId: String,
     },
-    mixins: [postData],
+    mixins: [ postData ],
     methods: {
         async switchBnEvaluator(e) {
             const u = await this.executePost('/users/switchBnEvaluator/', {}, e);
-            if (u) {
-                if (u.error) {
-                    this.info = u.error;
-                } else {
-                    this.$emit('update-user', u);
-                }
+
+            if (u.error) {
+                this.info = u.error;
+            } else {
+                this.$emit('update-user', u);
             }
         },
         async switchGroup(group, e) {
@@ -65,12 +64,11 @@ export default {
             );
             if (result) {
                 const u = await this.executePost('/users/switchGroup/' + userId, { group }, e);
-                if (u) {
-                    if (u.error) {
-                        this.info = u.error;
-                    } else {
-                        this.$emit('update-user', u);
-                    }
+
+                if (u.error) {
+                    this.info = u.error;
+                } else {
+                    this.$emit('update-user', u);
                 }
             }
         },
@@ -80,13 +78,12 @@ export default {
             );
             if (result) {
                 const u = await this.executePost('/users/removeNat/' + userId, {}, e);
-                if (u) {
-                    if (u.error) {
-                        this.info = u.error;
-                    } else {
-                        this.$emit('update-user', u);
-                        $('#extendedInfo').modal('hide');
-                    }
+
+                if (u.error) {
+                    this.info = u.error;
+                } else {
+                    this.$emit('update-user', u);
+                    $('#extendedInfo').modal('hide');
                 }
             }
         },

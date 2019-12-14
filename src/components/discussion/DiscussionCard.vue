@@ -86,5 +86,4 @@ export default {
 .card-bg-nat-vote {
     background-color: rgba(59, 36, 36, 0.596)!important;
 }
-
 </style>

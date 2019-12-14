@@ -61,7 +61,7 @@
                             Conclude Vote
                         </button>
                     </div>
-                    
+
                     <!--nat votes-->
                     <div v-else-if="discussion.isActive && discussion.isNatOnly" class="text-shadow">
                         <p class="min-spacing my-2">Total votes ({{ discussion.mediations.length }}):</p>
@@ -81,7 +81,7 @@
                         </p>
                         <ul v-if="discussion.isNatOnly || isLeader">
                             <li v-for="mediation in agreeMediations" :key="mediation.id" class="small ml-2">
-                                {{ mediation.mediator.username }}: 
+                                {{ mediation.mediator.username }}:
                                 <pre v-if="mediation.comment.length" class="secondary-text pre-font ml-2">{{ mediation.comment }}</pre>
                                 <i v-else>No comment...</i>
                             </li>
@@ -91,7 +91,7 @@
                         </p>
                         <ul v-if="discussion.isNatOnly || isLeader">
                             <li v-for="mediation in neutralMediations" :key="mediation.id" class="small ml-2">
-                                {{ mediation.mediator.username }}: 
+                                {{ mediation.mediator.username }}:
                                 <pre v-if="mediation.comment.length" class="secondary-text pre-font ml-2">{{ mediation.comment }}</pre>
                                 <i v-else>No comment...</i>
                             </li>
@@ -101,7 +101,7 @@
                         </p>
                         <ul v-if="discussion.isNatOnly || isLeader">
                             <li v-for="mediation in disagreeMediations" :key="mediation.id" class="small ml-2">
-                                {{ mediation.mediator.username }}: 
+                                {{ mediation.mediator.username }}:
                                 <pre v-if="mediation.comment.length" class="secondary-text pre-font ml-2">{{ mediation.comment }}</pre>
                                 <i v-else>No comment...</i>
                             </li>
@@ -250,19 +250,18 @@ export default {
                 this.info = 'Must include a vote!';
             }else{
                 const d = await this.executePost(
-                    '/discussionVote/submitMediation/' + this.discussion.id, 
-                    { mediationId: this.mediationId, 
-                        vote, 
-                        comment: this.comment, 
+                    '/discussionVote/submitMediation/' + this.discussion.id,
+                    { mediationId: this.mediationId,
+                        vote,
+                        comment: this.comment,
                     }, e);
-                if (d) {
-                    if (d.error) {
-                        this.info = d.error;
-                    } else {
-                        this.$emit('update-discussion', d);
-                        this.confirm = 'Vote submitted!';
-                        this.vote = vote;
-                    }
+
+                if (d.error) {
+                    this.info = d.error;
+                } else {
+                    this.$emit('update-discussion', d);
+                    this.confirm = 'Vote submitted!';
+                    this.vote = vote;
                 }
             }
         },
@@ -273,13 +272,12 @@ export default {
             if(result){
                 const d = await this.executePost(
                     '/discussionVote/concludeMediation/' + this.discussion.id, e);
-                if (d) {
-                    if (d.error) {
-                        this.info = d.error;
-                    } else {
-                        this.$emit('update-discussion', d);
-                        this.confirm = 'Discussion concluded!';
-                    }
+
+                if (d.error) {
+                    this.info = d.error;
+                } else {
+                    this.$emit('update-discussion', d);
+                    this.confirm = 'Discussion concluded!';
                 }
             }
         },
@@ -295,5 +293,4 @@ export default {
     .bg-inactive {
         background-color: var(--withdrawn);
     }
-    
 </style>
