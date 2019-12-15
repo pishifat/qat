@@ -15,16 +15,20 @@
                     />
 
                     <mediation-input
+                        :comment="comment"
                         :confirm="confirm"
                         :info="info"
                         :mediation-id="mediationId"
                         :veto="veto"
+                        :vote="vote"
                     />
                 </modal-body>
 
                 <modal-footer
+                    :comment="comment"
                     :mediation-id="mediationId"
                     :veto="veto"
+                    :vote="vote"
                     @update-veto="$emit('update-veto', $event)"
                 />
             </div>

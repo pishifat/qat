@@ -61,14 +61,16 @@
 
 <script>
 export default {
-    name: 'mediation-info',
+    name: 'mediation-input',
     props: {
+        comment: String,
         confirm: String,
         info: String,
         mediationId: String,
         veto: {
             status: String
-        }
+        },
+        vote: Number
     }
 };
 </script>

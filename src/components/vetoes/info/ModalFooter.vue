@@ -16,11 +16,13 @@ export default {
     name: 'modal-footer',
     mixins: [ postData ],
     props: {
+        comment: String,
         mediationId: String,
         veto: {
             createdAt: Date,
             status: String
-        }
+        },
+        vote: Number
     },
     methods: {
         async submitMediation (e) {
