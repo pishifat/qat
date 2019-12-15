@@ -15,7 +15,7 @@
                 <samp class="small">Your test results can be found here: http://bn.mappersguild.com/testresults</samp><br><br>
                 <samp class="small">Additional feedback from the NAT:</samp><br><br>
                 <samp><pre class="small">[notice]{{ feedback }}[/notice]</pre></samp>
-                <samp class="small">Link to the BN Discord Server: [url={{ discordLink || 'expired link' }}][b]Discord Invite[/b][/url]</samp><br><br>
+                <samp class="small">[url={{ discordLink || 'expired link' }}]Link to the BN Discord Server[/url]</samp><br><br>
                 <samp class="small">Regards, the Nomination Assessment Team</samp>
             </div>
             <div v-else class="copy-paste">
@@ -24,7 +24,7 @@
                 <samp class="small">Your test results can be found here: http://bn.mappersguild.com/testresults</samp><br><br>
                 <samp class="small">Additional feedback regarding why you were rejected and what you could potentially improve in your next application:</samp><br><br>
                 <samp><pre class="small">[notice]{{ feedback }}[/notice]</pre></samp>
-                <samp class="small">If you have questions or wish a more in-depth feedback contact:, contact any of these users:
+                <samp class="small">If you have questions or wish for more in-depth feedback, contact any of these users:
                     <span v-for="(evaluation, i) in natEvaluations" :key="i">[url=https://osu.ppy.sh/users/{{ evaluation.evaluator.osuId }}]{{ evaluation.evaluator.username }}[/url]{{ i+1 != natEvaluations.length ? ", " : "" }}</span>
                 </samp><br><br>
                 <samp class="small">If you disagree with the decision, you may also contact the above users to appeal.</samp><br><br>
