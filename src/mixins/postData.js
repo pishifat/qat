@@ -8,7 +8,7 @@ const postData = {
                 if (e) e.target.disabled = false;
 
                 if (res.data == null) {
-                    return { error: 'Something went wrong'};
+                    return { error: 'Something went wrong' };
                 }
 
                 return res.data;
@@ -25,7 +25,7 @@ const postData = {
                 if (e) e.target.disabled = false;
 
                 if (res.data == null) {
-                    return { error: 'Something went wrong'};
+                    return { error: 'Something went wrong' };
                 }
 
                 return res.data;
