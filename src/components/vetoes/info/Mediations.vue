@@ -81,6 +81,9 @@
                 This veto's mediation was dismissed due to being invalid, inappropriate, or resolved by the mapper.
             </p>
         </div>
+        <div :class="info.length ? 'errors' : 'confirm'" class="text-shadow ml-2" style="min-height: 24px;">
+            {{ info }} {{ confirm }}
+        </div>
     </div>
 </template>
 
@@ -112,6 +115,8 @@ export default {
     mixins: [ filterLinks, postData ],
     data() {
         return {
+            confirm: '',
+            info: '',
             mediators: null
         }
     },

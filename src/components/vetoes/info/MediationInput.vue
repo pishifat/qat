@@ -10,7 +10,7 @@
         <div class="form-group">
             <textarea
                 id="comment"
-                v-model="comment"
+                v-model="commentInput"
                 class="form-control dark-textarea"
                 style="white-space: pre-line;"
                 placeholder="Why you agree/disagree with the veto..."
@@ -53,9 +53,6 @@
                 <label class="form-check-label text-shadow vote-fail" for="3">Disagree</label>
             </div>
         </div>
-        <div :class="info.length ? 'errors' : 'confirm'" class="text-shadow ml-2" style="min-height: 24px;">
-            {{ info }} {{ confirm }}
-        </div>
     </div>
 </template>
 
@@ -64,13 +61,16 @@ export default {
     name: 'mediation-input',
     props: {
         comment: String,
-        confirm: String,
-        info: String,
         mediationId: String,
         veto: {
             status: String
         },
         vote: Number
+    },
+    data() {
+        return {
+            commentInput: this.comment
+        }
     }
 };
 </script>

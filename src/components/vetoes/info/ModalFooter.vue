@@ -1,5 +1,8 @@
 <template>
     <div class="modal-footer">
+        <div :class="info.length ? 'errors' : 'confirm'" class="text-shadow ml-2" style="min-height: 24px;">
+            {{ info }} {{ confirm }}
+        </div>
         <button v-if="mediationId && veto.status === 'wip'" class="btn btn-sm btn-nat" @click="submitMediation($event)">
             Submit Mediation
         </button>
@@ -16,21 +19,28 @@ export default {
     name: 'modal-footer',
     mixins: [ postData ],
     props: {
-        comment: String,
         mediationId: String,
         veto: {
             createdAt: Date,
             status: String
-        },
-        vote: Number
+        }
+    },
+    data() {
+        return {
+            confirm: '',
+            info: '',
+            vote: null
+        }
     },
     methods: {
         async submitMediation (e) {
-            this.info = '';
             this.confirm = '';
+            this.info = ''
+
+            const comment = $('#comment').val()
             const vote = $('input[name=vote]:checked').val();
 
-            if (!vote || !this.comment.length) {
+            if (!vote || !comment.length) {
                 this.info = 'Cannot leave fields blank!';
             } else {
                 const v = await this.executePost(
@@ -38,7 +48,7 @@ export default {
                     {
                         mediationId: this.mediationId,
                         vote,
-                        comment: this.comment,
+                        comment: comment,
                     },
                     e
                 );

@@ -16,8 +16,6 @@
 
                     <mediation-input
                         :comment="comment"
-                        :confirm="confirm"
-                        :info="info"
                         :mediation-id="mediationId"
                         :veto="veto"
                         :vote="vote"
