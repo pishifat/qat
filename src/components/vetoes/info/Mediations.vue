@@ -118,10 +118,12 @@ export default {
             if (result) {
                 const r = await this.executePost(`/vetoes/beginMediation/${this.veto.id}`, { mediators: this.mediators }, e);
 
-                if (r.error) {
-                    this.info = r.error;
-                } else {
-                    this.$parent.$emit('update-veto', r);
+                if (r) {
+                    if (r.error) {
+                        this.info = r.error;
+                    } else {
+                        this.$parent.$emit('update-veto', r);
+                    }
                 }
             }
         },
@@ -141,11 +143,13 @@ export default {
                     e
                 );
 
-                if (v.error) {
-                    this.info = v.error;
-                } else {
-                    this.$parent.$emit('update-veto', v);
-                    this.confirm = 'Mediation concluded!';
+                if (v) {
+                    if (v.error) {
+                        this.info = v.error;
+                    } else {
+                        this.$parent.$emit('update-veto', v);
+                        this.confirm = 'Mediation concluded!';
+                    }
                 }
             }
         },
@@ -158,11 +162,13 @@ export default {
             if (result) {
                 const v = await this.executePost(`/vetoes/continueMediation/${this.veto.id}`, {}, e);
 
-                if (v.error) {
-                    this.info = v.error;
-                } else {
-                    this.$parent.$emit('update-veto', v);
-                    this.confirm = 'Mediation re-opened!';
+                if (v) {
+                    if (v.error) {
+                        this.info = v.error;
+                    } else {
+                        this.$parent.$emit('update-veto', v);
+                        this.confirm = 'Mediation re-opened!';
+                    }
                 }
             }
         },
@@ -184,10 +190,12 @@ export default {
             if (result) {
                 const v = await this.executePost(`/vetoes/replaceMediator/${this.vet.id}`, { mediationId });
 
-                if (v.error) {
-                    this.info = v.error;
-                } else {
-                    this.$parent.$emit('update-veto', v);
+                if (v) {
+                    if (v.error) {
+                        this.info = v.error;
+                    } else {
+                        this.$parent.$emit('update-veto', v);
+                    }
                 }
             }
         },
@@ -203,10 +211,12 @@ export default {
 
             const r = await this.executePost('/vetoes/selectMediators', { mode: this.veto.mode, excludeUsers }, e);
 
-            if (r.error) {
-                this.info = r.error;
-            } else {
-                this.mediators = r;
+            if (r) {
+                if (r.error) {
+                    this.info = r.error;
+                } else {
+                    this.mediators = r;
+                }
             }
         }
     }

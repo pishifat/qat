@@ -129,11 +129,13 @@ export default {
                     e
                 );
 
-                if (veto.error) {
-                    this.info = veto.error;
-                } else {
-                    $('#addVeto').modal('hide');
-                    this.$emit('submit-veto', veto);
+                if (veto) {
+                    if (veto.error) {
+                        this.info = veto.error;
+                    } else {
+                        $('#addVeto').modal('hide');
+                        this.$emit('submit-veto', veto);
+                    }
                 }
             }
         }
