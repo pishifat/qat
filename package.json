@@ -22,7 +22,7 @@
     "express-session": "^1.16.1",
     "file-loader": "^3.0.1",
     "hbs": "^4.0.4",
-    "mongoose": "^5.5.14",
+    "mongoose": "^5.7.5",
     "morgan": "~1.9.0",
     "vue": "^2.6.10",
     "vue-loader": "^15.7.1",
