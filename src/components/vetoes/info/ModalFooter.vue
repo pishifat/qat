@@ -45,7 +45,7 @@ export default {
                     if (v.error) {
                         this.info = v.error;
                     } else {
-                        this.$parent.$emit('update-veto', v);
+                        this.$emit('update-veto', v);
                         this.confirm = 'Mediation submitted!';
                         this.vote = vote;
                     }

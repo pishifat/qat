@@ -1,6 +1,6 @@
 <template>
     <!--nat options-->
-    <div v-if="isNat && currentMediators.indexOf(userId) === -1 /*&& veto.vetoer.id !== userId*/" class="text-shadow">
+    <div v-if="isNat && currentMediators.indexOf(userId) === -1 && veto.vetoer.id !== userId" class="text-shadow">
         <hr>
         <div v-if="veto.mediations.length">
             <ul style="list-style-type: none; padding-left: 0.5rem">
@@ -100,7 +100,6 @@ export default {
         currentMediators: Array,
         isNat: Boolean,
         majority: Boolean,
-        mediators: Array,
         userId: String,
         veto: {
             mediations: Array,
@@ -111,6 +110,11 @@ export default {
         }
     },
     mixins: [ filterLinks, postData ],
+    data() {
+        return {
+            mediators: null
+        }
+    },
     methods: {
         async beginMediation (e) {
             const result = confirm(`Are you sure?`);
@@ -122,7 +126,7 @@ export default {
                     if (r.error) {
                         this.info = r.error;
                     } else {
-                        this.$parent.$emit('update-veto', r);
+                        this.$emit('update-veto', r);
                     }
                 }
             }
@@ -147,7 +151,7 @@ export default {
                     if (v.error) {
                         this.info = v.error;
                     } else {
-                        this.$parent.$emit('update-veto', v);
+                        this.$emit('update-veto', v);
                         this.confirm = 'Mediation concluded!';
                     }
                 }
@@ -166,7 +170,7 @@ export default {
                     if (v.error) {
                         this.info = v.error;
                     } else {
-                        this.$parent.$emit('update-veto', v);
+                        this.$emit('update-veto', v);
                         this.confirm = 'Mediation re-opened!';
                     }
                 }
@@ -188,13 +192,13 @@ export default {
             const result = confirm(`Are you sure? This should only be done if a mistake was made.`);
 
             if (result) {
-                const v = await this.executePost(`/vetoes/replaceMediator/${this.vet.id}`, { mediationId });
+                const v = await this.executePost(`/vetoes/replaceMediator/${this.veto.id}`, { mediationId });
 
                 if (v) {
                     if (v.error) {
                         this.info = v.error;
                     } else {
-                        this.$parent.$emit('update-veto', v);
+                        this.$emit('update-veto', v);
                     }
                 }
             }

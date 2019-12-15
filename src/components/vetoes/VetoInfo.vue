@@ -9,9 +9,9 @@
                         :current-mediators="currentMediators"
                         :is-nat="isNat"
                         :majority="majority"
-                        :mediators="mediators"
                         :user-id="userId"
                         :veto="veto"
+                        @update-veto="$emit('update-veto', $event)"
                     />
 
                     <mediation-input
@@ -25,6 +25,7 @@
                 <modal-footer
                     :mediation-id="mediationId"
                     :veto="veto"
+                    @update-veto="$emit('update-veto', $event)"
                 />
             </div>
         </div>
@@ -91,7 +92,6 @@ export default {
     },
     watch: {
         veto () {
-            this.mediators = null;
             this.mediationId = null;
 
             if (this.veto.mediations.length) {
