@@ -10,11 +10,12 @@
                 <samp class="small">[notice][b]Important information:[/b]</samp><br>
                 <samp class="small">[list][*]You will be on probation for your first month as a BN. This means you can only nominate beatmaps that have been nominated by non-probation BNs, and you cannot disqualify beatmaps.</samp><br><br>
                 <samp class="small">[*]At the end of your probation period, your activity/attitude/nomination quality will be evaluated by members of the NAT. If each of these areas are satisfactory, your probation period will be complete. If not, your probation will be extended for another month. or you'll be dismissed from the BN. In that second case, you will not be able to re-apply for another 90 days.</samp><br><br>
-                <samp class="small">[*]Read [url=https://osu.ppy.sh/help/wiki/People/Beatmap_Nominators/Rules]this page[/url] and follow the golden rule: [i]don't fuck up[/i].[/list][/notice]</samp><br><br>
+                <samp class="small">[*]Read the following pages: [url=https://osu.ppy.sh/help/wiki/People/Beatmap_Nominators/Rules][b]BN rules[/b][/url],  [url=https://osu.ppy.sh/help/wiki/People/Beatmap_Nominators/General_Information][b]General Information for BNs[/b][/url], and [url=https://osu.ppy.sh/help/wiki/People/The_Team/Beatmap_Nominators/Beatmap_Veto][b]Veto Information[/b][/url].</samp><br><br>
+                <samp class="small">[*]Follow the golden rule: [i]don't fuck up[/i].[/list][/notice]</samp><br><br>
                 <samp class="small">Your test results can be found here: http://bn.mappersguild.com/testresults</samp><br><br>
                 <samp class="small">Additional feedback from the NAT:</samp><br><br>
                 <samp><pre class="small">[notice]{{ feedback }}[/notice]</pre></samp>
-                <samp class="small">Link to the BN Discord Server: {{ discordLink || 'expired link' }}</samp><br><br>
+                <samp class="small">[url={{ discordLink || 'expired link' }}]Link to the BN Discord Server[/url]</samp><br><br>
                 <samp class="small">Regards, the Nomination Assessment Team</samp>
             </div>
             <div v-else class="copy-paste">
@@ -23,9 +24,10 @@
                 <samp class="small">Your test results can be found here: http://bn.mappersguild.com/testresults</samp><br><br>
                 <samp class="small">Additional feedback regarding why you were rejected and what you could potentially improve in your next application:</samp><br><br>
                 <samp><pre class="small">[notice]{{ feedback }}[/notice]</pre></samp>
-                <samp class="small">For further feedback or to appeal this decision, contact any of these users:
+                <samp class="small">If you have questions or wish for more in-depth feedback, contact any of these users:
                     <span v-for="(evaluation, i) in natEvaluations" :key="i">[url=https://osu.ppy.sh/users/{{ evaluation.evaluator.osuId }}]{{ evaluation.evaluator.username }}[/url]{{ i+1 != natEvaluations.length ? ", " : "" }}</span>
                 </samp><br><br>
+                <samp class="small">If you disagree with the decision, you may also contact the above users to appeal.</samp><br><br>
                 <samp class="small">You may apply for BN in this game mode again on {{ defineDate(cooldownDate) }}. Good luck!</samp><br><br>
                 <samp class="small">Regards, the Nomination Assessment Team</samp>
             </div>
