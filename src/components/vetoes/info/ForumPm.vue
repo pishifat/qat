@@ -13,7 +13,14 @@
 
 <script>
 export default {
-    name: 'veto-forum-pm',
-    props: ['veto'],
+    name: 'forum-pm',
+    props: {
+        veto: {
+            beatmapId: Number,
+            beatmapTitle: String,
+            discussionLink: String,
+            shortReason: String
+        }
+    }
 };
 </script>
