@@ -32,6 +32,11 @@ export default {
             vote: null
         }
     },
+    watch: {
+        mediationId() {
+            this.confirm = null;
+        }
+    },
     methods: {
         async submitMediation (e) {
             this.confirm = '';
