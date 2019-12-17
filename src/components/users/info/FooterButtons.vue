@@ -64,7 +64,7 @@ export default {
                 `Are you sure? This will affect join/leave dates and potentially reveal hidden pages.`
             );
             if (result) {
-                const u = await this.executePost('/users/switchGroup/' + userId, { group }, e);
+                const u = await this.executePost('/users/switchGroup/' + this.userId, { group }, e);
                 if (u) {
                     if (u.error) {
                         this.info = u.error;
