@@ -10,6 +10,8 @@ const aiessSchema = new mongoose.Schema({
     eventType: { type: String, enum: ['Bubbled', 'Qualified', 'Disqualified', 'Popped', 'Ranked'] },
     content: { type: String },
     timestamp: { type: Date },
+    hostId: { type: Number },
+    hostName: { type: String },
 
     valid: { type: Number, enum: [1, 2, 3] },
     mapperId: { type: Number },
@@ -18,6 +20,7 @@ const aiessSchema = new mongoose.Schema({
     isUnique: { type: Boolean, default: false },
     effortBonus: { type: Number }, //multiplier combining drain per diff, # diffs, and difficulty of each diff
     responsibleNominators: [{ type: Number }],
+    qualityAssuranceCheckers: [{ type: 'ObjectId', ref: 'User' }],
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 const Aiess = mongoose.model('aiess', aiessSchema, 'aiess');

@@ -18,6 +18,7 @@ const config =  {
         testResults: './src/testResults.js',
         testSubmission: './src/testSubmission.js',
         discussionVote: './src/discussionVote.js',
+        qualityAssurance: './src/qualityAssurance.js',
     },
     output: {
         filename: '[name].js',

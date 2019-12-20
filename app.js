@@ -23,9 +23,10 @@ const vetoesRouter = require('./routes/vetoes');
 const testSubmissionRouter = require('./routes/testSubmission');
 const manageTestRouter = require('./routes/manageTest');
 const testResultsRouter = require('./routes/testResults');
-const bnScoreRouter = require('./routes/bnScore');
-const logsRouter = require('./routes/logs');
 const discussionVoteRouter = require('./routes/discussionVote');
+const bnScoreRouter = require('./routes/bnScore');
+const qualityAssuranceRouter = require('./routes/qualityAssurance');
+const logsRouter = require('./routes/logs');
 
 const app = express();
 
@@ -85,9 +86,10 @@ app.use('/vetoes', vetoesRouter);
 app.use('/testSubmission', testSubmissionRouter);
 app.use('/managetest', manageTestRouter);
 app.use('/testresults', testResultsRouter);
-app.use('/bnscore', bnScoreRouter);
-app.use('/logs', logsRouter);
 app.use('/discussionVote', discussionVoteRouter);
+app.use('/bnscore', bnScoreRouter);
+app.use('/qualityassurance', qualityAssuranceRouter);
+app.use('/logs', logsRouter);
 
 // catch 404
 app.use(function(req, res) {

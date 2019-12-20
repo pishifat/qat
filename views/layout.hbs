@@ -30,9 +30,21 @@
                 <li class="nav-item">
                     <a class="nav-link text-shadow {{#if isBnApp}}main-text{{/if}}" href="/bnapps">BN Application</a>
                 </li>
+                {{#unless isNat}}
                 <li class="nav-item">
                     <a class="nav-link text-shadow {{#if isReports}}main-text{{/if}}" href="/reports">Reports</a>
                 </li>
+                {{else}}
+                <li class="nav-item dropdown">
+                    <a class="nav-link text-shadow dropdown-toggle {{#if isReports}}main-text{{/if}}" href="#" data-toggle="dropdown">
+                        Reports
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="/reports">Reports</a>
+                        <a class="dropdown-item" href="/managereports">Manage Reports</a>
+                    </div>
+                </li>
+                {{/unless}}
                 <li class="nav-item">
                     <a class="nav-link text-shadow {{#if isUsers}}main-text{{/if}}" href="/users">Users</a>
                 </li>
@@ -43,6 +55,9 @@
                 <li class="nav-item">
                     <a class="nav-link text-shadow {{#if isDiscussionVote}}main-text{{/if}}" href="/discussionvote">Discussion Vote</a>
                 </li>
+                <!--<li class="nav-item">
+                    <a class="nav-link text-shadow {{#if isQualityAssurance}}main-text{{/if}}" href="/qualityassurance">Quality Assurance</a>
+                </li>-->
                 <li class="nav-item">
                     <a class="nav-link text-shadow {{#if isEval}}main-text{{/if}}" href="/appeval">BN Application Evaluations</a>
                 </li>
@@ -54,6 +69,9 @@
                 <li class="nav-item">
                     <a class="nav-link text-shadow {{#if isDiscussionVote}}main-text{{/if}}" href="/discussionvote">Discussion Vote</a>
                 </li>
+                <!--<li class="nav-item">
+                    <a class="nav-link text-shadow {{#if isQualityAssurance}}main-text{{/if}}" href="/qualityassurance">Quality Assurance</a>
+                </li>-->
                 <li class="nav-item dropdown">
                     <a class="nav-link text-shadow dropdown-toggle {{#if isEval}}main-text{{/if}}" href="#" data-toggle="dropdown">
                         Evaluations
@@ -62,13 +80,8 @@
                         <a class="dropdown-item" href="/appeval">Applications</a>
                         <a class="dropdown-item" href="/bneval">Current BNs</a>
                         <a class="dropdown-item" href="/evalarchive">Archive</a>
+                        <a class="dropdown-item" href="/datacollection">Data collection</a>
                     </div>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-shadow {{#if isDataCollection}}main-text{{/if}}" href="/datacollection">Data Collection</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-shadow {{#if isManageReports}}main-text{{/if}}" href="/managereports">Manage Reports</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link text-shadow dropdown-toggle {{#if isTest}}main-text{{/if}}" href="#" data-toggle="dropdown">

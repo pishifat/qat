@@ -13,7 +13,7 @@ router.get('/', (req, res) => {
     res.render('evaluations/datacollection', {
         title: 'Data Collection',
         script: '../javascripts/dataCollection.js',
-        isDataCollection: true,
+        isEval: true,
         isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
     });
 });

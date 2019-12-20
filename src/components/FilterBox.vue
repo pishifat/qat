@@ -30,7 +30,7 @@ export default {
     props: {
         filterMode: String,
         filterValue: String,
-        placeholder: String
+        placeholder: String,
     },
     data () {
         return {
