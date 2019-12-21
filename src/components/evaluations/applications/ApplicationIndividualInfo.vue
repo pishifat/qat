@@ -5,8 +5,8 @@
                 <modal-header
                     :mode="application.mode"
                     :nat-evaluators="application.natEvaluators"
-                    :isApplication="true"
-                    :osuId="application.applicant.osuId"
+                    :is-application="true"
+                    :osu-id="application.applicant.osuId"
                     :username="application.applicant.username"
                     :evaluator-mongo-id="evaluator.id"
                 />
@@ -14,12 +14,12 @@
                     <div class="container">
                         <mods
                             :mods="application.mods"
-                            :osuId="application.applicant.osuId"
+                            :osu-id="application.applicant.osuId"
                         />
                         <test-results
                             v-if="evaluator.isNat"
                             :test-score="application.test.totalScore"
-                            :osuId="application.applicant.osuId"
+                            :osu-id="application.applicant.osuId"
                         />
                         <div v-if="evaluator.isNat">
                             <p class="text-shadow">
@@ -35,22 +35,23 @@
                                 <user-notes
                                     :user-mongo-id="application.applicant.id"
                                 />
-                               <evaluator-assignments
+                                <evaluator-assignments
                                     :bn-evaluators="application.bnEvaluators"
                                     :nat-evaluators="application.natEvaluators"
                                     :evaluations="application.evaluations"
-                                    :isLeader="evaluator.isLeader"
+                                    :is-leader="evaluator.isLeader"
                                     :mode="application.mode"
-                                    :osuId="application.applicant.osuId"
+                                    :osu-id="application.applicant.osuId"
                                     :username="application.applicant.username"
-                                    :application-id="application.id"
-                                    @update-application="$emit('update-application', $event);"
-                               />
+                                    :nominator-assessment-mongo-id="application.id"
+                                    :is-application="true"
+                                    @update-nominator-assessment="$emit('update-application', $event);"
+                                />
                             </div>
                         </div>
                         <hr>
                         <evaluation-input
-                            :isApplication="true"
+                            :is-application="true"
                             :nominator-assessment-mongo-id="application.id"
                             :evaluator-mongo-id="evaluator.id"
                             :evaluations="application.evaluations"

@@ -14,9 +14,11 @@
 </template>
 
 <script>
+import filterLinks from '../../../../mixins/filterLinks.js';
 
 export default {
     name: 'user-reports',
+    mixins: [filterLinks],
     props: {
         userMongoId: String,
     },

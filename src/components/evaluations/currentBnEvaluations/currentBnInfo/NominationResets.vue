@@ -35,6 +35,7 @@
                             </button>
                             <notability
                                 :selected-entry="event"
+                                @update-entry="$emit('update-entry', $event);"
                             />
                         </td>
                     </tr>
@@ -57,6 +58,7 @@ import Notability from '../../../dataCollection/Notability.vue';
 
 export default {
     name: 'nomination-resets',
+    mixins: [ postData, filterLinks ],
     props: {
         events: Array,
         eventsId: String,
@@ -66,7 +68,7 @@ export default {
         isNat: Boolean,
     },
     components: {
-        Notability
+        Notability,
     },
     data() {
         return {
@@ -76,9 +78,8 @@ export default {
     watch: { 
         editing() {
             this.info = null;
-        }
+        },
     },
-    mixins: [ postData, filterLinks ],
     methods: {
         async updateReason(entryId, e) {
             let reasonInput = $(`.input-${entryId}`).val();
@@ -91,6 +92,6 @@ export default {
                 }
             }
         },
-    }
+    },
 };
 </script>

@@ -35,7 +35,7 @@
 import postData from '../../mixins/postData.js';
 
 export default {
-    name: 'Notability',
+    name: 'notability',
     mixins: [postData],
     props: [ 'selectedEntry' ],
     methods: {
@@ -45,7 +45,7 @@ export default {
                 if (result.error) {
                     this.info = result.error;
                 } else {
-                    this.$parent.updateEntry(result);
+                    this.$emit('update-entry', result);
                 }
             }
         },

@@ -11,7 +11,7 @@
         >
             <card-header
                 :username="application.applicant.username"
-                :osuId="application.applicant.osuId"
+                :osu-id="application.applicant.osuId"
             />
             <card-footer
                 :mode="application.mode"
@@ -37,7 +37,7 @@ export default {
     name: 'application-individual-card',
     components: {
         CardHeader,
-        CardFooter
+        CardFooter,
     },
     props: {
         application: Object,

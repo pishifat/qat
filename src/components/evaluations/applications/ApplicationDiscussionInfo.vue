@@ -5,8 +5,8 @@
                 <modal-header
                     :mode="application.mode"
                     :nat-evaluators="application.natEvaluators"
-                    :isApplication="true"
-                    :osuId="application.applicant.osuId"
+                    :is-application="true"
+                    :osu-id="application.applicant.osuId"
                     :username="application.applicant.username"
                     :evaluator-mongo-id="evaluator.id"
                 />
@@ -14,12 +14,12 @@
                     <div class="container">
                         <mods
                             :mods="application.mods"
-                            :osuId="application.applicant.osuId"
+                            :osu-id="application.applicant.osuId"
                         />
                         <test-results
                             v-if="evaluator.isNat"
                             :test-score="application.test.totalScore"
-                            :osuId="application.applicant.osuId"
+                            :osu-id="application.applicant.osuId"
                         />
                         <p class="text-shadow">
                             <a href="#additionalInfo" data-toggle="collapse">Additional info <i class="fas fa-angle-down" /></a>
@@ -45,7 +45,7 @@
                         <cooldown
                             v-if="application.consensus == 'fail'"
                             :cooldown-date="application.cooldownDate"
-                            :originDate="application.createdAt"
+                            :origin-date="application.createdAt"
                             :nominator-assessment-mongo-id="application.id"
                             :is-application="true"
                             @update-nominator-assessment="$emit('update-application', $event);"
@@ -67,7 +67,7 @@
                             :evaluations="application.evaluations"
                         />
                         <evaluation-input
-                            :isApplication="true"
+                            :is-application="true"
                             :nominator-assessment-mongo-id="application.id"
                             :evaluator-mongo-id="evaluator.id"
                             :evaluations="application.evaluations"
@@ -104,7 +104,7 @@ export default {
         Cooldown,
         FeedbackInfo,
         Evaluations,
-        EvaluationInput
+        EvaluationInput,
     },
     props: {
         application: Object,

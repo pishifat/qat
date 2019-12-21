@@ -3,19 +3,26 @@
         <div :class="bnEvaluators.length ? 'col-sm-4' : 'col-sm-6'">
             <user-list
                 :header="'Assigned NAT:'"
-                :userList="natEvaluators"
+                :user-list="natEvaluators"
+                :is-application="isApplication"
+                :nominator-assessment-mongo-id="nominatorAssessmentMongoId"
+                :is-nat="true"
+                @update-nominator-assessment="$emit('update-nominator-assessment', $event);"
             />
         </div>
         <div v-if="bnEvaluators.length && isLeader" class="col-sm-4">
             <user-list
                 :header="'Assigned BN:'"
-                :userList="bnEvaluators"
+                :user-list="bnEvaluators"
+                :is-application="isApplication"
+                :nominator-assessment-mongo-id="nominatorAssessmentMongoId"
+                @update-nominator-assessment="$emit('update-nominator-assessment', $event);"
             />
         </div>
         <div :class="bnEvaluators.length ? 'col-sm-4' : 'col-sm-6'">
             <user-list
                 :header="'Total evaluations: (' + evaluations.length + ')'"
-                :userList="submittedEvaluators"
+                :user-list="submittedEvaluators"
             />
         </div>
         <div v-if="isLeader && !bnEvaluators.length" class="col-sm-12">
@@ -25,7 +32,9 @@
             <button v-if="potentialBnEvaluators" class="btn btn-sm btn-nat-red mb-2" @click="enableBnEvaluators($event)">
                 Enable BN Evaluations
             </button>
-            <p v-if="info" class="small errors">{{ info }}</p>
+            <p v-if="info" class="small errors">
+                {{ info }}
+            </p>
             <div v-if="potentialBnEvaluators" class="text-shadow">
                 <p>Users:</p>
                 <div id="usernames" class="copy-paste mb-4" style="width: 25%">
@@ -55,6 +64,7 @@ import UserList from '../../info/UserList.vue';
 
 export default {
     name: 'evaluator-assignments',
+    mixins: [ postData ],
     props: {
         bnEvaluators: Array,
         natEvaluators: Array,
@@ -63,11 +73,18 @@ export default {
         mode: String,
         osuId: Number,
         username: String,
-        applicationId: String,
+        nominatorAssessmentMongoId: String,
+        isApplication: Boolean,
     },
-    mixins: [ postData ],
     components: {
-        UserList
+        UserList,
+    },
+    data() {
+        return {
+            potentialBnEvaluators: null,
+            info: null,
+            confirm: null,
+        };
     },
     computed: {
         submittedEvaluators() {
@@ -78,15 +95,8 @@ export default {
             return evaluators;
         },
     },
-    data() {
-        return {
-            potentialBnEvaluators: null,
-            info: null,
-            confirm: null,
-        };
-    },
     watch: {
-        applicationId() {
+        nominatorAssessmentMongoId() {
             this.potentialBnEvaluators = null;
             this.info = null;
             this.confirm = null;
@@ -94,7 +104,7 @@ export default {
     },
     methods: {
         async selectBnEvaluators(e) {
-            const r = await this.executePost('/appeval/selectBnEvaluators', { mode: this.mode, id: this.applicationId }, e);
+            const r = await this.executePost('/appeval/selectBnEvaluators', { mode: this.mode, id: this.nominatorAssessmentMongoId }, e);
             if (r) {
                 if (r.error) {
                     this.info = r.error;
@@ -104,12 +114,12 @@ export default {
             }
         },
         async enableBnEvaluators (e) {
-            const a = await this.executePost('/appEval/enableBnEvaluators/' + this.applicationId, { bnEvaluators: this.potentialBnEvaluators }, e);
+            const a = await this.executePost('/appEval/enableBnEvaluators/' + this.nominatorAssessmentMongoId, { bnEvaluators: this.potentialBnEvaluators }, e);
             if (a) {
                 if (a.error) {
                     this.info = a.error;
                 } else {
-                    this.$emit('update-application', a);
+                    this.$emit('update-nominator-assessment', a);
                 }
             }
         },

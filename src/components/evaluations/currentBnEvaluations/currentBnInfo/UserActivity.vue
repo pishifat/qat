@@ -49,14 +49,12 @@
 <script>
 import postData from '../../../../mixins/postData.js';
 import filterLinks from '../../../../mixins/filterLinks.js';
-import Notability from '../../../dataCollection/Notability.vue';
 import UniqueNominations from './UniqueNominations.vue';
 import NominationResets from './NominationResets.vue';
 
 export default {
     name: 'UserActivity',
     components: {
-        Notability,
         UniqueNominations,
         NominationResets,
     },
@@ -65,7 +63,7 @@ export default {
         osuId: Number,
         mode: String,
         deadline: String,
-        isNat: Boolean
+        isNat: Boolean,
     },
     data() {
         return {

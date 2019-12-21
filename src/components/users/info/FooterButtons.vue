@@ -79,7 +79,7 @@ export default {
                 `Are you sure?`
             );
             if (result) {
-                const u = await this.executePost('/users/removeNat/' + userId, {}, e);
+                const u = await this.executePost('/users/removeNat/' + this.userId, {}, e);
                 if (u) {
                     if (u.error) {
                         this.info = u.error;

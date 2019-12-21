@@ -350,6 +350,60 @@ router.post('/setFeedback/:id', api.isNat, api.isNotSpectator, async (req, res) 
     );
 });
 
+/* POST replace mediator */
+router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) => {
+    let a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
+    let isNat = Boolean(req.body.isNat);
+    let newEvaluator;
+    if(isNat){
+        let invalids = [8129817, 3178418, 2202163];
+        a.natEvaluators.forEach(user => {
+            invalids.push(user.osuId);
+        });
+        newEvaluator = await usersModel.aggregate([
+            { $match: { group: 'nat', isSpectator: { $ne: true }, modes: a.mode, osuId: { $nin: invalids } } },
+            { $sample: { size: 1 } },
+        ]);
+        await bnAppsService.update(req.params.id, { $push: { natEvaluators: newEvaluator[0]._id } });
+        await bnAppsService.update(req.params.id, { $pull: { natEvaluators: req.body.evaluatorId } });
+    }else{
+        let invalids = [];
+        a.bnEvaluators.forEach(user => {
+            invalids.push(user.osuId);
+        });
+        newEvaluator = await usersModel.aggregate([
+            { $match: { group: 'bn', isSpectator: { $ne: true }, modes: a.mode, osuId: { $nin: invalids }, isBnEvaluator: true } },
+            { $sample: { size: 1 } },
+        ]);
+        await bnAppsService.update(req.params.id, { $push: { bnEvaluators: newEvaluator[0]._id } });
+        await bnAppsService.update(req.params.id, { $pull: { bnEvaluators: req.body.evaluatorId } });
+    }
+    a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
+    res.json(a);
+    logsService.create(
+        req.session.mongoId,
+        'Re-selected a single evaluator'
+    );
+    let u = await usersService.query({ _id: req.body.evaluatorId });
+    api.webhookPost(
+        [{
+            author: {
+                name: `${req.session.username}`,
+                icon_url: `https://a.ppy.sh/${req.session.osuId}`,
+                url: `https://osu.ppy.sh/users/${req.session.osuId}`,
+            },
+            color: '16747310',
+            fields:[
+                {
+                    name: `http://bn.mappersguild.com/appeval?eval=${a.id}`,
+                    value: `**${newEvaluator[0].username}** replaced **${u.username}** as ${isNat ? 'NAT' : 'BN'} evaluator for **${a.applicant.username}**'s BN app`,
+                },
+            ],
+        }], 
+        a.mode
+    );
+});
+
 /* POST select BN evaluators */
 router.post('/selectBnEvaluators', api.isLeader, async (req, res) => {
     const allUsers = await usersModel.aggregate([

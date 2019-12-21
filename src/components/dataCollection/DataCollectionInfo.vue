@@ -40,6 +40,7 @@
                             Notability:
                             <notability
                                 :selected-entry="selectedEntry"
+                                @update-entry="$emit('update-entry', $event);"
                             />
                         </p>
                     </div>
@@ -86,16 +87,6 @@ export default {
         },
     },
     methods: {
-        async updateNotability(entryId, notability) {
-            const result = await this.executePost('/dataCollection/updateNotability/' + entryId, { notability });
-            if (result) {
-                if (result.error) {
-                    this.info = result.error;
-                } else {
-                    this.$parent.updateEntry(result);
-                }
-            }
-        },
         async updateReason(e) {
             if(!this.reasonInput || !this.reasonInput.length){
                 this.info = 'Must enter a reason!';
@@ -105,13 +96,10 @@ export default {
                     if (result.error) {
                         this.info = result.error;
                     } else {
-                        this.updateEntry(result);
+                        this.$emit('update-entry', result);
                     }
                 }
             }
-        },
-        updateEntry(result) {
-            this.$parent.updateEntry(result);
         },
     },
 };

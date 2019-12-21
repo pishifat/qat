@@ -111,6 +111,7 @@
                             <td scope="row" style="width: 72px;">
                                 <notability
                                     :selected-entry="dq"
+                                    @update-entry="updateEntry($event)"
                                 />
                             </td>
                             <td scope="row" />
@@ -165,6 +166,7 @@
                             <td scope="row" style="width: 72px;">
                                 <notability
                                     :selected-entry="pop"
+                                    @update-entry="updateEntry($event)"
                                 />
                             </td>
                         </tr>
@@ -175,6 +177,7 @@
 
         <data-collection-info
             :selected-entry="selectedEntry"
+            @update-entry="updateEntry($event)"
         />
     </div>
 </template>
