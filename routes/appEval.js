@@ -438,6 +438,23 @@ router.post('/enableBnEvaluators/:id', api.isLeader, async (req, res) => {
         req.session.mongoId,
         `Opened a BN app to evaluation from ${req.body.bnEvaluators.length} current BNs.`
     );
+    api.webhookPost(
+        [{
+            author: {
+                name: `${req.session.username}`,
+                icon_url: `https://a.ppy.sh/${req.session.osuId}`,
+                url: `https://osu.ppy.sh/users/${req.session.osuId}`,
+            },
+            color: '3115512',
+            fields:[
+                {
+                    name: `http://bn.mappersguild.com/appeval?eval=${a.id}`,
+                    value: `Enabled BN evaluators for **${a.applicant.username}**`,
+                },
+            ],
+        }], 
+        a.mode
+    );
 });
 
 module.exports = router;

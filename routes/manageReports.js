@@ -26,7 +26,9 @@ const defaultPopulate = [
 
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res) => {
-    let r = await reportsService.query({}, defaultPopulate, { createdAt: 1 }, true);
+    let minDate = new Date();
+    minDate.setDate(minDate.getDate() - 90);
+    let r = await reportsService.query({ createdAt: { $gte: minDate } }, defaultPopulate, { createdAt: 1 }, true);
     res.json({ 
         r, 
         isLeader: res.locals.userRequest.isLeader,
