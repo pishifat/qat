@@ -194,7 +194,7 @@ router.post('/replaceMediator/:id', api.isNat, api.isNotSpectator, async (req, r
         ]);
     } else {
         newMediator = await usersModel.aggregate([
-            { $match: { modes: v.mode, osuId: { $nin: currentMediators }, vetoMediator: true } },
+            { $match: { modes: v.mode, osuId: { $nin: currentMediators }, probation: { $ne: v.mode }, vetoMediator: true } },
             { $sample: { size: 1 } }
         ]);
     }
