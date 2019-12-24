@@ -2,6 +2,7 @@ const express = require('express');
 const api = require('../helpers/api');
 const helpers = require('../helpers/helpers');
 const vetoesService = require('../models/veto').service;
+const usersModel = require('../models/user').User;
 const usersService = require('../models/user').service;
 const mediationsService = require('../models/mediation').service;
 const logsService = require('../models/log').service;
@@ -23,17 +24,17 @@ router.get('/', (req, res) => {
         script: '../javascripts/vetoes.js',
         isVetoes: true,
         isBn: res.locals.userRequest.isBn,
-        isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,        
+        isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
     });
 });
 
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res) => {
     let v = await vetoesService.query({}, defaultPopulate, { createdAt: -1 }, true);
-    res.json({ 
-        vetoes: v, 
-        userId: req.session.mongoId, 
-        isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator, 
+    res.json({
+        vetoes: v,
+        userId: req.session.mongoId,
+        isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
         userOsuId: req.session.osuId,
     });
 });
@@ -91,7 +92,7 @@ router.post('/submit', api.isNotSpectator, async (req, res) => {
                 value: req.body.shortReason,
             },
         ],
-    }], 
+    }],
     req.body.mode);
 });
 
@@ -180,27 +181,29 @@ router.post('/continueMediation/:id', api.isNat, api.isNotSpectator, async (req,
 router.post('/replaceMediator/:id', api.isNat, api.isNotSpectator, async (req, res) => {
     let v = await vetoesService.query({ _id: req.params.id }, defaultPopulate);
     let currentMediators = [];
+
     v.mediations.forEach(mediation => {
-        if(mediation.id != req.body.mediationId){
-            currentMediators.push(mediation.mediator.id);
-        }
+        currentMediators.push(mediation.mediator.osuId);
     });
 
-    const allUsers = await usersService.getAllMediators();
-    for (let i = 0; i < allUsers.length; i++) {
-        let user = allUsers[i];
-        if (
-            user.modes.indexOf(v.mode) >= 0 &&
-            user.probation.indexOf(v.mode) < 0 &&
-            user.osuId != v.vetoer.osuId &&
-            user.osuId != v.beatmapMapperId
-        ) {
-            await mediationsService.update(req.body.mediationId, { mediator: user._id });
-            break;
-        }
+    let newMediator;
+    if (v.mode === 'all') {
+        newMediator = await usersModel.aggregate([
+            { $match: { osuId: { $nin: currentMediators }, vetoMediator: true } },
+            { $sample: { size: 1 } }
+        ]);
+    } else {
+        newMediator = await usersModel.aggregate([
+            { $match: { modes: v.mode, osuId: { $nin: currentMediators }, probation: { $ne: v.mode }, vetoMediator: true } },
+            { $sample: { size: 1 } }
+        ]);
     }
+
+    await mediationsService.update(req.body.mediationId, { mediator: newMediator[0]._id });
+
     v = await vetoesService.query({ _id: req.params.id }, defaultPopulate);
     res.json(v);
+
     logsService.create(
         req.session.mongoId,
         'Re-selected a single veto mediator'
