@@ -1,7 +1,7 @@
 <template>
     <div>
         <p class="text-shadow min-spacing">
-            <a :href="events && `#${eventsId}`" data-toggle="collapse">{{ header }} <i class="fas fa-angle-down" /></a> 
+            <a :href="events && `#${eventsId}`" data-toggle="collapse">{{ header }} <i class="fas fa-angle-down" /></a>
             ({{ loading ? '...' : events ? events.length : '0' }})
         </p>
         <div v-if="events" :id="eventsId" class="collapse">
@@ -18,7 +18,7 @@
                     </td>
                 </thead>
                 <tbody class="small">
-                    <tr v-for="event in events" :key="event.id" :class="!isNat ? '' : event.valid == 1 ? 'vote-border-pass' : event.valid == 2 ? 'vote-border-extend' : event.valid == 3 ? 'vote-border-fail' : ''">
+                    <tr v-for="event in events" :key="event.id" :class="!isNat ? '' : getNotabilityColor(event.valid)">
                         <td scope="row">
                             {{ new Date(event.timestamp).toString().slice(4,10) }}
                         </td>
@@ -35,7 +35,7 @@
                             </button>
                             <notability
                                 :selected-entry="event"
-                                @update-entry="$emit('update-entry', $event);"
+                                @update-notability-color="updateNotabilityColor($event, event._id)"
                             />
                         </td>
                     </tr>
@@ -75,7 +75,7 @@ export default {
             info: null,
         };
     },
-    watch: { 
+    watch: {
         editing() {
             this.info = null;
         },
@@ -92,6 +92,25 @@ export default {
                 }
             }
         },
+
+        getNotabilityColor(notability) {
+            switch(notability) {
+                case 1:
+                    return 'vote-border-pass';
+                case 2:
+                    return 'vote-border-extend';
+                case 3:
+                    return 'vote-border-fail';
+                default:
+                    return '';
+            }
+        },
+
+        updateNotabilityColor(notability, eventId) {
+            const event = this.events.filter(x => x._id === eventId);
+            console.log(event[0]);
+            event[0].valid = notability;
+        }
     },
 };
 </script>

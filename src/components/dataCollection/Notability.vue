@@ -46,6 +46,7 @@ export default {
                     this.info = result.error;
                 } else {
                     this.$emit('update-entry', result);
+                    this.$emit('update-notability-color', notability);
                 }
             }
         },
