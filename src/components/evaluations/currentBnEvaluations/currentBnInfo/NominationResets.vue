@@ -108,7 +108,6 @@ export default {
 
         updateNotabilityColor(notability, eventId) {
             const event = this.events.filter(x => x._id === eventId);
-            console.log(event[0]);
             event[0].valid = notability;
         }
     },
