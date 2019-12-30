@@ -160,12 +160,12 @@
                         </p>
                         <div v-for="user in badgeUsers" :key="user.id" class="small min-spacing mb-1">
                             <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a>
-                            <p class="min-spacing" :class="user.bnProfileBadge != calculateDuration(user.bnDuration) && calculateDuration(user.bnDuration) >= 2 ? 'background-fail' : ''">
+                            <p class="min-spacing" :class="user.bnProfileBadge != calculateDuration(user.bnDuration) && calculateDuration(user.bnDuration) >= 1 ? 'background-fail' : ''">
                                 BN: {{ calculateDuration(user.bnDuration) }} -- badge: {{ user.bnProfileBadge }}
                                 <a href="#" @click.prevent="editBadgeValue(user.id, 'bn', true)"><i class="fas fa-plus" /></a>
                                 <a href="#" @click.prevent="editBadgeValue(user.id, 'bn', false)"><i class="fas fa-minus" /></a>
                             </p>
-                            <p class="min-spacing" :class="user.natProfileBadge != calculateDuration(user.natDuration) && calculateDuration(user.natDuration) >= 3 ? 'background-fail' : ''">
+                            <p class="min-spacing" :class="user.natProfileBadge != calculateDuration(user.natDuration) && calculateDuration(user.natDuration) >= 1 ? 'background-fail' : ''">
                                 NAT: {{ calculateDuration(user.natDuration) }} -- badge: {{ user.natProfileBadge }}
                                 <a href="#" @click.prevent="editBadgeValue(user.id, 'nat', true)"><i class="fas fa-plus" /></a>
                                 <a href="#" @click.prevent="editBadgeValue(user.id, 'nat', false)"><i class="fas fa-minus" /></a>
@@ -334,7 +334,7 @@ export default {
                     this.badgeUsers = [];
                     let users = response.data;
                     users.forEach(user => {
-                        if((this.calculateDuration(user.bnDuration) >= 2) || (this.calculateDuration(user.natDuration) >= 2)){
+                        if((this.calculateDuration(user.bnDuration) >= 1) || (this.calculateDuration(user.natDuration) >= 1)){
                             this.badgeUsers.push(user);
                         }
                     });
