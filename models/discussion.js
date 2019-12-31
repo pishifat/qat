@@ -10,6 +10,7 @@ const discussionSchema = new mongoose.Schema({
     isActive: { type: Boolean, default: true },
     mediations: [{ type: 'ObjectId', ref: 'Mediation' }],
     isNatOnly: { type: Boolean, default: false },
+    creator: { type: 'ObjectId', ref: 'User' },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 const Discussion = mongoose.model('Discussion', discussionSchema);
@@ -28,13 +29,14 @@ class DiscussionService extends BaseService
      * @param {string} mode 'osu', 'taiko', 'catch', 'mania', 'all'
      * @param {Boolean} isNatOnly
      */
-    async create(discussionLink, title, shortReason, mode, isNatOnly) {
+    async create(discussionLink, title, shortReason, mode, creator, isNatOnly) {
         try {
             return await Discussion.create({ 
                 discussionLink, 
                 title,
                 shortReason, 
                 mode, 
+                creator,
                 isNatOnly,
             });
         } catch(error) {

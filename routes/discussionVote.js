@@ -59,6 +59,7 @@ router.post('/submit', api.isNat, async (req, res) => {
         req.body.title,
         req.body.shortReason,
         req.body.mode,
+        req.session.mongoId,
         req.body.isNatOnly
     );
     res.json(d);

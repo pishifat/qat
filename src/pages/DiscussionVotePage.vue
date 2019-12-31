@@ -46,7 +46,7 @@ import pagination from '../mixins/pagination.js';
 import filters from '../mixins/filters.js';
 
 export default {
-    name: 'RcPage',
+    name: 'DiscussionVotePage',
     components: {
         DiscussionCard,
         DiscussionInfo,

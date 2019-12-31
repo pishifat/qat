@@ -2,32 +2,18 @@
     <div id="extendedInfo" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div v-if="discussion" class="modal-content">
-                <div class="modal-header text-dark bg-nat-logo">
-                    <h5 class="modal-title">
-                        <a v-if="discussion.discussionLink.length" class="text-dark" :href="discussion.discussionLink" target="_blank">{{ discussion.title }}</a>
-                        <span v-else class="text-dark">{{ discussion.title }}</span>
-                        <i v-if="discussion.mode.indexOf('osu') >= 0" class="far fa-circle" />
-                        <i v-if="discussion.mode.indexOf('taiko') >= 0" class="fas fa-drum" />
-                        <i v-if="discussion.mode.indexOf('catch') >= 0" class="fas fa-apple-alt" />
-                        <i v-if="discussion.mode.indexOf('mania') >= 0" class="fas fa-stream" />
-                        <span v-if="discussion.mode.indexOf('all') >= 0">
-                            <i class="far fa-circle" />
-                            <i class="fas fa-drum" />
-                            <i class="fas fa-apple-alt" />
-                            <i class="fas fa-stream" />
-                        </span>
-                    </h5>
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span>&times;</span>
-                    </button>
-                </div>
+                <modal-header
+                    :discussion-link="discussion.discussionLink"
+                    :title="discussion.title"
+                    :mode="discussion.mode"
+                />
                 <div class="modal-body" style="overflow: hidden">
-                    <div class="text-shadow mb-4">
-                        <p class="min-spacing">
-                            <a v-if="discussion.discussionLink.length" :href="discussion.discussionLink" target="_blank">Read and contribute to the full discussion here</a>
-                        </p>
-                        <small class="ml-2">Proposal: <i v-html="filterLinks(discussion.shortReason)" /></small>
-                    </div>
+                    <discussion-context
+                        :discussion-link="discussion.discussionLink"
+                        :is-creator="discussion.creator == userId"
+                        :title="discussion.title"
+                        :short-reason="discussion.shortReason"
+                    />
 
                     <div v-if="isNat && !isLeader && discussion.isActive">
                         <p class="min-spacing text-shadow">Counted votes ({{ discussion.mediations.length }}):</p>
@@ -184,11 +170,23 @@
 <script>
 import postData from '../../mixins/postData.js';
 import filterLinks from '../../mixins/filterLinks.js';
+import ModalHeader from './info/ModalHeader.vue';
+import DiscussionContext from './info/DiscussionContext.vue';
 
 export default {
     name: 'DiscussionInfo',
+    components: {
+        ModalHeader,
+        DiscussionContext,
+    },
     mixins: [ postData, filterLinks ],
-    props: [ 'discussion', 'userId', 'userModes', 'isLeader', 'isNat' ],
+    props: {
+        discussion: Object,
+        userId: String,
+        userModes: Array,
+        isLeader: Boolean,
+        isNat: Boolean,
+    },
     data() {
         return {
             info: '',
