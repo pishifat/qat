@@ -18,6 +18,8 @@
                         <notes
                             v-if="isNat"
                             :user-id="user.id"
+                            :viewing-user="userId"
+                            @update-user="$emit('update-user', $event);"
                         />
                         <p class="text-shadow min-spacing mb-1">BN activity (last 3 months):</p>
                         <div class="container">

@@ -142,7 +142,7 @@ router.post('/saveNote/:id', api.isNat, async (req, res) => {
     );
 });
 
-/* POST save note */
+/* POST hide note */
 router.post('/hideNote/:id', api.isNat, async (req, res) => {
     await notesService.update(req.params.id, { isHidden: true } );
     res.json({});
@@ -150,6 +150,18 @@ router.post('/hideNote/:id', api.isNat, async (req, res) => {
     logsService.create(
         req.session.mongoId,
         `Removed user note from "${u.username}"`
+    );
+});
+
+/* POST edit note */
+router.post('/editNote/:id', api.isNat, async (req, res) => {
+    await notesService.update(req.params.id, { comment: req.body.comment } );
+    let n = await notesService.query({ _id: req.params.id }, defaultNotePopulate);
+    res.json(n);
+    let u = await usersService.query({ _id: n.user });
+    logsService.create(
+        req.session.mongoId,
+        `edited user note for "${u.username}"`
     );
 });
 

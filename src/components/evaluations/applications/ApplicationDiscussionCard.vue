@@ -12,7 +12,7 @@
         >
             <card-header
                 :username="application.applicant.username"
-                :osuId="application.applicant.osuId"
+                :osu-id="application.applicant.osuId"
                 :consensus="application.consensus"
             />
             <card-footer
@@ -25,6 +25,7 @@
                 :date="application.createdAt"
                 :is-application="true"
                 :is-archive="isArchive"
+                :feedback="application.feedback"
                 @check-selection="checkSelection()"
             />
         </div>
@@ -36,16 +37,16 @@ import CardHeader from '../card/CardHeader.vue';
 import CardFooter from '../card/CardFooter.vue';
 
 export default {
-    name: 'application-discussion-card',
+    name: 'ApplicationDiscussionCard',
+    components: {
+        CardHeader,
+        CardFooter,
+    },
     props: {
         application: Object,
         evaluator: Object,
         allChecked: Boolean,
         isArchive: Boolean,
-    },
-    components: {
-        CardHeader,
-        CardFooter
     },
     data() {
         return {

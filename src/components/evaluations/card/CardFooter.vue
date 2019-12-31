@@ -48,7 +48,10 @@
 import AddVotes from '../card/AddVotes.vue';
 
 export default {
-    name: 'card-footer',
+    name: 'CardFooter',
+    components: {
+        AddVotes,
+    },
     props: {
         mode: String,
         isNat: Boolean,
@@ -60,9 +63,6 @@ export default {
         isApplication: Boolean,
         isArchive: Boolean,
         feedback: String,
-    },
-    components: {
-        AddVotes,
     },
     methods: {
         separateEvals() {
@@ -84,6 +84,6 @@ export default {
                 return deadline.toString().slice(4,10);
             }
         },
-    }
+    },
 };
 </script>

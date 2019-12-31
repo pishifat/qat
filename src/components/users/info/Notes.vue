@@ -1,33 +1,63 @@
 <template>
     <div>
         <hr>
-        <div class="form-group">
+        <div class="d-flex">
             <textarea
                 v-model="comment"
                 placeholder="new user note..."
-                class="form-control dark-textarea"
+                class="form-control dark-textarea mr-2"
                 style="white-space: pre-line;"
                 rows="2"
             />
-        </div>
-        <div class="mb-4">
-            <button class="btn btn-sm btn-nat float-right" @click="saveNote($event)">
+            <button class="btn btn-sm btn-nat align-self-center" @click="saveNote($event)">
                 Save
             </button>
         </div>
+        
         <ul class="mt-2">
-            <li v-if="!notes.length" class="small min-spacing">User has no notes</li>
-            <li v-else v-for="note in notes" :key="note.id" class="small text-shadow">
-                <b>{{ note.createdAt.slice(0,10) }} - {{ note.author.username }}</b>
-                <a href="#" @click.prevent="hideNote(note.id);" class="vote-fail" data-toggle="tooltip" data-placement="top" title="delete note">&times;</a>
-                <pre class="secondary-text pre-font ml-2" v-html="filterLinks(note.comment)"></pre>
+            <li v-if="!notes.length" class="small min-spacing">
+                User has no notes
+            </li>
+            <li v-for="note in notes" v-else :key="note.id" class="small text-shadow">
+                <b>
+                    {{ note.updatedAt.slice(0,10) }} -
+                    <a :href="'https://osu.ppy.sh/users/' + note.author.osuId" target="_blank">
+                        {{ note.author.username }}
+                    </a>
+                </b>
+                <a
+                    href="#"
+                    class="vote-fail"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="delete note"
+                    @click.prevent="hideNote(note.id);"
+                >&times;</a>
+                <a
+                    v-if="note.author.id == viewingUser"
+                    href="#"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="edit note"
+                    @click.prevent="editNoteId == note.id ? editNoteId = '' : editNoteId = note.id, editNoteComment = note.comment"
+                ><i class="fas fa-edit" /></a>
+                <pre v-if="note.id != editNoteId" class="secondary-text pre-font ml-2" v-html="filterLinks(note.comment)" />
+                <div v-else class="d-flex">
+                    <textarea
+                        v-model="editNoteComment"
+                        placeholder="edit user note..."
+                        class="form-control dark-textarea mr-2"
+                        style="white-space: pre-line;"
+                        rows="2"
+                    />
+                    <button class="btn btn-sm btn-nat align-self-center" @click="editNote($event)">
+                        Edit
+                    </button>
+                </div>
             </li>
         </ul>
         <p v-if="info.length" class="errors text-shadow mt-2">
             {{ info }}
-        </p>
-        <p v-if="confirm.length" class="confirm text-shadow mt-2">
-            {{ confirm }}
         </p>
     </div>
 </template>
@@ -37,17 +67,20 @@ import postData from '../../../mixins/postData.js';
 import filterLinks from '../../../mixins/filterLinks.js';
 
 export default {
-    name: 'notes',
+    name: 'Notes',
+    mixins: [postData, filterLinks],
     props: {
         userId: String,
+        viewingUser: String,
+        
     },
-    mixins: [postData, filterLinks],
     data() {
         return {
             notes: [],
             comment: '',
             info: '',
-            confirm: '',
+            editNoteId: '',
+            editNoteComment: '',
         };
     },
     watch: {
@@ -55,9 +88,9 @@ export default {
             this.notes = [];
             this.comment = '';
             this.info = '';
-            this.confirm = '';
+            this.editNoteId = '';
             this.loadUserNotes();
-        }
+        },
     },
     mounted() {
         this.loadUserNotes();
@@ -78,9 +111,24 @@ export default {
                         this.info = n.error;
                     } else {
                         if(this.notes){
-                            this.notes.unshift(n)
+                            this.notes.unshift(n);
                         }
-                        this.confirm = 'Note added!'
+                    }
+                }
+            }
+        },
+        async editNote(e) {
+            if(this.editNoteComment.length){
+                const n = await this.executePost('/users/editNote/' + this.editNoteId, { comment: this.editNoteComment }, e);
+                if (n) {
+                    if (n.error) {
+                        this.info = n.error;
+                    } else {
+                        if(this.notes){
+                            const i = this.notes.findIndex(note => note.id == this.editNoteId);
+                            this.notes[i] = n;
+                            this.editNoteId = '';
+                        }
                     }
                 }
             }
@@ -88,12 +136,11 @@ export default {
         async hideNote(noteId) {
             const result = confirm(`Are you sure?`);
             if(result){
-                const n = await this.executePost('/users/hideNote/' + noteId, { userId: this.userId });
+                await this.executePost('/users/hideNote/' + noteId, { userId: this.userId });
                 if(this.notes){
                     const i = this.notes.findIndex(note => note.id == noteId);
                     this.notes.splice(i, 1);
                 }
-                this.confirm = 'Note removed!' 
             }
         },
     },
