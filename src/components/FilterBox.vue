@@ -31,11 +31,7 @@ export default {
         filterMode: String,
         filterValue: String,
         placeholder: String,
+        options: Array,
     },
-    data () {
-        return {
-            options: ['', 'osu', 'taiko', 'catch', 'mania'],
-        };
-    }
 };
 </script>

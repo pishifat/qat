@@ -5,6 +5,7 @@
                 :filter-mode.sync="filterMode" 
                 :filter-value.sync="filterValue"
                 :placeholder="'content...'"
+                :options="['', 'osu', 'taiko', 'catch', 'mania']"
             >
                 <button v-if="isNat" class="btn btn-sm btn-nat ml-2" data-toggle="modal" data-target="#addDiscussion">
                     Submit topic for vote

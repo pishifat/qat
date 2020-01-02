@@ -6,6 +6,7 @@
                     :filter-mode.sync="filterMode" 
                     :filter-value.sync="filterValue"
                     :placeholder="'metadata...'"
+                    :options="['osu', 'taiko', 'catch', 'mania']"
                 />
             </div>
         </div>
@@ -17,6 +18,8 @@
                         :key="event.id"
                         :event="event"
                         :user-id="userId"
+                        :is-outdated="isOutdated(event.beatmapsetId, event.timestamp)"
+                        :is-max-checks="event.qualityAssuranceCheckers.length > 0"
                         @update-event="updateEvent($event)"
                     />
                 </transition-group>
@@ -79,6 +82,18 @@ export default {
                 return true;
             }
             return false;
+        },
+        isOutdated(beatmapsetId, timestamp) {
+            const beatmaps = this.pageObjs.filter(b => b.beatmapsetId == beatmapsetId && b.timestamp != timestamp);
+            let isOutdated = false;
+            for (let i = 0; i < beatmaps.length; i++) {
+                const b = beatmaps[i];
+                if(new Date(b.timestamp) > new Date(timestamp)){
+                    isOutdated = true;
+                    break;
+                }
+            }
+            return isOutdated;
         },
         updateEvent(event) {
             const i = this.allObjs.findIndex(e => e.id == event.id);

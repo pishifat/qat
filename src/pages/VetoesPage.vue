@@ -5,6 +5,7 @@
                 :filter-mode.sync="filterMode"
                 :filter-value.sync="filterValue"
                 :placeholder="'beatmap...'"
+                :options="['', 'osu', 'taiko', 'catch', 'mania']"
             >
                 <button class="btn btn-sm btn-nat ml-2" data-toggle="modal" data-target="#addVeto">
                     Submit veto

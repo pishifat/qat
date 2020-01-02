@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="card static-card">
+        <div class="card static-card" :class="isMaxChecks || isOutdated || isQualityAssuranceChecker ? 'low-opacity' : ''">
             <div class="card-header min-spacing d-flex align-items-center">
                 <div class="col-sm-6 mr-2" style="padding-left: 0px;">
                     <a 
@@ -12,16 +12,16 @@
                             class="beatmap-thumbnail mr-2"
                             :src="'https://b.ppy.sh/thumb/' + event.beatmapsetId + '.jpg'"
                         >
-                        {{ event.metadata.length > 50 ? event.metadata.slice(0,50) + '...' : event.metadata }}
+                        {{ event.metadata.length > 45 ? event.metadata.slice(0,42) + '...' : event.metadata }}
                     </a>
                 </div>
-                <div class="col-sm-2 small d-flex justify-content-end">
-                    <span class="text-white-50">
+                <div class="col-sm-3 small d-flex justify-content-end align-items-center">
+                    <p class="min-spacing">
                         Hosted by
-                        <a :href="'https://osu.ppy.sh/users/' + event.userId" target="_blank" @click.stop>{{ event.userId }}</a>
-                    </span>
+                        <a :href="'https://osu.ppy.sh/users/' + event.hostId" target="_blank" @click.stop>{{ event.hostName }}</a>
+                    </p>
                 </div>
-                <div class="col-sm-3 small d-flex justify-content-start">
+                <div class="col-sm-2 small d-flex justify-content-start">
                     <span v-if="event.qualityAssuranceCheckers">
                         <a 
                             v-for="user in event.qualityAssuranceCheckers"
@@ -39,23 +39,25 @@
                         </a>
                     </span>
                 </div>
-                <div class="col-sm-1 small d-flex justify-content-end">
+                <div v-if="!isOutdated" class="col-sm-1 small d-flex justify-content-end">
                     <button 
-                        v-if="event.qualityAssuranceCheckers && isQualityAssuranceChecker" 
+                        v-if="isQualityAssuranceChecker" 
                         data-toggle="tooltip" 
                         data-placement="top" 
                         title="toggle QA checker"
                         class="btn btn-xs btn-nat-red p-1"
+                        :disabled="forceDisabled"
                         @click.prevent="unassignUser($event)"
                     >
                         <i class="fas fa-minus vote-fail" />
                     </button>
                     <button 
-                        v-else
+                        v-else-if="!isMaxChecks"
                         data-toggle="tooltip"
                         data-placement="top"
                         title="toggle QA checker"
                         class="btn btn-xs btn-nat-green p-1"
+                        :disabled="forceDisabled"
                         @click.prevent="assignUser($event)"
                     >
                         <i class="fas fa-plus vote-pass" />
@@ -70,11 +72,18 @@
 import postData from '../../mixins/postData.js';
 
 export default {
-    name: 'event-row',
+    name: 'EventRow',
     mixins: [postData],
     props: {
         event: Object,
         userId: String,
+        isOutdated: Boolean,
+        isMaxChecks: Boolean,
+    },
+    data() {
+        return {
+            forceDisabled: false,
+        };
     },
     computed: {
         isQualityAssuranceChecker() {
@@ -88,24 +97,28 @@ export default {
         },
     },
     methods: {
-        async assignUser (e) {
-            const event = await this.executePost('/qualityAssurance/assignUser/' + this.event.id, {}, e);
+        async assignUser () {
+            this.forceDisabled = true;
+            const event = await this.executePost('/qualityAssurance/assignUser/' + this.event.id, {});
             if (event) {
                 if (event.error) {
                     this.info = event.error;
                 } else {
                     this.$emit('update-event', event);
                 }
+                this.forceDisabled = false;
             }
         },
-        async unassignUser (e) {
-            const event = await this.executePost('/qualityAssurance/unassignUser/' + this.event.id, {}, e);
+        async unassignUser () {
+            this.forceDisabled = true;
+            const event = await this.executePost('/qualityAssurance/unassignUser/' + this.event.id, {});
             if (event) {
                 if (event.error) {
                     this.info = event.error;
                 } else {
                     this.$emit('update-event', event);
                 }
+                this.forceDisabled = false;
             }
         },
     },
@@ -138,6 +151,10 @@ export default {
         border-bottom-left-radius: 5px;
         border-top-left-radius: 5px;
         box-shadow: 1px 1px 1px 1px rgb(12, 14, 17);
+    }
+
+    .low-opacity {
+        opacity: 0.5 !important;
     }
 </style>
 

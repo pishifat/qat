@@ -5,6 +5,7 @@
                 :filter-mode.sync="filterMode" 
                 :filter-value.sync="filterValue"
                 :placeholder="'username... (3+ characters)'"
+                :options="['', 'osu', 'taiko', 'catch', 'mania']"
             />
             <section class="row segment segment-solid my-1 mx-4">
                 <div class="small">

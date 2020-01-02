@@ -5,6 +5,7 @@
                 :filter-mode.sync="filterMode" 
                 :filter-value.sync="filterValue"
                 :placeholder="'username... (3+ characters)'"
+                :options="['', 'osu', 'taiko', 'catch', 'mania']"
             >
                 <slot>
                     <button v-if="evaluator && evaluator.isLeader" class="btn btn-nat btn-sm ml-2" @click="selectAll($event)">
