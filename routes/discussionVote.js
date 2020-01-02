@@ -64,6 +64,27 @@ router.post('/submit', api.isNat, async (req, res) => {
     );
     res.json(d);
     logsService.create(req.session.mongoId, 'Submitted a discussion for voting');
+    api.webhookPost(
+        [{
+            author: {
+                name: `${req.session.username}`,
+                icon_url: `https://a.ppy.sh/${req.session.osuId}`,
+                url: `https://osu.ppy.sh/users/${req.session.osuId}`,
+            },
+            color: '14805600',
+            fields:[
+                {
+                    name: `http://bn.mappersguild.com/discussionvote?id=${d.id}`,
+                    value: `**New discussion up for vote:** ${req.body.title}`,
+                },
+                {
+                    name: `Proposal`,
+                    value: req.body.shortReason,
+                },
+            ],
+        }], 
+        d.mode
+    );
 });
 
 /* POST submit mediation */
@@ -76,12 +97,31 @@ router.post('/submitMediation/:id', async (req, res) => {
         await discussionsService.update(req.params.id, { $push: { mediations: m } });
     }    
     await mediationsService.update(m._id, { comment: req.body.comment, vote: req.body.vote });
-    m = await discussionsService.query({ _id: req.params.id }, defaultPopulate);
-    res.json(m);
+    let d = await discussionsService.query({ _id: req.params.id }, defaultPopulate);
+    res.json(d);
     logsService.create(
         req.session.mongoId,
         'Submitted vote for a discussion'
     );
+    if(!req.body.mediationId){
+        api.webhookPost(
+            [{
+                author: {
+                    name: `${req.session.username}`,
+                    icon_url: `https://a.ppy.sh/${req.session.osuId}`,
+                    url: `https://osu.ppy.sh/users/${req.session.osuId}`,
+                },
+                color: '16777024',
+                fields:[
+                    {
+                        name: `http://bn.mappersguild.com/discussionvote?id=${d.id}`,
+                        value: `Submitted vote for discussion on **${d.title}**`,
+                    },
+                ],
+            }], 
+            d.mode
+        );
+    }
 });
 
 /* POST conclude mediation */

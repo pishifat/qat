@@ -100,6 +100,11 @@ export default {
             return this.discussion.mediations.filter(mediation => mediation.vote == 3);
         },
     },
+    watch: {
+        discussion() {
+            history.pushState(null, 'Discussion Vote', `/discussionvote?id=${this.discussion.id}`);
+        },
+    },
     methods: {
         async concludeMediation (e) {
             this.info = '';

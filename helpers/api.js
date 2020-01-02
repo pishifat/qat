@@ -203,6 +203,9 @@ async function webhookPost(message, mode) {
         case 'mania':
             url += `${config.maniaWebhook.id}/${config.maniaWebhook.token}`;
             break;
+        case 'all':
+            url += `${config.allWebhook.id}/${config.allWebhook.token}`;
+            break;
         default:
             url += `${config.reportWebhook.id}/${config.reportWebhook.token}`;
             break;

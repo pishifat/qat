@@ -76,6 +76,14 @@ export default {
                 this.isLeader = response.data.isLeader;
                 this.isNat = response.data.isNat;
                 this.limit = 24;
+                const params = new URLSearchParams(document.location.search.substring(1));
+                if (params.get('id') && params.get('id').length) {
+                    const i = this.allObjs.findIndex(a => a.id == params.get('id'));
+                    if(i >= 0){
+                        this.selectedDiscussion = this.allObjs[i];
+                        $('#extendedInfo').modal('show');
+                    }
+                }
             })
             .then(function() {
                 $('#loading').fadeOut();
