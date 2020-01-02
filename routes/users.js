@@ -134,7 +134,7 @@ router.post('/saveNote/:id', api.isNat, async (req, res) => {
                 },
                 {
                     name: 'Note',
-                    value: req.body.comment,
+                    value: req.body.comment.length > 975 ? req.body.comment.slice(0,975) + '... *(truncated)*' : req.body.comment,
                 },
             ],
         }], 
