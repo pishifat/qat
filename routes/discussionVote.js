@@ -84,7 +84,7 @@ router.post('/submitMediation/:id', async (req, res) => {
     );
 });
 
-/* POST submit mediation */
+/* POST conclude mediation */
 router.post('/concludeMediation/:id', api.isLeader, async (req, res) => {
     await discussionsService.update(req.params.id, { isActive: false });
     let m = await discussionsService.query({ _id: req.params.id }, defaultPopulate);
@@ -92,6 +92,28 @@ router.post('/concludeMediation/:id', api.isLeader, async (req, res) => {
     logsService.create(
         req.session.mongoId,
         'Concluded vote for a discussion'
+    );
+});
+
+/* POST save title */
+router.post('/saveTitle/:id', api.isLeader, async (req, res) => {
+    await discussionsService.update(req.params.id, { title: req.body.title });
+    let d = await discussionsService.query({ _id: req.params.id }, defaultPopulate);
+    res.json(d);
+    logsService.create(
+        req.session.mongoId,
+        `Changed discussion title to "${req.body.title}"`
+    );
+});
+
+/* POST save shortReason */
+router.post('/saveProposal/:id', api.isLeader, async (req, res) => {
+    await discussionsService.update(req.params.id, { shortReason: req.body.shortReason });
+    let d = await discussionsService.query({ _id: req.params.id }, defaultPopulate);
+    res.json(d);
+    logsService.create(
+        req.session.mongoId,
+        `Changed discussion proposal to "${req.body.shortReason}"`
     );
 });
 
