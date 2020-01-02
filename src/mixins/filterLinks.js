@@ -10,9 +10,9 @@ const filterLinks = {
 
                     if(hyperlink.includes(']')) {
                         const split = hyperlink.split(']');
+                        afterHyperlink = `]${split[1]}`;
                         hyperlink = split[0];
                         renderHyperlink = split[0];
-                        afterHyperlink = `]${split[1]}`;
                     }
 
                     if (!hyperlink.match(/^https?:\/\//)) {
