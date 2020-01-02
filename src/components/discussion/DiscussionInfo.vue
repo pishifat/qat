@@ -62,7 +62,6 @@
 
 <script>
 import postData from '../../mixins/postData.js';
-import filterLinks from '../../mixins/filterLinks.js';
 import ModalHeader from './info/ModalHeader.vue';
 import DiscussionContext from './info/DiscussionContext.vue';
 import VotesPublicActive from './info/votes/VotesPublicActive.vue';
@@ -82,7 +81,7 @@ export default {
         VotesInactive,
         MediatorOptions,
     },
-    mixins: [ postData, filterLinks ],
+    mixins: [ postData ],
     props: {
         discussion: Object,
         userId: String,
