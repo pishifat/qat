@@ -34,6 +34,7 @@
                     </button>
                 </div>
             </section>
+            <evaluation-instructions />
             <hr>
             <section class="row segment segment-image mx-1 px-0">
                 <div class="col-sm-12">
@@ -106,6 +107,7 @@ import ApplicationIndividualCard from '../components/evaluations/applications/Ap
 import ApplicationIndividualInfo from '../components/evaluations/applications/ApplicationIndividualInfo.vue';
 import ApplicationDiscussionCard from '../components/evaluations/applications/ApplicationDiscussionCard.vue';
 import ApplicationDiscussionInfo from '../components/evaluations/applications/ApplicationDiscussionInfo.vue';
+import EvaluationInstructions from '../components/evaluations/applications/EvaluationInstructions.vue';
 import FilterBox from '../components/FilterBox.vue';
 import filters from '../mixins/filters.js';
 import postData from '../mixins/postData.js';
@@ -117,6 +119,7 @@ export default {
         ApplicationIndividualInfo,
         ApplicationDiscussionCard,
         ApplicationDiscussionInfo,
+        EvaluationInstructions,
         FilterBox,
     },
     mixins: [ postData, filters ],

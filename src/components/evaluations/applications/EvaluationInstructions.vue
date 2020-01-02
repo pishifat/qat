@@ -1,0 +1,46 @@
+<template>
+    <section class="row segment my-1 mx-4">
+        <a data-toggle="collapse" href="#howToUse">How to evaluate applicants <i class="fas fa-angle-down" /></a> 
+        <div id="howToUse" class="collapse mt-4 mx-2">
+            <p>Modding</p>
+            <p class="small ml-4 min-spacing">
+                The following are modding traits expected of Beatmap Nominators. Their mods should demonstrate most, if not all of them
+            </p>
+            <ul class="small ml-2" style="list-style-type: disc;">
+                <li>Coverage of all difficulty levels</li>
+                <li>Identification of unrankable issues, including ones tools can't detect like timing/metadata</li>
+                <li>Comparisons of parts of a map to support issues/suggestions</li>
+                <li>A wide variety of map elements, such as rhythm, spacing, movement, intensity, contrast, and consistency.</li>
+                <li>Identification of both isolated issues and general map-wide issues</li>
+            </ul>
+            <p class="small ml-4">
+                To effectively evaluate an applicant's mods, you will likely need to download the beatmap and examine it yourself. This can reveal if the applicant's suggestions fit appropraitely with the beatmap and if the applicant overlooks any of the beatmap's glaring problems! When criticizing a specific mod post, include a link to it alongside your explanation.
+            </p>
+            <p class="small ml-4">
+                Mod posts with beneficial suggestions are valuable regardless of their writing style. Verbose writing may not be helpful despite explanations being detailed. Regardless of writing style, the content of the suggestions is what matters. A poor writing style can be fixed much more practically than poor modding knowledge, so don't consider it too vital to an applicant's capabiltiies.
+            </p>
+            <p class="small ml-4">
+                While there's no correct way to write a modding evaluation, we recommend writing anything noteworthy about their mods on each map, then a conclusive sentence or two explaining your voting decision.
+            </p>
+            <p>Behavior</p>
+            <p class="small ml-4">
+                Behavior is worth commenting on when an applicant is known to consistently cause problems within the mapping/modding community. Links to instances of poor behavior are appreciated when relevant. Behavior prior to 3 months from the application date should not be considered.
+            </p>
+            <p class="small ml-4">
+                Sloppy or rudely written mod posts are usually not worth addressing. Consider whether the beatmap's creator is a friend of the modder to understand reasons behind their behavior.
+            </p>
+            <p class="small ml-4">
+                If you don't know anything about a user, their behavior is likely not worth mentioning. Feel free to write a comment like "fine" in these cases.
+            </p>
+        </div>
+    </section>
+</template>
+
+<script>
+export default {
+    name: 'EvaluationInstructions',
+};
+</script>
+
+<style>
+</style>
