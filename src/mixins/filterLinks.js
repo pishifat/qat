@@ -2,13 +2,24 @@ const filterLinks = {
     methods: {
         filterLinks (text) {
             return (text || '...').replace(
-                /([^\S]|^)(((https?\:\/\/)|(www\.))(\S+))/gi,
+                /([^\S]|\[url\=|^)(((https?\:\/\/)|(www\.))(\S+))/gi,
                 function(match, space, url){
+                    let afterHyperlink = '';
                     let hyperlink = url;
-                    if (!hyperlink.match('^https?:\/\/')) {
-                        hyperlink = 'http://' + hyperlink;
+                    let renderHyperlink = url;
+
+                    if(hyperlink.includes(']')) {
+                        const split = hyperlink.split(']');
+                        hyperlink = split[0];
+                        renderHyperlink = split[0];
+                        afterHyperlink = `]${split[1]}`;
                     }
-                    return space + '<a href="' + hyperlink + '" target="_blank">' + url + '</a>';
+
+                    if (!hyperlink.match(/^https?:\/\//)) {
+                        hyperlink = `http://${hyperlink}`;
+                    }
+
+                    return `${space}<a href="${hyperlink}" target="_blank">${renderHyperlink}</a>${afterHyperlink}`;
                 }
             );
         },
