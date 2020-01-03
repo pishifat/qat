@@ -35,6 +35,7 @@
                         <hr v-if="application.consensus">
                         <evaluations
                             :evaluations="application.evaluations"
+                            :is-nat="evaluator.isNat"
                         />
                     </div>
                 </div>

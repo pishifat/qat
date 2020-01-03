@@ -29,6 +29,7 @@
                                 Applicant comment: <span class="small">{{ application.test.comment }}</span>
                             </p>
                             <previous-evaluations
+                                v-if="evaluator.isNat"
                                 :user-mongo-id="application.applicant.id"
                             />
                             <user-notes
@@ -37,13 +38,14 @@
                         </div>
                         <hr>
                         <consensus
+                            v-if="evaluator.isNat"
                             :consensus="application.consensus"
                             :nominator-assessment-mongo-id="application.id"
                             :is-application="true"
                             @update-nominator-assessment="$emit('update-application', $event);"
                         />
                         <cooldown
-                            v-if="application.consensus == 'fail'"
+                            v-if="application.consensus == 'fail' && evaluator.isNat"
                             :cooldown-date="application.cooldownDate"
                             :origin-date="application.createdAt"
                             :nominator-assessment-mongo-id="application.id"
@@ -51,7 +53,7 @@
                             @update-nominator-assessment="$emit('update-application', $event);"
                         />
                         <feedback-info
-                            v-if="application.consensus"
+                            v-if="application.consensus && evaluator.isNat"
                             :consensus="application.consensus"
                             :is-application="true"
                             :osu-id="application.applicant.osuId"
@@ -62,11 +64,18 @@
                             :nominator-assessment-mongo-id="application.id"
                             @update-nominator-assessment="$emit('update-application', $event);"
                         />
-                        <hr v-if="application.consensus">
+                        <hr v-if="application.consensus && evaluator.isNat">
                         <evaluations
+                            v-if="evaluator.isNat || application.consensus"
+                            :is-nat="evaluator.isNat"
+                            :consensus="application.consensus || 'none'"
                             :evaluations="application.evaluations"
                         />
+                        <p v-else class="text-shadow small">
+                            No consensus has been set, so evaluations are not visible. Check back later!
+                        </p>
                         <evaluation-input
+                            v-if="evaluator.isNat"
                             :is-application="true"
                             :nominator-assessment-mongo-id="application.id"
                             :evaluator-mongo-id="evaluator.id"
