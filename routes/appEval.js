@@ -51,7 +51,7 @@ router.get('/relevantInfo', async (req, res) => {
         );
     }else{
         a = await bnAppsService.query(
-            { active: true, test: { $exists: true }, bnEvaluators: { $elemMatch: { $in: res.locals.userRequest.id } } },
+            { test: { $exists: true }, bnEvaluators: { $elemMatch: { $in: res.locals.userRequest.id } } },
             defaultPopulate,
             { createdAt: 1, consensus: 1, feedback: 1  },
             true
