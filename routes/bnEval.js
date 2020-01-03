@@ -470,7 +470,7 @@ router.get('/findPreviousEvaluations/:id', api.isNat, async (req, res) => {
 });
 
 /* GET find user notes */
-router.get('/findUserNotes/:id', api.isBnOrNat, async (req, res) => {
+router.get('/findUserNotes/:id', api.isNat, async (req, res) => {
     let notes = await notesService.query({ user: req.params.id, isHidden: { $ne: true } }, notesPopulate, {}, true);
     res.json({ userNotes: notes });
 });

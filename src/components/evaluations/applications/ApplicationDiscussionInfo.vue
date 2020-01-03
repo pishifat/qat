@@ -21,20 +21,21 @@
                             :test-score="application.test.totalScore"
                             :osu-id="application.applicant.osuId"
                         />
-                        <p class="text-shadow">
-                            <a href="#additionalInfo" data-toggle="collapse">Additional info <i class="fas fa-angle-down" /></a>
-                        </p>
-                        <div id="additionalInfo" class="collapse container">
-                            <p v-if="application.test.comment" class="text-shadow">
-                                Applicant comment: <span class="small">{{ application.test.comment }}</span>
+                        <div v-if="evaluator.isNat">
+                            <p class="text-shadow">
+                                <a href="#additionalInfo" data-toggle="collapse">Additional info <i class="fas fa-angle-down" /></a>
                             </p>
-                            <previous-evaluations
-                                v-if="evaluator.isNat"
-                                :user-mongo-id="application.applicant.id"
-                            />
-                            <user-notes
-                                :user-mongo-id="application.applicant.id"
-                            />
+                            <div id="additionalInfo" class="collapse container">
+                                <p v-if="application.test.comment" class="text-shadow">
+                                    Applicant comment: <span class="small">{{ application.test.comment }}</span>
+                                </p>
+                                <previous-evaluations
+                                    :user-mongo-id="application.applicant.id"
+                                />
+                                <user-notes
+                                    :user-mongo-id="application.applicant.id"
+                                />
+                            </div>
                         </div>
                         <hr>
                         <consensus
