@@ -20,6 +20,11 @@
         "token": "",
         "role": ""
     },
+    "allWebhook": {
+        "id": "",
+        "token": "",
+        "role": ""
+    },
     "reportWebhook": {
         "id": "",
         "token": "",

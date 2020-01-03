@@ -24,7 +24,7 @@
             </p>
             <p>Behavior</p>
             <p class="small ml-4">
-                Behavior is worth commenting on when an applicant is known to consistently cause problems within the mapping/modding community. Links to instances of poor behavior are appreciated when relevant. Behavior prior to 3 months from the application date should not be considered.
+                Behavior is worth commenting on when an applicant is known to consistently cause problems within the mapping/modding community. Links to instances of poor behavior are appreciated when relevant. Behavior more than 3 months ago should only be considered for repeat offenders.
             </p>
             <p class="small ml-4">
                 Sloppy or rudely written mod posts are usually not worth addressing. Consider whether the beatmap's creator is a friend of the modder to understand reasons behind their behavior.
