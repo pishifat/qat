@@ -72,6 +72,8 @@
                         <hr v-if="evalRound.consensus">
                         <evaluations
                             :evaluations="evalRound.evaluations"
+                            :is-nat="true"
+                            :consensus="evalRound.consensus || 'none'"
                         />
                         <evaluation-input
                             :isApplication="false"
