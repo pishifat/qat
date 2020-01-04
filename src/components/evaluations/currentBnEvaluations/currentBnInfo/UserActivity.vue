@@ -51,6 +51,7 @@ import postData from '../../../../mixins/postData.js';
 import filterLinks from '../../../../mixins/filterLinks.js';
 import UniqueNominations from './UniqueNominations.vue';
 import NominationResets from './NominationResets.vue';
+import Vue from 'vue';
 
 export default {
     name: 'UserActivity',
@@ -101,21 +102,23 @@ export default {
         },
         updateEntry (event) {
             let i;
-            if(event.eventType == 'Disqualified'){
+            if (event.eventType == 'Disqualified') {
                 i = this.disqualifications.findIndex(e => e._id == event.id);
-                if(i >= 0){
-                    this.disqualifications[i] = event;
-                }else{
+
+                if (i >= 0) {
+                    Vue.set(this.disqualifications, i, event);
+                } else {
                     i = this.nominationsDisqualified.findIndex(e => e._id == event.id);
-                    this.nominationsDisqualified[i] = event;
+                    Vue.set(this.nominationsDisqualified, i, event);
                 }
-            }else if(event.eventType == 'Popped'){
+            } else if (event.eventType == 'Popped') {
                 i = this.pops.findIndex(e => e._id == event.id);
-                if(i >= 0){
-                    this.pops[i] = event;
-                }else{
+
+                if (i >= 0) {
+                    Vue.set(this.pops, i, event);
+                } else {
                     i = this.nominationsPopped.findIndex(e => e._id == event.id);
-                    this.nominationsPopped[i] = event;
+                    Vue.set(this.nominationsPopped, i, event);
                 }
             }
         },
