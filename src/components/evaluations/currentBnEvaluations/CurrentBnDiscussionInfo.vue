@@ -73,7 +73,7 @@
                         <evaluations
                             :evaluations="evalRound.evaluations"
                             :is-nat="true"
-                            :consensus="evalRound.consensus || 'none'"
+                            :consensus="evalRound.consensus"
                         />
                         <evaluation-input
                             :isApplication="false"

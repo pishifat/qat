@@ -69,7 +69,7 @@
                         <evaluations
                             v-if="evaluator.isNat || application.consensus"
                             :is-nat="evaluator.isNat"
-                            :consensus="application.consensus || 'none'"
+                            :consensus="application.consensus"
                             :evaluations="application.evaluations"
                         />
                         <p v-else class="text-shadow small">

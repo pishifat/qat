@@ -36,6 +36,7 @@
                         <evaluations
                             :evaluations="application.evaluations"
                             :is-nat="evaluator.isNat"
+                            :consensus="application.consensus"
                         />
                     </div>
                 </div>
