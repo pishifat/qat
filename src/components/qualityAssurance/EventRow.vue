@@ -6,19 +6,20 @@
                     <a 
                         :href="'https://osu.ppy.sh/beatmapsets/' + event.beatmapsetId" 
                         target="_blank"
-                        class="text-shadow"
+                        class="text-shadow small"
                     >
                         <img
                             class="beatmap-thumbnail mr-2"
                             :src="'https://b.ppy.sh/thumb/' + event.beatmapsetId + '.jpg'"
                         >
-                        {{ event.metadata.length > 45 ? event.metadata.slice(0,42) + '...' : event.metadata }}
                     </a>
+                    <!-- fix this-->
+                    {{ event.metadata.length > 45 ? event.metadata.slice(0,42) + '...' : event.metadata }}
                 </div>
                 <div class="col-sm-3 small d-flex justify-content-end align-items-center">
                     <p class="min-spacing">
-                        Hosted by
-                        <a :href="'https://osu.ppy.sh/users/' + event.hostId" target="_blank" @click.stop>{{ event.hostName }}</a>
+                        by
+                        <a :href="'https://osu.ppy.sh/users/' + event.hostId" target="_blank" @click.stop>{{ event.hostName }}</a>,
                     </p>
                 </div>
                 <div class="col-sm-2 small d-flex justify-content-start">
@@ -62,6 +63,9 @@
                     >
                         <i class="fas fa-plus vote-pass" />
                     </button>
+                    <p class="min-spacing">
+                        <span class="errors">{{ findDeadline(event.timestamp) }}</span>
+                    </p>
                 </div>
             </div>
         </div>
@@ -120,6 +124,11 @@ export default {
                 }
                 this.forceDisabled = false;
             }
+        },
+        findDeadline(timestamp){
+            let date = new Date(timestamp);
+            date.setDate(date.getDate() + 7);
+            return date.toString().slice(4,10);
         },
     },
 };

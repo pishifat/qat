@@ -24,6 +24,11 @@
                     />
                 </transition-group>
             </div>
+            <div class="text-center">
+                <button class="btn btn-sm btn-nat mt-4 mx-auto" @click="loadMore()">
+                    <i class="fas fa-angle-down mr-1">  </i> show more <i class="fas fa-angle-down ml-1"></i>
+                </button>
+            </div>
         </section>
     </div>
 </template>
@@ -46,7 +51,15 @@ export default {
             pageObjs: null,
             filteredObjs: null,
             userId: null,
+            limit: 50,
         };
+    },
+    computed: {
+        sevenDaysAgo(){
+            let date = new Date();
+            date.setDate(date.getDate() - 7);
+            return date;
+        },
     },
     created() {
         axios
@@ -84,21 +97,36 @@ export default {
             return false;
         },
         isOutdated(beatmapsetId, timestamp) {
-            const beatmaps = this.pageObjs.filter(b => b.beatmapsetId == beatmapsetId && b.timestamp != timestamp);
-            let isOutdated = false;
-            for (let i = 0; i < beatmaps.length; i++) {
-                const b = beatmaps[i];
-                if(new Date(b.timestamp) > new Date(timestamp)){
-                    isOutdated = true;
-                    break;
+            if(new Date(timestamp) < this.sevenDaysAgo){
+                return true;
+            }else{
+                const beatmaps = this.pageObjs.filter(b => b.beatmapsetId == beatmapsetId && b.timestamp != timestamp);
+                let isOutdated = false;
+                for (let i = 0; i < beatmaps.length; i++) {
+                    const b = beatmaps[i];
+                    if(new Date(b.timestamp) > new Date(timestamp)){
+                        isOutdated = true;
+                        break;
+                    }
                 }
+                return isOutdated;
             }
-            return isOutdated;
         },
         updateEvent(event) {
             const i = this.allObjs.findIndex(e => e.id == event.id);
             this.allObjs[i] = event;
             this.filter();
+        },
+        loadMore(){
+            axios
+                .get('/qualityAssurance/loadMore/' + this.limit + '/' + (this.limit - 50))
+                .then(response => {
+                    console.log(this.allObjs.length);
+                    this.allObjs = this.allObjs.concat(response.data.maps);
+                    console.log(this.allObjs.length);
+                    this.limit += 50;
+                    this.filter();
+                });
         },
     },
 };

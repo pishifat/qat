@@ -37,6 +37,21 @@ router.get('/relevantInfo', async (req, res) => {
     res.json({ maps: data, userId: res.locals.userRequest.id, mode: res.locals.userRequest.modes[0] || 'osu' });
 });
 
+/* GET load more content */
+router.get('/loadMore/:limit/:skip', async (req, res) => {
+    let date = new Date();
+    date.setDate(date.getDate() - 7);
+    let data = await aiessService.query(
+        { eventType: 'Qualified', timestamp: { $lte: date } },
+        defaultPopulate,
+        { timestamp: -1 },
+        true,
+        parseInt(req.params.limit),
+        parseInt(req.params.skip)
+    );
+    res.json({ maps: data });
+});
+
 /* POST assign user */
 router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
     let e = await aiessService.update(req.params.id, { $push: { qualityAssuranceCheckers: req.session.mongoId } });
