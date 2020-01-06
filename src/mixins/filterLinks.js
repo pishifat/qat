@@ -2,24 +2,30 @@ const filterLinks = {
     methods: {
         filterLinks (text) {
             return (text || '...').replace(
-                /([^\S]|\[url\=|^)(((https?\:\/\/)|(www\.))(\S+))/gi,
-                function(match, space, url){
+                /([^\S]|\[url\=|\(|^)(((https?\:\/\/)|(www\.))(\S+))/gi,
+                (match, space, url) => {
                     let afterHyperlink = '';
                     let hyperlink = url;
-                    let renderHyperlink = url;
 
-                    if(hyperlink.includes(']')) {
-                        const split = hyperlink.split(']');
-                        afterHyperlink = `]${split[1]}`;
-                        hyperlink = split[0];
-                        renderHyperlink = split[0];
+                    const ending = url.match(/[\)\]\}]*/g)
+                        .filter(x => x != '')[0];
+
+                    if (ending) {
+                        const endingIndex = url.indexOf(ending);
+                        hyperlink = '';
+
+                        for (let i = 0; i < endingIndex; i++) {
+                            hyperlink += url[i];
+                        }
+
+                        afterHyperlink = url.replace(hyperlink, '');
                     }
 
                     if (!hyperlink.match(/^https?:\/\//)) {
                         hyperlink = `http://${hyperlink}`;
                     }
 
-                    return `${space}<a href="${hyperlink}" target="_blank">${renderHyperlink}</a>${afterHyperlink}`;
+                    return `${space}<a href="${hyperlink}" target="_blank">${hyperlink}</a>${afterHyperlink}`;
                 }
             );
         },
