@@ -121,9 +121,7 @@ export default {
             axios
                 .get('/qualityAssurance/loadMore/' + this.limit + '/' + (this.limit - 50))
                 .then(response => {
-                    console.log(this.allObjs.length);
                     this.allObjs = this.allObjs.concat(response.data.maps);
-                    console.log(this.allObjs.length);
                     this.limit += 50;
                     this.filter();
                 });

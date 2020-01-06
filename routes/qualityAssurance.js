@@ -41,7 +41,7 @@ router.get('/loadMore/:limit/:skip', async (req, res) => {
     let date = new Date();
     date.setDate(date.getDate() - 7);
     let data = await aiessService.query(
-        { eventType: 'Qualified', timestamp: { $lte: date } },
+        { eventType: 'Qualified', timestamp: { $lte: date }, hostId: { $exists: true } },
         defaultPopulate,
         { timestamp: -1 },
         true,
