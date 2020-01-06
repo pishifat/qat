@@ -19,7 +19,7 @@
                         :event="event"
                         :user-id="userId"
                         :is-outdated="isOutdated(event.beatmapsetId, event.timestamp)"
-                        :is-max-checks="event.qualityAssuranceCheckers.length > 0"
+                        :is-max-checks="event.qualityAssuranceCheckers.length > 1"
                         @update-event="updateEvent($event)"
                     />
                 </transition-group>

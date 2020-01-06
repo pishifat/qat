@@ -2,24 +2,29 @@
     <div>
         <div class="card static-card" :class="isMaxChecks || isOutdated || isQualityAssuranceChecker ? 'low-opacity' : ''">
             <div class="card-header min-spacing d-flex align-items-center">
-                <div class="col-sm-6 mr-2" style="padding-left: 0px;">
+                <div class="col-sm-6 mr-2 truncate" style="padding-left: 0px;">
                     <a 
                         :href="'https://osu.ppy.sh/beatmapsets/' + event.beatmapsetId" 
                         target="_blank"
-                        class="text-shadow small"
+                        class="text-shadow"
                     >
                         <img
                             class="beatmap-thumbnail mr-2"
                             :src="'https://b.ppy.sh/thumb/' + event.beatmapsetId + '.jpg'"
                         >
+                        {{ event.metadata }}
                     </a>
-                    <!-- fix this-->
-                    {{ event.metadata.length > 45 ? event.metadata.slice(0,42) + '...' : event.metadata }}
                 </div>
-                <div class="col-sm-3 small d-flex justify-content-end align-items-center">
+                <div class="col-sm-2 small d-flex align-items-center justify-content-start">
                     <p class="min-spacing">
-                        by
-                        <a :href="'https://osu.ppy.sh/users/' + event.hostId" target="_blank" @click.stop>{{ event.hostName }}</a>,
+                        <span class="small">Host</span><br>
+                        <a :href="'https://osu.ppy.sh/users/' + event.hostId" target="_blank" class="ml-1" @click.stop>{{ event.hostName }}</a>
+                    </p>
+                </div>
+                <div class="col-sm-1 small d-flex align-items-center">
+                    <p class="min-spacing">
+                        <span class="small">Due</span><br>
+                        <span class="errors ml-1">{{ findDeadline(event.timestamp) }}</span>
                     </p>
                 </div>
                 <div class="col-sm-2 small d-flex justify-content-start">
@@ -63,9 +68,6 @@
                     >
                         <i class="fas fa-plus vote-pass" />
                     </button>
-                    <p class="min-spacing">
-                        <span class="errors">{{ findDeadline(event.timestamp) }}</span>
-                    </p>
                 </div>
             </div>
         </div>
@@ -128,7 +130,7 @@ export default {
         findDeadline(timestamp){
             let date = new Date(timestamp);
             date.setDate(date.getDate() + 7);
-            return date.toString().slice(4,10);
+            return date.toISOString().slice(5,10);
         },
     },
 };
@@ -164,6 +166,12 @@ export default {
 
     .low-opacity {
         opacity: 0.5 !important;
+    }
+
+    .truncate {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 </style>
 

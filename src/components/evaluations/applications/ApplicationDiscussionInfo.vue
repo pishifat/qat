@@ -26,9 +26,10 @@
                                 <a href="#additionalInfo" data-toggle="collapse">Additional info <i class="fas fa-angle-down" /></a>
                             </p>
                             <div id="additionalInfo" class="collapse container">
-                                <p v-if="application.test.comment" class="text-shadow">
-                                    Applicant comment: <span class="small">{{ application.test.comment }}</span>
-                                </p>
+                                <applicant-comment
+                                    v-if="application.test.comment"
+                                    :comment="application.test.comment"
+                                />
                                 <previous-evaluations
                                     :user-mongo-id="application.applicant.id"
                                 />
@@ -94,6 +95,7 @@
 import ModalHeader from '../info/ModalHeader.vue';
 import Mods from './applicationInfo/Mods.vue';
 import TestResults from './applicationInfo/TestResults.vue';
+import ApplicantComment from './applicationInfo/ApplicantComment.vue';
 import PreviousEvaluations from '../info/PreviousEvaluations.vue';
 import UserNotes from '../info/UserNotes.vue';
 import Consensus from '../info/Consensus.vue';
@@ -108,6 +110,7 @@ export default {
         ModalHeader,
         Mods,
         TestResults,
+        ApplicantComment,
         PreviousEvaluations,
         UserNotes,
         Consensus,
