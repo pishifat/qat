@@ -310,11 +310,13 @@ router.post('/setComplete/', api.isLeader, async (req, res) => {
 
         if (er.consensus == 'pass') {
             await usersService.update(u.id, { $pull: { probation: er.mode } });
+            let deadline = new Date();
             if(er.isLowActivity){
-                let deadline = new Date();
                 deadline.setDate(deadline.getDate() + 40);
-                await evalRoundsService.create(er.bn, er.mode, deadline);
+            }else{
+                deadline.setDate(deadline.getDate() + 100);
             }
+            await evalRoundsService.create(er.bn, er.mode, deadline);
         }
         
         await evalRoundsService.update(req.body.checkedRounds[i], { active: false });

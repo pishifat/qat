@@ -76,7 +76,17 @@
                                         'background-warn' :
                                         'background-fail'"
                             >
-                                Total evaluations: {{ user.totalEvaluations }}
+                                Application evaluations: {{ user.totalBnAppEvals }}
+                            </p>
+                            <p 
+                                class="min-spacing" 
+                                :class="user.totalEvaluations >= natTotal/(natActivity.length / natMode == 'osu' ? 3 : 2) - 1 ? 
+                                    'background-pass' 
+                                    : user.totalEvaluations >= natTotal/(natActivity.length * 2 / natMode == 'osu' ? 3 : 2) - 1 ? 
+                                        'background-warn' :
+                                        'background-fail'"
+                            >
+                                Current BN evaluations: {{ user.totalCurrentBnEvals }}
                             </p>
                             <p
                                 class="min-spacing"
@@ -90,7 +100,10 @@
                             </p>
                         </div>
                         <p class="small min-spacing ml-2">
-                            Total BN evaluations: {{ natTotal }}
+                            Total BN applications evaluated: {{ totalBnApps }}
+                        </p>
+                        <p class="small min-spacing ml-2">
+                            Total current BNs evaluated: {{ totalEvalRounds }}
                         </p>
                         <p class="small min-spacing ml-2">
                             Note: Evaluations only counted after May 5th. Written feedback only counted after September 9th
@@ -371,7 +384,9 @@ export default {
                 .get('/users/findNatActivity/' + this.natDays + '/' + this.natMode)
                 .then(response => {
                     this.natActivity = response.data.info;
-                    this.natTotal = response.data.total;
+                    this.natTotal = response.data.bnAppsCount + response.data.evalRoundsCount;
+                    this.totalBnApps = response.data.bnAppsCount;
+                    this.totalEvalRounds = response.data.evalRoundsCount;
                 });
         },
         findBnActivity() {

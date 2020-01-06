@@ -41,7 +41,8 @@ const defaultPopulate = [
 
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res) => {
-    let a;
+    let d = await bnAppsService.query({ bnDuration: { $size: 0 }});
+    let a = [];
     if(res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator){
         a = await bnAppsService.query(
             { active: true, test: { $exists: true } },
@@ -50,12 +51,19 @@ router.get('/relevantInfo', async (req, res) => {
             true
         );
     }else{
-        a = await bnAppsService.query(
+        let assignedApps = await bnAppsService.query(
             { test: { $exists: true }, bnEvaluators: { $elemMatch: { $in: res.locals.userRequest.id } } },
             defaultPopulate,
             { createdAt: 1, consensus: 1, feedback: 1  },
             true
         );
+        assignedApps.forEach(app => {
+            app.evaluations.forEach(evaluation => {
+                if(evaluation.evaluator.id == req.session.mongoId){
+                    a.push(app);
+                }
+            });
+        });
     }
     
     res.json({ a, evaluator: res.locals.userRequest });

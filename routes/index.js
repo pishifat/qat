@@ -76,7 +76,7 @@ router.get(
                 }
                 if (u.group != req.session.group) {
                     await usersService.update(u._id, { group: req.session.group });
-                    logsService.create(u._id, `User group changed to ${req.session.group}`);
+                    logsService.create(u._id, `User group changed to ${req.session.group.toUpperCase()}`);
                 }
                 req.session.mongoId = u._id;
                 return next();
@@ -134,7 +134,7 @@ router.get('/callback', async (req, res) => {
             req.session.group = 'nat';
             req.session.isSpectator = false;
         } else {
-            req.session.isSpectator = response.is_gmt;
+            req.session.isSpectator = (response.is_gmt || response.id == 3666350);
             if (response.is_bng) {
                 req.session.group = 'bn';
             } else {

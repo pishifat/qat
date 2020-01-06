@@ -195,8 +195,10 @@ router.post('/editBadgeValue/:id', api.isLeader, async (req, res) => {
 });
 
 router.get('/findNatActivity/:days/:mode', async (req, res) => {
-    let minDate = new Date();
-    minDate.setDate(minDate.getDate() - (req.params.days));
+    let minAppDate = new Date();
+    minAppDate.setDate(minAppDate.getDate() - (parseInt(req.params.days) + 14));
+    let minEvalDate = new Date();
+    minEvalDate.setDate(minEvalDate.getDate() - (parseInt(req.params.days)));
     let maxDate = new Date();
     const [users, bnApps, bnRounds] = await Promise.all([
         usersService.query({ 
@@ -204,61 +206,48 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
             modes: req.params.mode,
             isSpectator: { $ne: true } },
         {}, { username: 1 }, true),
-        bnAppsService.query({ mode: req.params.mode, updatedAt: { $gte: minDate, $lte: maxDate }, discussion: true }, evaluationsPopulate, {}, true),
-        evalRoundsService.query({ mode: req.params.mode, deadline: { $gte: minDate, $lte: maxDate }, discussion: true }, evaluationsPopulate, {}, true),
+        bnAppsService.query({ mode: req.params.mode, createdAt: { $gte: minAppDate, $lte: maxDate }, discussion: true }, evaluationsPopulate, {}, true),
+        evalRoundsService.query({ mode: req.params.mode, deadline: { $gte: minEvalDate, $lte: maxDate }, discussion: true }, evaluationsPopulate, {}, true),
     ]);
-
-    class obj 
-    {
-        constructor(username, osuId, totalEvaluations, totalWrittenFeedbacks, joinDate) 
-        {
-            this.username = username;
-            this.osuId = osuId;
-            this.totalEvaluations = totalEvaluations;
-            this.totalWrittenFeedbacks = totalWrittenFeedbacks;
-            this.joinDate = joinDate;
-        }
-    }
-
-    let rounds = bnApps.concat(bnRounds);
+    let bnAppsCount = bnApps.length;
+    let evalRoundsCount = bnRounds.length;
     let invalids = [8129817, 3178418];
     let info = [];
     users.forEach(user => {
         if(invalids.indexOf(user.osuId) == -1){
-            let evalCount = 0;
+            let evalsOnBnApps = 0;
+            let evalsOnCurrentBnEvals = 0;
             let feedbackCount = 0;
-            rounds.forEach(round => {
+            bnApps.forEach(app => {
+                app.evaluations.forEach(evaluation => {
+                    if(evaluation.evaluator == user.id){
+                        evalsOnBnApps++;
+                    }    
+                });
+                if(app.feedbackAuthor == user.id){
+                    feedbackCount++;
+                }
+            });
+            bnRounds.forEach(round => {
                 round.evaluations.forEach(evaluation => {
                     if(evaluation.evaluator == user.id){
-                        evalCount++;
+                        evalsOnCurrentBnEvals++;
                     }    
                 });
                 if(round.feedbackAuthor == user.id){
                     feedbackCount++;
                 }
             });
-            info.push(new obj(user.username, user.osuId, evalCount, feedbackCount, user.natDuration[user.natDuration.length - 1]));
+            info.push({ username: user.username, osuId: user.osuId, totalBnAppEvals: evalsOnBnApps, totalCurrentBnEvals: evalsOnCurrentBnEvals, totalWrittenFeedbacks: feedbackCount, joinDate: user.natDuration[user.natDuration.length - 1] })
         }
     });
 
-    res.json({ info, total: rounds.length });
+    res.json({ info, bnAppsCount, evalRoundsCount });
 });
 
 router.get('/findBnActivity/:days/:mode', async (req, res) => {
-    class obj 
-    {
-        constructor(username, osuId, uniqueNominations, nominationResets, joinDate) 
-        {
-            this.username = username;
-            this.osuId = osuId;
-            this.uniqueNominations = uniqueNominations;
-            this.nominationResets = nominationResets;
-            this.joinDate = joinDate;
-        }
-    }
-
     let minDate = new Date();
-    minDate.setDate(minDate.getDate() - req.params.days);
+    minDate.setDate(minDate.getDate() - parseInt(req.params.days));
     let maxDate = new Date();
     const [users, allEvents] = await Promise.all([
         usersService.query({ 
@@ -296,7 +285,7 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
                 }
             }
         }
-        info.push(new obj(user.username, user.osuId, uniqueNominations.length, nominationResets, user.bnDuration[user.bnDuration.length - 1]));
+        info.push({ username: user.username, osuId: user.osuId, uniqueNominations: uniqueNominations.length, nominationResets, joinDate: user.bnDuration[user.bnDuration.length - 1] })
     });
 
     res.json(info);
@@ -304,17 +293,6 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
 
 /* GET potential NAT info */
 router.get('/findPotentialNatInfo/', async (req, res) => {
-    class obj 
-    {
-        constructor(username, osuId, modes, evaluatedApps) 
-        {
-            this.username = username;
-            this.osuId = osuId;
-            this.modes = modes;
-            this.evaluatedApps = evaluatedApps;
-        }
-    }
-
     const [users, applications] = await Promise.all([
         usersService.query({ 
             group: 'bn', 
@@ -334,7 +312,7 @@ router.get('/findPotentialNatInfo/', async (req, res) => {
                 }
             });
         });
-        info.push(new obj(user.username, user.osuId, user.modes, evaluatedApps));
+        info.push({ username: user.username, osuId: user.osuId, modes: user.modes, evaluatedApps });
     });
 
     res.json(info);
