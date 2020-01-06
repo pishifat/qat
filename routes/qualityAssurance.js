@@ -7,7 +7,6 @@ const router = express.Router();
 
 router.use(api.isLoggedIn);
 router.use(api.isBnOrNat);
-router.use(api.isLeader);
 
 /* GET bn app page */
 router.get('/', (req, res) => {
