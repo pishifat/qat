@@ -93,6 +93,14 @@ export default {
                 this.hasPagination = false;
                 this.hasSeparation = true;
                 this.filter();
+                const params = new URLSearchParams(document.location.search.substring(1));
+                if (params.get('beatmap') && params.get('beatmap').length) {
+                    const i = this.allObjs.findIndex(v => v.id == params.get('beatmap'));
+                    if(i >= 0){
+                        this.selectedVeto = this.allObjs[i];
+                        $('#extendedInfo').modal('show');
+                    }
+                }
             })
             .then(function() {
                 $('#loading').fadeOut();

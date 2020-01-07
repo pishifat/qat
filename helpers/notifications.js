@@ -32,10 +32,40 @@ function notifyDeadlines() {
             true,
         );
 
+        const activeVetoes = await vetoesService.query(
+            { active: true }
+        );
+
         let osuHighlight;
         let taikoHighlight;
         let catchHighlight;
         let maniaHighlight;
+
+        activeVetoes.forEach((veto) => {
+            if (date > veto.deadline) {
+                if (!osuHighlight && veto.mode === 'osu') { osuHighlight = true; }
+                if (!taikoHighlight && veto.mode === 'taiko') { taikoHighlight = true; }
+                if (!catchHighlight && veto.mode === 'catch') { catchHighlight = true; }
+                if (!maniaHighlight && veto.mode === 'mania') { maniaHighlight = true; }
+
+                title = `Veto mediation for **${veto.beatmapTitle}** is overdue!`;
+            } else if (veto.deadline < nearDeadline) {
+                title = `Veto mediation for **${veto.beatmapTitle}** is due in less than 24 hours!`;
+            }
+
+            if (date > veto.deadline || veto.deadline < nearDeadline) {
+                api.webhookPost(
+                    [{
+                        author: {
+                            name: title,
+                            url: `http://bn.mappersguild.com/vetoes?beatmaps=${veto.id}`,
+                        },
+                        color: '16776960',
+                    }],
+                    veto.mode,
+                );
+            }
+        });
 
         activeApps.forEach((app) => {
             let addition = 7;
@@ -100,10 +130,10 @@ function notifyDeadlines() {
         });
 
         setTimeout(() => {
-            if (osuHighlight) { api.highlightWebhookPost('do shit', 'osu'); }
-            if (taikoHighlight) { api.highlightWebhookPost('I, bnsite, formally request you to do shit', 'taiko'); }
-            if (catchHighlight) { api.highlightWebhookPost('fat yoshi', 'catch'); }
-            if (maniaHighlight) { api.highlightWebhookPost('do shit', 'mania'); }
+            if (osuHighlight) { api.highlightWebhookPost('time to find a new NAT member?', 'osu'); }
+            if (taikoHighlight) { api.highlightWebhookPost('i wonder who would make the best new NAT...', 'taiko'); }
+            if (catchHighlight) { api.highlightWebhookPost('oh no', 'catch'); }
+            if (maniaHighlight) { api.highlightWebhookPost('so who is the new NAT candidate?', 'mania'); }
         }, 5000);
 
     }, 86400000);

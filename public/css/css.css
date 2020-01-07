@@ -247,6 +247,12 @@ hr {
     min-width: 150px;
 }
 
+.truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .segment {
     background-color: var(--dark);
     margin: 1rem 1rem 1rem 1rem;

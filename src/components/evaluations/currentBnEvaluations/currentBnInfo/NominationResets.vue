@@ -22,9 +22,9 @@
                         <td scope="row">
                             {{ new Date(event.timestamp).toString().slice(4,10) }}
                         </td>
-                        <td scope="row">
+                        <td scope="row truncate">
                             <a :href="event.postId ? 'https://osu.ppy.sh/beatmapsets/' + event.beatmapsetId + '/discussion/-/generalAll#/' + event.postId : 'https://osu.ppy.sh/beatmapsets/' + event.beatmapsetId + '/discussion/-/events'" target="_blank">
-                                {{ event.metadata.length > 30 ? event.metadata.slice(0,30).trim() + "..." : event.metadata }}
+                                {{ event.metadata }}
                             </a>
                         </td>
                         <td v-if="!editing" scope="row" v-html="filterLinks(event.content)" />

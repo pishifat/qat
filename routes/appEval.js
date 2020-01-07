@@ -97,7 +97,7 @@ router.post('/submitEval/:id', api.isNotSpectator, async (req, res) => {
                 fields:[
                     {
                         name: `http://bn.mappersguild.com/appeval?eval=${a.id}`,
-                        value: `submitted BN app eval for **${a.applicant.username}**`,
+                        value: `Submitted BN app eval for **${a.applicant.username}**`,
                     },
                 ],
             }], 
@@ -175,7 +175,7 @@ router.post('/setGroupEval/', api.isLeader, async (req, res) => {
                 fields:[
                     {
                         name: `http://bn.mappersguild.com/appeval?eval=${a.id}`,
-                        value: `Moved ${a.applicant.username}**'s BN app to group discussion`,
+                        value: `Moved **${a.applicant.username}**'s BN app to group discussion`,
                     },
                     {
                         name: 'Votes',
@@ -237,7 +237,7 @@ router.post('/setComplete/', api.isLeader, async (req, res) => {
                 fields:[
                     {
                         name: `http://bn.mappersguild.com/appeval?eval=${a.id}`,
-                        value: `archived **${u.username}**'s BN app`,
+                        value: `Archived **${u.username}**'s BN app`,
                     },
                     {
                         name: 'Consensus',

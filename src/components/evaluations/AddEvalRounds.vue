@@ -76,7 +76,7 @@
                         <div class="mb-2">
                             <span class="text-shadow">Deadline:</span>
                             <input
-                                id="month"
+                                v-model="month"
                                 class="ml-1"
                                 type="text"
                                 placeholder="MM"
@@ -84,7 +84,7 @@
                                 style="min-width: 55px; width: 55px;"
                             >
                             <input
-                                id="day"
+                                v-model="day"
                                 type="text"
                                 placeholder="DD"
                                 maxlength="2"
@@ -118,6 +118,8 @@ export default {
         return {
             info: '',
             confirm: '',
+            month: '',
+            day: '',
         };
     },
     methods: {
@@ -146,11 +148,9 @@ export default {
                 return;
             }
 
-            let y = new Date().getFullYear();
-            let m = $('#month').val() - 1;
-            let d = $('#day').val();
-            let deadline = new Date(y, m, d);
-            if (!(deadline instanceof Date) || isNaN(deadline) || !m || !d) {
+            let year = new Date().getFullYear();
+            let deadline = new Date(this.month + "/" + this.day + "/" + year);
+            if (!(deadline instanceof Date) || isNaN(deadline)) {
                 this.info = 'Invalid Date!';
                 return;
             }

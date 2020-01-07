@@ -109,7 +109,8 @@ export default {
                     }
                 }
             }
+            history.pushState(null, 'Vetoes', `/vetoes?beatmap=${this.veto.id}`);
         }
-    }
+    },
 };
 </script>

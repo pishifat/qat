@@ -127,7 +127,11 @@ router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
             }
         }
     }
-    
+
+    for (let i = 0; i < allEvalsToCreate.length; i++) {
+        const round = allEvalsToCreate[i];
+        await evalRoundsService.deleteManyByUserId(round.bn);
+    }
     if (allEvalsToCreate.length) {
         const result = await evalRoundsService.createMany(allEvalsToCreate);
         if (result.error) return res.json(result);
@@ -173,7 +177,7 @@ router.post('/submitEval/:id', api.isBnOrNat, async (req, res) => {
                 fields:[
                     {
                         name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
-                        value: `submitted current BN eval for **${er.bn.username}**`,
+                        value: `Submitted current BN eval for **${er.bn.username}**`,
                     },
                 ],
             }], 

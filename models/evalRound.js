@@ -51,6 +51,17 @@ class EvalRoundService extends BaseService
             return { error: 'Something went wrong!' };
         }
     }
+
+    async deleteManyByUserId(userId) {
+        let minDate = new Date();
+        minDate.setDate(minDate.getDate() + 14);
+        try {
+            return await EvalRound.deleteMany({ bn: userId, active: true, deadline: { $gte: minDate } });
+        } catch(error) {
+            logsService.create(null, JSON.stringify(error), true);
+            return { error: 'Something went wrong!' };
+        }
+    }
 }
 
 const service = new EvalRoundService();

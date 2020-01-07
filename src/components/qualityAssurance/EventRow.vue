@@ -184,11 +184,5 @@ export default {
     .low-opacity {
         opacity: 0.5 !important;
     }
-
-    .truncate {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
 </style>
 
