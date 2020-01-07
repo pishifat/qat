@@ -27,8 +27,8 @@
                         <span class="errors ml-1">{{ findDeadline(event.timestamp) }}</span>
                     </p>
                 </div>
-                <div class="col-sm-2 small d-flex justify-content-start">
-                    <span v-if="event.qualityAssuranceCheckers">
+                <div class="col-sm-2 small d-flex justify-content-start truncate">
+                    <span v-if="event.qualityAssuranceCheckers && isNat">
                         <a 
                             v-for="user in event.qualityAssuranceCheckers"
                             :key="user.id" 
@@ -41,6 +41,20 @@
                                 :src="'https://a.ppy.sh/' + user.osuId"
                                 data-toggle="tooltip"
                                 :title="user.username"
+                            >
+                        </a>
+                    </span>
+                    <span v-else-if="isQualityAssuranceChecker">
+                        <a 
+                            :href="'https://osu.ppy.sh/users/' + userOsuId"
+                            target="_blank"
+                        >
+                            <img
+                                class="rounded-circle mx-1"
+                                style="height:36px; width: 36px;"
+                                :src="'https://a.ppy.sh/' + userOsuId"
+                                data-toggle="tooltip"
+                                :title="username"
                             >
                         </a>
                     </span>
@@ -83,6 +97,9 @@ export default {
     props: {
         event: Object,
         userId: String,
+        userOsuId: Number,
+        username: String,
+        isNat: Boolean,
         isOutdated: Boolean,
         isMaxChecks: Boolean,
     },

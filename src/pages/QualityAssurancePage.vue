@@ -18,6 +18,9 @@
                         :key="event.id"
                         :event="event"
                         :user-id="userId"
+                        :is-nat="isNat"
+                        :user-osu-id="userOsuId"
+                        :username="username"
                         :is-outdated="isOutdated(event.beatmapsetId, event.timestamp)"
                         :is-max-checks="event.qualityAssuranceCheckers.length > 1"
                         @update-event="updateEvent($event)"
@@ -51,6 +54,9 @@ export default {
             pageObjs: null,
             filteredObjs: null,
             userId: null,
+            userOsuId: null,
+            username: null,
+            isNat: null,
             limit: 50,
         };
     },
@@ -67,6 +73,9 @@ export default {
             .then(response => {
                 this.allObjs = response.data.maps;
                 this.userId = response.data.userId;
+                this.userOsuId = response.data.userOsuId;
+                this.username = response.data.username;
+                this.isNat = response.data.isNat;
                 this.filterMode = response.data.mode;
                 this.hasPagination = false;
                 this.filter();

@@ -33,7 +33,7 @@ router.get('/relevantInfo', async (req, res) => {
         { timestamp: -1 },
         true
     );
-    res.json({ maps: data, userId: res.locals.userRequest.id, mode: res.locals.userRequest.modes[0] || 'osu' });
+    res.json({ maps: data, userId: res.locals.userRequest.id, userOsuId: res.locals.userRequest.osuId, username: res.locals.userRequest.username, isNat: res.locals.userRequest.isNat, mode: res.locals.userRequest.modes[0] || 'osu' });
 });
 
 /* GET load more content */
