@@ -16,6 +16,7 @@ const userSchema = new mongoose.Schema({
     isLeader: { type: Boolean },
     bnProfileBadge: { type: Number, default: 0 },
     natProfileBadge: { type: Number, default: 0 },
+    discordId: { type: Number },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 userSchema.virtual('isBnOrNat').get(function() {
