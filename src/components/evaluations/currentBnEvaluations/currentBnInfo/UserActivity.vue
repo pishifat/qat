@@ -1,7 +1,9 @@
 <template>
     <div>
-        <unique-nominations
-            :nominations="nominations"
+        <events-list
+            :events="nominations"
+            :eventsId="'nominations'"
+            :header="'Unique nominations'"
             :loading="loading"
             :editing="editing"
             :is-nat="isNat"
@@ -43,20 +45,29 @@
             :is-nat="isNat"
             @update-entry="updateEntry($event)"
         />
+        <events-list
+            :events="qualityAssuranceChecks"
+            :eventsId="'qualityAssuranceChecks'"
+            :header="'Quality Assurance Checks'"
+            :loading="loading"
+            :editing="editing"
+            :is-nat="isNat"
+            @update-editing="editing = !editing"
+        />
     </div>
 </template>
 
 <script>
 import postData from '../../../../mixins/postData.js';
 import filterLinks from '../../../../mixins/filterLinks.js';
-import UniqueNominations from './UniqueNominations.vue';
+import EventsList from './EventsList.vue';
 import NominationResets from './NominationResets.vue';
 import Vue from 'vue';
 
 export default {
     name: 'UserActivity',
     components: {
-        UniqueNominations,
+        EventsList,
         NominationResets,
     },
     mixins: [ postData, filterLinks ],
@@ -65,6 +76,7 @@ export default {
         mode: String,
         deadline: String,
         isNat: Boolean,
+        userMongoId: String,
     },
     data() {
         return {
@@ -73,6 +85,7 @@ export default {
             disqualifications: null,
             nominationsPopped: null,
             nominationsDisqualified: null,
+            qualityAssuranceChecks: null,
             loading: true,
             editing: false,
         };
@@ -90,13 +103,14 @@ export default {
     methods: {
         async findRelevantActivity(){
             axios
-                .get('/bnEval/userActivity/' + this.osuId + '/' + this.mode + '/' + this.deadline)
+                .get('/bnEval/userActivity/' + this.osuId + '/' + this.mode + '/' + this.deadline + '/' + this.userMongoId)
                 .then(response => {
                     this.nominations = response.data.noms;
                     this.nominationsDisqualified = response.data.nomsDqd;
                     this.nominationsPopped = response.data.nomsPopped;
                     this.disqualifications = response.data.dqs;
                     this.pops = response.data.pops;
+                    this.qualityAssuranceChecks = response.data.qualityAssuranceChecks;
                     this.loading = false;
                 });
         },

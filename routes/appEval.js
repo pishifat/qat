@@ -51,19 +51,12 @@ router.get('/relevantInfo', async (req, res) => {
             true
         );
     }else{
-        let assignedApps = await bnAppsService.query(
-            { test: { $exists: true }, bnEvaluators: { $elemMatch: { $in: res.locals.userRequest.id } } },
+        a = await bnAppsService.query(
+            { test: { $exists: true }, bnEvaluators: req.session.mongoId },
             defaultPopulate,
             { createdAt: 1, consensus: 1, feedback: 1  },
             true
         );
-        assignedApps.forEach(app => {
-            app.evaluations.forEach(evaluation => {
-                if(evaluation.evaluator.id == req.session.mongoId){
-                    a.push(app);
-                }
-            });
-        });
     }
     
     res.json({ a, evaluator: res.locals.userRequest });

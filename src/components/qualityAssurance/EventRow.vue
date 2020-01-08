@@ -16,13 +16,13 @@
                     </a>
                 </div>
                 <div class="col-sm-2 small d-flex align-items-center justify-content-start">
-                    <p class="min-spacing">
+                    <p class="min-spacing truncate">
                         <span class="small">Host</span><br>
                         <a :href="'https://osu.ppy.sh/users/' + event.hostId" target="_blank" class="ml-1" @click.stop>{{ event.hostName }}</a>
                     </p>
                 </div>
                 <div class="col-sm-1 small d-flex align-items-center">
-                    <p class="min-spacing">
+                    <p class="min-spacing truncate">
                         <span class="small">Due</span><br>
                         <span class="errors ml-1">{{ findDeadline(event.timestamp) }}</span>
                     </p>

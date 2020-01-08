@@ -17,6 +17,7 @@
                             :mode="evalRound.mode"
                             :deadline="evalRound.deadline"
                             :is-nat="evaluator.isNat"
+                            :user-mongo-id="evalRound.bn.id"
                         />
                         <p class="text-shadow">
                             <a href="#additionalInfo" data-toggle="collapse">Additional info <i class="fas fa-angle-down" /></a> 

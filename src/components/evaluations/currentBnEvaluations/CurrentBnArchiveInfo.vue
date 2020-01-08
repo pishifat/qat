@@ -17,6 +17,7 @@
                             :mode="evalRound.mode"
                             :deadline="evalRound.deadline"
                             :is-nat="evaluator.isNat"
+                            :user-mongo-id="evalRound.bn.id"
                         />
                         <hr>
                         <consensus

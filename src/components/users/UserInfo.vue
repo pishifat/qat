@@ -28,6 +28,7 @@
                                 :mode="user.modes[0]"
                                 :deadline="new Date().toString()"
                                 :is-nat="isNat"
+                                :user-mongo-id="user.id"
                             />
                         </div>
                         <footer-buttons

@@ -488,7 +488,7 @@ router.get('/findUserReports/:id', api.isNat, async (req, res) => {
 });
 
 /* GET aiess info */
-router.get('/userActivity/:id/:mode/:deadline', async (req, res) => {
+router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
     if (isNaN(req.params.id)) {
         return res.json({ error: 'Something went wrong!' });
     }
@@ -496,11 +496,12 @@ router.get('/userActivity/:id/:mode/:deadline', async (req, res) => {
     let minDate = new Date(req.params.deadline);
     minDate.setDate(minDate.getDate() - 90);
     let maxDate = new Date(req.params.deadline);
-    const [allUserEvents, allEvents] = await Promise.all([
+    const [allUserEvents, allEvents, qualityAssuranceChecks] = await Promise.all([
         aiessService.getByEventTypeAndUser(parseInt(req.params.id), minDate, maxDate, req.params.mode),
         aiessService.getAllByEventType(minDate, maxDate, req.params.mode),
+        aiessService.query({ qualityAssuranceCheckers: req.params.mongoId, updatedAt: { $gte: minDate, $lte: maxDate } }, {}, {}, true)
     ]);
-
+    
     if (allUserEvents.error || allEvents.error) return res.json({ error: 'Something went wrong!' });
     
     let nominations = [];
@@ -570,7 +571,7 @@ router.get('/userActivity/:id/:mode/:deadline', async (req, res) => {
         }
     }
 
-    res.json({ noms: uniqueNominations, nomsDqd, nomsPopped, dqs, pops });
+    res.json({ noms: uniqueNominations, nomsDqd, nomsPopped, dqs, pops, qualityAssuranceChecks });
 });
 
 module.exports = router;
