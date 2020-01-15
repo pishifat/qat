@@ -41,7 +41,6 @@ const defaultPopulate = [
 
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res) => {
-    let d = await bnAppsService.query({ bnDuration: { $size: 0 }});
     let a = [];
     if(res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator){
         a = await bnAppsService.query(
@@ -351,7 +350,7 @@ router.post('/setFeedback/:id', api.isNat, api.isNotSpectator, async (req, res) 
     );
 });
 
-/* POST replace mediator */
+/* POST replace evaluator */
 router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) => {
     let a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
     let isNat = Boolean(req.body.isNat);

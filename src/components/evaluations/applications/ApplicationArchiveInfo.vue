@@ -5,8 +5,8 @@
                 <modal-header
                     :mode="application.mode"
                     :nat-evaluators="application.natEvaluators"
-                    :isApplication="true"
-                    :osuId="application.applicant.osuId"
+                    :is-application="true"
+                    :osu-id="application.applicant.osuId"
                     :username="application.applicant.username"
                     :evaluator-mongo-id="evaluator.id"
                 />
@@ -14,12 +14,12 @@
                     <div class="container">
                         <mods
                             :mods="application.mods"
-                            :osuId="application.applicant.osuId"
+                            :osu-id="application.applicant.osuId"
                         />
                         <test-results
                             v-if="evaluator.isNat"
                             :test-score="application.test.totalScore"
-                            :osuId="application.applicant.osuId"
+                            :osu-id="application.applicant.osuId"
                         />
                         <consensus
                             :consensus="application.consensus"

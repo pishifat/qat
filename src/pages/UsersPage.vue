@@ -206,7 +206,7 @@
                             <div :id="'evaluations' + user.osuId" class="collapse ml-4">
                                 <div v-for="app in user.evaluatedApps" :key="app.id">
                                     <p class="min-spacing">
-                                        Applicant: <a :href="'https://osu.ppy.sh/users/' + app.applicant.osuId" target="_blank">{{ app.applicant.username }}</a>
+                                        Applicant: <a :href="'https://osu.ppy.sh/users/' + app.applicant.osuId" target="_blank">{{ app.applicant.username }}</a> -- {{ app.createdAt.slice(0,10) }}
                                     </p>
                                     <p class="min-spacing">
                                         Consensus: <span :class="app.consensus == 'pass' ? 'vote-pass' : 'vote-fail'">{{ app.consensus }}</span>

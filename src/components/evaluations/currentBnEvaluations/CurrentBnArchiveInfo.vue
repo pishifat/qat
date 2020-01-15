@@ -5,8 +5,8 @@
                 <modal-header
                     :mode="evalRound.mode"
                     :nat-evaluators="[]"
-                    :isApplication="false"
-                    :osuId="evalRound.bn.osuId"
+                    :is-application="false"
+                    :osu-id="evalRound.bn.osuId"
                     :username="evalRound.bn.username"
                     :evaluator-mongo-id="evaluator.id"
                 />
@@ -19,6 +19,19 @@
                             :is-nat="evaluator.isNat"
                             :user-mongo-id="evalRound.bn.id"
                         />
+                        <p class="text-shadow">
+                            <a href="#additionalInfo" data-toggle="collapse">Additional info <i class="fas fa-angle-down" /></a> 
+                        </p>
+                        <div id="additionalInfo" class="collapse container">
+                            <user-reports
+                                :user-mongo-id="evalRound.bn.id"
+                            />
+                            <user-list
+                                v-if="evalRound.evaluations.length"
+                                :header="'Total evaluations: (' + evalRound.evaluations.length + ')'"
+                                :user-list="submittedEvaluators"
+                            />
+                        </div>
                         <hr>
                         <consensus
                             :consensus="evalRound.consensus"
@@ -77,8 +90,8 @@ export default {
     watch: {
         evalRound() {
             history.pushState(null, 'Current BN Evaluations', `/evalarchive?eval=${this.evalRound.id}`);
-        }
-    }
+        },
+    },
 };
 </script>
 

@@ -38,7 +38,7 @@
                             <user-list
                                 v-if="evalRound.evaluations.length"
                                 :header="'Total evaluations: (' + evalRound.evaluations.length + ')'"
-                                :userList="submittedEvaluators"
+                                :user-list="submittedEvaluators"
                             />
                         </div>
                         <hr>
