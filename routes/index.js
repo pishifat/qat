@@ -147,4 +147,9 @@ router.get('/callback', async (req, res) => {
     }
 });
 
+/* GET redirect to mgsite */
+router.get('/mgsite', async (req, res, next) => {
+    return res.redirect('https://mappersguild.com');
+});
+
 module.exports = router;
