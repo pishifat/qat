@@ -77,7 +77,7 @@ router.post('/apply', async (req, res) => {
         // Create app & test
         const [newBnApp, test] = await Promise.all([
             await testSubmissionService.create(req.session.mongoId, req.body.mode),
-            await bnAppsService.create(req.session.mongoId, req.body.mode, req.body.mods),
+            await bnAppsService.create(req.session.mongoId, req.body.mode, req.body.mods, req.body.reasons),
         ]);
         if (!newBnApp || newBnApp.error || !test || test.error) {
             return res.json({ error: 'Failed to process application!' });

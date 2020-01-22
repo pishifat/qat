@@ -17,6 +17,10 @@ function notifyDeadlines() {
         const date = new Date();
         const nearDeadline = new Date();
         nearDeadline.setDate(nearDeadline.getDate() + 1);
+        const startRange = new Date();
+        startRange.setDate(startRange.getDate() + 6);
+        const endRange = new Date();
+        endRange.setDate(endRange.getDate() + 7);
 
         const activeApps = await bnAppsService.query(
             { active: true, test: { $exists: true } },
@@ -78,9 +82,7 @@ function notifyDeadlines() {
                 if (!taikoHighlight && app.mode === 'taiko') { taikoHighlight = true; }
                 if (!catchHighlight && app.mode === 'catch') { catchHighlight = true; }
                 if (!maniaHighlight && app.mode === 'mania') { maniaHighlight = true; }
-
                 title = `BN app eval for ${app.applicant.username} is overdue!`;
-
             } else if (deadline < nearDeadline) {
                 title = `BN app eval for ${app.applicant.username} is due in less than 24 hours!`;
             }
@@ -108,8 +110,9 @@ function notifyDeadlines() {
                 if (!taikoHighlight && round.mode === 'taiko') { taikoHighlight = true; }
                 if (!catchHighlight && round.mode === 'catch') { catchHighlight = true; }
                 if (!maniaHighlight && round.mode === 'mania') { maniaHighlight = true; }
-
                 title = `Current BN eval for ${round.bn.username} is overdue!`;
+            } else if (round.deadline < startRange && round.deadline > endRange) {
+                title = `Current BN eval for ${round.bn.username} is due in one week!`;
             } else if (round.deadline < nearDeadline) {
                 title = `Current BN eval for ${round.bn.username} is due in less than 24 hours!`;
             }

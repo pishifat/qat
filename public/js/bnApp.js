@@ -9,12 +9,15 @@ $(function() {
         $('#errors').text('');
         const mode = $('input[name=mode]:checked').val();
         let mods = [];
+        let reasons = [];
         // eslint-disable-next-line no-useless-escape
         const regexp = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
         for (let i = 0; i < 4; i++) {
             let mod = $(`#mod${i}`).val().trim();
             if (mod.indexOf('https://osu.ppy.sh/beatmapsets/') == 0 && regexp.test(mod)) {
                 mods.push(mod);
+                let reason = $(`#reason${i}`).val().trim();
+                reasons.push(reason);
             }
         }
         if (!mode) {
@@ -24,7 +27,7 @@ $(function() {
         } else {
             $('#submitting').text(`Submitting & calculating mod score... (this will take a few seconds)`);
             try {
-                const res = await axios.post(`/bnapps/apply`, { mode: mode, mods: mods });
+                const res = await axios.post(`/bnapps/apply`, { mode: mode, mods: mods, reasons: reasons });
                 if (res.data.error) {
                     $('#errors').text(res.data.error);
                 } else {

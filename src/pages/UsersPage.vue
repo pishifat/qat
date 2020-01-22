@@ -38,198 +38,14 @@
             </section>
             <!-- other tools -->
             <section class="segment segment-solid my-1 mx-4">
-                <div class="my-2">
-                    <button
-                        class="btn btn-sm btn-nat minw-200 my-1"
-                        data-toggle="tooltip"
-                        data-placement="right"
-                        title="Finds NAT eval activity, defaults to 30 days"
-                        @click="findNatActivity()"
-                    >
-                        Load NAT activity
-                    </button>
-                    <input
-                        v-model="natDays"
-                        class="small"
-                        type="text"
-                        autocomplete="off"
-                        placeholder="days of activity..."
-                        maxlength="3"
-                        @keyup.enter="findNatActivity()"
-                    >
-                    <small class="ml-1">
-                        <select v-model="natMode" class="custom-select" @change="findNatActivity()">
-                            <option class="ml-2" value="osu" selected>osu!</option>
-                            <option class="ml-2" value="taiko">osu!taiko</option>
-                            <option class="ml-2" value="catch">osu!catch</option>
-                            <option class="ml-2" value="mania">osu!mania</option>
-                        </select>
-                    </small>
-                    <div v-if="natActivity">
-                        <div v-for="user in natActivity" :key="user.username" class="small min-spacing mb-1">
-                            <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a> (joined {{user.joinDate.toString().slice(0, 10)}})
-                            <p 
-                                class="min-spacing" 
-                                :class="user.totalEvaluations >= natTotal/(natActivity.length / natMode == 'osu' ? 3 : 2) - 1 ? 
-                                    'background-pass' 
-                                    : user.totalEvaluations >= natTotal/(natActivity.length * 2 / natMode == 'osu' ? 3 : 2) - 1 ? 
-                                        'background-warn' :
-                                        'background-fail'"
-                            >
-                                Application evaluations: {{ user.totalBnAppEvals }}
-                            </p>
-                            <p 
-                                class="min-spacing" 
-                                :class="user.totalEvaluations >= natTotal/(natActivity.length / natMode == 'osu' ? 3 : 2) - 1 ? 
-                                    'background-pass' 
-                                    : user.totalEvaluations >= natTotal/(natActivity.length * 2 / natMode == 'osu' ? 3 : 2) - 1 ? 
-                                        'background-warn' :
-                                        'background-fail'"
-                            >
-                                Current BN evaluations: {{ user.totalCurrentBnEvals }}
-                            </p>
-                            <p
-                                class="min-spacing"
-                                :class="user.totalWrittenFeedbacks >= natTotal/natActivity.length - 1 ? 
-                                    'background-pass' : 
-                                    user.totalWrittenFeedbacks >= natTotal/(natActivity.length * 2) - 1 ? 
-                                        'background-warn' : 
-                                        'background-fail'"
-                            >
-                                Total written feedback: {{ user.totalWrittenFeedbacks }}
-                            </p>
-                        </div>
-                        <p class="small min-spacing ml-2">
-                            Total BN applications evaluated: {{ totalBnApps }}
-                        </p>
-                        <p class="small min-spacing ml-2">
-                            Total current BNs evaluated: {{ totalEvalRounds }}
-                        </p>
-                        <p class="small min-spacing ml-2">
-                            Note: Evaluations only counted after May 5th. Written feedback only counted after September 9th
-                        </p>
-                    </div>
-                </div>
-                <div class="my-2">
-                    <button
-                        class="btn btn-sm btn-nat minw-200 my-1"
-                        data-toggle="tooltip"
-                        data-placement="right"
-                        title="Finds BN nomination, pop/dq, and report activity, defaults to 30 days"
-                        @click="findBnActivity()"
-                    >
-                        Load BN activity
-                    </button>
-                    <input
-                        v-model="bnDays"
-                        class="small"
-                        type="text"
-                        autocomplete="off"
-                        placeholder="days of activity..."
-                        maxlength="3"
-                        @keyup.enter="findBnActivity()"
-                    >
-                    <small class="ml-1">
-                        <select v-model="bnMode" class="custom-select" @change="findBnActivity()">
-                            <option class="ml-2" value="osu" selected>osu!</option>
-                            <option class="ml-2" value="taiko">osu!taiko</option>
-                            <option class="ml-2" value="catch">osu!catch</option>
-                            <option class="ml-2" value="mania">osu!mania</option>
-                        </select>
-                    </small>
-                    <div v-if="bnActivity">
-                        <div v-for="user in bnActivity" :key="user.username" class="small min-spacing mb-1">
-                            <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a> (joined {{user.joinDate.toString().slice(0, 10)}})
-                            <p 
-                                class="min-spacing" 
-                                :class="user.uniqueNominations < bnDaysDisplay/10 ? 
-                                    'background-fail' : 
-                                    user.uniqueNominations < bnDaysDisplay/6 ? 
-                                        'background-warn' : 
-                                        'background-pass'">
-                                Nominations: {{ user.uniqueNominations }}
-                            </p>
-                            <p class="min-spacing">
-                                Nomination resets: {{ user.nominationResets }}
-                            </p>
-                        </div>
-                        <p class="small min-spacing ml-2">
-                            Note: Nominations only accounted for after March 31st.
-                        </p>
-                    </div>
-                </div>
-                <div v-if="isNat" class="my-2">
-                    <button
-                        class="btn btn-sm btn-nat minw-200 my-1"
-                        data-toggle="tooltip"
-                        data-placement="right"
-                        title="Finds relevant yearly profile badge info"
-                        @click="findUserBadgeInfo()"
-                    >
-                        Load badge info
-                    </button>
-                    <div v-if="badgeUsers.length">
-                        <p class="min-spacing small my-2">
-                            only pishifat can edit this section
-                        </p>
-                        <div v-for="user in badgeUsers" :key="user.id" class="small min-spacing mb-1">
-                            <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a>
-                            <p class="min-spacing" :class="user.bnProfileBadge != calculateDuration(user.bnDuration) && calculateDuration(user.bnDuration) >= 1 ? 'background-fail' : ''">
-                                BN: {{ calculateDuration(user.bnDuration) }} -- badge: {{ user.bnProfileBadge }}
-                                <a href="#" @click.prevent="editBadgeValue(user.id, 'bn', true)"><i class="fas fa-plus" /></a>
-                                <a href="#" @click.prevent="editBadgeValue(user.id, 'bn', false)"><i class="fas fa-minus" /></a>
-                            </p>
-                            <p class="min-spacing" :class="user.natProfileBadge != calculateDuration(user.natDuration) && calculateDuration(user.natDuration) >= 1 ? 'background-fail' : ''">
-                                NAT: {{ calculateDuration(user.natDuration) }} -- badge: {{ user.natProfileBadge }}
-                                <a href="#" @click.prevent="editBadgeValue(user.id, 'nat', true)"><i class="fas fa-plus" /></a>
-                                <a href="#" @click.prevent="editBadgeValue(user.id, 'nat', false)"><i class="fas fa-minus" /></a>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <div v-if="isNat" class="my-2">
-                    <button
-                        class="btn btn-sm btn-nat minw-200 my-1"
-                        data-toggle="tooltip"
-                        data-placement="right"
-                        title="Finds info on prospective NAT members"
-                        @click="findPotentialNatInfo()"
-                    >
-                        Load potential NAT info
-                    </button>
-                    <div v-if="potentialNatInfo.length">
-                        <div v-for="user in potentialNatInfo" :key="user.osuId" class="small min-spacing my-2">
-                            <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a>
-                            <p class="ml-2 min-spacing">
-                                <a data-toggle="collapse" :href="'#evaluations' + user.osuId" @click.prevent>Show app evals ({{ user.evaluatedApps.length }}) <i class="fas fa-angle-down" /></a>
-                            </p>
-                            <div :id="'evaluations' + user.osuId" class="collapse ml-4">
-                                <div v-for="app in user.evaluatedApps" :key="app.id">
-                                    <p class="min-spacing">
-                                        Applicant: <a :href="'https://osu.ppy.sh/users/' + app.applicant.osuId" target="_blank">{{ app.applicant.username }}</a> -- {{ app.createdAt.slice(0,10) }}
-                                    </p>
-                                    <p class="min-spacing">
-                                        Consensus: <span :class="app.consensus == 'pass' ? 'vote-pass' : 'vote-fail'">{{ app.consensus }}</span>
-                                    </p>
-                                    <p class="min-spacing mb-1">
-                                        NAT Feedback: <i>{{ app.feedback }}</i>
-                                    </p>
-                                    <p class="min-spacing">
-                                        BN's opinion:<span :class="findVote(app.evaluations, user.osuId) == 'pass' ? 'vote-pass' : findVote(app.evaluations, user.osuId) == 'neutral' ? 'vote-neutral' : 'vote-fail'">
-                                            {{ findVote(app.evaluations, user.osuId) }}
-                                        </span>
-                                    </p>
-                                    <p class="ml-3 min-spacing">
-                                        Behavior comment: <i>{{ findBehaviorComment(app.evaluations, user.osuId) }}</i> 
-                                    </p>
-                                    <p class="ml-3 min-spacing">
-                                        Modding comment: <i>{{ findModdingComment(app.evaluations, user.osuId) }}</i> 
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <nat-activity/>
+                <bn-activity/>
+                <badges
+                    :v-if="isNat"
+                />
+                <potential-nat-info
+                    :v-if="isNat"
+                />
             </section>
         </div>
 
@@ -246,19 +62,26 @@
 <script>
 import UserCard from '../components/users/UserCard.vue';
 import UserInfo from '../components/users/UserInfo.vue';
+import NatActivity from '../components/users/NatActivity.vue';
+import BnActivity from '../components/users/BnActivity.vue';
+import Badges from '../components/users/Badges.vue';
+import PotentialNatInfo from '../components/users/PotentialNatInfo.vue';
 import FilterBox from '../components/FilterBox.vue';
 import pagination from '../mixins/pagination.js';
 import filters from '../mixins/filters.js';
-import postData from '../mixins/postData.js';
 
 export default {
     name: 'UsersPage',
     components: {
         UserCard,
         UserInfo,
+        NatActivity,
+        BnActivity,
+        Badges,
+        PotentialNatInfo,
         FilterBox,
     },
-    mixins: [postData, pagination, filters],
+    mixins: [pagination, filters],
     data() {
         return {
             pageObjs: null,
@@ -269,16 +92,6 @@ export default {
             isNat: null,
             isBn: null,
             selectedUser: null,
-            badgeUsers: [],
-            natActivity: null,
-            natDays: '',
-            natMode: 'osu',
-            natTotal: null,
-            bnActivity: null,
-            bnDays: '',
-            bnDaysDisplay: '',
-            bnMode: 'osu',
-            potentialNatInfo: [],
         };
     },
     created() {
@@ -340,104 +153,6 @@ export default {
                 }
             }
             return days;
-        },
-        findUserBadgeInfo() {
-            axios
-                .get('/users/findUserBadgeInfo')
-                .then(response => {
-                    this.badgeUsers = [];
-                    let users = response.data;
-                    users.forEach(user => {
-                        if((this.calculateDuration(user.bnDuration) >= 1) || (this.calculateDuration(user.natDuration) >= 1)){
-                            this.badgeUsers.push(user);
-                        }
-                    });
-                });
-        },
-        calculateDuration(dateArray) {
-            let days = 0;
-            for (let i = 0; i < dateArray.length; i += 2) {
-                let a = new Date(dateArray[i]);
-                let b = new Date(dateArray[i + 1]);
-                if (dateArray[i + 1]) {
-                    days += Math.abs(b.getTime() - a.getTime()) / (1000 * 3600 * 24);
-                } else {
-                    days += Math.abs(new Date().getTime() - a.getTime()) / (1000 * 3600 * 24);
-                }
-            }
-            let years = Math.floor(days / 365);
-            return years;
-        },
-        async editBadgeValue(id, group, add) {
-            const u = await this.executePost(
-                '/users/editBadgeValue/' + id,
-                { group, add }
-            );
-            if (u && !u.error) {
-                const i = this.badgeUsers.findIndex(user => user.id == u.id);
-                group == 'bn' ? this.badgeUsers[i].bnProfileBadge = u.bnProfileBadge : this.badgeUsers[i].natProfileBadge = u.natProfileBadge;
-            }
-        },
-        findNatActivity() {
-            if(!this.natDays.length) this.natDays = 30;
-            axios
-                .get('/users/findNatActivity/' + this.natDays + '/' + this.natMode)
-                .then(response => {
-                    this.natActivity = response.data.info;
-                    this.natTotal = response.data.bnAppsCount + response.data.evalRoundsCount;
-                    this.totalBnApps = response.data.bnAppsCount;
-                    this.totalEvalRounds = response.data.evalRoundsCount;
-                });
-        },
-        findBnActivity() {
-            if(!this.bnDays.length) this.bnDays = 30;
-            axios
-                .get('/users/findBnActivity/' + this.bnDays + '/' + this.bnMode)
-                .then(response => {
-                    this.bnActivity = response.data;
-                    this.bnDaysDisplay = this.bnDays;
-                });
-        },
-        findPotentialNatInfo() {
-            axios
-                .get('/users/findPotentialNatInfo/')
-                .then(response => {
-                    let users = response.data;
-                    users.forEach(user => {
-                        if(user.evaluatedApps.length){
-                            this.potentialNatInfo.push(user);
-                        }
-                    });
-                });
-        },
-        findVote(evaluations, osuId) {
-            let vote = 'none';
-            evaluations.forEach(evaluation => {
-                if(evaluation.evaluator.osuId == osuId){
-                    if(evaluation.vote == 1) vote = 'pass';
-                    else if(evaluation.vote == 2) vote = 'neutral';
-                    else if(evaluation.vote == 3) vote = 'fail';
-                }
-            });
-            return vote;
-        },
-        findBehaviorComment(evaluations, osuId) {
-            let behaviorComment = 'none';
-            evaluations.forEach(evaluation => {
-                if(evaluation.evaluator.osuId == osuId){
-                    behaviorComment = evaluation.behaviorComment;
-                }
-            });
-            return behaviorComment;
-        },
-        findModdingComment(evaluations, osuId) {
-            let moddingComment = 'none';
-            evaluations.forEach(evaluation => {
-                if(evaluation.evaluator.osuId == osuId){
-                    moddingComment = evaluation.moddingComment;
-                }
-            });
-            return moddingComment;
         },
     },
 };

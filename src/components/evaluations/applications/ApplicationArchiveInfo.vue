@@ -14,6 +14,7 @@
                     <div class="container">
                         <mods
                             :mods="application.mods"
+                            :reasons="application.reasons"
                             :osu-id="application.applicant.osuId"
                         />
                         <test-results

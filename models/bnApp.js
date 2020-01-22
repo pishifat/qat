@@ -6,6 +6,7 @@ const bnAppSchema = new mongoose.Schema({
     applicant: { type: 'ObjectId', ref: 'User', required: true },
     mode: { type: String, enum: ['osu', 'taiko', 'catch', 'mania'], required: true },
     mods: [{ type: String, required: true }],
+    reasons: [{ type: String, required: true }],
     evaluations: [{ type: 'ObjectId', ref: 'Evaluation' }],
     active: { type: Boolean, default: true },
     discussion: { type: Boolean, default: false },
@@ -31,10 +32,11 @@ class BnAppService extends BaseService
      * @param {object} userId UserId of applicant
      * @param {string} mode 
      * @param {string[]} mods 
+     * @param {string[]} reasons 
      */
-    async create(userId, mode, mods) {
+    async create(userId, mode, mods, reasons) {
         try {
-            return await BnApp.create({ applicant: userId, mode, mods });
+            return await BnApp.create({ applicant: userId, mode, mods, reasons });
         } catch(error) {
             logsService.create(null, JSON.stringify(error), true);
             return { error: error._message };

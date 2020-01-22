@@ -81,7 +81,7 @@ router.get('/searchById/:id', async (req, res) => {
             defaultBnPopulate
         );
     }
-    if(!round.consensus){ //consensus because undefined round results in { error: undefined }, and that says !round is false
+    if(!round || !round.consensus){ //consensus because undefined round results in { error: undefined }, and that says !round is false
         return res.json({ error: 'Cannot find evaluation!' });
     }
     
