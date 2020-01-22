@@ -14,6 +14,7 @@
                 :username="evalRound.bn.username"
                 :osuId="evalRound.bn.osuId"
                 :consensus="evalRound.consensus"
+                :is-nat="true"
             />
             <card-footer
                 :mode="evalRound.mode"
