@@ -41,10 +41,10 @@
                 <nat-activity/>
                 <bn-activity/>
                 <badges
-                    :v-if="isNat"
+                    v-if="isNat"
                 />
                 <potential-nat-info
-                    :v-if="isNat"
+                    v-if="isNat"
                 />
             </section>
         </div>
