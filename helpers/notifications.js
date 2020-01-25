@@ -1,5 +1,6 @@
 const api = require('./api');
 const bnAppsService = require('../models/bnApp').service;
+const vetoesService = require('../models/veto').service;
 const evalRoundsService = require('../models/evalRound').service;
 
 const defaultAppPopulate = [{
@@ -37,7 +38,10 @@ function notifyDeadlines() {
         );
 
         const activeVetoes = await vetoesService.query(
-            { active: true }
+            { active: true },
+            {},
+            {},
+            true,
         );
 
         let osuHighlight;
@@ -46,6 +50,7 @@ function notifyDeadlines() {
         let maniaHighlight;
 
         activeVetoes.forEach((veto) => {
+            let title = '';
             if (date > veto.deadline) {
                 if (!osuHighlight && veto.mode === 'osu') { osuHighlight = true; }
                 if (!taikoHighlight && veto.mode === 'taiko') { taikoHighlight = true; }
