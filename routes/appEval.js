@@ -95,8 +95,9 @@ router.post('/submitEval/:id', api.isNotSpectator, async (req, res) => {
             }], 
             a.mode
         );
-        
-        if(!a.discussion && ((a.mode == 'osu' && a.evaluations.length > 2) || (a.mode != 'osu' && a.evaluations.length > 1))){
+        let twoEvaluationModes = ['taiko', 'mania'];
+        let threeEvaluationModes = ['osu', 'catch'];
+        if(!a.discussion && ((threeEvaluationModes.includes(a.mode) && a.evaluations.length > 2) || (twoEvaluationModes.includes(a.mode) && a.evaluations.length > 1))){
             let pass = 0;
             let neutral = 0;
             let fail = 0;
@@ -107,7 +108,7 @@ router.post('/submitEval/:id', api.isNotSpectator, async (req, res) => {
                 else if(evaluation.vote == 2) neutral++;
                 else if(evaluation.vote == 3) fail++;
             });
-            if((a.mode == 'osu' && nat > 2) || (a.mode != 'osu' && nat > 1)){
+            if((threeEvaluationModes.includes(a.mode) && nat > 2) || (twoEvaluationModes.includes(a.mode) && nat > 1)){
                 await bnAppsService.update(req.params.id, { discussion: true });
                 api.webhookPost(
                     [{

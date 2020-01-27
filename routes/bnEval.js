@@ -183,7 +183,9 @@ router.post('/submitEval/:id', api.isBnOrNat, async (req, res) => {
             }], 
             er.mode
         );
-        if(!er.discussion && ((er.mode == 'osu' && er.evaluations.length > 2) || (er.mode != 'osu' && er.evaluations.length > 1))){
+        let twoEvaluationModes = ['taiko', 'mania'];
+        let threeEvaluationModes = ['osu', 'catch'];
+        if(!er.discussion && ((threeEvaluationModes.includes(er.mode) && er.evaluations.length > 2) || (twoEvaluationModes.includes(er.mode) && er.evaluations.length > 1))){
             await evalRoundsService.update(req.params.id, { discussion: true });
             let pass = 0;
             let extend = 0;
