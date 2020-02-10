@@ -57,7 +57,7 @@ router.post('/apply', async (req, res) => {
 
     if (!currentBnApp && !currentBnEval) {
         // Check user kudosu total count & mod score
-        let invalids = [920861, 654108, 8693851, 1980256, 1623405, 4154071, 3611370, 626907, 2239480, 7612550, 481582, 6256027, 2377881]; //temporary exceptions to mod score
+        let invalids = [920861, 654108, 8693851, 1980256, 1623405, 4154071, 3611370, 626907, 2239480, 7612550, 481582, 6256027, 2377881, 480689]; //temporary exceptions to mod score
         if(invalids.indexOf(req.session.osuId) < 0){
             const [userInfo, modScore] = await Promise.all([
                 await api.getUserInfo(req.session.accessToken),
