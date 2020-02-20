@@ -1,6 +1,8 @@
 <template>
     <div class="row">
-        <p class="errors mx-auto">{{ info }}</p>
+        <p class="errors mx-auto">
+            {{ info }}
+        </p>
         <div class="col-md-12">
             <filter-box 
                 :filter-mode.sync="filterMode"
@@ -137,6 +139,14 @@ export default {
             info: '',
         };
     },
+    watch: {
+        selectedApplication() {
+            this.info = '';
+        },
+        selectedDiscussApp() {
+            this.info = '';
+        },
+    },
     created() {
         axios
             .get('/appEval/relevantInfo')
@@ -159,7 +169,7 @@ export default {
                             $('#applicationDiscussionInfo').modal('show');
                         }
                     }else if(this.evaluator.isNat){
-                        window.location = "/evalArchive?eval=" + params.get('eval');
+                        window.location = '/evalArchive?eval=' + params.get('eval');
                     }
                 }
             }).then(function(){
@@ -176,14 +186,6 @@ export default {
                     this.filter();
                 });
         }, 300000);
-    },
-    watch: {
-        selectedApplication() {
-            this.info = '';
-        },
-        selectedDiscussApp() {
-            this.info = '';
-        },
     },
     methods: {
         filterBySearchValueContext(a) {

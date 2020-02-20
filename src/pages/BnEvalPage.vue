@@ -169,7 +169,7 @@ export default {
                             $('#currentBnDiscussionInfo').modal('show');
                         }
                     }else{
-                        window.location = "/evalArchive?eval=" + params.get('eval');
+                        window.location = '/evalArchive?eval=' + params.get('eval');
                     }
                 }
             }).then(function(){

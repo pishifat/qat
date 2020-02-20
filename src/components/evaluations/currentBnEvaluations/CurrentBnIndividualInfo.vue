@@ -5,8 +5,8 @@
                 <modal-header
                     :mode="evalRound.mode"
                     :nat-evaluators="[]"
-                    :isApplication="false"
-                    :osuId="evalRound.bn.osuId"
+                    :is-application="false"
+                    :osu-id="evalRound.bn.osuId"
                     :username="evalRound.bn.username"
                     :evaluator-mongo-id="evaluator.id"
                 />
@@ -38,12 +38,12 @@
                             <user-list
                                 v-if="evalRound.evaluations.length"
                                 :header="'Total evaluations: (' + evalRound.evaluations.length + ')'"
-                                :userList="submittedEvaluators"
+                                :user-list="submittedEvaluators"
                             />
                         </div>
                         <hr>
                         <evaluation-input
-                            :isApplication="false"
+                            :is-application="false"
                             :nominator-assessment-mongo-id="evalRound.id"
                             :evaluator-mongo-id="evaluator.id"
                             :evaluations="evalRound.evaluations"
@@ -67,7 +67,7 @@ import UserList from '../info/UserList.vue';
 import EvaluationInput from '../info/EvaluationInput.vue';
 
 export default {
-    name: 'current-bn-individual-info',
+    name: 'CurrentBnIndividualInfo',
     components: {
         UserActivity,
         ModalHeader,
@@ -79,8 +79,14 @@ export default {
         EvaluationInput,
     },
     props: {
-        evalRound: Object,
-        evaluator: Object
+        evalRound: {
+            type: Object,
+            default: null,
+        },
+        evaluator: {
+            type: Object,
+            default: null,
+        },
     },
     computed: {
         submittedEvaluators() {

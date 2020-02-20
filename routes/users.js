@@ -129,7 +129,7 @@ router.post('/saveNote/:id', api.isNat, async (req, res) => {
             color: '7952450',
             fields:[
                 {
-                    name: 'http://bn.mappersguild.com/users',
+                    name: `http://bn.mappersguild.com/users?id=${note.user.id}`,
                     value: `Added note to **${note.user.username}**'s profile`,
                 },
                 {
@@ -238,7 +238,14 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
                     feedbackCount++;
                 }
             });
-            info.push({ username: user.username, osuId: user.osuId, totalBnAppEvals: evalsOnBnApps, totalCurrentBnEvals: evalsOnCurrentBnEvals, totalWrittenFeedbacks: feedbackCount, joinDate: user.natDuration[user.natDuration.length - 1] })
+            info.push({ 
+                username: user.username, 
+                osuId: user.osuId, 
+                totalBnAppEvals: evalsOnBnApps, 
+                totalCurrentBnEvals: evalsOnCurrentBnEvals, 
+                totalWrittenFeedbacks: feedbackCount, 
+                joinDate: user.natDuration[user.natDuration.length - 1],
+            });
         }
     });
 
@@ -285,7 +292,13 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
                 }
             }
         }
-        info.push({ username: user.username, osuId: user.osuId, uniqueNominations: uniqueNominations.length, nominationResets, joinDate: user.bnDuration[user.bnDuration.length - 1] })
+        info.push({ 
+            username: user.username, 
+            osuId: user.osuId, 
+            uniqueNominations: uniqueNominations.length, 
+            nominationResets, 
+            joinDate: user.bnDuration[user.bnDuration.length - 1],
+        });
     });
 
     res.json(info);

@@ -20,11 +20,13 @@
 </template>
 
 <script>
-
 export default {
-    name: 'modding-activity',
+    name: 'ModdingActivity',
     props: {
-        username: String,
+        username: {
+            type: String,
+            default: null,
+        },
     },
     data() {
         return {

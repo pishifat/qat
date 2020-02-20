@@ -6,7 +6,7 @@
         <ul style="list-style-type: disc;">
             <li v-for="(mod, i) in mods" :key="i" class="small text-shadow">
                 <a :href="modUrl(mod)" target="_blank">{{ modUrl(mod) }}</a><br>
-                <span v-if="reasons">{{ reasons[i] }}</span>
+                <span v-if="reasons" v-html="filterLinks(reasons[i])" />
             </li>
             <li class="small text-shadow">
                 <a :href="'https://osu.ppy.sh/users/' + osuId + '/modding/events?types%5B%5D=kudosu_gain&types%5B%5D=kudosu_lost&min_date=&max_date='" target="_blank">All history</a>
@@ -17,8 +17,11 @@
 
 <script>
 
+import filterLinks from '../../../../mixins/filterLinks.js';
+
 export default {
-    name: 'mods',
+    name: 'Mods',
+    mixins: [ filterLinks ],
     props: {
         mods: Array,
         reasons: Array,
