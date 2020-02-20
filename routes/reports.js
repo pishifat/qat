@@ -71,7 +71,7 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
             fields:[
                 {
                     name: 'Report reason',
-                    value: req.body.reason,
+                    value: req.body.reason.length > 975 ? req.body.reason.slice(0,975) + '... *(truncated)*' : req.body.reason,
                 },
             ],
         }]);

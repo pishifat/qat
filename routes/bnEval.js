@@ -501,7 +501,7 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
     const [allUserEvents, allEvents, qualityAssuranceChecks] = await Promise.all([
         aiessService.getByEventTypeAndUser(parseInt(req.params.id), minDate, maxDate, req.params.mode),
         aiessService.getAllByEventType(minDate, maxDate, req.params.mode),
-        aiessService.query({ qualityAssuranceCheckers: req.params.mongoId, updatedAt: { $gte: minDate, $lte: maxDate } }, {}, {}, true)
+        aiessService.query({ qualityAssuranceCheckers: req.params.mongoId, updatedAt: { $gte: minDate, $lte: maxDate } }, {}, {}, true),
     ]);
     
     if (allUserEvents.error || allEvents.error) return res.json({ error: 'Something went wrong!' });

@@ -64,7 +64,7 @@
             <section class="row segment segment-image mx-1 px-0">
                 <div class="col-sm-12">
                     <h2>
-                        Group Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="After individual evals are completed, their responses are made visible to allow discussion and form a consensus">?</sup>
+                        Group Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="After individual evals are completed, their responses are made visible to allow discussion between NAT and form a consensus">?</sup>
                         <small v-if="discussApps">({{ discussApps.length }})</small>
                     </h2>
 

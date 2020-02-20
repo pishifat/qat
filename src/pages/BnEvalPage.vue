@@ -71,7 +71,7 @@
             <hr>
             <section class="row segment segment-image mx-1 px-0">
                 <div class="col-sm-12">
-                    <h2>Group Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="After individual evals are completed, their responses are made visible to allow discussion and form a consensus">?</sup> <small v-if="discussRounds">({{ discussRounds.length }})</small></h2>
+                    <h2>Group Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="After individual evals are completed, their responses are made visible to allow discussion between NAT and form a consensus">?</sup> <small v-if="discussRounds">({{ discussRounds.length }})</small></h2>
                 
                     <transition-group name="list" tag="div" class="row">
                         <current-bn-discussion-card
