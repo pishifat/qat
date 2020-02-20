@@ -5,8 +5,8 @@
                 <modal-header
                     :mode="evalRound.mode"
                     :nat-evaluators="[]"
-                    :isApplication="false"
-                    :osuId="evalRound.bn.osuId"
+                    :is-application="false"
+                    :osu-id="evalRound.bn.osuId"
                     :username="evalRound.bn.username"
                     :evaluator-mongo-id="evaluator.id"
                 />
@@ -52,7 +52,7 @@
                         <cooldown
                             v-if="evalRound.consensus == 'fail'"
                             :cooldown-date="evalRound.cooldownDate"
-                            :originDate="evalRound.updatedAt"
+                            :origin-date="evalRound.updatedAt"
                             :nominator-assessment-mongo-id="evalRound.id"
                             :is-application="false"
                             @update-nominator-assessment="$emit('update-eval-round', $event);"
@@ -77,7 +77,7 @@
                             :consensus="evalRound.consensus"
                         />
                         <evaluation-input
-                            :isApplication="false"
+                            :is-application="false"
                             :nominator-assessment-mongo-id="evalRound.id"
                             :evaluator-mongo-id="evaluator.id"
                             :evaluations="evalRound.evaluations"
@@ -105,7 +105,7 @@ import FeedbackInfo from '../info/FeedbackInfo.vue';
 import Evaluations from '../info/Evaluations.vue';
 
 export default {
-    name: 'current-bn-discussion-info',
+    name: 'CurrentBnDiscussionInfo',
     components: {
         UserActivity,
         ModalHeader,
@@ -121,8 +121,14 @@ export default {
         Evaluations,
     },
     props: {
-        evalRound: Object,
-        evaluator: Object,
+        evalRound: {
+            type: Object,
+            default: null,
+        },
+        evaluator: {
+            type: Object,
+            default: null,
+        },
     },
     computed: {
         submittedEvaluators() {
@@ -137,8 +143,7 @@ export default {
         evalRound() {
             history.pushState(null, 'Current BN Evaluations', `/bneval?eval=${this.evalRound.id}`);
         },
-    }
-    
+    },
 };
 </script>
 

@@ -19,19 +19,11 @@
                             :is-nat="evaluator.isNat"
                             :user-mongo-id="evalRound.bn.id"
                         />
-                        <p class="text-shadow">
-                            <a href="#additionalInfo" data-toggle="collapse">Additional info <i class="fas fa-angle-down" /></a> 
-                        </p>
-                        <div id="additionalInfo" class="collapse container">
-                            <user-reports
-                                :user-mongo-id="evalRound.bn.id"
-                            />
-                            <user-list
-                                v-if="evalRound.evaluations.length"
-                                :header="'Total evaluations: (' + evalRound.evaluations.length + ')'"
-                                :user-list="submittedEvaluators"
-                            />
-                        </div>
+                        <user-list
+                            v-if="evalRound.evaluations.length"
+                            :header="'Total evaluations: (' + evalRound.evaluations.length + ')'"
+                            :user-list="submittedEvaluators"
+                        />
                         <hr>
                         <consensus
                             :consensus="evalRound.consensus"
@@ -64,20 +56,28 @@ import UserActivity from './currentBnInfo/UserActivity.vue';
 import ModalHeader from '../info/ModalHeader.vue';
 import Consensus from '../info/Consensus.vue';
 import Evaluations from '../info/Evaluations.vue';
+import UserList from '../info/UserList.vue';
 
 export default {
-    name: 'current-bn-archive-info',
+    name: 'CurrentBnArchiveInfo',
     components: {
         UserActivity,
         ModalHeader,
         Consensus,
         Evaluations,
-    },
-    props: {
-        evalRound: Object,
-        evaluator: Object,
+        UserList,
     },
     mixins: [ filterLinks ],
+    props: {
+        evalRound: {
+            type: Object,
+            default: null,
+        },
+        evaluator: {
+            type: Object,
+            default: null,
+        },
+    },
     computed: {
         submittedEvaluators() {
             let evaluators = new Array;
