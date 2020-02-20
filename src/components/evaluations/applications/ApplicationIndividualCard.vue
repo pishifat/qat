@@ -16,7 +16,6 @@
             <card-footer
                 :mode="application.mode"
                 :is-nat="evaluator.isNat"
-                :is-leader="evaluator.isLeader"
                 :nominator-assessment-mongo-id="application.id"
                 :evaluations="application.evaluations"
                 :is-discuss="false"
@@ -34,7 +33,7 @@ import CardHeader from '../card/CardHeader.vue';
 import CardFooter from '../card/CardFooter.vue';
 
 export default {
-    name: 'application-individual-card',
+    name: 'ApplicationIndividualCard',
     components: {
         CardHeader,
         CardFooter,

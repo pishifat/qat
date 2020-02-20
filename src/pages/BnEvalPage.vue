@@ -8,13 +8,13 @@
                 :options="['', 'osu', 'taiko', 'catch', 'mania']"
             >
                 <slot>
-                    <button v-if="evaluator && evaluator.isLeader" class="btn btn-nat btn-sm ml-2" @click="selectAll($event)">
+                    <button v-if="evaluator && evaluator.isNat" class="btn btn-nat btn-sm ml-2" @click="selectAll($event)">
                         Select all
                     </button>
                 </slot>
                 <span class="errors">{{ info }}</span>
             </filter-box>
-            <section v-if="evaluator && evaluator.isLeader" class="row segment my-1 mx-4">
+            <section v-if="evaluator && evaluator.isNat" class="row segment my-1 mx-4">
                 <div class="small filter-box">
                     <span class="filter-header" style="width: 110px;">Mark selected as</span>
                     <button class="btn btn-nat btn-sm ml-2" @click="setGroupEval($event)">

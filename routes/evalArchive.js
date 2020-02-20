@@ -112,4 +112,102 @@ router.get('/searchRecent/:limit', async (req, res) => {
     res.json({ a, b });
 });
 
+/* POST set evals as complete */
+router.post('/unarchive/:id', api.isNat, async (req, res) => {
+    if (req.body.type == 'application') {
+        let a = await bnAppsService.query({ _id: req.params.id });
+
+        if (!a || a.error) {
+            return res.json({ error: 'Could not load evalRound!' });
+        }
+
+        let u = await usersService.query({ _id: a.applicant });
+
+        if (!u || u.error) {
+            return res.json({ error: 'Could not load user!' });
+        }
+
+        if (a.consensus == 'pass') {
+            await usersService.update(u.id, { $pull: { modes: a.mode } });
+            await usersService.update(u.id, { $pull: { probation: a.mode } });
+            await evalRoundsService.deleteManyByUserId(u.id);
+            if (u.modes.length == 1) {
+                await usersService.update(u.id, { group: 'user' });
+                await usersService.update(u.id, { $pop: { bnDuration: 1 } });
+            }
+        } 
+
+        await bnAppsService.update(a.id, { active: true });
+
+        api.webhookPost(
+            [{
+                author: {
+                    name: `${req.session.username}`,
+                    icon_url: `https://a.ppy.sh/${req.session.osuId}`,
+                    url: `https://osu.ppy.sh/users/${req.session.osuId}`,
+                },
+                color: '15001599',
+                fields:[
+                    {
+                        name: `http://bn.mappersguild.com/appeval?eval=${a.id}`,
+                        value: `**${u.username}**'s application evaluation un-archived`,
+                    },
+                ],
+            }], 
+            a.mode
+        );
+
+    } else if (req.body.type == 'evalRound') {
+        let er = await evalRoundsService.query({ _id: req.params.id });
+
+        if (!er || er.error) {
+            return res.json({ error: 'Could not load evalRound!' });
+        }
+
+        let u = await usersService.query({ _id: er.bn });
+
+        if (!u || u.error) {
+            return res.json({ error: 'Could not load user!' });
+        }
+
+        if (er.consensus == 'fail') {
+            await usersService.update(u.id, { $push: { modes: er.mode } });
+            await usersService.update(u.id, { $push: { probation: er.mode } });
+            if (!u.modes.length) {
+                await usersService.update(u.id, { group: 'bn' });
+                await usersService.update(u.id, { $pop: { bnDuration: 1 } });
+            }
+        }
+
+        if (er.consensus == 'extend' || er.consensus == 'pass') {
+            await evalRoundsService.deleteManyByUserId(u.id);
+            if(u.probation.indexOf(er.mode) < 0){
+                await usersService.update(u.id, { $push: { probation: er.mode } });
+            }
+        }
+
+        await evalRoundsService.update(req.params.id, { active: true });
+
+        api.webhookPost(
+            [{
+                author: {
+                    name: `${req.session.username}`,
+                    icon_url: `https://a.ppy.sh/${req.session.osuId}`,
+                    url: `https://osu.ppy.sh/users/${req.session.osuId}`,
+                },
+                color: '15001599',
+                fields:[
+                    {
+                        name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
+                        value: `**${u.username}**'s current BN evaluation un-archived`,
+                    },
+                ],
+            }], 
+            er.mode
+        );
+    }
+
+    res.json({ success: 'ok' });
+});
+
 module.exports = router;

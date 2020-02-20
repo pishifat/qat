@@ -19,7 +19,6 @@
             <card-footer
                 :mode="application.mode"
                 :is-nat="evaluator.isNat"
-                :is-leader="evaluator.isLeader"
                 :nominator-assessment-mongo-id="application.id"
                 :evaluations="application.evaluations"
                 :is-discuss="true"

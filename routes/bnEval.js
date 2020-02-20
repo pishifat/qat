@@ -229,7 +229,7 @@ router.post('/submitEval/:id', api.isBnOrNat, async (req, res) => {
 });
 
 /* POST set group eval */
-router.post('/setGroupEval/', api.isLeader, async (req, res) => {
+router.post('/setGroupEval/', api.isNat, async (req, res) => {
     for (let i = 0; i < req.body.checkedRounds.length; i++) {
         await evalRoundsService.update(req.body.checkedRounds[i], { discussion: true });
         let er = await evalRoundsService.query({ _id: req.body.checkedRounds[i] }, defaultPopulate);
@@ -275,7 +275,7 @@ router.post('/setGroupEval/', api.isLeader, async (req, res) => {
 });
 
 /* POST set invidivual eval */
-router.post('/setIndividualEval/', api.isLeader, async (req, res) => {
+router.post('/setIndividualEval/', api.isNat, async (req, res) => {
     for (let i = 0; i < req.body.checkedRounds.length; i++) {
         await evalRoundsService.update(req.body.checkedRounds[i], { discussion: false });
     }
@@ -291,7 +291,7 @@ router.post('/setIndividualEval/', api.isLeader, async (req, res) => {
 });
 
 /* POST set evals as complete */
-router.post('/setComplete/', api.isLeader, async (req, res) => {
+router.post('/setComplete/', api.isNat, async (req, res) => {
     for (let i = 0; i < req.body.checkedRounds.length; i++) {
         let er = await evalRoundsService.query({ _id: req.body.checkedRounds[i] });
         let u = await usersService.query({ _id: er.bn });

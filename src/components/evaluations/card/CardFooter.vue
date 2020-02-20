@@ -33,7 +33,7 @@
             {{ createDeadline() }}
         </span>
         <input
-            v-if="isLeader && !isArchive"
+            v-if="isNat && !isArchive"
             :id="nominatorAssessmentMongoId + '-check'"
             class="mx-1 ml-auto"
             type="checkbox"
@@ -55,7 +55,6 @@ export default {
     props: {
         mode: String,
         isNat: Boolean,
-        isLeader: Boolean,
         nominatorAssessmentMongoId: String,
         evaluations: Array,
         isDiscuss: Boolean,

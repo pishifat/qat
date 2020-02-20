@@ -39,6 +39,12 @@
                             :is-nat="evaluator.isNat"
                             :consensus="application.consensus"
                         />
+                        <button
+                            class="btn btn-sm btn-nat-red float-right"
+                            @click="unarchive($event);"
+                        >
+                            Un-archive
+                        </button>
                     </div>
                 </div>
             </div>
@@ -48,6 +54,7 @@
 
 <script>
 import filterLinks from '../../../mixins/filterLinks.js';
+import postData from '../../../mixins/postData.js';
 import ModalHeader from '../info/ModalHeader.vue';
 import Mods from './applicationInfo/Mods.vue';
 import TestResults from './applicationInfo/TestResults.vue';
@@ -55,7 +62,7 @@ import Consensus from '../info/Consensus.vue';
 import Evaluations from '../info/Evaluations.vue';
 
 export default {
-    name: 'application-archive-info',
+    name: 'ApplicationArchiveInfo',
     components: {
         ModalHeader,
         Mods,
@@ -63,14 +70,25 @@ export default {
         Consensus,
         Evaluations,
     },
+    mixins: [ filterLinks, postData ],
     props: {
         application: Object,
         evaluator: Object,
     },
-    mixins: [ filterLinks ],
     watch: {
         application() {
             history.pushState(null, 'BN Application Evaluations', `/evalArchive?eval=${this.application.id}`);
+        },
+    },
+    methods: {
+        async unarchive(e) {
+            const result = confirm(`Are you sure? ${this.application.consensus == 'pass' ? 'This will remove the user from the BN' : ''}`);
+            if(result){
+                const er = await this.executePost('/evalArchive/unarchive/' + this.application.id, { type: 'application' }, e);
+                if (er) {
+                    window.location = '/appeval?eval=' + this.application.id;
+                }
+            }
         },
     },
 };

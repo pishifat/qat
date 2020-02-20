@@ -145,7 +145,7 @@ router.post('/submitEval/:id', api.isNotSpectator, async (req, res) => {
 });
 
 /* POST set group eval */
-router.post('/setGroupEval/', api.isLeader, async (req, res) => {
+router.post('/setGroupEval/', api.isNat, async (req, res) => {
     for (let i = 0; i < req.body.checkedApps.length; i++) {
         await bnAppsService.update(req.body.checkedApps[i], { discussion: true });
         let a = await bnAppsService.query({ _id: req.body.checkedApps[i] }, defaultPopulate);
@@ -189,7 +189,7 @@ router.post('/setGroupEval/', api.isLeader, async (req, res) => {
 });
 
 /* POST set invidivual eval */
-router.post('/setIndividualEval/', api.isLeader, async (req, res) => {
+router.post('/setIndividualEval/', api.isNat, async (req, res) => {
     for (let i = 0; i < req.body.checkedApps.length; i++) {
         await bnAppsService.update(req.body.checkedApps[i], { discussion: false });
     }
@@ -203,7 +203,7 @@ router.post('/setIndividualEval/', api.isLeader, async (req, res) => {
 });
 
 /* POST set evals as complete */
-router.post('/setComplete/', api.isLeader, async (req, res) => {
+router.post('/setComplete/', api.isNat, async (req, res) => {
     for (let i = 0; i < req.body.checkedApps.length; i++) {
         let a = await bnAppsService.query({ _id: req.body.checkedApps[i] });
         let u = await usersService.query({ _id: a.applicant });

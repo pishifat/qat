@@ -46,7 +46,8 @@
 import postData from '../../../mixins/postData.js';
 
 export default {
-    name: 'consensus',
+    name: 'Consensus',
+    mixins: [ postData ],
     props: {
         consensus: String,
         nominatorAssessmentMongoId: String,
@@ -54,7 +55,6 @@ export default {
         isLowActivity: Boolean,
         isArchive: Boolean,
     },
-    mixins: [ postData ],
     computed: {
         consensusText() {
             if(!this.consensus){
@@ -75,7 +75,7 @@ export default {
             }else{
                 return 'vote-' + this.consensus;
             }
-        }
+        },
     },
     methods: {
         async setConsensus(consensus, e, toggle){

@@ -19,11 +19,6 @@
                             :is-nat="evaluator.isNat"
                             :user-mongo-id="evalRound.bn.id"
                         />
-                        <user-list
-                            v-if="evalRound.evaluations.length"
-                            :header="'Total evaluations: (' + evalRound.evaluations.length + ')'"
-                            :user-list="submittedEvaluators"
-                        />
                         <hr>
                         <consensus
                             :consensus="evalRound.consensus"
@@ -43,6 +38,12 @@
                             :is-nat="true"
                             :consensus="evalRound.consensus"
                         />
+                        <button
+                            class="btn btn-sm btn-nat-red float-right"
+                            @click="unarchive($event);"
+                        >
+                            Un-archive
+                        </button>
                     </div>
                 </div>
             </div>
@@ -52,11 +53,11 @@
 
 <script>
 import filterLinks from '../../../mixins/filterLinks.js';
+import postData from '../../../mixins/postData.js';
 import UserActivity from './currentBnInfo/UserActivity.vue';
 import ModalHeader from '../info/ModalHeader.vue';
 import Consensus from '../info/Consensus.vue';
 import Evaluations from '../info/Evaluations.vue';
-import UserList from '../info/UserList.vue';
 
 export default {
     name: 'CurrentBnArchiveInfo',
@@ -65,9 +66,8 @@ export default {
         ModalHeader,
         Consensus,
         Evaluations,
-        UserList,
     },
-    mixins: [ filterLinks ],
+    mixins: [ filterLinks, postData ],
     props: {
         evalRound: {
             type: Object,
@@ -90,6 +90,17 @@ export default {
     watch: {
         evalRound() {
             history.pushState(null, 'Current BN Evaluations', `/evalarchive?eval=${this.evalRound.id}`);
+        },
+    },
+    methods: {
+        async unarchive(e) {
+            const result = confirm(`Are you sure? This will place the user on probation`);
+            if(result){
+                const er = await this.executePost('/evalArchive/unarchive/' + this.evalRound.id, { type: 'evalRound' }, e);
+                if (er) {
+                    window.location = '/bnEval?eval=' + this.evalRound.id;
+                }
+            }
         },
     },
 };
