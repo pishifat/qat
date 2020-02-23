@@ -134,7 +134,7 @@ router.get('/callback', async (req, res) => {
             req.session.group = 'nat';
             req.session.isSpectator = false;
         } else {
-            req.session.isSpectator = (response.is_gmt || response.id == 3666350);
+            req.session.isSpectator = response.is_gmt;
             if (response.is_bng) {
                 req.session.group = 'bn';
             } else {
