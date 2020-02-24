@@ -52,7 +52,7 @@ router.get('/loadMore/:limit/:skip', async (req, res) => {
 });
 
 /* POST assign user */
-router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
+router.post('/assignUser/:id', api.isBnOrNat, api.isNotProbation, async (req, res) => {
     let e = await aiessService.update(req.params.id, { $push: { qualityAssuranceCheckers: req.session.mongoId } });
     e = await aiessService.query({ _id: req.params.id }, defaultPopulate);
     res.json(e);
@@ -149,7 +149,7 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
 });
 
 /* POST unassign user */
-router.post('/unassignUser/:id', api.isBnOrNat, async (req, res) => {
+router.post('/unassignUser/:id', api.isBnOrNat, api.isNotProbation, async (req, res) => {
     let e = await aiessService.update(req.params.id, { $pull: { qualityAssuranceCheckers: req.session.mongoId } });
     e = await aiessService.query({ _id: req.params.id }, defaultPopulate);
     res.json(e);

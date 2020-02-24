@@ -66,7 +66,7 @@
             <section class="row segment segment-image mx-1 px-0">
                 <div class="col-sm-12">
                     <h2>
-                        {{evaluator && evaluator.isNat ? 'Group Evaluations' : 'Completed Evaluations' }}<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" :title="evaluator && evaluator.isNat ? 'After individual evals are completed, their responses are made visible to allow discussion and form a consensus' : 'Results of archived evaluations you were assigned to'">?</sup>
+                        {{ evaluator && evaluator.isNat ? 'Group Evaluations' : 'Completed Evaluations' }}<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" :title="evaluator && evaluator.isNat ? 'After individual evals are completed, their responses are made visible to allow discussion and form a consensus' : 'Results of archived evaluations you were assigned to'">?</sup>
                         <small v-if="discussApps">({{ discussApps.length }})</small>
                     </h2>
 

@@ -68,7 +68,7 @@
             </div>
         </div>
         <div class="d-flex justify-content-end">
-            <p class="text-shadow min-spacing mt-1 mr-2" :class="info.length ? 'errors' : 'confirm'" >
+            <p class="text-shadow min-spacing mt-1 mr-2" :class="info.length ? 'errors' : 'confirm'">
                 {{ info }} {{ confirm }}
             </p>
             <button class="btn btn-sm btn-nat" @click="submitEval($event)">
@@ -82,18 +82,13 @@
 import postData from '../../../mixins/postData.js';
 
 export default {
-    name: 'evaluation-input',
+    name: 'EvaluationInput',
+    mixins: [ postData ],
     props: {
         isApplication: Boolean,
         nominatorAssessmentMongoId: String,
         evaluatorMongoId: String,
         evaluations: Array,
-    },
-    mixins: [ postData ],
-    watch: {
-        nominatorAssessmentMongoId() {
-            this.findUserEvaluation();
-        },
     },
     data() {
         return {
@@ -104,6 +99,11 @@ export default {
             info: '',
             confirm: '',
         };
+    },
+    watch: {
+        nominatorAssessmentMongoId() {
+            this.findUserEvaluation();
+        },
     },
     mounted() {
         this.findUserEvaluation();
@@ -135,7 +135,7 @@ export default {
                         evaluationId: this.evaluationId, 
                         vote: this.vote, 
                         moddingComment: this.moddingComment,
-                        behaviorComment: this.behaviorComment
+                        behaviorComment: this.behaviorComment,
                     }, e);
                 if (r) {
                     if (r.error) {

@@ -28,6 +28,7 @@
                     </p>
                 </div>
                 <div class="col-sm-2 small d-flex justify-content-start truncate">
+                    <span v-if="info.length" class="small errors">{{ info }}</span>
                     <span v-if="event.qualityAssuranceCheckers && (isNat || isMaxChecks || isOutdated)">
                         <a 
                             v-for="user in event.qualityAssuranceCheckers"
@@ -106,6 +107,7 @@ export default {
     data() {
         return {
             forceDisabled: false,
+            info: '',
         };
     },
     computed: {
