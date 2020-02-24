@@ -27,8 +27,15 @@
     },
     "reportWebhook": {
         "id": "",
-        "token": "",
-        "role": ""
+        "token": ""
+    },
+    "standardQualityAssuranceWebhook": {
+        "id": "",
+        "token": ""
+    },
+    "taikoCatchManiaQualityAssuranceWebhook": {
+        "id": "",
+        "token": ""
     },
     "v1token": "",
     "id": 0,

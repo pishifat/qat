@@ -22,14 +22,14 @@
                         :user-osu-id="userOsuId"
                         :username="username"
                         :is-outdated="isOutdated(event.beatmapsetId, event.timestamp)"
-                        :is-max-checks="event.qualityAssuranceCheckers.length > 1"
+                        :is-max-checks="event.qualityAssuranceCheckers.length > event.modes.length * 2 - 1"
                         @update-event="updateEvent($event)"
                     />
                 </transition-group>
             </div>
             <div class="text-center">
                 <button class="btn btn-sm btn-nat mt-4 mx-auto" @click="loadMore()">
-                    <i class="fas fa-angle-down mr-1">  </i> show more <i class="fas fa-angle-down ml-1"></i>
+                    <i class="fas fa-angle-down mr-1" /> show more <i class="fas fa-angle-down ml-1" />
                 </button>
             </div>
         </section>
@@ -42,7 +42,7 @@ import FilterBox from '../components/FilterBox.vue';
 import EventRow from '../components/qualityAssurance/EventRow.vue';
 
 export default {
-    name: 'quality-assurance-page',
+    name: 'QualityAssurancePage',
     components: {
         FilterBox,
         EventRow,

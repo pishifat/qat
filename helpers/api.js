@@ -187,10 +187,10 @@ function isNotSpectator(req, res, next) {
     }
 }
 
-async function webhookPost(message, mode) {
+async function webhookPost(message, webhook) {
     let url = 'https://discordapp.com/api/webhooks/';
 
-    switch (mode) {
+    switch (webhook) {
         case 'osu':
             url += `${config.standardWebhook.id}/${config.standardWebhook.token}`;
             break;
@@ -206,6 +206,12 @@ async function webhookPost(message, mode) {
         case 'all':
             url += `${config.allWebhook.id}/${config.allWebhook.token}`;
             break;
+        case 'standardQualityAssurance':
+            url += `${config.standardQualityAssuranceWebhook.id}/${config.standardQualityAssuranceWebhook.token}`;
+            break;
+        case 'taikoCatchManiaQualityAssurance':
+            url += `${config.taikoCatchManiaQualityAssuranceWebhook.id}/${config.taikoCatchManiaQualityAssuranceWebhook.token}`;
+            break;
         default:
             url += `${config.reportWebhook.id}/${config.reportWebhook.token}`;
             break;
@@ -220,11 +226,11 @@ async function webhookPost(message, mode) {
     }
 }
 
-async function highlightWebhookPost(message, mode) {
+async function highlightWebhookPost(message, webhook) {
     let url = 'https://discordapp.com/api/webhooks/';
     let role;
 
-    switch (mode) {
+    switch (webhook) {
         case 'osu':
             url += `${config.standardWebhook.id}/${config.standardWebhook.token}`;
             role = '<@' + config.standardWebhook.role + '>';

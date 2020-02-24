@@ -28,7 +28,7 @@
                     </p>
                 </div>
                 <div class="col-sm-2 small d-flex justify-content-start truncate">
-                    <span v-if="event.qualityAssuranceCheckers && isNat">
+                    <span v-if="event.qualityAssuranceCheckers && (isNat || isMaxChecks || isOutdated)">
                         <a 
                             v-for="user in event.qualityAssuranceCheckers"
                             :key="user.id" 

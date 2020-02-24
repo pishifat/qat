@@ -56,10 +56,96 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
     let e = await aiessService.update(req.params.id, { $push: { qualityAssuranceCheckers: req.session.mongoId } });
     e = await aiessService.query({ _id: req.params.id }, defaultPopulate);
     res.json(e);
+
     logsService.create(
         req.session.mongoId,
         `Added ${req.session.username} as QA checker for s/${e.beatmapsetId}`
     );
+
+    let qualityAssuranceChecks = await aiessService.query({ qualityAssuranceCheckers: req.session.mongoId }, {}, {}, true);
+
+    const authorUser = {
+        name: `${req.session.username} (${qualityAssuranceChecks.length})`,
+        icon_url: `https://a.ppy.sh/${req.session.osuId}`,
+        url: `https://osu.ppy.sh/users/${req.session.osuId}`,
+    };
+    const authorBeatmap = {
+        name: `${e.metadata} (${e.hostName})`,
+        url: `https://osu.ppy.sh/beatmapsets/${e.beatmapsetId}`,
+    };
+    const thumbnail = {
+        url:  `https://b.ppy.sh/thumb/${e.beatmapsetId}.jpg`,
+    };
+    const colorUser = '11720607';
+    const colorBeatmap = '11726590';
+    const fieldsUser = [
+        {
+            name: `http://bn.mappersguild.com/qualityassurance`,
+            value: `Marked as QA checker for a beatmap`,
+        },
+    ];
+    let userList = '';
+    for (let i = 0; i < e.qualityAssuranceCheckers.length; i++) {
+        let user = e.qualityAssuranceCheckers[i];
+        userList += user.username;
+        if(i + 1 < e.qualityAssuranceCheckers.length){
+            userList += ', ';
+        }
+    }
+    const fieldsBeatmap = [
+        {
+            name: `http://bn.mappersguild.com/qualityassurance`,
+            value: `Reached maximum QA checkers`,
+        },
+        {
+            name: `QA checkers`,
+            value: userList,
+        },
+    ];
+
+    if (e.modes.includes('osu')) {
+        await api.webhookPost(
+            [{
+                author: authorUser,
+                color: colorUser,
+                fields: fieldsUser,
+            }], 
+            'standardQualityAssurance'
+        );
+        if (e.qualityAssuranceCheckers.length > e.modes.length * 2 - 1) {
+            api.webhookPost(
+                [{
+                    author: authorBeatmap,
+                    thumbnail,
+                    color: colorBeatmap,
+                    fields: fieldsBeatmap,
+                }], 
+                'standardQualityAssurance'
+            );
+        }
+    } if (e.modes.includes('taiko') || e.modes.includes('catch') || e.modes.includes('mania')) {
+        await api.webhookPost(
+            [{
+                author: authorUser,
+                color: colorUser,
+                fields: fieldsUser,
+            }], 
+            'taikoCatchManiaQualityAssurance'
+        );
+        if (e.qualityAssuranceCheckers.length > e.modes.length * 2 - 1) {
+            api.webhookPost(
+                [{
+                    author: authorBeatmap,
+                    thumbnail,
+                    color: colorBeatmap,
+                    fields: fieldsBeatmap,
+                }], 
+                'taikoCatchManiaQualityAssurance'
+            );
+        }
+    }
+    
+    
 });
 
 /* POST unassign user */
@@ -67,10 +153,46 @@ router.post('/unassignUser/:id', api.isBnOrNat, async (req, res) => {
     let e = await aiessService.update(req.params.id, { $pull: { qualityAssuranceCheckers: req.session.mongoId } });
     e = await aiessService.query({ _id: req.params.id }, defaultPopulate);
     res.json(e);
+
     logsService.create(
         req.session.mongoId,
         `Removed ${req.session.username} from QA checker for s/${e.beatmapsetId}`
     );
+
+    let qualityAssuranceChecks = await aiessService.query({ qualityAssuranceCheckers: req.session.mongoId }, {}, {}, true);
+
+    const author = {
+        name: `${req.session.username} (${qualityAssuranceChecks.length})`,
+        icon_url: `https://a.ppy.sh/${req.session.osuId}`,
+        url: `https://osu.ppy.sh/users/${req.session.osuId}`,
+    };
+    const color = '12959680';
+    const fields = [
+        {
+            name: `http://bn.mappersguild.com/qualityassurance`,
+            value: `Removed as QA checker for a beatmap (why?)`,
+        },
+    ];
+
+    if (e.modes.includes('osu')) {
+        api.webhookPost(
+            [{
+                author,
+                color,
+                fields,
+            }], 
+            'standardQualityAssurance'
+        );
+    } if (e.modes.includes('taiko') || e.modes.includes('catch') || e.modes.includes('mania')) {
+        api.webhookPost(
+            [{
+                author,
+                color,
+                fields,
+            }], 
+            'taikoCatchManiaQualityAssurance'
+        );
+    }
 });
 
 module.exports = router;
