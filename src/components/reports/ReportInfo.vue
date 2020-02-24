@@ -47,10 +47,10 @@
                         <samp class="small">Hello!</samp><br><br>
                         <samp v-if="report.culprit" class="small">You recently reported [url=https://osu.ppy.sh/users/{{ report.culprit.osuId }}]{{ report.culprit.username }}[/url] for the following reason:</samp>
                         <samp v-else class="small">You recently reported [url={{ report.link }}]this link[/url] for the following reason:</samp><br><br>
-                        <samp class="small">[notice]{{ report.reason }}[/notice]</samp><br><br>
+                        <pre class="secondary-text small">[notice]{{ report.reason }}[/notice]</pre>
                         <samp class="small">After investigating this, we've decided that the report is [b]{{ report.valid == 1 ? 'valid' : report.valid == 2 ? 'partially valid' : 'invalid' }}[/b].</samp><br><br>
                         <samp class="small">Additional feedback from the NAT:</samp><br><br>
-                        <samp><pre class="small">[notice]{{ report.feedback }}[/notice]</pre></samp>
+                        <pre class="secondary-text small">[notice]{{ report.feedback }}[/notice]</pre>
                         <samp class="small">Regards, the Nomination Assessment Team</samp><br><br>
                     </div>
 
