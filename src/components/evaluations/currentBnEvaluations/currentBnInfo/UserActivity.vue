@@ -2,7 +2,7 @@
     <div>
         <events-list
             :events="nominations"
-            :events-id="'nominations'"
+            :events-id="'uniqueNominations' + mode"
             :header="'Unique nominations'"
             :loading="loading"
             :editing="editing"
@@ -11,7 +11,7 @@
         />
         <nomination-resets
             :events="nominationsDisqualified"
-            :events-id="'nominationsDisqualified'"
+            :events-id="'nominationsDisqualified' + mode"
             :header="'Nominations disqualified'"
             :loading="loading"
             :editing="editing"
@@ -20,7 +20,7 @@
         />
         <nomination-resets
             :events="nominationsPopped"
-            :events-id="'nominationsPopped'"
+            :events-id="'nominationsPopped' + mode"
             :header="'Nominations popped'"
             :loading="loading"
             :editing="editing"
@@ -29,7 +29,7 @@
         />
         <nomination-resets
             :events="disqualifications"
-            :events-id="'disqualificationsByUser'"
+            :events-id="'disqualificationsByUser' + mode"
             :header="'Disqualifications done by user'"
             :loading="loading"
             :editing="editing"
@@ -38,7 +38,7 @@
         />
         <nomination-resets
             :events="pops"
-            :events-id="'popsByUser'"
+            :events-id="'popsByUser' + mode"
             :header="'Pops done by user'"
             :loading="loading"
             :editing="editing"
@@ -47,7 +47,7 @@
         />
         <events-list
             :events="qualityAssuranceChecks"
-            :events-id="'qualityAssuranceChecks'"
+            :events-id="'qualityAssuranceChecks' + mode"
             :header="'Quality Assurance Checks'"
             :loading="loading"
             :editing="editing"

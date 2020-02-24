@@ -32,7 +32,7 @@
                         <p class="min-spacing text-shadow">
                             Application Feedback:
                         </p>
-                        <pre class="secondary-text pre-font text-shadow small ml-2" v-html="filterLinks(application.feedback)" />
+                        <pre class="secondary-text pre-font text-shadow small ml-4" v-html="filterLinks(application.feedback)" />
                         <hr v-if="application.consensus">
                         <evaluations
                             :evaluations="application.evaluations"

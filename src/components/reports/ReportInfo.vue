@@ -134,7 +134,10 @@ import filterLinks from '../../mixins/filterLinks.js';
 export default {
     name: 'ReportInfo',
     mixins: [postData, filterLinks],
-    props: [ 'report', 'isLeader' ],
+    props: {
+        report: Object,
+        isLeader: Boolean,
+    },
     data() {
         return {
             feedback: '',

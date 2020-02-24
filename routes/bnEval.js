@@ -27,7 +27,7 @@ router.get('/', (req, res) => {
 
 //population
 const defaultPopulate = [
-    { populate: 'bn', display: 'username osuId probation' },
+    { populate: 'bn', display: 'username osuId probation modes' },
     {
         populate: 'evaluations',
         display: 'evaluator behaviorComment moddingComment vote',

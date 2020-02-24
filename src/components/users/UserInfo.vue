@@ -21,16 +21,20 @@
                             :viewing-user="userId"
                             @update-user="$emit('update-user', $event);"
                         />
-                        <p class="text-shadow min-spacing mb-1">BN activity (last 3 months):</p>
-                        <div class="container">
-                            <user-activity
-                                :osu-id="user.osuId"
-                                :mode="user.modes[0]"
-                                :deadline="new Date().toString()"
-                                :is-nat="isNat"
-                                :user-mongo-id="user.id"
-                            />
-                        </div>
+                        <span v-for="(mode, i) in user.modes" :key="mode">
+                            <p class="text-shadow min-spacing mb-1">Recent BN activity
+                                <span class="small">({{ mode == 'osu' ? 'osu!' : 'osu!' + mode }})</span>
+                            </p>
+                            <div class="container mb-3">
+                                <user-activity
+                                    :osu-id="user.osuId"
+                                    :mode="user.modes[i]"
+                                    :deadline="new Date().toString()"
+                                    :is-nat="isNat"
+                                    :user-mongo-id="user.id"
+                                />
+                            </div>
+                        </span>
                         <footer-buttons
                             :is-leader="isLeader"
                             :group="user.group"
@@ -51,7 +55,7 @@ import ModalHeader from './info/ModalHeader.vue';
 import Duration from './info/Duration.vue';
 import Notes from './info/Notes.vue';
 import FooterButtons from './info/FooterButtons.vue';
-import UserActivity from '../evaluations/currentBnEvaluations/currentBnInfo/UserActivity.vue'
+import UserActivity from '../evaluations/currentBnEvaluations/currentBnInfo/UserActivity.vue';
 
 export default {
     name: 'UserInfo',
@@ -60,7 +64,7 @@ export default {
         Duration,
         Notes,
         FooterButtons,
-        UserActivity
+        UserActivity,
     },
     props: {
         user: Object,

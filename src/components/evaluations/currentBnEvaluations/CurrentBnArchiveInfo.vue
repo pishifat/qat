@@ -11,14 +11,22 @@
                     :evaluator-mongo-id="evaluator.id"
                 />
                 <div class="modal-body" style="overflow: hidden;">
+                    <div v-for="(mode, i) in evalRound.bn.modes" :key="mode" class="container">
+                        <p class="text-shadow min-spacing mb-1">
+                            Recent BN activity
+                            <span class="small">({{ mode == 'osu' ? 'osu!' : 'osu!' + mode }})</span>
+                        </p>
+                        <div class="container mb-3">
+                            <user-activity
+                                :osu-id="evalRound.bn.osuId"
+                                :mode="evalRound.bn.modes[i]"
+                                :deadline="evalRound.deadline"
+                                :is-nat="evaluator.isNat"
+                                :user-mongo-id="evalRound.bn.id"
+                            />
+                        </div>
+                    </div>
                     <div class="container">
-                        <user-activity
-                            :osu-id="evalRound.bn.osuId"
-                            :mode="evalRound.mode"
-                            :deadline="evalRound.deadline"
-                            :is-nat="evaluator.isNat"
-                            :user-mongo-id="evalRound.bn.id"
-                        />
                         <hr>
                         <consensus
                             :consensus="evalRound.consensus"
@@ -31,7 +39,7 @@
                         <p class="min-spacing text-shadow">
                             Current BN Feedback:
                         </p>
-                        <pre class="secondary-text pre-font text-shadow small ml-2" v-html="filterLinks(evalRound.feedback)" />
+                        <pre class="secondary-text pre-font text-shadow small ml-3" v-html="filterLinks(evalRound.feedback)" />
                         <hr v-if="evalRound.consensus">
                         <evaluations
                             :evaluations="evalRound.evaluations"
