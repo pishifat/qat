@@ -373,7 +373,7 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
             invalids.push(user.osuId);
         });
         newEvaluator = await usersModel.aggregate([
-            { $match: { group: 'bn', isSpectator: { $ne: true }, modes: a.mode, osuId: { $nin: invalids }, isBnEvaluator: true } },
+            { $match: { group: 'bn', isSpectator: { $ne: true }, modes: a.mode, osuId: { $nin: invalids }, isBnEvaluator: true, probation: { $size: 0 } } },
             { $sample: { size: 1 } },
         ]);
         await bnAppsService.update(req.params.id, { $push: { bnEvaluators: newEvaluator[0]._id } });
