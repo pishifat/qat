@@ -12,6 +12,7 @@
                         class="form-control dark-textarea"
                         style="white-space: pre-line;"
                         rows="4"
+                        maxlength="3000"
                     />
                 </div>
             </div>
@@ -26,6 +27,7 @@
                         class="form-control dark-textarea"
                         style="white-space: pre-line;"
                         rows="4"
+                        maxlength="3000"
                     />
                 </div>
             </div>
