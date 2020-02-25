@@ -99,7 +99,12 @@ router.get(
     },
     api.isLoggedIn,
     (req, res) => {
-        res.redirect('/');
+        if (req.session.group == 'nat') {
+            res.redirect('/appeval');
+        } else {
+            res.redirect('/');
+        }
+        
     }
 );
 
