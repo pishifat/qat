@@ -79,6 +79,7 @@ export default {
             }
         },
         isNatEvaluator() {
+            if (!this.evalRound.natEvaluators) return false;
             for (let i = 0; i < this.evalRound.natEvaluators.length; i++) {
                 let user = this.evalRound.natEvaluators[i];
                 if(user.id == this.evaluator.id){
