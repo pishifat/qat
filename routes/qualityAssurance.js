@@ -27,28 +27,70 @@ const defaultPopulate = [
 router.get('/relevantInfo', async (req, res) => {
     let date = new Date();
     date.setDate(date.getDate() - 7);
-    let data = await aiessService.query(
-        { eventType: 'Qualified', timestamp: { $gte: date } },
-        defaultPopulate,
-        { timestamp: -1 },
-        true
-    );
-    res.json({ maps: data, userId: res.locals.userRequest.id, userOsuId: res.locals.userRequest.osuId, username: res.locals.userRequest.username, isNat: res.locals.userRequest.isNat, mode: res.locals.userRequest.modes[0] || 'osu' });
+    const [data, dqs] = await Promise.all([
+        aiessService.query(
+            { 
+                eventType: 'Qualified',
+                timestamp: { $gte: date } },
+            defaultPopulate,
+            { timestamp: -1 },
+            true
+        ),
+        aiessService.query(
+            { 
+                eventType: 'Disqualified',
+                timestamp: { $gte: date } },
+            defaultPopulate,
+            { timestamp: -1 },
+            true
+        ),
+    ]);
+    res.json({ 
+        maps: data, 
+        dqs, 
+        userId: res.locals.userRequest.id, 
+        userOsuId: res.locals.userRequest.osuId, 
+        username: res.locals.userRequest.username, 
+        isNat: res.locals.userRequest.isNat, 
+        mode: res.locals.userRequest.modes[0] || 'osu',
+    });
 });
 
 /* GET load more content */
 router.get('/loadMore/:limit/:skip', async (req, res) => {
     let date = new Date();
     date.setDate(date.getDate() - 7);
-    let data = await aiessService.query(
-        { eventType: 'Qualified', timestamp: { $lte: date }, hostId: { $exists: true } },
-        defaultPopulate,
-        { timestamp: -1 },
-        true,
-        parseInt(req.params.limit),
-        parseInt(req.params.skip)
-    );
-    res.json({ maps: data });
+    const [data, dqs] = await Promise.all([
+        aiessService.query(
+            { 
+                eventType: 'Qualified', 
+                timestamp: { $lte: date }, 
+                hostId: { $exists: true } 
+            },
+            defaultPopulate,
+            { timestamp: -1 },
+            true,
+            parseInt(req.params.limit),
+            parseInt(req.params.skip)
+        ),
+        aiessService.query(
+            { 
+                eventType: 'Disqualified', 
+                timestamp: { $lte: date }, 
+                hostId: { $exists: true } 
+            },
+            defaultPopulate,
+            { timestamp: -1 },
+            true,
+            parseInt(req.params.limit),
+            parseInt(req.params.skip)
+        ),
+    ]);
+
+    res.json({ 
+        maps: data, 
+        dqs,
+    });
 });
 
 /* POST assign user */

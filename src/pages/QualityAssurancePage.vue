@@ -118,6 +118,7 @@ export default {
             allObjs: null,
             pageObjs: null,
             filteredObjs: null,
+            disqualifiedEvents: null,
             userId: null,
             userOsuId: null,
             username: null,
@@ -137,6 +138,7 @@ export default {
             .get('/qualityAssurance/relevantInfo')
             .then(response => {
                 this.allObjs = response.data.maps;
+                this.disqualifiedEvents = response.data.dqs;
                 this.userId = response.data.userId;
                 this.userOsuId = response.data.userOsuId;
                 this.username = response.data.username;
@@ -157,6 +159,7 @@ export default {
         setInterval(() => {
             axios.get('/qualityAssurance/relevantInfo').then(response => {
                 this.allObjs = response.data.maps;
+                this.disqualifiedEvents = response.data.dqs;
                 if (this.isFiltered) {
                     this.filter();
                 }
@@ -171,14 +174,16 @@ export default {
             return false;
         },
         isOutdated(beatmapsetId, timestamp) {
-            if(new Date(timestamp) < this.sevenDaysAgo){
+            timestamp = new Date(timestamp);
+            if(timestamp < this.sevenDaysAgo){
                 return true;
             }else{
-                const beatmaps = this.pageObjs.filter(b => b.beatmapsetId == beatmapsetId && b.timestamp != timestamp);
+                let beatmaps = this.pageObjs.filter(b => b.beatmapsetId == beatmapsetId && b.timestamp != timestamp);
+                beatmaps = beatmaps.concat(this.disqualifiedEvents.filter(b => b.beatmapsetId == beatmapsetId));
                 let isOutdated = false;
                 for (let i = 0; i < beatmaps.length; i++) {
                     const b = beatmaps[i];
-                    if(new Date(b.timestamp) > new Date(timestamp)){
+                    if(new Date(b.timestamp) > timestamp){
                         isOutdated = true;
                         break;
                     }
@@ -196,6 +201,7 @@ export default {
                 .get('/qualityAssurance/loadMore/' + this.limit + '/' + (this.limit - 50))
                 .then(response => {
                     this.allObjs = this.allObjs.concat(response.data.maps);
+                    this.disqualifiedEvents = this.disqualifiedEvents.concat(response.data.dqs);
                     this.limit += 50;
                     this.filter();
                 });
