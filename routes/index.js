@@ -99,8 +99,10 @@ router.get(
     },
     api.isLoggedIn,
     (req, res) => {
-        if (req.session.group == 'nat') {
+        if (req.session.group == 'nat' || req.session.isSpectator) {
             res.redirect('/appeval');
+        } else if (req.session.group == 'bn') {
+            res.redirect('/qualityassurance');
         } else {
             res.redirect('/');
         }
