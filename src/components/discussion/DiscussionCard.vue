@@ -18,11 +18,11 @@
                 <div class="discussion-status my-auto" :class="discussion.isActive ? 'status-bar-active' : 'status-bar-inactive'" />
                 <div class="card-icons">
                     <span class="small text-shadow float-left">{{ discussion.createdAt.slice(0, 10) }}</span>
-                    <i v-if="discussion.mode.indexOf('osu') >= 0" class="far fa-circle" />
-                    <i v-if="discussion.mode.indexOf('taiko') >= 0" class="fas fa-drum" />
-                    <i v-if="discussion.mode.indexOf('catch') >= 0" class="fas fa-apple-alt" />
-                    <i v-if="discussion.mode.indexOf('mania') >= 0" class="fas fa-stream" />
-                    <span v-if="discussion.mode.indexOf('all') >= 0">
+                    <i v-if="discussion.mode.includes('osu')" class="far fa-circle" />
+                    <i v-if="discussion.mode.includes('taiko')" class="fas fa-drum" />
+                    <i v-if="discussion.mode.includes('catch')" class="fas fa-apple-alt" />
+                    <i v-if="discussion.mode.includes('mania')" class="fas fa-stream" />
+                    <span v-if="discussion.mode.includes('all')">
                         <i class="far fa-circle" />
                         <i class="fas fa-drum" />
                         <i class="fas fa-apple-alt" />
