@@ -5,14 +5,14 @@
     >
         <div
             class="card border-outline"
-            :class="[isSelected ? 'selected-card' : '', 'border-' + findRelevantEval()]"
+            :class="[isSelected ? 'selected-card' : '', 'border-' + findRelevantEval(), isNatEvaluator() ? 'card-bg-priority' : 'custom-bg-dark']"
             data-toggle="modal"
             :data-target="isArchive ? '#currentBnArchiveInfo' : '#currentBnDiscussionInfo'"
             :data-user="evalRound.id"
         >
             <card-header
                 :username="evalRound.bn.username"
-                :osuId="evalRound.bn.osuId"
+                :osu-id="evalRound.bn.osuId"
                 :consensus="evalRound.consensus"
                 :is-nat="true"
             />
@@ -37,10 +37,10 @@ import CardHeader from '../card/CardHeader.vue';
 import CardFooter from '../card/CardFooter.vue';
 
 export default {
-    name: 'current-bn-discussion-card',
+    name: 'CurrentBnDiscussionCard',
     components: {
         CardHeader,
-        CardFooter
+        CardFooter,
     },
     props: {
         evalRound: Object,
@@ -88,6 +88,15 @@ export default {
             } else {
                 this.isSelected = false;
             }
+        },
+        isNatEvaluator() {
+            for (let i = 0; i < this.evalRound.natEvaluators.length; i++) {
+                let user = this.evalRound.natEvaluators[i];
+                if(user.id == this.evaluator.id){
+                    return true;
+                }
+            }
+            return false;
         },
     },
 };

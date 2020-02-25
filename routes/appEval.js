@@ -357,7 +357,7 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
     let isNat = Boolean(req.body.isNat);
     let newEvaluator;
     if(isNat){
-        let invalids = [8129817, 3178418];
+        const invalids = [8129817, 3178418];
         a.natEvaluators.forEach(user => {
             invalids.push(user.osuId);
         });

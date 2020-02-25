@@ -1,7 +1,9 @@
 const api = require('./api');
+const helper = require('./helpers');
 const bnAppsService = require('../models/bnApp').service;
 const vetoesService = require('../models/veto').service;
 const evalRoundsService = require('../models/evalRound').service;
+const usersModel = require('../models/user').User;
 
 const defaultAppPopulate = [{
     populate: 'applicant',
@@ -19,9 +21,9 @@ function notifyDeadlines() {
         const nearDeadline = new Date();
         nearDeadline.setDate(nearDeadline.getDate() + 1);
         const startRange = new Date();
-        startRange.setDate(startRange.getDate() + 6);
+        startRange.setDate(startRange.getDate() + 13);
         const endRange = new Date();
-        endRange.setDate(endRange.getDate() + 7);
+        endRange.setDate(endRange.getDate() + 14);
 
         const activeApps = await bnAppsService.query(
             { active: true, test: { $exists: true } },
@@ -49,7 +51,8 @@ function notifyDeadlines() {
         let catchHighlight;
         let maniaHighlight;
 
-        activeVetoes.forEach((veto) => {
+        for (let i = 0; i < activeVetoes.length; i++) {
+            const veto = activeVetoes[i];
             let title = '';
             if (date > veto.deadline) {
                 if (!osuHighlight && veto.mode === 'osu') { osuHighlight = true; }
@@ -63,7 +66,7 @@ function notifyDeadlines() {
             }
 
             if (date > veto.deadline || veto.deadline < nearDeadline) {
-                api.webhookPost(
+                await api.webhookPost(
                     [{
                         author: {
                             name: title,
@@ -73,10 +76,13 @@ function notifyDeadlines() {
                     }],
                     veto.mode,
                 );
+                await helper.sleep(500);
             }
-        });
+        }
 
-        activeApps.forEach((app) => {
+        for (let i = 0; i < activeApps.length; i++) {
+            const app = activeApps[i];
+
             let addition = 7;
             if (app.discussion) { addition += 7; }
             const deadline = new Date(app.createdAt.setDate(app.createdAt.getDate() + addition));
@@ -92,8 +98,8 @@ function notifyDeadlines() {
                 title = `BN app eval for ${app.applicant.username} is due in less than 24 hours!`;
             }
 
-            if (date > deadline || deadline < nearDeadline) {
-                api.webhookPost(
+            if (title.length) {
+                await api.webhookPost(
                     [{
                         author: {
                             name: title,
@@ -104,11 +110,15 @@ function notifyDeadlines() {
                     }],
                     app.mode,
                 );
+                await helper.sleep(500);
             }
-        });
+        }
 
-        activeRounds.forEach((round) => {
+        for (let i = 0; i < activeRounds.length; i++) {
+            const round = activeRounds[i];
+
             let title = '';
+            let natList = '';
 
             if (date > round.deadline) {
                 if (!osuHighlight && round.mode === 'osu') { osuHighlight = true; }
@@ -116,14 +126,30 @@ function notifyDeadlines() {
                 if (!catchHighlight && round.mode === 'catch') { catchHighlight = true; }
                 if (!maniaHighlight && round.mode === 'mania') { maniaHighlight = true; }
                 title = `Current BN eval for ${round.bn.username} is overdue!`;
-            } else if (round.deadline < startRange && round.deadline > endRange) {
-                title = `Current BN eval for ${round.bn.username} is due in one week!`;
             } else if (round.deadline < nearDeadline) {
                 title = `Current BN eval for ${round.bn.username} is due in less than 24 hours!`;
+            } else if (round.deadline > startRange && round.deadline < endRange) {
+                title = `Current BN eval for ${round.bn.username} is due in two weeks!`;
+                
+                if (!round.natEvaluators || !round.natEvaluators.length) {
+                    const invalids = [8129817, 3178418];
+                    const assignedNat = await usersModel.aggregate([
+                        { $match: { group: 'nat', isSpectator: { $ne: true }, modes: round.mode, osuId: { $nin: invalids } } },
+                        { $sample: { size: round.mode == 'osu' || round.mode == 'catch' ? 3 : 2 } },
+                    ]);
+                    for (let i = 0; i < assignedNat.length; i++) {
+                        let user = assignedNat[i];
+                        await evalRoundsService.update(round.id, { $push: { natEvaluators: user._id } });
+                        natList += user.username;
+                        if(i + 1 < assignedNat.length){
+                            natList += ', ';
+                        }
+                    }
+                }
             }
 
-            if (date > round.deadline || round.deadline < nearDeadline) {
-                api.webhookPost(
+            if (title.length && !natList.length) {
+                await api.webhookPost(
                     [{
                         author: {
                             name: title,
@@ -134,15 +160,34 @@ function notifyDeadlines() {
                     }],
                     round.mode,
                 );
+                await helper.sleep(500);
+            } else if (title.length && natList.length) {
+                
+                await api.webhookPost(
+                    [{
+                        author: {
+                            name: title,
+                            icon_url: `https://a.ppy.sh/${round.bn.osuId}`,
+                            url: `http://bn.mappersguild.com/bneval?eval=${round.id}`,
+                        },
+                        color: '15711602',
+                        fields:[
+                            {
+                                name: 'Assigned NAT',
+                                value: natList,
+                            },
+                        ],
+                    }],
+                    round.mode,
+                );
+                await helper.sleep(500);
             }
-        });
+        }
 
-        setTimeout(() => {
-            if (osuHighlight) { api.highlightWebhookPost('time to find a new NAT member?', 'osu'); }
-            if (taikoHighlight) { api.highlightWebhookPost('i wonder who would make the best new NAT...', 'taiko'); }
-            if (catchHighlight) { api.highlightWebhookPost('oh no', 'catch'); }
-            if (maniaHighlight) { api.highlightWebhookPost('so who is the new NAT candidate?', 'mania'); }
-        }, 5000);
+        if (osuHighlight) api.highlightWebhookPost('time to find a new NAT member?', 'osu');
+        if (taikoHighlight) api.highlightWebhookPost('i wonder who would make the best new NAT...', 'taiko');
+        if (catchHighlight) api.highlightWebhookPost('oh no', 'catch');
+        if (maniaHighlight) api.highlightWebhookPost('so who is the new NAT candidate?', 'mania');
 
     }, 86400000);
 }

@@ -211,7 +211,7 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
     ]);
     let bnAppsCount = bnApps.length;
     let evalRoundsCount = bnRounds.length;
-    let invalids = [8129817, 3178418];
+    const invalids = [8129817, 3178418];
     let info = [];
     users.forEach(user => {
         if(invalids.indexOf(user.osuId) == -1){

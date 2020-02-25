@@ -130,4 +130,9 @@ async function getUserModsCount(username, mode) {
     }
 }
 
-module.exports = { escapeUsername, getBeatmapsetIdFromUrl, safeParam, isValidUrl, getUserModsCount };
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+module.exports = { escapeUsername, getBeatmapsetIdFromUrl, safeParam, isValidUrl, getUserModsCount, sleep };

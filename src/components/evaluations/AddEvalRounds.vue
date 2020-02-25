@@ -76,20 +76,16 @@
                         <div class="mb-2">
                             <span class="text-shadow">Deadline:</span>
                             <input
-                                v-model="month"
+                                v-model="dateInput"
                                 class="ml-1"
                                 type="text"
-                                placeholder="MM"
-                                maxlength="2"
-                                style="min-width: 55px; width: 55px;"
+                                placeholder="MM-DD-YYYY"
+                                maxlength="10"
+                                style="min-width: 125px; width: 125px;"
                             >
-                            <input
-                                v-model="day"
-                                type="text"
-                                placeholder="DD"
-                                maxlength="2"
-                                style="min-width: 55px; width: 55px;"
-                            >
+                            <button type="submit" class="btn btn-sm btn-nat" @click="setDefaultDate($event)">
+                                Set deadline ~2 weeks from now
+                            </button>
                             <p class="small pl-2 pt-2">
                                 Only deadlines within the next 2 weeks will be displayed
                             </p>
@@ -118,8 +114,7 @@ export default {
         return {
             info: '',
             confirm: '',
-            month: '',
-            day: '',
+            dateInput: '',
         };
     },
     methods: {
@@ -148,8 +143,13 @@ export default {
                 return;
             }
 
-            let year = new Date().getFullYear();
-            let deadline = new Date(this.month + "/" + this.day + "/" + year);
+            const dateSplit = this.dateInput.split('-');
+            const deadline = new Date(
+                parseInt(dateSplit[2], 10),
+                parseInt(dateSplit[0], 10) - 1,
+                parseInt(dateSplit[1], 10)
+            );
+
             if (!(deadline instanceof Date) || isNaN(deadline)) {
                 this.info = 'Invalid Date!';
                 return;
@@ -193,6 +193,24 @@ export default {
                     }
                 }
             }
+        },
+        setDefaultDate() {
+            const date = new Date();
+            date.setDate(date.getDate() + 12);
+            let month = (date.getMonth() + 1).toString();
+
+            if (month.length == 1) {
+                month = '0' + month;
+            }
+
+            let day = date.getDate().toString();
+
+            if (day.length == 1) {
+                day = '0' + day;
+            }
+
+            const year = date.getFullYear();
+            this.dateInput = month + '-' + day + '-' + year;
         },
     },
 };

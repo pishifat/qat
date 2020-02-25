@@ -9,6 +9,7 @@ const bnAppsService = require('../models/bnApp').service;
 const usersService = require('../models/user').service;
 const aiessService = require('../models/aiess').service;
 const notesService = require('../models/note').service;
+const usersModel = require('../models/user').User;
 
 const router = express.Router();
 
@@ -28,6 +29,7 @@ router.get('/', (req, res) => {
 //population
 const defaultPopulate = [
     { populate: 'bn', display: 'username osuId probation modes' },
+    { populate: 'natEvaluators', display: 'username osuId' },
     {
         populate: 'evaluations',
         display: 'evaluator behaviorComment moddingComment vote',
@@ -62,7 +64,7 @@ router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
     let allUsersByMode = await usersService.getAllByMode(req.body.bn, req.body.probation, req.body.nat);
     let allEvalsToCreate = [];
     let failed = [];
-    const deadline = req.body.deadline;
+    const deadline = new Date(req.body.deadline);
     
     if (allUsersByMode) {
         allUsersByMode = allUsersByMode.filter(m => {
@@ -139,13 +141,60 @@ router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
         let minDate = new Date();
         minDate.setDate(minDate.getDate() + 14);
         let ers = await evalRoundsService.query({ active: true, deadline: { $lte: minDate } }, defaultPopulate, { deadline: 1, consensus: 1, feedback: 1 }, true);
+        
         res.json({ ers, failed });
+        
+        if (deadline < minDate) {
+            for (let i = 0; i < result.length; i++) {
+                const er = result[i];
+                const u = await usersService.query({ _id: er.bn });
+                const invalids = [8129817];
+                const assignedNat = await usersModel.aggregate([
+                    { $match: { group: 'nat', isSpectator: { $ne: true }, modes: er.mode, osuId: { $nin: invalids } } },
+                    { $sample: { size: er.mode == 'osu' || er.mode == 'catch' ? 3 : 2 } },
+                ]);
+                let natList = '';
+                for (let i = 0; i < assignedNat.length; i++) {
+                    let user = assignedNat[i];
+                    await evalRoundsService.update(er.id, { $push: { natEvaluators: user._id } });
+                    natList += user.username;
+                    if(i + 1 < assignedNat.length){
+                        natList += ', ';
+                    }
+                }
+                await api.webhookPost(
+                    [{
+                        author: {
+                            name: `${req.session.username}`,
+                            icon_url: `https://a.ppy.sh/${req.session.osuId}`,
+                            url: `https://osu.ppy.sh/users/${req.session.osuId}`,
+                        },
+                        color: '16756444',
+                        fields:[
+                            {
+                                name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
+                                value: `Created current BN eval for **${u.username}**`,
+                            },
+                            {
+                                name: 'Assigned NAT',
+                                value: natList,
+                            },
+                        ],
+                    }], 
+                    er.mode
+                );
+                await helper.sleep(500);
+            }
+        }
+
+        
+        
         logsService.create(
             req.session.mongoId,
             `Added BN evaluations for ${allEvalsToCreate.length} user${allEvalsToCreate.length == 1 ? '' : 's'}`
         );
     } else {
-        return res.json({ errors: 'Nothing changed...' });
+        return res.json({ error: 'Nothing changed...' });
     }
 });
 

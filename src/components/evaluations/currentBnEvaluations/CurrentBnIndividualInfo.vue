@@ -4,7 +4,7 @@
             <div v-if="evalRound" class="modal-content custom-bg-dark">
                 <modal-header
                     :mode="evalRound.mode"
-                    :nat-evaluators="[]"
+                    :nat-evaluators="evalRound.natEvaluators || []"
                     :is-application="false"
                     :osu-id="evalRound.bn.osuId"
                     :username="evalRound.bn.username"

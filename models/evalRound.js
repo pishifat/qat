@@ -14,6 +14,7 @@ const evalRoundSchema = new mongoose.Schema({
     feedbackAuthor: { type: 'ObjectId', ref: 'User' },
     isLowActivity: { type: Boolean, default: false },
     cooldownDate: { type: Date },
+    natEvaluators: [{ type: 'ObjectId', ref: 'User' }],
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 const EvalRound = mongoose.model('EvalRound', evalRoundSchema);
