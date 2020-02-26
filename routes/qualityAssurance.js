@@ -60,37 +60,20 @@ router.get('/relevantInfo', async (req, res) => {
 router.get('/loadMore/:limit/:skip', async (req, res) => {
     let date = new Date();
     date.setDate(date.getDate() - 7);
-    const [data, dqs] = await Promise.all([
-        aiessService.query(
-            { 
-                eventType: 'Qualified', 
-                timestamp: { $lte: date }, 
-                hostId: { $exists: true } 
-            },
-            defaultPopulate,
-            { timestamp: -1 },
-            true,
-            parseInt(req.params.limit),
-            parseInt(req.params.skip)
-        ),
-        aiessService.query(
-            { 
-                eventType: 'Disqualified', 
-                timestamp: { $lte: date }, 
-                hostId: { $exists: true } 
-            },
-            defaultPopulate,
-            { timestamp: -1 },
-            true,
-            parseInt(req.params.limit),
-            parseInt(req.params.skip)
-        ),
-    ]);
+    const data = await aiessService.query(
+        { 
+            eventType: 'Qualified', 
+            timestamp: { $lte: date }, 
+            hostId: { $exists: true },
+        },
+        defaultPopulate,
+        { timestamp: -1 },
+        true,
+        parseInt(req.params.limit),
+        parseInt(req.params.skip)
+    );
 
-    res.json({ 
-        maps: data, 
-        dqs,
-    });
+    res.json({ maps: data });
 });
 
 /* POST assign user */

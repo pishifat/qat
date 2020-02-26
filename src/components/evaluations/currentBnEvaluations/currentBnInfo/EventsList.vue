@@ -3,9 +3,6 @@
         <p class="text-shadow min-spacing">
             <a :href="events && `#${eventsId}`" data-toggle="collapse">{{ header }} <i class="fas fa-angle-down" /></a> 
             ({{ loading ? '...' : events ? events.length: '0' }})
-            <button v-if="isNat && eventsId.includes('uniqueNominations')" class="btn btn-sm btn-nat float-right" @click="$emit('update-editing');">
-                {{ editing ? 'Disable reason editing' : 'Enable reason editing' }}
-            </button>
         </p>
         <div v-if="events" :id="eventsId" class="collapse">
             <table v-if="events.length" class="table table-sm table-dark table-hover col-md-12 mt-2">

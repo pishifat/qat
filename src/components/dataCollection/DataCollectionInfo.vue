@@ -2,7 +2,7 @@
     <div id="editReason" class="modal fade" tabindex="-1">
         <div class="modal-dialog">
             <div v-if="selectedEntry" class="modal-content custom-bg-dark">
-                <div class="modal-header text-dark" :class="selectedEntry.valid == 1 ? 'badge-pass' : selectedEntry.valid == 2 ? 'badge-extend' : selectedEntry.valid == 3 ? 'badge-fail' : 'bg-nat-logo'">
+                <div class="modal-header text-dark bg-nat-logo">
                     <h5 class="modal-title">
                         Edit DQ/Reset
                     </h5>
@@ -36,13 +36,6 @@
                                 @keyup.enter="updateReason($event)"
                             >
                         </div>
-                        <p class="text-shadow mt-4">
-                            Notability:
-                            <notability
-                                :selected-entry="selectedEntry"
-                                @update-entry="$emit('update-entry', $event);"
-                            />
-                        </p>
                     </div>
                     <p id="errors" class="errors">
                         {{ info }}
@@ -61,15 +54,13 @@
 <script>
 import postData from '../../mixins/postData.js';
 import filterLinks from '../../mixins/filterLinks.js';
-import Notability from './Notability.vue';
 
 export default {
     name: 'DataCollectionInfo',
-    components: {
-        Notability,
-    },
     mixins: [postData, filterLinks],
-    props: [ 'selectedEntry' ],
+    props: {
+        selectedEntry: Object,
+    },
     data() {
         return {
             reasonInput: '',

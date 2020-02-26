@@ -45,18 +45,39 @@ router.post('/updateReason/:id', api.isNotSpectator, async (req, res) => {
     }
 });
 
-/* POST edit validity */
-router.post('/updateNotability/:id', api.isNotSpectator, async (req, res) => {
-    let a = await aiessService.update(req.params.id, { valid: req.body.notability });
+/* POST edit obviousness */
+router.post('/updateObviousness/:id', api.isNotSpectator, async (req, res) => {
+    let obviousness = parseInt(req.body.obviousness);
+    let a = await aiessService.query({ _id: req.params.id });
+    if (obviousness == a.obviousness) {
+        a = await aiessService.update(req.params.id, { obviousness: null });
+    } else {
+        a = await aiessService.update(req.params.id, { obviousness });
+    }
+
     if (!a) {
         res.json({ error: 'Something went wrong' });
     } else {
         res.json(a);
-        logsService.create(
-            req.session.mongoId,
-            `Updated notability of s/${a.beatmapsetId} to 
-            "${req.body.notability == 1 ? 'notable' : req.body.notability == 2 ? 'semi-notable' : req.body.notability == 3 ? 'not notable' : 'unmarked'}"`
-        );
+        logsService.create(req.session.mongoId, `Updated obviousness of s/${a.beatmapsetId} to "${obviousness}"`);
+    }
+});
+
+/* POST edit severity */
+router.post('/updateSeverity/:id', api.isNotSpectator, async (req, res) => {
+    let severity = parseInt(req.body.severity);
+    let a = await aiessService.query({ _id: req.params.id });
+    if (severity == a.severity) {
+        a = await aiessService.update(req.params.id, { severity: null });
+    } else {
+        a = await aiessService.update(req.params.id, { severity });
+    }
+
+    if (!a) {
+        res.json({ error: 'Something went wrong' });
+    } else {
+        res.json(a);
+        logsService.create(req.session.mongoId, `Updated severity of s/${a.beatmapsetId} to "${severity}"`);
     }
 });
 

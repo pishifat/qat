@@ -201,7 +201,6 @@ export default {
                 .get('/qualityAssurance/loadMore/' + this.limit + '/' + (this.limit - 50))
                 .then(response => {
                     this.allObjs = this.allObjs.concat(response.data.maps);
-                    this.disqualifiedEvents = this.disqualifiedEvents.concat(response.data.dqs);
                     this.limit += 50;
                     this.filter();
                 });

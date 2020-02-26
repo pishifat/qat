@@ -18,7 +18,7 @@
                     </td>
                 </thead>
                 <tbody class="small">
-                    <tr v-for="event in events" :key="event.id" :class="!isNat ? '' : event.valid == 1 ? 'vote-border-pass' : event.valid == 2 ? 'vote-border-extend' : event.valid == 3 ? 'vote-border-fail' : ''">
+                    <tr v-for="event in events" :key="event.id">
                         <td scope="row">
                             {{ new Date(event.timestamp).toString().slice(4,10) }}
                         </td>
@@ -27,71 +27,35 @@
                                 {{ event.metadata }}
                             </a>
                         </td>
-                        <td v-if="!editing" scope="row" v-html="filterLinks(event.content)" />
-                        <td v-else scope="row">
-                            <input class="w-60" :class="'input-' + event._id" type="text" :placeholder="event.content.length > 40 ? event.content.slice(0,40) + '...' : event.content" maxlength="100">
-                            <button class="btn btn-xs btn-nat" @click="updateReason(event._id, $event);">
-                                Save
-                            </button>
-                            <notability
-                                :selected-entry="event"
-                                @update-entry="$emit('update-entry', $event);"
-                            />
-                        </td>
+                        <nomination-reset-editing
+                            :event="event"
+                            :is-nat="isNat"
+                            @update-entry="$emit('update-entry', $event);"
+                        />
                     </tr>
                 </tbody>
             </table>
             <p v-else class="small text-shadow ml-4">
                 None...
             </p>
-            <p v-if="info" class="errors">
-                {{ info }}
-            </p>
         </div>
     </div>
 </template>
 
 <script>
-import postData from '../../../../mixins/postData.js';
-import filterLinks from '../../../../mixins/filterLinks.js';
-import Notability from '../../../dataCollection/Notability.vue';
+import NominationResetEditing from './NominationResetEditing.vue';
 
 export default {
-    name: 'nomination-resets',
-    mixins: [ postData, filterLinks ],
+    name: 'NominationResets',
     props: {
         events: Array,
         eventsId: String,
         header: String,
         loading: Boolean,
-        editing: Boolean,
         isNat: Boolean,
     },
     components: {
-        Notability,
-    },
-    data() {
-        return {
-            info: null,
-        };
-    },
-    watch: { 
-        editing() {
-            this.info = null;
-        },
-    },
-    methods: {
-        async updateReason(entryId, e) {
-            let reasonInput = $(`.input-${entryId}`).val();
-            const result = await this.executePost('/dataCollection/updateReason/' + entryId, { reason: reasonInput }, e);
-            if (result) {
-                if (result.error) {
-                    this.info = result.error;
-                } else {
-                    this.$emit('update-entry', result);
-                }
-            }
-        },
+        NominationResetEditing,
     },
 };
 </script>

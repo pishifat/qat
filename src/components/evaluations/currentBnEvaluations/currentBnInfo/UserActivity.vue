@@ -5,7 +5,6 @@
             :events-id="'uniqueNominations' + mode"
             :header="'Unique nominations'"
             :loading="loading"
-            :editing="editing"
             :is-nat="isNat"
             @update-editing="editing = !editing"
         />
@@ -14,7 +13,6 @@
             :events-id="'nominationsDisqualified' + mode"
             :header="'Nominations disqualified'"
             :loading="loading"
-            :editing="editing"
             :is-nat="isNat"
             @update-entry="updateEntry($event)"
         />
@@ -23,7 +21,6 @@
             :events-id="'nominationsPopped' + mode"
             :header="'Nominations popped'"
             :loading="loading"
-            :editing="editing"
             :is-nat="isNat"
             @update-entry="updateEntry($event)"
         />
@@ -32,7 +29,6 @@
             :events-id="'disqualificationsByUser' + mode"
             :header="'Disqualifications done by user'"
             :loading="loading"
-            :editing="editing"
             :is-nat="isNat"
             @update-entry="updateEntry($event)"
         />
@@ -41,7 +37,6 @@
             :events-id="'popsByUser' + mode"
             :header="'Pops done by user'"
             :loading="loading"
-            :editing="editing"
             :is-nat="isNat"
             @update-entry="updateEntry($event)"
         />
@@ -50,9 +45,7 @@
             :events-id="'qualityAssuranceChecks' + mode"
             :header="'Quality Assurance Checks'"
             :loading="loading"
-            :editing="editing"
             :is-nat="isNat"
-            @update-editing="editing = !editing"
         />
     </div>
 </template>
@@ -87,17 +80,15 @@ export default {
             nominationsDisqualified: null,
             qualityAssuranceChecks: null,
             loading: true,
-            editing: false,
         };
     },
     watch: {
         osuId() {
-            this.editing = false;
             this.loading = true;
             this.findRelevantActivity();
         },
     },
-    mounted () {
+    created () {
         this.findRelevantActivity();
     },
     methods: {
@@ -121,8 +112,11 @@ export default {
 
                 if (i >= 0) {
                     Vue.set(this.disqualifications, i, event);
-                } else {
-                    i = this.nominationsDisqualified.findIndex(e => e._id == event.id);
+                }
+
+                i = this.nominationsDisqualified.findIndex(e => e._id == event.id);
+
+                if (i >= 0) {
                     Vue.set(this.nominationsDisqualified, i, event);
                 }
             } else if (event.eventType == 'Popped') {
@@ -130,8 +124,11 @@ export default {
 
                 if (i >= 0) {
                     Vue.set(this.pops, i, event);
-                } else {
-                    i = this.nominationsPopped.findIndex(e => e._id == event.id);
+                }
+
+                i = this.nominationsPopped.findIndex(e => e._id == event.id);
+
+                if (i >= 0) {
                     Vue.set(this.nominationsPopped, i, event);
                 }
             }

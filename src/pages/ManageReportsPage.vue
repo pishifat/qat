@@ -11,15 +11,6 @@
                         placeholder="username..."
                     >
                 </small>
-                <small class="ml-1">
-                    <select id="validity" v-model="filterVote" class="custom-select">
-                        <option class="ml-2" value="" selected>All statuses</option>
-                        <option class="ml-2" value="1">Valid</option>
-                        <option class="ml-2" value="2">Partial</option>
-                        <option class="ml-2" value="3">Invalid</option>
-                        <option class="ml-2" value="none">Unmarked</option>
-                    </select>
-                </small>
                 <span class="errors">{{ info }}</span>
             </section>
             <section class="col-md-12 segment segment-image mx-0">
@@ -106,7 +97,7 @@ export default {
                         this.selectedReport = this.allObjs[i];
                         $('#reportInfo').modal('show');
                     }else{
-                        this.info = "Cannot find report!"
+                        this.info = 'Cannot find report!';
                     }
                 }
             }).then(function(){

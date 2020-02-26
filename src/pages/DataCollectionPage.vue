@@ -20,15 +20,6 @@
                         <option class="ml-2" value="mania">osu!mania</option>
                     </select>
                 </small>
-                <small class="ml-1">
-                    <select id="notability" v-model="filterVote" class="custom-select">
-                        <option class="ml-2" value="" selected>All statuses</option>
-                        <option class="ml-2" value="1">Notable</option>
-                        <option class="ml-2" value="2">Semi</option>
-                        <option class="ml-2" value="3">Not notable</option>
-                        <option class="ml-2" value="none">Unmarked</option>
-                    </select>
-                </small>
             </section>
             <section class="segment my-1">
                 <a data-toggle="collapse" href="#howToUse">How do I use this page? <i class="fas fa-angle-down" /></a> 
@@ -78,16 +69,12 @@
                         <td scope="col">
                             Reason
                         </td>
-                        <td scope="col" data-toggle="tooltip" data-placement="top" title="Marks objectivity/subjectivity of issue for reference in BN Evaluations">
-                            Notability
-                        </td>
                         <td scope="col" />
                     </thead>
                     <tbody>
                         <tr
                             v-for="dq in dqs"
                             :key="dq.id" 
-                            :class="dq.valid == 1 ? 'vote-border-pass-wide' : dq.valid == 2 ? 'vote-border-extend-wide' : dq.valid == 3 ? 'vote-border-fail-wide' : ''"
                         >
                             <td scope="row">
                                 {{ new Date(dq.timestamp).toString().slice(4,15) }}
@@ -108,12 +95,6 @@
                                     @click.prevent="selectEntry(dq)"
                                 >edit</a>
                             </td>
-                            <td scope="row" style="width: 72px;">
-                                <notability
-                                    :selected-entry="dq"
-                                    @update-entry="updateEntry($event)"
-                                />
-                            </td>
                             <td scope="row" />
                         </tr>
                     </tbody>
@@ -133,16 +114,12 @@
                         <td scope="col">
                             Reason
                         </td>
-                        <td scope="col" data-toggle="tooltip" data-placement="top" title="Marks objectivity/subjectivity of issue for reference in BN Evaluations">
-                            Notability
-                        </td>
                         <td scope="col" />
                     </thead>
                     <tbody>
                         <tr
                             v-for="pop in pops"
                             :key="pop.id"
-                            :class="pop.valid == 1 ? 'vote-border-pass-wide' : pop.valid == 2 ? 'vote-border-extend-wide' : pop.valid == 3 ? 'vote-border-fail-wide' : ''"
                         >
                             <td scope="row">
                                 {{ new Date(pop.timestamp).toString().slice(4,15) }}
@@ -163,12 +140,6 @@
                                     @click.prevent="selectEntry(pop)"
                                 >edit</a>
                             </td>
-                            <td scope="row" style="width: 72px;">
-                                <notability
-                                    :selected-entry="pop"
-                                    @update-entry="updateEntry($event)"
-                                />
-                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -187,13 +158,11 @@ import postData from '../mixins/postData.js';
 import filters from '../mixins/filters.js';
 import filterLinks from '../mixins/filterLinks.js';
 import DataCollectionInfo from '../components/dataCollection/DataCollectionInfo.vue';
-import Notability from '../components/dataCollection/Notability.vue';
 
 export default {
     name: 'DataCollectionPage',
     components: {
         DataCollectionInfo,
-        Notability,
     },
     mixins: [postData, filters, filterLinks],
     data() {

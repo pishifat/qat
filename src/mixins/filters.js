@@ -3,7 +3,6 @@ const filters = {
         return {
             filterValue: '',
             filterMode: '',
-            filterVote: '',
             isFiltered: false,
             hasPagination: true,
             hasSeparation: false,
@@ -19,19 +18,15 @@ const filters = {
         filterMode() {
             this.filter();
         },
-        filterVote() {
-            this.filter();
-        },
     },
     methods: {
         filter() {
             this.pageObjs = this.allObjs;
 
             this.filterByMode();
-            this.filterByVote();
             this.filterBySearchValue();
 
-            this.isFiltered = this.filterValue.length > 2 || this.filterMode.length || this.filterVote.length;
+            this.isFiltered = this.filterValue.length > 2 || this.filterMode.length;
             if (this.sortBy) {
                 this.sort(this.sortBy, true);
             }
@@ -66,34 +61,9 @@ const filters = {
                 });
             }
         },
-        filterByVote() {
-            if (this.filterVote.length) {
-                if(this.filterMode.length){
-                    this.filteredObjs = this.filteredObjs.filter(v => {
-                        if (v.valid == this.filterVote) {
-                            return true;
-                        }
-                        if (this.filterVote == 'none' && !v.valid && !v.vote) {
-                            return true;
-                        }
-                        return false;
-                    });
-                }else{
-                    this.filteredObjs = this.allObjs.filter(v => {
-                        if (v.valid == this.filterVote) {
-                            return true;
-                        }
-                        if (this.filterVote == 'none' && !v.valid && !v.vote) {
-                            return true;
-                        }
-                        return false;
-                    });
-                }
-            }
-        },
         filterBySearchValue() {
             if (this.filterValue.length > 2) {
-                if (this.filterMode.length || this.filterVote.length) {
+                if (this.filterMode.length) {
                     this.filteredObjs = this.allObjs.filter(o => {
                         return this.filterBySearchValueContext(o);
                     });
