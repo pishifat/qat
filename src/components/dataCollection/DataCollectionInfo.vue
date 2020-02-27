@@ -11,40 +11,38 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="container">
-                        <p class="text-shadow">
+                    <div class="container text-shadow">
+                        <p>
                             Mapset: 
                             <a :href="selectedEntry.postId ? 'https://osu.ppy.sh/beatmapsets/' + selectedEntry.beatmapsetId + '/discussion/-/generalAll#/' + selectedEntry.postId : 'https://osu.ppy.sh/beatmapsets/' + selectedEntry.beatmapsetId + '/discussion/-/events'" target="_blank">
                                 {{ selectedEntry.metadata }}
                             </a>
                         </p>
-                        <p class="text-shadow">
-                            Current reason:
-                        </p>
-                        <p class="text-shadow small ml-4" v-html="filterLinks(selectedEntry.content)" />
-                        <p class="text-shadow" for="newReason">
-                            New reason:
-                        </p>
-                        <div class="input-group input-group-sm">
-                            <input
-                                id="newReason"
-                                v-model="reasonInput"
-                                type="text" 
-                                placeholder="reason..."
-                                style="filter: drop-shadow(1px 1px 1px #000000); width: 100%"
-                                maxlength="50"
-                                @keyup.enter="updateContent($event)"
-                            >
+                        <div class="d-flex">
+                            <textarea
+                                v-model="newEventContent"
+                                class="form-control form-control-sm dark-textarea mr-2"
+                                type="text"
+                                rows="4"
+                                maxlength="1000"
+                            />
+                            <button class="btn btn-xs btn-nat align-self-center" @click="updateContent($event);">
+                                Save
+                            </button>
                         </div>
+                        <obviousness-severity
+                            class="small"
+                            :obviousness="selectedEntry.obviousness"
+                            :severity="selectedEntry.severity"
+                            :event-id="selectedEntry._id"
+                            :event-type="selectedEntry.eventType"
+                            @update-obviousness="$emit('update-obviousness', $event);"
+                            @update-severity="$emit('update-severity', $event);"
+                        />
                     </div>
                     <p id="errors" class="errors">
                         {{ info }}
                     </p>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-nat" type="submit" @click="updateContent($event)">
-                        <span class="append-button-padding">Save reason</span>
-                    </button>
                 </div>
             </div>
         </div>
@@ -54,9 +52,13 @@
 <script>
 import postData from '../../mixins/postData.js';
 import filterLinks from '../../mixins/filterLinks.js';
+import ObviousnessSeverity from '../evaluations/currentBnEvaluations/currentBnInfo/ObviousnessSeverity.vue';
 
 export default {
     name: 'DataCollectionInfo',
+    components: {
+        ObviousnessSeverity,
+    },
     mixins: [postData, filterLinks],
     props: {
         selectedEntry: Object,
@@ -67,30 +69,18 @@ export default {
             confirm: '',
             info: '',
             tempId: null,
+            newEventContent: null,
         };
     },
     watch: {
         selectedEntry() {
-            if(this.tempId != this.selectedEntry.id){
-                this.reasonInput = '';
-            }
-            this.tempId = this.selectedEntry.id;
+            this.newEventContent = this.selectedEntry.content;
         },
     },
     methods: {
         async updateContent(e) {
-            if(!this.reasonInput || !this.reasonInput.length){
-                this.info = 'Must enter a reason!';
-            }else{
-                const result = await this.executePost('/dataCollection/updateContent/' + this.selectedEntry.id, { reason: this.reasonInput }, e);
-                if (result) {
-                    if (result.error) {
-                        this.info = result.error;
-                    } else {
-                        this.$emit('update-entry', result);
-                    }
-                }
-            }
+            const result = await this.executePost('/dataCollection/updateContent/' + this.selectedEntry.id, { reason: this.newEventContent }, e);
+            this.$emit('update-content', { id: this.selectedEntry._id, type: this.selectedEntry.eventType, value: result });
         },
     },
 };

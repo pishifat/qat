@@ -34,50 +34,14 @@
                         Save
                     </button>
                 </div>
-                <p class="min-spacing mt-2">Obviousness:</p>
-                <ul>
-                    <li>
-                        <a href="#" :class="event.obviousness == 0 ? 'errors' : ''" @click.prevent="updateObviousness(0)">
-                            0: Not obvious
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" :class="event.obviousness == 1 ? 'errors' : ''" @click.prevent="updateObviousness(1)">
-                            1: Can be found with experience
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" :class="event.obviousness == 2 ? 'errors' : ''" @click.prevent="updateObviousness(2)">
-                            2: Can be found at a glance
-                        </a>
-                    </li>
-                </ul>
-                <p class="min-spacing mt-2">Severity:</p>
-                <ul>
-                    <li>
-                        <a href="#" :class="event.severity == 0 ? 'errors' : ''" @click.prevent="updateSeverity(0)">
-                            0: Not severe
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" :class="event.severity == 1 ? 'errors' : ''" @click.prevent="updateSeverity(1)">
-                            1: Slightly detrimental to gameplay
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" :class="event.severity == 2 ? 'errors' : ''" @click.prevent="updateSeverity(2)">
-                            2: Noticably detrimental to gameplay
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" :class="event.severity == 3 ? 'errors' : ''" @click.prevent="updateSeverity(3)">
-                            3: More or less unplayable
-                        </a>
-                    </li>
-                </ul>
-                <p v-if="info" class="errors">
-                    {{ info }}
-                </p>
+                <obviousness-severity
+                    :obviousness="event.obviousness"
+                    :severity="event.severity"
+                    :event-id="event._id"
+                    :event-type="event.eventType"
+                    @update-obviousness="$emit('update-obviousness', $event);"
+                    @update-severity="$emit('update-severity', $event);"
+                />
             </template>
         </td>
     </span>
@@ -86,9 +50,13 @@
 <script>
 import postData from '../../../../mixins/postData.js';
 import filterLinks from '../../../../mixins/filterLinks.js';
+import ObviousnessSeverity from './ObviousnessSeverity.vue';
 
 export default {
     name: 'NominationResetEditing',
+    components: {
+        ObviousnessSeverity,
+    },
     mixins: [ postData, filterLinks ],
     props: {
         event: Object,
@@ -102,14 +70,14 @@ export default {
         };
     },
     computed: {
-        hasData() {
+        hasData () {
             if ((this.event.obviousness || this.event.obviousness == 0) && (this.event.severity || this.event.severity == 0)) {
                 return true;
             } else {
                 return false;
             }
         },
-        calculateColor() {
+        calculateColor () {
             let total = this.event.obviousness + this.event.severity;
             if (total >= 4 || this.event.obviousness == 2 || this.event.severity == 3) return 'vote-pass';
             else if (total >= 2) return 'vote-extend';
@@ -117,26 +85,16 @@ export default {
         },
     },
     watch: { 
-        editing() {
+        editing () {
             this.info = null;
             this.newEventContent = this.event.content;
         },
     },
     methods: {
-        async updateContent(e) {
+        async updateContent (e) {
             const result = await this.executePost('/dataCollection/updateContent/' + this.event._id, { reason: this.newEventContent }, e);
             this.$emit('update-content', { id: this.event._id, type: this.event.eventType, value: result });
         },
-        async updateObviousness(obviousness) {
-            let result = await this.executePost('/dataCollection/updateObviousness/' + this.event._id, { obviousness });
-            if (result == this.event.obviousness) result = null;
-            this.$emit('update-obviousness', { id: this.event._id,type: this.event.eventType, value: result });
-        },
-        async updateSeverity(severity) {
-            let result = await this.executePost('/dataCollection/updateSeverity/' + this.event._id, { severity });
-            if (result == this.event.severity) result = null;
-            this.$emit('update-severity', { id: this.event._id, type: this.event.eventType, value: result });
-        },
-    },
+    }
 };
 </script>

@@ -63,6 +63,7 @@ import postData from '../../../../mixins/postData.js';
 import filterLinks from '../../../../mixins/filterLinks.js';
 import EventsList from './EventsList.vue';
 import NominationResets from './NominationResets.vue';
+import Vue from 'vue';
 
 export default {
     name: 'UserActivity',
@@ -135,17 +136,17 @@ export default {
 
             if (event.type == 'Disqualified') {
                 i = this.disqualifications.findIndex(e => e._id == event.id);
-                if (i >= 0) this.disqualifications[i].obviousness = event.value;
+                if (i >= 0) Vue.set(this.disqualifications[i], 'obviousness', event.value);
 
                 i = this.nominationsDisqualified.findIndex(e => e._id == event.id);
-                if (i >= 0) this.nominationsDisqualified[i].obviousness = event.value; 
+                if (i >= 0) Vue.set(this.nominationsDisqualified[i], 'obviousness', event.value);
 
             } else if (event.type == 'Popped') {
                 i = this.pops.findIndex(e => e._id == event.id);
-                if (i >= 0) this.pops[i].obviousness = event.value;
+                if (i >= 0) Vue.set(this.pops[i], 'obviousness', event.value);
 
                 i = this.nominationsPopped.findIndex(e => e._id == event.id);
-                if (i >= 0) this.nominationsPopped[i].obviousness = event.value;
+                if (i >= 0) Vue.set(this.nominationsPopped[i], 'obviousness', event.value);
             }
         },
         updateSeverity (event) {
@@ -153,17 +154,17 @@ export default {
 
             if (event.type == 'Disqualified') {
                 i = this.disqualifications.findIndex(e => e._id == event.id);
-                if (i >= 0) this.disqualifications[i].severity = event.value;
+                if (i >= 0) Vue.set(this.disqualifications[i], 'severity', event.value);
 
                 i = this.nominationsDisqualified.findIndex(e => e._id == event.id);
-                if (i >= 0) this.nominationsDisqualified[i].severity = event.value; 
+                if (i >= 0) Vue.set(this.nominationsDisqualified[i], 'severity', event.value);
 
             } else if (event.type == 'Popped') {
                 i = this.pops.findIndex(e => e._id == event.id);
-                if (i >= 0) this.pops[i].severity = event.value;
+                if (i >= 0) Vue.set(this.pops[i], 'severity', event.value);
 
                 i = this.nominationsPopped.findIndex(e => e._id == event.id);
-                if (i >= 0) this.nominationsPopped[i].severity = event.value;
+                if (i >= 0) Vue.set(this.nominationsPopped[i], 'severity', event.value);
             }
         },
     },

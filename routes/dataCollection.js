@@ -21,7 +21,7 @@ router.get('/', (req, res) => {
 /* GET dq/pop listing */
 router.get('/relevantInfo', async (req, res) => {
     let date = new Date();
-    date.setDate(date.getDate() - 30);
+    date.setDate(date.getDate() - 90);
     let data = await aiessService.query(
         { $or: [{ eventType: 'Disqualified' }, { eventType: 'Popped' }], timestamp: { $gte: date } },
         {},

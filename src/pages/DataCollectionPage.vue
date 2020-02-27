@@ -85,6 +85,9 @@
                                 </a>
                             </td>
                             <td scope="row">
+                                <span v-if="hasData(dq)" :class="calculateColor(dq)">
+                                    ({{ dq.obviousness }}/{{ dq.severity }})
+                                </span>
                                 {{ dq.content.length > 50 ? dq.content.slice(0, 50) + '...' : dq.content }} 
                                 <a
                                     href="#"
@@ -130,6 +133,9 @@
                                 </a>
                             </td>
                             <td scope="row">
+                                <span v-if="hasData(pop)" :class="calculateColor(pop)">
+                                    ({{ dq.obviousness }}/{{ dq.severity }})
+                                </span>
                                 {{ pop.content.length > 50 ? pop.content.slice(0, 50) + '...' : pop.content }} 
                                 <a
                                     href="#"
@@ -148,7 +154,9 @@
 
         <data-collection-info
             :selected-entry="selectedEntry"
-            @update-entry="updateEntry($event)"
+            @update-content="updateContent($event)"
+            @update-obviousness="updateObviousness($event)"
+            @update-severity="updateSeverity($event)"
         />
     </div>
 </template>
@@ -205,14 +213,39 @@ export default {
             this.dqs = this.pageObjs.filter(v => v.eventType == 'Disqualified');
             this.pops = this.pageObjs.filter(v => v.eventType == 'Popped');
         },
-        updateEntry (obj) {
-            const i = this.allObjs.findIndex(o => o.id == obj.id);
-            this.allObjs[i] = obj;
-            this.selectedEntry = obj;
+        updateContent (event) {
+            const i = this.allObjs.findIndex(o => o.id == event.id);
+            this.allObjs[i].content = event.value;
+            this.selectedEntry = this.allObjs[i];
+            this.filter();
+        },
+        updateObviousness (event) {
+            const i = this.allObjs.findIndex(o => o.id == event.id);
+            this.allObjs[i].obviousness = event.value;
+            this.selectedEntry = this.allObjs[i];
+            this.filter();
+        },
+        updateSeverity (event) {
+            const i = this.allObjs.findIndex(o => o.id == event.id);
+            this.allObjs[i].severity = event.value;
+            this.selectedEntry = this.allObjs[i];
             this.filter();
         },
         selectEntry (entry) {
             this.selectedEntry = entry;
+        },
+        hasData (event) {
+            if ((event.obviousness || event.obviousness == 0) && (event.severity || event.severity == 0)) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        calculateColor (event) {
+            let total = event.obviousness + event.severity;
+            if (total >= 4 || event.obviousness == 2 || event.severity == 3) return 'vote-pass';
+            else if (total >= 2) return 'vote-extend';
+            else return 'vote-fail';
         },
     },
 };
