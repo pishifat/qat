@@ -4,6 +4,7 @@ const bnAppsService = require('../models/bnApp').service;
 const vetoesService = require('../models/veto').service;
 const evalRoundsService = require('../models/evalRound').service;
 const usersModel = require('../models/user').User;
+const usersService = require('../models/user').service;
 
 const defaultAppPopulate = [{
     populate: 'applicant',
@@ -142,6 +143,15 @@ function notifyDeadlines() {
                         await evalRoundsService.update(round.id, { $push: { natEvaluators: user._id } });
                         natList += user.username;
                         if(i + 1 < assignedNat.length){
+                            natList += ', ';
+                        }
+                    }
+                } else {
+                    for (let i = 0; i < round.natEvaluators.length; i++) {
+                        let userId = round.natEvaluators[i];
+                        let user = await usersService.query({ _id: userId });
+                        natList += user.username;
+                        if(i + 1 < round.natEvaluators.length){
                             natList += ', ';
                         }
                     }
