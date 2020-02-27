@@ -42,7 +42,7 @@ router.post('/updateContent/:id', api.isNotSpectator, async (req, res) => {
     } else {
         res.json(req.body.reason);
         logsService.create(req.session.mongoId, `Updated DQ reason of s/${a.beatmapsetId} to "${a.content}"`);
-        await api.webhookPost(
+        /*await api.webhookPost(
             [{
                 author: {
                     name: `${req.session.username}`,
@@ -58,7 +58,7 @@ router.post('/updateContent/:id', api.isNotSpectator, async (req, res) => {
                 ],
             }], 
             a.modes[0]
-        );
+        );*/
     }
 });
 
@@ -76,7 +76,7 @@ router.post('/updateObviousness/:id', api.isNotSpectator, async (req, res) => {
     } else {
         res.json(obviousness);
         logsService.create(req.session.mongoId, `Updated obviousness of s/${a.beatmapsetId} to "${obviousness}"`);
-        await api.webhookPost(
+        /*await api.webhookPost(
             [{
                 author: {
                     name: `${req.session.username}`,
@@ -92,7 +92,7 @@ router.post('/updateObviousness/:id', api.isNotSpectator, async (req, res) => {
                 ],
             }], 
             a.modes[0]
-        );
+        );*/
     }
 });
 
@@ -110,7 +110,7 @@ router.post('/updateSeverity/:id', api.isNotSpectator, async (req, res) => {
     } else {
         res.json(severity);
         logsService.create(req.session.mongoId, `Updated severity of s/${a.beatmapsetId} to "${severity}"`);
-        await api.webhookPost(
+        /*await api.webhookPost(
             [{
                 author: {
                     name: `${req.session.username}`,
@@ -126,7 +126,7 @@ router.post('/updateSeverity/:id', api.isNotSpectator, async (req, res) => {
                 ],
             }], 
             a.modes[0]
-        );
+        );*/
     }
 });
 
