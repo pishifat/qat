@@ -14,7 +14,9 @@
             :header="'Nominations disqualified'"
             :loading="loading"
             :is-nat="isNat"
-            @update-entry="updateEntry($event)"
+            @update-content="updateContent($event)"
+            @update-obviousness="updateObviousness($event)"
+            @update-severity="updateSeverity($event)"
         />
         <nomination-resets
             :events="nominationsPopped"
@@ -22,7 +24,9 @@
             :header="'Nominations popped'"
             :loading="loading"
             :is-nat="isNat"
-            @update-entry="updateEntry($event)"
+            @update-content="updateContent($event)"
+            @update-obviousness="updateObviousness($event)"
+            @update-severity="updateSeverity($event)"
         />
         <nomination-resets
             :events="disqualifications"
@@ -30,7 +34,9 @@
             :header="'Disqualifications done by user'"
             :loading="loading"
             :is-nat="isNat"
-            @update-entry="updateEntry($event)"
+            @update-content="updateContent($event)"
+            @update-obviousness="updateObviousness($event)"
+            @update-severity="updateSeverity($event)"
         />
         <nomination-resets
             :events="pops"
@@ -38,7 +44,9 @@
             :header="'Pops done by user'"
             :loading="loading"
             :is-nat="isNat"
-            @update-entry="updateEntry($event)"
+            @update-content="updateContent($event)"
+            @update-obviousness="updateObviousness($event)"
+            @update-severity="updateSeverity($event)"
         />
         <events-list
             :events="qualityAssuranceChecks"
@@ -55,7 +63,6 @@ import postData from '../../../../mixins/postData.js';
 import filterLinks from '../../../../mixins/filterLinks.js';
 import EventsList from './EventsList.vue';
 import NominationResets from './NominationResets.vue';
-import Vue from 'vue';
 
 export default {
     name: 'UserActivity',
@@ -105,32 +112,58 @@ export default {
                     this.loading = false;
                 });
         },
-        updateEntry (event) {
+        updateContent (event) {
             let i;
-            if (event.eventType == 'Disqualified') {
-                i = this.disqualifications.findIndex(e => e._id == event.id);
 
-                if (i >= 0) {
-                    Vue.set(this.disqualifications, i, event);
-                }
+            if (event.type == 'Disqualified') {
+                i = this.disqualifications.findIndex(e => e._id == event.id);
+                if (i >= 0) this.disqualifications[i].content = event.value;
 
                 i = this.nominationsDisqualified.findIndex(e => e._id == event.id);
+                if (i >= 0) this.nominationsDisqualified[i].content = event.value; 
 
-                if (i >= 0) {
-                    Vue.set(this.nominationsDisqualified, i, event);
-                }
-            } else if (event.eventType == 'Popped') {
+            } else if (event.type == 'Popped') {
                 i = this.pops.findIndex(e => e._id == event.id);
-
-                if (i >= 0) {
-                    Vue.set(this.pops, i, event);
-                }
+                if (i >= 0) this.pops[i].content = event.value;
 
                 i = this.nominationsPopped.findIndex(e => e._id == event.id);
+                if (i >= 0) this.nominationsPopped[i].content = event.value;
+            }
+        },
+        updateObviousness (event) {
+            let i;
 
-                if (i >= 0) {
-                    Vue.set(this.nominationsPopped, i, event);
-                }
+            if (event.type == 'Disqualified') {
+                i = this.disqualifications.findIndex(e => e._id == event.id);
+                if (i >= 0) this.disqualifications[i].obviousness = event.value;
+
+                i = this.nominationsDisqualified.findIndex(e => e._id == event.id);
+                if (i >= 0) this.nominationsDisqualified[i].obviousness = event.value; 
+
+            } else if (event.type == 'Popped') {
+                i = this.pops.findIndex(e => e._id == event.id);
+                if (i >= 0) this.pops[i].obviousness = event.value;
+
+                i = this.nominationsPopped.findIndex(e => e._id == event.id);
+                if (i >= 0) this.nominationsPopped[i].obviousness = event.value;
+            }
+        },
+        updateSeverity (event) {
+            let i;
+
+            if (event.type == 'Disqualified') {
+                i = this.disqualifications.findIndex(e => e._id == event.id);
+                if (i >= 0) this.disqualifications[i].severity = event.value;
+
+                i = this.nominationsDisqualified.findIndex(e => e._id == event.id);
+                if (i >= 0) this.nominationsDisqualified[i].severity = event.value; 
+
+            } else if (event.type == 'Popped') {
+                i = this.pops.findIndex(e => e._id == event.id);
+                if (i >= 0) this.pops[i].severity = event.value;
+
+                i = this.nominationsPopped.findIndex(e => e._id == event.id);
+                if (i >= 0) this.nominationsPopped[i].severity = event.value;
             }
         },
     },

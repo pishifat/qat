@@ -18,7 +18,7 @@
                     </td>
                 </thead>
                 <tbody class="small">
-                    <tr v-for="event in events" :key="event.id">
+                    <tr v-for="event in events" :key="event._id">
                         <td scope="row">
                             {{ new Date(event.timestamp).toString().slice(4,10) }}
                         </td>
@@ -30,7 +30,9 @@
                         <nomination-reset-editing
                             :event="event"
                             :is-nat="isNat"
-                            @update-entry="$emit('update-entry', $event);"
+                            @update-content="$emit('update-content', $event);"
+                            @update-obviousness="$emit('update-obviousness', $event);"
+                            @update-severity="$emit('update-severity', $event);"
                         />
                     </tr>
                 </tbody>
@@ -47,15 +49,15 @@ import NominationResetEditing from './NominationResetEditing.vue';
 
 export default {
     name: 'NominationResets',
+    components: {
+        NominationResetEditing,
+    },
     props: {
         events: Array,
         eventsId: String,
         header: String,
         loading: Boolean,
         isNat: Boolean,
-    },
-    components: {
-        NominationResetEditing,
     },
 };
 </script>

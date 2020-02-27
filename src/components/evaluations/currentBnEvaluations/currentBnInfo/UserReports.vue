@@ -4,8 +4,10 @@
             Reports:
         </p>
         <ul v-if="userReports">
-            <li v-if="!userReports.length" class="small min-spacing text-shadow">User has no reports</li>
-            <li v-else v-for="report in userReports" :key="report.id" class="small text-shadow">
+            <li v-if="!userReports.length" class="small min-spacing text-shadow">
+                User has no reports
+            </li>
+            <li v-for="report in userReports" v-else :key="report.id" class="small text-shadow">
                 <a :href="'http://bn.mappersguild.com/managereports?report=' + report.id">{{ report.createdAt.slice(0,10) }}</a>
                 <pre class="secondary-text pre-font ml-2" :class="report.valid == 1 ? 'vote-pass' : 'vote-extend'"> <span v-html="filterLinks(report.reason)" /></pre>
             </li>
@@ -17,20 +19,20 @@
 import filterLinks from '../../../../mixins/filterLinks.js';
 
 export default {
-    name: 'user-reports',
+    name: 'UserReports',
     mixins: [filterLinks],
     props: {
         userMongoId: String,
-    },
-    watch: {
-        userMongoId() {
-            this.findUserReports();
-        },
     },
     data() {
         return {
             userReports: null,
         };
+    },
+    watch: {
+        userMongoId() {
+            this.findUserReports();
+        },
     },
     mounted() {
         this.findUserReports();
@@ -43,7 +45,7 @@ export default {
                 .then(response => {
                     this.userReports = response.data.userReports;
                 });
-        }
+        },
     },
 };
 </script>

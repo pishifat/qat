@@ -33,7 +33,7 @@
                                 placeholder="reason..."
                                 style="filter: drop-shadow(1px 1px 1px #000000); width: 100%"
                                 maxlength="50"
-                                @keyup.enter="updateReason($event)"
+                                @keyup.enter="updateContent($event)"
                             >
                         </div>
                     </div>
@@ -42,7 +42,7 @@
                     </p>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-nat" type="submit" @click="updateReason($event)">
+                    <button class="btn btn-nat" type="submit" @click="updateContent($event)">
                         <span class="append-button-padding">Save reason</span>
                     </button>
                 </div>
@@ -78,11 +78,11 @@ export default {
         },
     },
     methods: {
-        async updateReason(e) {
+        async updateContent(e) {
             if(!this.reasonInput || !this.reasonInput.length){
                 this.info = 'Must enter a reason!';
             }else{
-                const result = await this.executePost('/dataCollection/updateReason/' + this.selectedEntry.id, { reason: this.reasonInput }, e);
+                const result = await this.executePost('/dataCollection/updateContent/' + this.selectedEntry.id, { reason: this.reasonInput }, e);
                 if (result) {
                     if (result.error) {
                         this.info = result.error;

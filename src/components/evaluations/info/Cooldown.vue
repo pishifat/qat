@@ -3,10 +3,10 @@
         Cooldown:
         <input
             id="day"
+            v-model="days"
             type="text"
             placeholder="days"
             maxlength="3"
-            v-model="days"
             style="min-width: 60px; width: 60px;"
             @change="setCooldownDate($event)"
         >
@@ -20,31 +20,19 @@
 import postData from '../../../mixins/postData.js';
 
 export default {
-    name: 'cooldown',
+    name: 'Cooldown',
+    mixins: [ postData ],
     props: {
         cooldownDate: String,
         nominatorAssessmentMongoId: String,
         isApplication: Boolean,
         originDate: String,
     },
-    mixins: [ postData ],
     data() {
         return {
             info: '',
             days: null,
         };
-    },
-    mounted() {
-        this.days = this.calculateDays;
-    },
-    watch: {
-        newCooldownDate() {
-            if(!(this.newCooldownDate instanceof Date) || isNaN(this.newCooldownDate)){
-                this.info = 'Invalid date!';
-            }else{
-                this.info = '';
-            }
-        },
     },
     computed: {
         newCooldownDate() {
@@ -56,7 +44,19 @@ export default {
             let origin = new Date(this.originDate);
             let cooldown = new Date(this.cooldownDate);
             return Math.round((cooldown.getTime() - origin.getTime())/(1000*60*60*24));
-        }
+        },
+    },
+    watch: {
+        newCooldownDate() {
+            if(!(this.newCooldownDate instanceof Date) || isNaN(this.newCooldownDate)){
+                this.info = 'Invalid date!';
+            }else{
+                this.info = '';
+            }
+        },
+    },
+    mounted() {
+        this.days = this.calculateDays;
     },
     methods: {
         async setCooldownDate(e){

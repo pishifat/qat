@@ -30,7 +30,7 @@
                         rows="4"
                         maxlength="1000"
                     />
-                    <button class="btn btn-xs btn-nat align-self-center" @click="updateReason($event);">
+                    <button class="btn btn-xs btn-nat align-self-center" @click="updateContent($event);">
                         Save
                     </button>
                 </div>
@@ -123,35 +123,19 @@ export default {
         },
     },
     methods: {
-        async updateReason(e) {
-            const result = await this.executePost('/dataCollection/updateReason/' + this.event._id, { reason: this.newEventContent }, e);
-            if (result) {
-                if (result.error) {
-                    this.info = result.error;
-                } else {
-                    this.$emit('update-entry', result);
-                }
-            }
+        async updateContent(e) {
+            const result = await this.executePost('/dataCollection/updateContent/' + this.event._id, { reason: this.newEventContent }, e);
+            this.$emit('update-content', { id: this.event._id, type: this.event.eventType, value: result });
         },
         async updateObviousness(obviousness) {
-            const result = await this.executePost('/dataCollection/updateObviousness/' + this.event._id, { obviousness });
-            if (result) {
-                if (result.error) {
-                    this.info = result.error;
-                } else {
-                    this.$emit('update-entry', result);
-                }
-            }
+            let result = await this.executePost('/dataCollection/updateObviousness/' + this.event._id, { obviousness });
+            if (result == this.event.obviousness) result = null;
+            this.$emit('update-obviousness', { id: this.event._id,type: this.event.eventType, value: result });
         },
         async updateSeverity(severity) {
-            const result = await this.executePost('/dataCollection/updateSeverity/' + this.event._id, { severity });
-            if (result) {
-                if (result.error) {
-                    this.info = result.error;
-                } else {
-                    this.$emit('update-entry', result);
-                }
-            }
+            let result = await this.executePost('/dataCollection/updateSeverity/' + this.event._id, { severity });
+            if (result == this.event.severity) result = null;
+            this.$emit('update-severity', { id: this.event._id, type: this.event.eventType, value: result });
         },
     },
 };

@@ -25,7 +25,7 @@
 import postData from '../../../mixins/postData.js';
 
 export default {
-    name: 'user-list',
+    name: 'UserList',
     mixins: [postData],
     props: {
         header: String,

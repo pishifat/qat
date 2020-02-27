@@ -19,7 +19,7 @@
 <script>
 
 export default {
-    name: 'modal-header',
+    name: 'ModalHeader',
     props: {
         mode: String,
         natEvaluators: Array,

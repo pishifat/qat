@@ -35,12 +35,12 @@ router.get('/relevantInfo', async (req, res) => {
 });
 
 /* POST edit reason for dq/pop */
-router.post('/updateReason/:id', api.isNotSpectator, async (req, res) => {
+router.post('/updateContent/:id', api.isNotSpectator, async (req, res) => {
     let a = await aiessService.update(req.params.id, { content: req.body.reason });
     if (!a) {
         res.json({ error: 'Something went wrong' });
     } else {
-        res.json(a);
+        res.json(req.body.reason);
         logsService.create(req.session.mongoId, `Updated DQ reason of s/${a.beatmapsetId} to "${a.content}"`);
     }
 });
@@ -58,7 +58,7 @@ router.post('/updateObviousness/:id', api.isNotSpectator, async (req, res) => {
     if (!a) {
         res.json({ error: 'Something went wrong' });
     } else {
-        res.json(a);
+        res.json(obviousness);
         logsService.create(req.session.mongoId, `Updated obviousness of s/${a.beatmapsetId} to "${obviousness}"`);
     }
 });
@@ -76,7 +76,7 @@ router.post('/updateSeverity/:id', api.isNotSpectator, async (req, res) => {
     if (!a) {
         res.json({ error: 'Something went wrong' });
     } else {
-        res.json(a);
+        res.json(severity);
         logsService.create(req.session.mongoId, `Updated severity of s/${a.beatmapsetId} to "${severity}"`);
     }
 });

@@ -41,10 +41,11 @@ import postData from '../../../mixins/postData.js';
 import FeedbackPm from './FeedbackPm.vue';
 
 export default {
-    name: 'feedback-info',
+    name: 'FeedbackInfo',
     components: {
         FeedbackPm,
     },
+    mixins: [ postData ],
     props: {
         consensus: String,
         isApplication: Boolean,
@@ -57,17 +58,16 @@ export default {
         savedFeedback: String,
         nominatorAssessmentMongoId: String,
     },
-    mixins: [ postData ],
-    watch: {
-        nominatorAssessmentMongoId() {
-            this.feedback = this.savedFeedback;
-        },
-    },
     data() {
         return {
             feedback: '',
             discordLink: '',
         };
+    },
+    watch: {
+        nominatorAssessmentMongoId() {
+            this.feedback = this.savedFeedback;
+        },
     },
     mounted() {
         this.feedback = this.savedFeedback;

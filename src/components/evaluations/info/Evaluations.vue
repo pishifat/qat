@@ -49,13 +49,13 @@
 import filterLinks from '../../../mixins/filterLinks.js';
 
 export default {
-    name: 'evaluations',
+    name: 'Evaluations',
+    mixins: [ filterLinks ],
     props: {
         evaluations: Array,
         consensus: String,
         isNat: Boolean,
     },
-    mixins: [ filterLinks ],
     computed: {
         bnEvaluations() {
             let e = [];
@@ -95,8 +95,8 @@ export default {
             }else if(vote == 3){
                 return 'vote-fail';
             }
-        }
-    }
+        },
+    },
 };
 </script>
 

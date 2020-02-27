@@ -4,15 +4,17 @@
             NAT user notes:
         </p>
         <ul v-if="userNotes">
-            <li v-if="!userNotes.length" class="small min-spacing text-shadow">User has no notes</li>
-            <li v-else v-for="note in userNotes" :key="note.id" class="small text-shadow">
+            <li v-if="!userNotes.length" class="small min-spacing text-shadow">
+                User has no notes
+            </li>
+            <li v-for="note in userNotes" v-else :key="note.id" class="small text-shadow">
                 <b>
                     {{ note.updatedAt.slice(0,10) }} -
                     <a :href="'https://osu.ppy.sh/users/' + note.author.osuId" target="_blank">
                         {{ note.author.username }}
                     </a>
                 </b>
-                <pre class="secondary-text pre-font ml-2" v-html="filterLinks(note.comment)"></pre>
+                <pre class="secondary-text pre-font ml-2" v-html="filterLinks(note.comment)" />
             </li>
         </ul>
     </div>
@@ -22,11 +24,16 @@
 import filterLinks from '../../../mixins/filterLinks.js';
 
 export default {
-    name: 'user-notes',
+    name: 'UserNotes',
+    mixins: [ filterLinks ],
     props: {
         userMongoId: String,
     },
-    mixins: [ filterLinks ],
+    data() {
+        return {
+            userNotes: null,
+        };
+    },
     watch: {
         userMongoId() {
             this.findUserNotes();
@@ -34,11 +41,6 @@ export default {
     },
     mounted () {
         this.findUserNotes();
-    },
-    data() {
-        return {
-            userNotes: null,
-        };
     },
     methods: {
         async findUserNotes() {
@@ -48,7 +50,7 @@ export default {
                 .then(response => {
                     this.userNotes = response.data.userNotes;
                 });
-        }
-    }
+        },
+    },
 };
 </script>
