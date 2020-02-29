@@ -134,7 +134,7 @@
                             </td>
                             <td scope="row">
                                 <span v-if="hasData(pop)" :class="calculateColor(pop)">
-                                    ({{ dq.obviousness }}/{{ dq.severity }})
+                                    ({{ pop.obviousness }}/{{ pop.severity }})
                                 </span>
                                 {{ pop.content.length > 50 ? pop.content.slice(0, 50) + '...' : pop.content }} 
                                 <a
