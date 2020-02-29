@@ -39,6 +39,7 @@
                         {{ user.uniqueNominations }} nominations
                     </li>
                     <li>{{ user.nominationResets }} nomination resets</li>
+                    <li>Next evaluation: {{ user.nextEvaluation.slice(0,10) }}</li>
                 </ul>
             </div>
             <p class="small min-spacing ml-2">

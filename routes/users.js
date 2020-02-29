@@ -165,6 +165,15 @@ router.post('/editNote/:id', api.isNat, async (req, res) => {
     );
 });
 
+/* GET user next evaluation */
+router.get('/loadNextEvaluation/:id', api.isNat, async (req, res) => {
+    let er = await evalRoundsService.query({ bn: req.params.id, active: true });
+    if (!er) {
+        return res.json('Never');
+    }
+    res.json(er.deadline);
+});
+
 /* GET all users with badge info */
 router.get('/findUserBadgeInfo', async (req, res) => {
     let u = await usersService.query(
@@ -256,13 +265,14 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
     let minDate = new Date();
     minDate.setDate(minDate.getDate() - parseInt(req.params.days));
     let maxDate = new Date();
-    const [users, allEvents] = await Promise.all([
+    const [users, allEvents, allActiveEvalRounds] = await Promise.all([
         usersService.query({ 
             group: 'bn', 
             modes: req.params.mode,
             isSpectator: { $ne: true } },
         {}, { username: 1 }, true),
         aiessService.getAllActivity(minDate, maxDate, req.params.mode),
+        evalRoundsService.query({ active: true }, {}, {}, true),
     ]);
 
     let info = [];
@@ -292,12 +302,24 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
                 }
             }
         }
+
+        let deadline;
+        for (let i = 0; i < allActiveEvalRounds.length; i++) {
+            const evalRound = allActiveEvalRounds[i];
+            if (evalRound.bn == user.id) {
+                deadline = evalRound.deadline;
+                break;
+            }
+        }
+        if (!deadline) deadline = 'Never';
+
         info.push({ 
             username: user.username, 
             osuId: user.osuId, 
             uniqueNominations: uniqueNominations.length, 
             nominationResets, 
             joinDate: user.bnDuration[user.bnDuration.length - 1],
+            nextEvaluation: deadline,
         });
     });
 

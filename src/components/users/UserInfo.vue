@@ -35,6 +35,9 @@
                                 />
                             </div>
                         </span>
+                        <next-evaluation
+                            :user-id="user.id"
+                        />
                         <footer-buttons
                             :is-leader="isLeader"
                             :group="user.group"
@@ -54,6 +57,7 @@
 import ModalHeader from './info/ModalHeader.vue';
 import Duration from './info/Duration.vue';
 import Notes from './info/Notes.vue';
+import NextEvaluation from './info/NextEvaluation.vue';
 import FooterButtons from './info/FooterButtons.vue';
 import UserActivity from '../evaluations/currentBnEvaluations/currentBnInfo/UserActivity.vue';
 
@@ -63,6 +67,7 @@ export default {
         ModalHeader,
         Duration,
         Notes,
+        NextEvaluation,
         FooterButtons,
         UserActivity,
     },
