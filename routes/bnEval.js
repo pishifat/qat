@@ -148,7 +148,7 @@ router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
             for (let i = 0; i < result.length; i++) {
                 const er = result[i];
                 const u = await usersService.query({ _id: er.bn });
-                const invalids = [8129817, 3178418];
+                const invalids = [8129817, 3178418, u.osuId];
                 const assignedNat = await usersModel.aggregate([
                     { $match: { group: 'nat', isSpectator: { $ne: true }, modes: er.mode, osuId: { $nin: invalids } } },
                     { $sample: { size: er.mode == 'osu' || er.mode == 'catch' ? 3 : 2 } },
