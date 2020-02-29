@@ -6,7 +6,7 @@
                 class="btn btn-nat-red btn-sm minw-150"
                 @click="group == 'bn' ? switchGroup('nat', $event) : switchGroup('bn', $event)"
             >
-                {{ group == 'bn' ? 'Move to NAT' : 'Move to BN' }}
+                Move to {{ group == 'bn' ? 'NAT' : 'BN' }}
             </button>
             <button
                 v-if="group == 'nat'"

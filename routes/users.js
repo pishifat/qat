@@ -78,6 +78,12 @@ router.post('/switchBnEvaluator/', api.isBnOrNat, async (req, res) => {
 router.post('/switchGroup/:id', api.isLeader, async (req, res) => {
     let u = await usersService.update(req.params.id, { group: req.body.group,  probation: [], $push: { bnDuration: new Date(), natDuration: new Date() } });
     res.json(u);
+
+    await evalRoundsService.deleteManyByUserId(u.id);
+    let deadline = new Date();
+    deadline.setDate(deadline.getDate() + 100);
+    await evalRoundsService.create(u.id, u.modes[0], deadline);
+    
     logsService.create(
         req.session.mongoId,
         `Changed usergroup of "${u.username}" to "${req.body.group.toUpperCase()}"`

@@ -47,7 +47,7 @@ const notesPopulate = [
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res) => {
     let minDate = new Date();
-    minDate.setDate(minDate.getDate() + 14);
+    minDate.setDate(minDate.getDate() + 414);
     let er = await evalRoundsService.query({ active: true, deadline: { $lte: minDate } }, defaultPopulate, { deadline: 1, consensus: 1, feedback: 1 }, true);
     res.json({ er, evaluator: res.locals.userRequest });
 });
