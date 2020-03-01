@@ -13,15 +13,15 @@ let Log = mongoose.model('Log', logSchema);
 class LogService
 {
     /**
-     * 
+     *
      * @param {string} params ex: 'x: y'
      * @param {string} populate ex: 'populate: x, display: y' or 'innerPopulate: x, populate: y'
      * @param {string} sorting ex: 'x: -1'
-     * @param {boolean} getAll 
+     * @param {boolean} getAll
      */
     async query(params, populate, sorting, getAll, limit, skip) {
         let query;
-        
+
         if (getAll) {
             query = Log.find(params);
         } else {
@@ -44,7 +44,7 @@ class LogService
             query.sort(sorting);
         }
 
-        if(limit) {
+        if (limit) {
             query.limit(limit);
         }
 
@@ -54,23 +54,26 @@ class LogService
 
         try {
             return await query.exec();
-        } catch(error) {
+        } catch (error) {
             this.create(null, JSON.stringify(error), true);
+
             return { error: error._message };
         }
     }
 
     /**
-     * 
+     *
      * @param {object} userId UserId of the action
      * @param {string} action short comment
      */
     async create(userId, action, isError) {
         const log = new Log({ user: userId, action, isError });
+
         try {
             return await log.save();
-        } catch(err) {
+        } catch (err) {
             console.log(err);
+
             return undefined;
         }
     }

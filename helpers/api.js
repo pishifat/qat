@@ -16,7 +16,7 @@ async function getToken(code) {
     const options = {
         method: 'post',
         url: 'https://osu.ppy.sh/oauth/token',
-        headers: { 
+        headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
         data: postData,
@@ -24,6 +24,7 @@ async function getToken(code) {
 
     try {
         const res = await axios(options);
+
         return res.data;
     } catch (error) {
         return { error };
@@ -38,10 +39,10 @@ async function refreshToken(refreshToken) {
         refresh_token: refreshToken,
     });
 
-    const options = { 
-        method: 'POST', 
+    const options = {
+        method: 'POST',
         url: 'https://osu.ppy.sh/oauth/token',
-        headers: { 
+        headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
         data: postData,
@@ -49,6 +50,7 @@ async function refreshToken(refreshToken) {
 
     try {
         const res = await axios(options);
+
         return res.data;
     } catch (error) {
         return { error };
@@ -56,7 +58,7 @@ async function refreshToken(refreshToken) {
 }
 
 async function getUserInfo(token) {
-    const options = { 
+    const options = {
         method: 'GET',
         url: 'https://osu.ppy.sh/api/v2/me',
         headers: {
@@ -66,6 +68,7 @@ async function getUserInfo(token) {
 
     try {
         const res = await axios(options);
+
         return res.data;
     } catch (error) {
         return { error };
@@ -74,9 +77,10 @@ async function getUserInfo(token) {
 
 async function beatmapsetOwnerMaps(userId) {
     const url = `https://osu.ppy.sh/api/get_beatmaps?k=${config.v1token}&u=${userId}`;
-    
+
     try {
         const res = await axios.get(url);
+
         return res.data;
     } catch (error) {
         return { error: 'Something went wrong!' };
@@ -85,12 +89,13 @@ async function beatmapsetOwnerMaps(userId) {
 
 async function beatmapsetInfo(setId, allDiffs) {
     const url = `https://osu.ppy.sh/api/get_beatmaps?k=${config.v1token}&s=${setId}`;
-    
+
     try {
         const res = await axios.get(url);
-        if(!allDiffs){
+
+        if (!allDiffs) {
             return res.data[0];
-        }else{
+        } else {
             return res.data;
         }
     } catch (error) {
@@ -98,11 +103,12 @@ async function beatmapsetInfo(setId, allDiffs) {
     }
 }
 
-async function getUserInfo(osuId) {
+async function getUserInfoV1(osuId) {
     const url = `https://osu.ppy.sh/api/get_user?k=${config.v1token}&u=${osuId}`;
 
     try {
         const res = await axios.get(url);
+
         return res.data;
     } catch (error) {
         return { error: 'Something went wrong!' };
@@ -112,6 +118,7 @@ async function getUserInfo(osuId) {
 async function isLoggedIn(req, res, next) {
     if (req.session.mongoId) {
         const u = await users.service.query({ _id: req.session.mongoId });
+
         if (!u) {
             return res.redirect('/');
         }
@@ -119,11 +126,12 @@ async function isLoggedIn(req, res, next) {
         // Refresh if less than 10 hours left
         if (new Date() > new Date(req.session.expireDate - (10 * 3600 * 1000))) {
             const response = await refreshToken(req.session.refreshToken);
+
             if (!response || response.error) {
                 req.session.destroy();
                 res.redirect('/');
             }
-            
+
             // *1000 because maxAge is miliseconds, oauth is seconds
             req.session.cookie.maxAge = response.expires_in * 2 * 1000;
             req.session.expireDate = Date.now() + (response.expires_in * 1000);
@@ -140,7 +148,7 @@ async function isLoggedIn(req, res, next) {
 
 function isBnOrNat(req, res, next) {
     const u = res.locals.userRequest;
-    
+
     if (u.group == 'bn' || u.group == 'nat' || u.isSpectator) {
         next();
     } else {
@@ -150,7 +158,7 @@ function isBnOrNat(req, res, next) {
 
 function isBn(req, res, next) {
     const u = res.locals.userRequest;
-    
+
     if (u.group == 'bn') {
         next();
     } else {
@@ -160,7 +168,7 @@ function isBn(req, res, next) {
 
 function isNat(req, res, next) {
     const u = res.locals.userRequest;
-    
+
     if (u.group == 'nat' || u.isSpectator) {
         next();
     } else {
@@ -170,7 +178,7 @@ function isNat(req, res, next) {
 
 function isLeader(req, res, next) {
     const u = res.locals.userRequest;
-    
+
     if (u.isLeader) {
         next();
     } else {
@@ -180,7 +188,7 @@ function isLeader(req, res, next) {
 
 function isBnEvaluator(req, res, next) {
     const u = res.locals.userRequest;
-    
+
     if (u.isBnEvaluator || u.group == 'nat') {
         next();
     } else {
@@ -190,7 +198,7 @@ function isBnEvaluator(req, res, next) {
 
 function isNotSpectator(req, res, next) {
     const u = res.locals.userRequest;
-    
+
     if (!u.isSpectator) {
         next();
     } else {
@@ -272,4 +280,19 @@ async function highlightWebhookPost(message, webhook) {
     }
 }
 
-module.exports = { isLoggedIn, getToken, getUserInfo, beatmapsetInfo, beatmapsetOwnerMaps, isBnOrNat, isBn, isNat, isLeader, isBnEvaluator, isNotSpectator, webhookPost, highlightWebhookPost };
+module.exports = {
+    isLoggedIn,
+    getToken,
+    getUserInfo,
+    getUserInfoV1,
+    beatmapsetInfo,
+    beatmapsetOwnerMaps,
+    isBnOrNat,
+    isBn,
+    isNat,
+    isLeader,
+    isBnEvaluator,
+    isNotSpectator,
+    webhookPost,
+    highlightWebhookPost,
+};

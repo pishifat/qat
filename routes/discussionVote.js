@@ -21,20 +21,22 @@ router.get('/', (req, res) => {
         script: '../javascripts/discussionVote.js',
         isDiscussionVote: true,
         isBn: res.locals.userRequest.isBn,
-        isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,     
+        isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
     });
 });
 
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res) => {
     let d;
-    if(res.locals.userRequest.isNat || res.locals.userRequest.isSpectator){
+
+    if (res.locals.userRequest.isNat || res.locals.userRequest.isSpectator) {
         d = await discussionsService.query({}, defaultPopulate, { createdAt: -1 }, true);
-    }else{
+    } else {
         d = await discussionsService.query({ isNatOnly: { $ne: true } }, defaultPopulate, { createdAt: -1 }, true);
     }
-    res.json({ 
-        discussions: d, 
+
+    res.json({
+        discussions: d,
         userId: req.session.mongoId,
         userModes: res.locals.userRequest.modes,
         isLeader: res.locals.userRequest.isLeader,
@@ -45,11 +47,12 @@ router.get('/relevantInfo', async (req, res) => {
 /* POST create a new discussion vote. */
 router.post('/submit', api.isNat, async (req, res) => {
     let url = req.body.discussionLink;
+
     if (url.length == 0) {
         url = undefined;
     }
-    
-    if(req.body.discussionLink.length){
+
+    if (req.body.discussionLink.length) {
         const validUrl = helpers.isValidUrl(url, 'osu.ppy.sh');
         if (validUrl.error) return res.json({ error: validUrl.error });
     }
@@ -72,7 +75,7 @@ router.post('/submit', api.isNat, async (req, res) => {
                 url: `https://osu.ppy.sh/users/${req.session.osuId}`,
             },
             color: '14805600',
-            fields:[
+            fields: [
                 {
                     name: `http://bn.mappersguild.com/discussionvote?id=${d.id}`,
                     value: `**New discussion up for vote:** ${req.body.title}`,
@@ -82,7 +85,7 @@ router.post('/submit', api.isNat, async (req, res) => {
                     value: req.body.shortReason,
                 },
             ],
-        }], 
+        }],
         d.mode
     );
 });
@@ -90,12 +93,14 @@ router.post('/submit', api.isNat, async (req, res) => {
 /* POST submit mediation */
 router.post('/submitMediation/:id', async (req, res) => {
     let m;
-    if(req.body.mediationId){
+
+    if (req.body.mediationId) {
         m = await mediationsService.query({ _id: req.body.mediationId });
-    }else{
+    } else {
         m = await mediationsService.create(req.session.mongoId);
         await discussionsService.update(req.params.id, { $push: { mediations: m } });
-    }    
+    }
+
     await mediationsService.update(m._id, { comment: req.body.comment, vote: req.body.vote });
     let d = await discussionsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(d);
@@ -103,7 +108,8 @@ router.post('/submitMediation/:id', async (req, res) => {
         req.session.mongoId,
         'Submitted vote for a discussion'
     );
-    if(!req.body.mediationId){
+
+    if (!req.body.mediationId) {
         api.webhookPost(
             [{
                 author: {
@@ -112,13 +118,13 @@ router.post('/submitMediation/:id', async (req, res) => {
                     url: `https://osu.ppy.sh/users/${req.session.osuId}`,
                 },
                 color: '16777024',
-                fields:[
+                fields: [
                     {
                         name: `http://bn.mappersguild.com/discussionvote?id=${d.id}`,
                         value: `Submitted vote for discussion on **${d.title}**`,
                     },
                 ],
-            }], 
+            }],
             d.mode
         );
     }

@@ -28,17 +28,18 @@ class BnAppService extends BaseService
     }
 
     /**
-     * 
+     *
      * @param {object} userId UserId of applicant
-     * @param {string} mode 
-     * @param {string[]} mods 
-     * @param {string[]} reasons 
+     * @param {string} mode
+     * @param {string[]} mods
+     * @param {string[]} reasons
      */
     async create(userId, mode, mods, reasons) {
         try {
             return await BnApp.create({ applicant: userId, mode, mods, reasons });
-        } catch(error) {
+        } catch (error) {
             logsService.create(null, JSON.stringify(error), true);
+
             return { error: error._message };
         }
     }

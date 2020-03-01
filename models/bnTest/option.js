@@ -19,7 +19,7 @@ class OptionService extends BaseService
     async remove(id) {
         try {
             return await Option.findByIdAndRemove(id);
-        } catch(error) {
+        } catch (error) {
             return { error: error._message };
         }
     }
@@ -27,11 +27,11 @@ class OptionService extends BaseService
     async create(content, score) {
         try {
             return await Option.create({ content, score });
-        } catch(error) {
+        } catch (error) {
             return { error: error._message };
         }
     }
-    
+
 }
 
 const service = new OptionService();

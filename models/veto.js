@@ -31,29 +31,30 @@ class VetoService extends BaseService
     }
 
     /**
-     * 
+     *
      * @param {object} vetoer UserId who creates
-     * @param {string} discussionLink 
-     * @param {number} beatmapId 
-     * @param {string} beatmapTitle 
-     * @param {string} beatmapMapper 
-     * @param {string} shortReason 
+     * @param {string} discussionLink
+     * @param {number} beatmapId
+     * @param {string} beatmapTitle
+     * @param {string} beatmapMapper
+     * @param {string} shortReason
      * @param {string} mode 'osu', 'taiko', 'catch', 'mania'
      */
     async create(vetoer, discussionLink, beatmapId, beatmapTitle, beatmapMapper, beatmapMapperId, shortReason, mode) {
         try {
-            return await Veto.create({ 
-                vetoer, 
-                discussionLink, 
-                beatmapId, 
-                beatmapTitle, 
+            return await Veto.create({
+                vetoer,
+                discussionLink,
+                beatmapId,
+                beatmapTitle,
                 beatmapMapper,
                 beatmapMapperId,
-                shortReason, 
-                mode, 
+                shortReason,
+                mode,
             });
-        } catch(error) {
+        } catch (error) {
             logsService.create(null, JSON.stringify(error), true);
+
             return { error: 'could not create veto' };
         }
     }

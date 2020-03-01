@@ -62,10 +62,14 @@ function notifyDeadlines() {
         for (let i = 0; i < activeVetoes.length; i++) {
             const veto = activeVetoes[i];
             let title = '';
+
             if (date > veto.deadline) {
                 if (!osuHighlight && veto.mode === 'osu') { osuHighlight = true; }
+
                 if (!taikoHighlight && veto.mode === 'taiko') { taikoHighlight = true; }
+
                 if (!catchHighlight && veto.mode === 'catch') { catchHighlight = true; }
+
                 if (!maniaHighlight && veto.mode === 'mania') { maniaHighlight = true; }
 
                 title = `Veto mediation for **${veto.beatmapTitle}** is overdue!`;
@@ -93,15 +97,21 @@ function notifyDeadlines() {
             const app = activeApps[i];
 
             let addition = 7;
+
             if (app.discussion) { addition += 7; }
+
             const deadline = new Date(app.createdAt.setDate(app.createdAt.getDate() + addition));
             let title = '';
 
             if (date > deadline) {
                 if (!osuHighlight && app.mode === 'osu') { osuHighlight = true; }
+
                 if (!taikoHighlight && app.mode === 'taiko') { taikoHighlight = true; }
+
                 if (!catchHighlight && app.mode === 'catch') { catchHighlight = true; }
+
                 if (!maniaHighlight && app.mode === 'mania') { maniaHighlight = true; }
+
                 title = `BN app eval for ${app.applicant.username} is overdue!`;
             } else if (deadline < nearDeadline) {
                 title = `BN app eval for ${app.applicant.username} is due in less than 24 hours!`;
@@ -132,26 +142,32 @@ function notifyDeadlines() {
 
             if (date > round.deadline) {
                 if (!osuHighlight && round.mode === 'osu') { osuHighlight = true; }
+
                 if (!taikoHighlight && round.mode === 'taiko') { taikoHighlight = true; }
+
                 if (!catchHighlight && round.mode === 'catch') { catchHighlight = true; }
+
                 if (!maniaHighlight && round.mode === 'mania') { maniaHighlight = true; }
+
                 title = `Current BN eval for ${round.bn.username} is overdue!`;
             } else if (round.deadline < nearDeadline) {
                 title = `Current BN eval for ${round.bn.username} is due in less than 24 hours!`;
             } else if (round.deadline > startRange && round.deadline < endRange) {
                 title = `Current BN eval for ${round.bn.username} is due in two weeks!`;
-                
+
                 if (!round.natEvaluators || !round.natEvaluators.length) {
                     const invalids = [8129817, 3178418];
                     const assignedNat = await usersModel.aggregate([
                         { $match: { group: 'nat', isSpectator: { $ne: true }, modes: round.mode, osuId: { $nin: invalids } } },
                         { $sample: { size: round.mode == 'osu' || round.mode == 'catch' ? 3 : 2 } },
                     ]);
+
                     for (let i = 0; i < assignedNat.length; i++) {
                         let user = assignedNat[i];
                         await evalRoundsService.update(round.id, { $push: { natEvaluators: user._id } });
                         natList += user.username;
-                        if(i + 1 < assignedNat.length){
+
+                        if (i + 1 < assignedNat.length) {
                             natList += ', ';
                         }
                     }
@@ -160,7 +176,8 @@ function notifyDeadlines() {
                         let userId = round.natEvaluators[i];
                         let user = await usersService.query({ _id: userId });
                         natList += user.username;
-                        if(i + 1 < round.natEvaluators.length){
+
+                        if (i + 1 < round.natEvaluators.length) {
                             natList += ', ';
                         }
                     }
@@ -181,7 +198,7 @@ function notifyDeadlines() {
                 );
                 await helper.sleep(500);
             } else if (title.length && natList.length) {
-                
+
                 await api.webhookPost(
                     [{
                         author: {
@@ -190,7 +207,7 @@ function notifyDeadlines() {
                             url: `http://bn.mappersguild.com/bneval?eval=${round.id}`,
                         },
                         color: '15711602',
-                        fields:[
+                        fields: [
                             {
                                 name: 'Assigned NAT',
                                 value: natList,
@@ -224,7 +241,7 @@ function notifyBeatmapReports() {
         // find database's discussion posts
         const date = new Date();
         date.setDate(date.getDate() - 7);
-        let beatmapReports = await beatmapReportsService.query({ createdAt: { $gte: date }}, {}, {}, true);
+        let beatmapReports = await beatmapReportsService.query({ createdAt: { $gte: date } }, {}, {}, true);
 
         // create array of reported beatmapsetIds
         let beatmapsetIds = [];
@@ -238,14 +255,16 @@ function notifyBeatmapReports() {
         for (let i = 0; i < discussions.length; i++) {
             const discussion = discussions[i];
             let createWebhook;
+
             if (!beatmapsetIds.includes(discussion.beatmapset_id)) {
                 createWebhook = true;
             } else {
-                let alreadyReported = await beatmapReportsService.query({ 
-                    createdAt: { $gte: date }, 
-                    beatmapsetId: discussion.beatmapset_id, 
-                    reporterUserId: discussion.starting_post.user_id 
+                let alreadyReported = await beatmapReportsService.query({
+                    createdAt: { $gte: date },
+                    beatmapsetId: discussion.beatmapset_id,
+                    reporterUserId: discussion.starting_post.user_id,
                 });
+
                 if (!alreadyReported) {
                     createWebhook = true;
                 }
@@ -256,7 +275,7 @@ function notifyBeatmapReports() {
             // create event in db and send webhook
             if (createWebhook) {
                 await beatmapReportsService.create(discussion.beatmapset_id, discussion.id, discussion.starting_post.user_id);
-                let userInfo = await api.getUserInfo(discussion.starting_post.user_id);
+                let userInfo = await api.getUserInfoV1(discussion.starting_post.user_id);
                 await api.webhookPost(
                     [{
                         author: {
@@ -265,16 +284,16 @@ function notifyBeatmapReports() {
                             url: `https://osu.ppy.sh/users/${discussion.starting_post.user_id}`,
                         },
                         thumbnail: {
-                            url:  `https://b.ppy.sh/thumb/${discussion.beatmapset_id}.jpg`,
+                            url: `https://b.ppy.sh/thumb/${discussion.beatmapset_id}.jpg`,
                         },
                         color: discussion.message_type == 'suggestion' ? '16564064' : '15144231',
-                        fields:[
+                        fields: [
                             {
                                 name: `https://osu.ppy.sh/beatmapsets/${discussion.beatmapset_id}/discussion/-/generalAll#/${discussion.id}`,
                                 value: discussion.starting_post.message.length > 500 ? discussion.starting_post.message + '... *(truncated)*' : discussion.starting_post.message,
                             },
                         ],
-                    }], 
+                    }],
                     a.mode
                 );
                 await helper.sleep(500);

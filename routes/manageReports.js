@@ -29,8 +29,8 @@ router.get('/relevantInfo', async (req, res) => {
     let minDate = new Date();
     minDate.setDate(minDate.getDate() - 90);
     let r = await reportsService.query({ createdAt: { $gte: minDate } }, defaultPopulate, { createdAt: 1 }, true);
-    res.json({ 
-        r, 
+    res.json({
+        r,
         isLeader: res.locals.userRequest.isLeader,
     });
 });
@@ -40,15 +40,19 @@ router.post('/submitReportEval/:id', api.isNotSpectator, async (req, res) => {
     if (req.body.feedback && req.body.feedback.length) {
         await reportsService.update(req.params.id, { feedback: req.body.feedback });
     }
+
     if (req.body.valid) {
         await reportsService.update(req.params.id, { valid: req.body.valid });
     }
+
     if (req.body.close) {
         await reportsService.update(req.params.id, { isActive: false });
     }
+
     let r = await reportsService.query({ _id: req.params.id }, defaultPopulate);
 
     res.json(r);
+
     if (req.body.feedback && req.body.feedback.length) {
         logsService.create(
             req.session.mongoId,
@@ -57,6 +61,7 @@ router.post('/submitReportEval/:id', api.isNotSpectator, async (req, res) => {
             }"`
         );
     }
+
     if (req.body.valid) {
         logsService.create(
             req.session.mongoId,

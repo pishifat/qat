@@ -18,17 +18,18 @@ class EvaluationService extends BaseService
     }
 
     /**
-     * 
+     *
      * @param {object} evaluatorId UserId who evualates
-     * @param {string} behaviorComment 
-     * @param {string} moddingComment 
-     * @param {number} vote 
+     * @param {string} behaviorComment
+     * @param {string} moddingComment
+     * @param {number} vote
      */
     async create(evaluatorId, behaviorComment, moddingComment, vote) {
         try {
             return await Evaluation.create({ evaluator: evaluatorId, behaviorComment, moddingComment, vote });
-        } catch(error) {
+        } catch (error) {
             logsService.create(null, JSON.stringify(error), true);
+
             return { error: error._message };
         }
     }

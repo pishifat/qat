@@ -4,15 +4,16 @@ const cheerio = require('cheerio');
 
 /**
  * Just replaces () and [] for now..
- * @param {string} username 
+ * @param {string} username
  */
 function escapeUsername(username) {
     username = username.trim();
+
     return username.replace(/[()[\]]/g, '\\$&');
 }
 
 /**
- * 
+ *
  * @param {string} url ex: https://osu.ppy.sh/beatmapsets/930028/discussion#/893132
  */
 function getBeatmapsetIdFromUrl(url) {
@@ -46,6 +47,7 @@ function safeParam(param) {
 function isValidUrl(url, contain) {
     // eslint-disable-next-line no-useless-escape
     const regexp = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+
     if (!regexp.test(url) || url.indexOf(contain) == -1) {
         return { error: 'Not a valid URL' };
     } else {
@@ -55,7 +57,7 @@ function isValidUrl(url, contain) {
 
 /**
  * Returns array with values per month ex: [1,1,1] or the calculated score ex: 7,77
- * @param {string} username 
+ * @param {string} username
  * @param {string} mode To calculate and return the score, pass this argument
  * @returns {number|number[]|object}
  */
@@ -67,6 +69,7 @@ async function getUserModsCount(username, mode) {
     let modCount = [];
     let modScore = 0;
     let expectedMods = (mode && mode == 'osu' ? 4 : 3);
+
     // Loops for months
     for (let i = 0; i < 3; i++) {
         const maxDateStr = `${maxDate.getFullYear()}-${maxDate.getMonth() + 1}-${maxDate.getDate()}`;
@@ -75,37 +78,40 @@ async function getUserModsCount(username, mode) {
         let monthMods = [];
         let hasEvents = true;
         let pageNumber = 1;
+
         // Loops through pages of a month
         while (hasEvents) {
             let finalUrl = urlWithDate + `&page=${pageNumber}`;
+
             try {
                 const historyHtml = await axios.get(finalUrl);
                 const $ = cheerio.load(historyHtml.data);
+
                 if (!$('.beatmapset-event').length) {
                     hasEvents = false;
                 } else {
                     let pageMods = [];
-                    $('.beatmapset-event').each(function(k, v) {  
+                    $('.beatmapset-event').each(function(k, v) {
                         console.log(v.attribs);
                         const url = $(v).find('a').first().attr('href');
-                        let mod = { 
+                        let mod = {
                             beatmapset: getBeatmapsetIdFromUrl(url),
                             url,
                         };
-                        
+
                         if ($(v).find('.beatmapset-event__icon--kudosu-gain').length) {
                             mod.isGain = true;
                         } else {
                             mod.isGain = false;
                         }
-                        
+
                         pageMods.push(mod);
                     });
-                    
+
                     // Filters repeated sets and checks for denied KDs
                     pageMods.forEach(mod => {
-                        if (mod.isGain && 
-                            pageMods.findIndex(m => m.url == mod.url && !m.isGain) === -1 && 
+                        if (mod.isGain &&
+                            pageMods.findIndex(m => m.url == mod.url && !m.isGain) === -1 &&
                             monthMods.findIndex(m => m.beatmapset == mod.beatmapset) === -1) {
                             monthMods.push(mod);
                         }
@@ -114,10 +120,10 @@ async function getUserModsCount(username, mode) {
             } catch (error) {
                 return { error: `Couldn't calculate your score` };
             }
-    
+
             pageNumber ++;
         }
-        
+
         modScore += Math.log(1 + monthMods.length) / Math.log(Math.sqrt(1 + expectedMods)) - (2 * (1 + expectedMods)) / (1 + monthMods.length);
         modCount.push(monthMods.length);
         minDate.setDate(minDate.getDate() - 30);

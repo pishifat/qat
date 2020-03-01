@@ -18,7 +18,7 @@ class NoteService extends BaseService
     }
 
     /**
-     * 
+     *
      * @param {object} author UserId who writes the note
      * @param {object} user UserId who note is for
      * @param {string} comment what's being said
@@ -26,8 +26,9 @@ class NoteService extends BaseService
     async create(author, user, comment) {
         try {
             return await Note.create({ author, user, comment });
-        } catch(error) {
+        } catch (error) {
             logsService.create(null, JSON.stringify(error), true);
+
             return { error: error._message };
         }
     }

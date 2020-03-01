@@ -28,31 +28,39 @@ router.get('/relevantInfo', (req, res) => {
 /* POST submit or edit eval */
 router.post('/search', async (req, res) => {
     let u = await usersService.query({ username: new RegExp('^' + helper.escapeUsername(req.body.username) + '$', 'i') });
+
     if (!u) {
         return res.json({ error: 'Cannot find user! Make sure you spelled it correctly' });
     }
+
     if (u.group == 'user') {
         return res.json({ error: 'User is not a member of the BN/NAT!' });
     }
+
     let allUserEvents = await aiessService.query({ userId: u.osuId, $or: [{ eventType: 'Bubbled' }, { eventType: 'Qualified' }] }, {}, { timestamp: 1 }, true);
     let mapIds = [];
     allUserEvents.forEach(event => {
-        if(mapIds.indexOf(event.beatmapsetId) == -1){
+        if (mapIds.indexOf(event.beatmapsetId) == -1) {
             mapIds.push(event.beatmapsetId);
         }
     });
     let allRankedEvents = [];
+
     for (let i = 0; i < mapIds.length; i++) {
         let mapId = mapIds[i];
         allRankedEvents.push(await aiessService.query({ beatmapsetId: mapId, eventType: 'Ranked' }, {}, { timestamp: 1 }, true));
     }
+
     let uniqueUsers = [];
+
     for (let i = 0; i < allRankedEvents.length; i++) {
         let eventGroup = allRankedEvents[i];
+
         for (let j = 0; j < eventGroup.length; j++) {
             let event = eventGroup[j];
             let mapperId = event.mapperId;
-            if(!event.mapperId){
+
+            if (!event.mapperId) {
                 let bmInfo = await api.beatmapsetInfo(event.beatmapsetId, true);
 
                 mapperId = parseInt(bmInfo[0].creator_id);
@@ -65,38 +73,43 @@ router.post('/search', async (req, res) => {
                     effort += (0.1*difficulty + 0.5)*(0.00385*drain + 0.5);
                 });
                 await aiessService.update(event.id, { effortBonus: effort });
-                
+
                 let u = await usersService.query({ osuId: mapperId });
-                if(u && u.group != 'user'){
+
+                if (u && u.group != 'user') {
                     await aiessService.update(event.id, { isBnOrNat: true });
                 }
-                
+
                 let userMaps = await api.beatmapsetOwnerMaps(mapperId);
                 let uniqueMapIds = [];
                 userMaps.forEach(map => {
-                    if(map.approved_date && uniqueMapIds.indexOf(map.beatmapset_id) == -1){
+                    if (map.approved_date && uniqueMapIds.indexOf(map.beatmapset_id) == -1) {
                         uniqueMapIds.push(map.beatmapset_id);
                     }
                 });
                 await aiessService.update(event.id, { mapperTotalRanked: uniqueMapIds.length });
             }
-        
+
             let uniqueMapperThreshold = new Date();
             uniqueMapperThreshold.setDate(uniqueMapperThreshold.getDate() - 90);
-            if(uniqueMapperThreshold < event.timestamp && uniqueUsers.indexOf(mapperId) == -1){
-                if(!event.mapperId){
+
+            if (uniqueMapperThreshold < event.timestamp && uniqueUsers.indexOf(mapperId) == -1) {
+                if (!event.mapperId) {
                     await aiessService.update(event.id, { isUnique: true });
                 }
+
                 uniqueUsers.push(mapperId);
             }
         }
     }
 
     let allRelatedEvents = [];
+
     for (let i = 0; i < mapIds.length; i++) {
         let mapId = mapIds[i];
         allRelatedEvents.push(await aiessService.query({ beatmapsetId: mapId }, {}, { timestamp: 1 }, true));
     }
+
     res.json({ events: allRelatedEvents, user: u });
 });
 

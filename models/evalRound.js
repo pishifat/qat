@@ -26,29 +26,31 @@ class EvalRoundService extends BaseService
     }
 
     /**
-     * 
+     *
      * @param {object} bnId UserId of bn to be evaluated
      * @param {string} mode 'osu', 'taiko', 'catch', 'mania'
-     * @param {date} deadline 
+     * @param {date} deadline
      */
     async create(bnId, mode, deadline) {
         try {
             return await EvalRound.create({ bn: bnId, mode, deadline });
-        } catch(error) {
+        } catch (error) {
             logsService.create(null, JSON.stringify(error), true);
+
             return { error: error._message };
         }
     }
 
     /**
-     * 
-     * @param {Array} evalRounds 
+     *
+     * @param {Array} evalRounds
      */
     async createMany(evalRounds) {
         try {
             return await EvalRound.insertMany(evalRounds);
-        } catch(error) {
+        } catch (error) {
             logsService.create(null, JSON.stringify(error), true);
+
             return { error: 'Something went wrong!' };
         }
     }
@@ -56,10 +58,12 @@ class EvalRoundService extends BaseService
     async deleteManyByUserId(userId) {
         let minDate = new Date();
         minDate.setDate(minDate.getDate() + 14);
+
         try {
             return await EvalRound.deleteMany({ bn: userId, active: true, deadline: { $gte: minDate } });
-        } catch(error) {
+        } catch (error) {
             logsService.create(null, JSON.stringify(error), true);
+
             return { error: 'Something went wrong!' };
         }
     }

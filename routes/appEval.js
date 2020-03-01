@@ -42,14 +42,15 @@ const defaultPopulate = [
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res) => {
     let a = [];
-    if(res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator){
+
+    if (res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator) {
         a = await bnAppsService.query(
             { active: true, test: { $exists: true } },
             defaultPopulate,
             { createdAt: 1, consensus: 1, feedback: 1  },
             true
         );
-    }else{
+    } else {
         a = await bnAppsService.query(
             { test: { $exists: true }, bnEvaluators: req.session.mongoId },
             defaultPopulate,
@@ -57,7 +58,7 @@ router.get('/relevantInfo', async (req, res) => {
             true
         );
     }
-    
+
     res.json({ a, evaluator: res.locals.userRequest });
 });
 
@@ -86,29 +87,31 @@ router.post('/submitEval/:id', api.isNotSpectator, async (req, res) => {
                     url: `https://osu.ppy.sh/users/${req.session.osuId}`,
                 },
                 color: '3800465',
-                fields:[
+                fields: [
                     {
                         name: `http://bn.mappersguild.com/appeval?eval=${a.id}`,
                         value: `Submitted BN app eval for **${a.applicant.username}**`,
                     },
                 ],
-            }], 
+            }],
             a.mode
         );
         let twoEvaluationModes = ['taiko', 'mania'];
         let threeEvaluationModes = ['osu', 'catch'];
-        if(!a.discussion && ((threeEvaluationModes.includes(a.mode) && a.evaluations.length > 2) || (twoEvaluationModes.includes(a.mode) && a.evaluations.length > 1))){
+
+        if (!a.discussion && ((threeEvaluationModes.includes(a.mode) && a.evaluations.length > 2) || (twoEvaluationModes.includes(a.mode) && a.evaluations.length > 1))) {
             let pass = 0;
             let neutral = 0;
             let fail = 0;
             let nat = 0;
             a.evaluations.forEach(evaluation => {
-                if(evaluation.evaluator.group == 'nat') nat++;
-                if(evaluation.vote == 1) pass++;
-                else if(evaluation.vote == 2) neutral++;
-                else if(evaluation.vote == 3) fail++;
+                if (evaluation.evaluator.group == 'nat') nat++;
+                if (evaluation.vote == 1) pass++;
+                else if (evaluation.vote == 2) neutral++;
+                else if (evaluation.vote == 3) fail++;
             });
-            if((threeEvaluationModes.includes(a.mode) && nat > 2) || (twoEvaluationModes.includes(a.mode) && nat > 1)){
+
+            if ((threeEvaluationModes.includes(a.mode) && nat > 2) || (twoEvaluationModes.includes(a.mode) && nat > 1)) {
                 await bnAppsService.update(req.params.id, { discussion: true });
                 api.webhookPost(
                     [{
@@ -117,10 +120,10 @@ router.post('/submitEval/:id', api.isNotSpectator, async (req, res) => {
                             url: `https://osu.ppy.sh/users/${a.applicant.osuId}`,
                         },
                         thumbnail: {
-                            url:  `https://a.ppy.sh/${a.applicant.osuId}`,
+                            url: `https://a.ppy.sh/${a.applicant.osuId}`,
                         },
                         color: '3773329',
-                        fields:[
+                        fields: [
                             {
                                 name: `http://bn.mappersguild.com/appeval?eval=${a.id}`,
                                 value: 'BN app moved to group discussion',
@@ -130,12 +133,13 @@ router.post('/submitEval/:id', api.isNotSpectator, async (req, res) => {
                                 value: `Pass: **${pass}**, Neutral: **${neutral}**, Fail: **${fail}**`,
                             },
                         ],
-                    }], 
+                    }],
                     a.mode
                 );
             }
         }
     }
+
     let a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(a);
     logsService.create(
@@ -153,9 +157,9 @@ router.post('/setGroupEval/', api.isNat, async (req, res) => {
         let neutral = 0;
         let fail = 0;
         a.evaluations.forEach(evaluation => {
-            if(evaluation.vote == 1) pass++;
-            else if(evaluation.vote == 2) neutral++;
-            else if(evaluation.vote == 3) fail++;
+            if (evaluation.vote == 1) pass++;
+            else if (evaluation.vote == 2) neutral++;
+            else if (evaluation.vote == 3) fail++;
         });
         api.webhookPost(
             [{
@@ -165,7 +169,7 @@ router.post('/setGroupEval/', api.isNat, async (req, res) => {
                     url: `https://osu.ppy.sh/users/${req.session.osuId}`,
                 },
                 color: '3773329',
-                fields:[
+                fields: [
                     {
                         name: `http://bn.mappersguild.com/appeval?eval=${a.id}`,
                         value: `Moved **${a.applicant.username}**'s BN app to group discussion`,
@@ -175,7 +179,7 @@ router.post('/setGroupEval/', api.isNat, async (req, res) => {
                         value: `Pass: **${pass}**, Neutral: **${neutral}**, Fail: **${fail}**`,
                     },
                 ],
-            }], 
+            }],
             a.mode
         );
     }
@@ -207,17 +211,20 @@ router.post('/setComplete/', api.isNat, async (req, res) => {
     for (let i = 0; i < req.body.checkedApps.length; i++) {
         let a = await bnAppsService.query({ _id: req.body.checkedApps[i] });
         let u = await usersService.query({ _id: a.applicant });
+
         if (a.consensus == 'pass') {
             await usersService.update(u.id, { $push: { modes: a.mode } });
             await usersService.update(u.id, { $push: { probation: a.mode } });
             let deadline = new Date();
             deadline.setDate(deadline.getDate() + 40);
             await evalRoundsService.create(a.applicant, a.mode, deadline);
+
             if (u.group == 'user') {
                 await usersService.update(u.id, { group: 'bn' });
                 await usersService.update(u.id, { $push: { bnDuration: new Date() } });
             }
         }
+
         await bnAppsService.update(a.id, { active: false });
         api.webhookPost(
             [{
@@ -227,7 +234,7 @@ router.post('/setComplete/', api.isNat, async (req, res) => {
                     url: `https://osu.ppy.sh/users/${req.session.osuId}`,
                 },
                 color: '6579298',
-                fields:[
+                fields: [
                     {
                         name: `http://bn.mappersguild.com/appeval?eval=${a.id}`,
                         value: `Archived **${u.username}**'s BN app`,
@@ -237,7 +244,7 @@ router.post('/setComplete/', api.isNat, async (req, res) => {
                         value: `${a.consensus == 'pass' ? 'Pass' : 'Fail'}`,
                     },
                 ],
-            }], 
+            }],
             a.mode
         );
         logsService.create(
@@ -257,11 +264,13 @@ router.post('/setComplete/', api.isNat, async (req, res) => {
 /* POST set consensus of eval */
 router.post('/setConsensus/:id', api.isNat, api.isNotSpectator, async (req, res) => {
     let a = await bnAppsService.update(req.params.id, { consensus: req.body.consensus });
-    if(req.body.consensus == 'fail'){
+
+    if (req.body.consensus == 'fail') {
         let date = new Date(a.createdAt);
         date.setDate(date.getDate() + 90);
         await bnAppsService.update(req.params.id, { cooldownDate: date });
     }
+
     a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(a);
     logsService.create(
@@ -276,13 +285,13 @@ router.post('/setConsensus/:id', api.isNat, api.isNotSpectator, async (req, res)
                 url: `https://osu.ppy.sh/users/${req.session.osuId}`,
             },
             color: '13272813',
-            fields:[
+            fields: [
                 {
                     name: `http://bn.mappersguild.com/appeval?eval=${a.id}`,
                     value: `**${a.applicant.username}**'s BN app set to **${req.body.consensus}**`,
                 },
             ],
-        }], 
+        }],
         a.mode
     );
 });
@@ -304,13 +313,13 @@ router.post('/setCooldownDate/:id', api.isNotSpectator, async (req, res) => {
                 url: `https://osu.ppy.sh/users/${req.session.osuId}`,
             },
             color: '16631799',
-            fields:[
+            fields: [
                 {
                     name: `http://bn.mappersguild.com/appeval?eval=${a.id}`,
                     value: `**${a.applicant.username}**'s re-application date set to **${req.body.cooldownDate.toString().slice(0,10)}**`,
                 },
             ],
-        }], 
+        }],
         a.mode
     );
 });
@@ -320,18 +329,20 @@ router.post('/setFeedback/:id', api.isNat, api.isNotSpectator, async (req, res) 
     await bnAppsService.update(req.params.id, { feedback: req.body.feedback });
     let a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(a);
-    if(!req.body.hasFeedback){
+
+    if (!req.body.hasFeedback) {
         logsService.create(
             req.session.mongoId,
             `Created feedback for ${a.applicant.username}'s ${a.mode} BN app`
         );
         bnAppsService.update(req.params.id, { feedbackAuthor: req.session.mongoId });
-    }else{
+    } else {
         logsService.create(
             req.session.mongoId,
             `Edited feedback of ${a.applicant.username}'s ${a.mode} BN app`
         );
     }
+
     api.webhookPost(
         [{
             author: {
@@ -340,13 +351,13 @@ router.post('/setFeedback/:id', api.isNat, api.isNotSpectator, async (req, res) 
                 url: `https://osu.ppy.sh/users/${req.session.osuId}`,
             },
             color: '5762129',
-            fields:[
+            fields: [
                 {
                     name: `http://bn.mappersguild.com/appeval?eval=${a.id}`,
                     value: `**${a.applicant.username}'s feedback**: ${req.body.feedback.length > 975 ? req.body.feedback.slice(0,975) + '... *(truncated)*' : req.body.feedback}`,
                 },
             ],
-        }], 
+        }],
         a.mode
     );
 });
@@ -356,7 +367,8 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
     let a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
     let isNat = Boolean(req.body.isNat);
     let newEvaluator;
-    if(isNat){
+
+    if (isNat) {
         const invalids = [8129817, 3178418];
         a.natEvaluators.forEach(user => {
             invalids.push(user.osuId);
@@ -367,7 +379,7 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
         ]);
         await bnAppsService.update(req.params.id, { $push: { natEvaluators: newEvaluator[0]._id } });
         await bnAppsService.update(req.params.id, { $pull: { natEvaluators: req.body.evaluatorId } });
-    }else{
+    } else {
         let invalids = [];
         a.bnEvaluators.forEach(user => {
             invalids.push(user.osuId);
@@ -379,6 +391,7 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
         await bnAppsService.update(req.params.id, { $push: { bnEvaluators: newEvaluator[0]._id } });
         await bnAppsService.update(req.params.id, { $pull: { bnEvaluators: req.body.evaluatorId } });
     }
+
     a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(a);
     logsService.create(
@@ -394,13 +407,13 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
                 url: `https://osu.ppy.sh/users/${req.session.osuId}`,
             },
             color: '16747310',
-            fields:[
+            fields: [
                 {
                     name: `http://bn.mappersguild.com/appeval?eval=${a.id}`,
                     value: `**${newEvaluator[0].username}** replaced **${u.username}** as ${isNat ? 'NAT' : 'BN'} evaluator for **${a.applicant.username}**'s BN app`,
                 },
             ],
-        }], 
+        }],
         a.mode
     );
 });
@@ -412,18 +425,22 @@ router.post('/selectBnEvaluators', api.isLeader, async (req, res) => {
         { $sample: { size: 1000 } },
     ]);
     let usernames = [];
+
     for (let i = 0; i < allUsers.length; i++) {
         let user = allUsers[i];
+
         if (
             user.modes.indexOf(req.body.mode) >= 0 &&
             user.probation.indexOf(req.body.mode) < 0
         ) {
             usernames.push(user);
+
             if (usernames.length >= (req.body.mode == 'osu' ? 6 : 3)) {
                 break;
             }
         }
     }
+
     res.json(usernames);
 });
 
@@ -433,6 +450,7 @@ router.post('/enableBnEvaluators/:id', api.isLeader, async (req, res) => {
         let bn = req.body.bnEvaluators[i];
         await bnAppsService.update(req.params.id, { $push: { bnEvaluators: bn._id } });
     }
+
     let a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(a);
     logsService.create(
@@ -447,13 +465,13 @@ router.post('/enableBnEvaluators/:id', api.isLeader, async (req, res) => {
                 url: `https://osu.ppy.sh/users/${req.session.osuId}`,
             },
             color: '3115512',
-            fields:[
+            fields: [
                 {
                     name: `http://bn.mappersguild.com/appeval?eval=${a.id}`,
                     value: `Enabled BN evaluators for **${a.applicant.username}**`,
                 },
             ],
-        }], 
+        }],
         a.mode
     );
 });

@@ -76,6 +76,7 @@ router.post('/toggleActive/:id', api.isNotSpectator, async (req, res) => {
 /* POST add option */
 router.post('/addOption/:id', api.isNotSpectator, async (req, res) => {
     let o = await optionsService.create(req.body.option, req.body.score);
+
     if (!o || o.error) {
         return res.json({ error: 'Something went wrong!' });
     }
@@ -94,9 +95,11 @@ router.post('/addOption/:id', api.isNotSpectator, async (req, res) => {
 /* POST edit option */
 router.post('/updateOption/:id', api.isNotSpectator, async (req, res) => {
     let o = await optionsService.update(req.params.id, { content: req.body.option, score: req.body.score });
+
     if (!o) {
         return res.json({ error: 'Something went wrong!' });
     }
+
     let q = await questionsService.query({ _id: req.body.questionId }, defaultPopulate);
     res.json(q);
     logsService.create(
@@ -113,6 +116,7 @@ router.post('/toggleActiveOption/', api.isNotSpectator, async (req, res) => {
         let o = await optionsService.query({ _id: req.body.checkedOptions[i] });
         await optionsService.update(req.body.checkedOptions[i], { active: !o.active });
     }
+
     let q = await questionsService.query({ _id: req.body.questionId }, defaultPopulate);
     res.json(q);
     logsService.create(

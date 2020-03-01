@@ -40,24 +40,24 @@ class UserService extends BaseService
     }
 
     /**
-     * 
+     *
      * @param {number} osuId Id from osu site
-     * @param {string} username 
+     * @param {string} username
      * @param {string} group Options: bn, nat, user
      */
     async create(osuId, username, group, isSpectator) {
         try {
             return await User.create({ osuId, username, group, isSpectator });
-        } catch(error) {
+        } catch (error) {
             return { error: error._message };
         }
     }
 
     /**
-     * 
-     * @param {boolean} includeFullBns 
-     * @param {boolean} includeProbation 
-     * @param {boolean} includeNat 
+     *
+     * @param {boolean} includeFullBns
+     * @param {boolean} includeProbation
+     * @param {boolean} includeNat
      */
     async getAllByMode(includeFullBns, includeProbation, includeNat) {
         if (!includeFullBns && !includeProbation && !includeNat) return null;
@@ -66,114 +66,127 @@ class UserService extends BaseService
             let allUsers;
             let allBns;
             let allNats;
-            
-            if(includeFullBns && includeProbation && includeNat){
+
+            if (includeFullBns && includeProbation && includeNat) {
                 allUsers = await User.aggregate([
                     {
                         $unwind: '$modes',
                     },
-                    { 
-                        $match: { 
-                            $or: [{ group: 'bn' }, 
-                                { $and:  
-                                    [{ group: 'nat', 
-                                        isSpectator: { $ne: true }, 
+                    {
+                        $match: {
+                            $or: [{ group: 'bn' },
+                                { $and:
+                                    [{ group: 'nat',
+                                        isSpectator: { $ne: true },
                                     }],
                                 }],
-                        }, 
+                        },
                     },
-                    { 
+                    {
                         $group: {
                             _id: '$modes', users: { $push: { id: '$_id', username: '$username', osuId: '$osuId', probation: '$probation', group: '$group' } },
-                        }, 
+                        },
                     },
                 ]);
-            }else if(includeFullBns || includeProbation){
+            } else if (includeFullBns || includeProbation) {
                 allBns = await User.aggregate([
                     {
                         $unwind: '$modes',
                     },
-                    { 
-                        $match: { 
+                    {
+                        $match: {
                             group: 'bn',
-                        }, 
+                        },
                     },
-                    { 
+                    {
                         $group: {
                             _id: '$modes', users: { $push: { id: '$_id', username: '$username', osuId: '$osuId', probation: '$probation', group: '$group' } },
-                        }, 
+                        },
                     },
                 ]);
             }
-            if(includeNat && (!includeFullBns || !includeProbation)){
+
+            if (includeNat && (!includeFullBns || !includeProbation)) {
                 allNats = await User.aggregate([
                     {
                         $unwind: '$modes',
                     },
-                    { 
-                        $match: { 
+                    {
+                        $match: {
                             group: 'nat',
-                            isSpectator: { $ne: true }, 
-                        }, 
+                            isSpectator: { $ne: true },
+                        },
                     },
-                    { 
+                    {
                         $group: {
                             _id: '$modes', users: { $push: { id: '$_id', username: '$username', osuId: '$osuId', group: '$group' } },
-                        }, 
+                        },
                     },
                 ]);
             }
-            if(includeFullBns && includeProbation && includeNat){
+
+            if (includeFullBns && includeProbation && includeNat) {
                 for (let i = 0; i < allUsers.length; i++) {
-                    allUsers[i].users.sort(function(a, b){
-                        if(a.username.toLowerCase() < b.username.toLowerCase()) return -1;
-                        if(a.username.toLowerCase() > b.username.toLowerCase()) return 1;
+                    allUsers[i].users.sort(function(a, b) {
+                        if (a.username.toLowerCase() < b.username.toLowerCase()) return -1;
+                        if (a.username.toLowerCase() > b.username.toLowerCase()) return 1;
+
                         return 0;
                     });
-                    allUsers[i].users.sort(function(a, b){
-                        if(a.group < b.group) return 1;
-                        if(a.group > b.group) return -1;
+                    allUsers[i].users.sort(function(a, b) {
+                        if (a.group < b.group) return 1;
+                        if (a.group > b.group) return -1;
+
                         return 0;
                     });
                 }
+
                 return allUsers;
-            }else if(!includeFullBns && !includeProbation){
+            } else if (!includeFullBns && !includeProbation) {
                 return allNats;
-            }else if(!includeNat && includeProbation && includeFullBns){
+            } else if (!includeNat && includeProbation && includeFullBns) {
                 return allBns;
-            }else if(includeProbation && !includeFullBns){
+            } else if (includeProbation && !includeFullBns) {
                 for (let i = 0; i < allBns.length; i++) {
                     allBns[i].users = allBns[i].users.filter(u => u.probation && u.probation.length);
                 }
+
                 allUsers = allBns;
-                if(includeNat){
+
+                if (includeNat) {
                     allUsers = allUsers.concat(allNats);
                 }
+
                 return allUsers;
-            }else if(!includeProbation && includeFullBns){
+            } else if (!includeProbation && includeFullBns) {
                 for (let i = 0; i < allBns.length; i++) {
                     allBns[i].users = allBns[i].users.filter(u => !u.probation || (u.probation && !u.probation.length));
                 }
+
                 allUsers = allBns;
-                if(includeNat){
+
+                if (includeNat) {
                     allUsers = allUsers.concat(allNats);
                 }
+
                 return allUsers;
             }
         } catch (error) {
             logsService.create(null, JSON.stringify(error), true);
+
             return { error: error._message };
         }
     }
 
     async getAllMediators() {
-        try{
+        try {
             return await User.aggregate([
                 { $match: { group: { $ne: 'user' }, vetoMediator: true, isSpectator: { $ne: true }, probation: { $size: 0 } } },
                 { $sample: { size: 1000 } },
             ]);
-        }catch (error) {
+        } catch (error) {
             logsService.create(null, JSON.stringify(error), true);
+
             return { error: error._message };
         }
     }

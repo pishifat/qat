@@ -56,12 +56,12 @@ router.get('/relevantInfo', async (req, res) => {
         { username: 1 },
         true
     );
-    res.json({ 
-        users: u, 
-        userId: req.session.mongoId, 
-        isLeader: res.locals.userRequest.isLeader, 
-        isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator, 
-        isBn: res.locals.userRequest.group == 'bn', 
+    res.json({
+        users: u,
+        userId: req.session.mongoId,
+        isLeader: res.locals.userRequest.isLeader,
+        isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
+        isBn: res.locals.userRequest.group == 'bn',
     });
 });
 
@@ -83,7 +83,7 @@ router.post('/switchGroup/:id', api.isLeader, async (req, res) => {
     let deadline = new Date();
     deadline.setDate(deadline.getDate() + 100);
     await evalRoundsService.create(u.id, u.modes[0], deadline);
-    
+
     logsService.create(
         req.session.mongoId,
         `Changed usergroup of "${u.username}" to "${req.body.group.toUpperCase()}"`
@@ -133,7 +133,7 @@ router.post('/saveNote/:id', api.isNat, async (req, res) => {
                 url: `https://osu.ppy.sh/users/${note.author.osuId}`,
             },
             color: '7952450',
-            fields:[
+            fields: [
                 {
                     name: `http://bn.mappersguild.com/users?id=${note.user.id}`,
                     value: `Added note to **${note.user.username}**'s profile`,
@@ -143,7 +143,7 @@ router.post('/saveNote/:id', api.isNat, async (req, res) => {
                     value: req.body.comment.length > 975 ? req.body.comment.slice(0,975) + '... *(truncated)*' : req.body.comment,
                 },
             ],
-        }], 
+        }],
         u.modes[0]
     );
 });
@@ -174,9 +174,11 @@ router.post('/editNote/:id', api.isNat, async (req, res) => {
 /* GET user next evaluation */
 router.get('/loadNextEvaluation/:id', api.isNat, async (req, res) => {
     let er = await evalRoundsService.query({ bn: req.params.id, active: true });
+
     if (!er) {
         return res.json('Never');
     }
+
     res.json(er.deadline);
 });
 
@@ -194,17 +196,20 @@ router.get('/findUserBadgeInfo', async (req, res) => {
 /* POST edit badge value */
 router.post('/editBadgeValue/:id', api.isLeader, async (req, res) => {
     let u = await usersService.query({ _id: req.params.id });
-    if(res.locals.userRequest.osuId == '3178418'){ //i dont want anyone else messing with this
+
+    if (res.locals.userRequest.osuId == '3178418') { //i dont want anyone else messing with this
         let years;
         let num = req.body.add ? 1 : -1;
-        if(req.body.group == 'bn'){
+
+        if (req.body.group == 'bn') {
             years = u.bnProfileBadge + num;
             await usersService.update(req.params.id, { bnProfileBadge: years });
-        }else{
+        } else {
             years = u.natProfileBadge + num;
             await usersService.update(req.params.id, { natProfileBadge: years });
         }
     }
+
     u = await usersService.query({ _id: req.params.id });
     res.json(u);
 });
@@ -216,8 +221,8 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
     minEvalDate.setDate(minEvalDate.getDate() - (parseInt(req.params.days)));
     let maxDate = new Date();
     const [users, bnApps, bnRounds] = await Promise.all([
-        usersService.query({ 
-            group: 'nat', 
+        usersService.query({
+            group: 'nat',
             modes: req.params.mode,
             isSpectator: { $ne: true } },
         {}, { username: 1 }, true),
@@ -229,36 +234,38 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
     const invalids = [8129817, 3178418];
     let info = [];
     users.forEach(user => {
-        if(invalids.indexOf(user.osuId) == -1){
+        if (invalids.indexOf(user.osuId) == -1) {
             let evalsOnBnApps = 0;
             let evalsOnCurrentBnEvals = 0;
             let feedbackCount = 0;
             bnApps.forEach(app => {
                 app.evaluations.forEach(evaluation => {
-                    if(evaluation.evaluator == user.id){
+                    if (evaluation.evaluator == user.id) {
                         evalsOnBnApps++;
-                    }    
+                    }
                 });
-                if(app.feedbackAuthor == user.id){
+
+                if (app.feedbackAuthor == user.id) {
                     feedbackCount++;
                 }
             });
             bnRounds.forEach(round => {
                 round.evaluations.forEach(evaluation => {
-                    if(evaluation.evaluator == user.id){
+                    if (evaluation.evaluator == user.id) {
                         evalsOnCurrentBnEvals++;
-                    }    
+                    }
                 });
-                if(round.feedbackAuthor == user.id){
+
+                if (round.feedbackAuthor == user.id) {
                     feedbackCount++;
                 }
             });
-            info.push({ 
-                username: user.username, 
-                osuId: user.osuId, 
-                totalBnAppEvals: evalsOnBnApps, 
-                totalCurrentBnEvals: evalsOnCurrentBnEvals, 
-                totalWrittenFeedbacks: feedbackCount, 
+            info.push({
+                username: user.username,
+                osuId: user.osuId,
+                totalBnAppEvals: evalsOnBnApps,
+                totalCurrentBnEvals: evalsOnCurrentBnEvals,
+                totalWrittenFeedbacks: feedbackCount,
                 joinDate: user.natDuration[user.natDuration.length - 1],
             });
         }
@@ -272,8 +279,8 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
     minDate.setDate(minDate.getDate() - parseInt(req.params.days));
     let maxDate = new Date();
     const [users, allEvents, allActiveEvalRounds] = await Promise.all([
-        usersService.query({ 
-            group: 'bn', 
+        usersService.query({
+            group: 'bn',
             modes: req.params.mode,
             isSpectator: { $ne: true } },
         {}, { username: 1 }, true),
@@ -285,14 +292,16 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
     users.forEach(user => {
         let uniqueNominations = [];
         let nominationResets = 0;
+
         for (let i = 0; i < allEvents.length; i++) {
             const eventType = allEvents[i]._id;
             const events = allEvents[i].events;
-    
+
             if (eventType == 'Bubbled' || eventType == 'Qualified') {
                 for (let j = 0; j < events.length; j++) {
                     let event = events[j];
-                    if(event.userId == user.osuId){
+
+                    if (event.userId == user.osuId) {
                         if (uniqueNominations.length == 0) {
                             uniqueNominations.push(events);
                         } else if (!uniqueNominations.find(n => n.beatmapsetId == event.beatmapsetId)) {
@@ -302,7 +311,7 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
                 }
             } else if (eventType == 'Popped' || eventType == 'Disqualified') {
                 for (let j = 0; j < events.length; j++) {
-                    if(events[j].userId == user.osuId){
+                    if (events[j].userId == user.osuId) {
                         nominationResets++;
                     }
                 }
@@ -310,20 +319,23 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
         }
 
         let deadline;
+
         for (let i = 0; i < allActiveEvalRounds.length; i++) {
             const evalRound = allActiveEvalRounds[i];
+
             if (evalRound.bn == user.id) {
                 deadline = evalRound.deadline;
                 break;
             }
         }
+
         if (!deadline) deadline = 'Never';
 
-        info.push({ 
-            username: user.username, 
-            osuId: user.osuId, 
-            uniqueNominations: uniqueNominations.length, 
-            nominationResets, 
+        info.push({
+            username: user.username,
+            osuId: user.osuId,
+            uniqueNominations: uniqueNominations.length,
+            nominationResets,
             joinDate: user.bnDuration[user.bnDuration.length - 1],
             nextEvaluation: deadline,
         });
@@ -335,10 +347,10 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
 /* GET potential NAT info */
 router.get('/findPotentialNatInfo/', async (req, res) => {
     const [users, applications] = await Promise.all([
-        usersService.query({ 
-            group: 'bn', 
+        usersService.query({
+            group: 'bn',
             isSpectator: { $ne: true },
-            isBnEvaluator: true }, 
+            isBnEvaluator: true },
         {}, { username: 1 }, true),
         bnAppsService.query({ bnEvaluators: { $exists: true, $not: { $size: 0 } }, active: false }, appPopulate, {}, true),
     ]);
@@ -348,7 +360,7 @@ router.get('/findPotentialNatInfo/', async (req, res) => {
         let evaluatedApps = [];
         applications.forEach(app => {
             app.evaluations.forEach(evaluation => {
-                if(evaluation.evaluator.id == user.id){
+                if (evaluation.evaluator.id == user.id) {
                     evaluatedApps.push(app);
                 }
             });

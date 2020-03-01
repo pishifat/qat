@@ -22,25 +22,26 @@ class DiscussionService extends BaseService
     }
 
     /**
-     * 
-     * @param {string} discussionLink 
+     *
+     * @param {string} discussionLink
      * @param {string} title
-     * @param {string} shortReason 
+     * @param {string} shortReason
      * @param {string} mode 'osu', 'taiko', 'catch', 'mania', 'all'
      * @param {Boolean} isNatOnly
      */
     async create(discussionLink, title, shortReason, mode, creator, isNatOnly) {
         try {
-            return await Discussion.create({ 
-                discussionLink, 
+            return await Discussion.create({
+                discussionLink,
                 title,
-                shortReason, 
-                mode, 
+                shortReason,
+                mode,
                 creator,
                 isNatOnly,
             });
-        } catch(error) {
+        } catch (error) {
             logsService.create(null, JSON.stringify(error), true);
+
             return { error: 'could not create Discussion' };
         }
     }

@@ -17,16 +17,17 @@ class BeatmapReportService extends BaseService
     }
 
     /**
-     * 
+     *
      * @param {number} beatmapsetId
-     * @param {number} postId 
-     * @param {number} reporterUserId 
+     * @param {number} postId
+     * @param {number} reporterUserId
      */
     async create(beatmapsetId, postId, reporterUserId) {
         try {
             return await BeatmapReport.create({ beatmapsetId, postId, reporterUserId });
-        } catch(error) {
+        } catch (error) {
             logsService.create(null, JSON.stringify(error), true);
+
             return { error: error._message };
         }
     }

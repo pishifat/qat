@@ -22,16 +22,17 @@ class ReportService extends BaseService
     }
 
     /**
-     * 
+     *
      * @param {object} reporter UserId who creates
      * @param {object} culpritId UserId who is being reported
-     * @param {string} reason 
+     * @param {string} reason
      */
     async create(reporter, culpritId, reason, link) {
         try {
             return await Report.create({ reporter, culprit: culpritId, reason, link });
-        } catch(error) {
+        } catch (error) {
             logsService.create(null, JSON.stringify(error), true);
+
             return { error: error._message };
         }
     }

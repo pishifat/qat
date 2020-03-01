@@ -98,7 +98,7 @@ router.post('/submitTest', async (req, res) => {
     const currentBnApp = await bnAppsService.query({
         applicant: req.session.mongoId,
         mode: test.mode,
-        active: true, 
+        active: true,
     });
 
     if (!test || test.error || !currentBnApp || currentBnApp.error) return res.json({ error: 'Something went wrong!' });
@@ -134,26 +134,32 @@ router.post('/submitTest', async (req, res) => {
     logsService.create(req.session.mongoId, `Completed ${test.mode} BN app test`);
     let u = res.locals.userRequest;
     let modsList = '';
+
     for (let i = 0; i < currentBnApp.mods.length; i++) {
         modsList += currentBnApp.mods[i];
-        if(i + 1 < currentBnApp.mods.length){
+
+        if (i + 1 < currentBnApp.mods.length) {
             modsList += ', ';
         }
     }
+
     const invalids = [8129817, 3178418];
     const assignedNat = await usersModel.aggregate([
         { $match: { group: 'nat', isSpectator: { $ne: true }, modes: test.mode, osuId: { $nin: invalids } } },
         { $sample: { size: test.mode == 'osu' || test.mode == 'catch' ? 3 : 2 } },
     ]);
     let natList = '';
+
     for (let i = 0; i < assignedNat.length; i++) {
         let user = assignedNat[i];
         await bnAppsService.update(currentBnApp.id, { $push: { natEvaluators: user._id } });
         natList += user.username;
-        if(i + 1 < assignedNat.length){
+
+        if (i + 1 < assignedNat.length) {
             natList += ', ';
         }
     }
+
     api.webhookPost(
         [{
             author: {
@@ -162,7 +168,7 @@ router.post('/submitTest', async (req, res) => {
                 url: `http://bn.mappersguild.com/appeval?eval=${currentBnApp.id}`,
             },
             color: '9884159',
-            fields:[
+            fields: [
                 {
                     name: 'New BN application',
                     value: `Test score: **${displayScore}**`,
@@ -176,7 +182,7 @@ router.post('/submitTest', async (req, res) => {
                     value: natList,
                 },
             ],
-        }], 
+        }],
         test.mode
     );
 });

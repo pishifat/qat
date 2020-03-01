@@ -10,8 +10,10 @@ $(function() {
         let username = $('#username').val();
         let reason = $('#reason').val();
         let link = $('#link').val();
+
         try {
-            const res = await axios.post(`/reports/submitReport`, { username: username, reason: reason, link: link });
+            const res = await axios.post(`/reports/submitReport`, { username, reason, link });
+
             if (res.data.error) {
                 $('#errors').text(res.data.error);
             } else {
@@ -23,6 +25,7 @@ $(function() {
             console.log(error);
             $('#errors').text('Something went wrong');
         }
+
         $('#report').attr('disabled', false);
     });
 });

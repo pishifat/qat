@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
     let isBnOrNat = user && user.isBnOrNat;
     let isBn = user && user.isBn && !user.isSpectator;
     let isNat = user && (user.isNat || user.isSpectator);
-    
+
     res.render('qatIndex', {
         title: 'NAT',
         layout: false,
@@ -36,9 +36,10 @@ router.get('/modsCount/:user', async (req, res) => {
     if (!req.params.user || req.params.user.trim() == '') {
         return res.json({ error: 'Missing user input' });
     }
-    
+
     const modCount = await getUserModsCount(req.params.user);
     if (modCount.error) return res.json(modCount.error);
+
     return res.json({ modCount });
 });
 
@@ -50,6 +51,7 @@ router.get(
     async (req, res, next) => {
         if (req.session.osuId && req.session.username) {
             const u = await usersService.query({ osuId: req.session.osuId });
+
             if (!u || u.error) {
                 const user = await usersService.create(
                     req.session.osuId,
@@ -61,6 +63,7 @@ router.get(
                 if (user && !user.error) {
                     req.session.mongoId = user._id;
                     logsService.create(req.session.mongoId, 'Verified their account for the first time');
+
                     return next();
                 } else {
                     return res.status(500).render('error', { message: 'Something went wrong!' });
@@ -70,15 +73,19 @@ router.get(
                     await usersService.update(u._id, { username: req.session.username });
                     logsService.create(u._id, `Username changed from "${u.username}" to "${req.session.username}"`);
                 }
+
                 if (u.isSpectator != req.session.isSpectator) {
                     await usersService.update(u._id, { isSpectator: req.session.isSpectator });
                     logsService.create(u._id, `User toggled spectator role`);
                 }
+
                 if (u.group != req.session.group) {
                     await usersService.update(u._id, { group: req.session.group });
                     logsService.create(u._id, `User group changed to ${req.session.group.toUpperCase()}`);
                 }
+
                 req.session.mongoId = u._id;
+
                 return next();
             }
         }
@@ -106,7 +113,7 @@ router.get(
         } else {
             res.redirect('/');
         }
-        
+
     }
 );
 
@@ -117,8 +124,10 @@ router.get('/callback', async (req, res) => {
     }
 
     const decodedState = Buffer.from(req.query.state, 'base64').toString('ascii');
+
     if (decodedState !== req.cookies._state) {
         res.clearCookie('_state');
+
         return res.status(403).render('error', { message: 'unauthorized' });
     }
 
@@ -135,6 +144,7 @@ router.get('/callback', async (req, res) => {
         req.session.refreshToken = response.refresh_token;
 
         response = await api.getUserInfo(req.session.accessToken);
+
         if (response.error) {
             res.status(500).render('error');
         } else if (response.is_nat) {
@@ -142,12 +152,14 @@ router.get('/callback', async (req, res) => {
             req.session.isSpectator = false;
         } else {
             req.session.isSpectator = response.is_gmt;
+
             if (response.is_bng) {
                 req.session.group = 'bn';
             } else {
                 req.session.group = 'user';
             }
         }
+
         req.session.username = response.username;
         req.session.osuId = response.id;
         res.redirect('/login');
@@ -155,7 +167,7 @@ router.get('/callback', async (req, res) => {
 });
 
 /* GET redirect to mgsite */
-router.get('/mgsite', async (req, res, next) => {
+router.get('/mgsite', (req, res) => {
     return res.redirect('https://mappersguild.com');
 });
 

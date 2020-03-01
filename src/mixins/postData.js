@@ -1,14 +1,18 @@
+import Axios from 'axios';
+
 const postData = {
     methods: {
         async executePost(path, data, e) {
             if (e) e.target.disabled = true;
 
             try {
-                const res = await axios.post(path, data);
+                const res = await Axios.post(path, data);
                 if (e) e.target.disabled = false;
+
                 return res.data;
             } catch (error) {
                 if (e) e.target.disabled = false;
+
                 return { error: 'Something went wrong' };
             }
         },
@@ -16,11 +20,13 @@ const postData = {
             if (e) e.target.disabled = true;
 
             try {
-                const res = await axios(path);
+                const res = await Axios(path);
                 if (e) e.target.disabled = false;
+
                 return res.data;
             } catch (error) {
                 if (e) e.target.disabled = false;
+
                 return { error: 'Something went wrong' };
             }
         },

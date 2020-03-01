@@ -3,8 +3,8 @@ const BaseService = require('../baseService');
 
 const questionSchema = new mongoose.Schema({
     category: { type: String, enum: [
-        'codeOfConduct', 'general', 'spread', 'metadata', 
-        'timing', 'audio', 'videoBackground', 'skinning', 
+        'codeOfConduct', 'general', 'spread', 'metadata',
+        'timing', 'audio', 'videoBackground', 'skinning',
         'storyboarding', 'osu', 'taiko', 'catch', 'mania', 'bn'], required: true },
     content: { type: String, required: true },
     active: { type: Boolean, default: false },
@@ -23,7 +23,7 @@ class QuestionService extends BaseService
     async remove(id) {
         try {
             return await Question.findByIdAndRemove(id);
-        } catch(error) {
+        } catch (error) {
             return { error: error._message };
         }
     }
@@ -31,11 +31,11 @@ class QuestionService extends BaseService
     async create(category, content, questionType) {
         try {
             return await Question.create({ category, content, questionType });
-        } catch(error) {
+        } catch (error) {
             return { error: error._message };
         }
     }
-    
+
 }
 
 const service = new QuestionService();

@@ -38,8 +38,9 @@ class TestSubmissionService extends BaseService
     async updateAnswer(id, update) {
         try {
             return await TestAnswer.findByIdAndUpdate(id, update, { 'new': true });
-        } catch(error) {
+        } catch (error) {
             logsService.create(null, JSON.stringify(error), true);
+
             return { error: error._message };
         }
     }
@@ -51,11 +52,11 @@ class TestSubmissionService extends BaseService
      */
     async create(applicant, mode) {
         try {
-            const test = await TestSubmission.create({ 
+            const test = await TestSubmission.create({
                 applicant,
                 mode,
             });
-            
+
             /* Dumb stuff that may revisit someday
             try {
                 // Group questions by category. Ex: { _id: 'osu', questions: [] }
@@ -82,9 +83,9 @@ class TestSubmissionService extends BaseService
 
             } catch (error) {
                 return { error: 'could not generate questions' };
-            } 
+            }
             */
-            
+
             let categoriesObject = [
                 { name: 'bn', total: 5 },
                 { name: 'codeOfConduct', total: 1 },
@@ -98,13 +99,16 @@ class TestSubmissionService extends BaseService
                 { name: 'storyboarding', total: 1 },
             ];
             categoriesObject.push({ name: mode, total: 6 });
-            
+
             let qs = [];
+
             for (let i = 0; i < categoriesObject.length; i++) {
                 const name = categoriesObject[i].name;
                 const total = categoriesObject[i].total;
+
                 try {
-                    const questionsByCategory = await questions.Question.aggregate([ { $match : { category: name, active: true } }, { $sample: { size: total } } ]);
+                    const questionsByCategory = await questions.Question.aggregate([ { $match: { category: name, active: true } }, { $sample: { size: total } } ]);
+
                     for (let j = 0; j < questionsByCategory.length; j++) {
                         const q = questionsByCategory[j];
                         qs.push(q);
@@ -113,7 +117,7 @@ class TestSubmissionService extends BaseService
                     return { error: 'Something went wrong' };
                 }
             }
-            
+
             let questionsToInsert = [];
             qs.forEach(q => {
                 questionsToInsert.push({
@@ -124,8 +128,9 @@ class TestSubmissionService extends BaseService
             await TestAnswer.insertMany(questionsToInsert);
 
             return test;
-        } catch(error) {
+        } catch (error) {
             logsService.create(null, JSON.stringify(error), true);
+
             return { error: 'could not create the test' };
         }
     }

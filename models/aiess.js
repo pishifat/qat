@@ -18,7 +18,7 @@ const aiessSchema = new mongoose.Schema({
     severity: { type: Number, default: null },
     mapperId: { type: Number },
     mapperTotalRanked: { type: Number },
-    isBnOrNat:  { type: Boolean, default: false },
+    isBnOrNat: { type: Boolean, default: false },
     isUnique: { type: Boolean, default: false },
     effortBonus: { type: Number }, //multiplier combining drain per diff, # diffs, and difficulty of each diff
     responsibleNominators: [{ type: Number }],
@@ -34,29 +34,29 @@ class AiessService extends BaseService
     }
 
     /**
-     * 
-     * @param {object} osuId 
+     *
+     * @param {object} osuId
      */
     async create(osuId) {
         try {
             return await Aiess.create({ userId: osuId });
-        } catch(error) {
+        } catch (error) {
             return { error: error._message };
         }
     }
 
     /**
      * Group all data by event
-     * @param {date} minDate 
-     * @param {date} maxDate 
-     * @param {string} mode 
+     * @param {date} minDate
+     * @param {date} maxDate
+     * @param {string} mode
      */
     async getAllByEventType(minDate, maxDate, mode) {
         if (!minDate && !maxDate && !mode) return null;
 
         try {
             return await Aiess.aggregate([
-                { 
+                {
                     $match: {
                         $or: [
                             { eventType: 'Disqualified' },
@@ -68,7 +68,7 @@ class AiessService extends BaseService
                             { timestamp: { $lte: maxDate } },
                         ],
                         modes: mode,
-                    }, 
+                    },
                 },
                 {
                     $sort: {
@@ -82,22 +82,22 @@ class AiessService extends BaseService
                     },
                 },
             ]);
-        } catch (error) {            
+        } catch (error) {
             return { error: error._message };
         }
     }
 
     /**
      * Group all data by event without mode and including nominations
-     * @param {date} minDate 
-     * @param {date} maxDate 
+     * @param {date} minDate
+     * @param {date} maxDate
      */
     async getAllActivity(minDate, maxDate, mode) {
         if (!minDate && !maxDate) return null;
 
         try {
             return await Aiess.aggregate([
-                { 
+                {
                     $match: {
                         $and: [
                             { timestamp: { $gte: minDate } },
@@ -105,7 +105,7 @@ class AiessService extends BaseService
                         ],
                         eventType: { $ne: 'Ranked' },
                         modes: mode,
-                    }, 
+                    },
                 },
                 {
                     $sort: {
@@ -119,17 +119,17 @@ class AiessService extends BaseService
                     },
                 },
             ]);
-        } catch (error) {            
+        } catch (error) {
             return { error: error._message };
         }
     }
-    
+
     /**
      * Group data of a user by event
-     * @param {number} userId 
+     * @param {number} userId
      * @param {date} minDate
-     * @param {date} maxDate 
-     * @param {string} mode 
+     * @param {date} maxDate
+     * @param {string} mode
      */
     async getByEventTypeAndUser(userId, minDate, maxDate, mode) {
         if (!userId && !minDate && !maxDate && !mode) return null;
@@ -137,7 +137,7 @@ class AiessService extends BaseService
         try {
             return await Aiess.aggregate([
                 {
-                    $match: { 
+                    $match: {
                         userId,
                         $and: [
                             { timestamp: { $gte: minDate } },
@@ -145,7 +145,7 @@ class AiessService extends BaseService
                         ],
                         eventType: { $ne: 'Ranked' },
                         modes: mode,
-                    }, 
+                    },
                 },
                 {
                     $sort: {
@@ -159,7 +159,7 @@ class AiessService extends BaseService
                     },
                 },
             ]);
-        } catch (error) {            
+        } catch (error) {
             return { error: error._message };
         }
     }

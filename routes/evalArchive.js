@@ -43,14 +43,17 @@ router.get('/relevantInfo', (req, res) => {
 router.get('/search/:user', async (req, res) => {
     let u;
     const userToSearch = helper.safeParam(req.params.user);
+
     if (isNaN(userToSearch)) {
         u = await usersService.query({ username: new RegExp('^' + helper.escapeUsername(userToSearch) + '$', 'i') });
     } else {
         u = await usersService.query({ osuId: parseInt(userToSearch) });
     }
+
     if (!u) {
         return res.json({ error: 'Cannot find user!' });
     }
+
     let a = await bnAppsService.query(
         { applicant: u.id, active: false, consensus: { $exists: true } },
         defaultAppPopulate,
@@ -74,27 +77,29 @@ router.get('/searchById/:id', async (req, res) => {
         { _id: idToSearch, active: false, consensus: { $exists: true } },
         defaultAppPopulate
     );
-    
-    if(!round){
+
+    if (!round) {
         round = await evalRoundsService.query(
             { _id: idToSearch, active: false, consensus: { $exists: true } },
             defaultBnPopulate
         );
     }
-    if(!round || !round.consensus){ //consensus because undefined round results in { error: undefined }, and that says !round is false
+
+    if (!round || !round.consensus) { //consensus because undefined round results in { error: undefined }, and that says !round is false
         return res.json({ error: 'Cannot find evaluation!' });
     }
-    
+
     res.json({ round, evaluator: res.locals.userRequest });
 });
 
 /* GET search by number of rounds */
 router.get('/searchRecent/:limit', async (req, res) => {
-    if(!req.params.limit){
+    if (!req.params.limit) {
         req.params.limit = 12;
-    }else{
+    } else {
         req.params.limit = parseInt(req.params.limit);
     }
+
     let a = await bnAppsService.query(
         { active: false, consensus: { $exists: true } },
         defaultAppPopulate,
@@ -131,11 +136,12 @@ router.post('/unarchive/:id', api.isNat, async (req, res) => {
             await usersService.update(u.id, { $pull: { modes: a.mode } });
             await usersService.update(u.id, { $pull: { probation: a.mode } });
             await evalRoundsService.deleteManyByUserId(u.id);
+
             if (u.modes.length == 1) {
                 await usersService.update(u.id, { group: 'user' });
                 await usersService.update(u.id, { $pop: { bnDuration: 1 } });
             }
-        } 
+        }
 
         await bnAppsService.update(a.id, { active: true });
 
@@ -147,13 +153,13 @@ router.post('/unarchive/:id', api.isNat, async (req, res) => {
                     url: `https://osu.ppy.sh/users/${req.session.osuId}`,
                 },
                 color: '15001599',
-                fields:[
+                fields: [
                     {
                         name: `http://bn.mappersguild.com/appeval?eval=${a.id}`,
                         value: `**${u.username}**'s application evaluation un-archived`,
                     },
                 ],
-            }], 
+            }],
             a.mode
         );
 
@@ -173,6 +179,7 @@ router.post('/unarchive/:id', api.isNat, async (req, res) => {
         if (er.consensus == 'fail') {
             await usersService.update(u.id, { $push: { modes: er.mode } });
             await usersService.update(u.id, { $push: { probation: er.mode } });
+
             if (!u.modes.length) {
                 await usersService.update(u.id, { group: 'bn' });
                 await usersService.update(u.id, { $pop: { bnDuration: 1 } });
@@ -181,7 +188,8 @@ router.post('/unarchive/:id', api.isNat, async (req, res) => {
 
         if (er.consensus == 'extend' || er.consensus == 'pass') {
             await evalRoundsService.deleteManyByUserId(u.id);
-            if(u.probation.indexOf(er.mode) < 0){
+
+            if (u.probation.indexOf(er.mode) < 0) {
                 await usersService.update(u.id, { $push: { probation: er.mode } });
             }
         }
@@ -196,13 +204,13 @@ router.post('/unarchive/:id', api.isNat, async (req, res) => {
                     url: `https://osu.ppy.sh/users/${req.session.osuId}`,
                 },
                 color: '15001599',
-                fields:[
+                fields: [
                     {
                         name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
                         value: `**${u.username}**'s current BN evaluation un-archived`,
                     },
                 ],
-            }], 
+            }],
             er.mode
         );
     }

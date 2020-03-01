@@ -27,6 +27,7 @@ const filters = {
             this.filterBySearchValue();
 
             this.isFiltered = this.filterValue.length > 2 || this.filterMode.length;
+
             if (this.sortBy) {
                 this.sort(this.sortBy, true);
             }
@@ -38,6 +39,7 @@ const filters = {
                 if (this.isFiltered) this.pageObjs = this.filteredObjs;
                 else this.pageObjs = this.allObjs;
             }
+
             if (this.hasSeparation) {
                 this.separateObjs();
             }
@@ -48,15 +50,19 @@ const filters = {
                     if (this.filterMode == 'osu' && ((v.mode && v.mode.indexOf('osu') !== -1) || (v.modes && v.modes.indexOf('osu') !== -1))) {
                         return true;
                     }
+
                     if (this.filterMode == 'taiko' && ((v.mode && v.mode.indexOf('taiko') !== -1) || (v.modes && v.modes.indexOf('taiko') !== -1))) {
                         return true;
                     }
+
                     if (this.filterMode == 'catch' && ((v.mode && v.mode.indexOf('catch') !== -1) || (v.modes && v.modes.indexOf('catch') !== -1))) {
                         return true;
                     }
+
                     if (this.filterMode == 'mania' &&  ((v.mode && v.mode.indexOf('mania') !== -1) || (v.modes && v.modes.indexOf('mania') !== -1))) {
                         return true;
                     }
+
                     return false;
                 });
             }
@@ -74,15 +80,17 @@ const filters = {
                 }
             }
         },
-        
-        
+
+
         sort (field, keepOrder) {
             this.sortBy = field;
+
             if (!keepOrder) {
                 this.asc = !this.asc;
             }
+
             if (this.sortBy == 'username') {
-                if(this.isFiltered){
+                if (this.isFiltered) {
                     this.filteredObjs.sort((a, b) => {
                         if (this.asc) {
                             return a.username.toLowerCase().localeCompare(b.username.toLowerCase());
@@ -90,7 +98,7 @@ const filters = {
                             return b.username.toLowerCase().localeCompare(a.username.toLowerCase());
                         }
                     });
-                }else{
+                } else {
                     this.allObjs.sort((a, b) => {
                         if (this.asc) {
                             return a.username.toLowerCase().localeCompare(b.username.toLowerCase());
@@ -100,7 +108,7 @@ const filters = {
                     });
                 }
             } else if (this.sortBy == 'createdAt') {
-                if(this.isFiltered){
+                if (this.isFiltered) {
                     this.filteredObjs.sort((a, b) => {
                         if (this.asc) {
                             if (a.createdAt > b.createdAt) return 1;
@@ -109,9 +117,10 @@ const filters = {
                             if (a.createdAt < b.createdAt) return 1;
                             if (a.createdAt > b.createdAt) return -1;
                         }
+
                         return 0;
                     });
-                }else{
+                } else {
                     this.allObjs.sort((a, b) => {
                         if (this.asc) {
                             if (a.createdAt > b.createdAt) return 1;
@@ -120,12 +129,13 @@ const filters = {
                             if (a.createdAt < b.createdAt) return 1;
                             if (a.createdAt > b.createdAt) return -1;
                         }
+
                         return 0;
                     });
                 }
-                
+
             } else if (this.sortBy == 'bnDuration') {
-                if(this.isFiltered){
+                if (this.isFiltered) {
                     this.filteredObjs.sort((a, b) => {
                         if (this.asc) {
                             if (this.sortDuration(a.bnDuration) > this.sortDuration(b.bnDuration)) return -1;
@@ -134,9 +144,10 @@ const filters = {
                             if (this.sortDuration(a.bnDuration) < this.sortDuration(b.bnDuration)) return -1;
                             if (this.sortDuration(a.bnDuration) > this.sortDuration(b.bnDuration)) return 1;
                         }
+
                         return 0;
                     });
-                }else{
+                } else {
                     this.allObjs.sort((a, b) => {
                         if (this.asc) {
                             if (this.sortDuration(a.bnDuration) > this.sortDuration(b.bnDuration)) return -1;
@@ -145,11 +156,12 @@ const filters = {
                             if (this.sortDuration(a.bnDuration) < this.sortDuration(b.bnDuration)) return -1;
                             if (this.sortDuration(a.bnDuration) > this.sortDuration(b.bnDuration)) return 1;
                         }
+
                         return 0;
                     });
                 }
             } else if (this.sortBy == 'natDuration') {
-                if(this.isFiltered){
+                if (this.isFiltered) {
                     this.filteredObjs.sort((a, b) => {
                         if (this.asc) {
                             if (this.sortDuration(a.natDuration) > this.sortDuration(b.natDuration)) return -1;
@@ -158,9 +170,10 @@ const filters = {
                             if (this.sortDuration(a.natDuration) < this.sortDuration(b.natDuration)) return -1;
                             if (this.sortDuration(a.natDuration) > this.sortDuration(b.natDuration)) return 1;
                         }
+
                         return 0;
                     });
-                }else{
+                } else {
                     this.allObjs.sort((a, b) => {
                         if (this.asc) {
                             if (this.sortDuration(a.natDuration) > this.sortDuration(b.natDuration)) return -1;
@@ -169,6 +182,7 @@ const filters = {
                             if (this.sortDuration(a.natDuration) < this.sortDuration(b.natDuration)) return -1;
                             if (this.sortDuration(a.natDuration) > this.sortDuration(b.natDuration)) return 1;
                         }
+
                         return 0;
                     });
                 }

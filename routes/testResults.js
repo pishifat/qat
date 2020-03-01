@@ -54,6 +54,7 @@ router.get('/relevantInfo', async (req, res) => {
 router.get('/search/:user', api.isNat, async (req, res) => {
     let user;
     const userToSearch = helper.safeParam(req.params.user);
+
     if (isNaN(userToSearch)) {
         user = await usersService.query({ username: new RegExp('^' + helper.escapeUsername(userToSearch) + '$', 'i') });
     } else {

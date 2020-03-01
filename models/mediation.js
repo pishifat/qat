@@ -17,14 +17,15 @@ class MediationService extends BaseService
     }
 
     /**
-     * 
+     *
      * @param {object} mediatorId UserId who mediates
      */
     async create(mediatorId) {
         try {
             return await Mediation.create({ mediator: mediatorId });
-        } catch(error) {
+        } catch (error) {
             logsService.create(null, JSON.stringify(error), true);
+
             return { error: error._message };
         }
     }

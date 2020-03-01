@@ -2,7 +2,6 @@ const express = require('express');
 const api = require('../helpers/api');
 const aiessService = require('../models/aiess').service;
 const logsService = require('../models/log').service;
-const helper = require('../helpers/helpers');
 
 const router = express.Router();
 
@@ -16,7 +15,7 @@ router.get('/', (req, res) => {
         script: '../javascripts/qualityAssurance.js',
         isQualityAssurance: true,
         isBn: res.locals.userRequest.isBn,
-        isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,     
+        isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
     });
 });
 
@@ -30,7 +29,7 @@ router.get('/relevantInfo', async (req, res) => {
     date.setDate(date.getDate() - 7);
     const [data, dqs] = await Promise.all([
         aiessService.query(
-            { 
+            {
                 eventType: 'Qualified',
                 timestamp: { $gte: date } },
             defaultPopulate,
@@ -38,7 +37,7 @@ router.get('/relevantInfo', async (req, res) => {
             true
         ),
         aiessService.query(
-            { 
+            {
                 eventType: 'Disqualified',
                 timestamp: { $gte: date } },
             defaultPopulate,
@@ -46,13 +45,13 @@ router.get('/relevantInfo', async (req, res) => {
             true
         ),
     ]);
-    res.json({ 
-        maps: data, 
-        dqs, 
-        userId: res.locals.userRequest.id, 
-        userOsuId: res.locals.userRequest.osuId, 
-        username: res.locals.userRequest.username, 
-        isNat: res.locals.userRequest.isNat, 
+    res.json({
+        maps: data,
+        dqs,
+        userId: res.locals.userRequest.id,
+        userOsuId: res.locals.userRequest.osuId,
+        username: res.locals.userRequest.username,
+        isNat: res.locals.userRequest.isNat,
         mode: res.locals.userRequest.modes[0] || 'osu',
     });
 });
@@ -62,9 +61,9 @@ router.get('/loadMore/:limit/:skip', async (req, res) => {
     let date = new Date();
     date.setDate(date.getDate() - 7);
     const data = await aiessService.query(
-        { 
-            eventType: 'Qualified', 
-            timestamp: { $lte: date }, 
+        {
+            eventType: 'Qualified',
+            timestamp: { $lte: date },
             hostId: { $exists: true },
         },
         defaultPopulate,
@@ -80,27 +79,33 @@ router.get('/loadMore/:limit/:skip', async (req, res) => {
 /* POST assign user */
 router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
     let e = await aiessService.query({ _id: req.params.id }, defaultPopulate);
-    
+
     let validMode;
+
     for (let i = 0; i < res.locals.userRequest.modes.length; i++) {
         const mode = res.locals.userRequest.modes[i];
+
         if (e.modes.includes(mode)) {
             validMode = true;
             break;
         }
     }
+
     if (!validMode) {
         return res.json({ error: 'Not qualified for this mode!' });
     }
-    
+
     let probation;
+
     for (let i = 0; i < res.locals.userRequest.probation.length; i++) {
         const mode = res.locals.userRequest.probation[i];
+
         if (e.modes.includes(mode)) {
             probation = true;
             break;
         }
     }
+
     if (probation) {
         return res.json({ error: 'Probation cannot do this!' });
     }
@@ -126,7 +131,7 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
         url: `https://osu.ppy.sh/beatmapsets/${e.beatmapsetId}`,
     };
     const thumbnail = {
-        url:  `https://b.ppy.sh/thumb/${e.beatmapsetId}.jpg`,
+        url: `https://b.ppy.sh/thumb/${e.beatmapsetId}.jpg`,
     };
     const colorUser = '11720607';
     const colorBeatmap = '11726590';
@@ -137,13 +142,16 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
         },
     ];
     let userList = '';
+
     for (let i = 0; i < e.qualityAssuranceCheckers.length; i++) {
         let user = e.qualityAssuranceCheckers[i];
         userList += user.username;
-        if(i + 1 < e.qualityAssuranceCheckers.length){
+
+        if (i + 1 < e.qualityAssuranceCheckers.length) {
             userList += ', ';
         }
     }
+
     const fieldsBeatmap = [
         {
             name: `http://bn.mappersguild.com/qualityassurance`,
@@ -161,9 +169,10 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
                 author: authorUser,
                 color: colorUser,
                 fields: fieldsUser,
-            }], 
+            }],
             'standardQualityAssurance'
         );
+
         if (e.qualityAssuranceCheckers.length > e.modes.length * 2 - 1) {
             api.webhookPost(
                 [{
@@ -171,19 +180,22 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
                     thumbnail,
                     color: colorBeatmap,
                     fields: fieldsBeatmap,
-                }], 
+                }],
                 'standardQualityAssurance'
             );
         }
-    } if (e.modes.includes('taiko') || e.modes.includes('catch') || e.modes.includes('mania')) {
+    }
+
+    if (e.modes.includes('taiko') || e.modes.includes('catch') || e.modes.includes('mania')) {
         await api.webhookPost(
             [{
                 author: authorUser,
                 color: colorUser,
                 fields: fieldsUser,
-            }], 
+            }],
             'taikoCatchManiaQualityAssurance'
         );
+
         if (e.qualityAssuranceCheckers.length > e.modes.length * 2 - 1) {
             api.webhookPost(
                 [{
@@ -191,13 +203,13 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
                     thumbnail,
                     color: colorBeatmap,
                     fields: fieldsBeatmap,
-                }], 
+                }],
                 'taikoCatchManiaQualityAssurance'
             );
         }
     }
-    
-    
+
+
 });
 
 /* POST unassign user */
@@ -232,16 +244,18 @@ router.post('/unassignUser/:id', api.isBnOrNat, async (req, res) => {
                 author,
                 color,
                 fields,
-            }], 
+            }],
             'standardQualityAssurance'
         );
-    } if (e.modes.includes('taiko') || e.modes.includes('catch') || e.modes.includes('mania')) {
+    }
+
+    if (e.modes.includes('taiko') || e.modes.includes('catch') || e.modes.includes('mania')) {
         api.webhookPost(
             [{
                 author,
                 color,
                 fields,
-            }], 
+            }],
             'taikoCatchManiaQualityAssurance'
         );
     }

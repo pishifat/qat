@@ -29,7 +29,7 @@ router.get('/relevantInfo', async (req, res) => {
         true
     );
     res.json({
-        events: data, 
+        events: data,
         mode: res.locals.userRequest.modes[0],
     });
 });
@@ -37,6 +37,7 @@ router.get('/relevantInfo', async (req, res) => {
 /* POST edit reason for dq/pop */
 router.post('/updateContent/:id', api.isNotSpectator, async (req, res) => {
     let a = await aiessService.update(req.params.id, { content: req.body.reason });
+
     if (!a) {
         res.json({ error: 'Something went wrong' });
     } else {
@@ -56,7 +57,7 @@ router.post('/updateContent/:id', api.isNotSpectator, async (req, res) => {
                         value: `Shortened **DQ/reset reason** of "${a.metadata}": ${req.body.reason}`,
                     },
                 ],
-            }], 
+            }],
             a.modes[0]
         );*/
     }
@@ -66,9 +67,11 @@ router.post('/updateContent/:id', api.isNotSpectator, async (req, res) => {
 router.post('/updateObviousness/:id', api.isNotSpectator, async (req, res) => {
     let obviousness = parseInt(req.body.obviousness);
     let a = await aiessService.query({ _id: req.params.id });
+
     if (obviousness == a.obviousness) {
         obviousness = null;
     }
+
     a = await aiessService.update(req.params.id, { obviousness });
 
     if (!a) {
@@ -90,7 +93,7 @@ router.post('/updateObviousness/:id', api.isNotSpectator, async (req, res) => {
                         value: `Set **obviousness** of "${a.metadata}": **${obviousness}**`,
                     },
                 ],
-            }], 
+            }],
             a.modes[0]
         );*/
     }
@@ -100,9 +103,11 @@ router.post('/updateObviousness/:id', api.isNotSpectator, async (req, res) => {
 router.post('/updateSeverity/:id', api.isNotSpectator, async (req, res) => {
     let severity = parseInt(req.body.severity);
     let a = await aiessService.query({ _id: req.params.id });
+
     if (severity == a.severity) {
         severity = null;
     }
+
     a = await aiessService.update(req.params.id, { severity });
 
     if (!a) {
@@ -124,7 +129,7 @@ router.post('/updateSeverity/:id', api.isNotSpectator, async (req, res) => {
                         value: `Set **obviousness** of "${a.metadata}": **${severity}**`,
                     },
                 ],
-            }], 
+            }],
             a.modes[0]
         );*/
     }

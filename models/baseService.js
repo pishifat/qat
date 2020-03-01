@@ -5,23 +5,23 @@ const logsService = require('./log').service;
 class BaseService {
 
     /**
-     * 
-     * @param {mongoose.Model} model 
+     *
+     * @param {mongoose.Model} model
      */
     constructor(model) {
         this.model = model;
     }
 
     /**
-     * 
+     *
      * @param {string} params ex: 'x: y'
      * @param {string} populate ex: 'populate: x, display: y' or 'innerPopulate: x, populate: y'
      * @param {string} sorting ex: 'x: -1'
-     * @param {boolean} getAll 
+     * @param {boolean} getAll
      */
     async query(params, populate, sorting, getAll, limit, skip) {
         let query;
-        
+
         if (getAll) {
             query = this.model.find(params);
         } else {
@@ -44,7 +44,7 @@ class BaseService {
             query.sort(sorting);
         }
 
-        if(limit) {
+        if (limit) {
             query.limit(limit);
         }
 
@@ -54,22 +54,24 @@ class BaseService {
 
         try {
             return await query.exec();
-        } catch(error) {
+        } catch (error) {
             logsService.create(null, JSON.stringify(error), true);
+
             return { error: error._message };
         }
     }
 
     /**
-     * 
+     *
      * @param {(string | object)} id id
      * @param {object} update ex: '{ x: y }'
      */
     async update(id, update) {
         try {
             return await this.model.findByIdAndUpdate(id, update, { 'new': true });
-        } catch(error) {
+        } catch (error) {
             logsService.create(null, JSON.stringify(error), true);
+
             return { error: error._message };
         }
     }
