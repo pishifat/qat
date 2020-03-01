@@ -1,3 +1,5 @@
+const axios = require('axios');
+const cheerio = require('cheerio');
 const api = require('./api');
 const helper = require('./helpers');
 const bnAppsService = require('../models/bnApp').service;
@@ -5,6 +7,7 @@ const vetoesService = require('../models/veto').service;
 const evalRoundsService = require('../models/evalRound').service;
 const usersModel = require('../models/user').User;
 const usersService = require('../models/user').service;
+const beatmapReportsService = require('../models/beatmapReport').service;
 
 const defaultAppPopulate = [{
     populate: 'applicant',
@@ -18,6 +21,7 @@ const defaultRoundPopulate = [{
 
 function notifyDeadlines() {
     setInterval(async () => {
+        // establish dates for reference
         const date = new Date();
         const nearDeadline = new Date();
         nearDeadline.setDate(nearDeadline.getDate() + 1);
@@ -26,32 +30,35 @@ function notifyDeadlines() {
         const endRange = new Date();
         endRange.setDate(endRange.getDate() + 14);
 
-        const activeApps = await bnAppsService.query(
-            { active: true, test: { $exists: true } },
-            defaultAppPopulate,
-            {},
-            true,
-        );
+        // find active events
+        const [activeApps, activeRounds, activeVetoes] = await Promise.all([
+            bnAppsService.query(
+                { active: true, test: { $exists: true } },
+                defaultAppPopulate,
+                {},
+                true,
+            ),
+            evalRoundsService.query(
+                { active: true },
+                defaultRoundPopulate,
+                {},
+                true,
+            ),
+            vetoesService.query(
+                { active: true },
+                {},
+                {},
+                true,
+            ),
+        ]);
 
-        const activeRounds = await evalRoundsService.query(
-            { active: true },
-            defaultRoundPopulate,
-            {},
-            true,
-        );
-
-        const activeVetoes = await vetoesService.query(
-            { active: true },
-            {},
-            {},
-            true,
-        );
-
+        // determine if NAT receives highlight by mode
         let osuHighlight;
         let taikoHighlight;
         let catchHighlight;
         let maniaHighlight;
 
+        // find and post webhook for vetoes
         for (let i = 0; i < activeVetoes.length; i++) {
             const veto = activeVetoes[i];
             let title = '';
@@ -81,6 +88,7 @@ function notifyDeadlines() {
             }
         }
 
+        // find and post webhook for BN applications
         for (let i = 0; i < activeApps.length; i++) {
             const app = activeApps[i];
 
@@ -115,6 +123,7 @@ function notifyDeadlines() {
             }
         }
 
+        // find and post webhook for current BN evals
         for (let i = 0; i < activeRounds.length; i++) {
             const round = activeRounds[i];
 
@@ -194,6 +203,7 @@ function notifyDeadlines() {
             }
         }
 
+        // send highlights if needed
         if (osuHighlight) api.highlightWebhookPost('time to find a new NAT member?', 'osu');
         if (taikoHighlight) api.highlightWebhookPost('i wonder who would make the best new NAT...', 'taiko');
         if (catchHighlight) api.highlightWebhookPost('oh no', 'catch');
@@ -202,4 +212,77 @@ function notifyDeadlines() {
     }, 86400000);
 }
 
-module.exports = notifyDeadlines;
+function notifyBeatmapReports() {
+    setInterval(async () => {
+        // find pending discussion posts
+        let url = 'https://osu.ppy.sh/beatmapsets/beatmap-discussions?user=&beatmapset_status=qualified&message_types%5B%5D=suggestion&message_types%5B%5D=problem&only_unresolved=on';
+        const historyHtml = await axios.get(url);
+        const $ = cheerio.load(historyHtml.data);
+        let discussions = JSON.parse($('#json-discussions').html());
+        console.log(discussions);
+
+        // find database's discussion posts
+        const date = new Date();
+        date.setDate(date.getDate() - 7);
+        let beatmapReports = await beatmapReportsService.query({ createdAt: { $gte: date }}, {}, {}, true);
+
+        // create array of reported beatmapsetIds
+        let beatmapsetIds = [];
+        beatmapReports.forEach(beatmapReport => {
+            if (!beatmapsetIds.includes(beatmapReport.beatmapsetId)) {
+                beatmapsetIds.push(beatmapReport.beatmapsetId);
+            }
+        });
+
+        // determine which posts haven't been sent to #report-feed
+        for (let i = 0; i < discussions.length; i++) {
+            const discussion = discussions[i];
+            let createWebhook;
+            if (!beatmapsetIds.includes(discussion.beatmapset_id)) {
+                createWebhook = true;
+            } else {
+                let alreadyReported = await beatmapReportsService.query({ 
+                    createdAt: { $gte: date }, 
+                    beatmapsetId: discussion.beatmapset_id, 
+                    reporterUserId: discussion.starting_post.user_id 
+                });
+                if (!alreadyReported) {
+                    createWebhook = true;
+                }
+            }
+
+            await helper.sleep(500);
+
+            // create event in db and send webhook
+            if (createWebhook) {
+                await beatmapReportsService.create(discussion.beatmapset_id, discussion.id, discussion.starting_post.user_id);
+                let userInfo = await api.getUserInfo(discussion.starting_post.user_id);
+                await api.webhookPost(
+                    [{
+                        author: {
+                            name: `USERNAME`,
+                            icon_url: `https://a.ppy.sh/${discussion.starting_post.user_id}`,
+                            url: `https://osu.ppy.sh/users/${discussion.starting_post.user_id}`,
+                        },
+                        thumbnail: {
+                            url:  `https://b.ppy.sh/thumb/${discussion.beatmapset_id}.jpg`,
+                        },
+                        color: discussion.message_type == 'suggestion' ? '16564064' : '15144231',
+                        fields:[
+                            {
+                                name: `https://osu.ppy.sh/beatmapsets/${discussion.beatmapset_id}/discussion/-/generalAll#/${discussion.id}`,
+                                value: discussion.starting_post.message.length > 500 ? discussion.starting_post.message + '... *(truncated)*' : discussion.starting_post.message,
+                            },
+                        ],
+                    }], 
+                    a.mode
+                );
+                await helper.sleep(500);
+            }
+        }
+
+        api.highlightWebhookPost('done', 'osu');
+    }, 15000);
+}
+
+module.exports = { notifyDeadlines, notifyBeatmapReports };

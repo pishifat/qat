@@ -37,6 +37,14 @@
         "id": "",
         "token": ""
     },
+    "beatmapReportWebhook": {
+        "id": "",
+        "token": "",
+        "osuRole": "",
+        "taikoRole": "",
+        "catchRole": "",
+        "maniaRole": ""
+    },
     "v1token": "",
     "id": 0,
     "secret": "",

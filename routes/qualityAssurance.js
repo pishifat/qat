@@ -247,13 +247,4 @@ router.post('/unassignUser/:id', api.isBnOrNat, async (req, res) => {
     }
 });
 
-/* GET load more content */
-router.get('/findPendingShit', async (req, res) => {
-    let x = await helper.findPendingShit();
-
-    console.log(x);
-
-    res.json({});
-});
-
 module.exports = router;

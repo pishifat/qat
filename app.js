@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const config = require('./config.json');
-const notifyDeadlines = require('./helpers/notifications');
+const notifications = require('./helpers/notifications');
 require('./helpers/hbs');
 
 const indexRouter = require('./routes/index');
@@ -137,7 +137,8 @@ server.on('error', (error) => {
 });
 server.on('listening', () => {
     console.log('Listening on ' + port);
-    notifyDeadlines();
+    notifications.notifyDeadlines();
+    notifications.notifyBeatmapReports();
 });
 
 module.exports = app;

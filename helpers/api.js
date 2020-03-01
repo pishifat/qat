@@ -98,6 +98,17 @@ async function beatmapsetInfo(setId, allDiffs) {
     }
 }
 
+async function getUserInfo(osuId) {
+    const url = `https://osu.ppy.sh/api/get_user?k=${config.v1token}&u=${osuId}`;
+
+    try {
+        const res = await axios.get(url);
+        return res.data;
+    } catch (error) {
+        return { error: 'Something went wrong!' };
+    }
+}
+
 async function isLoggedIn(req, res, next) {
     if (req.session.mongoId) {
         const u = await users.service.query({ _id: req.session.mongoId });
