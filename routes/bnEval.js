@@ -44,6 +44,18 @@ const notesPopulate = [
     { populate: 'author', display: 'username' },
 ];
 
+const applicationPopulate = [
+    { populate: 'applicant', display: 'username osuId' },
+    {
+        populate: 'evaluations',
+        display: 'evaluator behaviorComment moddingComment vote',
+    },
+    {
+        innerPopulate: 'evaluations',
+        populate: { path: 'evaluator', select: 'username osuId group' },
+    },
+];
+
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res) => {
     let minDate = new Date();
@@ -547,19 +559,21 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
     let minDate = new Date(req.params.deadline);
     minDate.setDate(minDate.getDate() - 90);
     let maxDate = new Date(req.params.deadline);
-    const [allUserEvents, allEvents, qualityAssuranceChecks] = await Promise.all([
+    const [user, allUserEvents, allEvents, qualityAssuranceChecks, assignedApplications] = await Promise.all([
+        usersService.query({ _id: req.params.mongoId }),
         aiessService.getByEventTypeAndUser(parseInt(req.params.id), minDate, maxDate, req.params.mode),
         aiessService.getAllByEventType(minDate, maxDate, req.params.mode),
         aiessService.query({ qualityAssuranceCheckers: req.params.mongoId, updatedAt: { $gte: minDate, $lte: maxDate } }, {}, {}, true),
+        bnAppsService.query({ bnEvaluators: req.params.mongoId, mode: req.params.mode, createdAt: { $gte: minDate } }, applicationPopulate, { createdAt: 1 }, true),
     ]);
     
-    if (allUserEvents.error || allEvents.error) return res.json({ error: 'Something went wrong!' });
-    
+    if (user.error || allUserEvents.error || allEvents.error || qualityAssuranceChecks.error || assignedApplications.error) return res.json({ error: 'Something went wrong!' });
+
+    // sort events done by user by type
     let nominations = [];
-    let uniqueNominations = [];
     let dqs = [];
     let pops = [];
-
+    
     allUserEvents.forEach(userEvent => {
         const eventType = userEvent._id;
         const events = userEvent.events;
@@ -575,6 +589,7 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
         }
     });
 
+    // sort nominations by date
     nominations.sort(function(a, b){
         let keyA = new Date(a.timestamp);
         let keyB = new Date(b.timestamp);
@@ -582,6 +597,9 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
         if(keyA > keyB) return 1;
         return 0;
     });
+
+    // remove duplicate nominations
+    let uniqueNominations = [];
 
     nominations.forEach(event => {
         if (uniqueNominations.length == 0) {
@@ -591,6 +609,7 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
         }
     });
 
+    // find user's disqualified/popped nominations
     let nomsDqd = [];
     let nomsPopped = [];
 
@@ -598,7 +617,6 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
         const eventType = allEvents[i]._id;
         const events = allEvents[i].events;
         
-        //this part is slow but necessary for accurate dq responsibility
         if (eventType == 'Disqualified') {
             for (let j = 0; j < events.length; j++) {
                 let event = events[j];
@@ -622,7 +640,52 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
         }
     }
 
-    res.json({ noms: uniqueNominations, nomsDqd, nomsPopped, dqs, pops, qualityAssuranceChecks });
+    // if user is NAT or was NAT during evaluation period...
+    let natApplications = [];
+    let natEvalRounds = [];
+
+    if (user.natDuration.length % 2 || user.natDuration[user.natDuration.length - 1] < minDate) {
+        // find all applications & evalRounds
+        const [allApplications, allEvalRounds] = await Promise.all([
+            bnAppsService.query(
+                { 
+                    createdAt: { $gte: minDate }, 
+                    mode: req.params.mode
+                }, 
+                applicationPopulate, { createdAt: 1 }, true),
+            evalRoundsService.query(
+                {
+                    deadline: { $gte: minDate },
+                    mode: req.params.mode
+                },
+                defaultPopulate, { createdAt: 1 }, true),
+            bnAppsService.query({ createdAt: { $gte: minDate } }, applicationPopulate, { createdAt: 1 }, true),
+        ]);
+
+        // extract apps that user evaluated or was assigned to
+        allApplications.forEach(application => {
+            for (let i = 0; i < application.evaluations.length; i++) {
+                const evaluation = application.evaluations[i];
+                if (evaluation.evaluator.id == user.id || (application.natEvaluators && application.natEvaluators.includes(user.id))) {
+                    natApplications.push(application);
+                    break;
+                }
+            }
+        });
+
+        // extract evalRounds that user evaluated or was assigned to
+        allEvalRounds.forEach(evalRound => {
+            for (let i = 0; i < evalRound.evaluations.length; i++) {
+                const evaluation = evalRound.evaluations[i];
+                if (evaluation.evaluator.id == user.id || (evalRound.natEvaluators && evalRound.natEvaluators.includes(user.id))) {
+                    natEvalRounds.push(evalRound);
+                    break;
+                }
+            }
+        });
+    }
+
+    res.json({ noms: uniqueNominations, nomsDqd, nomsPopped, dqs, pops, qualityAssuranceChecks, assignedApplications, natApplications, natEvalRounds });
 });
 
 module.exports = router;

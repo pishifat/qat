@@ -2,7 +2,7 @@
     <div>
         <p class="text-shadow min-spacing">
             <a :href="events && `#${eventsId}`" data-toggle="collapse">{{ header }} <i class="fas fa-angle-down" /></a> 
-            ({{ loading ? '...' : events ? events.length: '0' }})
+            ({{ loading ? '...' : events ? events.length : '0' }})
         </p>
         <div v-if="events" :id="eventsId" class="collapse">
             <table v-if="events.length" class="table table-sm table-dark table-hover col-md-12 mt-2">

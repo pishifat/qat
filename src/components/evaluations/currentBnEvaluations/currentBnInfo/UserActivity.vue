@@ -55,6 +55,33 @@
             :loading="loading"
             :is-nat="isNat"
         />
+        <evaluation-list
+            v-if="isNat && assignedApplications && assignedApplications.length"
+            :events="assignedApplications"
+            :events-id="'assignedApplications' + mode"
+            :header="'Application Evaluations (BN)'"
+            :loading="loading"
+            :is-application="true"
+            :user-id="userMongoId"
+        />
+        <evaluation-list
+            v-if="isNat && natApplications && natApplications.length"
+            :events="natApplications"
+            :events-id="'natApplications' + mode"
+            :header="'Application Evaluations (NAT)'"
+            :loading="loading"
+            :is-application="true"
+            :user-id="userMongoId"
+        />
+        <evaluation-list
+            v-if="isNat && natEvalRounds && natEvalRounds.length"
+            :events="natEvalRounds"
+            :events-id="'natEvalRounds' + mode"
+            :header="'Current BN Evaluations (NAT)'"
+            :loading="loading"
+            :is-application="false"
+            :user-id="userMongoId"
+        />
     </div>
 </template>
 
@@ -63,6 +90,7 @@ import postData from '../../../../mixins/postData.js';
 import filterLinks from '../../../../mixins/filterLinks.js';
 import EventsList from './EventsList.vue';
 import NominationResets from './NominationResets.vue';
+import EvaluationList from './EvaluationList.vue';
 import Vue from 'vue';
 
 export default {
@@ -70,6 +98,7 @@ export default {
     components: {
         EventsList,
         NominationResets,
+        EvaluationList,
     },
     mixins: [ postData, filterLinks ],
     props: {
@@ -87,6 +116,9 @@ export default {
             nominationsPopped: null,
             nominationsDisqualified: null,
             qualityAssuranceChecks: null,
+            assignedApplications: null,
+            natApplications: null,
+            natEvalRounds: null,
             loading: true,
         };
     },
@@ -110,6 +142,9 @@ export default {
                     this.disqualifications = response.data.dqs;
                     this.pops = response.data.pops;
                     this.qualityAssuranceChecks = response.data.qualityAssuranceChecks;
+                    this.assignedApplications = response.data.assignedApplications;
+                    this.natApplications = response.data.natApplications;
+                    this.natEvalRounds = response.data.natEvalRounds;
                     this.loading = false;
                 });
         },

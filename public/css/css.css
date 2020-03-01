@@ -546,6 +546,10 @@ input[type=number] {
     color: var(--neutral);
 }
 
+.vote-probation {
+    color: var(--neutral);
+}
+
 .vote-extend {
     color: var(--extend);
 }
