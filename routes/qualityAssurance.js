@@ -77,8 +77,34 @@ router.get('/loadMore/:limit/:skip', async (req, res) => {
 });
 
 /* POST assign user */
-router.post('/assignUser/:id', api.isBnOrNat, api.isNotProbation, async (req, res) => {
-    let e = await aiessService.update(req.params.id, { $push: { qualityAssuranceCheckers: req.session.mongoId } });
+router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
+    let e = await aiessService.query({ _id: req.params.id }, defaultPopulate);
+    
+    let validMode;
+    for (let i = 0; i < res.locals.userRequest.modes.length; i++) {
+        const mode = res.locals.userRequest.modes[i];
+        if (e.modes.includes(mode)) {
+            validMode = true;
+            break;
+        }
+    }
+    if (!validMode) {
+        return res.json({ error: 'Not qualified for this mode!' });
+    }
+    
+    let probation;
+    for (let i = 0; i < res.locals.userRequest.probation.length; i++) {
+        const mode = res.locals.userRequest.probation[i];
+        if (e.modes.includes(mode)) {
+            probation = true;
+            break;
+        }
+    }
+    if (probation) {
+        return res.json({ error: 'Probation cannot do this!' });
+    }
+
+    await aiessService.update(req.params.id, { $push: { qualityAssuranceCheckers: req.session.mongoId } });
     e = await aiessService.query({ _id: req.params.id }, defaultPopulate);
     res.json(e);
 
@@ -174,7 +200,7 @@ router.post('/assignUser/:id', api.isBnOrNat, api.isNotProbation, async (req, re
 });
 
 /* POST unassign user */
-router.post('/unassignUser/:id', api.isBnOrNat, api.isNotProbation, async (req, res) => {
+router.post('/unassignUser/:id', api.isBnOrNat, async (req, res) => {
     let e = await aiessService.update(req.params.id, { $pull: { qualityAssuranceCheckers: req.session.mongoId } });
     e = await aiessService.query({ _id: req.params.id }, defaultPopulate);
     res.json(e);

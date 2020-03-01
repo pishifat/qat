@@ -187,16 +187,6 @@ function isNotSpectator(req, res, next) {
     }
 }
 
-function isNotProbation(req, res, next) {
-    const u = res.locals.userRequest;
-    
-    if (!u.probation.length) {
-        next();
-    } else {
-        return res.json({ error: 'Probation users cannot do this!' });
-    }
-}
-
 async function webhookPost(message, webhook) {
     let url = 'https://discordapp.com/api/webhooks/';
 
@@ -271,4 +261,4 @@ async function highlightWebhookPost(message, webhook) {
     }
 }
 
-module.exports = { isLoggedIn, getToken, getUserInfo, beatmapsetInfo, beatmapsetOwnerMaps, isBnOrNat, isBn, isNat, isLeader, isBnEvaluator, isNotSpectator, isNotProbation, webhookPost, highlightWebhookPost };
+module.exports = { isLoggedIn, getToken, getUserInfo, beatmapsetInfo, beatmapsetOwnerMaps, isBnOrNat, isBn, isNat, isLeader, isBnEvaluator, isNotSpectator, webhookPost, highlightWebhookPost };
