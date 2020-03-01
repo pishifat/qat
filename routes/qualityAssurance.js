@@ -2,6 +2,7 @@ const express = require('express');
 const api = require('../helpers/api');
 const aiessService = require('../models/aiess').service;
 const logsService = require('../models/log').service;
+const helper = require('../helpers/helpers');
 
 const router = express.Router();
 
@@ -244,6 +245,15 @@ router.post('/unassignUser/:id', api.isBnOrNat, async (req, res) => {
             'taikoCatchManiaQualityAssurance'
         );
     }
+});
+
+/* GET load more content */
+router.get('/findPendingShit', async (req, res) => {
+    let x = await helper.findPendingShit();
+
+    console.log(x);
+
+    res.json({});
 });
 
 module.exports = router;
