@@ -85,8 +85,7 @@ async function getUserModsCount(username, mode) {
                     hasEvents = false;
                 } else {
                     let pageMods = [];
-                    $('.beatmapset-event').each(function(k, v) {  
-                        console.log(v.attribs);
+                    $('.beatmapset-event').each(function(k, v) {            
                         const url = $(v).find('a').first().attr('href');
                         let mod = { 
                             beatmapset: getBeatmapsetIdFromUrl(url),
@@ -132,28 +131,8 @@ async function getUserModsCount(username, mode) {
 }
 
 
-async function findPendingShit() {
-    let baseUrl = 'https://osu.ppy.sh/beatmapsets/beatmap-discussions?user=&beatmapset_status=qualified&message_types%5B%5D=suggestion&message_types%5B%5D=problem&only_unresolved=on';
-
-    let pageLinks = [];
-    const historyHtml = await axios.get(baseUrl);
-    const $ = cheerio.load(historyHtml.data);
-    $('.modding-profile-list__row').each(function(k, v) {
-        console.log('in');
-        const url = $(v).find('a').first().attr('href');
-        let link = { 
-            beatmapset: helper.getBeatmapsetIdFromUrl(url),
-            url,
-        };
-        
-        pageLinks.push(link);
-    });
-
-    return pageLinks;
-}
-
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-module.exports = { escapeUsername, getBeatmapsetIdFromUrl, safeParam, isValidUrl, getUserModsCount, sleep, findPendingShit };
+module.exports = { escapeUsername, getBeatmapsetIdFromUrl, safeParam, isValidUrl, getUserModsCount, sleep };

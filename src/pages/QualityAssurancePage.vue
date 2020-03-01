@@ -96,9 +96,6 @@
                 <button class="btn btn-sm btn-nat mt-4 mx-auto" @click="loadMore()">
                     <i class="fas fa-angle-down mr-1" /> show more <i class="fas fa-angle-down ml-1" />
                 </button>
-                <button class="btn btn-sm btn-nat mt-4 mx-auto" @click="findPendingShit()">
-                    find pending shit
-                </button>
             </div>
         </section>
     </div>
@@ -206,13 +203,6 @@ export default {
                     this.allObjs = this.allObjs.concat(response.data.maps);
                     this.limit += 50;
                     this.filter();
-                });
-        },
-        findPendingShit(){
-            axios
-                .get('/qualityAssurance/findPendingShit/')
-                .then(response => {
-                    console.log('done');
                 });
         },
     },
