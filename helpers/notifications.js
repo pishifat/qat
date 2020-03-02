@@ -322,16 +322,14 @@ function notifyBeatmapReports() {
                 await helper.sleep(500);
 
                 // send highlights
-                if (discussion.message_type == 'problem') {
-                    if (discussion.beatmap) {
-                        let mode = discussion.beatmap.mode;
-                        if (mode == 'fruits') mode = 'catch';
+                if (discussion.beatmap) {
+                    let mode = discussion.beatmap.mode;
+                    if (mode == 'fruits') mode = 'catch';
+                    api.highlightWebhookPost('', `${mode}BeatmapReport`);
+                } else {
+                    modes.forEach(mode => {
                         api.highlightWebhookPost('', `${mode}BeatmapReport`);
-                    } else {
-                        modes.forEach(mode => {
-                            api.highlightWebhookPost('', `${mode}BeatmapReport`);
-                        });
-                    }
+                    });
                 }
             }
         }
