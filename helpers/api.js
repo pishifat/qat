@@ -109,7 +109,7 @@ async function getUserInfoV1(osuId) {
     try {
         const res = await axios.get(url);
 
-        return res.data;
+        return res.data[0];
     } catch (error) {
         return { error: 'Something went wrong!' };
     }
@@ -231,6 +231,9 @@ async function webhookPost(message, webhook) {
         case 'taikoCatchManiaQualityAssurance':
             url += `${config.taikoCatchManiaQualityAssuranceWebhook.id}/${config.taikoCatchManiaQualityAssuranceWebhook.token}`;
             break;
+        case 'beatmapReport':
+            url += `${config.beatmapReportWebhook.id}/${config.beatmapReportWebhook.token}`;
+            break;
         default:
             url += `${config.reportWebhook.id}/${config.reportWebhook.token}`;
             break;
@@ -265,6 +268,22 @@ async function highlightWebhookPost(message, webhook) {
         case 'mania':
             url += `${config.maniaWebhook.id}/${config.maniaWebhook.token}`;
             role = '<@' + config.maniaWebhook.role + '>';
+            break;
+        case 'osuBeatmapReport':
+            url += `${config.beatmapReportWebhook.id}/${config.beatmapReportWebhook.token}`;
+            role = '<@' + config.beatmapReportWebhook.osuRole + '>';
+            break;
+        case 'taikoBeatmapReport':
+            url += `${config.beatmapReportWebhook.id}/${config.beatmapReportWebhook.token}`;
+            role = '<@' + config.beatmapReportWebhook.taikoRole + '>';
+            break;
+        case 'fruitsBeatmapReport':
+            url += `${config.beatmapReportWebhook.id}/${config.beatmapReportWebhook.token}`;
+            role = '<@' + config.beatmapReportWebhook.catchRole + '>';
+            break;
+        case 'maniaBeatmapReport':
+            url += `${config.beatmapReportWebhook.id}/${config.beatmapReportWebhook.token}`;
+            role = '<@' + config.beatmapReportWebhook.maniaRole + '>';
             break;
         default:
             url += `${config.reportWebhook.id}/${config.reportWebhook.token}`;

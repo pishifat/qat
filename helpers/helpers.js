@@ -92,7 +92,6 @@ async function getUserModsCount(username, mode) {
                 } else {
                     let pageMods = [];
                     $('.beatmapset-event').each(function(k, v) {
-                        console.log(v.attribs);
                         const url = $(v).find('a').first().attr('href');
                         let mod = {
                             beatmapset: getBeatmapsetIdFromUrl(url),

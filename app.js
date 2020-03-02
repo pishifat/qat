@@ -138,7 +138,7 @@ server.on('error', (error) => {
 server.on('listening', () => {
     console.log('Listening on ' + port);
     notifications.notifyDeadlines();
-    //notifications.notifyBeatmapReports();
+    notifications.notifyBeatmapReports();
 });
 
 module.exports = app;

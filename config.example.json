@@ -25,10 +25,6 @@
         "token": "",
         "role": ""
     },
-    "reportWebhook": {
-        "id": "",
-        "token": ""
-    },
     "standardQualityAssuranceWebhook": {
         "id": "",
         "token": ""
@@ -44,6 +40,10 @@
         "taikoRole": "",
         "catchRole": "",
         "maniaRole": ""
+    },
+    "reportWebhook": {
+        "id": "",
+        "token": ""
     },
     "v1token": "",
     "id": 0,

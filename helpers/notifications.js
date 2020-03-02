@@ -236,7 +236,6 @@ function notifyBeatmapReports() {
         const historyHtml = await axios.get(url);
         const $ = cheerio.load(historyHtml.data);
         let discussions = JSON.parse($('#json-discussions').html());
-        console.log(discussions);
 
         // find database's discussion posts
         const date = new Date();
@@ -270,38 +269,39 @@ function notifyBeatmapReports() {
                 }
             }
 
-            await helper.sleep(500);
-
             // create event in db and send webhook
             if (createWebhook) {
+                beatmapsetIds.push(discussion.beatmapset_id);
                 await beatmapReportsService.create(discussion.beatmapset_id, discussion.id, discussion.starting_post.user_id);
                 let userInfo = await api.getUserInfoV1(discussion.starting_post.user_id);
                 await api.webhookPost(
                     [{
                         author: {
-                            name: `USERNAME`,
+                            name: userInfo.username,
                             icon_url: `https://a.ppy.sh/${discussion.starting_post.user_id}`,
                             url: `https://osu.ppy.sh/users/${discussion.starting_post.user_id}`,
                         },
+                        description: `[**${discussion.beatmapset.artist} - ${discussion.beatmapset.title}**](https://osu.ppy.sh/beatmapsets/${discussion.beatmapset_id}/discussion/-/generalAll#/${discussion.id})\nMapped by [${discussion.beatmapset.creator}](https://osu.ppy.sh/users/${discussion.starting_post.user_id})`,
                         thumbnail: {
                             url: `https://b.ppy.sh/thumb/${discussion.beatmapset_id}.jpg`,
                         },
                         color: discussion.message_type == 'suggestion' ? '16564064' : '15144231',
                         fields: [
                             {
-                                name: `https://osu.ppy.sh/beatmapsets/${discussion.beatmapset_id}/discussion/-/generalAll#/${discussion.id}`,
+                                name: (!discussion.beatmap ? 'general' : discussion.beatmap.mode == 'fruits' ? 'catch' : discussion.beatmap.mode) + ': ' + discussion.message_type,
                                 value: discussion.starting_post.message.length > 500 ? discussion.starting_post.message + '... *(truncated)*' : discussion.starting_post.message,
                             },
                         ],
                     }],
-                    a.mode
+                    'beatmapReport'
                 );
                 await helper.sleep(500);
+                //api.highlightWebhookPost('', `${discussion.beatmap.mode}BeatmapReport`);
             }
         }
 
-        api.highlightWebhookPost('done', 'osu');
-    }, 15000);
+
+    }, 300000);
 }
 
 module.exports = { notifyDeadlines, notifyBeatmapReports };
