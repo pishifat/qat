@@ -38,6 +38,10 @@
                         <next-evaluation
                             :user-id="user.id"
                         />
+                        <modding-activity
+                            v-if="isNat"
+                            :username="user.username"
+                        />
                         <footer-buttons
                             :is-leader="isLeader"
                             :group="user.group"
@@ -59,6 +63,7 @@ import Duration from './info/Duration.vue';
 import Notes from './info/Notes.vue';
 import NextEvaluation from './info/NextEvaluation.vue';
 import FooterButtons from './info/FooterButtons.vue';
+import ModdingActivity from '../evaluations/currentBnEvaluations/currentBnInfo/ModdingActivity.vue';
 import UserActivity from '../evaluations/currentBnEvaluations/currentBnInfo/UserActivity.vue';
 
 export default {
@@ -69,6 +74,7 @@ export default {
         Notes,
         NextEvaluation,
         FooterButtons,
+        ModdingActivity,
         UserActivity,
     },
     props: {

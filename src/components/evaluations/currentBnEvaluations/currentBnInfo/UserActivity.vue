@@ -132,7 +132,7 @@ export default {
         this.findRelevantActivity();
     },
     methods: {
-        async findRelevantActivity(){
+        async findRelevantActivity() {
             axios
                 .get('/bnEval/userActivity/' + this.osuId + '/' + this.mode + '/' + this.deadline + '/' + this.userMongoId)
                 .then(response => {
@@ -156,7 +156,7 @@ export default {
                 if (i >= 0) this.disqualifications[i].content = event.value;
 
                 i = this.nominationsDisqualified.findIndex(e => e._id == event.id);
-                if (i >= 0) this.nominationsDisqualified[i].content = event.value; 
+                if (i >= 0) this.nominationsDisqualified[i].content = event.value;
 
             } else if (event.type == 'Popped') {
                 i = this.pops.findIndex(e => e._id == event.id);
