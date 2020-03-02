@@ -277,7 +277,7 @@ async function highlightWebhookPost(message, webhook) {
             url += `${config.beatmapReportWebhook.id}/${config.beatmapReportWebhook.token}`;
             role = '<@' + config.beatmapReportWebhook.taikoRole + '>';
             break;
-        case 'fruitsBeatmapReport':
+        case 'catchBeatmapReport':
             url += `${config.beatmapReportWebhook.id}/${config.beatmapReportWebhook.token}`;
             role = '<@' + config.beatmapReportWebhook.catchRole + '>';
             break;

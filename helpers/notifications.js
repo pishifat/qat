@@ -269,11 +269,35 @@ function notifyBeatmapReports() {
                 }
             }
 
-            // create event in db and send webhook
             if (createWebhook) {
+                // create event in db
                 beatmapsetIds.push(discussion.beatmapset_id);
                 await beatmapReportsService.create(discussion.beatmapset_id, discussion.id, discussion.starting_post.user_id);
+
                 let userInfo = await api.getUserInfoV1(discussion.starting_post.user_id);
+                await helper.sleep(500);
+
+                // identify modes
+                let beatmapsetInfo = await api.beatmapsetInfo(discussion.beatmapset_id, true);
+                let modes = [];
+                beatmapsetInfo.forEach(beatmap => {
+                    switch (beatmap.mode) {
+                        case '0':
+                            if (!modes.includes('osu')) modes.push('osu');
+                            break;
+                        case '1':
+                            if (!modes.includes('taiko')) modes.push('taiko');
+                            break;
+                        case '2':
+                            if (!modes.includes('catch')) modes.push('catch');
+                            break;
+                        case '3':
+                            if (!modes.includes('mania')) modes.push('mania');
+                            break;
+                    }
+                });
+
+                // send webhook
                 await api.webhookPost(
                     [{
                         author: {
@@ -281,22 +305,34 @@ function notifyBeatmapReports() {
                             icon_url: `https://a.ppy.sh/${discussion.starting_post.user_id}`,
                             url: `https://osu.ppy.sh/users/${discussion.starting_post.user_id}`,
                         },
-                        description: `[**${discussion.beatmapset.artist} - ${discussion.beatmapset.title}**](https://osu.ppy.sh/beatmapsets/${discussion.beatmapset_id}/discussion/-/generalAll#/${discussion.id})\nMapped by [${discussion.beatmapset.creator}](https://osu.ppy.sh/users/${discussion.starting_post.user_id})`,
+                        description: `[**${discussion.beatmapset.artist} - ${discussion.beatmapset.title}**](https://osu.ppy.sh/beatmapsets/${discussion.beatmapset_id}/discussion/-/generalAll#/${discussion.id})\nMapped by [${discussion.beatmapset.creator}](https://osu.ppy.sh/users/${discussion.starting_post.user_id}) [**${modes.join(', ')}**]`,
                         thumbnail: {
                             url: `https://b.ppy.sh/thumb/${discussion.beatmapset_id}.jpg`,
                         },
                         color: discussion.message_type == 'suggestion' ? '16564064' : '15144231',
                         fields: [
                             {
-                                name: (!discussion.beatmap ? 'general' : discussion.beatmap.mode == 'fruits' ? 'catch' : discussion.beatmap.mode) + ': ' + discussion.message_type,
-                                value: discussion.starting_post.message.length > 500 ? discussion.starting_post.message + '... *(truncated)*' : discussion.starting_post.message,
+                                name: discussion.message_type,
+                                value: discussion.starting_post.message.length > 500 ? discussion.starting_post.message.slice(0,500) + '... *(truncated)*' : discussion.starting_post.message,
                             },
                         ],
                     }],
                     'beatmapReport'
                 );
                 await helper.sleep(500);
-                //api.highlightWebhookPost('', `${discussion.beatmap.mode}BeatmapReport`);
+
+                // send highlights
+                if (discussion.message_type == 'problem') {
+                    if (discussion.beatmap) {
+                        let mode = discussion.beatmap.mode;
+                        if (mode == 'fruits') mode = 'catch';
+                        api.highlightWebhookPost('', `${mode}BeatmapReport`);
+                    } else {
+                        modes.forEach(mode => {
+                            api.highlightWebhookPost('', `${mode}BeatmapReport`);
+                        });
+                    }
+                }
             }
         }
 
