@@ -122,9 +122,13 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
     let qualityAssuranceChecks = await aiessService.query({ qualityAssuranceCheckers: req.session.mongoId }, {}, {}, true);
 
     const authorUser = {
-        name: `${req.session.username} (${qualityAssuranceChecks.length})`,
+        name: `${req.session.username} (${qualityAssuranceChecks.length} time${qualityAssuranceChecks.length > 1 ? 's' : ''})`,
         icon_url: `https://a.ppy.sh/${req.session.osuId}`,
         url: `https://osu.ppy.sh/users/${req.session.osuId}`,
+    };
+    const footer = {
+        text: qualityAssuranceChecks.length == 10 ? 'Great job at creating a better ranked section! ✨' :
+            qualityAssuranceChecks.length == 20 ? 'You are awesome for constantly working for a better osu! 💖' : '',
     };
     const authorBeatmap = {
         name: `${e.metadata} (${e.hostName})`,
@@ -169,6 +173,7 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
                 author: authorUser,
                 color: colorUser,
                 fields: fieldsUser,
+                footer,
             }],
             'standardQualityAssurance'
         );
@@ -192,6 +197,7 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
                 author: authorUser,
                 color: colorUser,
                 fields: fieldsUser,
+                footer,
             }],
             'taikoCatchManiaQualityAssurance'
         );
