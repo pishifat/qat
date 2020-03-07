@@ -578,9 +578,10 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
         return res.json({ error: 'Something went wrong!' });
     }
 
-    let minDate = new Date(req.params.deadline);
+    let deadline = parseInt(req.params.deadline);
+    let minDate = new Date(deadline);
     minDate.setDate(minDate.getDate() - 90);
-    let maxDate = new Date(req.params.deadline);
+    let maxDate = new Date(deadline);
     const [user, allUserEvents, allEvents, qualityAssuranceChecks, assignedApplications] = await Promise.all([
         usersService.query({ _id: req.params.mongoId }),
         aiessService.getByEventTypeAndUser(parseInt(req.params.id), minDate, maxDate, req.params.mode),

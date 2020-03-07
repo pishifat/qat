@@ -11,7 +11,7 @@
                     :evaluator-mongo-id="evaluator.id"
                 />
                 <div class="modal-body" style="overflow: hidden;">
-                    <div v-for="(mode, i) in evalRound.bn.modes" :key="mode" class="container">
+                    <div v-for="(mode, i) in modes" :key="mode" class="container">
                         <p class="text-shadow min-spacing mb-1">
                             Recent BN activity
                             <span class="small">({{ mode == 'osu' ? 'osu!' : 'osu!' + mode }})</span>
@@ -19,7 +19,7 @@
                         <div class="container mb-3">
                             <user-activity
                                 :osu-id="evalRound.bn.osuId"
-                                :mode="evalRound.bn.modes[i]"
+                                :mode="modes[i]"
                                 :deadline="evalRound.deadline"
                                 :is-nat="evaluator.isNat"
                                 :user-mongo-id="evalRound.bn.id"
@@ -94,6 +94,13 @@ export default {
             });
 
             return evaluators;
+        },
+        modes() {
+            let modes = [];
+            if (this.evalRound.bn.modes.length) modes = this.evalRound.bn.modes;
+            else modes.push(this.evalRound.mode);
+
+            return modes;
         },
     },
     watch: {

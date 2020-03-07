@@ -133,7 +133,7 @@ export default {
     },
     methods: {
         async findRelevantActivity() {
-            const res = await axios.get('/bnEval/userActivity/' + this.osuId + '/' + this.mode + '/' + this.deadline + '/' + this.userMongoId);
+            const res = await axios.get('/bnEval/userActivity/' + this.osuId + '/' + this.mode + '/' + new Date(this.deadline).getTime() + '/' + this.userMongoId);
 
             if (res.data) {
                 this.nominations = res.data.noms;
