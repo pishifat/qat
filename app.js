@@ -139,6 +139,7 @@ server.on('listening', () => {
     console.log('Listening on ' + port);
     notifications.notifyDeadlines();
     notifications.notifyBeatmapReports();
+    notifications.lowActivityTask.start();
 });
 
 module.exports = app;

@@ -8,6 +8,8 @@ const evalRoundsService = require('../models/evalRound').service;
 const usersModel = require('../models/user').User;
 const usersService = require('../models/user').service;
 const beatmapReportsService = require('../models/beatmapReport').service;
+const aiess = require('../models/aiess');
+const cron = require('node-cron');
 
 const defaultAppPopulate = [{
     populate: 'applicant',
@@ -340,4 +342,83 @@ function notifyBeatmapReports() {
     }, 300000);
 }
 
-module.exports = { notifyDeadlines, notifyBeatmapReports };
+/**
+ * Checks for bns with less than 6 mods (4 for mania) the first day every 2 months
+ */
+const lowActivityTask = cron.schedule('0 0 1 */2 *', async () => {
+    const lowActivityFields = [];
+    const initialDate = new Date();
+    initialDate.setMonth(initialDate.getMonth() - 2);
+    console.log('from', initialDate);
+
+    const bns = await usersService.query({ group: 'bn' }, null, null, true);
+
+    for (const bn of bns) {
+        for (const mode of bn.modes) {
+            if (hasLowActivity(initialDate, bn, mode)) {
+                lowActivityFields.push({
+                    name: mode,
+                    value: `[${bn.username}](https://osu.ppy.sh/users/${bn.osuId})`,
+                    inline: true,
+                });
+            }
+        }
+
+        for (const mode of bn.probation) {
+            if (hasLowActivity(initialDate, bn, mode)) {
+                lowActivityFields.push({
+                    name: mode,
+                    value: `[${bn.username}](https://osu.ppy.sh/users/${bn.osuId})`,
+                    inline: true,
+                });
+            }
+        }
+    }
+
+    if (!lowActivityFields.length) return;
+
+    const embeds = [];
+
+    for (let i = 0; i < lowActivityFields.length; i += 24) {
+        if (i == 0) {
+            embeds.push({
+                title: 'Low Activity',
+                description: `The following users have low activity from ${initialDate.toLocaleDateString()} to this date`,
+                color: '14427693',
+                fields: lowActivityFields.slice(i, i + 24),
+            });
+        } else {
+            embeds.push({
+                color: '14427693',
+                fields: lowActivityFields.slice(i, i + 24),
+            });
+        }
+    }
+
+    // await api.webhookPost(embeds, 'natwebhookidkwhichoneitis');
+}, {
+    scheduled: false,
+});
+
+async function hasLowActivity (initialDate, bn, mode) {
+    const events = await aiess.Aiess.distinct('beatmapsetId', {
+        userId: bn.osuId,
+        eventType: {
+            $in: ['Bubbled', 'Qualified'],
+        },
+        timestamp: {
+            $gt: initialDate,
+        },
+        modes: mode,
+    });
+
+    if ((events.length < 4 && mode == 'mania') ||
+        (events.length < 6 && mode != 'mania')
+    ) {
+        return true;
+    }
+
+    return false;
+}
+
+module.exports = { notifyDeadlines, notifyBeatmapReports, lowActivityTask };
