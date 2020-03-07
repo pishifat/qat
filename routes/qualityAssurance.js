@@ -27,7 +27,7 @@ const defaultPopulate = [
 router.get('/relevantInfo', async (req, res) => {
     let date = new Date();
     date.setDate(date.getDate() - 7);
-    const [data, dqs] = await Promise.all([
+    const [data, overwrite] = await Promise.all([
         aiessService.query(
             {
                 eventType: 'Qualified',
@@ -38,7 +38,10 @@ router.get('/relevantInfo', async (req, res) => {
         ),
         aiessService.query(
             {
-                eventType: 'Disqualified',
+                $or: [
+                    { eventType: 'Disqualified' },
+                    { eventType: 'Ranked' },
+                ],
                 timestamp: { $gte: date } },
             defaultPopulate,
             { timestamp: -1 },
@@ -47,7 +50,7 @@ router.get('/relevantInfo', async (req, res) => {
     ]);
     res.json({
         maps: data,
-        dqs,
+        overwrite,
         userId: res.locals.userRequest.id,
         userOsuId: res.locals.userRequest.osuId,
         username: res.locals.userRequest.username,
@@ -127,8 +130,8 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
         url: `https://osu.ppy.sh/users/${req.session.osuId}`,
     };
     const footer = {
-        text: qualityAssuranceChecks.length == 10 ? 'Great job at creating a better ranked section! ✨' :
-            qualityAssuranceChecks.length == 20 ? 'You are awesome for constantly working for a better osu! 💖' : '',
+        text: qualityAssuranceChecks.length == 10 ? 'Thank you for creating a better ranked section! ✨' :
+            qualityAssuranceChecks.length == 20 ? `You're making osu! a better place. Thanks again!' 💖` : '',
     };
     const authorBeatmap = {
         name: `${e.metadata} (${e.hostName})`,
