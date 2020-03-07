@@ -172,7 +172,7 @@ router.post('/editNote/:id', api.isNat, async (req, res) => {
 });
 
 /* GET user next evaluation */
-router.get('/loadNextEvaluation/:id', api.isNat, async (req, res) => {
+router.get('/loadNextEvaluation/:id', async (req, res) => {
     let er = await evalRoundsService.query({ bn: req.params.id, active: true });
 
     if (!er) {
