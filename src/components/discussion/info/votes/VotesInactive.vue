@@ -5,7 +5,7 @@
         </p>
         <ul v-if="isNatOnlyOrLeader">
             <li v-for="mediation in agreeMediations" :key="mediation.id" class="small ml-2">
-                {{ mediation.mediator.username }}: 
+                {{ mediation.mediator.username }}:
                 <pre v-if="mediation.comment && mediation.comment.length" class="secondary-text pre-font ml-2">{{ mediation.comment }}</pre>
             </li>
         </ul>
@@ -14,7 +14,7 @@
         </p>
         <ul v-if="isNatOnlyOrLeader">
             <li v-for="mediation in neutralMediations" :key="mediation.id" class="small ml-2">
-                {{ mediation.mediator.username }}: 
+                {{ mediation.mediator.username }}:
                 <pre v-if="mediation.comment && mediation.comment.length" class="secondary-text pre-font ml-2">{{ mediation.comment }}</pre>
             </li>
         </ul>
@@ -23,7 +23,7 @@
         </p>
         <ul v-if="isNatOnlyOrLeader">
             <li v-for="mediation in disagreeMediations" :key="mediation.id" class="small ml-2">
-                {{ mediation.mediator.username }}: 
+                {{ mediation.mediator.username }}:
                 <pre v-if="mediation.comment && mediation.comment.length" class="secondary-text pre-font ml-2">{{ mediation.comment }}</pre>
             </li>
         </ul>

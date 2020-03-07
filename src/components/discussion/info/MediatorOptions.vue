@@ -75,31 +75,20 @@ export default {
             error: false,
         };
     },
-    mounted() {
-        if (this.mediations.length) {
-            for (let i = 0; i < this.mediations.length; i++) {
-                let mediation = this.mediations[i];
-                if(mediation.mediator.id == this.userId){
-                    if(mediation.vote) this.vote = mediation.vote;
-                    if(mediation.comment) this.comment = mediation.comment;
-                    this.mediationId = mediation.id;
-                    break;
-                }
-            }
-        }
-    },
     watch: {
         discussionId() {
             this.vote = null;
             this.comment = null;
             this.mediationId = null;
             this.error = false;
+
             if (this.mediations.length) {
                 for (let i = 0; i < this.mediations.length; i++) {
                     let mediation = this.mediations[i];
-                    if(mediation.mediator.id == this.userId){
-                        if(mediation.vote) this.vote = mediation.vote;
-                        if(mediation.comment) this.comment = mediation.comment;
+
+                    if (mediation.mediator.id == this.userId) {
+                        if (mediation.vote) this.vote = mediation.vote;
+                        if (mediation.comment) this.comment = mediation.comment;
                         this.mediationId = mediation.id;
                         break;
                     }
@@ -107,18 +96,34 @@ export default {
             }
         },
     },
+    mounted() {
+        if (this.mediations.length) {
+            for (let i = 0; i < this.mediations.length; i++) {
+                let mediation = this.mediations[i];
+
+                if (mediation.mediator.id == this.userId) {
+                    if (mediation.vote) this.vote = mediation.vote;
+                    if (mediation.comment) this.comment = mediation.comment;
+                    this.mediationId = mediation.id;
+                    break;
+                }
+            }
+        }
+    },
     methods: {
         async submitMediation (e) {
             const vote = $('input[name=vote]:checked').val();
-            if(!vote){
+
+            if (!vote) {
                 this.error = true;
-            }else{
+            } else {
                 const d = await this.executePost(
-                    '/discussionVote/submitMediation/' + this.discussionId, 
-                    { mediationId: this.mediationId, 
-                        vote, 
-                        comment: this.comment, 
+                    '/discussionVote/submitMediation/' + this.discussionId,
+                    { mediationId: this.mediationId,
+                        vote,
+                        comment: this.comment,
                     }, e);
+
                 if (d) {
                     if (d.error) {
                         this.error = true;

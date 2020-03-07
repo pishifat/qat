@@ -1,7 +1,7 @@
 <template>
     <div>
         <p class="text-shadow min-spacing">
-            <a :href="events && `#${eventsId}`" data-toggle="collapse">{{ header }} <i class="fas fa-angle-down" /></a> 
+            <a :href="events && `#${eventsId}`" data-toggle="collapse">{{ header }} <i class="fas fa-angle-down" /></a>
             ({{ loading ? '...' : events ? events.length : '0' }})
         </p>
         <div v-if="events" :id="eventsId" class="collapse">

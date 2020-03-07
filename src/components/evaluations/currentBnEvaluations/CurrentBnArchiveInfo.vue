@@ -92,6 +92,7 @@ export default {
             this.evalRound.evaluations.forEach(evaluation => {
                 evaluators.push(evaluation.evaluator);
             });
+
             return evaluators;
         },
     },
@@ -103,8 +104,10 @@ export default {
     methods: {
         async unarchive(e) {
             const result = confirm(`Are you sure? This will place the user on probation`);
-            if(result){
+
+            if (result) {
                 const er = await this.executePost('/evalArchive/unarchive/' + this.evalRound.id, { type: 'evalRound' }, e);
+
                 if (er) {
                     window.location = '/bnEval?eval=' + this.evalRound.id;
                 }

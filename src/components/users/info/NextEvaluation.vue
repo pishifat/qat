@@ -7,7 +7,7 @@
 <script>
 
 export default {
-    name: 'duration',
+    name: 'Duration',
     props: {
         userId: String,
     },

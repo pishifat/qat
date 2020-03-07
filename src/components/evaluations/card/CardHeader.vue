@@ -11,7 +11,7 @@
 
 <script>
 export default {
-    name: 'card-header',
+    name: 'CardHeader',
     props: {
         username: String,
         osuId: Number,
@@ -20,14 +20,14 @@ export default {
     },
     computed: {
         consensusColor() {
-            if(!this.consensus){
+            if (!this.consensus) {
                 return '';
-            }else if(this.consensus == 'extend'){
+            } else if (this.consensus == 'extend') {
                 return 'card-status-neutral';
-            }else{
+            } else {
                 return 'card-status-' + this.consensus;
             }
-        }
+        },
     },
 };
 </script>

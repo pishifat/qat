@@ -23,7 +23,7 @@
                         @update:selectedReport="selectedReport = $event"
                     />
                 </transition-group>
-            
+
                 <p v-if="!openReports || openReports.length == 0" class="ml-4">
                     No open reports...
                 </p>
@@ -45,7 +45,7 @@
                 </p>
             </section>
         </div>
-    
+
         <report-info
             :report="selectedReport"
             :is-leader="isLeader"
@@ -78,7 +78,7 @@ export default {
         };
     },
     watch: {
-        allObjs(){
+        allObjs() {
             this.filter();
         },
     },
@@ -91,16 +91,18 @@ export default {
                 this.hasSeparation = true;
                 this.isLeader = response.data.isLeader;
                 const params = new URLSearchParams(document.location.search.substring(1));
+
                 if (params.get('report') && params.get('report').length) {
                     const i = this.allObjs.findIndex(r => r.id == params.get('report'));
-                    if(i >= 0){
+
+                    if (i >= 0) {
                         this.selectedReport = this.allObjs[i];
                         $('#reportInfo').modal('show');
-                    }else{
+                    } else {
                         this.info = 'Cannot find report!';
                     }
                 }
-            }).then(function(){
+            }).then(function() {
                 $('#loading').fadeOut();
                 $('#main').attr('style', 'visibility: visible').hide().fadeIn();
             });
@@ -124,17 +126,17 @@ export default {
         },
         separateObjs() {
             this.openReports = this.pageObjs.filter( report =>{
-                if(this.isLeader){
+                if (this.isLeader) {
                     return report.isActive;
-                }else{
+                } else {
                     return report.isActive && (!report.culprit || report.culprit.group != 'nat');
                 }
-                
+
             });
             this.closedReports = this.pageObjs.filter( report =>{
-                if(this.isLeader){
+                if (this.isLeader) {
                     return !report.isActive;
-                }else{
+                } else {
                     return !report.isActive && (!report.culprit || report.culprit.group != 'nat');
                 }
             });

@@ -84,7 +84,7 @@ export default {
             else return 'vote-fail';
         },
     },
-    watch: { 
+    watch: {
         editing () {
             this.info = null;
             this.newEventContent = this.event.content;
@@ -95,6 +95,6 @@ export default {
             const result = await this.executePost('/dataCollection/updateContent/' + this.event._id, { reason: this.newEventContent }, e);
             this.$emit('update-content', { id: this.event._id, type: this.event.eventType, value: result });
         },
-    }
+    },
 };
 </script>

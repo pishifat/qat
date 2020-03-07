@@ -77,7 +77,7 @@ import EvaluatorAssignments from './applicationInfo/EvaluatorAssignments.vue';
 import EvaluationInput from '../info/EvaluationInput.vue';
 
 export default {
-    name: 'application-individual-info',
+    name: 'ApplicationIndividualInfo',
     components: {
         ModalHeader,
         Mods,

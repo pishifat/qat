@@ -58,19 +58,19 @@
 
 <script>
 export default {
-    name: 'mediation-input',
+    name: 'MediationInput',
     props: {
         comment: String,
         mediationId: String,
         veto: {
-            status: String
+            status: String,
         },
-        vote: Number
+        vote: Number,
     },
     data() {
         return {
-            commentInput: this.comment
-        }
-    }
+            commentInput: this.comment,
+        };
+    },
 };
 </script>

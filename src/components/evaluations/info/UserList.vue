@@ -1,7 +1,7 @@
 <template>
     <div>
         <p class="text-shadow min-spacing">
-            {{ header }} 
+            {{ header }}
         </p>
         <ul>
             <li v-for="user in userList" :key="user.id" class="small text-shadow">
@@ -37,8 +37,10 @@ export default {
     methods: {
         async replaceUser (evaluatorId, e) {
             const result = confirm(`Are you sure?`);
-            if(result){
+
+            if (result) {
                 const r = await this.executePost(`/${this.isApplication ? 'appEval' : 'bnEval'}/replaceUser/${this.nominatorAssessmentMongoId}`, { evaluatorId, isNat: this.isNat }, e);
+
                 if (r) {
                     if (r.error) {
                         this.info = r.error;

@@ -28,7 +28,7 @@
         <div v-if="isLeader && !bnEvaluators.length" class="col-sm-12">
             <button class="btn btn-sm btn-nat mb-2" @click="selectBnEvaluators($event)">
                 {{ potentialBnEvaluators ? 'Re-select BN Evaluators' : 'Select BN Evaluators' }}
-            </button> 
+            </button>
             <button v-if="potentialBnEvaluators" class="btn btn-sm btn-nat-red mb-2" @click="enableBnEvaluators($event)">
                 Enable BN Evaluations
             </button>
@@ -63,7 +63,10 @@ import postData from '../../../../mixins/postData.js';
 import UserList from '../../info/UserList.vue';
 
 export default {
-    name: 'evaluator-assignments',
+    name: 'EvaluatorAssignments',
+    components: {
+        UserList,
+    },
     mixins: [ postData ],
     props: {
         bnEvaluators: Array,
@@ -75,9 +78,6 @@ export default {
         username: String,
         nominatorAssessmentMongoId: String,
         isApplication: Boolean,
-    },
-    components: {
-        UserList,
     },
     data() {
         return {
@@ -92,6 +92,7 @@ export default {
             this.evaluations.forEach(evaluation => {
                 evaluators.push(evaluation.evaluator);
             });
+
             return evaluators;
         },
     },
@@ -105,6 +106,7 @@ export default {
     methods: {
         async selectBnEvaluators(e) {
             const r = await this.executePost('/appeval/selectBnEvaluators', { mode: this.mode, id: this.nominatorAssessmentMongoId }, e);
+
             if (r) {
                 if (r.error) {
                     this.info = r.error;
@@ -115,6 +117,7 @@ export default {
         },
         async enableBnEvaluators (e) {
             const a = await this.executePost('/appEval/enableBnEvaluators/' + this.nominatorAssessmentMongoId, { bnEvaluators: this.potentialBnEvaluators }, e);
+
             if (a) {
                 if (a.error) {
                     this.info = a.error;

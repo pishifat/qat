@@ -6,20 +6,25 @@
                     id="search"
                     class="form-control form-control-sm"
                     type="text"
-                    placeholder="username" 
-                    style="filter: drop-shadow(1px 1px 1px #000000); border-radius: 100px 0 0 100px" 
+                    placeholder="username"
+                    style="filter: drop-shadow(1px 1px 1px #000000); border-radius: 100px 0 0 100px"
                     maxlength="18"
-                    @keyup.enter="query($event)" 
+                    @keyup.enter="query($event)"
                 >
                 <div class="input-group-append">
-                    <button style="border-radius: 0 100px 100px 0;" class="btn btn-nat" type="submit" @click="query($event)">
+                    <button
+                        style="border-radius: 0 100px 100px 0;"
+                        class="btn btn-nat"
+                        type="submit"
+                        @click="query($event)"
+                    >
                         Search
                     </button>
                 </div>
             </div>
             <p v-if="info" class="errors mt-1">
                 {{ info }}
-            </p> 
+            </p>
         </section>
         <section v-if="queried" class="col-md-12 segment">
             <p><a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a>: {{ findTotalTotalPoints() }}</p>
@@ -56,11 +61,11 @@
                     <tr
                         v-for="event in eventGroup"
                         :key="event.id"
-                        class="collapse" 
-                        :class="['row-' + event.beatmapsetId, 
-                                 event.eventType == 'Bubbled' || event.eventType == 'Qualified' ? 'vote-border-neutral' : 
-                                 (event.eventType == 'Disqualified' || event.eventType == 'Popped') && event.valid == 1 ? 'vote-border-fail' : 
-                                 (event.eventType == 'Disqualified' || event.eventType == 'Popped') && event.valid != 1 ? 'vote-border-extend' : 
+                        class="collapse"
+                        :class="['row-' + event.beatmapsetId,
+                                 event.eventType == 'Bubbled' || event.eventType == 'Qualified' ? 'vote-border-neutral' :
+                                 (event.eventType == 'Disqualified' || event.eventType == 'Popped') && event.valid == 1 ? 'vote-border-fail' :
+                                 (event.eventType == 'Disqualified' || event.eventType == 'Popped') && event.valid != 1 ? 'vote-border-extend' :
                                  event.eventType == 'Ranked' ? 'vote-border-pass' : '']"
                     >
                         <td scope="row">
@@ -115,11 +120,13 @@ export default {
         async query(e) {
             this.info = '';
             let username = $('#search').val();
+
             //if(!username || !username.length) username = 'neilperry'
-            if(!username || !username.length){
+            if (!username || !username.length) {
                 this.info = 'Must enter a username!';
-            }else{
+            } else {
                 const result = await this.executePost('/bnScore/search/', { username }, e);
+
                 if (result) {
                     if (result.error) {
                         this.info = result.error;
@@ -137,45 +144,53 @@ export default {
             });
             $(`.arrow-${id}`).toggleClass('fa-angle-right fa-angle-down');
         },
-        findTotalTotalPoints(){
+        findTotalTotalPoints() {
             let total = 0;
+
             for (let i = 0; i < this.events.length; i++) {
                 total += this.findTotalPoints(this.events[i]);
             }
+
             return Math.round(total*10)/10;
         },
         findTotalPoints(events) {
             let total = 0;
+
             for (let i = 0; i < events.length; i++) {
                 let event = events[i];
                 total += this.findPoints(event);
             }
+
             return total;
         },
         findPoints(event) {
-            if(event.eventType == 'Ranked'){
+            if (event.eventType == 'Ranked') {
                 let total = 10;
                 let bonus = 1;
                 total += event.effortBonus;
-                if(!event.isUnique){
+
+                if (!event.isUnique) {
                     total *= 0.5;
                 }
-                if(event.isBnOrNat){
+
+                if (event.isBnOrNat) {
                     total *= 0.5;
                 }
-                if(event.mapperTotalRanked <= 3){
+
+                if (event.mapperTotalRanked <= 3) {
                     bonus = -0.33 * event.mapperTotalRanked + 3;
-                }else if(event.mapperTotalRanked <= 10){
+                } else if (event.mapperTotalRanked <= 10) {
                     bonus = -0.15 * event.mapperTotalRanked + 2.5;
-                }else if(event.mapperTotalRanked <= 100){
+                } else if (event.mapperTotalRanked <= 100) {
                     bonus = -0.006 * event.mapperTotalRanked + 1.006;
-                }else{
+                } else {
                     bonus = 0.5;
                 }
+
                 return Math.round(total*bonus*10)/10;
-            }else if(event.eventType == 'Disqualified' && event.valid == 1){
+            } else if (event.eventType == 'Disqualified' && event.valid == 1) {
                 return -5;
-            }else{
+            } else {
                 return 0;
             }
         },

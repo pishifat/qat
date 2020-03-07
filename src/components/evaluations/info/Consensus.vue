@@ -1,8 +1,8 @@
 <template>
     <p class="text-shadow">
         Consensus:
-        <span 
-            v-if="consensus" 
+        <span
+            v-if="consensus"
             :class="consensusColor"
         >
             {{ consensusText }}
@@ -57,30 +57,31 @@ export default {
     },
     computed: {
         consensusText() {
-            if(!this.consensus){
+            if (!this.consensus) {
                 return 'none';
-            }else if(this.consensus == 'extend'){
+            } else if (this.consensus == 'extend') {
                 return 'probation';
-            }else if(this.consensus == 'pass' && this.isLowActivity){
+            } else if (this.consensus == 'pass' && this.isLowActivity) {
                 return 'pass + activity warning';
-            }else{
+            } else {
                 return this.consensus;
             }
         },
         consensusColor() {
-            if(!this.consensus){
+            if (!this.consensus) {
                 return '';
-            }else if(this.consensus == 'extend'){
+            } else if (this.consensus == 'extend') {
                 return 'vote-neutral';
-            }else{
+            } else {
                 return 'vote-' + this.consensus;
             }
         },
     },
     methods: {
-        async setConsensus(consensus, e, toggle){
+        async setConsensus(consensus, e, toggle) {
             const result = await this.executePost(
                 `/${this.isApplication? 'appEval' : 'bnEval'}/setConsensus/` + this.nominatorAssessmentMongoId, { consensus, isLowActivity: toggle }, e);
+
             if (result) {
                 if (result.error) {
                     this.info = result.error;

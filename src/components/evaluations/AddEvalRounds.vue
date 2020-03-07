@@ -13,38 +13,73 @@
                 <div class="modal-body" style="overflow: hidden">
                     <div class="container">
                         <div class="form-check form-check-inline text-shadow">
-                            <input id="osu" class="form-check-input" type="checkbox" value="osu">
+                            <input
+                                id="osu"
+                                class="form-check-input"
+                                type="checkbox"
+                                value="osu"
+                            >
                             <label class="form-check-label" for="osu">osu!</label>
                         </div>
                         <div class="form-check form-check-inline text-shadow">
-                            <input id="taiko" class="form-check-input" type="checkbox" value="taiko">
+                            <input
+                                id="taiko"
+                                class="form-check-input"
+                                type="checkbox"
+                                value="taiko"
+                            >
                             <label class="form-check-label" for="taiko">osu!taiko</label>
                         </div>
                         <div class="form-check form-check-inline text-shadow">
-                            <input id="catch" class="form-check-input" type="checkbox" value="catch">
+                            <input
+                                id="catch"
+                                class="form-check-input"
+                                type="checkbox"
+                                value="catch"
+                            >
                             <label class="form-check-label" for="catch">osu!catch</label>
                         </div>
                         <div class="form-check form-check-inline text-shadow">
-                            <input id="mania" class="form-check-input" type="checkbox" value="mania">
+                            <input
+                                id="mania"
+                                class="form-check-input"
+                                type="checkbox"
+                                value="mania"
+                            >
                             <label class="form-check-label" for="mania">osu!mania</label>
                         </div>
 
                         <hr>
 
                         <div class="form-check text-shadow mb-2">
-                            <input id="probationBns" class="form-check-input" type="checkbox" value="">
+                            <input
+                                id="probationBns"
+                                class="form-check-input"
+                                type="checkbox"
+                                value=""
+                            >
                             <label class="form-check-label" for="probationBns">
                                 Probation BNs
                             </label>
                         </div>
                         <div class="form-check text-shadow mb-2">
-                            <input id="fullBns" class="form-check-input" type="checkbox" value="">
+                            <input
+                                id="fullBns"
+                                class="form-check-input"
+                                type="checkbox"
+                                value=""
+                            >
                             <label class="form-check-label" for="fullBns">
                                 Full BNs
                             </label>
                         </div>
                         <div class="form-check text-shadow mb-2">
-                            <input id="nat" class="form-check-input" type="checkbox" value="">
+                            <input
+                                id="nat"
+                                class="form-check-input"
+                                type="checkbox"
+                                value=""
+                            >
                             <label class="form-check-label" for="nat">
                                 NAT
                             </label>
@@ -126,8 +161,10 @@ export default {
             let taiko = $('#taiko').is(':checked');
             let ctb = $('#catch').is(':checked');
             let mania = $('#mania').is(':checked');
+
             if (!osu && !taiko && !ctb && !mania) {
                 this.info = 'Must select game mode!';
+
                 return;
             }
 
@@ -140,6 +177,7 @@ export default {
 
             if (!probation && !bn && !nat && !includeUsers) {
                 this.info = 'Must select user type or specify the users to be evaluated!';
+
                 return;
             }
 
@@ -152,6 +190,7 @@ export default {
 
             if (!(deadline instanceof Date) || isNaN(deadline)) {
                 this.info = 'Invalid Date!';
+
                 return;
             }
 
@@ -171,24 +210,28 @@ export default {
                 },
                 e
             );
-            
+
             if (result) {
                 if (result.errors) {
                     this.info = result.errors;
                 } else {
                     this.$emit('update-all-eval-rounds', result.ers);
-                    if(result.ers.length){
+
+                    if (result.ers.length) {
                         this.confirm = 'Eval rounds added! ';
+
                         if (result.failed.length) {
                             this.confirm += 'However, the following usernames could not be processed: ';
+
                             for (let i = 0; i < result.failed.length; i++) {
                                 this.confirm += result.failed[i];
+
                                 if (i + 1 != result.failed.length) {
                                     this.confirm += ', ';
                                 }
                             }
                         }
-                    }else{
+                    } else {
                         this.confirm = 'No eval rounds were added! If you were trying to add specific users, re-check your spelling.';
                     }
                 }

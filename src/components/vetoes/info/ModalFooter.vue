@@ -16,33 +16,33 @@
 import postData from '../../../mixins/postData';
 
 export default {
-    name: 'modal-footer',
+    name: 'ModalFooter',
     mixins: [ postData ],
     props: {
         mediationId: String,
         veto: {
             createdAt: Date,
-            status: String
-        }
+            status: String,
+        },
     },
     data() {
         return {
             confirm: '',
             info: '',
-            vote: null
-        }
+            vote: null,
+        };
     },
     watch: {
         mediationId() {
             this.confirm = null;
-        }
+        },
     },
     methods: {
         async submitMediation (e) {
             this.confirm = '';
-            this.info = ''
+            this.info = '';
 
-            const comment = $('#comment').val()
+            const comment = $('#comment').val();
             const vote = $('input[name=vote]:checked').val();
 
             if (!vote || !comment.length) {
@@ -53,7 +53,7 @@ export default {
                     {
                         mediationId: this.mediationId,
                         vote,
-                        comment: comment,
+                        comment,
                     },
                     e
                 );
@@ -68,7 +68,7 @@ export default {
                     }
                 }
             }
-        }
-    }
+        },
+    },
 };
 </script>

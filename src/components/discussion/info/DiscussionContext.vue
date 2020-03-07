@@ -79,6 +79,7 @@ export default {
         async saveTitle () {
             const d = await this.executePost(
                 '/discussionVote/saveTitle/' + this.discussionId, { title: this.editTitleContent });
+
             if (d) {
                 if (d.error) {
                     this.info = d.error;
@@ -91,6 +92,7 @@ export default {
         async saveProposal () {
             const d = await this.executePost(
                 '/discussionVote/saveProposal/' + this.discussionId, { shortReason: this.editProposalContent });
+
             if (d) {
                 if (d.error) {
                     this.info = d.error;

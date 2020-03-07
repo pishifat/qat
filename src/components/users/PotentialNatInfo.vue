@@ -33,10 +33,10 @@
                             </span>
                         </p>
                         <p class="ml-3 min-spacing">
-                            Behavior comment: <i>{{ findBehaviorComment(app.evaluations, user.osuId) }}</i> 
+                            Behavior comment: <i>{{ findBehaviorComment(app.evaluations, user.osuId) }}</i>
                         </p>
                         <p class="ml-3 min-spacing">
-                            Modding comment: <i>{{ findModdingComment(app.evaluations, user.osuId) }}</i> 
+                            Modding comment: <i>{{ findModdingComment(app.evaluations, user.osuId) }}</i>
                         </p>
                     </div>
                 </div>
@@ -60,7 +60,7 @@ export default {
                 .then(response => {
                     let users = response.data;
                     users.forEach(user => {
-                        if(user.evaluatedApps.length){
+                        if (user.evaluatedApps.length) {
                             this.potentialNatInfo.push(user);
                         }
                     });
@@ -69,30 +69,33 @@ export default {
         findVote(evaluations, osuId) {
             let vote = 'none';
             evaluations.forEach(evaluation => {
-                if(evaluation.evaluator.osuId == osuId){
-                    if(evaluation.vote == 1) vote = 'pass';
-                    else if(evaluation.vote == 2) vote = 'neutral';
-                    else if(evaluation.vote == 3) vote = 'fail';
+                if (evaluation.evaluator.osuId == osuId) {
+                    if (evaluation.vote == 1) vote = 'pass';
+                    else if (evaluation.vote == 2) vote = 'neutral';
+                    else if (evaluation.vote == 3) vote = 'fail';
                 }
             });
+
             return vote;
         },
         findBehaviorComment(evaluations, osuId) {
             let behaviorComment = 'none';
             evaluations.forEach(evaluation => {
-                if(evaluation.evaluator.osuId == osuId){
+                if (evaluation.evaluator.osuId == osuId) {
                     behaviorComment = evaluation.behaviorComment;
                 }
             });
+
             return behaviorComment;
         },
         findModdingComment(evaluations, osuId) {
             let moddingComment = 'none';
             evaluations.forEach(evaluation => {
-                if(evaluation.evaluator.osuId == osuId){
+                if (evaluation.evaluator.osuId == osuId) {
                     moddingComment = evaluation.moddingComment;
                 }
             });
+
             return moddingComment;
         },
     },

@@ -26,18 +26,10 @@
 
 <script>
 export default {
-    name: 'add-votes',
+    name: 'AddVotes',
     props: {
         evaluations: Array,
         isApplication: Boolean,
-    },
-    mounted() {
-        this.addVotes();
-    },
-    watch: {
-        evaluations() {
-            this.addVotes();
-        },
     },
     data() {
         return {
@@ -46,6 +38,14 @@ export default {
             fail: 0,
             isSelected: false,
         };
+    },
+    watch: {
+        evaluations() {
+            this.addVotes();
+        },
+    },
+    mounted() {
+        this.addVotes();
     },
     methods: {
         addVotes() {
@@ -62,6 +62,6 @@ export default {
                 }
             });
         },
-    }
+    },
 };
 </script>

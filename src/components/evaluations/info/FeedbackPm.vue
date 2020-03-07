@@ -104,13 +104,14 @@ export default {
         natEvaluations() {
             let e = new Array;
             this.evaluations.forEach(evaluation => {
-                if(evaluation.evaluator.isNat) e.push(evaluation);
+                if (evaluation.evaluator.isNat) e.push(evaluation);
             });
+
             return e;
         },
     },
     methods: {
-        defineDate(){
+        defineDate() {
             return new Date(this.cooldownDate).toString().slice(4, 15);
         },
     },

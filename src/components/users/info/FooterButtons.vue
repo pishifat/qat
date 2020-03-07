@@ -17,7 +17,7 @@
             </button>
         </p>
         <p v-else-if="isCurrentUser && group != 'nat'" class="text-shadow min-spacing">
-            BN evaluation: 
+            BN evaluation:
             <span :class="{ 'vote-fail': !isBnEvaluator, 'vote-pass': isBnEvaluator }">
                 {{ isBnEvaluator ? 'active' : 'inactive' }}
             </span>
@@ -39,7 +39,8 @@
 import postData from '../../../mixins/postData.js';
 
 export default {
-    name: 'footer-buttons',
+    name: 'FooterButtons',
+    mixins: [postData],
     props: {
         isLeader: Boolean,
         group: String,
@@ -47,10 +48,10 @@ export default {
         isCurrentUser: Boolean,
         userId: String,
     },
-    mixins: [postData],
     methods: {
         async switchBnEvaluator(e) {
             const u = await this.executePost('/users/switchBnEvaluator/', {}, e);
+
             if (u) {
                 if (u.error) {
                     this.info = u.error;
@@ -63,8 +64,10 @@ export default {
             const result = confirm(
                 `Are you sure? This will affect join/leave dates and potentially reveal hidden pages.`
             );
+
             if (result) {
                 const u = await this.executePost('/users/switchGroup/' + this.userId, { group }, e);
+
                 if (u) {
                     if (u.error) {
                         this.info = u.error;
@@ -78,8 +81,10 @@ export default {
             const result = confirm(
                 `Are you sure?`
             );
+
             if (result) {
                 const u = await this.executePost('/users/removeNat/' + this.userId, {}, e);
+
                 if (u) {
                     if (u.error) {
                         this.info = u.error;

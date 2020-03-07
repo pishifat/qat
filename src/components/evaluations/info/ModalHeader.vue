@@ -1,8 +1,13 @@
 <template>
     <div class="modal-header text-dark" :class="isNatEvaluator() ? 'bg-priority' : 'bg-nat-logo'">
         <h5 class="modal-title">
-            {{ isApplication ? 'Application Evaluation:' : 'BN Evaluation:' }} 
-            <a :href="'https://osu.ppy.sh/users/' + osuId" class="text-dark" target="_blank" @click.stop>
+            {{ isApplication ? 'Application Evaluation:' : 'BN Evaluation:' }}
+            <a
+                :href="'https://osu.ppy.sh/users/' + osuId"
+                class="text-dark"
+                target="_blank"
+                @click.stop
+            >
                 {{ username }}
             </a>
             <i v-if="mode == 'osu'" class="far fa-circle" />
@@ -32,10 +37,12 @@ export default {
         isNatEvaluator() {
             for (let i = 0; i < this.natEvaluators.length; i++) {
                 let user = this.natEvaluators[i];
-                if(user.id == this.evaluatorMongoId){
+
+                if (user.id == this.evaluatorMongoId) {
                     return true;
                 }
             }
+
             return false;
         },
     },

@@ -106,7 +106,7 @@ import Evaluations from '../info/Evaluations.vue';
 import EvaluationInput from '../info/EvaluationInput.vue';
 
 export default {
-    name: 'application-discussion-info',
+    name: 'ApplicationDiscussionInfo',
     components: {
         ModalHeader,
         Mods,

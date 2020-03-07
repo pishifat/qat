@@ -7,7 +7,12 @@
             <li v-if="!userNotes.length" class="small min-spacing text-shadow">
                 User has no notes
             </li>
-            <li v-for="note in userNotes" v-else :key="note.id" class="small text-shadow">
+            <li
+                v-for="note in userNotes"
+                v-else
+                :key="note.id"
+                class="small text-shadow"
+            >
                 <b>
                     {{ note.updatedAt.slice(0,10) }} -
                     <a :href="'https://osu.ppy.sh/users/' + note.author.osuId" target="_blank">

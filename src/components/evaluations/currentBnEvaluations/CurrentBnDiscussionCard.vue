@@ -75,11 +75,13 @@ export default {
                     }
                 }
             });
+
             return vote;
         },
         createDeadline(date) {
             date = new Date(date);
             date = new Date(date.setDate(date.getDate() + 14)).toString().slice(4, 10);
+
             return date;
         },
         checkSelection() {
@@ -91,12 +93,15 @@ export default {
         },
         isNatEvaluator() {
             if (!this.evalRound.natEvaluators) return false;
+
             for (let i = 0; i < this.evalRound.natEvaluators.length; i++) {
                 let user = this.evalRound.natEvaluators[i];
-                if(user.id == this.evaluator.id){
+
+                if (user.id == this.evaluator.id) {
                     return true;
                 }
             }
+
             return false;
         },
     },

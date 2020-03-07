@@ -94,9 +94,11 @@ export default {
                 this.hasSeparation = true;
                 this.filter();
                 const params = new URLSearchParams(document.location.search.substring(1));
+
                 if (params.get('beatmap') && params.get('beatmap').length) {
                     const i = this.allObjs.findIndex(v => v.id == params.get('beatmap'));
-                    if(i >= 0){
+
+                    if (i >= 0) {
                         this.selectedVeto = this.allObjs[i];
                         $('#extendedInfo').modal('show');
                     }
@@ -114,6 +116,7 @@ export default {
         setInterval(() => {
             axios.get('/vetoes/relevantInfo').then(response => {
                 this.allObjs = response.data.vetoes;
+
                 if (this.isFiltered) {
                     this.filter();
                 }

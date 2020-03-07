@@ -15,7 +15,12 @@
                         <div class="row text-shadow">
                             <p>Game mode:</p>
                             <div class="row ml-4">
-                                <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!">
+                                <label
+                                    class="mx-1"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="osu!"
+                                >
                                     <input
                                         v-model="mode"
                                         type="radio"
@@ -26,7 +31,12 @@
                                     >
                                     <i class="fas fa-circle fa-lg" />
                                 </label>
-                                <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!taiko">
+                                <label
+                                    class="mx-1"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="osu!taiko"
+                                >
                                     <input
                                         v-model="mode"
                                         type="radio"
@@ -36,7 +46,12 @@
                                     >
                                     <i class="fas fa-drum fa-lg" />
                                 </label>
-                                <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!catch">
+                                <label
+                                    class="mx-1"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="osu!catch"
+                                >
                                     <input
                                         v-model="mode"
                                         type="radio"
@@ -46,7 +61,12 @@
                                     >
                                     <i class="fas fa-apple-alt fa-lg" />
                                 </label>
-                                <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!mania">
+                                <label
+                                    class="mx-1"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="osu!mania"
+                                >
                                     <input
                                         v-model="mode"
                                         type="radio"
@@ -56,7 +76,12 @@
                                     >
                                     <i class="fas fa-stream fa-lg" />
                                 </label>
-                                <label class="mx-1" data-toggle="tooltip" data-placement="top" title="all game modes">
+                                <label
+                                    class="mx-1"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="all game modes"
+                                >
                                     <input
                                         v-model="mode"
                                         type="radio"
@@ -138,7 +163,7 @@ export default {
                     }
                 }
             }
-        }
-    }
+        },
+    },
 };
 </script>

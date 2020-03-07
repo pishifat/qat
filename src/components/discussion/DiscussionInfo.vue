@@ -90,13 +90,13 @@ export default {
         isNat: Boolean,
     },
     computed: {
-        agreeMediations(){
+        agreeMediations() {
             return this.discussion.mediations.filter(mediation => mediation.vote == 1);
         },
-        neutralMediations(){
+        neutralMediations() {
             return this.discussion.mediations.filter(mediation => mediation.vote == 2);
         },
-        disagreeMediations(){
+        disagreeMediations() {
             return this.discussion.mediations.filter(mediation => mediation.vote == 3);
         },
     },
@@ -110,9 +110,11 @@ export default {
             this.info = '';
             this.confirm = '';
             const result = confirm(`Are you sure?`);
-            if(result){
+
+            if (result) {
                 const d = await this.executePost(
                     '/discussionVote/concludeMediation/' + this.discussion.id, e);
+
                 if (d) {
                     if (d.error) {
                         this.info = d.error;
@@ -135,5 +137,5 @@ export default {
     .bg-inactive {
         background-color: var(--withdrawn);
     }
-    
+
 </style>

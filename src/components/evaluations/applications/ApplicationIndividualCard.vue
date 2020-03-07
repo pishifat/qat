@@ -70,6 +70,7 @@ export default {
                     }
                 }
             });
+
             return vote;
         },
         checkSelection() {
@@ -82,10 +83,12 @@ export default {
         isNatEvaluator() {
             for (let i = 0; i < this.application.natEvaluators.length; i++) {
                 let user = this.application.natEvaluators[i];
-                if(user.id == this.evaluator.id){
+
+                if (user.id == this.evaluator.id) {
                     return true;
                 }
             }
+
             return false;
         },
     },

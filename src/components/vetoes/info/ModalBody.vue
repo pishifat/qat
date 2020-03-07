@@ -5,15 +5,15 @@
                 <a :href="veto.discussionLink" target="_blank">Read the veto discussion here</a>
             </p>
             <p class="min-spacing mb-2">
-                Veto reason: 
+                Veto reason:
                 <small v-html="filterLinks(veto.shortReason)" />
             </p>
             <p>
-                Consensus: 
-                <small>{{ veto.status === 'upheld' || veto.status === 'withdrawn' ? `Veto ${veto.status}` : 'none'}}</small>
+                Consensus:
+                <small>{{ veto.status === 'upheld' || veto.status === 'withdrawn' ? `Veto ${veto.status}` : 'none' }}</small>
             </p>
         </div>
-        
+
 
         <slot />
     </div>
@@ -23,13 +23,13 @@
 import filterLinks from '../../../mixins/filterLinks.js';
 
 export default {
-    name: 'modal-body',
+    name: 'ModalBody',
     mixins: [ filterLinks ],
     props: {
         veto: {
             discussionLink: String,
-            status: String
-        }
-    }
+            status: String,
+        },
+    },
 };
 </script>

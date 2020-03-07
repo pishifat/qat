@@ -13,12 +13,17 @@
                 Save
             </button>
         </div>
-        
+
         <ul class="mt-2">
             <li v-if="!notes.length" class="small min-spacing">
                 User has no notes
             </li>
-            <li v-for="note in notes" v-else :key="note.id" class="small text-shadow">
+            <li
+                v-for="note in notes"
+                v-else
+                :key="note.id"
+                class="small text-shadow"
+            >
                 <b>
                     {{ note.updatedAt.slice(0,10) }} -
                     <a :href="'https://osu.ppy.sh/users/' + note.author.osuId" target="_blank">
@@ -72,7 +77,7 @@ export default {
     props: {
         userId: String,
         viewingUser: String,
-        
+
     },
     data() {
         return {
@@ -104,13 +109,14 @@ export default {
                 });
         },
         async saveNote(e) {
-            if(this.comment.length){
+            if (this.comment.length) {
                 const n = await this.executePost('/users/saveNote/' + this.userId, { comment: this.comment }, e);
+
                 if (n) {
                     if (n.error) {
                         this.info = n.error;
                     } else {
-                        if(this.notes){
+                        if (this.notes) {
                             this.notes.unshift(n);
                         }
                     }
@@ -118,13 +124,14 @@ export default {
             }
         },
         async editNote(e) {
-            if(this.editNoteComment.length){
+            if (this.editNoteComment.length) {
                 const n = await this.executePost('/users/editNote/' + this.editNoteId, { comment: this.editNoteComment }, e);
+
                 if (n) {
                     if (n.error) {
                         this.info = n.error;
                     } else {
-                        if(this.notes){
+                        if (this.notes) {
                             const i = this.notes.findIndex(note => note.id == this.editNoteId);
                             this.notes[i] = n;
                             this.editNoteId = '';
@@ -135,9 +142,11 @@ export default {
         },
         async hideNote(noteId) {
             const result = confirm(`Are you sure?`);
-            if(result){
+
+            if (result) {
                 await this.executePost('/users/hideNote/' + noteId, { userId: this.userId });
-                if(this.notes){
+
+                if (this.notes) {
                     const i = this.notes.findIndex(note => note.id == noteId);
                     this.notes.splice(i, 1);
                 }

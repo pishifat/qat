@@ -1,7 +1,7 @@
 <template>
     <div>
         <p class="text-shadow">
-            Applicant comment: <span class="small" v-html="filterLinks(comment)"></span>
+            Applicant comment: <span class="small" v-html="filterLinks(comment)" />
         </p>
     </div>
 </template>
@@ -10,10 +10,10 @@
 import filterLinks from '../../../../mixins/filterLinks.js';
 
 export default {
-    name: 'applicant-comment',
+    name: 'ApplicantComment',
+    mixins: [ filterLinks ],
     props: {
         comment: String,
     },
-    mixins: [ filterLinks ],
 };
 </script>

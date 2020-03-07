@@ -17,9 +17,9 @@
         <div v-if="test" id="fullTest">
             <div class="segment segment-image test-question">
                 <p>
-                    The purpose of this test is to show your understanding of the 
-                    <a href="https://osu.ppy.sh/wiki/Ranking_Criteria" target="_blank">Ranking Criteria</a>, the 
-                    <a href="https://osu.ppy.sh/help/wiki/People/Beatmap_Nominators/Rules" target="_blank">Beatmap Nominator Rules</a>, and the 
+                    The purpose of this test is to show your understanding of the
+                    <a href="https://osu.ppy.sh/wiki/Ranking_Criteria" target="_blank">Ranking Criteria</a>, the
+                    <a href="https://osu.ppy.sh/help/wiki/People/Beatmap_Nominators/Rules" target="_blank">Beatmap Nominator Rules</a>, and the
                     <a href="https://osu.ppy.sh/help/wiki/Ranking_Criteria/Code_of_Conduct" target="_blank">Code of Conduct</a>.
                 </p>
                 <p>Feel free to reference those pages while taking this test. Maybe you'll learn something you didn't already know, which will make you more prepared than you would be otherwise!</p>
@@ -33,9 +33,9 @@
             </div>
 
             <hr>
-        
+
             <p class="text-center segment">
-                User: {{ test.applicant.username }} - 
+                User: {{ test.applicant.username }} -
                 Mode: {{ test.mode }}
             </p>
 
@@ -43,7 +43,7 @@
                 <p>Something went wrong and your test was not generated. Contact <a href="https://osu.ppy.sh/users/3178418" target="_blank">pishifat</a> to fix this.</p>
             </div>
 
-        
+
 
             <div v-for="(answer, i) in test.answers" :key="answer.id" class="segment segment-image test-question">
                 <small class="float-right">Q{{ ++i }} -- {{ answer.question.category }}</small>
@@ -53,9 +53,9 @@
                     </h5>
                     <div v-for="option in answer.question.options" :key="option.id">
                         <div class="form-check mb-2 ml-2">
-                            <input 
-                                :id="option.id" 
-                                v-model="checkedOptions[answer.id]" 
+                            <input
+                                :id="option.id"
+                                v-model="checkedOptions[answer.id]"
                                 :checked="checkedOptions[answer.id].includes(answer.id)"
                                 :value="option.id"
                                 class="form-check-input"
@@ -72,8 +72,16 @@
             </div>
             <hr>
             <div class="segment segment-image">
-                <p class="small min-spacing mb-1">If you have anything to say to the NAT members evaluating your application, write it here! (optional): </p>
-                <input v-model="comment" class="form-control mb-4" type="text" maxlength="1000" placeholder="comment...">
+                <p class="small min-spacing mb-1">
+                    If you have anything to say to the NAT members evaluating your application, write it here! (optional):
+                </p>
+                <input
+                    v-model="comment"
+                    class="form-control mb-4"
+                    type="text"
+                    maxlength="1000"
+                    placeholder="comment..."
+                >
                 <div class="mx-auto text-center">
                     <a href="#top"><button type="submit" class="btn btn-lg btn-nat w-50" @click="submitTest($event)">Submit</button></a>
                     <p class="small pt-2">
@@ -81,7 +89,6 @@
                     </p>
                 </div>
             </div>
-            
         </div>
     </div>
     <div v-else>
@@ -119,10 +126,11 @@ export default {
         axios
             .get('/testSubmission/tests')
             .then(async response => {
-                if(response.data.testList){
+                if (response.data.testList) {
                     this.testList = response.data.testList;
                     this.selectedTest = this.testList[0].id;
-                    if(this.testList.length == 1){
+
+                    if (this.testList.length == 1) {
                         await this.loadTest();
                     }
                 }
@@ -139,6 +147,7 @@ export default {
         getActiveOptions (options) {
             let currentIndex = options.length;
             let temporaryValue, randomIndex;
+
             while (0 !== currentIndex) {
                 randomIndex = Math.floor(Math.random() * currentIndex);
                 currentIndex -= 1;
@@ -146,12 +155,13 @@ export default {
                 options[currentIndex] = options[randomIndex];
                 options[randomIndex] = temporaryValue;
             }
+
             return options.filter(o => o.active);
         },
         async loadTest (e) {
             if (this.selectedTest) {
                 const test = await this.executePost('/testSubmission/loadTest', { testId: this.selectedTest }, e);
-                
+
                 if (test) {
                     if (test.error) this.info = test.error;
 
@@ -169,10 +179,11 @@ export default {
         async submitTest (e) {
             this.info = 'Submitting... (this will take a few seconds)';
             $('.test-question').hide();
-            const res = await this.executePost('/testSubmission/submitTest', { 
+            const res = await this.executePost('/testSubmission/submitTest', {
                 testId: this.selectedTest,
-                comment: this.comment
+                comment: this.comment,
             }, e);
+
             if (res || res == 0) {
                 if (res.error) {
                     this.info = res.error;
@@ -186,11 +197,12 @@ export default {
             }
         },
         async submitAnswer (answerId, e) {
-            const res = await this.executePost('/testSubmission/submitAnswer', { 
-                testId: this.selectedTest, 
+            const res = await this.executePost('/testSubmission/submitAnswer', {
+                testId: this.selectedTest,
                 answerId,
                 checkedOptions: this.checkedOptions[answerId],
             }, e);
+
             if (res) {
                 if (res.error) {
                     this.loadTest();

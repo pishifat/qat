@@ -22,7 +22,7 @@
                 </small>
             </section>
             <section class="segment my-1">
-                <a data-toggle="collapse" href="#howToUse">How do I use this page? <i class="fas fa-angle-down" /></a> 
+                <a data-toggle="collapse" href="#howToUse">How do I use this page? <i class="fas fa-angle-down" /></a>
                 <div id="howToUse" class="collapse mt-4 mx-2">
                     <p class="mx-2">
                         This page is used to make BN evaluations more consistent and convenient. As a member of the NAT, your roles here are to...
@@ -74,7 +74,7 @@
                     <tbody>
                         <tr
                             v-for="dq in dqs"
-                            :key="dq.id" 
+                            :key="dq.id"
                         >
                             <td scope="row">
                                 {{ new Date(dq.timestamp).toString().slice(4,15) }}
@@ -88,7 +88,7 @@
                                 <span v-if="hasData(dq)" :class="calculateColor(dq)">
                                     ({{ dq.obviousness }}/{{ dq.severity }})
                                 </span>
-                                {{ dq.content.length > 50 ? dq.content.slice(0, 50) + '...' : dq.content }} 
+                                {{ dq.content.length > 50 ? dq.content.slice(0, 50) + '...' : dq.content }}
                                 <a
                                     href="#"
                                     class="float-right"
@@ -136,7 +136,7 @@
                                 <span v-if="hasData(pop)" :class="calculateColor(pop)">
                                     ({{ pop.obviousness }}/{{ pop.severity }})
                                 </span>
-                                {{ pop.content.length > 50 ? pop.content.slice(0, 50) + '...' : pop.content }} 
+                                {{ pop.content.length > 50 ? pop.content.slice(0, 50) + '...' : pop.content }}
                                 <a
                                     href="#"
                                     class="float-right"
@@ -183,8 +183,8 @@ export default {
             info: '',
         };
     },
-    watch: { 
-        allObjs(){
+    watch: {
+        allObjs() {
             this.filter();
         },
     },
@@ -196,7 +196,7 @@ export default {
                 this.filterMode = response.data.mode;
                 this.hasPagination = false;
                 this.hasSeparation = true;
-            }).then(function(){
+            }).then(function() {
                 $('#loading').fadeOut();
                 $('#main').attr('style', 'visibility: visible').hide().fadeIn();
             });
@@ -252,5 +252,5 @@ export default {
 </script>
 
 <style>
-    
+
 </style>

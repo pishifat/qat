@@ -4,7 +4,7 @@
             {{ info }}
         </p>
         <div class="col-md-12">
-            <filter-box 
+            <filter-box
                 :filter-mode.sync="filterMode"
                 :filter-value.sync="filterValue"
                 :placeholder="'username... (3+ characters)'"
@@ -40,7 +40,14 @@
             <hr>
             <section class="row segment segment-image mx-1 px-0">
                 <div class="col-sm-12">
-                    <h2>Individual Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="Evaluations are hidden from others to avoid confirmation bias">?</sup> <small v-if="applications">({{ applications.length }})</small></h2> 
+                    <h2>
+                        Individual Evaluations<sup
+                            style="font-size: 12pt"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            title="Evaluations are hidden from others to avoid confirmation bias"
+                        >?</sup> <small v-if="applications">({{ applications.length }})</small>
+                    </h2>
 
                     <transition-group name="list" tag="div" class="row">
                         <application-individual-card
@@ -66,7 +73,12 @@
             <section class="row segment segment-image mx-1 px-0">
                 <div class="col-sm-12">
                     <h2>
-                        {{ evaluator && evaluator.isNat ? 'Group Evaluations' : 'Completed Evaluations' }}<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" :title="evaluator && evaluator.isNat ? 'After individual evals are completed, their responses are made visible to allow discussion and form a consensus' : 'Results of archived evaluations you were assigned to'">?</sup>
+                        {{ evaluator && evaluator.isNat ? 'Group Evaluations' : 'Completed Evaluations' }}<sup
+                            style="font-size: 12pt"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            :title="evaluator && evaluator.isNat ? 'After individual evals are completed, their responses are made visible to allow discussion and form a consensus' : 'Results of archived evaluations you were assigned to'"
+                        >?</sup>
                         <small v-if="discussApps">({{ discussApps.length }})</small>
                     </h2>
 
@@ -80,7 +92,7 @@
                             @update:selected-application="selectedDiscussApp = $event"
                         />
                     </transition-group>
-                
+
                     <div class="row">
                         <p v-if="!discussApps || discussApps.length == 0" class="ml-4">
                             No applications to evaluate...
@@ -158,21 +170,23 @@ export default {
                 this.hasSeparation = true;
                 this.filter();
                 const params = new URLSearchParams(document.location.search.substring(1));
+
                 if (params.get('eval') && params.get('eval').length) {
                     const i = this.allObjs.findIndex(a => a.id == params.get('eval'));
-                    if(i >= 0){
-                        if(!this.allObjs[i].discussion){
+
+                    if (i >= 0) {
+                        if (!this.allObjs[i].discussion) {
                             this.selectedApplication = this.allObjs[i];
                             $('#applicationIndividualInfo').modal('show');
-                        }else{
+                        } else {
                             this.selectedDiscussApp = this.allObjs[i];
                             $('#applicationDiscussionInfo').modal('show');
                         }
-                    }else if(this.evaluator.isNat){
+                    } else if (this.evaluator.isNat) {
                         window.location = '/evalArchive?eval=' + params.get('eval');
                     }
                 }
-            }).then(function(){
+            }).then(function() {
                 $('#loading').fadeOut();
                 $('#main').attr('style', 'visibility: visible').hide().fadeIn();
             });
@@ -189,9 +203,10 @@ export default {
     },
     methods: {
         filterBySearchValueContext(a) {
-            if(a.applicant.username.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1){
+            if (a.applicant.username.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1) {
                 return true;
             }
+
             return false;
         },
         separateObjs() {
@@ -201,11 +216,13 @@ export default {
         updateApplication (application) {
             const i = this.allObjs.findIndex(a => a.id == application.id);
             this.allObjs[i] = application;
-            if(application.discussion){
+
+            if (application.discussion) {
                 this.selectedDiscussApp = application;
-            }else{
+            } else {
                 this.selectedApplication = application;
             }
+
             this.filter();
         },
         async setGroupEval(e) {
@@ -213,10 +230,13 @@ export default {
             $('input[name=\'evalTypeCheck\']:checked').each( function () {
                 checkedApps.push( $(this).val() );
             });
-            if(checkedApps.length){
+
+            if (checkedApps.length) {
                 const result = confirm(`Are you sure?`);
+
                 if (result) {
                     const ers = await this.executePost('/appEval/setGroupEval/', { checkedApps }, e);
+
                     if (ers) {
                         if (ers.error) {
                             this.info = ers.error;
@@ -233,10 +253,13 @@ export default {
             $('input[name=\'evalTypeCheck\']:checked').each( function () {
                 checkedApps.push( $(this).val() );
             });
-            if(checkedApps.length){
+
+            if (checkedApps.length) {
                 const result = confirm(`Are you sure?`);
+
                 if (result) {
                     const ers = await this.executePost('/appEval/setIndividualEval/', { checkedApps }, e);
+
                     if (ers) {
                         if (ers.error) {
                             this.info = ers.error;
@@ -253,10 +276,13 @@ export default {
             $('input[name=\'evalTypeCheck\']:checked').each( function () {
                 checkedApps.push( $(this).val() );
             });
-            if(checkedApps.length){
+
+            if (checkedApps.length) {
                 const result = confirm(`Are you sure? The consensus of any evaluation will affect its respective user.\n\nOnly do this after feedback PMs have been sent.`);
-                if(result){
+
+                if (result) {
                     const ers = await this.executePost('/appEval/setComplete/', { checkedApps }, e);
+
                     if (ers) {
                         if (ers.error) {
                             this.info = ers.error;

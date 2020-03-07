@@ -117,7 +117,7 @@ export default {
             this.vote = 0;
             this.evaluationId = null;
             this.evaluations.forEach(evaluation => {
-                if(evaluation.evaluator.id == this.evaluatorMongoId){
+                if (evaluation.evaluator.id == this.evaluatorMongoId) {
                     this.behaviorComment = evaluation.behaviorComment;
                     this.moddingComment = evaluation.moddingComment;
                     this.vote = evaluation.vote;
@@ -126,17 +126,18 @@ export default {
             });
         },
         async submitEval (e) {
-            if(!this.vote || !this.moddingComment.length || !this.behaviorComment.length){
+            if (!this.vote || !this.moddingComment.length || !this.behaviorComment.length) {
                 this.info = 'Cannot leave fields blank!';
                 this.confirm = '';
-            }else{
+            } else {
                 const r = await this.executePost(
                     `/${this.isApplication ? 'appEval' : 'bnEval'}/submitEval/${this.nominatorAssessmentMongoId}`, {
-                        evaluationId: this.evaluationId, 
-                        vote: this.vote, 
+                        evaluationId: this.evaluationId,
+                        vote: this.vote,
                         moddingComment: this.moddingComment,
                         behaviorComment: this.behaviorComment,
                     }, e);
+
                 if (r) {
                     if (r.error) {
                         this.info = r.error;

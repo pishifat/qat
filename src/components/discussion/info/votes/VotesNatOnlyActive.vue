@@ -4,7 +4,9 @@
             Total votes ({{ mediations.length }}):
         </p>
         <ul>
-            <li v-for="mediation in mediations" :key="mediation.id" class="small">{{ mediation.mediator.username }}</li>
+            <li v-for="mediation in mediations" :key="mediation.id" class="small">
+                {{ mediation.mediator.username }}
+            </li>
         </ul>
     </div>
 </template>

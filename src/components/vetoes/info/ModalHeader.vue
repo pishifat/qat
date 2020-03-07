@@ -1,5 +1,5 @@
 <template>
-    <div class='modal-header text-dark' :class="`bg-${veto.status}`">
+    <div class="modal-header text-dark" :class="`bg-${veto.status}`">
         <h5 class="modal-title">
             <a class="text-dark" :href="`https://osu.ppy.sh/beatmapsets/${veto.beatmapId}`" target="_blank">{{ veto.beatmapTitle }}</a> by
             <a class="text-dark" :href="`https://osu.ppy.sh/users/${veto.beatmapMapperId}`" target="_blank">{{ veto.beatmapMapper }}</a>
@@ -22,7 +22,7 @@
 
 <script>
 export default {
-    name: 'modal-header',
+    name: 'ModalHeader',
     props: {
         veto: {
             mode: String,
@@ -30,10 +30,10 @@ export default {
             beatmapMapper: String,
             beatmapMapperId: Number,
             beatmapTitle: String,
-            status: String
-        }
-    }
-}
+            status: String,
+        },
+    },
+};
 </script>
 
 <style>

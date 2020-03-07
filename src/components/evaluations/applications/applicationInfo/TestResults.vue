@@ -1,10 +1,10 @@
 <template>
     <div>
         <p class="text-shadow">
-            Test results: 
+            Test results:
             <a
                 :href="`http://bn.mappersguild.com/testresults?user=${osuId}`"
-                target="_blank" 
+                target="_blank"
                 :class="scoreColor()"
             >
                 {{ testScore + '/20' }}
@@ -16,7 +16,7 @@
 <script>
 
 export default {
-    name: 'test-results',
+    name: 'TestResults',
     props: {
         testScore: Number,
         osuId: Number,
@@ -27,15 +27,15 @@ export default {
         };
     },
     methods: {
-        scoreColor(){
-            if(this.testScore > 15){
+        scoreColor() {
+            if (this.testScore > 15) {
                 return 'vote-pass';
-            }else if(this.testScore > 12.5){
+            } else if (this.testScore > 12.5) {
                 return 'vote-extend';
-            }else{
-                return 'vote-fail'
+            } else {
+                return 'vote-fail';
             }
-        }
+        },
     },
 };
 </script>

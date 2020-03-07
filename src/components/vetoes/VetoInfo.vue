@@ -4,7 +4,7 @@
             <div v-if="veto" class="modal-content">
                 <modal-header :veto="veto" />
 
-                <modal-body :veto="veto" >
+                <modal-body :veto="veto">
                     <mediations
                         :current-mediators="currentMediators"
                         :is-nat="isNat"
@@ -85,12 +85,12 @@ export default {
             let total = 0;
 
             this.veto.mediations.forEach(mediation => {
-                if(mediation.vote === 1) total++;
-                if(mediation.vote === 3) total--;
+                if (mediation.vote === 1) total++;
+                if (mediation.vote === 3) total--;
             });
 
             return total > 0 ? true : false;
-        }
+        },
     },
     watch: {
         veto () {
@@ -100,17 +100,18 @@ export default {
                 for (let i = 0; i < this.veto.mediations.length; i++) {
                     let mediation = this.veto.mediations[i];
 
-                    if(mediation.mediator.id === this.userId){
-                        if(mediation.comment) this.comment = mediation.comment;
-                        if(mediation.vote) this.vote = mediation.vote;
+                    if (mediation.mediator.id === this.userId) {
+                        if (mediation.comment) this.comment = mediation.comment;
+                        if (mediation.vote) this.vote = mediation.vote;
 
                         this.mediationId = mediation.id;
                         break;
                     }
                 }
             }
+
             history.pushState(null, 'Vetoes', `/vetoes?beatmap=${this.veto.id}`);
-        }
+        },
     },
 };
 </script>

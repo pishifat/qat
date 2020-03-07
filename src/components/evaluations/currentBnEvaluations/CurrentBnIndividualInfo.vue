@@ -28,7 +28,7 @@
                     </div>
                     <div class="container">
                         <p class="text-shadow">
-                            <a href="#additionalInfo" data-toggle="collapse">Additional info <i class="fas fa-angle-down" /></a> 
+                            <a href="#additionalInfo" data-toggle="collapse">Additional info <i class="fas fa-angle-down" /></a>
                         </p>
                         <div id="additionalInfo" class="collapse container">
                             <previous-evaluations
@@ -102,6 +102,7 @@ export default {
             this.evalRound.evaluations.forEach(evaluation => {
                 evaluators.push(evaluation.evaluator);
             });
+
             return evaluators;
         },
     },
