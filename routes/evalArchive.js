@@ -1,7 +1,7 @@
 const express = require('express');
 const api = require('../helpers/api');
 const helper = require('../helpers/helpers');
-const bnAppsService = require('../models/bnApp').service;
+const BnApp = require('../models/bnApp');
 const evalRoundsService = require('../models/evalRound').service;
 const User = require('../models/user');
 
@@ -22,10 +22,16 @@ router.get('/', (req, res) => {
 
 //population
 const defaultAppPopulate = [
-    { populate: 'applicant', display: 'username osuId' },
-    { populate: 'test', display: 'totalScore comment' },
-    { populate: 'evaluations', display: 'evaluator behaviorComment moddingComment vote' },
-    { innerPopulate: 'evaluations', populate: { path: 'evaluator', select: 'username osuId group' } },
+    { path: 'applicant', select: 'username osuId' },
+    { path: 'test', select: 'totalScore comment' },
+    {
+        path: 'evaluations',
+        select: 'evaluator behaviorComment moddingComment vote',
+        populate: {
+            path: 'evaluator',
+            select: 'username osuId group',
+        },
+    },
 ];
 
 const defaultBnPopulate = [
@@ -54,12 +60,15 @@ router.get('/search/:user', async (req, res) => {
         return res.json({ error: 'Cannot find user!' });
     }
 
-    let a = await bnAppsService.query(
-        { applicant: u.id, active: false, consensus: { $exists: true } },
-        defaultAppPopulate,
-        { createdAt: 1 },
-        true
-    );
+    let a = await BnApp
+        .find({
+            applicant: u.id,
+            active: false,
+            consensus: { $exists: true },
+        })
+        .populate(defaultAppPopulate)
+        .sort({ createdAt: 1 });
+
     let b = await evalRoundsService.query(
         { bn: u.id, active: false, consensus: { $exists: true } },
         defaultBnPopulate,
@@ -73,10 +82,13 @@ router.get('/search/:user', async (req, res) => {
 router.get('/searchById/:id', async (req, res) => {
     let round;
     const idToSearch = helper.safeParam(req.params.id);
-    round = await bnAppsService.query(
-        { _id: idToSearch, active: false, consensus: { $exists: true } },
-        defaultAppPopulate
-    );
+    round = await BnApp
+        .findOne({
+            _id: idToSearch,
+            active: false,
+            consensus: { $exists: true },
+        })
+        .populate(defaultAppPopulate);
 
     if (!round) {
         round = await evalRoundsService.query(
@@ -100,13 +112,15 @@ router.get('/searchRecent/:limit', async (req, res) => {
         req.params.limit = parseInt(req.params.limit);
     }
 
-    let a = await bnAppsService.query(
-        { active: false, consensus: { $exists: true } },
-        defaultAppPopulate,
-        { createdAt: -1 },
-        true,
-        req.params.limit
-    );
+    let a = await BnApp
+        .find({
+            active: false,
+            consensus: { $exists: true },
+        })
+        .populate(defaultAppPopulate)
+        .sort({ createdAt: -1 })
+        .limit(req.params.limit);
+
     let b = await evalRoundsService.query(
         { active: false, consensus: { $exists: true } },
         defaultBnPopulate,
@@ -120,7 +134,7 @@ router.get('/searchRecent/:limit', async (req, res) => {
 /* POST set evals as complete */
 router.post('/unarchive/:id', api.isNat, async (req, res) => {
     if (req.body.type == 'application') {
-        let a = await bnAppsService.query({ _id: req.params.id });
+        let a = await BnApp.findById(req.params.id);
 
         if (!a || a.error) {
             return res.json({ error: 'Could not load evalRound!' });
@@ -143,7 +157,7 @@ router.post('/unarchive/:id', api.isNat, async (req, res) => {
             }
         }
 
-        await bnAppsService.update(a.id, { active: true });
+        await BnApp.findByIdAndUpdate(a.id, { active: true });
 
         api.webhookPost(
             [{

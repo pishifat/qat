@@ -1,6 +1,6 @@
 const express = require('express');
 const api = require('../helpers/api');
-const bnAppsService = require('../models/bnApp').service;
+const BnApp = require('../models/bnApp');
 const evalsService = require('../models/evaluation').service;
 const evalRoundsService = require('../models/evalRound').service;
 const User = require('../models/user');
@@ -24,17 +24,17 @@ router.get('/', (req, res) => {
 
 //population
 const defaultPopulate = [
-    { populate: 'applicant', display: 'username osuId' },
-    { populate: 'bnEvaluators', display: 'username osuId' },
-    { populate: 'natEvaluators', display: 'username osuId' },
-    { populate: 'test', display: 'totalScore comment' },
+    { path: 'applicant', select: 'username osuId' },
+    { path: 'bnEvaluators', select: 'username osuId' },
+    { path: 'natEvaluators', select: 'username osuId' },
+    { path: 'test', select: 'totalScore comment' },
     {
-        populate: 'evaluations',
-        display: 'evaluator behaviorComment moddingComment vote',
-    },
-    {
-        innerPopulate: 'evaluations',
-        populate: { path: 'evaluator', select: 'username osuId group' },
+        path: 'evaluations',
+        select: 'evaluator behaviorComment moddingComment vote',
+        populate: {
+            path: 'evaluator',
+            select: 'username osuId group',
+        },
     },
 ];
 
@@ -43,19 +43,29 @@ router.get('/relevantInfo', async (req, res) => {
     let a = [];
 
     if (res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator) {
-        a = await bnAppsService.query(
-            { active: true, test: { $exists: true } },
-            defaultPopulate,
-            { createdAt: 1, consensus: 1, feedback: 1  },
-            true
-        );
+        a = await BnApp
+            .find({
+                active: true,
+                test: { $exists: true },
+            })
+            .populate(defaultPopulate)
+            .sort({
+                createdAt: 1,
+                consensus: 1,
+                feedback: 1,
+            });
     } else {
-        a = await bnAppsService.query(
-            { test: { $exists: true }, bnEvaluators: req.session.mongoId },
-            defaultPopulate,
-            { createdAt: 1, consensus: 1, feedback: 1  },
-            true
-        );
+        a = await BnApp
+            .find({
+                test: { $exists: true },
+                bnEvaluators: req.session.mongoId,
+            })
+            .populate(defaultPopulate)
+            .sort({
+                createdAt: 1,
+                consensus: 1,
+                feedback: 1,
+            });
     }
 
     res.json({ a, evaluator: res.locals.userRequest });
@@ -70,14 +80,16 @@ router.post('/submitEval/:id', api.isNotSpectator, async (req, res) => {
             vote: req.body.vote,
         });
     } else {
-        let ev = await evalsService.create(
+        const ev = await evalsService.create(
             req.session.mongoId,
             req.body.behaviorComment,
             req.body.moddingComment,
             req.body.vote
         );
-        await bnAppsService.update(req.params.id, { $push: { evaluations: ev._id } });
-        let a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
+        const a = await BnApp
+            .findByIdAndUpdate(req.params.id, { $push: { evaluations: ev._id } })
+            .populate(defaultPopulate);
+
         api.webhookPost(
             [{
                 author: {
@@ -111,7 +123,8 @@ router.post('/submitEval/:id', api.isNotSpectator, async (req, res) => {
             });
 
             if ((threeEvaluationModes.includes(a.mode) && nat > 2) || (twoEvaluationModes.includes(a.mode) && nat > 1)) {
-                await bnAppsService.update(req.params.id, { discussion: true });
+                await BnApp.findByIdAndUpdate(req.params.id, { discussion: true });
+
                 api.webhookPost(
                     [{
                         author: {
@@ -139,7 +152,7 @@ router.post('/submitEval/:id', api.isNotSpectator, async (req, res) => {
         }
     }
 
-    let a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
+    let a = await BnApp.findById(req.params.id).populate(defaultPopulate);
     res.json(a);
     logsService.create(
         req.session.mongoId,
@@ -150,16 +163,20 @@ router.post('/submitEval/:id', api.isNotSpectator, async (req, res) => {
 /* POST set group eval */
 router.post('/setGroupEval/', api.isNat, async (req, res) => {
     for (let i = 0; i < req.body.checkedApps.length; i++) {
-        await bnAppsService.update(req.body.checkedApps[i], { discussion: true });
-        let a = await bnAppsService.query({ _id: req.body.checkedApps[i] }, defaultPopulate);
+        const a = await BnApp
+            .findByIdAndUpdate(req.body.checkedApps[i], { discussion: true })
+            .populate(defaultPopulate);
+
         let pass = 0;
         let neutral = 0;
         let fail = 0;
+
         a.evaluations.forEach(evaluation => {
             if (evaluation.vote == 1) pass++;
             else if (evaluation.vote == 2) neutral++;
             else if (evaluation.vote == 3) fail++;
         });
+
         api.webhookPost(
             [{
                 author: {
@@ -183,7 +200,7 @@ router.post('/setGroupEval/', api.isNat, async (req, res) => {
         );
     }
 
-    let a = await bnAppsService.query({ active: true }, defaultPopulate, { deadline: 1 }, true);
+    let a = await BnApp.findActiveApps();
     res.json(a);
     logsService.create(
         req.session.mongoId,
@@ -193,11 +210,13 @@ router.post('/setGroupEval/', api.isNat, async (req, res) => {
 
 /* POST set invidivual eval */
 router.post('/setIndividualEval/', api.isNat, async (req, res) => {
-    for (let i = 0; i < req.body.checkedApps.length; i++) {
-        await bnAppsService.update(req.body.checkedApps[i], { discussion: false });
-    }
+    await BnApp.updateMany({
+        _id: { $in: req.body.checkedApps },
+    }, {
+        discussion: false,
+    });
 
-    let a = await bnAppsService.query({ active: true }, defaultPopulate, { deadline: 1 }, true);
+    let a = await BnApp.findActiveApps();
     res.json(a);
     logsService.create(
         req.session.mongoId,
@@ -208,23 +227,32 @@ router.post('/setIndividualEval/', api.isNat, async (req, res) => {
 /* POST set evals as complete */
 router.post('/setComplete/', api.isNat, async (req, res) => {
     for (let i = 0; i < req.body.checkedApps.length; i++) {
-        let a = await bnAppsService.query({ _id: req.body.checkedApps[i] });
-        let u = await User.findById(a.applicant);
+        let app = await BnApp.findById(req.body.checkedApps[i]);
+        let applicant = await User.findById(app.applicant);
 
-        if (a.consensus == 'pass') {
-            await User.findByIdAndUpdate(u.id, { $push: { modes: a.mode } });
-            await User.findByIdAndUpdate(u.id, { $push: { probation: a.mode } });
+        if (app.consensus == 'pass') {
+            await User.findByIdAndUpdate(applicant.id, {
+                $push: {
+                    modes: app.mode,
+                    probation: app.mode,
+                },
+            });
+
             let deadline = new Date();
             deadline.setDate(deadline.getDate() + 40);
-            await evalRoundsService.create(a.applicant, a.mode, deadline);
+            await evalRoundsService.create(app.applicant, app.mode, deadline);
 
-            if (u.group == 'user') {
-                await User.findByIdAndUpdate(u.id, { group: 'bn' });
-                await User.findByIdAndUpdate(u.id, { $push: { bnDuration: new Date() } });
+            if (applicant.group == 'user') {
+                await User.findByIdAndUpdate(applicant.id, {
+                    group: 'bn',
+                    $push: { bnDuration: new Date() },
+                });
             }
         }
 
-        await bnAppsService.update(a.id, { active: false });
+        app.active = false;
+        await app.save();
+
         api.webhookPost(
             [{
                 author: {
@@ -235,25 +263,26 @@ router.post('/setComplete/', api.isNat, async (req, res) => {
                 color: '6579298',
                 fields: [
                     {
-                        name: `http://bn.mappersguild.com/appeval?eval=${a.id}`,
-                        value: `Archived **${u.username}**'s BN app`,
+                        name: `http://bn.mappersguild.com/appeval?eval=${app.id}`,
+                        value: `Archived **${applicant.username}**'s BN app`,
                     },
                     {
                         name: 'Consensus',
-                        value: `${a.consensus == 'pass' ? 'Pass' : 'Fail'}`,
+                        value: `${app.consensus == 'pass' ? 'Pass' : 'Fail'}`,
                     },
                 ],
             }],
-            a.mode
+            app.mode
         );
         logsService.create(
             req.session.mongoId,
-            `Set ${u.username}'s ${a.mode} application eval as "${a.consensus}"`
+            `Set ${applicant.username}'s ${app.mode} application eval as "${app.consensus}"`
         );
     }
 
-    let a = await bnAppsService.query({ active: true }, defaultPopulate, { deadline: 1 }, true);
-    res.json(a);
+    const activeApps = await BnApp.findActiveApps();
+
+    res.json(activeApps);
     logsService.create(
         req.session.mongoId,
         `Set ${req.body.checkedApps.length} BN app${req.body.checkedApps.length == 1 ? '' : 's'} as completed`
@@ -262,20 +291,24 @@ router.post('/setComplete/', api.isNat, async (req, res) => {
 
 /* POST set consensus of eval */
 router.post('/setConsensus/:id', api.isNat, api.isNotSpectator, async (req, res) => {
-    let a = await bnAppsService.update(req.params.id, { consensus: req.body.consensus });
+    let a = await BnApp
+        .findByIdAndUpdate(req.params.id, { consensus: req.body.consensus })
+        .populate(defaultPopulate);
 
     if (req.body.consensus == 'fail') {
         let date = new Date(a.createdAt);
         date.setDate(date.getDate() + 90);
-        await bnAppsService.update(req.params.id, { cooldownDate: date });
+        a.cooldownDate = date;
+        await a.save();
     }
 
-    a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
     res.json(a);
+
     logsService.create(
         req.session.mongoId,
         `Set consensus of ${a.applicant.username}'s ${a.mode} BN app as ${req.body.consensus}`
     );
+
     api.webhookPost(
         [{
             author: {
@@ -297,13 +330,17 @@ router.post('/setConsensus/:id', api.isNat, api.isNotSpectator, async (req, res)
 
 /* POST set cooldown */
 router.post('/setCooldownDate/:id', api.isNotSpectator, async (req, res) => {
-    await bnAppsService.update(req.params.id, { cooldownDate: req.body.cooldownDate });
-    let a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
+    const a = await BnApp
+        .findByIdAndUpdate(req.params.id, { cooldownDate: req.body.cooldownDate })
+        .populate(defaultPopulate);
+
     res.json(a);
+
     logsService.create(
         req.session.mongoId,
         `Changed cooldown date to ${req.body.cooldownDate.toString().slice(0,10)} for ${a.applicant.username}'s ${a.mode} BN app`
     );
+
     api.webhookPost(
         [{
             author: {
@@ -325,8 +362,10 @@ router.post('/setCooldownDate/:id', api.isNotSpectator, async (req, res) => {
 
 /* POST set feedback of eval */
 router.post('/setFeedback/:id', api.isNat, api.isNotSpectator, async (req, res) => {
-    await bnAppsService.update(req.params.id, { feedback: req.body.feedback });
-    let a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
+    const a = await BnApp
+        .findByIdAndUpdate(req.params.id, { feedback: req.body.feedback })
+        .populate(defaultPopulate);
+
     res.json(a);
 
     if (!req.body.hasFeedback) {
@@ -334,7 +373,7 @@ router.post('/setFeedback/:id', api.isNat, api.isNotSpectator, async (req, res) 
             req.session.mongoId,
             `Created feedback for ${a.applicant.username}'s ${a.mode} BN app`
         );
-        bnAppsService.update(req.params.id, { feedbackAuthor: req.session.mongoId });
+        BnApp.findByIdAndUpdate(req.params.id, { feedbackAuthor: req.session.mongoId });
     } else {
         logsService.create(
             req.session.mongoId,
@@ -363,8 +402,8 @@ router.post('/setFeedback/:id', api.isNat, api.isNotSpectator, async (req, res) 
 
 /* POST replace evaluator */
 router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) => {
-    let a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
-    let isNat = Boolean(req.body.isNat);
+    const isNat = Boolean(req.body.isNat);
+    let a = await BnApp.findById(req.params.id).populate(defaultPopulate);
     let newEvaluator;
 
     if (isNat) {
@@ -376,8 +415,11 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
             { $match: { group: 'nat', isSpectator: { $ne: true }, modes: a.mode, osuId: { $nin: invalids } } },
             { $sample: { size: 1 } },
         ]);
-        await bnAppsService.update(req.params.id, { $push: { natEvaluators: newEvaluator[0]._id } });
-        await bnAppsService.update(req.params.id, { $pull: { natEvaluators: req.body.evaluatorId } });
+
+        await BnApp.findByIdAndUpdate(req.params.id, {
+            $push: { natEvaluators: newEvaluator[0]._id },
+            $pull: { natEvaluators: req.body.evaluatorId },
+        });
     } else {
         let invalids = [];
         a.bnEvaluators.forEach(user => {
@@ -387,17 +429,24 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
             { $match: { group: 'bn', isSpectator: { $ne: true }, modes: a.mode, osuId: { $nin: invalids }, isBnEvaluator: true, probation: { $size: 0 } } },
             { $sample: { size: 1 } },
         ]);
-        await bnAppsService.update(req.params.id, { $push: { bnEvaluators: newEvaluator[0]._id } });
-        await bnAppsService.update(req.params.id, { $pull: { bnEvaluators: req.body.evaluatorId } });
+
+        await BnApp.findByIdAndUpdate(req.params.id, {
+            $push: { bnEvaluators: newEvaluator[0]._id },
+            $pull: { bnEvaluators: req.body.evaluatorId },
+        });
     }
 
-    a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
+    a = await BnApp.findById(req.params.id).populate(defaultPopulate);
+
     res.json(a);
+
     logsService.create(
         req.session.mongoId,
         'Re-selected a single evaluator'
     );
-    let u = await User.findById(req.body.evaluatorId);
+
+    const u = await User.findById(req.body.evaluatorId);
+
     api.webhookPost(
         [{
             author: {
@@ -447,10 +496,10 @@ router.post('/selectBnEvaluators', api.isLeader, async (req, res) => {
 router.post('/enableBnEvaluators/:id', api.isLeader, async (req, res) => {
     for (let i = 0; i < req.body.bnEvaluators.length; i++) {
         let bn = req.body.bnEvaluators[i];
-        await bnAppsService.update(req.params.id, { $push: { bnEvaluators: bn._id } });
+        await BnApp.findByIdAndUpdate(req.params.id, { $push: { bnEvaluators: bn._id } });
     }
 
-    let a = await bnAppsService.query({ _id: req.params.id }, defaultPopulate);
+    let a = await BnApp.findById(req.params.id).populate(defaultPopulate);
     res.json(a);
     logsService.create(
         req.session.mongoId,

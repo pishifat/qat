@@ -5,7 +5,7 @@ const logsService = require('../models/log').service;
 const evalsService = require('../models/evaluation').service;
 const reportsService = require('../models/report').service;
 const evalRoundsService = require('../models/evalRound').service;
-const bnAppsService = require('../models/bnApp').service;
+const BnApp = require('../models/bnApp');
 const User = require('../models/user');
 const aiessService = require('../models/aiess').service;
 const notesService = require('../models/note').service;
@@ -44,14 +44,17 @@ const notesPopulate = [
 ];
 
 const applicationPopulate = [
-    { populate: 'applicant', display: 'username osuId' },
     {
-        populate: 'evaluations',
-        display: 'evaluator behaviorComment moddingComment vote',
+        path: 'applicant',
+        select: 'username osuId',
     },
     {
-        innerPopulate: 'evaluations',
-        populate: { path: 'evaluator', select: 'username osuId group' },
+        path: 'evaluations',
+        select: 'evaluator behaviorComment moddingComment vote',
+        populate: {
+            path: 'evaluator',
+            select: 'username osuId group',
+        },
     },
 ];
 
@@ -551,7 +554,12 @@ router.get('/findPreviousEvaluations/:id', api.isNat, async (req, res) => {
     evals = await evalRoundsService.query({ bn: req.params.id, active: false, consensus: { $exists: true }, feedback: { $exists: true } }, {}, {}, true);
 
     if (!evals.length) {
-        evals = await bnAppsService.query({ applicant: req.params.id, active: false, consensus: { $exists: true }, feedback: { $exists: true } }, {}, {}, true);
+        evals = await BnApp.find({
+            applicant: req.params.id,
+            active: false,
+            consensus: { $exists: true },
+            feedback: { $exists: true },
+        });
     }
 
     res.json({ previousEvaluations: evals });
@@ -584,7 +592,14 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
         aiessService.getByEventTypeAndUser(parseInt(req.params.id), minDate, maxDate, req.params.mode),
         aiessService.getAllByEventType(minDate, maxDate, req.params.mode),
         aiessService.query({ qualityAssuranceCheckers: req.params.mongoId, updatedAt: { $gte: minDate, $lte: maxDate } }, {}, {}, true),
-        bnAppsService.query({ bnEvaluators: req.params.mongoId, mode: req.params.mode, createdAt: { $gte: minDate } }, applicationPopulate, { createdAt: 1 }, true),
+        BnApp
+            .find({
+                bnEvaluators: req.params.mongoId,
+                mode: req.params.mode,
+                createdAt: { $gte: minDate },
+            })
+            .populate(applicationPopulate)
+            .sort({ createdAt: 1 }),
     ]);
 
     if (user.error || allUserEvents.error || allEvents.error || qualityAssuranceChecks.error || assignedApplications.error) return res.json({ error: 'Something went wrong!' });
@@ -672,19 +687,19 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
     if (user.natDuration.length % 2 || user.natDuration[user.natDuration.length - 1] < minDate) {
         // find all applications & evalRounds
         const [allApplications, allEvalRounds] = await Promise.all([
-            bnAppsService.query(
-                {
+            BnApp
+                .find({
                     createdAt: { $gte: minDate },
                     mode: req.params.mode,
-                },
-                applicationPopulate, { createdAt: 1 }, true),
+                })
+                .populate(applicationPopulate)
+                .sort({ createdAt: 1 }),
             evalRoundsService.query(
                 {
                     deadline: { $gte: minDate },
                     mode: req.params.mode,
                 },
                 defaultPopulate, { createdAt: 1 }, true),
-            bnAppsService.query({ createdAt: { $gte: minDate } }, applicationPopulate, { createdAt: 1 }, true),
         ]);
 
         // extract apps that user evaluated or was assigned to

@@ -2,7 +2,7 @@ const express = require('express');
 const api = require('../helpers/api');
 const testSubmissionService = require('../models/bnTest/testSubmission').service;
 const logsService = require('../models/log').service;
-const bnAppsService = require('../models/bnApp').service;
+const BnApp = require('../models/bnApp');
 const User = require('../models/user');
 
 const router = express.Router();
@@ -95,7 +95,7 @@ router.post('/submitTest', async (req, res) => {
         },
         defaultPopulate
     );
-    const currentBnApp = await bnAppsService.query({
+    const currentBnApp = await BnApp.findOne({
         applicant: req.session.mongoId,
         mode: test.mode,
         active: true,
@@ -125,7 +125,7 @@ router.post('/submitTest', async (req, res) => {
             totalScore: displayScore,
             comment: req.body.comment,
         }),
-        bnAppsService.update(currentBnApp.id, { test: test._id }),
+        BnApp.findByIdAndUpdate(currentBnApp.id, { test: test._id }),
     ]);
 
     if (!updatedTest || updatedTest.error || !updatedApp || updatedApp.error) return res.json({ error: 'Something went wrong!' });
@@ -152,7 +152,7 @@ router.post('/submitTest', async (req, res) => {
 
     for (let i = 0; i < assignedNat.length; i++) {
         let user = assignedNat[i];
-        await bnAppsService.update(currentBnApp.id, { $push: { natEvaluators: user._id } });
+        await BnApp.findByIdAndUpdate(currentBnApp.id, { $push: { natEvaluators: user._id } });
         natList += user.username;
 
         if (i + 1 < assignedNat.length) {

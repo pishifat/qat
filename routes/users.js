@@ -2,7 +2,7 @@ const express = require('express');
 const api = require('../helpers/api');
 const User = require('../models/user');
 const logsService = require('../models/log').service;
-const bnAppsService = require('../models/bnApp').service;
+const BnApp = require('../models/bnApp');
 const evalRoundsService = require('../models/evalRound').service;
 const aiessService = require('../models/aiess').service;
 const notesService = require('../models/note').service;
@@ -18,22 +18,22 @@ const defaultNotePopulate = [
 
 const evaluationsPopulate = [
     {
-        populate: 'evaluations',
-        display: 'evaluator',
+        path: 'evaluations',
+        select: 'evaluator',
     },
 ];
 
 const appPopulate = [
-    { populate: 'applicant', display: 'username osuId' },
-    { populate: 'bnEvaluators', display: 'username osuId' },
-    { populate: 'test', display: 'totalScore' },
+    { path: 'applicant', select: 'username osuId' },
+    { path: 'bnEvaluators', select: 'username osuId' },
+    { path: 'test', select: 'totalScore' },
     {
-        populate: 'evaluations',
-        display: 'evaluator behaviorComment moddingComment vote',
-    },
-    {
-        innerPopulate: 'evaluations',
-        populate: { path: 'evaluator', select: 'username osuId group' },
+        path: 'evaluations',
+        select: 'evaluator behaviorComment moddingComment vote',
+        populate: {
+            path: 'evaluator',
+            select: 'username osuId group',
+        },
     },
 ];
 
@@ -239,12 +239,22 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
     minEvalDate.setDate(minEvalDate.getDate() - (parseInt(req.params.days)));
     let maxDate = new Date();
     const [users, bnApps, bnRounds] = await Promise.all([
-        User.find({
-            group: 'nat',
-            modes: req.params.mode,
-            isSpectator: { $ne: true },
-        }).sort({ username: 1 }),
-        bnAppsService.query({ mode: req.params.mode, createdAt: { $gte: minAppDate, $lte: maxDate }, discussion: true }, evaluationsPopulate, {}, true),
+        User
+            .find({
+                group: 'nat',
+                modes: req.params.mode,
+                isSpectator: { $ne: true },
+            })
+            .sort({ username: 1 }),
+
+        BnApp
+            .find({
+                mode: req.params.mode,
+                createdAt: { $gte: minAppDate, $lte: maxDate },
+                discussion: true,
+            })
+            .populate(evaluationsPopulate),
+
         evalRoundsService.query({ mode: req.params.mode, deadline: { $gte: minEvalDate, $lte: maxDate }, discussion: true }, evaluationsPopulate, {}, true),
     ]);
     let bnAppsCount = bnApps.length;
@@ -370,7 +380,13 @@ router.get('/findPotentialNatInfo/', async (req, res) => {
             isSpectator: { $ne: true },
             isBnEvaluator: true,
         }).sort({ username: 1 }),
-        bnAppsService.query({ bnEvaluators: { $exists: true, $not: { $size: 0 } }, active: false }, appPopulate, {}, true),
+        BnApp.find({
+            bnEvaluators: {
+                $exists: true,
+                $not: { $size: 0 },
+            },
+            active: false,
+        }).populate(appPopulate),
     ]);
 
     let info = [];

@@ -2,7 +2,7 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const api = require('./api');
 const helper = require('./helpers');
-const bnAppsService = require('../models/bnApp').service;
+const BnApp = require('../models/bnApp');
 const vetoesService = require('../models/veto').service;
 const evalRoundsService = require('../models/evalRound').service;
 const User = require('../models/user');
@@ -11,8 +11,8 @@ const aiess = require('../models/aiess');
 const cron = require('node-cron');
 
 const defaultAppPopulate = [{
-    populate: 'applicant',
-    display: 'username osuId',
+    path: 'applicant',
+    select: 'username osuId',
 }];
 
 const defaultRoundPopulate = [{
@@ -33,12 +33,12 @@ function notifyDeadlines() {
 
         // find active events
         const [activeApps, activeRounds, activeVetoes] = await Promise.all([
-            bnAppsService.query(
-                { active: true, test: { $exists: true } },
-                defaultAppPopulate,
-                {},
-                true
-            ),
+            BnApp
+                .find({
+                    active: true,
+                    test: { $exists: true },
+                })
+                .populate(defaultAppPopulate),
             evalRoundsService.query(
                 { active: true },
                 defaultRoundPopulate,

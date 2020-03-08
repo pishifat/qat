@@ -11,7 +11,7 @@
                     :evaluator-mongo-id="evaluator.id"
                 />
                 <div class="modal-body" style="overflow: hidden;">
-                    <div v-for="(mode, i) in mode" :key="mode" class="container">
+                    <div v-for="(mode, i) in modes" :key="mode" class="container">
                         <p class="text-shadow min-spacing mb-1">
                             Recent BN activity
                             <span class="small">({{ mode == 'osu' ? 'osu!' : 'osu!' + mode }})</span>

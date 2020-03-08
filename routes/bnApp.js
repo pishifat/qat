@@ -1,6 +1,6 @@
 const express = require('express');
 const api = require('../helpers/api');
-const bnAppsService = require('../models/bnApp.js').service;
+const BnApp = require('../models/bnApp.js');
 const evalRoundsService = require('../models/evalRound').service;
 const logsService = require('../models/log.js').service;
 const testSubmissionService = require('../models/bnTest/testSubmission').service;
@@ -41,10 +41,13 @@ router.post('/apply', async (req, res) => {
 
     let cooldownDate = new Date();
     const [currentBnApp, currentBnEval] = await Promise.all([
-        await bnAppsService.query({
+        await BnApp.findOne({
             applicant: req.session.mongoId,
             mode: req.body.mode,
-            $or: [ { cooldownDate: { $gte: cooldownDate } }, { active: true }],
+            $or: [
+                { cooldownDate: { $gte: cooldownDate } },
+                { active: true },
+            ],
         }),
         await evalRoundsService.query({
             bn: req.session.mongoId,
@@ -78,13 +81,18 @@ router.post('/apply', async (req, res) => {
         // Create app & test
         const [newBnApp, test] = await Promise.all([
             await testSubmissionService.create(req.session.mongoId, req.body.mode),
-            await bnAppsService.create(req.session.mongoId, req.body.mode, req.body.mods, req.body.reasons),
+            await BnApp.create({
+                applicant: req.session.mongoId,
+                mode: req.body.mode,
+                mods: req.body.mods,
+                reasons: req.body.reasons,
+            }),
         ]);
 
         if (!newBnApp || newBnApp.error || !test || test.error) {
             return res.json({ error: 'Failed to process application!' });
         } else {
-            await bnAppsService.update(newBnApp.id, { test: test._id });
+            await BnApp.findByIdAndUpdate(newBnApp.id, { test: test._id });
             res.json('pass');
 
             logsService.create(req.session.mongoId, `Applied for ${req.body.mode} BN`);

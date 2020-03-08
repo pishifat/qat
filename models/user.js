@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
     discordId: { type: Number },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-class UserClass {
+class UserService {
 
     get isBnOrNat() {
         return this.group == 'bn' || this.group == 'nat' || this.isSpectator;
@@ -177,9 +177,10 @@ class UserClass {
             return { error: error._message };
         }
     }
+
 }
 
-userSchema.loadClass(UserClass);
+userSchema.loadClass(UserService);
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
