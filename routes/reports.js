@@ -1,8 +1,7 @@
 const express = require('express');
 const api = require('../helpers/api');
-const helper = require('../helpers/helpers');
 const reportsService = require('../models/report').service;
-const usersService = require('../models/user').service;
+const User = require('../models/user');
 const logsService = require('../models/log').service;
 
 const router = express.Router();
@@ -27,7 +26,7 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
     }
 
     if (req.body.username) {
-        let u = await usersService.query({ username: new RegExp('^' + helper.escapeUsername(req.body.username) + '$', 'i') });
+        let u = await User.findByUsername(req.body.username);
 
         if (!u) {
             return res.json({ error: 'Cannot find user! Make sure you spelled it correctly' });

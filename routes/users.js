@@ -1,6 +1,6 @@
 const express = require('express');
 const api = require('../helpers/api');
-const usersService = require('../models/user').service;
+const User = require('../models/user');
 const logsService = require('../models/log').service;
 const bnAppsService = require('../models/bnApp').service;
 const evalRoundsService = require('../models/evalRound').service;
@@ -50,14 +50,15 @@ router.get('/', (req, res) => {
 
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res) => {
-    let u = await usersService.query(
-        { $or: [{ group: 'nat' }, { group: 'bn' }] },
-        {},
-        { username: 1 },
-        true
-    );
+    const users = await User.find({
+        $or: [
+            { group: 'nat' },
+            { group: 'bn' },
+        ],
+    }).sort({ username: 1 });
+
     res.json({
-        users: u,
+        users,
         userId: req.session.mongoId,
         isLeader: res.locals.userRequest.isLeader,
         isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
@@ -67,16 +68,25 @@ router.get('/relevantInfo', async (req, res) => {
 
 /* POST switch bn evaluator */
 router.post('/switchBnEvaluator/', api.isBnOrNat, async (req, res) => {
-    let u = await usersService.update(req.session.mongoId, {
+    const u = await User.findByIdAndUpdate(req.session.mongoId, {
         isBnEvaluator: !res.locals.userRequest.isBnEvaluator,
     });
+
     res.json(u);
     logsService.create(req.session.mongoId, `Opted ${u.isBnEvaluator ? 'in to' : 'out of'} optional BN app evaluation input`);
 });
 
 /* POST switch usergroup */
 router.post('/switchGroup/:id', api.isLeader, async (req, res) => {
-    let u = await usersService.update(req.params.id, { group: req.body.group,  probation: [], $push: { bnDuration: new Date(), natDuration: new Date() } });
+    let u = await User.findByIdAndUpdate(req.params.id, {
+        group: req.body.group,
+        probation: [],
+        $push: {
+            bnDuration: new Date(),
+            natDuration: new Date(),
+        },
+    });
+
     res.json(u);
 
     await evalRoundsService.deleteManyByUserId(u.id);
@@ -92,7 +102,14 @@ router.post('/switchGroup/:id', api.isLeader, async (req, res) => {
 
 /* POST remove from BN/NAT without evaluation */
 router.post('/removeNat/:id', api.isLeader, async (req, res) => {
-    let u = await usersService.update(req.params.id, { group: 'user',  probation: [], modes: [], $push: { natDuration: new Date() } });
+    let u = await User.findByIdAndUpdate(req.params.id, {
+        group: 'user',
+        probation: [],
+        modes: [],
+        $push: {
+            natDuration: new Date(),
+        },
+    });
     res.json(u);
     logsService.create(
         req.session.mongoId,
@@ -120,7 +137,7 @@ router.post('/saveNote/:id', api.isNat, async (req, res) => {
     );
     note = await notesService.query({ _id: note._id }, defaultNotePopulate);
     res.json(note);
-    let u = await usersService.query({ _id: req.params.id });
+    let u = await User.findById(req.params.id);
     logsService.create(
         req.session.mongoId,
         `Added user note to "${u.username}"`
@@ -152,7 +169,7 @@ router.post('/saveNote/:id', api.isNat, async (req, res) => {
 router.post('/hideNote/:id', api.isNat, async (req, res) => {
     await notesService.update(req.params.id, { isHidden: true } );
     res.json({});
-    let u = await usersService.query({ _id: req.body.userId });
+    let u = await User.findById(req.body.userId);
     logsService.create(
         req.session.mongoId,
         `Removed user note from "${u.username}"`
@@ -164,7 +181,7 @@ router.post('/editNote/:id', api.isNat, async (req, res) => {
     await notesService.update(req.params.id, { comment: req.body.comment } );
     let n = await notesService.query({ _id: req.params.id }, defaultNotePopulate);
     res.json(n);
-    let u = await usersService.query({ _id: n.user });
+    let u = await User.findById(n.user);
     logsService.create(
         req.session.mongoId,
         `edited user note for "${u.username}"`
@@ -184,18 +201,19 @@ router.get('/loadNextEvaluation/:id', async (req, res) => {
 
 /* GET all users with badge info */
 router.get('/findUserBadgeInfo', async (req, res) => {
-    let u = await usersService.query(
-        { $or: [{ 'bnDuration.0': { $exists: true } }, { 'natDuration.0': { $exists: true } }] },
-        {},
-        { username: 1 },
-        true
-    );
+    const u = await User.find({
+        $or: [
+            { 'bnDuration.0': { $exists: true } },
+            { 'natDuration.0': { $exists: true } },
+        ],
+    }).sort({ username: 1 });
+
     res.json(u);
 });
 
 /* POST edit badge value */
 router.post('/editBadgeValue/:id', api.isLeader, async (req, res) => {
-    let u = await usersService.query({ _id: req.params.id });
+    let u = await User.findById(req.params.id);
 
     if (res.locals.userRequest.osuId == '3178418') { //i dont want anyone else messing with this
         let years;
@@ -203,14 +221,14 @@ router.post('/editBadgeValue/:id', api.isLeader, async (req, res) => {
 
         if (req.body.group == 'bn') {
             years = u.bnProfileBadge + num;
-            await usersService.update(req.params.id, { bnProfileBadge: years });
+            await User.findByIdAndUpdate(req.params.id, { bnProfileBadge: years });
         } else {
             years = u.natProfileBadge + num;
-            await usersService.update(req.params.id, { natProfileBadge: years });
+            await User.findByIdAndUpdate(req.params.id, { natProfileBadge: years });
         }
     }
 
-    u = await usersService.query({ _id: req.params.id });
+    u = await User.findById(req.params.id);
     res.json(u);
 });
 
@@ -221,11 +239,11 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
     minEvalDate.setDate(minEvalDate.getDate() - (parseInt(req.params.days)));
     let maxDate = new Date();
     const [users, bnApps, bnRounds] = await Promise.all([
-        usersService.query({
+        User.find({
             group: 'nat',
             modes: req.params.mode,
-            isSpectator: { $ne: true } },
-        {}, { username: 1 }, true),
+            isSpectator: { $ne: true },
+        }).sort({ username: 1 }),
         bnAppsService.query({ mode: req.params.mode, createdAt: { $gte: minAppDate, $lte: maxDate }, discussion: true }, evaluationsPopulate, {}, true),
         evalRoundsService.query({ mode: req.params.mode, deadline: { $gte: minEvalDate, $lte: maxDate }, discussion: true }, evaluationsPopulate, {}, true),
     ]);
@@ -279,11 +297,11 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
     minDate.setDate(minDate.getDate() - parseInt(req.params.days));
     let maxDate = new Date();
     const [users, allEvents, allActiveEvalRounds] = await Promise.all([
-        usersService.query({
+        User.find({
             group: 'bn',
             modes: req.params.mode,
-            isSpectator: { $ne: true } },
-        {}, { username: 1 }, true),
+            isSpectator: { $ne: true },
+        }).sort({ username: 1 }),
         aiessService.getAllActivity(minDate, maxDate, req.params.mode),
         evalRoundsService.query({ active: true }, {}, {}, true),
     ]);
@@ -347,11 +365,11 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
 /* GET potential NAT info */
 router.get('/findPotentialNatInfo/', async (req, res) => {
     const [users, applications] = await Promise.all([
-        usersService.query({
+        User.find({
             group: 'bn',
             isSpectator: { $ne: true },
-            isBnEvaluator: true },
-        {}, { username: 1 }, true),
+            isBnEvaluator: true,
+        }).sort({ username: 1 }),
         bnAppsService.query({ bnEvaluators: { $exists: true, $not: { $size: 0 } }, active: false }, appPopulate, {}, true),
     ]);
 

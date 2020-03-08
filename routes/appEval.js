@@ -3,8 +3,7 @@ const api = require('../helpers/api');
 const bnAppsService = require('../models/bnApp').service;
 const evalsService = require('../models/evaluation').service;
 const evalRoundsService = require('../models/evalRound').service;
-const usersModel = require('../models/user').User;
-const usersService = require('../models/user').service;
+const User = require('../models/user');
 const logsService = require('../models/log').service;
 
 const router = express.Router();
@@ -210,18 +209,18 @@ router.post('/setIndividualEval/', api.isNat, async (req, res) => {
 router.post('/setComplete/', api.isNat, async (req, res) => {
     for (let i = 0; i < req.body.checkedApps.length; i++) {
         let a = await bnAppsService.query({ _id: req.body.checkedApps[i] });
-        let u = await usersService.query({ _id: a.applicant });
+        let u = await User.findById(a.applicant);
 
         if (a.consensus == 'pass') {
-            await usersService.update(u.id, { $push: { modes: a.mode } });
-            await usersService.update(u.id, { $push: { probation: a.mode } });
+            await User.findByIdAndUpdate(u.id, { $push: { modes: a.mode } });
+            await User.findByIdAndUpdate(u.id, { $push: { probation: a.mode } });
             let deadline = new Date();
             deadline.setDate(deadline.getDate() + 40);
             await evalRoundsService.create(a.applicant, a.mode, deadline);
 
             if (u.group == 'user') {
-                await usersService.update(u.id, { group: 'bn' });
-                await usersService.update(u.id, { $push: { bnDuration: new Date() } });
+                await User.findByIdAndUpdate(u.id, { group: 'bn' });
+                await User.findByIdAndUpdate(u.id, { $push: { bnDuration: new Date() } });
             }
         }
 
@@ -373,7 +372,7 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
         a.natEvaluators.forEach(user => {
             invalids.push(user.osuId);
         });
-        newEvaluator = await usersModel.aggregate([
+        newEvaluator = await User.aggregate([
             { $match: { group: 'nat', isSpectator: { $ne: true }, modes: a.mode, osuId: { $nin: invalids } } },
             { $sample: { size: 1 } },
         ]);
@@ -384,7 +383,7 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
         a.bnEvaluators.forEach(user => {
             invalids.push(user.osuId);
         });
-        newEvaluator = await usersModel.aggregate([
+        newEvaluator = await User.aggregate([
             { $match: { group: 'bn', isSpectator: { $ne: true }, modes: a.mode, osuId: { $nin: invalids }, isBnEvaluator: true, probation: { $size: 0 } } },
             { $sample: { size: 1 } },
         ]);
@@ -398,7 +397,7 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
         req.session.mongoId,
         'Re-selected a single evaluator'
     );
-    let u = await usersService.query({ _id: req.body.evaluatorId });
+    let u = await User.findById(req.body.evaluatorId);
     api.webhookPost(
         [{
             author: {
@@ -420,7 +419,7 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
 
 /* POST select BN evaluators */
 router.post('/selectBnEvaluators', api.isLeader, async (req, res) => {
-    const allUsers = await usersModel.aggregate([
+    const allUsers = await User.aggregate([
         { $match: { group: { $eq: 'bn' }, isBnEvaluator: true, probation: { $size: 0 } }  },
         { $sample: { size: 1000 } },
     ]);

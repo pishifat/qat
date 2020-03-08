@@ -3,7 +3,7 @@ const api = require('../helpers/api');
 const helper = require('../helpers/helpers');
 const bnAppsService = require('../models/bnApp').service;
 const evalRoundsService = require('../models/evalRound').service;
-const usersService = require('../models/user').service;
+const User = require('../models/user');
 
 const router = express.Router();
 
@@ -45,9 +45,9 @@ router.get('/search/:user', async (req, res) => {
     const userToSearch = helper.safeParam(req.params.user);
 
     if (isNaN(userToSearch)) {
-        u = await usersService.query({ username: new RegExp('^' + helper.escapeUsername(userToSearch) + '$', 'i') });
+        u = await User.findByUsername(userToSearch);
     } else {
-        u = await usersService.query({ osuId: parseInt(userToSearch) });
+        u = await User.findOne({ osuId: parseInt(userToSearch) });
     }
 
     if (!u) {
@@ -126,20 +126,20 @@ router.post('/unarchive/:id', api.isNat, async (req, res) => {
             return res.json({ error: 'Could not load evalRound!' });
         }
 
-        let u = await usersService.query({ _id: a.applicant });
+        let u = await User.findById(a.applicant);
 
         if (!u || u.error) {
             return res.json({ error: 'Could not load user!' });
         }
 
         if (a.consensus == 'pass') {
-            await usersService.update(u.id, { $pull: { modes: a.mode } });
-            await usersService.update(u.id, { $pull: { probation: a.mode } });
+            await User.findByIdAndUpdate(u.id, { $pull: { modes: a.mode } });
+            await User.findByIdAndUpdate(u.id, { $pull: { probation: a.mode } });
             await evalRoundsService.deleteManyByUserId(u.id);
 
             if (u.modes.length == 1) {
-                await usersService.update(u.id, { group: 'user' });
-                await usersService.update(u.id, { $pop: { bnDuration: 1 } });
+                await User.findByIdAndUpdate(u.id, { group: 'user' });
+                await User.findByIdAndUpdate(u.id, { $pop: { bnDuration: 1 } });
             }
         }
 
@@ -170,19 +170,19 @@ router.post('/unarchive/:id', api.isNat, async (req, res) => {
             return res.json({ error: 'Could not load evalRound!' });
         }
 
-        let u = await usersService.query({ _id: er.bn });
+        let u = await User.findById(er.bn);
 
         if (!u || u.error) {
             return res.json({ error: 'Could not load user!' });
         }
 
         if (er.consensus == 'fail') {
-            await usersService.update(u.id, { $push: { modes: er.mode } });
-            await usersService.update(u.id, { $push: { probation: er.mode } });
+            await User.findByIdAndUpdate(u.id, { $push: { modes: er.mode } });
+            await User.findByIdAndUpdate(u.id, { $push: { probation: er.mode } });
 
             if (!u.modes.length) {
-                await usersService.update(u.id, { group: 'bn' });
-                await usersService.update(u.id, { $pop: { bnDuration: 1 } });
+                await User.findByIdAndUpdate(u.id, { group: 'bn' });
+                await User.findByIdAndUpdate(u.id, { $pop: { bnDuration: 1 } });
             }
         }
 
@@ -190,7 +190,7 @@ router.post('/unarchive/:id', api.isNat, async (req, res) => {
             await evalRoundsService.deleteManyByUserId(u.id);
 
             if (u.probation.indexOf(er.mode) < 0) {
-                await usersService.update(u.id, { $push: { probation: er.mode } });
+                await User.findByIdAndUpdate(u.id, { $push: { probation: er.mode } });
             }
         }
 

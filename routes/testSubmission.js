@@ -3,7 +3,7 @@ const api = require('../helpers/api');
 const testSubmissionService = require('../models/bnTest/testSubmission').service;
 const logsService = require('../models/log').service;
 const bnAppsService = require('../models/bnApp').service;
-const usersModel = require('../models/user').User;
+const User = require('../models/user');
 
 const router = express.Router();
 router.use(api.isLoggedIn);
@@ -144,7 +144,7 @@ router.post('/submitTest', async (req, res) => {
     }
 
     const invalids = [8129817, 3178418];
-    const assignedNat = await usersModel.aggregate([
+    const assignedNat = await User.aggregate([
         { $match: { group: 'nat', isSpectator: { $ne: true }, modes: test.mode, osuId: { $nin: invalids } } },
         { $sample: { size: test.mode == 'osu' || test.mode == 'catch' ? 3 : 2 } },
     ]);

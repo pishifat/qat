@@ -2,7 +2,7 @@ const express = require('express');
 const api = require('../helpers/api');
 const helper = require('../helpers/helpers');
 const testSubmissionService = require('../models/bnTest/testSubmission').service;
-const usersService = require('../models/user').service;
+const User = require('../models/user');
 
 const router = express.Router();
 
@@ -56,13 +56,16 @@ router.get('/search/:user', api.isNat, async (req, res) => {
     const userToSearch = helper.safeParam(req.params.user);
 
     if (isNaN(userToSearch)) {
-        user = await usersService.query({ username: new RegExp('^' + helper.escapeUsername(userToSearch) + '$', 'i') });
+        user = await User.findByUsername(userToSearch);
     } else {
-        user = await usersService.query({ osuId: parseInt(userToSearch) });
+        user = await User.findOne({ osuId: parseInt(userToSearch) });
     }
 
     if (!user) {
-        return res.json({ error: 'Cannot find user!', isNat: res.locals.userRequest.group == 'nat' });
+        return res.json({
+            error: 'Cannot find user!',
+            isNat: res.locals.userRequest.group == 'nat',
+        });
     }
 
     const tests = await testSubmissionService.query(

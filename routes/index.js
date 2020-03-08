@@ -2,18 +2,18 @@ const express = require('express');
 const config = require('../config.json');
 const crypto = require('crypto');
 const api = require('../helpers/api');
-const usersService = require('../models/user').service;
+const User = require('../models/user');
 const logsService = require('../models/log').service;
 const getUserModsCount = require('../helpers/helpers').getUserModsCount;
 const router = express.Router();
 
 /* GET bn app page */
 router.get('/', async (req, res) => {
-    const allUsersByMode = await usersService.getAllByMode(true, true, true);
+    const allUsersByMode = await User.getAllByMode(true, true, true);
     let user;
 
     if (req.session.mongoId) {
-        user = await usersService.query({ _id: req.session.mongoId });
+        user = await User.findById(req.session.mongoId);
     }
 
     let isBnOrNat = user && user.isBnOrNat;
@@ -50,15 +50,15 @@ router.get(
     '/login',
     async (req, res, next) => {
         if (req.session.osuId && req.session.username) {
-            const u = await usersService.query({ osuId: req.session.osuId });
+            const u = await User.findOne({ osuId: req.session.osuId });
 
             if (!u || u.error) {
-                const user = await usersService.create(
-                    req.session.osuId,
-                    req.session.username,
-                    req.session.group,
-                    req.session.isSpectator
-                );
+                const user = await User.create({
+                    osuId: req.session.osuId,
+                    username: req.session.username,
+                    group: req.session.group,
+                    isSpectator: req.session.isSpectator,
+                });
 
                 if (user && !user.error) {
                     req.session.mongoId = user._id;
@@ -70,17 +70,17 @@ router.get(
                 }
             } else {
                 if (u.username != req.session.username) {
-                    await usersService.update(u._id, { username: req.session.username });
+                    await User.findByIdAndUpdate(u._id, { username: req.session.username });
                     logsService.create(u._id, `Username changed from "${u.username}" to "${req.session.username}"`);
                 }
 
                 if (u.isSpectator != req.session.isSpectator) {
-                    await usersService.update(u._id, { isSpectator: req.session.isSpectator });
+                    await User.findByIdAndUpdate(u._id, { isSpectator: req.session.isSpectator });
                     logsService.create(u._id, `User toggled spectator role`);
                 }
 
                 if (u.group != req.session.group) {
-                    await usersService.update(u._id, { group: req.session.group });
+                    await User.findByIdAndUpdate(u._id, { group: req.session.group });
                     logsService.create(u._id, `User group changed to ${req.session.group.toUpperCase()}`);
                 }
 

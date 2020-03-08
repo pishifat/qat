@@ -5,8 +5,7 @@ const helper = require('./helpers');
 const bnAppsService = require('../models/bnApp').service;
 const vetoesService = require('../models/veto').service;
 const evalRoundsService = require('../models/evalRound').service;
-const usersModel = require('../models/user').User;
-const usersService = require('../models/user').service;
+const User = require('../models/user');
 const beatmapReportsService = require('../models/beatmapReport').service;
 const aiess = require('../models/aiess');
 const cron = require('node-cron');
@@ -38,19 +37,19 @@ function notifyDeadlines() {
                 { active: true, test: { $exists: true } },
                 defaultAppPopulate,
                 {},
-                true,
+                true
             ),
             evalRoundsService.query(
                 { active: true },
                 defaultRoundPopulate,
                 {},
-                true,
+                true
             ),
             vetoesService.query(
                 { active: true },
                 {},
                 {},
-                true,
+                true
             ),
         ]);
 
@@ -88,7 +87,7 @@ function notifyDeadlines() {
                         },
                         color: '16776960',
                     }],
-                    veto.mode,
+                    veto.mode
                 );
                 await helper.sleep(500);
             }
@@ -129,7 +128,7 @@ function notifyDeadlines() {
                         },
                         color: '14427693',
                     }],
-                    app.mode,
+                    app.mode
                 );
                 await helper.sleep(500);
             }
@@ -159,7 +158,7 @@ function notifyDeadlines() {
 
                 if (!round.natEvaluators || !round.natEvaluators.length) {
                     const invalids = [8129817, 3178418];
-                    const assignedNat = await usersModel.aggregate([
+                    const assignedNat = await User.aggregate([
                         { $match: { group: 'nat', isSpectator: { $ne: true }, modes: round.mode, osuId: { $nin: invalids } } },
                         { $sample: { size: round.mode == 'osu' || round.mode == 'catch' ? 3 : 2 } },
                     ]);
@@ -176,7 +175,7 @@ function notifyDeadlines() {
                 } else {
                     for (let i = 0; i < round.natEvaluators.length; i++) {
                         let userId = round.natEvaluators[i];
-                        let user = await usersService.query({ _id: userId });
+                        let user = await User.findById(userId);
                         natList += user.username;
 
                         if (i + 1 < round.natEvaluators.length) {
@@ -196,7 +195,7 @@ function notifyDeadlines() {
                         },
                         color: '14427693',
                     }],
-                    round.mode,
+                    round.mode
                 );
                 await helper.sleep(500);
             } else if (title.length && natList.length) {
@@ -216,7 +215,7 @@ function notifyDeadlines() {
                             },
                         ],
                     }],
-                    round.mode,
+                    round.mode
                 );
                 await helper.sleep(500);
             }
@@ -351,7 +350,7 @@ const lowActivityTask = cron.schedule('0 0 1 */2 *', async () => {
     initialDate.setMonth(initialDate.getMonth() - 2);
     console.log('from', initialDate);
 
-    const bns = await usersService.query({ group: 'bn' }, null, null, true);
+    const bns = await User.find({ group: 'bn' });
 
     for (const bn of bns) {
         for (const mode of bn.modes) {

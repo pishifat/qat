@@ -1,6 +1,6 @@
 const querystring = require('querystring');
 const config = require('../config.json');
-const users = require('../models/user.js');
+const User = require('../models/user');
 const axios = require('axios');
 const logsService = require('../models/log').service;
 
@@ -117,7 +117,7 @@ async function getUserInfoV1(osuId) {
 
 async function isLoggedIn(req, res, next) {
     if (req.session.mongoId) {
-        const u = await users.service.query({ _id: req.session.mongoId });
+        const u = await User.findById(req.session.mongoId);
 
         if (!u) {
             return res.redirect('/');

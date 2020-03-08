@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const logsService = require('./log').service;
-const BaseService = require('./baseService');
+const helper = require('../helpers/helpers');
 
 const userSchema = new mongoose.Schema({
     osuId: { type: Number, required: true },
@@ -19,47 +19,34 @@ const userSchema = new mongoose.Schema({
     discordId: { type: Number },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-userSchema.virtual('isBnOrNat').get(function() {
-    return this.group == 'bn' || this.group == 'nat' || this.isSpectator;
-});
+class UserClass {
 
-userSchema.virtual('isNat').get(function() {
-    return this.group == 'nat' || this.isSpectator;
-});
+    get isBnOrNat() {
+        return this.group == 'bn' || this.group == 'nat' || this.isSpectator;
+    }
 
-userSchema.virtual('isBn').get(function() {
-    return this.group == 'bn';
-});
+    get isNat() {
+        return this.group == 'nat' || this.isSpectator;
+    }
 
-const User = mongoose.model('User', userSchema);
-
-class UserService extends BaseService
-{
-    constructor() {
-        super(User);
+    get isBn() {
+        return this.group == 'bn';
     }
 
     /**
-     *
-     * @param {number} osuId Id from osu site
+     * Find an user by a given username
      * @param {string} username
-     * @param {string} group Options: bn, nat, user
      */
-    async create(osuId, username, group, isSpectator) {
-        try {
-            return await User.create({ osuId, username, group, isSpectator });
-        } catch (error) {
-            return { error: error._message };
-        }
+    static findByUsername(username) {
+        return this.findOne({ username: new RegExp('^' + helper.escapeUsername(username) + '$', 'i') });
     }
 
     /**
-     *
      * @param {boolean} includeFullBns
      * @param {boolean} includeProbation
      * @param {boolean} includeNat
      */
-    async getAllByMode(includeFullBns, includeProbation, includeNat) {
+    static async getAllByMode(includeFullBns, includeProbation, includeNat) {
         if (!includeFullBns && !includeProbation && !includeNat) return null;
 
         try {
@@ -68,7 +55,7 @@ class UserService extends BaseService
             let allNats;
 
             if (includeFullBns && includeProbation && includeNat) {
-                allUsers = await User.aggregate([
+                allUsers = await this.aggregate([
                     {
                         $unwind: '$modes',
                     },
@@ -89,7 +76,7 @@ class UserService extends BaseService
                     },
                 ]);
             } else if (includeFullBns || includeProbation) {
-                allBns = await User.aggregate([
+                allBns = await this.aggregate([
                     {
                         $unwind: '$modes',
                     },
@@ -107,7 +94,7 @@ class UserService extends BaseService
             }
 
             if (includeNat && (!includeFullBns || !includeProbation)) {
-                allNats = await User.aggregate([
+                allNats = await this.aggregate([
                     {
                         $unwind: '$modes',
                     },
@@ -178,9 +165,9 @@ class UserService extends BaseService
         }
     }
 
-    async getAllMediators() {
+    static async getAllMediators() {
         try {
-            return await User.aggregate([
+            return await this.aggregate([
                 { $match: { group: { $ne: 'user' }, vetoMediator: true, isSpectator: { $ne: true }, probation: { $size: 0 } } },
                 { $sample: { size: 1000 } },
             ]);
@@ -192,6 +179,7 @@ class UserService extends BaseService
     }
 }
 
-const service = new UserService();
+userSchema.loadClass(UserClass);
+const User = mongoose.model('User', userSchema);
 
-module.exports = { service, User };
+module.exports = User;

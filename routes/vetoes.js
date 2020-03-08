@@ -2,8 +2,7 @@ const express = require('express');
 const api = require('../helpers/api');
 const helpers = require('../helpers/helpers');
 const vetoesService = require('../models/veto').service;
-const usersModel = require('../models/user').User;
-const usersService = require('../models/user').service;
+const User = require('../models/user');
 const mediationsService = require('../models/mediation').service;
 const logsService = require('../models/log').service;
 
@@ -101,7 +100,7 @@ router.post('/selectMediators', api.isNat, api.isNotSpectator, async (req, res) 
     let allUsers;
 
     try {
-        allUsers = await usersService.getAllMediators();
+        allUsers = await User.getAllMediators();
     } catch (error) {
         return { error: error._message };
     }
@@ -245,12 +244,12 @@ router.post('/replaceMediator/:id', api.isNat, api.isNotSpectator, async (req, r
     let newMediator;
 
     if (v.mode === 'all') {
-        newMediator = await usersModel.aggregate([
+        newMediator = await User.aggregate([
             { $match: { osuId: { $nin: currentMediators }, vetoMediator: true } },
             { $sample: { size: 1 } },
         ]);
     } else {
-        newMediator = await usersModel.aggregate([
+        newMediator = await User.aggregate([
             { $match: { modes: v.mode, osuId: { $nin: currentMediators }, probation: { $ne: v.mode }, vetoMediator: true } },
             { $sample: { size: 1 } },
         ]);

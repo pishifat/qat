@@ -7,10 +7,19 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const config = require('./config.json');
-const notifications = require('./helpers/notifications');
 require('express-async-errors');
 require('./helpers/hbs');
 
+// Return the 'new' updated object by default when doing findByIdAndUpdate
+mongoose.plugin(schema => {
+    schema.pre('findOneAndUpdate', function() {
+        if (!('new' in this.options)) {
+            this.setOptions({ new: true });
+        }
+    });
+});
+
+const notifications = require('./helpers/notifications');
 const indexRouter = require('./routes/index');
 const bnAppRouter = require('./routes/bnApp');
 const reportsRouter = require('./routes/reports');
@@ -88,6 +97,8 @@ app.use(function(req, res) {
 // error handler
 // eslint-disable-next-line no-unused-vars
 app.use(function(err, req, res, next) {
+    if (err.name == 'DocumentNotFoundError') err.message = 'Not found';
+
     // set locals, only providing error in development
     res.locals.message = err.message;
     res.locals.error = req.app.get('env') === 'development' ? err : {};

@@ -1,6 +1,6 @@
 const express = require('express');
 const api = require('../helpers/api');
-const usersService = require('../models/user').service;
+const User = require('../models/user');
 const helper = require('../helpers/helpers');
 const aiessService = require('../models/aiess').service;
 
@@ -27,7 +27,7 @@ router.get('/relevantInfo', (req, res) => {
 
 /* POST submit or edit eval */
 router.post('/search', async (req, res) => {
-    let u = await usersService.query({ username: new RegExp('^' + helper.escapeUsername(req.body.username) + '$', 'i') });
+    let u = await User.findByUsername(req.body.username);
 
     if (!u) {
         return res.json({ error: 'Cannot find user! Make sure you spelled it correctly' });
@@ -74,7 +74,7 @@ router.post('/search', async (req, res) => {
                 });
                 await aiessService.update(event.id, { effortBonus: effort });
 
-                let u = await usersService.query({ osuId: mapperId });
+                let u = await User.findOne({ osuId: mapperId });
 
                 if (u && u.group != 'user') {
                     await aiessService.update(event.id, { isBnOrNat: true });

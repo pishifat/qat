@@ -6,10 +6,9 @@ const evalsService = require('../models/evaluation').service;
 const reportsService = require('../models/report').service;
 const evalRoundsService = require('../models/evalRound').service;
 const bnAppsService = require('../models/bnApp').service;
-const usersService = require('../models/user').service;
+const User = require('../models/user');
 const aiessService = require('../models/aiess').service;
 const notesService = require('../models/note').service;
-const usersModel = require('../models/user').User;
 
 const router = express.Router();
 
@@ -73,7 +72,7 @@ function isValidMode(modeToCheck, isOsu, isTaiko, isCatch, isMania) {
 
 /* POST submit or edit eval */
 router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
-    let allUsersByMode = await usersService.getAllByMode(req.body.bn, req.body.probation, req.body.nat);
+    let allUsersByMode = await User.getAllByMode(req.body.bn, req.body.probation, req.body.nat);
     let allEvalsToCreate = [];
     let failed = [];
     const deadline = new Date(req.body.deadline);
@@ -117,13 +116,11 @@ router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
 
             if (!isNaN(userToSearch)) {
                 userToSearch = parseInt(userToSearch);
-                u = await usersService.query({
+                u = await User.findOne({
                     osuId: userToSearch,
                 });
             } else {
-                u = await usersService.query({
-                    username: new RegExp('^' + helper.escapeUsername(includeUsers[i].trim()) + '$', 'i'),
-                });
+                u = await User.findByUsername(includeUsers[i].trim());
             }
 
             if (u && !u.error) {
@@ -166,9 +163,9 @@ router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
         if (deadline < minDate) {
             for (let i = 0; i < result.length; i++) {
                 const er = result[i];
-                const u = await usersService.query({ _id: er.bn });
+                const u = await User.findById(er.bn);
                 const invalids = [8129817, 3178418, u.osuId];
-                const assignedNat = await usersModel.aggregate([
+                const assignedNat = await User.aggregate([
                     { $match: { group: 'nat', isSpectator: { $ne: true }, modes: er.mode, osuId: { $nin: invalids } } },
                     { $sample: { size: er.mode == 'osu' || er.mode == 'catch' ? 3 : 2 } },
                 ]);
@@ -367,21 +364,21 @@ router.post('/setIndividualEval/', api.isNat, async (req, res) => {
 router.post('/setComplete/', api.isNat, async (req, res) => {
     for (let i = 0; i < req.body.checkedRounds.length; i++) {
         let er = await evalRoundsService.query({ _id: req.body.checkedRounds[i] });
-        let u = await usersService.query({ _id: er.bn });
+        let u = await User.findById(er.bn);
 
         if (er.consensus == 'fail') {
-            u = await usersService.update(u.id, { $pull: { modes: er.mode } });
-            await usersService.update(u.id, { $pull: { probation: er.mode } });
+            u = await User.findByIdAndUpdate(u.id, { $pull: { modes: er.mode } });
+            await User.findByIdAndUpdate(u.id, { $pull: { probation: er.mode } });
 
             if (!u.modes.length) {
-                await usersService.update(u.id, { group: 'user' });
-                await usersService.update(u.id, { $push: { bnDuration: new Date() } });
+                await User.findByIdAndUpdate(u.id, { group: 'user' });
+                await User.findByIdAndUpdate(u.id, { $push: { bnDuration: new Date() } });
             }
         }
 
         if (er.consensus == 'extend') {
             if (u.probation.indexOf(er.mode) < 0) {
-                await usersService.update(u.id, { $push: { probation: er.mode } });
+                await User.findByIdAndUpdate(u.id, { $push: { probation: er.mode } });
             }
 
             let deadline = new Date();
@@ -390,7 +387,7 @@ router.post('/setComplete/', api.isNat, async (req, res) => {
         }
 
         if (er.consensus == 'pass') {
-            await usersService.update(u.id, { $pull: { probation: er.mode } });
+            await User.findByIdAndUpdate(u.id, { $pull: { probation: er.mode } });
             let deadline = new Date();
 
             if (er.isLowActivity) {
@@ -583,7 +580,7 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
     minDate.setDate(minDate.getDate() - 90);
     let maxDate = new Date(deadline);
     const [user, allUserEvents, allEvents, qualityAssuranceChecks, assignedApplications] = await Promise.all([
-        usersService.query({ _id: req.params.mongoId }),
+        User.findById(req.params.mongoId),
         aiessService.getByEventTypeAndUser(parseInt(req.params.id), minDate, maxDate, req.params.mode),
         aiessService.getAllByEventType(minDate, maxDate, req.params.mode),
         aiessService.query({ qualityAssuranceCheckers: req.params.mongoId, updatedAt: { $gte: minDate, $lte: maxDate } }, {}, {}, true),
