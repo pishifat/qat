@@ -8,6 +8,7 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const config = require('./config.json');
 const notifications = require('./helpers/notifications');
+require('express-async-errors');
 require('./helpers/hbs');
 
 const indexRouter = require('./routes/index');
@@ -34,22 +35,6 @@ const app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
-// dev stuff
-if (process.env.NODE_ENV === 'development') {
-    const webpack = require('webpack');
-    const webpackDevMiddleware = require('webpack-dev-middleware');
-    const webpackConfig = require('./webpack.dev.config');
-
-    const compiler = webpack(webpackConfig);
-    const devServerOptions = Object.assign({}, webpackConfig.devServer, {
-        noInfo: true,
-        publicPath: webpackConfig.output.publicPath,
-        port: 8080,
-    });
-
-    app.use(webpackDevMiddleware(compiler, devServerOptions));
-}
-
 // middlewares and such
 app.use(logger('dev'));
 app.use(express.json());
@@ -58,7 +43,11 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 //natdb
-mongoose.connect(config.connection, { useFindAndModify: false, useNewUrlParser: true });
+mongoose.connect(config.connection, {
+    useFindAndModify: false,
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+});
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'db connection error:'));
 db.once('open', function() {
@@ -103,9 +92,13 @@ app.use(function(err, req, res, next) {
     res.locals.message = err.message;
     res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-    // render the error page
-    res.status(err.status || 500);
-    res.render('error');
+    // render the error page or return error obj for json
+    if (req.accepts(['html', 'json']) === 'json') {
+        res.json({ error: err.message || 'Something went wrong!' });
+    } else {
+        res.status(err.status || 500);
+        res.render('error');
+    }
 });
 
 

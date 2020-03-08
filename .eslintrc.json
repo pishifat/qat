@@ -46,8 +46,13 @@
         ],
         "no-var": "error",
         "comma-dangle": [
-            "error",
-            "always-multiline"
+            "error", {
+                "arrays": "always-multiline",
+                "objects": "always-multiline",
+                "imports": "always-multiline",
+                "exports": "always-multiline",
+                "functions": "never"
+            }
         ],
         "require-atomic-updates": "off",
         "object-curly-spacing": [

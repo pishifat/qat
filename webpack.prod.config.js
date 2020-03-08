@@ -1,8 +1,7 @@
 const { entry, output, rules, plugins } = require('./webpack.base.config');
 
 const config =  {
-    mode: 'development',
-    devtool: 'inline-source-map',
+    mode: 'production',
     entry,
     output,
     module: {
@@ -11,9 +10,10 @@ const config =  {
     plugins,
     resolve: {
         alias: {
-            vue: 'vue/dist/vue.js',
+            vue: 'vue/dist/vue.min.js',
         },
     },
+    stats: 'minimal',
 };
 
 module.exports = config;
