@@ -14,6 +14,14 @@ const config =  {
             vue: 'vue/dist/vue.js',
         },
     },
+    devServer: {
+        publicPath: '/javascripts/',
+        stats: 'minimal',
+        port: 8080,
+        proxy: {
+            '/': 'http://localhost:3001',
+        },
+    },
 };
 
 module.exports = config;

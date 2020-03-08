@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "run-p -rl watch-app watch-src",
-    "watch-app": "set NODE_ENV=development&& && nodemon ./app.js",
+    "watch-app": "set NODE_ENV=development&& nodemon ./app.js",
     "watch-src": "webpack-dev-server --mode development --port 8080 --watch",
     "build": "webpack --mode production --config webpack.prod.config.js",
     "prod": "set NODE_ENV=production&& node ./app.js"
@@ -39,7 +39,7 @@
     "eslint-plugin-vue": "^6.2.1",
     "nodemon": "^1.19.4",
     "npm-run-all": "^4.1.5",
-    "webpack-dev-middleware": "^3.7.2"
+    "webpack-dev-server": "^3.10.3"
   },
   "nodemonConfig": {
     "ignore": [
