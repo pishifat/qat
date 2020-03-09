@@ -3,7 +3,7 @@ const config = require('../config.json');
 const crypto = require('crypto');
 const api = require('../helpers/api');
 const User = require('../models/user');
-const logsService = require('../models/log').service;
+const Logger = require('../models/log');
 const getUserModsCount = require('../helpers/helpers').getUserModsCount;
 const router = express.Router();
 
@@ -62,7 +62,7 @@ router.get(
 
                 if (user && !user.error) {
                     req.session.mongoId = user._id;
-                    logsService.create(req.session.mongoId, 'Verified their account for the first time');
+                    Logger.generate(req.session.mongoId, 'Verified their account for the first time');
 
                     return next();
                 } else {
@@ -71,17 +71,17 @@ router.get(
             } else {
                 if (u.username != req.session.username) {
                     await User.findByIdAndUpdate(u._id, { username: req.session.username });
-                    logsService.create(u._id, `Username changed from "${u.username}" to "${req.session.username}"`);
+                    Logger.generate(u._id, `Username changed from "${u.username}" to "${req.session.username}"`);
                 }
 
                 if (u.isSpectator != req.session.isSpectator) {
                     await User.findByIdAndUpdate(u._id, { isSpectator: req.session.isSpectator });
-                    logsService.create(u._id, `User toggled spectator role`);
+                    Logger.generate(u._id, `User toggled spectator role`);
                 }
 
                 if (u.group != req.session.group) {
                     await User.findByIdAndUpdate(u._id, { group: req.session.group });
-                    logsService.create(u._id, `User group changed to ${req.session.group.toUpperCase()}`);
+                    Logger.generate(u._id, `User group changed to ${req.session.group.toUpperCase()}`);
                 }
 
                 req.session.mongoId = u._id;

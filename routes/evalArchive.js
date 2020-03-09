@@ -35,9 +35,18 @@ const defaultAppPopulate = [
 ];
 
 const defaultBnPopulate = [
-    { populate: 'bn', display: 'username osuId probation modes' },
-    { populate: 'evaluations', display: 'evaluator behaviorComment moddingComment vote' },
-    { innerPopulate: 'evaluations', populate: { path: 'evaluator', select: 'username osuId group' } },
+    {
+        path: 'bn',
+        select: 'username osuId probation modes',
+    },
+    {
+        path: 'evaluations',
+        select: 'evaluator behaviorComment moddingComment vote',
+        populate: {
+            path: 'evaluator',
+            select: 'username osuId group',
+        },
+    },
 ];
 
 /* GET applicant listing. */

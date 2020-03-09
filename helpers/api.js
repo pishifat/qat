@@ -2,7 +2,6 @@ const querystring = require('querystring');
 const config = require('../config.json');
 const User = require('../models/user');
 const axios = require('axios');
-const logsService = require('../models/log').service;
 
 async function getToken(code) {
     const postData = querystring.stringify({
@@ -245,7 +244,7 @@ async function webhookPost(message, webhook) {
             embeds: message,
         });
     } catch (error) {
-        logsService.create(null, error, true);
+        //
     }
 }
 
@@ -296,7 +295,7 @@ async function highlightWebhookPost(message, webhook) {
             content: role + ' ' + message,
         });
     } catch (error) {
-        logsService.create(null, error, true);
+        //
     }
 }
 

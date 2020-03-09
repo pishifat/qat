@@ -1,7 +1,7 @@
 const express = require('express');
 const api = require('../helpers/api');
 const Aiess = require('../models/aiess');
-const logsService = require('../models/log').service;
+const Logger = require('../models/log');
 
 const router = express.Router();
 
@@ -46,7 +46,7 @@ router.post('/updateContent/:id', api.isNotSpectator, async (req, res) => {
         res.json({ error: 'Something went wrong' });
     } else {
         res.json(req.body.reason);
-        logsService.create(req.session.mongoId, `Updated DQ reason of s/${a.beatmapsetId} to "${a.content}"`);
+        Logger.generate(req.session.mongoId, `Updated DQ reason of s/${a.beatmapsetId} to "${a.content}"`);
         /*await api.webhookPost(
             [{
                 author: {
@@ -80,7 +80,7 @@ router.post('/updateObviousness/:id', api.isNotSpectator, async (req, res) => {
     await a.save();
 
     res.json(obviousness);
-    logsService.create(req.session.mongoId, `Updated obviousness of s/${a.beatmapsetId} to "${obviousness}"`);
+    Logger.generate(req.session.mongoId, `Updated obviousness of s/${a.beatmapsetId} to "${obviousness}"`);
     /*await api.webhookPost(
         [{
             author: {
@@ -113,7 +113,7 @@ router.post('/updateSeverity/:id', api.isNotSpectator, async (req, res) => {
     await a.save();
 
     res.json(severity);
-    logsService.create(req.session.mongoId, `Updated severity of s/${a.beatmapsetId} to "${severity}"`);
+    Logger.generate(req.session.mongoId, `Updated severity of s/${a.beatmapsetId} to "${severity}"`);
     /*await api.webhookPost(
         [{
             author: {

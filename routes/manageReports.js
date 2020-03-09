@@ -1,6 +1,6 @@
 const express = require('express');
 const api = require('../helpers/api');
-const logsService = require('../models/log').service;
+const Logger = require('../models/log');
 const Report = require('../models/report');
 
 const router = express.Router();
@@ -60,7 +60,7 @@ router.post('/submitReportEval/:id', api.isNotSpectator, async (req, res) => {
     res.json(r);
 
     if (req.body.feedback && req.body.feedback.length) {
-        logsService.create(
+        Logger.generate(
             req.session.mongoId,
             `Set feedback on report to "${
                 req.body.feedback.length > 50 ? req.body.feedback.slice(0, 50) + '...' : req.body.feedback
@@ -69,7 +69,7 @@ router.post('/submitReportEval/:id', api.isNotSpectator, async (req, res) => {
     }
 
     if (req.body.valid) {
-        logsService.create(
+        Logger.generate(
             req.session.mongoId,
             `Set validity of report to
             "${req.body.valid == 1 ? 'valid' : req.body.valid == 2 ? 'partially valid' : 'invalid'}"`
@@ -85,7 +85,7 @@ router.post('/changeEvalDisplay/:id', api.isNotSpectator, async (req, res) => {
 
     res.json(r);
 
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Set report to ${req.body.display ? 'be hidden' : 'display'}  on evaluations`
     );

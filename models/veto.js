@@ -1,6 +1,4 @@
 const mongoose = require('mongoose');
-const logsService = require('./log').service;
-const BaseService = require('./baseService');
 
 const vetoesSchema = new mongoose.Schema({
     vetoer: { type: 'ObjectId', ref: 'User', required: true },

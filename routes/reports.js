@@ -2,7 +2,7 @@ const express = require('express');
 const api = require('../helpers/api');
 const Report = require('../models/report');
 const User = require('../models/user');
-const logsService = require('../models/log').service;
+const Logger = require('../models/log');
 
 const router = express.Router();
 
@@ -62,7 +62,7 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
                     },
                 ],
             }]);
-            logsService.create(
+            Logger.generate(
                 null,
                 `Reported "${u.username}" for reason "${
                     req.body.reason.length > 50 ? req.body.reason.slice(0, 50) + '...' : req.body.reason
@@ -91,7 +91,7 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
                 },
             ],
         }]);
-        logsService.create(
+        Logger.generate(
             null,
             'Reported something without a username included'
         );

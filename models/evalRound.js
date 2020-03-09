@@ -48,19 +48,15 @@ class EvalRoundService
             .sort({ deadline: 1, consensus: 1, feedback: 1 });
     }
 
-    static async deleteManyByUserId(userId) {
+    static deleteManyByUserId(userId) {
         let minDate = new Date();
         minDate.setDate(minDate.getDate() + 14);
 
-        try {
-            return await EvalRound.deleteMany({
-                bn: userId,
-                active: true,
-                deadline: { $gte: minDate },
-            });
-        } catch (error) {
-            return { error: 'Something went wrong!' };
-        }
+        return EvalRound.deleteMany({
+            bn: userId,
+            active: true,
+            deadline: { $gte: minDate },
+        });
     }
 
 }

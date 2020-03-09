@@ -2,7 +2,7 @@ const express = require('express');
 const api = require('../helpers/api');
 const TestSubmission = require('../models/bnTest/testSubmission');
 const TestAnswer = require('../models/bnTest/testAnswer');
-const logsService = require('../models/log').service;
+const Logger = require('../models/log');
 const BnApp = require('../models/bnApp');
 const User = require('../models/user');
 
@@ -127,7 +127,7 @@ router.post('/submitTest', async (req, res) => {
     if (!updatedTest || updatedTest.error || !updatedApp || updatedApp.error) return res.json({ error: 'Something went wrong!' });
 
     res.json(displayScore);
-    logsService.create(req.session.mongoId, `Completed ${test.mode} BN app test`);
+    Logger.generate(req.session.mongoId, `Completed ${test.mode} BN app test`);
     let u = res.locals.userRequest;
     let modsList = '';
 

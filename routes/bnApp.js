@@ -2,7 +2,7 @@ const express = require('express');
 const api = require('../helpers/api');
 const BnApp = require('../models/bnApp.js');
 const EvalRound = require('../models/evalRound');
-const logsService = require('../models/log.js').service;
+const Logger = require('../models/log.js');
 const TestSubmission = require('../models/bnTest/testSubmission');
 const getUserModsCount = require('../helpers/helpers').getUserModsCount;
 
@@ -94,7 +94,7 @@ router.post('/apply', async (req, res) => {
             await BnApp.findByIdAndUpdate(newBnApp.id, { test: test._id });
             res.json('pass');
 
-            logsService.create(req.session.mongoId, `Applied for ${req.body.mode} BN`);
+            Logger.generate(req.session.mongoId, `Applied for ${req.body.mode} BN`);
         }
     } else {
         if (currentBnApp) {

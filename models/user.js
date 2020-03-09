@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const logsService = require('./log').service;
 const helper = require('../helpers/helpers');
 
 const userSchema = new mongoose.Schema({
@@ -159,8 +158,6 @@ class UserService {
                 return allUsers;
             }
         } catch (error) {
-            logsService.create(null, JSON.stringify(error), true);
-
             return { error: error._message };
         }
     }
@@ -172,8 +169,6 @@ class UserService {
                 { $sample: { size: 1000 } },
             ]);
         } catch (error) {
-            logsService.create(null, JSON.stringify(error), true);
-
             return { error: error._message };
         }
     }

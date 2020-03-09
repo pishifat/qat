@@ -2,7 +2,7 @@ const express = require('express');
 const api = require('../helpers/api');
 const Question = require('../models/bnTest/question');
 const Option = require('../models/bnTest/option');
-const logsService = require('../models/log').service;
+const Logger = require('../models/log');
 
 const router = express.Router();
 
@@ -43,7 +43,7 @@ router.post('/addQuestion/', api.isNotSpectator, async (req, res) => {
     });
 
     res.json(q);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Added new "${req.body.category}" question to RC test: "${
             req.body.newQuestion.length > 50
@@ -63,7 +63,7 @@ router.post('/updateQuestion/:id', api.isNotSpectator, async (req, res) => {
         .populate(defaultPopulate);
 
     res.json(question);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Updated question on RC test: "${
             req.body.newQuestion.length > 50
@@ -80,7 +80,7 @@ router.post('/toggleActive/:id', api.isNotSpectator, async (req, res) => {
         .populate(defaultPopulate);
 
     res.json(question);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Marked RC test question as "${req.body.status ? 'active' : 'inactive'}"`
     );
@@ -102,7 +102,7 @@ router.post('/addOption/:id', api.isNotSpectator, async (req, res) => {
         .populate(defaultPopulate);
 
     res.json(q);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Added option for RC test question: "${
             req.body.option.length > 50 ? req.body.option.slice(0, 50) + '...' : req.body.option
@@ -126,7 +126,7 @@ router.post('/updateOption/:id', api.isNotSpectator, async (req, res) => {
         .populate(defaultPopulate);
 
     res.json(q);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Updated option for RC test question: "${
             req.body.option.length > 50 ? req.body.option.slice(0, 50) + '...' : req.body.option
@@ -147,7 +147,7 @@ router.post('/toggleActiveOption/', api.isNotSpectator, async (req, res) => {
         .populate(defaultPopulate);
 
     res.json(q);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Changed active status of ${req.body.checkedOptions.length} RC test question option${
             req.body.checkedOptions.length == 1 ? '' : 's'

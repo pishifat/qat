@@ -1,7 +1,7 @@
 const express = require('express');
 const api = require('../helpers/api');
 const Aiess = require('../models/aiess');
-const logsService = require('../models/log').service;
+const Logger = require('../models/log');
 
 const router = express.Router();
 
@@ -116,7 +116,7 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
 
     res.json(e);
 
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Added ${req.session.username} as QA checker for s/${e.beatmapsetId}`
     );
@@ -228,7 +228,7 @@ router.post('/unassignUser/:id', api.isBnOrNat, async (req, res) => {
 
     res.json(e);
 
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Removed ${req.session.username} from QA checker for s/${e.beatmapsetId}`
     );

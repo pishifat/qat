@@ -4,7 +4,7 @@ const helpers = require('../helpers/helpers');
 const Veto = require('../models/veto');
 const User = require('../models/user');
 const Mediation = require('../models/mediation');
-const logsService = require('../models/log').service;
+const Logger = require('../models/log');
 
 const router = express.Router();
 
@@ -93,7 +93,7 @@ router.post('/submit', api.isNotSpectator, async (req, res) => {
         .populate(defaultPopulate);
 
     res.json(v);
-    logsService.create(req.session.mongoId, `Submitted a veto for mediation on "${v.beatmapTitle}"`);
+    Logger.generate(req.session.mongoId, `Submitted a veto for mediation on "${v.beatmapTitle}"`);
     api.webhookPost([{
         author: {
             name: `${req.session.username}`,
@@ -160,7 +160,7 @@ router.post('/beginMediation/:id', api.isNat, api.isNotSpectator, async (req, re
         .populate(defaultPopulate);
 
     res.json(v);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Started veto mediation for "${v.beatmapTitle}"`
     );
@@ -191,7 +191,7 @@ router.post('/submitMediation/:id', api.isNotSpectator, async (req, res) => {
 
     res.json(v);
 
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         'Submitted vote for a veto'
     );
@@ -229,7 +229,7 @@ router.post('/concludeMediation/:id', api.isNat, api.isNotSpectator, async (req,
 
     await veto.save();
     res.json(veto);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Veto ${veto.status.charAt(0).toUpperCase() + veto.status.slice(1)} for "${veto.beatmapTitle}" ${req.body.dismiss ? 'without mediation' : ''}`
     );
@@ -257,7 +257,7 @@ router.post('/continueMediation/:id', api.isNat, api.isNotSpectator, async (req,
         .populate(defaultPopulate);
 
     res.json(veto);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Veto mediation for "${veto.beatmapTitle}" re-initiated`
     );
@@ -309,7 +309,7 @@ router.post('/replaceMediator/:id', api.isNat, api.isNotSpectator, async (req, r
 
     res.json(veto);
 
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         'Re-selected a single veto mediator'
     );

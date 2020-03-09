@@ -3,7 +3,7 @@ const api = require('../helpers/api');
 const helpers = require('../helpers/helpers');
 const Discussion = require('../models/discussion');
 const Mediation = require('../models/mediation');
-const logsService = require('../models/log').service;
+const Logger = require('../models/log');
 
 const router = express.Router();
 
@@ -80,7 +80,7 @@ router.post('/submit', api.isNat, async (req, res) => {
     });
 
     res.json(d);
-    logsService.create(req.session.mongoId, 'Submitted a discussion for voting');
+    Logger.generate(req.session.mongoId, 'Submitted a discussion for voting');
     api.webhookPost(
         [{
             author: {
@@ -123,7 +123,7 @@ router.post('/submitMediation/:id', async (req, res) => {
 
     res.json(d);
 
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         'Submitted vote for a discussion'
     );
@@ -156,7 +156,7 @@ router.post('/concludeMediation/:id', api.isLeader, async (req, res) => {
         .populate(defaultPopulate);
 
     res.json(m);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         'Concluded vote for a discussion'
     );
@@ -169,7 +169,7 @@ router.post('/saveTitle/:id', api.isLeader, async (req, res) => {
         .populate(defaultPopulate);
 
     res.json(d);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Changed discussion title to "${req.body.title}"`
     );
@@ -182,7 +182,7 @@ router.post('/saveProposal/:id', api.isLeader, async (req, res) => {
         .populate(defaultPopulate);
 
     res.json(d);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Changed discussion proposal to "${req.body.shortReason}"`
     );

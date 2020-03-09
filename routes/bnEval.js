@@ -1,7 +1,7 @@
 const express = require('express');
 const api = require('../helpers/api');
 const helper = require('../helpers/helpers');
-const logsService = require('../models/log').service;
+const Logger = require('../models/log');
 const Evaluation = require('../models/evaluation');
 const Report = require('../models/report');
 const EvalRound = require('../models/evalRound');
@@ -218,7 +218,7 @@ router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
 
 
 
-        logsService.create(
+        Logger.generate(
             req.session.mongoId,
             `Added BN evaluations for ${allEvalsToCreate.length} user${allEvalsToCreate.length == 1 ? '' : 's'}`
         );
@@ -306,7 +306,7 @@ router.post('/submitEval/:id', api.isBnOrNat, async (req, res) => {
     let ev_ = await EvalRound.findById(req.params.id).populate(defaultPopulate);
 
     res.json(ev_);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `${req.body.evaluationId ? 'Updated' : 'Submitted'} ${ev_.mode} BN evaluation for "${ev_.bn.username}"`
     );
@@ -353,7 +353,7 @@ router.post('/setGroupEval/', api.isNat, async (req, res) => {
     let ev = await EvalRound.findActiveEvaluations();
 
     res.json(ev);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Set ${req.body.checkedRounds.length} BN eval${req.body.checkedRounds.length == 1 ? '' : 's'} as group evaluation`
     );
@@ -370,7 +370,7 @@ router.post('/setIndividualEval/', api.isNat, async (req, res) => {
     let ev = await EvalRound.findActiveEvaluations();
 
     res.json(ev);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Set ${req.body.checkedRounds.length} BN eval${req.body.checkedRounds.length == 1 ? '' : 's'} as individual evaluation`
     );
@@ -426,7 +426,7 @@ router.post('/setComplete/', api.isNat, async (req, res) => {
         await EvalRound.findByIdAndUpdate(req.body.checkedRounds[i], { active: false });
 
         if (er.consensus) {
-            logsService.create(
+            Logger.generate(
                 req.session.mongoId,
                 `Set ${u.username}'s ${er.mode} BN eval as "${er.consensus}"`
             );
@@ -457,7 +457,7 @@ router.post('/setComplete/', api.isNat, async (req, res) => {
     let ev = await EvalRound.findActiveEvaluations();
 
     res.json(ev);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Set ${req.body.checkedRounds.length} BN eval${req.body.checkedRounds.length == 1 ? '' : 's'} as completed`
     );
@@ -481,7 +481,7 @@ router.post('/setConsensus/:id', api.isNat, async (req, res) => {
     res.json(er);
 
     if (req.body.consensus) {
-        logsService.create(
+        Logger.generate(
             req.session.mongoId,`Set consensus of ${er.bn.username}'s ${er.mode} BN eval as ${req.body.consensus == 'extend' ? 'probation' : req.body.consensus}`
         );
         api.webhookPost(
@@ -511,7 +511,7 @@ router.post('/setCooldownDate/:id', api.isNat, async (req, res) => {
         .populate(defaultPopulate);
 
     res.json(er);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Changed cooldown date to ${req.body.cooldownDate.toString().slice(0,10)} for ${er.bn.username}'s ${er.mode} current BN evaluation`
     );
@@ -543,13 +543,13 @@ router.post('/setFeedback/:id', api.isNat, async (req, res) => {
     res.json(er);
 
     if (!req.body.hasFeedback) {
-        logsService.create(
+        Logger.generate(
             req.session.mongoId,
             `Created feedback for ${er.bn.username}'s ${er.mode} BN evaluation`
         );
         EvalRound.findByIdAndUpdate(req.params.id, { feedbackAuthor: req.session.mongoId });
     } else {
-        logsService.create(
+        Logger.generate(
             req.session.mongoId,
             `Edited feedback of ${er.bn.username}'s ${er.mode} BN evaluation`
         );

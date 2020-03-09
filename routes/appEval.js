@@ -4,7 +4,7 @@ const BnApp = require('../models/bnApp');
 const Evaluation = require('../models/evaluation');
 const EvalRound = require('../models/evalRound');
 const User = require('../models/user');
-const logsService = require('../models/log').service;
+const Logger = require('../models/log');
 
 const router = express.Router();
 
@@ -154,7 +154,7 @@ router.post('/submitEval/:id', api.isNotSpectator, async (req, res) => {
 
     let a = await BnApp.findById(req.params.id).populate(defaultPopulate);
     res.json(a);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `${req.body.evaluationId ? 'Updated' : 'Submitted'} ${a.mode} BN app evaluation for "${a.applicant.username}"`
     );
@@ -202,7 +202,7 @@ router.post('/setGroupEval/', api.isNat, async (req, res) => {
 
     let a = await BnApp.findActiveApps();
     res.json(a);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Set ${req.body.checkedApps.length} BN app${req.body.checkedApps.length == 1 ? '' : 's'} as group evaluation`
     );
@@ -217,8 +217,9 @@ router.post('/setIndividualEval/', api.isNat, async (req, res) => {
     });
 
     let a = await BnApp.findActiveApps();
+
     res.json(a);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Set ${req.body.checkedApps.length} BN app${req.body.checkedApps.length == 1 ? '' : 's'} as individual evaluation`
     );
@@ -278,7 +279,7 @@ router.post('/setComplete/', api.isNat, async (req, res) => {
             }],
             app.mode
         );
-        logsService.create(
+        Logger.generate(
             req.session.mongoId,
             `Set ${applicant.username}'s ${app.mode} application eval as "${app.consensus}"`
         );
@@ -287,7 +288,7 @@ router.post('/setComplete/', api.isNat, async (req, res) => {
     const activeApps = await BnApp.findActiveApps();
 
     res.json(activeApps);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Set ${req.body.checkedApps.length} BN app${req.body.checkedApps.length == 1 ? '' : 's'} as completed`
     );
@@ -308,7 +309,7 @@ router.post('/setConsensus/:id', api.isNat, api.isNotSpectator, async (req, res)
 
     res.json(a);
 
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Set consensus of ${a.applicant.username}'s ${a.mode} BN app as ${req.body.consensus}`
     );
@@ -340,7 +341,7 @@ router.post('/setCooldownDate/:id', api.isNotSpectator, async (req, res) => {
 
     res.json(a);
 
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Changed cooldown date to ${req.body.cooldownDate.toString().slice(0,10)} for ${a.applicant.username}'s ${a.mode} BN app`
     );
@@ -373,13 +374,13 @@ router.post('/setFeedback/:id', api.isNat, api.isNotSpectator, async (req, res) 
     res.json(a);
 
     if (!req.body.hasFeedback) {
-        logsService.create(
+        Logger.generate(
             req.session.mongoId,
             `Created feedback for ${a.applicant.username}'s ${a.mode} BN app`
         );
         BnApp.findByIdAndUpdate(req.params.id, { feedbackAuthor: req.session.mongoId });
     } else {
-        logsService.create(
+        Logger.generate(
             req.session.mongoId,
             `Edited feedback of ${a.applicant.username}'s ${a.mode} BN app`
         );
@@ -444,7 +445,7 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
 
     res.json(a);
 
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         'Re-selected a single evaluator'
     );
@@ -505,7 +506,7 @@ router.post('/enableBnEvaluators/:id', api.isLeader, async (req, res) => {
 
     let a = await BnApp.findById(req.params.id).populate(defaultPopulate);
     res.json(a);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Opened a BN app to evaluation from ${req.body.bnEvaluators.length} current BNs.`
     );

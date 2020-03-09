@@ -1,7 +1,7 @@
 const express = require('express');
 const api = require('../helpers/api');
 const User = require('../models/user');
-const logsService = require('../models/log').service;
+const Logger = require('../models/log');
 const BnApp = require('../models/bnApp');
 const EvalRound = require('../models/evalRound');
 const Aiess = require('../models/aiess');
@@ -73,7 +73,7 @@ router.post('/switchBnEvaluator/', api.isBnOrNat, async (req, res) => {
     });
 
     res.json(u);
-    logsService.create(req.session.mongoId, `Opted ${u.isBnEvaluator ? 'in to' : 'out of'} optional BN app evaluation input`);
+    Logger.generate(req.session.mongoId, `Opted ${u.isBnEvaluator ? 'in to' : 'out of'} optional BN app evaluation input`);
 });
 
 /* POST switch usergroup */
@@ -98,7 +98,7 @@ router.post('/switchGroup/:id', api.isLeader, async (req, res) => {
         deadline,
     });
 
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Changed usergroup of "${u.username}" to "${req.body.group.toUpperCase()}"`
     );
@@ -115,7 +115,7 @@ router.post('/removeNat/:id', api.isLeader, async (req, res) => {
         },
     });
     res.json(u);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Removed "${u.username}" from the NAT`
     );
@@ -149,7 +149,7 @@ router.post('/saveNote/:id', api.isNat, async (req, res) => {
 
     let u = await User.findById(req.params.id);
 
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Added user note to "${u.username}"`
     );
@@ -183,7 +183,7 @@ router.post('/hideNote/:id', api.isNat, async (req, res) => {
 
     res.json({});
     let u = await User.findById(req.body.userId);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Removed user note from "${u.username}"`
     );
@@ -197,7 +197,7 @@ router.post('/editNote/:id', api.isNat, async (req, res) => {
 
     res.json(n);
     let u = await User.findById(n.user);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `edited user note for "${u.username}"`
     );
