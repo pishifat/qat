@@ -4,10 +4,10 @@ const api = require('./api');
 const helper = require('./helpers');
 const BnApp = require('../models/bnApp');
 const Veto = require('../models/veto');
-const evalRoundsService = require('../models/evalRound').service;
+const EvalRound = require('../models/evalRound');
 const User = require('../models/user');
 const BeatmapReport = require('../models/beatmapReport');
-const aiess = require('../models/aiess');
+const Aiess = require('../models/aiess');
 const cron = require('node-cron');
 
 const defaultAppPopulate = [{
@@ -16,8 +16,8 @@ const defaultAppPopulate = [{
 }];
 
 const defaultRoundPopulate = [{
-    populate: 'bn',
-    display: 'username osuId probation',
+    path: 'bn',
+    select: 'username osuId probation',
 }];
 
 function notifyDeadlines() {
@@ -39,12 +39,11 @@ function notifyDeadlines() {
                     test: { $exists: true },
                 })
                 .populate(defaultAppPopulate),
-            evalRoundsService.query(
-                { active: true },
-                defaultRoundPopulate,
-                {},
-                true
-            ),
+
+            EvalRound
+                .find({ active: true })
+                .populate(defaultRoundPopulate),
+
             Veto.find({ active: true }),
         ]);
 
@@ -160,7 +159,7 @@ function notifyDeadlines() {
 
                     for (let i = 0; i < assignedNat.length; i++) {
                         let user = assignedNat[i];
-                        await evalRoundsService.update(round.id, { $push: { natEvaluators: user._id } });
+                        await EvalRound.findByIdAndUpdate(round.id, { $push: { natEvaluators: user._id } });
                         natList += user.username;
 
                         if (i + 1 < assignedNat.length) {
@@ -399,7 +398,7 @@ const lowActivityTask = cron.schedule('0 0 1 */2 *', async () => {
 });
 
 async function hasLowActivity (initialDate, bn, mode) {
-    const events = await aiess.Aiess.distinct('beatmapsetId', {
+    const events = await Aiess.distinct('beatmapsetId', {
         userId: bn.osuId,
         eventType: {
             $in: ['Bubbled', 'Qualified'],

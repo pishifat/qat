@@ -1,7 +1,7 @@
 const express = require('express');
 const api = require('../helpers/api');
 const BnApp = require('../models/bnApp.js');
-const evalRoundsService = require('../models/evalRound').service;
+const EvalRound = require('../models/evalRound');
 const logsService = require('../models/log.js').service;
 const TestSubmission = require('../models/bnTest/testSubmission');
 const getUserModsCount = require('../helpers/helpers').getUserModsCount;
@@ -49,7 +49,7 @@ router.post('/apply', async (req, res) => {
                 { active: true },
             ],
         }),
-        await evalRoundsService.query({
+        await EvalRound.findOne({
             bn: req.session.mongoId,
             mode: req.body.mode,
             consensus: 'fail',

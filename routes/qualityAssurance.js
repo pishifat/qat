@@ -1,6 +1,6 @@
 const express = require('express');
 const api = require('../helpers/api');
-const aiessService = require('../models/aiess').service;
+const Aiess = require('../models/aiess');
 const logsService = require('../models/log').service;
 
 const router = express.Router();
@@ -20,7 +20,7 @@ router.get('/', (req, res) => {
 });
 
 const defaultPopulate = [
-    { populate: 'qualityAssuranceCheckers', display: 'username osuId' },
+    { path: 'qualityAssuranceCheckers', select: 'username osuId' },
 ];
 
 /* GET applicant listing. */
@@ -28,25 +28,24 @@ router.get('/relevantInfo', async (req, res) => {
     let date = new Date();
     date.setDate(date.getDate() - 7);
     const [data, overwrite] = await Promise.all([
-        aiessService.query(
-            {
+        Aiess
+            .find({
                 eventType: 'Qualified',
-                timestamp: { $gte: date } },
-            defaultPopulate,
-            { timestamp: -1 },
-            true
-        ),
-        aiessService.query(
-            {
+                timestamp: { $gte: date },
+            })
+            .populate(defaultPopulate)
+            .sort({ timestamp: -1 }),
+
+        Aiess
+            .find({
                 $or: [
                     { eventType: 'Disqualified' },
                     { eventType: 'Ranked' },
                 ],
-                timestamp: { $gte: date } },
-            defaultPopulate,
-            { timestamp: -1 },
-            true
-        ),
+                timestamp: { $gte: date },
+            })
+            .populate(defaultPopulate)
+            .sort({ timestamp: -1 }),
     ]);
     res.json({
         maps: data,
@@ -63,25 +62,23 @@ router.get('/relevantInfo', async (req, res) => {
 router.get('/loadMore/:limit/:skip', async (req, res) => {
     let date = new Date();
     date.setDate(date.getDate() - 7);
-    const data = await aiessService.query(
-        {
+    const data = await Aiess
+        .find({
             eventType: 'Qualified',
             timestamp: { $lte: date },
             hostId: { $exists: true },
-        },
-        defaultPopulate,
-        { timestamp: -1 },
-        true,
-        parseInt(req.params.limit),
-        parseInt(req.params.skip)
-    );
+        })
+        .populate(defaultPopulate)
+        .sort({ timestamp: -1 })
+        .limit(parseInt(req.params.limit))
+        .skip(parseInt(req.params.skip));
 
     res.json({ maps: data });
 });
 
 /* POST assign user */
 router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
-    let e = await aiessService.query({ _id: req.params.id }, defaultPopulate);
+    let e = await Aiess.findById(req.params.id).populate(defaultPopulate);
 
     let validMode;
 
@@ -113,8 +110,10 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
         return res.json({ error: 'Probation cannot do this!' });
     }
 
-    await aiessService.update(req.params.id, { $push: { qualityAssuranceCheckers: req.session.mongoId } });
-    e = await aiessService.query({ _id: req.params.id }, defaultPopulate);
+    e = await Aiess
+        .findByIdAndUpdate(req.params.id, { $push: { qualityAssuranceCheckers: req.session.mongoId } })
+        .populate(defaultPopulate);
+
     res.json(e);
 
     logsService.create(
@@ -122,7 +121,7 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
         `Added ${req.session.username} as QA checker for s/${e.beatmapsetId}`
     );
 
-    let qualityAssuranceChecks = await aiessService.query({ qualityAssuranceCheckers: req.session.mongoId }, {}, {}, true);
+    let qualityAssuranceChecks = await Aiess.find({ qualityAssuranceCheckers: req.session.mongoId });
 
     const authorUser = {
         name: `${req.session.username} (${qualityAssuranceChecks.length} time${qualityAssuranceChecks.length > 1 ? 's' : ''})`,
@@ -223,8 +222,10 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
 
 /* POST unassign user */
 router.post('/unassignUser/:id', api.isBnOrNat, async (req, res) => {
-    let e = await aiessService.update(req.params.id, { $pull: { qualityAssuranceCheckers: req.session.mongoId } });
-    e = await aiessService.query({ _id: req.params.id }, defaultPopulate);
+    let e = await Aiess
+        .findByIdAndUpdate(req.params.id, { $pull: { qualityAssuranceCheckers: req.session.mongoId } })
+        .populate(defaultPopulate);
+
     res.json(e);
 
     logsService.create(
@@ -232,7 +233,7 @@ router.post('/unassignUser/:id', api.isBnOrNat, async (req, res) => {
         `Removed ${req.session.username} from QA checker for s/${e.beatmapsetId}`
     );
 
-    let qualityAssuranceChecks = await aiessService.query({ qualityAssuranceCheckers: req.session.mongoId }, {}, {}, true);
+    let qualityAssuranceChecks = await Aiess.find({ qualityAssuranceCheckers: req.session.mongoId });
 
     const author = {
         name: `${req.session.username} (${qualityAssuranceChecks.length})`,

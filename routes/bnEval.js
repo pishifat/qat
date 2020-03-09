@@ -4,10 +4,10 @@ const helper = require('../helpers/helpers');
 const logsService = require('../models/log').service;
 const Evaluation = require('../models/evaluation');
 const Report = require('../models/report');
-const evalRoundsService = require('../models/evalRound').service;
+const EvalRound = require('../models/evalRound');
 const BnApp = require('../models/bnApp');
 const User = require('../models/user');
-const aiessService = require('../models/aiess').service;
+const Aiess = require('../models/aiess');
 const Note = require('../models/note');
 
 const router = express.Router();
@@ -27,20 +27,26 @@ router.get('/', (req, res) => {
 
 //population
 const defaultPopulate = [
-    { populate: 'bn', display: 'username osuId probation modes' },
-    { populate: 'natEvaluators', display: 'username osuId' },
     {
-        populate: 'evaluations',
-        display: 'evaluator behaviorComment moddingComment vote',
+        path: 'bn',
+        select: 'username osuId probation modes',
     },
     {
-        innerPopulate: 'evaluations',
-        populate: { path: 'evaluator', select: 'username osuId group isLeader' },
+        path: 'natEvaluators',
+        select: 'username osuId',
+    },
+    {
+        path: 'evaluations',
+        select: 'evaluator behaviorComment moddingComment vote',
+        populate: {
+            path: 'evaluator',
+            select: 'username osuId group isLeader',
+        },
     },
 ];
 
 const notesPopulate = [
-    { populate: 'author', display: 'username' },
+    { path: 'author', select: 'username' },
 ];
 
 const applicationPopulate = [
@@ -60,9 +66,8 @@ const applicationPopulate = [
 
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res) => {
-    let minDate = new Date();
-    minDate.setDate(minDate.getDate() + 14);
-    let er = await evalRoundsService.query({ active: true, deadline: { $lte: minDate } }, defaultPopulate, { deadline: 1, consensus: 1, feedback: 1 }, true);
+    let er = await EvalRound.findActiveEvaluations();
+
     res.json({ er, evaluator: res.locals.userRequest });
 });
 
@@ -150,18 +155,20 @@ router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
 
     for (let i = 0; i < allEvalsToCreate.length; i++) {
         const round = allEvalsToCreate[i];
-        await evalRoundsService.deleteManyByUserId(round.bn);
+        await EvalRound.deleteManyByUserId(round.bn);
     }
 
     if (allEvalsToCreate.length) {
-        const result = await evalRoundsService.createMany(allEvalsToCreate);
+        const result = await EvalRound.insertMany(allEvalsToCreate);
+
         if (result.error) return res.json(result);
+
+        let ers = await EvalRound.findActiveEvaluations();
+
+        res.json({ ers, failed });
 
         let minDate = new Date();
         minDate.setDate(minDate.getDate() + 14);
-        let ers = await evalRoundsService.query({ active: true, deadline: { $lte: minDate } }, defaultPopulate, { deadline: 1, consensus: 1, feedback: 1 }, true);
-
-        res.json({ ers, failed });
 
         if (deadline < minDate) {
             for (let i = 0; i < result.length; i++) {
@@ -176,7 +183,7 @@ router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
 
                 for (let i = 0; i < assignedNat.length; i++) {
                     let user = assignedNat[i];
-                    await evalRoundsService.update(er.id, { $push: { natEvaluators: user._id } });
+                    await EvalRound.findByIdAndUpdate(er.id, { $push: { natEvaluators: user._id } });
                     natList += user.username;
 
                     if (i + 1 < assignedNat.length) {
@@ -236,8 +243,9 @@ router.post('/submitEval/:id', api.isBnOrNat, async (req, res) => {
             vote: req.body.vote,
         });
 
-        await evalRoundsService.update(req.params.id, { $push: { evaluations: ev._id } });
-        let er = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
+        let er =await EvalRound
+            .findByIdAndUpdate(req.params.id, { $push: { evaluations: ev._id } })
+            .populate(defaultPopulate);
 
         api.webhookPost(
             [{
@@ -260,7 +268,7 @@ router.post('/submitEval/:id', api.isBnOrNat, async (req, res) => {
         let threeEvaluationModes = ['osu', 'catch'];
 
         if (!er.discussion && ((threeEvaluationModes.includes(er.mode) && er.evaluations.length > 2) || (twoEvaluationModes.includes(er.mode) && er.evaluations.length > 1))) {
-            await evalRoundsService.update(req.params.id, { discussion: true });
+            await EvalRound.findByIdAndUpdate(req.params.id, { discussion: true });
             let pass = 0;
             let extend = 0;
             let fail = 0;
@@ -295,7 +303,8 @@ router.post('/submitEval/:id', api.isBnOrNat, async (req, res) => {
         }
     }
 
-    let ev_ = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
+    let ev_ = await EvalRound.findById(req.params.id).populate(defaultPopulate);
+
     res.json(ev_);
     logsService.create(
         req.session.mongoId,
@@ -306,8 +315,10 @@ router.post('/submitEval/:id', api.isBnOrNat, async (req, res) => {
 /* POST set group eval */
 router.post('/setGroupEval/', api.isNat, async (req, res) => {
     for (let i = 0; i < req.body.checkedRounds.length; i++) {
-        await evalRoundsService.update(req.body.checkedRounds[i], { discussion: true });
-        let er = await evalRoundsService.query({ _id: req.body.checkedRounds[i] }, defaultPopulate);
+        let er = await EvalRound
+            .findByIdAndUpdate(req.body.checkedRounds[i], { discussion: true })
+            .populate(defaultPopulate);
+
         let pass = 0;
         let extend = 0;
         let fail = 0;
@@ -339,9 +350,8 @@ router.post('/setGroupEval/', api.isNat, async (req, res) => {
         );
     }
 
-    let minDate = new Date();
-    minDate.setDate(minDate.getDate() + 14);
-    let ev = await evalRoundsService.query({ active: true, deadline: { $lte: minDate } }, defaultPopulate, { deadline: 1, consensus: 1, feedback: 1 }, true);
+    let ev = await EvalRound.findActiveEvaluations();
+
     res.json(ev);
     logsService.create(
         req.session.mongoId,
@@ -351,13 +361,14 @@ router.post('/setGroupEval/', api.isNat, async (req, res) => {
 
 /* POST set invidivual eval */
 router.post('/setIndividualEval/', api.isNat, async (req, res) => {
-    for (let i = 0; i < req.body.checkedRounds.length; i++) {
-        await evalRoundsService.update(req.body.checkedRounds[i], { discussion: false });
-    }
+    await EvalRound.updateMany({
+        _id: { $in: req.body.checkedRounds },
+    }, {
+        discussion: false,
+    });
 
-    let minDate = new Date();
-    minDate.setDate(minDate.getDate() + 14);
-    let ev = await evalRoundsService.query({ active: true, deadline: { $lte: minDate } }, defaultPopulate, { deadline: 1, consensus: 1, feedback: 1 }, true);
+    let ev = await EvalRound.findActiveEvaluations();
+
     res.json(ev);
     logsService.create(
         req.session.mongoId,
@@ -368,7 +379,7 @@ router.post('/setIndividualEval/', api.isNat, async (req, res) => {
 /* POST set evals as complete */
 router.post('/setComplete/', api.isNat, async (req, res) => {
     for (let i = 0; i < req.body.checkedRounds.length; i++) {
-        let er = await evalRoundsService.query({ _id: req.body.checkedRounds[i] });
+        let er = await EvalRound.findById(req.body.checkedRounds[i]);
         let u = await User.findById(er.bn);
 
         if (er.consensus == 'fail') {
@@ -388,7 +399,11 @@ router.post('/setComplete/', api.isNat, async (req, res) => {
 
             let deadline = new Date();
             deadline.setDate(deadline.getDate() + 40);
-            await evalRoundsService.create(er.bn, er.mode, deadline);
+            await EvalRound.create({
+                bn: er.bn,
+                mode: er.mode,
+                deadline,
+            });
         }
 
         if (er.consensus == 'pass') {
@@ -401,10 +416,14 @@ router.post('/setComplete/', api.isNat, async (req, res) => {
                 deadline.setDate(deadline.getDate() + 100);
             }
 
-            await evalRoundsService.create(er.bn, er.mode, deadline);
+            await EvalRound.create({
+                bn: er.bn,
+                mode: er.mode,
+                deadline,
+            });
         }
 
-        await evalRoundsService.update(req.body.checkedRounds[i], { active: false });
+        await EvalRound.findByIdAndUpdate(req.body.checkedRounds[i], { active: false });
 
         if (er.consensus) {
             logsService.create(
@@ -435,9 +454,8 @@ router.post('/setComplete/', api.isNat, async (req, res) => {
         }
     }
 
-    let minDate = new Date();
-    minDate.setDate(minDate.getDate() + 14);
-    let ev = await evalRoundsService.query({ active: true, deadline: { $lte: minDate } }, defaultPopulate, { deadline: 1, consensus: 1, feedback: 1 }, true);
+    let ev = await EvalRound.findActiveEvaluations();
+
     res.json(ev);
     logsService.create(
         req.session.mongoId,
@@ -447,17 +465,19 @@ router.post('/setComplete/', api.isNat, async (req, res) => {
 
 /* POST set consensus of eval */
 router.post('/setConsensus/:id', api.isNat, async (req, res) => {
-    let er = await evalRoundsService.update(req.params.id, {
+    let er = await EvalRound.findByIdAndUpdate(req.params.id, {
         consensus: req.body.consensus,
-        isLowActivity: req.body.isLowActivity ? true : false });
+        isLowActivity: req.body.isLowActivity ? true : false,
+    });
 
     if (req.body.consensus == 'fail') {
         let date = new Date(er.updatedAt);
         date.setDate(date.getDate() + 90);
-        await evalRoundsService.update(req.params.id, { cooldownDate: date });
+        await EvalRound.findByIdAndUpdate(req.params.id, { cooldownDate: date });
     }
 
-    er = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
+    er = await EvalRound.findById(req.params.id).populate(defaultPopulate);
+
     res.json(er);
 
     if (req.body.consensus) {
@@ -486,8 +506,10 @@ router.post('/setConsensus/:id', api.isNat, async (req, res) => {
 
 /* POST set cooldown */
 router.post('/setCooldownDate/:id', api.isNat, async (req, res) => {
-    await evalRoundsService.update(req.params.id, { cooldownDate: req.body.cooldownDate });
-    let er = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
+    let er = await EvalRound
+        .findByIdAndUpdate(req.params.id, { cooldownDate: req.body.cooldownDate })
+        .populate(defaultPopulate);
+
     res.json(er);
     logsService.create(
         req.session.mongoId,
@@ -514,8 +536,10 @@ router.post('/setCooldownDate/:id', api.isNat, async (req, res) => {
 
 /* POST set feedback of eval */
 router.post('/setFeedback/:id', api.isNat, async (req, res) => {
-    await evalRoundsService.update(req.params.id, { feedback: req.body.feedback });
-    let er = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
+    let er = await EvalRound
+        .findByIdAndUpdate(req.params.id, { feedback: req.body.feedback })
+        .populate(defaultPopulate);
+
     res.json(er);
 
     if (!req.body.hasFeedback) {
@@ -523,7 +547,7 @@ router.post('/setFeedback/:id', api.isNat, async (req, res) => {
             req.session.mongoId,
             `Created feedback for ${er.bn.username}'s ${er.mode} BN evaluation`
         );
-        evalRoundsService.update(req.params.id, { feedbackAuthor: req.session.mongoId });
+        EvalRound.findByIdAndUpdate(req.params.id, { feedbackAuthor: req.session.mongoId });
     } else {
         logsService.create(
             req.session.mongoId,
@@ -553,7 +577,12 @@ router.post('/setFeedback/:id', api.isNat, async (req, res) => {
 /* GET find previous evaluations */
 router.get('/findPreviousEvaluations/:id', api.isNat, async (req, res) => {
     let evals;
-    evals = await evalRoundsService.query({ bn: req.params.id, active: false, consensus: { $exists: true }, feedback: { $exists: true } }, {}, {}, true);
+    evals = await EvalRound.find({
+        bn: req.params.id,
+        active: false,
+        consensus: { $exists: true },
+        feedback: { $exists: true },
+    });
 
     if (!evals.length) {
         evals = await BnApp.find({
@@ -601,9 +630,12 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
     let maxDate = new Date(deadline);
     const [user, allUserEvents, allEvents, qualityAssuranceChecks, assignedApplications] = await Promise.all([
         User.findById(req.params.mongoId),
-        aiessService.getByEventTypeAndUser(parseInt(req.params.id), minDate, maxDate, req.params.mode),
-        aiessService.getAllByEventType(minDate, maxDate, req.params.mode),
-        aiessService.query({ qualityAssuranceCheckers: req.params.mongoId, updatedAt: { $gte: minDate, $lte: maxDate } }, {}, {}, true),
+        Aiess.getByEventTypeAndUser(parseInt(req.params.id), minDate, maxDate, req.params.mode),
+        Aiess.getAllByEventType(minDate, maxDate, req.params.mode),
+        Aiess.find({
+            qualityAssuranceCheckers: req.params.mongoId,
+            updatedAt: { $gte: minDate, $lte: maxDate },
+        }),
         BnApp
             .find({
                 bnEvaluators: req.params.mongoId,
@@ -670,7 +702,14 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
                 let event = events[j];
 
                 if (uniqueNominations.find(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
-                    let a = await aiessService.query({ beatmapsetId: event.beatmapsetId, timestamp: { $lte: event.timestamp }, eventType: { $ne: 'Reported' } }, {}, { timestamp: -1 }, true, 3);
+                    let a = await Aiess
+                        .find({
+                            beatmapsetId: event.beatmapsetId,
+                            timestamp: { $lte: event.timestamp },
+                            eventType: { $ne: 'Reported' },
+                        })
+                        .sort({ timestamp: -1 })
+                        .limit(3);
 
                     if (a[1].userId == parseInt(req.params.id) || a[2].userId == parseInt(req.params.id)) {
                         nomsDqd.push(event);
@@ -682,7 +721,14 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
                 let event = events[j];
 
                 if (uniqueNominations.find(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
-                    let a = await aiessService.query({ beatmapsetId: event.beatmapsetId, timestamp: { $lte: event.timestamp }, eventType: { $ne: 'Reported' } }, {}, { timestamp: -1 }, true, 2);
+                    let a = await Aiess
+                        .find({
+                            beatmapsetId: event.beatmapsetId,
+                            timestamp: { $lte: event.timestamp },
+                            eventType: { $ne: 'Reported' },
+                        })
+                        .sort({ timestamp: -1 })
+                        .limit(2);
 
                     if (a[1].userId == parseInt(req.params.id)) {
                         nomsPopped.push(event);
@@ -706,12 +752,14 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
                 })
                 .populate(applicationPopulate)
                 .sort({ createdAt: 1 }),
-            evalRoundsService.query(
-                {
+
+            EvalRound
+                .find({
                     deadline: { $gte: minDate },
                     mode: req.params.mode,
-                },
-                defaultPopulate, { createdAt: 1 }, true),
+                })
+                .populate(defaultPopulate)
+                .sort({ createdAt: 1 }),
         ]);
 
         // extract apps that user evaluated or was assigned to

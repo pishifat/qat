@@ -3,8 +3,8 @@ const api = require('../helpers/api');
 const User = require('../models/user');
 const logsService = require('../models/log').service;
 const BnApp = require('../models/bnApp');
-const evalRoundsService = require('../models/evalRound').service;
-const aiessService = require('../models/aiess').service;
+const EvalRound = require('../models/evalRound');
+const Aiess = require('../models/aiess');
 const Note = require('../models/note');
 
 const router = express.Router();
@@ -89,10 +89,14 @@ router.post('/switchGroup/:id', api.isLeader, async (req, res) => {
 
     res.json(u);
 
-    await evalRoundsService.deleteManyByUserId(u.id);
+    await EvalRound.deleteManyByUserId(u.id);
     let deadline = new Date();
     deadline.setDate(deadline.getDate() + 100);
-    await evalRoundsService.create(u.id, u.modes[0], deadline);
+    await EvalRound.create({
+        bn: u.id,
+        mode: u.modes[0],
+        deadline,
+    });
 
     logsService.create(
         req.session.mongoId,
@@ -201,7 +205,7 @@ router.post('/editNote/:id', api.isNat, async (req, res) => {
 
 /* GET user next evaluation */
 router.get('/loadNextEvaluation/:id', async (req, res) => {
-    let er = await evalRoundsService.query({ bn: req.params.id, active: true });
+    let er = await EvalRound.findOne({ bn: req.params.id, active: true });
 
     if (!er) {
         return res.json('Never');
@@ -266,7 +270,13 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
             })
             .populate(evaluationsPopulate),
 
-        evalRoundsService.query({ mode: req.params.mode, deadline: { $gte: minEvalDate, $lte: maxDate }, discussion: true }, evaluationsPopulate, {}, true),
+        EvalRound
+            .find({
+                mode: req.params.mode,
+                deadline: { $gte: minEvalDate, $lte: maxDate },
+                discussion: true,
+            })
+            .populate(evaluationsPopulate),
     ]);
     let bnAppsCount = bnApps.length;
     let evalRoundsCount = bnRounds.length;
@@ -323,8 +333,8 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
             modes: req.params.mode,
             isSpectator: { $ne: true },
         }).sort({ username: 1 }),
-        aiessService.getAllActivity(minDate, maxDate, req.params.mode),
-        evalRoundsService.query({ active: true }, {}, {}, true),
+        Aiess.getAllActivity(minDate, maxDate, req.params.mode),
+        EvalRound.find({ active: true }),
     ]);
 
     let info = [];

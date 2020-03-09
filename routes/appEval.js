@@ -2,7 +2,7 @@ const express = require('express');
 const api = require('../helpers/api');
 const BnApp = require('../models/bnApp');
 const Evaluation = require('../models/evaluation');
-const evalRoundsService = require('../models/evalRound').service;
+const EvalRound = require('../models/evalRound');
 const User = require('../models/user');
 const logsService = require('../models/log').service;
 
@@ -240,7 +240,11 @@ router.post('/setComplete/', api.isNat, async (req, res) => {
 
             let deadline = new Date();
             deadline.setDate(deadline.getDate() + 40);
-            await evalRoundsService.create(app.applicant, app.mode, deadline);
+            await EvalRound.create({
+                bn: app.applicant,
+                mode: app.mode,
+                deadline,
+            });
 
             if (applicant.group == 'user') {
                 await User.findByIdAndUpdate(applicant.id, {

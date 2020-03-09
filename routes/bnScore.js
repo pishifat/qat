@@ -1,8 +1,7 @@
 const express = require('express');
 const api = require('../helpers/api');
 const User = require('../models/user');
-const helper = require('../helpers/helpers');
-const aiessService = require('../models/aiess').service;
+const Aiess = require('../models/aiess');
 
 const router = express.Router();
 
@@ -37,7 +36,16 @@ router.post('/search', async (req, res) => {
         return res.json({ error: 'User is not a member of the BN/NAT!' });
     }
 
-    let allUserEvents = await aiessService.query({ userId: u.osuId, $or: [{ eventType: 'Bubbled' }, { eventType: 'Qualified' }] }, {}, { timestamp: 1 }, true);
+    let allUserEvents = await Aiess
+        .find({
+            userId: u.osuId,
+            $or: [
+                { eventType: 'Bubbled' },
+                { eventType: 'Qualified' },
+            ],
+        })
+        .sort({ timestamp: 1 });
+
     let mapIds = [];
     allUserEvents.forEach(event => {
         if (mapIds.indexOf(event.beatmapsetId) == -1) {
@@ -48,7 +56,14 @@ router.post('/search', async (req, res) => {
 
     for (let i = 0; i < mapIds.length; i++) {
         let mapId = mapIds[i];
-        allRankedEvents.push(await aiessService.query({ beatmapsetId: mapId, eventType: 'Ranked' }, {}, { timestamp: 1 }, true));
+        allRankedEvents.push(
+            await Aiess
+                .find({
+                    beatmapsetId: mapId,
+                    eventType: 'Ranked',
+                })
+                .sort({ timestamp: 1 })
+        );
     }
 
     let uniqueUsers = [];
@@ -64,7 +79,7 @@ router.post('/search', async (req, res) => {
                 let bmInfo = await api.beatmapsetInfo(event.beatmapsetId, true);
 
                 mapperId = parseInt(bmInfo[0].creator_id);
-                await aiessService.update(event.id, { mapperId });
+                await Aiess.findByIdAndUpdate(event.id, { mapperId });
 
                 let effort = 0;
                 bmInfo.forEach(diff => {
@@ -72,12 +87,12 @@ router.post('/search', async (req, res) => {
                     let difficulty = diff.difficultyrating;
                     effort += (0.1*difficulty + 0.5)*(0.00385*drain + 0.5);
                 });
-                await aiessService.update(event.id, { effortBonus: effort });
+                await Aiess.findByIdAndUpdate(event.id, { effortBonus: effort });
 
                 let u = await User.findOne({ osuId: mapperId });
 
                 if (u && u.group != 'user') {
-                    await aiessService.update(event.id, { isBnOrNat: true });
+                    await Aiess.findByIdAndUpdate(event.id, { isBnOrNat: true });
                 }
 
                 let userMaps = await api.beatmapsetOwnerMaps(mapperId);
@@ -87,7 +102,7 @@ router.post('/search', async (req, res) => {
                         uniqueMapIds.push(map.beatmapset_id);
                     }
                 });
-                await aiessService.update(event.id, { mapperTotalRanked: uniqueMapIds.length });
+                await Aiess.findByIdAndUpdate(event.id, { mapperTotalRanked: uniqueMapIds.length });
             }
 
             let uniqueMapperThreshold = new Date();
@@ -95,7 +110,7 @@ router.post('/search', async (req, res) => {
 
             if (uniqueMapperThreshold < event.timestamp && uniqueUsers.indexOf(mapperId) == -1) {
                 if (!event.mapperId) {
-                    await aiessService.update(event.id, { isUnique: true });
+                    await Aiess.findByIdAndUpdate(event.id, { isUnique: true });
                 }
 
                 uniqueUsers.push(mapperId);
@@ -107,7 +122,11 @@ router.post('/search', async (req, res) => {
 
     for (let i = 0; i < mapIds.length; i++) {
         let mapId = mapIds[i];
-        allRelatedEvents.push(await aiessService.query({ beatmapsetId: mapId }, {}, { timestamp: 1 }, true));
+        allRelatedEvents.push(
+            await Aiess
+                .find({ beatmapsetId: mapId })
+                .sort({ timestamp: 1 })
+        );
     }
 
     res.json({ events: allRelatedEvents, user: u });

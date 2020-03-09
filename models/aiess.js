@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const BaseService = require('./baseService');
 
 const aiessSchema = new mongoose.Schema({
     beatmapsetId: { type: Number },
@@ -25,25 +24,8 @@ const aiessSchema = new mongoose.Schema({
     qualityAssuranceCheckers: [{ type: 'ObjectId', ref: 'User' }],
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-const Aiess = mongoose.model('aiess', aiessSchema, 'aiess');
-
-class AiessService extends BaseService
+class AiessService
 {
-    constructor() {
-        super(Aiess);
-    }
-
-    /**
-     *
-     * @param {object} osuId
-     */
-    async create(osuId) {
-        try {
-            return await Aiess.create({ userId: osuId });
-        } catch (error) {
-            return { error: error._message };
-        }
-    }
 
     /**
      * Group all data by event
@@ -51,11 +33,11 @@ class AiessService extends BaseService
      * @param {date} maxDate
      * @param {string} mode
      */
-    async getAllByEventType(minDate, maxDate, mode) {
+    static async getAllByEventType(minDate, maxDate, mode) {
         if (!minDate && !maxDate && !mode) return null;
 
         try {
-            return await Aiess.aggregate([
+            return await this.aggregate([
                 {
                     $match: {
                         $or: [
@@ -92,11 +74,11 @@ class AiessService extends BaseService
      * @param {date} minDate
      * @param {date} maxDate
      */
-    async getAllActivity(minDate, maxDate, mode) {
+    static async getAllActivity(minDate, maxDate, mode) {
         if (!minDate && !maxDate) return null;
 
         try {
-            return await Aiess.aggregate([
+            return await this.aggregate([
                 {
                     $match: {
                         $and: [
@@ -131,11 +113,11 @@ class AiessService extends BaseService
      * @param {date} maxDate
      * @param {string} mode
      */
-    async getByEventTypeAndUser(userId, minDate, maxDate, mode) {
+    static async getByEventTypeAndUser(userId, minDate, maxDate, mode) {
         if (!userId && !minDate && !maxDate && !mode) return null;
 
         try {
-            return await Aiess.aggregate([
+            return await this.aggregate([
                 {
                     $match: {
                         userId,
@@ -165,6 +147,7 @@ class AiessService extends BaseService
     }
 }
 
-const service = new AiessService();
+aiessSchema.loadClass(AiessService);
+const Aiess = mongoose.model('aiess', aiessSchema, 'aiess');
 
-module.exports = { service, Aiess };
+module.exports = Aiess;

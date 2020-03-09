@@ -2,7 +2,7 @@ const express = require('express');
 const api = require('../helpers/api');
 const helper = require('../helpers/helpers');
 const BnApp = require('../models/bnApp');
-const evalRoundsService = require('../models/evalRound').service;
+const EvalRound = require('../models/evalRound');
 const User = require('../models/user');
 
 const router = express.Router();
@@ -69,12 +69,15 @@ router.get('/search/:user', async (req, res) => {
         .populate(defaultAppPopulate)
         .sort({ createdAt: 1 });
 
-    let b = await evalRoundsService.query(
-        { bn: u.id, active: false, consensus: { $exists: true } },
-        defaultBnPopulate,
-        { createdAt: 1 },
-        true
-    );
+    let b = await EvalRound
+        .find({
+            bn: u.id,
+            active: false,
+            consensus: { $exists: true },
+        })
+        .populate(defaultBnPopulate)
+        .sort({ createdAt: 1 });
+
     res.json({ a, b, evaluator: req.session.mongoId });
 });
 
@@ -91,10 +94,13 @@ router.get('/searchById/:id', async (req, res) => {
         .populate(defaultAppPopulate);
 
     if (!round) {
-        round = await evalRoundsService.query(
-            { _id: idToSearch, active: false, consensus: { $exists: true } },
-            defaultBnPopulate
-        );
+        round = await EvalRound
+            .findOne({
+                _id: idToSearch,
+                active: false,
+                consensus: { $exists: true },
+            })
+            .populate(defaultBnPopulate);
     }
 
     if (!round || !round.consensus) { //consensus because undefined round results in { error: undefined }, and that says !round is false
@@ -121,13 +127,15 @@ router.get('/searchRecent/:limit', async (req, res) => {
         .sort({ createdAt: -1 })
         .limit(req.params.limit);
 
-    let b = await evalRoundsService.query(
-        { active: false, consensus: { $exists: true } },
-        defaultBnPopulate,
-        { createdAt: -1 },
-        true,
-        req.params.limit
-    );
+    let b = await EvalRound
+        .find({
+            active: false,
+            consensus: { $exists: true },
+        })
+        .populate(defaultBnPopulate)
+        .sort({ createdAt: -1 })
+        .limit(req.params.limit);
+
     res.json({ a, b });
 });
 
@@ -147,13 +155,19 @@ router.post('/unarchive/:id', api.isNat, async (req, res) => {
         }
 
         if (a.consensus == 'pass') {
-            await User.findByIdAndUpdate(u.id, { $pull: { modes: a.mode } });
-            await User.findByIdAndUpdate(u.id, { $pull: { probation: a.mode } });
-            await evalRoundsService.deleteManyByUserId(u.id);
+            await User.findByIdAndUpdate(u.id, {
+                $pull: {
+                    modes: a.mode,
+                    probation: a.mode,
+                },
+            });
+            await EvalRound.deleteManyByUserId(u.id);
 
             if (u.modes.length == 1) {
-                await User.findByIdAndUpdate(u.id, { group: 'user' });
-                await User.findByIdAndUpdate(u.id, { $pop: { bnDuration: 1 } });
+                await User.findByIdAndUpdate(u.id, {
+                    group: 'user',
+                    $pop: { bnDuration: 1 },
+                });
             }
         }
 
@@ -178,7 +192,7 @@ router.post('/unarchive/:id', api.isNat, async (req, res) => {
         );
 
     } else if (req.body.type == 'evalRound') {
-        let er = await evalRoundsService.query({ _id: req.params.id });
+        let er = await EvalRound.findById(req.params.id);
 
         if (!er || er.error) {
             return res.json({ error: 'Could not load evalRound!' });
@@ -201,14 +215,14 @@ router.post('/unarchive/:id', api.isNat, async (req, res) => {
         }
 
         if (er.consensus == 'extend' || er.consensus == 'pass') {
-            await evalRoundsService.deleteManyByUserId(u.id);
+            await EvalRound.deleteManyByUserId(u.id);
 
             if (u.probation.indexOf(er.mode) < 0) {
                 await User.findByIdAndUpdate(u.id, { $push: { probation: er.mode } });
             }
         }
 
-        await evalRoundsService.update(req.params.id, { active: true });
+        await EvalRound.findByIdAndUpdate(req.params.id, { active: true });
 
         api.webhookPost(
             [{
