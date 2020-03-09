@@ -23,7 +23,10 @@ class BnAppService
 
     static findActiveApps() {
         return BnApp
-            .find({ active: true })
+            .find({
+                active: true,
+                test: { $exists: true },
+            })
             .populate([
                 { path: 'applicant', select: 'username osuId' },
                 { path: 'bnEvaluators', select: 'username osuId' },
