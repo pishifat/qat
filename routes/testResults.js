@@ -1,7 +1,7 @@
 const express = require('express');
 const api = require('../helpers/api');
 const helper = require('../helpers/helpers');
-const TestSubmission = require('../models/bnTest/testSubmission').TestSubmission;
+const TestSubmission = require('../models/bnTest/testSubmission');
 const User = require('../models/user');
 
 const defaultTestPopulate = [

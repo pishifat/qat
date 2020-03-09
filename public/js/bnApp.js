@@ -19,7 +19,10 @@ $(function() {
             if (mod.indexOf('https://osu.ppy.sh/beatmapsets/') == 0 && regexp.test(mod)) {
                 mods.push(mod);
                 let reason = $(`#reason${i}`).val().trim();
-                reasons.push(reason);
+
+                if (reason) {
+                    reasons.push(reason);
+                }
             }
         }
 
@@ -27,6 +30,8 @@ $(function() {
             $('#errors').text('You must select a gamemode!');
         } else if (mods.length < 2) {
             $('#errors').text('You must enter at least two mods!');
+        } else if (reasons.length < mods.length) {
+            $('#errors').text('You must enter their reasons!');
         } else {
             $('#submitting').text(`Submitting & calculating mod score... (this will take a few seconds)`);
 

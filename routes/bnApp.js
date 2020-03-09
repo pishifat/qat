@@ -3,7 +3,7 @@ const api = require('../helpers/api');
 const BnApp = require('../models/bnApp.js');
 const evalRoundsService = require('../models/evalRound').service;
 const logsService = require('../models/log.js').service;
-const TestSubmission = require('../models/bnTest/testSubmission').TestSubmission;
+const TestSubmission = require('../models/bnTest/testSubmission');
 const getUserModsCount = require('../helpers/helpers').getUserModsCount;
 
 const router = express.Router();
@@ -30,7 +30,7 @@ router.get('/', async (req, res) => {
 
 /* POST a bn application */
 router.post('/apply', async (req, res) => {
-    if (!req.body.mods || !req.body.mode || !req.session.mongoId) {
+    if (!req.body.mods || !req.body.reasons || !req.body.mode || !req.session.mongoId) {
         return res.json({ error: 'Missing mode or mods' });
     }
 
@@ -56,7 +56,6 @@ router.post('/apply', async (req, res) => {
             cooldownDate: { $gte: cooldownDate },
         }),
     ]);
-
 
     if (!currentBnApp && !currentBnEval) {
         // Check user kudosu total count & mod score

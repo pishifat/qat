@@ -1,7 +1,7 @@
 const express = require('express');
 const api = require('../helpers/api');
-const TestSubmission = require('../models/bnTest/testSubmission').TestSubmission;
-const TestAnswer = require('../models/bnTest/testSubmission').TestAnswer;
+const TestSubmission = require('../models/bnTest/testSubmission');
+const TestAnswer = require('../models/bnTest/testAnswer');
 const logsService = require('../models/log').service;
 const BnApp = require('../models/bnApp');
 const User = require('../models/user');
@@ -10,10 +10,10 @@ const router = express.Router();
 router.use(api.isLoggedIn);
 
 const defaultPopulate = [
-    { populate: 'applicant', display: 'username' },
-    { populate: 'answers', display: 'question optionsChosen' },
+    { path: 'applicant', select: 'username' },
+    { path: 'answers', select: 'question optionsChosen' },
     {
-        innerPopulate: 'answers',
+        path: 'answers',
         populate: {
             path: 'question',
             populate: {
