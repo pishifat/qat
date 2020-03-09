@@ -3,7 +3,7 @@ const api = require('../helpers/api');
 const BnApp = require('../models/bnApp.js');
 const evalRoundsService = require('../models/evalRound').service;
 const logsService = require('../models/log.js').service;
-const testSubmissionService = require('../models/bnTest/testSubmission').service;
+const TestSubmission = require('../models/bnTest/testSubmission').TestSubmission;
 const getUserModsCount = require('../helpers/helpers').getUserModsCount;
 
 const router = express.Router();
@@ -12,7 +12,7 @@ router.use(api.isLoggedIn);
 
 /* GET bn app page */
 router.get('/', async (req, res) => {
-    const test = await testSubmissionService.query({
+    const test = await TestSubmission.findOne({
         applicant: req.session.mongoId,
         status: { $ne: 'finished' },
     });
@@ -80,8 +80,8 @@ router.post('/apply', async (req, res) => {
 
         // Create app & test
         const [newBnApp, test] = await Promise.all([
-            await testSubmissionService.create(req.session.mongoId, req.body.mode),
-            await BnApp.create({
+            TestSubmission.generateTest(req.session.mongoId, req.body.mode),
+            BnApp.create({
                 applicant: req.session.mongoId,
                 mode: req.body.mode,
                 mods: req.body.mods,

@@ -1,6 +1,4 @@
 const mongoose = require('mongoose');
-const logsService = require('./log').service;
-const BaseService = require('./baseService');
 
 const reportSchema = new mongoose.Schema({
     reporter: { type: 'ObjectId', ref: 'User', required: true },
@@ -15,29 +13,4 @@ const reportSchema = new mongoose.Schema({
 
 const Report = mongoose.model('Report', reportSchema);
 
-class ReportService extends BaseService
-{
-    constructor() {
-        super(Report);
-    }
-
-    /**
-     *
-     * @param {object} reporter UserId who creates
-     * @param {object} culpritId UserId who is being reported
-     * @param {string} reason
-     */
-    async create(reporter, culpritId, reason, link) {
-        try {
-            return await Report.create({ reporter, culprit: culpritId, reason, link });
-        } catch (error) {
-            logsService.create(null, JSON.stringify(error), true);
-
-            return { error: error._message };
-        }
-    }
-}
-
-const service = new ReportService();
-
-module.exports = { service, Report };
+module.exports = Report;

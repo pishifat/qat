@@ -46,5 +46,4 @@ class BnAppService
 bnAppSchema.loadClass(BnAppService);
 const BnApp = mongoose.model('BnApp', bnAppSchema);
 
-
 module.exports = BnApp;

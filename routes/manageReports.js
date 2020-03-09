@@ -1,7 +1,7 @@
 const express = require('express');
 const api = require('../helpers/api');
 const logsService = require('../models/log').service;
-const reportsService = require('../models/report').service;
+const Report = require('../models/report');
 
 const router = express.Router();
 
@@ -20,15 +20,19 @@ router.get('/', (req, res) => {
 
 //population
 const defaultPopulate = [
-    { populate: 'culprit', display: 'username osuId group' },
-    { populate: 'reporter', display: 'username osuId' },
+    { path: 'culprit', select: 'username osuId group' },
+    { path: 'reporter', select: 'username osuId' },
 ];
 
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res) => {
     let minDate = new Date();
     minDate.setDate(minDate.getDate() - 90);
-    let r = await reportsService.query({ createdAt: { $gte: minDate } }, defaultPopulate, { createdAt: 1 }, true);
+    let r = await Report
+        .find({ createdAt: { $gte: minDate } })
+        .populate(defaultPopulate)
+        .sort({ createdAt: 1 });
+
     res.json({
         r,
         isLeader: res.locals.userRequest.isLeader,
@@ -38,18 +42,20 @@ router.get('/relevantInfo', async (req, res) => {
 /* POST submit or edit eval */
 router.post('/submitReportEval/:id', api.isNotSpectator, async (req, res) => {
     if (req.body.feedback && req.body.feedback.length) {
-        await reportsService.update(req.params.id, { feedback: req.body.feedback });
+        await Report.findByIdAndUpdate(req.params.id, { feedback: req.body.feedback });
     }
 
     if (req.body.valid) {
-        await reportsService.update(req.params.id, { valid: req.body.valid });
+        await Report.findByIdAndUpdate(req.params.id, { valid: req.body.valid });
     }
 
     if (req.body.close) {
-        await reportsService.update(req.params.id, { isActive: false });
+        await Report.findByIdAndUpdate(req.params.id, { isActive: false });
     }
 
-    let r = await reportsService.query({ _id: req.params.id }, defaultPopulate);
+    let r = await Report
+        .findById(req.params.id)
+        .populate(defaultPopulate);
 
     res.json(r);
 
@@ -73,8 +79,10 @@ router.post('/submitReportEval/:id', api.isNotSpectator, async (req, res) => {
 
 /* POST change display of report on evals */
 router.post('/changeEvalDisplay/:id', api.isNotSpectator, async (req, res) => {
-    await reportsService.update(req.params.id, { display: !req.body.display });
-    let r = await reportsService.query({ _id: req.params.id }, defaultPopulate);
+    const r = await Report
+        .findByIdAndUpdate(req.params.id, { display: !req.body.display })
+        .populate(defaultPopulate);
+
     res.json(r);
 
     logsService.create(

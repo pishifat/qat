@@ -5,15 +5,15 @@ const logsService = require('../models/log').service;
 const BnApp = require('../models/bnApp');
 const evalRoundsService = require('../models/evalRound').service;
 const aiessService = require('../models/aiess').service;
-const notesService = require('../models/note').service;
+const Note = require('../models/note');
 
 const router = express.Router();
 
 router.use(api.isLoggedIn);
 
 const defaultNotePopulate = [
-    { populate: 'author', display: 'username osuId' },
-    { populate: 'user', display: 'username osuId' },
+    { path: 'author', select: 'username osuId' },
+    { path: 'user', select: 'username osuId' },
 ];
 
 const evaluationsPopulate = [
@@ -119,29 +119,37 @@ router.post('/removeNat/:id', api.isLeader, async (req, res) => {
 
 /* GET user notes */
 router.get('/loadUserNotes/:id', api.isNat, async (req, res) => {
-    let notes = await notesService.query(
-        { user: req.params.id, isHidden: { $ne: true } },
-        defaultNotePopulate,
-        { createdAt: -1 },
-        true
-    );
+    const notes = await Note
+        .find({
+            user: req.params.id,
+            isHidden: { $ne: true },
+        })
+        .populate(defaultNotePopulate)
+        .sort({ createdAt: -1 });
+
     res.json(notes);
 });
 
 /* POST save note */
 router.post('/saveNote/:id', api.isNat, async (req, res) => {
-    let note = await notesService.create(
-        req.session.mongoId,
-        req.params.id,
-        req.body.comment
-    );
-    note = await notesService.query({ _id: note._id }, defaultNotePopulate);
+    let note = await Note.create({
+        author: req.session.mongoId,
+        user: req.params.id,
+        comment: req.body.comment,
+    });
+    note = await Note
+        .findById(note._id)
+        .populate(defaultNotePopulate);
+
     res.json(note);
+
     let u = await User.findById(req.params.id);
+
     logsService.create(
         req.session.mongoId,
         `Added user note to "${u.username}"`
     );
+
     api.webhookPost(
         [{
             author: {
@@ -167,7 +175,8 @@ router.post('/saveNote/:id', api.isNat, async (req, res) => {
 
 /* POST hide note */
 router.post('/hideNote/:id', api.isNat, async (req, res) => {
-    await notesService.update(req.params.id, { isHidden: true } );
+    await Note.findByIdAndUpdate(req.params.id, { isHidden: true });
+
     res.json({});
     let u = await User.findById(req.body.userId);
     logsService.create(
@@ -178,8 +187,10 @@ router.post('/hideNote/:id', api.isNat, async (req, res) => {
 
 /* POST edit note */
 router.post('/editNote/:id', api.isNat, async (req, res) => {
-    await notesService.update(req.params.id, { comment: req.body.comment } );
-    let n = await notesService.query({ _id: req.params.id }, defaultNotePopulate);
+    const n = await Note
+        .findByIdAndUpdate(req.params.id, { comment: req.body.comment })
+        .populate(defaultNotePopulate);
+
     res.json(n);
     let u = await User.findById(n.user);
     logsService.create(

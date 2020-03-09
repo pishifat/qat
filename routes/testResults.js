@@ -1,8 +1,22 @@
 const express = require('express');
 const api = require('../helpers/api');
 const helper = require('../helpers/helpers');
-const testSubmissionService = require('../models/bnTest/testSubmission').service;
+const TestSubmission = require('../models/bnTest/testSubmission').TestSubmission;
 const User = require('../models/user');
+
+const defaultTestPopulate = [
+    { path: 'applicant', select: 'username osuId' },
+    { path: 'answers', select: 'question optionsChosen' },
+    {
+        path: 'answers',
+        populate: {
+            path: 'question',
+            populate: {
+                path: 'options',
+            },
+        },
+    },
+];
 
 const router = express.Router();
 
@@ -20,33 +34,19 @@ router.get('/', (req, res) => {
     });
 });
 
-const defaultTestPopulate = [
-    { populate: 'applicant', display: 'username osuId' },
-    { populate: 'answers', display: 'question optionsChosen' },
-    {
-        innerPopulate: 'answers',
-        populate: {
-            path: 'question',
-            populate: {
-                path: 'options',
-            },
-        },
-    },
-];
-
 /* GET relevant info. */
 router.get('/relevantInfo', async (req, res) => {
-    let tests = await testSubmissionService.query(
-        {
+    let tests = await TestSubmission
+        .find({
             applicant: req.session.mongoId,
             status: 'finished',
-        },
-        defaultTestPopulate,
-        {},
-        true
-    );
+        })
+        .populate(defaultTestPopulate);
 
-    res.json({ tests, isNat: res.locals.userRequest.isNat });
+    res.json({
+        tests,
+        isNat: res.locals.userRequest.isNat,
+    });
 });
 
 
@@ -68,21 +68,21 @@ router.get('/search/:user', api.isNat, async (req, res) => {
         });
     }
 
-    const tests = await testSubmissionService.query(
-        {
+    const tests = await TestSubmission
+        .find({
             applicant: user.id,
             status: 'finished',
-        },
-        defaultTestPopulate,
-        {},
-        true
-    );
+        })
+        .populate(defaultTestPopulate);
 
     if (!tests.length) {
         return res.json({ error: 'No tests saved for that user!', isNat: res.locals.userRequest.group == 'nat' });
     }
 
-    res.json({ tests, isNat: res.locals.userRequest.group == 'nat' });
+    res.json({
+        tests,
+        isNat: res.locals.userRequest.group == 'nat',
+    });
 });
 
 module.exports = router;

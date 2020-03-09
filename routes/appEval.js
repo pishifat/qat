@@ -1,7 +1,7 @@
 const express = require('express');
 const api = require('../helpers/api');
 const BnApp = require('../models/bnApp');
-const evalsService = require('../models/evaluation').service;
+const Evaluation = require('../models/evaluation');
 const evalRoundsService = require('../models/evalRound').service;
 const User = require('../models/user');
 const logsService = require('../models/log').service;
@@ -74,18 +74,18 @@ router.get('/relevantInfo', async (req, res) => {
 /* POST submit or edit eval */
 router.post('/submitEval/:id', api.isNotSpectator, async (req, res) => {
     if (req.body.evaluationId) {
-        await evalsService.update(req.body.evaluationId, {
+        await Evaluation.findByIdAndUpdate(req.body.evaluationId, {
             behaviorComment: req.body.behaviorComment,
             moddingComment: req.body.moddingComment,
             vote: req.body.vote,
         });
     } else {
-        const ev = await evalsService.create(
-            req.session.mongoId,
-            req.body.behaviorComment,
-            req.body.moddingComment,
-            req.body.vote
-        );
+        const ev = await Evaluation.create({
+            evaluator: req.session.mongoId,
+            behaviorComment: req.body.behaviorComment,
+            moddingComment: req.body.moddingComment,
+            vote: req.body.vote,
+        });
         const a = await BnApp
             .findByIdAndUpdate(req.params.id, { $push: { evaluations: ev._id } })
             .populate(defaultPopulate);

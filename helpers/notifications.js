@@ -3,10 +3,10 @@ const cheerio = require('cheerio');
 const api = require('./api');
 const helper = require('./helpers');
 const BnApp = require('../models/bnApp');
-const vetoesService = require('../models/veto').service;
+const Veto = require('../models/veto');
 const evalRoundsService = require('../models/evalRound').service;
 const User = require('../models/user');
-const beatmapReportsService = require('../models/beatmapReport').service;
+const BeatmapReport = require('../models/beatmapReport');
 const aiess = require('../models/aiess');
 const cron = require('node-cron');
 
@@ -45,12 +45,7 @@ function notifyDeadlines() {
                 {},
                 true
             ),
-            vetoesService.query(
-                { active: true },
-                {},
-                {},
-                true
-            ),
+            Veto.find({ active: true }),
         ]);
 
         // determine if NAT receives highlight by mode
@@ -241,7 +236,7 @@ function notifyBeatmapReports() {
         // find database's discussion posts
         const date = new Date();
         date.setDate(date.getDate() - 7);
-        let beatmapReports = await beatmapReportsService.query({ createdAt: { $gte: date } }, {}, {}, true);
+        let beatmapReports = await BeatmapReport.find({ createdAt: { $gte: date } });
 
         // create array of reported beatmapsetIds
         let beatmapsetIds = [];
@@ -259,7 +254,7 @@ function notifyBeatmapReports() {
             if (!beatmapsetIds.includes(discussion.beatmapset_id)) {
                 createWebhook = true;
             } else {
-                let alreadyReported = await beatmapReportsService.query({
+                let alreadyReported = await BeatmapReport.findOne({
                     createdAt: { $gte: date },
                     beatmapsetId: discussion.beatmapset_id,
                     reporterUserId: discussion.starting_post.user_id,
@@ -273,7 +268,11 @@ function notifyBeatmapReports() {
             if (createWebhook) {
                 // create event in db
                 beatmapsetIds.push(discussion.beatmapset_id);
-                await beatmapReportsService.create(discussion.beatmapset_id, discussion.id, discussion.starting_post.user_id);
+                await BeatmapReport.create({
+                    beatmapsetId: discussion.beatmapset_id,
+                    postId: discussion.id,
+                    reporterUserId: discussion.starting_post.user_id,
+                });
 
                 let userInfo = await api.getUserInfoV1(discussion.starting_post.user_id);
                 await helper.sleep(500);

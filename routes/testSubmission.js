@@ -1,6 +1,7 @@
 const express = require('express');
 const api = require('../helpers/api');
-const testSubmissionService = require('../models/bnTest/testSubmission').service;
+const TestSubmission = require('../models/bnTest/testSubmission').TestSubmission;
+const TestAnswer = require('../models/bnTest/testSubmission').TestAnswer;
 const logsService = require('../models/log').service;
 const BnApp = require('../models/bnApp');
 const User = require('../models/user');
@@ -34,15 +35,10 @@ router.get('/', (req, res) => {
 
 /* GET pending tests by user */
 router.get('/tests', async (req, res) => {
-    const tests = await testSubmissionService.query(
-        {
-            applicant: req.session.mongoId,
-            status: { $ne: 'finished' },
-        },
-        null,
-        null,
-        true
-    );
+    const tests = await TestSubmission.find({
+        applicant: req.session.mongoId,
+        status: { $ne: 'finished' },
+    });
 
     if (!tests || !tests.length || tests.error) {
         return res.redirect('/');
@@ -53,23 +49,23 @@ router.get('/tests', async (req, res) => {
 
 /* POST test by user */
 router.post('/loadTest', async (req, res) => {
-    let test = await testSubmissionService.query(
-        {
+    let test = await TestSubmission
+        .findOne({
             _id: req.body.testId,
             applicant: req.session.mongoId,
             status: { $ne: 'finished' },
-        },
-        defaultPopulate,
-        { 'answers.question.category': 1 }
-    );
+        })
+        .populate(defaultPopulate)
+        .sort({ 'answers.question.category': 1 });
 
     if (!test || test.error) {
         return res.redirect('/');
     }
 
     if (!test.startedAt) {
-        await testSubmissionService.update(req.body.testId, { startedAt: Date.now(), status: 'wip' });
         test.startedAt = Date.now();
+        test.status = 'wip';
+        await test.save();
     }
 
     return res.json(test);
@@ -79,7 +75,7 @@ router.post('/loadTest', async (req, res) => {
 router.post('/submitAnswer', async (req, res) => {
     if (!req.body.answerId || !req.body.checkedOptions) return res.json({ error: 'Something went wrong!' });
 
-    let answer = await testSubmissionService.updateAnswer(req.body.answerId, { optionsChosen: req.body.checkedOptions });
+    let answer = await TestAnswer.findByIdAndUpdate(req.body.answerId, { optionsChosen: req.body.checkedOptions });
 
     if (!answer || answer.error) return res.json({ error: 'Something went wrong!' });
     else return res.json({ success: 'ok' });
@@ -87,14 +83,14 @@ router.post('/submitAnswer', async (req, res) => {
 
 /* POST submit test */
 router.post('/submitTest', async (req, res) => {
-    const test = await testSubmissionService.query(
-        {
+    const test = await TestSubmission
+        .findOne({
             _id: req.body.testId,
             applicant: req.session.mongoId,
             status: { $ne: 'finished' },
-        },
-        defaultPopulate
-    );
+        })
+        .populate(defaultPopulate);
+
     const currentBnApp = await BnApp.findOne({
         applicant: req.session.mongoId,
         mode: test.mode,
@@ -119,7 +115,7 @@ router.post('/submitTest', async (req, res) => {
 
     displayScore = displayScore.toFixed(1);
     const [updatedTest, updatedApp] = await Promise.all([
-        testSubmissionService.update(req.body.testId, {
+        TestSubmission.findByIdAndUpdate(req.body.testId, {
             submittedAt: Date.now(),
             status: 'finished',
             totalScore: displayScore,

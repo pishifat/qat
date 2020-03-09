@@ -1,14 +1,20 @@
 const express = require('express');
 const api = require('../helpers/api');
 const helpers = require('../helpers/helpers');
-const discussionsService = require('../models/discussion').service;
-const mediationsService = require('../models/mediation').service;
+const Discussion = require('../models/discussion');
+const Mediation = require('../models/mediation');
 const logsService = require('../models/log').service;
 
 const router = express.Router();
 
 const defaultPopulate = [
-    { innerPopulate: 'mediations', populate: { path: 'mediator', select: 'username osuId' } },
+    {
+        path: 'mediations',
+        populate: {
+            path: 'mediator',
+            select: 'username osuId',
+        },
+    },
 ];
 
 router.use(api.isLoggedIn);
@@ -27,16 +33,23 @@ router.get('/', (req, res) => {
 
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res) => {
-    let d;
+    let discussions;
 
     if (res.locals.userRequest.isNat || res.locals.userRequest.isSpectator) {
-        d = await discussionsService.query({}, defaultPopulate, { createdAt: -1 }, true);
+        discussions = await Discussion
+            .find({})
+            .populate(defaultPopulate)
+            .sort({ createdAt: -1 });
+
     } else {
-        d = await discussionsService.query({ isNatOnly: { $ne: true } }, defaultPopulate, { createdAt: -1 }, true);
+        discussions = await Discussion
+            .find({ isNatOnly: { $ne: true } })
+            .populate(defaultPopulate)
+            .sort({ createdAt: -1 });
     }
 
     res.json({
-        discussions: d,
+        discussions,
         userId: req.session.mongoId,
         userModes: res.locals.userRequest.modes,
         isLeader: res.locals.userRequest.isLeader,
@@ -57,14 +70,15 @@ router.post('/submit', api.isNat, async (req, res) => {
         if (validUrl.error) return res.json({ error: validUrl.error });
     }
 
-    let d = await discussionsService.create(
-        req.body.discussionLink,
-        req.body.title,
-        req.body.shortReason,
-        req.body.mode,
-        req.session.mongoId,
-        req.body.isNatOnly
-    );
+    let d = await Discussion.create({
+        discussionLink: req.body.discussionLink,
+        title: req.body.title,
+        shortReason: req.body.shortReason,
+        mode: req.body.mode,
+        creator: req.session.mongoId,
+        isNatOnly: req.body.isNatOnly,
+    });
+
     res.json(d);
     logsService.create(req.session.mongoId, 'Submitted a discussion for voting');
     api.webhookPost(
@@ -95,15 +109,20 @@ router.post('/submitMediation/:id', async (req, res) => {
     let m;
 
     if (req.body.mediationId) {
-        m = await mediationsService.query({ _id: req.body.mediationId });
+        m = await Mediation.findById(req.body.mediationId);
     } else {
-        m = await mediationsService.create(req.session.mongoId);
-        await discussionsService.update(req.params.id, { $push: { mediations: m } });
+        m = await Mediation.create({ mediator: req.session.mongoId });
+        await Discussion.findByIdAndUpdate(req.params.id, { $push: { mediations: m } });
     }
 
-    await mediationsService.update(m._id, { comment: req.body.comment, vote: req.body.vote });
-    let d = await discussionsService.query({ _id: req.params.id }, defaultPopulate);
+    await Mediation.findByIdAndUpdate(m._id, { comment: req.body.comment, vote: req.body.vote });
+
+    let d = await Discussion
+        .findById(req.params.id)
+        .populate(defaultPopulate);
+
     res.json(d);
+
     logsService.create(
         req.session.mongoId,
         'Submitted vote for a discussion'
@@ -132,8 +151,10 @@ router.post('/submitMediation/:id', async (req, res) => {
 
 /* POST conclude mediation */
 router.post('/concludeMediation/:id', api.isLeader, async (req, res) => {
-    await discussionsService.update(req.params.id, { isActive: false });
-    let m = await discussionsService.query({ _id: req.params.id }, defaultPopulate);
+    const m = await Discussion
+        .findByIdAndUpdate(req.params.id, { isActive: false })
+        .populate(defaultPopulate);
+
     res.json(m);
     logsService.create(
         req.session.mongoId,
@@ -143,8 +164,10 @@ router.post('/concludeMediation/:id', api.isLeader, async (req, res) => {
 
 /* POST save title */
 router.post('/saveTitle/:id', api.isLeader, async (req, res) => {
-    await discussionsService.update(req.params.id, { title: req.body.title });
-    let d = await discussionsService.query({ _id: req.params.id }, defaultPopulate);
+    const d = await Discussion
+        .findByIdAndUpdate(req.params.id, { title: req.body.title })
+        .populate(defaultPopulate);
+
     res.json(d);
     logsService.create(
         req.session.mongoId,
@@ -154,14 +177,15 @@ router.post('/saveTitle/:id', api.isLeader, async (req, res) => {
 
 /* POST save shortReason */
 router.post('/saveProposal/:id', api.isLeader, async (req, res) => {
-    await discussionsService.update(req.params.id, { shortReason: req.body.shortReason });
-    let d = await discussionsService.query({ _id: req.params.id }, defaultPopulate);
+    const d = await Discussion
+        .findByIdAndUpdate(req.params.id, { shortReason: req.body.shortReason })
+        .populate(defaultPopulate);
+
     res.json(d);
     logsService.create(
         req.session.mongoId,
         `Changed discussion proposal to "${req.body.shortReason}"`
     );
 });
-
 
 module.exports = router;

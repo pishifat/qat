@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const BaseService = require('../baseService');
 
 const optionSchema = new mongoose.Schema({
     content: { type: String, required: () => { return typeof this.content === 'string'; } },
@@ -10,30 +9,4 @@ const optionSchema = new mongoose.Schema({
 
 const Option = mongoose.model('Option', optionSchema);
 
-class OptionService extends BaseService
-{
-    constructor() {
-        super(Option);
-    }
-
-    async remove(id) {
-        try {
-            return await Option.findByIdAndRemove(id);
-        } catch (error) {
-            return { error: error._message };
-        }
-    }
-
-    async create(content, score) {
-        try {
-            return await Option.create({ content, score });
-        } catch (error) {
-            return { error: error._message };
-        }
-    }
-
-}
-
-const service = new OptionService();
-
-module.exports = { service, Option };
+module.exports = Option;

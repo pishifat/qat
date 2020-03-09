@@ -2,13 +2,13 @@ const express = require('express');
 const api = require('../helpers/api');
 const helper = require('../helpers/helpers');
 const logsService = require('../models/log').service;
-const evalsService = require('../models/evaluation').service;
-const reportsService = require('../models/report').service;
+const Evaluation = require('../models/evaluation');
+const Report = require('../models/report');
 const evalRoundsService = require('../models/evalRound').service;
 const BnApp = require('../models/bnApp');
 const User = require('../models/user');
 const aiessService = require('../models/aiess').service;
-const notesService = require('../models/note').service;
+const Note = require('../models/note');
 
 const router = express.Router();
 
@@ -223,20 +223,22 @@ router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
 /* POST submit or edit eval */
 router.post('/submitEval/:id', api.isBnOrNat, async (req, res) => {
     if (req.body.evaluationId) {
-        await evalsService.update(req.body.evaluationId, {
+        await Evaluation.findByIdAndUpdate(req.body.evaluationId, {
             behaviorComment: req.body.behaviorComment,
             moddingComment: req.body.moddingComment,
             vote: req.body.vote,
         });
     } else {
-        let ev = await evalsService.create(
-            req.session.mongoId,
-            req.body.behaviorComment,
-            req.body.moddingComment,
-            req.body.vote
-        );
+        let ev = await Evaluation.create({
+            evaluator: req.session.mongoId,
+            behaviorComment: req.body.behaviorComment,
+            moddingComment: req.body.moddingComment,
+            vote: req.body.vote,
+        });
+
         await evalRoundsService.update(req.params.id, { $push: { evaluations: ev._id } });
         let er = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
+
         api.webhookPost(
             [{
                 author: {
@@ -567,14 +569,24 @@ router.get('/findPreviousEvaluations/:id', api.isNat, async (req, res) => {
 
 /* GET find user notes */
 router.get('/findUserNotes/:id', api.isNat, async (req, res) => {
-    let notes = await notesService.query({ user: req.params.id, isHidden: { $ne: true } }, notesPopulate, {}, true);
-    res.json({ userNotes: notes });
+    const userNotes = await Note
+        .find({
+            user: req.params.id,
+            isHidden: { $ne: true },
+        })
+        .populate(notesPopulate);
+
+    res.json({ userNotes });
 });
 
 /* GET find user reports */
 router.get('/findUserReports/:id', api.isNat, async (req, res) => {
-    let reports = await reportsService.query({ culprit: req.params.id, isActive: { $ne: true } }, {}, {}, true);
-    res.json({ userReports: reports });
+    const userReports = await Report.find({
+        culprit: req.params.id,
+        isActive: { $ne: true },
+    });
+
+    res.json({ userReports });
 });
 
 /* GET aiess info */

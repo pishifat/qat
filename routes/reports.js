@@ -1,6 +1,6 @@
 const express = require('express');
 const api = require('../helpers/api');
-const reportsService = require('../models/report').service;
+const Report = require('../models/report');
 const User = require('../models/user');
 const logsService = require('../models/log').service;
 
@@ -36,7 +36,13 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
             return res.json({ error: 'User is not a member of the BN/NAT!' });
         }
 
-        let r = await reportsService.create(req.session.mongoId, u.id, req.body.reason, req.body.link);
+        const r = await Report.create({
+            reporter: req.session.mongoId,
+            culprit: u.id,
+            reason: req.body.reason,
+            link: req.body.link,
+        });
+
         res.json({});
 
         if (u.group != 'nat') {
@@ -64,8 +70,14 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
             );
         }
     } else {
-        let r = await reportsService.create(req.session.mongoId, null, req.body.reason, req.body.link);
+        const r = await Report.create({
+            reporter: req.session.mongoId,
+            reason: req.body.reason,
+            link: req.body.link,
+        });
+
         res.json({});
+
         api.webhookPost([{
             author: {
                 name: 'Non-user report',
