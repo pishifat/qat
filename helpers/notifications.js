@@ -336,7 +336,7 @@ function notifyBeatmapReports() {
             }
         }
 
-    }, 20000);
+    }, 300000);
 }
 
 /**
