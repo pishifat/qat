@@ -108,10 +108,6 @@ router.get(
     (req, res) => {
         if (req.session.lastPage) {
             res.redirect(req.session.lastPage);
-        } else if (req.session.group == 'nat' || req.session.isSpectator) {
-            res.redirect('/appeval');
-        } else if (req.session.group == 'bn') {
-            res.redirect('/qualityassurance');
         } else {
             res.redirect('/');
         }

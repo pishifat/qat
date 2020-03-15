@@ -376,6 +376,13 @@ input[type=number] {
     letter-spacing: .3px;
 }
 
+.btn-mg {
+    background-color: var(--nat-logo);
+    border-radius: 3px;
+    color: var(--dark);
+    letter-spacing: .3px;
+}
+
 .btn:hover {
     -webkit-box-shadow: 0 9px 30px 0 rgba(35,38,42,.1);
     box-shadow: 0 9px 30px 0 rgba(35,38,42,.1);
