@@ -227,7 +227,7 @@ function notifyDeadlines() {
 function notifyBeatmapReports() {
     setInterval(async () => {
         // find pending discussion posts
-        let url = 'https://osu.ppy.sh/beatmapsets/beatmap-discussions?user=&beatmapset_status=qualified&message_types%5B%5D=suggestion&message_types%5B%5D=problem&only_unresolved=on';
+        let url = 'https://osu.ppy.sh/beatmapsets/beatmap-discussions?user=&beatmapset_status=qualified&limit=50&message_types%5B%5D=suggestion&message_types%5B%5D=problem&only_unresolved=on';
         const historyHtml = await axios.get(url);
         const $ = cheerio.load(historyHtml.data);
         let discussions = JSON.parse($('#json-discussions').html());
@@ -277,24 +277,31 @@ function notifyBeatmapReports() {
                 await helper.sleep(500);
 
                 // identify modes
-                let beatmapsetInfo = await api.beatmapsetInfo(discussion.beatmapset_id, true);
                 let modes = [];
-                beatmapsetInfo.forEach(beatmap => {
-                    switch (beatmap.mode) {
-                        case '0':
-                            if (!modes.includes('osu')) modes.push('osu');
-                            break;
-                        case '1':
-                            if (!modes.includes('taiko')) modes.push('taiko');
-                            break;
-                        case '2':
-                            if (!modes.includes('catch')) modes.push('catch');
-                            break;
-                        case '3':
-                            if (!modes.includes('mania')) modes.push('mania');
-                            break;
-                    }
-                });
+
+                if (discussion.beatmap) {
+                    if (discussion.beatmap.mode == 'fruits') modes.push('catch');
+                    else modes.push(discussion.beatmap.mode);
+
+                } else {
+                    let beatmapsetInfo = await api.beatmapsetInfo(discussion.beatmapset_id, true);
+                    beatmapsetInfo.forEach(beatmap => {
+                        switch (beatmap.mode) {
+                            case '0':
+                                if (!modes.includes('osu')) modes.push('osu');
+                                break;
+                            case '1':
+                                if (!modes.includes('taiko')) modes.push('taiko');
+                                break;
+                            case '2':
+                                if (!modes.includes('catch')) modes.push('catch');
+                                break;
+                            case '3':
+                                if (!modes.includes('mania')) modes.push('mania');
+                                break;
+                        }
+                    });
+                }
 
                 // send webhook
                 await api.webhookPost(
@@ -304,7 +311,7 @@ function notifyBeatmapReports() {
                             icon_url: `https://a.ppy.sh/${discussion.starting_post.user_id}`,
                             url: `https://osu.ppy.sh/users/${discussion.starting_post.user_id}`,
                         },
-                        description: `[**${discussion.beatmapset.artist} - ${discussion.beatmapset.title}**](https://osu.ppy.sh/beatmapsets/${discussion.beatmapset_id}/discussion/-/generalAll#/${discussion.id})\nMapped by [${discussion.beatmapset.creator}](https://osu.ppy.sh/users/${discussion.starting_post.user_id}) [**${modes.join(', ')}**]`,
+                        description: `[**${discussion.beatmapset.artist} - ${discussion.beatmapset.title}**](https://osu.ppy.sh/beatmapsets/${discussion.beatmapset_id}/discussion/-/generalAll#/${discussion.id})\nMapped by [${discussion.beatmapset.creator}](https://osu.ppy.sh/users/${discussion.beatmapset.user_id}) [**${modes.join(', ')}**]`,
                         thumbnail: {
                             url: `https://b.ppy.sh/thumb/${discussion.beatmapset_id}.jpg`,
                         },
@@ -322,21 +329,14 @@ function notifyBeatmapReports() {
 
                 // send highlights
                 if (discussion.message_type == 'problem') {
-                    if (discussion.beatmap) {
-                        let mode = discussion.beatmap.mode;
-                        if (mode == 'fruits') mode = 'catch';
+                    modes.forEach(mode => {
                         api.highlightWebhookPost('', `${mode}BeatmapReport`);
-                    } else {
-                        modes.forEach(mode => {
-                            api.highlightWebhookPost('', `${mode}BeatmapReport`);
-                        });
-                    }
+                    });
                 }
             }
         }
 
-
-    }, 300000);
+    }, 20000);
 }
 
 /**

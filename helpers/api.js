@@ -255,35 +255,35 @@ async function highlightWebhookPost(message, webhook) {
     switch (webhook) {
         case 'osu':
             url += `${config.standardWebhook.id}/${config.standardWebhook.token}`;
-            role = '<@' + config.standardWebhook.role + '>';
+            role = '<@&' + config.standardWebhook.role + '>';
             break;
         case 'taiko':
             url += `${config.taikoWebhook.id}/${config.taikoWebhook.token}`;
-            role = '<@' + config.taikoWebhook.role + '>';
+            role = '<@&' + config.taikoWebhook.role + '>';
             break;
         case 'catch':
             url += `${config.catchWebhook.id}/${config.catchWebhook.token}`;
-            role = '<@' + config.catchWebhook.role + '>';
+            role = '<@&' + config.catchWebhook.role + '>';
             break;
         case 'mania':
             url += `${config.maniaWebhook.id}/${config.maniaWebhook.token}`;
-            role = '<@' + config.maniaWebhook.role + '>';
+            role = '<@&' + config.maniaWebhook.role + '>';
             break;
         case 'osuBeatmapReport':
             url += `${config.beatmapReportWebhook.id}/${config.beatmapReportWebhook.token}`;
-            role = '<@' + config.beatmapReportWebhook.osuRole + '>';
+            role = '<@&' + config.beatmapReportWebhook.osuRole + '>';
             break;
         case 'taikoBeatmapReport':
             url += `${config.beatmapReportWebhook.id}/${config.beatmapReportWebhook.token}`;
-            role = '<@' + config.beatmapReportWebhook.taikoRole + '>';
+            role = '<@&' + config.beatmapReportWebhook.taikoRole + '>';
             break;
         case 'catchBeatmapReport':
             url += `${config.beatmapReportWebhook.id}/${config.beatmapReportWebhook.token}`;
-            role = '<@' + config.beatmapReportWebhook.catchRole + '>';
+            role = '<@&' + config.beatmapReportWebhook.catchRole + '>';
             break;
         case 'maniaBeatmapReport':
             url += `${config.beatmapReportWebhook.id}/${config.beatmapReportWebhook.token}`;
-            role = '<@' + config.beatmapReportWebhook.maniaRole + '>';
+            role = '<@&' + config.beatmapReportWebhook.maniaRole + '>';
             break;
         default:
             url += `${config.reportWebhook.id}/${config.reportWebhook.token}`;
