@@ -1,6 +1,5 @@
 const express = require('express');
 const api = require('../helpers/api');
-const helper = require('../helpers/helpers');
 const BnApp = require('../models/bnApp');
 const EvalRound = require('../models/evalRound');
 const User = require('../models/user');
