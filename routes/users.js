@@ -67,13 +67,13 @@ router.get('/relevantInfo', async (req, res) => {
 });
 
 /* POST switch bn evaluator */
-router.post('/switchBnEvaluator/', api.isBnOrNat, async (req, res) => {
-    const u = await User.findByIdAndUpdate(req.session.mongoId, {
-        isBnEvaluator: !res.locals.userRequest.isBnEvaluator,
+router.post('/switchBnEvaluator/:id', api.isBnOrNat, async (req, res) => {
+    const u = await User.findByIdAndUpdate(req.params.id, {
+        isBnEvaluator: !req.body.isBnEvaluator,
     });
 
     res.json(u);
-    Logger.generate(req.session.mongoId, `Opted ${u.isBnEvaluator ? 'in to' : 'out of'} optional BN app evaluation input`);
+    Logger.generate(req.session.mongoId, `Opted "${u.username}" ${u.isBnEvaluator ? 'in to' : 'out of'} optional BN app evaluation input`);
 });
 
 /* POST switch usergroup */

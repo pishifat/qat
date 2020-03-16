@@ -1,7 +1,7 @@
 <template>
     <div>
         <hr>
-        <p v-if="isLeader" class="min-spacing">
+        <p v-if="isLeader" class="min-spacing float-right">
             <button
                 class="btn btn-nat-red btn-sm minw-150"
                 @click="group == 'bn' ? switchGroup('nat', $event) : switchGroup('bn', $event)"
@@ -16,7 +16,7 @@
                 Remove from NAT
             </button>
         </p>
-        <p v-else-if="isCurrentUser && group != 'nat'" class="text-shadow min-spacing">
+        <p v-if="(isCurrentUser || isNat) && group != 'nat'" class="text-shadow min-spacing">
             BN evaluation:
             <span :class="{ 'vote-fail': !isBnEvaluator, 'vote-pass': isBnEvaluator }">
                 {{ isBnEvaluator ? 'active' : 'inactive' }}
@@ -43,6 +43,7 @@ export default {
     mixins: [postData],
     props: {
         isLeader: Boolean,
+        isNat: Boolean,
         group: String,
         isBnEvaluator: Boolean,
         isCurrentUser: Boolean,
@@ -50,7 +51,7 @@ export default {
     },
     methods: {
         async switchBnEvaluator(e) {
-            const u = await this.executePost('/users/switchBnEvaluator/', {}, e);
+            const u = await this.executePost('/users/switchBnEvaluator/' + this.userId, { isBnEvaluator: this.isBnEvaluator }, e);
 
             if (u) {
                 if (u.error) {

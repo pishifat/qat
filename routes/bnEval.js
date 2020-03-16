@@ -759,6 +759,7 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
                 .find({
                     createdAt: { $gte: minDate },
                     mode: req.params.mode,
+                    active: false,
                 })
                 .populate(applicationPopulate)
                 .sort({ createdAt: 1 }),
@@ -767,6 +768,7 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
                 .find({
                     deadline: { $gte: minDate },
                     mode: req.params.mode,
+                    active: false,
                 })
                 .populate(defaultPopulate)
                 .sort({ createdAt: 1 }),

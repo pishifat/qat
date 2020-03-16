@@ -44,6 +44,7 @@
                         />
                         <footer-buttons
                             :is-leader="isLeader"
+                            :is-nat="isNat"
                             :group="user.group"
                             :is-bn-evaluator="user.isBnEvaluator"
                             :is-current-user="user.id == userId"
