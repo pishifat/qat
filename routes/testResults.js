@@ -53,7 +53,7 @@ router.get('/relevantInfo', async (req, res) => {
 /* GET search for test */
 router.get('/search/:user', api.isNat, async (req, res) => {
     let user;
-    const userToSearch = helper.safeParam(req.params.user);
+    const userToSearch = decodeURI(req.params.user);
 
     if (isNaN(userToSearch)) {
         user = await User.findByUsername(userToSearch);

@@ -57,7 +57,7 @@ router.get('/relevantInfo', (req, res) => {
 /* GET search for user */
 router.get('/search/:user', async (req, res) => {
     let u;
-    const userToSearch = helper.safeParam(req.params.user);
+    const userToSearch = decodeURI(req.params.user);
 
     if (isNaN(userToSearch)) {
         u = await User.findByUsername(userToSearch);
@@ -87,13 +87,13 @@ router.get('/search/:user', async (req, res) => {
         .populate(defaultBnPopulate)
         .sort({ createdAt: 1 });
 
-    res.json({ a, b, evaluator: req.session.mongoId });
+    res.json({ a, b, evaluator: res.locals.userRequest });
 });
 
 /* GET search for user */
 router.get('/searchById/:id', async (req, res) => {
     let round;
-    const idToSearch = helper.safeParam(req.params.id);
+    const idToSearch = decodeURI(req.params.id);
     round = await BnApp
         .findOne({
             _id: idToSearch,

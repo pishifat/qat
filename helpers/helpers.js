@@ -1,4 +1,3 @@
-const qs = require('querystring');
 const axios = require('axios');
 const cheerio = require('cheerio');
 
@@ -28,14 +27,6 @@ function getBeatmapsetIdFromUrl(url) {
     }
 
     return bmId;
-}
-
-/**
- * escape a query parameter
- * @param {string} param
- */
-function safeParam(param) {
-    return qs.escape(param);
 }
 
 /**
@@ -140,4 +131,4 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-module.exports = { escapeUsername, getBeatmapsetIdFromUrl, safeParam, isValidUrl, getUserModsCount, sleep };
+module.exports = { escapeUsername, getBeatmapsetIdFromUrl, isValidUrl, getUserModsCount, sleep };
