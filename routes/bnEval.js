@@ -576,24 +576,34 @@ router.post('/setFeedback/:id', api.isNat, async (req, res) => {
 
 /* GET find previous evaluations */
 router.get('/findPreviousEvaluations/:id', api.isNat, async (req, res) => {
-    let evals;
-    evals = await EvalRound.find({
+    const evalRounds = await EvalRound.find({
         bn: req.params.id,
         active: false,
         consensus: { $exists: true },
         feedback: { $exists: true },
     });
 
-    if (!evals.length) {
-        evals = await BnApp.find({
-            applicant: req.params.id,
-            active: false,
-            consensus: { $exists: true },
-            feedback: { $exists: true },
+    const applications = await BnApp.find({
+        applicant: req.params.id,
+        active: false,
+        consensus: { $exists: true },
+        feedback: { $exists: true },
+    });
+
+    let previousEvaluations = evalRounds.concat(applications);
+
+    if (evalRounds.length && applications.length) {
+        previousEvaluations.sort((a, b) => {
+            a.date = (a.deadline ? a.deadline : a.createdAt);
+            b.date = (b.deadline ? b.deadline : b.createdAt);
+            if (a.date > b.date) return 1;
+            if (a.date < b.date) return -1;
+
+            return 0;
         });
     }
 
-    res.json({ previousEvaluations: evals });
+    res.json({ previousEvaluations });
 });
 
 /* GET find user notes */
