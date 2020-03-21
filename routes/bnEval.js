@@ -264,8 +264,8 @@ router.post('/submitEval/:id', api.isBnOrNat, async (req, res) => {
             }],
             er.mode
         );
-        let twoEvaluationModes = ['catch', 'mania'];
-        let threeEvaluationModes = ['osu', 'taiko'];
+        const twoEvaluationModes = ['catch', 'mania'];
+        const threeEvaluationModes = ['osu', 'taiko'];
 
         if (!er.discussion && ((threeEvaluationModes.includes(er.mode) && er.evaluations.length > 2) || (twoEvaluationModes.includes(er.mode) && er.evaluations.length > 1))) {
             await EvalRound.findByIdAndUpdate(req.params.id, { discussion: true });

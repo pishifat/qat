@@ -139,10 +139,13 @@ router.post('/submitTest', async (req, res) => {
         }
     }
 
+    const twoEvaluationModes = ['catch', 'mania'];
+    //const threeEvaluationModes = ['osu', 'taiko'];
+
     const invalids = [8129817, 3178418];
     const assignedNat = await User.aggregate([
         { $match: { group: 'nat', isSpectator: { $ne: true }, modes: test.mode, osuId: { $nin: invalids } } },
-        { $sample: { size: test.mode == 'osu' || test.mode == 'catch' ? 3 : 2 } },
+        { $sample: { size: twoEvaluationModes.includes(test.mode) ? 2 : 3 } },
     ]);
     let natList = '';
 

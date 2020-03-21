@@ -107,8 +107,8 @@ router.post('/submitEval/:id', api.isNotSpectator, async (req, res) => {
             }],
             a.mode
         );
-        let twoEvaluationModes = ['catch', 'mania'];
-        let threeEvaluationModes = ['osu', 'taiko'];
+        const twoEvaluationModes = ['catch', 'mania'];
+        const threeEvaluationModes = ['osu', 'taiko'];
 
         if (!a.discussion && ((threeEvaluationModes.includes(a.mode) && a.evaluations.length > 2) || (twoEvaluationModes.includes(a.mode) && a.evaluations.length > 1))) {
             let pass = 0;
