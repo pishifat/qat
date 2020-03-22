@@ -72,7 +72,11 @@ router.get('/relevantInfo', async (req, res) => {
 });
 
 /* POST submit or edit eval */
-router.post('/submitEval/:id', api.isNotSpectator, async (req, res) => {
+router.post('/submitEval/:id', async (req, res) => {
+    if (res.locals.userRequest.isSpectator && res.locals.userRequest.group != 'bn') {
+        return res.json({ error: 'Spectators cannot perform this action!' });
+    }
+
     if (req.body.evaluationId) {
         await Evaluation.findByIdAndUpdate(req.body.evaluationId, {
             behaviorComment: req.body.behaviorComment,
