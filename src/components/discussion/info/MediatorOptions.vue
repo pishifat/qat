@@ -23,7 +23,7 @@
                 >
                 <label class="form-check-label text-shadow vote-pass" for="1">Agree</label>
             </div>
-            <div class="form-check form-check-inline">
+            <div v-if="neutralAllowed" class="form-check form-check-inline">
                 <input
                     id="2"
                     class="form-check-input"
@@ -65,6 +65,7 @@ export default {
         discussionId: String,
         mediations: Array,
         isNatOnly: Boolean,
+        neutralAllowed: Boolean,
         userId: String,
     },
     data() {

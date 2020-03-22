@@ -128,6 +128,41 @@
                                 </label>
                             </div>
                         </div>
+                        <div class="row text-shadow">
+                            <p>Neutral vote allowed:</p>
+                            <div class="row ml-4">
+                                <label
+                                    class="mx-1"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="neutral not allowed"
+                                >
+                                    <input
+                                        v-model="neutral"
+                                        type="radio"
+                                        class="cross-radio hide-default"
+                                        name="neutral"
+                                        value="noNeutral"
+                                    >
+                                    <i class="fas fa-times fa-lg" />
+                                </label>
+                                <label
+                                    class="mx-1"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="neutral allowed"
+                                >
+                                    <input
+                                        v-model="neutral"
+                                        type="radio"
+                                        class="checkmark-radio hide-default"
+                                        name="neutral"
+                                        value="neutral"
+                                    >
+                                    <i class="fas fa-check fa-lg" />
+                                </label>
+                            </div>
+                        </div>
                         <div class="row mb-3">
                             <small class="text-shadow mb-1">Link to relevant discussion (optional)</small>
                             <input
@@ -182,6 +217,7 @@ export default {
             shortReason: null,
             mode: null,
             group: 'bn',
+            neutral: 'neutral',
             info: null,
         };
     },
@@ -199,6 +235,7 @@ export default {
                         shortReason: this.shortReason,
                         mode: this.mode,
                         isNatOnly: this.group == 'nat',
+                        neutralAllowed: this.neutral == 'neutral',
                     },
                     e
                 );

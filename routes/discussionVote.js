@@ -77,6 +77,7 @@ router.post('/submit', api.isNat, async (req, res) => {
         mode: req.body.mode,
         creator: req.session.mongoId,
         isNatOnly: req.body.isNatOnly,
+        neutralAllowed: req.body.neutralAllowed,
     });
 
     res.json(d);

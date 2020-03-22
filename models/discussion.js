@@ -8,6 +8,7 @@ const discussionSchema = new mongoose.Schema({
     isActive: { type: Boolean, default: true },
     mediations: [{ type: 'ObjectId', ref: 'Mediation' }],
     isNatOnly: { type: Boolean, default: false },
+    neutralAllowed: { type: Boolean, default: true },
     creator: { type: 'ObjectId', ref: 'User' },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 

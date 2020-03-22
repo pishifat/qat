@@ -26,6 +26,7 @@
                             :agree-mediations="agreeMediations"
                             :neutral-mediations="neutralMediations"
                             :disagree-mediations="disagreeMediations"
+                            :neutral-allowed="discussion.neutralAllowed"
                         />
                         <votes-nat-only-active
                             v-else-if="discussion.isActive && discussion.isNatOnly"
@@ -46,6 +47,7 @@
                             v-if="discussion.isActive && (userModes.indexOf(discussion.mode) >= 0 || discussion.mode == 'all' || isLeader)"
                             :discussion-id="discussion.id"
                             :is-nat-only="discussion.isNatOnly"
+                            :neutral-allowed="discussion.neutralAllowed"
                             :mediations="discussion.mediations"
                             :user-id="userId"
                             @update-discussion="$emit('update-discussion', $event)"
