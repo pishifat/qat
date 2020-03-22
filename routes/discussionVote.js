@@ -129,7 +129,7 @@ router.post('/submitMediation/:id', async (req, res) => {
         'Submitted vote for a discussion'
     );
 
-    if (!req.body.mediationId) {
+    if (!req.body.mediationId && req.session.group == 'nat') {
         api.webhookPost(
             [{
                 author: {
