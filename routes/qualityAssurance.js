@@ -130,7 +130,8 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
     };
     const footer = {
         text: qualityAssuranceChecks.length == 10 ? 'Thank you for creating a better ranked section! ✨' :
-            qualityAssuranceChecks.length == 20 ? `You're making osu! a better place. Thanks again!' 💖` : '',
+            qualityAssuranceChecks.length == 20 ? `You're making osu! a better place. Thanks again!' 💖` :
+                qualityAssuranceChecks.length == 69 ? `_nice_` : '',
     };
     const authorBeatmap = {
         name: `${e.metadata} (${e.hostName})`,
