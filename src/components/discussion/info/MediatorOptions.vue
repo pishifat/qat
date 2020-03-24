@@ -46,7 +46,10 @@
                 <label class="form-check-label text-shadow vote-fail" for="3">Disagree</label>
             </div>
             <p v-if="!isNatOnly" class="small ml-2">
-                Only NAT leaders can see your vote. If you have any feedback to improve the proposal, post on the thread.
+                Only NAT leaders can see your vote.
+                <span v-if="discussionLink">
+                    If you have any feedback to improve the proposal, post on <a :href="discussionLink" target="_blank">the thread</a>.
+                </span>
             </p>
             <button class="btn btn-sm btn-nat float-right" @click="submitMediation($event)">
                 Submit Vote
@@ -63,6 +66,7 @@ export default {
     mixins: [ postData ],
     props: {
         discussionId: String,
+        discussionLink: String,
         mediations: Array,
         isNatOnly: Boolean,
         neutralAllowed: Boolean,
@@ -77,7 +81,7 @@ export default {
         };
     },
     watch: {
-        discussionId() {
+        mediations() {
             this.vote = null;
             this.comment = null;
             this.mediationId = null;

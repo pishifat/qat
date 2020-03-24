@@ -46,6 +46,7 @@
                         <mediator-options
                             v-if="discussion.isActive && (userModes.indexOf(discussion.mode) >= 0 || discussion.mode == 'all' || isLeader)"
                             :discussion-id="discussion.id"
+                            :discussion-link="discussion.discussionLink"
                             :is-nat-only="discussion.isNatOnly"
                             :neutral-allowed="discussion.neutralAllowed"
                             :mediations="discussion.mediations"
