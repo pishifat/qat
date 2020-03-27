@@ -1,6 +1,6 @@
 <template>
     <!--nat options-->
-    <div v-if="isNat && currentMediators.indexOf(userId) === -1 && veto.vetoer.id !== userId" class="text-shadow">
+    <div class="text-shadow">
         <hr>
         <div v-if="veto.mediations.length">
             <ul style="list-style-type: none; padding-left: 0.5rem">

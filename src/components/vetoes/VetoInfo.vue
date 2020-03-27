@@ -6,6 +6,7 @@
 
                 <modal-body :veto="veto">
                     <mediations
+                        v-if="isNat && ((currentMediators.indexOf(userId) === -1 && veto.vetoer.id !== userId) || veto.status != 'wip')"
                         :current-mediators="currentMediators"
                         :is-nat="isNat"
                         :majority="majority"
