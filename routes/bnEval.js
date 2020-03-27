@@ -423,7 +423,7 @@ router.post('/setComplete/', api.isNat, async (req, res) => {
             });
         }
 
-        await EvalRound.findByIdAndUpdate(req.body.checkedRounds[i], { active: false });
+        await EvalRound.findByIdAndUpdate(req.body.checkedRounds[i], { active: false, resignedOnGoodTerms: er.resignedOnGoodTerms ? true : false });
 
         if (er.consensus) {
             Logger.generate(
@@ -468,6 +468,7 @@ router.post('/setConsensus/:id', api.isNat, async (req, res) => {
     let er = await EvalRound.findByIdAndUpdate(req.params.id, {
         consensus: req.body.consensus,
         isLowActivity: req.body.isLowActivity ? true : false,
+        resignedOnGoodTerms: req.body.resignedOnGoodTerms ? true : false,
     });
 
     if (req.body.consensus == 'fail') {
@@ -495,7 +496,7 @@ router.post('/setConsensus/:id', api.isNat, async (req, res) => {
                 fields: [
                     {
                         name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
-                        value: `**${er.bn.username}**'s current BN eval set to **${req.body.consensus}**${req.body.isLowActivity ? ' + low activity warning' : ''}`,
+                        value: `**${er.bn.username}**'s current BN eval set to **${req.body.consensus}**${req.body.isLowActivity ? ' + low activity warning' : req.body.resignedOnGoodTerms ? ' + resigned on good terms' : ''}`,
                     },
                 ],
             }],

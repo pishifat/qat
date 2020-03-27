@@ -40,7 +40,7 @@ router.post('/apply', async (req, res) => {
     }
 
     let cooldownDate = new Date();
-    const [currentBnApp, currentBnEval] = await Promise.all([
+    const [currentBnApp, currentBnEval, resignedOnGoodTerms, wasBnForThisMode] = await Promise.all([
         await BnApp.findOne({
             applicant: req.session.mongoId,
             mode: req.body.mode,
@@ -55,26 +55,45 @@ router.post('/apply', async (req, res) => {
             consensus: 'fail',
             cooldownDate: { $gte: cooldownDate },
         }),
+        await EvalRound.findOne({
+            bn: req.session.mongoId,
+            mode: req.body.mode,
+            resignedOnGoodTerms: true,
+        }),
+        await BnApp.findOne({
+            applicant: req.session.mongoId,
+            mode: req.body.mode,
+        }),
     ]);
+
+    let months = 3;
+    if (resignedOnGoodTerms) months = 1;
+    else if (wasBnForThisMode) months = 2;
 
     if (!currentBnApp && !currentBnEval) {
         // Check user kudosu total count & mod score
-        const invalids = [920861, 654108, 8693851, 1980256, 1623405, 4154071, 3611370, 626907, 2239480, 7612550, 481582, 6256027, 2377881, 480689]; //temporary exceptions to mod score
+        const [userInfo, modScore] = await Promise.all([
+            await api.getUserInfo(req.session.accessToken),
+            await getUserModsCount(req.session.username, req.body.mode, months),
+        ]);
 
-        if (invalids.indexOf(req.session.osuId) < 0) {
-            const [userInfo, modScore] = await Promise.all([
-                await api.getUserInfo(req.session.accessToken),
-                await getUserModsCount(req.session.username, req.body.mode),
-            ]);
+        if (!userInfo || userInfo.error || !modScore || modScore.error) {
+            return res.json({ error: 'Something went wrong! Please retry again.' });
+        }
 
-            if (!userInfo || userInfo.error || !modScore || modScore.error) {
-                return res.json({ error: 'Something went wrong! Please retry again.' });
-            }
+        const requiredKudosu = req.body.mode == 'osu' ? 200 : 150;
 
-            if (modScore <= 0 || ((req.body.mode == 'osu' && userInfo.kudosu.total <= 200) || (req.body.mode != 'osu' && userInfo.kudosu.total <= 150))) {
-                return res.json({ error: `You don't meet the minimum score or total kudosu requirement. 
-                    Your mod score needs to be higher or equal than 0. Currently it is ${modScore}` });
-            }
+        if (userInfo.kudosu.total <= requiredKudosu) {
+            return res.json({ error: `You do not meet the required ${requiredKudosu} kudosu to apply. You currently have ${userInfo.kudosu.total} kudosu.` });
+        }
+
+        if (modScore <= 0) {
+            let additionalInfo = `Your mod score was calculated based on ${months} month${months == 1 ? '' : 's'} of activity because `;
+            if (resignedOnGoodTerms) additionalInfo += 'you resigned from the BN on good terms.';
+            else if (wasBnForThisMode) additionalInfo += 'you were BN for this game mode in the past.';
+
+            return res.json({ error: `Your mod score needs to be higher or equal than 0. Currently it is ${modScore}.
+                ${resignedOnGoodTerms || wasBnForThisMode ? additionalInfo : ''}` });
         }
 
         // Create app & test

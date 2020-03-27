@@ -1,45 +1,55 @@
 <template>
-    <p class="text-shadow">
-        Consensus:
-        <span
-            v-if="consensus"
-            :class="consensusColor"
-        >
-            {{ consensusText }}
-        </span>
-        <span v-if="!isArchive">
-            <button
-                class="btn btn-sm btn-nat-green ml-2"
-                :disabled="consensus == 'pass' && !isLowActivity"
-                @click="setConsensus('pass', $event);"
+    <div class="text-shadow">
+        <p>
+            Consensus:
+            <span
+                v-if="consensus"
+                :class="consensusColor"
             >
-                Pass
-            </button>
+                {{ consensusText }}
+            </span>
+            <span v-if="!isArchive">
+                <button
+                    class="btn btn-sm btn-nat-green ml-2"
+                    :disabled="consensus == 'pass' && !isLowActivity"
+                    @click="setConsensus('pass', $event);"
+                >
+                    Pass
+                </button>
+                <button
+                    v-if="!isApplication"
+                    class="btn btn-sm btn-nat-blue"
+                    :disabled="consensus == 'extend' "
+                    @click="setConsensus('extend', $event);"
+                >
+                    Probation
+                </button>
+                <button
+                    class="btn btn-sm btn-nat-red"
+                    :disabled="consensus == 'fail' && !resignedOnGoodTerms"
+                    @click="setConsensus('fail', $event);"
+                >
+                    Fail
+                </button>
+            </span>
+        </p>
+        <p v-if="!isArchive && !isApplication">
             <button
-                v-if="!isApplication"
-                class="btn btn-sm btn-nat-green"
+                class="btn btn-xs btn-nat-green"
                 :disabled="consensus == 'pass' && isLowActivity"
                 @click="setConsensus('pass', $event, true);"
             >
                 Pass + activity warning
             </button>
             <button
-                v-if="!isApplication"
-                class="btn btn-sm btn-nat-blue"
-                :disabled="consensus == 'extend' "
-                @click="setConsensus('extend', $event);"
+                class="btn btn-xs btn-nat-red"
+                :disabled="consensus == 'fail' && resignedOnGoodTerms"
+                @click="setConsensus('fail', $event, false, true);"
             >
-                Probation
+                Fail + resign on good terms
             </button>
-            <button
-                class="btn btn-sm btn-nat-red"
-                :disabled="consensus == 'fail'"
-                @click="setConsensus('fail', $event);"
-            >
-                Fail
-            </button>
-        </span>
-    </p>
+        </p>
+    </div>
 </template>
 
 <script>
@@ -53,6 +63,7 @@ export default {
         nominatorAssessmentMongoId: String,
         isApplication: Boolean,
         isLowActivity: Boolean,
+        resignedOnGoodTerms: Boolean,
         isArchive: Boolean,
     },
     computed: {
@@ -63,6 +74,8 @@ export default {
                 return 'probation';
             } else if (this.consensus == 'pass' && this.isLowActivity) {
                 return 'pass + activity warning';
+            } else if (this.consensus == 'fail' && this.resignedOnGoodTerms) {
+                return 'fail + resigned on good terms';
             } else {
                 return this.consensus;
             }
@@ -78,9 +91,9 @@ export default {
         },
     },
     methods: {
-        async setConsensus(consensus, e, toggle) {
+        async setConsensus(consensus, e, isLowActivity, resignedOnGoodTerms) {
             const result = await this.executePost(
-                `/${this.isApplication? 'appEval' : 'bnEval'}/setConsensus/` + this.nominatorAssessmentMongoId, { consensus, isLowActivity: toggle }, e);
+                `/${this.isApplication? 'appEval' : 'bnEval'}/setConsensus/` + this.nominatorAssessmentMongoId, { consensus, isLowActivity, resignedOnGoodTerms }, e);
 
             if (result) {
                 if (result.error) {

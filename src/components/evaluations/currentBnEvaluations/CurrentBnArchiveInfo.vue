@@ -33,6 +33,7 @@
                             :nominator-assessment-mongo-id="evalRound.id"
                             :is-application="false"
                             :is-low-activity="evalRound.isLowActivity"
+                            :resigned-on-good-terms="evalRound.resignedOnGoodTerms"
                             :is-archive="true"
                             @update-nominator-assessment="$emit('update-eval-round', $event);"
                         />
