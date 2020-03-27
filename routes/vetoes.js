@@ -196,7 +196,12 @@ router.post('/submitMediation/:id', api.isNotSpectator, async (req, res) => {
         'Submitted vote for a veto'
     );
 
-    if (!originalMediation.comment.length) {
+    let count = 0;
+    v.mediations.forEach(mediation => {
+        if (mediation.comment) count++;
+    });
+
+    if (!originalMediation.comment) {
         api.webhookPost([{
             author: {
                 name: `${req.session.username}`,
@@ -207,7 +212,7 @@ router.post('/submitMediation/:id', api.isNotSpectator, async (req, res) => {
             fields: [
                 {
                     name: `https://bn.mappersguild.com/vetoes?beatmap=${v.id}`,
-                    value: `Submitted opinion on veto for **${v.beatmapTitle}** by **${v.beatmapMapper}**`,
+                    value: `Submitted opinion on veto for **${v.beatmapTitle}** (${count}/${v.mediations.length})`,
                 },
             ],
         }],
