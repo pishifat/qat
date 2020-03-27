@@ -139,14 +139,6 @@ router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
                         }
                     });
                 }
-
-                if (u.probation) {
-                    u.probation.forEach(m => {
-                        if (isValidMode(m, req.body.osu, req.body.taiko, req.body.catch, req.body.mania)) {
-                            allEvalsToCreate.push({ bn: u._id, mode: m, deadline });
-                        }
-                    });
-                }
             } else {
                 failed.push(includeUsers[i].trim());
             }
