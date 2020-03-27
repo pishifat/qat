@@ -34,6 +34,12 @@ export default {
             modCount: null,
         };
     },
+    watch: {
+        username() {
+            this.loadingModCount = false;
+            this.modCount = null;
+        },
+    },
     methods: {
         async findModCount() {
             this.loadingModCount = true;
