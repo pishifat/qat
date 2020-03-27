@@ -41,7 +41,6 @@
                                     :bn-evaluators="application.bnEvaluators"
                                     :nat-evaluators="application.natEvaluators"
                                     :evaluations="application.evaluations"
-                                    :is-leader="evaluator.isLeader"
                                     :mode="application.mode"
                                     :osu-id="application.applicant.osuId"
                                     :username="application.applicant.username"

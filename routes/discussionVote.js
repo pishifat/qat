@@ -164,7 +164,7 @@ router.post('/concludeMediation/:id', api.isLeader, async (req, res) => {
 });
 
 /* POST save title */
-router.post('/saveTitle/:id', api.isLeader, async (req, res) => {
+router.post('/saveTitle/:id', api.isNat, async (req, res) => {
     const d = await Discussion
         .findByIdAndUpdate(req.params.id, { title: req.body.title })
         .populate(defaultPopulate);
@@ -177,7 +177,7 @@ router.post('/saveTitle/:id', api.isLeader, async (req, res) => {
 });
 
 /* POST save shortReason */
-router.post('/saveProposal/:id', api.isLeader, async (req, res) => {
+router.post('/saveProposal/:id', api.isNat, async (req, res) => {
     const d = await Discussion
         .findByIdAndUpdate(req.params.id, { shortReason: req.body.shortReason })
         .populate(defaultPopulate);

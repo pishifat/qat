@@ -484,33 +484,58 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
 });
 
 /* POST select BN evaluators */
-router.post('/selectBnEvaluators', api.isLeader, async (req, res) => {
+router.post('/selectBnEvaluators', api.isNat, async (req, res) => {
     const allUsers = await User.aggregate([
-        { $match: { group: { $eq: 'bn' }, isBnEvaluator: true, probation: { $size: 0 } }  },
+        { $match: { group: { $eq: 'bn' }, isBnEvaluator: true, probation: { $size: 0 }, modes: req.body.mode }  },
         { $sample: { size: 1000 } },
     ]);
-    let usernames = [];
+    let users = [];
+    let excludeUserIds = [];
+    const requiredUsers = req.body.mode == 'osu' ? 6 : 3;
 
-    for (let i = 0; i < allUsers.length; i++) {
-        let user = allUsers[i];
+    if (req.body.includeUsers) {
+        const includeUsers = req.body.includeUsers.split(',');
 
-        if (
-            user.modes.indexOf(req.body.mode) >= 0 &&
-            user.probation.indexOf(req.body.mode) < 0
-        ) {
-            usernames.push(user);
+        for (let i = 0; i < includeUsers.length && users.length < requiredUsers; i++) {
+            const userToSearch = includeUsers[i].trim();
+            const user = await User.findByUsername(userToSearch);
 
-            if (usernames.length >= (req.body.mode == 'osu' ? 6 : 3)) {
-                break;
+            if (user && !user.error && user.modes.includes(req.body.mode)) {
+                users.push(user);
+                excludeUserIds.push(user.id);
             }
         }
     }
 
-    res.json(usernames);
+
+    if (req.body.excludeUsers) {
+        const excludeUsers = req.body.excludeUsers.split(',');
+
+        for (let i = 0; i < excludeUsers.length; i++) {
+            const userToSearch = excludeUsers[i].trim();
+            const user = await User.findByUsername(userToSearch);
+
+            if (user && !user.error) {
+                excludeUserIds.push(user.id);
+            }
+        }
+    }
+
+    for (let i = 0; users.length < requiredUsers; i++) {
+        const user = allUsers[i];
+        const userId = user._id.toString();
+
+        if (!excludeUserIds.includes(userId)) {
+            users.push(user);
+            excludeUserIds.push(userId);
+        }
+    }
+
+    res.json(users);
 });
 
 /* POST begin BN evaluations */
-router.post('/enableBnEvaluators/:id', api.isLeader, async (req, res) => {
+router.post('/enableBnEvaluators/:id', api.isNat, async (req, res) => {
     for (let i = 0; i < req.body.bnEvaluators.length; i++) {
         let bn = req.body.bnEvaluators[i];
         await BnApp.findByIdAndUpdate(req.params.id, { $push: { bnEvaluators: bn._id } });

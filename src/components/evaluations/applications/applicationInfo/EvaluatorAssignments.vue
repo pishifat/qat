@@ -10,7 +10,7 @@
                 @update-nominator-assessment="$emit('update-nominator-assessment', $event);"
             />
         </div>
-        <div v-if="bnEvaluators.length && isLeader" class="col-sm-4">
+        <div v-if="bnEvaluators.length" class="col-sm-4">
             <user-list
                 :header="'Assigned BN:'"
                 :user-list="bnEvaluators"
@@ -25,18 +25,40 @@
                 :user-list="submittedEvaluators"
             />
         </div>
-        <div v-if="isLeader && !bnEvaluators.length" class="col-sm-12">
-            <button class="btn btn-sm btn-nat mb-2" @click="selectBnEvaluators($event)">
+        <div v-if="!bnEvaluators.length" class="col-sm-12">
+            <button class="btn btn-sm btn-nat mb-2 w-100" @click="selectBnEvaluators($event)">
                 {{ potentialBnEvaluators ? 'Re-select BN Evaluators' : 'Select BN Evaluators' }}
             </button>
-            <button v-if="potentialBnEvaluators" class="btn btn-sm btn-nat-red mb-2" @click="enableBnEvaluators($event)">
+            <button v-if="potentialBnEvaluators" class="btn btn-sm btn-nat-red mb-2 w-100" @click="enableBnEvaluators($event)">
                 Enable BN Evaluations
             </button>
+            <div class="row">
+                <div class="col-sm-6">
+                    <span class="text-shadow">Include specific user(s):</span>
+                    <input
+                        v-model="includeUsers"
+                        class="ml-2 w-100 small"
+                        type="text"
+                        placeholder="username1, username2, username3..."
+                    >
+                </div>
+                <div class="col-sm-6">
+                    <span class="text-shadow">Exclude specific user(s):</span>
+                    <input
+                        v-model="excludeUsers"
+                        class="ml-2 w-100 small"
+                        type="text"
+                        placeholder="username1, username2, username3..."
+                    >
+                </div>
+            </div>
             <p v-if="info" class="small errors">
                 {{ info }}
             </p>
             <div v-if="potentialBnEvaluators" class="text-shadow">
-                <p>Users:</p>
+                <p class="my-3">
+                    Users:
+                </p>
                 <div id="usernames" class="copy-paste mb-4" style="width: 25%">
                     <ul style="list-style-type: none; padding: 0">
                         <li v-for="user in potentialBnEvaluators" :key="user.id">
@@ -72,7 +94,6 @@ export default {
         bnEvaluators: Array,
         natEvaluators: Array,
         evaluations: Array,
-        isLeader: Boolean,
         mode: String,
         osuId: Number,
         username: String,
@@ -81,6 +102,8 @@ export default {
     },
     data() {
         return {
+            includeUsers: null,
+            excludeUsers: null,
             potentialBnEvaluators: null,
             info: null,
             confirm: null,
@@ -105,7 +128,7 @@ export default {
     },
     methods: {
         async selectBnEvaluators(e) {
-            const r = await this.executePost('/appeval/selectBnEvaluators', { mode: this.mode, id: this.nominatorAssessmentMongoId }, e);
+            const r = await this.executePost('/appeval/selectBnEvaluators', { mode: this.mode, id: this.nominatorAssessmentMongoId, includeUsers: this.includeUsers, excludeUsers: this.excludeUsers }, e);
 
             if (r) {
                 if (r.error) {
@@ -116,13 +139,19 @@ export default {
             }
         },
         async enableBnEvaluators (e) {
-            const a = await this.executePost('/appEval/enableBnEvaluators/' + this.nominatorAssessmentMongoId, { bnEvaluators: this.potentialBnEvaluators }, e);
+            const result = confirm(
+                `Are you sure? Forum PMs must be sent before enabling.`
+            );
 
-            if (a) {
-                if (a.error) {
-                    this.info = a.error;
-                } else {
-                    this.$emit('update-nominator-assessment', a);
+            if (result) {
+                const a = await this.executePost('/appEval/enableBnEvaluators/' + this.nominatorAssessmentMongoId, { bnEvaluators: this.potentialBnEvaluators }, e);
+
+                if (a) {
+                    if (a.error) {
+                        this.info = a.error;
+                    } else {
+                        this.$emit('update-nominator-assessment', a);
+                    }
                 }
             }
         },
