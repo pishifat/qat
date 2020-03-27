@@ -425,10 +425,14 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
             { $sample: { size: 1 } },
         ]);
 
-        await BnApp.findByIdAndUpdate(req.params.id, {
-            $push: { natEvaluators: newEvaluator[0]._id },
-            $pull: { natEvaluators: req.body.evaluatorId },
-        });
+        await Promise.all([
+            BnApp.findByIdAndUpdate(req.params.id, {
+                $push: { natEvaluators: newEvaluator[0]._id },
+            }),
+            BnApp.findByIdAndUpdate(req.params.id, {
+                $pull: { natEvaluators: req.body.evaluatorId },
+            }),
+        ]);
     } else {
         let invalids = [];
         a.bnEvaluators.forEach(user => {
@@ -439,10 +443,14 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
             { $sample: { size: 1 } },
         ]);
 
-        await BnApp.findByIdAndUpdate(req.params.id, {
-            $push: { bnEvaluators: newEvaluator[0]._id },
-            $pull: { bnEvaluators: req.body.evaluatorId },
-        });
+        await Promise.all([
+            BnApp.findByIdAndUpdate(req.params.id, {
+                $push: { bnEvaluators: newEvaluator[0]._id },
+            }),
+            BnApp.findByIdAndUpdate(req.params.id, {
+                $pull: { bnEvaluators: req.body.evaluatorId },
+            }),
+        ]);
     }
 
     a = await BnApp.findById(req.params.id).populate(defaultPopulate);
