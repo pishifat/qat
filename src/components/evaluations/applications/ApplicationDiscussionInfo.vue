@@ -73,6 +73,7 @@
                             :is-nat="evaluator.isNat"
                             :consensus="application.consensus"
                             :evaluations="application.evaluations"
+                            :user-id="evaluator.id"
                         />
                         <p v-else class="text-shadow small">
                             No consensus has been set, so evaluations are not visible. Check back later!

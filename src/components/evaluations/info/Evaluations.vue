@@ -37,7 +37,10 @@
                     <img :src="'https://a.ppy.sh/' + evaluation.evaluator.osuId" class="card-avatar-img mx-auto">
                     {{ evaluation.evaluator.username }}
                 </a>
-                <span v-else class="small d-flex flex-column ml-auto font-weight-bold text-center" :class="voteColor(evaluation.vote)">BN</span>
+                <span v-else class="small d-flex flex-column ml-auto font-weight-bold text-center" :class="voteColor(evaluation.vote)">
+                    BN
+                    <span v-if="evaluation.evaluator.id == userId">(this is you!)</span>
+                </span>
             </div>
             <div class="col-sm-7">
                 <p class="min-spacing">
@@ -65,6 +68,7 @@ export default {
         evaluations: Array,
         consensus: String,
         isNat: Boolean,
+        userId: String,
     },
     computed: {
         bnEvaluations() {
@@ -76,7 +80,7 @@ export default {
                     let consensusVote;
                     if (this.consensus == 'pass') consensusVote = 1;
                     if (this.consensus == 'fail') consensusVote = 3;
-                    if (evaluation.evaluator.isBn && (evaluation.vote == consensusVote || evaluation.vote == 2)) e.push(evaluation);
+                    if (evaluation.evaluator.isBn && (evaluation.vote == consensusVote || evaluation.vote == 2 || evaluation.evaluator.id == this.userId)) e.push(evaluation);
                 }
             });
 
