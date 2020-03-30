@@ -131,7 +131,8 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
     const footer = {
         text: qualityAssuranceChecks.length == 10 ? 'Thank you for creating a better ranked section! ✨' :
             qualityAssuranceChecks.length == 20 ? `You're making osu! a better place. Thanks again!' 💖` :
-                qualityAssuranceChecks.length == 69 ? `_nice_` : '',
+                qualityAssuranceChecks.length == 69 ? `_nice_` :
+                    qualityAssuranceChecks.length == 100 ? `ever heard of passion? ${req.session.username} has it. you clearly don't so get off your bum and check some maps buddy` : '',
     };
     const authorBeatmap = {
         name: `${e.metadata} (${e.hostName})`,
