@@ -149,11 +149,14 @@ const notifyDeadlines = cron.schedule('0 0 * * *', async () => {
         } else if (round.deadline > startRange && round.deadline < endRange) {
             title = `Current BN eval for ${round.bn.username} is due in two weeks!`;
 
+            const twoEvaluationModes = ['catch', 'mania'];
+            //const threeEvaluationModes = ['osu', 'taiko'];
+
             if (!round.natEvaluators || !round.natEvaluators.length) {
                 const invalids = [8129817, 3178418];
                 const assignedNat = await User.aggregate([
                     { $match: { group: 'nat', isSpectator: { $ne: true }, modes: round.mode, osuId: { $nin: invalids } } },
-                    { $sample: { size: round.mode == 'osu' || round.mode == 'catch' ? 3 : 2 } },
+                    { $sample: { size: twoEvaluationModes.includes(round.mode) ? 2 : 3 } },
                 ]);
 
                 for (let i = 0; i < assignedNat.length; i++) {
