@@ -74,6 +74,7 @@
                             :evaluations="evalRound.evaluations"
                             :probation="evalRound.bn.probation"
                             :is-low-activity="evalRound.isLowActivity"
+                            :resigned-on-good-terms="evalRound.resignedOnGoodTerms"
                             :mode="evalRound.mode"
                             :saved-feedback="evalRound.feedback"
                             :nominator-assessment-mongo-id="evalRound.id"

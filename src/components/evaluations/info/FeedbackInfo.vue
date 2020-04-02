@@ -37,6 +37,7 @@
             :discord-link="discordLink"
             :evaluations="evaluations"
             :is-low-activity="isLowActivity"
+            :resigned-on-good-terms="resignedOnGoodTerms"
         />
     </div>
 </template>
@@ -60,6 +61,7 @@ export default {
         evaluations: Array,
         probation: Array,
         isLowActivity: Boolean,
+        resignedOnGoodTerms: Boolean,
         savedFeedback: String,
         nominatorAssessmentMongoId: String,
     },

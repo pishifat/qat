@@ -71,13 +71,19 @@
             </div>
             <div v-else class="copy-paste">
                 <samp class="small">Hello!</samp><br><br>
-                <samp class="small">After reviewing your work as a BN for the [i]{{ mode == 'osu' ? 'osu!' : 'osu!' + mode }}[/i] game mode, we have decided to [b]remove you from the Beatmap Nominators[/b].</samp><br><br>
-                <samp class="small">Despite this decision, we would like to thank you for your service to the mapping and modding communities and wish you the best of luck in your future endeavours. Should you wish to apply for the Beatmap Nominators in the future, you may do so on {{ defineDate() }}, provided you meet the normal required activity requirements and have shown improvement in the areas mentioned.</samp><br><br>
-                <samp class="small">Additional feedback from the NAT:</samp><br><br>
-                <samp><pre class="small">[notice]{{ feedback }}[/notice]</pre></samp>
-                <samp class="small">For further feedback or to appeal this decision, contact any of these users:
-                    <span v-for="(evaluation, i) in natEvaluations" :key="i">[url=https://osu.ppy.sh/users/{{ evaluation.evaluator.osuId }}]{{ evaluation.evaluator.username }}[/url]{{ i+1 != natEvaluations.length ? ", " : "" }}</span>
+                <samp v-if="resignedOnGoodTerms" class="small">Following your BN resignation from the [i]{{ mode == 'osu' ? 'osu!' : 'osu!' + mode }}[/i] game mode, we conducted an evaluation and determined that you are still a capable Beatmap Nominator!</samp>
+                <samp v-else class="small">After reviewing your work as a BN for the [i]{{ mode == 'osu' ? 'osu!' : 'osu!' + mode }}[/i] game mode, we have decided to [b]remove you from the Beatmap Nominators[/b].</samp><br><br>
+                <samp class="small">We would like to thank you for your service to the mapping and modding communities and wish you the best of luck in your future endeavours. Should you wish to apply for the Beatmap Nominators again, you may do so on {{ defineDate() }}, provided you have
+                    <span v-if="resignedOnGoodTerms">one month of modding activity (3-4 mods).</span>
+                    <span v-else>two months of modding activity (3-4 mods each month) and have shown improvement in the areas mentioned.</span>
                 </samp><br><br>
+                <span v-if="!resignedOnGoodTerms">
+                    <samp class="small">Additional feedback from the NAT:</samp><br><br>
+                    <samp><pre class="small">[notice]{{ feedback }}[/notice]</pre></samp>
+                    <samp class="small">For further feedback or to appeal this decision, contact any of these users:
+                        <span v-for="(evaluation, i) in natEvaluations" :key="i">[url=https://osu.ppy.sh/users/{{ evaluation.evaluator.osuId }}]{{ evaluation.evaluator.username }}[/url]{{ i+1 != natEvaluations.length ? ", " : "" }}</span>
+                    </samp><br><br>
+                </span>
                 <samp class="small">Good luck!</samp><br><br>
                 <samp class="small">Regards, the Nomination Assessment Team</samp>
             </div>
@@ -97,6 +103,7 @@ export default {
         evaluations: Array,
         probation: Array,
         isLowActivity: Boolean,
+        resignedOnGoodTerms: Boolean,
         feedback: String,
         discordLink: String,
     },

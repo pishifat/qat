@@ -66,11 +66,11 @@ router.post('/apply', async (req, res) => {
         }),
     ]);
 
-    let months = 3;
-    if (resignedOnGoodTerms) months = 1;
-    else if (wasBnForThisMode) months = 2;
-
     if (!currentBnApp && !currentBnEval) {
+        let months = 3;
+        if (resignedOnGoodTerms) months = 1;
+        else if (wasBnForThisMode) months = 2;
+
         // Check user kudosu total count & mod score
         const [userInfo, modScore] = await Promise.all([
             await api.getUserInfo(req.session.accessToken),
