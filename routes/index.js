@@ -146,7 +146,7 @@ router.get('/callback', async (req, res) => {
             res.status(500).render('error');
         } else if (!response.group_badge) {
             req.session.group = 'user';
-        } else if (response.group_badge.id == 7) {
+        } else if (response.group_badge.id == 7 || response.id == 318565) {
             req.session.group = 'nat';
             req.session.isSpectator = false;
         } else if (response.group_badge.id == 4) {
