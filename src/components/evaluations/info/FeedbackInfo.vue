@@ -3,7 +3,7 @@
         <p class="text-shadow min-spacing mb-2">
             Application feedback:
         </p>
-        <div class="form-group">
+        <div v-if="!resignedOnGoodTerms" class="form-group">
             <textarea v-model="feedback" class="form-control dark-textarea" style="white-space: pre-line;" />
         </div>
         <div v-if="isApplication && consensus == 'pass'" class="input-group mb-3">
