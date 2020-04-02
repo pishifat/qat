@@ -55,38 +55,63 @@ router.get('/relevantInfo', (req, res) => {
 
 /* GET search for user */
 router.get('/search/:user', async (req, res) => {
-    let u;
+    let user;
     const userToSearch = decodeURI(req.params.user);
 
     if (isNaN(userToSearch)) {
-        u = await User.findByUsername(userToSearch);
+        user = await User.findByUsername(userToSearch);
     } else {
-        u = await User.findOne({ osuId: parseInt(userToSearch) });
+        user = await User.findOne({ osuId: parseInt(userToSearch) });
     }
 
-    if (!u) {
+    if (!user) {
         return res.json({ error: 'Cannot find user!' });
     }
 
-    let a = await BnApp
+    let bnApplications = await BnApp
         .find({
-            applicant: u.id,
+            applicant: user.id,
             active: false,
             consensus: { $exists: true },
         })
         .populate(defaultAppPopulate)
         .sort({ createdAt: 1 });
 
-    let b = await EvalRound
+    let evalRounds = await EvalRound
         .find({
-            bn: u.id,
+            bn: user.id,
             active: false,
             consensus: { $exists: true },
         })
         .populate(defaultBnPopulate)
         .sort({ createdAt: 1 });
 
-    res.json({ a, b, evaluator: res.locals.userRequest });
+    res.json({ bnApplications, evalRounds, evaluator: res.locals.userRequest });
+});
+
+/* GET search by number of rounds */
+router.get('/searchRecent/:limit', async (req, res) => {
+    const limit = parseInt(req.params.limit);
+
+    let bnApplications = await BnApp
+        .find({
+            active: false,
+            consensus: { $exists: true },
+        })
+        .populate(defaultAppPopulate)
+        .sort({ createdAt: -1 })
+        .limit(limit);
+
+    let evalRounds = await EvalRound
+        .find({
+            active: false,
+            consensus: { $exists: true },
+        })
+        .populate(defaultBnPopulate)
+        .sort({ createdAt: -1 })
+        .limit(limit);
+
+    res.json({ bnApplications, evalRounds });
 });
 
 /* GET search for user */
@@ -116,35 +141,6 @@ router.get('/searchById/:id', async (req, res) => {
     }
 
     res.json({ round, evaluator: res.locals.userRequest });
-});
-
-/* GET search by number of rounds */
-router.get('/searchRecent/:limit', async (req, res) => {
-    if (!req.params.limit) {
-        req.params.limit = 12;
-    } else {
-        req.params.limit = parseInt(req.params.limit);
-    }
-
-    let a = await BnApp
-        .find({
-            active: false,
-            consensus: { $exists: true },
-        })
-        .populate(defaultAppPopulate)
-        .sort({ createdAt: -1 })
-        .limit(req.params.limit);
-
-    let b = await EvalRound
-        .find({
-            active: false,
-            consensus: { $exists: true },
-        })
-        .populate(defaultBnPopulate)
-        .sort({ createdAt: -1 })
-        .limit(req.params.limit);
-
-    res.json({ a, b });
 });
 
 /* POST set evals as complete */

@@ -100,32 +100,25 @@
                         {{ info }} {{ confirm }}
                     </div>
                 </div>
-                <div class="modal-footer" style="overflow: hidden;">
-                    <span v-if="report.isActive">
-                        <button
-                            class="btn btn-sm btn-nat"
-                            data-toggle="tooltip"
-                            data-placement="top"
-                            title="Generates feedback PM and stores feedback/validity inputs"
-                            @click="submitReportEval($event);"
-                        >Save Report Evaluation</button>
-                        <button
-                            class="btn btn-sm btn-nat-red"
-                            data-toggle="tooltip"
-                            data-placement="top"
-                            title="Disables feedback/validity inputs and reveals reporter"
-                            @click="submitReportEval($event, true)"
-                        >Close Report</button>
-                    </span>
-                    <span v-else-if="report.valid != 3">
-                        <button
-                            class="btn btn-sm btn-nat"
-                            data-toggle="tooltip"
-                            data-placement="top"
-                            title="Avoid displaying repeat reports on evaluations"
-                            @click="changeEvalDisplay($event);"
-                        >{{ report.display ? "Hide report on evaluations" : "Show report on evaluations" }}</button>
-                    </span>
+                <div v-if="report.isActive" class="modal-footer" style="overflow: hidden;">
+                    <button
+                        class="btn btn-sm btn-nat"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="Generates feedback PM and stores feedback/validity inputs"
+                        @click="submitReportEval($event);"
+                    >
+                        Save Report Evaluation
+                    </button>
+                    <button
+                        class="btn btn-sm btn-nat-red"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="Disables feedback/validity inputs and reveals reporter"
+                        @click="submitReportEval($event, true)"
+                    >
+                        Close Report
+                    </button>
                 </div>
             </div>
         </div>
@@ -156,7 +149,7 @@ export default {
                 this.info = '';
                 this.confirm = '';
                 this.feedback = this.report.feedback;
-                history.pushState(null, 'Manage Reports', `/managereports?report=${this.report.id}`);
+                history.pushState(null, 'Manage Reports', `/manageReports?report=${this.report.id}`);
             }
         },
     },
@@ -192,18 +185,6 @@ export default {
                         this.$emit('update-report', r);
                         this.confirm = 'Report updated!';
                     }
-                }
-            }
-        },
-        async changeEvalDisplay (e) {
-            let r = await this.executePost('/manageReports/changeEvalDisplay/' + this.report.id, { display: this.report.display }, e);
-
-            if (r) {
-                if (r.error) {
-                    this.info = r.error;
-                } else {
-                    this.$emit('update-report', r);
-                    this.confirm = 'Report updated!';
                 }
             }
         },

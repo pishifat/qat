@@ -2,6 +2,7 @@ const express = require('express');
 const api = require('../helpers/api');
 const Logger = require('../models/log');
 const Report = require('../models/report');
+const User = require('../models/user');
 
 const router = express.Router();
 
@@ -26,15 +27,13 @@ const defaultPopulate = [
 
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res) => {
-    let minDate = new Date();
-    minDate.setDate(minDate.getDate() - 90);
-    let r = await Report
-        .find({ createdAt: { $gte: minDate } })
+    const openReports = await Report
+        .find({ isActive: true })
         .populate(defaultPopulate)
-        .sort({ createdAt: 1 });
+        .sort({ createdAt: -1 });
 
     res.json({
-        r,
+        openReports,
         isLeader: res.locals.userRequest.isLeader,
     });
 });
@@ -77,18 +76,55 @@ router.post('/submitReportEval/:id', api.isNotSpectator, async (req, res) => {
     }
 });
 
-/* POST change display of report on evals */
-router.post('/changeEvalDisplay/:id', api.isNotSpectator, async (req, res) => {
-    const r = await Report
-        .findByIdAndUpdate(req.params.id, { display: !req.body.display })
+/* GET search for user */
+router.get('/search/:user', async (req, res) => {
+    let u;
+    const userToSearch = decodeURI(req.params.user);
+
+    if (isNaN(userToSearch)) {
+        u = await User.findByUsername(userToSearch);
+    } else {
+        u = await User.findOne({ osuId: parseInt(userToSearch) });
+    }
+
+    if (!u) {
+        return res.json({ error: 'Cannot find user!' });
+    }
+
+    const closedReports = await Report
+        .find({ isActive: false, culprit: u.id })
+        .populate(defaultPopulate)
+        .sort({ createdAt: -1 });
+
+    res.json(closedReports);
+});
+
+/* GET search by number of rounds */
+router.get('/searchRecent/:limit', async (req, res) => {
+    const limit = parseInt(req.params.limit);
+
+    const closedReports = await Report
+        .find({ isActive: false })
+        .populate(defaultPopulate)
+        .sort({ createdAt: -1 })
+        .limit(limit);
+
+    res.json(closedReports);
+});
+
+/* GET search for user */
+router.get('/searchById/:id', async (req, res) => {
+    const idToSearch = decodeURI(req.params.id);
+
+    const report = await Report
+        .findById(idToSearch)
         .populate(defaultPopulate);
 
-    res.json(r);
+    if (!report) {
+        return res.json({ error: 'Cannot find report!' });
+    }
 
-    Logger.generate(
-        req.session.mongoId,
-        `Set report to ${req.body.display ? 'be hidden' : 'display'}  on evaluations`
-    );
+    res.json(report);
 });
 
 module.exports = router;

@@ -45,30 +45,29 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
 
         res.json({});
 
-        if (u.group != 'nat') {
-            api.webhookPost([{
-                author: {
-                    name: `User report: ${u.username}`,
-                    url: `http://bn.mappersguild.com/managereports?report=${r.id}`,
+
+        api.webhookPost([{
+            author: {
+                name: `User report: ${u.username}`,
+                url: `http://bn.mappersguild.com/managereports?report=${r.id}`,
+            },
+            thumbnail: {
+                url: `https://a.ppy.sh/${u.osuId}`,
+            },
+            color: '16697937',
+            fields: [
+                {
+                    name: 'Report reason',
+                    value: req.body.reason.length > 975 ? req.body.reason.slice(0,975) + '... *(truncated)*' : req.body.reason,
                 },
-                thumbnail: {
-                    url: `https://a.ppy.sh/${u.osuId}`,
-                },
-                color: '16697937',
-                fields: [
-                    {
-                        name: 'Report reason',
-                        value: req.body.reason.length > 975 ? req.body.reason.slice(0,975) + '... *(truncated)*' : req.body.reason,
-                    },
-                ],
-            }]);
-            Logger.generate(
-                null,
-                `Reported "${u.username}" for reason "${
-                    req.body.reason.length > 50 ? req.body.reason.slice(0, 50) + '...' : req.body.reason
-                }"`
-            );
-        }
+            ],
+        }]);
+        Logger.generate(
+            null,
+            `Reported "${u.username}" for reason "${
+                req.body.reason.length > 50 ? req.body.reason.slice(0, 50) + '...' : req.body.reason
+            }"`
+        );
     } else {
         const r = await Report.create({
             reporter: req.session.mongoId,
