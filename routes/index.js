@@ -153,6 +153,8 @@ router.get('/callback', async (req, res) => {
             req.session.isSpectator = true;
         } else if (response.group_badge.id == 28 || response.group_badge.id == 32) {
             req.session.group = 'bn';
+        } else {
+            req.session.group = 'user';
         }
 
         req.session.username = response.username;
