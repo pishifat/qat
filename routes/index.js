@@ -142,23 +142,17 @@ router.get('/callback', async (req, res) => {
 
         response = await api.getUserInfo(req.session.accessToken);
 
-        if (!response.error) {
-            console.log(response);
-        }
-
         if (response.error) {
             res.status(500).render('error');
-        } else if (response.is_nat) {
+        } else if (!response.group_badge) {
+            req.session.group = 'user';
+        } else if (req.session.group_badge.id == 7) {
             req.session.group = 'nat';
             req.session.isSpectator = false;
-        } else {
-            req.session.isSpectator = response.is_gmt;
-
-            if (response.is_bng) {
-                req.session.group = 'bn';
-            } else {
-                req.session.group = 'user';
-            }
+        } else if (req.session.group_badge.id == 4) {
+            req.session.isSpectator = true;
+        } else if (req.session.group_badge.id == 28 || req.session.group_badge.id == 32) {
+            req.session.group = 'bn';
         }
 
         req.session.username = response.username;
