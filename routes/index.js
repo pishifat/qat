@@ -146,12 +146,12 @@ router.get('/callback', async (req, res) => {
             res.status(500).render('error');
         } else if (!response.group_badge) {
             req.session.group = 'user';
-        } else if (req.session.group_badge.id == 7) {
+        } else if (response.group_badge.id == 7) {
             req.session.group = 'nat';
             req.session.isSpectator = false;
-        } else if (req.session.group_badge.id == 4) {
+        } else if (response.group_badge.id == 4) {
             req.session.isSpectator = true;
-        } else if (req.session.group_badge.id == 28 || req.session.group_badge.id == 32) {
+        } else if (response.group_badge.id == 28 || response.group_badge.id == 32) {
             req.session.group = 'bn';
         }
 
