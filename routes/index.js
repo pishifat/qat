@@ -142,17 +142,22 @@ router.get('/callback', async (req, res) => {
 
         response = await api.getUserInfo(req.session.accessToken);
 
+        const bnGmt = [626907, 394326, 4879508];
+        const natGmt = [318565];
+
         if (response.error) {
             res.status(500).render('error');
         } else if (!response.group_badge) {
             req.session.group = 'user';
-        } else if (response.group_badge.id == 7 || response.id == 318565) {
+        } else if (response.group_badge.id == 7 || natGmt.includes(response.id)) {
             req.session.group = 'nat';
             req.session.isSpectator = false;
-        } else if (response.group_badge.id == 4) {
-            req.session.isSpectator = true;
         } else if (response.group_badge.id == 28 || response.group_badge.id == 32) {
             req.session.group = 'bn';
+        } else if (response.group_badge.id == 4) {
+            req.session.isSpectator = true;
+            if (bnGmt.includes(response.id)) {
+                req.session.group = 'bn';
         } else {
             req.session.group = 'user';
         }
