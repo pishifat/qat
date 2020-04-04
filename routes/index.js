@@ -151,15 +151,16 @@ router.get('/callback', async (req, res) => {
             req.session.group = 'user';
         } else if (response.group_badge.id == 7 || natGmt.includes(response.id)) {
             req.session.group = 'nat';
-            req.session.isSpectator = false;
-        } else if (response.group_badge.id == 28 || response.group_badge.id == 32) {
+        } else if (response.group_badge.id == 28 || response.group_badge.id == 32 || bnGmt.includes(response.id)) {
             req.session.group = 'bn';
-        } else if (response.group_badge.id == 4) {
-            req.session.isSpectator = true;
-            if (bnGmt.includes(response.id)) {
-                req.session.group = 'bn';
         } else {
             req.session.group = 'user';
+        }
+
+        if (response.group_badge.id == 4) {
+            req.session.isSpectator = true;
+        } else {
+            req.session.isSpectator = false;
         }
 
         req.session.username = response.username;
