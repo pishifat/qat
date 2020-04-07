@@ -56,6 +56,9 @@
                             :is-application="false"
                             :is-low-activity="evalRound.isLowActivity"
                             :resigned-on-good-terms="evalRound.resignedOnGoodTerms"
+                            :group="evalRound.bn.group"
+                            :is-move-to-nat="evalRound.isMoveToNat"
+                            :is-move-to-bn="evalRound.isMoveToBn"
                             @update-nominator-assessment="$emit('update-eval-round', $event);"
                         />
                         <cooldown
@@ -67,7 +70,7 @@
                             @update-nominator-assessment="$emit('update-eval-round', $event);"
                         />
                         <feedback-info
-                            v-if="evalRound.consensus"
+                            v-if="evalRound.consensus && !(evalRound.isMoveToNat || evalRound.isMoveToBn)"
                             :consensus="evalRound.consensus"
                             :osu-id="evalRound.bn.osuId"
                             :cooldown-date="evalRound.cooldownDate"

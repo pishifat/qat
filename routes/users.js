@@ -76,51 +76,6 @@ router.post('/switchBnEvaluator/:id', api.isBnOrNat, async (req, res) => {
     Logger.generate(req.session.mongoId, `Opted "${u.username}" ${u.isBnEvaluator ? 'in to' : 'out of'} optional BN app evaluation input`);
 });
 
-/* POST switch usergroup */
-router.post('/switchGroup/:id', api.isLeader, async (req, res) => {
-    let u = await User.findByIdAndUpdate(req.params.id, {
-        group: req.body.group,
-        probation: [],
-        $push: {
-            bnDuration: new Date(),
-            natDuration: new Date(),
-        },
-    });
-
-    res.json(u);
-
-    await EvalRound.deleteManyByUserId(u.id);
-    let deadline = new Date();
-    deadline.setDate(deadline.getDate() + 100);
-    await EvalRound.create({
-        bn: u.id,
-        mode: u.modes[0],
-        deadline,
-    });
-
-    Logger.generate(
-        req.session.mongoId,
-        `Changed usergroup of "${u.username}" to "${req.body.group.toUpperCase()}"`
-    );
-});
-
-/* POST remove from BN/NAT without evaluation */
-router.post('/removeNat/:id', api.isLeader, async (req, res) => {
-    let u = await User.findByIdAndUpdate(req.params.id, {
-        group: 'user',
-        probation: [],
-        modes: [],
-        $push: {
-            natDuration: new Date(),
-        },
-    });
-    res.json(u);
-    Logger.generate(
-        req.session.mongoId,
-        `Removed "${u.username}" from the NAT`
-    );
-});
-
 /* GET user notes */
 router.get('/loadUserNotes/:id', api.isNat, async (req, res) => {
     const notes = await Note

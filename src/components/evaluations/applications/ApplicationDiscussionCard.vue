@@ -56,10 +56,6 @@ export default {
     },
     data() {
         return {
-            pass: 0,
-            neutral: 0,
-            probation: 0,
-            fail: 0,
             isSelected: false,
         };
     },

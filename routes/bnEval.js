@@ -29,7 +29,7 @@ router.get('/', (req, res) => {
 const defaultPopulate = [
     {
         path: 'bn',
-        select: 'username osuId probation modes',
+        select: 'username osuId probation modes group',
     },
     {
         path: 'natEvaluators',
@@ -380,7 +380,12 @@ router.post('/setComplete/', api.isNat, async (req, res) => {
 
             if (!u.modes.length) {
                 await User.findByIdAndUpdate(u.id, { group: 'user' });
-                await User.findByIdAndUpdate(u.id, { $push: { bnDuration: new Date() } });
+
+                if (u.group == 'bn') {
+                    await User.findByIdAndUpdate(u.id, { $push: { bnDuration: new Date() } });
+                } else if (u.group == 'nat') {
+                    await User.findByIdAndUpdate(u.id, { $push: { natDuration: new Date() } });
+                }
             }
         }
 
@@ -406,6 +411,20 @@ router.post('/setComplete/', api.isNat, async (req, res) => {
                 deadline.setDate(deadline.getDate() + 40);
             } else {
                 deadline.setDate(deadline.getDate() + 100);
+
+                // process user group changes
+                if (er.isMoveToNat || er.isMoveToBn) {
+                    console.log(er.bn);
+                    console.log('in');
+                    await User.findByIdAndUpdate(er.bn, {
+                        group: er.isMoveToNat ? 'nat' : 'bn',
+                        probation: [],
+                        $push: {
+                            bnDuration: new Date(),
+                            natDuration: new Date(),
+                        },
+                    });
+                }
             }
 
             await EvalRound.create({
@@ -424,6 +443,10 @@ router.post('/setComplete/', api.isNat, async (req, res) => {
 
             if (er.isLowActivity) {
                 consensusText += ' + Low activity warning';
+            } else if (er.isMoveToNat) {
+                consensusText += ' + Move to NAT';
+            } else if (er.isMoveToBn) {
+                consensusText += ' + Move to BN';
             }
         } else if (er.consensus == 'probation') {
             consensusText = 'Probation';
@@ -480,6 +503,8 @@ router.post('/setConsensus/:id', api.isNat, async (req, res) => {
         consensus: req.body.consensus,
         isLowActivity: req.body.isLowActivity ? true : false,
         resignedOnGoodTerms: req.body.resignedOnGoodTerms ? true : false,
+        isMoveToNat: req.body.isMoveToNat ? true : false,
+        isMoveToBn: req.body.isMoveToBn ? true : false,
     });
 
     if (req.body.consensus == 'fail') {
@@ -492,28 +517,51 @@ router.post('/setConsensus/:id', api.isNat, async (req, res) => {
 
     res.json(er);
 
-    if (req.body.consensus) {
-        Logger.generate(
-            req.session.mongoId,`Set consensus of ${er.bn.username}'s ${er.mode} BN eval as ${req.body.consensus}`
-        );
-        api.webhookPost(
-            [{
-                author: {
-                    name: `${req.session.username}`,
-                    icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                    url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-                },
-                color: '13272813',
-                fields: [
-                    {
-                        name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
-                        value: `**${er.bn.username}**'s current BN eval set to **${req.body.consensus}**${req.body.isLowActivity ? ' + low activity warning' : req.body.resignedOnGoodTerms ? ' + resigned on good terms' : ''}`,
-                    },
-                ],
-            }],
-            er.mode
-        );
+    let consensusText;
+
+    if (er.consensus == 'pass') {
+        consensusText = 'Pass';
+
+        if (er.isLowActivity) {
+            consensusText += ' + Low activity warning';
+        } else if (er.isMoveToNat) {
+            consensusText += ' + Move to NAT';
+        } else if (er.isMoveToBn) {
+            consensusText += ' + Move to BN';
+        }
+    } else if (er.consensus == 'probation') {
+        consensusText = 'Probation';
+    } else if (er.consensus == 'fail') {
+        consensusText = 'Fail';
+
+        if (er.resignedOnGoodTerms) {
+            consensusText += ' + Resigned on good terms';
+        }
+    } else {
+        consensusText = 'No consensus set';
     }
+
+    Logger.generate(
+        req.session.mongoId,`Set consensus of ${er.bn.username}'s ${er.mode} BN eval as "${consensusText}"`
+    );
+
+    api.webhookPost(
+        [{
+            author: {
+                name: `${req.session.username}`,
+                icon_url: `https://a.ppy.sh/${req.session.osuId}`,
+                url: `https://osu.ppy.sh/users/${req.session.osuId}`,
+            },
+            color: '13272813',
+            fields: [
+                {
+                    name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
+                    value: `**${er.bn.username}**'s current BN eval set to **${consensusText}**`,
+                },
+            ],
+        }],
+        er.mode
+    );
 });
 
 /* POST set cooldown */

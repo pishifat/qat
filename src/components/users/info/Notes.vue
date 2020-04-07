@@ -1,6 +1,5 @@
 <template>
     <div>
-        <hr>
         <div class="d-flex">
             <textarea
                 v-model="comment"
@@ -15,7 +14,10 @@
         </div>
 
         <ul class="mt-2">
-            <li v-if="!notes.length" class="small min-spacing">
+            <li v-if="!notes" class="small min-spacing text-shadow">
+                ...
+            </li>
+            <li v-else-if="!notes.length" class="small min-spacing text-shadow">
                 User has no notes
             </li>
             <li
@@ -81,7 +83,7 @@ export default {
     },
     data() {
         return {
-            notes: [],
+            notes: null,
             comment: '',
             info: '',
             editNoteId: '',
@@ -90,7 +92,7 @@ export default {
     },
     watch: {
         userId() {
-            this.notes = [];
+            this.notes = null;
             this.comment = '';
             this.info = '';
             this.editNoteId = '';

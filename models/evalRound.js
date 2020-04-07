@@ -12,6 +12,8 @@ const evalRoundSchema = new mongoose.Schema({
     feedbackAuthor: { type: 'ObjectId', ref: 'User' },
     isLowActivity: { type: Boolean, default: false },
     resignedOnGoodTerms: { type: Boolean, default: false },
+    isMoveToNat: { type: Boolean, default: false },
+    isMoveToBn: { type: Boolean, default: false },
     cooldownDate: { type: Date },
     natEvaluators: [{ type: 'ObjectId', ref: 'User' }],
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
@@ -31,7 +33,7 @@ class EvalRoundService
             .populate([
                 {
                     path: 'bn',
-                    select: 'username osuId probation modes',
+                    select: 'username osuId probation modes group',
                 },
                 {
                     path: 'natEvaluators',

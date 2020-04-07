@@ -103,7 +103,9 @@ export default {
         },
         cooldownDate: {
             type: String,
-            required: true,
+            default() {
+                return new Date().toString();
+            },
         },
         mode: {
             type: String,

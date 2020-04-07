@@ -3,8 +3,11 @@
         <p class="min-spacing text-shadow">
             NAT user notes:
         </p>
-        <ul v-if="userNotes">
-            <li v-if="!userNotes.length" class="small min-spacing text-shadow">
+        <ul>
+            <li v-if="!userNotes" class="small min-spacing text-shadow">
+                ...
+            </li>
+            <li v-else-if="!userNotes.length" class="small min-spacing text-shadow">
                 User has no notes
             </li>
             <li
@@ -41,6 +44,7 @@ export default {
     },
     watch: {
         userMongoId() {
+            this.userNotes = null;
             this.findUserNotes();
         },
     },

@@ -35,18 +35,34 @@
         </p>
         <p v-if="!isArchive && !isApplication">
             <button
-                class="btn btn-xs btn-nat-green"
-                :disabled="consensus == 'pass' && isLowActivity"
-                @click="setConsensus('pass', $event, true);"
-            >
-                Pass + activity warning
-            </button>
-            <button
                 class="btn btn-xs btn-nat-red"
                 :disabled="consensus == 'fail' && resignedOnGoodTerms"
-                @click="setConsensus('fail', $event, false, true);"
+                @click="setConsensus('fail', $event, 'resignedOnGoodTerms');"
             >
-                Fail + resign on good terms
+                Resign on good terms
+            </button>
+            <button
+                class="btn btn-xs btn-nat-green"
+                :disabled="consensus == 'pass' && isLowActivity"
+                @click="setConsensus('pass', $event, 'isLowActivity');"
+            >
+                Low activity warning
+            </button>
+            <button
+                v-if="group == 'bn'"
+                class="btn btn-xs btn-nat-green"
+                :disabled="isMoveToNat"
+                @click="setConsensus('pass', $event, 'isMoveToNat');"
+            >
+                Move to NAT
+            </button>
+            <button
+                v-else
+                class="btn btn-xs btn-nat-green"
+                :disabled="isMoveToBn"
+                @click="setConsensus('pass', $event, 'isMoveToBn');"
+            >
+                Move to BN
             </button>
         </p>
     </div>
@@ -70,14 +86,28 @@ export default {
         isApplication: Boolean,
         isLowActivity: Boolean,
         resignedOnGoodTerms: Boolean,
+        isMoveToNat: Boolean,
+        isMoveToBn: Boolean,
         isArchive: Boolean,
+        group: {
+            type: String,
+            default: 'user',
+        },
     },
     computed: {
         consensusText() {
             if (!this.consensus) {
                 return 'none';
-            } else if (this.consensus == 'pass' && this.isLowActivity) {
-                return 'pass + activity warning';
+            } else if (this.consensus == 'pass') {
+                if (this.isLowActivity) {
+                    return 'pass + low activity warning';
+                } else if (this.isMoveToNat) {
+                    return 'pass + move to NAT';
+                } else if (this.isMoveToBn) {
+                    return 'pass + move to BN';
+                } else {
+                    return this.consensus;
+                }
             } else if (this.consensus == 'fail' && this.resignedOnGoodTerms) {
                 return 'fail + resigned on good terms';
             } else {
@@ -93,9 +123,15 @@ export default {
         },
     },
     methods: {
-        async setConsensus(consensus, e, isLowActivity, resignedOnGoodTerms) {
+        async setConsensus(consensus, e, addition) {
             const result = await this.executePost(
-                `/${this.isApplication? 'appEval' : 'bnEval'}/setConsensus/` + this.nominatorAssessmentMongoId, { consensus, isLowActivity, resignedOnGoodTerms }, e);
+                `/${this.isApplication? 'appEval' : 'bnEval'}/setConsensus/` + this.nominatorAssessmentMongoId, {
+                    consensus,
+                    isLowActivity: addition == 'isLowActivity',
+                    resignedOnGoodTerms: addition == 'resignedOnGoodTerms',
+                    isMoveToNat: addition == 'isMoveToNat',
+                    isMoveToBn: addition == 'isMoveToBn',
+                }, e);
 
             if (result) {
                 if (result.error) {
