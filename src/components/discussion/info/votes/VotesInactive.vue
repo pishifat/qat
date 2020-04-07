@@ -35,9 +35,24 @@ export default {
     name: 'VotesInactive',
     props: {
         isNatOnlyOrLeader: Boolean,
-        agreeMediations: Array,
-        neutralMediations: Array,
-        disagreeMediations: Array,
+        agreeMediations: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
+        neutralMediations: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
+        disagreeMediations: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
     },
     computed: {
         totalMediations() {

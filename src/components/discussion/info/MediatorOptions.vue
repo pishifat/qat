@@ -65,12 +65,28 @@ export default {
     name: 'MediatorOptions',
     mixins: [ postData ],
     props: {
-        discussionId: String,
-        discussionLink: String,
-        mediations: Array,
+        discussionId: {
+            type: String,
+            required: true,
+        },
+        discussionLink: {
+            type: String,
+            default() {
+                return null;
+            },
+        },
+        mediations: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
         isNatOnly: Boolean,
         neutralAllowed: Boolean,
-        userId: String,
+        userId: {
+            type: String,
+            required: true,
+        },
     },
     data() {
         return {

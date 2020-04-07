@@ -142,7 +142,7 @@ router.get('/callback', async (req, res) => {
 
         response = await api.getUserInfo(req.session.accessToken);
 
-        const bnGmt = [626907, 394326, 4879508];
+        const bnGmt = [626907, 394326, 4879508, 2239480];
         const natGmt = [318565];
 
         if (response.error) {
