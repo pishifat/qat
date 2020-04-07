@@ -66,17 +66,7 @@ const applicationPopulate = [
 
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res) => {
-    const evalRounds = await EvalRound.find({ consensus: 'probation' });
-
-    /*for (let i = 0; i < evalRounds.length; i++) {
-        const evalRound = evalRounds[i];
-        await EvalRound.findByIdAndUpdate(evalRound.id, { consensus: 'probation' });
-    }*/
-
-    console.log(evalRounds.length);
-    console.log(evalRounds[4]);
-
-    let er = await EvalRound.findActiveEvaluations();
+    const er = await EvalRound.findActiveEvaluations();
 
     res.json({ er, evaluator: res.locals.userRequest });
 });
