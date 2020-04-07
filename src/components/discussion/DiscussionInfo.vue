@@ -86,9 +86,20 @@ export default {
     },
     mixins: [ postData ],
     props: {
-        discussion: Object,
-        userId: String,
-        userModes: Array,
+        discussion: {
+            type: Object,
+            required: true,
+        },
+        userId: {
+            type: String,
+            required: true,
+        },
+        userModes: {
+            type: Array,
+            default() {
+                return ['osu'];
+            },
+        },
         isLeader: Boolean,
         isNat: Boolean,
     },

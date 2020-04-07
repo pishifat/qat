@@ -59,7 +59,10 @@ export default {
     },
     mixins: [ postData, filterLinks ],
     props: {
-        event: Object,
+        event: {
+            type: Object,
+            required: true,
+        },
         isNat: Boolean,
     },
     data() {
@@ -79,9 +82,9 @@ export default {
         },
         calculateColor () {
             let total = this.event.obviousness + this.event.severity;
-            if (total >= 4 || this.event.obviousness == 2 || this.event.severity == 3) return 'vote-pass';
-            else if (total >= 2) return 'vote-extend';
-            else return 'vote-fail';
+            if (total >= 4 || this.event.obviousness == 2 || this.event.severity == 3) return 'vote-green';
+            else if (total >= 2) return 'vote-yellow';
+            else return 'vote-red';
         },
     },
     watch: {

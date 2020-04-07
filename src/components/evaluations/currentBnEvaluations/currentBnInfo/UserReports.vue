@@ -14,7 +14,7 @@
                 class="small text-shadow"
             >
                 <a :href="'http://bn.mappersguild.com/managereports?report=' + report.id">{{ report.createdAt.slice(0,10) }}</a>
-                <pre class="secondary-text pre-font ml-2" :class="report.valid == 1 ? 'vote-pass' : 'vote-extend'"> <span v-html="filterLinks(report.reason)" /></pre>
+                <pre class="secondary-text pre-font ml-2" :class="report.valid == 1 ? 'vote-green' : 'vote-yellow'"> <span v-html="filterLinks(report.reason)" /></pre>
             </li>
         </ul>
     </div>
@@ -27,7 +27,10 @@ export default {
     name: 'UserReports',
     mixins: [filterLinks],
     props: {
-        userMongoId: String,
+        userMongoId: {
+            type: String,
+            required: true,
+        },
     },
     data() {
         return {

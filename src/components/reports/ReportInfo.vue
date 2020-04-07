@@ -70,7 +70,7 @@
                                 value="1"
                                 :checked="report.valid == 1"
                             >
-                            <label class="form-check-label text-shadow vote-pass" for="1">Valid</label>
+                            <label class="form-check-label text-shadow vote-green" for="1">Valid</label>
                         </div>
                         <div class="form-check form-check-inline">
                             <input
@@ -81,7 +81,7 @@
                                 value="2"
                                 :checked="report.valid == 2"
                             >
-                            <label class="form-check-label text-shadow vote-extend" for="2">Partially valid</label>
+                            <label class="form-check-label text-shadow vote-yellow" for="2">Partially valid</label>
                         </div>
                         <div class="form-check form-check-inline">
                             <input
@@ -92,7 +92,7 @@
                                 value="3"
                                 :checked="report.valid == 3"
                             >
-                            <label class="form-check-label text-shadow vote-fail" for="3">Invalid</label>
+                            <label class="form-check-label text-shadow vote-red" for="3">Invalid</label>
                         </div>
                     </span>
 
@@ -133,7 +133,10 @@ export default {
     name: 'ReportInfo',
     mixins: [postData, filterLinks],
     props: {
-        report: Object,
+        report: {
+            type: Object,
+            required: true,
+        },
         isLeader: Boolean,
     },
     data() {

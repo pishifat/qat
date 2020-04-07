@@ -66,6 +66,16 @@ const applicationPopulate = [
 
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res) => {
+    const evalRounds = await EvalRound.find({ consensus: 'probation' });
+
+    /*for (let i = 0; i < evalRounds.length; i++) {
+        const evalRound = evalRounds[i];
+        await EvalRound.findByIdAndUpdate(evalRound.id, { consensus: 'probation' });
+    }*/
+
+    console.log(evalRounds.length);
+    console.log(evalRounds[4]);
+
     let er = await EvalRound.findActiveEvaluations();
 
     res.json({ er, evaluator: res.locals.userRequest });
@@ -262,11 +272,11 @@ router.post('/submitEval/:id', api.isBnOrNat, async (req, res) => {
         if (!er.discussion && ((threeEvaluationModes.includes(er.mode) && er.evaluations.length > 2) || (twoEvaluationModes.includes(er.mode) && er.evaluations.length > 1))) {
             await EvalRound.findByIdAndUpdate(req.params.id, { discussion: true });
             let pass = 0;
-            let extend = 0;
+            let probation = 0;
             let fail = 0;
             er.evaluations.forEach(evaluation => {
                 if (evaluation.vote == 1) pass++;
-                else if (evaluation.vote == 2) extend++;
+                else if (evaluation.vote == 2) probation++;
                 else if (evaluation.vote == 3) fail++;
             });
             api.webhookPost(
@@ -286,7 +296,7 @@ router.post('/submitEval/:id', api.isBnOrNat, async (req, res) => {
                         },
                         {
                             name: 'Votes',
-                            value: `Pass: **${pass}**, Extend: **${extend}**, Fail: **${fail}**`,
+                            value: `Pass: **${pass}**, Probation: **${probation}**, Fail: **${fail}**`,
                         },
                     ],
                 }],
@@ -312,11 +322,11 @@ router.post('/setGroupEval/', api.isNat, async (req, res) => {
             .populate(defaultPopulate);
 
         let pass = 0;
-        let extend = 0;
+        let probation = 0;
         let fail = 0;
         er.evaluations.forEach(evaluation => {
             if (evaluation.vote == 1) pass++;
-            else if (evaluation.vote == 2) extend++;
+            else if (evaluation.vote == 2) probation++;
             else if (evaluation.vote == 3) fail++;
         });
         api.webhookPost(
@@ -334,7 +344,7 @@ router.post('/setGroupEval/', api.isNat, async (req, res) => {
                     },
                     {
                         name: 'Votes',
-                        value: `Pass: **${pass}**, Extend: **${extend}**, Fail: **${fail}**`,
+                        value: `Pass: **${pass}**, Probation: **${probation}**, Fail: **${fail}**`,
                     },
                 ],
             }],
@@ -384,7 +394,7 @@ router.post('/setComplete/', api.isNat, async (req, res) => {
             }
         }
 
-        if (er.consensus == 'extend') {
+        if (er.consensus == 'probation') {
             if (u.probation.indexOf(er.mode) < 0) {
                 await User.findByIdAndUpdate(u.id, { $push: { probation: er.mode } });
             }
@@ -437,7 +447,7 @@ router.post('/setComplete/', api.isNat, async (req, res) => {
                         },
                         {
                             name: 'Consensus',
-                            value: `${er.consensus == 'pass' ? 'Pass' : er.consensus == 'extend' ? 'Extend' : 'Fail'}`,
+                            value: `${er.consensus == 'pass' ? 'Pass' : er.consensus == 'probation' ? 'Probation' : 'Fail'}`,
                         },
                     ],
                 }],
@@ -475,7 +485,7 @@ router.post('/setConsensus/:id', api.isNat, async (req, res) => {
 
     if (req.body.consensus) {
         Logger.generate(
-            req.session.mongoId,`Set consensus of ${er.bn.username}'s ${er.mode} BN eval as ${req.body.consensus == 'extend' ? 'probation' : req.body.consensus}`
+            req.session.mongoId,`Set consensus of ${er.bn.username}'s ${er.mode} BN eval as ${req.body.consensus}`
         );
         api.webhookPost(
             [{

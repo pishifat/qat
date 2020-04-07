@@ -19,8 +19,8 @@
                 <button
                     v-if="!isApplication"
                     class="btn btn-sm btn-nat-blue"
-                    :disabled="consensus == 'extend' "
-                    @click="setConsensus('extend', $event);"
+                    :disabled="consensus == 'probation' "
+                    @click="setConsensus('probation', $event);"
                 >
                     Probation
                 </button>
@@ -59,8 +59,14 @@ export default {
     name: 'Consensus',
     mixins: [ postData ],
     props: {
-        consensus: String,
-        nominatorAssessmentMongoId: String,
+        consensus: {
+            type: String,
+            default: null,
+        },
+        nominatorAssessmentMongoId: {
+            type: String,
+            required: true,
+        },
         isApplication: Boolean,
         isLowActivity: Boolean,
         resignedOnGoodTerms: Boolean,
@@ -70,8 +76,6 @@ export default {
         consensusText() {
             if (!this.consensus) {
                 return 'none';
-            } else if (this.consensus == 'extend') {
-                return 'probation';
             } else if (this.consensus == 'pass' && this.isLowActivity) {
                 return 'pass + activity warning';
             } else if (this.consensus == 'fail' && this.resignedOnGoodTerms) {
@@ -83,8 +87,6 @@ export default {
         consensusColor() {
             if (!this.consensus) {
                 return '';
-            } else if (this.consensus == 'extend') {
-                return 'vote-neutral';
             } else {
                 return 'vote-' + this.consensus;
             }

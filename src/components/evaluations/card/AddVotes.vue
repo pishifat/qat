@@ -8,12 +8,12 @@
             title="pass"
         >{{ pass }}</span>
         <span
-            v-if="neutralOrExtend"
+            v-if="neutralOrProbation"
             class="badge badge-neutral mx-1"
             data-toggle="tooltip"
             data-placement="top"
-            :title="isApplication ? 'neutral' : 'extend'"
-        >{{ neutralOrExtend }}</span>
+            :title="isApplication ? 'neutral' : 'probation'"
+        >{{ neutralOrProbation }}</span>
         <span
             v-if="fail"
             class="badge badge-fail mx-1"
@@ -28,13 +28,18 @@
 export default {
     name: 'AddVotes',
     props: {
-        evaluations: Array,
+        evaluations: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
         isApplication: Boolean,
     },
     data() {
         return {
             pass: 0,
-            neutralOrExtend: 0,
+            neutralOrProbation: 0,
             fail: 0,
             isSelected: false,
         };
@@ -50,13 +55,13 @@ export default {
     methods: {
         addVotes() {
             this.pass = 0;
-            this.neutralOrExtend = 0;
+            this.neutralOrProbation = 0;
             this.fail = 0;
             this.evaluations.forEach(evaluation => {
                 if (evaluation.vote == 1) {
                     this.pass++;
                 } else if (evaluation.vote == 2) {
-                    this.neutralOrExtend++;
+                    this.neutralOrProbation++;
                 } else if (evaluation.vote == 3) {
                     this.fail++;
                 }

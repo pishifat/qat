@@ -52,7 +52,7 @@
                 <samp><pre class="small">[notice]{{ feedback }}[/notice]</pre></samp>
                 <samp class="small">Regards, the Nomination Assessment Team</samp>
             </div>
-            <div v-else-if="consensus == 'extend'" class="copy-paste">
+            <div v-else-if="consensus == 'probation'" class="copy-paste">
                 <samp class="small">Hello!</samp><br><br>
                 <span v-if="probation.indexOf(mode) >= 0">
                     <samp class="small">After reviewing your work as a BN for the [i]{{ mode == 'osu' ? 'osu!' : 'osu!' + mode }}[/i] game mode, we have decided to [b]extend your probation period[/b].</samp><br><br>
@@ -97,15 +97,40 @@ export default {
     name: 'FeedbackPm',
     props: {
         isApplication: Boolean,
-        consensus: String,
-        cooldownDate: String,
-        mode: String,
-        evaluations: Array,
-        probation: Array,
+        consensus: {
+            type: String,
+            required: true,
+        },
+        cooldownDate: {
+            type: String,
+            required: true,
+        },
+        mode: {
+            type: String,
+            required: true,
+        },
+        evaluations: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
+        probation: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
         isLowActivity: Boolean,
         resignedOnGoodTerms: Boolean,
-        feedback: String,
-        discordLink: String,
+        feedback: {
+            type: String,
+            default: '',
+        },
+        discordLink: {
+            type: String,
+            default: '',
+        },
     },
     computed: {
         natEvaluations() {

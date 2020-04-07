@@ -218,7 +218,7 @@ router.post('/unarchive/:id', api.isNat, async (req, res) => {
             }
         }
 
-        if (er.consensus == 'extend' || er.consensus == 'pass') {
+        if (er.consensus == 'probation' || er.consensus == 'pass') {
             await EvalRound.deleteManyByUserId(u.id);
 
             if (u.probation.indexOf(er.mode) < 0) {

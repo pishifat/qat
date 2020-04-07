@@ -63,10 +63,10 @@
                         :key="event.id"
                         class="collapse"
                         :class="['row-' + event.beatmapsetId,
-                                 event.eventType == 'Bubbled' || event.eventType == 'Qualified' ? 'vote-border-neutral' :
-                                 (event.eventType == 'Disqualified' || event.eventType == 'Popped') && event.valid == 1 ? 'vote-border-fail' :
-                                 (event.eventType == 'Disqualified' || event.eventType == 'Popped') && event.valid != 1 ? 'vote-border-extend' :
-                                 event.eventType == 'Ranked' ? 'vote-border-pass' : '']"
+                                 event.eventType == 'Bubbled' || event.eventType == 'Qualified' ? 'vote-border-blue' :
+                                 (event.eventType == 'Disqualified' || event.eventType == 'Popped') && event.valid == 1 ? 'vote-border-red' :
+                                 (event.eventType == 'Disqualified' || event.eventType == 'Popped') && event.valid != 1 ? 'vote-border-yellow' :
+                                 event.eventType == 'Ranked' ? 'vote-border-green' : '']"
                     >
                         <td scope="row">
                             {{ event.eventType == 'Bubbled' || event.eventType == 'Qualified' ? 'Nominated' : event.eventType }}{{ event.eventType == 'Disqualified' || event.eventType == 'Popped' ? ": " + event.content.slice(0, event.content.indexOf('.')+1) || event.content : '' }}

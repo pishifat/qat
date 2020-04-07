@@ -18,8 +18,14 @@
 export default {
     name: 'TestResults',
     props: {
-        testScore: Number,
-        osuId: Number,
+        testScore: {
+            type: Number,
+            default: 0,
+        },
+        osuId: {
+            type: Number,
+            required: true,
+        },
     },
     data() {
         return {
@@ -29,11 +35,11 @@ export default {
     methods: {
         scoreColor() {
             if (this.testScore > 15) {
-                return 'vote-pass';
+                return 'vote-green';
             } else if (this.testScore > 12.5) {
-                return 'vote-extend';
+                return 'vote-yellow';
             } else {
-                return 'vote-fail';
+                return 'vote-red';
             }
         },
     },

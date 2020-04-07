@@ -43,8 +43,14 @@
 export default {
     name: 'DiscussionCard',
     props: {
-        discussion: Object,
-        userId: String,
+        discussion: {
+            type: Object,
+            required: true,
+        },
+        userId: {
+            type: String,
+            required: true,
+        },
     },
     methods: {
         selectDiscussion() {

@@ -43,8 +43,14 @@ export default {
         CardFooter,
     },
     props: {
-        evalRound: Object,
-        evaluator: Object,
+        evalRound: {
+            type: Object,
+            required: true,
+        },
+        evaluator: {
+            type: Object,
+            required: true,
+        },
         allChecked: Boolean,
         isArchive: Boolean,
     },
@@ -67,11 +73,11 @@ export default {
             this.evalRound.evaluations.forEach(ev => {
                 if (ev.evaluator.id == this.evaluator.id) {
                     if (ev.vote == 1) {
-                        vote = 'pass';
+                        vote = 'green';
                     } else if (ev.vote == 2) {
-                        vote = 'extend';
+                        vote = 'blue';
                     } else {
-                        vote = 'fail';
+                        vote = 'red';
                     }
                 }
             });

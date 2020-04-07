@@ -7,7 +7,7 @@ const evalRoundSchema = new mongoose.Schema({
     deadline: { type: Date , required: true },
     active: { type: Boolean, default: true },
     discussion: { type: Boolean, default: false },
-    consensus: { type: String, enum: ['pass', 'extend', 'fail'] },
+    consensus: { type: String, enum: ['pass', 'probation', 'fail'] },
     feedback: { type: String },
     feedbackAuthor: { type: 'ObjectId', ref: 'User' },
     isLowActivity: { type: Boolean, default: false },

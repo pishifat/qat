@@ -39,8 +39,14 @@ export default {
         CardFooter,
     },
     props: {
-        application: Object,
-        evaluator: Object,
+        application: {
+            type: Object,
+            required: true,
+        },
+        evaluator: {
+            type: Object,
+            required: true,
+        },
         allChecked: Boolean,
     },
     data() {
