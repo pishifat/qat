@@ -417,33 +417,52 @@ router.post('/setComplete/', api.isNat, async (req, res) => {
 
         await EvalRound.findByIdAndUpdate(req.body.checkedRounds[i], { active: false, resignedOnGoodTerms: er.resignedOnGoodTerms ? true : false });
 
-        if (er.consensus) {
-            Logger.generate(
-                req.session.mongoId,
-                `Set ${u.username}'s ${er.mode} BN eval as "${er.consensus}"`
-            );
-            api.webhookPost(
-                [{
-                    author: {
-                        name: `${req.session.username}`,
-                        icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                        url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-                    },
-                    color: '6579298',
-                    fields: [
-                        {
-                            name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
-                            value: `**${u.username}**'s current BN eval archived`,
-                        },
-                        {
-                            name: 'Consensus',
-                            value: `${er.consensus == 'pass' ? 'Pass' : er.consensus == 'probation' ? 'Probation' : 'Fail'}`,
-                        },
-                    ],
-                }],
-                er.mode
-            );
+        let consensusText;
+
+        if (er.consensus == 'pass') {
+            consensusText = 'Pass';
+
+            if (er.isLowActivity) {
+                consensusText += ' + Low activity warning';
+            }
+        } else if (er.consensus == 'probation') {
+            consensusText = 'Probation';
+        } else if (er.consensus == 'fail') {
+            consensusText = 'Fail';
+
+            if (er.resignedOnGoodTerms) {
+                consensusText += ' + Resigned on good terms';
+            }
+        } else {
+            consensusText = 'No consensus set';
         }
+
+        Logger.generate(
+            req.session.mongoId,
+            `Set ${u.username}'s ${er.mode} BN eval as "${consensusText}"`
+        );
+
+        api.webhookPost(
+            [{
+                author: {
+                    name: `${req.session.username}`,
+                    icon_url: `https://a.ppy.sh/${req.session.osuId}`,
+                    url: `https://osu.ppy.sh/users/${req.session.osuId}`,
+                },
+                color: '6579298',
+                fields: [
+                    {
+                        name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
+                        value: `**${u.username}**'s current BN eval archived`,
+                    },
+                    {
+                        name: 'Consensus',
+                        value: consensusText,
+                    },
+                ],
+            }],
+            er.mode
+        );
     }
 
     let ev = await EvalRound.findActiveEvaluations();
