@@ -182,7 +182,11 @@ router.post('/beginMediation/:id', api.isNat, api.isNotSpectator, async (req, re
 });
 
 /* POST submit mediation */
-router.post('/submitMediation/:id', api.isNotSpectator, async (req, res) => {
+router.post('/submitMediation/:id', async (req, res) => {
+    if (res.locals.userRequest.isSpectator && res.locals.userRequest.group != 'bn') {
+        return res.json({ error: 'Spectators cannot perform this action!' });
+    }
+
     const originalMediation = await Mediation.findById(req.body.mediationId);
     await Mediation.findByIdAndUpdate(req.body.mediationId, { comment: req.body.comment, vote: req.body.vote });
     const v = await Veto
