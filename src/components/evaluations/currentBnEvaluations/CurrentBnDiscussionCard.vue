@@ -19,7 +19,6 @@
             <card-footer
                 :mode="evalRound.mode"
                 :is-nat="evaluator.isNat"
-                :is-leader="evaluator.isLeader"
                 :nominator-assessment-mongo-id="evalRound.id"
                 :evaluations="evalRound.evaluations"
                 :is-discuss="true"

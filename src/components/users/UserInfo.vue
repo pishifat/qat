@@ -86,7 +86,6 @@ export default {
             type: String,
             required: true,
         },
-        isLeader: Boolean,
         isNat: Boolean,
     },
     watch: {

@@ -48,10 +48,18 @@
                                 :header="'Total evaluations: (' + evalRound.evaluations.length + ')'"
                                 :user-list="submittedEvaluators"
                             />
+                            <evaluator-assignments
+                                :nat-evaluators="evalRound.natEvaluators"
+                                :evaluations="evalRound.evaluations"
+                                :mode="evalRound.mode"
+                                :osu-id="evalRound.bn.osuId"
+                                :username="evalRound.bn.username"
+                                :nominator-assessment-mongo-id="evalRound.id"
+                                @update-nominator-assessment="$emit('update-eval-round', $event);"
+                            />
                         </div>
                         <hr>
                         <evaluation-input
-                            :is-application="false"
                             :nominator-assessment-mongo-id="evalRound.id"
                             :evaluator-mongo-id="evaluator.id"
                             :evaluations="evalRound.evaluations"
@@ -73,6 +81,7 @@ import UserReports from './currentBnInfo/UserReports.vue';
 import ModdingActivity from './currentBnInfo/ModdingActivity.vue';
 import UserList from '../info/UserList.vue';
 import EvaluationInput from '../info/EvaluationInput.vue';
+import EvaluatorAssignments from '../info/EvaluatorAssignments.vue';
 
 export default {
     name: 'CurrentBnIndividualInfo',
@@ -85,6 +94,7 @@ export default {
         ModdingActivity,
         UserList,
         EvaluationInput,
+        EvaluatorAssignments,
     },
     props: {
         evalRound: {

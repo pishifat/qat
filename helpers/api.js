@@ -176,16 +176,6 @@ function isNat(req, res, next) {
     }
 }
 
-function isLeader(req, res, next) {
-    const u = res.locals.userRequest;
-
-    if (u.isLeader) {
-        next();
-    } else {
-        res.redirect('/');
-    }
-}
-
 function isBnEvaluator(req, res, next) {
     const u = res.locals.userRequest;
 
@@ -309,7 +299,6 @@ module.exports = {
     isBnOrNat,
     isBn,
     isNat,
-    isLeader,
     isBnEvaluator,
     isNotSpectator,
     webhookPost,

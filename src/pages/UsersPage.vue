@@ -24,7 +24,6 @@
                             :key="user.id"
                             :user="user"
                             :user-id="userId"
-                            :is-leader="isLeader"
                             @update:selectedUser="selectedUser = $event"
                         />
                     </transition-group>
@@ -62,7 +61,6 @@
         <user-info
             :user="selectedUser"
             :user-id="userId"
-            :is-leader="isLeader"
             :is-nat="isNat"
             @update-user="updateUser($event)"
         />
@@ -98,7 +96,6 @@ export default {
             allObjs: null,
             filteredObjs: null,
             userId: null,
-            isLeader: null,
             isNat: null,
             isBn: null,
             selectedUser: null,
@@ -110,7 +107,6 @@ export default {
             .then(response => {
                 this.allObjs = response.data.users;
                 this.userId = response.data.userId;
-                this.isLeader = response.data.isLeader;
                 this.isNat = response.data.isNat;
                 this.isBn = response.data.isBn;
                 this.limit = 24;

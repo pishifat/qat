@@ -12,17 +12,17 @@
                         <discussion-context
                             :discussion-id="discussion.id"
                             :discussion-link="discussion.discussionLink"
-                            :is-creator="discussion.creator == userId"
+                            :is-editable="discussion.creator == userId && discussion.isActive"
                             :title="discussion.title"
                             :short-reason="discussion.shortReason"
                             @update-discussion="$emit('update-discussion', $event)"
                         />
                         <votes-public-active
-                            v-if="discussion.isActive && !isLeader"
+                            v-if="discussion.isActive && !discussion.isNatOnly"
                             :mediations="discussion.mediations"
                         />
-                        <votes-leader-active
-                            v-else-if="!discussion.isNatOnly && isLeader"
+                        <votes-private-active
+                            v-else-if="!discussion.isNatOnly && isPishifat"
                             :agree-mediations="agreeMediations"
                             :neutral-mediations="neutralMediations"
                             :disagree-mediations="disagreeMediations"
@@ -34,17 +34,17 @@
                         />
                         <votes-inactive
                             v-else-if="!discussion.isActive"
-                            :is-nat-only-or-leader="discussion.isNatOnly || isLeader"
+                            :is-nat-only="discussion.isNatOnly"
                             :agree-mediations="agreeMediations"
                             :neutral-mediations="neutralMediations"
                             :disagree-mediations="disagreeMediations"
                         />
-                        <button v-if="discussion.isActive && isLeader" class="btn btn-sm btn-nat mt-3" @click="concludeMediation($event)">
+                        <button v-if="discussion.isActive && isNat" class="btn btn-sm btn-nat mt-3" @click="concludeMediation($event)">
                             Conclude Vote
                         </button>
                         <hr>
                         <mediator-options
-                            v-if="discussion.isActive && (userModes.indexOf(discussion.mode) >= 0 || discussion.mode == 'all' || isLeader)"
+                            v-if="discussion.isActive && (userModes.indexOf(discussion.mode) >= 0 || discussion.mode == 'all')"
                             :discussion-id="discussion.id"
                             :discussion-link="discussion.discussionLink"
                             :is-nat-only="discussion.isNatOnly"
@@ -68,7 +68,7 @@ import postData from '../../mixins/postData.js';
 import ModalHeader from './info/ModalHeader.vue';
 import DiscussionContext from './info/DiscussionContext.vue';
 import VotesPublicActive from './info/votes/VotesPublicActive.vue';
-import VotesLeaderActive from './info/votes/VotesLeaderActive.vue';
+import VotesPrivateActive from './info/votes/VotesPrivateActive.vue';
 import VotesNatOnlyActive from './info/votes/VotesNatOnlyActive.vue';
 import VotesInactive from './info/votes/VotesInactive.vue';
 import MediatorOptions from './info/MediatorOptions.vue';
@@ -79,7 +79,7 @@ export default {
         ModalHeader,
         DiscussionContext,
         VotesPublicActive,
-        VotesLeaderActive,
+        VotesPrivateActive,
         VotesNatOnlyActive,
         VotesInactive,
         MediatorOptions,
@@ -100,8 +100,8 @@ export default {
                 return ['osu'];
             },
         },
-        isLeader: Boolean,
         isNat: Boolean,
+        isPishifat: Boolean,
     },
     computed: {
         agreeMediations() {

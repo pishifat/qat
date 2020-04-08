@@ -459,10 +459,10 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
 
     Logger.generate(
         req.session.mongoId,
-        'Re-selected a single evaluator'
+        `Re-selected a ${isNat ? 'NAT' : 'BN'} evaluator on BN application for ${a.applicant.username}`
     );
 
-    const u = await User.findById(req.body.evaluatorId);
+    const user = await User.findById(req.body.evaluatorId);
 
     api.webhookPost(
         [{
@@ -475,7 +475,7 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
             fields: [
                 {
                     name: `http://bn.mappersguild.com/appeval?eval=${a.id}`,
-                    value: `**${newEvaluator[0].username}** replaced **${u.username}** as ${isNat ? 'NAT' : 'BN'} evaluator for **${a.applicant.username}**'s BN app`,
+                    value: `**${newEvaluator[0].username}** replaced **${user.username}** as ${isNat ? 'NAT' : 'BN'} evaluator for **${a.applicant.username}**'s BN app`,
                 },
             ],
         }],

@@ -35,7 +35,7 @@
             :discussion="selectedDiscussion"
             :user-id="userId"
             :user-modes="userModes"
-            :is-leader="isLeader"
+            :is-pishifat="isPishifat"
             :is-nat="isNat"
             @update-discussion="updateDiscussion($event)"
         />
@@ -67,7 +67,7 @@ export default {
             filteredObjs: null,
             userId: null,
             userModes: null,
-            isLeader: false,
+            isPishifat: false,
             isNat: false,
             selectedDiscussion: null,
         };
@@ -79,7 +79,7 @@ export default {
                 this.allObjs = response.data.discussions;
                 this.userId = response.data.userId;
                 this.userModes = response.data.userModes;
-                this.isLeader = response.data.isLeader;
+                this.isPishifat = response.data.isPishifat;
                 this.isNat = response.data.isNat;
                 this.limit = 24;
                 const params = new URLSearchParams(document.location.search.substring(1));

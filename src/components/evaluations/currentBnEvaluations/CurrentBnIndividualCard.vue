@@ -16,7 +16,6 @@
             <card-footer
                 :mode="evalRound.mode"
                 :is-nat="evaluator.isNat"
-                :is-leader="evaluator.isLeader"
                 :nominator-assessment-mongo-id="evalRound.id"
                 :evaluations="evalRound.evaluations"
                 :is-discuss="false"
@@ -38,8 +37,14 @@ export default {
         CardFooter,
     },
     props: {
-        evalRound: Object,
-        evaluator: Object,
+        evalRound: {
+            type: Object,
+            required: true,
+        },
+        evaluator: {
+            type: Object,
+            required: true,
+        },
         allChecked: Boolean,
     },
     data() {

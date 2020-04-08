@@ -45,11 +45,8 @@
                 >
                 <label class="form-check-label text-shadow vote-fail" for="3">Disagree</label>
             </div>
-            <p v-if="!isNatOnly" class="small ml-2">
-                Only NAT leaders can see your vote.
-                <span v-if="discussionLink">
-                    If you have any feedback to improve the proposal, post on <a :href="discussionLink" target="_blank">the thread</a>.
-                </span>
+            <p v-if="!isNatOnly && discussionLink" class="small ml-2">
+                If you have any feedback to improve the proposal, post on <a :href="discussionLink" target="_blank">the thread</a>.
             </p>
             <button class="btn btn-sm btn-nat float-right" @click="submitMediation($event)">
                 Submit Vote

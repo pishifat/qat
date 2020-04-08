@@ -60,7 +60,6 @@ router.get('/relevantInfo', async (req, res) => {
     res.json({
         users,
         userId: req.session.mongoId,
-        isLeader: res.locals.userRequest.isLeader,
         isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
         isBn: res.locals.userRequest.group == 'bn',
     });
@@ -182,7 +181,7 @@ router.get('/findUserBadgeInfo', async (req, res) => {
 });
 
 /* POST edit badge value */
-router.post('/editBadgeValue/:id', api.isLeader, async (req, res) => {
+router.post('/editBadgeValue/:id', async (req, res) => {
     let u = await User.findById(req.params.id);
 
     if (res.locals.userRequest.osuId == '3178418') { //i dont want anyone else messing with this

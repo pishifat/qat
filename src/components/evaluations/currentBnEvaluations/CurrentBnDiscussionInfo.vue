@@ -43,11 +43,6 @@
                             <modding-activity
                                 :username="evalRound.bn.username"
                             />
-                            <user-list
-                                v-if="evalRound.evaluations.length"
-                                :header="'Total evaluations: (' + evalRound.evaluations.length + ')'"
-                                :user-list="submittedEvaluators"
-                            />
                         </div>
                         <hr>
                         <consensus
@@ -110,7 +105,6 @@ import PreviousEvaluations from '../info/PreviousEvaluations.vue';
 import UserNotes from '../info/UserNotes.vue';
 import UserReports from './currentBnInfo/UserReports.vue';
 import ModdingActivity from './currentBnInfo/ModdingActivity.vue';
-import UserList from '../info/UserList.vue';
 import EvaluationInput from '../info/EvaluationInput.vue';
 import Consensus from '../info/Consensus.vue';
 import Cooldown from '../info/Cooldown.vue';
@@ -126,7 +120,6 @@ export default {
         UserNotes,
         UserReports,
         ModdingActivity,
-        UserList,
         EvaluationInput,
         Consensus,
         Cooldown,

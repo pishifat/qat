@@ -142,7 +142,16 @@ import postData from '../../mixins/postData.js';
 export default {
     name: 'EditQuestion',
     mixins: [ postData ],
-    props: ['question', 'category'],
+    props: {
+        question: {
+            type: Object,
+            required: true,
+        },
+        category: {
+            type: String,
+            required: true,
+        },
+    },
     data() {
         return {
             info: '',

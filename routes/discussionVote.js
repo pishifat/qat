@@ -52,8 +52,8 @@ router.get('/relevantInfo', async (req, res) => {
         discussions,
         userId: req.session.mongoId,
         userModes: res.locals.userRequest.modes,
-        isLeader: res.locals.userRequest.isLeader,
         isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
+        isPishifat: res.locals.userRequest.osuId == 3178418,
     });
 });
 
@@ -151,7 +151,7 @@ router.post('/submitMediation/:id', async (req, res) => {
 });
 
 /* POST conclude mediation */
-router.post('/concludeMediation/:id', api.isLeader, async (req, res) => {
+router.post('/concludeMediation/:id', api.isNat, async (req, res) => {
     const m = await Discussion
         .findByIdAndUpdate(req.params.id, { isActive: false })
         .populate(defaultPopulate);

@@ -25,7 +25,7 @@
                 :user-list="submittedEvaluators"
             />
         </div>
-        <div v-if="!bnEvaluators.length" class="col-sm-12">
+        <div v-if="!bnEvaluators.length && isApplication" class="col-sm-12">
             <button class="btn btn-sm btn-nat mb-2 w-100" @click="selectBnEvaluators($event)">
                 {{ potentialBnEvaluators ? 'Re-select BN Evaluators' : 'Select BN Evaluators' }}
             </button>
@@ -81,8 +81,8 @@
 </template>
 
 <script>
-import postData from '../../../../mixins/postData.js';
-import UserList from '../../info/UserList.vue';
+import postData from '../../../mixins/postData.js';
+import UserList from './UserList.vue';
 
 export default {
     name: 'EvaluatorAssignments',
@@ -91,13 +91,40 @@ export default {
     },
     mixins: [ postData ],
     props: {
-        bnEvaluators: Array,
-        natEvaluators: Array,
-        evaluations: Array,
-        mode: String,
-        osuId: Number,
-        username: String,
-        nominatorAssessmentMongoId: String,
+        bnEvaluators: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
+        natEvaluators: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
+        evaluations: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
+        mode: {
+            type: String,
+            default: '',
+        },
+        osuId: {
+            type: Number,
+            default: 0,
+        },
+        username: {
+            type: String,
+            default: '',
+        },
+        nominatorAssessmentMongoId: {
+            type: String,
+            required: true,
+        },
         isApplication: Boolean,
     },
     data() {

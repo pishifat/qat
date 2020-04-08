@@ -65,7 +65,6 @@
 
         <report-info
             :report="selectedReport"
-            :is-leader="isLeader"
             @update-report="updateReport($event)"
         />
     </div>
@@ -91,7 +90,6 @@ export default {
             openReports: null,
             closedReports: null,
             selectedReport: null,
-            isLeader: null,
             info: '',
         };
     },
@@ -101,7 +99,6 @@ export default {
         if (response) {
             this.openReports = response.openReports;
             this.hasPagination = false;
-            this.isLeader = response.isLeader;
             const params = new URLSearchParams(document.location.search.substring(1));
 
             if (params.get('report') && params.get('report').length) {

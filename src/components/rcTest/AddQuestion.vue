@@ -66,7 +66,16 @@ import postData from '../../mixins/postData.js';
 export default {
     name: 'AddQuestion',
     mixins: [ postData ],
-    props: ['category', 'rawCategory'],
+    props: {
+        category: {
+            type: String,
+            required: true,
+        },
+        rawCategory: {
+            type: String,
+            required: true,
+        },
+    },
     data() {
         return {
             info: '',

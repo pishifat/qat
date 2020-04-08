@@ -32,10 +32,7 @@ router.get('/relevantInfo', async (req, res) => {
         .populate(defaultPopulate)
         .sort({ createdAt: -1 });
 
-    res.json({
-        openReports,
-        isLeader: res.locals.userRequest.isLeader,
-    });
+    res.json({ openReports });
 });
 
 /* POST submit or edit eval */

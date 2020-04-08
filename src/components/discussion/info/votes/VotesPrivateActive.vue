@@ -25,11 +25,26 @@
 
 <script>
 export default {
-    name: 'VotesLeaderActive',
+    name: 'VotesPrivateActive',
     props: {
-        agreeMediations: Array,
-        neutralMediations: Array,
-        disagreeMediations: Array,
+        agreeMediations: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
+        neutralMediations: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
+        disagreeMediations: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
         neutralAllowed: Boolean,
     },
     computed: {

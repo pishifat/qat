@@ -137,7 +137,6 @@ export default {
             type: Object,
             required: true,
         },
-        isLeader: Boolean,
     },
     data() {
         return {

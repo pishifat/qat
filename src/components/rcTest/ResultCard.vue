@@ -23,7 +23,12 @@
 <script>
 export default {
     name: 'ResultCard',
-    props: ['selectedTest'],
+    props: {
+        selectedTest: {
+            type: Object,
+            required: true,
+        },
+    },
     methods: {
         selectTest() {
             this.$emit('update:selected-test', this.selectedTest);

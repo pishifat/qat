@@ -44,7 +44,7 @@ class EvalRoundService
                     select: 'evaluator behaviorComment moddingComment vote',
                     populate: {
                         path: 'evaluator',
-                        select: 'username osuId group isLeader',
+                        select: 'username osuId group',
                     },
                 },
             ])

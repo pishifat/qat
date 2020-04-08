@@ -12,7 +12,6 @@ const userSchema = new mongoose.Schema({
     isSpectator: { type: Boolean, default: false },
     bnDuration: [{ type: Date }],
     natDuration: [{ type: Date }],
-    isLeader: { type: Boolean },
     bnProfileBadge: { type: Number, default: 0 },
     natProfileBadge: { type: Number, default: 0 },
     discordId: { type: Number },

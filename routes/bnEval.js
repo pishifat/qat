@@ -40,7 +40,7 @@ const defaultPopulate = [
         select: 'evaluator behaviorComment moddingComment vote',
         populate: {
             path: 'evaluator',
-            select: 'username osuId group isLeader',
+            select: 'username osuId group',
         },
     },
 ];
@@ -695,6 +695,59 @@ router.get('/findUserReports/:id', api.isNat, async (req, res) => {
     });
 
     res.json({ userReports });
+});
+
+/* POST replace evaluator */
+router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) => {
+    let evalRound = await EvalRound.findById(req.params.id).populate(defaultPopulate);
+    let newEvaluator;
+
+    const invalids = [8129817, 3178418];
+    evalRound.natEvaluators.forEach(user => {
+        invalids.push(user.osuId);
+    });
+    newEvaluator = await User.aggregate([
+        { $match: { group: 'nat', isSpectator: { $ne: true }, modes: evalRound.mode, osuId: { $nin: invalids } } },
+        { $sample: { size: 1 } },
+    ]);
+
+    await Promise.all([
+        EvalRound.findByIdAndUpdate(req.params.id, {
+            $push: { natEvaluators: newEvaluator[0]._id },
+        }),
+        EvalRound.findByIdAndUpdate(req.params.id, {
+            $pull: { natEvaluators: req.body.evaluatorId },
+        }),
+    ]);
+
+    evalRound = await EvalRound.findById(req.params.id).populate(defaultPopulate);
+
+    res.json(evalRound);
+
+    Logger.generate(
+        req.session.mongoId,
+        'Re-selected an evaluator on current BN eval'
+    );
+
+    const user = await User.findById(req.body.evaluatorId);
+
+    api.webhookPost(
+        [{
+            author: {
+                name: `${req.session.username}`,
+                icon_url: `https://a.ppy.sh/${req.session.osuId}`,
+                url: `https://osu.ppy.sh/users/${req.session.osuId}`,
+            },
+            color: '16747310',
+            fields: [
+                {
+                    name: `http://bn.mappersguild.com/bneval?eval=${evalRound.id}`,
+                    value: `**${newEvaluator[0].username}** replaced **${user.username}** as NAT evaluator for **${evalRound.bn.username}**'s current BN eval`,
+                },
+            ],
+        }],
+        a.mode
+    );
 });
 
 /* GET aiess info */
