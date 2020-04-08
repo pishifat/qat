@@ -746,7 +746,7 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
                 },
             ],
         }],
-        a.mode
+        evalRound.mode
     );
 });
 
