@@ -88,8 +88,14 @@ export default {
         EvaluationInput,
     },
     props: {
-        application: Object,
-        evaluator: Object,
+        application: {
+            type: Object,
+            required: true,
+        },
+        evaluator: {
+            type: Object,
+            required: true,
+        },
     },
     watch: {
         application() {

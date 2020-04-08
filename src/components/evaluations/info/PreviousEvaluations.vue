@@ -3,8 +3,11 @@
         <p class="min-spacing text-shadow">
             Previous evaluations:
         </p>
-        <ul v-if="previousEvaluations">
-            <li v-if="!previousEvaluations.length" class="small min-spacing text-shadow">
+        <ul>
+            <li v-if="!previousEvaluations" class="small min-spacing text-shadow">
+                ...
+            </li>
+            <li v-else-if="!previousEvaluations.length" class="small min-spacing text-shadow">
                 User has no previous evaluations
             </li>
             <li
@@ -39,7 +42,10 @@ export default {
     name: 'PreviousEvaluations',
     mixins: [ filterLinks ],
     props: {
-        userMongoId: String,
+        userMongoId: {
+            type: String,
+            required: true,
+        },
     },
     data() {
         return {

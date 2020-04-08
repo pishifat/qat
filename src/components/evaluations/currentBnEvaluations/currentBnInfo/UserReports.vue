@@ -3,8 +3,11 @@
         <p class="min-spacing text-shadow">
             Reports:
         </p>
-        <ul v-if="userReports">
-            <li v-if="!userReports.length" class="small min-spacing text-shadow">
+        <ul>
+            <li v-if="!userReports" class="small min-spacing text-shadow">
+                ...
+            </li>
+            <li v-else-if="!userReports.length" class="small min-spacing text-shadow">
                 User has no reports
             </li>
             <li
