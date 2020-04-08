@@ -47,7 +47,7 @@
                         <notes
                             v-if="isNat"
                             :user-id="user.id"
-                            :viewing-user="userId"
+                            :viewing-user-id="userId"
                             @update-user="$emit('update-user', $event);"
                         />
                     </div>
@@ -78,8 +78,14 @@ export default {
         UserActivity,
     },
     props: {
-        user: Object,
-        userId: String,
+        user: {
+            type: Object,
+            required: true,
+        },
+        userId: {
+            type: String,
+            required: true,
+        },
         isLeader: Boolean,
         isNat: Boolean,
     },

@@ -27,7 +27,10 @@ export default {
     mixins: [postData],
     props: {
         isBnEvaluator: Boolean,
-        userId: String,
+        userId: {
+            type: String,
+            required: true,
+        },
     },
     methods: {
         async switchBnEvaluator(e) {

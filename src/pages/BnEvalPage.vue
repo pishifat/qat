@@ -45,7 +45,6 @@
                             title="Evaluations are hidden from others to avoid confirmation bias"
                         >?</sup> <small v-if="evalRounds">({{ evalRounds.length }})</small>
                         <button
-                            v-if="evaluator && evaluator.isLeader"
                             class="btn btn-nat"
                             data-toggle="modal"
                             data-target="#addEvalRounds"

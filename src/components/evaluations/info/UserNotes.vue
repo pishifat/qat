@@ -35,7 +35,10 @@ export default {
     name: 'UserNotes',
     mixins: [ filterLinks ],
     props: {
-        userMongoId: String,
+        userMongoId: {
+            type: String,
+            required: true,
+        },
     },
     data() {
         return {

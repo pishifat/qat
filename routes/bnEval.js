@@ -79,15 +79,24 @@ function isValidMode(modeToCheck, isOsu, isTaiko, isCatch, isMania) {
 }
 
 /* POST submit or edit eval */
-router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
-    let allUsersByMode = await User.getAllByMode(req.body.bn, req.body.probation, req.body.nat);
+router.post('/addEvalRounds/', async (req, res) => {
+    const includeFullBns = req.body.groups.includes('fullBn');
+    const includeProbationBns = req.body.groups.includes('probationBn');
+    const includeNat = req.body.groups.includes('nat');
+    const isOsu = req.body.modes.includes('osu');
+    const isTaiko = req.body.modes.includes('taiko');
+    const isCatch = req.body.modes.includes('catch');
+    const isMania = req.body.modes.includes('mania');
     let allEvalsToCreate = [];
     let failed = [];
     const deadline = new Date(req.body.deadline);
 
+    // if user groups are selected
+    let allUsersByMode = await User.getAllByMode(includeFullBns, includeProbationBns, includeNat);
+
     if (allUsersByMode) {
         allUsersByMode = allUsersByMode.filter(m => {
-            return isValidMode(m._id, req.body.osu, req.body.taiko, req.body.catch, req.body.mania);
+            return isValidMode(m._id, isOsu, isTaiko, isCatch, isMania);
         });
 
         if (req.body.excludeUsers) {
@@ -115,6 +124,7 @@ router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
         });
     }
 
+    // if usernames are specified
     if (req.body.includeUsers) {
         const includeUsers = req.body.includeUsers.split(',');
 
@@ -134,7 +144,7 @@ router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
             if (u && !u.error) {
                 if (u.modes) {
                     u.modes.forEach(m => {
-                        if (isValidMode(m, req.body.osu, req.body.taiko, req.body.catch, req.body.mania)) {
+                        if (isValidMode(m, isOsu, isTaiko, isCatch, isMania)) {
                             allEvalsToCreate.push({ bn: u._id, mode: m, deadline });
                         }
                     });
@@ -145,78 +155,79 @@ router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
         }
     }
 
+    if (!allEvalsToCreate.length) {
+        return res.json({ error: 'No evaluations generated' });
+    }
+
+
+    // delete scheduled evalRounds
     for (let i = 0; i < allEvalsToCreate.length; i++) {
         const round = allEvalsToCreate[i];
         await EvalRound.deleteManyByUserId(round.bn);
     }
 
-    if (allEvalsToCreate.length) {
-        const result = await EvalRound.insertMany(allEvalsToCreate);
+    // create evalRounds
+    const result = await EvalRound.insertMany(allEvalsToCreate);
 
-        if (result.error) return res.json(result);
+    if (result.error) return res.json(result);
 
-        let ers = await EvalRound.findActiveEvaluations();
+    let ers = await EvalRound.findActiveEvaluations();
 
-        res.json({ ers, failed });
+    res.json({ ers, failed });
 
-        let minDate = new Date();
-        minDate.setDate(minDate.getDate() + 14);
+    let minDate = new Date();
+    minDate.setDate(minDate.getDate() + 14);
 
-        if (deadline < minDate) {
-            for (let i = 0; i < result.length; i++) {
-                const er = result[i];
-                const u = await User.findById(er.bn);
-                const invalids = [8129817, 3178418, u.osuId];
-                const assignedNat = await User.aggregate([
-                    { $match: { group: 'nat', isSpectator: { $ne: true }, modes: er.mode, osuId: { $nin: invalids } } },
-                    { $sample: { size: er.mode == 'osu' || er.mode == 'catch' ? 3 : 2 } },
-                ]);
-                let natList = '';
+    if (deadline < minDate) {
+        for (let i = 0; i < result.length; i++) {
+            const er = result[i];
+            const u = await User.findById(er.bn);
+            const invalids = [8129817, 3178418, u.osuId];
+            const assignedNat = await User.aggregate([
+                { $match: { group: 'nat', isSpectator: { $ne: true }, modes: er.mode, osuId: { $nin: invalids } } },
+                { $sample: { size: er.mode == 'osu' || er.mode == 'catch' ? 3 : 2 } },
+            ]);
+            let natList = '';
 
-                for (let i = 0; i < assignedNat.length; i++) {
-                    let user = assignedNat[i];
-                    await EvalRound.findByIdAndUpdate(er.id, { $push: { natEvaluators: user._id } });
-                    natList += user.username;
+            for (let i = 0; i < assignedNat.length; i++) {
+                let user = assignedNat[i];
+                await EvalRound.findByIdAndUpdate(er.id, { $push: { natEvaluators: user._id } });
+                natList += user.username;
 
-                    if (i + 1 < assignedNat.length) {
-                        natList += ', ';
-                    }
+                if (i + 1 < assignedNat.length) {
+                    natList += ', ';
                 }
-
-                await api.webhookPost(
-                    [{
-                        author: {
-                            name: `${req.session.username}`,
-                            icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                            url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-                        },
-                        color: '16756444',
-                        fields: [
-                            {
-                                name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
-                                value: `Created current BN eval for **${u.username}**`,
-                            },
-                            {
-                                name: 'Assigned NAT',
-                                value: natList,
-                            },
-                        ],
-                    }],
-                    er.mode
-                );
-                await helper.sleep(500);
             }
+
+            await api.webhookPost(
+                [{
+                    author: {
+                        name: `${req.session.username}`,
+                        icon_url: `https://a.ppy.sh/${req.session.osuId}`,
+                        url: `https://osu.ppy.sh/users/${req.session.osuId}`,
+                    },
+                    color: '16756444',
+                    fields: [
+                        {
+                            name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
+                            value: `Created current BN eval for **${u.username}**`,
+                        },
+                        {
+                            name: 'Assigned NAT',
+                            value: natList,
+                        },
+                    ],
+                }],
+                er.mode
+            );
+            await helper.sleep(500);
         }
-
-
-
-        Logger.generate(
-            req.session.mongoId,
-            `Added BN evaluations for ${allEvalsToCreate.length} user${allEvalsToCreate.length == 1 ? '' : 's'}`
-        );
-    } else {
-        return res.json({ error: 'Nothing changed...' });
     }
+
+    Logger.generate(
+        req.session.mongoId,
+        `Added BN evaluations for ${allEvalsToCreate.length} user${allEvalsToCreate.length == 1 ? '' : 's'}`
+    );
 });
 
 /* POST submit or edit eval */
@@ -414,8 +425,6 @@ router.post('/setComplete/', api.isNat, async (req, res) => {
 
                 // process user group changes
                 if (er.isMoveToNat || er.isMoveToBn) {
-                    console.log(er.bn);
-                    console.log('in');
                     await User.findByIdAndUpdate(er.bn, {
                         group: er.isMoveToNat ? 'nat' : 'bn',
                         probation: [],

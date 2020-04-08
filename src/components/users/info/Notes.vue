@@ -41,7 +41,7 @@
                     @click.prevent="hideNote(note.id);"
                 >&times;</a>
                 <a
-                    v-if="note.author.id == viewingUser"
+                    v-if="note.author.id == viewingUserId"
                     href="#"
                     data-toggle="tooltip"
                     data-placement="top"
@@ -77,9 +77,14 @@ export default {
     name: 'Notes',
     mixins: [postData, filterLinks],
     props: {
-        userId: String,
-        viewingUser: String,
-
+        userId: {
+            type: String,
+            required: true,
+        },
+        viewingUserId: {
+            type: String,
+            required: true,
+        },
     },
     data() {
         return {

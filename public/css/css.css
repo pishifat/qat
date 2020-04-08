@@ -657,6 +657,9 @@ input[type="radio"] + .fas { cursor: pointer; }
 .all-radio + .fa-globe:before { content: "\f0ac"; }
 .checkmark-radio + .fa-check:before { content: "\f00c"; }
 .cross-radio + .fa-check:before { content: "\f00d"; }
+.probation-bn-radio + .fa-stream:before { content: "\f368"; }
+.full-bn-radio + .fa-stream:before { content: "\f554"; }
+.nat-radio + .fa-stream:before { content: "\f70c"; }
 
 /* Checked */
 .osu-radio:checked + .fa-circle:before { 
@@ -686,6 +689,18 @@ input[type="radio"] + .fas { cursor: pointer; }
 .cross-radio:checked + .fa-times:before { 
     color: var(--clicked);
     content: "\f00d"; 
+}
+.probation-bn-radio:checked + .fa-accessible-icon:before { 
+    color: var(--clicked);
+    content: "\f368"; 
+}
+.full-bn-radio:checked + .fa-walking:before { 
+    color: var(--clicked);
+    content: "\f554"; 
+}
+.nat-radio:checked + .fa-running:before { 
+    color: var(--clicked);
+    content: "\f70c"; 
 }
 /* END RADIO MODES */
 

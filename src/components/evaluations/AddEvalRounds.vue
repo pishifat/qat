@@ -11,128 +11,164 @@
                     </button>
                 </div>
                 <div class="modal-body" style="overflow: hidden">
-                    <div class="container">
-                        <div class="form-check form-check-inline text-shadow">
-                            <input
-                                id="osu"
-                                class="form-check-input"
-                                type="checkbox"
-                                value="osu"
-                            >
-                            <label class="form-check-label" for="osu">osu!</label>
-                        </div>
-                        <div class="form-check form-check-inline text-shadow">
-                            <input
-                                id="taiko"
-                                class="form-check-input"
-                                type="checkbox"
-                                value="taiko"
-                            >
-                            <label class="form-check-label" for="taiko">osu!taiko</label>
-                        </div>
-                        <div class="form-check form-check-inline text-shadow">
-                            <input
-                                id="catch"
-                                class="form-check-input"
-                                type="checkbox"
-                                value="catch"
-                            >
-                            <label class="form-check-label" for="catch">osu!catch</label>
-                        </div>
-                        <div class="form-check form-check-inline text-shadow">
-                            <input
-                                id="mania"
-                                class="form-check-input"
-                                type="checkbox"
-                                value="mania"
-                            >
-                            <label class="form-check-label" for="mania">osu!mania</label>
+                    <div class="container text-shadow">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div>
+                                    <span class="mr-4">Game mode:</span>
+                                    <label
+                                        class="mx-1"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="osu!"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            class="osu-radio hide-default"
+                                            name="mode"
+                                            value="osu"
+                                        >
+                                        <i class="fas fa-circle fa-lg" />
+                                    </label>
+                                    <label
+                                        class="mx-1"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="osu!taiko"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            class="taiko-radio hide-default"
+                                            name="mode"
+                                            value="taiko"
+                                        >
+                                        <i class="fas fa-drum fa-lg" />
+                                    </label>
+                                    <label
+                                        class="mx-1"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="osu!catch"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            class="catch-radio hide-default"
+                                            name="mode"
+                                            value="catch"
+                                        >
+                                        <i class="fas fa-apple-alt fa-lg" />
+                                    </label>
+                                    <label
+                                        class="mx-1"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="osu!mania"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            class="mania-radio hide-default"
+                                            name="mode"
+                                            value="mania"
+                                        >
+                                        <i class="fas fa-stream fa-lg" />
+                                    </label>
+                                </div>
+                                <p class="small min-spacing ml-2">
+                                    Specify mode(s) for evaluations. Multi-mode BNs can generate multiple evaluations.
+                                </p>
+                            </div>
+                            <div class="col-sm-12 mt-3">
+                                <div>
+                                    <span class="mr-4">User group:</span>
+                                    <label
+                                        class="mx-2"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="probation BN"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            class="probation-bn-radio hide-default"
+                                            name="group"
+                                            value="probationBn"
+                                        >
+                                        <i class="fab fa-accessible-icon" />
+                                    </label>
+                                    <label
+                                        class="mx-2"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="full BN"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            class="full-bn-radio hide-default"
+                                            name="group"
+                                            value="fullBn"
+                                        >
+                                        <i class="fas fa-walking" />
+                                    </label>
+                                    <label
+                                        class="mx-2"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="NAT"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            class="nat-radio hide-default"
+                                            name="group"
+                                            value="nat"
+                                        >
+                                        <i class="fas fa-running" />
+                                    </label>
+                                </div>
+                                <p class="small min-spacing ml-2">
+                                    Generate evaluations for all members of a user group. Only use this if you know what you're doing.
+                                </p>
+                            </div>
                         </div>
 
-                        <hr>
-
-                        <div class="form-check text-shadow mb-2">
-                            <input
-                                id="probationBns"
-                                class="form-check-input"
-                                type="checkbox"
-                                value=""
-                            >
-                            <label class="form-check-label" for="probationBns">
-                                Probation BNs
-                            </label>
-                        </div>
-                        <div class="form-check text-shadow mb-2">
-                            <input
-                                id="fullBns"
-                                class="form-check-input"
-                                type="checkbox"
-                                value=""
-                            >
-                            <label class="form-check-label" for="fullBns">
-                                Full BNs
-                            </label>
-                        </div>
-                        <div class="form-check text-shadow mb-2">
-                            <input
-                                id="nat"
-                                class="form-check-input"
-                                type="checkbox"
-                                value=""
-                            >
-                            <label class="form-check-label" for="nat">
-                                NAT
-                            </label>
+                        <div class="row mt-3">
+                            <div class="col-sm-6">
+                                Include specific user(s):
+                                <input
+                                    v-model="includeUsers"
+                                    class="ml-2 w-100 small"
+                                    type="text"
+                                    placeholder="username1, username2, username3..."
+                                >
+                            </div>
+                            <div class="col-sm-6">
+                                Exclude specific user(s):
+                                <input
+                                    v-model="excludeUsers"
+                                    class="ml-2 w-100 small"
+                                    type="text"
+                                    placeholder="username1, username2, username3..."
+                                >
+                            </div>
                         </div>
 
-                        <hr>
-
-                        <div class="mb-2">
-                            <span class="text-shadow">Include specific user(s):</span>
-                            <input
-                                id="includeUsers"
-                                class="ml-1 w-75"
-                                type="text"
-                                placeholder="username1, username2, username3..."
-                            >
-                        </div>
-                        <div class="mb-2">
-                            <span class="text-shadow">Exclude specific user(s):</span>
-                            <input
-                                id="excludeUsers"
-                                class="ml-1 w-75"
-                                type="text"
-                                placeholder="username1, username2, username3..."
-                            >
-                        </div>
-
-                        <hr>
-
-                        <div class="mb-2">
-                            <span class="text-shadow">Deadline:</span>
+                        <div class="mt-3">
+                            Deadline:
                             <input
                                 v-model="dateInput"
-                                class="ml-1"
+                                class="ml-1 small"
                                 type="text"
                                 placeholder="MM-DD-YYYY"
                                 maxlength="10"
                                 style="min-width: 125px; width: 125px;"
                             >
-                            <button type="submit" class="btn btn-sm btn-nat" @click="setDefaultDate($event)">
-                                Set deadline ~2 weeks from now
-                            </button>
-                            <p class="small pl-2 pt-2">
-                                Only deadlines within the next 2 weeks will be displayed
+                            <p class="small min-spacing ml-2 mt-1">
+                                Only deadlines within the next 2 weeks will be displayed.
                             </p>
                         </div>
                     </div>
-
-                    <hr>
-                    <span id="addEvalRoundsErrors" class="errors text-shadow">{{ info }}</span>
-                    <span id="addEvalRoundsConfirm" class="confirm text-shadow">{{ confirm }}</span>
-                    <button type="submit" class="btn btn-nat float-right" @click="addEvalRounds($event)">
-                        Add BNs
+                    <button class="btn btn-sm btn-nat mb-2 mt-4 w-100" @click="addEvalRounds($event)">
+                        Generate evaluations
                     </button>
+                    <span id="addEvalRoundsErrors" class="errors">{{ info }}</span>
                 </div>
             </div>
         </div>
@@ -148,91 +184,91 @@ export default {
     data() {
         return {
             info: '',
-            confirm: '',
-            dateInput: '',
+            includeUsers: null,
+            excludeUsers: null,
+            dateInput: this.setDefaultDate(),
         };
     },
     methods: {
         async addEvalRounds(e) {
-            this.info = '';
-            this.confirm = '';
+            const confirmInput = confirm(`Are you sure?`);
 
-            let osu = $('#osu').is(':checked');
-            let taiko = $('#taiko').is(':checked');
-            let ctb = $('#catch').is(':checked');
-            let mania = $('#mania').is(':checked');
+            if (confirmInput) {
+                this.info = '';
+                let modes = [];
 
-            if (!osu && !taiko && !ctb && !mania) {
-                this.info = 'Must select game mode!';
+                $('input[name="mode"]:checked').each(function () {
+                    modes.push(this.value);
+                });
 
-                return;
-            }
+                if (!modes.length) {
+                    this.info = 'Must select game mode!';
 
-            let probation = $('#probationBns').is(':checked');
-            let bn = $('#fullBns').is(':checked');
-            let nat = $('#nat').is(':checked');
+                    return;
+                }
 
-            let includeUsers = $('#includeUsers').val();
-            let excludeUsers = $('#excludeUsers').val();
+                let groups = [];
 
-            if (!probation && !bn && !nat && !includeUsers) {
-                this.info = 'Must select user type or specify the users to be evaluated!';
+                $('input[name="group"]:checked').each(function () {
+                    groups.push(this.value);
+                });
 
-                return;
-            }
 
-            const dateSplit = this.dateInput.split('-');
-            const deadline = new Date(
-                parseInt(dateSplit[2], 10),
-                parseInt(dateSplit[0], 10) - 1,
-                parseInt(dateSplit[1], 10)
-            );
+                if (!groups.length && !this.includeUsers) {
+                    this.info = 'Must select user group or include specific users!';
 
-            if (!(deadline instanceof Date) || isNaN(deadline)) {
-                this.info = 'Invalid Date!';
+                    return;
+                }
 
-                return;
-            }
+                const dateSplit = this.dateInput.split('-');
+                const deadline = new Date(
+                    parseInt(dateSplit[2], 10),
+                    parseInt(dateSplit[0], 10) - 1,
+                    parseInt(dateSplit[1], 10)
+                );
 
-            const result = await this.executePost(
-                '/bnEval/addEvalRounds/',
-                {
-                    osu,
-                    taiko,
-                    catch: ctb,
-                    mania,
-                    probation,
-                    bn,
-                    nat,
-                    includeUsers,
-                    excludeUsers,
-                    deadline,
-                },
-                e
-            );
+                if (!(deadline instanceof Date) || isNaN(deadline)) {
+                    this.info = 'Invalid Date!';
 
-            if (result) {
-                if (result.errors) {
-                    this.info = result.errors;
-                } else {
-                    this.$emit('update-all-eval-rounds', result.ers);
+                    return;
+                }
 
-                    if (result.ers.length) {
-                        this.confirm = 'Eval rounds added! ';
+                const result = await this.executePost(
+                    '/bnEval/addEvalRounds/',
+                    {
+                        modes,
+                        groups,
+                        includeUsers: this.includeUsers,
+                        excludeUsers: this.excludeUsers,
+                        deadline,
+                    },
+                    e
+                );
 
-                        if (result.failed.length) {
-                            this.confirm += 'However, the following usernames could not be processed: ';
-
-                            for (let i = 0; i < result.failed.length; i++) {
-                                this.confirm += result.failed[i];
-
-                                if (i + 1 != result.failed.length) {
-                                    this.confirm += ', ';
-                                }
-                            }
-                        }
+                if (result) {
+                    if (result.error) {
+                        this.info = result.error;
                     } else {
-                        this.confirm = 'No eval rounds were added! If you were trying to add specific users, re-check your spelling.';
+                        this.$emit('update-all-eval-rounds', result.ers);
+
+                        if (result.ers.length) {
+
+                            if (result.failed.length) {
+                                this.info += 'The following usernames could not be processed: ';
+
+                                for (let i = 0; i < result.failed.length; i++) {
+                                    this.info += result.failed[i];
+
+                                    if (i + 1 != result.failed.length) {
+                                        this.info += ', ';
+                                    }
+                                }
+                            } else {
+                                $('#addEvalRounds').modal('hide');
+                            }
+                        } else {
+                            this.info = 'No eval rounds were added! If you were trying to add specific users, re-check your spelling.';
+                        }
                     }
                 }
             }
@@ -253,7 +289,8 @@ export default {
             }
 
             const year = date.getFullYear();
-            this.dateInput = month + '-' + day + '-' + year;
+
+            return month + '-' + day + '-' + year;
         },
     },
 };
