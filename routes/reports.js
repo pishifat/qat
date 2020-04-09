@@ -47,14 +47,11 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
 
 
         api.webhookPost([{
-            author: {
-                name: `User report: ${u.username}`,
-                url: `http://bn.mappersguild.com/managereports?report=${r.id}`,
-            },
             thumbnail: {
                 url: `https://a.ppy.sh/${u.osuId}`,
             },
-            color: '16697937',
+            color: api.webhookColors.darkRed,
+            description: `[User report](http://bn.mappersguild.com/managereports?report=${r.id}) for **${u.username}**`,
             fields: [
                 {
                     name: 'Report reason',
@@ -78,11 +75,8 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
         res.json({});
 
         api.webhookPost([{
-            author: {
-                name: 'Non-user report',
-                url: `http://bn.mappersguild.com/managereports?report=${r.id}`,
-            },
-            color: '16698019',
+            description: `[Non-user report](http://bn.mappersguild.com/managereports?report=${r.id})`,
+            color: api.webhookColors.lightRed,
             fields: [
                 {
                     name: 'Report reason',

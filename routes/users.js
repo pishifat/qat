@@ -110,20 +110,13 @@ router.post('/saveNote/:id', api.isNat, async (req, res) => {
 
     api.webhookPost(
         [{
-            author: {
-                name: `${note.author.username}`,
-                icon_url: `https://a.ppy.sh/${note.author.osuId}`,
-                url: `https://osu.ppy.sh/users/${note.author.osuId}`,
-            },
-            color: '7952450',
+            author: api.defaultWebhookAuthor(req.session),
+            color: api.webhookColors.brown,
+            description: `Added note to [**${note.user.username}**'s profile](http://bn.mappersguild.com/users?id=${note.user.id})`,
             fields: [
                 {
-                    name: `http://bn.mappersguild.com/users?id=${note.user.id}`,
-                    value: `Added note to **${note.user.username}**'s profile`,
-                },
-                {
                     name: 'Note',
-                    value: req.body.comment.length > 975 ? req.body.comment.slice(0,975) + '... *(truncated)*' : req.body.comment,
+                    value: req.body.comment.length > 950 ? req.body.comment.slice(0,950) + '... *(truncated)*' : req.body.comment,
                 },
             ],
         }],

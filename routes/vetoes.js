@@ -95,18 +95,9 @@ router.post('/submit', api.isNotSpectator, async (req, res) => {
     res.json(v);
     Logger.generate(req.session.mongoId, `Submitted a veto for mediation on "${v.beatmapTitle}"`);
     api.webhookPost([{
-        author: {
-            name: `${req.session.username}`,
-            icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-            url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-        },
-        color: '16731997',
-        fields: [
-            {
-                name: `https://bn.mappersguild.com/vetoes?beatmap=${v.id}`,
-                value: `Submitted veto on **${v.beatmapTitle}** by **${v.beatmapMapper}**`,
-            },
-        ],
+        author: api.defaultWebhookAuthor(req.session),
+        color: api.webhookColors.darkPurple,
+        description: `Submitted [veto](https://bn.mappersguild.com/vetoes?beatmap=${v.id}) for **${v.beatmapTitle}** by **${v.beatmapMapper}**`,
     }],
     req.body.mode);
 });
@@ -165,18 +156,9 @@ router.post('/beginMediation/:id', api.isNat, api.isNotSpectator, async (req, re
         `Started veto mediation for "${v.beatmapTitle}"`
     );
     api.webhookPost([{
-        author: {
-            name: `${req.session.username}`,
-            icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-            url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-        },
-        color: '12858015',
-        fields: [
-            {
-                name: `https://bn.mappersguild.com/vetoes?beatmap=${v.id}`,
-                value: `Started veto mediation on **${v.beatmapTitle}** by **${v.beatmapMapper}**`,
-            },
-        ],
+        author: api.defaultWebhookAuthor(req.session),
+        color: api.webhookColors.purple,
+        description: `Started mediation on [veto](https://bn.mappersguild.com/vetoes?beatmap=${v.id}) for **${v.beatmapTitle}**`,
     }],
     v.mode);
 });
@@ -207,18 +189,9 @@ router.post('/submitMediation/:id', async (req, res) => {
 
     if (!originalMediation.comment) {
         api.webhookPost([{
-            author: {
-                name: `${req.session.username}`,
-                icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-            },
-            color: '10895161',
-            fields: [
-                {
-                    name: `https://bn.mappersguild.com/vetoes?beatmap=${v.id}`,
-                    value: `Submitted opinion on veto for **${v.beatmapTitle}** (${count}/${v.mediations.length})`,
-                },
-            ],
+            author: api.defaultWebhookAuthor(req.session),
+            color: api.webhookColors.lightPurple,
+            description: `Submitted opinion on [veto](https://bn.mappersguild.com/vetoes?beatmap=${v.id}) for **${v.beatmapTitle}** (${count}/${v.mediations.length})`,
         }],
         v.mode);
     }
@@ -243,18 +216,9 @@ router.post('/concludeMediation/:id', api.isNat, api.isNotSpectator, async (req,
         `Veto ${veto.status.charAt(0).toUpperCase() + veto.status.slice(1)} for "${veto.beatmapTitle}" ${req.body.dismiss ? 'without mediation' : ''}`
     );
     api.webhookPost([{
-        author: {
-            name: `${req.session.username}`,
-            icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-            url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-        },
-        color: '5118500',
-        fields: [
-            {
-                name: `https://bn.mappersguild.com/vetoes?beatmap=${veto.id}`,
-                value: `Concluded veto mediation for **${veto.beatmapTitle}** by **${veto.beatmapMapper}**`,
-            },
-        ],
+        author: api.defaultWebhookAuthor(req.session),
+        color: api.webhookColors.purple,
+        description: `Concluded mediation on [veto](https://bn.mappersguild.com/vetoes?beatmap=${veto.id}) for **${veto.beatmapTitle}**`,
     }],
     veto.mode);
 });
@@ -324,18 +288,9 @@ router.post('/replaceMediator/:id', api.isNat, api.isNotSpectator, async (req, r
     );
 
     api.webhookPost([{
-        author: {
-            name: `${req.session.username}`,
-            icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-            url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-        },
-        color: '7347001',
-        fields: [
-            {
-                name: `https://bn.mappersguild.com/vetoes?beatmap=${veto.id}`,
-                value: `Replaced **${oldMediation.mediator.username}** with **${newMediation.mediator.username}** as mediator for veto on **${veto.beatmapTitle}** by **${veto.beatmapMapper}**`,
-            },
-        ],
+        author: api.defaultWebhookAuthor(req.session),
+        color: api.webhookColors.darkOrange,
+        description: `Replaced **${oldMediation.mediator.username}** with **${newMediation.mediator.username}** as meditor on [veto](https://bn.mappersguild.com/vetoes?beatmap=${veto.id}) for **${veto.beatmapTitle}**`,
     }],
     veto.mode);
 });

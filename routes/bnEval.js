@@ -201,17 +201,10 @@ router.post('/addEvalRounds/', async (req, res) => {
 
             await api.webhookPost(
                 [{
-                    author: {
-                        name: `${req.session.username}`,
-                        icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                        url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-                    },
-                    color: '16756444',
+                    author: api.defaultWebhookAuthor(req.session),
+                    color: api.webhookColors.white,
+                    description: `Created [**${u.username}**'s current BN eval](http://bn.mappersguild.com/bneval?eval=${er.id})`,
                     fields: [
-                        {
-                            name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
-                            value: `Created current BN eval for **${u.username}**`,
-                        },
                         {
                             name: 'Assigned NAT',
                             value: natList,
@@ -252,18 +245,9 @@ router.post('/submitEval/:id', api.isBnOrNat, async (req, res) => {
 
         api.webhookPost(
             [{
-                author: {
-                    name: `${req.session.username}`,
-                    icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                    url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-                },
-                color: '3800465',
-                fields: [
-                    {
-                        name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
-                        value: `Submitted current BN eval for **${er.bn.username}**`,
-                    },
-                ],
+                author: api.defaultWebhookAuthor(req.session),
+                color: api.webhookColors.lightGreen,
+                description: `Submitted eval for [**${er.bn.username}**'s current BN eval](http://bn.mappersguild.com/bneval?eval=${er.id})`,
             }],
             er.mode
         );
@@ -282,19 +266,12 @@ router.post('/submitEval/:id', api.isBnOrNat, async (req, res) => {
             });
             api.webhookPost(
                 [{
-                    author: {
-                        name: `${er.bn.username}`,
-                        url: `https://osu.ppy.sh/users/${er.bn.osuId}`,
-                    },
                     thumbnail: {
                         url: `https://a.ppy.sh/${er.bn.osuId}`,
                     },
-                    color: '3773329',
+                    color: api.webhookColors.gray,
+                    description: `[**${er.bn.username}**'s current BN eval](http://bn.mappersguild.com/bneval?eval=${er.id}) moved to group discussion`,
                     fields: [
-                        {
-                            name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
-                            value: 'Current BN eval moved to group discussion',
-                        },
                         {
                             name: 'Votes',
                             value: `Pass: **${pass}**, Probation: **${probation}**, Fail: **${fail}**`,
@@ -332,17 +309,10 @@ router.post('/setGroupEval/', api.isNat, async (req, res) => {
         });
         api.webhookPost(
             [{
-                author: {
-                    name: `${req.session.username}`,
-                    icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                    url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-                },
-                color: '3773329',
+                author: api.defaultWebhookAuthor(req.session),
+                color: api.webhookColors.lightRed,
+                description: `Moved [**${er.bn.username}**'s current BN eval](http://bn.mappersguild.com/bneval?eval=${er.id}) to group discussion`,
                 fields: [
-                    {
-                        name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
-                        value: `Moved **${er.bn.username}**'s current BN eval to group discussion`,
-                    },
                     {
                         name: 'Votes',
                         value: `Pass: **${pass}**, Probation: **${probation}**, Fail: **${fail}**`,
@@ -476,22 +446,9 @@ router.post('/setComplete/', api.isNat, async (req, res) => {
 
         api.webhookPost(
             [{
-                author: {
-                    name: `${req.session.username}`,
-                    icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                    url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-                },
-                color: '6579298',
-                fields: [
-                    {
-                        name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
-                        value: `**${u.username}**'s current BN eval archived`,
-                    },
-                    {
-                        name: 'Consensus',
-                        value: consensusText,
-                    },
-                ],
+                author: api.defaultWebhookAuthor(req.session),
+                color: api.webhookColors.black,
+                description: `Archived [**${u.username}**'s current BN eval](http://bn.mappersguild.com/bneval?eval=${er.id}) with **${consensusText}** consensus`,
             }],
             er.mode
         );
@@ -556,18 +513,9 @@ router.post('/setConsensus/:id', api.isNat, async (req, res) => {
 
     api.webhookPost(
         [{
-            author: {
-                name: `${req.session.username}`,
-                icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-            },
-            color: '13272813',
-            fields: [
-                {
-                    name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
-                    value: `**${er.bn.username}**'s current BN eval set to **${consensusText}**`,
-                },
-            ],
+            author: api.defaultWebhookAuthor(req.session),
+            color: api.webhookColors.lightBlue,
+            description: `[**${er.bn.username}**'s current BN eval](http://bn.mappersguild.com/bneval?eval=${er.id}) set to **${consensusText}**`,
         }],
         er.mode
     );
@@ -586,18 +534,9 @@ router.post('/setCooldownDate/:id', api.isNat, async (req, res) => {
     );
     api.webhookPost(
         [{
-            author: {
-                name: `${req.session.username}`,
-                icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-            },
-            color: '16631799',
-            fields: [
-                {
-                    name: `http://bn.mappersguild.com/appeval?eval=${er.id}`,
-                    value: `**${er.bn.username}**'s re-application date set to **${req.body.cooldownDate.toString().slice(0,10)}**`,
-                },
-            ],
+            author: api.defaultWebhookAuthor(req.session),
+            color: api.webhookColors.darkBlue,
+            description: `**${er.bn.username}**'s re-application date set to **${req.body.cooldownDate.toString().slice(0,10)}**`,
         }],
         er.mode
     );
@@ -626,18 +565,9 @@ router.post('/setFeedback/:id', api.isNat, async (req, res) => {
 
     api.webhookPost(
         [{
-            author: {
-                name: `${req.session.username}`,
-                icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-            },
-            color: '5762129',
-            fields: [
-                {
-                    name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
-                    value: `**${er.bn.username}'s feedback**: ${req.body.feedback.length > 975 ? req.body.feedback.slice(0,975) + '... *(truncated)*' : req.body.feedback}`,
-                },
-            ],
+            author: api.defaultWebhookAuthor(req.session),
+            color: api.webhookColors.blue,
+            description: `[**${er.bn.username}'s current BN eval](http://bn.mappersguild.com/bneval?eval=${er.id}) feedback**: ${req.body.feedback.length > 925 ? req.body.feedback.slice(0,925) + '... *(truncated)*' : req.body.feedback}`,
         }],
         er.mode
     );
@@ -733,18 +663,9 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
 
     api.webhookPost(
         [{
-            author: {
-                name: `${req.session.username}`,
-                icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-            },
-            color: '16747310',
-            fields: [
-                {
-                    name: `http://bn.mappersguild.com/bneval?eval=${evalRound.id}`,
-                    value: `**${newEvaluator[0].username}** replaced **${user.username}** as NAT evaluator for **${evalRound.bn.username}**'s current BN eval`,
-                },
-            ],
+            author: api.defaultWebhookAuthor(req.session),
+            color: api.webhookColors.orange,
+            description: `Replaced **${user.username}** with **${newEvaluator[0].username}** as NAT evaluator for [**${evalRound.bn.username}**'s current BN eval](http://bn.mappersguild.com/bneval?eval=${evalRound.id})`,
         }],
         evalRound.mode
     );

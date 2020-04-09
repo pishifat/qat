@@ -128,16 +128,6 @@ router.post('/submitTest', async (req, res) => {
 
     res.json(displayScore);
     Logger.generate(req.session.mongoId, `Completed ${test.mode} BN app test`);
-    let u = res.locals.userRequest;
-    let modsList = '';
-
-    for (let i = 0; i < currentBnApp.mods.length; i++) {
-        modsList += currentBnApp.mods[i];
-
-        if (i + 1 < currentBnApp.mods.length) {
-            modsList += ', ';
-        }
-    }
 
     const twoEvaluationModes = ['catch', 'mania'];
     //const threeEvaluationModes = ['osu', 'taiko'];
@@ -161,21 +151,10 @@ router.post('/submitTest', async (req, res) => {
 
     api.webhookPost(
         [{
-            author: {
-                name: `${u.username}`,
-                icon_url: `https://a.ppy.sh/${u.osuId}`,
-                url: `http://bn.mappersguild.com/appeval?eval=${currentBnApp.id}`,
-            },
-            color: '9884159',
+            author: api.defaultWebhookAuthor(req.session),
+            description: `Submitted [BN application](http://bn.mappersguild.com/appeval?eval=${currentBnApp.id}) with test score of **${displayScore}**`,
+            color: api.webhookColors.green,
             fields: [
-                {
-                    name: 'New BN application',
-                    value: `Test score: **${displayScore}**`,
-                },
-                {
-                    name: 'Mods',
-                    value: modsList,
-                },
                 {
                     name: 'Assigned NAT',
                     value: natList,

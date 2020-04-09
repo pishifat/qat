@@ -55,7 +55,7 @@ const notifyDeadlines = cron.schedule('0 0 * * *', async () => {
     // find and post webhook for vetoes
     for (let i = 0; i < activeVetoes.length; i++) {
         const veto = activeVetoes[i];
-        let title = '';
+        let description = `Veto mediation for [**${veto.beatmapTitle}**](http://bn.mappersguild.com/vetoes?beatmaps=${veto.id}) `;
 
         if (date > veto.deadline) {
             if (!osuHighlight && veto.mode === 'osu') { osuHighlight = true; }
@@ -66,19 +66,16 @@ const notifyDeadlines = cron.schedule('0 0 * * *', async () => {
 
             if (!maniaHighlight && veto.mode === 'mania') { maniaHighlight = true; }
 
-            title = `Veto mediation for **${veto.beatmapTitle}** is overdue!`;
+            description += 'is overdue!';
         } else if (veto.deadline < nearDeadline) {
-            title = `Veto mediation for **${veto.beatmapTitle}** is due in less than 24 hours!`;
+            description += 'is due in less than 24 hours!';
         }
 
         if (date > veto.deadline || veto.deadline < nearDeadline) {
             await api.webhookPost(
                 [{
-                    author: {
-                        name: title,
-                        url: `http://bn.mappersguild.com/vetoes?beatmaps=${veto.id}`,
-                    },
-                    color: '16776960',
+                    description,
+                    color: api.webhookColors.red,
                 }],
                 veto.mode
             );
@@ -95,7 +92,8 @@ const notifyDeadlines = cron.schedule('0 0 * * *', async () => {
         if (app.discussion) { addition += 7; }
 
         const deadline = new Date(app.createdAt.setDate(app.createdAt.getDate() + addition));
-        let title = '';
+        let description = `[**${app.applicant.username}**'s BN app](http://bn.mappersguild.com/appeval?eval=${app.id}) `;
+        let generateWebhook;
 
         if (date > deadline) {
             if (!osuHighlight && app.mode === 'osu') { osuHighlight = true; }
@@ -106,20 +104,18 @@ const notifyDeadlines = cron.schedule('0 0 * * *', async () => {
 
             if (!maniaHighlight && app.mode === 'mania') { maniaHighlight = true; }
 
-            title = `BN app eval for ${app.applicant.username} is overdue!`;
+            description += 'is overdue!';
+            generateWebhook = true;
         } else if (deadline < nearDeadline) {
-            title = `BN app eval for ${app.applicant.username} is due in less than 24 hours!`;
+            description += 'is due in less than 24 hours!';
+            generateWebhook = true;
         }
 
-        if (title.length) {
+        if (generateWebhook) {
             await api.webhookPost(
                 [{
-                    author: {
-                        name: title,
-                        icon_url: `https://a.ppy.sh/${app.applicant.osuId}`,
-                        url: `http://bn.mappersguild.com/appeval?eval=${app.id}`,
-                    },
-                    color: '14427693',
+                    description,
+                    color: api.webhookColors.red,
                 }],
                 app.mode
             );
@@ -131,8 +127,9 @@ const notifyDeadlines = cron.schedule('0 0 * * *', async () => {
     for (let i = 0; i < activeRounds.length; i++) {
         const round = activeRounds[i];
 
-        let title = '';
+        let description = `[**${round.bn.username}**'s current BN eval](http://bn.mappersguild.com/bneval?eval=${round.id}) `;
         let natList = '';
+        let generateWebhook;
 
         if (date > round.deadline) {
             if (!osuHighlight && round.mode === 'osu') { osuHighlight = true; }
@@ -143,11 +140,14 @@ const notifyDeadlines = cron.schedule('0 0 * * *', async () => {
 
             if (!maniaHighlight && round.mode === 'mania') { maniaHighlight = true; }
 
-            title = `Current BN eval for ${round.bn.username} is overdue!`;
+            description += 'is overdue!';
+            generateWebhook = true;
         } else if (round.deadline < nearDeadline) {
-            title = `Current BN eval for ${round.bn.username} is due in less than 24 hours!`;
+            description += 'is due in less than 24 hours!';
+            generateWebhook = true;
         } else if (round.deadline > startRange && round.deadline < endRange) {
-            title = `Current BN eval for ${round.bn.username} is due in two weeks!`;
+            description += 'is due in two weeks!';
+            generateWebhook = true;
 
             const twoEvaluationModes = ['catch', 'mania'];
             //const threeEvaluationModes = ['osu', 'taiko'];
@@ -181,29 +181,21 @@ const notifyDeadlines = cron.schedule('0 0 * * *', async () => {
             }
         }
 
-        if (title.length && !natList.length) {
+        if (generateWebhook && !natList.length) {
             await api.webhookPost(
                 [{
-                    author: {
-                        name: title,
-                        icon_url: `https://a.ppy.sh/${round.bn.osuId}`,
-                        url: `http://bn.mappersguild.com/bneval?eval=${round.id}`,
-                    },
-                    color: '14427693',
+                    description,
+                    color: api.webhookColors.red,
                 }],
                 round.mode
             );
             await helper.sleep(500);
-        } else if (title.length && natList.length) {
+        } else if (generateWebhook && natList.length) {
 
             await api.webhookPost(
                 [{
-                    author: {
-                        name: title,
-                        icon_url: `https://a.ppy.sh/${round.bn.osuId}`,
-                        url: `http://bn.mappersguild.com/bneval?eval=${round.id}`,
-                    },
-                    color: '15711602',
+                    description,
+                    color: api.webhookColors.pink,
                     fields: [
                         {
                             name: 'Assigned NAT',
@@ -314,7 +306,7 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
                     thumbnail: {
                         url: `https://b.ppy.sh/thumb/${discussion.beatmapset_id}.jpg`,
                     },
-                    color: discussion.message_type == 'suggestion' ? '16564064' : '15144231',
+                    color: discussion.message_type == 'suggestion' ? api.webhookColors.lightOrange : api.webhookColors.red,
                     fields: [
                         {
                             name: discussion.message_type,
@@ -397,7 +389,7 @@ const lowActivityTask = cron.schedule('0 0 1 1 *', async () => {
             [{
                 title: 'Low Activity',
                 description: `The following users have low nomination activity from ${initialDate.toLocaleDateString()} to today`,
-                color: '14427693',
+                color: api.webhookColors.red,
                 fields: modeField,
             }],
             modeField[0].mode

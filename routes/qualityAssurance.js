@@ -141,8 +141,6 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
     const thumbnail = {
         url: `https://b.ppy.sh/thumb/${e.beatmapsetId}.jpg`,
     };
-    const colorUser = '11720607';
-    const colorBeatmap = '11726590';
     const fieldsUser = [
         {
             name: `http://bn.mappersguild.com/qualityassurance`,
@@ -175,7 +173,7 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
         await api.webhookPost(
             [{
                 author: authorUser,
-                color: colorUser,
+                color: api.webhookColors.lightGreen,
                 fields: fieldsUser,
                 footer,
             }],
@@ -187,7 +185,7 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
                 [{
                     author: authorBeatmap,
                     thumbnail,
-                    color: colorBeatmap,
+                    color: api.webhookColors.white,
                     fields: fieldsBeatmap,
                 }],
                 'standardQualityAssurance'
@@ -199,7 +197,7 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
         await api.webhookPost(
             [{
                 author: authorUser,
-                color: colorUser,
+                color: api.webhookColors.lightGreen,
                 fields: fieldsUser,
                 footer,
             }],
@@ -211,7 +209,7 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
                 [{
                     author: authorBeatmap,
                     thumbnail,
-                    color: colorBeatmap,
+                    color: api.webhookColors.white,
                     fields: fieldsBeatmap,
                 }],
                 'taikoCatchManiaQualityAssurance'

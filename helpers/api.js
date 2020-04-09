@@ -289,6 +289,46 @@ async function highlightWebhookPost(message, webhook) {
     }
 }
 
+function defaultWebhookAuthor(session) {
+    return {
+        name: session.username,
+        icon_url: `https://a.ppy.sh/${session.osuId}`,
+        url: `https://osu.ppy.sh/users/${session.osuId}`,
+    };
+}
+
+const webhookColors = {
+    lightRed: '16742771',       // nonUserReport, active: moveToGroupDiscussion
+    darkRed: '8787477',         // userReport
+    red: '15607337',            // overdueNotifications, problemReport, lowActivity
+
+    lightOrange: '15639928',    // enableBnEvaluators, suggestionReport
+    darkOrange: '7092736',      // replaceMediator
+    orange: '15169835',         // replaceEvaluator
+
+    lightYellow: '16777104',    // submitDiscussionVote
+    darkYellow: '7105536',      // concludeDiscussionVote
+    yellow: '16777022',         // submitMediationDiscussionVote
+
+    lightGreen: '8847214',      // submitEval, submitQA
+    darkGreen: '1921053',
+    green: '4380222',           // newBnApplication
+
+    lightBlue: '8643583',       // setConsensus
+    darkBlue: '1911891',        // setCooldown
+    blue: '6786559',            // setFeedback
+
+    lightPurple: '11173873',    // submitVetoMediation
+    darkPurple: '4263999',      // submitVeto
+    purple: '8536232',          // startVetoMediation, concludeVetoMediation
+
+    pink: '16728232',       // revealedCurrentBnEvalNotification
+    white: '15724527',      // unarchive, addEvalRound, maxQAChecks
+    brown: '7554849',       // submitUserNote
+    gray: '8815494',        // passive: moveToGroupDiscussion,
+    black: '2564903',       // archive
+};
+
 module.exports = {
     isLoggedIn,
     getToken,
@@ -303,4 +343,6 @@ module.exports = {
     isNotSpectator,
     webhookPost,
     highlightWebhookPost,
+    defaultWebhookAuthor,
+    webhookColors,
 };

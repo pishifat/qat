@@ -47,23 +47,6 @@ router.post('/updateContent/:id', api.isNotSpectator, async (req, res) => {
     } else {
         res.json(req.body.reason);
         Logger.generate(req.session.mongoId, `Updated DQ reason of s/${a.beatmapsetId} to "${a.content}"`);
-        /*await api.webhookPost(
-            [{
-                author: {
-                    name: `${req.session.username}`,
-                    icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                    url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-                },
-                color: '3103310',
-                fields:[
-                    {
-                        name: `https://osu.ppy.sh/beatmapsets/${a.beatmapsetId}/discussion/-/generalAll#/${a.postId}`,
-                        value: `Shortened **DQ/reset reason** of "${a.metadata}": ${req.body.reason}`,
-                    },
-                ],
-            }],
-            a.modes[0]
-        );*/
     }
 });
 
@@ -81,23 +64,6 @@ router.post('/updateObviousness/:id', api.isNotSpectator, async (req, res) => {
 
     res.json(obviousness);
     Logger.generate(req.session.mongoId, `Updated obviousness of s/${a.beatmapsetId} to "${obviousness}"`);
-    /*await api.webhookPost(
-        [{
-            author: {
-                name: `${req.session.username}`,
-                icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-            },
-            color: '6893914',
-            fields:[
-                {
-                    name: `https://osu.ppy.sh/beatmapsets/${a.beatmapsetId}/discussion/-/generalAll#/${a.postId}`,
-                    value: `Set **obviousness** of "${a.metadata}": **${obviousness}**`,
-                },
-            ],
-        }],
-        a.modes[0]
-    );*/
 });
 
 /* POST edit severity */
@@ -114,23 +80,6 @@ router.post('/updateSeverity/:id', api.isNotSpectator, async (req, res) => {
 
     res.json(severity);
     Logger.generate(req.session.mongoId, `Updated severity of s/${a.beatmapsetId} to "${severity}"`);
-    /*await api.webhookPost(
-        [{
-            author: {
-                name: `${req.session.username}`,
-                icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-            },
-            color: '4206938',
-            fields:[
-                {
-                    name: `https://osu.ppy.sh/beatmapsets/${a.beatmapsetId}/discussion/-/generalAll#/${a.postId}`,
-                    value: `Set **obviousness** of "${a.metadata}": **${severity}**`,
-                },
-            ],
-        }],
-        a.modes[0]
-    );*/
 });
 
 module.exports = router;

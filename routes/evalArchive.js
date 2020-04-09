@@ -179,18 +179,9 @@ router.post('/unarchive/:id', api.isNat, async (req, res) => {
 
         api.webhookPost(
             [{
-                author: {
-                    name: `${req.session.username}`,
-                    icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                    url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-                },
-                color: '15001599',
-                fields: [
-                    {
-                        name: `http://bn.mappersguild.com/appeval?eval=${a.id}`,
-                        value: `**${u.username}**'s application evaluation un-archived`,
-                    },
-                ],
+                author: api.defaultWebhookAuthor(req.session),
+                color: api.webhookColors.white,
+                description: `Un-archived [**${u.username}**'s BN app](http://bn.mappersguild.com/appeval?eval=${a.id})`,
             }],
             a.mode
         );
@@ -230,18 +221,9 @@ router.post('/unarchive/:id', api.isNat, async (req, res) => {
 
         api.webhookPost(
             [{
-                author: {
-                    name: `${req.session.username}`,
-                    icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                    url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-                },
-                color: '15001599',
-                fields: [
-                    {
-                        name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
-                        value: `**${u.username}**'s current BN evaluation un-archived`,
-                    },
-                ],
+                author: api.defaultWebhookAuthor(req.session),
+                color: api.webhookColors.white,
+                description: `Un-archived [**${u.username}**'s current BN eval](http://bn.mappersguild.com/bneval?eval=${er.id})`,
             }],
             er.mode
         );

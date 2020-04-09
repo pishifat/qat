@@ -84,17 +84,10 @@ router.post('/submit', api.isNat, async (req, res) => {
     Logger.generate(req.session.mongoId, 'Submitted a discussion for voting');
     api.webhookPost(
         [{
-            author: {
-                name: `${req.session.username}`,
-                icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-            },
-            color: '14805600',
+            author: api.defaultWebhookAuthor(req.session),
+            color: api.webhookColors.yellow,
+            description: `**New discussion up for vote:** [${req.body.title}](http://bn.mappersguild.com/discussionvote?id=${d.id})`,
             fields: [
-                {
-                    name: `http://bn.mappersguild.com/discussionvote?id=${d.id}`,
-                    value: `**New discussion up for vote:** ${req.body.title}`,
-                },
                 {
                     name: `Proposal`,
                     value: req.body.shortReason,
@@ -132,18 +125,9 @@ router.post('/submitMediation/:id', async (req, res) => {
     if (!req.body.mediationId && req.session.group == 'nat') {
         api.webhookPost(
             [{
-                author: {
-                    name: `${req.session.username}`,
-                    icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                    url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-                },
-                color: '16777024',
-                fields: [
-                    {
-                        name: `http://bn.mappersguild.com/discussionvote?id=${d.id}`,
-                        value: `Submitted vote for discussion on **${d.title}**`,
-                    },
-                ],
+                author: api.defaultWebhookAuthor(req.session),
+                color: api.webhookColors.lightYellow,
+                description: `Submitted vote for [discussion on **${d.title}**](http://bn.mappersguild.com/discussionvote?id=${d.id})`,
             }],
             d.mode
         );
@@ -152,14 +136,24 @@ router.post('/submitMediation/:id', async (req, res) => {
 
 /* POST conclude mediation */
 router.post('/concludeMediation/:id', api.isNat, async (req, res) => {
-    const m = await Discussion
+    const d = await Discussion
         .findByIdAndUpdate(req.params.id, { isActive: false })
         .populate(defaultPopulate);
 
-    res.json(m);
+    res.json(d);
+
     Logger.generate(
         req.session.mongoId,
         'Concluded vote for a discussion'
+    );
+
+    api.webhookPost(
+        [{
+            author: api.defaultWebhookAuthor(req.session),
+            color: api.webhookColors.darkYellow,
+            description: `Concluded vote for [discussion on **${d.title}**](http://bn.mappersguild.com/discussionvote?id=${d.id})`,
+        }],
+        d.mode
     );
 });
 
