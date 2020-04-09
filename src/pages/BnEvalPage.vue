@@ -103,12 +103,14 @@
         </div>
 
         <current-bn-individual-info
+            v-if="selectedEvalRound"
             :eval-round="selectedEvalRound"
             :evaluator="evaluator"
             @update-eval-round="updateEvalRound($event)"
         />
 
         <current-bn-discussion-info
+            v-if="selectedDiscussRound"
             :eval-round="selectedDiscussRound"
             :evaluator="evaluator"
             @update-eval-round="updateEvalRound($event)"

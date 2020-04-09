@@ -103,12 +103,14 @@
         </div>
 
         <application-individual-info
+            v-if="selectedApplication"
             :application="selectedApplication"
             :evaluator="evaluator"
             @update-application="updateApplication($event)"
         />
 
         <application-discussion-info
+            v-if="selectedDiscussApp"
             :application="selectedDiscussApp"
             :evaluator="evaluator"
             @update-application="updateApplication($event)"

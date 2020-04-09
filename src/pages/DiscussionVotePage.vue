@@ -32,6 +32,7 @@
             </section>
         </div>
         <discussion-info
+            v-if="selectedDiscussion"
             :discussion="selectedDiscussion"
             :user-id="userId"
             :user-modes="userModes"
