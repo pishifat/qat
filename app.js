@@ -144,6 +144,7 @@ server.on('listening', () => {
     notifications.notifyDeadlines.start();
     notifications.notifyBeatmapReports.start();
     notifications.lowActivityTask.start();
+    notifications.notifyQualityAssurance.start();
 });
 
 module.exports = app;

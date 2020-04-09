@@ -309,7 +309,7 @@ router.post('/setCooldownDate/:id', api.isNotSpectator, async (req, res) => {
         [{
             author: api.defaultWebhookAuthor(req.session),
             color: api.webhookColors.darkBlue,
-            description: `**${a.applicant.username}**'s re-application date set to **${req.body.cooldownDate.toString().slice(0,10)}**`,
+            description: `Re-application date set to **${req.body.cooldownDate.toString().slice(0,10)}** from [**${a.applicant.username}**'s BN app](http://bn.mappersguild.com/appeval?eval=${a.id})`,
         }],
         a.mode
     );
@@ -340,7 +340,7 @@ router.post('/setFeedback/:id', api.isNat, api.isNotSpectator, async (req, res) 
         [{
             author: api.defaultWebhookAuthor(req.session),
             color: api.webhookColors.blue,
-            description: `[**${a.applicant.username}'s BN app](http://bn.mappersguild.com/appeval?eval=${a.id}) feedback**: ${req.body.feedback.length > 925 ? req.body.feedback.slice(0,925) + '... *(truncated)*' : req.body.feedback}`,
+            description: `**[${a.applicant.username}'s BN app](http://bn.mappersguild.com/appeval?eval=${a.id}) feedback**: ${req.body.feedback.length > 925 ? req.body.feedback.slice(0,925) + '... *(truncated)*' : req.body.feedback}`,
         }],
         a.mode
     );

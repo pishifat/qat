@@ -329,6 +329,90 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
 });
 
 /**
+ * Notify of quality assurance helper activity daily
+ */
+const notifyQualityAssurance = cron.schedule('7 22 * * *', async () => {
+    const users = await User.find({
+        $or: [
+            { group: 'nat' },
+            { group: 'bn' },
+        ],
+    }).sort({ username: 1 });
+
+    for (let i = 0; i < users.length; i++) {
+        const qualityAssuranceChecks = await Aiess.find(
+            {
+                qualityAssuranceCheckers: users[i].id,
+            }
+        );
+        users[i].qualityAssuranceChecks = qualityAssuranceChecks.length;
+
+        let recentCount = 0;
+        let sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+        qualityAssuranceChecks.forEach(event => {
+            if (event.timestamp > sevenDaysAgo) recentCount++;
+        });
+
+        users[i].recentQualityAssuranceChecks = recentCount;
+    }
+
+    users.sort((a, b) => {
+        if (a.qualityAssuranceChecks > b.qualityAssuranceChecks) return -1;
+        if (a.qualityAssuranceChecks < b.qualityAssuranceChecks) return 1;
+
+        return 0;
+    });
+
+    const modes = ['osu', 'taiko', 'catch', 'mania'];
+
+    for (let modesIndex = 0; modesIndex < modes.length; modesIndex++) {
+        const mode = modes[modesIndex];
+
+        let topTenText = '';
+        let topTenCount = 0;
+
+        for (let i = 0; topTenCount < 10 && i < users.length; i++) {
+            const user = users[i];
+
+            if (user.modes.includes(mode) && user.qualityAssuranceChecks > 0) {
+                topTenCount++;
+                topTenText += `${topTenCount}. ${user.username}: **${user.qualityAssuranceChecks}**\n`;
+            }
+        }
+
+        let recentText = '';
+        let recentCount = '';
+
+        for (let i = 0; recentCount < 3 && i < users.length; i++) {
+            const user = users[i];
+
+            if (user.modes.includes(mode) && user.recentQualityAssuranceChecks > 0) {
+                recentCount++;
+                recentText += `${recentCount}. ${user.username}: **${user.recentQualityAssuranceChecks}**\n`;
+            }
+        }
+
+        await api.webhookPost(
+            [{
+                title: `${mode == 'osu' ? 'osu!' : 'osu!' + mode} QA activity`,
+                color: api.webhookColors.lightBlue,
+                fields: [{
+                    name: `all time`,
+                    value: topTenText,
+                },{
+                    name: `last 7 days`,
+                    value: recentText,
+                }],
+            }],
+            mode == 'osu' ? 'standardQualityAssurance' : 'taikoCatchManiaQualityAssurance'
+        );
+        await helper.sleep(500);
+    }
+});
+
+/**
  * Checks for bns with less than 6 mods (4 for mania) the first day of every month
  */
 const lowActivityTask = cron.schedule('0 0 1 1 *', async () => {
@@ -427,4 +511,4 @@ async function hasLowActivity (initialDate, bn, mode) {
     return false;
 }
 
-module.exports = { notifyDeadlines, notifyBeatmapReports, lowActivityTask };
+module.exports = { notifyDeadlines, notifyBeatmapReports, lowActivityTask, notifyQualityAssurance };

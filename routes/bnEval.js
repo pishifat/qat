@@ -567,7 +567,7 @@ router.post('/setFeedback/:id', api.isNat, async (req, res) => {
         [{
             author: api.defaultWebhookAuthor(req.session),
             color: api.webhookColors.blue,
-            description: `[**${er.bn.username}'s current BN eval](http://bn.mappersguild.com/bneval?eval=${er.id}) feedback**: ${req.body.feedback.length > 925 ? req.body.feedback.slice(0,925) + '... *(truncated)*' : req.body.feedback}`,
+            description: `**[${er.bn.username}'s current BN eval](http://bn.mappersguild.com/bneval?eval=${er.id}) feedback**: ${req.body.feedback.length > 925 ? req.body.feedback.slice(0,925) + '... *(truncated)*' : req.body.feedback}`,
         }],
         er.mode
     );
