@@ -331,7 +331,7 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
 /**
  * Notify of quality assurance helper activity daily
  */
-const notifyQualityAssurance = cron.schedule('7 22 * * *', async () => {
+const notifyQualityAssurance = cron.schedule('0 22 * * *', async () => {
     const users = await User.find({
         $or: [
             { group: 'nat' },
@@ -365,6 +365,13 @@ const notifyQualityAssurance = cron.schedule('7 22 * * *', async () => {
         return 0;
     });
 
+    const recentUsers = users.sort((a, b) => {
+        if (a.recentQualityAssuranceChecks > b.recentQualityAssuranceChecks) return -1;
+        if (a.recentQualityAssuranceChecks < b.recentQualityAssuranceChecks) return 1;
+
+        return 0;
+    });
+
     const modes = ['osu', 'taiko', 'catch', 'mania'];
 
     for (let modesIndex = 0; modesIndex < modes.length; modesIndex++) {
@@ -386,7 +393,7 @@ const notifyQualityAssurance = cron.schedule('7 22 * * *', async () => {
         let recentCount = '';
 
         for (let i = 0; recentCount < 3 && i < users.length; i++) {
-            const user = users[i];
+            const user = recentUsers[i];
 
             if (user.modes.includes(mode) && user.recentQualityAssuranceChecks > 0) {
                 recentCount++;
