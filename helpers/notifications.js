@@ -358,7 +358,7 @@ const notifyQualityAssurance = cron.schedule('0 22 * * *', async () => {
         users[i].recentQualityAssuranceChecks = recentCount;
     }
 
-    users.sort((a, b) => {
+    const overallUsers = users.sort((a, b) => {
         if (a.qualityAssuranceChecks > b.qualityAssuranceChecks) return -1;
         if (a.qualityAssuranceChecks < b.qualityAssuranceChecks) return 1;
 
@@ -381,7 +381,7 @@ const notifyQualityAssurance = cron.schedule('0 22 * * *', async () => {
         let topTenCount = 0;
 
         for (let i = 0; topTenCount < 10 && i < users.length; i++) {
-            const user = users[i];
+            const user = overallUsers[i];
 
             if (user.modes.includes(mode) && user.qualityAssuranceChecks > 0) {
                 topTenCount++;
