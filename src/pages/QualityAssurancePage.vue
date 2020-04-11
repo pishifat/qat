@@ -2,8 +2,8 @@
     <div>
         <div class="row">
             <div class="col-sm-12">
-                <filter-box
-                    :filter-mode.sync="filterMode"
+                <filter-box 
+                    :filter-mode.sync="filterMode" 
                     :filter-value.sync="filterValue"
                     :placeholder="'metadata...'"
                     :options="['osu', 'taiko', 'catch', 'mania']"
@@ -12,14 +12,14 @@
         </div>
 
         <section class="segment mx-4 my-1">
-            <a data-toggle="collapse" href="#howToUse">Quality Assurance Helpers handbook (aka: how do I use this page?) <i class="fas fa-angle-down" /></a>
+            <a data-toggle="collapse" href="#howToUse">Quality Assurance Helpers handbook (aka: how do I use this page?) <i class="fas fa-angle-down" /></a> 
             <div id="howToUse" class="collapse mt-4 mx-4">
                 <div class="container">
                     <p class="min-spacing">
                         What is the "Quality Assurance Helpers"?
                     </p>
                     <p class="small ml-4">
-                        The Quality Assurance Helpers (QAH) is a the final system in place to ensure beatmaps with unrankable issues do not reach the ranked section.
+                        The Quality Assurance Helpers (QAH) is a the final system in place to ensure beatmaps with unrankable issues do not reach the ranked section. 
                     </p>
                     <p class="small ml-4">
                         The system involves full BN and NAT members reviewing qualified maps for large potential issues, usually not involving extensive modding as would be done while the beatmap is pending. Like nomination-related activities, checking beatmaps through the QAH system counts towards a BN's overall activity.
@@ -28,22 +28,19 @@
                         How do I participate?
                     </p>
                     <p class="small ml-4">
-                        Any BN who is not on probation or NAT member may contribute by clicking on the buttons on the right side of any beatmap card. The
-                        <button
+                        Any BN who is not on probation or NAT member may contribute by clicking on the buttons on the right side of any beatmap card. The 
+                        <button 
                             class="btn btn-xs btn-nat-green p-1"
                         >
                             <i class="fas fa-plus vote-pass" />
                         </button>
-                        button should be used when you've checked a beatmap. The
-                        <button
+                        button should be used when you've checked a beatmap and are 100% there are no unrankable issues. The
+                        <button 
                             class="btn btn-xs btn-nat-red p-1"
                         >
                             <i class="fas fa-minus vote-fail" />
                         </button>
                         button can be used if you accidentally mark the wrong beatmap.
-                    </p>
-                    <p class="small ml-4">
-                        If you check a beatmap and note that it has issues, you should mark yourself as a QA checker and post the issues on the beatmap's discussion thread!
                     </p>
                     <p class="min-spacing">
                         What are the rules for adding myself to a card?
@@ -77,7 +74,7 @@
                 </div>
             </div>
         </section>
-
+        
         <section class="segment segment-image mx-0 px-0">
             <div class="col-sm-12">
                 <transition-group name="list" tag="div">
@@ -130,10 +127,9 @@ export default {
         };
     },
     computed: {
-        sevenDaysAgo() {
+        sevenDaysAgo(){
             let date = new Date();
             date.setDate(date.getDate() - 7);
-
             return date;
         },
     },
@@ -164,7 +160,6 @@ export default {
             axios.get('/qualityAssurance/relevantInfo').then(response => {
                 this.allObjs = response.data.maps;
                 this.disqualifiedEvents = response.data.dqs;
-
                 if (this.isFiltered) {
                     this.filter();
                 }
@@ -173,31 +168,26 @@ export default {
     },
     methods: {
         filterBySearchValueContext(v) {
-            if (v.metadata.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1) {
+            if(v.metadata.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1){
                 return true;
             }
-
             return false;
         },
         isOutdated(beatmapsetId, timestamp) {
             timestamp = new Date(timestamp);
-
-            if (timestamp < this.sevenDaysAgo) {
+            if(timestamp < this.sevenDaysAgo){
                 return true;
-            } else {
+            }else{
                 let beatmaps = this.pageObjs.filter(b => b.beatmapsetId == beatmapsetId && b.timestamp != timestamp);
                 beatmaps = beatmaps.concat(this.disqualifiedEvents.filter(b => b.beatmapsetId == beatmapsetId));
                 let isOutdated = false;
-
                 for (let i = 0; i < beatmaps.length; i++) {
                     const b = beatmaps[i];
-
-                    if (new Date(b.timestamp) > timestamp) {
+                    if(new Date(b.timestamp) > timestamp){
                         isOutdated = true;
                         break;
                     }
                 }
-
                 return isOutdated;
             }
         },
@@ -206,7 +196,7 @@ export default {
             this.allObjs[i] = event;
             this.filter();
         },
-        loadMore() {
+        loadMore(){
             axios
                 .get('/qualityAssurance/loadMore/' + this.limit + '/' + (this.limit - 50))
                 .then(response => {
