@@ -17,10 +17,10 @@
             :evaluations="evaluations"
         />
         <i
-            v-if="feedback" 
+            v-if="feedback"
             data-toggle="tooltip"
             data-placement="top"
-            title="feedback written" 
+            title="feedback written"
             class="fas fa-comment mx-1"
         />
         <span class="errors mx-1 ml-auto">
@@ -68,18 +68,21 @@ export default {
             let bn = 0;
             let nat = 0;
             this.evaluations.forEach(e => {
-                if(e.evaluator.group == 'bn') bn++;
+                if (e.evaluator.group == 'bn') bn++;
                 else nat++;
             });
+
             return bn + (bn == 1 ? ' BN eval, ' : ' BN evals, ') + nat + (nat == 1 ? ' NAT eval' : ' NAT evals');
         },
         createDeadline() {
             let deadline = new Date(this.date);
-            if(this.isApplication){
+
+            if (this.isApplication) {
                 let delay = this.isDiscuss ? 14 : 7;
                 deadline = new Date(deadline.setDate(deadline.getDate() + delay)).toString().slice(4,10);
+
                 return deadline;
-            }else{
+            } else {
                 return deadline.toString().slice(4,10);
             }
         },

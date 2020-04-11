@@ -34,15 +34,21 @@ export default {
             modCount: null,
         };
     },
+    watch: {
+        username() {
+            this.loadingModCount = false;
+            this.modCount = null;
+        },
+    },
     methods: {
         async findModCount() {
             this.loadingModCount = true;
-            axios
-                .get('/modsCount/' + this.username)
-                .then(response => {
-                    this.loadingModCount = false;
-                    this.modCount = response.data.modCount;
-                });
+            const res = await axios.get('/modsCount/' + this.username);
+
+            if (res.data) {
+                this.loadingModCount = false;
+                this.modCount = res.data.modCount;
+            }
         },
     },
 };

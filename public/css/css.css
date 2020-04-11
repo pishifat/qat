@@ -15,9 +15,9 @@
     --neutral: #a0c6ff;
     --neutral-secondary: #556986;
     --wip: var(--neutral);
-    --extend: #f0e770;
-    --extend-secondary: #979243;
-    --upheld: var(--extend);
+    --yellow: #f0e770;
+    --yellow-secondary: #979243;
+    --upheld: var(--yellow);
     --fail: #ff9b9b;
     --withdrawn: var(--fail);
     --main-text: rgba(255, 255, 255, 0.871);
@@ -376,6 +376,13 @@ input[type=number] {
     letter-spacing: .3px;
 }
 
+.btn-mg {
+    background-color: var(--nat-logo);
+    border-radius: 3px;
+    color: var(--dark);
+    letter-spacing: .3px;
+}
+
 .btn:hover {
     -webkit-box-shadow: 0 9px 30px 0 rgba(35,38,42,.1);
     box-shadow: 0 9px 30px 0 rgba(35,38,42,.1);
@@ -431,11 +438,11 @@ input[type=number] {
 }
 
 .btn-nat-yellow {
-    border-color: var(--extend-secondary);
+    border-color: var(--yellow-secondary);
 }
 
 .btn-nat-yellow:hover {
-    border-color: var(--extend);
+    border-color: var(--yellow);
     -webkit-box-shadow: 0 9px 30px 0 rgba(35,38,42,.1);
     box-shadow: 0 9px 30px 0 rgba(35,38,42,.1);
 }
@@ -488,11 +495,11 @@ input[type=number] {
     border-top: 5px solid var(--bn);
 }
 
-.border-probation {
-    border-top: 5px solid var(--probation);
+.border-pass {
+    border-left: 5px solid var(--pass);
 }
 
-.border-pass {
+.border-green {
     border-left: 5px solid var(--pass);
 }
 
@@ -500,11 +507,19 @@ input[type=number] {
     border-left: 5px solid var(--neutral);
 }
 
-.border-extend {
-    border-left: 5px solid var(--extend);
+.border-blue {
+    border-left: 5px solid var(--neutral);
+}
+
+.border-yellow {
+    border-left: 5px solid var(--yellow);
 }
 
 .border-fail {
+    border-left: 5px solid var(--fail);
+}
+
+.border-red {
     border-left: 5px solid var(--fail);
 }
 
@@ -542,6 +557,10 @@ input[type=number] {
     color: var(--pass);
 }
 
+.vote-green {
+    color: var(--pass);
+}
+
 .vote-neutral {
     color: var(--neutral);
 }
@@ -550,11 +569,19 @@ input[type=number] {
     color: var(--neutral);
 }
 
-.vote-extend {
-    color: var(--extend);
+.vote-blue {
+    color: var(--neutral);
+}
+
+.vote-yellow {
+    color: var(--yellow);
 }
 
 .vote-fail {
+    color: var(--fail);
+}
+
+.vote-red {
     color: var(--fail);
 }
 
@@ -562,15 +589,27 @@ input[type=number] {
     border-left: 3px solid var(--fail);
 }
 
-.vote-border-extend {
-    border-left: 3px solid var(--extend);
+.vote-border-red {
+    border-left: 3px solid var(--fail);
+}
+
+.vote-border-yellow {
+    border-left: 3px solid var(--yellow);
 }
 
 .vote-border-neutral {
     border-left: 3px solid var(--neutral);
 }
 
+.vote-border-blue {
+    border-left: 3px solid var(--neutral);
+}
+
 .vote-border-pass {
+    border-left: 3px solid var(--pass);
+}
+
+.vote-border-green {
     border-left: 3px solid var(--pass);
 }
 
@@ -588,8 +627,8 @@ input[type=number] {
     color: #111;
 }
   
-.badge-extend {
-    background-color: var(--extend);
+.badge-yellow {
+    background-color: var(--yellow);
     color: #111;
 }
   
@@ -618,6 +657,9 @@ input[type="radio"] + .fas { cursor: pointer; }
 .all-radio + .fa-globe:before { content: "\f0ac"; }
 .checkmark-radio + .fa-check:before { content: "\f00c"; }
 .cross-radio + .fa-check:before { content: "\f00d"; }
+.probation-bn-radio + .fa-stream:before { content: "\f368"; }
+.full-bn-radio + .fa-stream:before { content: "\f554"; }
+.nat-radio + .fa-stream:before { content: "\f70c"; }
 
 /* Checked */
 .osu-radio:checked + .fa-circle:before { 
@@ -647,6 +689,18 @@ input[type="radio"] + .fas { cursor: pointer; }
 .cross-radio:checked + .fa-times:before { 
     color: var(--clicked);
     content: "\f00d"; 
+}
+.probation-bn-radio:checked + .fa-accessible-icon:before { 
+    color: var(--clicked);
+    content: "\f368"; 
+}
+.full-bn-radio:checked + .fa-walking:before { 
+    color: var(--clicked);
+    content: "\f554"; 
+}
+.nat-radio:checked + .fa-running:before { 
+    color: var(--clicked);
+    content: "\f70c"; 
 }
 /* END RADIO MODES */
 
@@ -721,11 +775,11 @@ input[type="radio"] + .fas { cursor: pointer; }
     border-right: 15px solid var(--pass);
 }
 
-.card-status-extend {
-    border-right: 15px solid var(--extend);
+.card-status-neutral {
+    border-right: 15px solid var(--neutral);
 }
 
-.card-status-neutral {
+.card-status-probation {
     border-right: 15px solid var(--neutral);
 }
 

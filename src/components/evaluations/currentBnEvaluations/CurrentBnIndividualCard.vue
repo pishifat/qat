@@ -16,7 +16,6 @@
             <card-footer
                 :mode="evalRound.mode"
                 :is-nat="evaluator.isNat"
-                :is-leader="evaluator.isLeader"
                 :nominator-assessment-mongo-id="evalRound.id"
                 :evaluations="evalRound.evaluations"
                 :is-discuss="false"
@@ -38,8 +37,14 @@ export default {
         CardFooter,
     },
     props: {
-        evalRound: Object,
-        evaluator: Object,
+        evalRound: {
+            type: Object,
+            required: true,
+        },
+        evaluator: {
+            type: Object,
+            required: true,
+        },
         allChecked: Boolean,
     },
     data() {
@@ -69,6 +74,7 @@ export default {
                     }
                 }
             });
+
             return vote;
         },
         checkSelection() {
@@ -80,12 +86,15 @@ export default {
         },
         isNatEvaluator() {
             if (!this.evalRound.natEvaluators) return false;
+
             for (let i = 0; i < this.evalRound.natEvaluators.length; i++) {
                 let user = this.evalRound.natEvaluators[i];
-                if(user.id == this.evaluator.id){
+
+                if (user.id == this.evaluator.id) {
                     return true;
                 }
             }
+
             return false;
         },
     },

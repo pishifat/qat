@@ -1,7 +1,7 @@
 const express = require('express');
 const api = require('../helpers/api');
-const aiessService = require('../models/aiess').service;
-const logsService = require('../models/log').service;
+const Aiess = require('../models/aiess');
+const Logger = require('../models/log');
 
 const router = express.Router();
 
@@ -22,12 +22,16 @@ router.get('/', (req, res) => {
 router.get('/relevantInfo', async (req, res) => {
     let date = new Date();
     date.setDate(date.getDate() - 90);
-    let data = await aiessService.query(
-        { $or: [{ eventType: 'Disqualified' }, { eventType: 'Popped' }], timestamp: { $gte: date } },
-        {},
-        { timestamp: -1 },
-        true
-    );
+    let data = await Aiess
+        .find({
+            $or: [
+                { eventType: 'Disqualified' },
+                { eventType: 'Popped' },
+            ],
+            timestamp: { $gte: date },
+        })
+        .sort({ timestamp: -1 });
+
     res.json({
         events: data,
         mode: res.locals.userRequest.modes[0],
@@ -36,103 +40,46 @@ router.get('/relevantInfo', async (req, res) => {
 
 /* POST edit reason for dq/pop */
 router.post('/updateContent/:id', api.isNotSpectator, async (req, res) => {
-    let a = await aiessService.update(req.params.id, { content: req.body.reason });
+    let a = await Aiess.findByIdAndUpdate(req.params.id, { content: req.body.reason });
 
     if (!a) {
         res.json({ error: 'Something went wrong' });
     } else {
         res.json(req.body.reason);
-        logsService.create(req.session.mongoId, `Updated DQ reason of s/${a.beatmapsetId} to "${a.content}"`);
-        /*await api.webhookPost(
-            [{
-                author: {
-                    name: `${req.session.username}`,
-                    icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                    url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-                },
-                color: '3103310',
-                fields:[
-                    {
-                        name: `https://osu.ppy.sh/beatmapsets/${a.beatmapsetId}/discussion/-/generalAll#/${a.postId}`,
-                        value: `Shortened **DQ/reset reason** of "${a.metadata}": ${req.body.reason}`,
-                    },
-                ],
-            }],
-            a.modes[0]
-        );*/
+        Logger.generate(req.session.mongoId, `Updated DQ reason of s/${a.beatmapsetId} to "${a.content}"`);
     }
 });
 
 /* POST edit obviousness */
 router.post('/updateObviousness/:id', api.isNotSpectator, async (req, res) => {
     let obviousness = parseInt(req.body.obviousness);
-    let a = await aiessService.query({ _id: req.params.id });
+    let a = await Aiess.findById(req.params.id).orFail();
 
     if (obviousness == a.obviousness) {
         obviousness = null;
     }
 
-    a = await aiessService.update(req.params.id, { obviousness });
+    a.obviousness = obviousness;
+    await a.save();
 
-    if (!a) {
-        res.json({ error: 'Something went wrong' });
-    } else {
-        res.json(obviousness);
-        logsService.create(req.session.mongoId, `Updated obviousness of s/${a.beatmapsetId} to "${obviousness}"`);
-        /*await api.webhookPost(
-            [{
-                author: {
-                    name: `${req.session.username}`,
-                    icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                    url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-                },
-                color: '6893914',
-                fields:[
-                    {
-                        name: `https://osu.ppy.sh/beatmapsets/${a.beatmapsetId}/discussion/-/generalAll#/${a.postId}`,
-                        value: `Set **obviousness** of "${a.metadata}": **${obviousness}**`,
-                    },
-                ],
-            }],
-            a.modes[0]
-        );*/
-    }
+    res.json(obviousness);
+    Logger.generate(req.session.mongoId, `Updated obviousness of s/${a.beatmapsetId} to "${obviousness}"`);
 });
 
 /* POST edit severity */
 router.post('/updateSeverity/:id', api.isNotSpectator, async (req, res) => {
     let severity = parseInt(req.body.severity);
-    let a = await aiessService.query({ _id: req.params.id });
+    let a = await Aiess.findById(req.params.id).orFail();
 
     if (severity == a.severity) {
         severity = null;
     }
 
-    a = await aiessService.update(req.params.id, { severity });
+    a.severity = severity;
+    await a.save();
 
-    if (!a) {
-        res.json({ error: 'Something went wrong' });
-    } else {
-        res.json(severity);
-        logsService.create(req.session.mongoId, `Updated severity of s/${a.beatmapsetId} to "${severity}"`);
-        /*await api.webhookPost(
-            [{
-                author: {
-                    name: `${req.session.username}`,
-                    icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                    url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-                },
-                color: '4206938',
-                fields:[
-                    {
-                        name: `https://osu.ppy.sh/beatmapsets/${a.beatmapsetId}/discussion/-/generalAll#/${a.postId}`,
-                        value: `Set **obviousness** of "${a.metadata}": **${severity}**`,
-                    },
-                ],
-            }],
-            a.modes[0]
-        );*/
-    }
+    res.json(severity);
+    Logger.generate(req.session.mongoId, `Updated severity of s/${a.beatmapsetId} to "${severity}"`);
 });
 
 module.exports = router;

@@ -1,8 +1,8 @@
 <template>
     <div class="row">
         <div class="col-md-12">
-            <filter-box 
-                :filter-mode.sync="filterMode" 
+            <filter-box
+                :filter-mode.sync="filterMode"
                 :filter-value.sync="filterValue"
                 :placeholder="'username... (3+ characters)'"
                 :options="['', 'osu', 'taiko', 'catch', 'mania']"
@@ -24,22 +24,31 @@
                             :key="user.id"
                             :user="user"
                             :user-id="userId"
-                            :is-leader="isLeader"
                             @update:selectedUser="selectedUser = $event"
                         />
                     </transition-group>
-                    <button v-if="pre > 0" class="btn btn-sm btn-pags btn-pags-left" type="button" @click="showNewer()">
+                    <button
+                        v-if="pre > 0"
+                        class="btn btn-sm btn-pags btn-pags-left"
+                        type="button"
+                        @click="showNewer()"
+                    >
                         <i class="fas fa-angle-left px-1" />
                     </button>
-                    <button v-if="canShowOlder" class="btn btn-sm btn-pags btn-pags-right" type="button" @click="showOlder()">
+                    <button
+                        v-if="canShowOlder"
+                        class="btn btn-sm btn-pags btn-pags-right"
+                        type="button"
+                        @click="showOlder()"
+                    >
                         <i class="fas fa-angle-right px-1" />
                     </button>
                 </div>
             </section>
             <!-- other tools -->
             <section class="segment segment-solid my-1 mx-4">
-                <nat-activity/>
-                <bn-activity/>
+                <nat-activity />
+                <bn-activity />
                 <badges
                     v-if="isNat"
                 />
@@ -52,7 +61,6 @@
         <user-info
             :user="selectedUser"
             :user-id="userId"
-            :is-leader="isLeader"
             :is-nat="isNat"
             @update-user="updateUser($event)"
         />
@@ -88,7 +96,6 @@ export default {
             allObjs: null,
             filteredObjs: null,
             userId: null,
-            isLeader: null,
             isNat: null,
             isBn: null,
             selectedUser: null,
@@ -100,19 +107,20 @@ export default {
             .then(response => {
                 this.allObjs = response.data.users;
                 this.userId = response.data.userId;
-                this.isLeader = response.data.isLeader;
                 this.isNat = response.data.isNat;
                 this.isBn = response.data.isBn;
                 this.limit = 24;
                 const params = new URLSearchParams(document.location.search.substring(1));
+
                 if (params.get('id') && params.get('id').length) {
                     const i = this.allObjs.findIndex(u => u.id == params.get('id'));
-                    if(i >= 0){
+
+                    if (i >= 0) {
                         this.selectedUser = this.allObjs[i];
                         $('#extendedInfo').modal('show');
                     }
                 }
-            }).then(function(){
+            }).then(function() {
                 $('#loading').fadeOut();
                 $('#main').attr('style', 'visibility: visible').hide().fadeIn();
             });
@@ -123,7 +131,8 @@ export default {
                 .get('/users/relevantInfo')
                 .then(response => {
                     this.allObjs = response.data.users;
-                    if(this.isFiltered){
+
+                    if (this.isFiltered) {
                         this.filter();
                     }
                 });
@@ -131,9 +140,10 @@ export default {
     },
     methods: {
         filterBySearchValueContext(u) {
-            if(u.username.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1){
+            if (u.username.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1) {
                 return true;
             }
+
             return false;
         },
         updateUser(u) {
@@ -143,15 +153,18 @@ export default {
         },
         sortDuration(dateArray) {
             let days = 0;
+
             for (let i = 0; i < dateArray.length; i+=2) {
                 let a = new Date(dateArray[i]);
                 let b = new Date(dateArray[i+1]);
-                if(dateArray[i+1]){
+
+                if (dateArray[i+1]) {
                     days += (Math.abs(b.getTime() - a.getTime())) / (1000 * 3600 * 24);
-                }else{
+                } else {
                     days += (Math.abs(new Date().getTime() - a.getTime())) / (1000 * 3600 * 24);
                 }
             }
+
             return days;
         },
     },

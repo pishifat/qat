@@ -1,18 +1,19 @@
 const express = require('express');
 const api = require('../helpers/api');
-const testSubmissionService = require('../models/bnTest/testSubmission').service;
-const logsService = require('../models/log').service;
-const bnAppsService = require('../models/bnApp').service;
-const usersModel = require('../models/user').User;
+const TestSubmission = require('../models/bnTest/testSubmission');
+const TestAnswer = require('../models/bnTest/testAnswer');
+const Logger = require('../models/log');
+const BnApp = require('../models/bnApp');
+const User = require('../models/user');
 
 const router = express.Router();
 router.use(api.isLoggedIn);
 
 const defaultPopulate = [
-    { populate: 'applicant', display: 'username' },
-    { populate: 'answers', display: 'question optionsChosen' },
+    { path: 'applicant', select: 'username' },
+    { path: 'answers', select: 'question optionsChosen' },
     {
-        innerPopulate: 'answers',
+        path: 'answers',
         populate: {
             path: 'question',
             populate: {
@@ -34,15 +35,10 @@ router.get('/', (req, res) => {
 
 /* GET pending tests by user */
 router.get('/tests', async (req, res) => {
-    const tests = await testSubmissionService.query(
-        {
-            applicant: req.session.mongoId,
-            status: { $ne: 'finished' },
-        },
-        null,
-        null,
-        true
-    );
+    const tests = await TestSubmission.find({
+        applicant: req.session.mongoId,
+        status: { $ne: 'finished' },
+    });
 
     if (!tests || !tests.length || tests.error) {
         return res.redirect('/');
@@ -53,23 +49,23 @@ router.get('/tests', async (req, res) => {
 
 /* POST test by user */
 router.post('/loadTest', async (req, res) => {
-    let test = await testSubmissionService.query(
-        {
+    let test = await TestSubmission
+        .findOne({
             _id: req.body.testId,
             applicant: req.session.mongoId,
             status: { $ne: 'finished' },
-        },
-        defaultPopulate,
-        { 'answers.question.category': 1 }
-    );
+        })
+        .populate(defaultPopulate)
+        .sort({ 'answers.question.category': 1 });
 
     if (!test || test.error) {
         return res.redirect('/');
     }
 
     if (!test.startedAt) {
-        await testSubmissionService.update(req.body.testId, { startedAt: Date.now(), status: 'wip' });
         test.startedAt = Date.now();
+        test.status = 'wip';
+        await test.save();
     }
 
     return res.json(test);
@@ -79,7 +75,7 @@ router.post('/loadTest', async (req, res) => {
 router.post('/submitAnswer', async (req, res) => {
     if (!req.body.answerId || !req.body.checkedOptions) return res.json({ error: 'Something went wrong!' });
 
-    let answer = await testSubmissionService.updateAnswer(req.body.answerId, { optionsChosen: req.body.checkedOptions });
+    let answer = await TestAnswer.findByIdAndUpdate(req.body.answerId, { optionsChosen: req.body.checkedOptions });
 
     if (!answer || answer.error) return res.json({ error: 'Something went wrong!' });
     else return res.json({ success: 'ok' });
@@ -87,15 +83,15 @@ router.post('/submitAnswer', async (req, res) => {
 
 /* POST submit test */
 router.post('/submitTest', async (req, res) => {
-    const test = await testSubmissionService.query(
-        {
+    const test = await TestSubmission
+        .findOne({
             _id: req.body.testId,
             applicant: req.session.mongoId,
             status: { $ne: 'finished' },
-        },
-        defaultPopulate
-    );
-    const currentBnApp = await bnAppsService.query({
+        })
+        .populate(defaultPopulate);
+
+    const currentBnApp = await BnApp.findOne({
         applicant: req.session.mongoId,
         mode: test.mode,
         active: true,
@@ -119,40 +115,33 @@ router.post('/submitTest', async (req, res) => {
 
     displayScore = displayScore.toFixed(1);
     const [updatedTest, updatedApp] = await Promise.all([
-        testSubmissionService.update(req.body.testId, {
+        TestSubmission.findByIdAndUpdate(req.body.testId, {
             submittedAt: Date.now(),
             status: 'finished',
             totalScore: displayScore,
             comment: req.body.comment,
         }),
-        bnAppsService.update(currentBnApp.id, { test: test._id }),
+        BnApp.findByIdAndUpdate(currentBnApp.id, { test: test._id }),
     ]);
 
     if (!updatedTest || updatedTest.error || !updatedApp || updatedApp.error) return res.json({ error: 'Something went wrong!' });
 
     res.json(displayScore);
-    logsService.create(req.session.mongoId, `Completed ${test.mode} BN app test`);
-    let u = res.locals.userRequest;
-    let modsList = '';
+    Logger.generate(req.session.mongoId, `Completed ${test.mode} BN app test`);
 
-    for (let i = 0; i < currentBnApp.mods.length; i++) {
-        modsList += currentBnApp.mods[i];
-
-        if (i + 1 < currentBnApp.mods.length) {
-            modsList += ', ';
-        }
-    }
+    const twoEvaluationModes = ['catch', 'mania'];
+    //const threeEvaluationModes = ['osu', 'taiko'];
 
     const invalids = [8129817, 3178418];
-    const assignedNat = await usersModel.aggregate([
+    const assignedNat = await User.aggregate([
         { $match: { group: 'nat', isSpectator: { $ne: true }, modes: test.mode, osuId: { $nin: invalids } } },
-        { $sample: { size: test.mode == 'osu' || test.mode == 'catch' ? 3 : 2 } },
+        { $sample: { size: twoEvaluationModes.includes(test.mode) ? 2 : 3 } },
     ]);
     let natList = '';
 
     for (let i = 0; i < assignedNat.length; i++) {
         let user = assignedNat[i];
-        await bnAppsService.update(currentBnApp.id, { $push: { natEvaluators: user._id } });
+        await BnApp.findByIdAndUpdate(currentBnApp.id, { $push: { natEvaluators: user._id } });
         natList += user.username;
 
         if (i + 1 < assignedNat.length) {
@@ -162,21 +151,10 @@ router.post('/submitTest', async (req, res) => {
 
     api.webhookPost(
         [{
-            author: {
-                name: `${u.username}`,
-                icon_url: `https://a.ppy.sh/${u.osuId}`,
-                url: `http://bn.mappersguild.com/appeval?eval=${currentBnApp.id}`,
-            },
-            color: '9884159',
+            author: api.defaultWebhookAuthor(req.session),
+            description: `Submitted [BN application](http://bn.mappersguild.com/appeval?eval=${currentBnApp.id}) with test score of **${displayScore}**`,
+            color: api.webhookColors.green,
             fields: [
-                {
-                    name: 'New BN application',
-                    value: `Test score: **${displayScore}**`,
-                },
-                {
-                    name: 'Mods',
-                    value: modsList,
-                },
                 {
                     name: 'Assigned NAT',
                     value: natList,

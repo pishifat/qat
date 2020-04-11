@@ -28,7 +28,7 @@
         </small>
         <div v-if="natActivity">
             <div v-for="user in natActivity" :key="user.username" class="small min-spacing mb-1">
-                <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a> (joined {{user.joinDate.toString().slice(0, 10)}})
+                <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a> (joined {{ user.joinDate.toString().slice(0, 10) }})
                 <ul>
                     <li>{{ user.totalBnAppEvals }} application evaluations</li>
                     <li>{{ user.totalCurrentBnEvals }} current BN evaluations</li>
@@ -63,7 +63,7 @@ export default {
     },
     methods: {
         findNatActivity() {
-            if(!this.natDays.length) this.natDays = 30;
+            if (!this.natDays.length) this.natDays = 30;
             axios
                 .get('/users/findNatActivity/' + this.natDays + '/' + this.natMode)
                 .then(response => {

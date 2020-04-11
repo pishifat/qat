@@ -83,8 +83,10 @@ export default {
     methods: {
         async unarchive(e) {
             const result = confirm(`Are you sure? ${this.application.consensus == 'pass' ? 'This will remove the user from the BN' : ''}`);
-            if(result){
+
+            if (result) {
                 const er = await this.executePost('/evalArchive/unarchive/' + this.application.id, { type: 'application' }, e);
+
                 if (er) {
                     window.location = '/appeval?eval=' + this.application.id;
                 }

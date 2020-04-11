@@ -28,14 +28,15 @@
         </small>
         <div v-if="bnActivity">
             <div v-for="user in bnActivity" :key="user.username" class="small min-spacing mb-1">
-                <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a> (joined {{user.joinDate.toString().slice(0, 10)}})
+                <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a> (joined {{ user.joinDate.toString().slice(0, 10) }})
                 <ul>
                     <li
-                        :class="user.uniqueNominations < bnDaysDisplay/10 ? 
-                            'background-fail' : 
-                            user.uniqueNominations < bnDaysDisplay/6 ? 
-                                'background-warn' : 
-                                'background-pass'">
+                        :class="user.uniqueNominations < bnDaysDisplay/10 ?
+                            'background-fail' :
+                            user.uniqueNominations < bnDaysDisplay/6 ?
+                                'background-warn' :
+                                'background-pass'"
+                    >
                         {{ user.uniqueNominations }} nominations
                     </li>
                     <li>{{ user.nominationResets }} nomination resets</li>
@@ -62,7 +63,7 @@ export default {
     },
     methods: {
         findBnActivity() {
-            if(!this.bnDays.length) this.bnDays = 30;
+            if (!this.bnDays.length) this.bnDays = 30;
             axios
                 .get('/users/findBnActivity/' + this.bnDays + '/' + this.bnMode)
                 .then(response => {

@@ -1,15 +1,14 @@
 const express = require('express');
 const api = require('../helpers/api');
 const helper = require('../helpers/helpers');
-const logsService = require('../models/log').service;
-const evalsService = require('../models/evaluation').service;
-const reportsService = require('../models/report').service;
-const evalRoundsService = require('../models/evalRound').service;
-const bnAppsService = require('../models/bnApp').service;
-const usersService = require('../models/user').service;
-const aiessService = require('../models/aiess').service;
-const notesService = require('../models/note').service;
-const usersModel = require('../models/user').User;
+const Logger = require('../models/log');
+const Evaluation = require('../models/evaluation');
+const Report = require('../models/report');
+const EvalRound = require('../models/evalRound');
+const BnApp = require('../models/bnApp');
+const User = require('../models/user');
+const Aiess = require('../models/aiess');
+const Note = require('../models/note');
 
 const router = express.Router();
 
@@ -28,39 +27,47 @@ router.get('/', (req, res) => {
 
 //population
 const defaultPopulate = [
-    { populate: 'bn', display: 'username osuId probation modes' },
-    { populate: 'natEvaluators', display: 'username osuId' },
     {
-        populate: 'evaluations',
-        display: 'evaluator behaviorComment moddingComment vote',
+        path: 'bn',
+        select: 'username osuId probation modes group',
     },
     {
-        innerPopulate: 'evaluations',
-        populate: { path: 'evaluator', select: 'username osuId group isLeader' },
+        path: 'natEvaluators',
+        select: 'username osuId',
+    },
+    {
+        path: 'evaluations',
+        select: 'evaluator behaviorComment moddingComment vote',
+        populate: {
+            path: 'evaluator',
+            select: 'username osuId group',
+        },
     },
 ];
 
 const notesPopulate = [
-    { populate: 'author', display: 'username' },
+    { path: 'author', select: 'username' },
 ];
 
 const applicationPopulate = [
-    { populate: 'applicant', display: 'username osuId' },
     {
-        populate: 'evaluations',
-        display: 'evaluator behaviorComment moddingComment vote',
+        path: 'applicant',
+        select: 'username osuId',
     },
     {
-        innerPopulate: 'evaluations',
-        populate: { path: 'evaluator', select: 'username osuId group' },
+        path: 'evaluations',
+        select: 'evaluator behaviorComment moddingComment vote',
+        populate: {
+            path: 'evaluator',
+            select: 'username osuId group',
+        },
     },
 ];
 
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res) => {
-    let minDate = new Date();
-    minDate.setDate(minDate.getDate() + 14);
-    let er = await evalRoundsService.query({ active: true, deadline: { $lte: minDate } }, defaultPopulate, { deadline: 1, consensus: 1, feedback: 1 }, true);
+    const er = await EvalRound.findActiveEvaluations();
+
     res.json({ er, evaluator: res.locals.userRequest });
 });
 
@@ -72,15 +79,24 @@ function isValidMode(modeToCheck, isOsu, isTaiko, isCatch, isMania) {
 }
 
 /* POST submit or edit eval */
-router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
-    let allUsersByMode = await usersService.getAllByMode(req.body.bn, req.body.probation, req.body.nat);
+router.post('/addEvalRounds/', async (req, res) => {
+    const includeFullBns = req.body.groups.includes('fullBn');
+    const includeProbationBns = req.body.groups.includes('probationBn');
+    const includeNat = req.body.groups.includes('nat');
+    const isOsu = req.body.modes.includes('osu');
+    const isTaiko = req.body.modes.includes('taiko');
+    const isCatch = req.body.modes.includes('catch');
+    const isMania = req.body.modes.includes('mania');
     let allEvalsToCreate = [];
     let failed = [];
     const deadline = new Date(req.body.deadline);
 
+    // if user groups are selected
+    let allUsersByMode = await User.getAllByMode(includeFullBns, includeProbationBns, includeNat);
+
     if (allUsersByMode) {
         allUsersByMode = allUsersByMode.filter(m => {
-            return isValidMode(m._id, req.body.osu, req.body.taiko, req.body.catch, req.body.mania);
+            return isValidMode(m._id, isOsu, isTaiko, isCatch, isMania);
         });
 
         if (req.body.excludeUsers) {
@@ -108,6 +124,7 @@ router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
         });
     }
 
+    // if usernames are specified
     if (req.body.includeUsers) {
         const includeUsers = req.body.includeUsers.split(',');
 
@@ -117,27 +134,17 @@ router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
 
             if (!isNaN(userToSearch)) {
                 userToSearch = parseInt(userToSearch);
-                u = await usersService.query({
+                u = await User.findOne({
                     osuId: userToSearch,
                 });
             } else {
-                u = await usersService.query({
-                    username: new RegExp('^' + helper.escapeUsername(includeUsers[i].trim()) + '$', 'i'),
-                });
+                u = await User.findByUsername(includeUsers[i].trim());
             }
 
             if (u && !u.error) {
                 if (u.modes) {
                     u.modes.forEach(m => {
-                        if (isValidMode(m, req.body.osu, req.body.taiko, req.body.catch, req.body.mania)) {
-                            allEvalsToCreate.push({ bn: u._id, mode: m, deadline });
-                        }
-                    });
-                }
-
-                if (u.probation) {
-                    u.probation.forEach(m => {
-                        if (isValidMode(m, req.body.osu, req.body.taiko, req.body.catch, req.body.mania)) {
+                        if (isValidMode(m, isOsu, isTaiko, isCatch, isMania)) {
                             allEvalsToCreate.push({ bn: u._id, mode: m, deadline });
                         }
                     });
@@ -148,143 +155,126 @@ router.post('/addEvalRounds/', api.isLeader, async (req, res) => {
         }
     }
 
+    if (!allEvalsToCreate.length) {
+        return res.json({ error: 'No evaluations generated' });
+    }
+
+
+    // delete scheduled evalRounds
     for (let i = 0; i < allEvalsToCreate.length; i++) {
         const round = allEvalsToCreate[i];
-        await evalRoundsService.deleteManyByUserId(round.bn);
+        await EvalRound.deleteManyByUserId(round.bn);
     }
 
-    if (allEvalsToCreate.length) {
-        const result = await evalRoundsService.createMany(allEvalsToCreate);
-        if (result.error) return res.json(result);
+    // create evalRounds
+    const result = await EvalRound.insertMany(allEvalsToCreate);
 
-        let minDate = new Date();
-        minDate.setDate(minDate.getDate() + 14);
-        let ers = await evalRoundsService.query({ active: true, deadline: { $lte: minDate } }, defaultPopulate, { deadline: 1, consensus: 1, feedback: 1 }, true);
+    if (result.error) return res.json(result);
 
-        res.json({ ers, failed });
+    let ers = await EvalRound.findActiveEvaluations();
 
-        if (deadline < minDate) {
-            for (let i = 0; i < result.length; i++) {
-                const er = result[i];
-                const u = await usersService.query({ _id: er.bn });
-                const invalids = [8129817, 3178418, u.osuId];
-                const assignedNat = await usersModel.aggregate([
-                    { $match: { group: 'nat', isSpectator: { $ne: true }, modes: er.mode, osuId: { $nin: invalids } } },
-                    { $sample: { size: er.mode == 'osu' || er.mode == 'catch' ? 3 : 2 } },
-                ]);
-                let natList = '';
+    res.json({ ers, failed });
 
-                for (let i = 0; i < assignedNat.length; i++) {
-                    let user = assignedNat[i];
-                    await evalRoundsService.update(er.id, { $push: { natEvaluators: user._id } });
-                    natList += user.username;
+    let minDate = new Date();
+    minDate.setDate(minDate.getDate() + 14);
 
-                    if (i + 1 < assignedNat.length) {
-                        natList += ', ';
-                    }
+    if (deadline < minDate) {
+        for (let i = 0; i < result.length; i++) {
+            const er = result[i];
+            const u = await User.findById(er.bn);
+            const invalids = [8129817, 3178418, u.osuId];
+            const assignedNat = await User.aggregate([
+                { $match: { group: 'nat', isSpectator: { $ne: true }, modes: er.mode, osuId: { $nin: invalids } } },
+                { $sample: { size: er.mode == 'osu' || er.mode == 'catch' ? 3 : 2 } },
+            ]);
+            let natList = '';
+
+            for (let i = 0; i < assignedNat.length; i++) {
+                let user = assignedNat[i];
+                await EvalRound.findByIdAndUpdate(er.id, { $push: { natEvaluators: user._id } });
+                natList += user.username;
+
+                if (i + 1 < assignedNat.length) {
+                    natList += ', ';
                 }
-
-                await api.webhookPost(
-                    [{
-                        author: {
-                            name: `${req.session.username}`,
-                            icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                            url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-                        },
-                        color: '16756444',
-                        fields: [
-                            {
-                                name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
-                                value: `Created current BN eval for **${u.username}**`,
-                            },
-                            {
-                                name: 'Assigned NAT',
-                                value: natList,
-                            },
-                        ],
-                    }],
-                    er.mode
-                );
-                await helper.sleep(500);
             }
+
+            await api.webhookPost(
+                [{
+                    author: api.defaultWebhookAuthor(req.session),
+                    color: api.webhookColors.white,
+                    description: `Created [**${u.username}**'s current BN eval](http://bn.mappersguild.com/bneval?eval=${er.id})`,
+                    fields: [
+                        {
+                            name: 'Assigned NAT',
+                            value: natList,
+                        },
+                    ],
+                }],
+                er.mode
+            );
+            await helper.sleep(500);
         }
-
-
-
-        logsService.create(
-            req.session.mongoId,
-            `Added BN evaluations for ${allEvalsToCreate.length} user${allEvalsToCreate.length == 1 ? '' : 's'}`
-        );
-    } else {
-        return res.json({ error: 'Nothing changed...' });
     }
+
+    Logger.generate(
+        req.session.mongoId,
+        `Added BN evaluations for ${allEvalsToCreate.length} user${allEvalsToCreate.length == 1 ? '' : 's'}`
+    );
 });
 
 /* POST submit or edit eval */
 router.post('/submitEval/:id', api.isBnOrNat, async (req, res) => {
     if (req.body.evaluationId) {
-        await evalsService.update(req.body.evaluationId, {
+        await Evaluation.findByIdAndUpdate(req.body.evaluationId, {
             behaviorComment: req.body.behaviorComment,
             moddingComment: req.body.moddingComment,
             vote: req.body.vote,
         });
     } else {
-        let ev = await evalsService.create(
-            req.session.mongoId,
-            req.body.behaviorComment,
-            req.body.moddingComment,
-            req.body.vote
-        );
-        await evalRoundsService.update(req.params.id, { $push: { evaluations: ev._id } });
-        let er = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
+        let ev = await Evaluation.create({
+            evaluator: req.session.mongoId,
+            behaviorComment: req.body.behaviorComment,
+            moddingComment: req.body.moddingComment,
+            vote: req.body.vote,
+        });
+
+        let er =await EvalRound
+            .findByIdAndUpdate(req.params.id, { $push: { evaluations: ev._id } })
+            .populate(defaultPopulate);
+
         api.webhookPost(
             [{
-                author: {
-                    name: `${req.session.username}`,
-                    icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                    url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-                },
-                color: '3800465',
-                fields: [
-                    {
-                        name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
-                        value: `Submitted current BN eval for **${er.bn.username}**`,
-                    },
-                ],
+                author: api.defaultWebhookAuthor(req.session),
+                color: api.webhookColors.lightGreen,
+                description: `Submitted eval for [**${er.bn.username}**'s current BN eval](http://bn.mappersguild.com/bneval?eval=${er.id})`,
             }],
             er.mode
         );
-        let twoEvaluationModes = ['taiko', 'mania'];
-        let threeEvaluationModes = ['osu', 'catch'];
+        const twoEvaluationModes = ['catch', 'mania'];
+        const threeEvaluationModes = ['osu', 'taiko'];
 
         if (!er.discussion && ((threeEvaluationModes.includes(er.mode) && er.evaluations.length > 2) || (twoEvaluationModes.includes(er.mode) && er.evaluations.length > 1))) {
-            await evalRoundsService.update(req.params.id, { discussion: true });
+            await EvalRound.findByIdAndUpdate(req.params.id, { discussion: true });
             let pass = 0;
-            let extend = 0;
+            let probation = 0;
             let fail = 0;
             er.evaluations.forEach(evaluation => {
                 if (evaluation.vote == 1) pass++;
-                else if (evaluation.vote == 2) extend++;
+                else if (evaluation.vote == 2) probation++;
                 else if (evaluation.vote == 3) fail++;
             });
             api.webhookPost(
                 [{
-                    author: {
-                        name: `${er.bn.username}`,
-                        url: `https://osu.ppy.sh/users/${er.bn.osuId}`,
-                    },
                     thumbnail: {
                         url: `https://a.ppy.sh/${er.bn.osuId}`,
                     },
-                    color: '3773329',
+                    color: api.webhookColors.gray,
+                    description: `[**${er.bn.username}**'s current BN eval](http://bn.mappersguild.com/bneval?eval=${er.id}) moved to group discussion`,
                     fields: [
                         {
-                            name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
-                            value: 'Current BN eval moved to group discussion',
-                        },
-                        {
                             name: 'Votes',
-                            value: `Pass: **${pass}**, Extend: **${extend}**, Fail: **${fail}**`,
+                            value: `Pass: **${pass}**, Probation: **${probation}**, Fail: **${fail}**`,
                         },
                     ],
                 }],
@@ -293,9 +283,10 @@ router.post('/submitEval/:id', api.isBnOrNat, async (req, res) => {
         }
     }
 
-    let ev_ = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
+    let ev_ = await EvalRound.findById(req.params.id).populate(defaultPopulate);
+
     res.json(ev_);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `${req.body.evaluationId ? 'Updated' : 'Submitted'} ${ev_.mode} BN evaluation for "${ev_.bn.username}"`
     );
@@ -304,32 +295,27 @@ router.post('/submitEval/:id', api.isBnOrNat, async (req, res) => {
 /* POST set group eval */
 router.post('/setGroupEval/', api.isNat, async (req, res) => {
     for (let i = 0; i < req.body.checkedRounds.length; i++) {
-        await evalRoundsService.update(req.body.checkedRounds[i], { discussion: true });
-        let er = await evalRoundsService.query({ _id: req.body.checkedRounds[i] }, defaultPopulate);
+        let er = await EvalRound
+            .findByIdAndUpdate(req.body.checkedRounds[i], { discussion: true })
+            .populate(defaultPopulate);
+
         let pass = 0;
-        let extend = 0;
+        let probation = 0;
         let fail = 0;
         er.evaluations.forEach(evaluation => {
             if (evaluation.vote == 1) pass++;
-            else if (evaluation.vote == 2) extend++;
+            else if (evaluation.vote == 2) probation++;
             else if (evaluation.vote == 3) fail++;
         });
         api.webhookPost(
             [{
-                author: {
-                    name: `${req.session.username}`,
-                    icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                    url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-                },
-                color: '3773329',
+                author: api.defaultWebhookAuthor(req.session),
+                color: api.webhookColors.lightRed,
+                description: `Moved [**${er.bn.username}**'s current BN eval](http://bn.mappersguild.com/bneval?eval=${er.id}) to group discussion`,
                 fields: [
                     {
-                        name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
-                        value: `Moved **${er.bn.username}**'s current BN eval to group discussion`,
-                    },
-                    {
                         name: 'Votes',
-                        value: `Pass: **${pass}**, Extend: **${extend}**, Fail: **${fail}**`,
+                        value: `Pass: **${pass}**, Probation: **${probation}**, Fail: **${fail}**`,
                     },
                 ],
             }],
@@ -337,11 +323,10 @@ router.post('/setGroupEval/', api.isNat, async (req, res) => {
         );
     }
 
-    let minDate = new Date();
-    minDate.setDate(minDate.getDate() + 14);
-    let ev = await evalRoundsService.query({ active: true, deadline: { $lte: minDate } }, defaultPopulate, { deadline: 1, consensus: 1, feedback: 1 }, true);
+    let ev = await EvalRound.findActiveEvaluations();
+
     res.json(ev);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Set ${req.body.checkedRounds.length} BN eval${req.body.checkedRounds.length == 1 ? '' : 's'} as group evaluation`
     );
@@ -349,15 +334,16 @@ router.post('/setGroupEval/', api.isNat, async (req, res) => {
 
 /* POST set invidivual eval */
 router.post('/setIndividualEval/', api.isNat, async (req, res) => {
-    for (let i = 0; i < req.body.checkedRounds.length; i++) {
-        await evalRoundsService.update(req.body.checkedRounds[i], { discussion: false });
-    }
+    await EvalRound.updateMany({
+        _id: { $in: req.body.checkedRounds },
+    }, {
+        discussion: false,
+    });
 
-    let minDate = new Date();
-    minDate.setDate(minDate.getDate() + 14);
-    let ev = await evalRoundsService.query({ active: true, deadline: { $lte: minDate } }, defaultPopulate, { deadline: 1, consensus: 1, feedback: 1 }, true);
+    let ev = await EvalRound.findActiveEvaluations();
+
     res.json(ev);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Set ${req.body.checkedRounds.length} BN eval${req.body.checkedRounds.length == 1 ? '' : 's'} as individual evaluation`
     );
@@ -366,78 +352,112 @@ router.post('/setIndividualEval/', api.isNat, async (req, res) => {
 /* POST set evals as complete */
 router.post('/setComplete/', api.isNat, async (req, res) => {
     for (let i = 0; i < req.body.checkedRounds.length; i++) {
-        let er = await evalRoundsService.query({ _id: req.body.checkedRounds[i] });
-        let u = await usersService.query({ _id: er.bn });
+        let er = await EvalRound.findById(req.body.checkedRounds[i]);
+        let u = await User.findById(er.bn);
 
         if (er.consensus == 'fail') {
-            u = await usersService.update(u.id, { $pull: { modes: er.mode } });
-            await usersService.update(u.id, { $pull: { probation: er.mode } });
+            u = await User.findByIdAndUpdate(u.id, { $pull: { modes: er.mode } });
+            await User.findByIdAndUpdate(u.id, { $pull: { probation: er.mode } });
 
             if (!u.modes.length) {
-                await usersService.update(u.id, { group: 'user' });
-                await usersService.update(u.id, { $push: { bnDuration: new Date() } });
+                await User.findByIdAndUpdate(u.id, { group: 'user' });
+
+                if (u.group == 'bn') {
+                    await User.findByIdAndUpdate(u.id, { $push: { bnDuration: new Date() } });
+                } else if (u.group == 'nat') {
+                    await User.findByIdAndUpdate(u.id, { $push: { natDuration: new Date() } });
+                }
             }
         }
 
-        if (er.consensus == 'extend') {
+        if (er.consensus == 'probation') {
             if (u.probation.indexOf(er.mode) < 0) {
-                await usersService.update(u.id, { $push: { probation: er.mode } });
+                await User.findByIdAndUpdate(u.id, { $push: { probation: er.mode } });
             }
 
             let deadline = new Date();
             deadline.setDate(deadline.getDate() + 40);
-            await evalRoundsService.create(er.bn, er.mode, deadline);
+            await EvalRound.create({
+                bn: er.bn,
+                mode: er.mode,
+                deadline,
+            });
         }
 
         if (er.consensus == 'pass') {
-            await usersService.update(u.id, { $pull: { probation: er.mode } });
+            await User.findByIdAndUpdate(u.id, { $pull: { probation: er.mode } });
             let deadline = new Date();
 
             if (er.isLowActivity) {
                 deadline.setDate(deadline.getDate() + 40);
             } else {
                 deadline.setDate(deadline.getDate() + 100);
+
+                // process user group changes
+                if (er.isMoveToNat || er.isMoveToBn) {
+                    await User.findByIdAndUpdate(er.bn, {
+                        group: er.isMoveToNat ? 'nat' : 'bn',
+                        probation: [],
+                        $push: {
+                            bnDuration: new Date(),
+                            natDuration: new Date(),
+                        },
+                    });
+                }
             }
 
-            await evalRoundsService.create(er.bn, er.mode, deadline);
+            await EvalRound.create({
+                bn: er.bn,
+                mode: er.mode,
+                deadline,
+            });
         }
 
-        await evalRoundsService.update(req.body.checkedRounds[i], { active: false });
+        await EvalRound.findByIdAndUpdate(req.body.checkedRounds[i], { active: false, resignedOnGoodTerms: er.resignedOnGoodTerms ? true : false });
 
-        if (er.consensus) {
-            logsService.create(
-                req.session.mongoId,
-                `Set ${u.username}'s ${er.mode} BN eval as "${er.consensus}"`
-            );
-            api.webhookPost(
-                [{
-                    author: {
-                        name: `${req.session.username}`,
-                        icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                        url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-                    },
-                    color: '6579298',
-                    fields: [
-                        {
-                            name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
-                            value: `**${u.username}**'s current BN eval archived`,
-                        },
-                        {
-                            name: 'Consensus',
-                            value: `${er.consensus == 'pass' ? 'Pass' : er.consensus == 'extend' ? 'Extend' : 'Fail'}`,
-                        },
-                    ],
-                }],
-                er.mode
-            );
+        let consensusText;
+
+        if (er.consensus == 'pass') {
+            consensusText = 'Pass';
+
+            if (er.isLowActivity) {
+                consensusText += ' + Low activity warning';
+            } else if (er.isMoveToNat) {
+                consensusText += ' + Move to NAT';
+            } else if (er.isMoveToBn) {
+                consensusText += ' + Move to BN';
+            }
+        } else if (er.consensus == 'probation') {
+            consensusText = 'Probation';
+        } else if (er.consensus == 'fail') {
+            consensusText = 'Fail';
+
+            if (er.resignedOnGoodTerms) {
+                consensusText += ' + Resigned on good terms';
+            }
+        } else {
+            consensusText = 'No consensus set';
         }
+
+        Logger.generate(
+            req.session.mongoId,
+            `Set ${u.username}'s ${er.mode} BN eval as "${consensusText}"`
+        );
+
+        api.webhookPost(
+            [{
+                author: api.defaultWebhookAuthor(req.session),
+                color: api.webhookColors.black,
+                description: `Archived [**${u.username}**'s current BN eval](http://bn.mappersguild.com/bneval?eval=${er.id}) with **${consensusText}** consensus`,
+            }],
+            er.mode
+        );
     }
 
-    let minDate = new Date();
-    minDate.setDate(minDate.getDate() + 14);
-    let ev = await evalRoundsService.query({ active: true, deadline: { $lte: minDate } }, defaultPopulate, { deadline: 1, consensus: 1, feedback: 1 }, true);
+    let ev = await EvalRound.findActiveEvaluations();
+
     res.json(ev);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Set ${req.body.checkedRounds.length} BN eval${req.body.checkedRounds.length == 1 ? '' : 's'} as completed`
     );
@@ -445,66 +465,78 @@ router.post('/setComplete/', api.isNat, async (req, res) => {
 
 /* POST set consensus of eval */
 router.post('/setConsensus/:id', api.isNat, async (req, res) => {
-    let er = await evalRoundsService.update(req.params.id, {
+    let er = await EvalRound.findByIdAndUpdate(req.params.id, {
         consensus: req.body.consensus,
-        isLowActivity: req.body.isLowActivity ? true : false });
+        isLowActivity: req.body.isLowActivity ? true : false,
+        resignedOnGoodTerms: req.body.resignedOnGoodTerms ? true : false,
+        isMoveToNat: req.body.isMoveToNat ? true : false,
+        isMoveToBn: req.body.isMoveToBn ? true : false,
+    });
 
     if (req.body.consensus == 'fail') {
         let date = new Date(er.updatedAt);
         date.setDate(date.getDate() + 90);
-        await evalRoundsService.update(req.params.id, { cooldownDate: date });
+        await EvalRound.findByIdAndUpdate(req.params.id, { cooldownDate: date });
     }
 
-    er = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
+    er = await EvalRound.findById(req.params.id).populate(defaultPopulate);
+
     res.json(er);
 
-    if (req.body.consensus) {
-        logsService.create(
-            req.session.mongoId,`Set consensus of ${er.bn.username}'s ${er.mode} BN eval as ${req.body.consensus == 'extend' ? 'probation' : req.body.consensus}`
-        );
-        api.webhookPost(
-            [{
-                author: {
-                    name: `${req.session.username}`,
-                    icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                    url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-                },
-                color: '13272813',
-                fields: [
-                    {
-                        name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
-                        value: `**${er.bn.username}**'s current BN eval set to **${req.body.consensus}**${req.body.isLowActivity ? ' + low activity warning' : ''}`,
-                    },
-                ],
-            }],
-            er.mode
-        );
+    let consensusText;
+
+    if (er.consensus == 'pass') {
+        consensusText = 'Pass';
+
+        if (er.isLowActivity) {
+            consensusText += ' + Low activity warning';
+        } else if (er.isMoveToNat) {
+            consensusText += ' + Move to NAT';
+        } else if (er.isMoveToBn) {
+            consensusText += ' + Move to BN';
+        }
+    } else if (er.consensus == 'probation') {
+        consensusText = 'Probation';
+    } else if (er.consensus == 'fail') {
+        consensusText = 'Fail';
+
+        if (er.resignedOnGoodTerms) {
+            consensusText += ' + Resigned on good terms';
+        }
+    } else {
+        consensusText = 'No consensus set';
     }
+
+    Logger.generate(
+        req.session.mongoId,`Set consensus of ${er.bn.username}'s ${er.mode} BN eval as "${consensusText}"`
+    );
+
+    api.webhookPost(
+        [{
+            author: api.defaultWebhookAuthor(req.session),
+            color: api.webhookColors.lightBlue,
+            description: `[**${er.bn.username}**'s current BN eval](http://bn.mappersguild.com/bneval?eval=${er.id}) set to **${consensusText}**`,
+        }],
+        er.mode
+    );
 });
 
 /* POST set cooldown */
 router.post('/setCooldownDate/:id', api.isNat, async (req, res) => {
-    await evalRoundsService.update(req.params.id, { cooldownDate: req.body.cooldownDate });
-    let er = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
+    let er = await EvalRound
+        .findByIdAndUpdate(req.params.id, { cooldownDate: req.body.cooldownDate })
+        .populate(defaultPopulate);
+
     res.json(er);
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Changed cooldown date to ${req.body.cooldownDate.toString().slice(0,10)} for ${er.bn.username}'s ${er.mode} current BN evaluation`
     );
     api.webhookPost(
         [{
-            author: {
-                name: `${req.session.username}`,
-                icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-            },
-            color: '16631799',
-            fields: [
-                {
-                    name: `http://bn.mappersguild.com/appeval?eval=${er.id}`,
-                    value: `**${er.bn.username}**'s re-application date set to **${req.body.cooldownDate.toString().slice(0,10)}**`,
-                },
-            ],
+            author: api.defaultWebhookAuthor(req.session),
+            color: api.webhookColors.darkBlue,
+            description: `**${er.bn.username}**'s re-application date set to **${req.body.cooldownDate.toString().slice(0,10)}**`,
         }],
         er.mode
     );
@@ -512,18 +544,20 @@ router.post('/setCooldownDate/:id', api.isNat, async (req, res) => {
 
 /* POST set feedback of eval */
 router.post('/setFeedback/:id', api.isNat, async (req, res) => {
-    await evalRoundsService.update(req.params.id, { feedback: req.body.feedback });
-    let er = await evalRoundsService.query({ _id: req.params.id }, defaultPopulate);
+    let er = await EvalRound
+        .findByIdAndUpdate(req.params.id, { feedback: req.body.feedback })
+        .populate(defaultPopulate);
+
     res.json(er);
 
     if (!req.body.hasFeedback) {
-        logsService.create(
+        Logger.generate(
             req.session.mongoId,
             `Created feedback for ${er.bn.username}'s ${er.mode} BN evaluation`
         );
-        evalRoundsService.update(req.params.id, { feedbackAuthor: req.session.mongoId });
+        EvalRound.findByIdAndUpdate(req.params.id, { feedbackAuthor: req.session.mongoId });
     } else {
-        logsService.create(
+        Logger.generate(
             req.session.mongoId,
             `Edited feedback of ${er.bn.username}'s ${er.mode} BN evaluation`
         );
@@ -531,18 +565,9 @@ router.post('/setFeedback/:id', api.isNat, async (req, res) => {
 
     api.webhookPost(
         [{
-            author: {
-                name: `${req.session.username}`,
-                icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-                url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-            },
-            color: '5762129',
-            fields: [
-                {
-                    name: `http://bn.mappersguild.com/bneval?eval=${er.id}`,
-                    value: `**${er.bn.username}'s feedback**: ${req.body.feedback.length > 975 ? req.body.feedback.slice(0,975) + '... *(truncated)*' : req.body.feedback}`,
-                },
-            ],
+            author: api.defaultWebhookAuthor(req.session),
+            color: api.webhookColors.blue,
+            description: `**[${er.bn.username}'s current BN eval](http://bn.mappersguild.com/bneval?eval=${er.id}) feedback**: ${req.body.feedback.length > 925 ? req.body.feedback.slice(0,925) + '... *(truncated)*' : req.body.feedback}`,
         }],
         er.mode
     );
@@ -550,26 +575,100 @@ router.post('/setFeedback/:id', api.isNat, async (req, res) => {
 
 /* GET find previous evaluations */
 router.get('/findPreviousEvaluations/:id', api.isNat, async (req, res) => {
-    let evals;
-    evals = await evalRoundsService.query({ bn: req.params.id, active: false, consensus: { $exists: true }, feedback: { $exists: true } }, {}, {}, true);
+    const evalRounds = await EvalRound.find({
+        bn: req.params.id,
+        active: false,
+        consensus: { $exists: true },
+        feedback: { $exists: true },
+    });
 
-    if (!evals.length) {
-        evals = await bnAppsService.query({ applicant: req.params.id, active: false, consensus: { $exists: true }, feedback: { $exists: true } }, {}, {}, true);
+    const applications = await BnApp.find({
+        applicant: req.params.id,
+        active: false,
+        consensus: { $exists: true },
+        feedback: { $exists: true },
+    });
+
+    let previousEvaluations = evalRounds.concat(applications);
+
+    if (evalRounds.length && applications.length) {
+        previousEvaluations.sort((a, b) => {
+            a.date = (a.deadline ? a.deadline : a.createdAt);
+            b.date = (b.deadline ? b.deadline : b.createdAt);
+            if (a.date > b.date) return 1;
+            if (a.date < b.date) return -1;
+
+            return 0;
+        });
     }
 
-    res.json({ previousEvaluations: evals });
+    res.json({ previousEvaluations });
 });
 
 /* GET find user notes */
 router.get('/findUserNotes/:id', api.isNat, async (req, res) => {
-    let notes = await notesService.query({ user: req.params.id, isHidden: { $ne: true } }, notesPopulate, {}, true);
-    res.json({ userNotes: notes });
+    const userNotes = await Note
+        .find({
+            user: req.params.id,
+            isHidden: { $ne: true },
+        })
+        .populate(notesPopulate);
+
+    res.json({ userNotes });
 });
 
 /* GET find user reports */
 router.get('/findUserReports/:id', api.isNat, async (req, res) => {
-    let reports = await reportsService.query({ culprit: req.params.id, isActive: { $ne: true } }, {}, {}, true);
-    res.json({ userReports: reports });
+    const userReports = await Report.find({
+        culprit: req.params.id,
+        isActive: { $ne: true },
+    });
+
+    res.json({ userReports });
+});
+
+/* POST replace evaluator */
+router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) => {
+    let evalRound = await EvalRound.findById(req.params.id).populate(defaultPopulate);
+    let newEvaluator;
+
+    const invalids = [8129817, 3178418];
+    evalRound.natEvaluators.forEach(user => {
+        invalids.push(user.osuId);
+    });
+    newEvaluator = await User.aggregate([
+        { $match: { group: 'nat', isSpectator: { $ne: true }, modes: evalRound.mode, osuId: { $nin: invalids } } },
+        { $sample: { size: 1 } },
+    ]);
+
+    await Promise.all([
+        EvalRound.findByIdAndUpdate(req.params.id, {
+            $push: { natEvaluators: newEvaluator[0]._id },
+        }),
+        EvalRound.findByIdAndUpdate(req.params.id, {
+            $pull: { natEvaluators: req.body.evaluatorId },
+        }),
+    ]);
+
+    evalRound = await EvalRound.findById(req.params.id).populate(defaultPopulate);
+
+    res.json(evalRound);
+
+    Logger.generate(
+        req.session.mongoId,
+        'Re-selected an evaluator on current BN eval'
+    );
+
+    const user = await User.findById(req.body.evaluatorId);
+
+    api.webhookPost(
+        [{
+            author: api.defaultWebhookAuthor(req.session),
+            color: api.webhookColors.orange,
+            description: `Replaced **${user.username}** with **${newEvaluator[0].username}** as NAT evaluator for [**${evalRound.bn.username}**'s current BN eval](http://bn.mappersguild.com/bneval?eval=${evalRound.id})`,
+        }],
+        evalRound.mode
+    );
 });
 
 /* GET aiess info */
@@ -578,15 +677,26 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
         return res.json({ error: 'Something went wrong!' });
     }
 
-    let minDate = new Date(req.params.deadline);
+    let deadline = parseInt(req.params.deadline);
+    let minDate = new Date(deadline);
     minDate.setDate(minDate.getDate() - 90);
-    let maxDate = new Date(req.params.deadline);
+    let maxDate = new Date(deadline);
     const [user, allUserEvents, allEvents, qualityAssuranceChecks, assignedApplications] = await Promise.all([
-        usersService.query({ _id: req.params.mongoId }),
-        aiessService.getByEventTypeAndUser(parseInt(req.params.id), minDate, maxDate, req.params.mode),
-        aiessService.getAllByEventType(minDate, maxDate, req.params.mode),
-        aiessService.query({ qualityAssuranceCheckers: req.params.mongoId, updatedAt: { $gte: minDate, $lte: maxDate } }, {}, {}, true),
-        bnAppsService.query({ bnEvaluators: req.params.mongoId, mode: req.params.mode, createdAt: { $gte: minDate } }, applicationPopulate, { createdAt: 1 }, true),
+        User.findById(req.params.mongoId),
+        Aiess.getByEventTypeAndUser(parseInt(req.params.id), minDate, maxDate, req.params.mode),
+        Aiess.getAllByEventType(minDate, maxDate, req.params.mode),
+        Aiess.find({
+            qualityAssuranceCheckers: req.params.mongoId,
+            updatedAt: { $gte: minDate, $lte: maxDate },
+        }),
+        BnApp
+            .find({
+                bnEvaluators: req.params.mongoId,
+                mode: req.params.mode,
+                createdAt: { $gte: minDate },
+            })
+            .populate(applicationPopulate)
+            .sort({ createdAt: 1 }),
     ]);
 
     if (user.error || allUserEvents.error || allEvents.error || qualityAssuranceChecks.error || assignedApplications.error) return res.json({ error: 'Something went wrong!' });
@@ -645,7 +755,14 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
                 let event = events[j];
 
                 if (uniqueNominations.find(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
-                    let a = await aiessService.query({ beatmapsetId: event.beatmapsetId, timestamp: { $lte: event.timestamp }, eventType: { $ne: 'Reported' } }, {}, { timestamp: -1 }, true, 3);
+                    let a = await Aiess
+                        .find({
+                            beatmapsetId: event.beatmapsetId,
+                            timestamp: { $lte: event.timestamp },
+                            eventType: { $ne: 'Reported' },
+                        })
+                        .sort({ timestamp: -1 })
+                        .limit(3);
 
                     if (a[1].userId == parseInt(req.params.id) || a[2].userId == parseInt(req.params.id)) {
                         nomsDqd.push(event);
@@ -657,7 +774,14 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
                 let event = events[j];
 
                 if (uniqueNominations.find(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
-                    let a = await aiessService.query({ beatmapsetId: event.beatmapsetId, timestamp: { $lte: event.timestamp }, eventType: { $ne: 'Reported' } }, {}, { timestamp: -1 }, true, 2);
+                    let a = await Aiess
+                        .find({
+                            beatmapsetId: event.beatmapsetId,
+                            timestamp: { $lte: event.timestamp },
+                            eventType: { $ne: 'Reported' },
+                        })
+                        .sort({ timestamp: -1 })
+                        .limit(2);
 
                     if (a[1].userId == parseInt(req.params.id)) {
                         nomsPopped.push(event);
@@ -674,19 +798,23 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
     if (user.natDuration.length % 2 || user.natDuration[user.natDuration.length - 1] < minDate) {
         // find all applications & evalRounds
         const [allApplications, allEvalRounds] = await Promise.all([
-            bnAppsService.query(
-                {
+            BnApp
+                .find({
                     createdAt: { $gte: minDate },
                     mode: req.params.mode,
-                },
-                applicationPopulate, { createdAt: 1 }, true),
-            evalRoundsService.query(
-                {
+                    active: false,
+                })
+                .populate(applicationPopulate)
+                .sort({ createdAt: 1 }),
+
+            EvalRound
+                .find({
                     deadline: { $gte: minDate },
                     mode: req.params.mode,
-                },
-                defaultPopulate, { createdAt: 1 }, true),
-            bnAppsService.query({ createdAt: { $gte: minDate } }, applicationPopulate, { createdAt: 1 }, true),
+                    active: false,
+                })
+                .populate(defaultPopulate)
+                .sort({ createdAt: 1 }),
         ]);
 
         // extract apps that user evaluated or was assigned to

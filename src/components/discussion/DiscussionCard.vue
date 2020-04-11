@@ -9,7 +9,12 @@
         >
             <div class="card-body">
                 <p class="text-shadow wrap-text">
-                    <a v-if="discussion.discussionLink.length" :href="discussion.discussionLink" target="_blank" @click.stop>{{ discussion.title }}</a>
+                    <a
+                        v-if="discussion.discussionLink.length"
+                        :href="discussion.discussionLink"
+                        target="_blank"
+                        @click.stop
+                    >{{ discussion.title }}</a>
                     <span v-else>{{ discussion.title }}</span>
                 </p>
                 <p class="small text-shadow">
@@ -37,7 +42,16 @@
 <script>
 export default {
     name: 'DiscussionCard',
-    props: ['discussion', 'userId'],
+    props: {
+        discussion: {
+            type: Object,
+            required: true,
+        },
+        userId: {
+            type: String,
+            required: true,
+        },
+    },
     methods: {
         selectDiscussion() {
             this.$emit('update:selectedDiscussion', this.discussion);
@@ -55,6 +69,7 @@ export default {
                     }
                 }
             });
+
             return vote;
         },
     },

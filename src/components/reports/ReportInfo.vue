@@ -4,7 +4,12 @@
             <div v-if="report" class="modal-content">
                 <div class="modal-header text-dark bg-nat-logo">
                     <h5 class="modal-title">
-                        <a v-if="report.culprit" class="text-dark" :href="'https://osu.ppy.sh/users/' + report.culprit.osuId" target="_blank">{{ report.culprit.username }}</a>
+                        <a
+                            v-if="report.culprit"
+                            class="text-dark"
+                            :href="'https://osu.ppy.sh/users/' + report.culprit.osuId"
+                            target="_blank"
+                        >{{ report.culprit.username }}</a>
                         <span v-else class="text-dark">Report details</span>
                     </h5>
                     <button type="button" class="close" data-dismiss="modal">
@@ -31,7 +36,7 @@
                     </p>
                     <span v-if="report.isActive">
                         <small class="text-shadow ml-2">This will be sent to the reporter in a forum PM. Include the consensus and any actions being taken.</small>
-                    
+
                         <div class="form-group mt-2">
                             <textarea
                                 id="feedback"
@@ -65,7 +70,7 @@
                                 value="1"
                                 :checked="report.valid == 1"
                             >
-                            <label class="form-check-label text-shadow vote-pass" for="1">Valid</label>
+                            <label class="form-check-label text-shadow vote-green" for="1">Valid</label>
                         </div>
                         <div class="form-check form-check-inline">
                             <input
@@ -76,7 +81,7 @@
                                 value="2"
                                 :checked="report.valid == 2"
                             >
-                            <label class="form-check-label text-shadow vote-extend" for="2">Partially valid</label>
+                            <label class="form-check-label text-shadow vote-yellow" for="2">Partially valid</label>
                         </div>
                         <div class="form-check form-check-inline">
                             <input
@@ -87,7 +92,7 @@
                                 value="3"
                                 :checked="report.valid == 3"
                             >
-                            <label class="form-check-label text-shadow vote-fail" for="3">Invalid</label>
+                            <label class="form-check-label text-shadow vote-red" for="3">Invalid</label>
                         </div>
                     </span>
 
@@ -95,32 +100,25 @@
                         {{ info }} {{ confirm }}
                     </div>
                 </div>
-                <div class="modal-footer" style="overflow: hidden;">
-                    <span v-if="report.isActive">
-                        <button
-                            class="btn btn-sm btn-nat"
-                            data-toggle="tooltip"
-                            data-placement="top"
-                            title="Generates feedback PM and stores feedback/validity inputs"
-                            @click="submitReportEval($event);"
-                        >Save Report Evaluation</button>
-                        <button
-                            class="btn btn-sm btn-nat-red"
-                            data-toggle="tooltip"
-                            data-placement="top"
-                            title="Disables feedback/validity inputs and reveals reporter"
-                            @click="submitReportEval($event, true)"
-                        >Close Report</button>
-                    </span>
-                    <span v-else-if="report.valid != 3">
-                        <button
-                            class="btn btn-sm btn-nat"
-                            data-toggle="tooltip"
-                            data-placement="top"
-                            title="Avoid displaying repeat reports on evaluations"
-                            @click="changeEvalDisplay($event);"
-                        >{{ report.display ? "Hide report on evaluations" : "Show report on evaluations" }}</button>
-                    </span>
+                <div v-if="report.isActive" class="modal-footer" style="overflow: hidden;">
+                    <button
+                        class="btn btn-sm btn-nat"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="Generates feedback PM and stores feedback/validity inputs"
+                        @click="submitReportEval($event);"
+                    >
+                        Save Report Evaluation
+                    </button>
+                    <button
+                        class="btn btn-sm btn-nat-red"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="Disables feedback/validity inputs and reveals reporter"
+                        @click="submitReportEval($event, true)"
+                    >
+                        Close Report
+                    </button>
                 </div>
             </div>
         </div>
@@ -135,8 +133,10 @@ export default {
     name: 'ReportInfo',
     mixins: [postData, filterLinks],
     props: {
-        report: Object,
-        isLeader: Boolean,
+        report: {
+            type: Object,
+            required: true,
+        },
     },
     data() {
         return {
@@ -147,35 +147,39 @@ export default {
     },
     watch: {
         report(v) {
-            if(v){
+            if (v) {
                 this.info = '';
                 this.confirm = '';
                 this.feedback = this.report.feedback;
-                history.pushState(null, 'Manage Reports', `/managereports?report=${this.report.id}`);
+                history.pushState(null, 'Manage Reports', `/manageReports?report=${this.report.id}`);
             }
         },
     },
     methods: {
         async submitReportEval (e, close) {
             const valid = $('input[name=vote]:checked').val();
-            if(close && (!valid || (!this.feedback || !this.feedback.length))){
+
+            if (close && (!valid || (!this.feedback || !this.feedback.length))) {
                 this.info = 'Cannot leave fields blank!';
-            }else if(!valid && (!this.feedback || !this.feedback.length)){
+            } else if (!valid && (!this.feedback || !this.feedback.length)) {
                 this.info = 'At least one field must have input!';
-            }else{
+            } else {
                 let r;
-                if(close){
+
+                if (close) {
                     const result = confirm(`Are you sure? Report feedback cannot be edited after closing. Doing this will reveal the reporter.`);
-                    if(result){
+
+                    if (result) {
                         r = await this.executePost(
-                            '/manageReports/submitReportEval/' + this.report.id, 
+                            '/manageReports/submitReportEval/' + this.report.id,
                             { valid, feedback: this.feedback, close }, e);
                     }
-                }else{
+                } else {
                     r = await this.executePost(
-                        '/manageReports/submitReportEval/' + this.report.id, 
+                        '/manageReports/submitReportEval/' + this.report.id,
                         { valid, feedback: this.feedback, close }, e);
                 }
+
                 if (r) {
                     if (r.error) {
                         this.info = r.error;
@@ -183,17 +187,6 @@ export default {
                         this.$emit('update-report', r);
                         this.confirm = 'Report updated!';
                     }
-                }
-            }
-        },
-        async changeEvalDisplay (e) {
-            let r = await this.executePost('/manageReports/changeEvalDisplay/' + this.report.id, { display: this.report.display }, e);
-            if (r) {
-                if (r.error) {
-                    this.info = r.error;
-                } else {
-                    this.$emit('update-report', r);
-                    this.confirm = 'Report updated!';
                 }
             }
         },

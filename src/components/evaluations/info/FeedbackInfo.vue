@@ -1,13 +1,18 @@
 <template>
     <div>
         <p class="text-shadow min-spacing mb-2">
-            Application feedback: 
+            Application feedback:
         </p>
-        <div class="form-group">
+        <div v-if="!resignedOnGoodTerms" class="form-group">
             <textarea v-model="feedback" class="form-control dark-textarea" style="white-space: pre-line;" />
         </div>
         <div v-if="isApplication && consensus == 'pass'" class="input-group mb-3">
-            <input v-model="discordLink" class="form-control" type="text" placeholder="discord invite link...">
+            <input
+                v-model="discordLink"
+                class="form-control"
+                type="text"
+                placeholder="discord invite link..."
+            >
         </div>
         <div>
             <button class="btn btn-sm btn-nat" data-toggle="collapse" :data-target="isApplication ? '#applicationForumPmBox' : '#currentBnForumPmBox'">
@@ -32,6 +37,7 @@
             :discord-link="discordLink"
             :evaluations="evaluations"
             :is-low-activity="isLowActivity"
+            :resigned-on-good-terms="resignedOnGoodTerms"
         />
     </div>
 </template>
@@ -55,6 +61,7 @@ export default {
         evaluations: Array,
         probation: Array,
         isLowActivity: Boolean,
+        resignedOnGoodTerms: Boolean,
         savedFeedback: String,
         nominatorAssessmentMongoId: String,
     },
@@ -73,9 +80,10 @@ export default {
         this.feedback = this.savedFeedback;
     },
     methods: {
-        async setFeedback(e){
+        async setFeedback(e) {
             const result = await this.executePost(
                 `/${this.isApplication ? 'appEval' : 'bnEval'}/setFeedback/` + this.nominatorAssessmentMongoId, { feedback: this.feedback, hasFeedback: this.savedFeedback }, e);
+
             if (result) {
                 if (result.error) {
                     this.info = result.error;

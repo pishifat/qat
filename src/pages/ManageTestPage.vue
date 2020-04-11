@@ -52,7 +52,7 @@
         </section>
         <section v-if="category" class="col-md-12 segment segment-image">
             <h2>
-                {{ category }} Questions 
+                {{ category }} Questions
                 <button
                     class="btn btn-nat"
                     data-toggle="modal"
@@ -133,7 +133,7 @@ export default {
         };
     },
     watch: {
-        
+
     },
     created() {
         $('#loading').hide(); //this is temporary
@@ -150,7 +150,7 @@ export default {
             this.questions.splice(i, 1);
             this.selectedQuestion = null;
         },
-        selectQuestion(q){
+        selectQuestion(q) {
             this.selectedQuestion = q;
         },
         loadContent (e) {

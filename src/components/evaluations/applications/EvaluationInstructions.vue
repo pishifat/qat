@@ -1,6 +1,6 @@
 <template>
     <section class="row segment my-1 mx-4">
-        <a data-toggle="collapse" href="#howToUse">How to evaluate applicants <i class="fas fa-angle-down" /></a> 
+        <a data-toggle="collapse" href="#howToUse">How to evaluate applicants <i class="fas fa-angle-down" /></a>
         <div id="howToUse" class="collapse mt-4 mx-2">
             <p>Modding</p>
             <p class="small ml-4 min-spacing">

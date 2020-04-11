@@ -52,7 +52,7 @@
                 <samp><pre class="small">[notice]{{ feedback }}[/notice]</pre></samp>
                 <samp class="small">Regards, the Nomination Assessment Team</samp>
             </div>
-            <div v-else-if="consensus == 'extend'" class="copy-paste">
+            <div v-else-if="consensus == 'probation'" class="copy-paste">
                 <samp class="small">Hello!</samp><br><br>
                 <span v-if="probation.indexOf(mode) >= 0">
                     <samp class="small">After reviewing your work as a BN for the [i]{{ mode == 'osu' ? 'osu!' : 'osu!' + mode }}[/i] game mode, we have decided to [b]extend your probation period[/b].</samp><br><br>
@@ -71,13 +71,19 @@
             </div>
             <div v-else class="copy-paste">
                 <samp class="small">Hello!</samp><br><br>
-                <samp class="small">After reviewing your work as a BN for the [i]{{ mode == 'osu' ? 'osu!' : 'osu!' + mode }}[/i] game mode, we have decided to [b]remove you from the Beatmap Nominators[/b].</samp><br><br>
-                <samp class="small">Despite this decision, we would like to thank you for your service to the mapping and modding communities and wish you the best of luck in your future endeavours. Should you wish to apply for the Beatmap Nominators in the future, you may do so on {{ defineDate() }}, provided you meet the normal required activity requirements and have shown improvement in the areas mentioned.</samp><br><br>
-                <samp class="small">Additional feedback from the NAT:</samp><br><br>
-                <samp><pre class="small">[notice]{{ feedback }}[/notice]</pre></samp>
-                <samp class="small">For further feedback or to appeal this decision, contact any of these users:
-                    <span v-for="(evaluation, i) in natEvaluations" :key="i">[url=https://osu.ppy.sh/users/{{ evaluation.evaluator.osuId }}]{{ evaluation.evaluator.username }}[/url]{{ i+1 != natEvaluations.length ? ", " : "" }}</span>
+                <samp v-if="resignedOnGoodTerms" class="small">Following your BN resignation from the [i]{{ mode == 'osu' ? 'osu!' : 'osu!' + mode }}[/i] game mode, we conducted an evaluation and determined that you are still a capable Beatmap Nominator!</samp>
+                <samp v-else class="small">After reviewing your work as a BN for the [i]{{ mode == 'osu' ? 'osu!' : 'osu!' + mode }}[/i] game mode, we have decided to [b]remove you from the Beatmap Nominators[/b].</samp><br><br>
+                <samp class="small">We would like to thank you for your service to the mapping and modding communities and wish you the best of luck in your future endeavours. Should you wish to apply for the Beatmap Nominators again, you may do so on {{ defineDate() }}, provided you have
+                    <span v-if="resignedOnGoodTerms">one month of modding activity (3-4 mods).</span>
+                    <span v-else>two months of modding activity (3-4 mods each month) and have shown improvement in the areas mentioned.</span>
                 </samp><br><br>
+                <span v-if="!resignedOnGoodTerms">
+                    <samp class="small">Additional feedback from the NAT:</samp><br><br>
+                    <samp><pre class="small">[notice]{{ feedback }}[/notice]</pre></samp>
+                    <samp class="small">For further feedback or to appeal this decision, contact any of these users:
+                        <span v-for="(evaluation, i) in natEvaluations" :key="i">[url=https://osu.ppy.sh/users/{{ evaluation.evaluator.osuId }}]{{ evaluation.evaluator.username }}[/url]{{ i+1 != natEvaluations.length ? ", " : "" }}</span>
+                    </samp><br><br>
+                </span>
                 <samp class="small">Good luck!</samp><br><br>
                 <samp class="small">Regards, the Nomination Assessment Team</samp>
             </div>
@@ -91,26 +97,55 @@ export default {
     name: 'FeedbackPm',
     props: {
         isApplication: Boolean,
-        consensus: String,
-        cooldownDate: String,
-        mode: String,
-        evaluations: Array,
-        probation: Array,
+        consensus: {
+            type: String,
+            required: true,
+        },
+        cooldownDate: {
+            type: String,
+            default() {
+                return new Date().toString();
+            },
+        },
+        mode: {
+            type: String,
+            required: true,
+        },
+        evaluations: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
+        probation: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
         isLowActivity: Boolean,
-        feedback: String,
-        discordLink: String,
+        resignedOnGoodTerms: Boolean,
+        feedback: {
+            type: String,
+            default: '',
+        },
+        discordLink: {
+            type: String,
+            default: '',
+        },
     },
     computed: {
         natEvaluations() {
             let e = new Array;
             this.evaluations.forEach(evaluation => {
-                if(evaluation.evaluator.isNat) e.push(evaluation);
+                if (evaluation.evaluator.isNat) e.push(evaluation);
             });
+
             return e;
         },
     },
     methods: {
-        defineDate(){
+        defineDate() {
             return new Date(this.cooldownDate).toString().slice(4, 15);
         },
     },

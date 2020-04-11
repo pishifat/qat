@@ -45,7 +45,7 @@
 
 <script>
 export default {
-    name: 'veto-card',
+    name: 'VetoCard',
     props: {
         userId: String,
         veto: {
@@ -57,14 +57,14 @@ export default {
             deadline: Date,
             id: String,
             mode: String,
-            status: String
-        }
+            status: String,
+        },
     },
     methods: {
         selectVeto () {
             this.$emit('update:selectedVeto', this.veto);
-        }
-    }
+        },
+    },
 };
 </script>
 

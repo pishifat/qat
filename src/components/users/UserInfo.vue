@@ -15,12 +15,10 @@
                             :bn-duration="user.bnDuration"
                             :nat-duration="user.natDuration"
                         />
-                        <notes
-                            v-if="isNat"
+                        <next-evaluation
                             :user-id="user.id"
-                            :viewing-user="userId"
-                            @update-user="$emit('update-user', $event);"
                         />
+                        <hr>
                         <span v-for="(mode, i) in user.modes" :key="mode">
                             <p class="text-shadow min-spacing mb-1">Recent BN activity
                                 <span class="small">({{ mode == 'osu' ? 'osu!' : 'osu!' + mode }})</span>
@@ -33,21 +31,23 @@
                                     :is-nat="isNat"
                                     :user-mongo-id="user.id"
                                 />
+                                <modding-activity
+                                    v-if="isNat"
+                                    class="mt-2"
+                                    :username="user.username"
+                                />
                             </div>
                         </span>
-                        <next-evaluation
-                            :user-id="user.id"
-                        />
-                        <modding-activity
-                            v-if="isNat"
-                            :username="user.username"
-                        />
-                        <footer-buttons
-                            :is-leader="isLeader"
-                            :group="user.group"
+                        <bn-evaluator-toggle
+                            v-if="(user.id == userId || isNat) && user.group != 'nat'"
                             :is-bn-evaluator="user.isBnEvaluator"
-                            :is-current-user="user.id == userId"
                             :user-id="user.id"
+                            @update-user="$emit('update-user', $event);"
+                        />
+                        <notes
+                            v-if="isNat"
+                            :user-id="user.id"
+                            :viewing-user-id="userId"
                             @update-user="$emit('update-user', $event);"
                         />
                     </div>
@@ -62,7 +62,7 @@ import ModalHeader from './info/ModalHeader.vue';
 import Duration from './info/Duration.vue';
 import Notes from './info/Notes.vue';
 import NextEvaluation from './info/NextEvaluation.vue';
-import FooterButtons from './info/FooterButtons.vue';
+import BnEvaluatorToggle from './info/BnEvaluatorToggle.vue';
 import ModdingActivity from '../evaluations/currentBnEvaluations/currentBnInfo/ModdingActivity.vue';
 import UserActivity from '../evaluations/currentBnEvaluations/currentBnInfo/UserActivity.vue';
 
@@ -73,14 +73,19 @@ export default {
         Duration,
         Notes,
         NextEvaluation,
-        FooterButtons,
+        BnEvaluatorToggle,
         ModdingActivity,
         UserActivity,
     },
     props: {
-        user: Object,
-        userId: String,
-        isLeader: Boolean,
+        user: {
+            type: Object,
+            required: true,
+        },
+        userId: {
+            type: String,
+            required: true,
+        },
         isNat: Boolean,
     },
     watch: {

@@ -11,7 +11,7 @@
                     :evaluator-mongo-id="evaluator.id"
                 />
                 <div class="modal-body" style="overflow: hidden;">
-                    <div v-for="(mode, i) in evalRound.bn.modes" :key="mode" class="container">
+                    <div v-for="(mode, i) in modes" :key="mode" class="container">
                         <p class="text-shadow min-spacing mb-1">
                             Recent BN activity
                             <span class="small">({{ mode == 'osu' ? 'osu!' : 'osu!' + mode }})</span>
@@ -19,7 +19,7 @@
                         <div class="container mb-3">
                             <user-activity
                                 :osu-id="evalRound.bn.osuId"
-                                :mode="evalRound.bn.modes[i]"
+                                :mode="modes[i]"
                                 :deadline="evalRound.deadline"
                                 :is-nat="evaluator.isNat"
                                 :user-mongo-id="evalRound.bn.id"
@@ -33,6 +33,7 @@
                             :nominator-assessment-mongo-id="evalRound.id"
                             :is-application="false"
                             :is-low-activity="evalRound.isLowActivity"
+                            :resigned-on-good-terms="evalRound.resignedOnGoodTerms"
                             :is-archive="true"
                             @update-nominator-assessment="$emit('update-eval-round', $event);"
                         />
@@ -92,7 +93,15 @@ export default {
             this.evalRound.evaluations.forEach(evaluation => {
                 evaluators.push(evaluation.evaluator);
             });
+
             return evaluators;
+        },
+        modes() {
+            let modes = [];
+            if (this.evalRound.bn.modes.length) modes = this.evalRound.bn.modes;
+            else modes.push(this.evalRound.mode);
+
+            return modes;
         },
     },
     watch: {
@@ -103,8 +112,10 @@ export default {
     methods: {
         async unarchive(e) {
             const result = confirm(`Are you sure? This will place the user on probation`);
-            if(result){
+
+            if (result) {
                 const er = await this.executePost('/evalArchive/unarchive/' + this.evalRound.id, { type: 'evalRound' }, e);
+
                 if (er) {
                     window.location = '/bnEval?eval=' + this.evalRound.id;
                 }

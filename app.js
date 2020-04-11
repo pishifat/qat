@@ -7,9 +7,19 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const config = require('./config.json');
-const notifications = require('./helpers/notifications');
+require('express-async-errors');
 require('./helpers/hbs');
 
+// Return the 'new' updated object by default when doing findByIdAndUpdate
+mongoose.plugin(schema => {
+    schema.pre('findOneAndUpdate', function() {
+        if (!('new' in this.options)) {
+            this.setOptions({ new: true });
+        }
+    });
+});
+
+const notifications = require('./helpers/notifications');
 const indexRouter = require('./routes/index');
 const bnAppRouter = require('./routes/bnApp');
 const reportsRouter = require('./routes/reports');
@@ -34,22 +44,6 @@ const app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
-// dev stuff
-if (process.env.NODE_ENV === 'development') {
-    const webpack = require('webpack');
-    const webpackDevMiddleware = require('webpack-dev-middleware');
-    const webpackConfig = require('./webpack.dev.config');
-
-    const compiler = webpack(webpackConfig);
-    const devServerOptions = Object.assign({}, webpackConfig.devServer, {
-        noInfo: true,
-        publicPath: webpackConfig.output.publicPath,
-        port: 8080,
-    });
-
-    app.use(webpackDevMiddleware(compiler, devServerOptions));
-}
-
 // middlewares and such
 app.use(logger('dev'));
 app.use(express.json());
@@ -58,7 +52,11 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 //natdb
-mongoose.connect(config.connection, { useFindAndModify: false, useNewUrlParser: true });
+mongoose.connect(config.connection, {
+    useFindAndModify: false,
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+});
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'db connection error:'));
 db.once('open', function() {
@@ -99,13 +97,19 @@ app.use(function(req, res) {
 // error handler
 // eslint-disable-next-line no-unused-vars
 app.use(function(err, req, res, next) {
+    if (err.name == 'DocumentNotFoundError') err.message = 'Not found';
+
     // set locals, only providing error in development
     res.locals.message = err.message;
     res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-    // render the error page
-    res.status(err.status || 500);
-    res.render('error');
+    // render the error page or return error obj for json
+    if (req.accepts(['html', 'json']) === 'json') {
+        res.json({ error: err.message || 'Something went wrong!' });
+    } else {
+        res.status(err.status || 500);
+        res.render('error');
+    }
 });
 
 
@@ -137,8 +141,10 @@ server.on('error', (error) => {
 });
 server.on('listening', () => {
     console.log('Listening on ' + port);
-    notifications.notifyDeadlines();
-    notifications.notifyBeatmapReports();
+    notifications.notifyDeadlines.start();
+    notifications.notifyBeatmapReports.start();
+    notifications.lowActivityTask.start();
+    notifications.notifyQualityAssurance.start();
 });
 
 module.exports = app;

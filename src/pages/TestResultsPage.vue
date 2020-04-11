@@ -124,12 +124,14 @@ export default {
     },
     created() {
         const params = new URLSearchParams(document.location.search.substring(1));
+
         if (params.get('user') && params.get('user').length) {
             axios
                 .get(`/testResults/search/${params.get('user')}`)
                 .then(response => {
                     this.isNat = response.data.isNat;
                     this.allTests = response.data.tests;
+
                     if (this.allTests && this.allTests.length == 1) {
                         this.selectedTest = this.allTests[0];
                     }
@@ -147,6 +149,7 @@ export default {
                 .then(response => {
                     this.isNat = response.data.isNat;
                     this.allTests = response.data.tests;
+
                     if (this.allTests && this.allTests.length == 1) {
                         this.selectedTest = this.allTests[0];
                     }
@@ -168,16 +171,18 @@ export default {
                     displayScore += option.score;
                 });
             });
+
             return Math.round(displayScore * 10) / 10;
         },
         calculateQuestionScore(answer) {
             let score = 0;
             answer.question.options.forEach(option => {
-                if(answer.optionsChosen.indexOf(option.id) >= 0){
+                if (answer.optionsChosen.indexOf(option.id) >= 0) {
                     score += option.score;
                 }
             });
-            if(score < 0) score = 0;
+            if (score < 0) score = 0;
+
             return score;
         },
         getActiveOptions(options) {
@@ -196,16 +201,19 @@ export default {
             this.selectedTest = null;
             this.info = '';
             let user = this.searchValue;
+
             if (!user || !user.length) {
                 this.info = 'Must enter a username or ID!';
             } else {
                 history.pushState(null, 'Ranking Criteria Test Results', `/testresults?user=${user}`);
                 const result = await this.executeGet(`/testResults/search/${user}`, e);
+
                 if (result) {
                     if (result.error) {
                         this.info = result.error;
                     } else {
                         this.allTests = result.tests;
+
                         if (this.allTests.length == 1) {
                             this.selectedTest = result[0];
                         }

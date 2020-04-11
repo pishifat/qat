@@ -13,7 +13,7 @@
                 <div class="modal-body">
                     <div class="container text-shadow">
                         <p>
-                            Mapset: 
+                            Mapset:
                             <a :href="selectedEntry.postId ? 'https://osu.ppy.sh/beatmapsets/' + selectedEntry.beatmapsetId + '/discussion/-/generalAll#/' + selectedEntry.postId : 'https://osu.ppy.sh/beatmapsets/' + selectedEntry.beatmapsetId + '/discussion/-/events'" target="_blank">
                                 {{ selectedEntry.metadata }}
                             </a>

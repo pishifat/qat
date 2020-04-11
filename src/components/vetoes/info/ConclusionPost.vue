@@ -25,13 +25,13 @@
 
 <script>
 export default {
-    name: 'conclusion-post',
+    name: 'ConclusionPost',
     props: {
         majority: Boolean,
         veto: {
             discussionLink: String,
             mediations: Array,
-        }
+        },
     },
     computed: {
         shuffledMediations () {
@@ -51,7 +51,7 @@ export default {
 
         withdrawMediations () {
             return this.veto.mediations.filter(mediation => mediation.vote && mediation.vote !== 1);
-        }
-    }
+        },
+    },
 };
 </script>

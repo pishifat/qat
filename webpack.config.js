@@ -1,65 +1,27 @@
-const VueLoaderPlugin = require('vue-loader/lib/plugin');
-const path = require('path');
+const { entry, output, rules, plugins } = require('./webpack.base.config');
 
 const config =  {
-    name: 'qat',
-    mode: 'production',
-    entry: {
-        appEval: './src/appEval.js',
-        bnEval: './src/bnEval.js',
-        dataCollection: './src/dataCollection.js',
-        evalArchive: './src/evalArchive.js',
-        bnScore: './src/bnScore.js',
-        manageReports: './src/manageReports.js',
-        users: './src/users.js',
-        vetoes: './src/vetoes.js',
-        manageTest: './src/manageTest.js',
-        testResults: './src/testResults.js',
-        testSubmission: './src/testSubmission.js',
-        discussionVote: './src/discussionVote.js',
-        qualityAssurance: './src/qualityAssurance.js',
-    },
-    output: {
-        filename: '[name].js',
-        path: path.resolve(__dirname, 'public/javascripts/'),
-        publicPath: '/javascripts/',
-    },
+    mode: 'development',
+    devtool: 'inline-source-map',
+    entry,
+    output,
     module: {
-        rules: [
-            {
-                test: /\.vue$/,
-                exclude: /node_modules/,
-                loader: 'vue-loader',
-            },
-            {
-                test: /\.js$/,
-                exclude: /node_modules/,
-                loader: 'babel-loader',
-            },
-            {
-                test: /\.(png|svg|jpg|gif)$/,
-                use: [{
-                    loader: 'file-loader',
-                    options: {
-                        outputPath: '../images',
-                    },
-                }],
-            },
-            {
-                test: /\.css$/,
-                use: ['vue-style-loader', 'css-loader'],
-            },
-        ],
+        rules,
     },
-    plugins: [
-        new VueLoaderPlugin(),
-    ],
+    plugins,
     resolve: {
         alias: {
-            vue: 'vue/dist/vue.min.js',
+            vue: 'vue/dist/vue.js',
         },
     },
-    stats: 'minimal',
+    devServer: {
+        publicPath: '/javascripts/',
+        stats: 'minimal',
+        port: 8080,
+        proxy: {
+            '/': 'http://localhost:3001',
+        },
+    },
 };
 
 module.exports = config;

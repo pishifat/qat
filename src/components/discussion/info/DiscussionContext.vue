@@ -3,7 +3,7 @@
         <p v-if="discussionLink.length" class="min-spacing mb-2">
             <a :href="discussionLink" target="_blank">Read and contribute to the full discussion here</a>
         </p>
-        <p v-if="isCreator" class="min-spacing">
+        <p v-if="isEditable" class="min-spacing">
             <a
                 href="#"
                 data-toggle="tooltip"
@@ -24,7 +24,7 @@
         </p>
         <p>
             <a
-                v-if="isCreator"
+                v-if="isEditable"
                 href="#"
                 data-toggle="tooltip"
                 data-placement="top"
@@ -53,11 +53,25 @@ export default {
     name: 'DiscussionContext',
     mixins: [ postData, filterLinks ],
     props: {
-        discussionId: String,
-        discussionLink: String,
-        isCreator: Boolean,
-        title: String,
-        shortReason: String,
+        discussionId: {
+            type: String,
+            required: true,
+        },
+        discussionLink: {
+            type: String,
+            default() {
+                return null;
+            },
+        },
+        isEditable: Boolean,
+        title: {
+            type: String,
+            required: true,
+        },
+        shortReason: {
+            type: String,
+            required: true,
+        },
     },
     data() {
         return {
@@ -79,6 +93,7 @@ export default {
         async saveTitle () {
             const d = await this.executePost(
                 '/discussionVote/saveTitle/' + this.discussionId, { title: this.editTitleContent });
+
             if (d) {
                 if (d.error) {
                     this.info = d.error;
@@ -91,6 +106,7 @@ export default {
         async saveProposal () {
             const d = await this.executePost(
                 '/discussionVote/saveProposal/' + this.discussionId, { shortReason: this.editProposalContent });
+
             if (d) {
                 if (d.error) {
                     this.info = d.error;

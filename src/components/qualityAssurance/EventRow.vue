@@ -3,8 +3,8 @@
         <div class="card static-card" :class="isMaxChecks || isOutdated || isQualityAssuranceChecker ? 'low-opacity' : ''">
             <div class="card-header min-spacing d-flex align-items-center">
                 <div class="col-sm-6 mr-2 truncate" style="padding-left: 0px;">
-                    <a 
-                        :href="'https://osu.ppy.sh/beatmapsets/' + event.beatmapsetId" 
+                    <a
+                        :href="'https://osu.ppy.sh/beatmapsets/' + event.beatmapsetId"
                         target="_blank"
                         class="text-shadow"
                     >
@@ -18,7 +18,12 @@
                 <div class="col-sm-2 small d-flex align-items-center justify-content-start">
                     <p class="min-spacing truncate">
                         <span class="small">Host</span><br>
-                        <a :href="'https://osu.ppy.sh/users/' + event.hostId" target="_blank" class="ml-1" @click.stop>{{ event.hostName }}</a>
+                        <a
+                            :href="'https://osu.ppy.sh/users/' + event.hostId"
+                            target="_blank"
+                            class="ml-1"
+                            @click.stop
+                        >{{ event.hostName }}</a>
                     </p>
                 </div>
                 <div class="col-sm-1 small d-flex align-items-center">
@@ -30,9 +35,9 @@
                 <div class="col-sm-2 small d-flex justify-content-start truncate">
                     <span v-if="info.length" class="small errors">{{ info }}</span>
                     <span v-if="event.qualityAssuranceCheckers && (isNat || isMaxChecks || isOutdated)">
-                        <a 
+                        <a
                             v-for="user in event.qualityAssuranceCheckers"
-                            :key="user.id" 
+                            :key="user.id"
                             :href="'https://osu.ppy.sh/users/' + user.osuId"
                             target="_blank"
                         >
@@ -46,7 +51,7 @@
                         </a>
                     </span>
                     <span v-else-if="isQualityAssuranceChecker">
-                        <a 
+                        <a
                             :href="'https://osu.ppy.sh/users/' + userOsuId"
                             target="_blank"
                         >
@@ -61,10 +66,10 @@
                     </span>
                 </div>
                 <div v-if="!isOutdated" class="col-sm-1 small d-flex justify-content-end">
-                    <button 
-                        v-if="isQualityAssuranceChecker" 
-                        data-toggle="tooltip" 
-                        data-placement="top" 
+                    <button
+                        v-if="isQualityAssuranceChecker"
+                        data-toggle="tooltip"
+                        data-placement="top"
                         title="toggle QA checker"
                         class="btn btn-xs btn-nat-red p-1"
                         :disabled="forceDisabled"
@@ -72,7 +77,7 @@
                     >
                         <i class="fas fa-minus vote-fail" />
                     </button>
-                    <button 
+                    <button
                         v-else-if="!isMaxChecks"
                         data-toggle="tooltip"
                         data-placement="top"
@@ -114,10 +119,11 @@ export default {
         isQualityAssuranceChecker() {
             let valid;
             this.event.qualityAssuranceCheckers.forEach(user => {
-                if(user.id == this.userId){
+                if (user.id == this.userId) {
                     valid = true;
                 }
             });
+
             return valid;
         },
     },
@@ -125,30 +131,35 @@ export default {
         async assignUser () {
             this.forceDisabled = true;
             const event = await this.executePost('/qualityAssurance/assignUser/' + this.event.id, {});
+
             if (event) {
                 if (event.error) {
                     this.info = event.error;
                 } else {
                     this.$emit('update-event', event);
                 }
+
                 this.forceDisabled = false;
             }
         },
         async unassignUser () {
             this.forceDisabled = true;
             const event = await this.executePost('/qualityAssurance/unassignUser/' + this.event.id, {});
+
             if (event) {
                 if (event.error) {
                     this.info = event.error;
                 } else {
                     this.$emit('update-event', event);
                 }
+
                 this.forceDisabled = false;
             }
         },
-        findDeadline(timestamp){
+        findDeadline(timestamp) {
             let date = new Date(timestamp);
             date.setDate(date.getDate() + 7);
+
             return date.toISOString().slice(5,10);
         },
     },

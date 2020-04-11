@@ -1,4 +1,3 @@
-const qs = require('querystring');
 const axios = require('axios');
 const cheerio = require('cheerio');
 
@@ -31,14 +30,6 @@ function getBeatmapsetIdFromUrl(url) {
 }
 
 /**
- * escape a query parameter
- * @param {string} param
- */
-function safeParam(param) {
-    return qs.escape(param);
-}
-
-/**
  * check if it's a valid url
  * @param {string} url
  * @param {string} contain url must contain ...
@@ -61,17 +52,18 @@ function isValidUrl(url, contain) {
  * @param {string} mode To calculate and return the score, pass this argument
  * @returns {number|number[]|object}
  */
-async function getUserModsCount(username, mode) {
+async function getUserModsCount(username, mode, months) {
     let baseUrl = `https://osu.ppy.sh/beatmapsets/events?limit=50&types[]=kudosu_gain&types[]=kudosu_lost&user=${username}`;
     let maxDate = new Date();
     let minDate = new Date();
     minDate.setDate(minDate.getDate() - 30);
     let modCount = [];
     let modScore = 0;
+    if (!months) months = 3;
     let expectedMods = (mode && mode == 'osu' ? 4 : 3);
 
     // Loops for months
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < months; i++) {
         const maxDateStr = `${maxDate.getFullYear()}-${maxDate.getMonth() + 1}-${maxDate.getDate()}`;
         const minDateStr = `${minDate.getFullYear()}-${minDate.getMonth() + 1}-${minDate.getDate()}`;
         let urlWithDate = baseUrl + `&min_date=${minDateStr}&max_date=${maxDateStr}`;
@@ -140,4 +132,4 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-module.exports = { escapeUsername, getBeatmapsetIdFromUrl, safeParam, isValidUrl, getUserModsCount, sleep };
+module.exports = { escapeUsername, getBeatmapsetIdFromUrl, isValidUrl, getUserModsCount, sleep };

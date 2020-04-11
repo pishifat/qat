@@ -1,37 +1,37 @@
 <template>
     <div class="row">
         <section class="col-md-12 segment mb-4">
-            <div class="input-group input-group-sm">
+            <div class="input-group input-group-sm small">
                 <input
                     v-model="searchValue"
                     type="text"
-                    placeholder="username or osuID..." 
+                    placeholder="username or osuID..."
                     maxlength="18"
                     autocomplete="off"
-                    @keyup.enter="query($event)" 
+                    @keyup.enter="query($event)"
                 >
-                <button class="btn btn-nat ml-2" type="submit" @click="query($event)">
+                <button class="btn btn-sm btn-nat ml-2" type="submit" @click="query($event)">
                     Search archives
                 </button>
                 <span v-if="info" class="errors ml-4 mt-2">Error: {{ info }}</span>
             </div>
-            <div class="input-group input-group-sm my-2">
+            <div class="input-group input-group-sm small my-2">
                 <input
-                    id="limit"
+                    v-model="limit"
                     type="text"
                     placeholder="# entries..."
                     maxlength="3"
                     autocomplete="off"
-                    @keyup.enter="queryRecent($event)" 
+                    @keyup.enter="queryRecent($event)"
                 >
-                <button class="btn btn-nat ml-2" type="submit" @click="queryRecent($event)">
+                <button class="btn btn-sm btn-nat ml-2" type="submit" @click="queryRecent($event)">
                     Show recent
                 </button>
             </div>
         </section>
         <section v-if="queried" class="col-md-12 segment segment-image">
             <h2>Application Evaluations</h2>
-        
+
             <div v-if="appEvals.length">
                 <transition-group name="list" tag="div" class="row">
                     <application-discussion-card
@@ -51,7 +51,7 @@
         </section>
         <section v-if="queried" class="col-md-12 segment segment-image">
             <h2>BN Evaluations</h2>
-        
+
             <div v-if="bnEvals.length">
                 <transition-group name="list" tag="div" class="row">
                     <current-bn-discussion-card
@@ -111,10 +111,12 @@ export default {
             info: '',
             evaluator: null,
             searchValue: null,
+            limit: null,
         };
     },
     created() {
         const params = new URLSearchParams(document.location.search.substring(1));
+
         if (params.get('user') && params.get('user').length) {
             axios
                 .get(`/evalArchive/search/${params.get('user')}`)
@@ -125,7 +127,7 @@ export default {
                         this.evaluator = response.data.evaluator;
                         this.queried = true;
                         this.appEvals = response.data.a;
-                        this.bnEvals = response.data.b; 
+                        this.bnEvals = response.data.b;
                     }
                 })
                 .then(function() {
@@ -135,7 +137,7 @@ export default {
                         .hide()
                         .fadeIn();
                 });
-        } else if(params.get('eval') && params.get('eval').length){
+        } else if (params.get('eval') && params.get('eval').length) {
             axios
                 .get(`/evalArchive/searchById/${params.get('eval')}`)
                 .then(response => {
@@ -143,9 +145,11 @@ export default {
                         this.info = response.data.error;
                     } else {
                         this.evaluator = response.data.evaluator;
-                        if(response.data.round){
+
+                        if (response.data.round) {
                             this.queried = true;
-                            if(response.data.round.applicant){
+
+                            if (response.data.round.applicant) {
                                 this.selectedDiscussApp = response.data.round;
                                 this.appEvals.push(response.data.round);
                                 $('#applicationArchiveInfo').modal('show');
@@ -154,9 +158,9 @@ export default {
                                 this.bnEvals.push(response.data.round);
                                 $('#currentBnArchiveInfo').modal('show');
                             }
-                            
+
                         }
-                        
+
                     }
                 })
                 .then(function() {
@@ -184,38 +188,40 @@ export default {
     methods: {
         async query(e) {
             this.info = '';
-            let user = this.searchValue;
-            if(!user || !user.length){
+
+            if (!this.searchValue || !this.searchValue.length) {
                 this.info = 'Must enter a username or osu ID!';
-            }else{
-                history.pushState(null, 'Evaluation Archives', `/evalArchive?user=${user}`);
-                const result = await this.executeGet('/evalArchive/search/' + user, e);
+            } else {
+                history.pushState(null, 'Evaluation Archives', `/evalArchive?user=${this.searchValue}`);
+                const result = await this.executeGet('/evalArchive/search/' + this.searchValue, e);
+
                 if (result) {
                     if (result.error) {
                         this.info = result.error;
                     } else {
                         this.queried = true;
-                        this.appEvals = result.a;
-                        this.bnEvals = result.b; 
+                        this.appEvals = result.bnApplications;
+                        this.bnEvals = result.evalRounds;
                     }
                 }
             }
         },
         async queryRecent(e) {
             this.info = '';
-            let limit = $('#limit').val();
-            if(parseInt(limit)){
-                const result = await this.executeGet('/evalArchive/searchRecent/' + limit, e);
+
+            if (parseInt(this.limit)) {
+                const result = await this.executeGet('/evalArchive/searchRecent/' + this.limit, e);
+
                 if (result) {
                     if (result.error) {
                         this.info = result.error;
                     } else {
                         this.queried = true;
-                        this.appEvals = result.a;
-                        this.bnEvals = result.b; 
+                        this.appEvals = result.bnApplications;
+                        this.bnEvals = result.evalRounds;
                     }
                 }
-            }else{
+            } else {
                 this.info = 'Invalid number';
             }
         },

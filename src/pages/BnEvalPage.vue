@@ -1,8 +1,8 @@
 <template>
     <div class="row">
         <div class="col-md-12">
-            <filter-box 
-                :filter-mode.sync="filterMode" 
+            <filter-box
+                :filter-mode.sync="filterMode"
                 :filter-value.sync="filterValue"
                 :placeholder="'username... (3+ characters)'"
                 :options="['', 'osu', 'taiko', 'catch', 'mania']"
@@ -38,9 +38,13 @@
             <section class="row segment segment-image mx-1 px-0">
                 <div class="col-sm-12">
                     <h2>
-                        Individual Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="Evaluations are hidden from others to avoid confirmation bias">?</sup> <small v-if="evalRounds">({{ evalRounds.length }})</small>
+                        Individual Evaluations<sup
+                            style="font-size: 12pt"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            title="Evaluations are hidden from others to avoid confirmation bias"
+                        >?</sup> <small v-if="evalRounds">({{ evalRounds.length }})</small>
                         <button
-                            v-if="evaluator && evaluator.isLeader"
                             class="btn btn-nat"
                             data-toggle="modal"
                             data-target="#addEvalRounds"
@@ -49,7 +53,7 @@
                             Add users to evaluate
                         </button>
                     </h2>
-                
+
                     <transition-group name="list" tag="div" class="row">
                         <current-bn-individual-card
                             v-for="evalRound in evalRounds"
@@ -62,7 +66,7 @@
                             @update:selected-eval-round="selectedEvalRound = $event"
                         />
                     </transition-group>
-                
+
                     <p v-if="!evalRounds || evalRounds.length == 0" class="ml-4">
                         No BNs to evaluate...
                     </p>
@@ -71,8 +75,15 @@
             <hr>
             <section class="row segment segment-image mx-1 px-0">
                 <div class="col-sm-12">
-                    <h2>Group Evaluations<sup style="font-size: 12pt" data-toggle="tooltip" data-placement="top" title="After individual evals are completed, their responses are made visible to allow discussion between NAT and form a consensus">?</sup> <small v-if="discussRounds">({{ discussRounds.length }})</small></h2>
-                
+                    <h2>
+                        Group Evaluations<sup
+                            style="font-size: 12pt"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            title="After individual evals are completed, their responses are made visible to allow discussion between NAT and form a consensus"
+                        >?</sup> <small v-if="discussRounds">({{ discussRounds.length }})</small>
+                    </h2>
+
                     <transition-group name="list" tag="div" class="row">
                         <current-bn-discussion-card
                             v-for="evalRound in discussRounds"
@@ -83,7 +94,7 @@
                             @update:selected-discuss-round="selectedDiscussRound = $event"
                         />
                     </transition-group>
-                
+
                     <p v-if="!discussRounds || discussRounds.length == 0" class="ml-4">
                         No BNs to evaluate...
                     </p>
@@ -92,12 +103,14 @@
         </div>
 
         <current-bn-individual-info
+            v-if="selectedEvalRound"
             :eval-round="selectedEvalRound"
             :evaluator="evaluator"
             @update-eval-round="updateEvalRound($event)"
         />
 
         <current-bn-discussion-info
+            v-if="selectedDiscussRound"
             :eval-round="selectedDiscussRound"
             :evaluator="evaluator"
             @update-eval-round="updateEvalRound($event)"
@@ -145,7 +158,7 @@ export default {
         };
     },
     computed: {
-        
+
     },
     created() {
         axios
@@ -158,21 +171,23 @@ export default {
                 this.hasSeparation = true;
                 this.filter();
                 const params = new URLSearchParams(document.location.search.substring(1));
+
                 if (params.get('eval') && params.get('eval').length) {
                     const i = this.allObjs.findIndex(a => a.id == params.get('eval'));
-                    if(i >= 0){
-                        if(!this.allObjs[i].discussion){
+
+                    if (i >= 0) {
+                        if (!this.allObjs[i].discussion) {
                             this.selectedEvalRound = this.allObjs[i];
                             $('#currentBnIndividualInfo').modal('show');
-                        }else{
+                        } else {
                             this.selectedDiscussRound = this.allObjs[i];
                             $('#currentBnDiscussionInfo').modal('show');
                         }
-                    }else{
+                    } else {
                         window.location = '/evalArchive?eval=' + params.get('eval');
                     }
                 }
-            }).then(function(){
+            }).then(function() {
                 $('#loading').fadeOut();
                 $('#main').attr('style', 'visibility: visible').hide().fadeIn();
             });
@@ -188,9 +203,10 @@ export default {
     },
     methods: {
         filterBySearchValueContext(e) {
-            if(e.bn.username.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1){
+            if (e.bn.username.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1) {
                 return true;
             }
+
             return false;
         },
         separateObjs() {
@@ -200,11 +216,13 @@ export default {
         updateEvalRound (evalRound) {
             const i = this.allObjs.findIndex(er => er.id == evalRound.id);
             this.allObjs[i] = evalRound;
-            if(evalRound.discussion){
+
+            if (evalRound.discussion) {
                 this.selectedDiscussRound = evalRound;
-            }else{
+            } else {
                 this.selectedEvalRound = evalRound;
             }
+
             this.filter();
         },
         updateAllEvalRounds (evalRounds) {
@@ -221,8 +239,10 @@ export default {
             $('input[name=\'evalTypeCheck\']:checked').each( function () {
                 checkedRounds.push( $(this).val() );
             });
-            if(checkedRounds.length){
+
+            if (checkedRounds.length) {
                 const ers = await this.executePost('/bnEval/setGroupEval/', { checkedRounds }, e);
+
                 if (ers) {
                     if (ers.error) {
                         this.info = ers.error;
@@ -238,8 +258,10 @@ export default {
             $('input[name=\'evalTypeCheck\']:checked').each( function () {
                 checkedRounds.push( $(this).val() );
             });
-            if(checkedRounds.length){
+
+            if (checkedRounds.length) {
                 const ers = await this.executePost('/bnEval/setIndividualEval/', { checkedRounds }, e);
+
                 if (ers) {
                     if (ers.error) {
                         this.info = ers.error;
@@ -255,10 +277,13 @@ export default {
             $('input[name=\'evalTypeCheck\']:checked').each( function () {
                 checkedRounds.push( $(this).val() );
             });
-            if(checkedRounds.length){
+
+            if (checkedRounds.length) {
                 const result = confirm(`Are you sure? The consensus of any evaluation will affect its respective user.\n\nOnly do this after feedback PMs have been sent.`);
-                if(result){
+
+                if (result) {
                     const ers = await this.executePost('/bnEval/setComplete/', { checkedRounds }, e);
+
                     if (ers) {
                         if (ers.error) {
                             this.info = ers.error;

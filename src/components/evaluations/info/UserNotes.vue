@@ -3,11 +3,19 @@
         <p class="min-spacing text-shadow">
             NAT user notes:
         </p>
-        <ul v-if="userNotes">
-            <li v-if="!userNotes.length" class="small min-spacing text-shadow">
+        <ul>
+            <li v-if="!userNotes" class="small min-spacing text-shadow">
+                ...
+            </li>
+            <li v-else-if="!userNotes.length" class="small min-spacing text-shadow">
                 User has no notes
             </li>
-            <li v-for="note in userNotes" v-else :key="note.id" class="small text-shadow">
+            <li
+                v-for="note in userNotes"
+                v-else
+                :key="note.id"
+                class="small text-shadow"
+            >
                 <b>
                     {{ note.updatedAt.slice(0,10) }} -
                     <a :href="'https://osu.ppy.sh/users/' + note.author.osuId" target="_blank">
@@ -27,7 +35,10 @@ export default {
     name: 'UserNotes',
     mixins: [ filterLinks ],
     props: {
-        userMongoId: String,
+        userMongoId: {
+            type: String,
+            required: true,
+        },
     },
     data() {
         return {
@@ -36,6 +47,7 @@ export default {
     },
     watch: {
         userMongoId() {
+            this.userNotes = null;
             this.findUserNotes();
         },
     },

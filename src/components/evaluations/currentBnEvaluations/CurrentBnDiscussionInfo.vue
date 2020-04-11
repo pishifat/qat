@@ -11,7 +11,7 @@
                     :evaluator-mongo-id="evaluator.id"
                 />
                 <div class="modal-body" style="overflow: hidden;">
-                    <div v-for="(mode, i) in evalRound.bn.modes" :key="mode" class="container">
+                    <div v-for="(mode, i) in modes" :key="mode" class="container">
                         <p class="text-shadow min-spacing mb-1">
                             Recent BN activity
                             <span class="small">({{ mode == 'osu' ? 'osu!' : 'osu!' + mode }})</span>
@@ -19,7 +19,7 @@
                         <div class="container mb-3">
                             <user-activity
                                 :osu-id="evalRound.bn.osuId"
-                                :mode="evalRound.bn.modes[i]"
+                                :mode="modes[i]"
                                 :deadline="evalRound.deadline"
                                 :is-nat="evaluator.isNat"
                                 :user-mongo-id="evalRound.bn.id"
@@ -43,11 +43,6 @@
                             <modding-activity
                                 :username="evalRound.bn.username"
                             />
-                            <user-list
-                                v-if="evalRound.evaluations.length"
-                                :header="'Total evaluations: (' + evalRound.evaluations.length + ')'"
-                                :user-list="submittedEvaluators"
-                            />
                         </div>
                         <hr>
                         <consensus
@@ -55,6 +50,10 @@
                             :nominator-assessment-mongo-id="evalRound.id"
                             :is-application="false"
                             :is-low-activity="evalRound.isLowActivity"
+                            :resigned-on-good-terms="evalRound.resignedOnGoodTerms"
+                            :group="evalRound.bn.group"
+                            :is-move-to-nat="evalRound.isMoveToNat"
+                            :is-move-to-bn="evalRound.isMoveToBn"
                             @update-nominator-assessment="$emit('update-eval-round', $event);"
                         />
                         <cooldown
@@ -66,13 +65,14 @@
                             @update-nominator-assessment="$emit('update-eval-round', $event);"
                         />
                         <feedback-info
-                            v-if="evalRound.consensus"
+                            v-if="evalRound.consensus && !(evalRound.isMoveToNat || evalRound.isMoveToBn)"
                             :consensus="evalRound.consensus"
                             :osu-id="evalRound.bn.osuId"
                             :cooldown-date="evalRound.cooldownDate"
                             :evaluations="evalRound.evaluations"
                             :probation="evalRound.bn.probation"
                             :is-low-activity="evalRound.isLowActivity"
+                            :resigned-on-good-terms="evalRound.resignedOnGoodTerms"
                             :mode="evalRound.mode"
                             :saved-feedback="evalRound.feedback"
                             :nominator-assessment-mongo-id="evalRound.id"
@@ -105,7 +105,6 @@ import PreviousEvaluations from '../info/PreviousEvaluations.vue';
 import UserNotes from '../info/UserNotes.vue';
 import UserReports from './currentBnInfo/UserReports.vue';
 import ModdingActivity from './currentBnInfo/ModdingActivity.vue';
-import UserList from '../info/UserList.vue';
 import EvaluationInput from '../info/EvaluationInput.vue';
 import Consensus from '../info/Consensus.vue';
 import Cooldown from '../info/Cooldown.vue';
@@ -121,7 +120,6 @@ export default {
         UserNotes,
         UserReports,
         ModdingActivity,
-        UserList,
         EvaluationInput,
         Consensus,
         Cooldown,
@@ -146,6 +144,13 @@ export default {
             });
 
             return evaluators;
+        },
+        modes() {
+            let modes = [];
+            if (this.evalRound.bn.modes.length) modes = this.evalRound.bn.modes;
+            else modes.push(this.evalRound.mode);
+
+            return modes;
         },
     },
     watch: {

@@ -73,6 +73,7 @@
                             :is-nat="evaluator.isNat"
                             :consensus="application.consensus"
                             :evaluations="application.evaluations"
+                            :user-id="evaluator.id"
                         />
                         <p v-else class="text-shadow small">
                             No consensus has been set, so evaluations are not visible. Check back later!
@@ -106,7 +107,7 @@ import Evaluations from '../info/Evaluations.vue';
 import EvaluationInput from '../info/EvaluationInput.vue';
 
 export default {
-    name: 'application-discussion-info',
+    name: 'ApplicationDiscussionInfo',
     components: {
         ModalHeader,
         Mods,
@@ -121,8 +122,14 @@ export default {
         EvaluationInput,
     },
     props: {
-        application: Object,
-        evaluator: Object,
+        application: {
+            type: Object,
+            required: true,
+        },
+        evaluator: {
+            type: Object,
+            required: true,
+        },
     },
     watch: {
         application() {

@@ -43,17 +43,19 @@ export default {
         CardFooter,
     },
     props: {
-        application: Object,
-        evaluator: Object,
+        application: {
+            type: Object,
+            required: true,
+        },
+        evaluator: {
+            type: Object,
+            required: true,
+        },
         allChecked: Boolean,
         isArchive: Boolean,
     },
     data() {
         return {
-            pass: 0,
-            neutral: 0,
-            extend: 0,
-            fail: 0,
             isSelected: false,
         };
     },
@@ -84,6 +86,7 @@ export default {
                     }
                 }
             });
+
             return vote;
         },
         checkSelection() {
@@ -96,10 +99,12 @@ export default {
         isNatEvaluator() {
             for (let i = 0; i < this.application.natEvaluators.length; i++) {
                 let user = this.application.natEvaluators[i];
-                if(user.id == this.evaluator.id){
+
+                if (user.id == this.evaluator.id) {
                     return true;
                 }
             }
+
             return false;
         },
     },

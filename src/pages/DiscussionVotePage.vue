@@ -1,17 +1,22 @@
 <template>
     <div class="row">
         <div class="col-md-12">
-            <filter-box 
-                :filter-mode.sync="filterMode" 
+            <filter-box
+                :filter-mode.sync="filterMode"
                 :filter-value.sync="filterValue"
                 :placeholder="'content...'"
                 :options="['', 'osu', 'taiko', 'catch', 'mania']"
             >
-                <button v-if="isNat" class="btn btn-sm btn-nat ml-2" data-toggle="modal" data-target="#addDiscussion">
+                <button
+                    v-if="isNat"
+                    class="btn btn-sm btn-nat ml-2"
+                    data-toggle="modal"
+                    data-target="#addDiscussion"
+                >
                     Submit topic for vote
                 </button>
             </filter-box>
-            
+
             <section class="row segment segment-image mx-0 px-0">
                 <div class="col-sm-12">
                     <transition-group name="list" tag="div" class="row mx-auto">
@@ -27,10 +32,11 @@
             </section>
         </div>
         <discussion-info
+            v-if="selectedDiscussion"
             :discussion="selectedDiscussion"
             :user-id="userId"
             :user-modes="userModes"
-            :is-leader="isLeader"
+            :is-pishifat="isPishifat"
             :is-nat="isNat"
             @update-discussion="updateDiscussion($event)"
         />
@@ -62,7 +68,7 @@ export default {
             filteredObjs: null,
             userId: null,
             userModes: null,
-            isLeader: false,
+            isPishifat: false,
             isNat: false,
             selectedDiscussion: null,
         };
@@ -74,13 +80,15 @@ export default {
                 this.allObjs = response.data.discussions;
                 this.userId = response.data.userId;
                 this.userModes = response.data.userModes;
-                this.isLeader = response.data.isLeader;
+                this.isPishifat = response.data.isPishifat;
                 this.isNat = response.data.isNat;
                 this.limit = 24;
                 const params = new URLSearchParams(document.location.search.substring(1));
+
                 if (params.get('id') && params.get('id').length) {
                     const i = this.allObjs.findIndex(a => a.id == params.get('id'));
-                    if(i >= 0){
+
+                    if (i >= 0) {
                         this.selectedDiscussion = this.allObjs[i];
                         $('#extendedInfo').modal('show');
                     }
@@ -98,6 +106,7 @@ export default {
         setInterval(() => {
             axios.get('/discussionVote/relevantInfo').then(response => {
                 this.allObjs = response.data.discussions;
+
                 if (this.isFiltered) {
                     this.filter();
                 }
@@ -106,9 +115,10 @@ export default {
     },
     methods: {
         filterBySearchValueContext(v) {
-            if(v.title.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1){
+            if (v.title.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1) {
                 return true;
             }
+
             return false;
         },
         SubmitDiscussion(v) {

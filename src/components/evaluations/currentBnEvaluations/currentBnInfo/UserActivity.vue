@@ -133,20 +133,20 @@ export default {
     },
     methods: {
         async findRelevantActivity() {
-            axios
-                .get('/bnEval/userActivity/' + this.osuId + '/' + this.mode + '/' + this.deadline + '/' + this.userMongoId)
-                .then(response => {
-                    this.nominations = response.data.noms;
-                    this.nominationsDisqualified = response.data.nomsDqd;
-                    this.nominationsPopped = response.data.nomsPopped;
-                    this.disqualifications = response.data.dqs;
-                    this.pops = response.data.pops;
-                    this.qualityAssuranceChecks = response.data.qualityAssuranceChecks;
-                    this.assignedApplications = response.data.assignedApplications;
-                    this.natApplications = response.data.natApplications;
-                    this.natEvalRounds = response.data.natEvalRounds;
-                    this.loading = false;
-                });
+            const res = await axios.get('/bnEval/userActivity/' + this.osuId + '/' + this.mode + '/' + new Date(this.deadline).getTime() + '/' + this.userMongoId);
+
+            if (res.data) {
+                this.nominations = res.data.noms;
+                this.nominationsDisqualified = res.data.nomsDqd;
+                this.nominationsPopped = res.data.nomsPopped;
+                this.disqualifications = res.data.dqs;
+                this.pops = res.data.pops;
+                this.qualityAssuranceChecks = res.data.qualityAssuranceChecks;
+                this.assignedApplications = res.data.assignedApplications;
+                this.natApplications = res.data.natApplications;
+                this.natEvalRounds = res.data.natEvalRounds;
+                this.loading = false;
+            }
         },
         updateContent (event) {
             let i;

@@ -3,13 +3,21 @@
         <p class="min-spacing text-shadow">
             Reports:
         </p>
-        <ul v-if="userReports">
-            <li v-if="!userReports.length" class="small min-spacing text-shadow">
+        <ul>
+            <li v-if="!userReports" class="small min-spacing text-shadow">
+                ...
+            </li>
+            <li v-else-if="!userReports.length" class="small min-spacing text-shadow">
                 User has no reports
             </li>
-            <li v-for="report in userReports" v-else :key="report.id" class="small text-shadow">
+            <li
+                v-for="report in userReports"
+                v-else
+                :key="report.id"
+                class="small text-shadow"
+            >
                 <a :href="'http://bn.mappersguild.com/managereports?report=' + report.id">{{ report.createdAt.slice(0,10) }}</a>
-                <pre class="secondary-text pre-font ml-2" :class="report.valid == 1 ? 'vote-pass' : 'vote-extend'"> <span v-html="filterLinks(report.reason)" /></pre>
+                <pre class="secondary-text pre-font ml-2" :class="report.valid == 1 ? 'vote-green' : 'vote-yellow'"> <span v-html="filterLinks(report.reason)" /></pre>
             </li>
         </ul>
     </div>
@@ -22,7 +30,10 @@ export default {
     name: 'UserReports',
     mixins: [filterLinks],
     props: {
-        userMongoId: String,
+        userMongoId: {
+            type: String,
+            required: true,
+        },
     },
     data() {
         return {

@@ -1,8 +1,7 @@
 const querystring = require('querystring');
 const config = require('../config.json');
-const users = require('../models/user.js');
+const User = require('../models/user');
 const axios = require('axios');
-const logsService = require('../models/log').service;
 
 async function getToken(code) {
     const postData = querystring.stringify({
@@ -117,7 +116,7 @@ async function getUserInfoV1(osuId) {
 
 async function isLoggedIn(req, res, next) {
     if (req.session.mongoId) {
-        const u = await users.service.query({ _id: req.session.mongoId });
+        const u = await User.findById(req.session.mongoId);
 
         if (!u) {
             return res.redirect('/');
@@ -142,6 +141,7 @@ async function isLoggedIn(req, res, next) {
         res.locals.userRequest = u;
         next();
     } else {
+        req.session.lastPage = req.originalUrl;
         res.redirect('/');
     }
 }
@@ -170,16 +170,6 @@ function isNat(req, res, next) {
     const u = res.locals.userRequest;
 
     if (u.group == 'nat' || u.isSpectator) {
-        next();
-    } else {
-        res.redirect('/');
-    }
-}
-
-function isLeader(req, res, next) {
-    const u = res.locals.userRequest;
-
-    if (u.isLeader) {
         next();
     } else {
         res.redirect('/');
@@ -244,7 +234,7 @@ async function webhookPost(message, webhook) {
             embeds: message,
         });
     } catch (error) {
-        logsService.create(null, error, true);
+        //
     }
 }
 
@@ -255,35 +245,35 @@ async function highlightWebhookPost(message, webhook) {
     switch (webhook) {
         case 'osu':
             url += `${config.standardWebhook.id}/${config.standardWebhook.token}`;
-            role = '<@' + config.standardWebhook.role + '>';
+            role = '<@&' + config.standardWebhook.role + '>';
             break;
         case 'taiko':
             url += `${config.taikoWebhook.id}/${config.taikoWebhook.token}`;
-            role = '<@' + config.taikoWebhook.role + '>';
+            role = '<@&' + config.taikoWebhook.role + '>';
             break;
         case 'catch':
             url += `${config.catchWebhook.id}/${config.catchWebhook.token}`;
-            role = '<@' + config.catchWebhook.role + '>';
+            role = '<@&' + config.catchWebhook.role + '>';
             break;
         case 'mania':
             url += `${config.maniaWebhook.id}/${config.maniaWebhook.token}`;
-            role = '<@' + config.maniaWebhook.role + '>';
+            role = '<@&' + config.maniaWebhook.role + '>';
             break;
         case 'osuBeatmapReport':
             url += `${config.beatmapReportWebhook.id}/${config.beatmapReportWebhook.token}`;
-            role = '<@' + config.beatmapReportWebhook.osuRole + '>';
+            role = '<@&' + config.beatmapReportWebhook.osuRole + '>';
             break;
         case 'taikoBeatmapReport':
             url += `${config.beatmapReportWebhook.id}/${config.beatmapReportWebhook.token}`;
-            role = '<@' + config.beatmapReportWebhook.taikoRole + '>';
+            role = '<@&' + config.beatmapReportWebhook.taikoRole + '>';
             break;
         case 'catchBeatmapReport':
             url += `${config.beatmapReportWebhook.id}/${config.beatmapReportWebhook.token}`;
-            role = '<@' + config.beatmapReportWebhook.catchRole + '>';
+            role = '<@&' + config.beatmapReportWebhook.catchRole + '>';
             break;
         case 'maniaBeatmapReport':
             url += `${config.beatmapReportWebhook.id}/${config.beatmapReportWebhook.token}`;
-            role = '<@' + config.beatmapReportWebhook.maniaRole + '>';
+            role = '<@&' + config.beatmapReportWebhook.maniaRole + '>';
             break;
         default:
             url += `${config.reportWebhook.id}/${config.reportWebhook.token}`;
@@ -295,9 +285,49 @@ async function highlightWebhookPost(message, webhook) {
             content: role + ' ' + message,
         });
     } catch (error) {
-        logsService.create(null, error, true);
+        //
     }
 }
+
+function defaultWebhookAuthor(session) {
+    return {
+        name: session.username,
+        icon_url: `https://a.ppy.sh/${session.osuId}`,
+        url: `https://osu.ppy.sh/users/${session.osuId}`,
+    };
+}
+
+const webhookColors = {
+    lightRed: '16742771',       // nonUserReport, active: moveToGroupDiscussion
+    darkRed: '8787477',         // userReport
+    red: '15607337',            // overdueNotifications, problemReport, lowActivity
+
+    lightOrange: '15639928',    // enableBnEvaluators, suggestionReport
+    darkOrange: '7092736',      // replaceMediator
+    orange: '15169835',         // replaceEvaluator
+
+    lightYellow: '16777104',    // submitDiscussionVote
+    darkYellow: '7105536',      // concludeDiscussionVote
+    yellow: '16777022',         // submitMediationDiscussionVote
+
+    lightGreen: '8847214',      // submitEval, submitQA
+    darkGreen: '1921053',
+    green: '4380222',           // newBnApplication
+
+    lightBlue: '8643583',       // setConsensus
+    darkBlue: '1911891',        // setCooldown
+    blue: '6786559',            // setFeedback
+
+    lightPurple: '11173873',    // submitVetoMediation
+    darkPurple: '4263999',      // submitVeto
+    purple: '8536232',          // startVetoMediation, concludeVetoMediation
+
+    pink: '16728232',       // revealedCurrentBnEvalNotification
+    white: '15724527',      // unarchive, addEvalRound, maxQAChecks
+    brown: '7554849',       // submitUserNote
+    gray: '8815494',        // passive: moveToGroupDiscussion,
+    black: '2564903',       // archive
+};
 
 module.exports = {
     isLoggedIn,
@@ -309,9 +339,10 @@ module.exports = {
     isBnOrNat,
     isBn,
     isNat,
-    isLeader,
     isBnEvaluator,
     isNotSpectator,
     webhookPost,
     highlightWebhookPost,
+    defaultWebhookAuthor,
+    webhookColors,
 };

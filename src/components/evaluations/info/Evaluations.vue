@@ -2,7 +2,12 @@
     <div class="text-shadow mt-3">
         <div v-for="evaluation in natEvaluations" :key="evaluation.id" class="row border-bottom border-dark my-2">
             <div class="col-sm-2">
-                <a v-if="isNat" :href="'https://osu.ppy.sh/users/' + evaluation.evaluator.osuId" class="small d-flex flex-column ml-auto font-weight-bold text-center" :class="voteColor(evaluation.vote)">
+                <a
+                    v-if="isNat"
+                    :href="'https://osu.ppy.sh/users/' + evaluation.evaluator.osuId"
+                    class="small d-flex flex-column ml-auto font-weight-bold text-center"
+                    :class="voteColor(evaluation.vote)"
+                >
                     <img :src="'https://a.ppy.sh/' + evaluation.evaluator.osuId" class="card-avatar-img mx-auto">
                     {{ evaluation.evaluator.username }}
                 </a>
@@ -23,11 +28,19 @@
         </div>
         <div v-for="evaluation in bnEvaluations" :key="evaluation.id" class="row border-bottom border-dark my-2">
             <div class="col-sm-2">
-                <a v-if="isNat" :href="'https://osu.ppy.sh/users/' + evaluation.evaluator.osuId" class="small d-flex flex-column ml-auto font-weight-bold text-center" :class="voteColor(evaluation.vote)">
+                <a
+                    v-if="isNat"
+                    :href="'https://osu.ppy.sh/users/' + evaluation.evaluator.osuId"
+                    class="small d-flex flex-column ml-auto font-weight-bold text-center"
+                    :class="voteColor(evaluation.vote)"
+                >
                     <img :src="'https://a.ppy.sh/' + evaluation.evaluator.osuId" class="card-avatar-img mx-auto">
                     {{ evaluation.evaluator.username }}
                 </a>
-                <span v-else class="small d-flex flex-column ml-auto font-weight-bold text-center" :class="voteColor(evaluation.vote)">BN</span>
+                <span v-else class="small d-flex flex-column ml-auto font-weight-bold text-center" :class="voteColor(evaluation.vote)">
+                    BN
+                    <span v-if="evaluation.evaluator.id == userId">(this is you!)</span>
+                </span>
             </div>
             <div class="col-sm-7">
                 <p class="min-spacing">
@@ -55,44 +68,47 @@ export default {
         evaluations: Array,
         consensus: String,
         isNat: Boolean,
+        userId: String,
     },
     computed: {
         bnEvaluations() {
             let e = [];
             this.evaluations.forEach(evaluation => {
-                if(this.isNat){
-                    if(evaluation.evaluator.isBn || evaluation.evaluator.group == 'user') e.push(evaluation);
-                }else{
+                if (this.isNat) {
+                    if (evaluation.evaluator.isBn || evaluation.evaluator.group == 'user') e.push(evaluation);
+                } else {
                     let consensusVote;
-                    if(this.consensus == 'pass') consensusVote = 1;
-                    if(this.consensus == 'fail') consensusVote = 3;
-                    if(evaluation.evaluator.isBn && (evaluation.vote == consensusVote || evaluation.vote == 2)) e.push(evaluation);
+                    if (this.consensus == 'pass') consensusVote = 1;
+                    if (this.consensus == 'fail') consensusVote = 3;
+                    if (evaluation.evaluator.isBn && (evaluation.vote == consensusVote || evaluation.vote == 2 || evaluation.evaluator.id == this.userId)) e.push(evaluation);
                 }
             });
+
             return e;
         },
         natEvaluations() {
             let e = [];
             this.evaluations.forEach(evaluation => {
-                if(this.isNat){
-                    if(evaluation.evaluator.isNat) e.push(evaluation);
-                }else{
+                if (this.isNat) {
+                    if (evaluation.evaluator.isNat) e.push(evaluation);
+                } else {
                     let consensusVote;
-                    if(this.consensus == 'pass') consensusVote = 1;
-                    if(this.consensus == 'fail') consensusVote = 3;
-                    if(evaluation.evaluator.isNat && (evaluation.vote == consensusVote || evaluation.vote == 2)) e.push(evaluation);
+                    if (this.consensus == 'pass') consensusVote = 1;
+                    if (this.consensus == 'fail') consensusVote = 3;
+                    if (evaluation.evaluator.isNat && (evaluation.vote == consensusVote || evaluation.vote == 2)) e.push(evaluation);
                 }
             });
+
             return e;
         },
     },
     methods: {
         voteColor(vote) {
-            if(vote == 1){
+            if (vote == 1) {
                 return 'vote-pass';
-            }else if(vote == 2){
+            } else if (vote == 2) {
                 return 'vote-neutral';
-            }else if(vote == 3){
+            } else if (vote == 3) {
                 return 'vote-fail';
             }
         },

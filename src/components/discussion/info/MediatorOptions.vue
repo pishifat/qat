@@ -23,7 +23,7 @@
                 >
                 <label class="form-check-label text-shadow vote-pass" for="1">Agree</label>
             </div>
-            <div class="form-check form-check-inline">
+            <div v-if="neutralAllowed" class="form-check form-check-inline">
                 <input
                     id="2"
                     class="form-check-input"
@@ -45,8 +45,8 @@
                 >
                 <label class="form-check-label text-shadow vote-fail" for="3">Disagree</label>
             </div>
-            <p v-if="!isNatOnly" class="small ml-2">
-                Only NAT leaders can see your vote. If you have any feedback to improve the proposal, post on the thread.
+            <p v-if="!isNatOnly && discussionLink" class="small ml-2">
+                If you have any feedback to improve the proposal, post on <a :href="discussionLink" target="_blank">the thread</a>.
             </p>
             <button class="btn btn-sm btn-nat float-right" @click="submitMediation($event)">
                 Submit Vote
@@ -62,10 +62,28 @@ export default {
     name: 'MediatorOptions',
     mixins: [ postData ],
     props: {
-        discussionId: String,
-        mediations: Array,
+        discussionId: {
+            type: String,
+            required: true,
+        },
+        discussionLink: {
+            type: String,
+            default() {
+                return null;
+            },
+        },
+        mediations: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
         isNatOnly: Boolean,
-        userId: String,
+        neutralAllowed: Boolean,
+        userId: {
+            type: String,
+            required: true,
+        },
     },
     data() {
         return {
@@ -75,31 +93,20 @@ export default {
             error: false,
         };
     },
-    mounted() {
-        if (this.mediations.length) {
-            for (let i = 0; i < this.mediations.length; i++) {
-                let mediation = this.mediations[i];
-                if(mediation.mediator.id == this.userId){
-                    if(mediation.vote) this.vote = mediation.vote;
-                    if(mediation.comment) this.comment = mediation.comment;
-                    this.mediationId = mediation.id;
-                    break;
-                }
-            }
-        }
-    },
     watch: {
-        discussionId() {
+        mediations() {
             this.vote = null;
             this.comment = null;
             this.mediationId = null;
             this.error = false;
+
             if (this.mediations.length) {
                 for (let i = 0; i < this.mediations.length; i++) {
                     let mediation = this.mediations[i];
-                    if(mediation.mediator.id == this.userId){
-                        if(mediation.vote) this.vote = mediation.vote;
-                        if(mediation.comment) this.comment = mediation.comment;
+
+                    if (mediation.mediator.id == this.userId) {
+                        if (mediation.vote) this.vote = mediation.vote;
+                        if (mediation.comment) this.comment = mediation.comment;
                         this.mediationId = mediation.id;
                         break;
                     }
@@ -107,18 +114,34 @@ export default {
             }
         },
     },
+    mounted() {
+        if (this.mediations.length) {
+            for (let i = 0; i < this.mediations.length; i++) {
+                let mediation = this.mediations[i];
+
+                if (mediation.mediator.id == this.userId) {
+                    if (mediation.vote) this.vote = mediation.vote;
+                    if (mediation.comment) this.comment = mediation.comment;
+                    this.mediationId = mediation.id;
+                    break;
+                }
+            }
+        }
+    },
     methods: {
         async submitMediation (e) {
             const vote = $('input[name=vote]:checked').val();
-            if(!vote){
+
+            if (!vote) {
                 this.error = true;
-            }else{
+            } else {
                 const d = await this.executePost(
-                    '/discussionVote/submitMediation/' + this.discussionId, 
-                    { mediationId: this.mediationId, 
-                        vote, 
-                        comment: this.comment, 
+                    '/discussionVote/submitMediation/' + this.discussionId,
+                    { mediationId: this.mediationId,
+                        vote,
+                        comment: this.comment,
                     }, e);
+
                 if (d) {
                     if (d.error) {
                         this.error = true;

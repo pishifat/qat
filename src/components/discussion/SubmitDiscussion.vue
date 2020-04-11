@@ -15,7 +15,12 @@
                         <div class="row text-shadow">
                             <p>Game mode:</p>
                             <div class="row ml-4">
-                                <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!">
+                                <label
+                                    class="mx-1"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="osu!"
+                                >
                                     <input
                                         v-model="mode"
                                         type="radio"
@@ -26,7 +31,12 @@
                                     >
                                     <i class="fas fa-circle fa-lg" />
                                 </label>
-                                <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!taiko">
+                                <label
+                                    class="mx-1"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="osu!taiko"
+                                >
                                     <input
                                         v-model="mode"
                                         type="radio"
@@ -36,7 +46,12 @@
                                     >
                                     <i class="fas fa-drum fa-lg" />
                                 </label>
-                                <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!catch">
+                                <label
+                                    class="mx-1"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="osu!catch"
+                                >
                                     <input
                                         v-model="mode"
                                         type="radio"
@@ -46,7 +61,12 @@
                                     >
                                     <i class="fas fa-apple-alt fa-lg" />
                                 </label>
-                                <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!mania">
+                                <label
+                                    class="mx-1"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="osu!mania"
+                                >
                                     <input
                                         v-model="mode"
                                         type="radio"
@@ -56,7 +76,12 @@
                                     >
                                     <i class="fas fa-stream fa-lg" />
                                 </label>
-                                <label class="mx-1" data-toggle="tooltip" data-placement="top" title="all game modes">
+                                <label
+                                    class="mx-1"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="all game modes"
+                                >
                                     <input
                                         v-model="mode"
                                         type="radio"
@@ -71,7 +96,12 @@
                         <div class="row text-shadow">
                             <p>NAT only vote:</p>
                             <div class="row ml-4">
-                                <label class="mx-1" data-toggle="tooltip" data-placement="top" title="BN + NAT vote">
+                                <label
+                                    class="mx-1"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="BN + NAT vote"
+                                >
                                     <input
                                         v-model="group"
                                         type="radio"
@@ -79,9 +109,14 @@
                                         name="bn"
                                         value="bn"
                                     >
-                                    <i class="fas fa-times fa-lg"></i>
+                                    <i class="fas fa-times fa-lg" />
                                 </label>
-                                <label class="mx-1" data-toggle="tooltip" data-placement="top" title="NAT only vote">
+                                <label
+                                    class="mx-1"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="NAT only vote"
+                                >
                                     <input
                                         v-model="group"
                                         type="radio"
@@ -89,7 +124,42 @@
                                         name="nat"
                                         value="nat"
                                     >
-                                    <i class="fas fa-check fa-lg"></i>
+                                    <i class="fas fa-check fa-lg" />
+                                </label>
+                            </div>
+                        </div>
+                        <div class="row text-shadow">
+                            <p>Neutral vote allowed:</p>
+                            <div class="row ml-4">
+                                <label
+                                    class="mx-1"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="neutral not allowed"
+                                >
+                                    <input
+                                        v-model="neutral"
+                                        type="radio"
+                                        class="cross-radio hide-default"
+                                        name="neutral"
+                                        value="noNeutral"
+                                    >
+                                    <i class="fas fa-times fa-lg" />
+                                </label>
+                                <label
+                                    class="mx-1"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="neutral allowed"
+                                >
+                                    <input
+                                        v-model="neutral"
+                                        type="radio"
+                                        class="checkmark-radio hide-default"
+                                        name="neutral"
+                                        value="neutral"
+                                    >
+                                    <i class="fas fa-check fa-lg" />
                                 </label>
                             </div>
                         </div>
@@ -146,7 +216,8 @@ export default {
             title: null,
             shortReason: null,
             mode: null,
-            group: "bn",
+            group: 'bn',
+            neutral: 'neutral',
             info: null,
         };
     },
@@ -155,7 +226,7 @@ export default {
             if (!this.shortReason || !this.title || !this.mode) {
                 this.info = 'Required fields are missing!';
             } else {
-                if(!this.discussionLink) this.discussionLink = '';
+                if (!this.discussionLink) this.discussionLink = '';
                 const discussion = await this.executePost(
                     '/discussionVote/submit',
                     {
@@ -163,7 +234,8 @@ export default {
                         title: this.title,
                         shortReason: this.shortReason,
                         mode: this.mode,
-                        isNatOnly: this.group == 'nat'
+                        isNatOnly: this.group == 'nat',
+                        neutralAllowed: this.neutral == 'neutral',
                     },
                     e
                 );

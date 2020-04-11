@@ -1,6 +1,4 @@
 const mongoose = require('mongoose');
-const logsService = require('./log').service;
-const BaseService = require('./baseService');
 
 const bnAppSchema = new mongoose.Schema({
     applicant: { type: 'ObjectId', ref: 'User', required: true },
@@ -19,32 +17,36 @@ const bnAppSchema = new mongoose.Schema({
     cooldownDate: { type: Date },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-const BnApp = mongoose.model('BnApp', bnAppSchema);
 
-class BnAppService extends BaseService
+class BnAppService
 {
-    constructor() {
-        super(BnApp);
+
+    static findActiveApps() {
+        return BnApp
+            .find({
+                active: true,
+                test: { $exists: true },
+            })
+            .populate([
+                { path: 'applicant', select: 'username osuId' },
+                { path: 'bnEvaluators', select: 'username osuId' },
+                { path: 'natEvaluators', select: 'username osuId' },
+                { path: 'test', select: 'totalScore comment' },
+                {
+                    path: 'evaluations',
+                    select: 'evaluator behaviorComment moddingComment vote',
+                    populate: {
+                        path: 'evaluator',
+                        select: 'username osuId group',
+                    },
+                },
+            ])
+            .sort({ deadline: 1 });
     }
 
-    /**
-     *
-     * @param {object} userId UserId of applicant
-     * @param {string} mode
-     * @param {string[]} mods
-     * @param {string[]} reasons
-     */
-    async create(userId, mode, mods, reasons) {
-        try {
-            return await BnApp.create({ applicant: userId, mode, mods, reasons });
-        } catch (error) {
-            logsService.create(null, JSON.stringify(error), true);
-
-            return { error: error._message };
-        }
-    }
 }
 
-const service = new BnAppService();
+bnAppSchema.loadClass(BnAppService);
+const BnApp = mongoose.model('BnApp', bnAppSchema);
 
-module.exports = { service };
+module.exports = BnApp;

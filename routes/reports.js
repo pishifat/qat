@@ -1,9 +1,8 @@
 const express = require('express');
 const api = require('../helpers/api');
-const helper = require('../helpers/helpers');
-const reportsService = require('../models/report').service;
-const usersService = require('../models/user').service;
-const logsService = require('../models/log').service;
+const Report = require('../models/report');
+const User = require('../models/user');
+const Logger = require('../models/log');
 
 const router = express.Router();
 
@@ -27,7 +26,7 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
     }
 
     if (req.body.username) {
-        let u = await usersService.query({ username: new RegExp('^' + helper.escapeUsername(req.body.username) + '$', 'i') });
+        let u = await User.findByUsername(req.body.username);
 
         if (!u) {
             return res.json({ error: 'Cannot find user! Make sure you spelled it correctly' });
@@ -37,42 +36,22 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
             return res.json({ error: 'User is not a member of the BN/NAT!' });
         }
 
-        let r = await reportsService.create(req.session.mongoId, u.id, req.body.reason, req.body.link);
+        const r = await Report.create({
+            reporter: req.session.mongoId,
+            culprit: u.id,
+            reason: req.body.reason,
+            link: req.body.link,
+        });
+
         res.json({});
 
-        if (u.group != 'nat') {
-            api.webhookPost([{
-                author: {
-                    name: `User report: ${u.username}`,
-                    url: `http://bn.mappersguild.com/managereports?report=${r.id}`,
-                },
-                thumbnail: {
-                    url: `https://a.ppy.sh/${u.osuId}`,
-                },
-                color: '16697937',
-                fields: [
-                    {
-                        name: 'Report reason',
-                        value: req.body.reason.length > 975 ? req.body.reason.slice(0,975) + '... *(truncated)*' : req.body.reason,
-                    },
-                ],
-            }]);
-            logsService.create(
-                null,
-                `Reported "${u.username}" for reason "${
-                    req.body.reason.length > 50 ? req.body.reason.slice(0, 50) + '...' : req.body.reason
-                }"`
-            );
-        }
-    } else {
-        let r = await reportsService.create(req.session.mongoId, null, req.body.reason, req.body.link);
-        res.json({});
+
         api.webhookPost([{
-            author: {
-                name: 'Non-user report',
-                url: `http://bn.mappersguild.com/managereports?report=${r.id}`,
+            thumbnail: {
+                url: `https://a.ppy.sh/${u.osuId}`,
             },
-            color: '16698019',
+            color: api.webhookColors.darkRed,
+            description: `[User report](http://bn.mappersguild.com/managereports?report=${r.id}) for **${u.username}**`,
             fields: [
                 {
                     name: 'Report reason',
@@ -80,7 +59,32 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
                 },
             ],
         }]);
-        logsService.create(
+        Logger.generate(
+            null,
+            `Reported "${u.username}" for reason "${
+                req.body.reason.length > 50 ? req.body.reason.slice(0, 50) + '...' : req.body.reason
+            }"`
+        );
+    } else {
+        const r = await Report.create({
+            reporter: req.session.mongoId,
+            reason: req.body.reason,
+            link: req.body.link,
+        });
+
+        res.json({});
+
+        api.webhookPost([{
+            description: `[Non-user report](http://bn.mappersguild.com/managereports?report=${r.id})`,
+            color: api.webhookColors.lightRed,
+            fields: [
+                {
+                    name: 'Report reason',
+                    value: req.body.reason.length > 975 ? req.body.reason.slice(0,975) + '... *(truncated)*' : req.body.reason,
+                },
+            ],
+        }]);
+        Logger.generate(
             null,
             'Reported something without a username included'
         );

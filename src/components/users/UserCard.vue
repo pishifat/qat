@@ -37,7 +37,16 @@
 <script>
 export default {
     name: 'UserCard',
-    props: ['user', 'userId'],
+    props: {
+        user: {
+            type: Object,
+            required: true,
+        },
+        userId: {
+            type: String,
+            required: true,
+        },
+    },
     methods: {
         selectUser() {
             this.$emit('update:selectedUser', this.user);

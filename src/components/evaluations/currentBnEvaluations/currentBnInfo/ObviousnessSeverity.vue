@@ -1,6 +1,8 @@
 <template>
     <div>
-        <p class="min-spacing mt-2">Obviousness:</p>
+        <p class="min-spacing mt-2">
+            Obviousness:
+        </p>
         <ul>
             <li>
                 <a href="#" :class="obviousness == 0 ? 'errors' : ''" @click.prevent="updateObviousness(0)">
@@ -18,7 +20,9 @@
                 </a>
             </li>
         </ul>
-        <p class="min-spacing mt-2">Severity:</p>
+        <p class="min-spacing mt-2">
+            Severity:
+        </p>
         <ul>
             <li>
                 <a href="#" :class="severity == 0 ? 'errors' : ''" @click.prevent="updateSeverity(0)">

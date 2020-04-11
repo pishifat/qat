@@ -1,6 +1,5 @@
 <template>
     <div>
-        <hr>
         <div class="d-flex">
             <textarea
                 v-model="comment"
@@ -13,12 +12,20 @@
                 Save
             </button>
         </div>
-        
+
         <ul class="mt-2">
-            <li v-if="!notes.length" class="small min-spacing">
+            <li v-if="!notes" class="small min-spacing text-shadow">
+                ...
+            </li>
+            <li v-else-if="!notes.length" class="small min-spacing text-shadow">
                 User has no notes
             </li>
-            <li v-for="note in notes" v-else :key="note.id" class="small text-shadow">
+            <li
+                v-for="note in notes"
+                v-else
+                :key="note.id"
+                class="small text-shadow"
+            >
                 <b>
                     {{ note.updatedAt.slice(0,10) }} -
                     <a :href="'https://osu.ppy.sh/users/' + note.author.osuId" target="_blank">
@@ -34,7 +41,7 @@
                     @click.prevent="hideNote(note.id);"
                 >&times;</a>
                 <a
-                    v-if="note.author.id == viewingUser"
+                    v-if="note.author.id == viewingUserId"
                     href="#"
                     data-toggle="tooltip"
                     data-placement="top"
@@ -70,13 +77,18 @@ export default {
     name: 'Notes',
     mixins: [postData, filterLinks],
     props: {
-        userId: String,
-        viewingUser: String,
-        
+        userId: {
+            type: String,
+            required: true,
+        },
+        viewingUserId: {
+            type: String,
+            required: true,
+        },
     },
     data() {
         return {
-            notes: [],
+            notes: null,
             comment: '',
             info: '',
             editNoteId: '',
@@ -85,7 +97,7 @@ export default {
     },
     watch: {
         userId() {
-            this.notes = [];
+            this.notes = null;
             this.comment = '';
             this.info = '';
             this.editNoteId = '';
@@ -104,13 +116,14 @@ export default {
                 });
         },
         async saveNote(e) {
-            if(this.comment.length){
+            if (this.comment.length) {
                 const n = await this.executePost('/users/saveNote/' + this.userId, { comment: this.comment }, e);
+
                 if (n) {
                     if (n.error) {
                         this.info = n.error;
                     } else {
-                        if(this.notes){
+                        if (this.notes) {
                             this.notes.unshift(n);
                         }
                     }
@@ -118,13 +131,14 @@ export default {
             }
         },
         async editNote(e) {
-            if(this.editNoteComment.length){
+            if (this.editNoteComment.length) {
                 const n = await this.executePost('/users/editNote/' + this.editNoteId, { comment: this.editNoteComment }, e);
+
                 if (n) {
                     if (n.error) {
                         this.info = n.error;
                     } else {
-                        if(this.notes){
+                        if (this.notes) {
                             const i = this.notes.findIndex(note => note.id == this.editNoteId);
                             this.notes[i] = n;
                             this.editNoteId = '';
@@ -135,9 +149,11 @@ export default {
         },
         async hideNote(noteId) {
             const result = confirm(`Are you sure?`);
-            if(result){
+
+            if (result) {
                 await this.executePost('/users/hideNote/' + noteId, { userId: this.userId });
-                if(this.notes){
+
+                if (this.notes) {
                     const i = this.notes.findIndex(note => note.id == noteId);
                     this.notes.splice(i, 1);
                 }

@@ -1,9 +1,9 @@
 const express = require('express');
 const api = require('../helpers/api');
-const bnAppsService = require('../models/bnApp.js').service;
-const evalRoundsService = require('../models/evalRound').service;
-const logsService = require('../models/log.js').service;
-const testSubmissionService = require('../models/bnTest/testSubmission').service;
+const BnApp = require('../models/bnApp.js');
+const EvalRound = require('../models/evalRound');
+const Logger = require('../models/log.js');
+const TestSubmission = require('../models/bnTest/testSubmission');
 const getUserModsCount = require('../helpers/helpers').getUserModsCount;
 
 const router = express.Router();
@@ -12,7 +12,7 @@ router.use(api.isLoggedIn);
 
 /* GET bn app page */
 router.get('/', async (req, res) => {
-    const test = await testSubmissionService.query({
+    const test = await TestSubmission.findOne({
         applicant: req.session.mongoId,
         status: { $ne: 'finished' },
     });
@@ -30,7 +30,7 @@ router.get('/', async (req, res) => {
 
 /* POST a bn application */
 router.post('/apply', async (req, res) => {
-    if (!req.body.mods || !req.body.mode || !req.session.mongoId) {
+    if (!req.body.mods || !req.body.reasons || !req.body.mode || !req.session.mongoId) {
         return res.json({ error: 'Missing mode or mods' });
     }
 
@@ -40,54 +40,80 @@ router.post('/apply', async (req, res) => {
     }
 
     let cooldownDate = new Date();
-    const [currentBnApp, currentBnEval] = await Promise.all([
-        await bnAppsService.query({
+    const [currentBnApp, currentBnEval, resignedOnGoodTerms, wasBnForThisMode] = await Promise.all([
+        await BnApp.findOne({
             applicant: req.session.mongoId,
             mode: req.body.mode,
-            $or: [ { cooldownDate: { $gte: cooldownDate } }, { active: true }],
+            $or: [
+                { cooldownDate: { $gte: cooldownDate } },
+                { active: true },
+            ],
         }),
-        await evalRoundsService.query({
+        await EvalRound.findOne({
             bn: req.session.mongoId,
             mode: req.body.mode,
             consensus: 'fail',
             cooldownDate: { $gte: cooldownDate },
         }),
+        await EvalRound.findOne({
+            bn: req.session.mongoId,
+            mode: req.body.mode,
+            resignedOnGoodTerms: true,
+        }),
+        await BnApp.findOne({
+            applicant: req.session.mongoId,
+            mode: req.body.mode,
+        }),
     ]);
 
-
     if (!currentBnApp && !currentBnEval) {
+        let months = 3;
+        if (resignedOnGoodTerms) months = 1;
+        else if (wasBnForThisMode) months = 2;
+
         // Check user kudosu total count & mod score
-        const invalids = [920861, 654108, 8693851, 1980256, 1623405, 4154071, 3611370, 626907, 2239480, 7612550, 481582, 6256027, 2377881, 480689]; //temporary exceptions to mod score
+        const [userInfo, modScore] = await Promise.all([
+            await api.getUserInfo(req.session.accessToken),
+            await getUserModsCount(req.session.username, req.body.mode, months),
+        ]);
 
-        if (invalids.indexOf(req.session.osuId) < 0) {
-            const [userInfo, modScore] = await Promise.all([
-                await api.getUserInfo(req.session.accessToken),
-                await getUserModsCount(req.session.username, req.body.mode),
-            ]);
+        if (!userInfo || userInfo.error || !modScore || modScore.error) {
+            return res.json({ error: 'Something went wrong! Please retry again.' });
+        }
 
-            if (!userInfo || userInfo.error || !modScore || modScore.error) {
-                return res.json({ error: 'Something went wrong! Please retry again.' });
-            }
+        const requiredKudosu = req.body.mode == 'osu' ? 200 : 150;
 
-            if (modScore <= 0 || ((req.body.mode == 'osu' && userInfo.kudosu.total <= 200) || (req.body.mode != 'osu' && userInfo.kudosu.total <= 150))) {
-                return res.json({ error: `You don't meet the minimum score or total kudosu requirement. 
-                    Your mod score needs to be higher or equal than 0. Currently it is ${modScore}` });
-            }
+        if (userInfo.kudosu.total <= requiredKudosu) {
+            return res.json({ error: `You do not meet the required ${requiredKudosu} kudosu to apply. You currently have ${userInfo.kudosu.total} kudosu.` });
+        }
+
+        if (modScore <= 0) {
+            let additionalInfo = `Your mod score was calculated based on ${months} month${months == 1 ? '' : 's'} of activity because `;
+            if (resignedOnGoodTerms) additionalInfo += 'you resigned from the BN on good terms.';
+            else if (wasBnForThisMode) additionalInfo += 'you were BN for this game mode in the past.';
+
+            return res.json({ error: `Your mod score needs to be higher or equal than 0. Currently it is ${modScore}.
+                ${resignedOnGoodTerms || wasBnForThisMode ? additionalInfo : ''}` });
         }
 
         // Create app & test
         const [newBnApp, test] = await Promise.all([
-            await testSubmissionService.create(req.session.mongoId, req.body.mode),
-            await bnAppsService.create(req.session.mongoId, req.body.mode, req.body.mods, req.body.reasons),
+            TestSubmission.generateTest(req.session.mongoId, req.body.mode),
+            BnApp.create({
+                applicant: req.session.mongoId,
+                mode: req.body.mode,
+                mods: req.body.mods,
+                reasons: req.body.reasons,
+            }),
         ]);
 
         if (!newBnApp || newBnApp.error || !test || test.error) {
             return res.json({ error: 'Failed to process application!' });
         } else {
-            await bnAppsService.update(newBnApp.id, { test: test._id });
+            await BnApp.findByIdAndUpdate(newBnApp.id, { test: test._id });
             res.json('pass');
 
-            logsService.create(req.session.mongoId, `Applied for ${req.body.mode} BN`);
+            Logger.generate(req.session.mongoId, `Applied for ${req.body.mode} BN`);
         }
     } else {
         if (currentBnApp) {

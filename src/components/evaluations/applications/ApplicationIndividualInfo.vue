@@ -41,7 +41,6 @@
                                     :bn-evaluators="application.bnEvaluators"
                                     :nat-evaluators="application.natEvaluators"
                                     :evaluations="application.evaluations"
-                                    :is-leader="evaluator.isLeader"
                                     :mode="application.mode"
                                     :osu-id="application.applicant.osuId"
                                     :username="application.applicant.username"
@@ -73,11 +72,11 @@ import TestResults from './applicationInfo/TestResults.vue';
 import ApplicantComment from './applicationInfo/ApplicantComment.vue';
 import PreviousEvaluations from '../info/PreviousEvaluations.vue';
 import UserNotes from '../info/UserNotes.vue';
-import EvaluatorAssignments from './applicationInfo/EvaluatorAssignments.vue';
+import EvaluatorAssignments from '../info/EvaluatorAssignments.vue';
 import EvaluationInput from '../info/EvaluationInput.vue';
 
 export default {
-    name: 'application-individual-info',
+    name: 'ApplicationIndividualInfo',
     components: {
         ModalHeader,
         Mods,
@@ -89,8 +88,14 @@ export default {
         EvaluationInput,
     },
     props: {
-        application: Object,
-        evaluator: Object,
+        application: {
+            type: Object,
+            required: true,
+        },
+        evaluator: {
+            type: Object,
+            required: true,
+        },
     },
     watch: {
         application() {

@@ -3,11 +3,19 @@
         <p class="min-spacing text-shadow">
             Previous evaluations:
         </p>
-        <ul v-if="previousEvaluations">
-            <li v-if="!previousEvaluations.length" class="small min-spacing text-shadow">
+        <ul>
+            <li v-if="!previousEvaluations" class="small min-spacing text-shadow">
+                ...
+            </li>
+            <li v-else-if="!previousEvaluations.length" class="small min-spacing text-shadow">
                 User has no previous evaluations
             </li>
-            <li v-for="evaluation in previousEvaluations" v-else :key="evaluation.id" class="small text-shadow">
+            <li
+                v-for="evaluation in previousEvaluations"
+                v-else
+                :key="evaluation.id"
+                class="small text-shadow"
+            >
                 <a :href="'http://bn.mappersguild.com/evalarchive?eval=' + evaluation.id">
                     {{ evaluation.applicant ? evaluation.createdAt.slice(0,10) : evaluation.deadline.slice(0,10) }}
                     -
@@ -34,7 +42,10 @@ export default {
     name: 'PreviousEvaluations',
     mixins: [ filterLinks ],
     props: {
-        userMongoId: String,
+        userMongoId: {
+            type: String,
+            required: true,
+        },
     },
     data() {
         return {
@@ -52,11 +63,11 @@ export default {
     methods: {
         async findPreviousEvaluations() {
             this.previousEvaluations = null;
-            axios
-                .get('/bnEval/findPreviousEvaluations/' + this.userMongoId)
-                .then(response => {
-                    this.previousEvaluations = response.data.previousEvaluations;
-                });
+            const res = await axios.get('/bnEval/findPreviousEvaluations/' + this.userMongoId);
+
+            if (res.data) {
+                this.previousEvaluations = res.data.previousEvaluations;
+            }
         },
     },
 };

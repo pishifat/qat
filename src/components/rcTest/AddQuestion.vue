@@ -4,7 +4,7 @@
             <div class="modal-content">
                 <div class="modal-header bg-nat-logo">
                     <h5 class="modal-title text-dark">
-                        Add question: {{category}}
+                        Add question: {{ category }}
                     </h5>
                     <button type="button" class="close" data-dismiss="modal">
                         <span>&times;</span>
@@ -40,8 +40,8 @@
                         <div class="form-group">
                             <textarea
                                 id="newQuestion"
-                                class="form-control dark-textarea" 
-                                placeholder="question..." 
+                                class="form-control dark-textarea"
+                                placeholder="question..."
                                 maxlength="300"
                                 rows="2"
                                 @keyup.enter="addQuestion($event)"
@@ -66,7 +66,16 @@ import postData from '../../mixins/postData.js';
 export default {
     name: 'AddQuestion',
     mixins: [ postData ],
-    props: ['category', 'rawCategory'],
+    props: {
+        category: {
+            type: String,
+            required: true,
+        },
+        rawCategory: {
+            type: String,
+            required: true,
+        },
+    },
     data() {
         return {
             info: '',
@@ -80,10 +89,12 @@ export default {
             this.confirm = '';
             let questionType = $('input[name=questionType]:checked').val();
             let newQuestion = $('#newQuestion').val();
-            if(!newQuestion || !newQuestion.length || !questionType || !questionType.length){
+
+            if (!newQuestion || !newQuestion.length || !questionType || !questionType.length) {
                 this.info = 'Cannot leave fields blank!';
-            }else{
+            } else {
                 const question = await this.executePost('/manageTest/addQuestion', { questionType, newQuestion: newQuestion.trim(), category: this.rawCategory }, e);
+
                 if (question) {
                     if (question.error) {
                         this.info = question.error;

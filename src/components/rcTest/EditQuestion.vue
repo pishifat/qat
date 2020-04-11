@@ -42,13 +42,13 @@
                         <div class="form-group">
                             <textarea
                                 id="newQuestionEdit"
-                                v-model="question.content" 
-                                class="form-control dark-textarea" 
+                                v-model="question.content"
+                                class="form-control dark-textarea"
                                 placeholder="question..."
                                 maxlength="300"
                                 rows="2"
                                 @keyup.enter="editQuestion($event)"
-                            />    
+                            />
                         </div>
                         <button type="submit" class="btn btn-sm btn-nat float-right ml-2" @click="updateQuestion($event)">
                             Update Question
@@ -103,7 +103,7 @@
                         <div class="row col-md-12">
                             <input
                                 id="option"
-                                class="form-control-sm col-md-9 mb-2" 
+                                class="form-control-sm col-md-9 mb-2"
                                 type="text"
                                 maxlength="200"
                                 placeholder="potential answer... (if image, post link)"
@@ -142,7 +142,16 @@ import postData from '../../mixins/postData.js';
 export default {
     name: 'EditQuestion',
     mixins: [ postData ],
-    props: ['question', 'category'],
+    props: {
+        question: {
+            type: Object,
+            required: true,
+        },
+        category: {
+            type: String,
+            required: true,
+        },
+    },
     data() {
         return {
             info: '',
@@ -152,12 +161,15 @@ export default {
     computed: {
         sortedOptions() {
             let sorted = this.question.options;
+
             for (let i = 0; i < sorted.length; i++) {
                 let option = sorted[i];
-                if(!option.active){
+
+                if (!option.active) {
                     sorted.splice(sorted.length, 0, sorted.splice(i, 1)[0]);
                 }
             }
+
             return sorted;
         },
     },
@@ -167,10 +179,12 @@ export default {
             this.confirm = '';
             let questionType = $('input[name=questionTypeEdit]:checked').val();
             let newQuestion = $('#newQuestionEdit').val();
-            if(!newQuestion || !newQuestion.length || !questionType || !questionType.length){
+
+            if (!newQuestion || !newQuestion.length || !questionType || !questionType.length) {
                 this.info = 'Cannot leave question fields blank!';
-            }else{
+            } else {
                 const question = await this.executePost('/manageTest/updateQuestion/' + this.question.id, { questionType, newQuestion }, e);
+
                 if (question) {
                     if (question.error) {
                         this.info = question.error;
@@ -183,6 +197,7 @@ export default {
         },
         async toggleActive(e) {
             const question = await this.executePost('/manageTest/toggleActive/' + this.question.id, { status: !this.question.active }, e);
+
             if (question) {
                 if (question.error) {
                     this.info = question.error;
@@ -197,10 +212,12 @@ export default {
             this.confirm = '';
             let option = $('#option').val();
             let score = parseFloat($('#score').val());
+
             if ((!option || !option.length) || (!score && score != 0)) {
                 this.info = 'Cannot leave option fields blank!';
             } else {
                 const question = await this.executePost('/manageTest/addOption/' + this.question.id, { option, score }, e);
+
                 if (question) {
                     if (question.error) {
                         this.info = question.error;
@@ -218,12 +235,14 @@ export default {
             let option = $('#option').val();
             let score = parseFloat($('#score').val());
             let checked = $('input[name=\'optionList\']:checked').length;
-            if(checked != 1){
+
+            if (checked != 1) {
                 this.info = 'You must select only one option to edit!';
-            }else if(!option || !option.length || (!score && score != 0)){
+            } else if (!option || !option.length || (!score && score != 0)) {
                 this.info = 'Cannot leave option fields blank!';
-            }else{
+            } else {
                 const question = await this.executePost('/manageTest/updateOption/' + id, { option, score, questionId: this.question.id }, e);
+
                 if (question) {
                     if (question.error) {
                         this.info = question.error;
@@ -241,10 +260,12 @@ export default {
             $('input[name=\'optionList\']:checked').each(function() {
                 checkedOptions.push( $(this).val() );
             });
-            if(!checkedOptions.length){
+
+            if (!checkedOptions.length) {
                 this.info = 'Must select options!';
-            }else{
+            } else {
                 const question = await this.executePost('/manageTest/toggleActiveOption/', { checkedOptions, questionId: this.question.id }, e);
+
                 if (question) {
                     if (question.error) {
                         this.info = question.error;

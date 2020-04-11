@@ -11,7 +11,7 @@
                     :evaluator-mongo-id="evaluator.id"
                 />
                 <div class="modal-body" style="overflow: hidden;">
-                    <div v-for="(mode, i) in evalRound.bn.modes" :key="mode" class="container">
+                    <div v-for="(mode, i) in modes" :key="mode" class="container">
                         <p class="text-shadow min-spacing mb-1">
                             Recent BN activity
                             <span class="small">({{ mode == 'osu' ? 'osu!' : 'osu!' + mode }})</span>
@@ -19,7 +19,7 @@
                         <div class="container mb-3">
                             <user-activity
                                 :osu-id="evalRound.bn.osuId"
-                                :mode="evalRound.bn.modes[i]"
+                                :mode="modes[i]"
                                 :deadline="evalRound.deadline"
                                 :is-nat="evaluator.isNat"
                                 :user-mongo-id="evalRound.bn.id"
@@ -28,7 +28,7 @@
                     </div>
                     <div class="container">
                         <p class="text-shadow">
-                            <a href="#additionalInfo" data-toggle="collapse">Additional info <i class="fas fa-angle-down" /></a> 
+                            <a href="#additionalInfo" data-toggle="collapse">Additional info <i class="fas fa-angle-down" /></a>
                         </p>
                         <div id="additionalInfo" class="collapse container">
                             <previous-evaluations
@@ -48,10 +48,18 @@
                                 :header="'Total evaluations: (' + evalRound.evaluations.length + ')'"
                                 :user-list="submittedEvaluators"
                             />
+                            <evaluator-assignments
+                                :nat-evaluators="evalRound.natEvaluators"
+                                :evaluations="evalRound.evaluations"
+                                :mode="evalRound.mode"
+                                :osu-id="evalRound.bn.osuId"
+                                :username="evalRound.bn.username"
+                                :nominator-assessment-mongo-id="evalRound.id"
+                                @update-nominator-assessment="$emit('update-eval-round', $event);"
+                            />
                         </div>
                         <hr>
                         <evaluation-input
-                            :is-application="false"
                             :nominator-assessment-mongo-id="evalRound.id"
                             :evaluator-mongo-id="evaluator.id"
                             :evaluations="evalRound.evaluations"
@@ -73,6 +81,7 @@ import UserReports from './currentBnInfo/UserReports.vue';
 import ModdingActivity from './currentBnInfo/ModdingActivity.vue';
 import UserList from '../info/UserList.vue';
 import EvaluationInput from '../info/EvaluationInput.vue';
+import EvaluatorAssignments from '../info/EvaluatorAssignments.vue';
 
 export default {
     name: 'CurrentBnIndividualInfo',
@@ -85,6 +94,7 @@ export default {
         ModdingActivity,
         UserList,
         EvaluationInput,
+        EvaluatorAssignments,
     },
     props: {
         evalRound: {
@@ -102,7 +112,15 @@ export default {
             this.evalRound.evaluations.forEach(evaluation => {
                 evaluators.push(evaluation.evaluator);
             });
+
             return evaluators;
+        },
+        modes() {
+            let modes = [];
+            if (this.evalRound.bn.modes.length) modes = this.evalRound.bn.modes;
+            else modes.push(this.evalRound.mode);
+
+            return modes;
         },
     },
     watch: {

@@ -1,6 +1,4 @@
 const mongoose = require('mongoose');
-const logsService = require('./log').service;
-const BaseService = require('./baseService');
 
 const evaluationSchema = new mongoose.Schema({
     evaluator: { type: 'ObjectId', ref: 'User', required: true },
@@ -11,30 +9,4 @@ const evaluationSchema = new mongoose.Schema({
 
 const Evaluation = mongoose.model('Evaluation', evaluationSchema);
 
-class EvaluationService extends BaseService
-{
-    constructor() {
-        super(Evaluation);
-    }
-
-    /**
-     *
-     * @param {object} evaluatorId UserId who evualates
-     * @param {string} behaviorComment
-     * @param {string} moddingComment
-     * @param {number} vote
-     */
-    async create(evaluatorId, behaviorComment, moddingComment, vote) {
-        try {
-            return await Evaluation.create({ evaluator: evaluatorId, behaviorComment, moddingComment, vote });
-        } catch (error) {
-            logsService.create(null, JSON.stringify(error), true);
-
-            return { error: error._message };
-        }
-    }
-}
-
-const service = new EvaluationService();
-
-module.exports = { service, Evaluation };
+module.exports = Evaluation;

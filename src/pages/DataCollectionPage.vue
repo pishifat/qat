@@ -22,7 +22,7 @@
                 </small>
             </section>
             <section class="segment my-1">
-                <a data-toggle="collapse" href="#howToUse">How do I use this page? <i class="fas fa-angle-down" /></a> 
+                <a data-toggle="collapse" href="#howToUse">How do I use this page? <i class="fas fa-angle-down" /></a>
                 <div id="howToUse" class="collapse mt-4 mx-2">
                     <p class="mx-2">
                         This page is used to make BN evaluations more consistent and convenient. As a member of the NAT, your roles here are to...
@@ -39,13 +39,13 @@
                         All events are accounted for in a BN's performance evaluation. Many events resulting from minor or subjective issues aren't important enough to require punishment. "Notability" serves as a way to mark which DQs/resets are applicable for judgment on a BN's evaluations.
                     </p>
                     <p class="mx-2">
-                        <span class="vote-pass">Notable</span>: Objective issues, direct violations of the Ranking Criteria
+                        <span class="vote-green">Notable</span>: Objective issues, direct violations of the Ranking Criteria
                     </p>
                     <p class="mx-2">
-                        <span class="vote-extend">Semi-notable</span>: Major subjective issues whose importance should be judged by evaluators individually
+                        <span class="vote-yellow">Semi-notable</span>: Major subjective issues whose importance should be judged by evaluators individually
                     </p>
                     <p class="mx-2">
-                        <span class="vote-fail">Not notable</span>: Anything else
+                        <span class="vote-red">Not notable</span>: Anything else
                     </p>
                     <p class="mx-2">
                         If you're unsure how to mark something, ask another NAT member for their opinion
@@ -74,7 +74,7 @@
                     <tbody>
                         <tr
                             v-for="dq in dqs"
-                            :key="dq.id" 
+                            :key="dq.id"
                         >
                             <td scope="row">
                                 {{ new Date(dq.timestamp).toString().slice(4,15) }}
@@ -88,7 +88,7 @@
                                 <span v-if="hasData(dq)" :class="calculateColor(dq)">
                                     ({{ dq.obviousness }}/{{ dq.severity }})
                                 </span>
-                                {{ dq.content.length > 50 ? dq.content.slice(0, 50) + '...' : dq.content }} 
+                                {{ dq.content.length > 50 ? dq.content.slice(0, 50) + '...' : dq.content }}
                                 <a
                                     href="#"
                                     class="float-right"
@@ -136,7 +136,7 @@
                                 <span v-if="hasData(pop)" :class="calculateColor(pop)">
                                     ({{ pop.obviousness }}/{{ pop.severity }})
                                 </span>
-                                {{ pop.content.length > 50 ? pop.content.slice(0, 50) + '...' : pop.content }} 
+                                {{ pop.content.length > 50 ? pop.content.slice(0, 50) + '...' : pop.content }}
                                 <a
                                     href="#"
                                     class="float-right"
@@ -183,8 +183,8 @@ export default {
             info: '',
         };
     },
-    watch: { 
-        allObjs(){
+    watch: {
+        allObjs() {
             this.filter();
         },
     },
@@ -196,7 +196,7 @@ export default {
                 this.filterMode = response.data.mode;
                 this.hasPagination = false;
                 this.hasSeparation = true;
-            }).then(function(){
+            }).then(function() {
                 $('#loading').fadeOut();
                 $('#main').attr('style', 'visibility: visible').hide().fadeIn();
             });
@@ -243,14 +243,14 @@ export default {
         },
         calculateColor (event) {
             let total = event.obviousness + event.severity;
-            if (total >= 4 || event.obviousness == 2 || event.severity == 3) return 'vote-pass';
-            else if (total >= 2) return 'vote-extend';
-            else return 'vote-fail';
+            if (total >= 4 || event.obviousness == 2 || event.severity == 3) return 'vote-green';
+            else if (total >= 2) return 'vote-yellow';
+            else return 'vote-red';
         },
     },
 };
 </script>
 
 <style>
-    
+
 </style>

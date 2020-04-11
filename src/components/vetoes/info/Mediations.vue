@@ -1,6 +1,6 @@
 <template>
     <!--nat options-->
-    <div v-if="isNat && currentMediators.indexOf(userId) === -1 && veto.vetoer.id !== userId" class="text-shadow">
+    <div class="text-shadow">
         <hr>
         <div v-if="veto.mediations.length">
             <ul style="list-style-type: none; padding-left: 0.5rem">
@@ -53,7 +53,12 @@
             </button>
             <div class="mb-2">
                 <span class="text-shadow">Exclude specific user(s):</span>
-                <input id="excludeUsers" class="ml-1 w-75 small" type="text" placeholder="username1, username2, username3..."><br>
+                <input
+                    id="excludeUsers"
+                    class="ml-1 w-75 small"
+                    type="text"
+                    placeholder="username1, username2, username3..."
+                ><br>
                 <small class="ml-2 text-shadow">The mapper and veto submitter are automatically excluded</small>
             </div>
             <div v-if="mediators" class="mt-2">
@@ -94,11 +99,12 @@ import ForumPm from './ForumPm.vue';
 import postData from '../../../mixins/postData';
 
 export default {
-    name: 'mediations',
+    name: 'Mediations',
     components: {
         ConclusionPost,
-        ForumPm
+        ForumPm,
     },
+    mixins: [ filterLinks, postData ],
     props: {
         currentMediators: Array,
         isNat: Boolean,
@@ -108,17 +114,16 @@ export default {
             mediations: Array,
             status: String,
             vetoer: {
-                id: String
-            }
-        }
+                id: String,
+            },
+        },
     },
-    mixins: [ filterLinks, postData ],
     data() {
         return {
             confirm: '',
             info: '',
-            mediators: null
-        }
+            mediators: null,
+        };
     },
     methods: {
         async beginMediation (e) {
@@ -147,7 +152,7 @@ export default {
                     `/vetoes/concludeMediation/${this.veto.id}`,
                     {
                         majority: this.majority,
-                        dismiss
+                        dismiss,
                     },
                     e
                 );
@@ -183,7 +188,7 @@ export default {
         },
 
         getVoteClass (vote) {
-            switch(vote) {
+            switch (vote) {
                 case 1:
                     return 'vote-pass';
                 case 2:
@@ -227,7 +232,7 @@ export default {
                     this.mediators = r;
                 }
             }
-        }
-    }
+        },
+    },
 };
 </script>

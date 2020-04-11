@@ -1,7 +1,7 @@
 const express = require('express');
 const api = require('../helpers/api');
-const aiessService = require('../models/aiess').service;
-const logsService = require('../models/log').service;
+const Aiess = require('../models/aiess');
+const Logger = require('../models/log');
 
 const router = express.Router();
 
@@ -20,34 +20,36 @@ router.get('/', (req, res) => {
 });
 
 const defaultPopulate = [
-    { populate: 'qualityAssuranceCheckers', display: 'username osuId' },
+    { path: 'qualityAssuranceCheckers', select: 'username osuId' },
 ];
 
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res) => {
     let date = new Date();
     date.setDate(date.getDate() - 7);
-    const [data, dqs] = await Promise.all([
-        aiessService.query(
-            {
+    const [data, overwrite] = await Promise.all([
+        Aiess
+            .find({
                 eventType: 'Qualified',
-                timestamp: { $gte: date } },
-            defaultPopulate,
-            { timestamp: -1 },
-            true
-        ),
-        aiessService.query(
-            {
-                eventType: 'Disqualified',
-                timestamp: { $gte: date } },
-            defaultPopulate,
-            { timestamp: -1 },
-            true
-        ),
+                timestamp: { $gte: date },
+            })
+            .populate(defaultPopulate)
+            .sort({ timestamp: -1 }),
+
+        Aiess
+            .find({
+                $or: [
+                    { eventType: 'Disqualified' },
+                    { eventType: 'Ranked' },
+                ],
+                timestamp: { $gte: date },
+            })
+            .populate(defaultPopulate)
+            .sort({ timestamp: -1 }),
     ]);
     res.json({
         maps: data,
-        dqs,
+        overwrite,
         userId: res.locals.userRequest.id,
         userOsuId: res.locals.userRequest.osuId,
         username: res.locals.userRequest.username,
@@ -60,25 +62,23 @@ router.get('/relevantInfo', async (req, res) => {
 router.get('/loadMore/:limit/:skip', async (req, res) => {
     let date = new Date();
     date.setDate(date.getDate() - 7);
-    const data = await aiessService.query(
-        {
+    const data = await Aiess
+        .find({
             eventType: 'Qualified',
             timestamp: { $lte: date },
             hostId: { $exists: true },
-        },
-        defaultPopulate,
-        { timestamp: -1 },
-        true,
-        parseInt(req.params.limit),
-        parseInt(req.params.skip)
-    );
+        })
+        .populate(defaultPopulate)
+        .sort({ timestamp: -1 })
+        .limit(parseInt(req.params.limit))
+        .skip(parseInt(req.params.skip));
 
     res.json({ maps: data });
 });
 
 /* POST assign user */
 router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
-    let e = await aiessService.query({ _id: req.params.id }, defaultPopulate);
+    let e = await Aiess.findById(req.params.id).populate(defaultPopulate);
 
     let validMode;
 
@@ -110,155 +110,30 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
         return res.json({ error: 'Probation cannot do this!' });
     }
 
-    await aiessService.update(req.params.id, { $push: { qualityAssuranceCheckers: req.session.mongoId } });
-    e = await aiessService.query({ _id: req.params.id }, defaultPopulate);
+    e = await Aiess
+        .findByIdAndUpdate(req.params.id, { $push: { qualityAssuranceCheckers: req.session.mongoId } })
+        .populate(defaultPopulate);
+
     res.json(e);
 
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Added ${req.session.username} as QA checker for s/${e.beatmapsetId}`
     );
-
-    let qualityAssuranceChecks = await aiessService.query({ qualityAssuranceCheckers: req.session.mongoId }, {}, {}, true);
-
-    const authorUser = {
-        name: `${req.session.username} (${qualityAssuranceChecks.length})`,
-        icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-        url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-    };
-    const authorBeatmap = {
-        name: `${e.metadata} (${e.hostName})`,
-        url: `https://osu.ppy.sh/beatmapsets/${e.beatmapsetId}`,
-    };
-    const thumbnail = {
-        url: `https://b.ppy.sh/thumb/${e.beatmapsetId}.jpg`,
-    };
-    const colorUser = '11720607';
-    const colorBeatmap = '11726590';
-    const fieldsUser = [
-        {
-            name: `http://bn.mappersguild.com/qualityassurance`,
-            value: `Marked as QA checker for a beatmap`,
-        },
-    ];
-    let userList = '';
-
-    for (let i = 0; i < e.qualityAssuranceCheckers.length; i++) {
-        let user = e.qualityAssuranceCheckers[i];
-        userList += user.username;
-
-        if (i + 1 < e.qualityAssuranceCheckers.length) {
-            userList += ', ';
-        }
-    }
-
-    const fieldsBeatmap = [
-        {
-            name: `http://bn.mappersguild.com/qualityassurance`,
-            value: `Reached maximum QA checkers`,
-        },
-        {
-            name: `QA checkers`,
-            value: userList,
-        },
-    ];
-
-    if (e.modes.includes('osu')) {
-        await api.webhookPost(
-            [{
-                author: authorUser,
-                color: colorUser,
-                fields: fieldsUser,
-            }],
-            'standardQualityAssurance'
-        );
-
-        if (e.qualityAssuranceCheckers.length > e.modes.length * 2 - 1) {
-            api.webhookPost(
-                [{
-                    author: authorBeatmap,
-                    thumbnail,
-                    color: colorBeatmap,
-                    fields: fieldsBeatmap,
-                }],
-                'standardQualityAssurance'
-            );
-        }
-    }
-
-    if (e.modes.includes('taiko') || e.modes.includes('catch') || e.modes.includes('mania')) {
-        await api.webhookPost(
-            [{
-                author: authorUser,
-                color: colorUser,
-                fields: fieldsUser,
-            }],
-            'taikoCatchManiaQualityAssurance'
-        );
-
-        if (e.qualityAssuranceCheckers.length > e.modes.length * 2 - 1) {
-            api.webhookPost(
-                [{
-                    author: authorBeatmap,
-                    thumbnail,
-                    color: colorBeatmap,
-                    fields: fieldsBeatmap,
-                }],
-                'taikoCatchManiaQualityAssurance'
-            );
-        }
-    }
-
-
 });
 
 /* POST unassign user */
 router.post('/unassignUser/:id', api.isBnOrNat, async (req, res) => {
-    let e = await aiessService.update(req.params.id, { $pull: { qualityAssuranceCheckers: req.session.mongoId } });
-    e = await aiessService.query({ _id: req.params.id }, defaultPopulate);
+    let e = await Aiess
+        .findByIdAndUpdate(req.params.id, { $pull: { qualityAssuranceCheckers: req.session.mongoId } })
+        .populate(defaultPopulate);
+
     res.json(e);
 
-    logsService.create(
+    Logger.generate(
         req.session.mongoId,
         `Removed ${req.session.username} from QA checker for s/${e.beatmapsetId}`
     );
-
-    let qualityAssuranceChecks = await aiessService.query({ qualityAssuranceCheckers: req.session.mongoId }, {}, {}, true);
-
-    const author = {
-        name: `${req.session.username} (${qualityAssuranceChecks.length})`,
-        icon_url: `https://a.ppy.sh/${req.session.osuId}`,
-        url: `https://osu.ppy.sh/users/${req.session.osuId}`,
-    };
-    const color = '12959680';
-    const fields = [
-        {
-            name: `http://bn.mappersguild.com/qualityassurance`,
-            value: `Removed as QA checker for a beatmap (why?)`,
-        },
-    ];
-
-    if (e.modes.includes('osu')) {
-        api.webhookPost(
-            [{
-                author,
-                color,
-                fields,
-            }],
-            'standardQualityAssurance'
-        );
-    }
-
-    if (e.modes.includes('taiko') || e.modes.includes('catch') || e.modes.includes('mania')) {
-        api.webhookPost(
-            [{
-                author,
-                color,
-                fields,
-            }],
-            'taikoCatchManiaQualityAssurance'
-        );
-    }
 });
 
 module.exports = router;

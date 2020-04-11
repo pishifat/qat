@@ -1,6 +1,4 @@
 const mongoose = require('mongoose');
-const logsService = require('./log').service;
-const BaseService = require('./baseService');
 
 const vetoesSchema = new mongoose.Schema({
     vetoer: { type: 'ObjectId', ref: 'User', required: true },
@@ -16,50 +14,6 @@ const vetoesSchema = new mongoose.Schema({
     deadline: { type: Date },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-vetoesSchema.pre('findByIdAndUpdate', function (next) {
-    //this.populate('mediators', 'username osuId');
-    this.populate('vetoer', 'username osuId');
-    next();
-});
-
 const Veto = mongoose.model('Veto', vetoesSchema);
 
-class VetoService extends BaseService
-{
-    constructor() {
-        super(Veto);
-    }
-
-    /**
-     *
-     * @param {object} vetoer UserId who creates
-     * @param {string} discussionLink
-     * @param {number} beatmapId
-     * @param {string} beatmapTitle
-     * @param {string} beatmapMapper
-     * @param {string} shortReason
-     * @param {string} mode 'osu', 'taiko', 'catch', 'mania'
-     */
-    async create(vetoer, discussionLink, beatmapId, beatmapTitle, beatmapMapper, beatmapMapperId, shortReason, mode) {
-        try {
-            return await Veto.create({
-                vetoer,
-                discussionLink,
-                beatmapId,
-                beatmapTitle,
-                beatmapMapper,
-                beatmapMapperId,
-                shortReason,
-                mode,
-            });
-        } catch (error) {
-            logsService.create(null, JSON.stringify(error), true);
-
-            return { error: 'could not create veto' };
-        }
-    }
-}
-
-const service = new VetoService();
-
-module.exports = { service, Veto };
+module.exports = Veto;

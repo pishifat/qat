@@ -28,13 +28,14 @@ export default {
         osuId: Number,
     },
     methods: {
-        modUrl(mod){
+        modUrl(mod) {
             if (mod.indexOf('https://osu.ppy.sh/beatmapsets/') == 0 && (mod.indexOf('#') < 0 || mod.indexOf('#') > 40)) {
                 mod = mod.slice(31);
                 let indexEnd = mod.indexOf('/');
-                if(indexEnd == -1) indexEnd = mod.length;
+                if (indexEnd == -1) indexEnd = mod.length;
+
                 return `https://osu.ppy.sh/beatmapsets/${mod.slice(0, indexEnd)}/discussion/timeline?user=${this.osuId}`;
-            }else{
+            } else {
                 return mod;
             }
         },

@@ -1,7 +1,8 @@
 const express = require('express');
 const api = require('../helpers/api');
-const logsService = require('../models/log').service;
-const reportsService = require('../models/report').service;
+const Logger = require('../models/log');
+const Report = require('../models/report');
+const User = require('../models/user');
 
 const router = express.Router();
 
@@ -20,41 +21,42 @@ router.get('/', (req, res) => {
 
 //population
 const defaultPopulate = [
-    { populate: 'culprit', display: 'username osuId group' },
-    { populate: 'reporter', display: 'username osuId' },
+    { path: 'culprit', select: 'username osuId group' },
+    { path: 'reporter', select: 'username osuId' },
 ];
 
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res) => {
-    let minDate = new Date();
-    minDate.setDate(minDate.getDate() - 90);
-    let r = await reportsService.query({ createdAt: { $gte: minDate } }, defaultPopulate, { createdAt: 1 }, true);
-    res.json({
-        r,
-        isLeader: res.locals.userRequest.isLeader,
-    });
+    const openReports = await Report
+        .find({ isActive: true })
+        .populate(defaultPopulate)
+        .sort({ createdAt: -1 });
+
+    res.json({ openReports });
 });
 
 /* POST submit or edit eval */
 router.post('/submitReportEval/:id', api.isNotSpectator, async (req, res) => {
     if (req.body.feedback && req.body.feedback.length) {
-        await reportsService.update(req.params.id, { feedback: req.body.feedback });
+        await Report.findByIdAndUpdate(req.params.id, { feedback: req.body.feedback });
     }
 
     if (req.body.valid) {
-        await reportsService.update(req.params.id, { valid: req.body.valid });
+        await Report.findByIdAndUpdate(req.params.id, { valid: req.body.valid });
     }
 
     if (req.body.close) {
-        await reportsService.update(req.params.id, { isActive: false });
+        await Report.findByIdAndUpdate(req.params.id, { isActive: false });
     }
 
-    let r = await reportsService.query({ _id: req.params.id }, defaultPopulate);
+    let r = await Report
+        .findById(req.params.id)
+        .populate(defaultPopulate);
 
     res.json(r);
 
     if (req.body.feedback && req.body.feedback.length) {
-        logsService.create(
+        Logger.generate(
             req.session.mongoId,
             `Set feedback on report to "${
                 req.body.feedback.length > 50 ? req.body.feedback.slice(0, 50) + '...' : req.body.feedback
@@ -63,7 +65,7 @@ router.post('/submitReportEval/:id', api.isNotSpectator, async (req, res) => {
     }
 
     if (req.body.valid) {
-        logsService.create(
+        Logger.generate(
             req.session.mongoId,
             `Set validity of report to
             "${req.body.valid == 1 ? 'valid' : req.body.valid == 2 ? 'partially valid' : 'invalid'}"`
@@ -71,16 +73,55 @@ router.post('/submitReportEval/:id', api.isNotSpectator, async (req, res) => {
     }
 });
 
-/* POST change display of report on evals */
-router.post('/changeEvalDisplay/:id', api.isNotSpectator, async (req, res) => {
-    await reportsService.update(req.params.id, { display: !req.body.display });
-    let r = await reportsService.query({ _id: req.params.id }, defaultPopulate);
-    res.json(r);
+/* GET search for user */
+router.get('/search/:user', async (req, res) => {
+    let u;
+    const userToSearch = decodeURI(req.params.user);
 
-    logsService.create(
-        req.session.mongoId,
-        `Set report to ${req.body.display ? 'be hidden' : 'display'}  on evaluations`
-    );
+    if (isNaN(userToSearch)) {
+        u = await User.findByUsername(userToSearch);
+    } else {
+        u = await User.findOne({ osuId: parseInt(userToSearch) });
+    }
+
+    if (!u) {
+        return res.json({ error: 'Cannot find user!' });
+    }
+
+    const closedReports = await Report
+        .find({ isActive: false, culprit: u.id })
+        .populate(defaultPopulate)
+        .sort({ createdAt: -1 });
+
+    res.json(closedReports);
+});
+
+/* GET search by number of rounds */
+router.get('/searchRecent/:limit', async (req, res) => {
+    const limit = parseInt(req.params.limit);
+
+    const closedReports = await Report
+        .find({ isActive: false })
+        .populate(defaultPopulate)
+        .sort({ createdAt: -1 })
+        .limit(limit);
+
+    res.json(closedReports);
+});
+
+/* GET search for user */
+router.get('/searchById/:id', async (req, res) => {
+    const idToSearch = decodeURI(req.params.id);
+
+    const report = await Report
+        .findById(idToSearch)
+        .populate(defaultPopulate);
+
+    if (!report) {
+        return res.json({ error: 'Cannot find report!' });
+    }
+
+    res.json(report);
 });
 
 module.exports = router;

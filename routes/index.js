@@ -2,18 +2,18 @@ const express = require('express');
 const config = require('../config.json');
 const crypto = require('crypto');
 const api = require('../helpers/api');
-const usersService = require('../models/user').service;
-const logsService = require('../models/log').service;
+const User = require('../models/user');
+const Logger = require('../models/log');
 const getUserModsCount = require('../helpers/helpers').getUserModsCount;
 const router = express.Router();
 
 /* GET bn app page */
 router.get('/', async (req, res) => {
-    const allUsersByMode = await usersService.getAllByMode(true, true, true);
+    const allUsersByMode = await User.getAllByMode(true, true, true);
     let user;
 
     if (req.session.mongoId) {
-        user = await usersService.query({ _id: req.session.mongoId });
+        user = await User.findById(req.session.mongoId);
     }
 
     let isBnOrNat = user && user.isBnOrNat;
@@ -50,19 +50,19 @@ router.get(
     '/login',
     async (req, res, next) => {
         if (req.session.osuId && req.session.username) {
-            const u = await usersService.query({ osuId: req.session.osuId });
+            const u = await User.findOne({ osuId: req.session.osuId });
 
             if (!u || u.error) {
-                const user = await usersService.create(
-                    req.session.osuId,
-                    req.session.username,
-                    req.session.group,
-                    req.session.isSpectator
-                );
+                const user = await User.create({
+                    osuId: req.session.osuId,
+                    username: req.session.username,
+                    group: req.session.group,
+                    isSpectator: req.session.isSpectator,
+                });
 
                 if (user && !user.error) {
                     req.session.mongoId = user._id;
-                    logsService.create(req.session.mongoId, 'Verified their account for the first time');
+                    Logger.generate(req.session.mongoId, 'Verified their account for the first time');
 
                     return next();
                 } else {
@@ -70,18 +70,18 @@ router.get(
                 }
             } else {
                 if (u.username != req.session.username) {
-                    await usersService.update(u._id, { username: req.session.username });
-                    logsService.create(u._id, `Username changed from "${u.username}" to "${req.session.username}"`);
+                    await User.findByIdAndUpdate(u._id, { username: req.session.username });
+                    Logger.generate(u._id, `Username changed from "${u.username}" to "${req.session.username}"`);
                 }
 
                 if (u.isSpectator != req.session.isSpectator) {
-                    await usersService.update(u._id, { isSpectator: req.session.isSpectator });
-                    logsService.create(u._id, `User toggled spectator role`);
+                    await User.findByIdAndUpdate(u._id, { isSpectator: req.session.isSpectator });
+                    Logger.generate(u._id, `User toggled spectator role`);
                 }
 
                 if (u.group != req.session.group) {
-                    await usersService.update(u._id, { group: req.session.group });
-                    logsService.create(u._id, `User group changed to ${req.session.group.toUpperCase()}`);
+                    await User.findByIdAndUpdate(u._id, { group: req.session.group });
+                    Logger.generate(u._id, `User group changed to ${req.session.group.toUpperCase()}`);
                 }
 
                 req.session.mongoId = u._id;
@@ -106,14 +106,11 @@ router.get(
     },
     api.isLoggedIn,
     (req, res) => {
-        if (req.session.group == 'nat' || req.session.isSpectator) {
-            res.redirect('/appeval');
-        } else if (req.session.group == 'bn') {
-            res.redirect('/qualityassurance');
+        if (req.session.lastPage) {
+            res.redirect(req.session.lastPage);
         } else {
             res.redirect('/');
         }
-
     }
 );
 
@@ -145,19 +142,25 @@ router.get('/callback', async (req, res) => {
 
         response = await api.getUserInfo(req.session.accessToken);
 
+        const bnGmt = [626907, 394326, 4879508, 2239480];
+        const natGmt = [318565];
+
         if (response.error) {
             res.status(500).render('error');
-        } else if (response.is_nat) {
+        } else if (!response.group_badge) {
+            req.session.group = 'user';
+        } else if (response.group_badge.id == 7 || natGmt.includes(response.id)) {
             req.session.group = 'nat';
-            req.session.isSpectator = false;
+        } else if (response.group_badge.id == 28 || response.group_badge.id == 32 || bnGmt.includes(response.id)) {
+            req.session.group = 'bn';
         } else {
-            req.session.isSpectator = response.is_gmt;
+            req.session.group = 'user';
+        }
 
-            if (response.is_bng) {
-                req.session.group = 'bn';
-            } else {
-                req.session.group = 'user';
-            }
+        if (response.group_badge && response.group_badge.id == 4 && !natGmt.includes(response.id)) {
+            req.session.isSpectator = true;
+        } else {
+            req.session.isSpectator = false;
         }
 
         req.session.username = response.username;
