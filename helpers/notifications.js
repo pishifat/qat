@@ -358,14 +358,17 @@ const notifyQualityAssurance = cron.schedule('0 22 * * *', async () => {
         users[i].recentQualityAssuranceChecks = recentCount;
     }
 
-    const overallUsers = users.sort((a, b) => {
+    let overallUsers = [...users];
+    let recentUsers = [...users];
+
+    overallUsers.sort((a, b) => {
         if (a.qualityAssuranceChecks > b.qualityAssuranceChecks) return -1;
         if (a.qualityAssuranceChecks < b.qualityAssuranceChecks) return 1;
 
         return 0;
     });
 
-    const recentUsers = users.sort((a, b) => {
+    recentUsers.sort((a, b) => {
         if (a.recentQualityAssuranceChecks > b.recentQualityAssuranceChecks) return -1;
         if (a.recentQualityAssuranceChecks < b.recentQualityAssuranceChecks) return 1;
 
