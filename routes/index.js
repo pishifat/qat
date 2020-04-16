@@ -157,7 +157,7 @@ router.get('/callback', async (req, res) => {
             req.session.group = 'user';
         }
 
-        if (response.group_badge && response.group_badge.id == 4 && !natGmt.includes(response.id)) {
+        if (response.group_badge && (response.group_badge.id == 4 || response.group_badge.id == 11) && !natGmt.includes(response.id)) {
             req.session.isSpectator = true;
         } else {
             req.session.isSpectator = false;
