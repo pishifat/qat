@@ -97,7 +97,7 @@ router.post('/submit', api.isNotSpectator, async (req, res) => {
     api.webhookPost([{
         author: api.defaultWebhookAuthor(req.session),
         color: api.webhookColors.darkPurple,
-        description: `Submitted [veto](https://bn.mappersguild.com/vetoes?beatmap=${v.id}) for **${v.beatmapTitle}** by **${v.beatmapMapper}**`,
+        description: `Submitted [veto for **${v.beatmapTitle}** by **${v.beatmapMapper}**](https://bn.mappersguild.com/vetoes?beatmap=${v.id})`,
     }],
     req.body.mode);
 });
@@ -158,7 +158,7 @@ router.post('/beginMediation/:id', api.isNat, api.isNotSpectator, async (req, re
     api.webhookPost([{
         author: api.defaultWebhookAuthor(req.session),
         color: api.webhookColors.purple,
-        description: `Started mediation on [veto](https://bn.mappersguild.com/vetoes?beatmap=${v.id}) for **${v.beatmapTitle}**`,
+        description: `Started mediation on [veto for **${v.beatmapTitle}**](https://bn.mappersguild.com/vetoes?beatmap=${v.id})`,
     }],
     v.mode);
 });
@@ -191,7 +191,7 @@ router.post('/submitMediation/:id', async (req, res) => {
         api.webhookPost([{
             author: api.defaultWebhookAuthor(req.session),
             color: api.webhookColors.lightPurple,
-            description: `Submitted opinion on [veto](https://bn.mappersguild.com/vetoes?beatmap=${v.id}) for **${v.beatmapTitle}** (${count}/${v.mediations.length})`,
+            description: `Submitted opinion on [veto for **${v.beatmapTitle}** (${count}/${v.mediations.length})](https://bn.mappersguild.com/vetoes?beatmap=${v.id})`,
         }],
         v.mode);
     }
@@ -218,7 +218,7 @@ router.post('/concludeMediation/:id', api.isNat, api.isNotSpectator, async (req,
     api.webhookPost([{
         author: api.defaultWebhookAuthor(req.session),
         color: api.webhookColors.purple,
-        description: `Concluded mediation on [veto](https://bn.mappersguild.com/vetoes?beatmap=${veto.id}) for **${veto.beatmapTitle}**`,
+        description: `Concluded mediation on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?beatmap=${veto.id})`,
     }],
     veto.mode);
 });
@@ -290,7 +290,7 @@ router.post('/replaceMediator/:id', api.isNat, api.isNotSpectator, async (req, r
     api.webhookPost([{
         author: api.defaultWebhookAuthor(req.session),
         color: api.webhookColors.darkOrange,
-        description: `Replaced **${oldMediation.mediator.username}** with **${newMediation.mediator.username}** as meditor on [veto](https://bn.mappersguild.com/vetoes?beatmap=${veto.id}) for **${veto.beatmapTitle}**`,
+        description: `Replaced **${oldMediation.mediator.username}** with **${newMediation.mediator.username}** as meditor on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?beatmap=${veto.id})`,
     }],
     veto.mode);
 });
