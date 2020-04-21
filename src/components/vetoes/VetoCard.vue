@@ -47,8 +47,9 @@
 export default {
     name: 'VetoCard',
     props: {
-        userId: String,
         veto: {
+            type: Object,
+            required: true,
             beatmapId: Number,
             beatmapMapper: String,
             beatmapMapperId: Number,

@@ -2,34 +2,48 @@
     <div id="extendedInfo" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div v-if="veto" class="modal-content">
-                <modal-header :veto="veto" />
-
-                <modal-body :veto="veto">
-                    <mediations
-                        v-if="isNat && ((currentMediators.indexOf(userId) === -1 && veto.vetoer.id !== userId) || veto.status != 'wip')"
-                        :current-mediators="currentMediators"
-                        :is-nat="isNat"
-                        :majority="majority"
-                        :user-id="userId"
-                        :veto="veto"
-                        @update-veto="$emit('update-veto', $event)"
-                    />
-
-                    <mediation-input
-                        :comment="comment"
-                        :mediation-id="mediationId"
-                        :veto="veto"
-                        :vote="vote"
-                    />
-                </modal-body>
-
-                <modal-footer
-                    :comment="comment"
-                    :mediation-id="mediationId"
-                    :veto="veto"
-                    :vote="vote"
-                    @update-veto="$emit('update-veto', $event)"
+                <modal-header
+                    :mode="veto.mode"
+                    :beatmap-id="parseInt(veto.beatmapId, 10)"
+                    :beatmap-mapper="veto.beatmapMapper"
+                    :beatmap-mapper-id="parseInt(veto.beatmapMapperId, 10)"
+                    :beatmap-title="veto.beatmapTitle"
+                    :status="veto.status"
                 />
+                <div class="modal-body" style="overflow: hidden">
+                    <div class="container">
+                        <context
+                            :veto="veto"
+                        />
+
+                        <span v-if="isNat && veto.mediations.length && (!isMediator || veto.status != 'wip')">
+                            <hr>
+                            <mediations
+                                :mediations="veto.mediations"
+                                :status="veto.status"
+                                :veto-id="veto.id"
+                                @update-veto="$emit('update-veto', $event)"
+                            />
+
+                            <hr>
+                        </span>
+                        <span v-if="isNat && !isMediator">
+                            <admin-buttons
+                                :current-mediators="currentMediators"
+                                :veto="veto"
+                                @update-veto="$emit('update-veto', $event)"
+                            />
+                        </span>
+
+                        <mediation-input
+                            v-else-if="isMediator && veto.status == 'wip'"
+                            :mediations="veto.mediations"
+                            :veto-id="veto.id"
+                            :user-id="userId"
+                            @update-veto="$emit('update-veto', $event)"
+                        />
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -38,8 +52,8 @@
 <script>
 import MediationInput from './info/MediationInput.vue';
 import Mediations from './info/Mediations.vue';
-import ModalBody from './info/ModalBody.vue';
-import ModalFooter from './info/ModalFooter.vue';
+import AdminButtons from './info/AdminButtons.vue';
+import Context from './info/Context.vue';
 import ModalHeader from './info/ModalHeader.vue';
 
 export default {
@@ -47,24 +61,31 @@ export default {
     components: {
         MediationInput,
         Mediations,
+        AdminButtons,
+        Context,
         ModalHeader,
-        ModalFooter,
-        ModalBody,
     },
     props: {
-        veto: Object,
-        userId: String,
-        userOsuId: Number,
+        veto: {
+            type: Object,
+            default() {
+                return {};
+            },
+        },
+        userId: {
+            type: String,
+            default: '',
+        },
+        userOsuId: {
+            type: Number,
+            default: 0,
+        },
         isNat: Boolean,
     },
     data () {
         return {
-            info: '',
-            confirm: '',
             mediators: null,
-            comment: '',
             vote: null,
-            mediationId: null,
         };
     },
     computed: {
@@ -81,36 +102,12 @@ export default {
 
             return userIds;
         },
-
-        majority () {
-            let total = 0;
-
-            this.veto.mediations.forEach(mediation => {
-                if (mediation.vote === 1) total++;
-                if (mediation.vote === 3) total--;
-            });
-
-            return total > 0 ? true : false;
+        isMediator () {
+            return this.currentMediators.indexOf(this.userId) >= 0;
         },
     },
     watch: {
         veto () {
-            this.mediationId = null;
-
-            if (this.veto.mediations.length) {
-                for (let i = 0; i < this.veto.mediations.length; i++) {
-                    let mediation = this.veto.mediations[i];
-
-                    if (mediation.mediator.id === this.userId) {
-                        if (mediation.comment) this.comment = mediation.comment;
-                        if (mediation.vote) this.vote = mediation.vote;
-
-                        this.mediationId = mediation.id;
-                        break;
-                    }
-                }
-            }
-
             history.pushState(null, 'Vetoes', `/vetoes?beatmap=${this.veto.id}`);
         },
     },

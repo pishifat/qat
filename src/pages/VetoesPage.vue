@@ -20,7 +20,6 @@
                             v-for="veto in activeVetoes"
                             :key="veto.id"
                             :veto="veto"
-                            :user-id="userId"
                             @update:selectedVeto="selectedVeto = $event"
                         />
                     </transition-group>
@@ -34,7 +33,6 @@
                             v-for="veto in resolvedVetoes"
                             :key="veto.id"
                             :veto="veto"
-                            :user-id="userId"
                             @update:selectedVeto="selectedVeto = $event"
                         />
                     </transition-group>
@@ -47,6 +45,7 @@
             :user-osu-id="userOsuId"
             :is-nat="isNat"
             @update-veto="updateVeto($event)"
+            @update-mediation="updateMediation($event)"
         />
         <submit-veto @submit-veto="submitVeto($event)" />
     </div>
@@ -59,6 +58,7 @@ import SubmitVeto from '../components/vetoes/SubmitVeto.vue';
 import FilterBox from '../components/FilterBox.vue';
 import pagination from '../mixins/pagination.js';
 import filters from '../mixins/filters.js';
+import postData from '../mixins/postData.js';
 
 export default {
     name: 'VetoesPage',
@@ -68,7 +68,7 @@ export default {
         SubmitVeto,
         FilterBox,
     },
-    mixins: [pagination, filters],
+    mixins: [pagination, filters, postData],
     data() {
         return {
             allObjs: null,
@@ -82,45 +82,46 @@ export default {
             selectedVeto: null,
         };
     },
-    created () {
-        axios
-            .get('/vetoes/relevantInfo')
-            .then(response => {
-                this.allObjs = response.data.vetoes;
-                this.userId = response.data.userId;
-                this.userOsuId = response.data.userOsuId;
-                this.isNat = response.data.isNat;
-                this.hasPagination = false;
-                this.hasSeparation = true;
-                this.filter();
-                const params = new URLSearchParams(document.location.search.substring(1));
+    async created () {
+        const res = await this.executeGet('/vetoes/relevantInfo/');
 
-                if (params.get('beatmap') && params.get('beatmap').length) {
-                    const i = this.allObjs.findIndex(v => v.id == params.get('beatmap'));
+        if (res) {
+            this.allObjs = res.vetoes;
+            this.userId = res.userId;
+            this.userOsuId = res.userOsuId;
+            this.isNat = res.isNat;
+            this.hasPagination = false;
+            this.hasSeparation = true;
+            this.filter();
+            const params = new URLSearchParams(document.location.search.substring(1));
 
-                    if (i >= 0) {
-                        this.selectedVeto = this.allObjs[i];
-                        $('#extendedInfo').modal('show');
-                    }
+            if (params.get('beatmap') && params.get('beatmap').length) {
+                const i = this.allObjs.findIndex(v => v.id == params.get('beatmap'));
+
+                if (i >= 0) {
+                    this.selectedVeto = this.allObjs[i];
+                    $('#extendedInfo').modal('show');
                 }
-            })
-            .then(function() {
-                $('#loading').fadeOut();
-                $('#main')
-                    .attr('style', 'visibility: visible')
-                    .hide()
-                    .fadeIn();
-            });
+            }
+        }
+
+        $('#loading').fadeOut();
+        $('#main')
+            .attr('style', 'visibility: visible')
+            .hide()
+            .fadeIn();
     },
     mounted () {
-        setInterval(() => {
-            axios.get('/vetoes/relevantInfo').then(response => {
-                this.allObjs = response.data.vetoes;
+        setInterval(async () => {
+            const res = await this.executeGet('/vetoes/relevantInfo/');
+
+            if (res) {
+                this.allObjs = res.vetoes;
 
                 if (this.isFiltered) {
                     this.filter();
                 }
-            });
+            }
         }, 300000);
     },
     methods: {

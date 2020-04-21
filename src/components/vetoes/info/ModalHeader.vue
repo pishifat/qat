@@ -1,12 +1,12 @@
 <template>
-    <div class="modal-header text-dark" :class="`bg-${veto.status}`">
+    <div class="modal-header text-dark" :class="`bg-${status}`">
         <h5 class="modal-title">
-            <a class="text-dark" :href="`https://osu.ppy.sh/beatmapsets/${veto.beatmapId}`" target="_blank">{{ veto.beatmapTitle }}</a> by
-            <a class="text-dark" :href="`https://osu.ppy.sh/users/${veto.beatmapMapperId}`" target="_blank">{{ veto.beatmapMapper }}</a>
-            <i v-if="veto.mode.indexOf('osu') >= 0" class="far fa-circle" />
-            <i v-else-if="veto.mode.indexOf('taiko') >= 0" class="fas fa-drum" />
-            <i v-else-if="veto.mode.indexOf('catch') >= 0" class="fas fa-apple-alt" />
-            <i v-else-if="veto.mode.indexOf('mania') >= 0" class="fas fa-stream" />
+            <a class="text-dark" :href="`https://osu.ppy.sh/beatmapsets/${beatmapId}`" target="_blank">{{ beatmapTitle }}</a> by
+            <a class="text-dark" :href="`https://osu.ppy.sh/users/${beatmapMapperId}`" target="_blank">{{ beatmapMapper }}</a>
+            <i v-if="mode.indexOf('osu') >= 0" class="far fa-circle" />
+            <i v-else-if="mode.indexOf('taiko') >= 0" class="fas fa-drum" />
+            <i v-else-if="mode.indexOf('catch') >= 0" class="fas fa-apple-alt" />
+            <i v-else-if="mode.indexOf('mania') >= 0" class="fas fa-stream" />
             <span v-else>
                 <i class="far fa-circle" />
                 <i class="fas fa-drum" />
@@ -24,13 +24,29 @@
 export default {
     name: 'ModalHeader',
     props: {
-        veto: {
-            mode: String,
-            beatmapId: Number,
-            beatmapMapper: String,
-            beatmapMapperId: Number,
-            beatmapTitle: String,
-            status: String,
+        mode: {
+            type: String,
+            required: true,
+        },
+        beatmapId: {
+            type: Number,
+            required: true,
+        },
+        beatmapMapper: {
+            type: String,
+            required: true,
+        },
+        beatmapMapperId: {
+            type: Number,
+            required: true,
+        },
+        beatmapTitle: {
+            type: String,
+            required: true,
+        },
+        status: {
+            type: String,
+            required: true,
         },
     },
 };
