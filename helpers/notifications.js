@@ -225,7 +225,7 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
 
     // find database's discussion posts
     const date = new Date();
-    date.setDate(date.getDate() - 7);
+    date.setDate(date.getDate() - 10); // used to be 7, but backlog in qualified maps feed caused duplicate reports
     let beatmapReports = await BeatmapReport.find({ createdAt: { $gte: date } });
 
     // create array of reported beatmapsetIds
