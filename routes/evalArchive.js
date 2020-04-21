@@ -114,7 +114,7 @@ router.get('/searchRecent/:limit', async (req, res) => {
     res.json({ bnApplications, evalRounds });
 });
 
-/* GET search for user */
+/* GET search by id */
 router.get('/searchById/:id', async (req, res) => {
     let round;
     const idToSearch = decodeURI(req.params.id);

@@ -103,14 +103,12 @@
         </div>
 
         <current-bn-individual-info
-            v-if="selectedEvalRound"
             :eval-round="selectedEvalRound"
             :evaluator="evaluator"
             @update-eval-round="updateEvalRound($event)"
         />
 
         <current-bn-discussion-info
-            v-if="selectedDiscussRound"
             :eval-round="selectedDiscussRound"
             :evaluator="evaluator"
             @update-eval-round="updateEvalRound($event)"
@@ -160,45 +158,45 @@ export default {
     computed: {
 
     },
-    created() {
-        axios
-            .get('/bnEval/relevantInfo')
-            .then(response => {
-                this.allObjs = response.data.er;
-                this.evaluator = response.data.evaluator;
-                this.filterMode = response.data.evaluator.modes[0] || 'osu';
-                this.hasPagination = false;
-                this.hasSeparation = true;
-                this.filter();
-                const params = new URLSearchParams(document.location.search.substring(1));
+    async created() {
+        const res = await this.executeGet('/bnEval/relevantInfo');
 
-                if (params.get('eval') && params.get('eval').length) {
-                    const i = this.allObjs.findIndex(a => a.id == params.get('eval'));
+        if (res) {
+            this.allObjs = res.er;
+            this.evaluator = res.evaluator;
+            this.filterMode = res.evaluator.modes[0] || 'osu';
+            this.hasPagination = false;
+            this.hasSeparation = true;
+            this.filter();
+            const params = new URLSearchParams(document.location.search.substring(1));
 
-                    if (i >= 0) {
-                        if (!this.allObjs[i].discussion) {
-                            this.selectedEvalRound = this.allObjs[i];
-                            $('#currentBnIndividualInfo').modal('show');
-                        } else {
-                            this.selectedDiscussRound = this.allObjs[i];
-                            $('#currentBnDiscussionInfo').modal('show');
-                        }
+            if (params.get('eval') && params.get('eval').length) {
+                const i = this.allObjs.findIndex(a => a.id == params.get('eval'));
+
+                if (i >= 0) {
+                    if (!this.allObjs[i].discussion) {
+                        this.selectedEvalRound = this.allObjs[i];
+                        $('#currentBnIndividualInfo').modal('show');
                     } else {
-                        window.location = '/evalArchive?eval=' + params.get('eval');
+                        this.selectedDiscussRound = this.allObjs[i];
+                        $('#currentBnDiscussionInfo').modal('show');
                     }
+                } else {
+                    window.location = '/evalArchive?eval=' + params.get('eval');
                 }
-            }).then(function() {
-                $('#loading').fadeOut();
-                $('#main').attr('style', 'visibility: visible').hide().fadeIn();
-            });
+            }
+        }
+
+        $('#loading').fadeOut();
+        $('#main').attr('style', 'visibility: visible').hide().fadeIn();
     },
     mounted () {
-        setInterval(() => {
-            axios
-                .get('/bnEval/relevantInfo')
-                .then(response => {
-                    this.allObjs = response.data.er;
-                });
+        setInterval(async () => {
+            const res = await this.executeGet('/bnEval/relevantInfo');
+
+            if (res) {
+                this.allObjs = res.er;
+            }
         }, 300000);
     },
     methods: {

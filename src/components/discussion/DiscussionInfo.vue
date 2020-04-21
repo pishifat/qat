@@ -119,6 +119,9 @@ export default {
             history.pushState(null, 'Discussion Vote', `/discussionvote?id=${this.discussion.id}`);
         },
     },
+    created() {
+        history.pushState(null, 'Discussion Vote', `/discussionvote?id=${this.discussion.id}`);
+    },
     methods: {
         async concludeMediation (e) {
             this.info = '';

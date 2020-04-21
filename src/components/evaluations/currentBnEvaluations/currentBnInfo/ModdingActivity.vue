@@ -20,8 +20,11 @@
 </template>
 
 <script>
+import postData from '../../../../mixins/postData.js';
+
 export default {
     name: 'ModdingActivity',
+    mixins: [postData],
     props: {
         username: {
             type: String,
@@ -43,11 +46,11 @@ export default {
     methods: {
         async findModCount() {
             this.loadingModCount = true;
-            const res = await axios.get('/modsCount/' + this.username);
+            const res = await this.executeGet('/modsCount/' + this.username);
 
-            if (res.data) {
+            if (res) {
                 this.loadingModCount = false;
-                this.modCount = res.data.modCount;
+                this.modCount = res.modCount;
             }
         },
     },

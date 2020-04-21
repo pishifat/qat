@@ -122,46 +122,38 @@ export default {
             }
         },
     },
-    created() {
+    async created() {
         const params = new URLSearchParams(document.location.search.substring(1));
 
         if (params.get('user') && params.get('user').length) {
-            axios
-                .get(`/testResults/search/${params.get('user')}`)
-                .then(response => {
-                    this.isNat = response.data.isNat;
-                    this.allTests = response.data.tests;
+            const res = await this.executeGet(`/testResults/search/${params.get('user')}`);
 
-                    if (this.allTests && this.allTests.length == 1) {
-                        this.selectedTest = this.allTests[0];
-                    }
-                })
-                .then(function() {
-                    $('#loading').fadeOut();
-                    $('#main')
-                        .attr('style', 'visibility: visible')
-                        .hide()
-                        .fadeIn();
-                });
+            if (res) {
+                this.isNat = res.isNat;
+                this.allTests = res.tests;
+
+                if (this.allTests && this.allTests.length == 1) {
+                    this.selectedTest = this.allTests[0];
+                }
+            }
         } else {
-            axios
-                .get('/testResults/relevantInfo')
-                .then(response => {
-                    this.isNat = response.data.isNat;
-                    this.allTests = response.data.tests;
+            const res = await this.executeGet('/testResults/relevantInfo');
 
-                    if (this.allTests && this.allTests.length == 1) {
-                        this.selectedTest = this.allTests[0];
-                    }
-                })
-                .then(function() {
-                    $('#loading').fadeOut();
-                    $('#main')
-                        .attr('style', 'visibility: visible')
-                        .hide()
-                        .fadeIn();
-                });
+            if (res) {
+                this.isNat = res.isNat;
+                this.allTests = res.tests;
+
+                if (this.allTests && this.allTests.length == 1) {
+                    this.selectedTest = this.allTests[0];
+                }
+            }
         }
+
+        $('#loading').fadeOut();
+        $('#main')
+            .attr('style', 'visibility: visible')
+            .hide()
+            .fadeIn();
     },
     methods: {
         calculateTotalScore() {

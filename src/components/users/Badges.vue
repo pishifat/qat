@@ -45,18 +45,17 @@ export default {
         };
     },
     methods: {
-        findUserBadgeInfo() {
-            axios
-                .get('/users/findUserBadgeInfo')
-                .then(response => {
-                    this.badgeUsers = [];
-                    let users = response.data;
-                    users.forEach(user => {
-                        if ((this.calculateDuration(user.bnDuration) >= 1) || (this.calculateDuration(user.natDuration) >= 1)) {
-                            this.badgeUsers.push(user);
-                        }
-                    });
+        async findUserBadgeInfo() {
+            const users = await this.executeGet('/users/findUserBadgeInfo');
+
+            if (users) {
+                this.badgeUsers = [];
+                users.forEach(user => {
+                    if ((this.calculateDuration(user.bnDuration) >= 1) || (this.calculateDuration(user.natDuration) >= 1)) {
+                        this.badgeUsers.push(user);
+                    }
                 });
+            }
         },
         calculateDuration(dateArray) {
             let days = 0;

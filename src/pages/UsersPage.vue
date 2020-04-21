@@ -77,6 +77,7 @@ import PotentialNatInfo from '../components/users/PotentialNatInfo.vue';
 import FilterBox from '../components/FilterBox.vue';
 import pagination from '../mixins/pagination.js';
 import filters from '../mixins/filters.js';
+import postData from '../mixins/postData.js';
 
 export default {
     name: 'UsersPage',
@@ -89,7 +90,7 @@ export default {
         PotentialNatInfo,
         FilterBox,
     },
-    mixins: [pagination, filters],
+    mixins: [pagination, filters, postData],
     data() {
         return {
             pageObjs: null,
@@ -101,41 +102,41 @@ export default {
             selectedUser: null,
         };
     },
-    created() {
-        axios
-            .get('/users/relevantInfo')
-            .then(response => {
-                this.allObjs = response.data.users;
-                this.userId = response.data.userId;
-                this.isNat = response.data.isNat;
-                this.isBn = response.data.isBn;
-                this.limit = 24;
-                const params = new URLSearchParams(document.location.search.substring(1));
+    async created() {
+        const res = await this.executeGet('/users/relevantInfo');
 
-                if (params.get('id') && params.get('id').length) {
-                    const i = this.allObjs.findIndex(u => u.id == params.get('id'));
+        if (res) {
+            this.allObjs = res.users;
+            this.userId = res.userId;
+            this.isNat = res.isNat;
+            this.isBn = res.isBn;
+            this.limit = 24;
+            const params = new URLSearchParams(document.location.search.substring(1));
 
-                    if (i >= 0) {
-                        this.selectedUser = this.allObjs[i];
-                        $('#extendedInfo').modal('show');
-                    }
+            if (params.get('id') && params.get('id').length) {
+                const i = this.allObjs.findIndex(u => u.id == params.get('id'));
+
+                if (i >= 0) {
+                    this.selectedUser = this.allObjs[i];
+                    $('#extendedInfo').modal('show');
                 }
-            }).then(function() {
-                $('#loading').fadeOut();
-                $('#main').attr('style', 'visibility: visible').hide().fadeIn();
-            });
+            }
+        }
+
+        $('#loading').fadeOut();
+        $('#main').attr('style', 'visibility: visible').hide().fadeIn();
     },
     mounted () {
-        setInterval(() => {
-            axios
-                .get('/users/relevantInfo')
-                .then(response => {
-                    this.allObjs = response.data.users;
+        setInterval(async () => {
+            const res = await this.executeGet('/users/relevantInfo');
 
-                    if (this.isFiltered) {
-                        this.filter();
-                    }
-                });
+            if (res) {
+                this.allObjs = res.users;
+
+                if (this.isFiltered) {
+                    this.filter();
+                }
+            }
         }, 300000);
     },
     methods: {

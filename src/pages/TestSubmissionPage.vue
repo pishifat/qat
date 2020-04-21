@@ -122,26 +122,23 @@ export default {
             comment: '',
         };
     },
-    created() {
-        axios
-            .get('/testSubmission/tests')
-            .then(async response => {
-                if (response.data.testList) {
-                    this.testList = response.data.testList;
-                    this.selectedTest = this.testList[0].id;
+    async created() {
+        const res = await this.executeGet('/testSubmission/tests');
 
-                    if (this.testList.length == 1) {
-                        await this.loadTest();
-                    }
-                }
-            })
-            .then(function() {
-                $('#loading').fadeOut();
-                $('#main')
-                    .attr('style', 'visibility: visible')
-                    .hide()
-                    .fadeIn();
-            });
+        if (res) {
+            this.testList = res.testList;
+            this.selectedTest = this.testList[0].id;
+
+            if (this.testList.length == 1) {
+                await this.loadTest();
+            }
+        }
+
+        $('#loading').fadeOut();
+        $('#main')
+            .attr('style', 'visibility: visible')
+            .hide()
+            .fadeIn();
     },
     methods: {
         getActiveOptions (options) {

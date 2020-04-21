@@ -5,11 +5,16 @@
 </template>
 
 <script>
+import postData from '../../../mixins/postData.js';
 
 export default {
     name: 'Duration',
+    mixins: [ postData ],
     props: {
-        userId: String,
+        userId: {
+            type: String,
+            required: true,
+        },
     },
     data() {
         return {
@@ -27,11 +32,11 @@ export default {
     },
     methods: {
         async loadNextEvaluation() {
-            await axios
-                .get('/users/loadNextEvaluation/' + this.userId)
-                .then(response => {
-                    this.nextEvaluationDate = response.data;
-                });
+            const nextEvaluationDate = await this.executeGet('/users/loadNextEvaluation/' + this.userId);
+
+            if (nextEvaluationDate) {
+                this.nextEvaluationDate = nextEvaluationDate;
+            }
         },
     },
 };

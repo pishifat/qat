@@ -13,7 +13,7 @@
                 title="Toggle ability to give input on BN applications"
                 @click="switchBnEvaluator($event)"
             >
-                {{ isBnEvaluator ? 'Deactivate' : 'Enable' }}
+                {{ isBnEvaluator ? 'Disable' : 'Enable' }}
             </button>
         </p>
     </div>

@@ -25,10 +25,11 @@
 
 <script>
 import filterLinks from '../../../../mixins/filterLinks.js';
+import postData from '../../../../mixins/postData.js';
 
 export default {
     name: 'UserReports',
-    mixins: [filterLinks],
+    mixins: [filterLinks, postData],
     props: {
         userMongoId: {
             type: String,
@@ -49,13 +50,13 @@ export default {
         this.findUserReports();
     },
     methods: {
-        findUserReports() {
+        async findUserReports() {
             this.userReports = null;
-            axios
-                .get('/bnEval/findUserReports/' + this.userMongoId)
-                .then(response => {
-                    this.userReports = response.data.userReports;
-                });
+            const res = await this.executeGet('/bnEval/findUserReports/' + this.userMongoId);
+
+            if (res) {
+                this.userReports = res.userReports;
+            }
         },
     },
 };

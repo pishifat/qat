@@ -102,11 +102,23 @@ export default {
     },
     mixins: [ postData, filterLinks ],
     props: {
-        osuId: Number,
-        mode: String,
-        deadline: String,
+        osuId: {
+            type: Number,
+            required: true,
+        },
+        mode: {
+            type: String,
+            required: true,
+        },
+        deadline: {
+            type: String,
+            required: true,
+        },
         isNat: Boolean,
-        userMongoId: String,
+        userMongoId: {
+            type: String,
+            required: true,
+        },
     },
     data() {
         return {
@@ -133,18 +145,18 @@ export default {
     },
     methods: {
         async findRelevantActivity() {
-            const res = await axios.get('/bnEval/userActivity/' + this.osuId + '/' + this.mode + '/' + new Date(this.deadline).getTime() + '/' + this.userMongoId);
+            const res = await this.executeGet('/bnEval/userActivity/' + this.osuId + '/' + this.mode + '/' + new Date(this.deadline).getTime() + '/' + this.userMongoId);
 
-            if (res.data) {
-                this.nominations = res.data.noms;
-                this.nominationsDisqualified = res.data.nomsDqd;
-                this.nominationsPopped = res.data.nomsPopped;
-                this.disqualifications = res.data.dqs;
-                this.pops = res.data.pops;
-                this.qualityAssuranceChecks = res.data.qualityAssuranceChecks;
-                this.assignedApplications = res.data.assignedApplications;
-                this.natApplications = res.data.natApplications;
-                this.natEvalRounds = res.data.natEvalRounds;
+            if (res) {
+                this.nominations = res.noms;
+                this.nominationsDisqualified = res.nomsDqd;
+                this.nominationsPopped = res.nomsPopped;
+                this.disqualifications = res.dqs;
+                this.pops = res.pops;
+                this.qualityAssuranceChecks = res.qualityAssuranceChecks;
+                this.assignedApplications = res.assignedApplications;
+                this.natApplications = res.natApplications;
+                this.natEvalRounds = res.natEvalRounds;
                 this.loading = false;
             }
         },

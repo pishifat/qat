@@ -103,14 +103,12 @@
         </div>
 
         <application-individual-info
-            v-if="selectedApplication"
             :application="selectedApplication"
             :evaluator="evaluator"
             @update-application="updateApplication($event)"
         />
 
         <application-discussion-info
-            v-if="selectedDiscussApp"
             :application="selectedDiscussApp"
             :evaluator="evaluator"
             @update-application="updateApplication($event)"
@@ -161,46 +159,46 @@ export default {
             this.info = '';
         },
     },
-    created() {
-        axios
-            .get('/appEval/relevantInfo')
-            .then(response => {
-                this.allObjs = response.data.a;
-                this.evaluator = response.data.evaluator;
-                this.filterMode = response.data.evaluator.modes[0] || 'osu';
-                this.hasPagination = false;
-                this.hasSeparation = true;
-                this.filter();
-                const params = new URLSearchParams(document.location.search.substring(1));
+    async created() {
+        const res = await this.executeGet('/appEval/relevantInfo');
 
-                if (params.get('eval') && params.get('eval').length) {
-                    const i = this.allObjs.findIndex(a => a.id == params.get('eval'));
+        if (res) {
+            this.allObjs = res.a;
+            this.evaluator = res.evaluator;
+            this.filterMode = res.evaluator.modes[0] || 'osu';
+            this.hasPagination = false;
+            this.hasSeparation = true;
+            this.filter();
+            const params = new URLSearchParams(document.location.search.substring(1));
 
-                    if (i >= 0) {
-                        if (!this.allObjs[i].discussion) {
-                            this.selectedApplication = this.allObjs[i];
-                            $('#applicationIndividualInfo').modal('show');
-                        } else {
-                            this.selectedDiscussApp = this.allObjs[i];
-                            $('#applicationDiscussionInfo').modal('show');
-                        }
-                    } else if (this.evaluator.isNat) {
-                        window.location = '/evalArchive?eval=' + params.get('eval');
+            if (params.get('eval') && params.get('eval').length) {
+                const i = this.allObjs.findIndex(a => a.id == params.get('eval'));
+
+                if (i >= 0) {
+                    if (!this.allObjs[i].discussion) {
+                        this.selectedApplication = this.allObjs[i];
+                        $('#applicationIndividualInfo').modal('show');
+                    } else {
+                        this.selectedDiscussApp = this.allObjs[i];
+                        $('#applicationDiscussionInfo').modal('show');
                     }
+                } else if (this.evaluator.isNat) {
+                    window.location = '/evalArchive?eval=' + params.get('eval');
                 }
-            }).then(function() {
-                $('#loading').fadeOut();
-                $('#main').attr('style', 'visibility: visible').hide().fadeIn();
-            });
+            }
+        }
+
+        $('#loading').fadeOut();
+        $('#main').attr('style', 'visibility: visible').hide().fadeIn();
     },
     mounted () {
-        setInterval(() => {
-            axios
-                .get('/appEval/relevantInfo')
-                .then(response => {
-                    this.allObjs = response.data.a;
-                    this.filter();
-                });
+        setInterval(async () => {
+            const res = await this.executeGet('/appEval/relevantInfo');
+
+            if (res) {
+                this.allObjs = res.a;
+                this.filter();
+            }
         }, 300000);
     },
     methods: {

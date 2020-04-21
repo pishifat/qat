@@ -72,8 +72,18 @@ export default {
     },
     mixins: [ filterLinks, postData ],
     props: {
-        application: Object,
-        evaluator: Object,
+        application: {
+            type: Object,
+            default() {
+                return {};
+            },
+        },
+        evaluator: {
+            type: Object,
+            default() {
+                return {};
+            },
+        },
     },
     watch: {
         application() {

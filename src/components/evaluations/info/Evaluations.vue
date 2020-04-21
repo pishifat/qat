@@ -65,10 +65,21 @@ export default {
     name: 'Evaluations',
     mixins: [ filterLinks ],
     props: {
-        evaluations: Array,
-        consensus: String,
+        evaluations: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
+        consensus: {
+            type: String,
+            default: '',
+        },
         isNat: Boolean,
-        userId: String,
+        userId: {
+            type: String,
+            default: '',
+        },
     },
     computed: {
         bnEvaluations() {

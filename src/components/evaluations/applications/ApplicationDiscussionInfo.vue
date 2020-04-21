@@ -124,17 +124,24 @@ export default {
     props: {
         application: {
             type: Object,
-            required: true,
+            default() {
+                return {};
+            },
         },
         evaluator: {
             type: Object,
-            required: true,
+            default() {
+                return {};
+            },
         },
     },
     watch: {
         application() {
             history.pushState(null, 'BN Application Evaluations', `/appeval?eval=${this.application.id}`);
         },
+    },
+    created() {
+        history.pushState(null, 'BN Application Evaluations', `/appeval?eval=${this.application.id}`);
     },
 };
 </script>

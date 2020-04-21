@@ -114,76 +114,51 @@ export default {
             limit: null,
         };
     },
-    created() {
+    async created() {
         const params = new URLSearchParams(document.location.search.substring(1));
 
         if (params.get('user') && params.get('user').length) {
-            axios
-                .get(`/evalArchive/search/${params.get('user')}`)
-                .then(response => {
-                    if (response.data.error) {
-                        this.info = response.data.error;
-                    } else {
-                        this.evaluator = response.data.evaluator;
-                        this.queried = true;
-                        this.appEvals = response.data.a;
-                        this.bnEvals = response.data.b;
-                    }
-                })
-                .then(function() {
-                    $('#loading').fadeOut();
-                    $('#main')
-                        .attr('style', 'visibility: visible')
-                        .hide()
-                        .fadeIn();
-                });
+            const res = await this.executeGet(`/evalArchive/search/${params.get('user')}`);
+
+            if (res) {
+                this.evaluator = res.evaluator;
+                this.queried = true;
+                this.appEvals = res.bnApplications;
+                this.bnEvals = res.evalRounds;
+            }
         } else if (params.get('eval') && params.get('eval').length) {
-            axios
-                .get(`/evalArchive/searchById/${params.get('eval')}`)
-                .then(response => {
-                    if (response.data.error) {
-                        this.info = response.data.error;
+            const res = await this.executeGet(`/evalArchive/searchById/${params.get('eval')}`);
+
+            if (res) {
+                this.evaluator = res.evaluator;
+
+                if (res.round) {
+                    this.queried = true;
+
+                    if (res.round.applicant) {
+                        this.selectedDiscussApp = res.round;
+                        this.appEvals.push(res.round);
+                        $('#applicationArchiveInfo').modal('show');
                     } else {
-                        this.evaluator = response.data.evaluator;
-
-                        if (response.data.round) {
-                            this.queried = true;
-
-                            if (response.data.round.applicant) {
-                                this.selectedDiscussApp = response.data.round;
-                                this.appEvals.push(response.data.round);
-                                $('#applicationArchiveInfo').modal('show');
-                            } else {
-                                this.selectedDiscussRound = response.data.round;
-                                this.bnEvals.push(response.data.round);
-                                $('#currentBnArchiveInfo').modal('show');
-                            }
-
-                        }
-
+                        this.selectedDiscussRound = res.round;
+                        this.bnEvals.push(res.round);
+                        $('#currentBnArchiveInfo').modal('show');
                     }
-                })
-                .then(function() {
-                    $('#loading').fadeOut();
-                    $('#main')
-                        .attr('style', 'visibility: visible')
-                        .hide()
-                        .fadeIn();
-                });
+                }
+            }
         } else {
-            axios
-                .get('/evalArchive/relevantInfo')
-                .then(response => {
-                    this.evaluator = response.data.evaluator;
-                })
-                .then(function() {
-                    $('#loading').fadeOut();
-                    $('#main')
-                        .attr('style', 'visibility: visible')
-                        .hide()
-                        .fadeIn();
-                });
+            const res = await this.executeGet('/evalArchive/relevantInfo');
+
+            if (res) {
+                this.evaluator = res.evaluator;
+            }
         }
+
+        $('#loading').fadeOut();
+        $('#main')
+            .attr('style', 'visibility: visible')
+            .hide()
+            .fadeIn();
     },
     methods: {
         async query(e) {

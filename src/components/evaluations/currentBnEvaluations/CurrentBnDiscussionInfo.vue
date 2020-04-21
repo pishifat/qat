@@ -158,6 +158,9 @@ export default {
             history.pushState(null, 'Current BN Evaluations', `/bneval?eval=${this.evalRound.id}`);
         },
     },
+    created() {
+        history.pushState(null, 'Current BN Evaluations', `/bneval?eval=${this.evalRound.id}`);
+    },
 };
 </script>
 

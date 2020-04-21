@@ -49,8 +49,11 @@
 </template>
 
 <script>
+import postData from '../../mixins/postData.js';
+
 export default {
     name: 'NatActivity',
+    mixins: [ postData ],
     data() {
         return {
             natActivity: null,
@@ -62,16 +65,17 @@ export default {
         };
     },
     methods: {
-        findNatActivity() {
+        async findNatActivity() {
             if (!this.natDays.length) this.natDays = 30;
-            axios
-                .get('/users/findNatActivity/' + this.natDays + '/' + this.natMode)
-                .then(response => {
-                    this.natActivity = response.data.info;
-                    this.natTotal = response.data.bnAppsCount + response.data.evalRoundsCount;
-                    this.totalBnApps = response.data.bnAppsCount;
-                    this.totalEvalRounds = response.data.evalRoundsCount;
-                });
+
+            const res = await this.executeGet('/users/findNatActivity/' + this.natDays + '/' + this.natMode);
+
+            if (res) {
+                this.natActivity = res.info;
+                this.natTotal = res.bnAppsCount + res.evalRoundsCount;
+                this.totalBnApps = res.bnAppsCount;
+                this.totalEvalRounds = res.evalRoundsCount;
+            }
         },
     },
 };

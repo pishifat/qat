@@ -37,10 +37,11 @@
 
 <script>
 import filterLinks from '../../../mixins/filterLinks.js';
+import postData from '../../../mixins/postData.js';
 
 export default {
     name: 'PreviousEvaluations',
-    mixins: [ filterLinks ],
+    mixins: [ filterLinks, postData ],
     props: {
         userMongoId: {
             type: String,
@@ -63,10 +64,10 @@ export default {
     methods: {
         async findPreviousEvaluations() {
             this.previousEvaluations = null;
-            const res = await axios.get('/bnEval/findPreviousEvaluations/' + this.userMongoId);
+            const res = await this.executeGet('/bnEval/findPreviousEvaluations/' + this.userMongoId);
 
-            if (res.data) {
-                this.previousEvaluations = res.data.previousEvaluations;
+            if (res) {
+                this.previousEvaluations = res.previousEvaluations;
             }
         },
     },

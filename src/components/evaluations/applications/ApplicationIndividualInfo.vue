@@ -102,6 +102,9 @@ export default {
             history.pushState(null, 'BN Application Evaluations', `/appeval?eval=${this.application.id}`);
         },
     },
+    created() {
+        history.pushState(null, 'BN Application Evaluations', `/appeval?eval=${this.application.id}`);
+    },
 };
 </script>
 

@@ -51,8 +51,11 @@
 </template>
 
 <script>
+import postData from '../../mixins/postData.js';
+
 export default {
     name: 'BnActivity',
+    mixins: [ postData ],
     data() {
         return {
             bnActivity: null,
@@ -62,14 +65,14 @@ export default {
         };
     },
     methods: {
-        findBnActivity() {
+        async findBnActivity() {
             if (!this.bnDays.length) this.bnDays = 30;
-            axios
-                .get('/users/findBnActivity/' + this.bnDays + '/' + this.bnMode)
-                .then(response => {
-                    this.bnActivity = response.data;
-                    this.bnDaysDisplay = this.bnDays;
-                });
+            const activity = await this.executeGet('/users/findBnActivity/' + this.bnDays + '/' + this.bnMode);
+
+            if (activity) {
+                this.bnActivity = activity;
+                this.bnDaysDisplay = this.bnDays;
+            }
         },
     },
 };

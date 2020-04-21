@@ -46,25 +46,27 @@
 </template>
 
 <script>
+import postData from '../../mixins/postData.js';
+
 export default {
     name: 'PotentialNatInfo',
+    mixins: [ postData ],
     data() {
         return {
             potentialNatInfo: [],
         };
     },
     methods: {
-        findPotentialNatInfo() {
-            axios
-                .get('/users/findPotentialNatInfo/')
-                .then(response => {
-                    let users = response.data;
-                    users.forEach(user => {
-                        if (user.evaluatedApps.length) {
-                            this.potentialNatInfo.push(user);
-                        }
-                    });
+        async findPotentialNatInfo() {
+            const users = await this.executeGet('/users/findPotentialNatInfo/');
+
+            if (users) {
+                users.forEach(user => {
+                    if (user.evaluatedApps.length) {
+                        this.potentialNatInfo.push(user);
+                    }
                 });
+            }
         },
         findVote(evaluations, osuId) {
             let vote = 'none';

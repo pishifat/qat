@@ -103,6 +103,7 @@
         />
 
         <edit-question
+            v-if="selectedQuestion"
             :question="selectedQuestion"
             :category="category"
             @update-question="updateQuestion($event)"
@@ -116,6 +117,7 @@
 <script>
 import AddQuestion from '../components/rcTest/AddQuestion.vue';
 import EditQuestion from '../components/rcTest/EditQuestion.vue';
+import postData from '../mixins/postData.js';
 
 export default {
     name: 'ManageTestPage',
@@ -123,10 +125,11 @@ export default {
         AddQuestion,
         EditQuestion,
     },
+    mixins: [ postData ],
     data() {
         return {
-            category: null,
-            rawCategory: null,
+            category: '',
+            rawCategory: '',
             questions: [],
             selectedQuestion: null,
             info: '',
@@ -153,17 +156,18 @@ export default {
         selectQuestion(q) {
             this.selectedQuestion = q;
         },
-        loadContent (e) {
+        async loadContent (e) {
             e.target.disabled = true;
             let questionType = $('#questionType').val();
-            axios
-                .get('/manageTest/load/' + questionType)
-                .then(response => {
-                    this.questions = response.data.questions;
-                    this.category = $('#questionType option:selected').text();
-                    this.rawCategory = $('#questionType').val();
-                    e.target.disabled = false;
-                });
+            const res = await this.executeGet('/manageTest/load/' + questionType);
+
+            if (res) {
+                this.questions = res.questions;
+                this.category = $('#questionType option:selected').text();
+                this.rawCategory = $('#questionType').val();
+            }
+
+            e.target.disabled = false;
         },
         resetInput() {
             $('#optionList').text('');

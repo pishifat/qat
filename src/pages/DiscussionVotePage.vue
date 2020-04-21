@@ -32,7 +32,6 @@
             </section>
         </div>
         <discussion-info
-            v-if="selectedDiscussion"
             :discussion="selectedDiscussion"
             :user-id="userId"
             :user-modes="userModes"
@@ -51,6 +50,7 @@ import SubmitDiscussion from '../components/discussion/SubmitDiscussion.vue';
 import FilterBox from '../components/FilterBox.vue';
 import pagination from '../mixins/pagination.js';
 import filters from '../mixins/filters.js';
+import postData from '../mixins/postData.js';
 
 export default {
     name: 'DiscussionVotePage',
@@ -60,7 +60,7 @@ export default {
         SubmitDiscussion,
         FilterBox,
     },
-    mixins: [pagination, filters],
+    mixins: [pagination, filters, postData],
     data() {
         return {
             allObjs: null,
@@ -73,44 +73,45 @@ export default {
             selectedDiscussion: null,
         };
     },
-    created() {
-        axios
-            .get('/discussionVote/relevantInfo')
-            .then(response => {
-                this.allObjs = response.data.discussions;
-                this.userId = response.data.userId;
-                this.userModes = response.data.userModes;
-                this.isPishifat = response.data.isPishifat;
-                this.isNat = response.data.isNat;
-                this.limit = 24;
-                const params = new URLSearchParams(document.location.search.substring(1));
+    async created() {
+        const res = await this.executeGet('/discussionVote/relevantInfo');
 
-                if (params.get('id') && params.get('id').length) {
-                    const i = this.allObjs.findIndex(a => a.id == params.get('id'));
+        if (res) {
+            this.allObjs = res.discussions;
+            this.userId = res.userId;
+            this.userModes = res.userModes;
+            this.isPishifat = res.isPishifat;
+            this.isNat = res.isNat;
+            this.limit = 24;
+            const params = new URLSearchParams(document.location.search.substring(1));
 
-                    if (i >= 0) {
-                        this.selectedDiscussion = this.allObjs[i];
-                        $('#extendedInfo').modal('show');
-                    }
+            if (params.get('id') && params.get('id').length) {
+                const i = this.allObjs.findIndex(a => a.id == params.get('id'));
+
+                if (i >= 0) {
+                    this.selectedDiscussion = this.allObjs[i];
+                    $('#extendedInfo').modal('show');
                 }
-            })
-            .then(function() {
-                $('#loading').fadeOut();
-                $('#main')
-                    .attr('style', 'visibility: visible')
-                    .hide()
-                    .fadeIn();
-            });
+            }
+        }
+
+        $('#loading').fadeOut();
+        $('#main')
+            .attr('style', 'visibility: visible')
+            .hide()
+            .fadeIn();
     },
     mounted() {
-        setInterval(() => {
-            axios.get('/discussionVote/relevantInfo').then(response => {
-                this.allObjs = response.data.discussions;
+        setInterval(async () => {
+            const res = await this.executeGet('/discussionVote/relevantInfo');
+
+            if (res) {
+                this.allObjs = res.discussions;
 
                 if (this.isFiltered) {
                     this.filter();
                 }
-            });
+            }
         }, 300000);
     },
     methods: {

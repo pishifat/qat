@@ -109,11 +109,11 @@ export default {
     },
     methods: {
         async loadUserNotes() {
-            axios
-                .get('/users/loadUserNotes/' + this.userId)
-                .then(response => {
-                    this.notes = response.data;
-                });
+            const notes = await this.executeGet('/users/loadUserNotes/' + this.userId);
+
+            if (notes) {
+                this.notes = notes;
+            }
         },
         async saveNote(e) {
             if (this.comment.length) {

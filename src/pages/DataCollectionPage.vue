@@ -188,18 +188,18 @@ export default {
             this.filter();
         },
     },
-    created() {
-        axios
-            .get('/dataCollection/relevantInfo')
-            .then(response => {
-                this.allObjs = response.data.events;
-                this.filterMode = response.data.mode;
-                this.hasPagination = false;
-                this.hasSeparation = true;
-            }).then(function() {
-                $('#loading').fadeOut();
-                $('#main').attr('style', 'visibility: visible').hide().fadeIn();
-            });
+    async created() {
+        const res = await this.executeGet('/dataCollection/relevantInfo');
+
+        if (res) {
+            this.allObjs = res.events;
+            this.filterMode = res.mode;
+            this.hasPagination = false;
+            this.hasSeparation = true;
+        }
+
+        $('#loading').fadeOut();
+        $('#main').attr('style', 'visibility: visible').hide().fadeIn();
     },
     methods: {
         filterBySearchValueContext(o) {

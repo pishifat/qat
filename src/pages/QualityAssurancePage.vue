@@ -103,6 +103,7 @@
 
 <script>
 import filters from '../mixins/filters.js';
+import postData from '../mixins/postData.js';
 import FilterBox from '../components/FilterBox.vue';
 import EventRow from '../components/qualityAssurance/EventRow.vue';
 
@@ -112,7 +113,7 @@ export default {
         FilterBox,
         EventRow,
     },
-    mixins: [filters],
+    mixins: [filters, postData],
     data() {
         return {
             allObjs: null,
@@ -134,38 +135,40 @@ export default {
             return date;
         },
     },
-    created() {
-        axios
-            .get('/qualityAssurance/relevantInfo')
-            .then(response => {
-                this.allObjs = response.data.maps;
-                this.overwriteEvents = response.data.overwrite;
-                this.userId = response.data.userId;
-                this.userOsuId = response.data.userOsuId;
-                this.username = response.data.username;
-                this.isNat = response.data.isNat;
-                this.filterMode = response.data.mode;
-                this.hasPagination = false;
-                this.filter();
-            })
-            .then(function() {
-                $('#loading').fadeOut();
-                $('#main')
-                    .attr('style', 'visibility: visible')
-                    .hide()
-                    .fadeIn();
-            });
+    async created() {
+        const res = await this.executeGet('/qualityAssurance/relevantInfo');
+
+        if (res) {
+            this.allObjs = res.maps;
+            this.overwriteEvents = res.overwrite;
+            this.userId = res.userId;
+            this.userOsuId = res.userOsuId;
+            this.username = res.username;
+            this.isNat = res.isNat;
+            this.filterMode = res.mode;
+            this.hasPagination = false;
+            this.filter();
+        }
+
+        $('#loading').fadeOut();
+        $('#main')
+            .attr('style', 'visibility: visible')
+            .hide()
+            .fadeIn();
+
     },
     mounted() {
-        setInterval(() => {
-            axios.get('/qualityAssurance/relevantInfo').then(response => {
-                this.allObjs = response.data.maps;
-                this.overwriteEvents = response.data.overwrite;
+        setInterval(async () => {
+            const res = await this.executeGet('/qualityAssurance/relevantInfo');
+
+            if (res) {
+                this.allObjs = res.maps;
+                this.overwriteEvents = res.overwrite;
 
                 if (this.isFiltered) {
                     this.filter();
                 }
-            });
+            }
         }, 300000);
     },
     methods: {
@@ -203,14 +206,14 @@ export default {
             this.allObjs[i] = event;
             this.filter();
         },
-        loadMore() {
-            axios
-                .get('/qualityAssurance/loadMore/' + this.limit + '/' + (this.limit - 50))
-                .then(response => {
-                    this.allObjs = this.allObjs.concat(response.data.maps);
-                    this.limit += 50;
-                    this.filter();
-                });
+        async loadMore() {
+            const res = await this.executeGet('/qualityAssurance/loadMore/' + this.limit + '/' + (this.limit - 50));
+
+            if (res) {
+                this.allObjs = this.allObjs.concat(res.maps);
+                this.limit += 50;
+                this.filter();
+            }
         },
     },
 };
