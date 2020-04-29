@@ -74,7 +74,7 @@ router.get(
                     Logger.generate(u._id, `Username changed from "${u.username}" to "${req.session.username}"`);
                 }
 
-                if (u.isSpectator != req.session.isSpectator) {
+                if (u.isSpectator != req.session.isSpectator && u.isSpectator !== null) {
                     await User.findByIdAndUpdate(u._id, { isSpectator: req.session.isSpectator });
                     Logger.generate(u._id, `User toggled spectator role`);
                 }
