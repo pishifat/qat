@@ -45,6 +45,17 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
 
         res.json({});
 
+        let fields = [{
+            name: 'Report reason',
+            value: req.body.reason.length > 975 ? req.body.reason.slice(0,975) + '... *(truncated)*' : req.body.reason,
+        }];
+
+        if (req.body.link && req.body.link.length) {
+            fields.push({
+                name: 'Relevant link',
+                value: req.body.link,
+            });
+        }
 
         api.webhookPost([{
             thumbnail: {
@@ -52,12 +63,7 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
             },
             color: api.webhookColors.darkRed,
             description: `[User report](http://bn.mappersguild.com/managereports?report=${r.id}) for **${u.username}**`,
-            fields: [
-                {
-                    name: 'Report reason',
-                    value: req.body.reason.length > 975 ? req.body.reason.slice(0,975) + '... *(truncated)*' : req.body.reason,
-                },
-            ],
+            fields,
         }]);
         Logger.generate(
             null,

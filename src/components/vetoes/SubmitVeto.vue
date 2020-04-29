@@ -99,7 +99,7 @@
                                 v-model="discussionLink"
                                 type="text"
                                 class="form-control"
-                                placeholder="beatmap link..."
+                                placeholder="veto discussion post link..."
                             >
                         </div>
                         <div class="row mb-2">
@@ -141,6 +141,8 @@ export default {
     },
     methods: {
         async submitVeto (e) {
+            this.info = '';
+
             if (!this.discussionLink || !this.shortReason || !this.mode) {
                 this.info = 'Cannot leave fields blank!';
             } else {
@@ -153,6 +155,8 @@ export default {
                     },
                     e
                 );
+
+                console.log(veto);
 
                 if (veto) {
                     if (veto.error) {

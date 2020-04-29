@@ -59,8 +59,13 @@ router.post('/submit', api.isNotSpectator, async (req, res) => {
         url = undefined;
     }
 
-    const validUrl = helpers.isValidUrl(url, 'osu.ppy.sh/beatmapsets');
-    if (validUrl.error) return res.json(validUrl.error);
+    const containChecks = ['osu.ppy.sh/beatmapsets', 'discussion'];
+
+    for (let i = 0; i < containChecks.length; i++) {
+        const contain = containChecks[i];
+        const validUrl = helpers.isValidUrl(url, contain);
+        if (validUrl.error) return res.json({ error: validUrl.error });
+    }
 
     let indexStart = url.indexOf('beatmapsets/') + 'beatmapsets/'.length;
     let indexEnd = url.indexOf('#');
