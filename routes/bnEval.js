@@ -742,9 +742,10 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
         }
     });
 
-    // find user's disqualified/popped nominations
+    // find user's disqualified/popped nominations & disqualified qa checks
     let nomsDqd = [];
     let nomsPopped = [];
+    let disqualifiedQualityAssuranceChecks = [];
 
     for (let i = 0; i < allEvents.length; i++) {
         const eventType = allEvents[i]._id;
@@ -754,6 +755,7 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
             for (let j = 0; j < events.length; j++) {
                 let event = events[j];
 
+                // check if user's nomination was disqualified
                 if (uniqueNominations.find(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
                     let a = await Aiess
                         .find({
@@ -764,8 +766,23 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
                         .sort({ timestamp: -1 })
                         .limit(3);
 
+                    // check if user was the nominator
                     if (a[1].userId == parseInt(req.params.id) || a[2].userId == parseInt(req.params.id)) {
                         nomsDqd.push(event);
+                    }
+                // check if user's quality assurance check was later disqualified
+                } else if (qualityAssuranceChecks.find(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
+                    let a = await Aiess
+                        .findOne({
+                            beatmapsetId: event.beatmapsetId,
+                            timestamp: { $lte: event.timestamp },
+                            eventType: 'Qualified',
+                        })
+                        .sort({ timestamp: -1 });
+
+                    // check if qa check for previous qualification was done by user and they did not dq it
+                    if (a.qualityAssuranceCheckers.includes(req.params.mongoId) && event.userId != parseInt(req.params.id)) {
+                        disqualifiedQualityAssuranceChecks.push(event);
                     }
                 }
             }
@@ -773,6 +790,7 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
             for (let j = 0; j < events.length; j++) {
                 let event = events[j];
 
+                // check if user's bubble was popped
                 if (uniqueNominations.find(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
                     let a = await Aiess
                         .find({
@@ -842,7 +860,7 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
         });
     }
 
-    res.json({ noms: uniqueNominations, nomsDqd, nomsPopped, dqs, pops, qualityAssuranceChecks, assignedApplications, natApplications, natEvalRounds });
+    res.json({ noms: uniqueNominations, nomsDqd, nomsPopped, dqs, pops, qualityAssuranceChecks, disqualifiedQualityAssuranceChecks, assignedApplications, natApplications, natEvalRounds });
 });
 
 module.exports = router;

@@ -78,14 +78,27 @@ router.get('/loadMore/:limit/:skip', async (req, res) => {
 
 /* POST assign user */
 router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
-    let e = await Aiess.findById(req.params.id).populate(defaultPopulate);
+    const event = await Aiess.findById(req.params.id).populate(defaultPopulate);
+    const bubble =
+        await Aiess
+            .findOne({
+                beatmapsetId: event.beatmapsetId,
+                eventType: 'Bubbled',
+            })
+            .sort({ timestamp: -1 });
+
+    if (event.userId == req.session.osuId || bubble.userId == req.session.osuId) {
+        return res.json({ error: 'Cannot check your nominations!' });
+    }
+
+    // find event, previous bubble, and any previous qualifications. if bubble comes before any previous qualifications, pass. if not, fail.
 
     let validMode;
 
     for (let i = 0; i < res.locals.userRequest.modes.length; i++) {
         const mode = res.locals.userRequest.modes[i];
 
-        if (e.modes.includes(mode)) {
+        if (event.modes.includes(mode)) {
             validMode = true;
             break;
         }
@@ -100,7 +113,7 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
     for (let i = 0; i < res.locals.userRequest.probation.length; i++) {
         const mode = res.locals.userRequest.probation[i];
 
-        if (e.modes.includes(mode)) {
+        if (event.modes.includes(mode)) {
             probation = true;
             break;
         }
@@ -110,15 +123,15 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
         return res.json({ error: 'Probation cannot do this!' });
     }
 
-    e = await Aiess
+    const newEvent = await Aiess
         .findByIdAndUpdate(req.params.id, { $push: { qualityAssuranceCheckers: req.session.mongoId } })
         .populate(defaultPopulate);
 
-    res.json(e);
+    res.json(newEvent);
 
     Logger.generate(
         req.session.mongoId,
-        `Added ${req.session.username} as QA checker for s/${e.beatmapsetId}`
+        `Added ${req.session.username} as QA checker for s/${newEvent.beatmapsetId}`
     );
 });
 

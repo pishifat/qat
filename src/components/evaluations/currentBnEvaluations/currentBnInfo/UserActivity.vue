@@ -55,6 +55,16 @@
             :loading="loading"
             :is-nat="isNat"
         />
+        <nomination-resets
+            :events="disqualifiedQualityAssuranceChecks"
+            :events-id="'disqualifiedQualityAssuranceChecks' + mode"
+            :header="'Disqualified Quality Assurance Checks'"
+            :loading="loading"
+            :is-nat="isNat"
+            @update-content="updateContent($event)"
+            @update-obviousness="updateObviousness($event)"
+            @update-severity="updateSeverity($event)"
+        />
         <evaluation-list
             v-if="isNat && assignedApplications && assignedApplications.length"
             :events="assignedApplications"
@@ -128,6 +138,7 @@ export default {
             nominationsPopped: null,
             nominationsDisqualified: null,
             qualityAssuranceChecks: null,
+            disqualifiedQualityAssuranceChecks: null,
             assignedApplications: null,
             natApplications: null,
             natEvalRounds: null,
@@ -154,6 +165,7 @@ export default {
                 this.disqualifications = res.dqs;
                 this.pops = res.pops;
                 this.qualityAssuranceChecks = res.qualityAssuranceChecks;
+                this.disqualifiedQualityAssuranceChecks = res.disqualifiedQualityAssuranceChecks;
                 this.assignedApplications = res.assignedApplications;
                 this.natApplications = res.natApplications;
                 this.natEvalRounds = res.natEvalRounds;

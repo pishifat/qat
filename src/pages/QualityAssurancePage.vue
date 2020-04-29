@@ -169,7 +169,7 @@ export default {
                     this.filter();
                 }
             }
-        }, 300000);
+        }, 600000);
     },
     methods: {
         filterBySearchValueContext(v) {
