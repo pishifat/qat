@@ -75,7 +75,7 @@
             </div>
         </section>
 
-        <section class="segment segment-image mx-0 px-0">
+        <section v-if="allObjs" class="segment segment-image mx-0 px-0">
             <div class="col-sm-12">
                 <transition-group name="list" tag="div">
                     <event-row
@@ -88,7 +88,7 @@
                         :username="username"
                         :is-outdated="isOutdated(event.beatmapsetId, event.timestamp)"
                         :is-max-checks="event.qualityAssuranceCheckers.length > event.modes.length * 2 - 1"
-                        @update-event="updateEvent($event)"
+                        @update-quality-assurance-checkers="updateQualityAssuranceCheckers($event)"
                     />
                 </transition-group>
             </div>
@@ -106,6 +106,7 @@ import filters from '../mixins/filters.js';
 import postData from '../mixins/postData.js';
 import FilterBox from '../components/FilterBox.vue';
 import EventRow from '../components/qualityAssurance/EventRow.vue';
+import Vue from 'vue';
 
 export default {
     name: 'QualityAssurancePage',
@@ -201,9 +202,9 @@ export default {
                 return isOutdated;
             }
         },
-        updateEvent(event) {
+        updateQualityAssuranceCheckers(event) {
             const i = this.allObjs.findIndex(e => e.id == event.id);
-            this.allObjs[i] = event;
+            if (i >= 0) Vue.set(this.allObjs[i], 'qualityAssuranceCheckers', event.value);
             this.filter();
         },
         async loadMore() {

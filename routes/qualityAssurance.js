@@ -127,7 +127,7 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
         .findByIdAndUpdate(req.params.id, { $push: { qualityAssuranceCheckers: req.session.mongoId } })
         .populate(defaultPopulate);
 
-    res.json(newEvent);
+    res.json(newEvent.qualityAssuranceCheckers);
 
     Logger.generate(
         req.session.mongoId,
@@ -137,15 +137,15 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
 
 /* POST unassign user */
 router.post('/unassignUser/:id', api.isBnOrNat, async (req, res) => {
-    let e = await Aiess
+    let event = await Aiess
         .findByIdAndUpdate(req.params.id, { $pull: { qualityAssuranceCheckers: req.session.mongoId } })
         .populate(defaultPopulate);
 
-    res.json(e);
+    res.json(event.qualityAssuranceCheckers);
 
     Logger.generate(
         req.session.mongoId,
-        `Removed ${req.session.username} from QA checker for s/${e.beatmapsetId}`
+        `Removed ${req.session.username} from QA checker for s/${event.beatmapsetId}`
     );
 });
 

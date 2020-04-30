@@ -22,6 +22,7 @@ const aiessSchema = new mongoose.Schema({
     effortBonus: { type: Number }, //multiplier combining drain per diff, # diffs, and difficulty of each diff
     responsibleNominators: [{ type: Number }],
     qualityAssuranceCheckers: [{ type: 'ObjectId', ref: 'User' }],
+    qualityAssuranceComments: [{ type: 'ObjectId', ref: 'Mediation' }],
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 class AiessService

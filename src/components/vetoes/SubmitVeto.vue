@@ -156,8 +156,6 @@ export default {
                     e
                 );
 
-                console.log(veto);
-
                 if (veto) {
                     if (veto.error) {
                         this.info = veto.error;
