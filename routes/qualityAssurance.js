@@ -2,6 +2,7 @@ const express = require('express');
 const api = require('../helpers/api');
 const Aiess = require('../models/aiess');
 const Logger = require('../models/log');
+const Mediation = require('../models/mediation');
 
 const router = express.Router();
 
@@ -21,6 +22,13 @@ router.get('/', (req, res) => {
 
 const defaultPopulate = [
     { path: 'qualityAssuranceCheckers', select: 'username osuId' },
+    {
+        path: 'qualityAssuranceComments',
+        populate: {
+            path: 'mediator',
+            select: 'username osuId id',
+        },
+    },
 ];
 
 /* GET applicant listing. */
@@ -88,7 +96,7 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
             .sort({ timestamp: -1 });
 
     if (event.userId == req.session.osuId || bubble.userId == req.session.osuId) {
-        return res.json({ error: 'Cannot check your nominations!' });
+        return res.json({ error: 'You cannot check your nominations!' });
     }
 
     // find event, previous bubble, and any previous qualifications. if bubble comes before any previous qualifications, pass. if not, fail.
@@ -105,7 +113,7 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
     }
 
     if (!validMode) {
-        return res.json({ error: 'Not qualified for this mode!' });
+        return res.json({ error: 'You are not qualified for this game mode!' });
     }
 
     let probation;
@@ -120,7 +128,7 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
     }
 
     if (probation) {
-        return res.json({ error: 'Probation cannot do this!' });
+        return res.json({ error: 'Probation users cannot do this!' });
     }
 
     const newEvent = await Aiess
@@ -147,6 +155,26 @@ router.post('/unassignUser/:id', api.isBnOrNat, async (req, res) => {
         req.session.mongoId,
         `Removed ${req.session.username} from QA checker for s/${event.beatmapsetId}`
     );
+});
+
+/* POST unassign user */
+router.post('/editComment/:id', api.isBnOrNat, async (req, res) => {
+    let mediation;
+
+    if (req.body.mediationId) {
+        mediation = await Mediation.findById(req.body.mediationId);
+    } else {
+        mediation = await Mediation.create({ mediator: req.session.mongoId });
+        await Aiess.findByIdAndUpdate(req.params.id, { $push: { qualityAssuranceComments: mediation } });
+    }
+
+    await Mediation.findByIdAndUpdate(mediation._id, { comment: req.body.comment });
+
+    let event = await Aiess
+        .findById(req.params.id)
+        .populate(defaultPopulate);
+
+    res.json(event.qualityAssuranceComments);
 });
 
 module.exports = router;

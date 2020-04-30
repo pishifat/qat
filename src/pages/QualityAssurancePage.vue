@@ -12,17 +12,17 @@
         </div>
 
         <section class="segment mx-4 my-1">
-            <a data-toggle="collapse" href="#howToUse">Quality Assurance Helpers handbook (aka: how do I use this page?) <i class="fas fa-angle-down" /></a>
+            <a data-toggle="collapse" href="#howToUse">Quality Assurance handbook (aka: how do I use this page?) <i class="fas fa-angle-down" /></a>
             <div id="howToUse" class="collapse mt-4 mx-4">
                 <div class="container">
                     <p class="min-spacing">
-                        What is the "Quality Assurance Helpers"?
+                        What is this page for?
                     </p>
                     <p class="small ml-4">
-                        The Quality Assurance Helpers (QAH) is a the final system in place to ensure beatmaps with unrankable issues do not reach the ranked section.
+                        The "Quality Assurance" system is designed to ensure beatmaps with unrankable issues do not reach the ranked section.
                     </p>
                     <p class="small ml-4">
-                        The system involves full BN and NAT members reviewing qualified maps for large potential issues, usually not involving extensive modding as would be done while the beatmap is pending. Like nomination-related activities, checking beatmaps through the QAH system counts towards a BN's overall activity.
+                        This involves full BN and NAT members reviewing qualified maps for large potential issues, usually not involving extensive modding as would be done while the beatmap is pending. Like nomination-related activities, checking beatmaps through the QAH system counts towards a BN's overall activity.
                     </p>
                     <p class="min-spacing">
                         How do I participate?
@@ -34,13 +34,16 @@
                         >
                             <i class="fas fa-plus vote-pass" />
                         </button>
-                        button should be used when you've checked a beatmap and are 100% there are no unrankable issues. The
+                        button should be used when you've checked a beatmap, including when you post issues on the map discussion page! The
                         <button
                             class="btn btn-xs btn-nat-red p-1"
                         >
                             <i class="fas fa-minus vote-fail" />
                         </button>
                         button can be used if you accidentally mark the wrong beatmap.
+                    </p>
+                    <p class="small ml-4">
+                        You can also leave comments under any beatmap by clicking the <a href="#" @click.prevent><i class="fas fa-edit" /></a> button. If you post on a map's discussion, write what problems you found. While a map is still available to be checked, comments will be displayed anonymously.
                     </p>
                     <p class="min-spacing">
                         What are the rules for adding myself to a card?
@@ -50,6 +53,9 @@
                     </p>
                     <p class="small ml-4">
                         You should only mark yourself as a QA checker on beatmaps in modes you are qualified for. For example, if you're not an osu!taiko BN, don't mark yourself on any osu!taiko beatmaps.
+                    </p>
+                    <p class="small ml-4">
+                        You should mark yourself as a QA checker regardless of whether or not you post issues on the beatmap's thread.
                     </p>
                     <p class="min-spacing">
                         What else is there to know?
@@ -89,6 +95,7 @@
                         :is-outdated="isOutdated(event.beatmapsetId, event.timestamp)"
                         :is-max-checks="event.qualityAssuranceCheckers.length > event.modes.length * 2 - 1"
                         @update-quality-assurance-checkers="updateQualityAssuranceCheckers($event)"
+                        @update-quality-assurance-comments="updateQualityAssuranceComments($event)"
                     />
                 </transition-group>
             </div>
@@ -205,6 +212,11 @@ export default {
         updateQualityAssuranceCheckers(event) {
             const i = this.allObjs.findIndex(e => e.id == event.id);
             if (i >= 0) Vue.set(this.allObjs[i], 'qualityAssuranceCheckers', event.value);
+            this.filter();
+        },
+        updateQualityAssuranceComments(event) {
+            const i = this.allObjs.findIndex(e => e.id == event.id);
+            if (i >= 0) Vue.set(this.allObjs[i], 'qualityAssuranceComments', event.value);
             this.filter();
         },
         async loadMore() {

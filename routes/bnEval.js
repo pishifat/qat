@@ -677,13 +677,14 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
         return res.json({ error: 'Something went wrong!' });
     }
 
+    const userOsuId = parseInt(req.params.id);
     let deadline = parseInt(req.params.deadline);
     let minDate = new Date(deadline);
     minDate.setDate(minDate.getDate() - 90);
     let maxDate = new Date(deadline);
     const [user, allUserEvents, allEvents, qualityAssuranceChecks, assignedApplications] = await Promise.all([
         User.findById(req.params.mongoId),
-        Aiess.getByEventTypeAndUser(parseInt(req.params.id), minDate, maxDate, req.params.mode),
+        Aiess.getByEventTypeAndUser(userOsuId, minDate, maxDate, req.params.mode),
         Aiess.getAllByEventType(minDate, maxDate, req.params.mode),
         Aiess.find({
             qualityAssuranceCheckers: req.params.mongoId,
@@ -767,7 +768,7 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
                         .limit(3);
 
                     // check if user was the nominator
-                    if (a[1].userId == parseInt(req.params.id) || a[2].userId == parseInt(req.params.id)) {
+                    if (a[1].userId == userOsuId || a[2].userId == userOsuId) {
                         nomsDqd.push(event);
                     }
                 // check if user's quality assurance check was later disqualified
@@ -778,10 +779,27 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
                             timestamp: { $lte: event.timestamp },
                             eventType: 'Qualified',
                         })
+                        .populate([{
+                            path: 'qualityAssuranceComments',
+                            populate: {
+                                path: 'mediator',
+                                select: 'username osuId id',
+                            },
+                        }])
                         .sort({ timestamp: -1 });
 
                     // check if qa check for previous qualification was done by user and they did not dq it
-                    if (a.qualityAssuranceCheckers.includes(req.params.mongoId) && event.userId != parseInt(req.params.id)) {
+                    if (a.qualityAssuranceCheckers.includes(req.params.mongoId) && event.userId != userOsuId) {
+                        if (a.qualityAssuranceComments) {
+                            // add user's qa comment if it exists
+                            const qualityAssuranceComment = a.qualityAssuranceComments.find(m => m.mediator.osuId == userOsuId);
+
+                            if (qualityAssuranceComment) {
+                                // this isn't part of the model. i'm cheating. sue me
+                                event.userQualityAssuranceComment = qualityAssuranceComment.comment;
+                            }
+                        }
+
                         disqualifiedQualityAssuranceChecks.push(event);
                     }
                 }
@@ -801,7 +819,7 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
                         .sort({ timestamp: -1 })
                         .limit(2);
 
-                    if (a[1].userId == parseInt(req.params.id)) {
+                    if (a[1].userId == userOsuId) {
                         nomsPopped.push(event);
                     }
                 }

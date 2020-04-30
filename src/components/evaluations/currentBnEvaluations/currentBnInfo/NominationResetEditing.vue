@@ -11,6 +11,11 @@
                     </a>
                 </span>
                 <span v-html="filterLinks(event.content)" />
+
+                <div v-if="event.userQualityAssuranceComment" class="mt-2">
+                    <span class="font-weight-bold">QA comment:</span>
+                    <span v-html="filterLinks(event.userQualityAssuranceComment)" />
+                </div>
             </template>
             <template v-else>
                 <span>

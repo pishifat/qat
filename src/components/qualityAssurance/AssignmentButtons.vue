@@ -1,5 +1,8 @@
 <template>
     <div class="d-flex justify-content-end align-items-center pr-0">
+        <div v-if="info" class="small errors">
+            {{ info }}
+        </div>
         <button
             v-if="isQualityAssuranceChecker"
             data-toggle="tooltip"
@@ -22,11 +25,6 @@
         >
             <i class="fas fa-plus vote-pass" />
         </button>
-
-        <!-- this is temporary -->
-        <div v-if="info">
-            {{ info }}
-        </div>
     </div>
 </template>
 

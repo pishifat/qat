@@ -1,7 +1,7 @@
 <template>
     <div class="mt-2 ml-1">
-        <div class="medium-small col-sm-12">
-            <div class="truncate text-light">
+        <div class="col-sm-12">
+            <div class="medium-small truncate text-light">
                 {{ splitMetadata[0] }}
             </div>
         </div>

@@ -27,8 +27,8 @@ export default {
 
 <style>
     .beatmap-thumbnail {
-        width: 75px;
-        height: 56px;
+        width: 80px;
+        height: 60px;
         border-top-left-radius: 5px;
         box-shadow: 1px 1px 1px 1px rgb(12, 14, 17);
     }

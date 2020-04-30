@@ -1,11 +1,11 @@
 <template>
-    <div class="row">
+    <div class="row my-2">
         <div class="col-sm-12">
             <div
                 class="card static-card text-shadow"
                 :class="isMaxChecks || isOutdated || isQualityAssuranceChecker ? 'low-opacity' : ''"
             >
-                <div class="card-header row px-0 py-0">
+                <div class="row px-0 py-0">
                     <div class="col-sm-5 row">
                         <beatmap-thumbnail
                             class="col-lg-2 col-md-3 col-sm-4"
@@ -47,10 +47,15 @@
                         </div>
                     </div>
                 </div>
-                <notes
-                    class="row col-sm-12 small text-shadow my-2"
+                <comments
+                    class="row small text-shadow my-2"
                     :quality-assurance-comments="event.qualityAssuranceComments"
                     :user-id="userId"
+                    :event-id="event.id"
+                    :is-max-checks="isMaxChecks"
+                    :is-outdated="isOutdated"
+                    :is-nat="isNat"
+                    @update-quality-assurance-comments="$emit('update-quality-assurance-comments', $event)"
                 />
             </div>
         </div>
@@ -64,7 +69,7 @@ import BeatmapHost from './BeatmapHost.vue';
 import DueDate from './DueDate.vue';
 import QualityAssuranceCheckers from './QualityAssuranceCheckers.vue';
 import AssignmentButtons from './AssignmentButtons.vue';
-import Notes from './Notes.vue';
+import Comments from './Comments.vue';
 
 export default {
     name: 'EventRow',
@@ -75,7 +80,7 @@ export default {
         DueDate,
         QualityAssuranceCheckers,
         AssignmentButtons,
-        Notes,
+        Comments,
     },
     props: {
         event: {
