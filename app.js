@@ -34,7 +34,6 @@ const testSubmissionRouter = require('./routes/testSubmission');
 const manageTestRouter = require('./routes/manageTest');
 const testResultsRouter = require('./routes/testResults');
 const discussionVoteRouter = require('./routes/discussionVote');
-const bnScoreRouter = require('./routes/bnScore');
 const qualityAssuranceRouter = require('./routes/qualityAssurance');
 const logsRouter = require('./routes/logs');
 
@@ -85,7 +84,6 @@ app.use('/testSubmission', testSubmissionRouter);
 app.use('/managetest', manageTestRouter);
 app.use('/testresults', testResultsRouter);
 app.use('/discussionVote', discussionVoteRouter);
-app.use('/bnscore', bnScoreRouter);
 app.use('/qualityassurance', qualityAssuranceRouter);
 app.use('/logs', logsRouter);
 
