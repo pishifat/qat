@@ -155,19 +155,21 @@ export default {
             } else {
                 let score = 0;
                 score += this.nominations.length;
-                score += (this.qualityAssuranceChecks.length/4);
+                //score += (this.qualityAssuranceChecks.length/4);
 
                 this.nominationsDisqualified.forEach(dq => {
-                    if (dq.obviousness) score -= dq.obviousness;
-                    if (dq.severity) score -= dq.severity;
+                    let tempScore = 0;
+                    if (dq.obviousness) tempScore += dq.obviousness;
+                    if (dq.severity) tempScore += dq.severity;
+                    score -= Math.floor(tempScore*1.5);
                 });
 
-                this.disqualifiedQualityAssuranceChecks.forEach(dq => {
+                /*this.disqualifiedQualityAssuranceChecks.forEach(dq => {
                     let tempScore = -2;
                     if (dq.obviousness) tempScore += dq.obviousness;
                     if (dq.severity) tempScore += dq.severity;
                     if (tempScore > 0) score -= tempScore;
-                });
+                });*/
 
                 return score;
             }
