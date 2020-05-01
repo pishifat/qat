@@ -425,7 +425,7 @@ const notifyQualityAssurance = cron.schedule('0 22 * * *', async () => {
 /**
  * Checks for bns with less than 6 mods (4 for mania) the first day of every month
  */
-const lowActivityTask = cron.schedule('0 17 1 * *', async () => {
+const lowActivityTask = cron.schedule('0 23 1 * *', async () => {
     const lowActivityFields = [];
     const initialDate = new Date();
     initialDate.setMonth(initialDate.getMonth() - 2);
