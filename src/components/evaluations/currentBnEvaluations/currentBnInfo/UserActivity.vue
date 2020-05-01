@@ -92,6 +92,9 @@
             :is-application="false"
             :user-id="userMongoId"
         />
+        <p v-if="isNat" class="small">
+            bnscore: {{ bnScore }}
+        </p>
     </div>
 </template>
 
@@ -144,6 +147,31 @@ export default {
             natEvalRounds: null,
             loading: true,
         };
+    },
+    computed: {
+        bnScore() {
+            if (this.loading) {
+                return '...';
+            } else {
+                let score = 0;
+                score += this.nominations.length;
+                score += (this.qualityAssuranceChecks.length/4);
+
+                this.nominationsDisqualified.forEach(dq => {
+                    if (dq.obviousness) score -= dq.obviousness;
+                    if (dq.severity) score -= dq.severity;
+                });
+
+                this.disqualifiedQualityAssuranceChecks.forEach(dq => {
+                    let tempScore = -2;
+                    if (dq.obviousness) tempScore += dq.obviousness;
+                    if (dq.severity) tempScore += dq.severity;
+                    if (tempScore > 0) score -= tempScore;
+                });
+
+                return score;
+            }
+        },
     },
     watch: {
         osuId() {
