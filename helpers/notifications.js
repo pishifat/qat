@@ -428,7 +428,7 @@ const notifyQualityAssurance = cron.schedule('0 22 * * *', async () => {
 const lowActivityTask = cron.schedule('0 23 1 * *', async () => {
     const lowActivityFields = [];
     const initialDate = new Date();
-    initialDate.setMonth(initialDate.getMonth() - 2);
+    initialDate.setMonth(initialDate.getMonth() - 3);
     console.log('from', initialDate);
 
     const bns = await User.find({ group: 'bn' });
@@ -448,7 +448,7 @@ const lowActivityTask = cron.schedule('0 23 1 * *', async () => {
 
     if (!lowActivityFields.length) return;
 
-    let formatField = { name: 'username', value: 'nominations within 2 months' };
+    let formatField = { name: 'username', value: 'nominations within 3 months' };
     let osuFields = [];
     let taikoFields = [];
     let catchFields = [];
