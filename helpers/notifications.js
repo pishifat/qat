@@ -475,7 +475,8 @@ const lowActivityTask = cron.schedule('0 23 1 * *', async () => {
         }
     });
 
-    let modeFields = [osuFields, taikoFields, catchFields, maniaFields];
+    const modeFields = [osuFields, taikoFields, catchFields, maniaFields];
+    const modes = ['osu', 'taiko', 'catch', 'mania'];
 
     for (let i = 0; i < modeFields.length; i++) {
         const modeField = modeFields[i];
@@ -486,7 +487,7 @@ const lowActivityTask = cron.schedule('0 23 1 * *', async () => {
                 color: api.webhookColors.red,
                 fields: modeField,
             }],
-            modeField[0].mode
+            modes[i]
         );
         await helper.sleep(500);
     }
