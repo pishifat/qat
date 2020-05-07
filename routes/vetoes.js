@@ -129,7 +129,7 @@ router.post('/selectMediators', api.isNat, api.isNotSpectator, async (req, res) 
         ) {
             usernames.push(user);
 
-            if (usernames.length >= (req.body.mode == 'osu' || req.body.mode == 'all' ? 11 : 5)) {
+            if (usernames.length >= (req.body.mode == 'osu' || req.body.mode == 'all' ? 11 : 7)) {
                 break;
             }
         }
