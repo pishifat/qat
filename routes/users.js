@@ -274,7 +274,7 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
     let minDate = new Date();
     minDate.setDate(minDate.getDate() - parseInt(req.params.days));
     let maxDate = new Date();
-    const [users, allEvents, allActiveEvalRounds] = await Promise.all([
+    const [users, allEvents, allActiveEvalRounds, allQualityAssuranceChecks] = await Promise.all([
         User.find({
             group: 'bn',
             modes: req.params.mode,
@@ -282,12 +282,14 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
         }).sort({ username: 1 }),
         Aiess.getAllActivity(minDate, maxDate, req.params.mode),
         EvalRound.find({ active: true }),
+        Aiess.find({ qualityAssuranceCheckers: { $exists: true, $ne: [] }, timestamp: { $gt: minDate } }),
     ]);
 
     let info = [];
     users.forEach(user => {
         let uniqueNominations = [];
         let nominationResets = 0;
+        let qualityAssuranceChecks = 0;
 
         for (let i = 0; i < allEvents.length; i++) {
             const eventType = allEvents[i]._id;
@@ -314,6 +316,14 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
             }
         }
 
+        for (let i = 0; i < allQualityAssuranceChecks.length; i++) {
+            const event = allQualityAssuranceChecks[i];
+
+            if (event.qualityAssuranceCheckers.includes(user.id)) {
+                qualityAssuranceChecks++;
+            }
+        }
+
         let deadline;
 
         for (let i = 0; i < allActiveEvalRounds.length; i++) {
@@ -334,6 +344,7 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
             nominationResets,
             joinDate: user.bnDuration[user.bnDuration.length - 1],
             nextEvaluation: deadline,
+            qualityAssuranceChecks,
         });
     });
 
