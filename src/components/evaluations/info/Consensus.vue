@@ -42,6 +42,13 @@
                 Resign on good terms
             </button>
             <button
+                class="btn btn-xs btn-nat-red"
+                :disabled="consensus == 'fail' && resignedOnStandardTerms"
+                @click="setConsensus('fail', $event, 'resignedOnStandardTerms');"
+            >
+                Resign on standard terms
+            </button>
+            <button
                 class="btn btn-xs btn-nat-green"
                 :disabled="consensus == 'pass' && isLowActivity"
                 @click="setConsensus('pass', $event, 'isLowActivity');"
@@ -86,6 +93,7 @@ export default {
         isApplication: Boolean,
         isLowActivity: Boolean,
         resignedOnGoodTerms: Boolean,
+        resignedOnStandardTerms: Boolean,
         isMoveToNat: Boolean,
         isMoveToBn: Boolean,
         isArchive: Boolean,
@@ -108,8 +116,10 @@ export default {
                 } else {
                     return this.consensus;
                 }
-            } else if (this.consensus == 'fail' && this.resignedOnGoodTerms) {
+            } else if (this.resignedOnGoodTerms) {
                 return 'fail + resigned on good terms';
+            } else if (this.resignedOnStandardTerms) {
+                return 'fail + resigned on standard terms';
             } else {
                 return this.consensus;
             }
@@ -129,6 +139,7 @@ export default {
                     consensus,
                     isLowActivity: addition == 'isLowActivity',
                     resignedOnGoodTerms: addition == 'resignedOnGoodTerms',
+                    resignedOnStandardTerms: addition == 'resignedOnStandardTerms',
                     isMoveToNat: addition == 'isMoveToNat',
                     isMoveToBn: addition == 'isMoveToBn',
                 }, e);

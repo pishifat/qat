@@ -3,7 +3,7 @@
         <p class="text-shadow min-spacing mb-2">
             Application feedback:
         </p>
-        <div v-if="!resignedOnGoodTerms" class="form-group">
+        <div v-if="!resigned" class="form-group">
             <textarea v-model="feedback" class="form-control dark-textarea" style="white-space: pre-line;" />
         </div>
         <div v-if="isApplication && consensus == 'pass'" class="input-group mb-3">
@@ -38,6 +38,7 @@
             :evaluations="evaluations"
             :is-low-activity="isLowActivity"
             :resigned-on-good-terms="resignedOnGoodTerms"
+            :resigned-on-standard-terms="resignedOnStandardTerms"
         />
     </div>
 </template>
@@ -53,23 +54,61 @@ export default {
     },
     mixins: [ postData ],
     props: {
-        consensus: String,
         isApplication: Boolean,
-        osuId: Number,
-        cooldownDate: String,
-        mode: String,
-        evaluations: Array,
-        probation: Array,
         isLowActivity: Boolean,
         resignedOnGoodTerms: Boolean,
-        savedFeedback: String,
-        nominatorAssessmentMongoId: String,
+        resignedOnStandardTerms: Boolean,
+        consensus: {
+            type: String,
+            required: true,
+        },
+        osuId: {
+            type: Number,
+            required: true,
+        },
+        cooldownDate: {
+            type: String,
+            default: new Date().toString(),
+        },
+        mode: {
+            type: String,
+            required: true,
+        },
+        evaluations: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
+        probation: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
+        savedFeedback: {
+            type: String || null,
+            default: null,
+        },
+        nominatorAssessmentMongoId: {
+            type: String,
+            required: true,
+        },
     },
     data() {
         return {
             feedback: '',
             discordLink: '',
         };
+    },
+    computed: {
+        resigned() {
+            if (this.resignedOnGoodTerms || this.resignedOnStandardTerms) {
+                return true;
+            } else {
+                return false;
+            }
+        },
     },
     watch: {
         nominatorAssessmentMongoId() {

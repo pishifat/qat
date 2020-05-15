@@ -34,6 +34,7 @@
                             :is-application="false"
                             :is-low-activity="evalRound.isLowActivity"
                             :resigned-on-good-terms="evalRound.resignedOnGoodTerms"
+                            :resigned-on-standard-terms="evalRound.resignedOnStandardTerms"
                             :is-archive="true"
                             @update-nominator-assessment="$emit('update-eval-round', $event);"
                         />

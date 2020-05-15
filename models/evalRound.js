@@ -12,6 +12,7 @@ const evalRoundSchema = new mongoose.Schema({
     feedbackAuthor: { type: 'ObjectId', ref: 'User' },
     isLowActivity: { type: Boolean, default: false },
     resignedOnGoodTerms: { type: Boolean, default: false },
+    resignedOnStandardTerms: { type: Boolean, default: false },
     isMoveToNat: { type: Boolean, default: false },
     isMoveToBn: { type: Boolean, default: false },
     cooldownDate: { type: Date },

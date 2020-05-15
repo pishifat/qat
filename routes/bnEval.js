@@ -469,6 +469,7 @@ router.post('/setConsensus/:id', api.isNat, async (req, res) => {
         consensus: req.body.consensus,
         isLowActivity: req.body.isLowActivity ? true : false,
         resignedOnGoodTerms: req.body.resignedOnGoodTerms ? true : false,
+        resignedOnStandardTerms: req.body.resignedOnStandardTerms ? true : false,
         isMoveToNat: req.body.isMoveToNat ? true : false,
         isMoveToBn: req.body.isMoveToBn ? true : false,
     });
@@ -502,6 +503,8 @@ router.post('/setConsensus/:id', api.isNat, async (req, res) => {
 
         if (er.resignedOnGoodTerms) {
             consensusText += ' + Resigned on good terms';
+        } else if (er.resignedOnStandardTerms) {
+            consensusText += ' + Resigned on standard terms';
         }
     } else {
         consensusText = 'No consensus set';

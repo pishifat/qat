@@ -1,9 +1,12 @@
 <template>
     <div>
+        <!-- application -->
         <div v-if="isApplication" id="applicationForumPmBox" class="collapse">
             <div class="copy-paste">
                 <samp class="small">BN Application Results ({{ mode == 'osu' ? 'osu!' : 'osu!' + mode }})</samp>
             </div>
+
+            <!-- pass -->
             <div v-if="consensus == 'pass'" class="copy-paste">
                 <samp class="small">Hello!</samp><br><br>
                 <samp class="small">Following a positive evaluation of your BN application for the [i]{{ mode == 'osu' ? 'osu!' : 'osu!' + mode }}[/i] game mode, you've been invited to join the Beatmap Nominators. Congratulations!</samp><br><br>
@@ -18,6 +21,8 @@
                 <samp class="small">[url={{ discordLink || 'expired link' }}]Link to the BN Discord Server[/url]</samp><br><br>
                 <samp class="small">Regards, the Nomination Assessment Team</samp>
             </div>
+
+            <!-- fail -->
             <div v-else class="copy-paste">
                 <samp class="small">Hello!</samp><br><br>
                 <samp class="small">Following an evaluation of your BN application for the [i]{{ mode == 'osu' ? 'osu!' : 'osu!' + mode }}[/i] game mode, we've decided not to admit you into the Beatmap Nominators.</samp><br><br>
@@ -32,16 +37,22 @@
                 <samp class="small">Regards, the Nomination Assessment Team</samp>
             </div>
         </div>
+
+        <!-- current BN eval -->
         <div v-else id="currentBnForumPmBox" class="collapse">
             <div class="copy-paste">
                 <samp class="small">Current BN Evaluation Results ({{ mode == 'osu' ? 'osu!' : 'osu!' + mode }})</samp>
             </div>
+
+            <!-- pass -->
             <div v-if="consensus == 'pass'" class="copy-paste">
                 <samp class="small">Hello!</samp><br><br>
                 <span v-if="probation.indexOf(mode) >= 0">
                     <samp class="small">Following a positive evaluation of your work as a BN for the [i]{{ mode == 'osu' ? 'osu!' : 'osu!' + mode }}[/i] game mode, we've decided to conclude your probation period and promote you to a full Beatmap Nominator. Congratulations!</samp><br><br>
                     <samp class="small">You may now nominate maps that are nominated by other probation BNs, and you may disqualify maps when applicable.</samp><br><br>
                 </span>
+
+                <!-- low activity warning -->
                 <span v-else-if="isLowActivity">
                     <samp class="small">We've noticed that your nomination activity for the [i]{{ mode == 'osu' ? 'osu!' : 'osu!' + mode }}[/i] game mode is too low to effectively evaluate your work as a Beatmap Nominator. That said, we won't place you on probation, however we will follow up on your nomination activity one month from now in hopes that it improves. If it does not, you will likely be removed from the Beatmap Nominators for this game mode.</samp><br><br>
                 </span>
@@ -52,6 +63,8 @@
                 <samp><pre class="small">[notice]{{ feedback }}[/notice]</pre></samp>
                 <samp class="small">Regards, the Nomination Assessment Team</samp>
             </div>
+
+            <!-- probation -->
             <div v-else-if="consensus == 'probation'" class="copy-paste">
                 <samp class="small">Hello!</samp><br><br>
                 <span v-if="probation.indexOf(mode) >= 0">
@@ -69,15 +82,25 @@
                 <samp class="small">We hope to see you off of probation soon!</samp><br><br>
                 <samp class="small">Regards, the Nomination Assessment Team</samp>
             </div>
+
+            <!-- remove from BN -->
             <div v-else class="copy-paste">
                 <samp class="small">Hello!</samp><br><br>
-                <samp v-if="resignedOnGoodTerms" class="small">Following your BN resignation from the [i]{{ mode == 'osu' ? 'osu!' : 'osu!' + mode }}[/i] game mode, we conducted an evaluation and determined that you are still a capable Beatmap Nominator!</samp>
+
+                <!-- resign -->
+                <samp v-if="resigned" class="small">Following your BN resignation from the [i]{{ mode == 'osu' ? 'osu!' : 'osu!' + mode }}[/i] game mode, we conducted an evaluation and determined that
+                    <span v-if="resignedOnGoodTerms">you are still a capable Beatmap Nominator!</span>
+                    <span v-else>your resignation will be on standard terms.</span>
+                </samp>
+
+                <!-- fail -->
                 <samp v-else class="small">After reviewing your work as a BN for the [i]{{ mode == 'osu' ? 'osu!' : 'osu!' + mode }}[/i] game mode, we have decided to [b]remove you from the Beatmap Nominators[/b].</samp><br><br>
                 <samp class="small">We would like to thank you for your service to the mapping and modding communities and wish you the best of luck in your future endeavours. Should you wish to apply for the Beatmap Nominators again, you may do so on {{ defineDate() }}, provided you have
                     <span v-if="resignedOnGoodTerms">one month of modding activity (3-4 mods).</span>
+                    <span v-else-if="resignedOnStandardTerms">two months of modding activity (3-4 mods each month).</span>
                     <span v-else>two months of modding activity (3-4 mods each month) and have shown improvement in the areas mentioned.</span>
                 </samp><br><br>
-                <span v-if="!resignedOnGoodTerms">
+                <span v-if="!resigned">
                     <samp class="small">Additional feedback from the NAT:</samp><br><br>
                     <samp><pre class="small">[notice]{{ feedback }}[/notice]</pre></samp>
                     <samp class="small">For further feedback or to appeal this decision, contact any of these users:
@@ -97,6 +120,9 @@ export default {
     name: 'FeedbackPm',
     props: {
         isApplication: Boolean,
+        isLowActivity: Boolean,
+        resignedOnGoodTerms: Boolean,
+        resignedOnStandardTerms: Boolean,
         consensus: {
             type: String,
             required: true,
@@ -123,8 +149,6 @@ export default {
                 return [];
             },
         },
-        isLowActivity: Boolean,
-        resignedOnGoodTerms: Boolean,
         feedback: {
             type: String,
             default: '',
@@ -142,6 +166,13 @@ export default {
             });
 
             return e;
+        },
+        resigned() {
+            if (this.resignedOnGoodTerms || this.resignedOnStandardTerms) {
+                return true;
+            } else {
+                return false;
+            }
         },
     },
     methods: {
