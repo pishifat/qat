@@ -20,25 +20,25 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import postData from '../../../../mixins/postData.js';
 
 export default {
     name: 'ModdingActivity',
     mixins: [postData],
-    props: {
-        username: {
-            type: String,
-            default: null,
-        },
-    },
     data() {
         return {
             loadingModCount: false,
             modCount: null,
         };
     },
+    computed: {
+        ...mapGetters([
+            'selectedUser',
+        ]),
+    },
     watch: {
-        username() {
+        selectedUser() {
             this.loadingModCount = false;
             this.modCount = null;
         },
@@ -46,11 +46,15 @@ export default {
     methods: {
         async findModCount() {
             this.loadingModCount = true;
-            const res = await this.executeGet('/modsCount/' + this.username);
+            const res = await this.executeGet('/modsCount/' + this.selectedUser.username);
 
             if (res) {
                 this.loadingModCount = false;
                 this.modCount = res.modCount;
+                this.$store.dispatch('updateToastMessages', {
+                    message: `loaded modding activity`,
+                    type: 'info',
+                });
             }
         },
     },

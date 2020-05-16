@@ -5,7 +5,6 @@
             :events-id="'uniqueNominations' + mode"
             :header="'Unique nominations'"
             :loading="loading"
-            :is-nat="isNat"
             @update-editing="editing = !editing"
         />
         <nomination-resets
@@ -13,7 +12,6 @@
             :events-id="'nominationsDisqualified' + mode"
             :header="'Nominations disqualified'"
             :loading="loading"
-            :is-nat="isNat"
             @update-content="updateContent($event)"
             @update-obviousness="updateObviousness($event)"
             @update-severity="updateSeverity($event)"
@@ -23,7 +21,6 @@
             :events-id="'nominationsPopped' + mode"
             :header="'Nominations popped'"
             :loading="loading"
-            :is-nat="isNat"
             @update-content="updateContent($event)"
             @update-obviousness="updateObviousness($event)"
             @update-severity="updateSeverity($event)"
@@ -33,7 +30,6 @@
             :events-id="'disqualificationsByUser' + mode"
             :header="'Disqualifications done by user'"
             :loading="loading"
-            :is-nat="isNat"
             @update-content="updateContent($event)"
             @update-obviousness="updateObviousness($event)"
             @update-severity="updateSeverity($event)"
@@ -43,7 +39,6 @@
             :events-id="'popsByUser' + mode"
             :header="'Pops done by user'"
             :loading="loading"
-            :is-nat="isNat"
             @update-content="updateContent($event)"
             @update-obviousness="updateObviousness($event)"
             @update-severity="updateSeverity($event)"
@@ -53,14 +48,12 @@
             :events-id="'qualityAssuranceChecks' + mode"
             :header="'Quality Assurance Checks'"
             :loading="loading"
-            :is-nat="isNat"
         />
         <nomination-resets
             :events="disqualifiedQualityAssuranceChecks"
             :events-id="'disqualifiedQualityAssuranceChecks' + mode"
             :header="'Disqualified Quality Assurance Checks'"
             :loading="loading"
-            :is-nat="isNat"
             @update-content="updateContent($event)"
             @update-obviousness="updateObviousness($event)"
             @update-severity="updateSeverity($event)"
@@ -72,7 +65,6 @@
             :header="'Application Evaluations (BN)'"
             :loading="loading"
             :is-application="true"
-            :user-id="userMongoId"
         />
         <evaluation-list
             v-if="isNat && natApplications && natApplications.length"
@@ -81,7 +73,6 @@
             :header="'Application Evaluations (NAT)'"
             :loading="loading"
             :is-application="true"
-            :user-id="userMongoId"
         />
         <evaluation-list
             v-if="isNat && natEvalRounds && natEvalRounds.length"
@@ -90,18 +81,18 @@
             :header="'Current BN Evaluations (NAT)'"
             :loading="loading"
             :is-application="false"
-            :user-id="userMongoId"
         />
     </div>
 </template>
 
 <script>
+import Vue from 'vue';
+import { mapState, mapGetters } from 'vuex';
 import postData from '../../../../mixins/postData.js';
 import filterLinks from '../../../../mixins/filterLinks.js';
 import EventsList from './EventsList.vue';
 import NominationResets from './NominationResets.vue';
 import EvaluationList from './EvaluationList.vue';
-import Vue from 'vue';
 
 export default {
     name: 'UserActivity',
@@ -112,20 +103,11 @@ export default {
     },
     mixins: [ postData, filterLinks ],
     props: {
-        osuId: {
-            type: Number,
-            required: true,
-        },
         mode: {
             type: String,
             required: true,
         },
         deadline: {
-            type: String,
-            required: true,
-        },
-        isNat: Boolean,
-        userMongoId: {
             type: String,
             required: true,
         },
@@ -145,8 +127,16 @@ export default {
             loading: true,
         };
     },
+    computed: {
+        ...mapState([
+            'isNat',
+        ]),
+        ...mapGetters([
+            'selectedUser',
+        ]),
+    },
     watch: {
-        osuId() {
+        selectedUser() {
             this.loading = true;
             this.findRelevantActivity();
         },
@@ -156,7 +146,7 @@ export default {
     },
     methods: {
         async findRelevantActivity() {
-            const res = await this.executeGet('/bnEval/userActivity/' + this.osuId + '/' + this.mode + '/' + new Date(this.deadline).getTime() + '/' + this.userMongoId);
+            const res = await this.executeGet('/bnEval/userActivity/' + this.selectedUser.osuId + '/' + this.mode + '/' + new Date(this.deadline).getTime() + '/' + this.selectedUser.id);
 
             if (res) {
                 this.nominations = res.noms;

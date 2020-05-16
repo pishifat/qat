@@ -41,7 +41,7 @@
                     @click.prevent="hideNote(note.id);"
                 >&times;</a>
                 <a
-                    v-if="note.author.id == viewingUserId"
+                    v-if="note.author.id == userId"
                     href="#"
                     data-toggle="tooltip"
                     data-placement="top"
@@ -70,22 +70,13 @@
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex';
 import postData from '../../../mixins/postData.js';
 import filterLinks from '../../../mixins/filterLinks.js';
 
 export default {
     name: 'Notes',
     mixins: [postData, filterLinks],
-    props: {
-        userId: {
-            type: String,
-            required: true,
-        },
-        viewingUserId: {
-            type: String,
-            required: true,
-        },
-    },
     data() {
         return {
             notes: null,
@@ -95,8 +86,16 @@ export default {
             editNoteComment: '',
         };
     },
+    computed: {
+        ...mapState([
+            'userId',
+        ]),
+        ...mapGetters([
+            'selectedUser',
+        ]),
+    },
     watch: {
-        userId() {
+        selectedUser() {
             this.notes = null;
             this.comment = '';
             this.info = '';
@@ -109,7 +108,7 @@ export default {
     },
     methods: {
         async loadUserNotes() {
-            const notes = await this.executeGet('/users/loadUserNotes/' + this.userId);
+            const notes = await this.executeGet('/users/loadUserNotes/' + this.selectedUser.id);
 
             if (notes) {
                 this.notes = notes;
@@ -117,7 +116,7 @@ export default {
         },
         async saveNote(e) {
             if (this.comment.length) {
-                const n = await this.executePost('/users/saveNote/' + this.userId, { comment: this.comment }, e);
+                const n = await this.executePost('/users/saveNote/' + this.selectedUser.id, { comment: this.comment }, e);
 
                 if (n) {
                     if (n.error) {
@@ -125,6 +124,10 @@ export default {
                     } else {
                         if (this.notes) {
                             this.notes.unshift(n);
+                            this.$store.dispatch('updateToastMessages', {
+                                message: `added note`,
+                                type: 'info',
+                            });
                         }
                     }
                 }
@@ -142,6 +145,10 @@ export default {
                             const i = this.notes.findIndex(note => note.id == this.editNoteId);
                             this.notes[i] = n;
                             this.editNoteId = '';
+                            this.$store.dispatch('updateToastMessages', {
+                                message: `edited note`,
+                                type: 'info',
+                            });
                         }
                     }
                 }
@@ -151,11 +158,15 @@ export default {
             const result = confirm(`Are you sure?`);
 
             if (result) {
-                await this.executePost('/users/hideNote/' + noteId, { userId: this.userId });
+                await this.executePost('/users/hideNote/' + noteId, { userId: this.selectedUser.id });
 
                 if (this.notes) {
                     const i = this.notes.findIndex(note => note.id == noteId);
                     this.notes.splice(i, 1);
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `removed note`,
+                        type: 'info',
+                    });
                 }
             }
         },

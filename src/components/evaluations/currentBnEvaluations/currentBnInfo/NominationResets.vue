@@ -29,7 +29,6 @@
                         </td>
                         <nomination-reset-editing
                             :event="event"
-                            :is-nat="isNat"
                             @update-content="$emit('update-content', $event);"
                             @update-obviousness="$emit('update-obviousness', $event);"
                             @update-severity="$emit('update-severity', $event);"
@@ -53,11 +52,21 @@ export default {
         NominationResetEditing,
     },
     props: {
-        events: Array,
-        eventsId: String,
-        header: String,
+        events: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
+        eventsId: {
+            type: String,
+            required: true,
+        },
+        header: {
+            type: String,
+            required: true,
+        },
         loading: Boolean,
-        isNat: Boolean,
     },
 };
 </script>
