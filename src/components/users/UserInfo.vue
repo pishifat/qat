@@ -1,37 +1,54 @@
 <template>
     <div id="extendedInfo" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-lg">
-            <div v-if="selectedUser" class="modal-content">
-                <modal-header />
+            <div v-if="user" class="modal-content">
+                <modal-header
+                    :osu-id="user.osuId"
+                    :username="user.username"
+                    :modes="user.modes"
+                    :group="user.group"
+                    :probation="user.probation"
+                />
                 <div class="modal-body">
                     <div class="container">
-                        <duration />
-                        <next-evaluation />
+                        <duration
+                            :bn-duration="user.bnDuration"
+                            :nat-duration="user.natDuration"
+                        />
+                        <next-evaluation
+                            :user-id="user.id"
+                        />
                         <hr>
-                        <div v-for="mode in selectedUser.modes" :key="mode">
-                            <p class="text-shadow min-spacing mb-1">
-                                Recent BN activity
+                        <span v-for="(mode, i) in user.modes" :key="mode">
+                            <p class="text-shadow min-spacing mb-1">Recent BN activity
                                 <span class="small">({{ mode == 'osu' ? 'osu!' : 'osu!' + mode }})</span>
                             </p>
                             <div class="container mb-3">
                                 <user-activity
-                                    :mode="mode"
+                                    :osu-id="user.osuId"
+                                    :mode="user.modes[i]"
                                     :deadline="new Date().toString()"
+                                    :is-nat="isNat"
+                                    :user-mongo-id="user.id"
+                                />
+                                <modding-activity
+                                    v-if="isNat"
+                                    class="mt-2"
+                                    :username="user.username"
                                 />
                             </div>
-                        </div>
-                        <modding-activity
-                            v-if="isNat"
-                            class="mt-2"
-                        />
-
-                        <!-- BN can only see this on their own cards. NAT can see on everyone's cards -->
+                        </span>
                         <bn-evaluator-toggle
-                            v-if="(selectedUser.id == userId || isNat) && selectedUser.group != 'nat'"
+                            v-if="(user.id == userId || isNat) && user.group != 'nat'"
+                            :is-bn-evaluator="user.isBnEvaluator"
+                            :user-id="user.id"
+                            @update-user="$emit('update-user', $event);"
                         />
-
                         <notes
                             v-if="isNat"
+                            :user-id="user.id"
+                            :viewing-user-id="userId"
+                            @update-user="$emit('update-user', $event);"
                         />
                     </div>
                 </div>
@@ -41,7 +58,6 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex';
 import ModalHeader from './info/ModalHeader.vue';
 import Duration from './info/Duration.vue';
 import Notes from './info/Notes.vue';
@@ -61,18 +77,20 @@ export default {
         ModdingActivity,
         UserActivity,
     },
-    computed: {
-        ...mapState([
-            'userId',
-            'isNat',
-        ]),
-        ...mapGetters([
-            'selectedUser',
-        ]),
+    props: {
+        user: {
+            type: Object,
+            required: true,
+        },
+        userId: {
+            type: String,
+            required: true,
+        },
+        isNat: Boolean,
     },
     watch: {
-        selectedUser() {
-            history.pushState(null, 'BN/NAT Listing', `/users?id=${this.selectedUser.id}`);
+        user() {
+            history.pushState(null, 'BN/NAT Listing', `/users?id=${this.user.id}`);
         },
     },
 };

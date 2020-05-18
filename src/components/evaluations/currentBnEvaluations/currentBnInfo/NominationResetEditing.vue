@@ -53,7 +53,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
 import postData from '../../../../mixins/postData.js';
 import filterLinks from '../../../../mixins/filterLinks.js';
 import ObviousnessSeverity from './ObviousnessSeverity.vue';
@@ -69,6 +68,7 @@ export default {
             type: Object,
             required: true,
         },
+        isNat: Boolean,
     },
     data() {
         return {
@@ -78,9 +78,6 @@ export default {
         };
     },
     computed: {
-        ...mapState([
-            'isNat',
-        ]),
         hasData () {
             if ((this.event.obviousness || this.event.obviousness == 0) && (this.event.severity || this.event.severity == 0)) {
                 return true;

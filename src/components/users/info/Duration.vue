@@ -1,24 +1,24 @@
 <template>
     <div class="row">
-        <div v-if="selectedUser.bnDuration.length" class="col-sm-6">
+        <div v-if="bnDuration.length" class="col-sm-6">
             <p class="text-shadow mb-2 min-spacing">
                 BN: {{ calculateDuration('bn') }}
             </p>
             <div class="text-shadow">
                 <ul>
-                    <li v-for="(date, i) in selectedUser.bnDuration" :key="date" class="small">
+                    <li v-for="(date, i) in bnDuration" :key="date" class="small">
                         {{ date.slice(0, 10) }}: {{ i % 2 == 0 ? 'joined' : 'left' }}
                     </li>
                 </ul>
             </div>
         </div>
-        <div v-if="selectedUser.natDuration.length" class="col-sm-6">
+        <div v-if="natDuration.length" class="col-sm-6">
             <p class="text-shadow mb-2 min-spacing">
                 NAT: {{ calculateDuration('nat') }}
             </p>
             <div class="text-shadow">
                 <ul>
-                    <li v-for="(date, i) in selectedUser.natDuration" :key="date" class="small">
+                    <li v-for="(date, i) in natDuration" :key="date" class="small">
                         {{ date.slice(0, 10) }}: {{ i % 2 == 0 ? 'joined' : 'left' }}
                     </li>
                 </ul>
@@ -28,18 +28,16 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
 
 export default {
     name: 'Duration',
-    computed: {
-        ...mapGetters([
-            'selectedUser',
-        ]),
+    props: {
+        bnDuration: Array,
+        natDuration: Array,
     },
     methods: {
         calculateDuration(group) {
-            let dateArray = group == 'bn' ? this.selectedUser.bnDuration : this.selectedUser.natDuration;
+            let dateArray = group == 'bn' ? this.bnDuration : this.natDuration;
             let days = 0;
 
             for (let i = 0; i < dateArray.length; i += 2) {

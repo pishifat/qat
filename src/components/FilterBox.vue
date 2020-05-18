@@ -4,23 +4,18 @@
             <span class="filter-header">Search</span>
             <input
                 id="search"
-                v-model="newFilterValue"
                 class="ml-2"
                 type="text"
                 autocomplete="off"
                 :placeholder="placeholder || ''"
-                @change="updateFilterValue(newFilterValue)"
+                @input="$emit('update:filterValue', $event.target.value)"
             >
-            <select
-                id="mode"
-                class="custom-select ml-2"
-                @change="updateFilterMode(options[$event.target.selectedIndex])"
-            >
+            <select id="mode" class="custom-select ml-2" @change="$emit('update:filterMode', options[$event.target.selectedIndex])">
                 <option
                     v-for="option in options"
                     :key="option"
                     :value="option"
-                    :selected="option === filters.mode"
+                    :selected="option === filterMode"
                 >
                     {{ option === '' ? 'All modes' : option }}
                 </option>
@@ -31,36 +26,12 @@
 </template>
 
 <script>
-import { mapState, mapMutations, mapActions } from 'vuex';
-
 export default {
     props: {
-        placeholder: {
-            type: String,
-            required: true,
-        },
-        options: {
-            type: Array,
-            required: true,
-        },
-    },
-    data () {
-        return {
-            newFilterValue: '',
-        };
-    },
-    computed: mapState([
-        'filters',
-    ]),
-    methods: {
-        ...mapMutations([
-            'setFilterValue',
-            'setFilterMode',
-        ]),
-        ...mapActions([
-            'updateFilterValue',
-            'updateFilterMode',
-        ]),
+        filterMode: String,
+        filterValue: String,
+        placeholder: String,
+        options: Array,
     },
 };
 </script>

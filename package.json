@@ -31,7 +31,6 @@
     "vue": "^2.6.11",
     "vue-loader": "^15.9.0",
     "vue-template-compiler": "^2.6.11",
-    "vuex": "^3.4.0",
     "webpack": "^4.42.0",
     "webpack-cli": "^3.3.11"
   },
@@ -40,7 +39,7 @@
     "eslint-plugin-vue": "^6.2.1",
     "nodemon": "^2.0.3",
     "npm-run-all": "^4.1.5",
-    "webpack-dev-server": "^3.11.0"
+    "webpack-dev-server": "^3.10.3"
   },
   "nodemonConfig": {
     "ignore": [

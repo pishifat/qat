@@ -2,15 +2,17 @@
     <div class="row">
         <div class="col-md-12">
             <filter-box
-                :placeholder="'enter to search username...'"
+                :filter-mode.sync="filterMode"
+                :filter-value.sync="filterValue"
+                :placeholder="'username... (3+ characters)'"
                 :options="['', 'osu', 'taiko', 'catch', 'mania']"
             />
             <section class="row segment segment-solid my-1 mx-4">
                 <div class="small">
                     <span class="filter-header">Sort by</span>
-                    <a :class="sort.type === 'username' ? 'sorted' : 'unsorted'" href="#" @click.prevent="updateSorting('username')">Name</a>
-                    <a :class="sort.type === 'bnDuration' ? 'sorted' : 'unsorted'" href="#" @click.prevent="updateSorting('bnDuration')">Time as BN</a>
-                    <a :class="sort.type === 'natDuration' ? 'sorted' : 'unsorted'" href="#" @click.prevent="updateSorting('natDuration')">Time as NAT</a>
+                    <a :class="sortBy === 'username' ? 'sorted' : 'unsorted'" href="#" @click.prevent="sort('username')">Name</a>
+                    <a :class="sortBy === 'bnDuration' ? 'sorted' : 'unsorted'" href="#" @click.prevent="sort('bnDuration')">Time as BN</a>
+                    <a :class="sortBy === 'natDuration' ? 'sorted' : 'unsorted'" href="#" @click.prevent="sort('natDuration')">Time as NAT</a>
                 </div>
             </section>
 
@@ -18,13 +20,15 @@
                 <div class="col-sm-12">
                     <transition-group name="list" tag="div" class="row mx-auto">
                         <user-card
-                            v-for="user in paginatedUsers"
+                            v-for="user in pageObjs"
                             :key="user.id"
                             :user="user"
+                            :user-id="userId"
+                            @update:selectedUser="selectedUser = $event"
                         />
                     </transition-group>
                     <button
-                        v-if="pagination.page > 1"
+                        v-if="pre > 0"
                         class="btn btn-sm btn-pags btn-pags-left"
                         type="button"
                         @click="showNewer()"
@@ -32,7 +36,7 @@
                         <i class="fas fa-angle-left px-1" />
                     </button>
                     <button
-                        v-if="pagination.page < pagination.maxPages"
+                        v-if="canShowOlder"
                         class="btn btn-sm btn-pags btn-pags-right"
                         type="button"
                         @click="showOlder()"
@@ -54,15 +58,16 @@
             </section>
         </div>
 
-        <user-info />
-
-        <toast-messages />
+        <user-info
+            :user="selectedUser"
+            :user-id="userId"
+            :is-nat="isNat"
+            @update-user="updateUser($event)"
+        />
     </div>
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex';
-import ToastMessages from '../components/ToastMessages.vue';
 import UserCard from '../components/users/UserCard.vue';
 import UserInfo from '../components/users/UserInfo.vue';
 import NatActivity from '../components/users/NatActivity.vue';
@@ -70,13 +75,13 @@ import BnActivity from '../components/users/BnActivity.vue';
 import Badges from '../components/users/Badges.vue';
 import PotentialNatInfo from '../components/users/PotentialNatInfo.vue';
 import FilterBox from '../components/FilterBox.vue';
+import pagination from '../mixins/pagination.js';
+import filters from '../mixins/filters.js';
 import postData from '../mixins/postData.js';
-
 
 export default {
     name: 'UsersPage',
     components: {
-        ToastMessages,
         UserCard,
         UserInfo,
         NatActivity,
@@ -85,46 +90,34 @@ export default {
         PotentialNatInfo,
         FilterBox,
     },
-    mixins: [postData],
+    mixins: [pagination, filters, postData],
     data() {
         return {
+            pageObjs: null,
+            allObjs: null,
+            filteredObjs: null,
+            userId: null,
+            isNat: null,
+            isBn: null,
             selectedUser: null,
         };
-    },
-    computed: {
-        ...mapState([
-            'userId',
-            'isNat',
-            'isBn',
-            'pagination',
-            'sort',
-        ]),
-        ...mapGetters([
-            'paginatedUsers',
-            'allUsers',
-        ]),
-    },
-    watch: {
-        paginatedUsers () {
-            this.$store.dispatch('updatePaginationMaxPages');
-        },
     },
     async created() {
         const res = await this.executeGet('/users/relevantInfo');
 
         if (res) {
-            this.$store.commit('setUsers', res.users);
-            this.$store.commit('setUserId', res.userId);
-            this.$store.commit('setIsNat', res.isNat);
-            this.$store.commit('setIsBn', res.isBn);
-
+            this.allObjs = res.users;
+            this.userId = res.userId;
+            this.isNat = res.isNat;
+            this.isBn = res.isBn;
+            this.limit = 24;
             const params = new URLSearchParams(document.location.search.substring(1));
 
             if (params.get('id') && params.get('id').length) {
-                const i = this.allUsers.findIndex(u => u.id == params.get('id'));
+                const i = this.allObjs.findIndex(u => u.id == params.get('id'));
 
                 if (i >= 0) {
-                    this.$store.commit('setSelectedUserId', params.get('id'));
+                    this.selectedUser = this.allObjs[i];
                     $('#extendedInfo').modal('show');
                 }
             }
@@ -138,19 +131,26 @@ export default {
             const res = await this.executeGet('/users/relevantInfo');
 
             if (res) {
-                this.$store.commit('setUsers', res.users);
+                this.allObjs = res.users;
+
+                if (this.isFiltered) {
+                    this.filter();
+                }
             }
         }, 300000);
     },
     methods: {
-        showOlder() {
-            this.$store.commit('increasePaginationPage');
+        filterBySearchValueContext(u) {
+            if (u.username.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1) {
+                return true;
+            }
+
+            return false;
         },
-        showNewer() {
-            this.$store.commit('decreasePaginationPage');
-        },
-        updateSorting(sortBy) {
-            this.$store.dispatch('updateSorting', sortBy);
+        updateUser(u) {
+            const i = this.pageObjs.findIndex(user => user.id == u.id);
+            this.pageObjs[i] = u;
+            this.selectedUser = u;
         },
         sortDuration(dateArray) {
             let days = 0;
@@ -173,7 +173,6 @@ export default {
 </script>
 
 <style>
-/* these are used in BN activity and badge sections */
 
 .background-pass {
     background-color: rgb(50,255,50,0.25);
