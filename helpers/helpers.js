@@ -83,7 +83,6 @@ async function getUserModsCount(username, mode, months) {
                 if (!events.length) {
                     hasEvents = false;
                 } else {
-                    console.log('in');
                     let pageMods = [];
                     events.forEach(event => {
                         let mod = {
