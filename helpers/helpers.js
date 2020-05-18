@@ -78,23 +78,19 @@ async function getUserModsCount(username, mode, months) {
             try {
                 const historyHtml = await axios.get(finalUrl);
                 const $ = cheerio.load(historyHtml.data);
+                const events = JSON.parse($('#json-events').html());
 
-                if (!$('.beatmapset-event').length) {
+                if (!events.length) {
                     hasEvents = false;
                 } else {
+                    console.log('in');
                     let pageMods = [];
-                    $('.beatmapset-event').each(function(k, v) {
-                        const url = $(v).find('a').first().attr('href');
+                    events.forEach(event => {
                         let mod = {
-                            beatmapset: getBeatmapsetIdFromUrl(url),
-                            url,
+                            beatmapsetId: event.beatmapset.id,
+                            discussionId: event.discussion.id,
+                            isGain: event.type == 'kudosu_gain',
                         };
-
-                        if ($(v).find('.beatmapset-event__icon--kudosu-gain').length) {
-                            mod.isGain = true;
-                        } else {
-                            mod.isGain = false;
-                        }
 
                         pageMods.push(mod);
                     });
@@ -102,8 +98,8 @@ async function getUserModsCount(username, mode, months) {
                     // Filters repeated sets and checks for denied KDs
                     pageMods.forEach(mod => {
                         if (mod.isGain &&
-                            pageMods.findIndex(m => m.url == mod.url && !m.isGain) === -1 &&
-                            monthMods.findIndex(m => m.beatmapset == mod.beatmapset) === -1) {
+                            pageMods.findIndex(m => m.discussionId == mod.discussionId && !m.isGain) === -1 &&
+                            monthMods.findIndex(m => m.beatmapsetId == mod.beatmapsetId) === -1) {
                             monthMods.push(mod);
                         }
                     });
