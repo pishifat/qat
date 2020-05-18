@@ -51,6 +51,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import filterLinks from '../../../../mixins/filterLinks.js';
 
 export default {
@@ -63,7 +64,11 @@ export default {
         eventsId: String,
         editing: Boolean,
         isApplication: Boolean,
-        userId: String,
+    },
+    computed: {
+        ...mapGetters([
+            'selectedUser',
+        ]),
     },
     methods: {
         findDate (event) {
@@ -93,7 +98,7 @@ export default {
             for (let i = 0; i < evaluations.length; i++) {
                 const evaluation = evaluations[i];
 
-                if (evaluation.evaluator.id == this.userId) {
+                if (evaluation.evaluator.id == this.selectedUser.id) {
                     vote = evaluation.vote;
                     break;
                 }
@@ -113,7 +118,7 @@ export default {
             for (let i = 0; i < evaluations.length; i++) {
                 const evaluation = evaluations[i];
 
-                if (evaluation.evaluator.id == this.userId) {
+                if (evaluation.evaluator.id == this.selectedUser.id) {
                     comment = evaluation.moddingComment;
                     break;
                 }

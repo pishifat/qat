@@ -42,14 +42,10 @@ export default {
             type: Object,
             required: true,
         },
-        userId: {
-            type: String,
-            required: true,
-        },
     },
     methods: {
         selectUser() {
-            this.$emit('update:selectedUser', this.user);
+            this.$store.commit('setSelectedUserId', this.user.id);
         },
     },
 };

@@ -1,28 +1,28 @@
 <template>
     <p class="text-shadow">
-        Next evaluation: {{ nextEvaluationDate.slice(0,10) }}
+        Next evaluation: {{ nextEvaluationDate }}
     </p>
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import postData from '../../../mixins/postData.js';
 
 export default {
-    name: 'Duration',
+    name: 'NextEvaluation',
     mixins: [ postData ],
-    props: {
-        userId: {
-            type: String,
-            required: true,
-        },
-    },
     data() {
         return {
             nextEvaluationDate: '...',
         };
     },
+    computed: {
+        ...mapGetters([
+            'selectedUser',
+        ]),
+    },
     watch: {
-        userId() {
+        selectedUser() {
             this.nextEvaluationDate = '...';
             this.loadNextEvaluation();
         },
@@ -32,10 +32,10 @@ export default {
     },
     methods: {
         async loadNextEvaluation() {
-            const nextEvaluationDate = await this.executeGet('/users/loadNextEvaluation/' + this.userId);
+            const nextEvaluationDate = await this.executeGet('/users/loadNextEvaluation/' + this.selectedUser.id);
 
             if (nextEvaluationDate) {
-                this.nextEvaluationDate = nextEvaluationDate;
+                this.nextEvaluationDate = nextEvaluationDate.slice(0,10);
             }
         },
     },
