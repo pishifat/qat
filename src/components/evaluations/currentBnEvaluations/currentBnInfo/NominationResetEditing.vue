@@ -2,10 +2,10 @@
     <span>
         <td scope="row" class="w-60">
             <template v-if="!editing">
+                <span v-if="hasData" :class="calculateColor">
+                    ({{ event.obviousness }}/{{ event.severity }})
+                </span>
                 <span v-if="isNat">
-                    <span v-if="hasData" :class="calculateColor">
-                        ({{ event.obviousness }}/{{ event.severity }})
-                    </span>
                     <a href="#" @click.prevent="editing = !editing">
                         <i class="fas fa-edit" />
                     </a>
