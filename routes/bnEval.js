@@ -675,20 +675,21 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
 });
 
 /* GET aiess info */
-router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
+router.get('/userActivity/:id/:modes/:deadline/:mongoId', async (req, res) => {
     if (isNaN(req.params.id)) {
         return res.json({ error: 'Something went wrong!' });
     }
 
     const userOsuId = parseInt(req.params.id);
+    const modes = req.params.modes.split(',');
     let deadline = parseInt(req.params.deadline);
     let minDate = new Date(deadline);
     minDate.setDate(minDate.getDate() - 90);
     let maxDate = new Date(deadline);
     const [user, allUserEvents, allEvents, qualityAssuranceChecks, assignedApplications] = await Promise.all([
         User.findById(req.params.mongoId),
-        Aiess.getByEventTypeAndUser(userOsuId, minDate, maxDate, req.params.mode),
-        Aiess.getAllByEventType(minDate, maxDate, req.params.mode),
+        Aiess.getByEventTypeAndUser(userOsuId, minDate, maxDate, modes),
+        Aiess.getAllByEventType(minDate, maxDate, modes),
         Aiess.find({
             qualityAssuranceCheckers: req.params.mongoId,
             updatedAt: { $gte: minDate, $lte: maxDate },

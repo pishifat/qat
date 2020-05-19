@@ -2,57 +2,57 @@
     <div>
         <events-list
             :events="nominations"
-            :events-id="'uniqueNominations' + mode"
+            :events-id="'uniqueNominations'"
             :header="'Unique nominations'"
         />
         <nomination-resets
             :events="nominationsDisqualified"
-            :events-id="'nominationsDisqualified' + mode"
+            :events-id="'nominationsDisqualified'"
             :header="'Nominations disqualified'"
         />
         <nomination-resets
             :events="nominationsPopped"
-            :events-id="'nominationsPopped' + mode"
+            :events-id="'nominationsPopped'"
             :header="'Nominations popped'"
         />
         <nomination-resets
             :events="disqualifications"
-            :events-id="'disqualificationsByUser' + mode"
+            :events-id="'disqualificationsByUser'"
             :header="'Disqualifications done by user'"
         />
         <nomination-resets
             :events="pops"
-            :events-id="'popsByUser' + mode"
+            :events-id="'popsByUser'"
             :header="'Pops done by user'"
         />
         <events-list
             :events="qualityAssuranceChecks"
-            :events-id="'qualityAssuranceChecks' + mode"
+            :events-id="'qualityAssuranceChecks'"
             :header="'Quality Assurance Checks'"
         />
         <nomination-resets
             :events="disqualifiedQualityAssuranceChecks"
-            :events-id="'disqualifiedQualityAssuranceChecks' + mode"
+            :events-id="'disqualifiedQualityAssuranceChecks'"
             :header="'Disqualified Quality Assurance Checks'"
         />
         <evaluation-list
             v-if="isNat && assignedApplications && assignedApplications.length"
             :events="assignedApplications"
-            :events-id="'assignedApplications' + mode"
+            :events-id="'assignedApplications'"
             :header="'Application Evaluations (BN)'"
             :is-application="true"
         />
         <evaluation-list
             v-if="isNat && natApplications && natApplications.length"
             :events="natApplications"
-            :events-id="'natApplications' + mode"
+            :events-id="'natApplications'"
             :header="'Application Evaluations (NAT)'"
             :is-application="true"
         />
         <evaluation-list
             v-if="isNat && natEvalRounds && natEvalRounds.length"
             :events="natEvalRounds"
-            :events-id="'natEvalRounds' + mode"
+            :events-id="'natEvalRounds'"
             :header="'Current BN Evaluations (NAT)'"
             :is-application="false"
         />
@@ -76,8 +76,8 @@ export default {
     },
     mixins: [ postData, filterLinks ],
     props: {
-        mode: {
-            type: String,
+        modes: {
+            type: Array,
             required: true,
         },
         deadline: {
@@ -115,7 +115,7 @@ export default {
         async findRelevantActivity() {
             this.$store.commit('setIsLoading', true);
 
-            const res = await this.executeGet('/bnEval/userActivity/' + this.selectedUser.osuId + '/' + this.mode + '/' + new Date(this.deadline).getTime() + '/' + this.selectedUser.id);
+            const res = await this.executeGet('/bnEval/userActivity/' + this.selectedUser.osuId + '/' + this.modes + '/' + new Date(this.deadline).getTime() + '/' + this.selectedUser.id);
 
             if (res) {
                 this.$store.commit('setNominations', res.noms);

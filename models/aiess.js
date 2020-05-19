@@ -34,8 +34,8 @@ class AiessService
      * @param {date} maxDate
      * @param {string} mode
      */
-    static async getAllByEventType(minDate, maxDate, mode) {
-        if (!minDate && !maxDate && !mode) return null;
+    static async getAllByEventType(minDate, maxDate, modes) {
+        if (!minDate && !maxDate && !modes) return null;
 
         try {
             return await this.aggregate([
@@ -50,7 +50,7 @@ class AiessService
                             { timestamp: { $gte: minDate } },
                             { timestamp: { $lte: maxDate } },
                         ],
-                        modes: mode,
+                        modes: { $in: modes },
                     },
                 },
                 {
@@ -114,8 +114,8 @@ class AiessService
      * @param {date} maxDate
      * @param {string} mode
      */
-    static async getByEventTypeAndUser(userId, minDate, maxDate, mode) {
-        if (!userId && !minDate && !maxDate && !mode) return null;
+    static async getByEventTypeAndUser(userId, minDate, maxDate, modes) {
+        if (!userId && !minDate && !maxDate && !modes) return null;
 
         try {
             return await this.aggregate([
@@ -127,7 +127,7 @@ class AiessService
                             { timestamp: { $lte: maxDate } },
                         ],
                         eventType: { $ne: 'Ranked' },
-                        modes: mode,
+                        modes: { $in: modes },
                     },
                 },
                 {

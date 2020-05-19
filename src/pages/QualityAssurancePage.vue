@@ -3,7 +3,7 @@
         <div class="row">
             <div class="col-sm-12">
                 <filter-box
-                    :placeholder="'metadata...'"
+                    :placeholder="'enter to search beatmap...'"
                     :options="['osu', 'taiko', 'catch', 'mania']"
                 />
             </div>

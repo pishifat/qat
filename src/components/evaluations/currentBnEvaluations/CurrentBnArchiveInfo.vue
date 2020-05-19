@@ -11,15 +11,14 @@
                     :evaluator-mongo-id="evaluator.id"
                 />
                 <div class="modal-body" style="overflow: hidden;">
-                    <div v-for="(mode, i) in modes" :key="mode" class="container">
+                    <div class="container">
                         <p class="text-shadow min-spacing mb-1">
                             Recent BN activity
-                            <span class="small">({{ mode == 'osu' ? 'osu!' : 'osu!' + mode }})</span>
                         </p>
                         <div class="container mb-3">
                             <user-activity
                                 :osu-id="evalRound.bn.osuId"
-                                :mode="modes[i]"
+                                :modes="modes"
                                 :deadline="evalRound.deadline"
                                 :is-nat="evaluator.isNat"
                                 :user-mongo-id="evalRound.bn.id"

@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations, mapActions } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 
 export default {
     props: {
@@ -53,10 +53,6 @@ export default {
         'filters',
     ]),
     methods: {
-        ...mapMutations([
-            'setFilterValue',
-            'setFilterMode',
-        ]),
         ...mapActions([
             'updateFilterValue',
             'updateFilterMode',

@@ -85,12 +85,11 @@ const store = new Vuex.Store({
         },
     },
     actions: {
-        updateVeto ({ commit, state }, veto) {
-            commit('updateVeto', veto);
-
-            if (state.selectedVeto && state.selectedVeto.id === veto.id) {
-                commit('setSelectedVetoId', veto.id);
-            }
+        updateFilterMode ({ commit }, mode) {
+            commit('setFilterMode', mode);
+        },
+        updateFilterValue ({ commit }, value) {
+            commit('setFilterValue', value);
         },
     },
     strict: process.env.NODE_ENV !== 'production',

@@ -8,17 +8,14 @@
                         <duration />
                         <next-evaluation />
                         <hr>
-                        <div v-for="mode in selectedUser.modes" :key="mode">
-                            <p class="text-shadow min-spacing mb-1">
-                                Recent BN activity
-                                <span class="small">({{ mode == 'osu' ? 'osu!' : 'osu!' + mode }})</span>
-                            </p>
-                            <div class="container mb-3">
-                                <user-activity
-                                    :mode="mode"
-                                    :deadline="new Date().toString()"
-                                />
-                            </div>
+                        <p class="text-shadow min-spacing mb-1">
+                            Recent BN activity
+                        </p>
+                        <div class="container mb-3">
+                            <user-activity
+                                :modes="selectedUser.modes"
+                                :deadline="new Date().toString()"
+                            />
                         </div>
                         <modding-activity
                             v-if="isNat"
