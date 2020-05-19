@@ -41,6 +41,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import postData from '../../mixins/postData.js';
 import filterLinks from '../../mixins/filterLinks.js';
 
@@ -54,27 +55,25 @@ export default {
                 return [];
             },
         },
-        userId: {
-            type: String,
-            required: true,
-        },
         eventId: {
             type: String,
             required: true,
         },
         isMaxChecks: Boolean,
         isOutdated: Boolean,
-        isNat: Boolean,
     },
     data() {
         return {
-            info: '',
             showInput: false,
             userComment: null,
             mediationId: null,
         };
     },
     computed: {
+        ...mapState([
+            'userId',
+            'isNat',
+        ]),
         otherUserComments() {
             return this.qualityAssuranceComments.filter(m => m.mediator.id != this.userId && m.comment.length);
         },
@@ -101,15 +100,11 @@ export default {
         },
         async editComment (e) {
             this.showInput = false;
-            const qualityAssuranceComments = await this.executePost('/qualityAssurance/editComment/' + this.eventId, { mediationId: this.mediationId, comment: this.userComment }, e);
+            const event = await this.executePost('/qualityAssurance/editComment/' + this.eventId, { mediationId: this.mediationId, comment: this.userComment }, e);
 
-            if (qualityAssuranceComments) {
-                if (qualityAssuranceComments.error) {
-                    this.info = qualityAssuranceComments.error;
-                } else {
-                    this.$emit('update-quality-assurance-comments', { id: this.eventId, value: qualityAssuranceComments });
-                    this.findRelevantComment();
-                }
+            if (event && !event.error) {
+                this.$store.commit('updateEvent', event);
+                this.findRelevantComment();
             }
         },
     },
