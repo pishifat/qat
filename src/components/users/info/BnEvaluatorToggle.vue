@@ -35,16 +35,12 @@ export default {
         async switchBnEvaluator(e) {
             const user = await this.executePost('/users/switchBnEvaluator/' + this.selectedUser.id, { isBnEvaluator: this.selectedUser.isBnEvaluator }, e);
 
-            if (user) {
-                if (user.error) {
-                    this.info = user.error;
-                } else {
-                    this.$store.dispatch('updateUser', user);
-                    this.$store.dispatch('updateToastMessages', {
-                        message: `toggled BN evaluator`,
-                        type: 'info',
-                    });
-                }
+            if (user && !user.error) {
+                this.$store.dispatch('updateUser', user);
+                this.$store.dispatch('updateToastMessages', {
+                    message: `toggled BN evaluator`,
+                    type: 'info',
+                });
             }
         },
     },

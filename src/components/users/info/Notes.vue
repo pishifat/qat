@@ -63,9 +63,6 @@
                 </div>
             </li>
         </ul>
-        <p v-if="info.length" class="errors text-shadow mt-2">
-            {{ info }}
-        </p>
     </div>
 </template>
 
@@ -81,7 +78,6 @@ export default {
         return {
             notes: null,
             comment: '',
-            info: '',
             editNoteId: '',
             editNoteComment: '',
         };
@@ -98,7 +94,6 @@ export default {
         selectedUser() {
             this.notes = null;
             this.comment = '';
-            this.info = '';
             this.editNoteId = '';
             this.loadUserNotes();
         },
@@ -116,40 +111,32 @@ export default {
         },
         async saveNote(e) {
             if (this.comment.length) {
-                const n = await this.executePost('/users/saveNote/' + this.selectedUser.id, { comment: this.comment }, e);
+                const note = await this.executePost('/users/saveNote/' + this.selectedUser.id, { comment: this.comment }, e);
 
-                if (n) {
-                    if (n.error) {
-                        this.info = n.error;
-                    } else {
-                        if (this.notes) {
-                            this.notes.unshift(n);
-                            this.$store.dispatch('updateToastMessages', {
-                                message: `added note`,
-                                type: 'info',
-                            });
-                        }
+                if (note && !note.error) {
+                    if (this.notes) {
+                        this.notes.unshift(note);
+                        this.$store.dispatch('updateToastMessages', {
+                            message: `added note`,
+                            type: 'info',
+                        });
                     }
                 }
             }
         },
         async editNote(e) {
             if (this.editNoteComment.length) {
-                const n = await this.executePost('/users/editNote/' + this.editNoteId, { comment: this.editNoteComment }, e);
+                const note = await this.executePost('/users/editNote/' + this.editNoteId, { comment: this.editNoteComment }, e);
 
-                if (n) {
-                    if (n.error) {
-                        this.info = n.error;
-                    } else {
-                        if (this.notes) {
-                            const i = this.notes.findIndex(note => note.id == this.editNoteId);
-                            this.notes[i] = n;
-                            this.editNoteId = '';
-                            this.$store.dispatch('updateToastMessages', {
-                                message: `edited note`,
-                                type: 'info',
-                            });
-                        }
+                if (note && !note.error) {
+                    if (this.notes) {
+                        const i = this.notes.findIndex(n => n.id == this.editNoteId);
+                        this.notes[i] = note;
+                        this.editNoteId = '';
+                        this.$store.dispatch('updateToastMessages', {
+                            message: `edited note`,
+                            type: 'info',
+                        });
                     }
                 }
             }

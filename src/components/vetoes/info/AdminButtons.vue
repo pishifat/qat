@@ -159,15 +159,11 @@ export default {
                 const veto = await this.executePost(`/vetoes/continueMediation/${this.selectedVeto.id}`, {}, e);
 
                 if (veto && !veto.error) {
-                    if (veto.error) {
-                        this.info = veto.error;
-                    } else {
-                        this.$store.dispatch('updateVeto', veto);
-                        this.$store.dispatch('updateToastMessages', {
-                            message: `re-opened mediation`,
-                            type: 'info',
-                        });
-                    }
+                    this.$store.dispatch('updateVeto', veto);
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `re-opened mediation`,
+                        type: 'info',
+                    });
                 }
             }
         },

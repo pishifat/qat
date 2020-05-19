@@ -137,8 +137,6 @@ export default {
     },
     methods: {
         async submitVeto (e) {
-            this.info = '';
-
             if (!this.discussionLink || !this.shortReason || !this.mode) {
                 this.$store.dispatch('updateToastMessages', {
                     message: `cannot leave fields blank!`,

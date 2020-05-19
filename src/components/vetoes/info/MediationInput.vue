@@ -107,9 +107,6 @@ export default {
             }
         },
         async submitMediation (e) {
-            this.confirm = '';
-            this.info = '';
-
             if (!this.vote || !this.comment.length) {
                 this.$store.dispatch('updateToastMessages', {
                     message: `cannot leave fields blank!`,
