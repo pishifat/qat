@@ -2,7 +2,7 @@
     <div>
         <p class="text-shadow min-spacing">
             <a :href="events && `#${eventsId}`" data-toggle="collapse">{{ header }} <i class="fas fa-angle-down" /></a>
-            ({{ loading ? '...' : events ? events.length : '0' }})
+            ({{ isLoading ? '...' : events ? events.length : '0' }})
         </p>
         <div v-if="events" :id="eventsId" class="collapse">
             <table v-if="events.length" class="table table-sm table-dark table-hover col-md-12 mt-2">
@@ -29,9 +29,6 @@
                         </td>
                         <nomination-reset-editing
                             :event="event"
-                            @update-content="$emit('update-content', $event);"
-                            @update-obviousness="$emit('update-obviousness', $event);"
-                            @update-severity="$emit('update-severity', $event);"
                         />
                     </tr>
                 </tbody>
@@ -44,6 +41,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import NominationResetEditing from './NominationResetEditing.vue';
 
 export default {
@@ -66,7 +64,11 @@ export default {
             type: String,
             required: true,
         },
-        loading: Boolean,
+    },
+    computed: {
+        ...mapState({
+            isLoading: (state) => state.userActivity.isLoading,
+        }),
     },
 };
 </script>

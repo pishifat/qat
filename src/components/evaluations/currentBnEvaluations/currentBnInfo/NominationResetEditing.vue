@@ -44,8 +44,6 @@
                     :severity="event.severity"
                     :event-id="event._id"
                     :event-type="event.eventType"
-                    @update-obviousness="$emit('update-obviousness', $event);"
-                    @update-severity="$emit('update-severity', $event);"
                 />
             </template>
         </td>
@@ -74,7 +72,6 @@ export default {
         return {
             editing: false,
             newEventContent: null,
-            info: null,
         };
     },
     computed: {
@@ -97,14 +94,13 @@ export default {
     },
     watch: {
         editing () {
-            this.info = null;
             this.newEventContent = this.event.content;
         },
     },
     methods: {
         async updateContent (e) {
             const result = await this.executePost('/dataCollection/updateContent/' + this.event._id, { reason: this.newEventContent }, e);
-            this.$emit('update-content', { id: this.event._id, type: this.event.eventType, value: result });
+            this.$store.commit('updateEvent', { id: this.event._id, type: this.event.eventType, modifiedField: 'content', value: result });
         },
     },
 };

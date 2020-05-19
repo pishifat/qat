@@ -2,6 +2,7 @@ import './bootstrap';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import toastsModule from './modules/toasts';
+import userActivityModule from './modules/userActivity';
 import UsersPage from './pages/UsersPage.vue';
 
 Vue.use(Vuex);
@@ -9,12 +10,12 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
     modules: {
         toasts: toastsModule,
+        userActivity: userActivityModule,
     },
     state: {
         users: [],
         userId: null,
         isNat: false,
-        isBn: false,
         selectedUserId: null,
         filters: {
             mode: '',
@@ -39,9 +40,6 @@ const store = new Vuex.Store({
         },
         setIsNat (state, value) {
             state.isNat = value;
-        },
-        setIsBn (state, value) {
-            state.isBn = value;
         },
         setSelectedUserId (state, id) {
             state.selectedUserId = id;

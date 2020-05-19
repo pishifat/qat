@@ -95,7 +95,6 @@ export default {
         ...mapState([
             'userId',
             'isNat',
-            'isBn',
             'pagination',
             'sort',
         ]),
@@ -116,7 +115,6 @@ export default {
             this.$store.commit('setUsers', res.users);
             this.$store.commit('setUserId', res.userId);
             this.$store.commit('setIsNat', res.isNat);
-            this.$store.commit('setIsBn', res.isBn);
 
             const params = new URLSearchParams(document.location.search.substring(1));
 

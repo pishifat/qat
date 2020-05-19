@@ -62,7 +62,7 @@ router.post('/updateObviousness/:id', api.isNotSpectator, async (req, res) => {
     a.obviousness = obviousness;
     await a.save();
 
-    res.json(obviousness);
+    res.json(req.body.obviousness);
     Logger.generate(req.session.mongoId, `Updated obviousness of s/${a.beatmapsetId} to "${obviousness}"`);
 });
 
@@ -78,7 +78,7 @@ router.post('/updateSeverity/:id', api.isNotSpectator, async (req, res) => {
     a.severity = severity;
     await a.save();
 
-    res.json(severity);
+    res.json(req.body.severity);
     Logger.generate(req.session.mongoId, `Updated severity of s/${a.beatmapsetId} to "${severity}"`);
 });
 

@@ -4,66 +4,42 @@
             :events="nominations"
             :events-id="'uniqueNominations' + mode"
             :header="'Unique nominations'"
-            :loading="loading"
-            @update-editing="editing = !editing"
         />
         <nomination-resets
             :events="nominationsDisqualified"
             :events-id="'nominationsDisqualified' + mode"
             :header="'Nominations disqualified'"
-            :loading="loading"
-            @update-content="updateContent($event)"
-            @update-obviousness="updateObviousness($event)"
-            @update-severity="updateSeverity($event)"
         />
         <nomination-resets
             :events="nominationsPopped"
             :events-id="'nominationsPopped' + mode"
             :header="'Nominations popped'"
-            :loading="loading"
-            @update-content="updateContent($event)"
-            @update-obviousness="updateObviousness($event)"
-            @update-severity="updateSeverity($event)"
         />
         <nomination-resets
             :events="disqualifications"
             :events-id="'disqualificationsByUser' + mode"
             :header="'Disqualifications done by user'"
-            :loading="loading"
-            @update-content="updateContent($event)"
-            @update-obviousness="updateObviousness($event)"
-            @update-severity="updateSeverity($event)"
         />
         <nomination-resets
             :events="pops"
             :events-id="'popsByUser' + mode"
             :header="'Pops done by user'"
-            :loading="loading"
-            @update-content="updateContent($event)"
-            @update-obviousness="updateObviousness($event)"
-            @update-severity="updateSeverity($event)"
         />
         <events-list
             :events="qualityAssuranceChecks"
             :events-id="'qualityAssuranceChecks' + mode"
             :header="'Quality Assurance Checks'"
-            :loading="loading"
         />
         <nomination-resets
             :events="disqualifiedQualityAssuranceChecks"
             :events-id="'disqualifiedQualityAssuranceChecks' + mode"
             :header="'Disqualified Quality Assurance Checks'"
-            :loading="loading"
-            @update-content="updateContent($event)"
-            @update-obviousness="updateObviousness($event)"
-            @update-severity="updateSeverity($event)"
         />
         <evaluation-list
             v-if="isNat && assignedApplications && assignedApplications.length"
             :events="assignedApplications"
             :events-id="'assignedApplications' + mode"
             :header="'Application Evaluations (BN)'"
-            :loading="loading"
             :is-application="true"
         />
         <evaluation-list
@@ -71,7 +47,6 @@
             :events="natApplications"
             :events-id="'natApplications' + mode"
             :header="'Application Evaluations (NAT)'"
-            :loading="loading"
             :is-application="true"
         />
         <evaluation-list
@@ -79,14 +54,12 @@
             :events="natEvalRounds"
             :events-id="'natEvalRounds' + mode"
             :header="'Current BN Evaluations (NAT)'"
-            :loading="loading"
             :is-application="false"
         />
     </div>
 </template>
 
 <script>
-import Vue from 'vue';
 import { mapState, mapGetters } from 'vuex';
 import postData from '../../../../mixins/postData.js';
 import filterLinks from '../../../../mixins/filterLinks.js';
@@ -112,32 +85,26 @@ export default {
             required: true,
         },
     },
-    data() {
-        return {
-            nominations: null,
-            pops: null,
-            disqualifications: null,
-            nominationsPopped: null,
-            nominationsDisqualified: null,
-            qualityAssuranceChecks: null,
-            disqualifiedQualityAssuranceChecks: null,
-            assignedApplications: null,
-            natApplications: null,
-            natEvalRounds: null,
-            loading: true,
-        };
-    },
     computed: {
-        ...mapState([
-            'isNat',
-        ]),
+        ...mapState({
+            isNat: (state) => state.isNat,
+            nominations: (state) => state.userActivity.nominations,
+            nominationsDisqualified: (state) => state.userActivity.nominationsDisqualified,
+            nominationsPopped: (state) => state.userActivity.nominationsPopped,
+            disqualifications: (state) => state.userActivity.disqualifications,
+            pops: (state) => state.userActivity.pops,
+            qualityAssuranceChecks: (state) => state.userActivity.qualityAssuranceChecks,
+            disqualifiedQualityAssuranceChecks: (state) => state.userActivity.disqualifiedQualityAssuranceChecks,
+            assignedApplications: (state) => state.userActivity.assignedApplications,
+            natApplications: (state) => state.userActivity.natApplications,
+            natEvalRounds: (state) => state.userActivity.natEvalRounds,
+        }),
         ...mapGetters([
             'selectedUser',
         ]),
     },
     watch: {
         selectedUser() {
-            this.loading = true;
             this.findRelevantActivity();
         },
     },
@@ -146,74 +113,22 @@ export default {
     },
     methods: {
         async findRelevantActivity() {
+            this.$store.commit('setIsLoading', true);
+
             const res = await this.executeGet('/bnEval/userActivity/' + this.selectedUser.osuId + '/' + this.mode + '/' + new Date(this.deadline).getTime() + '/' + this.selectedUser.id);
 
             if (res) {
-                this.nominations = res.noms;
-                this.nominationsDisqualified = res.nomsDqd;
-                this.nominationsPopped = res.nomsPopped;
-                this.disqualifications = res.dqs;
-                this.pops = res.pops;
-                this.qualityAssuranceChecks = res.qualityAssuranceChecks;
-                this.disqualifiedQualityAssuranceChecks = res.disqualifiedQualityAssuranceChecks;
-                this.assignedApplications = res.assignedApplications;
-                this.natApplications = res.natApplications;
-                this.natEvalRounds = res.natEvalRounds;
-                this.loading = false;
-            }
-        },
-        updateContent (event) {
-            let i;
-
-            if (event.type == 'Disqualified') {
-                i = this.disqualifications.findIndex(e => e._id == event.id);
-                if (i >= 0) this.disqualifications[i].content = event.value;
-
-                i = this.nominationsDisqualified.findIndex(e => e._id == event.id);
-                if (i >= 0) this.nominationsDisqualified[i].content = event.value;
-
-            } else if (event.type == 'Popped') {
-                i = this.pops.findIndex(e => e._id == event.id);
-                if (i >= 0) this.pops[i].content = event.value;
-
-                i = this.nominationsPopped.findIndex(e => e._id == event.id);
-                if (i >= 0) this.nominationsPopped[i].content = event.value;
-            }
-        },
-        updateObviousness (event) {
-            let i;
-
-            if (event.type == 'Disqualified') {
-                i = this.disqualifications.findIndex(e => e._id == event.id);
-                if (i >= 0) Vue.set(this.disqualifications[i], 'obviousness', event.value);
-
-                i = this.nominationsDisqualified.findIndex(e => e._id == event.id);
-                if (i >= 0) Vue.set(this.nominationsDisqualified[i], 'obviousness', event.value);
-
-            } else if (event.type == 'Popped') {
-                i = this.pops.findIndex(e => e._id == event.id);
-                if (i >= 0) Vue.set(this.pops[i], 'obviousness', event.value);
-
-                i = this.nominationsPopped.findIndex(e => e._id == event.id);
-                if (i >= 0) Vue.set(this.nominationsPopped[i], 'obviousness', event.value);
-            }
-        },
-        updateSeverity (event) {
-            let i;
-
-            if (event.type == 'Disqualified') {
-                i = this.disqualifications.findIndex(e => e._id == event.id);
-                if (i >= 0) Vue.set(this.disqualifications[i], 'severity', event.value);
-
-                i = this.nominationsDisqualified.findIndex(e => e._id == event.id);
-                if (i >= 0) Vue.set(this.nominationsDisqualified[i], 'severity', event.value);
-
-            } else if (event.type == 'Popped') {
-                i = this.pops.findIndex(e => e._id == event.id);
-                if (i >= 0) Vue.set(this.pops[i], 'severity', event.value);
-
-                i = this.nominationsPopped.findIndex(e => e._id == event.id);
-                if (i >= 0) Vue.set(this.nominationsPopped[i], 'severity', event.value);
+                this.$store.commit('setNominations', res.noms);
+                this.$store.commit('setNominationsDisqualified', res.nominationsDisqualified);
+                this.$store.commit('setNominationsPopped', res.nominationsPopped);
+                this.$store.commit('setDisqualifications', res.disqualifications);
+                this.$store.commit('setPops', res.pops);
+                this.$store.commit('setQualityAssuranceChecks', res.qualityAssuranceChecks);
+                this.$store.commit('setDisqualifiedQualityAssuranceChecks', res.disqualifiedQualityAssuranceChecks);
+                this.$store.commit('setAssignedApplications', res.assignedApplications);
+                this.$store.commit('setNatApplications', res.natApplications);
+                this.$store.commit('setNatEvalRounds', res.natEvalRounds);
+                this.$store.commit('setIsLoading', false);
             }
         },
     },

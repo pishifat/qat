@@ -2,7 +2,7 @@
     <div>
         <p class="text-shadow min-spacing">
             <a :href="events && `#${eventsId}`" data-toggle="collapse">{{ header }} <i class="fas fa-angle-down" /></a>
-            ({{ loading ? '...' : events ? events.length : '0' }})
+            ({{ isLoading ? '...' : events ? events.length : '0' }})
         </p>
         <div v-if="events" :id="eventsId" class="collapse">
             <table v-if="events.length" class="table table-sm table-dark table-hover col-md-12 mt-2">
@@ -51,21 +51,33 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import filterLinks from '../../../../mixins/filterLinks.js';
 
 export default {
     name: 'EvaluationList',
     mixins: [ filterLinks ],
     props: {
-        events: Array,
-        loading: Boolean,
-        header: String,
-        eventsId: String,
-        editing: Boolean,
+        events: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
+        header: {
+            type: String,
+            required: true,
+        },
+        eventsId: {
+            type: String,
+            required: true,
+        },
         isApplication: Boolean,
     },
     computed: {
+        ...mapState({
+            isLoading: (state) => state.userActivity.isLoading,
+        }),
         ...mapGetters([
             'selectedUser',
         ]),
