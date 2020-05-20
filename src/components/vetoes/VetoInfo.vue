@@ -22,10 +22,6 @@
                         <!-- show mediation input for active mediators -->
                         <mediation-input
                             v-else-if="isMediator && selectedVeto.status == 'wip'"
-                            :mediations="selectedVeto.mediations"
-                            :veto-id="selectedVeto.id"
-                            :user-id="userId"
-                            @update-veto="$emit('update-veto', $event)"
                         />
                     </div>
                 </div>
