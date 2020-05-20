@@ -20,7 +20,7 @@ const defaultRoundPopulate = [{
     select: 'username osuId probation',
 }];
 
-const notifyDeadlines = cron.schedule('0 0 * * *', async () => {
+const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
     // establish dates for reference
     const date = new Date();
     const nearDeadline = new Date();
