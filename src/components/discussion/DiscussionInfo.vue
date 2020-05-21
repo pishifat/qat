@@ -1,61 +1,37 @@
 <template>
     <div id="extendedInfo" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-lg">
-            <div v-if="discussion" class="modal-content">
-                <modal-header
-                    :discussion-link="discussion.discussionLink"
-                    :title="discussion.title"
-                    :mode="discussion.mode"
-                />
+            <div v-if="selectedDiscussionVote" class="modal-content">
+                <modal-header />
                 <div class="modal-body" style="overflow: hidden">
                     <div class="container text-shadow">
-                        <discussion-context
-                            :discussion-id="discussion.id"
-                            :discussion-link="discussion.discussionLink"
-                            :is-editable="discussion.creator == userId && discussion.isActive"
-                            :title="discussion.title"
-                            :short-reason="discussion.shortReason"
-                            @update-discussion="$emit('update-discussion', $event)"
-                        />
+                        <discussion-context />
+
                         <votes-public-active
-                            v-if="discussion.isActive && !discussion.isNatOnly"
-                            :mediations="discussion.mediations"
-                        />
-                        <votes-private-active
-                            v-else-if="!discussion.isNatOnly && isPishifat"
-                            :agree-mediations="agreeMediations"
-                            :neutral-mediations="neutralMediations"
-                            :disagree-mediations="disagreeMediations"
-                            :neutral-allowed="discussion.neutralAllowed"
+                            v-if="selectedDiscussionVote.isActive && !selectedDiscussionVote.isNatOnly"
                         />
                         <votes-nat-only-active
-                            v-else-if="discussion.isActive && discussion.isNatOnly"
-                            :mediations="discussion.mediations"
+                            v-else-if="selectedDiscussionVote.isActive && selectedDiscussionVote.isNatOnly"
                         />
                         <votes-inactive
-                            v-else-if="!discussion.isActive"
-                            :is-nat-only="discussion.isNatOnly"
-                            :agree-mediations="agreeMediations"
-                            :neutral-mediations="neutralMediations"
-                            :disagree-mediations="disagreeMediations"
+                            v-else-if="!selectedDiscussionVote.isActive"
                         />
-                        <button v-if="discussion.isActive && isNat" class="btn btn-sm btn-nat mt-3" @click="concludeMediation($event)">
+
+                        <button v-if="selectedDiscussionVote.isActive && isNat" class="btn btn-sm btn-nat mt-3" @click="concludeMediation($event)">
                             Conclude Vote
                         </button>
-                        <hr>
-                        <mediator-options
-                            v-if="discussion.isActive && (userModes.indexOf(discussion.mode) >= 0 || discussion.mode == 'all')"
-                            :discussion-id="discussion.id"
-                            :discussion-link="discussion.discussionLink"
-                            :is-nat-only="discussion.isNatOnly"
-                            :neutral-allowed="discussion.neutralAllowed"
-                            :mediations="discussion.mediations"
-                            :user-id="userId"
-                            @update-discussion="$emit('update-discussion', $event)"
-                        />
-                        <p v-else-if="discussion.isActive" class="small">
-                            Because you're not proficient in this proposal's game mode, you're not able to vote :(
-                        </p>
+
+                        <div v-if="selectedDiscussionVote.isActive">
+                            <hr>
+
+                            <!-- only show voting options for users of specified mode -->
+                            <mediator-options
+                                v-if="userModes.indexOf(selectedDiscussionVote.mode) >= 0 || selectedDiscussionVote.mode == 'all'"
+                            />
+                            <p v-else class="small">
+                                Because you're not proficient in this proposal's game mode, you're not able to vote :(
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -64,11 +40,11 @@
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex';
 import postData from '../../mixins/postData.js';
 import ModalHeader from './info/ModalHeader.vue';
 import DiscussionContext from './info/DiscussionContext.vue';
 import VotesPublicActive from './info/votes/VotesPublicActive.vue';
-import VotesPrivateActive from './info/votes/VotesPrivateActive.vue';
 import VotesNatOnlyActive from './info/votes/VotesNatOnlyActive.vue';
 import VotesInactive from './info/votes/VotesInactive.vue';
 import MediatorOptions from './info/MediatorOptions.vue';
@@ -79,80 +55,43 @@ export default {
         ModalHeader,
         DiscussionContext,
         VotesPublicActive,
-        VotesPrivateActive,
         VotesNatOnlyActive,
         VotesInactive,
         MediatorOptions,
     },
     mixins: [ postData ],
-    props: {
-        discussion: {
-            type: Object,
-            required: true,
-        },
-        userId: {
-            type: String,
-            required: true,
-        },
-        userModes: {
-            type: Array,
-            default() {
-                return ['osu'];
-            },
-        },
-        isNat: Boolean,
-        isPishifat: Boolean,
-    },
     computed: {
-        agreeMediations() {
-            return this.discussion.mediations.filter(mediation => mediation.vote == 1);
-        },
-        neutralMediations() {
-            return this.discussion.mediations.filter(mediation => mediation.vote == 2);
-        },
-        disagreeMediations() {
-            return this.discussion.mediations.filter(mediation => mediation.vote == 3);
-        },
+        ...mapState([
+            'userId',
+            'userModes',
+            'isNat',
+        ]),
+        ...mapGetters([
+            'selectedDiscussionVote',
+        ]),
     },
     watch: {
-        discussion() {
-            history.pushState(null, 'Discussion Vote', `/discussionvote?id=${this.discussion.id}`);
+        selectedDiscussionVote() {
+            history.pushState(null, 'Discussion Vote', `/discussionvote?id=${this.selectedDiscussionVote.id}`);
         },
-    },
-    created() {
-        history.pushState(null, 'Discussion Vote', `/discussionvote?id=${this.discussion.id}`);
     },
     methods: {
         async concludeMediation (e) {
-            this.info = '';
-            this.confirm = '';
             const result = confirm(`Are you sure?`);
 
             if (result) {
-                const d = await this.executePost(
-                    '/discussionVote/concludeMediation/' + this.discussion.id, e);
+                const discussionVote = await this.executePost(
+                    '/discussionVote/concludeMediation/' + this.selectedDiscussionVote.id, e);
 
-                if (d) {
-                    if (d.error) {
-                        this.info = d.error;
-                    } else {
-                        this.$emit('update-discussion', d);
-                        this.confirm = 'Discussion concluded!';
-                    }
+                if (discussionVote && !discussionVote.error) {
+                    this.$store.dispatch('updateDiscussionVote', discussionVote);
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `concluded vote`,
+                        type: 'info',
+                    });
                 }
             }
         },
     },
 };
 </script>
-
-<style>
-    .bg-active {
-        background-color: var(--available);
-    }
-
-    .bg-inactive {
-        background-color: var(--withdrawn);
-    }
-
-</style>

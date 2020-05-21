@@ -143,7 +143,7 @@ const store = new Vuex.Store({
         updateVeto ({ commit, state }, veto) {
             commit('updateVeto', veto);
 
-            if (state.selectedVeto && state.selectedVeto.id === veto.id) {
+            if (state.selectedVetoId && state.selectedVetoId === veto.id) {
                 commit('setSelectedVetoId', veto.id);
             }
         },

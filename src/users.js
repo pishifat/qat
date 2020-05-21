@@ -138,7 +138,7 @@ const store = new Vuex.Store({
         updateUser ({ commit, state }, user) {
             commit('updateUser', user);
 
-            if (state.selectedUser && state.selectedUser.id === user.id) {
+            if (state.selectedUserId && state.selectedUserId === user.id) {
                 commit('setSelectedUserId', user.id);
             }
         },

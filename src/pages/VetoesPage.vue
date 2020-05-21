@@ -52,12 +52,9 @@
             </section>
         </div>
 
-        <veto-info
-            @update-veto="updateVeto($event)"
-            @update-mediation="updateMediation($event)"
-        />
+        <veto-info />
 
-        <submit-veto @submit-veto="submitVeto($event)" />
+        <submit-veto />
 
         <toast-messages />
     </div>

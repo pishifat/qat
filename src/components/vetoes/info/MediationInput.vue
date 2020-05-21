@@ -69,7 +69,7 @@ export default {
     mixins: [ postData ],
     data() {
         return {
-            comment: '',
+            comment: null,
             vote: null,
             mediationId: null,
         };
@@ -93,6 +93,8 @@ export default {
     methods: {
         findUserMediation() {
             this.mediationId = null;
+            this.comment = null;
+            this.vote = null;
 
             for (let i = 0; i < this.selectedVeto.mediations.length; i++) {
                 let mediation = this.selectedVeto.mediations[i];

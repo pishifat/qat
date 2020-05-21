@@ -53,7 +53,6 @@ router.get('/relevantInfo', async (req, res) => {
         userId: req.session.mongoId,
         userModes: res.locals.userRequest.modes,
         isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
-        isPishifat: res.locals.userRequest.osuId == 3178418,
     });
 });
 

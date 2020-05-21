@@ -227,7 +227,7 @@ export default {
                 this.info = 'Required fields are missing!';
             } else {
                 if (!this.discussionLink) this.discussionLink = '';
-                const discussion = await this.executePost(
+                const discussionVote = await this.executePost(
                     '/discussionVote/submit',
                     {
                         discussionLink: this.discussionLink,
@@ -240,13 +240,13 @@ export default {
                     e
                 );
 
-                if (discussion) {
-                    if (discussion.error) {
-                        this.info = discussion.error;
-                    } else {
-                        $('#addDiscussion').modal('hide');
-                        this.$emit('submit-discussion', discussion);
-                    }
+                if (discussionVote && !discussionVote.error) {
+                    $('#addDiscussion').modal('hide');
+                    this.$store.commit('addDiscussionVote', discussionVote);
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `submitted discussion`,
+                        type: 'info',
+                    });
                 }
             }
         },
