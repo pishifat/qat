@@ -100,7 +100,16 @@ export default {
     methods: {
         async updateContent (e) {
             const result = await this.executePost('/dataCollection/updateContent/' + this.event._id, { reason: this.newEventContent }, e);
-            this.$store.commit('updateEvent', { id: this.event._id, type: this.event.eventType, modifiedField: 'content', value: result });
+            this.$store.commit('updateEvent', {
+                id: this.event._id,
+                type: this.event.eventType,
+                modifiedField: 'content',
+                value: result,
+            });
+            this.$store.dispatch('updateToastMessages', {
+                message: `updated content`,
+                type: 'info',
+            });
         },
     },
 };

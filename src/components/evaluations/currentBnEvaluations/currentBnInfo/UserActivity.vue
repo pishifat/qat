@@ -139,17 +139,3 @@ export default {
     },
 };
 </script>
-
-<style>
-.w-10 {
-    width: 10%;
-}
-
-.w-30 {
-    width: 30%;
-}
-
-.w-60 {
-    width: 60%;
-}
-</style>

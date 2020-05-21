@@ -247,6 +247,18 @@ hr {
     min-width: 150px;
 }
 
+.w-10 {
+    width: 10%;
+}
+
+.w-30 {
+    width: 30%;
+}
+
+.w-60 {
+    width: 60%;
+}
+
 .truncate {
     white-space: nowrap;
     overflow: hidden;

@@ -1,10 +1,10 @@
 <template>
     <div id="editReason" class="modal fade" tabindex="-1">
         <div class="modal-dialog">
-            <div v-if="selectedEntry" class="modal-content custom-bg-dark">
+            <div v-if="selectedEvent" class="modal-content custom-bg-dark">
                 <div class="modal-header text-dark bg-nat-logo">
                     <h5 class="modal-title">
-                        Edit DQ/Reset
+                        Edit {{ selectedEvent.eventType == 'Disqualified' ? 'disqualification' : 'nomination reset' }}
                     </h5>
                     <button type="button" class="close" data-dismiss="modal">
                         <span>&times;</span>
@@ -14,8 +14,13 @@
                     <div class="container text-shadow">
                         <p>
                             Mapset:
-                            <a :href="selectedEntry.postId ? 'https://osu.ppy.sh/beatmapsets/' + selectedEntry.beatmapsetId + '/discussion/-/generalAll#/' + selectedEntry.postId : 'https://osu.ppy.sh/beatmapsets/' + selectedEntry.beatmapsetId + '/discussion/-/events'" target="_blank">
-                                {{ selectedEntry.metadata }}
+                            <a
+                                :href="selectedEvent.postId ?
+                                    'https://osu.ppy.sh/beatmapsets/' + selectedEvent.beatmapsetId + '/discussion/-/generalAll#/' + selectedEvent.postId :
+                                    'https://osu.ppy.sh/beatmapsets/' + selectedEvent.beatmapsetId + '/discussion/-/events'"
+                                target="_blank"
+                            >
+                                {{ selectedEvent.metadata }}
                             </a>
                         </p>
                         <div class="d-flex">
@@ -32,17 +37,14 @@
                         </div>
                         <obviousness-severity
                             class="small"
-                            :obviousness="selectedEntry.obviousness"
-                            :severity="selectedEntry.severity"
-                            :event-id="selectedEntry._id"
-                            :event-type="selectedEntry.eventType"
+                            :obviousness="selectedEvent.obviousness"
+                            :severity="selectedEvent.severity"
+                            :event-id="selectedEvent._id"
+                            :event-type="selectedEvent.eventType"
                             @update-obviousness="$emit('update-obviousness', $event);"
                             @update-severity="$emit('update-severity', $event);"
                         />
                     </div>
-                    <p id="errors" class="errors">
-                        {{ info }}
-                    </p>
                 </div>
             </div>
         </div>
@@ -50,8 +52,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import postData from '../../mixins/postData.js';
-import filterLinks from '../../mixins/filterLinks.js';
 import ObviousnessSeverity from '../evaluations/currentBnEvaluations/currentBnInfo/ObviousnessSeverity.vue';
 
 export default {
@@ -59,28 +61,35 @@ export default {
     components: {
         ObviousnessSeverity,
     },
-    mixins: [postData, filterLinks],
-    props: {
-        selectedEntry: Object,
-    },
+    mixins: [postData],
     data() {
         return {
-            reasonInput: '',
-            confirm: '',
-            info: '',
-            tempId: null,
             newEventContent: null,
         };
     },
+    computed: {
+        ...mapGetters([
+            'selectedEvent',
+        ]),
+    },
     watch: {
-        selectedEntry() {
-            this.newEventContent = this.selectedEntry.content;
+        selectedEvent() {
+            this.newEventContent = this.selectedEvent.content;
         },
     },
     methods: {
         async updateContent(e) {
-            const result = await this.executePost('/dataCollection/updateContent/' + this.selectedEntry.id, { reason: this.newEventContent }, e);
-            this.$emit('update-content', { id: this.selectedEntry._id, type: this.selectedEntry.eventType, value: result });
+            const result = await this.executePost('/dataCollection/updateContent/' + this.selectedEvent.id, { reason: this.newEventContent }, e);
+            this.$store.commit('updateEvent', {
+                id: this.selectedEvent.id,
+                type: this.selectedEvent.eventType,
+                modifiedField: 'content',
+                value: result,
+            });
+            this.$store.dispatch('updateToastMessages', {
+                message: `updated content`,
+                type: 'info',
+            });
         },
     },
 };

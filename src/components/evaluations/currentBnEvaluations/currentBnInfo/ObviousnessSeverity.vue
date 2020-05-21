@@ -50,11 +50,10 @@
 
 <script>
 import postData from '../../../../mixins/postData.js';
-import filterLinks from '../../../../mixins/filterLinks.js';
 
 export default {
-    name: 'NominationResetEditing',
-    mixins: [ postData, filterLinks ],
+    name: 'ObviousnessSeverity',
+    mixins: [ postData ],
     props: {
         obviousness: {
             type: Number || null,
@@ -78,11 +77,19 @@ export default {
             let result = await this.executePost('/dataCollection/updateObviousness/' + this.eventId, { obviousness });
             if (result == this.obviousness) result = null;
             this.$store.commit('updateEvent', { id: this.eventId, type: this.eventType, modifiedField: 'obviousness', value: result });
+            this.$store.dispatch('updateToastMessages', {
+                message: `updated obviousness`,
+                type: 'info',
+            });
         },
         async updateSeverity(severity) {
             let result = await this.executePost('/dataCollection/updateSeverity/' + this.eventId, { severity });
             if (result == this.severity) result = null;
             this.$store.commit('updateEvent', { id: this.eventId, type: this.eventType, modifiedField: 'severity', value: result });
+            this.$store.dispatch('updateToastMessages', {
+                message: `updated severity`,
+                type: 'info',
+            });
         },
     },
 };
