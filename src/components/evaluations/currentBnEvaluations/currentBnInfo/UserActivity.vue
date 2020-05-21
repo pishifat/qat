@@ -60,7 +60,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 import postData from '../../../../mixins/postData.js';
 import filterLinks from '../../../../mixins/filterLinks.js';
 import EventsList from './EventsList.vue';
@@ -84,10 +84,18 @@ export default {
             type: String,
             required: true,
         },
+        osuId: {
+            type: Number,
+            required: true,
+        },
+        mongoId: {
+            type: String,
+            required: true,
+        },
+        isNat: Boolean,
     },
     computed: {
         ...mapState({
-            isNat: (state) => state.isNat,
             nominations: (state) => state.userActivity.nominations,
             nominationsDisqualified: (state) => state.userActivity.nominationsDisqualified,
             nominationsPopped: (state) => state.userActivity.nominationsPopped,
@@ -99,12 +107,9 @@ export default {
             natApplications: (state) => state.userActivity.natApplications,
             natEvalRounds: (state) => state.userActivity.natEvalRounds,
         }),
-        ...mapGetters([
-            'selectedUser',
-        ]),
     },
     watch: {
-        selectedUser() {
+        mongoId() {
             this.findRelevantActivity();
         },
     },
@@ -115,7 +120,7 @@ export default {
         async findRelevantActivity() {
             this.$store.commit('setIsLoading', true);
 
-            const res = await this.executeGet('/bnEval/userActivity/' + this.selectedUser.osuId + '/' + this.modes + '/' + new Date(this.deadline).getTime() + '/' + this.selectedUser.id);
+            const res = await this.executeGet('/bnEval/userActivity/' + this.osuId + '/' + this.modes + '/' + new Date(this.deadline).getTime() + '/' + this.mongoId);
 
             if (res) {
                 this.$store.commit('setNominations', res.noms);

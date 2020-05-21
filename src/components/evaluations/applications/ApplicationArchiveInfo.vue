@@ -1,43 +1,39 @@
 <template>
     <div id="applicationArchiveInfo" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-lg">
-            <div v-if="application" class="modal-content custom-bg-dark">
+            <div v-if="selectedDiscussApp" class="modal-content custom-bg-dark">
                 <modal-header
-                    :mode="application.mode"
-                    :nat-evaluators="application.natEvaluators"
+                    :osu-id="selectedDiscussApp.applicant.osuId"
+                    :username="selectedDiscussApp.applicant.username"
+                    :mode="selectedDiscussApp.mode"
+                    :nat-evaluators="selectedDiscussApp.natEvaluators"
                     :is-application="true"
-                    :osu-id="application.applicant.osuId"
-                    :username="application.applicant.username"
-                    :evaluator-mongo-id="evaluator.id"
                 />
                 <div class="modal-body" style="overflow: hidden;">
                     <div class="container">
                         <mods
-                            :mods="application.mods"
-                            :reasons="application.reasons"
-                            :osu-id="application.applicant.osuId"
+                            :mods="selectedDiscussApp.mods"
+                            :reasons="selectedDiscussApp.reasons"
+                            :osu-id="selectedDiscussApp.applicant.osuId"
                         />
                         <test-results
                             v-if="evaluator.isNat"
-                            :test-score="application.test.totalScore"
-                            :osu-id="application.applicant.osuId"
+                            :test-score="selectedDiscussApp.test.totalScore"
+                            :osu-id="selectedDiscussApp.applicant.osuId"
                         />
                         <consensus
-                            :consensus="application.consensus"
-                            :nominator-assessment-mongo-id="application.id"
                             :is-application="true"
                             :is-archive="true"
-                            @update-nominator-assessment="$emit('update-application', $event);"
                         />
                         <p class="min-spacing text-shadow">
                             Application Feedback:
                         </p>
-                        <pre class="secondary-text pre-font text-shadow small ml-4" v-html="filterLinks(application.feedback)" />
-                        <hr v-if="application.consensus">
+                        <pre class="secondary-text pre-font text-shadow small ml-4" v-html="filterLinks(selectedDiscussApp.feedback)" />
+                        <hr v-if="selectedDiscussApp.consensus">
                         <evaluations
-                            :evaluations="application.evaluations"
+                            :evaluations="selectedDiscussApp.evaluations"
                             :is-nat="evaluator.isNat"
-                            :consensus="application.consensus"
+                            :consensus="selectedDiscussApp.consensus"
                         />
                         <button
                             class="btn btn-sm btn-nat-red float-right"
@@ -53,6 +49,7 @@
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex';
 import filterLinks from '../../../mixins/filterLinks.js';
 import postData from '../../../mixins/postData.js';
 import ModalHeader from '../info/ModalHeader.vue';
@@ -71,34 +68,33 @@ export default {
         Evaluations,
     },
     mixins: [ filterLinks, postData ],
-    props: {
-        application: {
-            type: Object,
-            default() {
-                return {};
-            },
-        },
-        evaluator: {
-            type: Object,
-            default() {
-                return {};
-            },
-        },
+    computed: {
+        ...mapState([
+            'evaluator',
+        ]),
+        ...mapGetters([
+            'selectedDiscussApp',
+        ]),
     },
     watch: {
-        application() {
-            history.pushState(null, 'BN Application Evaluations', `/evalArchive?eval=${this.application.id}`);
+        selectedDiscussApp() {
+            history.pushState(null, 'BN Application Evaluations', `/evalArchive?eval=${this.selectedDiscussApp.id}`);
         },
+    },
+    created() {
+        if (this.selectedDiscussApp) {
+            history.pushState(null, 'BN Application Evaluations', `/evalArchive?eval=${this.selectedDiscussApp.id}`);
+        }
     },
     methods: {
         async unarchive(e) {
-            const result = confirm(`Are you sure? ${this.application.consensus == 'pass' ? 'This will remove the user from the BN' : ''}`);
+            const result = confirm(`Are you sure? ${this.selectedDiscussApp.consensus == 'pass' ? 'This will remove the user from the BN' : ''}`);
 
             if (result) {
-                const er = await this.executePost('/evalArchive/unarchive/' + this.application.id, { type: 'application' }, e);
+                const er = await this.executePost('/evalArchive/unarchive/' + this.selectedDiscussApp.id, { type: 'application' }, e);
 
                 if (er) {
-                    window.location = '/appeval?eval=' + this.application.id;
+                    window.location = '/appeval?eval=' + this.selectedDiscussApp.id;
                 }
             }
         },

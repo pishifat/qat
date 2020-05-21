@@ -86,11 +86,6 @@ export default {
         FilterBox,
     },
     mixins: [postData],
-    data() {
-        return {
-            selectedUser: null,
-        };
-    },
     computed: {
         ...mapState([
             'userId',

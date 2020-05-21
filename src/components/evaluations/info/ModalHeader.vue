@@ -22,23 +22,42 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 
 export default {
     name: 'ModalHeader',
     props: {
-        mode: String,
-        natEvaluators: Array,
         isApplication: Boolean,
-        osuId: Number,
-        username: String,
-        evaluatorMongoId: String,
+        osuId: {
+            type: Number,
+            required: true,
+        },
+        username: {
+            type: String,
+            required: true,
+        },
+        mode: {
+            type: String,
+            required: true,
+        },
+        natEvaluators: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
+    },
+    computed: {
+        ...mapGetters([
+            'evaluatorId',
+        ]),
     },
     methods: {
         isNatEvaluator() {
             for (let i = 0; i < this.natEvaluators.length; i++) {
                 let user = this.natEvaluators[i];
 
-                if (user.id == this.evaluatorMongoId) {
+                if (user.id == this.evaluatorId) {
                     return true;
                 }
             }

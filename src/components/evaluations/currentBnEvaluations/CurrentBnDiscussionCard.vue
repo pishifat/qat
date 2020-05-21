@@ -32,6 +32,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import CardHeader from '../card/CardHeader.vue';
 import CardFooter from '../card/CardFooter.vue';
 
@@ -46,10 +47,6 @@ export default {
             type: Object,
             required: true,
         },
-        evaluator: {
-            type: Object,
-            required: true,
-        },
         allChecked: Boolean,
         isArchive: Boolean,
     },
@@ -58,6 +55,11 @@ export default {
             isSelected: false,
         };
     },
+    computed: {
+        ...mapState([
+            'evaluator',
+        ]),
+    },
     watch: {
         allChecked() {
             this.checkSelection();
@@ -65,7 +67,7 @@ export default {
     },
     methods: {
         selectEvalRound() {
-            this.$emit('update:selected-discuss-round', this.evalRound);
+            this.$store.commit('setSelectedDiscussRoundId', this.evalRound.id);
         },
         findRelevantEval() {
             let vote;

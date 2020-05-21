@@ -16,16 +16,28 @@
 </template>
 
 <script>
-
 import filterLinks from '../../../../mixins/filterLinks.js';
 
 export default {
     name: 'Mods',
     mixins: [ filterLinks ],
     props: {
-        mods: Array,
-        reasons: Array,
-        osuId: Number,
+        mods: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
+        reasons: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
+        osuId: {
+            type: Number,
+            required: true,
+        },
     },
     methods: {
         modUrl(mod) {

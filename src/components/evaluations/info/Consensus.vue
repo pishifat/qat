@@ -88,7 +88,7 @@ export default {
         },
         nominatorAssessmentMongoId: {
             type: String,
-            required: true,
+            default: '',
         },
         isApplication: Boolean,
         isLowActivity: Boolean,

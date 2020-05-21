@@ -15,10 +15,14 @@
                             <user-activity
                                 :modes="selectedUser.modes"
                                 :deadline="new Date().toString()"
+                                :osu-id="selectedUser.osuId"
+                                :is-nat="isNat"
+                                :mongo-id="selectedUser.id"
                             />
                         </div>
                         <modding-activity
                             v-if="isNat"
+                            :username="selectedUser.username"
                             class="mt-2"
                         />
 

@@ -33,6 +33,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import CardHeader from '../card/CardHeader.vue';
 import CardFooter from '../card/CardFooter.vue';
 
@@ -47,10 +48,6 @@ export default {
             type: Object,
             required: true,
         },
-        evaluator: {
-            type: Object,
-            required: true,
-        },
         allChecked: Boolean,
         isArchive: Boolean,
     },
@@ -60,6 +57,9 @@ export default {
         };
     },
     computed: {
+        ...mapState([
+            'evaluator',
+        ]),
         consensus() {
             return this.application.consensus;
         },
@@ -71,7 +71,7 @@ export default {
     },
     methods: {
         selectApplication() {
-            this.$emit('update:selected-application', this.application);
+            this.$store.commit('setSelectedDiscussAppId', this.application.id);
         },
         findRelevantEval() {
             let vote;

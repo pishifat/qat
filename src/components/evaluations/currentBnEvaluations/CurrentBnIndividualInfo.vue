@@ -21,7 +21,7 @@
                                 :modes="modes"
                                 :deadline="evalRound.deadline"
                                 :is-nat="evaluator.isNat"
-                                :user-mongo-id="evalRound.bn.id"
+                                :mongo-id="evalRound.bn.id"
                             />
                         </div>
                     </div>
