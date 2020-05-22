@@ -103,9 +103,7 @@
 
         <current-bn-discussion-info />
 
-        <add-eval-rounds
-            @update-all-eval-rounds="updateAllEvalRounds($event)"
-        />
+        <add-eval-rounds />
 
         <toast-messages />
     </div>
@@ -190,10 +188,6 @@ export default {
         }, 300000);
     },
     methods: {
-        updateAllEvalRounds (evalRounds) {
-            this.allObjs = evalRounds;
-            this.filter();
-        },
         selectAll() {
             let checkBoxes = $('input[name=\'evalTypeCheck\'');
             checkBoxes.prop('checked', !checkBoxes.prop('checked'));
@@ -215,6 +209,10 @@ export default {
 
                 if (evalRounds && !evalRounds.error) {
                     this.$store.commit('setEvalRounds', evalRounds);
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `set as group eval`,
+                        type: 'info',
+                    });
                 }
             }
         },
@@ -229,6 +227,10 @@ export default {
 
                 if (evalRounds && !evalRounds.error) {
                     this.$store.commit('setEvalRounds', evalRounds);
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `set as individual eval`,
+                        type: 'info',
+                    });
                 }
             }
         },
@@ -246,6 +248,10 @@ export default {
 
                     if (evalRounds && !evalRounds.error) {
                         this.$store.commit('setEvalRounds', evalRounds);
+                        this.$store.dispatch('updateToastMessages', {
+                            message: `archived`,
+                            type: 'info',
+                        });
                     }
                 }
             }

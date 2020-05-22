@@ -17,6 +17,7 @@ const store = new Vuex.Store({
         evaluator: null,
         selectedIndividualRoundId: null,
         selectedDiscussRoundId: null,
+        isNat: true, // static. required for userActivityModule
         filters: {
             mode: '',
             value: '',
