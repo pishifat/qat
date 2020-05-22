@@ -1,13 +1,8 @@
 <template>
     <div class="row">
-        <p class="errors mx-auto">
-            {{ info }}
-        </p>
         <div class="col-md-12">
             <filter-box
-                :filter-mode.sync="filterMode"
-                :filter-value.sync="filterValue"
-                :placeholder="'username... (3+ characters)'"
+                :placeholder="'enter to search username...'"
                 :options="['', 'osu', 'taiko', 'catch', 'mania']"
             >
                 <slot>
@@ -46,24 +41,20 @@
                             data-toggle="tooltip"
                             data-placement="top"
                             title="Evaluations are hidden from others to avoid confirmation bias"
-                        >?</sup> <small v-if="applications">({{ applications.length }})</small>
+                        >?</sup> <small v-if="individualApplications">({{ individualApplications.length }})</small>
                     </h2>
 
                     <transition-group name="list" tag="div" class="row">
                         <application-individual-card
-                            v-for="application in applications"
+                            v-for="application in individualApplications"
                             :key="application.id"
                             :application="application"
-                            :evaluator="evaluator"
                             :all-checked="allChecked"
-                            :user-to-evaluate="application.applicant"
-                            :mode="application.mode"
-                            @update:selected-application="selectedApplication = $event"
                         />
                     </transition-group>
 
                     <div class="row">
-                        <p v-if="!applications || applications.length == 0" class="ml-4">
+                        <p v-if="!individualApplications || !individualApplications.length" class="ml-4">
                             No applications to evaluate...
                         </p>
                     </div>
@@ -79,22 +70,20 @@
                             data-placement="top"
                             :title="evaluator && evaluator.isNat ? 'After individual evals are completed, their responses are made visible to allow discussion and form a consensus' : 'Results of archived evaluations you were assigned to'"
                         >?</sup>
-                        <small v-if="discussApps">({{ discussApps.length }})</small>
+                        <small v-if="discussApplications">({{ discussApplications.length }})</small>
                     </h2>
 
                     <transition-group name="list" tag="div" class="row">
                         <application-discussion-card
-                            v-for="application in discussApps"
+                            v-for="application in discussApplications"
                             :key="application.id"
                             :application="application"
-                            :evaluator="evaluator"
                             :all-checked="allChecked"
-                            @update:selected-application="selectedDiscussApp = $event"
                         />
                     </transition-group>
 
                     <div class="row">
-                        <p v-if="!discussApps || discussApps.length == 0" class="ml-4">
+                        <p v-if="!discussApplications || !discussApplications.length" class="ml-4">
                             No applications to evaluate...
                         </p>
                     </div>
@@ -102,21 +91,17 @@
             </section>
         </div>
 
-        <application-individual-info
-            :application="selectedApplication"
-            :evaluator="evaluator"
-            @update-application="updateApplication($event)"
-        />
+        <application-individual-info />
 
-        <application-discussion-info
-            :application="selectedDiscussApp"
-            :evaluator="evaluator"
-            @update-application="updateApplication($event)"
-        />
+        <application-discussion-info />
+
+        <toast-messages />
     </div>
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex';
+import ToastMessages from '../components/ToastMessages.vue';
 import ApplicationIndividualCard from '../components/evaluations/applications/ApplicationIndividualCard.vue';
 import ApplicationIndividualInfo from '../components/evaluations/applications/ApplicationIndividualInfo.vue';
 import ApplicationDiscussionCard from '../components/evaluations/applications/ApplicationDiscussionCard.vue';
@@ -129,6 +114,7 @@ import postData from '../mixins/postData.js';
 export default {
     name: 'AppEvalPage',
     components: {
+        ToastMessages,
         ApplicationIndividualCard,
         ApplicationIndividualInfo,
         ApplicationDiscussionCard,
@@ -139,51 +125,42 @@ export default {
     mixins: [ postData, filters ],
     data() {
         return {
-            allObjs: null,
-            filteredObjs: null,
-            pageObjs: null,
-            applications: null,
-            discussApps: null,
             allChecked: false,
-            selectedApplication: null,
-            selectedDiscussApp: null,
-            evaluator: null,
-            info: '',
         };
     },
-    watch: {
-        selectedApplication() {
-            this.info = '';
-        },
-        selectedDiscussApp() {
-            this.info = '';
-        },
+    computed: {
+        ...mapState([
+            'applications',
+            'evaluator',
+        ]),
+        ...mapGetters([
+            'individualApplications',
+            'discussApplications',
+        ]),
     },
     async created() {
         const res = await this.executeGet('/appEval/relevantInfo');
 
         if (res) {
-            this.allObjs = res.a;
-            this.evaluator = res.evaluator;
-            this.filterMode = res.evaluator.modes[0] || 'osu';
-            this.hasPagination = false;
-            this.hasSeparation = true;
-            this.filter();
+            this.$store.commit('setApplications', res.a);
+            this.$store.commit('setEvaluator', res.evaluator);
+            this.$store.commit('setFilterMode', res.evaluator.modes[0] || 'osu');
+
             const params = new URLSearchParams(document.location.search.substring(1));
 
             if (params.get('eval') && params.get('eval').length) {
-                const i = this.allObjs.findIndex(a => a.id == params.get('eval'));
+                const i = this.applications.findIndex(a => a.id == params.get('eval'));
 
                 if (i >= 0) {
-                    if (!this.allObjs[i].discussion) {
-                        this.selectedApplication = this.allObjs[i];
+                    if (!this.applications[i].discussion) {
+                        this.$store.commit('setSelectedIndividualApplicationId', params.get('eval'));
                         $('#applicationIndividualInfo').modal('show');
                     } else {
-                        this.selectedDiscussApp = this.allObjs[i];
+                        this.$store.commit('setSelectedDiscussApplicationId', params.get('eval'));
                         $('#applicationDiscussionInfo').modal('show');
                     }
                 } else if (this.evaluator.isNat) {
-                    window.location = '/evalArchive?eval=' + params.get('eval');
+                    //window.location = '/evalArchive?eval=' + params.get('eval');
                 }
             }
         }
@@ -196,35 +173,11 @@ export default {
             const res = await this.executeGet('/appEval/relevantInfo');
 
             if (res) {
-                this.allObjs = res.a;
-                this.filter();
+                this.$store.commit('setApplications', res.a);
             }
         }, 300000);
     },
     methods: {
-        filterBySearchValueContext(a) {
-            if (a.applicant.username.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1) {
-                return true;
-            }
-
-            return false;
-        },
-        separateObjs() {
-            this.applications = this.pageObjs.filter(v => !v.discussion);
-            this.discussApps = this.pageObjs.filter(v => v.discussion);
-        },
-        updateApplication (application) {
-            const i = this.allObjs.findIndex(a => a.id == application.id);
-            this.allObjs[i] = application;
-
-            if (application.discussion) {
-                this.selectedDiscussApp = application;
-            } else {
-                this.selectedApplication = application;
-            }
-
-            this.filter();
-        },
         async setGroupEval(e) {
             let checkedApps = [];
             $('input[name=\'evalTypeCheck\']:checked').each( function () {
@@ -235,15 +188,14 @@ export default {
                 const result = confirm(`Are you sure?`);
 
                 if (result) {
-                    const ers = await this.executePost('/appEval/setGroupEval/', { checkedApps }, e);
+                    const applications = await this.executePost('/appEval/setGroupEval/', { checkedApps }, e);
 
-                    if (ers) {
-                        if (ers.error) {
-                            this.info = ers.error;
-                        } else {
-                            this.allObjs = ers;
-                            this.filter();
-                        }
+                    if (applications && !applications.error) {
+                        this.$store.commit('setApplications', applications);
+                        this.$store.dispatch('updateToastMessages', {
+                            message: `set as group eval`,
+                            type: 'info',
+                        });
                     }
                 }
             }
@@ -258,15 +210,14 @@ export default {
                 const result = confirm(`Are you sure?`);
 
                 if (result) {
-                    const ers = await this.executePost('/appEval/setIndividualEval/', { checkedApps }, e);
+                    const applications = await this.executePost('/appEval/setIndividualEval/', { checkedApps }, e);
 
-                    if (ers) {
-                        if (ers.error) {
-                            this.info = ers.error;
-                        } else {
-                            this.allObjs = ers;
-                            this.filter();
-                        }
+                    if (applications && !applications.error) {
+                        this.$store.commit('setApplications', applications);
+                        this.$store.dispatch('updateToastMessages', {
+                            message: `set as individual eval`,
+                            type: 'info',
+                        });
                     }
                 }
             }
@@ -281,15 +232,14 @@ export default {
                 const result = confirm(`Are you sure? The consensus of any evaluation will affect its respective user.\n\nOnly do this after feedback PMs have been sent.`);
 
                 if (result) {
-                    const ers = await this.executePost('/appEval/setComplete/', { checkedApps }, e);
+                    const applications = await this.executePost('/appEval/setComplete/', { checkedApps }, e);
 
-                    if (ers) {
-                        if (ers.error) {
-                            this.info = ers.error;
-                        } else {
-                            this.allObjs = ers;
-                            this.filter();
-                        }
+                    if (applications && !applications.error) {
+                        this.$store.commit('setApplications', applications);
+                        this.$store.dispatch('updateToastMessages', {
+                            message: `archived`,
+                            type: 'info',
+                        });
                     }
                 }
             }

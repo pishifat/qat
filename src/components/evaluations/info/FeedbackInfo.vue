@@ -127,7 +127,7 @@ export default {
                 `/${this.isApplication ? 'appEval' : 'bnEval'}/setFeedback/` + this.nominatorAssessmentMongoId, { feedback: this.feedback, hasFeedback: this.savedFeedback }, e);
 
             if (result && !result.error) {
-                this.$store.dispatch('updateEvalRound', result);
+                this.$store.dispatch(this.isApplication ? 'updateApplication' : 'updateEvalRound', result);
                 this.$store.dispatch('updateToastMessages', {
                     message: `saved feedback`,
                     type: 'info',

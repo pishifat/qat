@@ -15,7 +15,7 @@ const store = new Vuex.Store({
     state: {
         applications: [],
         evalRounds: [],
-        selectedDiscussAppId: null,
+        selectedDiscussApplicationId: null,
         selectedDiscussRoundId: null,
         isQueried: false,
         evaluator: null,
@@ -33,16 +33,16 @@ const store = new Vuex.Store({
         setEvalRounds (state, evalRounds) {
             state.evalRounds = evalRounds;
         },
-        setSelectedDiscussAppId (state, id) {
-            state.selectedDiscussAppId = id;
+        setSelectedDiscussApplicationId (state, id) {
+            state.selectedDiscussApplicationId = id;
         },
         setSelectedDiscussRoundId (state, id) {
             state.selectedDiscussRoundId = id;
         },
     },
     getters: {
-        selectedDiscussApp: (state) => {
-            return state.applications.find(a => a.id === state.selectedDiscussAppId);
+        selectedDiscussApplication: (state) => {
+            return state.applications.find(a => a.id === state.selectedDiscussApplicationId);
         },
         selectedDiscussRound: (state) => {
             return state.evalRounds.find(a => a.id === state.selectedDiscussRoundId);

@@ -57,7 +57,6 @@
                         <hr>
                         <evaluation-input
                             :nominator-assessment-mongo-id="selectedIndividualRound.id"
-                            :evaluator-mongo-id="evaluator.id"
                             :evaluations="selectedIndividualRound.evaluations"
                         />
                     </div>

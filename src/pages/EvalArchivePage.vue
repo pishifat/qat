@@ -104,8 +104,6 @@ export default {
             'applications',
             'evalRounds',
             'isQueried',
-            'selectedDiscussAppId',
-            'selectedDiscussRoundId',
         ]),
     },
     async created() {

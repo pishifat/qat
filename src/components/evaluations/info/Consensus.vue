@@ -135,7 +135,7 @@ export default {
     methods: {
         async setConsensus(consensus, e, addition) {
             const result = await this.executePost(
-                `/${this.isApplication? 'appEval' : 'bnEval'}/setConsensus/` + this.nominatorAssessmentMongoId, {
+                `/${this.isApplication ? 'appEval' : 'bnEval'}/setConsensus/` + this.nominatorAssessmentMongoId, {
                     consensus,
                     isLowActivity: addition == 'isLowActivity',
                     resignedOnGoodTerms: addition == 'resignedOnGoodTerms',
@@ -145,7 +145,7 @@ export default {
                 }, e);
 
             if (result && !result.error) {
-                this.$store.dispatch('updateEvalRound', result);
+                this.$store.dispatch(this.isApplication ? 'updateApplication' : 'updateEvalRound', result);
                 this.$store.dispatch('updateToastMessages', {
                     message: `saved consensus`,
                     type: 'info',

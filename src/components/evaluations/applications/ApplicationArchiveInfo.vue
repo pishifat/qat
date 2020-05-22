@@ -1,25 +1,25 @@
 <template>
     <div id="applicationArchiveInfo" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-lg">
-            <div v-if="selectedDiscussApp" class="modal-content custom-bg-dark">
+            <div v-if="selectedDiscussApplication" class="modal-content custom-bg-dark">
                 <modal-header
-                    :osu-id="selectedDiscussApp.applicant.osuId"
-                    :username="selectedDiscussApp.applicant.username"
-                    :mode="selectedDiscussApp.mode"
-                    :nat-evaluators="selectedDiscussApp.natEvaluators"
+                    :osu-id="selectedDiscussApplication.applicant.osuId"
+                    :username="selectedDiscussApplication.applicant.username"
+                    :mode="selectedDiscussApplication.mode"
+                    :nat-evaluators="selectedDiscussApplication.natEvaluators"
                     :is-application="true"
                 />
                 <div class="modal-body" style="overflow: hidden;">
                     <div class="container">
                         <mods
-                            :mods="selectedDiscussApp.mods"
-                            :reasons="selectedDiscussApp.reasons"
-                            :osu-id="selectedDiscussApp.applicant.osuId"
+                            :mods="selectedDiscussApplication.mods"
+                            :reasons="selectedDiscussApplication.reasons"
+                            :osu-id="selectedDiscussApplication.applicant.osuId"
                         />
                         <test-results
                             v-if="evaluator.isNat"
-                            :test-score="selectedDiscussApp.test.totalScore"
-                            :osu-id="selectedDiscussApp.applicant.osuId"
+                            :test-score="selectedDiscussApplication.test.totalScore"
+                            :osu-id="selectedDiscussApplication.applicant.osuId"
                         />
                         <consensus
                             :is-application="true"
@@ -28,12 +28,12 @@
                         <p class="min-spacing text-shadow">
                             Application Feedback:
                         </p>
-                        <pre class="secondary-text pre-font text-shadow small ml-4" v-html="filterLinks(selectedDiscussApp.feedback)" />
-                        <hr v-if="selectedDiscussApp.consensus">
+                        <pre class="secondary-text pre-font text-shadow small ml-4" v-html="filterLinks(selectedDiscussApplication.feedback)" />
+                        <hr v-if="selectedDiscussApplication.consensus">
                         <evaluations
-                            :evaluations="selectedDiscussApp.evaluations"
+                            :evaluations="selectedDiscussApplication.evaluations"
                             :is-nat="evaluator.isNat"
-                            :consensus="selectedDiscussApp.consensus"
+                            :consensus="selectedDiscussApplication.consensus"
                         />
                         <button
                             class="btn btn-sm btn-nat-red float-right"
@@ -73,28 +73,23 @@ export default {
             'evaluator',
         ]),
         ...mapGetters([
-            'selectedDiscussApp',
+            'selectedDiscussApplication',
         ]),
     },
     watch: {
-        selectedDiscussApp() {
-            history.pushState(null, 'BN Application Evaluations', `/evalArchive?eval=${this.selectedDiscussApp.id}`);
+        selectedDiscussApplication() {
+            history.pushState(null, 'BN Application Evaluations', `/evalArchive?eval=${this.selectedDiscussApplication.id}`);
         },
-    },
-    created() {
-        if (this.selectedDiscussApp) {
-            history.pushState(null, 'BN Application Evaluations', `/evalArchive?eval=${this.selectedDiscussApp.id}`);
-        }
     },
     methods: {
         async unarchive(e) {
-            const result = confirm(`Are you sure? ${this.selectedDiscussApp.consensus == 'pass' ? 'This will remove the user from the BN' : ''}`);
+            const result = confirm(`Are you sure? ${this.selectedDiscussApplication.consensus == 'pass' ? 'This will remove the user from the BN' : ''}`);
 
             if (result) {
-                const er = await this.executePost('/evalArchive/unarchive/' + this.selectedDiscussApp.id, { type: 'application' }, e);
+                const er = await this.executePost('/evalArchive/unarchive/' + this.selectedDiscussApplication.id, { type: 'application' }, e);
 
                 if (er) {
-                    window.location = '/appeval?eval=' + this.selectedDiscussApp.id;
+                    window.location = '/appeval?eval=' + this.selectedDiscussApplication.id;
                 }
             }
         },

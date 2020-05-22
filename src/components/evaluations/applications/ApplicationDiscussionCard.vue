@@ -71,7 +71,7 @@ export default {
     },
     methods: {
         selectApplication() {
-            this.$store.commit('setSelectedDiscussAppId', this.application.id);
+            this.$store.commit('setSelectedDiscussApplicationId', this.application.id);
         },
         findRelevantEval() {
             let vote;

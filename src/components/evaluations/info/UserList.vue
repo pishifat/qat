@@ -53,7 +53,7 @@ export default {
                 const r = await this.executePost(`/${this.isApplication ? 'appEval' : 'bnEval'}/replaceUser/${this.nominatorAssessmentMongoId}`, { evaluatorId, isNat: this.isNat }, e);
 
                 if (r && !r.error) {
-                    this.$store.dispatch('updateEvalRound', r);
+                    this.$store.dispatch(this.isApplication ? 'updateApplication' : 'updateEvalRound', r);
                     this.$store.dispatch('updateToastMessages', {
                         message: `replaced user`,
                         type: 'info',

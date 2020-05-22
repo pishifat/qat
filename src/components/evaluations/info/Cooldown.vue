@@ -78,10 +78,10 @@ export default {
         async setCooldownDate(e) {
             if (!this.invalidDate.length) {
                 const result = await this.executePost(
-                    `/${this.isApplication? 'appEval' : 'bnEval'}/setCooldownDate/` + this.nominatorAssessmentMongoId, { cooldownDate: this.newCooldownDate }, e);
+                    `/${this.isApplication ? 'appEval' : 'bnEval'}/setCooldownDate/` + this.nominatorAssessmentMongoId, { cooldownDate: this.newCooldownDate }, e);
 
                 if (result && !result.error) {
-                    this.$store.dispatch('updateEvalRound', result);
+                    this.$store.dispatch(this.isApplication ? 'updateApplication' : 'updateEvalRound', result);
                     this.$store.dispatch('updateToastMessages', {
                         message: `saved cooldown date`,
                         type: 'info',

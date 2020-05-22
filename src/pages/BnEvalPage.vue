@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col-md-12">
             <filter-box
-                :placeholder="'username... (3+ characters)'"
+                :placeholder="'enter to search username...'"
                 :options="['', 'osu', 'taiko', 'catch', 'mania']"
             >
                 <slot>
@@ -56,11 +56,7 @@
                             v-for="evalRound in individualRounds"
                             :key="evalRound.id"
                             :eval-round="evalRound"
-                            :evaluator="evaluator"
                             :all-checked="allChecked"
-                            :user-to-evaluate="evalRound.bn"
-                            :mode="evalRound.mode"
-                            @update:selected-eval-round="selectedEvalRound = $event"
                         />
                     </transition-group>
 
@@ -86,9 +82,7 @@
                             v-for="evalRound in discussRounds"
                             :key="evalRound.id"
                             :eval-round="evalRound"
-                            :evaluator="evaluator"
                             :all-checked="allChecked"
-                            @update:selected-discuss-round="selectedDiscussRound = $event"
                         />
                     </transition-group>
 
