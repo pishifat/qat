@@ -190,9 +190,6 @@
                                 placeholder="change..."
                             >
                         </div>
-                        <p class="errors text-shadow">
-                            {{ info }}
-                        </p>
                         <hr>
                         <button type="submit" class="btn btn-nat float-right" @click="submitDiscussion($event)">
                             Submit
@@ -218,13 +215,15 @@ export default {
             mode: null,
             group: 'bn',
             neutral: 'neutral',
-            info: null,
         };
     },
     methods: {
         async submitDiscussion(e) {
             if (!this.shortReason || !this.title || !this.mode) {
-                this.info = 'Required fields are missing!';
+                this.$store.dispatch('updateToastMessages', {
+                    message: `required fields missing!`,
+                    type: 'danger',
+                });
             } else {
                 if (!this.discussionLink) this.discussionLink = '';
                 const discussionVote = await this.executePost(

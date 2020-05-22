@@ -17,7 +17,7 @@ const store = new Vuex.Store({
         evaluator: null,
         selectedIndividualRoundId: null,
         selectedDiscussRoundId: null,
-        isNat: true, // static. required for userActivityModule
+        isNat: false,
         filters: {
             mode: '',
             value: '',
@@ -29,6 +29,7 @@ const store = new Vuex.Store({
         },
         setEvaluator (state, evaluator) {
             state.evaluator = evaluator;
+            state.isNat = evaluator.isNat;
         },
         setSelectedIndividualRoundId (state, id) {
             state.selectedIndividualRoundId = id;

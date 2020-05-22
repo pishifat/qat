@@ -44,7 +44,6 @@
                             :consensus="selectedDiscussApplication.consensus"
                             :nominator-assessment-mongo-id="selectedDiscussApplication.id"
                             :is-application="true"
-                            @update-nominator-assessment="$emit('update-application', $event);"
                         />
                         <cooldown
                             v-if="selectedDiscussApplication.consensus == 'fail' && evaluator.isNat"
@@ -52,7 +51,6 @@
                             :origin-date="selectedDiscussApplication.createdAt"
                             :nominator-assessment-mongo-id="selectedDiscussApplication.id"
                             :is-application="true"
-                            @update-nominator-assessment="$emit('update-application', $event);"
                         />
                         <feedback-info
                             v-if="selectedDiscussApplication.consensus && evaluator.isNat"
@@ -64,7 +62,6 @@
                             :mode="selectedDiscussApplication.mode"
                             :saved-feedback="selectedDiscussApplication.feedback"
                             :nominator-assessment-mongo-id="selectedDiscussApplication.id"
-                            @update-nominator-assessment="$emit('update-application', $event);"
                         />
                         <hr v-if="selectedDiscussApplication.consensus && evaluator.isNat">
                         <evaluations
@@ -72,7 +69,6 @@
                             :is-nat="evaluator.isNat"
                             :consensus="selectedDiscussApplication.consensus"
                             :evaluations="selectedDiscussApplication.evaluations"
-                            :user-id="evaluator.id"
                         />
                         <p v-else class="text-shadow small">
                             No consensus has been set, so evaluations are not visible. Check back later!
@@ -81,9 +77,7 @@
                             v-if="evaluator.isNat"
                             :is-application="true"
                             :nominator-assessment-mongo-id="selectedDiscussApplication.id"
-                            :evaluator-mongo-id="evaluator.id"
                             :evaluations="selectedDiscussApplication.evaluations"
-                            @update-nominator-assessment="$emit('update-application', $event);"
                         />
                     </div>
                 </div>

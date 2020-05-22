@@ -50,9 +50,6 @@
                     >
                 </div>
             </div>
-            <p v-if="info" class="small errors">
-                {{ info }}
-            </p>
             <div v-if="potentialBnEvaluators" class="text-shadow">
                 <p class="my-3">
                     Users:
@@ -130,8 +127,6 @@ export default {
             includeUsers: null,
             excludeUsers: null,
             potentialBnEvaluators: null,
-            info: null,
-            confirm: null,
         };
     },
     computed: {
@@ -147,8 +142,6 @@ export default {
     watch: {
         nominatorAssessmentMongoId() {
             this.potentialBnEvaluators = null;
-            this.info = null;
-            this.confirm = null;
         },
     },
     methods: {

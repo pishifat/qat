@@ -39,7 +39,7 @@
                 </a>
                 <span v-else class="small d-flex flex-column ml-auto font-weight-bold text-center" :class="voteColor(evaluation.vote)">
                     BN
-                    <span v-if="evaluation.evaluator.id == userId">(this is you!)</span>
+                    <span v-if="evaluation.evaluator.id == evaluatorId">(this is you!)</span>
                 </span>
             </div>
             <div class="col-sm-7">
@@ -59,6 +59,7 @@
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex';
 import filterLinks from '../../../mixins/filterLinks.js';
 
 export default {
@@ -76,12 +77,14 @@ export default {
             default: '',
         },
         isNat: Boolean,
-        userId: {
-            type: String,
-            default: '',
-        },
     },
     computed: {
+        ...mapState([
+            'isNat',
+        ]),
+        ...mapGetters([
+            'evaluatorId',
+        ]),
         bnEvaluations() {
             let e = [];
             this.evaluations.forEach(evaluation => {
@@ -91,7 +94,7 @@ export default {
                     let consensusVote;
                     if (this.consensus == 'pass') consensusVote = 1;
                     if (this.consensus == 'fail') consensusVote = 3;
-                    if (evaluation.evaluator.isBn && (evaluation.vote == consensusVote || evaluation.vote == 2 || evaluation.evaluator.id == this.userId)) e.push(evaluation);
+                    if (evaluation.evaluator.isBn && (evaluation.vote == consensusVote || evaluation.vote == 2 || evaluation.evaluator.id == this.evaluatorId)) e.push(evaluation);
                 }
             });
 

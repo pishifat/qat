@@ -192,7 +192,6 @@ export default {
             const confirmInput = confirm(`Are you sure?`);
 
             if (confirmInput) {
-                this.info = '';
                 let modes = [];
 
                 $('input[name="mode"]:checked').each(function () {

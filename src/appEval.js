@@ -15,7 +15,7 @@ const store = new Vuex.Store({
         evaluator: null,
         selectedIndividualApplicationId: null,
         selectedDiscussApplicationId: null,
-        isNat: true, // static. required for userActivityModule
+        isNat: false,
         filters: {
             mode: '',
             value: '',
@@ -27,6 +27,7 @@ const store = new Vuex.Store({
         },
         setEvaluator (state, evaluator) {
             state.evaluator = evaluator;
+            state.isNat = evaluator.isNat;
         },
         setSelectedIndividualApplicationId (state, id) {
             state.selectedIndividualApplicationId = id;

@@ -41,8 +41,6 @@
                             :severity="selectedEvent.severity"
                             :event-id="selectedEvent._id"
                             :event-type="selectedEvent.eventType"
-                            @update-obviousness="$emit('update-obviousness', $event);"
-                            @update-severity="$emit('update-severity', $event);"
                         />
                     </div>
                 </div>
