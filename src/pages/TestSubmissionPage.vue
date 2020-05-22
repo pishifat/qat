@@ -9,9 +9,6 @@
             <button class="btn btn-sm btn-nat" @click="loadTest($event)">
                 Start / Continue
             </button>
-            <p class="text-danger">
-                {{ info }}
-            </p>
         </div>
 
         <div v-if="test" id="fullTest">
@@ -84,12 +81,11 @@
                 >
                 <div class="mx-auto text-center">
                     <a href="#top"><button type="submit" class="btn btn-lg btn-nat w-50" @click="submitTest($event)">Submit</button></a>
-                    <p class="small pt-2">
-                        {{ info }}
-                    </p>
                 </div>
             </div>
         </div>
+
+        <toast-messages />
     </div>
     <div v-else>
         <div v-if="displayScore || displayScore == 0" class="segment segment-solid">
@@ -101,21 +97,26 @@
         <p v-else class="text-center">
             You have no pending test...
         </p>
+
+        <toast-messages />
     </div>
 </template>
 
 <script>
+import ToastMessages from '../components/ToastMessages.vue';
 import postData from '../mixins/postData.js';
 
 export default {
     name: 'TestSubmissionPage',
+    components: {
+        ToastMessages,
+    },
     mixins: [ postData ],
     data() {
         return {
             testList: null,
             selectedTest: null,
             test: null,
-            info: null,
             timeRemaining: null,
             displayScore: null,
             checkedOptions: {},
@@ -159,9 +160,7 @@ export default {
             if (this.selectedTest) {
                 const test = await this.executePost('/testSubmission/loadTest', { testId: this.selectedTest }, e);
 
-                if (test) {
-                    if (test.error) this.info = test.error;
-
+                if (test && !test.error) {
                     test.answers.forEach(a => {
                         this.checkedOptions[a.id] = a.optionsChosen;
 
@@ -170,26 +169,39 @@ export default {
                     this.test = test;
                 }
             } else {
-                this.info = 'Select the test to answer';
+                this.$store.dispatch('updateToastMessages', {
+                    message: `select a test to answer`,
+                    type: 'danger',
+                });
             }
         },
         async submitTest (e) {
-            this.info = 'Submitting... (this will take a few seconds)';
+            this.$store.dispatch('updateToastMessages', {
+                message: `submitting... (this will take a few seconds)`,
+                type: 'info',
+            });
             $('.test-question').hide();
             const res = await this.executePost('/testSubmission/submitTest', {
                 testId: this.selectedTest,
                 comment: this.comment,
             }, e);
 
-            if (res || res == 0) {
+            if ((res || res == 0) && !res.error) {
                 if (res.error) {
-                    this.info = res.error;
+                    this.$store.dispatch('updateToastMessages', {
+                        message: res.error,
+                        type: 'danger',
+                    });
                     this.loadTest();
                     $('.test-question').show();
                 } else {
                     this.selectedTest = null;
                     this.testList = null;
                     this.displayScore = res;
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `test submitted!`,
+                        type: 'success',
+                    });
                 }
             }
         },
@@ -203,7 +215,15 @@ export default {
             if (res) {
                 if (res.error) {
                     this.loadTest();
-                    this.info = res.error;
+                    this.$store.dispatch('updateToastMessages', {
+                        message: res.error,
+                        type: 'danger',
+                    });
+                } else {
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `answer saved`,
+                        type: 'info',
+                    });
                 }
             }
         },

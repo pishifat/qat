@@ -48,7 +48,6 @@
             <button id="artistButton" class="btn btn-nat btn-sm ml-2" @click="loadContent($event);">
                 Load test content
             </button>
-            <span v-if="info" class="errors mt-1">{{ info }}</span>
         </section>
         <section v-if="category" class="col-md-12 segment segment-image">
             <h2>
@@ -109,12 +108,15 @@
             @update-question="updateQuestion($event)"
             @delete-question="deleteQuestion($event)"
         />
+
+        <toast-messages />
     </div>
 </template>
 
 
 
 <script>
+import ToastMessages from '../components/ToastMessages.vue';
 import AddQuestion from '../components/rcTest/AddQuestion.vue';
 import EditQuestion from '../components/rcTest/EditQuestion.vue';
 import postData from '../mixins/postData.js';
@@ -122,6 +124,7 @@ import postData from '../mixins/postData.js';
 export default {
     name: 'ManageTestPage',
     components: {
+        ToastMessages,
         AddQuestion,
         EditQuestion,
     },
@@ -132,7 +135,6 @@ export default {
             rawCategory: '',
             questions: [],
             selectedQuestion: null,
-            info: '',
         };
     },
     watch: {
