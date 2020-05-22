@@ -1,14 +1,12 @@
 <template>
     <div id="currentBnDiscussionInfo" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-lg">
-            <div v-if="evalRound" class="modal-content custom-bg-dark">
+            <div v-if="selectedDiscussRound" class="modal-content custom-bg-dark">
                 <modal-header
-                    :mode="evalRound.mode"
-                    :nat-evaluators="evalRound.natEvaluators || []"
-                    :is-application="false"
-                    :osu-id="evalRound.bn.osuId"
-                    :username="evalRound.bn.username"
-                    :evaluator-mongo-id="evaluator.id"
+                    :mode="selectedDiscussRound.mode"
+                    :nat-evaluators="selectedDiscussRound.natEvaluators || []"
+                    :osu-id="selectedDiscussRound.bn.osuId"
+                    :username="selectedDiscussRound.bn.username"
                 />
                 <div class="modal-body" style="overflow: hidden;">
                     <div class="container">
@@ -17,11 +15,11 @@
                         </p>
                         <div class="container mb-3">
                             <user-activity
-                                :osu-id="evalRound.bn.osuId"
+                                :osu-id="selectedDiscussRound.bn.osuId"
                                 :modes="modes"
-                                :deadline="evalRound.deadline"
+                                :deadline="selectedDiscussRound.deadline"
                                 :is-nat="evaluator.isNat"
-                                :mongo-id="evalRound.bn.id"
+                                :mongo-id="selectedDiscussRound.bn.id"
                             />
                         </div>
                     </div>
@@ -31,66 +29,58 @@
                         </p>
                         <div id="additionalInfo" class="collapse container">
                             <previous-evaluations
-                                :user-mongo-id="evalRound.bn.id"
+                                :user-mongo-id="selectedDiscussRound.bn.id"
                             />
                             <user-notes
-                                :user-mongo-id="evalRound.bn.id"
+                                :user-mongo-id="selectedDiscussRound.bn.id"
                             />
                             <user-reports
-                                :user-mongo-id="evalRound.bn.id"
+                                :user-mongo-id="selectedDiscussRound.bn.id"
                             />
                             <modding-activity
-                                :username="evalRound.bn.username"
+                                :username="selectedDiscussRound.bn.username"
                             />
                         </div>
                         <hr>
                         <consensus
-                            :consensus="evalRound.consensus"
-                            :nominator-assessment-mongo-id="evalRound.id"
-                            :is-application="false"
-                            :is-low-activity="evalRound.isLowActivity"
-                            :resigned-on-good-terms="evalRound.resignedOnGoodTerms"
-                            :resigned-on-standard-terms="evalRound.resignedOnStandardTerms"
-                            :group="evalRound.bn.group"
-                            :is-move-to-nat="evalRound.isMoveToNat"
-                            :is-move-to-bn="evalRound.isMoveToBn"
-                            @update-nominator-assessment="$emit('update-eval-round', $event);"
+                            :consensus="selectedDiscussRound.consensus"
+                            :nominator-assessment-mongo-id="selectedDiscussRound.id"
+                            :is-low-activity="selectedDiscussRound.isLowActivity"
+                            :resigned-on-good-terms="selectedDiscussRound.resignedOnGoodTerms"
+                            :resigned-on-standard-terms="selectedDiscussRound.resignedOnStandardTerms"
+                            :group="selectedDiscussRound.bn.group"
+                            :is-move-to-nat="selectedDiscussRound.isMoveToNat"
+                            :is-move-to-bn="selectedDiscussRound.isMoveToBn"
                         />
                         <cooldown
-                            v-if="evalRound.consensus == 'fail'"
-                            :cooldown-date="evalRound.cooldownDate"
-                            :origin-date="evalRound.updatedAt"
-                            :nominator-assessment-mongo-id="evalRound.id"
-                            :is-application="false"
-                            @update-nominator-assessment="$emit('update-eval-round', $event);"
+                            v-if="selectedDiscussRound.consensus == 'fail'"
+                            :cooldown-date="selectedDiscussRound.cooldownDate"
+                            :origin-date="selectedDiscussRound.updatedAt"
+                            :nominator-assessment-mongo-id="selectedDiscussRound.id"
                         />
                         <feedback-info
-                            v-if="evalRound.consensus && !(evalRound.isMoveToNat || evalRound.isMoveToBn)"
-                            :consensus="evalRound.consensus"
-                            :osu-id="evalRound.bn.osuId"
-                            :cooldown-date="evalRound.cooldownDate"
-                            :evaluations="evalRound.evaluations"
-                            :probation="evalRound.bn.probation"
-                            :is-low-activity="evalRound.isLowActivity"
-                            :resigned-on-good-terms="evalRound.resignedOnGoodTerms"
-                            :resigned-on-standard-terms="evalRound.resignedOnStandardTerms"
-                            :mode="evalRound.mode"
-                            :saved-feedback="evalRound.feedback"
-                            :nominator-assessment-mongo-id="evalRound.id"
-                            @update-nominator-assessment="$emit('update-eval-round', $event);"
+                            v-if="selectedDiscussRound.consensus && !(selectedDiscussRound.isMoveToNat || selectedDiscussRound.isMoveToBn)"
+                            :consensus="selectedDiscussRound.consensus"
+                            :osu-id="selectedDiscussRound.bn.osuId"
+                            :cooldown-date="selectedDiscussRound.cooldownDate"
+                            :evaluations="selectedDiscussRound.evaluations"
+                            :probation="selectedDiscussRound.bn.probation"
+                            :is-low-activity="selectedDiscussRound.isLowActivity"
+                            :resigned-on-good-terms="selectedDiscussRound.resignedOnGoodTerms"
+                            :resigned-on-standard-terms="selectedDiscussRound.resignedOnStandardTerms"
+                            :mode="selectedDiscussRound.mode"
+                            :saved-feedback="selectedDiscussRound.feedback"
+                            :nominator-assessment-mongo-id="selectedDiscussRound.id"
                         />
-                        <hr v-if="evalRound.consensus">
+                        <hr v-if="selectedDiscussRound.consensus">
                         <evaluations
-                            :evaluations="evalRound.evaluations"
+                            :evaluations="selectedDiscussRound.evaluations"
                             :is-nat="true"
-                            :consensus="evalRound.consensus"
+                            :consensus="selectedDiscussRound.consensus"
                         />
                         <evaluation-input
-                            :is-application="false"
-                            :nominator-assessment-mongo-id="evalRound.id"
-                            :evaluator-mongo-id="evaluator.id"
-                            :evaluations="evalRound.evaluations"
-                            @update-nominator-assessment="$emit('update-eval-round', $event);"
+                            :nominator-assessment-mongo-id="selectedDiscussRound.id"
+                            :evaluations="selectedDiscussRound.evaluations"
                         />
                     </div>
                 </div>
@@ -100,6 +90,7 @@
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex';
 import UserActivity from './currentBnInfo/UserActivity.vue';
 import ModalHeader from '../info/ModalHeader.vue';
 import PreviousEvaluations from '../info/PreviousEvaluations.vue';
@@ -127,20 +118,16 @@ export default {
         FeedbackInfo,
         Evaluations,
     },
-    props: {
-        evalRound: {
-            type: Object,
-            default: null,
-        },
-        evaluator: {
-            type: Object,
-            default: null,
-        },
-    },
     computed: {
+        ...mapState([
+            'evaluator',
+        ]),
+        ...mapGetters([
+            'selectedDiscussRound',
+        ]),
         submittedEvaluators() {
             let evaluators = new Array;
-            this.evalRound.evaluations.forEach(evaluation => {
+            this.selectedDiscussRound.evaluations.forEach(evaluation => {
                 evaluators.push(evaluation.evaluator);
             });
 
@@ -148,19 +135,16 @@ export default {
         },
         modes() {
             let modes = [];
-            if (this.evalRound.bn.modes.length) modes = this.evalRound.bn.modes;
-            else modes.push(this.evalRound.mode);
+            if (this.selectedDiscussRound.bn.modes.length) modes = this.selectedDiscussRound.bn.modes;
+            else modes.push(this.selectedDiscussRound.mode);
 
             return modes;
         },
     },
     watch: {
-        evalRound() {
-            history.pushState(null, 'Current BN Evaluations', `/bneval?eval=${this.evalRound.id}`);
+        selectedDiscussRound() {
+            history.pushState(null, 'Current BN Evaluations', `/bneval?eval=${this.selectedDiscussRound.id}`);
         },
-    },
-    created() {
-        history.pushState(null, 'Current BN Evaluations', `/bneval?eval=${this.evalRound.id}`);
     },
 };
 </script>

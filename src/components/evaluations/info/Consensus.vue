@@ -26,7 +26,7 @@
                 </button>
                 <button
                     class="btn btn-sm btn-nat-red"
-                    :disabled="consensus == 'fail' && !resignedOnGoodTerms"
+                    :disabled="consensus == 'fail' && !resignedOnGoodTerms && !resignedOnStandardTerms"
                     @click="setConsensus('fail', $event);"
                 >
                     Fail
@@ -144,12 +144,12 @@ export default {
                     isMoveToBn: addition == 'isMoveToBn',
                 }, e);
 
-            if (result) {
-                if (result.error) {
-                    this.info = result.error;
-                } else {
-                    this.$emit('update-nominator-assessment', result);
-                }
+            if (result && !result.error) {
+                this.$store.dispatch('updateEvalRound', result);
+                this.$store.dispatch('updateToastMessages', {
+                    message: `saved consensus`,
+                    type: 'info',
+                });
             }
         },
     },

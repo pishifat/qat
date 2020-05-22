@@ -2,8 +2,6 @@
     <div class="row">
         <div class="col-md-12">
             <filter-box
-                :filter-mode.sync="filterMode"
-                :filter-value.sync="filterValue"
                 :placeholder="'username... (3+ characters)'"
                 :options="['', 'osu', 'taiko', 'catch', 'mania']"
             >
@@ -12,7 +10,6 @@
                         Select all
                     </button>
                 </slot>
-                <span class="errors">{{ info }}</span>
             </filter-box>
             <section v-if="evaluator && evaluator.isNat" class="row segment my-1 mx-4">
                 <div class="small filter-box">
@@ -43,7 +40,7 @@
                             data-toggle="tooltip"
                             data-placement="top"
                             title="Evaluations are hidden from others to avoid confirmation bias"
-                        >?</sup> <small v-if="evalRounds">({{ evalRounds.length }})</small>
+                        >?</sup> <small v-if="individualRounds">({{ individualRounds.length }})</small>
                         <button
                             class="btn btn-nat"
                             data-toggle="modal"
@@ -56,7 +53,7 @@
 
                     <transition-group name="list" tag="div" class="row">
                         <current-bn-individual-card
-                            v-for="evalRound in evalRounds"
+                            v-for="evalRound in individualRounds"
                             :key="evalRound.id"
                             :eval-round="evalRound"
                             :evaluator="evaluator"
@@ -67,7 +64,7 @@
                         />
                     </transition-group>
 
-                    <p v-if="!evalRounds || evalRounds.length == 0" class="ml-4">
+                    <p v-if="!individualRounds || !individualRounds.length" class="ml-4">
                         No BNs to evaluate...
                     </p>
                 </div>
@@ -102,25 +99,21 @@
             </section>
         </div>
 
-        <current-bn-individual-info
-            :eval-round="selectedEvalRound"
-            :evaluator="evaluator"
-            @update-eval-round="updateEvalRound($event)"
-        />
+        <current-bn-individual-info />
 
-        <current-bn-discussion-info
-            :eval-round="selectedDiscussRound"
-            :evaluator="evaluator"
-            @update-eval-round="updateEvalRound($event)"
-        />
+        <current-bn-discussion-info />
 
         <add-eval-rounds
             @update-all-eval-rounds="updateAllEvalRounds($event)"
         />
+
+        <toast-messages />
     </div>
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex';
+import ToastMessages from '../components/ToastMessages.vue';
 import AddEvalRounds from '../components/evaluations/AddEvalRounds.vue';
 import CurrentBnIndividualCard from '../components/evaluations/currentBnEvaluations/CurrentBnIndividualCard.vue';
 import CurrentBnIndividualInfo from '../components/evaluations/currentBnEvaluations/CurrentBnIndividualInfo.vue';
@@ -133,6 +126,7 @@ import filters from '../mixins/filters.js';
 export default {
     name: 'BnEvalPage',
     components: {
+        ToastMessages,
         AddEvalRounds,
         CurrentBnIndividualCard,
         CurrentBnIndividualInfo,
@@ -143,42 +137,38 @@ export default {
     mixins: [ postData, filters ],
     data() {
         return {
-            allObjs: null,
-            filteredObjs: null,
-            pageObjs: null,
-            evalRounds: null,
-            discussRounds: null,
-            selectedEvalRound: null,
-            selectedDiscussRound: null,
             allChecked: false,
-            evaluator: null,
-            info: '',
         };
     },
     computed: {
-
+        ...mapState([
+            'evalRounds',
+            'evaluator',
+        ]),
+        ...mapGetters([
+            'individualRounds',
+            'discussRounds',
+        ]),
     },
     async created() {
         const res = await this.executeGet('/bnEval/relevantInfo');
 
         if (res) {
-            this.allObjs = res.er;
-            this.evaluator = res.evaluator;
-            this.filterMode = res.evaluator.modes[0] || 'osu';
-            this.hasPagination = false;
-            this.hasSeparation = true;
-            this.filter();
+            this.$store.commit('setEvalRounds', res.er);
+            this.$store.commit('setEvaluator', res.evaluator);
+            this.$store.commit('setFilterMode',  res.evaluator.modes[0] || 'osu');
+
             const params = new URLSearchParams(document.location.search.substring(1));
 
             if (params.get('eval') && params.get('eval').length) {
-                const i = this.allObjs.findIndex(a => a.id == params.get('eval'));
+                const i = this.evalRounds.findIndex(e => e.id == params.get('eval'));
 
                 if (i >= 0) {
-                    if (!this.allObjs[i].discussion) {
-                        this.selectedEvalRound = this.allObjs[i];
+                    if (!this.evalRounds[i].discussion) {
+                        this.$store.commit('setSelectedIndividualRoundId', params.get('eval'));
                         $('#currentBnIndividualInfo').modal('show');
                     } else {
-                        this.selectedDiscussRound = this.allObjs[i];
+                        this.$store.commit('setSelectedDiscussRoundId', params.get('eval'));
                         $('#currentBnDiscussionInfo').modal('show');
                     }
                 } else {
@@ -195,37 +185,19 @@ export default {
             const res = await this.executeGet('/bnEval/relevantInfo');
 
             if (res) {
-                this.allObjs = res.er;
+                this.$store.commit('setEvalRounds', res.er);
             }
         }, 300000);
     },
     methods: {
-        filterBySearchValueContext(e) {
-            if (e.bn.username.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1) {
-                return true;
-            }
-
-            return false;
-        },
-        separateObjs() {
-            this.evalRounds = this.pageObjs.filter(v => !v.discussion);
-            this.discussRounds = this.pageObjs.filter(v => v.discussion);
-        },
-        updateEvalRound (evalRound) {
-            const i = this.allObjs.findIndex(er => er.id == evalRound.id);
-            this.allObjs[i] = evalRound;
-
-            if (evalRound.discussion) {
-                this.selectedDiscussRound = evalRound;
-            } else {
-                this.selectedEvalRound = evalRound;
-            }
-
-            this.filter();
-        },
         updateAllEvalRounds (evalRounds) {
             this.allObjs = evalRounds;
             this.filter();
+        },
+        selectAll() {
+            let checkBoxes = $('input[name=\'evalTypeCheck\'');
+            checkBoxes.prop('checked', !checkBoxes.prop('checked'));
+            this.allChecked = !this.allChecked;
         },
         openAddEvalRounds() {
             $('input[type=checkbox]').each(function() {
@@ -239,15 +211,10 @@ export default {
             });
 
             if (checkedRounds.length) {
-                const ers = await this.executePost('/bnEval/setGroupEval/', { checkedRounds }, e);
+                const evalRounds = await this.executePost('/bnEval/setGroupEval/', { checkedRounds }, e);
 
-                if (ers) {
-                    if (ers.error) {
-                        this.info = ers.error;
-                    } else {
-                        this.allObjs = ers;
-                        this.filter();
-                    }
+                if (evalRounds && !evalRounds.error) {
+                    this.$store.commit('setEvalRounds', evalRounds);
                 }
             }
         },
@@ -258,15 +225,10 @@ export default {
             });
 
             if (checkedRounds.length) {
-                const ers = await this.executePost('/bnEval/setIndividualEval/', { checkedRounds }, e);
+                const evalRounds = await this.executePost('/bnEval/setIndividualEval/', { checkedRounds }, e);
 
-                if (ers) {
-                    if (ers.error) {
-                        this.info = ers.error;
-                    } else {
-                        this.allObjs = ers;
-                        this.filter();
-                    }
+                if (evalRounds && !evalRounds.error) {
+                    this.$store.commit('setEvalRounds', evalRounds);
                 }
             }
         },
@@ -280,23 +242,13 @@ export default {
                 const result = confirm(`Are you sure? The consensus of any evaluation will affect its respective user.\n\nOnly do this after feedback PMs have been sent.`);
 
                 if (result) {
-                    const ers = await this.executePost('/bnEval/setComplete/', { checkedRounds }, e);
+                    const evalRounds = await this.executePost('/bnEval/setComplete/', { checkedRounds }, e);
 
-                    if (ers) {
-                        if (ers.error) {
-                            this.info = ers.error;
-                        } else {
-                            this.allObjs = ers;
-                            this.filter();
-                        }
+                    if (evalRounds && !evalRounds.error) {
+                        this.$store.commit('setEvalRounds', evalRounds);
                     }
                 }
             }
-        },
-        selectAll() {
-            let checkBoxes = $('input[name=\'evalTypeCheck\'');
-            checkBoxes.prop('checked', !checkBoxes.prop('checked'));
-            this.allChecked = !this.allChecked;
         },
     },
 };
