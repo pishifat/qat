@@ -83,8 +83,8 @@ export default {
                 if (result && !result.error) {
                     this.$store.dispatch(this.isApplication ? 'updateApplication' : 'updateEvalRound', result);
                     this.$store.dispatch('updateToastMessages', {
-                        message: `saved cooldown date`,
-                        type: 'info',
+                        message: `Saved cooldown date`,
+                        type: 'success',
                     });
                 }
             }

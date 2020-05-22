@@ -170,14 +170,14 @@ export default {
                 }
             } else {
                 this.$store.dispatch('updateToastMessages', {
-                    message: `select a test to answer`,
+                    message: `Select a test to answer!`,
                     type: 'danger',
                 });
             }
         },
         async submitTest (e) {
             this.$store.dispatch('updateToastMessages', {
-                message: `submitting... (this will take a few seconds)`,
+                message: `Submitting... (this will take a few seconds)`,
                 type: 'info',
             });
             $('.test-question').hide();
@@ -199,7 +199,7 @@ export default {
                     this.testList = null;
                     this.displayScore = res;
                     this.$store.dispatch('updateToastMessages', {
-                        message: `test submitted!`,
+                        message: `Test submitted!`,
                         type: 'success',
                     });
                 }
@@ -221,8 +221,8 @@ export default {
                     });
                 } else {
                     this.$store.dispatch('updateToastMessages', {
-                        message: `answer saved`,
-                        type: 'info',
+                        message: `Answer saved`,
+                        type: 'success',
                     });
                 }
             }

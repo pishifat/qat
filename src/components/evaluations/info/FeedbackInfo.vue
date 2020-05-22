@@ -129,8 +129,8 @@ export default {
             if (result && !result.error) {
                 this.$store.dispatch(this.isApplication ? 'updateApplication' : 'updateEvalRound', result);
                 this.$store.dispatch('updateToastMessages', {
-                    message: `saved feedback`,
-                    type: 'info',
+                    message: `Saved feedback`,
+                    type: 'success',
                 });
             }
         },

@@ -67,8 +67,8 @@ export default {
                 if (veto && !veto.error) {
                     this.$store.dispatch('updateVeto', veto);
                     this.$store.dispatch('updateToastMessages', {
-                        message: `replaced mediator`,
-                        type: 'info',
+                        message: `Replaced mediator`,
+                        type: 'success',
                     });
                 }
             }

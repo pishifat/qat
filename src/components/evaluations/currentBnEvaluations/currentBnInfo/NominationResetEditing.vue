@@ -107,8 +107,8 @@ export default {
                 value: result,
             });
             this.$store.dispatch('updateToastMessages', {
-                message: `updated content`,
-                type: 'info',
+                message: `Updated content`,
+                type: 'success',
             });
         },
     },

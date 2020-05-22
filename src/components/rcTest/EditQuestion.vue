@@ -172,7 +172,7 @@ export default {
 
             if (!newQuestion || !newQuestion.length || !questionType || !questionType.length) {
                 this.$store.dispatch('updateToastMessages', {
-                    message: `cannot leave question fields blank!`,
+                    message: `Cannot leave question fields blank!`,
                     type: 'danger',
                 });
             } else {
@@ -181,8 +181,8 @@ export default {
                 if (question && !question.error) {
                     this.$emit('update-question', question);
                     this.$store.dispatch('updateToastMessages', {
-                        message: `question content updated`,
-                        type: 'info',
+                        message: `Question content updated`,
+                        type: 'success',
                     });
                 }
             }
@@ -193,8 +193,8 @@ export default {
             if (question && !question.error) {
                 this.$emit('update-question', question);
                 this.$store.dispatch('updateToastMessages', {
-                    message: `question activity updated`,
-                    type: 'info',
+                    message: `Question activity updated`,
+                    type: 'success',
                 });
             }
         },
@@ -204,7 +204,7 @@ export default {
 
             if ((!option || !option.length) || (!score && score != 0)) {
                 this.$store.dispatch('updateToastMessages', {
-                    message: `cannot leave option fields blank!`,
+                    message: `Cannot leave option fields blank!`,
                     type: 'danger',
                 });
             } else {
@@ -213,8 +213,8 @@ export default {
                 if (question && !question.error) {
                     this.$emit('update-question', question);
                     this.$store.dispatch('updateToastMessages', {
-                        message: `option added`,
-                        type: 'info',
+                        message: `Option added`,
+                        type: 'success',
                     });
                 }
             }
@@ -227,20 +227,20 @@ export default {
 
             if (checked != 1) {
                 this.$store.dispatch('updateToastMessages', {
-                    message: `select only one option!`,
+                    message: `Select only one option!`,
                     type: 'danger',
                 });
                 this.$store.dispatch('updateToastMessages', {
-                    message: `apologies for how terribly designed this part of the website is. i can't justify improving it because nobody uses it`,
-                    type: 'danger',
+                    message: `Apologies for how terribly designed this part of the website is. I can't justify improving it because nobody uses it`,
+                    type: 'info',
                 });
             } else if (!option || !option.length || (!score && score != 0)) {
                 this.$store.dispatch('updateToastMessages', {
-                    message: `cannot leave option fields blank!`,
+                    message: `Cannot leave option fields blank!`,
                     type: 'danger',
                 });
                 this.$store.dispatch('updateToastMessages', {
-                    message: `apologies for how terribly designed this part of the website is. i can't justify improving it because nobody uses it`,
+                    message: `Apologies for how terribly designed this part of the website is. I can't justify improving it because nobody uses it`,
                     type: 'info',
                 });
             } else {
@@ -249,8 +249,8 @@ export default {
                 if (question && !question.error) {
                     this.$emit('update-question', question);
                     this.$store.dispatch('updateToastMessages', {
-                        message: `option added`,
-                        type: 'info',
+                        message: `Option added`,
+                        type: 'success',
                     });
                 }
             }
@@ -263,7 +263,7 @@ export default {
 
             if (!checkedOptions.length) {
                 this.$store.dispatch('updateToastMessages', {
-                    message: `must select options!`,
+                    message: `Must select options!`,
                     type: 'danger',
                 });
             } else {
@@ -272,8 +272,8 @@ export default {
                 if (question && !question.error) {
                     this.$emit('update-question', question);
                     this.$store.dispatch('updateToastMessages', {
-                        message: `question updated`,
-                        type: 'info',
+                        message: `Question updated`,
+                        type: 'success',
                     });
                 }
             }

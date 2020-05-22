@@ -193,8 +193,8 @@ export default {
                     if (applications && !applications.error) {
                         this.$store.commit('setApplications', applications);
                         this.$store.dispatch('updateToastMessages', {
-                            message: `set as group eval`,
-                            type: 'info',
+                            message: `Set as group eval`,
+                            type: 'success',
                         });
                     }
                 }
@@ -215,8 +215,8 @@ export default {
                     if (applications && !applications.error) {
                         this.$store.commit('setApplications', applications);
                         this.$store.dispatch('updateToastMessages', {
-                            message: `set as individual eval`,
-                            type: 'info',
+                            message: `Set as individual eval`,
+                            type: 'success',
                         });
                     }
                 }
@@ -237,8 +237,8 @@ export default {
                     if (applications && !applications.error) {
                         this.$store.commit('setApplications', applications);
                         this.$store.dispatch('updateToastMessages', {
-                            message: `archived`,
-                            type: 'info',
+                            message: `Archived`,
+                            type: 'success',
                         });
                     }
                 }

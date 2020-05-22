@@ -147,8 +147,8 @@ export default {
             if (result && !result.error) {
                 this.$store.dispatch(this.isApplication ? 'updateApplication' : 'updateEvalRound', result);
                 this.$store.dispatch('updateToastMessages', {
-                    message: `saved consensus`,
-                    type: 'info',
+                    message: `Saved consensus`,
+                    type: 'success',
                 });
             }
         },

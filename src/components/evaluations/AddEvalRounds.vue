@@ -200,7 +200,7 @@ export default {
 
                 if (!modes.length) {
                     this.$store.dispatch('updateToastMessages', {
-                        message: `must select game mode!`,
+                        message: `Must select game mode!`,
                         type: 'danger',
                     });
 
@@ -216,7 +216,7 @@ export default {
 
                 if (!groups.length && !this.includeUsers) {
                     this.$store.dispatch('updateToastMessages', {
-                        message: `must select user group or include specific users!`,
+                        message: `Must select user group or include specific users!`,
                         type: 'danger',
                     });
 
@@ -232,7 +232,7 @@ export default {
 
                 if (!(deadline instanceof Date) || isNaN(deadline)) {
                     this.$store.dispatch('updateToastMessages', {
-                        message: `invalid date!`,
+                        message: `Invalid date!`,
                         type: 'danger',
                     });
 
@@ -254,8 +254,8 @@ export default {
                 if (result && !result.error) {
                     this.$store.commit('setEvalRounds', result.ers);
                     this.$store.dispatch('updateToastMessages', {
-                        message: `generated evaluations`,
-                        type: 'info',
+                        message: `Generated evaluations`,
+                        type: 'success',
                     });
 
                     if (result.ers.length) {
@@ -280,7 +280,7 @@ export default {
                         }
                     } else {
                         this.$store.dispatch('updateToastMessages', {
-                            message: `no eval rounds added. maybe re-check spelling?`,
+                            message: `No eval rounds added. Maybe re-check spelling?`,
                             type: 'danger',
                         });
                     }

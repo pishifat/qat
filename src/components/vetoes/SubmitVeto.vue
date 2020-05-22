@@ -139,7 +139,7 @@ export default {
         async submitVeto (e) {
             if (!this.discussionLink || !this.shortReason || !this.mode) {
                 this.$store.dispatch('updateToastMessages', {
-                    message: `cannot leave fields blank!`,
+                    message: `Cannot leave fields blank!`,
                     type: 'danger',
                 });
             } else {
@@ -157,8 +157,8 @@ export default {
                     $('#addVeto').modal('hide');
                     this.$store.commit('addVeto', veto);
                     this.$store.dispatch('updateToastMessages', {
-                        message: `submitted veto`,
-                        type: 'info',
+                        message: `Submitted veto`,
+                        type: 'success',
                     });
                 }
             }

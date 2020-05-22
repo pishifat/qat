@@ -111,7 +111,7 @@ export default {
         async submitMediation (e) {
             if (!this.vote || !this.comment.length) {
                 this.$store.dispatch('updateToastMessages', {
-                    message: `cannot leave fields blank!`,
+                    message: `Cannot leave fields blank!`,
                     type: 'danger',
                 });
             } else {
@@ -128,8 +128,8 @@ export default {
                 if (veto && !veto.error) {
                     this.$store.dispatch('updateVeto', veto);
                     this.$store.dispatch('updateToastMessages', {
-                        message: `submitted mediation`,
-                        type: 'info',
+                        message: `Submitted mediation`,
+                        type: 'success',
                     });
                 }
             }

@@ -134,7 +134,7 @@ export default {
         async submitEval (e) {
             if (!this.vote || !this.moddingComment.length || !this.behaviorComment.length) {
                 this.$store.dispatch('updateToastMessages', {
-                    message: `cannot leave fields blank!`,
+                    message: `Cannot leave fields blank!`,
                     type: 'danger',
                 });
             } else {
@@ -149,8 +149,8 @@ export default {
                 if (result && !result.error) {
                     this.$store.dispatch(this.isApplication ? 'updateApplication' : 'updateEvalRound', result);
                     this.$store.dispatch('updateToastMessages', {
-                        message: `submitted evaluation`,
-                        type: 'info',
+                        message: `Submitted evaluation`,
+                        type: 'success',
                     });
                 }
             }

@@ -86,8 +86,8 @@ export default {
                 if (discussionVote && !discussionVote.error) {
                     this.$store.dispatch('updateDiscussionVote', discussionVote);
                     this.$store.dispatch('updateToastMessages', {
-                        message: `concluded vote`,
-                        type: 'info',
+                        message: `Concluded vote`,
+                        type: 'success',
                     });
                 }
             }

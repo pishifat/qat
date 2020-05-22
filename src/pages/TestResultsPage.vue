@@ -188,7 +188,7 @@ export default {
 
             if (!user || !user.length) {
                 this.$store.dispatch('updateToastMessages', {
-                    message: `must enter username or ID!`,
+                    message: `Must enter username or ID!`,
                     type: 'danger',
                 });
             } else {

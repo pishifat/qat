@@ -221,7 +221,7 @@ export default {
         async submitDiscussion(e) {
             if (!this.shortReason || !this.title || !this.mode) {
                 this.$store.dispatch('updateToastMessages', {
-                    message: `required fields missing!`,
+                    message: `Required fields missing!`,
                     type: 'danger',
                 });
             } else {
@@ -243,8 +243,8 @@ export default {
                     $('#addDiscussion').modal('hide');
                     this.$store.commit('addDiscussionVote', discussionVote);
                     this.$store.dispatch('updateToastMessages', {
-                        message: `submitted discussion`,
-                        type: 'info',
+                        message: `Submitted discussion`,
+                        type: 'success',
                     });
                 }
             }

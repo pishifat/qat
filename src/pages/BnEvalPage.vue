@@ -204,8 +204,8 @@ export default {
                 if (evalRounds && !evalRounds.error) {
                     this.$store.commit('setEvalRounds', evalRounds);
                     this.$store.dispatch('updateToastMessages', {
-                        message: `set as group eval`,
-                        type: 'info',
+                        message: `Set as group eval`,
+                        type: 'success',
                     });
                 }
             }
@@ -222,8 +222,8 @@ export default {
                 if (evalRounds && !evalRounds.error) {
                     this.$store.commit('setEvalRounds', evalRounds);
                     this.$store.dispatch('updateToastMessages', {
-                        message: `set as individual eval`,
-                        type: 'info',
+                        message: `Set as individual eval`,
+                        type: 'success',
                     });
                 }
             }
@@ -243,8 +243,8 @@ export default {
                     if (evalRounds && !evalRounds.error) {
                         this.$store.commit('setEvalRounds', evalRounds);
                         this.$store.dispatch('updateToastMessages', {
-                            message: `archived`,
-                            type: 'info',
+                            message: `Archived`,
+                            type: 'success',
                         });
                     }
                 }

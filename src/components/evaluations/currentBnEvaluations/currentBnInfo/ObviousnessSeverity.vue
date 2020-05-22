@@ -78,8 +78,8 @@ export default {
             if (result == this.obviousness) result = null;
             this.$store.commit('updateEvent', { id: this.eventId, type: this.eventType, modifiedField: 'obviousness', value: result });
             this.$store.dispatch('updateToastMessages', {
-                message: `updated obviousness`,
-                type: 'info',
+                message: `Updated obviousness`,
+                type: 'success',
             });
         },
         async updateSeverity(severity) {
@@ -87,8 +87,8 @@ export default {
             if (result == this.severity) result = null;
             this.$store.commit('updateEvent', { id: this.eventId, type: this.eventType, modifiedField: 'severity', value: result });
             this.$store.dispatch('updateToastMessages', {
-                message: `updated severity`,
-                type: 'info',
+                message: `Updated severity`,
+                type: 'success',
             });
         },
     },

@@ -52,7 +52,7 @@ export default {
                 this.loadingModCount = false;
                 this.modCount = res.modCount;
                 this.$store.dispatch('updateToastMessages', {
-                    message: `loaded modding activity`,
+                    message: `Loaded modding activity`,
                     type: 'info',
                 });
             }

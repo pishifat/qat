@@ -88,7 +88,7 @@ export default {
             if (discussionVote && !discussionVote.error) {
                 this.$store.dispatch('updateDiscussionVote', discussionVote);
                 this.$store.dispatch('updateToastMessages', {
-                    message: `saved title`,
+                    message: `Saved title`,
                     type: 'info',
                 });
                 this.isEditTitle = !this.isEditTitle;
@@ -101,7 +101,7 @@ export default {
             if (discussionVote && !discussionVote.error) {
                 this.$store.dispatch('updateDiscussionVote', discussionVote);
                 this.$store.dispatch('updateToastMessages', {
-                    message: `saved proposal`,
+                    message: `Saved proposal`,
                     type: 'info',
                 });
                 this.isEditProposal = !this.isEditProposal;

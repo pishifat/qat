@@ -86,7 +86,7 @@ export default {
 
             if (!newQuestion || !newQuestion.length || !questionType || !questionType.length) {
                 this.$store.dispatch('updateToastMessages', {
-                    message: `cannot leave fields blank!`,
+                    message: `Cannot leave fields blank!`,
                     type: 'danger',
                 });
             } else {
@@ -95,8 +95,8 @@ export default {
                 if (question && !question.error) {
                     this.$emit('add-question', question);
                     this.$store.dispatch('updateToastMessages', {
-                        message: `question added`,
-                        type: 'info',
+                        message: `Question added`,
+                        type: 'success',
                     });
                 }
             }

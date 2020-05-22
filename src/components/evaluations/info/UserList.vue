@@ -55,8 +55,8 @@ export default {
                 if (r && !r.error) {
                     this.$store.dispatch(this.isApplication ? 'updateApplication' : 'updateEvalRound', r);
                     this.$store.dispatch('updateToastMessages', {
-                        message: `replaced user`,
-                        type: 'info',
+                        message: `Replaced user`,
+                        type: 'success',
                     });
                 }
             }

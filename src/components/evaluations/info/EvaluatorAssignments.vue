@@ -163,8 +163,8 @@ export default {
                 if (a && !a.error) {
                     this.$store.dispatch('updateApplication', a);
                     this.$store.dispatch('updateToastMessages', {
-                        message: `enabled BN evaluators`,
-                        type: 'info',
+                        message: `Enabled BN evaluators`,
+                        type: 'success',
                     });
                 }
             }

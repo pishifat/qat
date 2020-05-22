@@ -123,8 +123,8 @@ export default {
                 if (veto && !veto.error) {
                     this.$store.dispatch('updateVeto', veto);
                     this.$store.dispatch('updateToastMessages', {
-                        message: `started veto mediation`,
-                        type: 'info',
+                        message: `Started veto mediation`,
+                        type: 'success',
                     });
                 }
             }
@@ -145,8 +145,8 @@ export default {
                 if (veto && !veto.error) {
                     this.$store.dispatch('updateVeto', veto);
                     this.$store.dispatch('updateToastMessages', {
-                        message: `concluded mediation`,
-                        type: 'info',
+                        message: `Concluded mediation`,
+                        type: 'success',
                     });
                 }
             }
@@ -161,8 +161,8 @@ export default {
                 if (veto && !veto.error) {
                     this.$store.dispatch('updateVeto', veto);
                     this.$store.dispatch('updateToastMessages', {
-                        message: `re-opened mediation`,
-                        type: 'info',
+                        message: `Re-opened mediation`,
+                        type: 'success',
                     });
                 }
             }

@@ -156,7 +156,7 @@ export default {
         async query(e) {
             if (!this.searchValue || !this.searchValue.length) {
                 this.$store.dispatch('updateToastMessages', {
-                    message: `must enter username or osu ID!`,
+                    message: `Must enter username or osu ID!`,
                     type: 'danger',
                 });
             } else {
@@ -173,7 +173,7 @@ export default {
         async queryRecent(e) {
             if (!parseInt(this.limit)) {
                 this.$store.dispatch('updateToastMessages', {
-                    message: `invalid number!`,
+                    message: `Invalid number!`,
                     type: 'danger',
                 });
             } else {

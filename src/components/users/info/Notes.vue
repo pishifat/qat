@@ -117,8 +117,8 @@ export default {
                     if (this.notes) {
                         this.notes.unshift(note);
                         this.$store.dispatch('updateToastMessages', {
-                            message: `added note`,
-                            type: 'info',
+                            message: `Added note`,
+                            type: 'success',
                         });
                     }
                 }
@@ -134,8 +134,8 @@ export default {
                         this.notes[i] = note;
                         this.editNoteId = '';
                         this.$store.dispatch('updateToastMessages', {
-                            message: `edited note`,
-                            type: 'info',
+                            message: `Edited note`,
+                            type: 'success',
                         });
                     }
                 }
@@ -151,8 +151,8 @@ export default {
                     const i = this.notes.findIndex(note => note.id == noteId);
                     this.notes.splice(i, 1);
                     this.$store.dispatch('updateToastMessages', {
-                        message: `removed note`,
-                        type: 'info',
+                        message: `Removed note`,
+                        type: 'success',
                     });
                 }
             }

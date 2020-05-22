@@ -112,12 +112,12 @@ export default {
         async submitReportEval (e, close) {
             if (close && (!this.vote || (!this.feedback || !this.feedback.length))) {
                 this.$store.dispatch('updateToastMessages', {
-                    message: `cannot leave fields blank!`,
+                    message: `Cannot leave fields blank!`,
                     type: 'danger',
                 });
             } else if (!this.vote && (!this.feedback || !this.feedback.length)) {
                 this.$store.dispatch('updateToastMessages', {
-                    message: `at least one field must have input!`,
+                    message: `At least one field must have input!`,
                     type: 'danger',
                 });
             } else {
@@ -140,8 +140,8 @@ export default {
                 if (report && !report.error) {
                     this.$store.dispatch('updateReport', report);
                     this.$store.dispatch('updateToastMessages', {
-                        message: `saved evaluation`,
-                        type: 'info',
+                        message: `Saved evaluation`,
+                        type: 'success',
                     });
                 }
             }

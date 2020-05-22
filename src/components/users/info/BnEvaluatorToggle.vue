@@ -38,8 +38,8 @@ export default {
             if (user && !user.error) {
                 this.$store.dispatch('updateUser', user);
                 this.$store.dispatch('updateToastMessages', {
-                    message: `toggled BN evaluator`,
-                    type: 'info',
+                    message: `Toggled BN evaluator`,
+                    type: 'success',
                 });
             }
         },
