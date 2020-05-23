@@ -63,7 +63,7 @@ export default {
     },
     methods: {
         selectVeto () {
-            this.$emit('update:selectedVeto', this.veto);
+            this.$store.commit('setSelectedVetoId', this.veto.id);
         },
     },
 };

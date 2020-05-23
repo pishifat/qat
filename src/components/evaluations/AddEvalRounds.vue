@@ -168,7 +168,6 @@
                     <button class="btn btn-sm btn-nat mb-2 mt-4 w-100" @click="addEvalRounds($event)">
                         Generate evaluations
                     </button>
-                    <span id="addEvalRoundsErrors" class="errors">{{ info }}</span>
                 </div>
             </div>
         </div>
@@ -183,7 +182,6 @@ export default {
     mixins: [postData],
     data() {
         return {
-            info: '',
             includeUsers: null,
             excludeUsers: null,
             dateInput: this.setDefaultDate(),
@@ -194,7 +192,6 @@ export default {
             const confirmInput = confirm(`Are you sure?`);
 
             if (confirmInput) {
-                this.info = '';
                 let modes = [];
 
                 $('input[name="mode"]:checked').each(function () {
@@ -202,7 +199,10 @@ export default {
                 });
 
                 if (!modes.length) {
-                    this.info = 'Must select game mode!';
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `Must select game mode!`,
+                        type: 'danger',
+                    });
 
                     return;
                 }
@@ -215,7 +215,10 @@ export default {
 
 
                 if (!groups.length && !this.includeUsers) {
-                    this.info = 'Must select user group or include specific users!';
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `Must select user group or include specific users!`,
+                        type: 'danger',
+                    });
 
                     return;
                 }
@@ -228,7 +231,10 @@ export default {
                 );
 
                 if (!(deadline instanceof Date) || isNaN(deadline)) {
-                    this.info = 'Invalid Date!';
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `Invalid date!`,
+                        type: 'danger',
+                    });
 
                     return;
                 }
@@ -245,30 +251,38 @@ export default {
                     e
                 );
 
-                if (result) {
-                    if (result.error) {
-                        this.info = result.error;
-                    } else {
-                        this.$emit('update-all-eval-rounds', result.ers);
+                if (result && !result.error) {
+                    this.$store.commit('setEvalRounds', result.ers);
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `Generated evaluations`,
+                        type: 'success',
+                    });
 
-                        if (result.ers.length) {
+                    if (result.ers.length) {
 
-                            if (result.failed.length) {
-                                this.info += 'The following usernames could not be processed: ';
+                        if (result.failed.length) {
+                            let errorMessage = 'The following usernames could not be processed: ';
 
-                                for (let i = 0; i < result.failed.length; i++) {
-                                    this.info += result.failed[i];
+                            for (let i = 0; i < result.failed.length; i++) {
+                                errorMessage += result.failed[i];
 
-                                    if (i + 1 != result.failed.length) {
-                                        this.info += ', ';
-                                    }
+                                if (i + 1 != result.failed.length) {
+                                    errorMessage += ', ';
                                 }
-                            } else {
-                                $('#addEvalRounds').modal('hide');
                             }
+
+                            this.$store.dispatch('updateToastMessages', {
+                                message: errorMessage,
+                                type: 'danger',
+                            });
                         } else {
-                            this.info = 'No eval rounds were added! If you were trying to add specific users, re-check your spelling.';
+                            $('#addEvalRounds').modal('hide');
                         }
+                    } else {
+                        this.$store.dispatch('updateToastMessages', {
+                            message: `No eval rounds added. Maybe re-check spelling?`,
+                            type: 'danger',
+                        });
                     }
                 }
             }

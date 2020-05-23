@@ -1,8 +1,5 @@
 <template>
     <div class="d-flex justify-content-end align-items-center pr-0">
-        <div v-if="info" class="small errors">
-            {{ info }}
-        </div>
         <button
             v-if="isQualityAssuranceChecker"
             data-toggle="tooltip"
@@ -45,35 +42,24 @@ export default {
     data() {
         return {
             forceDisabled: false,
-            info: '',
         };
     },
     methods: {
         async assignUser () {
             this.forceDisabled = true;
-            const qualityAssuranceCheckers = await this.executePost('/qualityAssurance/assignUser/' + this.eventId, {});
+            const event = await this.executePost('/qualityAssurance/assignUser/' + this.eventId, {});
 
-            if (qualityAssuranceCheckers) {
-                if (qualityAssuranceCheckers.error) {
-                    this.info = qualityAssuranceCheckers.error;
-                } else {
-                    this.$emit('update-quality-assurance-checkers', { id: this.eventId, value: qualityAssuranceCheckers });
-                }
-
+            if (event) {
+                this.$store.commit('updateEvent', event);
                 this.forceDisabled = false;
             }
         },
         async unassignUser () {
             this.forceDisabled = true;
-            const qualityAssuranceCheckers = await this.executePost('/qualityAssurance/unassignUser/' + this.eventId, {});
+            const event = await this.executePost('/qualityAssurance/unassignUser/' + this.eventId, {});
 
-            if (qualityAssuranceCheckers) {
-                if (qualityAssuranceCheckers.error) {
-                    this.info = qualityAssuranceCheckers.error;
-                } else {
-                    this.$emit('update-quality-assurance-checkers', { id: this.eventId, value: qualityAssuranceCheckers });
-                }
-
+            if (event && !event.error) {
+                this.$store.commit('updateEvent', event);
                 this.forceDisabled = false;
             }
         },

@@ -1,7 +1,7 @@
 <template>
     <div>
-        <p v-if="discussionLink.length" class="min-spacing mb-2">
-            <a :href="discussionLink" target="_blank">Read and contribute to the full discussion here</a>
+        <p v-if="selectedDiscussionVote.discussionLink.length" class="min-spacing mb-2">
+            <a :href="selectedDiscussionVote.discussionLink" target="_blank">Read and contribute to the full discussion here</a>
         </p>
         <p v-if="isEditable" class="min-spacing">
             <a
@@ -20,7 +20,7 @@
                 placeholder="enter to submit new title..."
                 @keyup.enter="saveTitle()"
             >
-            <span v-else class="small">{{ title }}</span>
+            <span v-else class="small">{{ selectedDiscussionVote.title }}</span>
         </p>
         <p>
             <a
@@ -40,39 +40,19 @@
                 placeholder="enter to submit new proposal..."
                 @keyup.enter="saveProposal()"
             >
-            <span v-else class="small" v-html="filterLinks(shortReason)" />
+            <span v-else class="small" v-html="filterLinks(selectedDiscussionVote.shortReason)" />
         </p>
     </div>
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex';
 import postData from '../../../mixins/postData.js';
 import filterLinks from '../../../mixins/filterLinks.js';
 
 export default {
     name: 'DiscussionContext',
     mixins: [ postData, filterLinks ],
-    props: {
-        discussionId: {
-            type: String,
-            required: true,
-        },
-        discussionLink: {
-            type: String,
-            default() {
-                return null;
-            },
-        },
-        isEditable: Boolean,
-        title: {
-            type: String,
-            required: true,
-        },
-        shortReason: {
-            type: String,
-            required: true,
-        },
-    },
     data() {
         return {
             isEditTitle: false,
@@ -81,39 +61,50 @@ export default {
             editProposalContent: this.shortReason,
         };
     },
+    computed: {
+        ...mapState([
+            'userId',
+        ]),
+        ...mapGetters([
+            'selectedDiscussionVote',
+        ]),
+        isEditable() {
+            return this.selectedDiscussionVote.creator == this.userId && this.selectedDiscussionVote.isActive;
+        },
+    },
     watch: {
-        discussionId () {
+        selectedDiscussionVote () {
             this.isEditTitle = false;
-            this.editTitleContent = this.title;
+            this.editTitleContent = this.selectedDiscussionVote.title;
             this.isEditProposal = false;
-            this.editProposalContent = this.shortReason;
+            this.editProposalContent = this.selectedDiscussionVote.shortReason;
         },
     },
     methods: {
         async saveTitle () {
-            const d = await this.executePost(
-                '/discussionVote/saveTitle/' + this.discussionId, { title: this.editTitleContent });
+            const discussionVote = await this.executePost(
+                '/discussionVote/saveTitle/' + this.selectedDiscussionVote.id, { title: this.editTitleContent });
 
-            if (d) {
-                if (d.error) {
-                    this.info = d.error;
-                } else {
-                    this.$emit('update-discussion', d);
-                    this.isEditTitle = !this.isEditTitle;
-                }
+            if (discussionVote && !discussionVote.error) {
+                this.$store.dispatch('updateDiscussionVote', discussionVote);
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Saved title`,
+                    type: 'info',
+                });
+                this.isEditTitle = !this.isEditTitle;
             }
         },
         async saveProposal () {
-            const d = await this.executePost(
-                '/discussionVote/saveProposal/' + this.discussionId, { shortReason: this.editProposalContent });
+            const discussionVote = await this.executePost(
+                '/discussionVote/saveProposal/' + this.selectedDiscussionVote.id , { shortReason: this.editProposalContent });
 
-            if (d) {
-                if (d.error) {
-                    this.info = d.error;
-                } else {
-                    this.$emit('update-discussion', d);
-                    this.isEditProposal = !this.isEditProposal;
-                }
+            if (discussionVote && !discussionVote.error) {
+                this.$store.dispatch('updateDiscussionVote', discussionVote);
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Saved proposal`,
+                    type: 'info',
+                });
+                this.isEditProposal = !this.isEditProposal;
             }
         },
     },

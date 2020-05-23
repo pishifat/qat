@@ -10,9 +10,9 @@
             style="min-width: 60px; width: 60px;"
             @change="setCooldownDate($event)"
         >
-        <span class="small" :class="info.length ? 'errors' : ''">
-            {{ info || 'User can reapply on ' + newCooldownDate.toString().slice(4,15) }}<span
-                v-if="calculateDays != parseInt(days) && !info.length"
+        <span class="small" :class="invalidDate ? 'errors' : ''">
+            {{ invalidDate ? 'Invalid date!' : 'User can reapply on ' + newCooldownDate.toString().slice(4,15) }}<span
+                v-if="calculateDays != parseInt(days) && !invalidDate"
                 data-toggle="tooltip"
                 data-placement="top"
                 title="not saved"
@@ -28,14 +28,23 @@ export default {
     name: 'Cooldown',
     mixins: [ postData ],
     props: {
-        cooldownDate: String,
-        nominatorAssessmentMongoId: String,
+        cooldownDate: {
+            type: String,
+            default: '',
+        },
+        nominatorAssessmentMongoId: {
+            type: String,
+            required: true,
+        },
         isApplication: Boolean,
-        originDate: String,
+        originDate: {
+            type: String,
+            required: true,
+        },
     },
     data() {
         return {
-            info: '',
+            invalidDate: '',
             days: null,
         };
     },
@@ -56,9 +65,9 @@ export default {
     watch: {
         newCooldownDate() {
             if (!(this.newCooldownDate instanceof Date) || isNaN(this.newCooldownDate)) {
-                this.info = 'Invalid date!';
+                this.invalidDate = 'Invalid date!';
             } else {
-                this.info = '';
+                this.invalidDate = '';
             }
         },
     },
@@ -67,16 +76,16 @@ export default {
     },
     methods: {
         async setCooldownDate(e) {
-            if (!this.info.length) {
+            if (!this.invalidDate.length) {
                 const result = await this.executePost(
-                    `/${this.isApplication? 'appEval' : 'bnEval'}/setCooldownDate/` + this.nominatorAssessmentMongoId, { cooldownDate: this.newCooldownDate }, e);
+                    `/${this.isApplication ? 'appEval' : 'bnEval'}/setCooldownDate/` + this.nominatorAssessmentMongoId, { cooldownDate: this.newCooldownDate }, e);
 
-                if (result) {
-                    if (result.error) {
-                        this.info = result.error;
-                    } else {
-                        this.$emit('update-nominator-assessment', result);
-                    }
+                if (result && !result.error) {
+                    this.$store.dispatch(this.isApplication ? 'updateApplication' : 'updateEvalRound', result);
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `Saved cooldown date`,
+                        type: 'success',
+                    });
                 }
             }
         },

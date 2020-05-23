@@ -53,9 +53,6 @@
             </div>
         </div>
         <div class="d-flex justify-content-end">
-            <p class="text-shadow min-spacing mt-1 mr-2" :class="info.length ? 'errors' : 'confirm'">
-                {{ info }} {{ confirm }}
-            </p>
             <button class="btn btn-sm btn-nat" @click="submitMediation($event)">
                 Submit mediation
             </button>
@@ -64,36 +61,29 @@
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex';
 import postData from '../../../mixins/postData';
 
 export default {
     name: 'MediationInput',
     mixins: [ postData ],
-    props: {
-        mediations: {
-            type: Array,
-            required: true,
-        },
-        vetoId: {
-            type: String,
-            required: true,
-        },
-        userId: {
-            type: String,
-            required: true,
-        },
-    },
     data() {
         return {
-            info: '',
-            confirm: '',
-            comment: '',
+            comment: null,
             vote: null,
             mediationId: null,
         };
     },
+    computed: {
+        ...mapState([
+            'userId',
+        ]),
+        ...mapGetters([
+            'selectedVeto',
+        ]),
+    },
     watch: {
-        veto() {
+        selectedVeto() {
             this.findUserMediation();
         },
     },
@@ -102,12 +92,12 @@ export default {
     },
     methods: {
         findUserMediation() {
-            this.info = '';
-            this.confirm = '';
             this.mediationId = null;
+            this.comment = null;
+            this.vote = null;
 
-            for (let i = 0; i < this.mediations.length; i++) {
-                let mediation = this.mediations[i];
+            for (let i = 0; i < this.selectedVeto.mediations.length; i++) {
+                let mediation = this.selectedVeto.mediations[i];
 
                 if (mediation.mediator.id === this.userId) {
                     if (mediation.comment) this.comment = mediation.comment;
@@ -119,14 +109,14 @@ export default {
             }
         },
         async submitMediation (e) {
-            this.confirm = '';
-            this.info = '';
-
             if (!this.vote || !this.comment.length) {
-                this.info = 'Cannot leave fields blank!';
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Cannot leave fields blank!`,
+                    type: 'danger',
+                });
             } else {
-                const v = await this.executePost(
-                    `vetoes/submitMediation/${this.vetoId}`,
+                const veto = await this.executePost(
+                    `vetoes/submitMediation/${this.selectedVeto.id}`,
                     {
                         mediationId: this.mediationId,
                         vote: this.vote,
@@ -135,13 +125,12 @@ export default {
                     e
                 );
 
-                if (v) {
-                    if (v.error) {
-                        this.info = v.error;
-                    } else {
-                        this.$emit('update-veto', v);
-                        this.confirm = 'Mediation submitted!';
-                    }
+                if (veto && !veto.error) {
+                    this.$store.dispatch('updateVeto', veto);
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `Submitted mediation`,
+                        type: 'success',
+                    });
                 }
             }
         },

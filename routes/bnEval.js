@@ -675,20 +675,21 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
 });
 
 /* GET aiess info */
-router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
+router.get('/userActivity/:id/:modes/:deadline/:mongoId', async (req, res) => {
     if (isNaN(req.params.id)) {
         return res.json({ error: 'Something went wrong!' });
     }
 
     const userOsuId = parseInt(req.params.id);
+    const modes = req.params.modes.split(',');
     let deadline = parseInt(req.params.deadline);
     let minDate = new Date(deadline);
     minDate.setDate(minDate.getDate() - 90);
     let maxDate = new Date(deadline);
     const [user, allUserEvents, allEvents, qualityAssuranceChecks, assignedApplications] = await Promise.all([
         User.findById(req.params.mongoId),
-        Aiess.getByEventTypeAndUser(userOsuId, minDate, maxDate, req.params.mode),
-        Aiess.getAllByEventType(minDate, maxDate, req.params.mode),
+        Aiess.getByEventTypeAndUser(userOsuId, minDate, maxDate, modes),
+        Aiess.getAllByEventType(minDate, maxDate, modes),
         Aiess.find({
             qualityAssuranceCheckers: req.params.mongoId,
             updatedAt: { $gte: minDate, $lte: maxDate },
@@ -707,7 +708,7 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
 
     // sort events done by user by type
     let nominations = [];
-    let dqs = [];
+    let disqualifications = [];
     let pops = [];
 
     allUserEvents.forEach(userEvent => {
@@ -719,7 +720,7 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
                 nominations.push(event);
             });
         } else if (eventType == 'Disqualified') {
-            dqs = events;
+            disqualifications = events;
         } else if (eventType == 'Popped') {
             pops = events;
         }
@@ -747,8 +748,8 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
     });
 
     // find user's disqualified/popped nominations & disqualified qa checks
-    let nomsDqd = [];
-    let nomsPopped = [];
+    let nominationsDisqualified = [];
+    let nominationsPopped = [];
     let disqualifiedQualityAssuranceChecks = [];
 
     for (let i = 0; i < allEvents.length; i++) {
@@ -772,7 +773,7 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
 
                     // check if user was the nominator
                     if (a[1].userId == userOsuId || a[2].userId == userOsuId) {
-                        nomsDqd.push(event);
+                        nominationsDisqualified.push(event);
                     }
                 // check if user's quality assurance check was later disqualified
                 } else if (qualityAssuranceChecks.find(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
@@ -823,7 +824,7 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
                         .limit(2);
 
                     if (a[1].userId == userOsuId) {
-                        nomsPopped.push(event);
+                        nominationsPopped.push(event);
                     }
                 }
             }
@@ -881,7 +882,7 @@ router.get('/userActivity/:id/:mode/:deadline/:mongoId', async (req, res) => {
         });
     }
 
-    res.json({ noms: uniqueNominations, nomsDqd, nomsPopped, dqs, pops, qualityAssuranceChecks, disqualifiedQualityAssuranceChecks, assignedApplications, natApplications, natEvalRounds });
+    res.json({ noms: uniqueNominations, nominationsDisqualified, nominationsPopped, disqualifications, pops, qualityAssuranceChecks, disqualifiedQualityAssuranceChecks, assignedApplications, natApplications, natEvalRounds });
 });
 
 module.exports = router;

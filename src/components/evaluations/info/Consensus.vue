@@ -26,7 +26,7 @@
                 </button>
                 <button
                     class="btn btn-sm btn-nat-red"
-                    :disabled="consensus == 'fail' && !resignedOnGoodTerms"
+                    :disabled="consensus == 'fail' && !resignedOnGoodTerms && !resignedOnStandardTerms"
                     @click="setConsensus('fail', $event);"
                 >
                     Fail
@@ -88,7 +88,7 @@ export default {
         },
         nominatorAssessmentMongoId: {
             type: String,
-            required: true,
+            default: '',
         },
         isApplication: Boolean,
         isLowActivity: Boolean,
@@ -135,7 +135,7 @@ export default {
     methods: {
         async setConsensus(consensus, e, addition) {
             const result = await this.executePost(
-                `/${this.isApplication? 'appEval' : 'bnEval'}/setConsensus/` + this.nominatorAssessmentMongoId, {
+                `/${this.isApplication ? 'appEval' : 'bnEval'}/setConsensus/` + this.nominatorAssessmentMongoId, {
                     consensus,
                     isLowActivity: addition == 'isLowActivity',
                     resignedOnGoodTerms: addition == 'resignedOnGoodTerms',
@@ -144,12 +144,12 @@ export default {
                     isMoveToBn: addition == 'isMoveToBn',
                 }, e);
 
-            if (result) {
-                if (result.error) {
-                    this.info = result.error;
-                } else {
-                    this.$emit('update-nominator-assessment', result);
-                }
+            if (result && !result.error) {
+                this.$store.dispatch(this.isApplication ? 'updateApplication' : 'updateEvalRound', result);
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Saved consensus`,
+                    type: 'success',
+                });
             }
         },
     },

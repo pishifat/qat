@@ -1,6 +1,6 @@
 <template>
     <div class="text-shadow">
-        <div v-for="mediation in mediations" :key="mediation.id" class="row border-bottom border-dark my-2">
+        <div v-for="mediation in selectedVeto.mediations" :key="mediation.id" class="row border-bottom border-dark my-2">
             <div class="col-sm-2">
                 <a
                     :href="'https://osu.ppy.sh/users/' + mediation.mediator.osuId"
@@ -11,7 +11,7 @@
                     {{ mediation.mediator.username }}
                 </a>
                 <a
-                    v-if="!mediation.comment && status === 'wip'"
+                    v-if="!mediation.comment && selectedVeto.status === 'wip'"
                     class="small d-flex flex-column ml-auto text-center mb-2"
                     href="#"
                     data-toggle="tooltip"
@@ -35,31 +35,17 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import filterLinks from '../../../mixins/filterLinks';
 import postData from '../../../mixins/postData';
 
 export default {
     name: 'Mediations',
     mixins: [ filterLinks, postData ],
-    props: {
-        mediations: {
-            type: Array,
-            required: true,
-        },
-        status: {
-            type: String,
-            required: true,
-        },
-        vetoId: {
-            type: String,
-            required: true,
-        },
-    },
-    data() {
-        return {
-            info: '',
-            mediators: null,
-        };
+    computed: {
+        ...mapGetters([
+            'selectedVeto',
+        ]),
     },
     methods: {
         voteColor (vote) {
@@ -76,14 +62,14 @@ export default {
             const result = confirm(`Are you sure? This should only be done if a mistake was made.`);
 
             if (result) {
-                const v = await this.executePost(`/vetoes/replaceMediator/${this.vetoId}`, { mediationId });
+                const veto = await this.executePost(`/vetoes/replaceMediator/${this.selectedVeto.id}`, { mediationId });
 
-                if (v) {
-                    if (v.error) {
-                        this.info = v.error;
-                    } else {
-                        this.$emit('update-veto', v);
-                    }
+                if (veto && !veto.error) {
+                    this.$store.dispatch('updateVeto', veto);
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `Replaced mediator`,
+                        type: 'success',
+                    });
                 }
             }
         },

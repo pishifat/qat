@@ -28,7 +28,7 @@ export default {
     props: {
         username: {
             type: String,
-            default: null,
+            required: true,
         },
     },
     data() {
@@ -51,6 +51,10 @@ export default {
             if (res) {
                 this.loadingModCount = false;
                 this.modCount = res.modCount;
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Loaded modding activity`,
+                    type: 'info',
+                });
             }
         },
     },

@@ -49,8 +49,6 @@
                         </div>
                     </div>
                     <hr>
-                    <span id="addEvalRoundsErrors" class="errors text-shadow">{{ info }}</span>
-                    <span id="addEvalRoundsConfirm" class="confirm text-shadow">{{ confirm }}</span>
                     <button type="submit" class="btn btn-nat btn-sm float-right" @click="addQuestion($event)">
                         Add Question
                     </button>
@@ -78,30 +76,28 @@ export default {
     },
     data() {
         return {
-            info: '',
-            confirm: '',
             type: null,
         };
     },
     methods: {
         async addQuestion (e) {
-            this.info = '';
-            this.confirm = '';
             let questionType = $('input[name=questionType]:checked').val();
             let newQuestion = $('#newQuestion').val();
 
             if (!newQuestion || !newQuestion.length || !questionType || !questionType.length) {
-                this.info = 'Cannot leave fields blank!';
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Cannot leave fields blank!`,
+                    type: 'danger',
+                });
             } else {
                 const question = await this.executePost('/manageTest/addQuestion', { questionType, newQuestion: newQuestion.trim(), category: this.rawCategory }, e);
 
-                if (question) {
-                    if (question.error) {
-                        this.info = question.error;
-                    } else {
-                        this.$emit('add-question', question);
-                        this.confirm = 'Question added! ';
-                    }
+                if (question && !question.error) {
+                    this.$emit('add-question', question);
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `Question added`,
+                        type: 'success',
+                    });
                 }
             }
         },

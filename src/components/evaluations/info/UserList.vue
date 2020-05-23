@@ -28,11 +28,22 @@ export default {
     name: 'UserList',
     mixins: [postData],
     props: {
-        header: String,
-        userList: Array,
+        header: {
+            type: String,
+            required: true,
+        },
+        userList: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
         isNat: Boolean,
         isApplication: Boolean,
-        nominatorAssessmentMongoId: String,
+        nominatorAssessmentMongoId: {
+            type: String || null,
+            default: null,
+        },
     },
     methods: {
         async replaceUser (evaluatorId, e) {
@@ -41,12 +52,12 @@ export default {
             if (result) {
                 const r = await this.executePost(`/${this.isApplication ? 'appEval' : 'bnEval'}/replaceUser/${this.nominatorAssessmentMongoId}`, { evaluatorId, isNat: this.isNat }, e);
 
-                if (r) {
-                    if (r.error) {
-                        this.info = r.error;
-                    } else {
-                        this.$emit('update-nominator-assessment', r);
-                    }
+                if (r && !r.error) {
+                    this.$store.dispatch(this.isApplication ? 'updateApplication' : 'updateEvalRound', r);
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `Replaced user`,
+                        type: 'success',
+                    });
                 }
             }
         },

@@ -190,9 +190,6 @@
                                 placeholder="change..."
                             >
                         </div>
-                        <p class="errors text-shadow">
-                            {{ info }}
-                        </p>
                         <hr>
                         <button type="submit" class="btn btn-nat float-right" @click="submitDiscussion($event)">
                             Submit
@@ -218,16 +215,18 @@ export default {
             mode: null,
             group: 'bn',
             neutral: 'neutral',
-            info: null,
         };
     },
     methods: {
         async submitDiscussion(e) {
             if (!this.shortReason || !this.title || !this.mode) {
-                this.info = 'Required fields are missing!';
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Required fields missing!`,
+                    type: 'danger',
+                });
             } else {
                 if (!this.discussionLink) this.discussionLink = '';
-                const discussion = await this.executePost(
+                const discussionVote = await this.executePost(
                     '/discussionVote/submit',
                     {
                         discussionLink: this.discussionLink,
@@ -240,13 +239,13 @@ export default {
                     e
                 );
 
-                if (discussion) {
-                    if (discussion.error) {
-                        this.info = discussion.error;
-                    } else {
-                        $('#addDiscussion').modal('hide');
-                        this.$emit('submit-discussion', discussion);
-                    }
+                if (discussionVote && !discussionVote.error) {
+                    $('#addDiscussion').modal('hide');
+                    this.$store.commit('addDiscussionVote', discussionVote);
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `Submitted discussion`,
+                        type: 'success',
+                    });
                 }
             }
         },

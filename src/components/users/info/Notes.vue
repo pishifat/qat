@@ -41,7 +41,7 @@
                     @click.prevent="hideNote(note.id);"
                 >&times;</a>
                 <a
-                    v-if="note.author.id == viewingUserId"
+                    v-if="note.author.id == userId"
                     href="#"
                     data-toggle="tooltip"
                     data-placement="top"
@@ -63,43 +63,37 @@
                 </div>
             </li>
         </ul>
-        <p v-if="info.length" class="errors text-shadow mt-2">
-            {{ info }}
-        </p>
     </div>
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex';
 import postData from '../../../mixins/postData.js';
 import filterLinks from '../../../mixins/filterLinks.js';
 
 export default {
     name: 'Notes',
     mixins: [postData, filterLinks],
-    props: {
-        userId: {
-            type: String,
-            required: true,
-        },
-        viewingUserId: {
-            type: String,
-            required: true,
-        },
-    },
     data() {
         return {
             notes: null,
             comment: '',
-            info: '',
             editNoteId: '',
             editNoteComment: '',
         };
     },
+    computed: {
+        ...mapState([
+            'userId',
+        ]),
+        ...mapGetters([
+            'selectedUser',
+        ]),
+    },
     watch: {
-        userId() {
+        selectedUser() {
             this.notes = null;
             this.comment = '';
-            this.info = '';
             this.editNoteId = '';
             this.loadUserNotes();
         },
@@ -109,7 +103,7 @@ export default {
     },
     methods: {
         async loadUserNotes() {
-            const notes = await this.executeGet('/users/loadUserNotes/' + this.userId);
+            const notes = await this.executeGet('/users/loadUserNotes/' + this.selectedUser.id);
 
             if (notes) {
                 this.notes = notes;
@@ -117,32 +111,32 @@ export default {
         },
         async saveNote(e) {
             if (this.comment.length) {
-                const n = await this.executePost('/users/saveNote/' + this.userId, { comment: this.comment }, e);
+                const note = await this.executePost('/users/saveNote/' + this.selectedUser.id, { comment: this.comment }, e);
 
-                if (n) {
-                    if (n.error) {
-                        this.info = n.error;
-                    } else {
-                        if (this.notes) {
-                            this.notes.unshift(n);
-                        }
+                if (note && !note.error) {
+                    if (this.notes) {
+                        this.notes.unshift(note);
+                        this.$store.dispatch('updateToastMessages', {
+                            message: `Added note`,
+                            type: 'success',
+                        });
                     }
                 }
             }
         },
         async editNote(e) {
             if (this.editNoteComment.length) {
-                const n = await this.executePost('/users/editNote/' + this.editNoteId, { comment: this.editNoteComment }, e);
+                const note = await this.executePost('/users/editNote/' + this.editNoteId, { comment: this.editNoteComment }, e);
 
-                if (n) {
-                    if (n.error) {
-                        this.info = n.error;
-                    } else {
-                        if (this.notes) {
-                            const i = this.notes.findIndex(note => note.id == this.editNoteId);
-                            this.notes[i] = n;
-                            this.editNoteId = '';
-                        }
+                if (note && !note.error) {
+                    if (this.notes) {
+                        const i = this.notes.findIndex(n => n.id == this.editNoteId);
+                        this.notes[i] = note;
+                        this.editNoteId = '';
+                        this.$store.dispatch('updateToastMessages', {
+                            message: `Edited note`,
+                            type: 'success',
+                        });
                     }
                 }
             }
@@ -151,11 +145,15 @@ export default {
             const result = confirm(`Are you sure?`);
 
             if (result) {
-                await this.executePost('/users/hideNote/' + noteId, { userId: this.userId });
+                await this.executePost('/users/hideNote/' + noteId, { userId: this.selectedUser.id });
 
                 if (this.notes) {
                     const i = this.notes.findIndex(note => note.id == noteId);
                     this.notes.splice(i, 1);
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `Removed note`,
+                        type: 'success',
+                    });
                 }
             }
         },

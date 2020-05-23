@@ -208,7 +208,7 @@ router.post('/concludeMediation/:id', api.isNat, api.isNotSpectator, async (req,
         .findById(req.params.id)
         .populate(defaultPopulate);
 
-    if (req.body.dismiss || !req.body.majority) {
+    if (req.body.dismiss || !req.body.majorityUphold) {
         veto.status = 'withdrawn';
     } else {
         veto.status = 'upheld';

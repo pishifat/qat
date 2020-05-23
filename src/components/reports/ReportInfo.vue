@@ -1,124 +1,18 @@
 <template>
     <div id="reportInfo" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-lg">
-            <div v-if="report" class="modal-content">
-                <div class="modal-header text-dark bg-nat-logo">
-                    <h5 class="modal-title">
-                        <a
-                            v-if="report.culprit"
-                            class="text-dark"
-                            :href="'https://osu.ppy.sh/users/' + report.culprit.osuId"
-                            target="_blank"
-                        >{{ report.culprit.username }}</a>
-                        <span v-else class="text-dark">Report details</span>
-                    </h5>
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span>&times;</span>
-                    </button>
-                </div>
+            <div v-if="selectedReport" class="modal-content">
+                <modal-header />
                 <div class="modal-body" style="overflow: hidden">
-                    <p class="text-shadow">
-                        Reason: <pre class="small pre-font ml-4" v-html="filterLinks(report.reason)" />
-                    </p>
-                    <p v-if="report.link" class="text-shadow">
-                        Relevant link: <span v-html="filterLinks(report.link)" />
-                    </p>
-                    <p class="text-shadow">
-                        Reported: {{ report.createdAt.slice(0,10) }}
-                    </p>
-                    <p v-if="!report.isActive" class="text-shadow">
-                        Reported by: <a :href="'https://osu.ppy.sh/users/' + report.reporter.osuId" target="_blank">{{ report.reporter.username }}</a>
-                    </p>
-                    <hr>
+                    <div class="container">
+                        <context />
 
-                    <p class="text-shadow min-spacing mb-1">
-                        Feedback:
-                    </p>
-                    <span v-if="report.isActive">
-                        <small class="text-shadow ml-2">This will be sent to the reporter in a forum PM. Include the consensus and any actions being taken.</small>
+                        <hr>
 
-                        <div class="form-group mt-2">
-                            <textarea
-                                id="feedback"
-                                v-model="feedback"
-                                class="form-control dark-textarea"
-                                style="white-space: pre-line;"
-                                rows="4"
-                            />
-                        </div>
-                    </span>
+                        <feedback />
 
-                    <div id="forumMessage" class="copy-paste">
-                        <samp class="small">Hello!</samp><br><br>
-                        <samp v-if="report.culprit" class="small">You recently reported [url=https://osu.ppy.sh/users/{{ report.culprit.osuId }}]{{ report.culprit.username }}[/url] for the following reason:</samp>
-                        <samp v-else class="small">You recently reported [url={{ report.link }}]this link[/url] for the following reason:</samp><br><br>
-                        <pre class="secondary-text small">[notice]{{ report.reason }}[/notice]</pre>
-                        <samp class="small">After investigating this, we've decided that the report is [b]{{ report.valid == 1 ? 'valid' : report.valid == 2 ? 'partially valid' : 'invalid' }}[/b].</samp><br><br>
-                        <samp class="small">Additional feedback from the NAT:</samp><br><br>
-                        <pre class="secondary-text small">[notice]{{ report.feedback }}[/notice]</pre>
-                        <samp class="small">Regards, the Nomination Assessment Team</samp><br><br>
+                        <feedback-pm />
                     </div>
-
-                    <span v-if="report.isActive">
-                        <span class="mr-3 text-shadow">Validity:</span>
-                        <div class="form-check form-check-inline">
-                            <input
-                                id="1"
-                                class="form-check-input"
-                                type="radio"
-                                name="vote"
-                                value="1"
-                                :checked="report.valid == 1"
-                            >
-                            <label class="form-check-label text-shadow vote-green" for="1">Valid</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input
-                                id="2"
-                                class="form-check-input"
-                                type="radio"
-                                name="vote"
-                                value="2"
-                                :checked="report.valid == 2"
-                            >
-                            <label class="form-check-label text-shadow vote-yellow" for="2">Partially valid</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input
-                                id="3"
-                                class="form-check-input"
-                                type="radio"
-                                name="vote"
-                                value="3"
-                                :checked="report.valid == 3"
-                            >
-                            <label class="form-check-label text-shadow vote-red" for="3">Invalid</label>
-                        </div>
-                    </span>
-
-                    <div :class="info.length ? 'errors' : 'confirm'" class="text-shadow ml-2" style="min-height: 24px;">
-                        {{ info }} {{ confirm }}
-                    </div>
-                </div>
-                <div v-if="report.isActive" class="modal-footer" style="overflow: hidden;">
-                    <button
-                        class="btn btn-sm btn-nat"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        title="Generates feedback PM and stores feedback/validity inputs"
-                        @click="submitReportEval($event);"
-                    >
-                        Save Report Evaluation
-                    </button>
-                    <button
-                        class="btn btn-sm btn-nat-red"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        title="Disables feedback/validity inputs and reveals reporter"
-                        @click="submitReportEval($event, true)"
-                    >
-                        Close Report
-                    </button>
                 </div>
             </div>
         </div>
@@ -126,69 +20,28 @@
 </template>
 
 <script>
-import postData from '../../mixins/postData.js';
-import filterLinks from '../../mixins/filterLinks.js';
+import { mapGetters } from 'vuex';
+import ModalHeader from './info/ModalHeader.vue';
+import Context from './info/Context.vue';
+import Feedback from './info/Feedback.vue';
+import FeedbackPm from './info/FeedbackPm.vue';
 
 export default {
     name: 'ReportInfo',
-    mixins: [postData, filterLinks],
-    props: {
-        report: {
-            type: Object,
-            required: true,
-        },
+    components: {
+        ModalHeader,
+        Context,
+        Feedback,
+        FeedbackPm,
     },
-    data() {
-        return {
-            feedback: '',
-            confirm: '',
-            info: '',
-        };
+    computed: {
+        ...mapGetters([
+            'selectedReport',
+        ]),
     },
     watch: {
-        report(v) {
-            if (v) {
-                this.info = '';
-                this.confirm = '';
-                this.feedback = this.report.feedback;
-                history.pushState(null, 'Manage Reports', `/manageReports?report=${this.report.id}`);
-            }
-        },
-    },
-    methods: {
-        async submitReportEval (e, close) {
-            const valid = $('input[name=vote]:checked').val();
-
-            if (close && (!valid || (!this.feedback || !this.feedback.length))) {
-                this.info = 'Cannot leave fields blank!';
-            } else if (!valid && (!this.feedback || !this.feedback.length)) {
-                this.info = 'At least one field must have input!';
-            } else {
-                let r;
-
-                if (close) {
-                    const result = confirm(`Are you sure? Report feedback cannot be edited after closing. Doing this will reveal the reporter.`);
-
-                    if (result) {
-                        r = await this.executePost(
-                            '/manageReports/submitReportEval/' + this.report.id,
-                            { valid, feedback: this.feedback, close }, e);
-                    }
-                } else {
-                    r = await this.executePost(
-                        '/manageReports/submitReportEval/' + this.report.id,
-                        { valid, feedback: this.feedback, close }, e);
-                }
-
-                if (r) {
-                    if (r.error) {
-                        this.info = r.error;
-                    } else {
-                        this.$emit('update-report', r);
-                        this.confirm = 'Report updated!';
-                    }
-                }
-            }
+        selectedReport() {
+            history.pushState(null, 'Manage Reports', `/managereports?report=${this.selectedReport.id}`);
         },
     },
 };

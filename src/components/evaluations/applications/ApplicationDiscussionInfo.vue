@@ -1,26 +1,25 @@
 <template>
     <div id="applicationDiscussionInfo" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-lg">
-            <div v-if="application" class="modal-content custom-bg-dark">
+            <div v-if="selectedDiscussApplication" class="modal-content custom-bg-dark">
                 <modal-header
-                    :mode="application.mode"
-                    :nat-evaluators="application.natEvaluators"
+                    :mode="selectedDiscussApplication.mode"
+                    :nat-evaluators="selectedDiscussApplication.natEvaluators"
                     :is-application="true"
-                    :osu-id="application.applicant.osuId"
-                    :username="application.applicant.username"
-                    :evaluator-mongo-id="evaluator.id"
+                    :osu-id="selectedDiscussApplication.applicant.osuId"
+                    :username="selectedDiscussApplication.applicant.username"
                 />
                 <div class="modal-body" style="overflow: hidden;">
                     <div class="container">
                         <mods
-                            :mods="application.mods"
-                            :reasons="application.reasons"
-                            :osu-id="application.applicant.osuId"
+                            :mods="selectedDiscussApplication.mods"
+                            :reasons="selectedDiscussApplication.reasons"
+                            :osu-id="selectedDiscussApplication.applicant.osuId"
                         />
                         <test-results
                             v-if="evaluator.isNat"
-                            :test-score="application.test.totalScore"
-                            :osu-id="application.applicant.osuId"
+                            :test-score="selectedDiscussApplication.test.totalScore"
+                            :osu-id="selectedDiscussApplication.applicant.osuId"
                         />
                         <div v-if="evaluator.isNat">
                             <p class="text-shadow">
@@ -28,52 +27,48 @@
                             </p>
                             <div id="additionalInfo" class="collapse container">
                                 <applicant-comment
-                                    v-if="application.test.comment"
-                                    :comment="application.test.comment"
+                                    v-if="selectedDiscussApplication.test.comment"
+                                    :comment="selectedDiscussApplication.test.comment"
                                 />
                                 <previous-evaluations
-                                    :user-mongo-id="application.applicant.id"
+                                    :user-mongo-id="selectedDiscussApplication.applicant.id"
                                 />
                                 <user-notes
-                                    :user-mongo-id="application.applicant.id"
+                                    :user-mongo-id="selectedDiscussApplication.applicant.id"
                                 />
                             </div>
                         </div>
                         <hr>
                         <consensus
                             v-if="evaluator.isNat"
-                            :consensus="application.consensus"
-                            :nominator-assessment-mongo-id="application.id"
+                            :consensus="selectedDiscussApplication.consensus"
+                            :nominator-assessment-mongo-id="selectedDiscussApplication.id"
                             :is-application="true"
-                            @update-nominator-assessment="$emit('update-application', $event);"
                         />
                         <cooldown
-                            v-if="application.consensus == 'fail' && evaluator.isNat"
-                            :cooldown-date="application.cooldownDate"
-                            :origin-date="application.createdAt"
-                            :nominator-assessment-mongo-id="application.id"
+                            v-if="selectedDiscussApplication.consensus == 'fail' && evaluator.isNat"
+                            :cooldown-date="selectedDiscussApplication.cooldownDate"
+                            :origin-date="selectedDiscussApplication.createdAt"
+                            :nominator-assessment-mongo-id="selectedDiscussApplication.id"
                             :is-application="true"
-                            @update-nominator-assessment="$emit('update-application', $event);"
                         />
                         <feedback-info
-                            v-if="application.consensus && evaluator.isNat"
-                            :consensus="application.consensus"
+                            v-if="selectedDiscussApplication.consensus && evaluator.isNat"
+                            :consensus="selectedDiscussApplication.consensus"
                             :is-application="true"
-                            :osu-id="application.applicant.osuId"
-                            :cooldown-date="application.cooldownDate"
-                            :evaluations="application.evaluations"
-                            :mode="application.mode"
-                            :saved-feedback="application.feedback"
-                            :nominator-assessment-mongo-id="application.id"
-                            @update-nominator-assessment="$emit('update-application', $event);"
+                            :osu-id="selectedDiscussApplication.applicant.osuId"
+                            :cooldown-date="selectedDiscussApplication.cooldownDate"
+                            :evaluations="selectedDiscussApplication.evaluations"
+                            :mode="selectedDiscussApplication.mode"
+                            :saved-feedback="selectedDiscussApplication.feedback"
+                            :nominator-assessment-mongo-id="selectedDiscussApplication.id"
                         />
-                        <hr v-if="application.consensus && evaluator.isNat">
+                        <hr v-if="selectedDiscussApplication.consensus && evaluator.isNat">
                         <evaluations
-                            v-if="evaluator.isNat || application.consensus"
+                            v-if="evaluator.isNat || selectedDiscussApplication.consensus"
                             :is-nat="evaluator.isNat"
-                            :consensus="application.consensus"
-                            :evaluations="application.evaluations"
-                            :user-id="evaluator.id"
+                            :consensus="selectedDiscussApplication.consensus"
+                            :evaluations="selectedDiscussApplication.evaluations"
                         />
                         <p v-else class="text-shadow small">
                             No consensus has been set, so evaluations are not visible. Check back later!
@@ -81,10 +76,8 @@
                         <evaluation-input
                             v-if="evaluator.isNat"
                             :is-application="true"
-                            :nominator-assessment-mongo-id="application.id"
-                            :evaluator-mongo-id="evaluator.id"
-                            :evaluations="application.evaluations"
-                            @update-nominator-assessment="$emit('update-application', $event);"
+                            :nominator-assessment-mongo-id="selectedDiscussApplication.id"
+                            :evaluations="selectedDiscussApplication.evaluations"
                         />
                     </div>
                 </div>
@@ -94,6 +87,7 @@
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex';
 import ModalHeader from '../info/ModalHeader.vue';
 import Mods from './applicationInfo/Mods.vue';
 import TestResults from './applicationInfo/TestResults.vue';
@@ -121,27 +115,18 @@ export default {
         Evaluations,
         EvaluationInput,
     },
-    props: {
-        application: {
-            type: Object,
-            default() {
-                return {};
-            },
-        },
-        evaluator: {
-            type: Object,
-            default() {
-                return {};
-            },
-        },
+    computed: {
+        ...mapState([
+            'evaluator',
+        ]),
+        ...mapGetters([
+            'selectedDiscussApplication',
+        ]),
     },
     watch: {
-        application() {
-            history.pushState(null, 'BN Application Evaluations', `/appeval?eval=${this.application.id}`);
+        selectedDiscussApplication() {
+            history.pushState(null, 'BN Application Evaluations', `/appeval?eval=${this.selectedDiscussApplication.id}`);
         },
-    },
-    created() {
-        history.pushState(null, 'BN Application Evaluations', `/appeval?eval=${this.application.id}`);
     },
 };
 </script>

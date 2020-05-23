@@ -2,7 +2,7 @@
     <div class="col-md-6 col-sm-12 my-2" @click="selectReport()">
         <div
             class="card"
-            :class="report.valid == 1 ? 'border-green' : report.valid == 2 ? 'border-yellow' : report.valid == 3 ? 'border-red' : ''"
+            :class="report.valid == 1 ? 'border-green' : report.valid == 2 ? 'border-blue' : report.valid == 3 ? 'border-red' : ''"
             data-toggle="modal"
             data-target="#reportInfo"
             :data-user="report.id"
@@ -46,7 +46,7 @@ export default {
     },
     methods: {
         selectReport () {
-            this.$emit('update:selectedReport', this.report);
+            this.$store.commit('setSelectedReportId', this.report.id);
         },
     },
 };

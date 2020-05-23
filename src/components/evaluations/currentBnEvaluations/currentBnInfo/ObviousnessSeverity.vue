@@ -50,27 +50,46 @@
 
 <script>
 import postData from '../../../../mixins/postData.js';
-import filterLinks from '../../../../mixins/filterLinks.js';
 
 export default {
-    name: 'NominationResetEditing',
-    mixins: [ postData, filterLinks ],
+    name: 'ObviousnessSeverity',
+    mixins: [ postData ],
     props: {
-        obviousness: Number,
-        severity: Number,
-        eventId: String,
-        eventType: String,
+        obviousness: {
+            type: Number || null,
+            default: null,
+        },
+        severity: {
+            type: Number || null,
+            default: null,
+        },
+        eventId: {
+            type: String,
+            required: true,
+        },
+        eventType: {
+            type: String,
+            required: true,
+        },
     },
     methods: {
         async updateObviousness(obviousness) {
             let result = await this.executePost('/dataCollection/updateObviousness/' + this.eventId, { obviousness });
             if (result == this.obviousness) result = null;
-            this.$emit('update-obviousness', { id: this.eventId, type: this.eventType, value: result });
+            this.$store.commit('updateEvent', { id: this.eventId, type: this.eventType, modifiedField: 'obviousness', value: result });
+            this.$store.dispatch('updateToastMessages', {
+                message: `Updated obviousness`,
+                type: 'success',
+            });
         },
         async updateSeverity(severity) {
             let result = await this.executePost('/dataCollection/updateSeverity/' + this.eventId, { severity });
             if (result == this.severity) result = null;
-            this.$emit('update-severity', { id: this.eventId, type: this.eventType, value: result });
+            this.$store.commit('updateEvent', { id: this.eventId, type: this.eventType, modifiedField: 'severity', value: result });
+            this.$store.dispatch('updateToastMessages', {
+                message: `Updated severity`,
+                type: 'success',
+            });
         },
     },
 };

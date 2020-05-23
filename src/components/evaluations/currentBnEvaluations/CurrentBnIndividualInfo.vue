@@ -1,28 +1,25 @@
 <template>
     <div id="currentBnIndividualInfo" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-lg">
-            <div v-if="evalRound" class="modal-content custom-bg-dark">
+            <div v-if="selectedIndividualRound" class="modal-content custom-bg-dark">
                 <modal-header
-                    :mode="evalRound.mode"
-                    :nat-evaluators="evalRound.natEvaluators || []"
-                    :is-application="false"
-                    :osu-id="evalRound.bn.osuId"
-                    :username="evalRound.bn.username"
-                    :evaluator-mongo-id="evaluator.id"
+                    :mode="selectedIndividualRound.mode"
+                    :nat-evaluators="selectedIndividualRound.natEvaluators || []"
+                    :osu-id="selectedIndividualRound.bn.osuId"
+                    :username="selectedIndividualRound.bn.username"
                 />
                 <div class="modal-body" style="overflow: hidden;">
-                    <div v-for="(mode, i) in modes" :key="mode" class="container">
+                    <div class="container">
                         <p class="text-shadow min-spacing mb-1">
                             Recent BN activity
-                            <span class="small">({{ mode == 'osu' ? 'osu!' : 'osu!' + mode }})</span>
                         </p>
                         <div class="container mb-3">
                             <user-activity
-                                :osu-id="evalRound.bn.osuId"
-                                :mode="modes[i]"
-                                :deadline="evalRound.deadline"
+                                :osu-id="selectedIndividualRound.bn.osuId"
+                                :modes="modes"
+                                :deadline="selectedIndividualRound.deadline"
                                 :is-nat="evaluator.isNat"
-                                :user-mongo-id="evalRound.bn.id"
+                                :mongo-id="selectedIndividualRound.bn.id"
                             />
                         </div>
                     </div>
@@ -32,38 +29,35 @@
                         </p>
                         <div id="additionalInfo" class="collapse container">
                             <previous-evaluations
-                                :user-mongo-id="evalRound.bn.id"
+                                :user-mongo-id="selectedIndividualRound.bn.id"
                             />
                             <user-notes
-                                :user-mongo-id="evalRound.bn.id"
+                                :user-mongo-id="selectedIndividualRound.bn.id"
                             />
                             <user-reports
-                                :user-mongo-id="evalRound.bn.id"
+                                :user-mongo-id="selectedIndividualRound.bn.id"
                             />
                             <modding-activity
-                                :username="evalRound.bn.username"
+                                :username="selectedIndividualRound.bn.username"
                             />
                             <user-list
-                                v-if="evalRound.evaluations.length"
-                                :header="'Total evaluations: (' + evalRound.evaluations.length + ')'"
+                                v-if="selectedIndividualRound.evaluations.length"
+                                :header="'Total evaluations: (' + selectedIndividualRound.evaluations.length + ')'"
                                 :user-list="submittedEvaluators"
                             />
                             <evaluator-assignments
-                                :nat-evaluators="evalRound.natEvaluators"
-                                :evaluations="evalRound.evaluations"
-                                :mode="evalRound.mode"
-                                :osu-id="evalRound.bn.osuId"
-                                :username="evalRound.bn.username"
-                                :nominator-assessment-mongo-id="evalRound.id"
-                                @update-nominator-assessment="$emit('update-eval-round', $event);"
+                                :nat-evaluators="selectedIndividualRound.natEvaluators"
+                                :evaluations="selectedIndividualRound.evaluations"
+                                :mode="selectedIndividualRound.mode"
+                                :osu-id="selectedIndividualRound.bn.osuId"
+                                :username="selectedIndividualRound.bn.username"
+                                :nominator-assessment-mongo-id="selectedIndividualRound.id"
                             />
                         </div>
                         <hr>
                         <evaluation-input
-                            :nominator-assessment-mongo-id="evalRound.id"
-                            :evaluator-mongo-id="evaluator.id"
-                            :evaluations="evalRound.evaluations"
-                            @update-nominator-assessment="$emit('update-eval-round', $event);"
+                            :nominator-assessment-mongo-id="selectedIndividualRound.id"
+                            :evaluations="selectedIndividualRound.evaluations"
                         />
                     </div>
                 </div>
@@ -73,6 +67,7 @@
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex';
 import UserActivity from './currentBnInfo/UserActivity.vue';
 import ModalHeader from '../info/ModalHeader.vue';
 import PreviousEvaluations from '../info/PreviousEvaluations.vue';
@@ -96,20 +91,16 @@ export default {
         EvaluationInput,
         EvaluatorAssignments,
     },
-    props: {
-        evalRound: {
-            type: Object,
-            default: null,
-        },
-        evaluator: {
-            type: Object,
-            default: null,
-        },
-    },
     computed: {
+        ...mapState([
+            'evaluator',
+        ]),
+        ...mapGetters([
+            'selectedIndividualRound',
+        ]),
         submittedEvaluators() {
             let evaluators = new Array;
-            this.evalRound.evaluations.forEach(evaluation => {
+            this.selectedIndividualRound.evaluations.forEach(evaluation => {
                 evaluators.push(evaluation.evaluator);
             });
 
@@ -117,23 +108,16 @@ export default {
         },
         modes() {
             let modes = [];
-            if (this.evalRound.bn.modes.length) modes = this.evalRound.bn.modes;
-            else modes.push(this.evalRound.mode);
+            if (this.selectedIndividualRound.bn.modes.length) modes = this.selectedIndividualRound.bn.modes;
+            else modes.push(this.selectedIndividualRound.mode);
 
             return modes;
         },
     },
     watch: {
-        evalRound() {
-            history.pushState(null, 'Current BN Evaluations', `/bneval?eval=${this.evalRound.id}`);
+        selectedIndividualRound() {
+            history.pushState(null, 'Current BN Evaluations', `/bneval?eval=${this.selectedIndividualRound.id}`);
         },
-    },
-    created() {
-        history.pushState(null, 'Current BN Evaluations', `/bneval?eval=${this.evalRound.id}`);
     },
 };
 </script>
-
-<style>
-
-</style>

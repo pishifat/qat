@@ -111,9 +111,6 @@
                                 placeholder="reason for veto..."
                             >
                         </div>
-                        <p class="errors text-shadow">
-                            {{ info }}
-                        </p>
                         <hr>
                         <button type="submit" class="btn btn-nat float-right" @click="submitVeto($event)">
                             Submit
@@ -136,15 +133,15 @@ export default {
             discussionLink: null,
             shortReason: null,
             mode: null,
-            info: null,
         };
     },
     methods: {
         async submitVeto (e) {
-            this.info = '';
-
             if (!this.discussionLink || !this.shortReason || !this.mode) {
-                this.info = 'Cannot leave fields blank!';
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Cannot leave fields blank!`,
+                    type: 'danger',
+                });
             } else {
                 const veto = await this.executePost(
                     '/vetoes/submit',
@@ -156,13 +153,13 @@ export default {
                     e
                 );
 
-                if (veto) {
-                    if (veto.error) {
-                        this.info = veto.error;
-                    } else {
-                        $('#addVeto').modal('hide');
-                        this.$emit('submit-veto', veto);
-                    }
+                if (veto && !veto.error) {
+                    $('#addVeto').modal('hide');
+                    this.$store.commit('addVeto', veto);
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `Submitted veto`,
+                        type: 'success',
+                    });
                 }
             }
         },

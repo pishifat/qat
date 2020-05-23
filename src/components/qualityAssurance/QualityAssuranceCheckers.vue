@@ -32,6 +32,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 export default {
     name: 'QualityAssuranceCheckers',
     props: {
@@ -41,16 +43,14 @@ export default {
                 return [];
             },
         },
-        userOsuId: {
-            type: Number,
-            default: 0,
-        },
-        username: {
-            type: String,
-            default: '',
-        },
         showAll: Boolean,
         isQualityAssuranceChecker: Boolean,
+    },
+    computed: {
+        ...mapState([
+            'userOsuId',
+            'username',
+        ]),
     },
 };
 </script>

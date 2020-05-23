@@ -2,6 +2,9 @@
     <div>
         <p class="text-shadow min-spacing mb-2">
             Application feedback:
+            <span v-if="resigned" class="text-white-50">
+                resigned
+            </span>
         </p>
         <div v-if="!resigned" class="form-group">
             <textarea v-model="feedback" class="form-control dark-textarea" style="white-space: pre-line;" />
@@ -123,12 +126,12 @@ export default {
             const result = await this.executePost(
                 `/${this.isApplication ? 'appEval' : 'bnEval'}/setFeedback/` + this.nominatorAssessmentMongoId, { feedback: this.feedback, hasFeedback: this.savedFeedback }, e);
 
-            if (result) {
-                if (result.error) {
-                    this.info = result.error;
-                } else {
-                    this.$emit('update-nominator-assessment', result);
-                }
+            if (result && !result.error) {
+                this.$store.dispatch(this.isApplication ? 'updateApplication' : 'updateEvalRound', result);
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Saved feedback`,
+                    type: 'success',
+                });
             }
         },
     },

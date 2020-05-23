@@ -27,6 +27,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import CardHeader from '../card/CardHeader.vue';
 import CardFooter from '../card/CardFooter.vue';
 
@@ -41,16 +42,17 @@ export default {
             type: Object,
             required: true,
         },
-        evaluator: {
-            type: Object,
-            required: true,
-        },
         allChecked: Boolean,
     },
     data() {
         return {
             isSelected: false,
         };
+    },
+    computed: {
+        ...mapState([
+            'evaluator',
+        ]),
     },
     watch: {
         allChecked() {
@@ -59,7 +61,7 @@ export default {
     },
     methods: {
         selectEvalRound() {
-            this.$emit('update:selected-eval-round', this.evalRound);
+            this.$store.commit('setSelectedIndividualRoundId', this.evalRound.id);
         },
         findRelevantEval() {
             let vote;

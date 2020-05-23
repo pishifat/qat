@@ -135,7 +135,7 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
         .findByIdAndUpdate(req.params.id, { $push: { qualityAssuranceCheckers: req.session.mongoId } })
         .populate(defaultPopulate);
 
-    res.json(newEvent.qualityAssuranceCheckers);
+    res.json(newEvent);
 
     Logger.generate(
         req.session.mongoId,
@@ -145,11 +145,11 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
 
 /* POST unassign user */
 router.post('/unassignUser/:id', api.isBnOrNat, async (req, res) => {
-    let event = await Aiess
+    const event = await Aiess
         .findByIdAndUpdate(req.params.id, { $pull: { qualityAssuranceCheckers: req.session.mongoId } })
         .populate(defaultPopulate);
 
-    res.json(event.qualityAssuranceCheckers);
+    res.json(event);
 
     Logger.generate(
         req.session.mongoId,
@@ -170,11 +170,11 @@ router.post('/editComment/:id', api.isBnOrNat, async (req, res) => {
 
     await Mediation.findByIdAndUpdate(mediation._id, { comment: req.body.comment });
 
-    let event = await Aiess
+    const event = await Aiess
         .findById(req.params.id)
         .populate(defaultPopulate);
 
-    res.json(event.qualityAssuranceComments);
+    res.json(event);
 });
 
 module.exports = router;

@@ -31,7 +31,7 @@ export default {
     },
     methods: {
         selectTest() {
-            this.$emit('update:selected-test', this.selectedTest);
+            this.$store.commit('setSelectedTestId', this.selectedTest.id);
         },
     },
 };

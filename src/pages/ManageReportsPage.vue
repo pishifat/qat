@@ -31,7 +31,6 @@
                     <button class="btn btn-sm btn-nat ml-2" type="submit" @click="query($event)">
                         Search archives
                     </button>
-                    <span v-if="info" class="errors ml-4 mt-2">Error: {{ info }}</span>
                 </div>
                 <div class="input-group input-group-sm small my-2">
                     <input
@@ -46,13 +45,12 @@
                         Show recent
                     </button>
                 </div>
-                <template v-if="queried">
+                <template v-if="isQueried">
                     <transition-group name="list" tag="div" class="row">
                         <report-card
                             v-for="report in closedReports"
                             :key="report.id"
                             :report="report"
-                            @update:selectedReport="selectedReport = $event"
                         />
                     </transition-group>
 
@@ -63,14 +61,15 @@
             </section>
         </div>
 
-        <report-info
-            :report="selectedReport"
-            @update-report="updateReport($event)"
-        />
+        <report-info />
+
+        <toast-messages />
     </div>
 </template>
 
 <script>
+import { mapState } from 'vuex';
+import ToastMessages from '../components/ToastMessages.vue';
 import ReportCard from '../components/reports/ReportCard.vue';
 import ReportInfo from '../components/reports/ReportInfo.vue';
 import postData from '../mixins/postData.js';
@@ -78,6 +77,7 @@ import postData from '../mixins/postData.js';
 export default {
     name: 'ManageReportsPage',
     components: {
+        ToastMessages,
         ReportCard,
         ReportInfo,
     },
@@ -86,39 +86,36 @@ export default {
         return {
             searchValue: null,
             limit: null,
-            queried: false,
-            openReports: null,
-            closedReports: null,
-            selectedReport: null,
-            info: '',
         };
     },
+    computed: {
+        ...mapState([
+            'openReports',
+            'closedReports',
+            'isQueried',
+        ]),
+    },
     async created() {
-        const response = await this.executeGet('/manageReports/relevantInfo');
+        const res = await this.executeGet('/manageReports/relevantInfo');
 
-        if (response) {
-            this.openReports = response.openReports;
-            this.hasPagination = false;
+        if (res) {
+            this.$store.commit('setOpenReports', res.openReports);
             const params = new URLSearchParams(document.location.search.substring(1));
 
             if (params.get('report') && params.get('report').length) {
                 const i = this.openReports.findIndex(r => r.id == params.get('report'));
 
                 if (i >= 0) {
-                    this.selectedReport = this.openReports[i];
+                    this.$store.commit('setSelectedReportId', params.get('report'));
                     $('#reportInfo').modal('show');
                 } else {
                     const report = await this.executeGet(`/manageReports/searchById/${params.get('report')}`);
 
-                    if (report) {
-                        if (report.error) {
-                            this.info = report.error;
-                        } else {
-                            this.closedReports = [report];
-                            this.selectedReport = this.closedReports[0];
-                            this.queried = true;
-                            $('#reportInfo').modal('show');
-                        }
+                    if (report && !report.error) {
+                        this.$store.commit('setClosedReports', [report]);
+                        this.$store.commit('setSelectedReportId', params.get('report'));
+                        this.$store.commit('setIsQueried', true);
+                        $('#reportInfo').modal('show');
                     }
                 }
             }
@@ -133,53 +130,43 @@ export default {
         $('#main').attr('style', 'visibility: visible').hide().fadeIn();
     },
     methods: {
-        updateReport (report) {
-            const i = this.openReports.findIndex(r => r.id == report.id);
-
-            if (report.isActive) {
-                this.openReports[i] = report;
-            } else {
-                this.openReports.splice(i,1);
-                this.closedReports = [report];
-            }
-
-            this.selectedReport = report;
-        },
         async query(e) {
-            this.info = '';
-
             if (!this.searchValue || !this.searchValue.length) {
-                this.info = 'Must enter a username or osu ID!';
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Must enter username or osu ID!`,
+                    type: 'danger',
+                });
             } else {
                 history.pushState(null, 'Evaluation Archives', `/manageReports?user=${this.searchValue}`);
-                const result = await this.executeGet('/manageReports/search/' + this.searchValue, e);
+                const res = await this.executeGet('/manageReports/search/' + this.searchValue, e);
 
-                if (result) {
-                    if (result.error) {
-                        this.info = result.error;
-                    } else {
-                        this.queried = true;
-                        this.closedReports = result;
-                    }
+                if (res && !res.error) {
+                    this.$store.commit('setIsQueried', true);
+                    this.$store.commit('setClosedReports', res);
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `Reports loaded`,
+                        type: 'info',
+                    });
                 }
             }
         },
         async queryRecent(e) {
-            this.info = '';
-
-            if (parseInt(this.limit)) {
-                const result = await this.executeGet('/manageReports/searchRecent/' + this.limit, e);
-
-                if (result) {
-                    if (result.error) {
-                        this.info = result.error;
-                    } else {
-                        this.queried = true;
-                        this.closedReports = result;
-                    }
-                }
+            if (!parseInt(this.limit)) {
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Invalid number!`,
+                    type: 'danger',
+                });
             } else {
-                this.info = 'Invalid number';
+                const res = await this.executeGet('/manageReports/searchRecent/' + this.limit, e);
+
+                if (res && !res.error) {
+                    this.$store.commit('setIsQueried', true);
+                    this.$store.commit('setClosedReports', res);
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `Reports loaded`,
+                        type: 'info',
+                    });
+                }
             }
         },
     },

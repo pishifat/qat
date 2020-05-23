@@ -2,46 +2,45 @@
     <div>
         <p class="text-shadow">
             BN application input:
-            <span :class="{ 'vote-fail': !isBnEvaluator, 'vote-pass': isBnEvaluator }">
-                {{ isBnEvaluator ? 'Enabled' : 'Disabled' }}
+            <span :class="{ 'vote-fail': !selectedUser.isBnEvaluator, 'vote-pass': selectedUser.isBnEvaluator }">
+                {{ selectedUser.isBnEvaluator ? 'Enabled' : 'Disabled' }}
             </span>
             <button
                 class="btn btn-sm ml-2"
-                :class="{ 'btn-nat-green': !isBnEvaluator, 'btn-nat-red': isBnEvaluator }"
+                :class="{ 'btn-nat-green': !selectedUser.isBnEvaluator, 'btn-nat-red': selectedUser.isBnEvaluator }"
                 data-toggle="tooltip"
                 data-placement="top"
                 title="Toggle ability to give input on BN applications"
                 @click="switchBnEvaluator($event)"
             >
-                {{ isBnEvaluator ? 'Disable' : 'Enable' }}
+                {{ selectedUser.isBnEvaluator ? 'Disable' : 'Enable' }}
             </button>
         </p>
     </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import postData from '../../../mixins/postData.js';
 
 export default {
     name: 'BnEvaluatorToggle',
     mixins: [postData],
-    props: {
-        isBnEvaluator: Boolean,
-        userId: {
-            type: String,
-            required: true,
-        },
+    computed: {
+        ...mapGetters([
+            'selectedUser',
+        ]),
     },
     methods: {
         async switchBnEvaluator(e) {
-            const u = await this.executePost('/users/switchBnEvaluator/' + this.userId, { isBnEvaluator: this.isBnEvaluator }, e);
+            const user = await this.executePost('/users/switchBnEvaluator/' + this.selectedUser.id, { isBnEvaluator: this.selectedUser.isBnEvaluator }, e);
 
-            if (u) {
-                if (u.error) {
-                    this.info = u.error;
-                } else {
-                    this.$emit('update-user', u);
-                }
+            if (user && !user.error) {
+                this.$store.dispatch('updateUser', user);
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Toggled BN evaluator`,
+                    type: 'success',
+                });
             }
         },
     },

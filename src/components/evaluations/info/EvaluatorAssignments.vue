@@ -7,7 +7,6 @@
                 :is-application="isApplication"
                 :nominator-assessment-mongo-id="nominatorAssessmentMongoId"
                 :is-nat="true"
-                @update-nominator-assessment="$emit('update-nominator-assessment', $event);"
             />
         </div>
         <div v-if="bnEvaluators.length" class="col-sm-4">
@@ -16,7 +15,6 @@
                 :user-list="bnEvaluators"
                 :is-application="isApplication"
                 :nominator-assessment-mongo-id="nominatorAssessmentMongoId"
-                @update-nominator-assessment="$emit('update-nominator-assessment', $event);"
             />
         </div>
         <div :class="bnEvaluators.length ? 'col-sm-4' : 'col-sm-6'">
@@ -52,9 +50,6 @@
                     >
                 </div>
             </div>
-            <p v-if="info" class="small errors">
-                {{ info }}
-            </p>
             <div v-if="potentialBnEvaluators" class="text-shadow">
                 <p class="my-3">
                     Users:
@@ -132,8 +127,6 @@ export default {
             includeUsers: null,
             excludeUsers: null,
             potentialBnEvaluators: null,
-            info: null,
-            confirm: null,
         };
     },
     computed: {
@@ -149,20 +142,14 @@ export default {
     watch: {
         nominatorAssessmentMongoId() {
             this.potentialBnEvaluators = null;
-            this.info = null;
-            this.confirm = null;
         },
     },
     methods: {
         async selectBnEvaluators(e) {
             const r = await this.executePost('/appeval/selectBnEvaluators', { mode: this.mode, id: this.nominatorAssessmentMongoId, includeUsers: this.includeUsers, excludeUsers: this.excludeUsers }, e);
 
-            if (r) {
-                if (r.error) {
-                    this.info = r.error;
-                } else {
-                    this.potentialBnEvaluators = r;
-                }
+            if (r && !r.error) {
+                this.potentialBnEvaluators = r;
             }
         },
         async enableBnEvaluators (e) {
@@ -173,12 +160,12 @@ export default {
             if (result) {
                 const a = await this.executePost('/appEval/enableBnEvaluators/' + this.nominatorAssessmentMongoId, { bnEvaluators: this.potentialBnEvaluators }, e);
 
-                if (a) {
-                    if (a.error) {
-                        this.info = a.error;
-                    } else {
-                        this.$emit('update-nominator-assessment', a);
-                    }
+                if (a && !a.error) {
+                    this.$store.dispatch('updateApplication', a);
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `Enabled BN evaluators`,
+                        type: 'success',
+                    });
                 }
             }
         },

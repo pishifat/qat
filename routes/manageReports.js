@@ -41,8 +41,8 @@ router.post('/submitReportEval/:id', api.isNotSpectator, async (req, res) => {
         await Report.findByIdAndUpdate(req.params.id, { feedback: req.body.feedback });
     }
 
-    if (req.body.valid) {
-        await Report.findByIdAndUpdate(req.params.id, { valid: req.body.valid });
+    if (req.body.vote) {
+        await Report.findByIdAndUpdate(req.params.id, { valid: req.body.vote });
     }
 
     if (req.body.close) {
@@ -64,11 +64,11 @@ router.post('/submitReportEval/:id', api.isNotSpectator, async (req, res) => {
         );
     }
 
-    if (req.body.valid) {
+    if (req.body.vote) {
         Logger.generate(
             req.session.mongoId,
             `Set validity of report to
-            "${req.body.valid == 1 ? 'valid' : req.body.valid == 2 ? 'partially valid' : 'invalid'}"`
+            "${req.body.vote == 1 ? 'valid' : req.body.vote == 2 ? 'partially valid' : 'invalid'}"`
         );
     }
 });

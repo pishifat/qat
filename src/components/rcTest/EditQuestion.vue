@@ -119,8 +119,6 @@
                         </div>
                     </div>
                     <hr>
-                    <span id="addEvalRoundsErrors" class="errors text-shadow">{{ info }}</span>
-                    <span id="addEvalRoundsConfirm" class="confirm text-shadow">{{ confirm }}</span>
                     <button type="submit" class="btn btn-sm btn-nat-red float-right ml-2" @click="toggleActiveOption($event)">
                         Toggle activity
                     </button>
@@ -152,12 +150,6 @@ export default {
             required: true,
         },
     },
-    data() {
-        return {
-            info: '',
-            confirm: '',
-        };
-    },
     computed: {
         sortedOptions() {
             let sorted = this.question.options;
@@ -175,104 +167,114 @@ export default {
     },
     methods: {
         async updateQuestion (e) {
-            this.info = '';
-            this.confirm = '';
             let questionType = $('input[name=questionTypeEdit]:checked').val();
             let newQuestion = $('#newQuestionEdit').val();
 
             if (!newQuestion || !newQuestion.length || !questionType || !questionType.length) {
-                this.info = 'Cannot leave question fields blank!';
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Cannot leave question fields blank!`,
+                    type: 'danger',
+                });
             } else {
                 const question = await this.executePost('/manageTest/updateQuestion/' + this.question.id, { questionType, newQuestion }, e);
 
-                if (question) {
-                    if (question.error) {
-                        this.info = question.error;
-                    } else {
-                        this.$emit('update-question', question);
-                        this.confirm = 'Question updated! ';
-                    }
+                if (question && !question.error) {
+                    this.$emit('update-question', question);
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `Question content updated`,
+                        type: 'success',
+                    });
                 }
             }
         },
         async toggleActive(e) {
             const question = await this.executePost('/manageTest/toggleActive/' + this.question.id, { status: !this.question.active }, e);
 
-            if (question) {
-                if (question.error) {
-                    this.info = question.error;
-                } else {
-                    this.$emit('update-question', question);
-                    this.confirm = 'Question updated! ';
-                }
+            if (question && !question.error) {
+                this.$emit('update-question', question);
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Question activity updated`,
+                    type: 'success',
+                });
             }
         },
         async addOption(e) {
-            this.info = '';
-            this.confirm = '';
             let option = $('#option').val();
             let score = parseFloat($('#score').val());
 
             if ((!option || !option.length) || (!score && score != 0)) {
-                this.info = 'Cannot leave option fields blank!';
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Cannot leave option fields blank!`,
+                    type: 'danger',
+                });
             } else {
                 const question = await this.executePost('/manageTest/addOption/' + this.question.id, { option, score }, e);
 
-                if (question) {
-                    if (question.error) {
-                        this.info = question.error;
-                    } else {
-                        this.$emit('update-question', question);
-                        this.confirm = 'Option added! ';
-                    }
+                if (question && !question.error) {
+                    this.$emit('update-question', question);
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `Option added`,
+                        type: 'success',
+                    });
                 }
             }
         },
         async updateOption(e) {
-            this.info = '';
-            this.confirm = '';
             let id = $('input[name=\'optionList\']:checked').val();
             let option = $('#option').val();
             let score = parseFloat($('#score').val());
             let checked = $('input[name=\'optionList\']:checked').length;
 
             if (checked != 1) {
-                this.info = 'You must select only one option to edit!';
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Select only one option!`,
+                    type: 'danger',
+                });
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Apologies for how terribly designed this part of the website is. I can't justify improving it because nobody uses it`,
+                    type: 'info',
+                });
             } else if (!option || !option.length || (!score && score != 0)) {
-                this.info = 'Cannot leave option fields blank!';
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Cannot leave option fields blank!`,
+                    type: 'danger',
+                });
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Apologies for how terribly designed this part of the website is. I can't justify improving it because nobody uses it`,
+                    type: 'info',
+                });
             } else {
                 const question = await this.executePost('/manageTest/updateOption/' + id, { option, score, questionId: this.question.id }, e);
 
-                if (question) {
-                    if (question.error) {
-                        this.info = question.error;
-                    } else {
-                        this.$emit('update-question', question);
-                        this.confirm = 'Option updated!';
-                    }
+                if (question && !question.error) {
+                    this.$emit('update-question', question);
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `Option added`,
+                        type: 'success',
+                    });
                 }
             }
         },
         async toggleActiveOption(e) {
-            this.info = '';
-            this.confirm = '';
             let checkedOptions = [];
             $('input[name=\'optionList\']:checked').each(function() {
                 checkedOptions.push( $(this).val() );
             });
 
             if (!checkedOptions.length) {
-                this.info = 'Must select options!';
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Must select options!`,
+                    type: 'danger',
+                });
             } else {
                 const question = await this.executePost('/manageTest/toggleActiveOption/', { checkedOptions, questionId: this.question.id }, e);
 
-                if (question) {
-                    if (question.error) {
-                        this.info = question.error;
-                    } else {
-                        this.$emit('update-question', question);
-                        this.confirm = checkedOptions.length > 1 ? 'Options edited!' : 'Option edited!';
-                    }
+                if (question && !question.error) {
+                    this.$emit('update-question', question);
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `Question updated`,
+                        type: 'success',
+                    });
                 }
             }
         },

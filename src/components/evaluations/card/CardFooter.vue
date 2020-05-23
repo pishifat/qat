@@ -53,15 +53,32 @@ export default {
         AddVotes,
     },
     props: {
-        mode: String,
+        mode: {
+            type: String,
+            required: true,
+        },
         isNat: Boolean,
-        nominatorAssessmentMongoId: String,
-        evaluations: Array,
+        nominatorAssessmentMongoId: {
+            type: String,
+            required: true,
+        },
+        evaluations: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
         isDiscuss: Boolean,
-        date: String,
+        date: {
+            type: String,
+            required: true,
+        },
         isApplication: Boolean,
         isArchive: Boolean,
-        feedback: String,
+        feedback: {
+            type: String,
+            default: '',
+        },
     },
     methods: {
         separateEvals() {

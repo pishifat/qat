@@ -13,21 +13,20 @@
                 <button class="btn btn-nat ml-2" type="submit" @click="query($event)">
                     Search tests
                 </button>
-                <span v-if="info" class="errors ml-4 mt-2">Error: {{ info }}</span>
             </div>
         </section>
 
-        <section v-if="allTests" class="col-md-12 segment segment-image">
+        <section v-if="tests" class="col-md-12 segment segment-image">
             <transition-group name="list" tag="div" class="row">
                 <result-card
-                    v-for="test in allTests"
+                    v-for="test in tests"
                     :key="test.id"
                     :selected-test="test"
                     @update:selected-test="selectedTest = $event"
                 />
             </transition-group>
-            <p v-if="!allTests.length" class="text-center min-spacing">
-                You have no test results saved...
+            <p v-if="!tests.length" class="text-center min-spacing">
+                No test results...
             </p>
         </section>
 
@@ -93,6 +92,7 @@
 
 
 <script>
+import { mapState, mapGetters } from 'vuex';
 import postData from '../mixins/postData.js';
 import ResultCard from '../components/rcTest/ResultCard.vue';
 
@@ -104,48 +104,43 @@ export default {
     mixins: [postData],
     data() {
         return {
-            info: '',
-            confirm: '',
-            isNat: false,
-            allTests: null,
-            selectedTest: null,
             selectedOptionIds: [],
             searchValue: null,
         };
+    },
+    computed: {
+        ...mapState([
+            'tests',
+            'isNat',
+        ]),
+        ...mapGetters([
+            'selectedTest',
+        ]),
     },
     watch: {
         selectedTest(v) {
             if (v) {
                 this.getOptionIds();
-                this.confirm = '';
-                this.info = '';
             }
         },
     },
     async created() {
         const params = new URLSearchParams(document.location.search.substring(1));
 
+        let res;
+
         if (params.get('user') && params.get('user').length) {
-            const res = await this.executeGet(`/testResults/search/${params.get('user')}`);
-
-            if (res) {
-                this.isNat = res.isNat;
-                this.allTests = res.tests;
-
-                if (this.allTests && this.allTests.length == 1) {
-                    this.selectedTest = this.allTests[0];
-                }
-            }
+            res = await this.executeGet(`/testResults/search/${params.get('user')}`);
         } else {
-            const res = await this.executeGet('/testResults/relevantInfo');
+            res = await this.executeGet('/testResults/relevantInfo');
+        }
 
-            if (res) {
-                this.isNat = res.isNat;
-                this.allTests = res.tests;
+        if (res) {
+            this.$store.commit('setIsNat', res.isNat);
+            this.$store.commit('setTests', res.tests);
 
-                if (this.allTests && this.allTests.length == 1) {
-                    this.selectedTest = this.allTests[0];
-                }
+            if (this.tests && this.tests.length == 1) {
+                this.$store.commit('setSelectedTestId', this.tests[0].id);
             }
         }
 
@@ -189,34 +184,27 @@ export default {
             });
         },
         async query(e) {
-            this.allTests = null;
-            this.selectedTest = null;
-            this.info = '';
             let user = this.searchValue;
 
             if (!user || !user.length) {
-                this.info = 'Must enter a username or ID!';
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Must enter username or ID!`,
+                    type: 'danger',
+                });
             } else {
                 history.pushState(null, 'Ranking Criteria Test Results', `/testresults?user=${user}`);
                 const result = await this.executeGet(`/testResults/search/${user}`, e);
 
-                if (result) {
-                    if (result.error) {
-                        this.info = result.error;
-                    } else {
-                        this.allTests = result.tests;
+                if (result && !result.error) {
+                    this.$store.commit('setTests', result.tests);
 
-                        if (this.allTests.length == 1) {
-                            this.selectedTest = result[0];
-                        }
+                    if (this.tests && this.tests.length == 1) {
+                        this.$store.commit('setSelectedTestId', this.tests[0].id);
+                    } else {
+                        this.$store.commit('setSelectedTestId', null);
                     }
                 }
             }
-        },
-        updateTest(t) {
-            const i = this.allTests.findIndex(test => test.id == t.id);
-            this.allTests[i] = t;
-            this.selectedTest = t;
         },
     },
 };

@@ -17,9 +17,6 @@
                     >{{ discussion.title }}</a>
                     <span v-else>{{ discussion.title }}</span>
                 </p>
-                <p class="small text-shadow">
-                    {{ discussion.isActive ? 'Open for voting' : 'Voting concluded' }}
-                </p>
                 <div class="discussion-status my-auto" :class="discussion.isActive ? 'status-bar-active' : 'status-bar-inactive'" />
                 <div class="card-icons">
                     <span class="small text-shadow float-left">{{ discussion.createdAt.slice(0, 10) }}</span>
@@ -40,6 +37,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 export default {
     name: 'DiscussionCard',
     props: {
@@ -47,14 +46,15 @@ export default {
             type: Object,
             required: true,
         },
-        userId: {
-            type: String,
-            required: true,
-        },
+    },
+    computed: {
+        ...mapState([
+            'userId',
+        ]),
     },
     methods: {
         selectDiscussion() {
-            this.$emit('update:selectedDiscussion', this.discussion);
+            this.$store.commit('setSelectedDiscussionVoteId', this.discussion.id);
         },
         findRelevantMediation() {
             let vote;

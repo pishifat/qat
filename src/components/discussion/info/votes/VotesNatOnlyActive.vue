@@ -1,10 +1,10 @@
 <template>
     <div>
         <p class="min-spacing my-2">
-            Total votes ({{ mediations.length }}):
+            Total votes ({{ selectedDiscussionVote.mediations.length }}):
         </p>
         <ul>
-            <li v-for="mediation in mediations" :key="mediation.id" class="small">
+            <li v-for="mediation in selectedDiscussionVote.mediations" :key="mediation.id" class="small">
                 {{ mediation.mediator.username }}
             </li>
         </ul>
@@ -12,10 +12,13 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 export default {
     name: 'VotesNatOnlyActive',
-    props: {
-        mediations: Array,
+    computed: {
+        ...mapGetters([
+            'selectedDiscussionVote',
+        ]),
     },
 };
 </script>

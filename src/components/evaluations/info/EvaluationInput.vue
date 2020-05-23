@@ -68,9 +68,6 @@
             </div>
         </div>
         <div class="d-flex justify-content-end">
-            <p class="text-shadow min-spacing mt-1 mr-2" :class="info.length ? 'errors' : 'confirm'">
-                {{ info }} {{ confirm }}
-            </p>
             <button class="btn btn-sm btn-nat" @click="submitEval($event)">
                 {{ evaluationId ? 'Update Evaluation' : 'Submit Evaluation' }}
             </button>
@@ -79,6 +76,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import postData from '../../../mixins/postData.js';
 
 export default {
@@ -86,9 +84,16 @@ export default {
     mixins: [ postData ],
     props: {
         isApplication: Boolean,
-        nominatorAssessmentMongoId: String,
-        evaluatorMongoId: String,
-        evaluations: Array,
+        nominatorAssessmentMongoId: {
+            type: String,
+            required: true,
+        },
+        evaluations: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
     },
     data() {
         return {
@@ -96,12 +101,15 @@ export default {
             behaviorComment: '',
             vote: 0,
             evaluationId: null,
-            info: '',
-            confirm: '',
         };
     },
+    computed: {
+        ...mapGetters([
+            'evaluatorId',
+        ]),
+    },
     watch: {
-        nominatorAssessmentMongoId() {
+        evaluations() {
             this.findUserEvaluation();
         },
     },
@@ -110,14 +118,12 @@ export default {
     },
     methods: {
         findUserEvaluation() {
-            this.info = '',
-            this.confirm = '',
             this.moddingComment = '';
             this.behaviorComment = '';
             this.vote = 0;
             this.evaluationId = null;
             this.evaluations.forEach(evaluation => {
-                if (evaluation.evaluator.id == this.evaluatorMongoId) {
+                if (evaluation.evaluator.id == this.evaluatorId) {
                     this.behaviorComment = evaluation.behaviorComment;
                     this.moddingComment = evaluation.moddingComment;
                     this.vote = evaluation.vote;
@@ -127,10 +133,12 @@ export default {
         },
         async submitEval (e) {
             if (!this.vote || !this.moddingComment.length || !this.behaviorComment.length) {
-                this.info = 'Cannot leave fields blank!';
-                this.confirm = '';
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Cannot leave fields blank!`,
+                    type: 'danger',
+                });
             } else {
-                const r = await this.executePost(
+                const result = await this.executePost(
                     `/${this.isApplication ? 'appEval' : 'bnEval'}/submitEval/${this.nominatorAssessmentMongoId}`, {
                         evaluationId: this.evaluationId,
                         vote: this.vote,
@@ -138,15 +146,12 @@ export default {
                         behaviorComment: this.behaviorComment,
                     }, e);
 
-                if (r) {
-                    if (r.error) {
-                        this.info = r.error;
-                        this.confirm = '';
-                    } else {
-                        await this.$emit('update-nominator-assessment', r);
-                        this.findUserEvaluation();
-                        this.confirm = 'Submitted!';
-                    }
+                if (result && !result.error) {
+                    this.$store.dispatch(this.isApplication ? 'updateApplication' : 'updateEvalRound', result);
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `Submitted evaluation`,
+                        type: 'success',
+                    });
                 }
             }
         },

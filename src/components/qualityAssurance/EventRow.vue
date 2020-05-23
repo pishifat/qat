@@ -30,11 +30,9 @@
                             />
                             <quality-assurance-checkers
                                 class="col-sm-4"
-                                :user-osu-id="userOsuId"
-                                :username="username"
                                 :quality-assurance-checkers="event.qualityAssuranceCheckers"
-                                :show-all="showAll"
                                 :is-quality-assurance-checker="isQualityAssuranceChecker"
+                                :show-all="showAll"
                             />
                             <assignment-buttons
                                 v-if="!isOutdated"
@@ -42,7 +40,6 @@
                                 :event-id="event.id"
                                 :is-quality-assurance-checker="isQualityAssuranceChecker"
                                 :is-max-checks="isMaxChecks"
-                                @update-quality-assurance-checkers="$emit('update-quality-assurance-checkers', $event)"
                             />
                         </div>
                     </div>
@@ -50,12 +47,9 @@
                 <comments
                     class="row small text-shadow my-2"
                     :quality-assurance-comments="event.qualityAssuranceComments"
-                    :user-id="userId"
                     :event-id="event.id"
                     :is-max-checks="isMaxChecks"
                     :is-outdated="isOutdated"
-                    :is-nat="isNat"
-                    @update-quality-assurance-comments="$emit('update-quality-assurance-comments', $event)"
                 />
             </div>
         </div>
@@ -63,6 +57,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import BeatmapThumbnail from './BeatmapThumbnail.vue';
 import BeatmapMetadata from './BeatmapMetadata.vue';
 import BeatmapHost from './BeatmapHost.vue';
@@ -87,23 +82,16 @@ export default {
             type: Object,
             required: true,
         },
-        userId: {
-            type: String,
-            required: true,
-        },
-        userOsuId: {
-            type: Number,
-            required: true,
-        },
-        username: {
-            type: String,
-            required: true,
-        },
-        isNat: Boolean,
-        isOutdated: Boolean,
         isMaxChecks: Boolean,
+        isOutdated: Boolean,
     },
     computed: {
+        ...mapState([
+            'userId',
+            'userOsuId',
+            'username',
+            'isNat',
+        ]),
         isQualityAssuranceChecker() {
             let valid;
             this.event.qualityAssuranceCheckers.forEach(user => {
