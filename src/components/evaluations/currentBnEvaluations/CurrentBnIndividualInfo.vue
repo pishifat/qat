@@ -18,7 +18,6 @@
                                 :osu-id="selectedIndividualRound.bn.osuId"
                                 :modes="modes"
                                 :deadline="selectedIndividualRound.deadline"
-                                :is-nat="evaluator.isNat"
                                 :mongo-id="selectedIndividualRound.bn.id"
                             />
                         </div>

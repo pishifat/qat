@@ -10,6 +10,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 export default {
     name: 'CardHeader',
     props: {
@@ -21,7 +23,6 @@ export default {
             type: Number,
             required: true,
         },
-        isNat: Boolean,
         consensus: {
             type: String,
             default() {
@@ -30,6 +31,9 @@ export default {
         },
     },
     computed: {
+        ...mapState([
+            'isNat',
+        ]),
         consensusColor() {
             if (!this.consensus) {
                 return '';

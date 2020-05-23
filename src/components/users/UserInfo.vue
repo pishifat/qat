@@ -16,7 +16,6 @@
                                 :modes="selectedUser.modes"
                                 :deadline="new Date().toString()"
                                 :osu-id="selectedUser.osuId"
-                                :is-nat="isNat"
                                 :mongo-id="selectedUser.id"
                             />
                         </div>

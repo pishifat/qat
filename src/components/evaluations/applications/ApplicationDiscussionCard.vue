@@ -13,12 +13,10 @@
             <card-header
                 :username="application.applicant.username"
                 :osu-id="application.applicant.osuId"
-                :is-nat="evaluator.isNat"
                 :consensus="application.consensus"
             />
             <card-footer
                 :mode="application.mode"
-                :is-nat="evaluator.isNat"
                 :nominator-assessment-mongo-id="application.id"
                 :evaluations="application.evaluations"
                 :is-discuss="true"

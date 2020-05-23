@@ -32,7 +32,6 @@
                         <hr v-if="selectedDiscussApplication.consensus">
                         <evaluations
                             :evaluations="selectedDiscussApplication.evaluations"
-                            :is-nat="evaluator.isNat"
                             :consensus="selectedDiscussApplication.consensus"
                         />
                         <button

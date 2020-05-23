@@ -52,7 +52,6 @@
                         <evaluation-input
                             :is-application="true"
                             :nominator-assessment-mongo-id="selectedIndividualApplication.id"
-                            :evaluator-mongo-id="evaluator.id"
                             :evaluations="selectedIndividualApplication.evaluations"
                         />
                     </div>

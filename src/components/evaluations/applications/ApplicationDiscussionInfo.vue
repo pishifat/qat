@@ -66,7 +66,6 @@
                         <hr v-if="selectedDiscussApplication.consensus && evaluator.isNat">
                         <evaluations
                             v-if="evaluator.isNat || selectedDiscussApplication.consensus"
-                            :is-nat="evaluator.isNat"
                             :consensus="selectedDiscussApplication.consensus"
                             :evaluations="selectedDiscussApplication.evaluations"
                         />

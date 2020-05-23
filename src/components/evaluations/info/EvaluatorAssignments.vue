@@ -6,7 +6,6 @@
                 :user-list="natEvaluators"
                 :is-application="isApplication"
                 :nominator-assessment-mongo-id="nominatorAssessmentMongoId"
-                :is-nat="true"
             />
         </div>
         <div v-if="bnEvaluators.length" class="col-sm-4">

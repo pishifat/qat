@@ -10,7 +10,6 @@
         >
             Load modding activity
         </button>
-        <span v-if="loadingModCount" class="small">Finding mods (this will take a few seconds...)</span>
         <ul v-if="modCount" class="text-shadow">
             <li v-for="(mod, i) in modCount" :key="i" class="min-spacing small">
                 Month {{ i+1 }}: {{ modCount[i] }}
@@ -33,19 +32,20 @@ export default {
     },
     data() {
         return {
-            loadingModCount: false,
             modCount: null,
         };
     },
     watch: {
         username() {
-            this.loadingModCount = false;
             this.modCount = null;
         },
     },
     methods: {
         async findModCount() {
-            this.loadingModCount = true;
+            this.$store.dispatch('updateToastMessages', {
+                message: `Loading modding activity (this may take a while)`,
+                type: 'info',
+            });
             const res = await this.executeGet('/modsCount/' + this.username);
 
             if (res) {
@@ -53,7 +53,7 @@ export default {
                 this.modCount = res.modCount;
                 this.$store.dispatch('updateToastMessages', {
                     message: `Loaded modding activity`,
-                    type: 'info',
+                    type: 'success',
                 });
             }
         },

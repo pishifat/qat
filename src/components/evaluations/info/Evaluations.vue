@@ -76,7 +76,6 @@ export default {
             type: String,
             default: '',
         },
-        isNat: Boolean,
     },
     computed: {
         ...mapState([

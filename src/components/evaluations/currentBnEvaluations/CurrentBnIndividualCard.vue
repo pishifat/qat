@@ -15,7 +15,6 @@
             />
             <card-footer
                 :mode="evalRound.mode"
-                :is-nat="evaluator.isNat"
                 :nominator-assessment-mongo-id="evalRound.id"
                 :evaluations="evalRound.evaluations"
                 :is-discuss="false"

@@ -19,7 +19,6 @@
                                 :osu-id="selectedDiscussRound.bn.osuId"
                                 :modes="modes"
                                 :deadline="selectedDiscussRound.deadline"
-                                :is-nat="evaluator.isNat"
                                 :mongo-id="selectedDiscussRound.bn.id"
                             />
                         </div>
@@ -42,7 +41,6 @@
                         <hr v-if="selectedDiscussRound.consensus">
                         <evaluations
                             :evaluations="selectedDiscussRound.evaluations"
-                            :is-nat="true"
                             :consensus="selectedDiscussRound.consensus"
                         />
                         <button

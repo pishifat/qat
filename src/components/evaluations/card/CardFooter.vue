@@ -45,6 +45,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import AddVotes from '../card/AddVotes.vue';
 
 export default {
@@ -57,7 +58,6 @@ export default {
             type: String,
             required: true,
         },
-        isNat: Boolean,
         nominatorAssessmentMongoId: {
             type: String,
             required: true,
@@ -79,6 +79,11 @@ export default {
             type: String,
             default: '',
         },
+    },
+    computed: {
+        ...mapState([
+            'isNat',
+        ]),
     },
     methods: {
         separateEvals() {
