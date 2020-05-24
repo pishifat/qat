@@ -348,23 +348,29 @@ router.post('/setFeedback/:id', api.isNat, api.isNotSpectator, async (req, res) 
 
 /* POST replace evaluator */
 router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) => {
-    const isNat = Boolean(req.body.isNat);
+    const replaceNat = Boolean(req.body.replaceNat);
     let a = await BnApp.findById(req.params.id).populate(defaultPopulate);
-    let newEvaluator;
+    let newEvaluators;
 
-    if (isNat) {
+    if (replaceNat) {
         const invalids = [8129817, 3178418];
         a.natEvaluators.forEach(user => {
             invalids.push(user.osuId);
         });
-        newEvaluator = await User.aggregate([
-            { $match: { group: 'nat', isSpectator: { $ne: true }, modes: a.mode, osuId: { $nin: invalids } } },
-            { $sample: { size: 1 } },
-        ]);
+
+        // assigns current user if possible. rng otherwise
+        if (!invalids.includes(res.locals.userRequest.osuId) && res.locals.userRequest.modes.includes(a.mode)) {
+            newEvaluators = [res.locals.userRequest];
+        } else {
+            newEvaluators = await User.aggregate([
+                { $match: { group: 'nat', isSpectator: { $ne: true }, modes: a.mode, osuId: { $nin: invalids } } },
+                { $sample: { size: 1 } },
+            ]);
+        }
 
         await Promise.all([
             BnApp.findByIdAndUpdate(req.params.id, {
-                $push: { natEvaluators: newEvaluator[0]._id },
+                $push: { natEvaluators: newEvaluators[0]._id },
             }),
             BnApp.findByIdAndUpdate(req.params.id, {
                 $pull: { natEvaluators: req.body.evaluatorId },
@@ -375,14 +381,14 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
         a.bnEvaluators.forEach(user => {
             invalids.push(user.osuId);
         });
-        newEvaluator = await User.aggregate([
+        newEvaluators = await User.aggregate([
             { $match: { group: 'bn', isSpectator: { $ne: true }, modes: a.mode, osuId: { $nin: invalids }, isBnEvaluator: true, probation: { $size: 0 } } },
             { $sample: { size: 1 } },
         ]);
 
         await Promise.all([
             BnApp.findByIdAndUpdate(req.params.id, {
-                $push: { bnEvaluators: newEvaluator[0]._id },
+                $push: { bnEvaluators: newEvaluators[0]._id },
             }),
             BnApp.findByIdAndUpdate(req.params.id, {
                 $pull: { bnEvaluators: req.body.evaluatorId },
@@ -396,7 +402,7 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
 
     Logger.generate(
         req.session.mongoId,
-        `Re-selected a ${isNat ? 'NAT' : 'BN'} evaluator on BN application for ${a.applicant.username}`
+        `Re-selected a ${replaceNat ? 'NAT' : 'BN'} evaluator on BN application for ${a.applicant.username}`
     );
 
     const user = await User.findById(req.body.evaluatorId);
@@ -405,7 +411,7 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
         [{
             author: api.defaultWebhookAuthor(req.session),
             color: api.webhookColors.orange,
-            description: `Replaced **${user.username}** with **${newEvaluator[0].username}**  as ${isNat ? 'NAT' : 'BN'} evaluator for [**${a.applicant.username}**'s BN app](http://bn.mappersguild.com/appeval?eval=${a.id})`,
+            description: `Replaced **${user.username}** with **${newEvaluators[0].username}**  as ${replaceNat ? 'NAT' : 'BN'} evaluator for [**${a.applicant.username}**'s BN app](http://bn.mappersguild.com/appeval?eval=${a.id})`,
         }],
         a.mode
     );

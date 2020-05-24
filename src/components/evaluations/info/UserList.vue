@@ -22,6 +22,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import postData from '../../../mixins/postData.js';
 
 export default {
@@ -38,19 +39,24 @@ export default {
                 return [];
             },
         },
-        isNat: Boolean,
         isApplication: Boolean,
         nominatorAssessmentMongoId: {
             type: String || null,
             default: null,
         },
+        replaceNat: Boolean,
+    },
+    computed: {
+        ...mapState([
+            'isNat',
+        ]),
     },
     methods: {
         async replaceUser (evaluatorId, e) {
             const result = confirm(`Are you sure?`);
 
             if (result) {
-                const r = await this.executePost(`/${this.isApplication ? 'appEval' : 'bnEval'}/replaceUser/${this.nominatorAssessmentMongoId}`, { evaluatorId, isNat: this.isNat }, e);
+                const r = await this.executePost(`/${this.isApplication ? 'appEval' : 'bnEval'}/replaceUser/${this.nominatorAssessmentMongoId}`, { evaluatorId, replaceNat: this.replaceNat }, e);
 
                 if (r && !r.error) {
                     this.$store.dispatch(this.isApplication ? 'updateApplication' : 'updateEvalRound', r);
