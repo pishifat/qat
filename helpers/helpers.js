@@ -85,13 +85,15 @@ async function getUserModsCount(username, mode, months) {
                 } else {
                     let pageMods = [];
                     events.forEach(event => {
-                        let mod = {
-                            beatmapsetId: event.beatmapset.id,
-                            discussionId: event.discussion.id,
-                            isGain: event.type == 'kudosu_gain',
-                        };
+                        if (event.beatmapset && event.discussion) {
+                            let mod = {
+                                beatmapsetId: event.beatmapset.id,
+                                discussionId: event.discussion.id,
+                                isGain: event.type == 'kudosu_gain',
+                            };
 
-                        pageMods.push(mod);
+                            pageMods.push(mod);
+                        }
                     });
 
                     // Filters repeated sets and checks for denied KDs
@@ -119,6 +121,8 @@ async function getUserModsCount(username, mode, months) {
     if (mode) {
         return modScore.toFixed(2);
     } else {
+        console.log(modCount);
+
         return modCount;
     }
 }
