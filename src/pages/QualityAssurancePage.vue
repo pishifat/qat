@@ -24,7 +24,13 @@
                 </transition-group>
             </div>
             <div class="text-center">
-                <button class="btn btn-sm btn-nat mt-4 mx-auto" @click="loadMore($event)">
+                <button
+                    class="btn btn-sm btn-nat mt-4 mx-auto"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="show 200 more events throughout all modes"
+                    @click="loadMore($event)"
+                >
                     <i class="fas fa-angle-down mr-1" /> show more <i class="fas fa-angle-down ml-1" />
                 </button>
             </div>
@@ -53,7 +59,7 @@ export default {
     mixins: [postData],
     data() {
         return {
-            limit: 50,
+            limit: 200,
         };
     },
     computed: {
@@ -125,11 +131,11 @@ export default {
             }
         },
         async loadMore(e) {
-            const res = await this.executeGet('/qualityAssurance/loadMore/' + this.limit + '/' + (this.limit - 50), e);
+            const res = await this.executeGet('/qualityAssurance/loadMore/' + this.limit + '/' + (this.limit - 200), e);
 
             if (res) {
                 this.$store.commit('addEvents', res.maps);
-                this.limit += 50;
+                this.limit += 200;
             }
         },
     },
