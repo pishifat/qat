@@ -841,7 +841,7 @@ router.get('/userActivity/:id/:modes/:deadline/:mongoId', async (req, res) => {
             BnApp
                 .find({
                     createdAt: { $gte: minDate },
-                    mode: req.params.mode,
+                    mode: { $in: modes },
                     active: false,
                 })
                 .populate(applicationPopulate)
@@ -850,7 +850,7 @@ router.get('/userActivity/:id/:modes/:deadline/:mongoId', async (req, res) => {
             EvalRound
                 .find({
                     deadline: { $gte: minDate },
-                    mode: req.params.mode,
+                    mode: { $in: modes },
                     active: false,
                 })
                 .populate(defaultPopulate)
