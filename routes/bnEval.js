@@ -640,8 +640,12 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
         invalids.push(user.osuId);
     });
 
-    if (!invalids.includes(res.locals.userRequest.osuId) && res.locals.userRequest.modes.includes(evalRound.mode)) {
-        newEvaluator = res.locals.userRequest;
+    if (!invalids.includes(req.session.osuId) && res.locals.userRequest.modes.includes(evalRound.mode)) {
+        let currentUser = await User.findById(req.session.mongoId);
+
+        if (currentUser.modes.includes(evalRound.mode)) {
+            newEvaluator = currentUser;
+        }
     } else {
         const evaluatorArray = await User.aggregate([
             { $match: { group: 'nat', isSpectator: { $ne: true }, modes: evalRound.mode, osuId: { $nin: invalids } } },
