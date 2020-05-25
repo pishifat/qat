@@ -455,7 +455,7 @@ router.post('/selectBnEvaluators', api.isNat, async (req, res) => {
         }
     }
 
-    for (let i = 0; users.length < requiredUsers; i++) {
+    for (let i = 0; users.length < requiredUsers && i < allUsers.length; i++) {
         const user = allUsers[i];
         const userId = user._id.toString();
 

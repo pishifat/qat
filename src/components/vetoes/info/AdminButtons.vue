@@ -56,12 +56,12 @@
                 </div>
             </div>
             <button class="btn btn-sm btn-block btn-nat mb-2" @click="selectMediators($event)">
-                {{ mediators ? 'Re-select Mediators' : 'Select Mediators' }}
+                {{ mediators ? 'Re-select mediators' : 'Select mediators' }}
             </button>
 
             <!-- begin mediation -->
-            <button v-if="mediators" class="btn btn-sm btn-block btn-nat-red mb-2" @click="beginMediation($event)">
-                Begin Mediation
+            <button v-if="mediators && mediators.length" class="btn btn-sm btn-block btn-nat-red mb-2" @click="beginMediation($event)">
+                Begin mediation
             </button>
 
             <!-- view mediators -->

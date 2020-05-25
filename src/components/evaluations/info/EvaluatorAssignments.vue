@@ -27,8 +27,8 @@
             <button class="btn btn-sm btn-nat mb-2 w-100" @click="selectBnEvaluators($event)">
                 {{ potentialBnEvaluators ? 'Re-select BN Evaluators' : 'Select BN Evaluators' }}
             </button>
-            <button v-if="potentialBnEvaluators" class="btn btn-sm btn-nat-red mb-2 w-100" @click="enableBnEvaluators($event)">
-                Enable BN Evaluations
+            <button v-if="potentialBnEvaluators && potentialBnEvaluators.length" class="btn btn-sm btn-nat-red mb-2 w-100" @click="enableBnEvaluators($event)">
+                Enable BN evaluations
             </button>
             <div class="row">
                 <div class="col-sm-6">
