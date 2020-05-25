@@ -350,7 +350,7 @@ router.post('/setFeedback/:id', api.isNat, api.isNotSpectator, async (req, res) 
 router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) => {
     const replaceNat = Boolean(req.body.replaceNat);
     let a = await BnApp.findById(req.params.id).populate(defaultPopulate);
-    let newEvaluators;
+    let newEvaluator;
 
     if (replaceNat) {
         const invalids = [8129817, 3178418];
@@ -360,17 +360,18 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
 
         // assigns current user if possible. rng otherwise
         if (!invalids.includes(res.locals.userRequest.osuId) && res.locals.userRequest.modes.includes(a.mode)) {
-            newEvaluators = [res.locals.userRequest];
+            newEvaluator = res.locals.userRequest;
         } else {
-            newEvaluators = await User.aggregate([
+            const evaluatorArray = await User.aggregate([
                 { $match: { group: 'nat', isSpectator: { $ne: true }, modes: a.mode, osuId: { $nin: invalids } } },
                 { $sample: { size: 1 } },
             ]);
+            newEvaluator = evaluatorArray[0];
         }
 
         await Promise.all([
             BnApp.findByIdAndUpdate(req.params.id, {
-                $push: { natEvaluators: newEvaluators[0]._id },
+                $push: { natEvaluators: newEvaluator._id },
             }),
             BnApp.findByIdAndUpdate(req.params.id, {
                 $pull: { natEvaluators: req.body.evaluatorId },
@@ -381,14 +382,15 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
         a.bnEvaluators.forEach(user => {
             invalids.push(user.osuId);
         });
-        newEvaluators = await User.aggregate([
+        const evaluatorArray = await User.aggregate([
             { $match: { group: 'bn', isSpectator: { $ne: true }, modes: a.mode, osuId: { $nin: invalids }, isBnEvaluator: true, probation: { $size: 0 } } },
             { $sample: { size: 1 } },
         ]);
+        newEvaluator = evaluatorArray[0];
 
         await Promise.all([
             BnApp.findByIdAndUpdate(req.params.id, {
-                $push: { bnEvaluators: newEvaluators[0]._id },
+                $push: { bnEvaluators: newEvaluator._id },
             }),
             BnApp.findByIdAndUpdate(req.params.id, {
                 $pull: { bnEvaluators: req.body.evaluatorId },
@@ -411,7 +413,7 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
         [{
             author: api.defaultWebhookAuthor(req.session),
             color: api.webhookColors.orange,
-            description: `Replaced **${user.username}** with **${newEvaluators[0].username}**  as ${replaceNat ? 'NAT' : 'BN'} evaluator for [**${a.applicant.username}**'s BN app](http://bn.mappersguild.com/appeval?eval=${a.id})`,
+            description: `Replaced **${user.username}** with **${newEvaluator.username}**  as ${replaceNat ? 'NAT' : 'BN'} evaluator for [**${a.applicant.username}**'s BN app](http://bn.mappersguild.com/appeval?eval=${a.id})`,
         }],
         a.mode
     );

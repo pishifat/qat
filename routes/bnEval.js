@@ -639,14 +639,20 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
     evalRound.natEvaluators.forEach(user => {
         invalids.push(user.osuId);
     });
-    newEvaluator = await User.aggregate([
-        { $match: { group: 'nat', isSpectator: { $ne: true }, modes: evalRound.mode, osuId: { $nin: invalids } } },
-        { $sample: { size: 1 } },
-    ]);
+
+    if (!invalids.includes(res.locals.userRequest.osuId) && res.locals.userRequest.modes.includes(evalRound.mode)) {
+        newEvaluator = res.locals.userRequest;
+    } else {
+        const evaluatorArray = await User.aggregate([
+            { $match: { group: 'nat', isSpectator: { $ne: true }, modes: evalRound.mode, osuId: { $nin: invalids } } },
+            { $sample: { size: 1 } },
+        ]);
+        newEvaluator = evaluatorArray[0];
+    }
 
     await Promise.all([
         EvalRound.findByIdAndUpdate(req.params.id, {
-            $push: { natEvaluators: newEvaluator[0]._id },
+            $push: { natEvaluators: newEvaluator._id },
         }),
         EvalRound.findByIdAndUpdate(req.params.id, {
             $pull: { natEvaluators: req.body.evaluatorId },
@@ -668,7 +674,7 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
         [{
             author: api.defaultWebhookAuthor(req.session),
             color: api.webhookColors.orange,
-            description: `Replaced **${user.username}** with **${newEvaluator[0].username}** as NAT evaluator for [**${evalRound.bn.username}**'s current BN eval](http://bn.mappersguild.com/bneval?eval=${evalRound.id})`,
+            description: `Replaced **${user.username}** with **${newEvaluator.username}** as NAT evaluator for [**${evalRound.bn.username}**'s current BN eval](http://bn.mappersguild.com/bneval?eval=${evalRound.id})`,
         }],
         evalRound.mode
     );
