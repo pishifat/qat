@@ -148,7 +148,7 @@ export default {
             if (res) {
                 this.$store.commit('setDiscussionVotes', res.discussions);
             }
-        }, 300000);
+        }, 21600000);
     },
     methods: {
         showOlder() {

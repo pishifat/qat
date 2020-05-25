@@ -175,7 +175,7 @@ export default {
             if (res) {
                 this.$store.commit('setApplications', res.a);
             }
-        }, 300000);
+        }, 21600000);
     },
     methods: {
         async setGroupEval(e) {

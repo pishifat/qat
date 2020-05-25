@@ -128,7 +128,7 @@ export default {
             if (res) {
                 this.$store.commit('setVetoes', res.vetoes);
             }
-        }, 300000);
+        }, 21600000);
     },
     methods: {
         showOlder() {

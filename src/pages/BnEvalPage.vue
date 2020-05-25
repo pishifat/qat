@@ -179,7 +179,7 @@ export default {
             if (res) {
                 this.$store.commit('setEvalRounds', res.er);
             }
-        }, 300000);
+        }, 21600000);
     },
     methods: {
         selectAll() {

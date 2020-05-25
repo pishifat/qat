@@ -126,15 +126,6 @@ export default {
         $('#loading').fadeOut();
         $('#main').attr('style', 'visibility: visible').hide().fadeIn();
     },
-    mounted () {
-        setInterval(async () => {
-            const res = await this.executeGet('/users/relevantInfo');
-
-            if (res) {
-                this.$store.commit('setUsers', res.users);
-            }
-        }, 300000);
-    },
     methods: {
         showOlder() {
             this.$store.commit('increasePaginationPage');
