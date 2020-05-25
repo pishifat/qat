@@ -19,6 +19,7 @@ const store = new Vuex.Store({
         selectedDiscussRoundId: null,
         isQueried: false,
         evaluator: null,
+        isNat: true,
     },
     mutations: {
         setIsQueried (state, value) {

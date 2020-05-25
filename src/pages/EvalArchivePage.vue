@@ -128,7 +128,7 @@ export default {
                     this.$store.commit('setIsQueried', true);
 
                     if (res.round.applicant) {
-                        this.$store.commit('setSelectedDiscussAppId', res.round.id);
+                        this.$store.commit('setSelectedDiscussApplicationId', res.round.id);
                         this.$store.commit('setApplications', [res.round]);
                         $('#applicationArchiveInfo').modal('show');
                     } else {
