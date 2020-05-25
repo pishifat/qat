@@ -31,7 +31,7 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
     endRange.setDate(endRange.getDate() + 14);
 
     // find active events
-    const [activeApps, activeRounds, activeVetoes] = await Promise.all([
+    let [activeApps, activeRounds, activeVetoes] = await Promise.all([
         BnApp
             .find({
                 active: true,
@@ -43,8 +43,11 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
             .find({ active: true })
             .populate(defaultRoundPopulate),
 
-        Veto.find({ active: true }),
+        Veto.find({ status: 'wip' }),
     ]);
+
+    activeApps = [];
+    activeRounds = [];
 
     // determine if NAT receives highlight by mode
     let osuHighlight;
@@ -58,14 +61,6 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
         let description = `Veto mediation for [**${veto.beatmapTitle}**](http://bn.mappersguild.com/vetoes?beatmaps=${veto.id}) `;
 
         if (date > veto.deadline) {
-            if (!osuHighlight && veto.mode === 'osu') { osuHighlight = true; }
-
-            if (!taikoHighlight && veto.mode === 'taiko') { taikoHighlight = true; }
-
-            if (!catchHighlight && veto.mode === 'catch') { catchHighlight = true; }
-
-            if (!maniaHighlight && veto.mode === 'mania') { maniaHighlight = true; }
-
             description += 'is overdue!';
         } else if (veto.deadline < nearDeadline) {
             description += 'is due in less than 24 hours!';
