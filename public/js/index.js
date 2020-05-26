@@ -5,6 +5,9 @@ function calculateMonthScore(modCount, modeValue) {
 }
 
 $(function() {
+    $('#loading').hide();
+    $('#main').attr('style', 'visibility: visible');
+
     $('body').tooltip({ selector: '[data-toggle=tooltip]', trigger: 'hover' });
     let to = new Date();
     let from = new Date();

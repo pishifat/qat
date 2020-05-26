@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
 
     res.render('index', {
         title: 'NAT',
-        script: '../js/reports.js',
+        script: '../js/index.js',
         loggedInAs: req.session.mongoId,
         isIndex: true,
         isBnOrNat,
