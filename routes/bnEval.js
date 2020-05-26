@@ -13,7 +13,6 @@ const Note = require('../models/note');
 const router = express.Router();
 
 router.use(api.isLoggedIn);
-router.use(api.isNat);
 
 /* GET bn app page */
 router.get('/', (req, res) => {
@@ -67,7 +66,7 @@ const applicationPopulate = [
 ];
 
 /* GET applicant listing. */
-router.get('/relevantInfo', async (req, res) => {
+router.get('/relevantInfo', api.isNat, async (req, res) => {
     const er = await EvalRound.findActiveEvaluations();
 
     res.json({ er, evaluator: res.locals.userRequest });
@@ -81,7 +80,7 @@ function isValidMode(modeToCheck, isOsu, isTaiko, isCatch, isMania) {
 }
 
 /* POST submit or edit eval */
-router.post('/addEvalRounds/', async (req, res) => {
+router.post('/addEvalRounds/', api.isNat, api.isNotSpectator, async (req, res) => {
     const includeFullBns = req.body.groups.includes('fullBn');
     const includeProbationBns = req.body.groups.includes('probationBn');
     const includeNat = req.body.groups.includes('nat');
@@ -226,7 +225,7 @@ router.post('/addEvalRounds/', async (req, res) => {
 });
 
 /* POST submit or edit eval */
-router.post('/submitEval/:id', async (req, res) => {
+router.post('/submitEval/:id', api.isNat, api.isNotSpectator, async (req, res) => {
     if (req.body.evaluationId) {
         await Evaluation.findByIdAndUpdate(req.body.evaluationId, {
             behaviorComment: req.body.behaviorComment,
@@ -295,7 +294,7 @@ router.post('/submitEval/:id', async (req, res) => {
 });
 
 /* POST set group eval */
-router.post('/setGroupEval/', api.isNat, async (req, res) => {
+router.post('/setGroupEval/', api.isNat, api.isNotSpectator, async (req, res) => {
     for (let i = 0; i < req.body.checkedRounds.length; i++) {
         let er = await EvalRound
             .findByIdAndUpdate(req.body.checkedRounds[i], { discussion: true })
@@ -335,7 +334,7 @@ router.post('/setGroupEval/', api.isNat, async (req, res) => {
 });
 
 /* POST set invidivual eval */
-router.post('/setIndividualEval/', api.isNat, async (req, res) => {
+router.post('/setIndividualEval/', api.isNat, api.isNotSpectator, async (req, res) => {
     await EvalRound.updateMany({
         _id: { $in: req.body.checkedRounds },
     }, {
@@ -352,7 +351,7 @@ router.post('/setIndividualEval/', api.isNat, async (req, res) => {
 });
 
 /* POST set evals as complete */
-router.post('/setComplete/', api.isNat, async (req, res) => {
+router.post('/setComplete/', api.isNat, api.isNotSpectator, async (req, res) => {
     for (let i = 0; i < req.body.checkedRounds.length; i++) {
         let er = await EvalRound.findById(req.body.checkedRounds[i]);
         let u = await User.findById(er.bn);
@@ -466,7 +465,7 @@ router.post('/setComplete/', api.isNat, async (req, res) => {
 });
 
 /* POST set consensus of eval */
-router.post('/setConsensus/:id', api.isNat, async (req, res) => {
+router.post('/setConsensus/:id', api.isNat, api.isNotSpectator, async (req, res) => {
     let er = await EvalRound.findByIdAndUpdate(req.params.id, {
         consensus: req.body.consensus,
         isLowActivity: req.body.isLowActivity ? true : false,
@@ -527,7 +526,7 @@ router.post('/setConsensus/:id', api.isNat, async (req, res) => {
 });
 
 /* POST set cooldown */
-router.post('/setCooldownDate/:id', api.isNat, async (req, res) => {
+router.post('/setCooldownDate/:id', api.isNat, api.isNotSpectator, async (req, res) => {
     let er = await EvalRound
         .findByIdAndUpdate(req.params.id, { cooldownDate: req.body.cooldownDate })
         .populate(defaultPopulate);
@@ -548,7 +547,7 @@ router.post('/setCooldownDate/:id', api.isNat, async (req, res) => {
 });
 
 /* POST set feedback of eval */
-router.post('/setFeedback/:id', api.isNat, async (req, res) => {
+router.post('/setFeedback/:id', api.isNat, api.isNotSpectator, async (req, res) => {
     let er = await EvalRound
         .findByIdAndUpdate(req.params.id, { feedback: req.body.feedback })
         .populate(defaultPopulate);
