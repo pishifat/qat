@@ -1,5 +1,5 @@
 <template>
-    <div class="row my-2">
+    <div class="row my-2" :style="isUser && !event.qualityAssuranceComments.length ? 'max-height: 60px;' : ''">
         <div class="col-sm-12">
             <div
                 class="card static-card text-shadow"
@@ -35,7 +35,7 @@
                                 :show-all="showAll"
                             />
                             <assignment-buttons
-                                v-if="!isOutdated"
+                                v-if="!isOutdated && !isUser"
                                 class="col-sm-3"
                                 :event-id="event.id"
                                 :is-quality-assurance-checker="isQualityAssuranceChecker"
@@ -45,6 +45,7 @@
                     </div>
                 </div>
                 <comments
+                    v-if="!isUser || (isUser && event.qualityAssuranceComments.length)"
                     class="row small text-shadow my-2"
                     :quality-assurance-comments="event.qualityAssuranceComments"
                     :event-id="event.id"
@@ -91,6 +92,7 @@ export default {
             'userOsuId',
             'username',
             'isNat',
+            'isUser',
         ]),
         isQualityAssuranceChecker() {
             let valid;

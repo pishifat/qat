@@ -13,6 +13,7 @@ router.get('/', (req, res) => {
     res.render('reports', {
         title: 'Reports',
         script: '../js/reports.js',
+        loggedInAs: req.session.mongoId,
         isReports: true,
         isBn: res.locals.userRequest.isBn,
         isNat: res.locals.userRequest.isNat,

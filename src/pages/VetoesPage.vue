@@ -103,6 +103,8 @@ export default {
             this.$store.commit('setUserId', res.userId);
             this.$store.commit('setUserOsuId', res.userOsuId);
             this.$store.commit('setIsNat', res.isNat);
+            this.$store.commit('setIsUser', res.isUser);
+
             const params = new URLSearchParams(document.location.search.substring(1));
 
             if (params.get('id') && params.get('id').length) {

@@ -14,6 +14,7 @@ router.get('/', (req, res) => {
     res.render('managereports', {
         title: 'Manage Reports',
         script: '../javascripts/manageReports.js',
+        loggedInAs: req.session.mongoId,
         isReports: true,
         isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
     });

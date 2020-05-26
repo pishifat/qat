@@ -20,8 +20,8 @@ router.get('/', async (req, res) => {
     res.render('bnapp', {
         title: 'Beatmap Nominator Application',
         script: '../js/bnApp.js',
-        isBnApp: true,
         loggedInAs: req.session.mongoId,
+        isBnApp: true,
         isBn: res.locals.userRequest.isBn,
         isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
         pendingTest: test,

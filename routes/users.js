@@ -42,6 +42,7 @@ router.get('/', (req, res) => {
     res.render('users', {
         title: 'BN/NAT Listing',
         script: '../javascripts/users.js',
+        loggedInAs: req.session.mongoId,
         isUsers: true,
         isBn: res.locals.userRequest.isBn,
         isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,

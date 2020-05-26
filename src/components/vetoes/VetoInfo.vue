@@ -8,7 +8,7 @@
                         <context />
 
                         <!-- show mediations to NAT if they're not active mediators -->
-                        <div v-if="isNat && selectedVeto.mediations.length && (!isMediator || selectedVeto.status != 'wip')">
+                        <div v-if="showMediations">
                             <hr>
                             <mediations />
                             <hr>
@@ -55,9 +55,21 @@ export default {
         ]),
         ...mapGetters([
             'selectedVeto',
-            'currentMediators',
             'isMediator',
         ]),
+        showMediations() {
+            if (this.selectedVeto.mediations.length) {
+                // NAT can see only if they're not mediators
+                if (this.isNat && !this.isMediator) {
+                    return true;
+                // everyone can see when upheld/withdrawn
+                } else if (this.selectedVeto.status == 'upheld' || this.selectedVeto.status == 'withdrawn') {
+                    return true;
+                }
+            }
+
+            return false;
+        },
     },
     watch: {
         selectedVeto () {

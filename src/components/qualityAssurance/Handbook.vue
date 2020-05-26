@@ -7,7 +7,7 @@
                     What is this page for?
                 </p>
                 <p class="small ml-4">
-                    The "Quality Assurance" system is designed to ensure beatmaps with unrankable issues do not reach the ranked section.
+                    The "Quality Assurance" system aims to ensure beatmaps with unrankable issues do not reach the ranked section.
                 </p>
                 <p class="small ml-4">
                     This involves full BN and NAT members reviewing qualified maps for large potential issues, usually not involving extensive modding as would be done while the beatmap is pending. Like nomination-related activities, checking beatmaps through the QAH system counts towards a BN's overall activity.

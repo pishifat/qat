@@ -3,6 +3,10 @@ const api = require('../helpers/api');
 const TestSubmission = require('../models/bnTest/testSubmission');
 const User = require('../models/user');
 
+const router = express.Router();
+
+router.use(api.isLoggedIn);
+
 const defaultTestPopulate = [
     { path: 'applicant', select: 'username osuId' },
     { path: 'answers', select: 'question optionsChosen' },
@@ -17,15 +21,12 @@ const defaultTestPopulate = [
     },
 ];
 
-const router = express.Router();
-
-router.use(api.isLoggedIn);
-
 /* GET bn app page */
 router.get('/', (req, res) => {
     res.render('rcTest/testresults', {
         title: 'Ranking Criteria Test Results',
         script: '../javascripts/testResults.js',
+        loggedInAs: req.session.mongoId,
         isTest: true,
         isBn: res.locals.userRequest.isBn,
         isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,

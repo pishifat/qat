@@ -14,6 +14,7 @@ router.get('/', (req, res) => {
     res.render('rcTest/managetest', {
         title: 'Manage RC Test',
         script: '../javascripts/manageTest.js',
+        loggedInAs: req.session.mongoId,
         isTest: true,
         isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
     });

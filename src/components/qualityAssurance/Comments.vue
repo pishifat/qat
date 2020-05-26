@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="col-sm-12 ml-2" :class="otherUserComments.length ? 'mb-1' : ''">
+        <div v-if="!isUser" class="col-sm-12 ml-2" :class="otherUserComments.length ? 'mb-1' : ''">
             <a
                 href="#"
                 :class="isMaxChecks || isOutdated ? 'disabled' : ''"
@@ -73,6 +73,7 @@ export default {
         ...mapState([
             'userId',
             'isNat',
+            'isUser',
         ]),
         otherUserComments() {
             return this.qualityAssuranceComments.filter(m => m.mediator.id != this.userId && m.comment.length);
@@ -114,10 +115,6 @@ export default {
 <style scoped>
     .w-90 {
         width: 90%;
-    }
-
-    .max-height-20-px {
-        max-height: 20px;
     }
 
     a.disabled {

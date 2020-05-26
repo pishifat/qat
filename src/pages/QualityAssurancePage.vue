@@ -87,6 +87,7 @@ export default {
             this.$store.commit('setUserOsuId', res.userOsuId);
             this.$store.commit('setUsername', res.username);
             this.$store.commit('setIsNat', res.isNat);
+            this.$store.commit('setIsUser', res.isUser);
             this.$store.commit('setFilterMode', res.mode);
         }
 

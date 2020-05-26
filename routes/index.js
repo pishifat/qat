@@ -20,10 +20,11 @@ router.get('/', async (req, res) => {
     let isBn = user && user.isBn && !user.isSpectator;
     let isNat = user && (user.isNat || user.isSpectator);
 
-    res.render('qatIndex', {
+    res.render('index', {
         title: 'NAT',
-        layout: false,
+        script: '../js/reports.js',
         loggedInAs: req.session.mongoId,
+        isIndex: true,
         isBnOrNat,
         isBn,
         isNat,

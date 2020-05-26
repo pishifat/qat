@@ -7,6 +7,9 @@ const Logger = require('../models/log');
 
 const router = express.Router();
 
+router.use(api.isLoggedIn);
+router.use(api.isBnOrNat);
+
 const defaultPopulate = [
     {
         path: 'mediations',
@@ -17,14 +20,12 @@ const defaultPopulate = [
     },
 ];
 
-router.use(api.isLoggedIn);
-router.use(api.isBnOrNat);
-
 /* GET bn app page */
 router.get('/', (req, res) => {
     res.render('discussionvote', {
         title: 'Discussion Vote',
         script: '../javascripts/discussionVote.js',
+        loggedInAs: req.session.mongoId,
         isDiscussionVote: true,
         isBn: res.locals.userRequest.isBn,
         isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,

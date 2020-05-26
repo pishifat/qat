@@ -8,6 +8,8 @@ const Logger = require('../models/log');
 
 const router = express.Router();
 
+router.use(api.isLoggedIn);
+
 const defaultPopulate = [
     {
         path: 'vetoer',
@@ -22,14 +24,20 @@ const defaultPopulate = [
     },
 ];
 
-router.use(api.isLoggedIn);
-router.use(api.isBnOrNat);
+// hides mediator info
+const regularUserPopulate = [
+    {
+        path: 'mediations',
+        select: '-mediator',
+    },
+];
 
 /* GET bn app page */
 router.get('/', (req, res) => {
     res.render('vetoes', {
         title: 'Vetoes',
         script: '../javascripts/vetoes.js',
+        loggedInAs: req.session.mongoId,
         isVetoes: true,
         isBn: res.locals.userRequest.isBn,
         isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
@@ -40,13 +48,14 @@ router.get('/', (req, res) => {
 router.get('/relevantInfo', async (req, res) => {
     let vetoes = await Veto
         .find({})
-        .populate(defaultPopulate)
+        .populate(req.session.group == 'user' ? regularUserPopulate : defaultPopulate)
         .sort({ createdAt: -1 });
 
     res.json({
         vetoes,
         userId: req.session.mongoId,
         isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
+        isUser: res.locals.userRequest.group == 'user',
         userOsuId: req.session.osuId,
     });
 });
@@ -81,6 +90,10 @@ router.post('/submit', api.isNotSpectator, async (req, res) => {
 
     if (!bmInfo || bmInfo.error) {
         return res.json(bmInfo);
+    }
+
+    if (req.session.group == 'user' && req.session.osuId != bmInfo.creator_id) {
+        return res.json({ error: 'You can only submit vetoes for mediation on your own beatmaps!' });
     }
 
     let v = await Veto.create({

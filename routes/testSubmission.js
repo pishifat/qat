@@ -7,6 +7,7 @@ const BnApp = require('../models/bnApp');
 const User = require('../models/user');
 
 const router = express.Router();
+
 router.use(api.isLoggedIn);
 
 const defaultPopulate = [
@@ -28,6 +29,7 @@ router.get('/', (req, res) => {
     res.render('testsubmission', {
         title: 'Test Submission',
         script: '../javascripts/testSubmission.js',
+        loggedInAs: req.session.mongoId,
         isBn: res.locals.userRequest.isBn,
         isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
     });

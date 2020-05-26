@@ -77,6 +77,7 @@ export default {
     computed: {
         ...mapState([
             'userId',
+            'isUser',
         ]),
         ...mapGetters([
             'selectedVeto',
@@ -92,19 +93,21 @@ export default {
     },
     methods: {
         findUserMediation() {
-            this.mediationId = null;
-            this.comment = null;
-            this.vote = null;
+            if (!this.isUser) { // mediator info is hidden from normal users, so this function wouldn't work
+                this.mediationId = null;
+                this.comment = null;
+                this.vote = null;
 
-            for (let i = 0; i < this.selectedVeto.mediations.length; i++) {
-                let mediation = this.selectedVeto.mediations[i];
+                for (let i = 0; i < this.selectedVeto.mediations.length; i++) {
+                    let mediation = this.selectedVeto.mediations[i];
 
-                if (mediation.mediator.id === this.userId) {
-                    if (mediation.comment) this.comment = mediation.comment;
-                    if (mediation.vote) this.vote = mediation.vote;
+                    if (mediation.mediator.id === this.userId) {
+                        if (mediation.comment) this.comment = mediation.comment;
+                        if (mediation.vote) this.vote = mediation.vote;
 
-                    this.mediationId = mediation.id;
-                    break;
+                        this.mediationId = mediation.id;
+                        break;
+                    }
                 }
             }
         },

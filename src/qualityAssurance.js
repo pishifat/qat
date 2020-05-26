@@ -17,6 +17,7 @@ const store = new Vuex.Store({
         userOsuId: null,
         username: null,
         isNat: false,
+        isUser: false,
         filters: {
             mode: '',
             value: '',
@@ -40,6 +41,9 @@ const store = new Vuex.Store({
         },
         setIsNat (state, value) {
             state.isNat = value;
+        },
+        setIsUser (state, value) {
+            state.isUser = value;
         },
 
         // modify data

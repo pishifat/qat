@@ -16,6 +16,7 @@
 </head>
 
 <body class="text-light px-0">
+    {{#if loggedInAs}}
     <nav id="top" class="navbar navbar-expand-md navbar-dark navbar-nat" style="position:absolute; width:100%">
         <a class="navbar-brand" href="/">
             <img src="../images/qatlogo.png" width="48" height="48" style="border-radius: 32px 32px 32px 32px; filter: drop-shadow(1px 1px 1px #000000);" alt="">
@@ -48,15 +49,15 @@
                 <li class="nav-item">
                     <a class="nav-link text-shadow {{#if isUsers}}main-text{{/if}}" href="/users">Users</a>
                 </li>
-                {{#if isBn}}
                 <li class="nav-item">
                     <a class="nav-link text-shadow {{#if isVetoes}}main-text{{/if}}" href="/vetoes">Vetoes</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-shadow {{#if isDiscussionVote}}main-text{{/if}}" href="/discussionvote">Discussion Vote</a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link text-shadow {{#if isQualityAssurance}}main-text{{/if}}" href="/qualityassurance">Quality Assurance</a>
+                </li>
+                {{#if isBn}}
+                <li class="nav-item">
+                    <a class="nav-link text-shadow {{#if isDiscussionVote}}main-text{{/if}}" href="/discussionvote">Discussion Vote</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link text-shadow {{#if isEval}}main-text{{/if}}" href="/appeval">BN Application Evaluations</a>
@@ -64,13 +65,7 @@
                 {{/if}}
                 {{#if isNat}}
                 <li class="nav-item">
-                    <a class="nav-link text-shadow {{#if isVetoes}}main-text{{/if}}" href="/vetoes">Vetoes</a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link text-shadow {{#if isDiscussionVote}}main-text{{/if}}" href="/discussionvote">Discussion Vote</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-shadow {{#if isQualityAssurance}}main-text{{/if}}" href="/qualityassurance">Quality Assurance</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link text-shadow dropdown-toggle {{#if isEval}}main-text{{/if}}" href="#" data-toggle="dropdown">
@@ -99,6 +94,7 @@
             </ul>
         </div>
     </nav>
+    {{/if}}
     
     <div id="loading">
         <img src="../images/rip.svg">
@@ -106,11 +102,17 @@
 
     <div id="main">
         <header class="container-fluid text-white text-center">
+            {{#if isIndex}}<div class="text-center mb-4">
+                <img src="../images/qatlogo.png" style="border-radius: 100%">
+            </div>
+            {{else}}
             <img src="../images/cat.png" class="header-img">
             <div class="header-img-overlay">
                 <h3 class="header-img-overlay-title">{{title}}</h3>
             </div>
+              {{/if}}
         </header>
+      
         <div class="container">
             {{{body}}}
         </div>

@@ -14,6 +14,7 @@ router.get('/', async (req, res) => {
     res.render('logs', {
         title: 'Logs',
         script: '../js/logs.js',
+        loggedInAs: req.session.mongoId,
         isLogs: true,
         logs: await Logger
             .find({ isError: { $ne: true } })

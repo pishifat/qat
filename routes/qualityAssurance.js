@@ -7,13 +7,13 @@ const Mediation = require('../models/mediation');
 const router = express.Router();
 
 router.use(api.isLoggedIn);
-router.use(api.isBnOrNat);
 
 /* GET bn app page */
 router.get('/', (req, res) => {
     res.render('qualityassurance', {
         title: 'Quality Assurance',
         script: '../javascripts/qualityAssurance.js',
+        loggedInAs: req.session.mongoId,
         isQualityAssurance: true,
         isBn: res.locals.userRequest.isBn,
         isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
@@ -62,6 +62,7 @@ router.get('/relevantInfo', async (req, res) => {
         userOsuId: res.locals.userRequest.osuId,
         username: res.locals.userRequest.username,
         isNat: res.locals.userRequest.isNat,
+        isUser: res.locals.userRequest.group == 'user',
         mode: res.locals.userRequest.modes[0] || 'osu',
     });
 });
@@ -98,8 +99,6 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
     if (event.userId == req.session.osuId || bubble.userId == req.session.osuId) {
         return res.json({ error: 'You cannot check your nominations!' });
     }
-
-    // find event, previous bubble, and any previous qualifications. if bubble comes before any previous qualifications, pass. if not, fail.
 
     let validMode;
 

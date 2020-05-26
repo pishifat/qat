@@ -14,6 +14,7 @@ router.get('/', (req, res) => {
     res.render('evaluations/evalarchive', {
         title: 'Evaluation Archives',
         script: '../javascripts/evalArchive.js',
+        loggedInAs: req.session.mongoId,
         isEval: true,
         isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
     });

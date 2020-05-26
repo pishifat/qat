@@ -109,7 +109,6 @@ export default {
     computed: {
         ...mapGetters([
             'selectedVeto',
-            'currentMediators',
             'majorityUphold',
         ]),
     },

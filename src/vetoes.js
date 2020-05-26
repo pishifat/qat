@@ -15,6 +15,7 @@ const store = new Vuex.Store({
         userId: null,
         userOsuId: null,
         isNat: false,
+        isUser: false,
         selectedVetoId: null,
         filters: {
             mode: '',
@@ -38,6 +39,9 @@ const store = new Vuex.Store({
         },
         setIsNat (state, value) {
             state.isNat = value;
+        },
+        setIsUser (state, value) {
+            state.isUser = value;
         },
         setSelectedVetoId (state, value) {
             state.selectedVetoId = value;
@@ -116,6 +120,8 @@ const store = new Vuex.Store({
             return state.vetoes.find(v => v.id === state.selectedVetoId);
         },
         currentMediators: (state, getters) => {
+            if (state.isUser) return []; // hide mediators from public
+
             let veto = getters.selectedVeto;
             let userIds = [];
 

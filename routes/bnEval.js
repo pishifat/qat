@@ -13,12 +13,14 @@ const Note = require('../models/note');
 const router = express.Router();
 
 router.use(api.isLoggedIn);
+router.use(api.isNat);
 
 /* GET bn app page */
 router.get('/', (req, res) => {
     res.render('evaluations/bneval', {
         title: 'Current BN Evaluations',
         script: '../javascripts/bnEval.js',
+        loggedInAs: req.session.mongoId,
         isEval: true,
         isBn: res.locals.userRequest.isBn,
         isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
@@ -224,7 +226,7 @@ router.post('/addEvalRounds/', async (req, res) => {
 });
 
 /* POST submit or edit eval */
-router.post('/submitEval/:id', api.isBnOrNat, async (req, res) => {
+router.post('/submitEval/:id', async (req, res) => {
     if (req.body.evaluationId) {
         await Evaluation.findByIdAndUpdate(req.body.evaluationId, {
             behaviorComment: req.body.behaviorComment,

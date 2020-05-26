@@ -13,6 +13,7 @@ router.get('/', (req, res) => {
     res.render('evaluations/datacollection', {
         title: 'Data Collection',
         script: '../javascripts/dataCollection.js',
+        loggedInAs: req.session.mongoId,
         isEval: true,
         isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
     });

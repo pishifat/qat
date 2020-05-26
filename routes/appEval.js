@@ -16,6 +16,7 @@ router.get('/', (req, res) => {
     res.render('evaluations/appeval', {
         title: 'BN Application Evaluations',
         script: '../javascripts/appEval.js',
+        loggedInAs: req.session.mongoId,
         isEval: true,
         isBn: res.locals.userRequest.isBn,
         isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
