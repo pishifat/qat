@@ -1,5 +1,11 @@
 {
     "session": "",
+    "v1token": "",
+    "id": 0,
+    "secret": "",
+    "redirect": "http://localhost:8080/callback",
+    "connection": "",
+    "interOpSecret": "",
     "standardWebhook": {
         "id": "",
         "token": "",
@@ -44,11 +50,5 @@
     "reportWebhook": {
         "id": "",
         "token": ""
-    },
-    "v1token": "",
-    "id": 0,
-    "secret": "",
-    "redirect": "http://localhost:8080/callback",
-    "connection": "",
-    "interOpSecret": ""
+    }
 }
