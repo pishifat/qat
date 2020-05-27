@@ -36,6 +36,7 @@ const testResultsRouter = require('./routes/testResults');
 const discussionVoteRouter = require('./routes/discussionVote');
 const qualityAssuranceRouter = require('./routes/qualityAssurance');
 const logsRouter = require('./routes/logs');
+const interOpRouter = require('./routes/interOp');
 
 const app = express();
 
@@ -86,6 +87,7 @@ app.use('/testresults', testResultsRouter);
 app.use('/discussionVote', discussionVoteRouter);
 app.use('/qualityassurance', qualityAssuranceRouter);
 app.use('/logs', logsRouter);
+app.use('/interOp', interOpRouter);
 
 // catch 404
 app.use(function(req, res) {
