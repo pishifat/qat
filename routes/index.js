@@ -143,26 +143,25 @@ router.get('/callback', async (req, res) => {
 
         response = await api.getUserInfo(req.session.accessToken);
 
-        const bnGmt = [626907, 394326, 4879508, 2239480];
-        const natGmt = [318565];
+        let groupIds = [];
 
         if (response.error) {
             res.status(500).render('error');
-        } else if (!response.group_badge) {
-            req.session.group = 'user';
-        } else if (response.group_badge.id == 7 || natGmt.includes(response.id)) {
+        } else {
+            response.groups.forEach(group => {
+                groupIds.push(group.id);
+            });
+        }
+
+        if (groupIds.includes(7)) {
             req.session.group = 'nat';
-        } else if (response.group_badge.id == 28 || response.group_badge.id == 32 || bnGmt.includes(response.id)) {
+        } else if (groupIds.includes(28) || groupIds.includes(32)) {
             req.session.group = 'bn';
         } else {
             req.session.group = 'user';
         }
 
-        if (response.group_badge && (response.group_badge.id == 4 || response.group_badge.id == 11) && !natGmt.includes(response.id)) {
-            req.session.isSpectator = true;
-        } else {
-            req.session.isSpectator = false;
-        }
+        req.session.isSpectator = !groupIds.includes(7) && (groupIds.includes(4) || groupIds.includes(11));
 
         req.session.username = response.username;
         req.session.osuId = response.id;
