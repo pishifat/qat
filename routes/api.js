@@ -6,10 +6,10 @@ const User = require('../models/user');
 const router = express.Router();
 
 router.use((req, res, next) => {
-    const secret = req.header('Qat-Signature');
+    const secret = req.header('Qat-Key');
 
-    if (!secret || config.interOpSecret !== secret)
-        return res.status(401).send('Invalid signature');
+    if (!secret || config.apiSecret !== secret)
+        return res.status(401).send('Invalid API key');
 
     return next();
 });
