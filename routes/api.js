@@ -15,25 +15,34 @@ router.use((req, res, next) => {
 });
 
 router.get('/users', async (_, res) => {
-    res.json(await User.getAllByMode(true, true, true));
+    res.json(await User.find({ group: { $in: ['bn', 'nat'] } }));
 });
 
-router.get('/qualityAssuranceEvents/:id', async (req, res) => {
-    const [enterQualified, exitQualified] = await Promise.all([
-        Aiess
-            .find({ beatmapsetId: req.params.id, eventType: 'Qualified' })
-            .populate({ path: 'qualityAssuranceCheckers' })
-            .sort({ timestamp: -1 }),
+router.get('/users/all', async (_, res) => {
+    res.json(
+        await User.find({
+            $or: [
+                { bnDuration: { $ne: [] } },
+                { natDuration: { $ne: [] } },
+            ]
+        })
+    );
+});
 
-        Aiess
-            .find({
-                beatmapsetId: req.params.id,
-                $or: [{ eventType: 'Disqualified' }, { eventType: 'Ranked' }],
-            })
-            .sort({ timestamp: -1 }),
-    ]);
+router.get('/users/:osuId', async (req, res) => {
+    res.json(await User.findOne({ osuId: req.params.osuId }));
+});
 
-    res.json({ enterQualified, exitQualified });
+router.get('/events/:beatmapsetId', async (req, res) => {
+    res.json(
+        await Aiess
+            .find({ beatmapsetId: req.params.beatmapsetId })
+            .populate([
+                { path: 'qualityAssuranceCheckers', select: 'osuId username' },
+                { path: 'qualityAssuranceComments', populate: { path: 'mediator', select: 'osuId username' } },
+            ])
+            .sort({ timestamp: 1 })
+    );
 });
 
 module.exports = router;
