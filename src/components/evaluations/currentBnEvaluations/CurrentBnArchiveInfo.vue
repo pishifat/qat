@@ -24,6 +24,20 @@
                         </div>
                     </div>
                     <div class="container">
+                        <p class="text-shadow">
+                            <a href="#additionalInfo" data-toggle="collapse">Additional info <i class="fas fa-angle-down" /></a>
+                        </p>
+                        <div id="additionalInfo" class="collapse container">
+                            <previous-evaluations
+                                :user-mongo-id="selectedDiscussRound.bn.id"
+                            />
+                            <user-notes
+                                :user-mongo-id="selectedDiscussRound.bn.id"
+                            />
+                            <user-reports
+                                :user-mongo-id="selectedDiscussRound.bn.id"
+                            />
+                        </div>
                         <hr>
                         <consensus
                             :consensus="selectedDiscussRound.consensus"
@@ -61,6 +75,9 @@ import { mapState, mapGetters } from 'vuex';
 import filterLinks from '../../../mixins/filterLinks.js';
 import postData from '../../../mixins/postData.js';
 import UserActivity from './currentBnInfo/UserActivity.vue';
+import PreviousEvaluations from '../info/PreviousEvaluations.vue';
+import UserNotes from '../info/UserNotes.vue';
+import UserReports from './currentBnInfo/UserReports.vue';
 import ModalHeader from '../info/ModalHeader.vue';
 import Consensus from '../info/Consensus.vue';
 import Evaluations from '../info/Evaluations.vue';
@@ -69,6 +86,9 @@ export default {
     name: 'CurrentBnArchiveInfo',
     components: {
         UserActivity,
+        PreviousEvaluations,
+        UserNotes,
+        UserReports,
         ModalHeader,
         Consensus,
         Evaluations,
