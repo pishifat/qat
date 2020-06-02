@@ -1,7 +1,7 @@
 <template>
     <div class="col-md-6 col-sm-12 my-2" @click="selectReport()">
         <div
-            class="card"
+            class="card cursor-pointer"
             :class="report.valid == 1 ? 'border-success' : report.valid == 2 ? 'border-info' : report.valid == 3 ? 'border-danger' : ''"
             data-toggle="modal"
             data-target="#reportInfo"

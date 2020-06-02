@@ -7,7 +7,8 @@
     "watch-app": "set NODE_ENV=development&& nodemon ./app.js",
     "watch-src": "webpack-dev-server --mode development --port 8080 --watch",
     "build": "webpack --mode production --config webpack.prod.config.js",
-    "prod": "set NODE_ENV=production&& node ./app.js"
+    "prod": "set NODE_ENV=production&& node ./app.js",
+    "lint": "eslint . --ext .js,.vue"
   },
   "dependencies": {
     "@babel/core": "^7.8.7",

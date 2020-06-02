@@ -90,7 +90,6 @@
 <script>
 import { mapState } from 'vuex';
 import ToastMessages from '../ToastMessages.vue';
-import EvaluationInstructions from '../evaluations/applications/EvaluationInstructions.vue';
 import FilterBox from '../FilterBox.vue';
 import filters from '../../mixins/filters.js';
 import postData from '../../mixins/postData.js';
@@ -99,7 +98,6 @@ export default {
     name: 'AppEvalPage',
     components: {
         ToastMessages,
-        EvaluationInstructions,
         FilterBox,
     },
     mixins: [ postData, filters ],
