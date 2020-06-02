@@ -30,7 +30,7 @@
                     </p>
                     <p>Feel free to reference those pages while taking this test. Maybe you'll learn something you didn't already know, which will make you more prepared than you would be otherwise!</p>
                     <br>
-                    <p>There are 20 questions total, all of which require you to select all applicable answers. Categories of questions are listed in the upper right for you to reference on their respective wiki pages.</p>
+                    <p>There are 20 questions total, all of which require you to select all applicable answers. Categories of questions are listed in the upper left for you to reference on their respective wiki pages.</p>
                     <p>The test has no time limit. If you close this page, your answers will not be saved, however you can still take the test at a later time.</p>
                     <p>After submitting your answers, you will see a score out of 20 possible points. When your application is fully evaluated, you will be able to view which questions you answered correctly/incorrectly.</p>
                     <br>

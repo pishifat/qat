@@ -53,6 +53,7 @@
 import { mapState, mapGetters } from 'vuex';
 import ToastMessages from '../components/ToastMessages.vue';
 import EvalPage from '../components/evaluations/EvalPage.vue';
+import EvaluationInstructions from '../components/evaluations/applications/EvaluationInstructions.vue';
 import ApplicationIndividualCard from '../components/evaluations/applications/ApplicationIndividualCard.vue';
 import ApplicationIndividualInfo from '../components/evaluations/applications/ApplicationIndividualInfo.vue';
 import ApplicationDiscussionCard from '../components/evaluations/applications/ApplicationDiscussionCard.vue';
@@ -64,6 +65,7 @@ export default {
     components: {
         ToastMessages,
         EvalPage,
+        EvaluationInstructions,
         ApplicationIndividualCard,
         ApplicationIndividualInfo,
         ApplicationDiscussionCard,
