@@ -52,6 +52,7 @@
                 <comments
                     v-if="!isUser || (isUser && event.qualityAssuranceComments.length)"
                     class="row small"
+                    :class="isUser ? 'mt-2' : ''"
                     :quality-assurance-comments="event.qualityAssuranceComments"
                     :event-id="event.id"
                     :is-max-checks="isMaxChecks"
