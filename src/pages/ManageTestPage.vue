@@ -47,7 +47,7 @@
                     </option>
                 </select>
 
-                <button id="artistButton" class="btn btn-nat btn-block" @click="loadContent($event);">
+                <button id="artistButton" class="btn btn-primary btn-block" @click="loadContent($event);">
                     Load test content
                 </button>
             </section>
@@ -56,7 +56,7 @@
                 <h2>
                     {{ category }} - Questions
                     <button
-                        class="btn btn-nat btn-sm"
+                        class="btn btn-primary btn-sm"
                         data-toggle="modal"
                         data-target="#addQuestion"
                         @click="resetInput()"

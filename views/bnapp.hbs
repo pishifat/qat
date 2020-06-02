@@ -78,7 +78,7 @@
     <div class="row">
         {{#unless pendingTest}}
         <div id="applyBlock" class="col-sm-12 text-center">
-            <button id="apply" class="btn btn-block btn-nat" type="submit">Apply</button>
+            <button id="apply" class="btn btn-block btn-primary" type="submit">Apply</button>
             <div class="mt-2">
                 <span id="submitting" class="small"></span>
                 <span id="errors" class="text-danger small"></span>
@@ -88,7 +88,7 @@
 
         {{#if pendingTest}}
         <div id="startTest" class="col-sm-12 text-center">
-            <a href="/testsubmission" class="btn btn-nat btn-block">Begin Ranking Criteria Test</a>
+            <a href="/testsubmission" class="btn btn-primary btn-block">Begin Ranking Criteria Test</a>
             <p class="small mt-2">Before your application can be reviewed, you must take a short test.</p>
         </div>
         {{/if}}

@@ -1,5 +1,5 @@
 <template>
-    <div class="modal-header bg-nat">
+    <div class="modal-header bg-primary">
         <h5 class="modal-title">
             <a
                 v-if="selectedDiscussionVote.discussionLink.length"

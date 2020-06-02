@@ -21,7 +21,7 @@
 
                 <div class="text-center">
                     <button
-                        class="btn btn-sm btn-nat mt-4 mx-auto"
+                        class="btn btn-sm btn-primary mt-4 mx-auto"
                         data-toggle="tooltip"
                         data-placement="top"
                         title="show 200 more events throughout all modes"

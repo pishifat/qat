@@ -180,7 +180,7 @@
                 >
             </div>
             <hr>
-            <button type="submit" class="btn btn-nat float-right" @click="submitDiscussion($event)">
+            <button type="submit" class="btn btn-primary float-right" @click="submitDiscussion($event)">
                 Submit
             </button>
         </div>

@@ -2,7 +2,7 @@
     <div class="modal fade" tabindex="-1">
         <div class="modal-dialog" :class="`modal-${modalSize}`">
             <div class="modal-content">
-                <div v-if="title" class="modal-header bg-nat">
+                <div v-if="title" class="modal-header bg-primary">
                     <h5 class="modal-title">
                         {{ title }}
                     </h5>

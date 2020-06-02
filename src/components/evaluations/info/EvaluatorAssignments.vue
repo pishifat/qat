@@ -48,7 +48,7 @@
                 </div>
             </div>
 
-            <button class="btn btn-sm btn-nat my-2 btn-block" @click="selectBnEvaluators($event)">
+            <button class="btn btn-sm btn-primary my-2 btn-block" @click="selectBnEvaluators($event)">
                 {{ potentialBnEvaluators ? 'Re-select BN Evaluators' : 'Select BN Evaluators' }}
             </button>
 

@@ -31,7 +31,7 @@
             </select>
 
             <button
-                class="btn btn-sm btn-nat ml-1"
+                class="btn btn-sm btn-primary ml-1"
                 data-toggle="tooltip"
                 data-placement="right"
                 title="Finds NAT eval activity, defaults to 30 days"

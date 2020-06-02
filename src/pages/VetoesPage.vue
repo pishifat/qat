@@ -5,7 +5,7 @@
                 :placeholder="'enter to search beatmap...'"
                 :options="['', 'osu', 'taiko', 'catch', 'mania']"
             >
-                <button class="btn btn-block btn-nat my-1" data-toggle="modal" data-target="#addVeto">
+                <button class="btn btn-block btn-primary my-1" data-toggle="modal" data-target="#addVeto">
                     Submit veto
                 </button>
             </filter-box>

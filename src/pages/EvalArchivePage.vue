@@ -12,7 +12,7 @@
                         class="form-control"
                         @keyup.enter="query($event)"
                     >
-                    <button class="btn btn-sm btn-nat ml-2" type="submit" @click="query($event)">
+                    <button class="btn btn-sm btn-primary ml-2" type="submit" @click="query($event)">
                         Search archives
                     </button>
                 </div>
@@ -27,7 +27,7 @@
                         class="form-control"
                         @keyup.enter="queryRecent($event)"
                     >
-                    <button class="btn btn-sm btn-nat ml-2" type="submit" @click="queryRecent($event)">
+                    <button class="btn btn-sm btn-primary ml-2" type="submit" @click="queryRecent($event)">
                         Show recent
                     </button>
                 </div>

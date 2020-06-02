@@ -51,7 +51,7 @@
             </p>
 
             <div class="d-flex justify-content-end">
-                <button class="btn btn-sm btn-nat" @click="submitMediation($event)">
+                <button class="btn btn-sm btn-primary" @click="submitMediation($event)">
                     Submit vote
                 </button>
             </div>

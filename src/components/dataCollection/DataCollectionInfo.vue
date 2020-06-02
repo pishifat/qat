@@ -24,7 +24,7 @@
                 maxlength="1000"
             />
 
-            <button class="btn btn-sm btn-block btn-nat mb-2" @click="updateContent($event)">
+            <button class="btn btn-sm btn-block btn-primary mb-2" @click="updateContent($event)">
                 Save
             </button>
 

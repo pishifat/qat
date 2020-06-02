@@ -12,7 +12,7 @@
                     @keyup.enter="query($event)"
                 >
 
-                <button class="btn btn-nat btn-block" type="submit" @click="query($event)">
+                <button class="btn btn-primary btn-block" type="submit" @click="query($event)">
                     Search tests
                 </button>
             </section>

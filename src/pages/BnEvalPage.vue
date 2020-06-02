@@ -10,7 +10,7 @@
         >
             <template #individual-evaluations-title>
                 <button
-                    class="btn btn-nat"
+                    class="btn btn-primary"
                     data-toggle="modal"
                     data-target="#addEvalRounds"
                     @click="openAddEvalRounds()"

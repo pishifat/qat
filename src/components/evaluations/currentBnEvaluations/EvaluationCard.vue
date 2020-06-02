@@ -5,7 +5,7 @@
     >
         <div
             class="card cursor-pointer"
-            :class="[isSelected ? 'bg-nat' : '', 'border-' + findRelevantEval, isNatEvaluator ? 'bg-info' : '']"
+            :class="[isSelected ? 'bg-primary' : '', 'border-' + findRelevantEval, isNatEvaluator ? 'bg-info' : '']"
             data-toggle="modal"
             :data-target="target"
         >

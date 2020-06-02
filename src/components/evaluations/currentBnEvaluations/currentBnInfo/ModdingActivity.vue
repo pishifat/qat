@@ -2,7 +2,7 @@
     <div>
         <b>Modding:</b>
         <button
-            class="btn btn-sm btn-nat mx-2 mb-2"
+            class="btn btn-sm btn-primary mx-2 mb-2"
             data-toggle="tooltip"
             data-placement="right"
             title="Finds unique mod count in the last 90 days. Only use on BNs with low activity"

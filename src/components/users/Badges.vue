@@ -2,7 +2,7 @@
     <div class="my-2">
         <button
             v-if="!badgeUsers.length"
-            class="btn btn-sm btn-nat my-1"
+            class="btn btn-sm btn-primary my-1"
             data-toggle="tooltip"
             data-placement="right"
             title="Finds relevant yearly profile badge info"

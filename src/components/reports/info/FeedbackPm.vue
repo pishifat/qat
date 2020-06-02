@@ -1,11 +1,11 @@
 <template>
     <div>
-        <button class="btn btn-sm btn-block btn-nat mb-2" data-toggle="collapse" data-target="#forumMessage">
+        <button class="btn btn-sm btn-block btn-primary mb-2" data-toggle="collapse" data-target="#forumMessage">
             See full forum PM <i class="fas fa-angle-down" />
         </button>
 
         <div id="forumMessage" class="collapse">
-            <a :href="'https://osu.ppy.sh/forum/ucp.php?i=pm&mode=compose&u=' + selectedReport.reporter.osuId" target="_blank" class="btn btn-sm btn-block btn-nat mb-2">
+            <a :href="'https://osu.ppy.sh/forum/ucp.php?i=pm&mode=compose&u=' + selectedReport.reporter.osuId" target="_blank" class="btn btn-sm btn-block btn-primary mb-2">
                 Open osu! PM
             </a>
 

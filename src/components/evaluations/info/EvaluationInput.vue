@@ -69,7 +69,7 @@
                 <label class="form-check-label text-fail" for="3">Fail</label>
             </div>
 
-            <button class="btn btn-sm btn-nat" @click="submitEval($event)">
+            <button class="btn btn-sm btn-primary" @click="submitEval($event)">
                 {{ evaluationId ? 'Update Evaluation' : 'Submit Evaluation' }}
             </button>
         </div>

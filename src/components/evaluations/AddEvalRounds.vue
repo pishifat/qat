@@ -162,7 +162,7 @@
 
             <hr>
 
-            <button class="btn btn-nat mb-2 mt-4 btn-block" @click="addEvalRounds($event)">
+            <button class="btn btn-primary mb-2 mt-4 btn-block" @click="addEvalRounds($event)">
                 Generate evaluations
             </button>
         </div>

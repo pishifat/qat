@@ -1,5 +1,5 @@
 <template>
-    <div class="modal-header" :class="isNatEvaluator() ? 'bg-info' : 'bg-nat'">
+    <div class="modal-header" :class="isNatEvaluator() ? 'bg-info' : 'bg-primary'">
         <h5 class="modal-title">
             {{ isApplication ? 'Application Evaluation:' : 'BN Evaluation:' }}
             <a

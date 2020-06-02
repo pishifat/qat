@@ -15,7 +15,7 @@
                     </option>
                 </select>
 
-                <button class="btn btn-block btn-nat" @click="loadTest($event)">
+                <button class="btn btn-block btn-primary" @click="loadTest($event)">
                     Start / Continue
                 </button>
             </section>
@@ -89,7 +89,7 @@
 
                         <hr>
 
-                        <a href="#top" class="btn btn-lg btn-nat btn-block" @click="submitTest($event)">Submit</a>
+                        <a href="#top" class="btn btn-lg btn-primary btn-block" @click="submitTest($event)">Submit</a>
                     </section>
                 </template>
             </div>

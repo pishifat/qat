@@ -7,7 +7,7 @@
             rows="2"
         />
 
-        <button class="btn btn-nat btn-block btn-sm" @click="saveNote($event)">
+        <button class="btn btn-primary btn-block btn-sm" @click="saveNote($event)">
             Save
         </button>
 
@@ -61,7 +61,7 @@
                             rows="2"
                         />
                         <div class="input-group-append">
-                            <button class="btn btn-nat" @click="editNote($event)">
+                            <button class="btn btn-primary" @click="editNote($event)">
                                 Edit
                             </button>
                         </div>

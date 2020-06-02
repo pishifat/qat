@@ -26,13 +26,13 @@
             </button>
 
             <!-- view conclusion discussion post -->
-            <button class="btn btn-sm btn-block btn-nat mb-2" data-toggle="collapse" data-target="#conclusion">
+            <button class="btn btn-sm btn-block btn-primary mb-2" data-toggle="collapse" data-target="#conclusion">
                 See full conclusion post <i class="fas fa-angle-down" />
             </button>
             <conclusion-post />
 
             <!-- view mediator forum PM -->
-            <button class="btn btn-sm btn-block btn-nat mb-2" data-toggle="collapse" data-target="#forumMessage">
+            <button class="btn btn-sm btn-block btn-primary mb-2" data-toggle="collapse" data-target="#forumMessage">
                 See full forum PM <i class="fas fa-angle-down" />
             </button>
             <forum-pm />
@@ -55,7 +55,7 @@
                     The mapper and veto submitter are automatically excluded. Please manually exclude any guest difficulty creators and the nominating BNs.
                 </div>
             </div>
-            <button class="btn btn-sm btn-block btn-nat mb-2" @click="selectMediators($event)">
+            <button class="btn btn-sm btn-block btn-primary mb-2" @click="selectMediators($event)">
                 {{ mediators ? 'Re-select mediators' : 'Select mediators' }}
             </button>
 

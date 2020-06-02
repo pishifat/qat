@@ -34,7 +34,7 @@
                 rows="4"
                 maxlength="1000"
             />
-            <button class="btn btn-sm btn-nat btn-block mb-2" @click="updateContent($event);">
+            <button class="btn btn-sm btn-primary btn-block mb-2" @click="updateContent($event);">
                 Save
             </button>
 

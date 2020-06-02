@@ -22,19 +22,19 @@
         >
 
         <div class="form-inline">
-            <button class="btn btn-sm btn-nat mr-2 mt-2" data-toggle="collapse" :data-target="isApplication ? '#applicationForumPmBox' : '#currentBnForumPmBox'">
+            <button class="btn btn-sm btn-primary mr-2 mt-2" data-toggle="collapse" :data-target="isApplication ? '#applicationForumPmBox' : '#currentBnForumPmBox'">
                 See full message <i class="fas fa-angle-down" />
             </button>
 
             <a
                 :href="'https://osu.ppy.sh/forum/ucp.php?i=pm&mode=compose&u=' + osuId"
                 target="_blank"
-                class="btn btn-sm btn-nat mr-2 mt-2"
+                class="btn btn-sm btn-primary mr-2 mt-2"
             >
                 Open osu! PM
             </a>
 
-            <button class="btn btn-sm btn-nat mt-2 ml-0 ml-sm-auto" @click="setFeedback($event)">
+            <button class="btn btn-sm btn-primary mt-2 ml-0 ml-sm-auto" @click="setFeedback($event)">
                 Save
             </button>
         </div>

@@ -6,16 +6,16 @@
                 :options="['', 'osu', 'taiko', 'catch', 'mania']"
             >
                 <template v-if="evaluator && evaluator.isNat">
-                    <button class="btn btn-block btn-nat my-1" @click="$emit('select-all', $event)">
+                    <button class="btn btn-block btn-primary my-1" @click="$emit('select-all', $event)">
                         Select all
                     </button>
 
                     <div class="sort-filter">
                         <span class="sort-filter__title--large">Mark selected as</span>
-                        <button class="btn btn-nat btn-sm ml-2" @click="$emit('set-group-eval', $event)">
+                        <button class="btn btn-primary btn-sm ml-2" @click="$emit('set-group-eval', $event)">
                             Group evaluation
                         </button>
-                        <button class="btn btn-nat btn-sm ml-2" @click="$emit('set-individual-eval', $event)">
+                        <button class="btn btn-primary btn-sm ml-2" @click="$emit('set-individual-eval', $event)">
                             Individual evaluation
                         </button>
                         <button

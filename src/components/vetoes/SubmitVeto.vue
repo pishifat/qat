@@ -105,7 +105,7 @@
 
             <hr>
 
-            <button type="submit" class="btn btn-nat float-right" @click="submitVeto($event)">
+            <button type="submit" class="btn btn-primary float-right" @click="submitVeto($event)">
                 Submit
             </button>
         </div>

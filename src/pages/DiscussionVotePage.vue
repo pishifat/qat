@@ -7,7 +7,7 @@
             >
                 <button
                     v-if="isNat"
-                    class="btn btn-block btn-nat my-1"
+                    class="btn btn-block btn-primary my-1"
                     data-toggle="modal"
                     data-target="#addDiscussion"
                 >
