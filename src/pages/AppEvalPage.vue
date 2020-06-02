@@ -1,95 +1,41 @@
 <template>
-    <div class="row">
-        <div class="col-md-12">
-            <filter-box
-                :placeholder="'enter to search username...'"
-                :options="['', 'osu', 'taiko', 'catch', 'mania']"
-            >
-                <slot>
-                    <button v-if="evaluator && evaluator.isNat" class="btn btn-nat btn-sm ml-2" @click="selectAll($event)">
-                        Select all
-                    </button>
-                </slot>
-            </filter-box>
-            <section v-if="evaluator && evaluator.isNat" class="row segment my-1 mx-4">
-                <div class="small filter-box">
-                    <span class="filter-header" style="width: 110px;">Mark selected as</span>
-                    <button class="btn btn-nat btn-sm ml-2" @click="setGroupEval($event)">
-                        Group evaluation
-                    </button>
-                    <button class="btn btn-nat btn-sm ml-2" @click="setIndividualEval($event)">
-                        Individual evaluation
-                    </button>
-                    <button
-                        class="btn btn-nat-red btn-sm ml-2"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        title="Moves an evaluation to archives and applies its consensus to its user"
-                        @click="setComplete($event)"
-                    >
-                        Archive
-                    </button>
-                </div>
-            </section>
-            <evaluation-instructions />
-            <hr>
-            <section class="row segment segment-image mx-1 px-0">
-                <div class="col-sm-12">
-                    <h2>
-                        Individual Evaluations<sup
-                            style="font-size: 12pt"
-                            data-toggle="tooltip"
-                            data-placement="top"
-                            title="Evaluations are hidden from others to avoid confirmation bias"
-                        >?</sup> <small v-if="individualApplications">({{ individualApplications.length }})</small>
-                    </h2>
+    <div>
+        <eval-page
+            :individual-evaluations="individualApplications"
+            :discussion-evaluations="discussApplications"
+            :discussions-evaluations-title="
+                evaluator && evaluator.isNat ?
+                    'Group Evaluations' :
+                    'Completed Evaluations'
+            "
+            :discussions-evaluations-help="
+                evaluator && evaluator.isNat ?
+                    'After individual evals are completed, their responses are made visible to allow discussion and form a consensus' :
+                    'Results of archived evaluations you were assigned to'
+            "
+            @select-all="selectAll($event)"
+            @set-group-eval="setGroupEval($event)"
+            @set-individual-eval="setIndividualEval($event)"
+            @set-complete="setComplete($event)"
+        >
+            <template #individual-evaluations-cards>
+                <application-individual-card
+                    v-for="application in individualApplications"
+                    :key="application.id"
+                    :application="application"
+                    :all-checked="allChecked"
+                />
+            </template>
 
-                    <transition-group name="list" tag="div" class="row">
-                        <application-individual-card
-                            v-for="application in individualApplications"
-                            :key="application.id"
-                            :application="application"
-                            :all-checked="allChecked"
-                        />
-                    </transition-group>
-
-                    <div class="row">
-                        <p v-if="!individualApplications || !individualApplications.length" class="ml-4">
-                            No applications to evaluate...
-                        </p>
-                    </div>
-                </div>
-            </section>
-            <hr>
-            <section class="row segment segment-image mx-1 px-0">
-                <div class="col-sm-12">
-                    <h2>
-                        {{ evaluator && evaluator.isNat ? 'Group Evaluations' : 'Completed Evaluations' }}<sup
-                            style="font-size: 12pt"
-                            data-toggle="tooltip"
-                            data-placement="top"
-                            :title="evaluator && evaluator.isNat ? 'After individual evals are completed, their responses are made visible to allow discussion and form a consensus' : 'Results of archived evaluations you were assigned to'"
-                        >?</sup>
-                        <small v-if="discussApplications">({{ discussApplications.length }})</small>
-                    </h2>
-
-                    <transition-group name="list" tag="div" class="row">
-                        <application-discussion-card
-                            v-for="application in discussApplications"
-                            :key="application.id"
-                            :application="application"
-                            :all-checked="allChecked"
-                        />
-                    </transition-group>
-
-                    <div class="row">
-                        <p v-if="!discussApplications || !discussApplications.length" class="ml-4">
-                            No applications to evaluate...
-                        </p>
-                    </div>
-                </div>
-            </section>
-        </div>
+            <template #discussion-evaluations-cards>
+                <application-discussion-card
+                    v-for="application in discussApplications"
+                    :key="application.id"
+                    :application="application"
+                    :all-checked="allChecked"
+                />
+            </template>
+        </eval-page>
 
         <application-individual-info />
 
@@ -102,27 +48,24 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import ToastMessages from '../components/ToastMessages.vue';
+import EvalPage from '../components/evaluations/EvalPage.vue';
 import ApplicationIndividualCard from '../components/evaluations/applications/ApplicationIndividualCard.vue';
 import ApplicationIndividualInfo from '../components/evaluations/applications/ApplicationIndividualInfo.vue';
 import ApplicationDiscussionCard from '../components/evaluations/applications/ApplicationDiscussionCard.vue';
 import ApplicationDiscussionInfo from '../components/evaluations/applications/ApplicationDiscussionInfo.vue';
-import EvaluationInstructions from '../components/evaluations/applications/EvaluationInstructions.vue';
-import FilterBox from '../components/FilterBox.vue';
-import filters from '../mixins/filters.js';
 import postData from '../mixins/postData.js';
 
 export default {
     name: 'AppEvalPage',
     components: {
         ToastMessages,
+        EvalPage,
         ApplicationIndividualCard,
         ApplicationIndividualInfo,
         ApplicationDiscussionCard,
         ApplicationDiscussionInfo,
-        EvaluationInstructions,
-        FilterBox,
     },
-    mixins: [ postData, filters ],
+    mixins: [ postData ],
     data() {
         return {
             allChecked: false,

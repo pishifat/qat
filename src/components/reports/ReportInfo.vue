@@ -1,22 +1,19 @@
 <template>
-    <div id="reportInfo" class="modal fade" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div v-if="selectedReport" class="modal-content">
-                <modal-header />
-                <div class="modal-body" style="overflow: hidden">
-                    <div class="container">
-                        <context />
+    <modal-dialog id="reportInfo" :title="title">
+        <template v-if="selectedReport" #header>
+            <modal-header />
+        </template>
 
-                        <hr>
+        <div v-if="selectedReport" class="container">
+            <context />
 
-                        <feedback />
+            <hr>
 
-                        <feedback-pm />
-                    </div>
-                </div>
-            </div>
+            <feedback class="mb-3" />
+
+            <feedback-pm />
         </div>
-    </div>
+    </modal-dialog>
 </template>
 
 <script>
@@ -25,6 +22,7 @@ import ModalHeader from './info/ModalHeader.vue';
 import Context from './info/Context.vue';
 import Feedback from './info/Feedback.vue';
 import FeedbackPm from './info/FeedbackPm.vue';
+import ModalDialog from '../ModalDialog.vue';
 
 export default {
     name: 'ReportInfo',
@@ -33,6 +31,7 @@ export default {
         Context,
         Feedback,
         FeedbackPm,
+        ModalDialog,
     },
     computed: {
         ...mapGetters([

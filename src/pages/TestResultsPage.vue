@@ -1,95 +1,104 @@
 <template>
     <div class="row">
-        <section v-if="isNat" class="col-md-12 mb-4 segment">
-            <div class="input-group input-group-sm">
+        <div class="col-md-12">
+            <section v-if="isNat" class="card card-body">
                 <input
                     v-model="searchValue"
                     type="text"
                     placeholder="username..."
                     maxlength="18"
                     autocomplete="off"
+                    class="form-control mb-1"
                     @keyup.enter="query($event)"
                 >
-                <button class="btn btn-nat ml-2" type="submit" @click="query($event)">
+
+                <button class="btn btn-nat btn-block" type="submit" @click="query($event)">
                     Search tests
                 </button>
-            </div>
-        </section>
+            </section>
 
-        <section v-if="tests" class="col-md-12 segment segment-image">
-            <transition-group name="list" tag="div" class="row">
-                <result-card
-                    v-for="test in tests"
-                    :key="test.id"
-                    :selected-test="test"
-                    @update:selected-test="selectedTest = $event"
-                />
-            </transition-group>
-            <p v-if="!tests.length" class="text-center min-spacing">
-                No test results...
-            </p>
-        </section>
+            <section v-if="tests" class="card card-body">
+                <transition-group name="list" tag="div" class="row">
+                    <result-card
+                        v-for="test in tests"
+                        :key="test.id"
+                        :selected-test="test"
+                        @update:selected-test="selectedTest = $event"
+                    />
+                </transition-group>
+                <div v-if="!tests.length" class="text-center">
+                    No test results...
+                </div>
+            </section>
 
-        <section v-if="selectedTest">
-            <p class="text-center segment">
-                User: {{ selectedTest.applicant.username }} - Mode: {{ selectedTest.mode }} - Score:
-                {{ selectedTest.totalScore }}
-            </p>
+            <template v-if="selectedTest">
+                <section class="card card-body text-center">
+                    <div>
+                        <b>User:</b> {{ selectedTest.applicant.username }} -
+                        <b>Mode:</b> {{ selectedTest.mode }} -
+                        <b>Score:</b> {{ selectedTest.totalScore }}
+                    </div>
+                </section>
 
-            <div v-for="(answer, i) in selectedTest.answers" :key="answer.id" class="segment segment-image">
-                <small class="float-right">
-                    Q{{ ++i }} -- {{ answer.question.category }}
-                    <span v-if="isNat && answer.question.questionType != 'fill'"> -- total: {{ calculateQuestionScore(answer) }}</span>
-                </small>
-                <div>
-                    <h5 style="width: 90%">
-                        {{ answer.question.content }}
-                    </h5>
-                    <div v-for="option in getActiveOptions(answer.question.options)" :key="option.id">
-                        <div class="form-check mb-2 ml-2">
-                            <input
-                                :id="option.id"
-                                class="form-check-input"
-                                type="checkbox"
-                                :value="option.id"
-                                :checked="answer.optionsChosen.indexOf(option.id) >= 0"
-                            >
-                            <label
-                                v-if="answer.question.questionType === 'text'"
-                                class="form-check-label"
-                                style="width: 90%"
-                                :for="option.id"
-                                :class="[
-                                    option.score > 0 ? 'vote-pass' : 'vote-fail',
-                                    answer.optionsChosen.indexOf(option.id) >= 0 ? 'selected-answer' : '',
-                                ]"
-                            >
-                                {{ option.content }}
-                            </label>
-                            <label
-                                v-else
-                                :for="option.id"
-                                :class="
-                                    answer.optionsChosen.indexOf(option.id) >= 0
-                                        ? 'selected-image-answer'
-                                        : ''
-                                "
-                            >
-                                <img :src="option.content" class="test-image">
-                                <span :class="option.score > 0 ? 'vote-pass' : 'vote-fail'">{{
-                                    option.score > 0 ? 'Correct' : 'Incorrect'
-                                }}</span>
-                            </label>
-                            <small v-if="isNat" class="float-right">{{ option.score }}</small>
+                <section class="card card-body">
+                    <div v-for="(answer, i) in selectedTest.answers" :key="answer.id" class="card card-body my-1">
+                        <small class="text-right">
+                            Q{{ ++i }} -- {{ answer.question.category }}
+                            <span v-if="isNat && answer.question.questionType != 'fill'"> -- total: {{ calculateQuestionScore(answer) }}</span>
+                        </small>
+
+                        <div>
+                            <h5>
+                                {{ answer.question.content }}
+                            </h5>
+
+                            <div v-for="option in getActiveOptions(answer.question.options)" :key="option.id">
+                                <div class="form-check mb-2 ml-2">
+                                    <input
+                                        :id="option.id"
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        :value="option.id"
+                                        :checked="answer.optionsChosen.indexOf(option.id) >= 0"
+                                    >
+
+                                    <label
+                                        v-if="answer.question.questionType === 'text'"
+                                        class="form-check-label"
+                                        :for="option.id"
+                                        :class="[
+                                            option.score > 0 ? 'text-pass' : 'text-fail',
+                                            answer.optionsChosen.indexOf(option.id) >= 0 ? 'bg-secondary' : '',
+                                        ]"
+                                    >
+                                        {{ option.content }}
+                                    </label>
+
+                                    <label
+                                        v-else
+                                        :for="option.id"
+                                        :class="
+                                            answer.optionsChosen.indexOf(option.id) >= 0
+                                                ? 'bg-secondary'
+                                                : ''
+                                        "
+                                    >
+                                        <img :src="option.content" class="test-image">
+                                        <span :class="option.score > 0 ? 'text-success' : 'text-danger'">
+                                            {{ option.score > 0 ? 'Correct' : 'Incorrect' }}
+                                        </span>
+                                    </label>
+
+                                    <small v-if="isNat" class="float-right">{{ option.score }}</small>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </section>
+                </section>
+            </template>
+        </div>
     </div>
 </template>
-
-
 
 <script>
 import { mapState, mapGetters } from 'vuex';

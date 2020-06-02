@@ -1,3 +1,5 @@
+import Axios from 'axios';
+
 $(function() {
     $('#loading').hide();
     $('#main').attr('style', 'visibility: visible');
@@ -36,7 +38,7 @@ $(function() {
             $('#submitting').text(`Submitting & calculating mod score... (this will take a few seconds)`);
 
             try {
-                const res = await axios.post(`/bnapps/apply`, { mode, mods, reasons });
+                const res = await Axios.post(`/bnapps/apply`, { mode, mods, reasons });
 
                 if (res.data.error) {
                     $('#errors').text(res.data.error);

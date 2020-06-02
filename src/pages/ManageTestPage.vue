@@ -1,85 +1,82 @@
 <template>
     <div class="row">
-        <section class="col-md-12 segment mb-4">
-            <select id="questionType" class="custom-select small" style="width: 200px;">
-                <option value="codeOfConduct">
-                    Code of Conduct
-                </option>
-                <option value="general">
-                    General
-                </option>
-                <option value="spread">
-                    Spread
-                </option>
-                <option value="metadata">
-                    Metadata
-                </option>
-                <option value="timing">
-                    Timing
-                </option>
-                <option value="audio">
-                    Audio
-                </option>
-                <option value="videoBackground">
-                    Video/BG
-                </option>
-                <option value="skinning">
-                    Skinning
-                </option>
-                <option value="storyboarding">
-                    Storyboarding
-                </option>
-                <option value="osu">
-                    osu!
-                </option>
-                <option value="taiko">
-                    osu!taiko
-                </option>
-                <option value="catch">
-                    osu!catch
-                </option>
-                <option value="mania">
-                    osu!mania
-                </option>
-                <option value="bn">
-                    BN Rules
-                </option>
-            </select>
-            <button id="artistButton" class="btn btn-nat btn-sm ml-2" @click="loadContent($event);">
-                Load test content
-            </button>
-        </section>
-        <section v-if="category" class="col-md-12 segment segment-image">
-            <h2>
-                {{ category }} Questions
-                <button
-                    class="btn btn-nat"
-                    data-toggle="modal"
-                    data-target="#addQuestion"
-                    @click="resetInput()"
-                >
-                    Add question
+        <div class="col-md-12">
+            <section class="card card-body">
+                <select id="questionType" class="form-control small">
+                    <option value="codeOfConduct">
+                        Code of Conduct
+                    </option>
+                    <option value="general">
+                        General
+                    </option>
+                    <option value="spread">
+                        Spread
+                    </option>
+                    <option value="metadata">
+                        Metadata
+                    </option>
+                    <option value="timing">
+                        Timing
+                    </option>
+                    <option value="audio">
+                        Audio
+                    </option>
+                    <option value="videoBackground">
+                        Video/BG
+                    </option>
+                    <option value="skinning">
+                        Skinning
+                    </option>
+                    <option value="storyboarding">
+                        Storyboarding
+                    </option>
+                    <option value="osu">
+                        osu!
+                    </option>
+                    <option value="taiko">
+                        osu!taiko
+                    </option>
+                    <option value="catch">
+                        osu!catch
+                    </option>
+                    <option value="mania">
+                        osu!mania
+                    </option>
+                    <option value="bn">
+                        BN Rules
+                    </option>
+                </select>
+
+                <button id="artistButton" class="btn btn-nat btn-block" @click="loadContent($event);">
+                    Load test content
                 </button>
-            </h2>
-            <table v-if="questions && questions.length" class="table table-sm table-dark table-hover col-md-12 mt-2">
-                <thead>
-                    <td scope="col">
-                        Question
-                    </td>
-                    <td scope="col">
-                        Updated
-                    </td>
-                    <td scope="col" />
-                </thead>
-                <tbody>
+            </section>
+
+            <section v-if="category" class="card card-body">
+                <h2>
+                    {{ category }} - Questions
+                    <button
+                        class="btn btn-nat btn-sm"
+                        data-toggle="modal"
+                        data-target="#addQuestion"
+                        @click="resetInput()"
+                    >
+                        Add question
+                    </button>
+                </h2>
+
+                <data-table
+                    v-if="questions && questions.length"
+                    :headers="['Question', 'Updated', '']"
+                >
                     <tr v-for="question in questions" :key="question.id" :class="question.active ? 'border-active' : 'border-inactive'">
-                        <td scope="row">
+                        <td>
                             {{ question.content }}
                         </td>
-                        <td scope="row" style="white-space: nowrap;">
+                        <td class="text-nowrap">
                             {{ question.updatedAt.slice(0,10) }}
                         </td>
-                        <td scope="row" class="text-right">
+                        <td class="text-right">
                             <a
                                 href="#"
                                 data-toggle="modal"
@@ -91,9 +88,9 @@
                             </a>
                         </td>
                     </tr>
-                </tbody>
-            </table>
-        </section>
+                </data-table>
+            </section>
+        </div>
 
         <add-question
             :category="category"
@@ -113,12 +110,11 @@
     </div>
 </template>
 
-
-
 <script>
 import ToastMessages from '../components/ToastMessages.vue';
 import AddQuestion from '../components/rcTest/AddQuestion.vue';
 import EditQuestion from '../components/rcTest/EditQuestion.vue';
+import DataTable from '../components/DataTable.vue';
 import postData from '../mixins/postData.js';
 
 export default {
@@ -127,6 +123,7 @@ export default {
         ToastMessages,
         AddQuestion,
         EditQuestion,
+        DataTable,
     },
     mixins: [ postData ],
     data() {

@@ -1,6 +1,6 @@
 <template>
-    <p class="text-shadow">
-        Next evaluation: {{ nextEvaluationDate }}
+    <p>
+        <b>Next evaluation:</b> {{ nextEvaluationDate }}
     </p>
 </template>
 

@@ -12,7 +12,7 @@ router.use(api.isLoggedIn);
 router.get('/', (req, res) => {
     res.render('reports', {
         title: 'Reports',
-        script: '../js/reports.js',
+        script: '../javascripts/reports.js',
         loggedInAs: req.session.mongoId,
         isReports: true,
         isBn: res.locals.userRequest.isBn,

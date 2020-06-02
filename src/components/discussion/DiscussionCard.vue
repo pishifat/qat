@@ -1,14 +1,14 @@
 <template>
     <div class="col-md-6 col-lg-4 my-2" @click="selectDiscussion()">
         <div
-            class="card"
-            :class="['border-' + findRelevantMediation(), discussion.isNatOnly ? 'card-bg-nat-vote' : '']"
+            class="card card-individual"
+            :class="['border-' + findRelevantMediation(), discussion.isNatOnly ? 'bg-nat' : '']"
             data-toggle="modal"
             data-target="#extendedInfo"
             :data-discussion="discussion.id"
         >
             <div class="card-body">
-                <p class="text-shadow wrap-text">
+                <p class="wrap-text">
                     <a
                         v-if="discussion.discussionLink.length"
                         :href="discussion.discussionLink"
@@ -17,9 +17,9 @@
                     >{{ discussion.title }}</a>
                     <span v-else>{{ discussion.title }}</span>
                 </p>
-                <div class="discussion-status my-auto" :class="discussion.isActive ? 'status-bar-active' : 'status-bar-inactive'" />
+                <div class="card-status" :class="discussion.isActive ? 'status-bar-active' : 'status-bar-inactive'" />
                 <div class="card-icons">
-                    <span class="small text-shadow float-left">{{ discussion.createdAt.slice(0, 10) }}</span>
+                    <span class="small float-left">{{ discussion.createdAt.slice(0, 10) }}</span>
                     <i v-if="discussion.mode.includes('osu')" class="far fa-circle" />
                     <i v-if="discussion.mode.includes('taiko')" class="fas fa-drum" />
                     <i v-if="discussion.mode.includes('catch')" class="fas fa-apple-alt" />
@@ -76,30 +76,14 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+
 .status-bar-active {
-    background: radial-gradient(white, transparent 70%);
+    background: radial-gradient(#fff, transparent 70%);
 }
 
 .status-bar-inactive {
-    background: radial-gradient(slategray, transparent 70%);
-}
-
-.discussion-status {
-    height: 5px;
-    margin: 5px 0;
-}
-
-.card-icons {
-    text-align: right;
-}
-
-.card {
-    overflow: hidden;
-}
-
-.card-bg-nat-vote {
-    background-color: rgba(59, 36, 36, 0.596)!important;
+    background: radial-gradient(var(--gray), transparent 70%);
 }
 
 </style>

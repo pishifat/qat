@@ -1,16 +1,25 @@
 <template>
     <div>
-        <p class="text-shadow">
-            Reason: <pre class="small pre-font ml-4" v-html="filterLinks(selectedReport.reason)" />
+        <p>
+            <b>Reason:</b>
         </p>
-        <p v-if="selectedReport.link" class="text-shadow">
-            Relevant link: <span v-html="filterLinks(selectedReport.link)" />
+
+        <div class="small pre-line ml-4 mb-3 text-secondary" v-html="filterLinks(selectedReport.reason)" />
+
+        <p v-if="selectedReport.link">
+            <b>Relevant link:</b>
+            <span class="text-secondary" v-html="filterLinks(selectedReport.link)" />
         </p>
-        <p class="text-shadow">
-            Reported: {{ selectedReport.createdAt.slice(0,10) }}
+        <p>
+            <b>Reported:</b>
+            <span class="text-secondary">{{ selectedReport.createdAt.slice(0,10) }}</span>
         </p>
-        <p v-if="!selectedReport.isActive" class="text-shadow">
-            Reported by: <a :href="'https://osu.ppy.sh/users/' + selectedReport.reporter.osuId" target="_blank">{{ selectedReport.reporter.username }}</a>
+        <p v-if="!selectedReport.isActive">
+            <b>Reported by:</b>
+
+            <a :href="'https://osu.ppy.sh/users/' + selectedReport.reporter.osuId" target="_blank">
+                {{ selectedReport.reporter.username }}
+            </a>
         </p>
     </div>
 </template>

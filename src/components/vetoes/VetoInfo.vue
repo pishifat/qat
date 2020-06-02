@@ -1,33 +1,33 @@
 <template>
-    <div id="extendedInfo" class="modal fade" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div v-if="selectedVeto" class="modal-content">
-                <modal-header />
-                <div class="modal-body" style="overflow: hidden">
-                    <div class="container">
-                        <context />
+    <modal-dialog
+        id="extendedInfo"
+        modal-size="xl"
+    >
+        <template v-if="selectedVeto" #header>
+            <modal-header />
+        </template>
 
-                        <!-- show mediations to NAT if they're not active mediators -->
-                        <div v-if="showMediations">
-                            <hr>
-                            <mediations />
-                            <hr>
-                        </div>
+        <div v-if="selectedVeto" class="container">
+            <context />
 
-                        <!-- show admin buttons to NAT who aren't active mediators -->
-                        <admin-buttons
-                            v-if="isNat && !isMediator"
-                        />
-
-                        <!-- show mediation input for active mediators -->
-                        <mediation-input
-                            v-else-if="isMediator && selectedVeto.status == 'wip'"
-                        />
-                    </div>
-                </div>
+            <!-- show mediations to NAT if they're not active mediators -->
+            <div v-if="showMediations">
+                <hr>
+                <mediations />
+                <hr>
             </div>
+
+            <!-- show admin buttons to NAT who aren't active mediators -->
+            <admin-buttons
+                v-if="isNat && !isMediator"
+            />
+
+            <!-- show mediation input for active mediators -->
+            <mediation-input
+                v-else-if="isMediator && selectedVeto.status == 'wip'"
+            />
         </div>
-    </div>
+    </modal-dialog>
 </template>
 
 <script>
@@ -37,6 +37,7 @@ import Context from './info/Context.vue';
 import Mediations from './info/Mediations.vue';
 import AdminButtons from './info/AdminButtons.vue';
 import MediationInput from './info/MediationInput.vue';
+import ModalDialog from '../ModalDialog.vue';
 
 export default {
     name: 'VetoInfo',
@@ -46,6 +47,7 @@ export default {
         Mediations,
         AdminButtons,
         MediationInput,
+        ModalDialog,
     },
     computed: {
         ...mapState([

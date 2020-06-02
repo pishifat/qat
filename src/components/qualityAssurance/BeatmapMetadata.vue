@@ -1,21 +1,15 @@
 <template>
-    <div class="mt-2 ml-1">
-        <div class="col-sm-12">
-            <div class="medium-small truncate text-light">
-                {{ splitMetadata[0] }}
-            </div>
+    <div>
+        <div class="text-truncate text-secondary">
+            {{ splitMetadata[0] }}
         </div>
-        <div class="col-sm-12">
-            <div class="truncate">
-                <a
-                    :href="'https://osu.ppy.sh/beatmapsets/' + beatmapsetId"
-                    target="_blank"
-                    class="text-shadow"
-                >
-                    {{ splitMetadata[1] }}
-                </a>
-            </div>
-        </div>
+        <a
+            :href="'https://osu.ppy.sh/beatmapsets/' + beatmapsetId"
+            target="_blank"
+            class="text-truncate"
+        >
+            {{ splitMetadata[1] }}
+        </a>
     </div>
 </template>
 

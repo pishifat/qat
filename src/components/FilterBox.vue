@@ -1,32 +1,31 @@
 <template>
-    <section class="row segment my-1 mx-4">
-        <div class="small filter-box">
-            <span class="filter-header">Search</span>
-            <input
-                id="search"
-                v-model="newFilterValue"
-                class="ml-2"
-                type="text"
-                autocomplete="off"
-                :placeholder="placeholder || ''"
-                @change="updateFilterValue(newFilterValue)"
+    <section class="card card-body">
+        <input
+            id="search"
+            v-model="newFilterValue"
+            class="form-control"
+            type="text"
+            autocomplete="off"
+            :placeholder="placeholder || ''"
+            @change="updateFilterValue(newFilterValue)"
+        >
+
+        <select
+            id="mode"
+            class="form-control"
+            @change="updateFilterMode(options[$event.target.selectedIndex])"
+        >
+            <option
+                v-for="option in options"
+                :key="option"
+                :value="option"
+                :selected="option === filters.mode"
             >
-            <select
-                id="mode"
-                class="custom-select ml-2"
-                @change="updateFilterMode(options[$event.target.selectedIndex])"
-            >
-                <option
-                    v-for="option in options"
-                    :key="option"
-                    :value="option"
-                    :selected="option === filters.mode"
-                >
-                    {{ option === '' ? 'All modes' : option }}
-                </option>
-            </select>
-            <slot />
-        </div>
+                {{ option === '' ? 'All modes' : option }}
+            </option>
+        </select>
+
+        <slot />
     </section>
 </template>
 

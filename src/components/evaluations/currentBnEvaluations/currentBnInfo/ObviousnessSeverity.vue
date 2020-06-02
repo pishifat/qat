@@ -1,46 +1,47 @@
 <template>
     <div>
-        <p class="min-spacing mt-2">
-            Obviousness:
+        <p>
+            <b>Obviousness:</b>
         </p>
-        <ul>
+        <ul class="small">
             <li>
-                <a href="#" :class="obviousness == 0 ? 'errors' : ''" @click.prevent="updateObviousness(0)">
+                <a href="#" :class="obviousness == 0 ? 'text-danger' : ''" @click.prevent="updateObviousness(0)">
                     0: Not obvious
                 </a>
             </li>
             <li>
-                <a href="#" :class="obviousness == 1 ? 'errors' : ''" @click.prevent="updateObviousness(1)">
+                <a href="#" :class="obviousness == 1 ? 'text-danger' : ''" @click.prevent="updateObviousness(1)">
                     1: Can be found with experience
                 </a>
             </li>
             <li>
-                <a href="#" :class="obviousness == 2 ? 'errors' : ''" @click.prevent="updateObviousness(2)">
+                <a href="#" :class="obviousness == 2 ? 'text-danger' : ''" @click.prevent="updateObviousness(2)">
                     2: Can be found at a glance
                 </a>
             </li>
         </ul>
-        <p class="min-spacing mt-2">
-            Severity:
+
+        <p>
+            <b>Severity:</b>
         </p>
-        <ul>
+        <ul class="small">
             <li>
-                <a href="#" :class="severity == 0 ? 'errors' : ''" @click.prevent="updateSeverity(0)">
+                <a href="#" :class="severity == 0 ? 'text-danger' : ''" @click.prevent="updateSeverity(0)">
                     0: Not severe
                 </a>
             </li>
             <li>
-                <a href="#" :class="severity == 1 ? 'errors' : ''" @click.prevent="updateSeverity(1)">
+                <a href="#" :class="severity == 1 ? 'text-danger' : ''" @click.prevent="updateSeverity(1)">
                     1: Slightly detrimental to gameplay
                 </a>
             </li>
             <li>
-                <a href="#" :class="severity == 2 ? 'errors' : ''" @click.prevent="updateSeverity(2)">
+                <a href="#" :class="severity == 2 ? 'text-danger' : ''" @click.prevent="updateSeverity(2)">
                     2: Noticably detrimental to gameplay
                 </a>
             </li>
             <li>
-                <a href="#" :class="severity == 3 ? 'errors' : ''" @click.prevent="updateSeverity(3)">
+                <a href="#" :class="severity == 3 ? 'text-danger' : ''" @click.prevent="updateSeverity(3)">
                     3: More or less unplayable
                 </a>
             </li>

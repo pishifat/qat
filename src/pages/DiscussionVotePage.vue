@@ -7,7 +7,7 @@
             >
                 <button
                     v-if="isNat"
-                    class="btn btn-sm btn-nat ml-2"
+                    class="btn btn-block btn-nat my-1"
                     data-toggle="modal"
                     data-target="#addDiscussion"
                 >
@@ -15,56 +15,45 @@
                 </button>
             </filter-box>
 
-            <section class="row segment segment-image mx-0 px-0">
-                <div class="col-sm-12">
-                    <h2>Active votes <small v-if="activeDiscussionVotes">({{ activeDiscussionVotes.length }})</small></h2>
-                    <div v-if="!activeDiscussionVotes.length" class="ml-4 text-white-50">
-                        None...
-                    </div>
-                    <transition-group name="list" tag="div" class="row mx-auto">
-                        <discussion-card
-                            v-for="discussion in activeDiscussionVotes"
-                            :key="discussion.id"
-                            :discussion="discussion"
-                            :user-id="userId"
-                            @update:selectedDiscussion="selectedDiscussion = $event"
-                        />
-                    </transition-group>
+            <section class="card card-body">
+                <h2>Active votes <small v-if="activeDiscussionVotes">({{ activeDiscussionVotes.length }})</small></h2>
+
+                <div v-if="!activeDiscussionVotes.length" class="ml-4 text-white-50">
+                    None...
                 </div>
+
+                <transition-group name="list" tag="div" class="row">
+                    <discussion-card
+                        v-for="discussion in activeDiscussionVotes"
+                        :key="discussion.id"
+                        :discussion="discussion"
+                        :user-id="userId"
+                    />
+                </transition-group>
             </section>
 
-            <section class="row segment segment-image mx-0 px-0">
-                <div class="col-sm-12">
-                    <h2>Inactive Votes <small v-if="paginatedInactiveDiscussionVotes">({{ inactiveDiscussionVotes.length }})</small></h2>
-                    <div v-if="!paginatedInactiveDiscussionVotes.length" class="ml-4 text-white-50">
-                        None...
-                    </div>
-                    <transition-group name="list" tag="div" class="row mx-auto">
-                        <discussion-card
-                            v-for="discussion in paginatedInactiveDiscussionVotes"
-                            :key="discussion.id"
-                            :discussion="discussion"
-                            :user-id="userId"
-                            @update:selectedDiscussion="selectedDiscussion = $event"
-                        />
-                    </transition-group>
-                    <button
-                        v-if="pagination.page > 1"
-                        class="btn btn-sm btn-pags btn-pags-left"
-                        type="button"
-                        @click="showNewer()"
-                    >
-                        <i class="fas fa-angle-left px-1" />
-                    </button>
-                    <button
-                        v-if="pagination.page < pagination.maxPages"
-                        class="btn btn-sm btn-pags btn-pags-right"
-                        type="button"
-                        @click="showOlder()"
-                    >
-                        <i class="fas fa-angle-right px-1" />
-                    </button>
+            <section class="card card-body">
+                <h2>
+                    Inactive Votes <small v-if="paginatedInactiveDiscussionVotes">({{ inactiveDiscussionVotes.length }})</small>
+                </h2>
+
+                <div v-if="!paginatedInactiveDiscussionVotes.length" class="ml-4 text-white-50">
+                    None...
                 </div>
+
+                <transition-group name="list" tag="div" class="row">
+                    <discussion-card
+                        v-for="discussion in paginatedInactiveDiscussionVotes"
+                        :key="discussion.id"
+                        :discussion="discussion"
+                        :user-id="userId"
+                    />
+                </transition-group>
+
+                <pagination-nav
+                    @show-newer="showNewer()"
+                    @show-older="showOlder()"
+                />
             </section>
         </div>
 
@@ -83,6 +72,7 @@ import DiscussionCard from '../components/discussion/DiscussionCard.vue';
 import DiscussionInfo from '../components/discussion/DiscussionInfo.vue';
 import SubmitDiscussion from '../components/discussion/SubmitDiscussion.vue';
 import FilterBox from '../components/FilterBox.vue';
+import PaginationNav from '../components/PaginationNav.vue';
 import postData from '../mixins/postData.js';
 
 export default {
@@ -93,6 +83,7 @@ export default {
         DiscussionInfo,
         SubmitDiscussion,
         FilterBox,
+        PaginationNav,
     },
     mixins: [postData],
     computed: {
@@ -100,7 +91,6 @@ export default {
             'userId',
             'userModes',
             'isNat',
-            'pagination',
         ]),
         ...mapGetters([
             'allDiscussionVotes',

@@ -1,3 +1,5 @@
+import Axios from 'axios';
+
 $(function() {
     $('#loading').hide();
     $('#main').attr('style', 'visibility: visible');
@@ -12,7 +14,7 @@ $(function() {
         let link = $('#link').val();
 
         try {
-            const res = await axios.post(`/reports/submitReport`, { username, reason, link });
+            const res = await Axios.post(`/reports/submitReport`, { username, reason, link });
 
             if (res.data.error) {
                 $('#errors').text(res.data.error);

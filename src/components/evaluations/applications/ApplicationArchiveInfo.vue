@@ -1,50 +1,57 @@
 <template>
-    <div id="applicationArchiveInfo" class="modal fade" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div v-if="selectedDiscussApplication" class="modal-content custom-bg-dark">
-                <modal-header
-                    :osu-id="selectedDiscussApplication.applicant.osuId"
-                    :username="selectedDiscussApplication.applicant.username"
-                    :mode="selectedDiscussApplication.mode"
-                    :nat-evaluators="selectedDiscussApplication.natEvaluators"
-                    :is-application="true"
-                />
-                <div class="modal-body" style="overflow: hidden;">
-                    <div class="container">
-                        <mods
-                            :mods="selectedDiscussApplication.mods"
-                            :reasons="selectedDiscussApplication.reasons"
-                            :osu-id="selectedDiscussApplication.applicant.osuId"
-                        />
-                        <test-results
-                            v-if="evaluator.isNat"
-                            :test-score="selectedDiscussApplication.test.totalScore"
-                            :osu-id="selectedDiscussApplication.applicant.osuId"
-                        />
-                        <consensus
-                            :is-application="true"
-                            :is-archive="true"
-                        />
-                        <p class="min-spacing text-shadow">
-                            Application Feedback:
-                        </p>
-                        <pre class="secondary-text pre-font text-shadow small ml-4" v-html="filterLinks(selectedDiscussApplication.feedback)" />
-                        <hr v-if="selectedDiscussApplication.consensus">
-                        <evaluations
-                            :evaluations="selectedDiscussApplication.evaluations"
-                            :consensus="selectedDiscussApplication.consensus"
-                        />
-                        <button
-                            class="btn btn-sm btn-nat-red float-right"
-                            @click="unarchive($event);"
-                        >
-                            Un-archive
-                        </button>
-                    </div>
-                </div>
-            </div>
+    <modal-dialog
+        id="applicationArchiveInfo"
+        modal-size="xl"
+    >
+        <template v-if="selectedDiscussApplication" #header>
+            <modal-header
+                :mode="selectedDiscussApplication.mode"
+                :nat-evaluators="selectedDiscussApplication.natEvaluators"
+                :is-application="true"
+                :osu-id="selectedDiscussApplication.applicant.osuId"
+                :username="selectedDiscussApplication.applicant.username"
+            />
+        </template>
+
+        <div v-if="selectedDiscussApplication" class="container">
+            <mods
+                :mods="selectedDiscussApplication.mods"
+                :reasons="selectedDiscussApplication.reasons"
+                :osu-id="selectedDiscussApplication.applicant.osuId"
+            />
+
+            <test-results
+                v-if="evaluator.isNat"
+                :test-score="selectedDiscussApplication.test.totalScore"
+                :osu-id="selectedDiscussApplication.applicant.osuId"
+            />
+
+            <consensus
+                :is-application="true"
+                :is-archive="true"
+            />
+
+            <p>
+                <b>Application Feedback:</b>
+            </p>
+
+            <div class="card card-body pre-line small" v-html="filterLinks(selectedDiscussApplication.feedback)" />
+
+            <hr v-if="selectedDiscussApplication.consensus">
+
+            <evaluations
+                :evaluations="selectedDiscussApplication.evaluations"
+                :consensus="selectedDiscussApplication.consensus"
+            />
+
+            <button
+                class="btn btn-sm btn-danger float-right"
+                @click="unarchive($event)"
+            >
+                Un-archive
+            </button>
         </div>
-    </div>
+    </modal-dialog>
 </template>
 
 <script>
@@ -56,6 +63,7 @@ import Mods from './applicationInfo/Mods.vue';
 import TestResults from './applicationInfo/TestResults.vue';
 import Consensus from '../info/Consensus.vue';
 import Evaluations from '../info/Evaluations.vue';
+import ModalDialog from '../../ModalDialog.vue';
 
 export default {
     name: 'ApplicationArchiveInfo',
@@ -65,6 +73,7 @@ export default {
         TestResults,
         Consensus,
         Evaluations,
+        ModalDialog,
     },
     mixins: [ filterLinks, postData ],
     computed: {
@@ -95,12 +104,3 @@ export default {
     },
 };
 </script>
-
-<style>
-
-.eval-bg-priority {
-    background-color: rgb(38, 48, 63)!important;
-    box-shadow: 5px 5px 5px 5px rgb(38, 48, 63);
-}
-
-</style>

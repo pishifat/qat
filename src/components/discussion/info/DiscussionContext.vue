@@ -1,27 +1,34 @@
 <template>
     <div>
-        <p v-if="selectedDiscussionVote.discussionLink.length" class="min-spacing mb-2">
+        <p v-if="selectedDiscussionVote.discussionLink.length" class="mb-2">
             <a :href="selectedDiscussionVote.discussionLink" target="_blank">Read and contribute to the full discussion here</a>
         </p>
-        <p v-if="isEditable" class="min-spacing">
+
+        <p v-if="isEditable">
             <a
                 href="#"
                 data-toggle="tooltip"
                 data-placement="top"
                 title="edit title"
                 @click.prevent="isEditTitle ? saveTitle() : isEditTitle = true"
-            ><i class="fas fa-edit" /></a>
-            Title:
+            >
+                <i class="fas fa-edit" />
+            </a>
+
+            <b>Title:</b>
+
             <input
                 v-if="isEditTitle"
                 v-model="editTitleContent"
-                class="small w-50"
+                class="form-control form-control-sm w-50"
                 type="text"
                 placeholder="enter to submit new title..."
                 @keyup.enter="saveTitle()"
             >
+
             <span v-else class="small">{{ selectedDiscussionVote.title }}</span>
         </p>
+
         <p>
             <a
                 v-if="isEditable"
@@ -30,16 +37,21 @@
                 data-placement="top"
                 title="edit title"
                 @click.prevent="isEditProposal ? saveProposal() : isEditProposal = true"
-            ><i class="fas fa-edit" /></a>
-            Proposal:
+            >
+                <i class="fas fa-edit" />
+            </a>
+
+            <b>Proposal:</b>
+
             <input
                 v-if="isEditProposal"
                 v-model="editProposalContent"
-                class="small w-75"
+                class="form-control form-control-sm w-75"
                 type="text"
                 placeholder="enter to submit new proposal..."
                 @keyup.enter="saveProposal()"
             >
+
             <span v-else class="small" v-html="filterLinks(selectedDiscussionVote.shortReason)" />
         </p>
     </div>

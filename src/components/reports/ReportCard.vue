@@ -2,20 +2,22 @@
     <div class="col-md-6 col-sm-12 my-2" @click="selectReport()">
         <div
             class="card"
-            :class="report.valid == 1 ? 'border-green' : report.valid == 2 ? 'border-blue' : report.valid == 3 ? 'border-red' : ''"
+            :class="report.valid == 1 ? 'border-success' : report.valid == 2 ? 'border-info' : report.valid == 3 ? 'border-danger' : ''"
             data-toggle="modal"
             data-target="#reportInfo"
             :data-user="report.id"
         >
             <div class="card-body">
-                <p class="truncate text-shadow text-white-50">
+                <p class="text-truncate text-secondary">
                     <a
                         v-if="report.culprit"
                         :href="'https://osu.ppy.sh/users/' + report.culprit.osuId"
                         target="_blank"
                         @click.stop
-                    >{{ report.culprit.username }}
+                    >
+                        {{ report.culprit.username }}
                     </a>
+
                     <a
                         v-else
                         :href="report.link"
@@ -28,8 +30,9 @@
                     <span class="small">{{ report.reason }}</span>
                 </p>
             </div>
+
             <div class="card-footer">
-                <span class="small text-shadow"><i class="fas fa-clock mx-1" /> {{ report.createdAt.slice(0,10) }}</span>
+                <span class="small"><i class="fas fa-clock mx-1" /> {{ report.createdAt.slice(0,10) }}</span>
             </div>
         </div>
     </div>
@@ -52,14 +55,8 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .card {
     min-height: 80px;
-}
-
-.truncate {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 </style>

@@ -13,7 +13,7 @@ const defaultPopulate = [{ path: 'user', select: 'username' }];
 router.get('/', async (req, res) => {
     res.render('logs', {
         title: 'Logs',
-        script: '../js/logs.js',
+        script: '../javascripts/logs.js',
         loggedInAs: req.session.mongoId,
         isLogs: true,
         logs: await Logger

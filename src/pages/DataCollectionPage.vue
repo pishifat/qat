@@ -6,15 +6,19 @@
                 :options="['', 'osu', 'taiko', 'catch', 'mania']"
             />
 
-            <events-table
-                :events="disqualifications"
-                :title="'Disqualifications'"
-            />
+            <section class="card card-body">
+                <events-table
+                    :events="disqualifications"
+                    :title="'Disqualifications'"
+                />
+            </section>
 
-            <events-table
-                :events="pops"
-                :title="'Nomination resets'"
-            />
+            <section class="card card-body">
+                <events-table
+                    :events="pops"
+                    :title="'Nomination resets'"
+                />
+            </section>
         </div>
 
         <data-collection-info />

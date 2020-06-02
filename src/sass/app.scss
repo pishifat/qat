@@ -1,0 +1,177 @@
+@import "variables";
+@import "~bootstrap/scss/bootstrap";
+@import "custom";
+
+// Vue transitions  ======================================================
+.list-enter-active,
+.list-leave-active,
+.list-move {
+    transition: all 1s;
+}
+
+.list-leave-active {
+    position: absolute;
+}
+
+.list-enter,
+.list-leave-to {
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+
+// =========================================================================
+
+.body-triangles::before {
+    background-image: url('/images/triangles.png');
+    opacity: .25;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    content: "";
+}
+
+.body-content-padding {
+    padding-top: 90px !important;
+}
+
+#loading {
+    position: absolute;
+    margin: auto;
+    left: 0;
+    right: 0;
+    top: 50vh;
+    text-align: center;
+    z-index: 1;
+}
+
+#main {
+    visibility: hidden;
+    @extend .body-content-padding;
+}
+
+sup {
+    font-size: 18px;
+}
+
+section {
+    @extend .mb-2;
+}
+
+.sort-filter {
+    @extend .small, .mt-3, .ml-3;
+
+    &__title {
+        width: 60px; 
+        display: inline-block;
+
+        &--large {
+            width: 120px;
+        }
+    }
+
+    &__item {
+        padding: 4px;
+
+        &--selected {
+            color: #fff;
+            font-weight: bold;
+        }
+    }
+
+}
+
+.pre-line {
+    white-space: pre-line;
+}
+
+.avatar-img {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 100%;
+    box-shadow: 0 1px 1rem rgba(10, 10, 25, .5);
+
+    &--small {
+        width: 38px;
+        height: 38px;
+    }
+}
+
+// =========================================================================
+// remove spinner buttons from number inputs
+input[type=number] { 
+    -moz-appearance: textfield;
+    appearance: textfield;
+    margin: 0; 
+}
+
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+}
+
+/* RADIO MODES */
+.hide-default {
+    display: none;
+}
+
+input[type="radio"] + .fas { cursor: pointer; }
+
+/* Unchecked */
+.osu-radio + .fa-circle:before { content: "\f111"; }
+.taiko-radio + .fa-drum:before { content: "\f569"; }
+.catch-radio + .fa-apple-alt:before { content: "\f5d1"; }
+.mania-radio + .fa-stream:before { content: "\f550"; }
+.all-radio + .fa-globe:before { content: "\f0ac"; }
+.checkmark-radio + .fa-check:before { content: "\f00c"; }
+.cross-radio + .fa-check:before { content: "\f00d"; }
+.probation-bn-radio + .fa-stream:before { content: "\f368"; }
+.full-bn-radio + .fa-stream:before { content: "\f554"; }
+.nat-radio + .fa-stream:before { content: "\f70c"; }
+
+/* Checked */
+.osu-radio:checked + .fa-circle:before { 
+    color: var(--info);
+    content: "\f111"; 
+}
+.taiko-radio:checked + .fa-drum:before { 
+    color: var(--info);
+    content: "\f569"; 
+}
+.catch-radio:checked + .fa-apple-alt:before { 
+    color: var(--info);
+    content: "\f5d1"; 
+}
+.mania-radio:checked + .fa-stream:before { 
+    color: var(--info);
+    content: "\f550"; 
+}
+.all-radio:checked + .fa-globe:before { 
+    color: var(--info);
+    content: "\f0ac"; 
+}
+.checkmark-radio:checked + .fa-check:before { 
+    color: var(--info);
+    content: "\f00c"; 
+}
+.cross-radio:checked + .fa-times:before { 
+    color: var(--info);
+    content: "\f00d"; 
+}
+.probation-bn-radio:checked + .fa-accessible-icon:before { 
+    color: var(--info);
+    content: "\f368"; 
+}
+.full-bn-radio:checked + .fa-walking:before { 
+    color: var(--info);
+    content: "\f554"; 
+}
+.nat-radio:checked + .fa-running:before { 
+    color: var(--info);
+    content: "\f70c"; 
+}
+/* END RADIO MODES */

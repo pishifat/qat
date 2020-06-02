@@ -1,3 +1,5 @@
+import Axios from 'axios';
+
 function calculateMonthScore(modCount, modeValue) {
     if (!modCount) modCount = 0;
 
@@ -46,7 +48,7 @@ $(function() {
 
         $('#calculateScore').attr('disabled', true);
         $('#calcWait').text('Retrieving info... (this will take a few seconds)');
-        const res = await axios.get(`/modsCount/${userId}`);
+        const res = await Axios.get(`/modsCount/${userId}`);
         $('#calcWait').text('');
         $('#calculateScore').attr('disabled', false);
 

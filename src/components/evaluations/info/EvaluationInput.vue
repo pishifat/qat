@@ -1,38 +1,40 @@
 <template>
     <div>
         <div class="row">
-            <div class="col-sm-8">
-                <p class="text-shadow min-spacing mb-1">
-                    Modding comments:
+            <div class="col-sm-12">
+                <p>
+                    <b>Modding comments:</b>
                 </p>
+
                 <div class="form-group">
                     <textarea
                         id="moddingComments"
                         v-model="moddingComment"
-                        class="form-control dark-textarea"
-                        style="white-space: pre-line;"
+                        class="form-control"
                         rows="4"
                         maxlength="3000"
                     />
                 </div>
             </div>
-            <div class="col-sm-4">
-                <p class="text-shadow min-spacing mb-1">
-                    Behavior comments:
+
+            <div class="col-sm-12">
+                <p>
+                    <b>Behavior comments:</b>
                 </p>
+
                 <div class="form-group">
                     <textarea
                         id="behaviorComments"
                         v-model="behaviorComment"
-                        class="form-control dark-textarea"
-                        style="white-space: pre-line;"
+                        class="form-control"
                         rows="4"
                         maxlength="3000"
                     />
                 </div>
             </div>
         </div>
-        <div class="d-flex justify-content-end mb-2">
+
+        <div class="form-inline justify-content-end">
             <div class="form-check form-check-inline">
                 <input
                     id="1"
@@ -42,7 +44,7 @@
                     name="vote"
                     value="1"
                 >
-                <label class="form-check-label text-shadow vote-pass" for="1">Pass</label>
+                <label class="form-check-label text-pass" for="1">Pass</label>
             </div>
             <div class="form-check form-check-inline">
                 <input
@@ -53,7 +55,7 @@
                     name="vote"
                     value="2"
                 >
-                <label class="form-check-label text-shadow vote-neutral" for="2">{{ isApplication ? 'Neutral' : 'Probation' }}</label>
+                <label class="form-check-label text-neutral" for="2">{{ isApplication ? 'Neutral' : 'Probation' }}</label>
             </div>
             <div class="form-check form-check-inline">
                 <input
@@ -64,10 +66,9 @@
                     name="vote"
                     value="3"
                 >
-                <label class="form-check-label text-shadow vote-fail" for="3">Fail</label>
+                <label class="form-check-label text-fail" for="3">Fail</label>
             </div>
-        </div>
-        <div class="d-flex justify-content-end">
+
             <button class="btn btn-sm btn-nat" @click="submitEval($event)">
                 {{ evaluationId ? 'Update Evaluation' : 'Submit Evaluation' }}
             </button>

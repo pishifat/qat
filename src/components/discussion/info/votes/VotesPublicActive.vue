@@ -1,7 +1,7 @@
 <template>
     <div>
-        <p class="min-spacing text-shadow">
-            Total votes ({{ selectedDiscussionVote.mediations.length }}):
+        <p>
+            <b>Total votes</b> ({{ selectedDiscussionVote.mediations.length }}):
         </p>
         <ul>
             <li v-for="mediation in selectedDiscussionVote.mediations" :key="mediation.id" class="small">

@@ -1,63 +1,54 @@
 <template>
-    <div id="editReason" class="modal fade" tabindex="-1">
-        <div class="modal-dialog">
-            <div v-if="selectedEvent" class="modal-content custom-bg-dark">
-                <div class="modal-header text-dark bg-nat-logo">
-                    <h5 class="modal-title">
-                        Edit {{ selectedEvent.eventType == 'Disqualified' ? 'disqualification' : 'nomination reset' }}
-                    </h5>
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span>&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="container text-shadow">
-                        <p>
-                            Mapset:
-                            <a
-                                :href="selectedEvent.postId ?
-                                    'https://osu.ppy.sh/beatmapsets/' + selectedEvent.beatmapsetId + '/discussion/-/generalAll#/' + selectedEvent.postId :
-                                    'https://osu.ppy.sh/beatmapsets/' + selectedEvent.beatmapsetId + '/discussion/-/events'"
-                                target="_blank"
-                            >
-                                {{ selectedEvent.metadata }}
-                            </a>
-                        </p>
-                        <div class="d-flex">
-                            <textarea
-                                v-model="newEventContent"
-                                class="form-control form-control-sm dark-textarea mr-2"
-                                type="text"
-                                rows="4"
-                                maxlength="1000"
-                            />
-                            <button class="btn btn-xs btn-nat align-self-center" @click="updateContent($event);">
-                                Save
-                            </button>
-                        </div>
-                        <obviousness-severity
-                            class="small"
-                            :obviousness="selectedEvent.obviousness"
-                            :severity="selectedEvent.severity"
-                            :event-id="selectedEvent._id"
-                            :event-type="selectedEvent.eventType"
-                        />
-                    </div>
-                </div>
-            </div>
+    <modal-dialog
+        id="editReason"
+        :title="title"
+    >
+        <div v-if="selectedEvent" class="container">
+            <p>
+                <b>Mapset:</b>
+                <a
+                    :href="selectedEvent.postId ?
+                        'https://osu.ppy.sh/beatmapsets/' + selectedEvent.beatmapsetId + '/discussion/-/generalAll#/' + selectedEvent.postId :
+                        'https://osu.ppy.sh/beatmapsets/' + selectedEvent.beatmapsetId + '/discussion/-/events'"
+                    target="_blank"
+                >
+                    {{ selectedEvent.metadata }}
+                </a>
+            </p>
+
+            <textarea
+                v-model="newEventContent"
+                class="form-control form-control-sm mr-2"
+                type="text"
+                rows="4"
+                maxlength="1000"
+            />
+
+            <button class="btn btn-sm btn-block btn-nat mb-2" @click="updateContent($event)">
+                Save
+            </button>
+
+            <obviousness-severity
+                :obviousness="selectedEvent.obviousness"
+                :severity="selectedEvent.severity"
+                :event-id="selectedEvent._id"
+                :event-type="selectedEvent.eventType"
+            />
         </div>
-    </div>
+    </modal-dialog>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
 import postData from '../../mixins/postData.js';
 import ObviousnessSeverity from '../evaluations/currentBnEvaluations/currentBnInfo/ObviousnessSeverity.vue';
+import ModalDialog from '../ModalDialog.vue';
 
 export default {
     name: 'DataCollectionInfo',
     components: {
         ObviousnessSeverity,
+        ModalDialog,
     },
     mixins: [postData],
     data() {
@@ -69,6 +60,11 @@ export default {
         ...mapGetters([
             'selectedEvent',
         ]),
+        title () {
+            if (!this.selectedEvent) return '';
+
+            return `Edit ${this.selectedEvent.eventType == 'Disqualified' ? 'disqualification' : 'nomination reset'}`;
+        },
     },
     watch: {
         selectedEvent() {

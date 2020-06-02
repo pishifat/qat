@@ -1,22 +1,26 @@
 <template>
-    <p class="text-shadow">
-        Cooldown:
+    <p class="form-inline">
+        <b>Cooldown:</b>
         <input
             id="day"
             v-model="days"
             type="text"
             placeholder="days"
             maxlength="3"
-            style="min-width: 60px; width: 60px;"
+            style="width: 60px"
+            class="form-control mx-2"
             @change="setCooldownDate($event)"
         >
-        <span class="small" :class="invalidDate ? 'errors' : ''">
-            {{ invalidDate ? 'Invalid date!' : 'User can reapply on ' + newCooldownDate.toString().slice(4,15) }}<span
+        <span class="small" :class="invalidDate ? 'text-danger' : 'text-secondary'">
+            {{ invalidDate ? 'Invalid date!' : 'User can reapply on ' + newCooldownDate.toString().slice(4,15) }}
+            <span
                 v-if="calculateDays != parseInt(days) && !invalidDate"
                 data-toggle="tooltip"
                 data-placement="top"
                 title="not saved"
-            >*</span>
+            >
+                *
+            </span>
         </span>
     </p>
 </template>

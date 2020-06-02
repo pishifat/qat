@@ -1,44 +1,21 @@
 <template>
-    <div
-        class="col-lg-3 col-md-4 col-sm-6 my-2"
-        @click="selectEvalRound()"
-    >
-        <div
-            class="card border-outline"
-            :class="[isSelected ? 'selected-card' : '', 'border-' + findRelevantEval(), isNatEvaluator() ? 'card-bg-priority' : 'custom-bg-dark']"
-            data-toggle="modal"
-            :data-target="isArchive ? '#currentBnArchiveInfo' : '#currentBnDiscussionInfo'"
-            :data-user="evalRound.id"
-        >
-            <card-header
-                :username="evalRound.bn.username"
-                :osu-id="evalRound.bn.osuId"
-                :consensus="evalRound.consensus"
-            />
-            <card-footer
-                :mode="evalRound.mode"
-                :nominator-assessment-mongo-id="evalRound.id"
-                :evaluations="evalRound.evaluations"
-                :is-discuss="true"
-                :date="evalRound.deadline"
-                :is-archive="isArchive"
-                :feedback="evalRound.feedback"
-                @check-selection="checkSelection()"
-            />
-        </div>
-    </div>
+    <evaluation-card
+        :target="isArchive ? '#currentBnArchiveInfo' : '#currentBnDiscussionInfo'"
+        :evaluation-round="evalRound"
+        :is-discuss="true"
+        :all-checked="allChecked"
+        :is-archive="isArchive"
+        @select-evaluation-round="selectEvalRound()"
+    />
 </template>
 
 <script>
-import { mapState } from 'vuex';
-import CardHeader from '../card/CardHeader.vue';
-import CardFooter from '../card/CardFooter.vue';
+import EvaluationCard from './EvaluationCard.vue';
 
 export default {
     name: 'CurrentBnDiscussionCard',
     components: {
-        CardHeader,
-        CardFooter,
+        EvaluationCard,
     },
     props: {
         evalRound: {
@@ -48,73 +25,10 @@ export default {
         allChecked: Boolean,
         isArchive: Boolean,
     },
-    data() {
-        return {
-            isSelected: false,
-        };
-    },
-    computed: {
-        ...mapState([
-            'evaluator',
-        ]),
-    },
-    watch: {
-        allChecked() {
-            this.checkSelection();
-        },
-    },
     methods: {
         selectEvalRound() {
             this.$store.commit('setSelectedDiscussRoundId', this.evalRound.id);
         },
-        findRelevantEval() {
-            let vote;
-            this.evalRound.evaluations.forEach(ev => {
-                if (ev.evaluator.id == this.evaluator.id) {
-                    if (ev.vote == 1) {
-                        vote = 'green';
-                    } else if (ev.vote == 2) {
-                        vote = 'blue';
-                    } else {
-                        vote = 'red';
-                    }
-                }
-            });
-
-            return vote;
-        },
-        createDeadline(date) {
-            date = new Date(date);
-            date = new Date(date.setDate(date.getDate() + 14)).toString().slice(4, 10);
-
-            return date;
-        },
-        checkSelection() {
-            if ($(`#${this.evalRound.id}-check`).is(':checked')) {
-                this.isSelected = true;
-            } else {
-                this.isSelected = false;
-            }
-        },
-        isNatEvaluator() {
-            if (!this.evalRound.natEvaluators) return false;
-
-            for (let i = 0; i < this.evalRound.natEvaluators.length; i++) {
-                let user = this.evalRound.natEvaluators[i];
-
-                if (user.id == this.evaluator.id) {
-                    return true;
-                }
-            }
-
-            return false;
-        },
     },
 };
 </script>
-
-<style>
-.card {
-    min-height: 80px;
-}
-</style>

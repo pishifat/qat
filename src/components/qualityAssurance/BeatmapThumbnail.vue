@@ -1,16 +1,10 @@
 <template>
-    <div>
-        <a
-            :href="'https://osu.ppy.sh/beatmapsets/' + beatmapsetId"
-            target="_blank"
-            class="text-shadow"
-        >
-            <img
-                class="beatmap-thumbnail"
-                :src="'https://b.ppy.sh/thumb/' + beatmapsetId + '.jpg'"
-            >
-        </a>
-    </div>
+    <a
+        :href="'https://osu.ppy.sh/beatmapsets/' + beatmapsetId"
+        target="_blank"
+        class="beatmap-thumbnail shadow"
+        :style="`background-image: url(https://b.ppy.sh/thumb/${beatmapsetId}.jpg)`"
+    />
 </template>
 
 <script>
@@ -26,11 +20,13 @@ export default {
 </script>
 
 <style>
-    .beatmap-thumbnail {
-        width: 80px;
-        height: 60px;
-        border-top-left-radius: 5px;
-        box-shadow: 1px 1px 1px 1px rgb(12, 14, 17);
-    }
-</style>
 
+.beatmap-thumbnail {
+    width: 80px;
+    height: 60px;
+    border-top-left-radius: 5px;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+</style>

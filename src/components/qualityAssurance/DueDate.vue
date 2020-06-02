@@ -1,10 +1,11 @@
 <template>
-    <div class="small mt-2 d-flex align-items-center">
-        <div class="col-sm-12">
+    <div class="small">
+        <div>
             Due by
         </div>
-        <div class="col-sm-12 truncate errors">
-            {{ deadline }}
+
+        <div class="text-truncate text-danger">
+            <b>{{ deadline }}</b>
         </div>
     </div>
 </template>

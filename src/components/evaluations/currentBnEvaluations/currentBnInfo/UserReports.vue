@@ -1,23 +1,27 @@
 <template>
     <div>
-        <p class="min-spacing text-shadow">
-            Reports:
+        <p>
+            <b>Reports:</b>
         </p>
-        <ul>
-            <li v-if="!userReports" class="small min-spacing text-shadow">
+
+        <ul class="small text-secondary">
+            <li v-if="!userReports">
                 ...
             </li>
-            <li v-else-if="!userReports.length" class="small min-spacing text-shadow">
+            <li v-else-if="!userReports.length">
                 User has no reports
             </li>
             <li
                 v-for="report in userReports"
                 v-else
                 :key="report.id"
-                class="small text-shadow"
             >
                 <a :href="'http://bn.mappersguild.com/managereports?report=' + report.id">{{ report.createdAt.slice(0,10) }}</a>
-                <pre class="secondary-text pre-font ml-2" :class="report.valid == 1 ? 'vote-green' : 'vote-yellow'"> <span v-html="filterLinks(report.reason)" /></pre>
+                <div
+                    class="pre-line"
+                    :class="report.valid == 1 ? 'text-success' : ''"
+                    v-html="filterLinks(report.reason)"
+                />
             </li>
         </ul>
     </div>

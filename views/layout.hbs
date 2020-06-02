@@ -6,118 +6,130 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>{{title}}</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
-        integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-    <link rel="stylesheet" href="../css/css.css">
     <link rel="icon" type="image/png" href="../images/qatlogo.png">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" 
         integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <link rel="stylesheet" href="/css/app.css">
 </head>
 
-<body class="text-light px-0">
+<body 
+    {{#unless loggedInAs}}
+    class="body-triangles"
+    {{/unless}}
+>
     {{#if loggedInAs}}
-    <nav id="top" class="navbar navbar-expand-md navbar-dark navbar-nat" style="position:absolute; width:100%">
-        <a class="navbar-brand" href="/">
-            <img src="../images/qatlogo.png" width="48" height="48" style="border-radius: 32px 32px 32px 32px; filter: drop-shadow(1px 1px 1px #000000);" alt="">
-        </a>
-
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        
-        <div class="collapse navbar-collapse" id="navbar">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item">
-                    <a class="nav-link text-shadow {{#if isBnApp}}main-text{{/if}}" href="/bnapps">BN Application</a>
-                </li>
-                {{#unless isNat}}
-                <li class="nav-item">
-                    <a class="nav-link text-shadow {{#if isReports}}main-text{{/if}}" href="/reports">Reports</a>
-                </li>
-                {{else}}
-                <li class="nav-item dropdown">
-                    <a class="nav-link text-shadow dropdown-toggle {{#if isReports}}main-text{{/if}}" href="#" data-toggle="dropdown">
-                        Reports
-                    </a>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="/reports">Reports</a>
-                        <a class="dropdown-item" href="/managereports">Manage Reports</a>
-                    </div>
-                </li>
-                {{/unless}}
-                <li class="nav-item">
-                    <a class="nav-link text-shadow {{#if isUsers}}main-text{{/if}}" href="/users">Users</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-shadow {{#if isVetoes}}main-text{{/if}}" href="/vetoes">Vetoes</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-shadow {{#if isQualityAssurance}}main-text{{/if}}" href="/qualityassurance">Quality Assurance</a>
-                </li>
-                {{#if isBn}}
-                <li class="nav-item">
-                    <a class="nav-link text-shadow {{#if isDiscussionVote}}main-text{{/if}}" href="/discussionvote">Discussion Vote</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-shadow {{#if isEval}}main-text{{/if}}" href="/appeval">BN Application Evaluations</a>
-                </li>
-                {{/if}}
-                {{#if isNat}}
-                <li class="nav-item">
-                    <a class="nav-link text-shadow {{#if isDiscussionVote}}main-text{{/if}}" href="/discussionvote">Discussion Vote</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link text-shadow dropdown-toggle {{#if isEval}}main-text{{/if}}" href="#" data-toggle="dropdown">
-                        Evaluations
-                    </a>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="/appeval">Applications</a>
-                        <a class="dropdown-item" href="/bneval">Current BNs</a>
-                        <a class="dropdown-item" href="/evalarchive">Archive</a>
-                        <a class="dropdown-item" href="/datacollection">Data collection</a>
-                    </div>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link text-shadow dropdown-toggle {{#if isTest}}main-text{{/if}}" href="#" data-toggle="dropdown">
-                        RC Test
-                    </a>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="/managetest">Questions</a>
-                        <a class="dropdown-item" href="/testresults">Results</a>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-shadow {{#if isLogs}}main-text{{/if}}" href="/logs">Logs</a>
-                </li>
-                {{/if}}
-            </ul>
-        </div>
-    </nav>
+    <header>
+        <nav 
+            id="top" 
+            class="navbar navbar-expand-md navbar-dark navbar-nat" 
+        >
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse justify-content-center" id="navbar">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link {{#if isIndex}}active{{/if}}" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{#if isBnApp}}active{{/if}}" href="/bnapps">BN Application</a>
+                    </li>
+                    {{#unless isNat}}
+                    <li class="nav-item">
+                        <a class="nav-link {{#if isReports}}active{{/if}}" href="/reports">Reports</a>
+                    </li>
+                    {{else}}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle {{#if isReports}}active{{/if}}" href="#" data-toggle="dropdown">
+                            Reports
+                        </a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="/reports">Reports</a>
+                            <a class="dropdown-item" href="/managereports">Manage Reports</a>
+                        </div>
+                    </li>
+                    {{/unless}}
+                    <li class="nav-item">
+                        <a class="nav-link {{#if isUsers}}active{{/if}}" href="/users">Users</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{#if isVetoes}}active{{/if}}" href="/vetoes">Vetoes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{#if isQualityAssurance}}active{{/if}}" href="/qualityassurance">Quality Assurance</a>
+                    </li>
+                    {{#if isBn}}
+                    <li class="nav-item">
+                        <a class="nav-link {{#if isDiscussionVote}}active{{/if}}" href="/discussionvote">Discussion Vote</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{#if isEval}}active{{/if}}" href="/appeval">BN Application Evaluations</a>
+                    </li>
+                    {{/if}}
+                    {{#if isNat}}
+                    <li class="nav-item">
+                        <a class="nav-link {{#if isDiscussionVote}}active{{/if}}" href="/discussionvote">Discussion Vote</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle {{#if isEval}}active{{/if}}" href="#" data-toggle="dropdown">
+                            Evaluations
+                        </a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="/appeval">Applications</a>
+                            <a class="dropdown-item" href="/bneval">Current BNs</a>
+                            <a class="dropdown-item" href="/evalarchive">Archive</a>
+                            <a class="dropdown-item" href="/datacollection">Data collection</a>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle {{#if isTest}}active{{/if}}" href="#" data-toggle="dropdown">
+                            RC Test
+                        </a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="/managetest">Questions</a>
+                            <a class="dropdown-item" href="/testresults">Results</a>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{#if isLogs}}active{{/if}}" href="/logs">Logs</a>
+                    </li>
+                    {{/if}}
+                </ul>
+            </div>
+        </nav>
+    </header>
     {{/if}}
     
+    {{#if isIndex}}
+        <div
+            class="container py-4 {{#if loggedInAs}} body-content-padding {{/if}}"
+        >
+            {{{body}}}
+        </div>
+    {{/if}}
+
+    {{#unless isIndex}}
     <div id="loading">
-        <img src="../images/rip.svg">
+        <img src="/images/rip.svg">
     </div>
 
     <div id="main">
-        <header class="container-fluid text-white text-center">
-            {{#if isIndex}}<div class="text-center mb-4">
-                <img src="../images/qatlogo.png" style="border-radius: 100%">
+        <div class="container pb-4">
+            <div class="card">
+                <div class="card-header d-flex align-items-center">
+                    <div class="card-header-img"></div>
+                    <h4 class="mb-0">{{title}}</h4>
+                </div>
             </div>
-            {{else}}
-            <img src="../images/cat.png" class="header-img">
-            <div class="header-img-overlay">
-                <h3 class="header-img-overlay-title">{{title}}</h3>
-            </div>
-              {{/if}}
-        </header>
-      
-        <div class="container">
+
             {{{body}}}
         </div>
     </div>
+    {{/unless}}
 
+    <script src="/javascripts/app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
         integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"

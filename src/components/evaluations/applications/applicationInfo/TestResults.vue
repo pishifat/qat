@@ -1,7 +1,7 @@
 <template>
     <div>
-        <p class="text-shadow">
-            Test results:
+        <p>
+            <b>Test results:</b>
             <a
                 :href="`http://bn.mappersguild.com/testresults?user=${osuId}`"
                 target="_blank"
@@ -34,11 +34,11 @@ export default {
     methods: {
         scoreColor() {
             if (this.testScore > 15) {
-                return 'vote-green';
+                return 'text-success';
             } else if (this.testScore > 12.5) {
-                return 'vote-yellow';
+                return 'text-neutral';
             } else {
-                return 'vote-red';
+                return 'text-danger';
             }
         },
     },

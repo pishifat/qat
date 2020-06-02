@@ -1,21 +1,25 @@
 <template>
-    <div class="card-footer small d-flex justify-content-start align-items-center">
+    <div class="card-footer d-flex justify-content-start align-items-center">
         <i v-if="mode == 'osu'" class="far fa-circle mx-1" />
         <i v-else-if="mode == 'taiko'" class="fas fa-drum mx-1" />
         <i v-else-if="mode == 'catch'" class="fas fa-apple-alt mx-1" />
         <i v-else-if="mode == 'mania'" class="fas fa-stream mx-1" />
+
         <span
             v-if="isNat && !isDiscuss"
-            class="badge badge-none mx-1"
+            class="badge badge-info mx-1"
             data-toggle="tooltip"
             data-placement="top"
             :title="separateEvals()"
-        >{{ evaluations.length }}
+        >
+            {{ evaluations.length }}
         </span>
+
         <add-votes
             v-else-if="isNat && isDiscuss"
             :evaluations="evaluations"
         />
+
         <i
             v-if="feedback"
             data-toggle="tooltip"
@@ -23,7 +27,8 @@
             title="feedback written"
             class="fas fa-comment mx-1"
         />
-        <span class="errors mx-1 ml-auto">
+
+        <span class="mr-1 ml-auto small">
             <i
                 class="fas fa-clock mr-1"
                 data-toggle="tooltip"
@@ -32,6 +37,7 @@
             />
             {{ createDeadline() }}
         </span>
+
         <input
             v-if="isNat && !isArchive"
             :id="nominatorAssessmentMongoId + '-check'"

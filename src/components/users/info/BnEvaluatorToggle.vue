@@ -1,13 +1,13 @@
 <template>
     <div>
-        <p class="text-shadow">
-            BN application input:
-            <span :class="{ 'vote-fail': !selectedUser.isBnEvaluator, 'vote-pass': selectedUser.isBnEvaluator }">
+        <p>
+            <b>BN application input:</b>
+            <span :class="{ 'text-danger': !selectedUser.isBnEvaluator, 'text-success': selectedUser.isBnEvaluator }">
                 {{ selectedUser.isBnEvaluator ? 'Enabled' : 'Disabled' }}
             </span>
             <button
                 class="btn btn-sm ml-2"
-                :class="{ 'btn-nat-green': !selectedUser.isBnEvaluator, 'btn-nat-red': selectedUser.isBnEvaluator }"
+                :class="{ 'btn-success': !selectedUser.isBnEvaluator, 'btn-danger': selectedUser.isBnEvaluator }"
                 data-toggle="tooltip"
                 data-placement="top"
                 title="Toggle ability to give input on BN applications"

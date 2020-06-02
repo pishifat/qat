@@ -1,25 +1,22 @@
 <template>
     <div>
         <div v-if="selectedReport.isActive">
-            <p class="text-shadow min-spacing mb-1">
-                Feedback:
+            <p>
+                <b>Feedback:</b>
             </p>
 
-            <p class="small text-shadow ml-2">
+            <p class="small ml-2">
                 This will be sent to the reporter in a forum PM. Include the consensus and any actions being taken.
             </p>
 
-            <div class="form-group mt-2">
-                <textarea
-                    id="feedback"
-                    v-model="feedback"
-                    class="form-control dark-textarea"
-                    style="white-space: pre-line;"
-                    rows="4"
-                />
-            </div>
+            <textarea
+                id="feedback"
+                v-model="feedback"
+                class="form-control mb-2"
+                rows="4"
+            />
 
-            <div class="d-flex justify-content-end mb-2">
+            <div class="form-inline justify-content-end">
                 <div class="form-check form-check-inline">
                     <input
                         id="1"
@@ -29,7 +26,7 @@
                         name="vote"
                         value="1"
                     >
-                    <label class="form-check-label text-shadow vote-pass" for="1">Valid</label>
+                    <label class="form-check-label text-success" for="1">Valid</label>
                 </div>
                 <div class="form-check form-check-inline">
                     <input
@@ -40,7 +37,7 @@
                         name="vote"
                         value="2"
                     >
-                    <label class="form-check-label text-shadow vote-neutral" for="2">Partially valid</label>
+                    <label class="form-check-label text-neutral" for="2">Partially valid</label>
                 </div>
                 <div class="form-check form-check-inline">
                     <input
@@ -51,12 +48,13 @@
                         name="vote"
                         value="3"
                     >
-                    <label class="form-check-label text-shadow vote-fail" for="3">Invalid</label>
+                    <label class="form-check-label text-danger" for="3">Invalid</label>
                 </div>
             </div>
-            <div class="d-flex justify-content-end mb-3">
+
+            <div class="form-inline justify-content-end">
                 <button
-                    class="btn btn-sm btn-nat mx-1"
+                    class="btn btn-sm btn-success mx-1"
                     data-toggle="tooltip"
                     data-placement="top"
                     title="Generates feedback PM and stores feedback/validity inputs"
@@ -65,7 +63,7 @@
                     Save Report Evaluation
                 </button>
                 <button
-                    class="btn btn-sm btn-nat-red mx-1"
+                    class="btn btn-sm btn-danger mx-1"
                     data-toggle="tooltip"
                     data-placement="top"
                     title="Disables feedback/validity inputs and reveals reporter"

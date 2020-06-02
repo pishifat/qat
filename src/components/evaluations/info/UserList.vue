@@ -1,21 +1,23 @@
 <template>
     <div>
-        <p class="text-shadow min-spacing">
-            {{ header }}
+        <p>
+            <b>{{ header }}</b>
         </p>
         <ul>
-            <li v-for="user in userList" :key="user.id" class="small text-shadow">
-                {{ user.username }}
+            <li v-for="user in userList" :key="user.id" class="small">
                 <a
                     v-if="nominatorAssessmentMongoId"
                     href="#"
                     data-toggle="tooltip"
                     data-placement="top"
                     title="replace user"
+                    class="mr-1"
                     @click.prevent="replaceUser(user.id, $event);"
                 >
-                    <i class="fas fa-redo-alt vote-pass" />
+                    <i class="fas fa-redo-alt text-success" />
                 </a>
+
+                {{ user.username }}
             </li>
         </ul>
     </div>

@@ -1,0 +1,134 @@
+//
+// Color system
+//
+
+$white:    #fff;
+$gray-100: #f8f9fa;
+$gray-200: #ebebeb;
+$gray-300: #dee2e6;
+$gray-400: #ced4da;
+$gray-500: #adb5bd;
+$gray-600: #999;
+$gray-700: #444;
+$gray-800: #303030;
+$gray-900: #222;
+$black:    #000;
+
+$blue-gray:         #22282a;
+$bright-blue-gray:  #2d3b42;
+$blue:    #3b74b1;
+$indigo:  #6f27e2;
+$purple:  #795fa6;
+$pink:    #e83e8c;
+$red:     #E74C3C;
+$orange:  #fd7e14;
+$yellow:  #F39C12;
+$green:   #7b9351;
+$teal:    #20c997;
+$cyan:    #3688bf;
+
+$primary:       lighten($bright-blue-gray, 7%);
+$secondary:     hsl(196, 11%, 80%);
+$success:       $green;
+$info:          $cyan;
+$warning:       $yellow;
+$danger:        $red;
+$light:         $gray-600;
+$dark:          $gray-800;
+
+$theme-colors: (
+  "nat": $primary,
+  "bn": $indigo,
+  "probation": $purple,
+  "pass": $success,
+  "neutral": $gray-500,
+  "fail": $danger,
+  "blue-gray": $blue-gray,
+  "bright-blue-gray": $bright-blue-gray
+);
+
+$component-active-bg: $gray-900;
+$yiq-contrasted-threshold:  175;
+
+// Typography
+
+@import url('https://fonts.googleapis.com/css2?family=Baloo+Tamma+2:wght@400;500;600;700;800&display=swap');
+
+$font-family-base:                  'Baloo Tamma 2', sans-serif;
+$paragraph-margin-bottom:           0.5rem;
+$small-font-size:                   85%;
+
+// Body
+
+$body-bg:                         rgb(23, 26, 28);
+$body-color:                      $white;
+
+// Links
+
+$link-color:                      rgb(166, 200, 217);
+
+// Forms
+
+$input-height-border:               3px;
+$input-bg:                        rgb(59, 71, 73);
+$input-color:                     #fff;
+$input-border-color:                transparent;
+$input-border-width:                3px;
+$input-focus-border-color:          rgb(101, 119, 122);
+$input-disabled-bg:                 $gray-700;
+
+$input-group-addon-color:           $gray-500;
+$input-group-addon-bg:              $gray-700;
+
+$custom-file-color:                 $gray-500;
+$custom-file-border-color:          $gray-700;
+
+// Dropdowns
+
+$dropdown-bg:                       $gray-900;
+$dropdown-border-color:             $gray-700;
+$dropdown-divider-bg:               $gray-700;
+
+$dropdown-link-color:               $white;
+$dropdown-link-hover-color:         $white;
+$dropdown-link-hover-bg:            $primary;
+
+// Navs
+
+$nav-link-padding-x:                2rem;
+$nav-link-disabled-color:           $gray-500;
+
+$nav-tabs-border-color:             $gray-700;
+$nav-tabs-link-hover-border-color:  $nav-tabs-border-color $nav-tabs-border-color transparent;
+$nav-tabs-link-active-color:        $white;
+$nav-tabs-link-active-border-color: $nav-tabs-border-color $nav-tabs-border-color transparent;
+
+// Navbar
+
+$navbar-padding-y:                  1rem;
+
+$navbar-dark-color:                 rgba($white,.75);
+$navbar-dark-hover-color:           $white;
+
+// Cards
+
+$card-cap-bg:                       $bright-blue-gray;
+$card-bg:                           $blue-gray;
+
+// Modals
+
+$modal-content-bg:                  lighten($blue-gray, 5%);
+$modal-content-border-color:        lighten($blue-gray, 5%);
+
+$modal-header-border-color:         lighten($blue-gray, 5%);
+
+// Close
+
+$close-color:                       $white;
+$close-text-shadow:                 none;
+
+// Shadows
+
+$box-shadow-sm:               0 1px 1px rgba(0, 0, 0, .075) !default;
+$box-shadow:                  0 1px 3px rgba(0, 0, 0, .25) !default;
+$box-shadow-lg:               0 1px 3px rgba(0, 0, 0, .5) !default;

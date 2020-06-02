@@ -1,6 +1,6 @@
 <template>
     <div class="row">
-        <div :class="bnEvaluators.length ? 'col-sm-4' : 'col-sm-6'">
+        <div :class="bnEvaluators.length ? 'col-lg-4' : 'col-sm-6'">
             <user-list
                 :header="'Assigned NAT:'"
                 :user-list="natEvaluators"
@@ -9,7 +9,7 @@
                 :replace-nat="true"
             />
         </div>
-        <div v-if="bnEvaluators.length" class="col-sm-4">
+        <div v-if="bnEvaluators.length" class="col-lg-4">
             <user-list
                 :header="'Assigned BN:'"
                 :user-list="bnEvaluators"
@@ -17,7 +17,7 @@
                 :nominator-assessment-mongo-id="nominatorAssessmentMongoId"
             />
         </div>
-        <div :class="bnEvaluators.length ? 'col-sm-4' : 'col-sm-6'">
+        <div :class="bnEvaluators.length ? 'col-lg-4' : 'col-sm-6'">
             <user-list
                 :header="'Total evaluations: (' + evaluations.length + ')'"
                 :user-list="submittedEvaluators"
@@ -27,12 +27,12 @@
             <button class="btn btn-sm btn-nat mb-2 w-100" @click="selectBnEvaluators($event)">
                 {{ potentialBnEvaluators ? 'Re-select BN Evaluators' : 'Select BN Evaluators' }}
             </button>
-            <button v-if="potentialBnEvaluators && potentialBnEvaluators.length" class="btn btn-sm btn-nat-red mb-2 w-100" @click="enableBnEvaluators($event)">
+            <button v-if="potentialBnEvaluators && potentialBnEvaluators.length" class="btn btn-sm btn-danger mb-2 w-100" @click="enableBnEvaluators($event)">
                 Enable BN evaluations
             </button>
             <div class="row">
                 <div class="col-sm-6">
-                    <span class="text-shadow">Include specific user(s):</span>
+                    <span>Include specific user(s):</span>
                     <input
                         v-model="includeUsers"
                         class="ml-2 w-100 small"
@@ -41,7 +41,7 @@
                     >
                 </div>
                 <div class="col-sm-6">
-                    <span class="text-shadow">Exclude specific user(s):</span>
+                    <span>Exclude specific user(s):</span>
                     <input
                         v-model="excludeUsers"
                         class="ml-2 w-100 small"
@@ -50,19 +50,19 @@
                     >
                 </div>
             </div>
-            <div v-if="potentialBnEvaluators" class="text-shadow">
+            <div v-if="potentialBnEvaluators">
                 <p class="my-3">
                     Users:
                 </p>
-                <div id="usernames" class="copy-paste mb-4" style="width: 25%">
-                    <ul style="list-style-type: none; padding: 0">
+                <div id="usernames" class="mb-4">
+                    <ul class="small">
                         <li v-for="user in potentialBnEvaluators" :key="user.id">
-                            <samp class="small">{{ user.username }}</samp>
+                            {{ user.username }}
                         </li>
                     </ul>
                 </div>
                 <p>Forum message:</p>
-                <div id="forumMessage" class="copy-paste">
+                <div id="forumMessage">
                     <samp class="small">Hello!</samp><br><br>
                     <samp class="small">You have been selected to help evaluate the [i]{{ mode == 'osu' ? 'osu!' : 'osu!' + mode }}[/i] mode BN application for [url=https://osu.ppy.sh/users/{{ osuId }}]{{ username }}[/url].</samp><br><br>
                     <samp class="small">Please post your thoughts on the applicant's behavior and modding quality (based on submitted mods and anything else you may know) on the [url=http://bn.mappersguild.com/appeval]BN/NAT website[/url].</samp><br><br>

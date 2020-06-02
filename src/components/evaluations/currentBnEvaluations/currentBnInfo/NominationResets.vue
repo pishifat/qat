@@ -1,43 +1,33 @@
 <template>
     <div>
-        <p class="text-shadow min-spacing">
+        <p>
             <a :href="events && `#${eventsId}`" data-toggle="collapse">{{ header }} <i class="fas fa-angle-down" /></a>
             ({{ isLoading ? '...' : events ? events.length : '0' }})
         </p>
         <div v-if="events" :id="eventsId" class="collapse">
-            <table v-if="events.length" class="table table-sm table-dark table-hover col-md-12 mt-2">
-                <thead>
-                    <td scope="col" class="w-10">
-                        Date
+            <data-table
+                v-if="events.length"
+                :headers="['Date', 'Mapset', 'Reason']"
+            >
+                <tr v-for="event in events" :key="event._id">
+                    <td class="text-nowrap">
+                        {{ new Date(event.timestamp).toString().slice(4,10) }}
                     </td>
-                    <td scope="col" class="w-30">
-                        Mapset
+                    <td class="w-25">
+                        <a :href="event.postId ? 'https://osu.ppy.sh/beatmapsets/' + event.beatmapsetId + '/discussion/-/generalAll#/' + event.postId : 'https://osu.ppy.sh/beatmapsets/' + event.beatmapsetId + '/discussion/-/events'" target="_blank">
+                            <i v-if="event.modes.includes('osu')" class="far fa-circle" />
+                            <i v-if="event.modes.includes('taiko')" class="fas fa-drum" />
+                            <i v-if="event.modes.includes('catch')" class="fas fa-apple-alt" />
+                            <i v-if="event.modes.includes('mania')" class="fas fa-stream" />
+                            {{ event.metadata }}
+                        </a>
                     </td>
-                    <td scope="col" class="w-60">
-                        Reason
-                    </td>
-                </thead>
-                <tbody class="small">
-                    <tr v-for="event in events" :key="event._id">
-                        <td scope="row">
-                            {{ new Date(event.timestamp).toString().slice(4,10) }}
-                        </td>
-                        <td scope="row truncate">
-                            <a :href="event.postId ? 'https://osu.ppy.sh/beatmapsets/' + event.beatmapsetId + '/discussion/-/generalAll#/' + event.postId : 'https://osu.ppy.sh/beatmapsets/' + event.beatmapsetId + '/discussion/-/events'" target="_blank">
-                                <i v-if="event.modes.includes('osu')" class="far fa-circle" />
-                                <i v-if="event.modes.includes('taiko')" class="fas fa-drum" />
-                                <i v-if="event.modes.includes('catch')" class="fas fa-apple-alt" />
-                                <i v-if="event.modes.includes('mania')" class="fas fa-stream" />
-                                {{ event.metadata }}
-                            </a>
-                        </td>
-                        <nomination-reset-editing
-                            :event="event"
-                        />
-                    </tr>
-                </tbody>
-            </table>
-            <p v-else class="small text-shadow ml-4">
+                    <nomination-reset-editing
+                        :event="event"
+                    />
+                </tr>
+            </data-table>
+            <p v-else class="small ml-4">
                 None...
             </p>
         </div>
@@ -47,11 +37,13 @@
 <script>
 import { mapState } from 'vuex';
 import NominationResetEditing from './NominationResetEditing.vue';
+import DataTable from '../../../DataTable.vue';
 
 export default {
     name: 'NominationResets',
     components: {
         NominationResetEditing,
+        DataTable,
     },
     props: {
         events: {

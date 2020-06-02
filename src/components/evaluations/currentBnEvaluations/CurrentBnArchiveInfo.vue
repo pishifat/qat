@@ -1,73 +1,83 @@
 <template>
-    <div id="currentBnArchiveInfo" class="modal fade" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div v-if="selectedDiscussRound" class="modal-content custom-bg-dark">
-                <modal-header
-                    :mode="selectedDiscussRound.mode"
-                    :nat-evaluators="selectedDiscussRound.natEvaluators || []"
-                    :is-application="false"
-                    :osu-id="selectedDiscussRound.bn.osuId"
-                    :username="selectedDiscussRound.bn.username"
+    <modal-dialog
+        id="currentBnArchiveInfo"
+        modal-size="xl"
+    >
+        <template v-if="selectedDiscussRound" #header>
+            <modal-header
+                :mode="selectedDiscussRound.mode"
+                :nat-evaluators="selectedDiscussRound.natEvaluators || []"
+                :is-application="false"
+                :osu-id="selectedDiscussRound.bn.osuId"
+                :username="selectedDiscussRound.bn.username"
+            />
+        </template>
+
+        <div v-if="selectedDiscussRound" class="container">
+            <p>
+                <b>Recent BN activity</b>
+            </p>
+
+            <user-activity
+                :osu-id="selectedDiscussRound.bn.osuId"
+                :modes="modes"
+                :deadline="selectedDiscussRound.deadline"
+                :mongo-id="selectedDiscussRound.bn.id"
+            />
+
+            <p>
+                <a href="#additionalInfo" data-toggle="collapse">
+                    Additional info <i class="fas fa-angle-down" />
+                </a>
+            </p>
+
+            <div id="additionalInfo" class="collapse container">
+                <previous-evaluations
+                    :user-mongo-id="selectedDiscussRound.bn.id"
                 />
-                <div class="modal-body" style="overflow: hidden;">
-                    <div class="container">
-                        <p class="text-shadow min-spacing mb-1">
-                            Recent BN activity
-                        </p>
-                        <div class="container mb-3">
-                            <user-activity
-                                :osu-id="selectedDiscussRound.bn.osuId"
-                                :modes="modes"
-                                :deadline="selectedDiscussRound.deadline"
-                                :mongo-id="selectedDiscussRound.bn.id"
-                            />
-                        </div>
-                    </div>
-                    <div class="container">
-                        <p class="text-shadow">
-                            <a href="#additionalInfo" data-toggle="collapse">Additional info <i class="fas fa-angle-down" /></a>
-                        </p>
-                        <div id="additionalInfo" class="collapse container">
-                            <previous-evaluations
-                                :user-mongo-id="selectedDiscussRound.bn.id"
-                            />
-                            <user-notes
-                                :user-mongo-id="selectedDiscussRound.bn.id"
-                            />
-                            <user-reports
-                                :user-mongo-id="selectedDiscussRound.bn.id"
-                            />
-                        </div>
-                        <hr>
-                        <consensus
-                            :consensus="selectedDiscussRound.consensus"
-                            :nominator-assessment-mongo-id="selectedDiscussRound.id"
-                            :is-low-activity="selectedDiscussRound.isLowActivity"
-                            :resigned-on-good-terms="selectedDiscussRound.resignedOnGoodTerms"
-                            :resigned-on-standard-terms="selectedDiscussRound.resignedOnStandardTerms"
-                            :is-application="false"
-                            :is-archive="true"
-                        />
-                        <p class="min-spacing text-shadow">
-                            Current BN Feedback:
-                        </p>
-                        <pre class="secondary-text pre-font text-shadow small ml-3" v-html="filterLinks(selectedDiscussRound.feedback)" />
-                        <hr v-if="selectedDiscussRound.consensus">
-                        <evaluations
-                            :evaluations="selectedDiscussRound.evaluations"
-                            :consensus="selectedDiscussRound.consensus"
-                        />
-                        <button
-                            class="btn btn-sm btn-nat-red float-right"
-                            @click="unarchive($event);"
-                        >
-                            Un-archive
-                        </button>
-                    </div>
-                </div>
+
+                <user-notes
+                    :user-mongo-id="selectedDiscussRound.bn.id"
+                />
+
+                <user-reports
+                    :user-mongo-id="selectedDiscussRound.bn.id"
+                />
             </div>
+
+            <hr>
+
+            <consensus
+                :consensus="selectedDiscussRound.consensus"
+                :nominator-assessment-mongo-id="selectedDiscussRound.id"
+                :is-low-activity="selectedDiscussRound.isLowActivity"
+                :resigned-on-good-terms="selectedDiscussRound.resignedOnGoodTerms"
+                :resigned-on-standard-terms="selectedDiscussRound.resignedOnStandardTerms"
+                :is-application="false"
+                :is-archive="true"
+            />
+
+            <p>
+                <b>Current BN Feedback:</b>
+            </p>
+
+            <div class="card card-body pre-line small" v-html="filterLinks(selectedDiscussRound.feedback)" />
+
+            <hr v-if="selectedDiscussRound.consensus">
+
+            <evaluations
+                :evaluations="selectedDiscussRound.evaluations"
+                :consensus="selectedDiscussRound.consensus"
+            />
+
+            <button
+                class="btn btn-sm btn-danger float-right"
+                @click="unarchive($event);"
+            >
+                Un-archive
+            </button>
         </div>
-    </div>
+    </modal-dialog>
 </template>
 
 <script>
@@ -81,6 +91,7 @@ import UserReports from './currentBnInfo/UserReports.vue';
 import ModalHeader from '../info/ModalHeader.vue';
 import Consensus from '../info/Consensus.vue';
 import Evaluations from '../info/Evaluations.vue';
+import ModalDialog from '../../ModalDialog.vue';
 
 export default {
     name: 'CurrentBnArchiveInfo',
@@ -92,6 +103,7 @@ export default {
         ModalHeader,
         Consensus,
         Evaluations,
+        ModalDialog,
     },
     mixins: [ filterLinks, postData ],
     computed: {
@@ -142,7 +154,3 @@ export default {
     },
 };
 </script>
-
-<style>
-
-</style>

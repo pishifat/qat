@@ -1,30 +1,28 @@
 <template>
     <div>
-        <div class="d-flex">
-            <textarea
-                v-model="comment"
-                placeholder="new user note..."
-                class="form-control dark-textarea mr-2"
-                style="white-space: pre-line;"
-                rows="2"
-            />
-            <button class="btn btn-sm btn-nat align-self-center" @click="saveNote($event)">
-                Save
-            </button>
-        </div>
+        <textarea
+            v-model="comment"
+            placeholder="new user note..."
+            class="form-control"
+            rows="2"
+        />
+
+        <button class="btn btn-nat btn-block btn-sm" @click="saveNote($event)">
+            Save
+        </button>
 
         <ul class="mt-2">
-            <li v-if="!notes" class="small min-spacing text-shadow">
+            <li v-if="!notes" class="small">
                 ...
             </li>
-            <li v-else-if="!notes.length" class="small min-spacing text-shadow">
+            <li v-else-if="!notes.length" class="small">
                 User has no notes
             </li>
             <li
                 v-for="note in notes"
                 v-else
                 :key="note.id"
-                class="small text-shadow"
+                class="small"
             >
                 <b>
                     {{ note.updatedAt.slice(0,10) }} -
@@ -34,12 +32,14 @@
                 </b>
                 <a
                     href="#"
-                    class="vote-fail"
+                    class="ml-1 text-danger"
                     data-toggle="tooltip"
                     data-placement="top"
                     title="delete note"
                     @click.prevent="hideNote(note.id);"
-                >&times;</a>
+                >
+                    &times;
+                </a>
                 <a
                     v-if="note.author.id == userId"
                     href="#"
@@ -47,19 +47,25 @@
                     data-placement="top"
                     title="edit note"
                     @click.prevent="editNoteId == note.id ? editNoteId = '' : editNoteId = note.id, editNoteComment = note.comment"
-                ><i class="fas fa-edit" /></a>
-                <pre v-if="note.id != editNoteId" class="secondary-text pre-font ml-2" v-html="filterLinks(note.comment)" />
-                <div v-else class="d-flex">
-                    <textarea
-                        v-model="editNoteComment"
-                        placeholder="edit user note..."
-                        class="form-control dark-textarea mr-2"
-                        style="white-space: pre-line;"
-                        rows="2"
-                    />
-                    <button class="btn btn-sm btn-nat align-self-center" @click="editNote($event)">
-                        Edit
-                    </button>
+                >
+                    <i class="fas fa-edit" />
+                </a>
+
+                <div v-if="note.id != editNoteId" class="text-secondary pre-line ml-2" v-html="filterLinks(note.comment)" />
+                <div v-else>
+                    <div class="input-group">
+                        <textarea
+                            v-model="editNoteComment"
+                            placeholder="edit user note..."
+                            class="form-control"
+                            rows="2"
+                        />
+                        <div class="input-group-append">
+                            <button class="btn btn-nat" @click="editNote($event)">
+                                Edit
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </li>
         </ul>

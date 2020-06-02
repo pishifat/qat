@@ -1,8 +1,8 @@
 <template>
-    <div class="modal-header text-dark" :class="`bg-${selectedVeto.status}`">
+    <div class="modal-header" :class="`bg-${selectedVeto.status}`">
         <h5 class="modal-title">
-            <a class="text-dark" :href="`https://osu.ppy.sh/beatmapsets/${selectedVeto.beatmapId}`" target="_blank">{{ selectedVeto.beatmapTitle }}</a> by
-            <a class="text-dark" :href="`https://osu.ppy.sh/users/${selectedVeto.beatmapMapperId}`" target="_blank">{{ selectedVeto.beatmapMapper }}</a>
+            <a :href="`https://osu.ppy.sh/beatmapsets/${selectedVeto.beatmapId}`" target="_blank">{{ selectedVeto.beatmapTitle }}</a> by
+            <a :href="`https://osu.ppy.sh/users/${selectedVeto.beatmapMapperId}`" target="_blank">{{ selectedVeto.beatmapMapper }}</a>
             <i v-if="selectedVeto.mode.indexOf('osu') >= 0" class="far fa-circle" />
             <i v-else-if="selectedVeto.mode.indexOf('taiko') >= 0" class="fas fa-drum" />
             <i v-else-if="selectedVeto.mode.indexOf('catch') >= 0" class="fas fa-apple-alt" />
@@ -15,7 +15,7 @@
             </span>
         </h5>
         <button type="button" class="close" data-dismiss="modal">
-            <span>&times;</span>
+            &times;
         </button>
     </div>
 </template>
