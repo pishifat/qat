@@ -9,17 +9,15 @@
                 <b>{{ selectedVeto.beatmapMapper }}</b>
             </a>
 
-            <span class="ml-1">
-                <i v-if="selectedVeto.mode.indexOf('osu') >= 0" class="far fa-circle" />
-                <i v-else-if="selectedVeto.mode.indexOf('taiko') >= 0" class="fas fa-drum" />
-                <i v-else-if="selectedVeto.mode.indexOf('catch') >= 0" class="fas fa-apple-alt" />
-                <i v-else-if="selectedVeto.mode.indexOf('mania') >= 0" class="fas fa-stream" />
-                <span v-else>
-                    <i class="far fa-circle" />
-                    <i class="fas fa-drum" />
-                    <i class="fas fa-apple-alt" />
-                    <i class="fas fa-stream" />
-                </span>
+            <i v-if="selectedVeto.mode.indexOf('osu') >= 0" class="far fa-circle" />
+            <i v-else-if="selectedVeto.mode.indexOf('taiko') >= 0" class="fas fa-drum" />
+            <i v-else-if="selectedVeto.mode.indexOf('catch') >= 0" class="fas fa-apple-alt" />
+            <i v-else-if="selectedVeto.mode.indexOf('mania') >= 0" class="fas fa-stream" />
+            <span v-else>
+                <i class="far fa-circle" />
+                <i class="fas fa-drum" />
+                <i class="fas fa-apple-alt" />
+                <i class="fas fa-stream" />
             </span>
         </h5>
         <button type="button" class="close" data-dismiss="modal">

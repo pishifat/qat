@@ -79,7 +79,7 @@
 
                 <div class="col-sm-9">
                     <b>Forum PM:</b>
-                    <forum-pm />
+                    <forum-pm class="show" />
                 </div>
             </div>
         </div>
