@@ -1,8 +1,9 @@
 <template>
     <div class="row">
         <div class="col-md-12">
-            <section class="col-md-12 segment segment-image mx-0">
+            <section class="card card-body">
                 <h2>Open Reports</h2>
+
                 <transition-group name="list" tag="div" class="row">
                     <report-card
                         v-for="report in openReports"
@@ -17,34 +18,39 @@
                 </p>
             </section>
 
-            <section class="col-md-12 segment segment-image mx-0">
+            <section class="card card-body">
                 <h2>Closed Reports</h2>
-                <div class="input-group input-group-sm small">
+
+                <div class="form-inline">
                     <input
                         v-model="searchValue"
                         type="text"
                         placeholder="username or osuID..."
                         maxlength="18"
                         autocomplete="off"
+                        class="form-control"
                         @keyup.enter="query($event)"
                     >
-                    <button class="btn btn-sm btn-nat ml-2" type="submit" @click="query($event)">
+                    <button class="btn btn-sm btn-primary ml-2" type="submit" @click="query($event)">
                         Search archives
                     </button>
                 </div>
-                <div class="input-group input-group-sm small my-2">
+
+                <div class="form-inline mt-2">
                     <input
                         v-model="limit"
                         type="text"
                         placeholder="# entries..."
                         maxlength="3"
                         autocomplete="off"
+                        class="form-control"
                         @keyup.enter="queryRecent($event)"
                     >
-                    <button class="btn btn-sm btn-nat ml-2" type="submit" @click="queryRecent($event)">
+                    <button class="btn btn-sm btn-primary ml-2" type="submit" @click="queryRecent($event)">
                         Show recent
                     </button>
                 </div>
+
                 <template v-if="isQueried">
                     <transition-group name="list" tag="div" class="row">
                         <report-card

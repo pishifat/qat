@@ -7,7 +7,8 @@
     "watch-app": "set NODE_ENV=development&& nodemon ./app.js",
     "watch-src": "webpack-dev-server --mode development --port 8080 --watch",
     "build": "webpack --mode production --config webpack.prod.config.js",
-    "prod": "set NODE_ENV=production&& node ./app.js"
+    "prod": "set NODE_ENV=production&& node ./app.js",
+    "lint": "eslint . --ext .js,.vue"
   },
   "dependencies": {
     "@babel/core": "^7.8.7",
@@ -15,6 +16,7 @@
     "axios": "^0.18.1",
     "babel-loader": "^8.0.6",
     "babel-plugin-transform-regenerator": "^6.26.0",
+    "bootstrap": "^4.4.1",
     "cheerio": "^1.0.0-rc.3",
     "connect-mongo": "^3.2.0",
     "cookie-parser": "^1.4.4",
@@ -38,8 +40,12 @@
   "devDependencies": {
     "eslint": "^6.8.0",
     "eslint-plugin-vue": "^6.2.1",
+    "mini-css-extract-plugin": "^0.9.0",
+    "node-sass": "^4.14.1",
     "nodemon": "^2.0.3",
     "npm-run-all": "^4.1.5",
+    "sass-loader": "^8.0.2",
+    "style-loader": "^1.1.3",
     "webpack-dev-server": "^3.11.0"
   },
   "nodemonConfig": {

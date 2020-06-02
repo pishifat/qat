@@ -1,10 +1,13 @@
 <template>
     <div
-        class="modal-header text-dark"
-        :class="selectedUser.probation.length && selectedUser.group != 'nat' ? 'bg-probation' : 'bg-' + selectedUser.group"
+        class="modal-header"
+        :class="headerColor"
     >
         <h5 class="modal-title">
-            <a class="text-dark" :href="'https://osu.ppy.sh/users/' + selectedUser.osuId">{{ selectedUser.username }}</a>
+            <a :href="'https://osu.ppy.sh/users/' + selectedUser.osuId" class="text-white">
+                <b>{{ selectedUser.username }}</b>
+            </a>
+
             <i v-if="selectedUser.modes.indexOf('osu') >= 0" class="far fa-circle" />
             <i v-if="selectedUser.modes.indexOf('taiko') >= 0" class="fas fa-drum" />
             <i v-if="selectedUser.modes.indexOf('catch') >= 0" class="fas fa-apple-alt" />
@@ -25,6 +28,15 @@ export default {
         ...mapGetters([
             'selectedUser',
         ]),
+        headerColor () {
+            if (!this.selectedUser) return '';
+
+            if (this.selectedUser.probation.length && this.selectedUser.group != 'nat') {
+                return 'bg-probation';
+            }
+
+            return 'bg-' + this.selectedUser.group;
+        },
     },
 };
 </script>

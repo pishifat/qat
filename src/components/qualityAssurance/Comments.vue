@@ -1,8 +1,9 @@
 <template>
     <div>
-        <div v-if="!isUser" class="col-sm-12 ml-2" :class="otherUserComments.length ? 'mb-1' : ''">
+        <div v-if="!isUser" class="col-sm-12 my-2" :class="otherUserComments.length ? 'mb-1' : ''">
             <a
                 href="#"
+                class="ml-2"
                 :class="isMaxChecks || isOutdated ? 'disabled' : ''"
                 @click.prevent="showInput = !showInput"
             >
@@ -13,14 +14,14 @@
             </span>
             <span
                 v-else-if="!showInput"
-                class="small text-shadow min-spacing text-white-50"
+                class="ml-1 small text-white"
                 v-html="filterLinks(userComment)"
             />
             <input
                 v-if="showInput"
                 v-model="userComment"
                 :disabled="isMaxChecks || isOutdated"
-                class="small w-90"
+                class="form-control form-control-sm"
                 type="text"
                 maxlength="1000"
                 placeholder="enter to submit..."
@@ -28,8 +29,9 @@
                 @change="editComment($event)"
             >
         </div>
-        <div v-if="otherUserComments.length" class="col-sm-12">
-            <ul class="small text-shadow mb-0">
+
+        <div v-if="otherUserComments.length" class="col-sm-12 mb-2">
+            <ul class="small mb-0">
                 <!-- if not maxchecks/outdated/currentuser, show Anoynmous: comment, otherwise show username: comment -->
                 <li v-for="mediation in otherUserComments" :key="mediation.id">
                     {{ isNat || isMaxChecks || isOutdated ? mediation.mediator.username + ':' : 'anonymous:' }}
@@ -111,15 +113,3 @@ export default {
     },
 };
 </script>
-
-<style scoped>
-    .w-90 {
-        width: 90%;
-    }
-
-    a.disabled {
-        pointer-events: none;
-        cursor: default;
-    }
-
-</style>

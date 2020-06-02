@@ -1,20 +1,20 @@
 <template>
     <div>
-        <p class="min-spacing text-shadow">
-            NAT user notes:
+        <p>
+            <b>NAT user notes:</b>
         </p>
-        <ul>
-            <li v-if="!userNotes" class="small min-spacing text-shadow">
+
+        <ul class="text-secondary small">
+            <li v-if="!userNotes">
                 ...
             </li>
-            <li v-else-if="!userNotes.length" class="small min-spacing text-shadow">
+            <li v-else-if="!userNotes.length">
                 User has no notes
             </li>
             <li
                 v-for="note in userNotes"
                 v-else
                 :key="note.id"
-                class="small text-shadow"
             >
                 <b>
                     {{ note.updatedAt.slice(0,10) }} -
@@ -22,7 +22,10 @@
                         {{ note.author.username }}
                     </a>
                 </b>
-                <pre class="secondary-text pre-font ml-2" v-html="filterLinks(note.comment)" />
+                <div
+                    class="pre-line"
+                    v-html="filterLinks(note.comment)"
+                />
             </li>
         </ul>
     </div>

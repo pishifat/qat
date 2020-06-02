@@ -1,42 +1,39 @@
 <template>
-    <div id="extendedInfo" class="modal fade" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div v-if="selectedDiscussionVote" class="modal-content">
-                <modal-header />
-                <div class="modal-body" style="overflow: hidden">
-                    <div class="container text-shadow">
-                        <discussion-context />
+    <modal-dialog id="extendedInfo">
+        <template v-if="selectedDiscussionVote" #header>
+            <modal-header />
+        </template>
 
-                        <votes-public-active
-                            v-if="selectedDiscussionVote.isActive && !selectedDiscussionVote.isNatOnly"
-                        />
-                        <votes-nat-only-active
-                            v-else-if="selectedDiscussionVote.isActive && selectedDiscussionVote.isNatOnly"
-                        />
-                        <votes-inactive
-                            v-else-if="!selectedDiscussionVote.isActive"
-                        />
+        <div v-if="selectedDiscussionVote" class="container">
+            <discussion-context />
 
-                        <button v-if="selectedDiscussionVote.isActive && isNat" class="btn btn-sm btn-nat mt-3" @click="concludeMediation($event)">
-                            Conclude Vote
-                        </button>
+            <votes-public-active
+                v-if="selectedDiscussionVote.isActive && !selectedDiscussionVote.isNatOnly"
+            />
+            <votes-nat-only-active
+                v-else-if="selectedDiscussionVote.isActive && selectedDiscussionVote.isNatOnly"
+            />
+            <votes-inactive
+                v-else-if="!selectedDiscussionVote.isActive"
+            />
 
-                        <div v-if="selectedDiscussionVote.isActive">
-                            <hr>
+            <button v-if="selectedDiscussionVote.isActive && isNat" class="btn btn-sm btn-primary mt-3" @click="concludeMediation($event)">
+                Conclude Vote
+            </button>
 
-                            <!-- only show voting options for users of specified mode -->
-                            <mediator-options
-                                v-if="userModes.indexOf(selectedDiscussionVote.mode) >= 0 || selectedDiscussionVote.mode == 'all'"
-                            />
-                            <p v-else class="small">
-                                Because you're not proficient in this proposal's game mode, you're not able to vote :(
-                            </p>
-                        </div>
-                    </div>
-                </div>
+            <div v-if="selectedDiscussionVote.isActive">
+                <hr>
+
+                <!-- only show voting options for users of specified mode -->
+                <mediator-options
+                    v-if="userModes.indexOf(selectedDiscussionVote.mode) >= 0 || selectedDiscussionVote.mode == 'all'"
+                />
+                <p v-else class="small">
+                    Because you're not proficient in this proposal's game mode, you're not able to vote :(
+                </p>
             </div>
         </div>
-    </div>
+    </modal-dialog>
 </template>
 
 <script>
@@ -48,6 +45,7 @@ import VotesPublicActive from './info/votes/VotesPublicActive.vue';
 import VotesNatOnlyActive from './info/votes/VotesNatOnlyActive.vue';
 import VotesInactive from './info/votes/VotesInactive.vue';
 import MediatorOptions from './info/MediatorOptions.vue';
+import ModalDialog from '../ModalDialog.vue';
 
 export default {
     name: 'DiscussionInfo',
@@ -58,6 +56,7 @@ export default {
         VotesNatOnlyActive,
         VotesInactive,
         MediatorOptions,
+        ModalDialog,
     },
     mixins: [ postData ],
     computed: {

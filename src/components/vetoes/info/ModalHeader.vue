@@ -1,8 +1,14 @@
 <template>
-    <div class="modal-header text-dark" :class="`bg-${selectedVeto.status}`">
+    <div class="modal-header" :style="bgColor">
         <h5 class="modal-title">
-            <a class="text-dark" :href="`https://osu.ppy.sh/beatmapsets/${selectedVeto.beatmapId}`" target="_blank">{{ selectedVeto.beatmapTitle }}</a> by
-            <a class="text-dark" :href="`https://osu.ppy.sh/users/${selectedVeto.beatmapMapperId}`" target="_blank">{{ selectedVeto.beatmapMapper }}</a>
+            <a :href="`https://osu.ppy.sh/beatmapsets/${selectedVeto.beatmapId}`" target="_blank" class="text-white">
+                <b>{{ selectedVeto.beatmapTitle }}</b>
+            </a>
+            by
+            <a :href="`https://osu.ppy.sh/users/${selectedVeto.beatmapMapperId}`" target="_blank" class="text-white">
+                <b>{{ selectedVeto.beatmapMapper }}</b>
+            </a>
+
             <i v-if="selectedVeto.mode.indexOf('osu') >= 0" class="far fa-circle" />
             <i v-else-if="selectedVeto.mode.indexOf('taiko') >= 0" class="fas fa-drum" />
             <i v-else-if="selectedVeto.mode.indexOf('catch') >= 0" class="fas fa-apple-alt" />
@@ -15,7 +21,7 @@
             </span>
         </h5>
         <button type="button" class="close" data-dismiss="modal">
-            <span>&times;</span>
+            &times;
         </button>
     </div>
 </template>
@@ -29,24 +35,24 @@ export default {
         ...mapGetters([
             'selectedVeto',
         ]),
+        bgColor () {
+            if (!this.selectedVeto) return '';
+
+            let style = 'background-color: ';
+
+            switch (this.selectedVeto.status) {
+                case 'available':
+                    return style + 'var(--success)';
+                case 'upheld':
+                    return style + 'var(--warning)';
+                case 'wip':
+                    return style + 'var(--purple)';
+                case 'withdrawn':
+                    return style + 'var(--danger)';
+                default:
+                    return style + 'var(--bright-blue-gray)';
+            }
+        },
     },
 };
 </script>
-
-<style>
-.bg-available {
-    background-color: var(--available);
-}
-
-.bg-upheld {
-    background-color: var(--upheld);
-}
-
-.bg-wip {
-    background-color: var(--wip);
-}
-
-.bg-withdrawn {
-    background-color: var(--withdrawn);
-}
-</style>

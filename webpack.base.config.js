@@ -3,6 +3,11 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
 module.exports = {
     entry: {
+        index: './src/index.js',
+        reports: './src/reports.js',
+        bnApp: './src/bnApp.js',
+        logs: './src/logs.js',
+        app: './src/app.js',
         appEval: './src/appEval.js',
         bnEval: './src/bnEval.js',
         dataCollection: './src/dataCollection.js',
@@ -37,6 +42,7 @@ module.exports = {
             use: [{
                 loader: 'file-loader',
                 options: {
+                    name: '[name].[ext]',
                     outputPath: '../images',
                 },
             }],

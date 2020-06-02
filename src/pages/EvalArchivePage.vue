@@ -1,38 +1,47 @@
 <template>
     <div class="row">
-        <section class="col-md-12 segment mb-4">
-            <div class="input-group input-group-sm small">
-                <input
-                    v-model="searchValue"
-                    type="text"
-                    placeholder="username or osuID..."
-                    maxlength="18"
-                    autocomplete="off"
-                    @keyup.enter="query($event)"
-                >
-                <button class="btn btn-sm btn-nat ml-2" type="submit" @click="query($event)">
-                    Search archives
-                </button>
-            </div>
-            <div class="input-group input-group-sm small my-2">
-                <input
-                    v-model="limit"
-                    type="text"
-                    placeholder="# entries..."
-                    maxlength="3"
-                    autocomplete="off"
-                    @keyup.enter="queryRecent($event)"
-                >
-                <button class="btn btn-sm btn-nat ml-2" type="submit" @click="queryRecent($event)">
-                    Show recent
-                </button>
-            </div>
-        </section>
-        <section v-if="isQueried" class="col-md-12 segment segment-image">
-            <h2>Application Evaluations</h2>
+        <div class="col-md-12">
+            <section class="card card-body">
+                <div class="form-inline">
+                    <input
+                        v-model="searchValue"
+                        type="text"
+                        placeholder="username or osuID..."
+                        maxlength="18"
+                        autocomplete="off"
+                        class="form-control"
+                        @keyup.enter="query($event)"
+                    >
+                    <button class="btn btn-sm btn-primary ml-2" type="submit" @click="query($event)">
+                        Search archives
+                    </button>
+                </div>
 
-            <div v-if="applications.length">
-                <transition-group name="list" tag="div" class="row">
+                <div class="form-inline mt-2">
+                    <input
+                        v-model="limit"
+                        type="text"
+                        placeholder="# entries..."
+                        maxlength="3"
+                        autocomplete="off"
+                        class="form-control"
+                        @keyup.enter="queryRecent($event)"
+                    >
+                    <button class="btn btn-sm btn-primary ml-2" type="submit" @click="queryRecent($event)">
+                        Show recent
+                    </button>
+                </div>
+            </section>
+
+            <section v-if="isQueried" class="card card-body">
+                <h2>Application Evaluations</h2>
+
+                <transition-group
+                    v-if="applications.length"
+                    name="list"
+                    tag="div"
+                    class="row"
+                >
                     <application-discussion-card
                         v-for="application in applications"
                         :key="application.id"
@@ -41,16 +50,21 @@
                         :is-archive="true"
                     />
                 </transition-group>
-            </div>
-            <p v-else class="ml-4">
-                None...
-            </p>
-        </section>
-        <section v-if="isQueried" class="col-md-12 segment segment-image">
-            <h2>BN Evaluations</h2>
 
-            <div v-if="evalRounds.length">
-                <transition-group name="list" tag="div" class="row">
+                <p v-else class="ml-4">
+                    None...
+                </p>
+            </section>
+
+            <section v-if="isQueried" class="card card-body">
+                <h2>BN Evaluations</h2>
+
+                <transition-group
+                    v-if="evalRounds.length"
+                    name="list"
+                    tag="div"
+                    class="row"
+                >
                     <current-bn-discussion-card
                         v-for="evalRound in evalRounds"
                         :key="evalRound.id"
@@ -58,17 +72,18 @@
                         :is-archive="true"
                     />
                 </transition-group>
-            </div>
-            <p v-else class="ml-4">
-                None...
-            </p>
-        </section>
 
-        <application-archive-info />
+                <p v-else class="ml-4">
+                    None...
+                </p>
+            </section>
 
-        <current-bn-archive-info />
+            <application-archive-info />
 
-        <toast-messages />
+            <current-bn-archive-info />
+
+            <toast-messages />
+        </div>
     </div>
 </template>
 

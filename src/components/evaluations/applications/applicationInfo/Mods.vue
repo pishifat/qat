@@ -1,14 +1,19 @@
 <template>
     <div>
-        <p class="text-shadow min-spacing">
-            Modding:
+        <p>
+            <b>Modding:</b>
         </p>
-        <ul style="list-style-type: disc;">
-            <li v-for="(mod, i) in mods" :key="i" class="small text-shadow">
+
+        <ul>
+            <li v-for="(mod, i) in mods" :key="i" class="small">
                 <a :href="modUrl(mod)" target="_blank">{{ modUrl(mod) }}</a><br>
-                <span v-if="reasons" v-html="filterLinks(reasons[i])" />
+                <span
+                    v-if="reasons"
+                    class="text-secondary"
+                    v-html="filterLinks(reasons[i])"
+                />
             </li>
-            <li class="small text-shadow">
+            <li class="small">
                 <a :href="'https://osu.ppy.sh/users/' + osuId + '/modding/events?types%5B%5D=kudosu_gain&types%5B%5D=kudosu_lost&min_date=&max_date='" target="_blank">All history</a>
             </li>
         </ul>

@@ -1,13 +1,16 @@
 <template>
-    <div class="modal-header text-dark bg-nat-logo">
+    <div class="modal-header bg-primary">
         <h5 class="modal-title">
             <a
                 v-if="selectedDiscussionVote.discussionLink.length"
-                class="text-dark"
                 :href="selectedDiscussionVote.discussionLink"
                 target="_blank"
-            >{{ selectedDiscussionVote.title }}</a>
-            <span v-else class="text-dark">{{ selectedDiscussionVote.title }}</span>
+            >
+                {{ selectedDiscussionVote.title }}
+            </a>
+
+            <span v-else>{{ selectedDiscussionVote.title }}</span>
+
             <i v-if="selectedDiscussionVote.mode.indexOf('osu') >= 0" class="far fa-circle" />
             <i v-if="selectedDiscussionVote.mode.indexOf('taiko') >= 0" class="fas fa-drum" />
             <i v-if="selectedDiscussionVote.mode.indexOf('catch') >= 0" class="fas fa-apple-alt" />

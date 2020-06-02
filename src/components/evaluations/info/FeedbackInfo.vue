@@ -1,35 +1,44 @@
 <template>
     <div>
-        <p class="text-shadow min-spacing mb-2">
-            Application feedback:
-            <span v-if="resigned" class="text-white-50">
+        <p class="mb-2">
+            <b>Application feedback:</b>
+            <span v-if="resigned" class="text-secondary">
                 resigned
             </span>
         </p>
-        <div v-if="!resigned" class="form-group">
-            <textarea v-model="feedback" class="form-control dark-textarea" style="white-space: pre-line;" />
-        </div>
-        <div v-if="isApplication && consensus == 'pass'" class="input-group mb-3">
-            <input
-                v-model="discordLink"
-                class="form-control"
-                type="text"
-                placeholder="discord invite link..."
-            >
-        </div>
-        <div>
-            <button class="btn btn-sm btn-nat" data-toggle="collapse" :data-target="isApplication ? '#applicationForumPmBox' : '#currentBnForumPmBox'">
+
+        <textarea
+            v-model="feedback"
+            class="form-control mb-2"
+            rows="4"
+        />
+
+        <input
+            v-if="isApplication && consensus == 'pass'"
+            v-model="discordLink"
+            class="form-control"
+            type="text"
+            placeholder="discord invite link..."
+        >
+
+        <div class="form-inline">
+            <button class="btn btn-sm btn-primary mr-2 mt-2" data-toggle="collapse" :data-target="isApplication ? '#applicationForumPmBox' : '#currentBnForumPmBox'">
                 See full message <i class="fas fa-angle-down" />
             </button>
-            <a :href="'https://osu.ppy.sh/forum/ucp.php?i=pm&mode=compose&u=' + osuId" target="_blank">
-                <button class="btn btn-sm btn-nat">
-                    Open osu! PM
-                </button>
+
+            <a
+                :href="'https://osu.ppy.sh/forum/ucp.php?i=pm&mode=compose&u=' + osuId"
+                target="_blank"
+                class="btn btn-sm btn-primary mr-2 mt-2"
+            >
+                Open osu! PM
             </a>
-            <button class="btn btn-sm btn-nat float-right" @click="setFeedback($event)">
+
+            <button class="btn btn-sm btn-primary mt-2 ml-0 ml-sm-auto" @click="setFeedback($event)">
                 Save
             </button>
         </div>
+
         <feedback-pm
             :is-application="isApplication"
             :consensus="consensus"

@@ -1,18 +1,14 @@
 <template>
-    <div>
-        <div class="row">
-            <div class="col-sm-12">
-                <filter-box
-                    :placeholder="'enter to search beatmap...'"
-                    :options="['osu', 'taiko', 'catch', 'mania']"
-                />
-            </div>
-        </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <filter-box
+                :placeholder="'enter to search beatmap...'"
+                :options="['osu', 'taiko', 'catch', 'mania']"
+            />
 
-        <handbook />
+            <handbook />
 
-        <section v-if="allEvents" class="segment segment-image mx-0 px-0">
-            <div class="col-sm-12">
+            <section v-if="allEvents" class="card card-body">
                 <transition-group name="list" tag="div">
                     <event-row
                         v-for="event in filteredEvents"
@@ -22,19 +18,20 @@
                         :is-max-checks="event.qualityAssuranceCheckers.length > event.modes.length * 2 - 1"
                     />
                 </transition-group>
-            </div>
-            <div class="text-center">
-                <button
-                    class="btn btn-sm btn-nat mt-4 mx-auto"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="show 200 more events throughout all modes"
-                    @click="loadMore($event)"
-                >
-                    <i class="fas fa-angle-down mr-1" /> show more <i class="fas fa-angle-down ml-1" />
-                </button>
-            </div>
-        </section>
+
+                <div class="text-center">
+                    <button
+                        class="btn btn-sm btn-primary mt-4 mx-auto"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="show 200 more events throughout all modes"
+                        @click="loadMore($event)"
+                    >
+                        <i class="fas fa-angle-down mr-1" /> show more <i class="fas fa-angle-down ml-1" />
+                    </button>
+                </div>
+            </section>
+        </div>
 
         <toast-messages />
     </div>
@@ -142,6 +139,3 @@ export default {
     },
 };
 </script>
-
-<style>
-</style>

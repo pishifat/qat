@@ -47,7 +47,7 @@ const defaultPopulate = [
 ];
 
 const notesPopulate = [
-    { path: 'author', select: 'username' },
+    { path: 'author', select: 'username osuId' },
 ];
 
 const applicationPopulate = [

@@ -1,68 +1,58 @@
 <template>
-    <div id="addQuestion" class="modal fade" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header bg-nat-logo">
-                    <h5 class="modal-title text-dark">
-                        Add question: {{ category }}
-                    </h5>
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span>&times;</span>
-                    </button>
+    <modal-dialog id="addQuestion" :title="`Add question: ${category}`">
+        <div class="container">
+            <div class="form-inline mb-2">
+                <b>Question type:</b>
+
+                <div class="form-check form-check-inline ml-2">
+                    <input
+                        id="text"
+                        class="form-check-input"
+                        type="radio"
+                        name="questionType"
+                        value="text"
+                    >
+                    <label class="form-check-label" for="text">Select text</label>
                 </div>
-                <div class="modal-body" style="overflow: hidden">
-                    <div class="container">
-                        <div class="text-shadow mb-2">
-                            <p>Question:</p>
-                            <div>
-                                <div class="form-check form-check-inline ml-2">
-                                    <input
-                                        id="text"
-                                        class="form-check-input"
-                                        type="radio"
-                                        name="questionType"
-                                        value="text"
-                                    >
-                                    <label class="form-check-label text-shadow" for="text">Select text</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input
-                                        id="image"
-                                        class="form-check-input"
-                                        type="radio"
-                                        name="questionType"
-                                        value="image"
-                                    >
-                                    <label class="form-check-label text-shadow" for="image">Select Image</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <textarea
-                                id="newQuestion"
-                                class="form-control dark-textarea"
-                                placeholder="question..."
-                                maxlength="300"
-                                rows="2"
-                                @keyup.enter="addQuestion($event)"
-                            />
-                        </div>
-                    </div>
-                    <hr>
-                    <button type="submit" class="btn btn-nat btn-sm float-right" @click="addQuestion($event)">
-                        Add Question
-                    </button>
+                <div class="form-check form-check-inline">
+                    <input
+                        id="image"
+                        class="form-check-input"
+                        type="radio"
+                        name="questionType"
+                        value="image"
+                    >
+                    <label class="form-check-label" for="image">Select Image</label>
                 </div>
             </div>
+
+            <textarea
+                id="newQuestion"
+                class="form-control mb-2"
+                placeholder="question..."
+                maxlength="300"
+                rows="4"
+                @keyup.enter="addQuestion($event)"
+            />
+
+            <hr>
+
+            <button type="submit" class="btn btn-success btn-sm float-right" @click="addQuestion($event)">
+                Add Question
+            </button>
         </div>
-    </div>
+    </modal-dialog>
 </template>
 
 <script>
+import ModalDialog from '../../components/ModalDialog.vue';
 import postData from '../../mixins/postData.js';
 
 export default {
     name: 'AddQuestion',
+    components: {
+        ModalDialog,
+    },
     mixins: [ postData ],
     props: {
         category: {

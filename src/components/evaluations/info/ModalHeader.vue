@@ -1,10 +1,9 @@
 <template>
-    <div class="modal-header text-dark" :class="isNatEvaluator() ? 'bg-priority' : 'bg-nat-logo'">
+    <div class="modal-header" :class="isNatEvaluator() ? 'bg-info' : 'bg-primary'">
         <h5 class="modal-title">
             {{ isApplication ? 'Application Evaluation:' : 'BN Evaluation:' }}
             <a
                 :href="'https://osu.ppy.sh/users/' + osuId"
-                class="text-dark"
                 target="_blank"
                 @click.stop
             >

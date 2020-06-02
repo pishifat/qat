@@ -1,32 +1,46 @@
 <template>
     <div class="col-md-6 col-lg-4 my-2" @click="selectVeto()">
         <div
-            class="card"
+            class="card card-individual"
             data-toggle="modal"
             data-target="#extendedInfo"
             :data-veto="veto.id"
         >
             <img :src="`https://assets.ppy.sh/beatmaps/${veto.beatmapId}/covers/card.jpg`" class="card-img">
             <div class="card-body">
-                <p class="text-shadow wrap-text">
-                    <a :href="`https://osu.ppy.sh/beatmapsets/${veto.beatmapId}`" target="_blank" @click.stop>{{ veto.beatmapTitle || '...' }}</a>
-                </p>
-                <p class="small text-shadow">
-                    Hosted by <a :href="`https://osu.ppy.sh/users/${veto.beatmapMapperId}`" target="_blank" @click.stop>{{ veto.beatmapMapper }}</a>
-                </p>
+                <div class="text-truncate">
+                    <a
+                        :href="`https://osu.ppy.sh/beatmapsets/${veto.beatmapId}`"
+                        target="_blank"
+                        @click.stop
+                    >
+                        <b>{{ veto.beatmapTitle || '...' }}</b>
+                    </a>
+                </div>
+                <div class="small">
+                    Hosted by
+                    <a
+                        class="font-weight-bold"
+                        :href="`https://osu.ppy.sh/users/${veto.beatmapMapperId}`"
+                        target="_blank"
+                        @click.stop
+                    >
+                        {{ veto.beatmapMapper }}
+                    </a>
+                </div>
 
-                <div class="veto-status my-auto" :class="`status-bar-${veto.status}`" />
+                <div class="card-status" :class="`status-bar-${veto.status}`" />
                 <div class="card-icons">
-                    <span v-if="veto.status === 'wip'" class="small text-shadow float-left">
+                    <span v-if="veto.status === 'wip'" class="small float-left">
                         <i
                             class="fas fa-clock mx-1"
                             data-toggle="tooltip"
                             data-placement="top"
                             title="deadline"
                         />
-                        <span class="errors">{{ veto.deadline.slice(0, 10) }}</span>
+                        {{ veto.deadline.slice(0, 10) }}
                     </span>
-                    <span v-else class="small text-shadow float-left">{{ veto.createdAt.slice(0, 10) }}</span>
+                    <span v-else class="small float-left">{{ veto.createdAt.slice(0, 10) }}</span>
                     <i v-if="veto.mode.indexOf('osu') >= 0" class="far fa-circle" />
                     <i v-else-if="veto.mode.indexOf('taiko') >= 0" class="fas fa-drum" />
                     <i v-else-if="veto.mode.indexOf('catch') >= 0" class="fas fa-apple-alt" />
@@ -69,33 +83,31 @@ export default {
 };
 </script>
 
-<style>
-.card {
-    overflow: hidden;
-}
+<style scoped>
 
-.card-icons {
-    text-align: right;
+.card-img {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    opacity: 0.2;
+    overflow: hidden;
+    object-fit: cover;
 }
 
 .status-bar-available {
-    background: radial-gradient(var(--available), transparent 70%);
+    background: radial-gradient(var(--success), transparent 70%);
 }
 
 .status-bar-upheld {
-    background: radial-gradient(var(--upheld), transparent 70%);
+    background: radial-gradient(var(--warning), transparent 70%);
 }
 
 .status-bar-wip {
-    background: radial-gradient(var(--wip), transparent 70%);
+    background: radial-gradient(var(--purple), transparent 70%);
 }
 
 .status-bar-withdrawn {
-    background: radial-gradient(var(--withdrawn), transparent 70%);
+    background: radial-gradient(var(--danger), transparent 70%);
 }
 
-.veto-status {
-    height: 5px;
-    margin: 5px 0;
-}
 </style>

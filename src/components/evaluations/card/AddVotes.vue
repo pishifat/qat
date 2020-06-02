@@ -6,21 +6,29 @@
             data-toggle="tooltip"
             data-placement="top"
             title="pass"
-        >{{ pass }}</span>
+        >
+            {{ pass }}
+        </span>
+
         <span
             v-if="neutralOrProbation"
-            class="badge badge-neutral mx-1"
+            class="badge badge-light mx-1"
             data-toggle="tooltip"
             data-placement="top"
             :title="isApplication ? 'neutral' : 'probation'"
-        >{{ neutralOrProbation }}</span>
+        >
+            {{ neutralOrProbation }}
+        </span>
+
         <span
             v-if="fail"
             class="badge badge-fail mx-1"
             data-toggle="tooltip"
             data-placement="top"
             title="fail"
-        >{{ fail }}</span>
+        >
+            {{ fail }}
+        </span>
     </div>
 </template>
 

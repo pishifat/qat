@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
 
     res.render('index', {
         title: 'NAT',
-        script: '../js/index.js',
+        script: '../javascripts/index.js',
         loggedInAs: req.session.mongoId,
         isIndex: true,
         isBnOrNat,
@@ -167,11 +167,6 @@ router.get('/callback', async (req, res) => {
         req.session.osuId = response.id;
         res.redirect('/login');
     }
-});
-
-/* GET redirect to mgsite */
-router.get('/mgsite', (req, res) => {
-    return res.redirect('https://mappersguild.com');
 });
 
 module.exports = router;

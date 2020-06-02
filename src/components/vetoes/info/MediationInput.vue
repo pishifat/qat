@@ -1,22 +1,19 @@
 <template>
     <div>
         <hr>
-        <p class="text-shadow min-spacing">
-            Reason for vote:
-        </p>
-        <p class="text-shadow small min-spacing px-4 mb-2">
+        Reason for vote:
+        <div class="small px-4 mb-2">
             This comment will be displayed anonymously alongside the verdict post. If your response is deemed inappropriate, your vote will be marked as invalid.
-        </p>
-        <div class="form-group">
-            <textarea
-                id="comment"
-                v-model="comment"
-                class="form-control dark-textarea"
-                style="white-space: pre-line;"
-                placeholder="Why you agree/disagree with the veto..."
-                rows="2"
-            />
         </div>
+
+        <textarea
+            id="comment"
+            v-model="comment"
+            class="form-control mb-2"
+            placeholder="Why you agree/disagree with the veto..."
+            rows="3"
+        />
+
         <div class="d-flex justify-content-end mb-2">
             <div class="form-check form-check-inline">
                 <input
@@ -27,8 +24,9 @@
                     name="vote"
                     value="1"
                 >
-                <label class="form-check-label text-shadow vote-pass" for="1">Agree</label>
+                <label class="form-check-label text-success" for="1">Agree</label>
             </div>
+
             <div class="form-check form-check-inline">
                 <input
                     id="2"
@@ -38,8 +36,9 @@
                     name="vote"
                     value="2"
                 >
-                <label class="form-check-label text-shadow vote-neutral" for="2">Neutral</label>
+                <label class="form-check-label text-neutral" for="2">Neutral</label>
             </div>
+
             <div class="form-check form-check-inline">
                 <input
                     id="3"
@@ -49,11 +48,12 @@
                     name="vote"
                     value="3"
                 >
-                <label class="form-check-label text-shadow vote-fail" for="3">Disagree</label>
+                <label class="form-check-label text-danger" for="3">Disagree</label>
             </div>
         </div>
+
         <div class="d-flex justify-content-end">
-            <button class="btn btn-sm btn-nat" @click="submitMediation($event)">
+            <button class="btn btn-sm btn-primary" @click="submitMediation($event)">
                 Submit mediation
             </button>
         </div>

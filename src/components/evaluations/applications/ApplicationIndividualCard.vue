@@ -1,42 +1,21 @@
 <template>
-    <div
-        class="col-lg-3 col-md-4 col-sm-6 my-2"
-        @click="selectApplication()"
-    >
-        <div
-            class="card border-outline"
-            :class="[isSelected ? 'selected-card' : '', 'border-' + findRelevantEval(), isNatEvaluator() ? 'card-bg-priority' : 'custom-bg-dark']"
-            data-toggle="modal"
-            data-target="#applicationIndividualInfo"
-        >
-            <card-header
-                :username="application.applicant.username"
-                :osu-id="application.applicant.osuId"
-            />
-            <card-footer
-                :mode="application.mode"
-                :nominator-assessment-mongo-id="application.id"
-                :evaluations="application.evaluations"
-                :is-discuss="false"
-                :date="application.createdAt"
-                :is-application="true"
-                :feedback="application.feedback"
-                @check-selection="checkSelection()"
-            />
-        </div>
-    </div>
+    <application-card
+        target="#applicationIndividualInfo"
+        :application="application"
+        :is-discuss="false"
+        :is-application="true"
+        :all-checked="allChecked"
+        @select-application="selectApplication()"
+    />
 </template>
 
 <script>
-import { mapState } from 'vuex';
-import CardHeader from '../card/CardHeader.vue';
-import CardFooter from '../card/CardFooter.vue';
+import ApplicationCard from './ApplicationCard.vue';
 
 export default {
     name: 'ApplicationIndividualCard',
     components: {
-        CardHeader,
-        CardFooter,
+        ApplicationCard,
     },
     props: {
         application: {
@@ -45,65 +24,10 @@ export default {
         },
         allChecked: Boolean,
     },
-    data() {
-        return {
-            isSelected: false,
-        };
-    },
-    computed: {
-        ...mapState([
-            'evaluator',
-        ]),
-    },
-    watch: {
-        allChecked() {
-            this.checkSelection();
-        },
-    },
     methods: {
         selectApplication() {
             this.$store.commit('setSelectedIndividualApplicationId', this.application.id);
         },
-        findRelevantEval() {
-            let vote;
-            this.application.evaluations.forEach(ev => {
-                if (ev.evaluator.id == this.evaluator.id) {
-                    if (ev.vote == 1) {
-                        vote = 'pass';
-                    } else if (ev.vote == 2) {
-                        vote = 'neutral';
-                    } else {
-                        vote = 'fail';
-                    }
-                }
-            });
-
-            return vote;
-        },
-        checkSelection() {
-            if ($(`#${this.application.id}-check`).is(':checked')) {
-                this.isSelected = true;
-            } else {
-                this.isSelected = false;
-            }
-        },
-        isNatEvaluator() {
-            for (let i = 0; i < this.application.natEvaluators.length; i++) {
-                let user = this.application.natEvaluators[i];
-
-                if (user.id == this.evaluator.id) {
-                    return true;
-                }
-            }
-
-            return false;
-        },
     },
 };
 </script>
-
-<style>
-.card {
-    min-height: 80px;
-}
-</style>

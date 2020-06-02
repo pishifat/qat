@@ -1,7 +1,7 @@
 <template>
-    <div class="text-shadow">
+    <div>
         <p>
-            Consensus:
+            <b>Consensus:</b>
             <span
                 v-if="consensus"
                 :class="consensusColor"
@@ -10,7 +10,7 @@
             </span>
             <span v-if="!isArchive">
                 <button
-                    class="btn btn-sm btn-nat-green ml-2"
+                    class="btn btn-sm btn-pass ml-2"
                     :disabled="consensus == 'pass' && !isLowActivity"
                     @click="setConsensus('pass', $event);"
                 >
@@ -18,14 +18,14 @@
                 </button>
                 <button
                     v-if="!isApplication"
-                    class="btn btn-sm btn-nat-blue"
-                    :disabled="consensus == 'probation' "
+                    class="btn btn-sm btn-probation"
+                    :disabled="consensus == 'probation'"
                     @click="setConsensus('probation', $event);"
                 >
                     Probation
                 </button>
                 <button
-                    class="btn btn-sm btn-nat-red"
+                    class="btn btn-sm btn-fail"
                     :disabled="consensus == 'fail' && !resignedOnGoodTerms && !resignedOnStandardTerms"
                     @click="setConsensus('fail', $event);"
                 >
@@ -33,23 +33,24 @@
                 </button>
             </span>
         </p>
+
         <p v-if="!isArchive && !isApplication">
             <button
-                class="btn btn-xs btn-nat-red"
+                class="btn btn-sm btn-danger mt-2"
                 :disabled="consensus == 'fail' && resignedOnGoodTerms"
                 @click="setConsensus('fail', $event, 'resignedOnGoodTerms');"
             >
                 Resign on good terms
             </button>
             <button
-                class="btn btn-xs btn-nat-red"
+                class="btn btn-sm btn-danger mt-2"
                 :disabled="consensus == 'fail' && resignedOnStandardTerms"
                 @click="setConsensus('fail', $event, 'resignedOnStandardTerms');"
             >
                 Resign on standard terms
             </button>
             <button
-                class="btn btn-xs btn-nat-green"
+                class="btn btn-sm btn-success mt-2"
                 :disabled="consensus == 'pass' && isLowActivity"
                 @click="setConsensus('pass', $event, 'isLowActivity');"
             >
@@ -57,7 +58,7 @@
             </button>
             <button
                 v-if="group == 'bn'"
-                class="btn btn-xs btn-nat-green"
+                class="btn btn-sm btn-success mt-2"
                 :disabled="isMoveToNat"
                 @click="setConsensus('pass', $event, 'isMoveToNat');"
             >
@@ -65,7 +66,7 @@
             </button>
             <button
                 v-else
-                class="btn btn-xs btn-nat-green"
+                class="btn btn-sm btn-success mt-2"
                 :disabled="isMoveToBn"
                 @click="setConsensus('pass', $event, 'isMoveToBn');"
             >
@@ -128,7 +129,7 @@ export default {
             if (!this.consensus) {
                 return '';
             } else {
-                return 'vote-' + this.consensus;
+                return 'text-' + this.consensus;
             }
         },
     },

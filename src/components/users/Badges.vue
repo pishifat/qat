@@ -2,7 +2,7 @@
     <div class="my-2">
         <button
             v-if="!badgeUsers.length"
-            class="btn btn-sm btn-nat minw-200 my-1"
+            class="btn btn-sm btn-primary my-1"
             data-toggle="tooltip"
             data-placement="right"
             title="Finds relevant yearly profile badge info"
@@ -11,10 +11,11 @@
             Load badge info
         </button>
         <div v-if="badgeUsers.length">
-            <p class="min-spacing small my-2">
+            <small class="my-2">
                 only pishifat can edit this section
-            </p>
-            <div v-for="user in badgeUsers" :key="user.id" class="small min-spacing mb-1">
+            </small>
+
+            <div v-for="user in badgeUsers" :key="user.id" class="small mb-1">
                 <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a>
                 <ul>
                     <li :class="user.bnProfileBadge != calculateDuration(user.bnDuration) && calculateDuration(user.bnDuration) >= 1 ? 'background-fail' : ''">

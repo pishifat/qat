@@ -1,14 +1,15 @@
 <template>
-    <div class="small mt-2 d-flex align-items-center">
-        <div class="col-sm-12">
-            Hosted by
-        </div>
-        <div class="col-sm-12 truncate">
+    <div class="small">
+        <div>Hosted by</div>
+
+        <div class="text-truncate">
             <a
                 :href="'https://osu.ppy.sh/users/' + hostId"
                 target="_blank"
                 @click.stop
-            >{{ hostName }}</a>
+            >
+                {{ hostName }}
+            </a>
         </div>
     </div>
 </template>

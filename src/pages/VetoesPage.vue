@@ -5,50 +5,38 @@
                 :placeholder="'enter to search beatmap...'"
                 :options="['', 'osu', 'taiko', 'catch', 'mania']"
             >
-                <button class="btn btn-sm btn-nat ml-2" data-toggle="modal" data-target="#addVeto">
+                <button class="btn btn-block btn-primary my-1" data-toggle="modal" data-target="#addVeto">
                     Submit veto
                 </button>
             </filter-box>
 
-            <section class="row segment segment-image mx-0 px-0">
-                <div class="col-sm-12">
-                    <h2>Active Vetoes <small v-if="activeVetoes">({{ activeVetoes.length }})</small></h2>
-                    <transition-group name="list" tag="div" class="row mx-auto">
-                        <veto-card
-                            v-for="veto in activeVetoes"
-                            :key="veto.id"
-                            :veto="veto"
-                        />
-                    </transition-group>
-                </div>
+            <section class="card card-body">
+                <h2>Active Vetoes <small v-if="activeVetoes">({{ activeVetoes.length }})</small></h2>
+
+                <transition-group name="list" tag="div" class="row">
+                    <veto-card
+                        v-for="veto in activeVetoes"
+                        :key="veto.id"
+                        :veto="veto"
+                    />
+                </transition-group>
             </section>
-            <section class="row segment segment-image mx-0 px-0">
-                <div class="col-sm-12">
-                    <h2>Resolved Vetoes <small v-if="paginatedResolvedVetoes">({{ resolvedVetoes.length }})</small></h2>
-                    <transition-group name="list" tag="div" class="row mx-auto">
-                        <veto-card
-                            v-for="veto in paginatedResolvedVetoes"
-                            :key="veto.id"
-                            :veto="veto"
-                        />
-                    </transition-group>
-                    <button
-                        v-if="pagination.page > 1"
-                        class="btn btn-sm btn-pags btn-pags-left"
-                        type="button"
-                        @click="showNewer()"
-                    >
-                        <i class="fas fa-angle-left px-1" />
-                    </button>
-                    <button
-                        v-if="pagination.page < pagination.maxPages"
-                        class="btn btn-sm btn-pags btn-pags-right"
-                        type="button"
-                        @click="showOlder()"
-                    >
-                        <i class="fas fa-angle-right px-1" />
-                    </button>
-                </div>
+
+            <section class="card card-body">
+                <h2>Resolved Vetoes <small v-if="paginatedResolvedVetoes">({{ resolvedVetoes.length }})</small></h2>
+
+                <transition-group name="list" tag="div" class="row">
+                    <veto-card
+                        v-for="veto in paginatedResolvedVetoes"
+                        :key="veto.id"
+                        :veto="veto"
+                    />
+                </transition-group>
+
+                <pagination-nav
+                    @show-newer="showNewer()"
+                    @show-older="showOlder()"
+                />
             </section>
         </div>
 
@@ -67,6 +55,7 @@ import VetoCard from '../components/vetoes/VetoCard.vue';
 import VetoInfo from '../components/vetoes/VetoInfo.vue';
 import SubmitVeto from '../components/vetoes/SubmitVeto.vue';
 import FilterBox from '../components/FilterBox.vue';
+import PaginationNav from '../components/PaginationNav.vue';
 import postData from '../mixins/postData.js';
 
 export default {
@@ -77,6 +66,7 @@ export default {
         VetoInfo,
         SubmitVeto,
         FilterBox,
+        PaginationNav,
     },
     mixins: [postData],
     computed: {
@@ -105,13 +95,14 @@ export default {
             this.$store.commit('setIsNat', res.isNat);
             this.$store.commit('setIsUser', res.isUser);
 
-            const params = new URLSearchParams(document.location.search.substring(1));
+            const params = new URLSearchParams(document.location.search);
+            const id = params.get('id');
 
-            if (params.get('id') && params.get('id').length) {
-                const i = this.allVetoes.findIndex(v => v.id == params.get('id'));
+            if (id && id.length) {
+                const i = this.allVetoes.findIndex(v => v.id == id);
 
                 if (i >= 0) {
-                    this.$store.commit('setSelectedVetoId', params.get('id'));
+                    this.$store.commit('setSelectedVetoId', id);
                     $('#extendedInfo').modal('show');
                 }
             }

@@ -100,6 +100,12 @@ router.post('/submit', api.isNat, async (req, res) => {
 
 /* POST submit mediation */
 router.post('/submitMediation/:id', async (req, res) => {
+    if (!req.body.vote) {
+        return res.json({
+            error: 'Select your vote!',
+        });
+    }
+
     let m;
 
     if (req.body.mediationId) {

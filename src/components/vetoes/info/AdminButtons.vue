@@ -5,13 +5,13 @@
             <div v-if="selectedVeto.status !== 'upheld' && selectedVeto.status !== 'withdrawn'">
                 <!-- ...based on voting results -->
                 <button
-                    class="btn btn-sm btn-block btn-nat-red mb-2"
+                    class="btn btn-sm btn-block btn-danger mb-2"
                     @click="concludeMediation($event)"
                 >
                     {{ majorityUphold ? 'Uphold veto' : 'Withdraw veto' }}
                 </button>
                 <!-- ...regardless of voting results -->
-                <button class="btn btn-sm btn-block btn-nat-red mb-2" @click="concludeMediation($event, true)">
+                <button class="btn btn-sm btn-block btn-danger mb-2" @click="concludeMediation($event, true)">
                     Dismiss without mediation
                 </button>
             </div>
@@ -19,20 +19,20 @@
             <!-- restart mediation if concluded -->
             <button
                 v-else
-                class="btn btn-sm btn-nat-red btn-block mb-2"
+                class="btn btn-sm btn-danger btn-block mb-2"
                 @click="continueMediation($event, true)"
             >
                 Re-initiate veto mediation
             </button>
 
             <!-- view conclusion discussion post -->
-            <button class="btn btn-sm btn-block btn-nat mb-2" data-toggle="collapse" data-target="#conclusion">
+            <button class="btn btn-sm btn-block btn-primary mb-2" data-toggle="collapse" data-target="#conclusion">
                 See full conclusion post <i class="fas fa-angle-down" />
             </button>
             <conclusion-post />
 
             <!-- view mediator forum PM -->
-            <button class="btn btn-sm btn-block btn-nat mb-2" data-toggle="collapse" data-target="#forumMessage">
+            <button class="btn btn-sm btn-block btn-primary mb-2" data-toggle="collapse" data-target="#forumMessage">
                 See full forum PM <i class="fas fa-angle-down" />
             </button>
             <forum-pm />
@@ -44,44 +44,43 @@
 
             <!-- specify mediators -->
             <div class="mb-2">
-                <span class="text-shadow">Exclude specific user(s):</span>
+                <span>Exclude specific user(s):</span>
                 <input
                     id="excludeUsers"
-                    class="ml-1 w-75 small"
+                    class="form-control ml-1 w-75 small"
                     type="text"
                     placeholder="username1, username2, username3..."
                 ><br>
-                <div class="small text-shadow px-4">
+                <div class="small px-4">
                     The mapper and veto submitter are automatically excluded. Please manually exclude any guest difficulty creators and the nominating BNs.
                 </div>
             </div>
-            <button class="btn btn-sm btn-block btn-nat mb-2" @click="selectMediators($event)">
+            <button class="btn btn-sm btn-block btn-primary mb-2" @click="selectMediators($event)">
                 {{ mediators ? 'Re-select mediators' : 'Select mediators' }}
             </button>
 
             <!-- begin mediation -->
-            <button v-if="mediators && mediators.length" class="btn btn-sm btn-block btn-nat-red mb-2" @click="beginMediation($event)">
+            <button v-if="mediators && mediators.length" class="btn btn-sm btn-block btn-success mb-2" @click="beginMediation($event)">
                 Begin mediation
             </button>
 
             <!-- view mediators -->
-            <div v-if="mediators" class="mt-2">
-                <p class="text-shadow">
-                    Users:
-                </p>
-                <div id="usernames" class="copy-paste mb-4" style="width: 25%">
-                    <ul style="list-style-type: none; padding: 0">
-                        <li v-for="user in mediators" :key="user.id">
-                            <samp class="small">{{ user.username }}</samp>
-                        </li>
-                    </ul>
+            <div v-if="mediators" class="mt-2 row">
+                <div class="col-sm-3 align-self-center">
+                    <b>Users:</b>
+                    <div id="usernames" class="card card-body small">
+                        <ul class="list-unstyled">
+                            <li v-for="user in mediators" :key="user.id">
+                                {{ user.username }}
+                            </li>
+                        </ul>
+                    </div>
                 </div>
 
-                <!-- view mediator forum pm -->
-                <button class="btn btn-sm btn-block btn-nat mb-2" data-toggle="collapse" data-target="#forumMessage">
-                    See full forum PM <i class="fas fa-angle-down" />
-                </button>
-                <forum-pm />
+                <div class="col-sm-9">
+                    <b>Forum PM:</b>
+                    <forum-pm class="show" />
+                </div>
             </div>
         </div>
     </div>

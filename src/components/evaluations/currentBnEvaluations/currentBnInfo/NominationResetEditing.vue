@@ -1,53 +1,51 @@
 <template>
-    <span>
-        <td scope="row" class="w-60">
-            <template v-if="!editing">
+    <td>
+        <template v-if="!editing">
+            <span v-if="hasData" :class="calculateColor">
+                ({{ event.obviousness }}/{{ event.severity }})
+            </span>
+            <span v-if="isNat">
+                <a href="#" @click.prevent="editing = !editing">
+                    <i class="fas fa-edit" />
+                </a>
+            </span>
+            <span v-html="filterLinks(event.content)" />
+
+            <div v-if="event.userQualityAssuranceComment && isNat" class="mt-2">
+                <span class="font-weight-bold">QA comment:</span>
+                <span v-html="filterLinks(event.userQualityAssuranceComment)" />
+            </div>
+        </template>
+
+        <template v-else>
+            <span>
                 <span v-if="hasData" :class="calculateColor">
                     ({{ event.obviousness }}/{{ event.severity }})
                 </span>
-                <span v-if="isNat">
-                    <a href="#" @click.prevent="editing = !editing">
-                        <i class="fas fa-edit" />
-                    </a>
-                </span>
-                <span v-html="filterLinks(event.content)" />
+                <a href="#" @click.prevent="editing = !editing">
+                    <i class="fas fa-edit" />
+                </a>
+                <p class="mt-2 mb-1">Shorten the "reason" field:</p>
+            </span>
+            <textarea
+                v-model="newEventContent"
+                class="form-control form-control-sm mr-2"
+                type="text"
+                rows="4"
+                maxlength="1000"
+            />
+            <button class="btn btn-sm btn-primary btn-block mb-2" @click="updateContent($event);">
+                Save
+            </button>
 
-                <div v-if="event.userQualityAssuranceComment && isNat" class="mt-2">
-                    <span class="font-weight-bold">QA comment:</span>
-                    <span v-html="filterLinks(event.userQualityAssuranceComment)" />
-                </div>
-            </template>
-            <template v-else>
-                <span>
-                    <span v-if="hasData" :class="calculateColor">
-                        ({{ event.obviousness }}/{{ event.severity }})
-                    </span>
-                    <a href="#" @click.prevent="editing = !editing">
-                        <i class="fas fa-edit" />
-                    </a>
-                    <p class="min-spacing mt-2 mb-1">Shorten the "reason" field:</p>
-                </span>
-                <div class="d-flex">
-                    <textarea
-                        v-model="newEventContent"
-                        class="form-control form-control-sm dark-textarea mr-2"
-                        type="text"
-                        rows="4"
-                        maxlength="1000"
-                    />
-                    <button class="btn btn-xs btn-nat align-self-center" @click="updateContent($event);">
-                        Save
-                    </button>
-                </div>
-                <obviousness-severity
-                    :obviousness="event.obviousness"
-                    :severity="event.severity"
-                    :event-id="event._id"
-                    :event-type="event.eventType"
-                />
-            </template>
-        </td>
-    </span>
+            <obviousness-severity
+                :obviousness="event.obviousness"
+                :severity="event.severity"
+                :event-id="event._id"
+                :event-type="event.eventType"
+            />
+        </template>
+    </td>
 </template>
 
 <script>
@@ -87,9 +85,9 @@ export default {
         },
         calculateColor () {
             let total = this.event.obviousness + this.event.severity;
-            if (total >= 4 || this.event.obviousness == 2 || this.event.severity == 3) return 'vote-green';
-            else if (total >= 2) return 'vote-yellow';
-            else return 'vote-red';
+            if (total >= 4 || this.event.obviousness == 2 || this.event.severity == 3) return 'text-success';
+            else if (total >= 2) return 'text-neutral';
+            else return 'text-danger';
         },
     },
     watch: {

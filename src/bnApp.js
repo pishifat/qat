@@ -1,3 +1,5 @@
+import Axios from 'axios';
+
 $(function() {
     $('#loading').hide();
     $('#main').attr('style', 'visibility: visible');
@@ -36,13 +38,13 @@ $(function() {
             $('#submitting').text(`Submitting & calculating mod score... (this will take a few seconds)`);
 
             try {
-                const res = await axios.post(`/bnapps/apply`, { mode, mods, reasons });
+                const res = await Axios.post(`/bnapps/apply`, { mode, mods, reasons });
 
                 if (res.data.error) {
                     $('#errors').text(res.data.error);
                 } else {
                     $('#applyBlock').hide();
-                    $('#startTest').html(`<a href="/testsubmission" class="btn btn-lg btn-nat">Begin Ranking Criteria Test</a>
+                    $('#startTest').html(`<a href="/testsubmission" class="btn btn-lg btn-primary">Begin Ranking Criteria Test</a>
                         <p class="small pt-2 confirm">Your application has been submitted!</p>
                         <p class="small">Before your application can be reviewed, you must take a short test.</p>`);
                 }

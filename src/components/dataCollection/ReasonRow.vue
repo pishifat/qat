@@ -1,5 +1,5 @@
 <template>
-    <td scope="row">
+    <td>
         <!-- edit button -->
         <a
             href="#"
@@ -39,9 +39,9 @@ export default {
         },
         calculateColor() {
             let total = this.event.obviousness + this.event.severity;
-            if (total >= 4 || this.event.obviousness == 2 || this.event.severity == 3) return 'vote-green';
-            else if (total >= 2) return 'vote-yellow';
-            else return 'vote-red';
+            if (total >= 4 || this.event.obviousness == 2 || this.event.severity == 3) return 'text-success';
+            else if (total >= 2) return 'text-neutral';
+            else return 'text-danger';
         },
     },
     methods: {

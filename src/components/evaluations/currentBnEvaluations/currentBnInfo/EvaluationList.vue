@@ -1,49 +1,36 @@
 <template>
     <div>
-        <p class="text-shadow min-spacing">
+        <p>
             <a :href="events && `#${eventsId}`" data-toggle="collapse">{{ header }} <i class="fas fa-angle-down" /></a>
             ({{ isLoading ? '...' : events ? events.length : '0' }})
         </p>
         <div v-if="events" :id="eventsId" class="collapse">
-            <table v-if="events.length" class="table table-sm table-dark table-hover col-md-12 mt-2">
-                <thead>
-                    <td scope="col" class="w-10">
-                        Date
+            <data-table
+                v-if="events.length"
+                :headers="['Date', 'Evaluation', 'Vote', 'Consensus']"
+            >
+                <tr v-for="event in events" :key="event.id">
+                    <td class="text-nowrap">
+                        {{ findDate(event) }}
                     </td>
-                    <td scope="col" class="w-30">
-                        Evaluation
+                    <td>
+                        <a :href="'/' + (isApplication ? 'appeval' : 'bneval') + '?eval=' + event.id" target="_blank">
+                            {{ findUsername(event) }}
+                        </a>
                     </td>
-                    <td scope="col" class="w-30">
-                        Vote
+                    <td>
+                        <span :class="'text-' + findVote(event.evaluations)">
+                            {{ findVote(event.evaluations).toUpperCase() }}
+                        </span>
                     </td>
-                    <td scope="col" class="w-30">
-                        Consensus
+                    <td>
+                        <span :class="'text-' + event.consensus">
+                            {{ event.consensus ? event.consensus.toUpperCase() : 'NONE' }}
+                        </span>
                     </td>
-                </thead>
-                <tbody class="small">
-                    <tr v-for="event in events" :key="event.id">
-                        <td scope="row">
-                            {{ findDate(event) }}
-                        </td>
-                        <td scope="row">
-                            <a :href="'/' + (isApplication ? 'appeval' : 'bneval') + '?eval=' + event.id" target="_blank">
-                                {{ findUsername(event) }}
-                            </a>
-                        </td>
-                        <td scope="row">
-                            <span :class="'vote-' + findVote(event.evaluations)">
-                                {{ findVote(event.evaluations).toUpperCase() }}
-                            </span>
-                        </td>
-                        <td scope="row">
-                            <span :class="'vote-' + event.consensus">
-                                {{ event.consensus ? event.consensus.toUpperCase() : 'NONE' }}
-                            </span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <p v-else class="small text-shadow ml-4">
+                </tr>
+            </data-table>
+            <p v-else class="small ml-4">
                 None...
             </p>
         </div>
@@ -53,9 +40,13 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import filterLinks from '../../../../mixins/filterLinks.js';
+import DataTable from '../../../DataTable.vue';
 
 export default {
     name: 'EvaluationList',
+    components: {
+        DataTable,
+    },
     mixins: [ filterLinks ],
     props: {
         events: {

@@ -42,10 +42,6 @@ router.get('/tests', async (req, res) => {
         status: { $ne: 'finished' },
     });
 
-    if (!tests || !tests.length || tests.error) {
-        return res.redirect('/');
-    }
-
     return res.json({ testList: tests });
 });
 
@@ -58,11 +54,8 @@ router.post('/loadTest', async (req, res) => {
             status: { $ne: 'finished' },
         })
         .populate(defaultPopulate)
-        .sort({ 'answers.question.category': 1 });
-
-    if (!test || test.error) {
-        return res.redirect('/');
-    }
+        .sort({ 'answers.question.category': 1 })
+        .orFail();
 
     if (!test.startedAt) {
         test.startedAt = Date.now();

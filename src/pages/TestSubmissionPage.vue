@@ -1,102 +1,112 @@
 <template>
-    <div v-if="testList">
-        <div v-if="!test">
-            <small>
-                <select v-model="selectedTest" class="custom-select">
-                    <option v-for="pendingTest in testList" :key="pendingTest.id" :value="pendingTest.id">{{ pendingTest.mode }}</option>
-                </select>
-            </small>
-            <button class="btn btn-sm btn-nat" @click="loadTest($event)">
-                Start / Continue
-            </button>
-        </div>
-
-        <div v-if="test" id="fullTest">
-            <div class="segment segment-image test-question">
-                <p>
-                    The purpose of this test is to show your understanding of the
-                    <a href="https://osu.ppy.sh/wiki/Ranking_Criteria" target="_blank">Ranking Criteria</a>, the
-                    <a href="https://osu.ppy.sh/help/wiki/People/Beatmap_Nominators/Rules" target="_blank">Beatmap Nominator Rules</a>, and the
-                    <a href="https://osu.ppy.sh/help/wiki/Ranking_Criteria/Code_of_Conduct" target="_blank">Code of Conduct</a>.
-                </p>
-                <p>Feel free to reference those pages while taking this test. Maybe you'll learn something you didn't already know, which will make you more prepared than you would be otherwise!</p>
-                <br>
-                <p>There are 20 questions total, all of which require you to select all applicable answers. Categories of questions are listed in the upper right for you to reference on their respective wiki pages.</p>
-                <p>The test has no time limit. If you close this page, your answers will not be saved, however you can still take the test at a later time.</p>
-                <p>After submitting your answers, you will see a score out of 20 possible points. When your application is fully evaluated, you will be able to view which questions you answered correctly/incorrectly.</p>
-                <p class="min-spacing">
-                    Good luck!
-                </p>
-            </div>
-
-            <hr>
-
-            <p class="text-center segment">
-                User: {{ test.applicant.username }} -
-                Mode: {{ test.mode }}
-            </p>
-
-            <div v-if="!test.answers.length">
-                <p>Something went wrong and your test was not generated. Contact <a href="https://osu.ppy.sh/users/3178418" target="_blank">pishifat</a> to fix this.</p>
-            </div>
-
-
-
-            <div v-for="(answer, i) in test.answers" :key="answer.id" class="segment segment-image test-question">
-                <small class="float-right">Q{{ ++i }} -- {{ answer.question.category }}</small>
-                <div>
-                    <h5 style="width: 90%">
-                        {{ answer.question.content }}
-                    </h5>
-                    <div v-for="option in answer.question.options" :key="option.id">
-                        <div class="form-check mb-2 ml-2">
-                            <input
-                                :id="option.id"
-                                v-model="checkedOptions[answer.id]"
-                                :checked="checkedOptions[answer.id].includes(answer.id)"
-                                :value="option.id"
-                                class="form-check-input"
-                                type="checkbox"
-                                @change="submitAnswer(answer.id, $event)"
-                            >
-                            <label class="form-check-label" :for="option.id">
-                                <img v-if="answer.question.questionType === 'image'" :src="option.content" class="test-image">
-                                <span v-if="answer.question.questionType === 'text'">{{ option.content }}</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <hr>
-            <div class="segment segment-image">
-                <p class="small min-spacing mb-1">
-                    If you have anything to say to the NAT members evaluating your application, write it here! (optional):
-                </p>
-                <input
-                    v-model="comment"
-                    class="form-control mb-4"
-                    type="text"
-                    maxlength="1000"
-                    placeholder="comment..."
+    <div>
+        <div v-if="testList">
+            <section v-if="!test" class="card card-body">
+                <select
+                    v-model="selectedTest"
+                    class="form-control mb-1"
                 >
-                <div class="mx-auto text-center">
-                    <a href="#top"><button type="submit" class="btn btn-lg btn-nat w-50" @click="submitTest($event)">Submit</button></a>
-                </div>
+                    <option
+                        v-for="pendingTest in testList"
+                        :key="pendingTest.id"
+                        :value="pendingTest.id"
+                    >
+                        {{ pendingTest.mode }}
+                    </option>
+                </select>
+
+                <button class="btn btn-block btn-primary" @click="loadTest($event)">
+                    Start / Continue
+                </button>
+            </section>
+
+            <div v-if="test" id="fullTest">
+                <section v-if="!isSubmitting" class="card card-body">
+                    <p>
+                        The purpose of this test is to show your understanding of the
+                        <a href="https://osu.ppy.sh/wiki/Ranking_Criteria" target="_blank">Ranking Criteria</a>, the
+                        <a href="https://osu.ppy.sh/help/wiki/People/Beatmap_Nominators/Rules" target="_blank">Beatmap Nominator Rules</a>, and the
+                        <a href="https://osu.ppy.sh/help/wiki/Ranking_Criteria/Code_of_Conduct" target="_blank">Code of Conduct</a>.
+                    </p>
+                    <p>Feel free to reference those pages while taking this test. Maybe you'll learn something you didn't already know, which will make you more prepared than you would be otherwise!</p>
+                    <br>
+                    <p>There are 20 questions total, all of which require you to select all applicable answers. Categories of questions are listed in the upper left for you to reference on their respective wiki pages.</p>
+                    <p>The test has no time limit. If you close this page, your answers will not be saved, however you can still take the test at a later time.</p>
+                    <p>After submitting your answers, you will see a score out of 20 possible points. When your application is fully evaluated, you will be able to view which questions you answered correctly/incorrectly.</p>
+                    <br>
+                    Good luck!
+                </section>
+
+                <section class="card card-body text-center">
+                    <div>
+                        <b>User:</b> {{ test.applicant.username }} -
+                        <b>Mode:</b> {{ test.mode }}
+                    </div>
+
+                    <div v-if="!test.answers.length">
+                        Something went wrong and your test was not generated. Contact <a href="https://osu.ppy.sh/users/3178418" target="_blank">pishifat</a> to fix this.
+                    </div>
+                </section>
+
+                <template v-if="!isSubmitting">
+                    <section v-for="(answer, i) in test.answers" :key="answer.id" class="card card-body">
+                        <small class="float-right">Q{{ ++i }} -- {{ answer.question.category }}</small>
+                        <div>
+                            <h5 style="width: 90%">
+                                {{ answer.question.content }}
+                            </h5>
+                            <div v-for="option in answer.question.options" :key="option.id">
+                                <div class="form-check mb-2 ml-2">
+                                    <input
+                                        :id="option.id"
+                                        v-model="checkedOptions[answer.id]"
+                                        :checked="checkedOptions[answer.id].includes(answer.id)"
+                                        :value="option.id"
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        @change="submitAnswer(answer.id, $event)"
+                                    >
+                                    <label class="form-check-label" :for="option.id">
+                                        <img v-if="answer.question.questionType === 'image'" :src="option.content" class="test-image">
+                                        <span v-if="answer.question.questionType === 'text'">{{ option.content }}</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="card card-body">
+                        <p class="mb-1">
+                            If you have anything to say to the NAT members evaluating your application, write it here! (optional):
+                        </p>
+                        <input
+                            v-model="comment"
+                            class="form-control"
+                            type="text"
+                            maxlength="1000"
+                            placeholder="comment..."
+                        >
+
+                        <hr>
+
+                        <a href="#top" class="btn btn-lg btn-primary btn-block" @click="submitTest($event)">Submit</a>
+                    </section>
+                </template>
             </div>
         </div>
 
-        <toast-messages />
-    </div>
-    <div v-else>
-        <div v-if="displayScore || displayScore == 0" class="segment segment-solid">
-            <p class="small">
-                If you see nonsense below this line, you'll need to visit the <a href="http://bn.mappersguild.com/bnapps">BN Application page</a> and re-submit your test. Sorry!
-            </p>
-            <p>Your test has been submitted! Your score is {{ displayScore }}/20.</p>
+        <div v-else class="card card-body">
+            <div v-if="displayScore || displayScore == 0">
+                <p class="small">
+                    If you see nonsense below this line, you'll need to visit the <a href="http://bn.mappersguild.com/bnapps">BN Application page</a> and re-submit your test. Sorry!
+                </p>
+
+                <p>Your test has been submitted! Your score is {{ displayScore }}/20.</p>
+            </div>
+            <div v-else class="text-center">
+                You have no pending test...
+            </div>
         </div>
-        <p v-else class="text-center">
-            You have no pending test...
-        </p>
 
         <toast-messages />
     </div>
@@ -121,13 +131,14 @@ export default {
             displayScore: null,
             checkedOptions: {},
             comment: '',
+            isSubmitting: false,
         };
     },
     async created() {
-        const res = await this.executeGet('/testSubmission/tests');
+        const data = await this.executeGet('/testSubmission/tests');
 
-        if (res) {
-            this.testList = res.testList;
+        if (data && data.testList && data.testList.length) {
+            this.testList = data.testList;
             this.selectedTest = this.testList[0].id;
 
             if (this.testList.length == 1) {
@@ -180,7 +191,7 @@ export default {
                 message: `Submitting... (this will take a few seconds)`,
                 type: 'info',
             });
-            $('.test-question').hide();
+            this.isSubmitting = true;
             const res = await this.executePost('/testSubmission/submitTest', {
                 testId: this.selectedTest,
                 comment: this.comment,
@@ -193,7 +204,7 @@ export default {
                         type: 'danger',
                     });
                     this.loadTest();
-                    $('.test-question').show();
+                    this.isSubmitting = false;
                 } else {
                     this.selectedTest = null;
                     this.testList = null;

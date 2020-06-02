@@ -4,47 +4,55 @@
             <filter-box
                 :placeholder="'enter to search username...'"
                 :options="['', 'osu', 'taiko', 'catch', 'mania']"
-            />
-            <section class="row segment segment-solid my-1 mx-4">
-                <div class="small">
-                    <span class="filter-header">Sort by</span>
-                    <a :class="sort.type === 'username' ? 'sorted' : 'unsorted'" href="#" @click.prevent="updateSorting('username')">Name</a>
-                    <a :class="sort.type === 'bnDuration' ? 'sorted' : 'unsorted'" href="#" @click.prevent="updateSorting('bnDuration')">Time as BN</a>
-                    <a :class="sort.type === 'natDuration' ? 'sorted' : 'unsorted'" href="#" @click.prevent="updateSorting('natDuration')">Time as NAT</a>
+            >
+                <div class="sort-filter">
+                    <span class="sort-filter__title">Sort by</span>
+                    <a
+                        class="sort-filter__item"
+                        :class="sort.type === 'username' ? 'sort-filter__item--selected' : ''"
+                        href="#"
+                        @click.prevent="updateSorting('username')"
+                    >
+                        Name
+                    </a>
+                    <a
+                        class="sort-filter__item"
+                        :class="sort.type === 'bnDuration' ? 'sort-filter__item--selected' : ''"
+                        href="#"
+                        @click.prevent="updateSorting('bnDuration')"
+                    >
+                        Time as BN
+                    </a>
+                    <a
+                        class="sort-filter__item"
+                        :class="sort.type === 'natDuration' ? 'sort-filter__item--selected' : ''"
+                        href="#"
+                        @click.prevent="updateSorting('natDuration')"
+                    >
+                        Time as NAT
+                    </a>
                 </div>
+            </filter-box>
+
+            <section class="card card-body">
+                <transition-group name="list" tag="div" class="row">
+                    <user-card
+                        v-for="user in paginatedUsers"
+                        :key="user.id"
+                        :user="user"
+                    />
+                </transition-group>
+
+                <pagination-nav
+                    @show-newer="showNewer()"
+                    @show-older="showOlder()"
+                />
             </section>
 
-            <section class="row segment segment-image mx-0 px-0">
-                <div class="col-sm-12">
-                    <transition-group name="list" tag="div" class="row mx-auto">
-                        <user-card
-                            v-for="user in paginatedUsers"
-                            :key="user.id"
-                            :user="user"
-                        />
-                    </transition-group>
-                    <button
-                        v-if="pagination.page > 1"
-                        class="btn btn-sm btn-pags btn-pags-left"
-                        type="button"
-                        @click="showNewer()"
-                    >
-                        <i class="fas fa-angle-left px-1" />
-                    </button>
-                    <button
-                        v-if="pagination.page < pagination.maxPages"
-                        class="btn btn-sm btn-pags btn-pags-right"
-                        type="button"
-                        @click="showOlder()"
-                    >
-                        <i class="fas fa-angle-right px-1" />
-                    </button>
-                </div>
-            </section>
             <!-- other tools -->
-            <section class="segment segment-solid my-1 mx-4">
-                <nat-activity />
-                <bn-activity />
+            <section class="card card-body">
+                <nat-activity class="my-2" />
+                <bn-activity classs="my-2" />
                 <badges
                     v-if="isNat"
                 />
@@ -70,8 +78,8 @@ import BnActivity from '../components/users/BnActivity.vue';
 import Badges from '../components/users/Badges.vue';
 import PotentialNatInfo from '../components/users/PotentialNatInfo.vue';
 import FilterBox from '../components/FilterBox.vue';
+import PaginationNav from '../components/PaginationNav.vue';
 import postData from '../mixins/postData.js';
-
 
 export default {
     name: 'UsersPage',
@@ -84,6 +92,7 @@ export default {
         Badges,
         PotentialNatInfo,
         FilterBox,
+        PaginationNav,
     },
     mixins: [postData],
     computed: {

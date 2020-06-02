@@ -1,42 +1,35 @@
 <template>
-    <div class="text-shadow">
-        <div v-for="(mediation, i) in selectedVeto.mediations" :key="mediation.id" class="row border-bottom border-dark my-2">
-            <div class="col-sm-2">
-                <div v-if="isNat">
-                    <a
-                        :href="'https://osu.ppy.sh/users/' + mediation.mediator.osuId"
-                        class="small d-flex flex-column ml-auto font-weight-bold text-center"
-                        :class="voteColor(mediation.vote)"
-                    >
-                        <img :src="'https://a.ppy.sh/' + mediation.mediator.osuId" class="card-avatar-img mx-auto">
-                        {{ mediation.mediator.username }}
-                    </a>
+    <div>
+        <div v-for="(mediation, i) in selectedVeto.mediations" :key="mediation.id" class="row my-3">
+            <div class="col-sm-2 small">
+                <user-avatar
+                    v-if="isNat"
+                    :user="mediation.mediator"
+                    :text-color="voteColor(mediation.vote)"
+                >
                     <a
                         v-if="!mediation.comment && selectedVeto.status === 'wip'"
-                        class="small d-flex flex-column ml-auto text-center mb-2"
                         href="#"
                         data-toggle="tooltip"
                         data-placement="top"
                         title="replace mediator"
                         @click.prevent="replaceMediator(mediation.id);"
                     >
-                        <i class="fas fa-redo-alt vote-pass" />
+                        <i class="fas fa-redo-alt text-success" />
                     </a>
-                </div>
-                <div v-else>
-                    <span
-                        class="small d-flex flex-column ml-auto text-center"
-                        :class="voteColor(mediation.vote)"
-                    >
-                        User {{ i+1 }}
-                    </span>
+                </user-avatar>
+
+                <div v-else class="text-center my-2" :class="voteColor(mediation.vote)">
+                    User {{ i + 1 }}
                 </div>
             </div>
-            <div class="col-sm-10">
-                <pre v-if="!mediation.comment" class="pre-font small">...</pre>
-                <pre
+            <div class="col-sm-10 card card-body small">
+                <div v-if="!mediation.comment">
+                    ...
+                </div>
+                <div
                     v-else
-                    class="pre-font small"
+                    class="pre-line"
                     v-html="filterLinks(mediation.comment.trim())"
                 />
             </div>
@@ -48,9 +41,13 @@
 import { mapState, mapGetters } from 'vuex';
 import filterLinks from '../../../mixins/filterLinks';
 import postData from '../../../mixins/postData';
+import UserAvatar from '../../UserAvatar.vue';
 
 export default {
     name: 'Mediations',
+    components: {
+        UserAvatar,
+    },
     mixins: [ filterLinks, postData ],
     computed: {
         ...mapState([
@@ -64,11 +61,11 @@ export default {
         voteColor (vote) {
             switch (vote) {
                 case 1:
-                    return 'vote-pass';
+                    return 'text-success'; // agree
                 case 2:
-                    return 'vote-neutral';
+                    return 'text-neutral'; // neutral
                 case 3:
-                    return 'vote-fail';
+                    return 'text-danger'; // disagree
             }
         },
         async replaceMediator (mediationId) {
@@ -89,15 +86,3 @@ export default {
     },
 };
 </script>
-
-<style scoped>
-
-.card-avatar-img {
-    max-width: 48px;
-    max-height: 48px;
-    object-fit: cover;
-    border-radius: 100%;
-    box-shadow: 0 1px 1rem rgba(10, 10, 25);
-}
-
-</style>

@@ -1,26 +1,27 @@
 <template>
-    <div class="d-flex justify-content-end align-items-center pr-0">
-        <button
+    <div>
+        <a
             v-if="isQualityAssuranceChecker"
             data-toggle="tooltip"
             data-placement="top"
             title="toggle QA checker"
-            class="btn btn-xs btn-nat-red p-1"
+            class="btn btn-sm btn-link"
             :disabled="forceDisabled"
             @click.prevent="unassignUser($event)"
         >
-            <i class="fas fa-minus vote-fail" />
-        </button>
+            <i class="fas fa-minus text-danger" />
+        </a>
+
         <button
             v-else-if="!isMaxChecks"
             data-toggle="tooltip"
             data-placement="top"
             title="toggle QA checker"
-            class="btn btn-xs btn-nat-green p-1"
+            class="btn btn-sm btn-link"
             :disabled="forceDisabled"
             @click.prevent="assignUser($event)"
         >
-            <i class="fas fa-plus vote-pass" />
+            <i class="fas fa-plus text-success" />
         </button>
     </div>
 </template>

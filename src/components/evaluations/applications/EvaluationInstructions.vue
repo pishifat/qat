@@ -1,12 +1,13 @@
 <template>
-    <section class="row segment my-1 mx-4">
+    <section class="card card-body">
         <a data-toggle="collapse" href="#howToUse">How to evaluate applicants <i class="fas fa-angle-down" /></a>
+
         <div id="howToUse" class="collapse mt-4 mx-2">
-            <p>Modding</p>
-            <p class="small ml-4 min-spacing">
+            <p><b>Modding</b></p>
+            <p class="small ml-4">
                 The following are modding traits expected of Beatmap Nominators. Their mods should demonstrate most, if not all of them
             </p>
-            <ul class="small ml-2" style="list-style-type: disc;">
+            <ul class="small ml-2">
                 <li>Coverage of all difficulty levels</li>
                 <li>Identification of unrankable issues, including ones tools can't detect like timing/metadata</li>
                 <li>Comparisons of parts of a map to support issues/suggestions</li>
@@ -22,7 +23,8 @@
             <p class="small ml-4">
                 While there's no correct way to write a modding evaluation, we recommend writing anything noteworthy about their mods on each map, then a conclusive sentence or two explaining your voting decision.
             </p>
-            <p>Behavior</p>
+
+            <p><b>Behavior</b></p>
             <p class="small ml-4">
                 Behavior is worth commenting on when an applicant is known to consistently cause problems within the mapping/modding community. Links to instances of poor behavior are appreciated when relevant. Behavior more than 3 months ago should only be considered for repeat offenders.
             </p>
@@ -41,6 +43,3 @@ export default {
     name: 'EvaluationInstructions',
 };
 </script>
-
-<style>
-</style>

@@ -1,42 +1,46 @@
 <template>
-    <div class="row my-2" :style="isUser && !event.qualityAssuranceComments.length ? 'max-height: 60px;' : ''">
+    <div class="row my-2">
         <div class="col-sm-12">
             <div
-                class="card static-card text-shadow"
+                class="card"
                 :class="isMaxChecks || isOutdated || isQualityAssuranceChecker ? 'low-opacity' : ''"
             >
-                <div class="row px-0 py-0">
-                    <div class="col-sm-5 row">
+                <div class="row">
+                    <div class="col-sm-12 col-md-5 d-flex">
                         <beatmap-thumbnail
-                            class="col-lg-2 col-md-3 col-sm-4"
                             :beatmapset-id="event.beatmapsetId"
                         />
+
                         <beatmap-metadata
-                            class="row col-lg-10 col-md-9 col-sm-8"
+                            class="mt-2 ml-2"
                             :metadata="event.metadata"
                             :beatmapset-id="event.beatmapsetId"
                         />
                     </div>
-                    <div class="col-sm-7 pr-2">
+
+                    <div class="col-sm-12 col-md-7 mt-2">
                         <div class="row">
                             <beatmap-host
-                                class="row col-sm-3"
+                                class="col-sm-3 ml-2 ml-sm-0"
                                 :host-id="event.hostId"
                                 :host-name="event.hostName"
                             />
+
                             <due-date
-                                class="row col-sm-3"
+                                class="col-sm-3 ml-2 ml-sm-0"
                                 :timestamp="event.timestamp"
                             />
+
                             <quality-assurance-checkers
-                                class="col-sm-4"
+                                class="col-sm-4 ml-2 ml-sm-0"
                                 :quality-assurance-checkers="event.qualityAssuranceCheckers"
                                 :is-quality-assurance-checker="isQualityAssuranceChecker"
                                 :show-all="showAll"
                             />
+
                             <assignment-buttons
                                 v-if="!isOutdated && !isUser"
-                                class="col-sm-3"
+                                class="col-sm-2 ml-2 ml-sm-0 text-center"
                                 :event-id="event.id"
                                 :is-quality-assurance-checker="isQualityAssuranceChecker"
                                 :is-max-checks="isMaxChecks"
@@ -44,9 +48,11 @@
                         </div>
                     </div>
                 </div>
+
                 <comments
                     v-if="!isUser || (isUser && event.qualityAssuranceComments.length)"
-                    class="row small text-shadow my-2"
+                    class="row small"
+                    :class="isUser ? 'mt-2' : ''"
                     :quality-assurance-comments="event.qualityAssuranceComments"
                     :event-id="event.id"
                     :is-max-checks="isMaxChecks"
@@ -112,28 +118,11 @@ export default {
 };
 </script>
 
-<style>
-    .card:hover {
-        transform: scale(1) !important;
-        opacity: 1;
-    }
+<style scoped>
 
-    .card {
-        min-height: 0px !important;
-    }
+.low-opacity {
+    opacity: 0.5 !important;
+}
 
-    .bg-darker {
-        background-color: #252525a6 !important;
-    }
-
-    .collapsing {
-        -webkit-transition: none;
-        transition: none;
-        display: none;
-    }
-
-    .low-opacity {
-        opacity: 0.5 !important;
-    }
 </style>
 
