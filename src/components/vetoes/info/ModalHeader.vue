@@ -1,5 +1,5 @@
 <template>
-    <div class="modal-header" :class="`bg-${selectedVeto.status}`">
+    <div class="modal-header" :class="bgColor">
         <h5 class="modal-title">
             <a :href="`https://osu.ppy.sh/beatmapsets/${selectedVeto.beatmapId}`" target="_blank">{{ selectedVeto.beatmapTitle }}</a> by
             <a :href="`https://osu.ppy.sh/users/${selectedVeto.beatmapMapperId}`" target="_blank">{{ selectedVeto.beatmapMapper }}</a>
@@ -29,24 +29,22 @@ export default {
         ...mapGetters([
             'selectedVeto',
         ]),
+        bgColor () {
+            if (!this.selectedVeto) return '';
+
+            switch (this.selectedVeto.status) {
+                case 'available':
+                    return 'bg-success';
+                case 'upheld':
+                    return 'bg-warning';
+                case 'wip':
+                    return 'bg-purple';
+                case 'withdrawn':
+                    return 'bg-danger';
+                default:
+                    return 'bg-bright-blue-gray';
+            }
+        },
     },
 };
 </script>
-
-<style>
-.bg-available {
-    background-color: var(--available);
-}
-
-.bg-upheld {
-    background-color: var(--upheld);
-}
-
-.bg-wip {
-    background-color: var(--wip);
-}
-
-.bg-withdrawn {
-    background-color: var(--withdrawn);
-}
-</style>

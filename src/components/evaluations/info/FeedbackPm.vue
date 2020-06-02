@@ -7,7 +7,7 @@
             </div>
 
             <!-- pass -->
-            <div v-if="consensus == 'pass'" class="card card-body">
+            <div v-if="consensus == 'pass'" class="card card-body small">
                 <span>Hello!</span><br><br>
                 <span>Following a positive evaluation of your BN application for the [i]{{ mode == 'osu' ? 'osu!' : 'osu!' + mode }}[/i] game mode, you've been invited to join the Beatmap Nominators. Congratulations!</span><br><br>
                 <span>[notice][b]Important information:[/b]</span><br>
@@ -40,7 +40,7 @@
 
         <!-- current BN eval -->
         <div v-else id="currentBnForumPmBox" class="collapse">
-            <div class="card card-body">
+            <div class="card card-body my-2">
                 <span>Current BN Evaluation Results ({{ mode == 'osu' ? 'osu!' : 'osu!' + mode }})</span>
             </div>
 

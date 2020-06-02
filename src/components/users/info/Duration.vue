@@ -4,25 +4,23 @@
             <p class="mb-2">
                 <b>BN:</b> {{ calculateDuration('bn') }}
             </p>
-            <div class="text-secondary">
-                <ul>
-                    <li v-for="(date, i) in selectedUser.bnDuration" :key="date" class="small">
-                        {{ date.slice(0, 10) }}: {{ i % 2 == 0 ? 'joined' : 'left' }}
-                    </li>
-                </ul>
-            </div>
+
+            <ul class="text-secondary">
+                <li v-for="(date, i) in selectedUser.bnDuration" :key="date" class="small">
+                    {{ date.slice(0, 10) }}: {{ i % 2 == 0 ? 'joined' : 'left' }}
+                </li>
+            </ul>
         </div>
         <div v-if="selectedUser.natDuration.length" class="col-sm-6">
             <p class="mb-2">
                 <b>NAT:</b> {{ calculateDuration('nat') }}
             </p>
-            <div>
-                <ul>
-                    <li v-for="(date, i) in selectedUser.natDuration" :key="date" class="small">
-                        {{ date.slice(0, 10) }}: {{ i % 2 == 0 ? 'joined' : 'left' }}
-                    </li>
-                </ul>
-            </div>
+
+            <ul class="text-secondary">
+                <li v-for="(date, i) in selectedUser.natDuration" :key="date" class="small">
+                    {{ date.slice(0, 10) }}: {{ i % 2 == 0 ? 'joined' : 'left' }}
+                </li>
+            </ul>
         </div>
     </div>
 </template>

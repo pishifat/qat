@@ -68,7 +68,7 @@
                                         :for="option.id"
                                         :class="[
                                             option.score > 0 ? 'text-pass' : 'text-fail',
-                                            answer.optionsChosen.indexOf(option.id) >= 0 ? 'bg-secondary' : '',
+                                            answer.optionsChosen.indexOf(option.id) >= 0 ? 'bg-primary' : '',
                                         ]"
                                     >
                                         {{ option.content }}
@@ -79,7 +79,7 @@
                                         :for="option.id"
                                         :class="
                                             answer.optionsChosen.indexOf(option.id) >= 0
-                                                ? 'bg-secondary'
+                                                ? 'bg-primary'
                                                 : ''
                                         "
                                     >

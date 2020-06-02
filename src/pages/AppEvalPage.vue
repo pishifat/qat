@@ -18,6 +18,10 @@
             @set-individual-eval="setIndividualEval($event)"
             @set-complete="setComplete($event)"
         >
+            <template #instructions>
+                <evaluation-instructions />
+            </template>
+
             <template #individual-evaluations-cards>
                 <application-individual-card
                     v-for="application in individualApplications"

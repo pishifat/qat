@@ -5,7 +5,7 @@
             class="d-flex flex-column align-items-center mb-2"
         >
             <img :src="'https://a.ppy.sh/' + user.osuId" class="avatar-img mb-2">
-            <b>{{ user.username }}</b>
+            <b :class="textColor">{{ user.username }}</b>
         </a>
 
         <slot />

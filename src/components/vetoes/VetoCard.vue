@@ -38,7 +38,7 @@
                             data-placement="top"
                             title="deadline"
                         />
-                        <span class="text-danger">{{ veto.deadline.slice(0, 10) }}</span>
+                        {{ veto.deadline.slice(0, 10) }}
                     </span>
                     <span v-else class="small float-left">{{ veto.createdAt.slice(0, 10) }}</span>
                     <i v-if="veto.mode.indexOf('osu') >= 0" class="far fa-circle" />

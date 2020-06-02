@@ -31,7 +31,7 @@
                 </template>
             </filter-box>
 
-            <evaluation-instructions />
+            <slot name="instructions" />
 
             <section class="card card-body">
                 <h2>

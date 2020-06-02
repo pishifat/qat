@@ -102,16 +102,6 @@ header {
 
 // Cards
 
-.card-columns {
-    @include media-breakpoint-only(sm) {
-      column-count: 1;
-    }
-
-    @include media-breakpoint-only(md) {
-      column-count: 2;
-    }
-}
-
 .card-header-img {
     background-image: url('/images/cat.png');
     background-repeat: no-repeat;
@@ -125,14 +115,8 @@ header {
     min-height: 110px;
     height: 100%;
     background-color: $bright-blue-gray;
-    transition: all 0.12s ease-in-out;
-    cursor: default;
+    cursor: pointer;
     @extend .shadow;
-
-    &:hover {
-        transform: scale(1.03);
-        opacity: 1;
-    }
 
     & .card-body {
         padding: 0.5rem 1rem 0.5rem 1rem;

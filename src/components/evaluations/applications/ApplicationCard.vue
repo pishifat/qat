@@ -4,7 +4,7 @@
         @click="$emit('select-application')"
     >
         <div
-            class="card"
+            class="card cursor-pointer"
             :class="[isSelected ? 'bg-nat' : '', 'border-' + findRelevantEval, isNatEvaluator ? 'bg-info' : '']"
             data-toggle="modal"
             :data-target="target"

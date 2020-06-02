@@ -60,28 +60,27 @@
             </button>
 
             <!-- begin mediation -->
-            <button v-if="mediators && mediators.length" class="btn btn-sm btn-block btn-danger mb-2" @click="beginMediation($event)">
+            <button v-if="mediators && mediators.length" class="btn btn-sm btn-block btn-success mb-2" @click="beginMediation($event)">
                 Begin mediation
             </button>
 
             <!-- view mediators -->
-            <div v-if="mediators" class="mt-2">
-                <p>
-                    Users:
-                </p>
-                <div id="usernames" class="mb-4 w-25 card card-body small">
-                    <ul class="list-unstyled">
-                        <li v-for="user in mediators" :key="user.id">
-                            {{ user.username }}
-                        </li>
-                    </ul>
+            <div v-if="mediators" class="mt-2 row">
+                <div class="col-sm-3 align-self-center">
+                    <b>Users:</b>
+                    <div id="usernames" class="card card-body small">
+                        <ul class="list-unstyled">
+                            <li v-for="user in mediators" :key="user.id">
+                                {{ user.username }}
+                            </li>
+                        </ul>
+                    </div>
                 </div>
 
-                <!-- view mediator forum pm -->
-                <button class="btn btn-sm btn-block btn-nat mb-2" data-toggle="collapse" data-target="#forumMessage">
-                    See full forum PM <i class="fas fa-angle-down" />
-                </button>
-                <forum-pm />
+                <div class="col-sm-9">
+                    <b>Forum PM:</b>
+                    <forum-pm />
+                </div>
             </div>
         </div>
     </div>

@@ -40,9 +40,13 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import filterLinks from '../../../../mixins/filterLinks.js';
+import DataTable from '../../../DataTable.vue';
 
 export default {
     name: 'EvaluationList',
+    components: {
+        DataTable,
+    },
     mixins: [ filterLinks ],
     props: {
         events: {

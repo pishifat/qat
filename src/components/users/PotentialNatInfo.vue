@@ -17,28 +17,56 @@
                 <p class="ml-2">
                     <a data-toggle="collapse" :href="'#evaluations' + user.osuId" @click.prevent>Show app evals ({{ user.evaluatedApps.length }}) <i class="fas fa-angle-down" /></a>
                 </p>
+
                 <div :id="'evaluations' + user.osuId" class="collapse ml-4">
-                    <div v-for="app in user.evaluatedApps" :key="app.id">
-                        <div>
-                            Applicant: <a :href="'https://osu.ppy.sh/users/' + app.applicant.osuId" target="_blank">{{ app.applicant.username }}</a> -- {{ app.createdAt.slice(0,10) }}
+                    <div v-for="app in user.evaluatedApps" :key="app.id" class="my-2">
+                        <div class="card card-body mb-2">
+                            <div>
+                                <b>Applicant:</b>
+                                <a :href="'https://osu.ppy.sh/users/' + app.applicant.osuId" target="_blank">
+                                    {{ app.applicant.username }}
+                                </a>
+                                -- {{ app.createdAt.slice(0,10) }}
+                            </div>
                         </div>
-                        <div>
-                            Consensus: <span :class="app.consensus == 'pass' ? 'text-success' : 'text-danger'">{{ app.consensus }}</span>
+
+                        <div class="card card-body mb-2">
+                            <div class="mb-2">
+                                <b>NAT Consensus:</b>
+                                <span :class="app.consensus == 'pass' ? 'text-success' : 'text-danger'">{{ app.consensus }}</span>
+                            </div>
+
+                            <b>Feedback:</b>
+                            <div class="pre-line text-secondary ml-2">
+                                {{ app.feedback }}
+                            </div>
                         </div>
-                        <div>
-                            NAT Feedback: <i>{{ app.feedback }}</i>
+
+                        <div class="card card-body">
+                            <div class="mb-2">
+                                <b>BN's opinion:</b>
+                                <span :class="findVote(app.evaluations, user.osuId) == 'pass' ? 'text-success' : findVote(app.evaluations, user.osuId) == 'neutral' ? 'text-neutral' : 'text-danger'">
+                                    {{ findVote(app.evaluations, user.osuId) }}
+                                </span>
+                            </div>
+
+                            <div class="mb-2">
+                                <b>Behavior comment:</b>
+                                <div class="pre-line text-secondary ml-2">
+                                    {{ findBehaviorComment(app.evaluations, user.osuId) }}
+                                </div>
+                            </div>
+
+                            <div>
+                                <b>Modding comment:</b>
+
+                                <div class="pre-line text-secondary ml-2">
+                                    {{ findModdingComment(app.evaluations, user.osuId) }}
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            BN's opinion:<span :class="findVote(app.evaluations, user.osuId) == 'pass' ? 'text-success' : findVote(app.evaluations, user.osuId) == 'neutral' ? 'text-neutral' : 'text-danger'">
-                                {{ findVote(app.evaluations, user.osuId) }}
-                            </span>
-                        </div>
-                        <div class="ml-3">
-                            Behavior comment: <i>{{ findBehaviorComment(app.evaluations, user.osuId) }}</i>
-                        </div>
-                        <div class="ml-3">
-                            Modding comment: <i>{{ findModdingComment(app.evaluations, user.osuId) }}</i>
-                        </div>
+
+                        <hr>
                     </div>
                 </div>
             </div>

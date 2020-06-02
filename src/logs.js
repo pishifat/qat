@@ -20,16 +20,4 @@ $(function () {
             });
         });
     });
-
-    $('#showErrors').click(function () {
-        $.getJSON(`/logs/showErrors`).done(function (logs) {
-            $.each(logs, function (k, log) {
-                $(`<tr>
-                    <td scope="row">${new Date(log.createdAt).toString().slice(4,24)} GMT</td>
-                    <td scope="row">~</td>
-                    <td scope="row">${log.action}</td>
-                </tr>`).hide().prependTo('tbody').fadeIn();
-            });
-        });
-    });
 });

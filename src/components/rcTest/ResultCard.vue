@@ -1,6 +1,6 @@
 <template>
     <div class="col-md-6 col-lg-4 my-2" @click="selectTest()">
-        <div class="card">
+        <div class="card cursor-pointer">
             <div class="card-body">
                 <a
                     :href="'https://osu.ppy.sh/users/' + selectedTest.applicant.osuId"

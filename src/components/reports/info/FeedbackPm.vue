@@ -9,7 +9,7 @@
                 Open osu! PM
             </a>
 
-            <div class="card card-body pre-line">
+            <div class="card card-body pre-line small">
                 <span>Hello!</span><br><br>
                 <span v-if="selectedReport.culprit">You recently reported [url=https://osu.ppy.sh/users/{{ selectedReport.culprit.osuId }}]{{ selectedReport.culprit.username }}[/url] for the following reason:</span>
                 <span v-else>You recently reported [url={{ selectedReport.link }}]this link[/url] for the following reason:</span><br><br>

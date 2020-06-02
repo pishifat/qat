@@ -23,33 +23,39 @@
                 :user-list="submittedEvaluators"
             />
         </div>
+
         <div v-if="!bnEvaluators.length && isApplication" class="col-sm-12">
-            <button class="btn btn-sm btn-nat mb-2 w-100" @click="selectBnEvaluators($event)">
-                {{ potentialBnEvaluators ? 'Re-select BN Evaluators' : 'Select BN Evaluators' }}
-            </button>
-            <button v-if="potentialBnEvaluators && potentialBnEvaluators.length" class="btn btn-sm btn-danger mb-2 w-100" @click="enableBnEvaluators($event)">
-                Enable BN evaluations
-            </button>
+            <hr>
+
             <div class="row">
                 <div class="col-sm-6">
-                    <span>Include specific user(s):</span>
+                    <b>Include specific user(s):</b>
                     <input
                         v-model="includeUsers"
-                        class="ml-2 w-100 small"
+                        class="ml-2 form-control"
                         type="text"
                         placeholder="username1, username2, username3..."
                     >
                 </div>
                 <div class="col-sm-6">
-                    <span>Exclude specific user(s):</span>
+                    <b>Exclude specific user(s):</b>
                     <input
                         v-model="excludeUsers"
-                        class="ml-2 w-100 small"
+                        class="ml-2 form-control"
                         type="text"
                         placeholder="username1, username2, username3..."
                     >
                 </div>
             </div>
+
+            <button class="btn btn-sm btn-nat my-2 btn-block" @click="selectBnEvaluators($event)">
+                {{ potentialBnEvaluators ? 'Re-select BN Evaluators' : 'Select BN Evaluators' }}
+            </button>
+
+            <button v-if="potentialBnEvaluators && potentialBnEvaluators.length" class="btn btn-sm btn-success my-2 btn-block" @click="enableBnEvaluators($event)">
+                Enable BN evaluations
+            </button>
+
             <div v-if="potentialBnEvaluators">
                 <p class="my-3">
                     Users:
@@ -61,14 +67,17 @@
                         </li>
                     </ul>
                 </div>
-                <p>Forum message:</p>
-                <div id="forumMessage">
-                    <samp class="small">Hello!</samp><br><br>
-                    <samp class="small">You have been selected to help evaluate the [i]{{ mode == 'osu' ? 'osu!' : 'osu!' + mode }}[/i] mode BN application for [url=https://osu.ppy.sh/users/{{ osuId }}]{{ username }}[/url].</samp><br><br>
-                    <samp class="small">Please post your thoughts on the applicant's behavior and modding quality (based on submitted mods and anything else you may know) on the [url=http://bn.mappersguild.com/appeval]BN/NAT website[/url].</samp><br><br>
-                    <samp class="small">If the user's application is not visible, that means it has received enough evaluations for a consensus to be reached -- this usually [b]3-5 days[/b] after you receive this message. Your decision will be anonymous to everyone but members of the NAT.</samp><br><br>
-                    <samp class="small">Keep in mind that this is a 100% optional activity. If you do not want to participate in BN application evaluations, opt-out from your card on the [url=http://bn.mappersguild.com/users]users page[/url]. Failing to finish on time has no penalty.</samp><br><br>
-                    <samp class="small">Thank you for your hard work!</samp><br><br>
+
+                <p>
+                    <b>Forum message:</b>
+                </p>
+                <div id="forumMessage" class="card card-body small">
+                    <span>Hello!</span><br><br>
+                    <span>You have been selected to help evaluate the [i]{{ mode == 'osu' ? 'osu!' : 'osu!' + mode }}[/i] mode BN application for [url=https://osu.ppy.sh/users/{{ osuId }}]{{ username }}[/url].</span><br><br>
+                    <span>Please post your thoughts on the applicant's behavior and modding quality (based on submitted mods and anything else you may know) on the [url=http://bn.mappersguild.com/appeval]BN/NAT website[/url].</span><br><br>
+                    <span>If the user's application is not visible, that means it has received enough evaluations for a consensus to be reached -- this usually [b]3-5 days[/b] after you receive this message. Your decision will be anonymous to everyone but members of the NAT.</span><br><br>
+                    <span>Keep in mind that this is a 100% optional activity. If you do not want to participate in BN application evaluations, opt-out from your card on the [url=http://bn.mappersguild.com/users]users page[/url]. Failing to finish on time has no penalty.</span><br><br>
+                    <span>Thank you for your hard work!</span>
                 </div>
             </div>
         </div>

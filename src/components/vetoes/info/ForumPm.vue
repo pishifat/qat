@@ -1,5 +1,5 @@
 <template>
-    <div id="forumMessage" class="collapse card card-body small">
+    <div class="card card-body small">
         <span>Hello!</span><br><br>
         <span>You have been selected as a veto mediator for [url=https://osu.ppy.sh/beatmapsets/{{ selectedVeto.beatmapId }}]{{ selectedVeto.beatmapTitle }}[/url].</span><br>
         <span>The map is currently vetoed for the following reason:</span><br>
