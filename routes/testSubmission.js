@@ -10,20 +10,6 @@ const router = express.Router();
 
 router.use(api.isLoggedIn);
 
-const defaultPopulate = [
-    { path: 'applicant', select: 'username' },
-    { path: 'answers', select: 'question optionsChosen' },
-    {
-        path: 'answers',
-        populate: {
-            path: 'question',
-            populate: {
-                path: 'options',
-            },
-        },
-    },
-];
-
 /* GET test page */
 router.get('/', (req, res) => {
     res.render('testsubmission', {
@@ -46,14 +32,36 @@ router.get('/tests', async (req, res) => {
 });
 
 /* POST test by user */
-router.post('/loadTest', async (req, res) => {
+router.get('/tests/:id', async (req, res) => {
     let test = await TestSubmission
         .findOne({
-            _id: req.body.testId,
+            _id: req.params.id,
             applicant: req.session.mongoId,
             status: { $ne: 'finished' },
         })
-        .populate(defaultPopulate)
+        .populate([
+            {
+                path: 'applicant',
+                select: 'username',
+            },
+            {
+                path: 'answers',
+                select: 'question optionsChosen',
+
+                populate: {
+                    path: 'question',
+                    select: 'content category options questionType',
+
+                    populate: {
+                        path: 'options',
+                        select: 'content metadataType',
+                        match: {
+                            active: true,
+                        },
+                    },
+                },
+            },
+        ])
         .sort({ 'answers.question.category': 1 })
         .orFail();
 
@@ -63,14 +71,16 @@ router.post('/loadTest', async (req, res) => {
         await test.save();
     }
 
-    return res.json(test);
+    return res.json({
+        test,
+    });
 });
 
 /* POST submit answers */
 router.post('/submitAnswer', async (req, res) => {
     if (!req.body.answerId || !req.body.checkedOptions) return res.json({ error: 'Something went wrong!' });
 
-    let answer = await TestAnswer.findByIdAndUpdate(req.body.answerId, { optionsChosen: req.body.checkedOptions });
+    const answer = await TestAnswer.findByIdAndUpdate(req.body.answerId, { optionsChosen: req.body.checkedOptions });
 
     if (!answer || answer.error) return res.json({ error: 'Something went wrong!' });
     else return res.json({ success: 'ok' });
@@ -84,70 +94,86 @@ router.post('/submitTest', async (req, res) => {
             applicant: req.session.mongoId,
             status: { $ne: 'finished' },
         })
-        .populate(defaultPopulate);
+        .populate({
+            path: 'answers',
+            populate: {
+                path: 'question',
+                populate: {
+                    path: 'options',
+                },
+            },
+        })
+        .orFail();
 
-    const currentBnApp = await BnApp.findOne({
-        applicant: req.session.mongoId,
-        mode: test.mode,
-        active: true,
-    });
+    const currentBnApp = await BnApp
+        .findOne({
+            applicant: req.session.mongoId,
+            mode: test.mode,
+            active: true,
+        })
+        .orFail();
 
-    if (!test || test.error || !currentBnApp || currentBnApp.error) return res.json({ error: 'Something went wrong!' });
-    let displayScore = 0;
+    let totalScore = 0;
 
     for (const answer of test.answers) {
         let questionScore = 0;
 
         for (const option of answer.question.options) {
-            if (answer.optionsChosen.indexOf(option.id) != -1) {
+            if (answer.optionsChosen.includes(option.id)) {
                 questionScore += option.score;
             }
         }
 
-        if (questionScore < 0) questionScore = 0;
-        displayScore += questionScore;
+        // Adding scores below 0 are just wrong answers - Only add 'overall' correct answers
+        if (questionScore > 0) {
+            totalScore += questionScore;
+        }
     }
 
-    displayScore = displayScore.toFixed(1);
-    const [updatedTest, updatedApp] = await Promise.all([
-        TestSubmission.findByIdAndUpdate(req.body.testId, {
-            submittedAt: Date.now(),
-            status: 'finished',
-            totalScore: displayScore,
-            comment: req.body.comment,
-        }),
-        BnApp.findByIdAndUpdate(currentBnApp.id, { test: test._id }),
+    totalScore = totalScore.toFixed(1);
+    test.submittedAt = Date.now();
+    test.status = 'finished';
+    test.totalScore = totalScore;
+    test.comment = req.body.comment;
+    currentBnApp.test = test._id;
+
+    await Promise.all([
+        test.save(),
+        currentBnApp.save(),
     ]);
 
-    if (!updatedTest || updatedTest.error || !updatedApp || updatedApp.error) return res.json({ error: 'Something went wrong!' });
+    res.json({
+        totalScore,
+    });
 
-    res.json(displayScore);
     Logger.generate(req.session.mongoId, `Completed ${test.mode} BN app test`);
 
     const twoEvaluationModes = ['catch', 'mania'];
-    //const threeEvaluationModes = ['osu', 'taiko'];
-
     const invalids = [8129817, 3178418];
     const assignedNat = await User.aggregate([
-        { $match: { group: 'nat', isSpectator: { $ne: true }, modes: test.mode, osuId: { $nin: invalids } } },
-        { $sample: { size: twoEvaluationModes.includes(test.mode) ? 2 : 3 } },
+        {
+            $match: {
+                group: 'nat',
+                isSpectator: { $ne: true },
+                modes: test.mode,
+                osuId: { $nin: invalids },
+            },
+        },
+        {
+            $sample: {
+                size: twoEvaluationModes.includes(test.mode) ? 2 : 3,
+            },
+        },
     ]);
-    let natList = '';
 
-    for (let i = 0; i < assignedNat.length; i++) {
-        let user = assignedNat[i];
-        await BnApp.findByIdAndUpdate(currentBnApp.id, { $push: { natEvaluators: user._id } });
-        natList += user.username;
-
-        if (i + 1 < assignedNat.length) {
-            natList += ', ';
-        }
-    }
+    currentBnApp.natEvaluators = assignedNat;
+    await currentBnApp.save();
+    const natList = assignedNat.map(n => n.username).join(', ');
 
     api.webhookPost(
         [{
             author: api.defaultWebhookAuthor(req.session),
-            description: `Submitted [BN application](http://bn.mappersguild.com/appeval?eval=${currentBnApp.id}) with test score of **${displayScore}**`,
+            description: `Submitted [BN application](http://bn.mappersguild.com/appeval?eval=${currentBnApp.id}) with test score of **${totalScore}**`,
             color: api.webhookColors.green,
             fields: [
                 {

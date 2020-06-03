@@ -50,27 +50,31 @@
 
                 <template v-if="!isSubmitting">
                     <section v-for="(answer, i) in test.answers" :key="answer.id" class="card card-body">
-                        <small class="float-right">Q{{ ++i }} -- {{ answer.question.category }}</small>
-                        <div>
-                            <h5 style="width: 90%">
+                        <div class="form-inline mb-2">
+                            <h5>
                                 {{ answer.question.content }}
                             </h5>
-                            <div v-for="option in answer.question.options" :key="option.id">
-                                <div class="form-check mb-2 ml-2">
-                                    <input
-                                        :id="option.id"
-                                        v-model="checkedOptions[answer.id]"
-                                        :checked="checkedOptions[answer.id].includes(answer.id)"
-                                        :value="option.id"
-                                        class="form-check-input"
-                                        type="checkbox"
-                                        @change="submitAnswer(answer.id, $event)"
-                                    >
-                                    <label class="form-check-label" :for="option.id">
-                                        <img v-if="answer.question.questionType === 'image'" :src="option.content" class="test-image">
-                                        <span v-if="answer.question.questionType === 'text'">{{ option.content }}</span>
-                                    </label>
-                                </div>
+
+                            <div class="small ml-0 mr-2 ml-lg-auto order-first order-lg-last">
+                                Q{{ ++i }} -- {{ answer.question.category }}
+                            </div>
+                        </div>
+
+                        <div v-for="option in answer.question.options" :key="option.id">
+                            <div class="form-check mb-2 ml-2">
+                                <input
+                                    :id="option.id"
+                                    v-model="checkedOptions[answer.id]"
+                                    :checked="checkedOptions[answer.id].includes(answer.id)"
+                                    :value="option.id"
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    @change="submitAnswer(answer.id, $event)"
+                                >
+                                <label class="form-check-label" :for="option.id">
+                                    <img v-if="answer.question.questionType === 'image'" :src="option.content" class="test-image">
+                                    <span v-if="answer.question.questionType === 'text'">{{ option.content }}</span>
+                                </label>
                             </div>
                         </div>
                     </section>
@@ -153,7 +157,7 @@ export default {
             .fadeIn();
     },
     methods: {
-        getActiveOptions (options) {
+        randomSort (options) {
             let currentIndex = options.length;
             let temporaryValue, randomIndex;
 
@@ -165,19 +169,19 @@ export default {
                 options[randomIndex] = temporaryValue;
             }
 
-            return options.filter(o => o.active);
+            return options;
         },
         async loadTest (e) {
             if (this.selectedTest) {
-                const test = await this.executePost('/testSubmission/loadTest', { testId: this.selectedTest }, e);
+                const data = await this.executeGet(`/testSubmission/tests/${this.selectedTest}`, e);
 
-                if (test && !test.error) {
-                    test.answers.forEach(a => {
+                if (data.test && !data.error) {
+                    data.test.answers.forEach(a => {
                         this.checkedOptions[a.id] = a.optionsChosen;
 
-                        a.question.options = this.getActiveOptions(a.question.options);
+                        a.question.options = this.randomSort(a.question.options);
                     });
-                    this.test = test;
+                    this.test = data.test;
                 }
             } else {
                 this.$store.dispatch('updateToastMessages', {
@@ -192,28 +196,22 @@ export default {
                 type: 'info',
             });
             this.isSubmitting = true;
-            const res = await this.executePost('/testSubmission/submitTest', {
+            const data = await this.executePost('/testSubmission/submitTest', {
                 testId: this.selectedTest,
                 comment: this.comment,
             }, e);
 
-            if ((res || res == 0) && !res.error) {
-                if (res.error) {
-                    this.$store.dispatch('updateToastMessages', {
-                        message: res.error,
-                        type: 'danger',
-                    });
-                    this.loadTest();
-                    this.isSubmitting = false;
-                } else {
-                    this.selectedTest = null;
-                    this.testList = null;
-                    this.displayScore = res;
-                    this.$store.dispatch('updateToastMessages', {
-                        message: `Test submitted!`,
-                        type: 'success',
-                    });
-                }
+            if (data.totalScore != undefined) {
+                this.selectedTest = null;
+                this.testList = null;
+                this.displayScore = data.totalScore;
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Test submitted!`,
+                    type: 'success',
+                });
+            } else {
+                this.loadTest();
+                this.isSubmitting = false;
             }
         },
         async submitAnswer (answerId, e) {
