@@ -17,7 +17,7 @@
                 <span>[*]Follow the golden rule: [i]don't fuck up[/i].[/list][/notice]</span><br><br>
                 <span>Your test results can be found here: http://bn.mappersguild.com/testresults</span><br><br>
                 <span>Additional feedback from the NAT:</span><br><br>
-                <span>[notice]{{ feedback }}[/notice]</span>
+                <span>[notice] {{ feedback }} [/notice]</span>
                 <span>[url={{ discordLink || 'expired link' }}]Link to the BN Discord Server[/url]</span><br><br>
                 <span>Regards, the Nomination Assessment Team</span>
             </div>
@@ -28,7 +28,7 @@
                 <span>Following an evaluation of your BN application for the [i]{{ mode == 'osu' ? 'osu!' : 'osu!' + mode }}[/i] game mode, we've decided not to admit you into the Beatmap Nominators.</span><br><br>
                 <span>Your test results can be found here: http://bn.mappersguild.com/testresults</span><br><br>
                 <span>Additional feedback regarding why you were rejected and what you could potentially improve in your next application:</span><br><br>
-                <span>[notice]{{ feedback }}[/notice]</span>
+                <span>[notice] {{ feedback }} [/notice]</span>
                 <span>If you have questions or wish for more in-depth feedback, contact any of these users:
                     <span v-for="(evaluation, i) in natEvaluations" :key="i">[url=https://osu.ppy.sh/users/{{ evaluation.evaluator.osuId }}]{{ evaluation.evaluator.username }}[/url]{{ i+1 != natEvaluations.length ? ", " : "" }}</span>
                 </span><br><br>
@@ -60,7 +60,7 @@
                     <span>After evaluating your work as a BN, we'd just like to let you know that you're doing well. Thanks!</span><br><br>
                 </span>
                 <span>Additional feedback from the NAT:</span><br><br>
-                <span>[notice]{{ feedback }}[/notice]</span>
+                <span>[notice] {{ feedback }} [/notice]</span>
                 <span>Regards, the Nomination Assessment Team</span>
             </div>
 
@@ -75,7 +75,7 @@
                     <span>After reviewing your work as a BN for the [i]{{ mode == 'osu' ? 'osu!' : 'osu!' + mode }}[/i] game mode, we have decided to [b]place you on probation[/b]. After one month, we will re-evaluate your work as a BN to determine if your probation should be lifted or if you should be removed from the Beatmap Nominators.</span><br><br>
                 </span>
                 <span>Additional feedback from the NAT:</span><br><br>
-                <span>[notice]{{ feedback }}[/notice]</span>
+                <span>[notice] {{ feedback }} [/notice]</span>
                 <span>For further feedback or to appeal this decision, contact any of these users:
                     <span v-for="(evaluation, i) in natEvaluations" :key="i">[url=https://osu.ppy.sh/users/{{ evaluation.evaluator.osuId }}]{{ evaluation.evaluator.username }}[/url]{{ i+1 != natEvaluations.length ? ", " : "" }}</span>
                 </span><br><br>
@@ -102,7 +102,7 @@
                 </span><br><br>
                 <span v-if="!resigned">
                     <span>Additional feedback from the NAT:</span><br><br>
-                    <span>[notice]{{ feedback }}[/notice]</span>
+                    <span>[notice] {{ feedback }} [/notice]</span>
                     <span>For further feedback or to appeal this decision, contact any of these users:
                         <span v-for="(evaluation, i) in natEvaluations" :key="i">[url=https://osu.ppy.sh/users/{{ evaluation.evaluator.osuId }}]{{ evaluation.evaluator.username }}[/url]{{ i+1 != natEvaluations.length ? ", " : "" }}</span>
                     </span><br><br>
