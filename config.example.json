@@ -5,7 +5,7 @@
     "secret": "",
     "redirect": "http://localhost:8080/callback",
     "connection": "",
-    "apiSecret": "",
+    "interOpSecret": "",
     "standardWebhook": {
         "id": "",
         "token": "",
