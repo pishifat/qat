@@ -46,9 +46,6 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
         Veto.find({ status: 'wip' }),
     ]);
 
-    activeApps = [];
-    activeRounds = [];
-
     // determine if NAT receives highlight by mode
     let osuHighlight;
     let taikoHighlight;
