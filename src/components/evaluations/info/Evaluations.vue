@@ -11,7 +11,7 @@
 
         <div v-for="evaluation in bnEvaluations" :key="evaluation.id">
             <evaluation-content
-                content-type="nat"
+                content-type="bn"
                 :evaluation="evaluation"
             />
 
