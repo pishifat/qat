@@ -31,7 +31,6 @@
 </template>
 
 <script>
-import filterLinks from '../../mixins/filterLinks.js';
 import ReasonRow from './ReasonRow.vue';
 import DataTable from '../DataTable.vue';
 
@@ -41,7 +40,6 @@ export default {
         ReasonRow,
         DataTable,
     },
-    mixins: [filterLinks],
     props: {
         events: {
             type: Array,

@@ -23,11 +23,11 @@
             <div class="row">
                 <div class="col-sm-12">
                     <b>Modding:</b>
-                    <div class="pre-line small ml-2 card card-body" v-html="filterLinks(evaluation.moddingComment)" />
+                    <div class="small ml-2 card card-body" v-html="$md.render(evaluation.moddingComment)" />
                 </div>
                 <div class="col-sm-12">
                     <b>Behavior:</b>
-                    <div class="pre-line small ml-2 card card-body" v-html="filterLinks(evaluation.behaviorComment)" />
+                    <div class="small ml-2 card card-body" v-html="$md.render(evaluation.behaviorComment)" />
                 </div>
             </div>
         </div>
@@ -35,7 +35,6 @@
 </template>
 
 <script>
-import filterLinks from '../../../mixins/filterLinks.js';
 import UserAvatar from '../../UserAvatar.vue';
 import { mapState, mapGetters } from 'vuex';
 
@@ -44,7 +43,6 @@ export default {
     components: {
         UserAvatar,
     },
-    mixins: [ filterLinks ],
     props: {
         evaluation: {
             type: Object,

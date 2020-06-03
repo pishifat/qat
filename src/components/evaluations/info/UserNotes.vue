@@ -22,22 +22,18 @@
                         {{ note.author.username }}
                     </a>
                 </b>
-                <div
-                    class="pre-line"
-                    v-html="filterLinks(note.comment)"
-                />
+                <div v-html="$md.render(note.comment)" />
             </li>
         </ul>
     </div>
 </template>
 
 <script>
-import filterLinks from '../../../mixins/filterLinks.js';
 import postData from '../../../mixins/postData.js';
 
 export default {
     name: 'UserNotes',
-    mixins: [ filterLinks, postData ],
+    mixins: [ postData ],
     props: {
         userMongoId: {
             type: String,

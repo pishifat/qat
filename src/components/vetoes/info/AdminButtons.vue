@@ -89,7 +89,6 @@
 <script>
 import { mapGetters } from 'vuex';
 import ConclusionPost from './ConclusionPost.vue';
-import filterLinks from '../../../mixins/filterLinks';
 import ForumPm from './ForumPm.vue';
 import postData from '../../../mixins/postData';
 
@@ -99,7 +98,7 @@ export default {
         ConclusionPost,
         ForumPm,
     },
-    mixins: [ filterLinks, postData ],
+    mixins: [ postData ],
     data() {
         return {
             mediators: null,

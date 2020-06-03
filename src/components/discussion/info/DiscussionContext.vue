@@ -52,7 +52,7 @@
                 @keyup.enter="saveProposal()"
             >
 
-            <span v-else class="small" v-html="filterLinks(selectedDiscussionVote.shortReason)" />
+            <span v-else class="small" v-html="$md.render(selectedDiscussionVote.shortReason)" />
         </p>
     </div>
 </template>
@@ -60,11 +60,10 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import postData from '../../../mixins/postData.js';
-import filterLinks from '../../../mixins/filterLinks.js';
 
 export default {
     name: 'DiscussionContext',
-    mixins: [ postData, filterLinks ],
+    mixins: [ postData ],
     data() {
         return {
             isEditTitle: false,

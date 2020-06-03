@@ -22,22 +22,18 @@
                     {{ report.valid == 1 ? 'VALID' : report.valid == 2 ? 'PARTIALLY VALID' : report.valid == 3 ? 'INVALID' : '' }}
                 </span>
 
-                <div
-                    class="pre-line"
-                    v-html="filterLinks(report.reason)"
-                />
+                <div v-html="$md.render(report.reason)" />
             </li>
         </ul>
     </div>
 </template>
 
 <script>
-import filterLinks from '../../../../mixins/filterLinks.js';
 import postData from '../../../../mixins/postData.js';
 
 export default {
     name: 'UserReports',
-    mixins: [filterLinks, postData],
+    mixins: [postData],
     props: {
         userMongoId: {
             type: String,

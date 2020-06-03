@@ -10,7 +10,7 @@
                 <span
                     v-if="reasons"
                     class="text-secondary"
-                    v-html="filterLinks(reasons[i])"
+                    v-html="$md.render(reasons[i])"
                 />
             </li>
             <li class="small">
@@ -21,11 +21,8 @@
 </template>
 
 <script>
-import filterLinks from '../../../../mixins/filterLinks.js';
-
 export default {
     name: 'Mods',
-    mixins: [ filterLinks ],
     props: {
         mods: {
             type: Array,

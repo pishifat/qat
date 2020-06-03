@@ -9,11 +9,11 @@
                     <i class="fas fa-edit" />
                 </a>
             </span>
-            <span v-html="filterLinks(event.content)" />
+            <span v-html="$md.render(event.content)" />
 
             <div v-if="event.userQualityAssuranceComment && isNat" class="mt-2">
-                <span class="font-weight-bold">QA comment:</span>
-                <span v-html="filterLinks(event.userQualityAssuranceComment)" />
+                <b>QA comment:</b>
+                <span v-html="$md.render(event.userQualityAssuranceComment)" />
             </div>
         </template>
 
@@ -51,7 +51,6 @@
 <script>
 import { mapState } from 'vuex';
 import postData from '../../../../mixins/postData.js';
-import filterLinks from '../../../../mixins/filterLinks.js';
 import ObviousnessSeverity from './ObviousnessSeverity.vue';
 
 export default {
@@ -59,7 +58,7 @@ export default {
     components: {
         ObviousnessSeverity,
     },
-    mixins: [ postData, filterLinks ],
+    mixins: [ postData ],
     props: {
         event: {
             type: Object,

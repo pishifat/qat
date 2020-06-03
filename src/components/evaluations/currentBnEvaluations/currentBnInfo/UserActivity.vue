@@ -41,6 +41,7 @@
             :events-id="'assignedApplications'"
             :header="'Application Evaluations (BN)'"
             :is-application="true"
+            :mongo-id="mongoId"
         />
         <evaluation-list
             v-if="isNat && natApplications && natApplications.length"
@@ -48,6 +49,7 @@
             :events-id="'natApplications'"
             :header="'Application Evaluations (NAT)'"
             :is-application="true"
+            :mongo-id="mongoId"
         />
         <evaluation-list
             v-if="isNat && natEvalRounds && natEvalRounds.length"
@@ -55,6 +57,7 @@
             :events-id="'natEvalRounds'"
             :header="'Current BN Evaluations (NAT)'"
             :is-application="false"
+            :mongo-id="mongoId"
         />
     </div>
 </template>
@@ -62,7 +65,6 @@
 <script>
 import { mapState } from 'vuex';
 import postData from '../../../../mixins/postData.js';
-import filterLinks from '../../../../mixins/filterLinks.js';
 import EventsList from './EventsList.vue';
 import NominationResets from './NominationResets.vue';
 import EvaluationList from './EvaluationList.vue';
@@ -74,7 +76,7 @@ export default {
         NominationResets,
         EvaluationList,
     },
-    mixins: [ postData, filterLinks ],
+    mixins: [ postData ],
     props: {
         modes: {
             type: Array,

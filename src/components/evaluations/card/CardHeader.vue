@@ -1,10 +1,14 @@
 <template>
-    <div class="card-body mx-1" :class="consensusColor">
+    <div class="card-body">
         <p class="card-text">
             <a :href="'https://osu.ppy.sh/users/' + osuId" target="_blank">
-                {{ username }}
+                <b>{{ username }}</b>
             </a>
         </p>
+        <div v-if="consensus">
+            Consensus:
+            <span :class="`text-${consensus}`">{{ consensus }}</span>
+        </div>
     </div>
 </template>
 
@@ -31,28 +35,6 @@ export default {
         ...mapState([
             'isNat',
         ]),
-        consensusColor() {
-            if (this.consensus && this.isNat) {
-                return 'border-bottom border-' + this.consensus;
-            }
-
-            return '';
-        },
     },
 };
 </script>
-
-<style scoped>
-
-.card-consensus-status {
-    position: absolute;
-    top: 0px;
-    right: 0px;
-    width: 0px;
-    height: 0px;
-    border-bottom: 15px solid transparent;
-    border-right: 15px solid transparent;
-    z-index: 10000;
-}
-
-</style>

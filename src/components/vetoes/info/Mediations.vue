@@ -29,8 +29,7 @@
                 </div>
                 <div
                     v-else
-                    class="pre-line"
-                    v-html="filterLinks(mediation.comment.trim())"
+                    v-html="$md.render(mediation.comment.trim())"
                 />
             </div>
         </div>
@@ -39,7 +38,6 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import filterLinks from '../../../mixins/filterLinks';
 import postData from '../../../mixins/postData';
 import UserAvatar from '../../UserAvatar.vue';
 
@@ -48,7 +46,7 @@ export default {
     components: {
         UserAvatar,
     },
-    mixins: [ filterLinks, postData ],
+    mixins: [ postData ],
     computed: {
         ...mapState([
             'isNat',

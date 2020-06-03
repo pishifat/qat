@@ -3,7 +3,7 @@
         Veto reason:
 
         <p class="small px-4">
-            <span v-html="filterLinks(selectedVeto.shortReason)" />
+            <span v-html="$md.render(selectedVeto.shortReason)" />
             --
             <a :href="selectedVeto.discussionLink" target="_blank">Read the full veto discussion here!</a>
         </p>
@@ -19,11 +19,9 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import filterLinks from '../../../mixins/filterLinks.js';
 
 export default {
     name: 'Context',
-    mixins: [ filterLinks ],
     computed: {
         ...mapGetters([
             'selectedVeto',

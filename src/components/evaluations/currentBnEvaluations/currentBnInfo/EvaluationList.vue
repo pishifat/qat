@@ -4,6 +4,7 @@
             <a :href="events && `#${eventsId}`" data-toggle="collapse">{{ header }} <i class="fas fa-angle-down" /></a>
             ({{ isLoading ? '...' : events ? events.length : '0' }})
         </p>
+
         <div v-if="events" :id="eventsId" class="collapse">
             <data-table
                 v-if="events.length"
@@ -38,8 +39,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex';
-import filterLinks from '../../../../mixins/filterLinks.js';
+import { mapState } from 'vuex';
 import DataTable from '../../../DataTable.vue';
 
 export default {
@@ -47,7 +47,6 @@ export default {
     components: {
         DataTable,
     },
-    mixins: [ filterLinks ],
     props: {
         events: {
             type: Array,
@@ -63,15 +62,16 @@ export default {
             type: String,
             required: true,
         },
+        mongoId: {
+            type: String,
+            required: true,
+        },
         isApplication: Boolean,
     },
     computed: {
         ...mapState({
             isLoading: (state) => state.userActivity.isLoading,
         }),
-        ...mapGetters([
-            'selectedUser',
-        ]),
     },
     methods: {
         findDate (event) {
@@ -88,20 +88,13 @@ export default {
 
             return username;
         },
-        findOsuId (event) {
-            let osuId;
-            if (this.isApplication) osuId = event.applicant.osuId;
-            else osuId = event.bn.osuId;
-
-            return osuId;
-        },
         findVote (evaluations) {
             let vote;
 
             for (let i = 0; i < evaluations.length; i++) {
                 const evaluation = evaluations[i];
 
-                if (evaluation.evaluator.id == this.selectedUser.id) {
+                if (evaluation.evaluator.id == this.mongoId) {
                     vote = evaluation.vote;
                     break;
                 }
@@ -114,22 +107,6 @@ export default {
             else if (vote == 3) vote = 'fail';
 
             return vote;
-        },
-        findModdingComment (evaluations) {
-            let comment;
-
-            for (let i = 0; i < evaluations.length; i++) {
-                const evaluation = evaluations[i];
-
-                if (evaluation.evaluator.id == this.selectedUser.id) {
-                    comment = evaluation.moddingComment;
-                    break;
-                }
-            }
-
-            if (!comment) return 'NONE';
-
-            return comment;
         },
     },
 };

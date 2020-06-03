@@ -51,21 +51,18 @@
                     <i class="fas fa-edit" />
                 </a>
 
-                <div v-if="note.id != editNoteId" class="text-secondary pre-line ml-2" v-html="filterLinks(note.comment)" />
+                <div v-if="note.id != editNoteId" class="text-secondary ml-2" v-html="$md.render(note.comment)" />
                 <div v-else>
-                    <div class="input-group">
-                        <textarea
-                            v-model="editNoteComment"
-                            placeholder="edit user note..."
-                            class="form-control"
-                            rows="2"
-                        />
-                        <div class="input-group-append">
-                            <button class="btn btn-primary" @click="editNote($event)">
-                                Edit
-                            </button>
-                        </div>
-                    </div>
+                    <textarea
+                        v-model="editNoteComment"
+                        placeholder="edit user note..."
+                        class="form-control"
+                        rows="2"
+                    />
+
+                    <button class="btn btn-primary btn-sm btn-block" @click="editNote($event)">
+                        Edit
+                    </button>
                 </div>
             </li>
         </ul>
@@ -75,11 +72,10 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import postData from '../../../mixins/postData.js';
-import filterLinks from '../../../mixins/filterLinks.js';
 
 export default {
     name: 'Notes',
-    mixins: [postData, filterLinks],
+    mixins: [ postData ],
     data() {
         return {
             notes: null,

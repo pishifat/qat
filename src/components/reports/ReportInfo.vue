@@ -1,5 +1,5 @@
 <template>
-    <modal-dialog id="reportInfo" :title="title">
+    <modal-dialog id="reportInfo">
         <template v-if="selectedReport" #header>
             <modal-header />
         </template>

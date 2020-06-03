@@ -15,7 +15,7 @@
             <span
                 v-else-if="!showInput"
                 class="ml-1 small text-white"
-                v-html="filterLinks(userComment)"
+                v-html="$md.render(userComment)"
             />
             <input
                 v-if="showInput"
@@ -35,7 +35,7 @@
                 <!-- if not maxchecks/outdated/currentuser, show Anoynmous: comment, otherwise show username: comment -->
                 <li v-for="mediation in otherUserComments" :key="mediation.id">
                     {{ isNat || isMaxChecks || isOutdated ? mediation.mediator.username + ':' : 'anonymous:' }}
-                    <span v-html="filterLinks(mediation.comment)" />
+                    <span v-html="$md.render(mediation.comment)" />
                 </li>
             </ul>
         </div>
@@ -45,11 +45,10 @@
 <script>
 import { mapState } from 'vuex';
 import postData from '../../mixins/postData.js';
-import filterLinks from '../../mixins/filterLinks.js';
 
 export default {
     name: 'Comments',
-    mixins: [ postData, filterLinks ],
+    mixins: [ postData ],
     props: {
         qualityAssuranceComments: {
             type: Array,

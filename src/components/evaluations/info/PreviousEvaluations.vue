@@ -31,19 +31,18 @@
                     {{ evaluation.consensus.toUpperCase() }}
                 </span>
 
-                <div class="pre-line" v-html="filterLinks(evaluation.feedback)" />
+                <div v-html="$md.render(evaluation.feedback)" />
             </li>
         </ul>
     </div>
 </template>
 
 <script>
-import filterLinks from '../../../mixins/filterLinks.js';
 import postData from '../../../mixins/postData.js';
 
 export default {
     name: 'PreviousEvaluations',
-    mixins: [ filterLinks, postData ],
+    mixins: [ postData ],
     props: {
         userMongoId: {
             type: String,

@@ -61,7 +61,7 @@
                 <b>Current BN Feedback:</b>
             </p>
 
-            <div class="card card-body pre-line small" v-html="filterLinks(selectedDiscussRound.feedback)" />
+            <div class="card card-body small" v-html="$md.render(selectedDiscussRound.feedback)" />
 
             <hr v-if="selectedDiscussRound.consensus">
 
@@ -82,7 +82,6 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import filterLinks from '../../../mixins/filterLinks.js';
 import postData from '../../../mixins/postData.js';
 import UserActivity from './currentBnInfo/UserActivity.vue';
 import PreviousEvaluations from '../info/PreviousEvaluations.vue';
@@ -105,7 +104,7 @@ export default {
         Evaluations,
         ModalDialog,
     },
-    mixins: [ filterLinks, postData ],
+    mixins: [ postData ],
     computed: {
         ...mapState([
             'evaluator',

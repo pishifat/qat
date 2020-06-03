@@ -27,6 +27,7 @@
     "express-session": "^1.17.0",
     "file-loader": "^3.0.1",
     "hbs": "^4.1.1",
+    "markdown-it": "^11.0.0",
     "mongoose": "^5.9.3",
     "morgan": "~1.9.0",
     "node-cron": "^2.0.3",

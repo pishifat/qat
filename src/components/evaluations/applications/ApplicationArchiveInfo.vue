@@ -35,7 +35,7 @@
                 <b>Application Feedback:</b>
             </p>
 
-            <div class="card card-body pre-line small" v-html="filterLinks(selectedDiscussApplication.feedback)" />
+            <div class="card card-body small" v-html="$md.render(selectedDiscussApplication.feedback)" />
 
             <hr v-if="selectedDiscussApplication.consensus">
 
@@ -56,7 +56,6 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import filterLinks from '../../../mixins/filterLinks.js';
 import postData from '../../../mixins/postData.js';
 import ModalHeader from '../info/ModalHeader.vue';
 import Mods from './applicationInfo/Mods.vue';
@@ -75,7 +74,7 @@ export default {
         Evaluations,
         ModalDialog,
     },
-    mixins: [ filterLinks, postData ],
+    mixins: [ postData ],
     computed: {
         ...mapState([
             'evaluator',

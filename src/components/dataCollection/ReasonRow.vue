@@ -17,16 +17,13 @@
         </span>
 
         <!-- dq reason -->
-        <span v-html="filterLinks(event.content)" />
+        <span v-html="$md.render(event.content)" />
     </td>
 </template>
 
 <script>
-import filterLinks from '../../mixins/filterLinks.js';
-
 export default {
     name: 'ReasonRow',
-    mixins: [filterLinks],
     props: {
         event: {
             type: Object,
