@@ -182,11 +182,3 @@ export default {
     },
 };
 </script>
-
-<style>
-
-.pre-line {
-    white-space: pre-line;
-}
-
-</style>

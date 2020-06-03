@@ -87,7 +87,7 @@ export default {
     },
     methods: {
         async findPotentialNatInfo() {
-            const users = await this.executeGet('/nat/findPotentialNatInfo/');
+            const users = await this.executeGet('/users/nat/findPotentialNatInfo/');
 
             if (users) {
                 users.forEach(user => {

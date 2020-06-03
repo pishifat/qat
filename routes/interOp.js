@@ -1,10 +1,12 @@
 const express = require('express');
 const config = require('../config.json');
 const Aiess = require('../models/aiess');
+const EvalRound = require('../models/evalRound');
 const User = require('../models/user');
 
 const router = express.Router();
 
+/* AUTHENTICATION */
 router.use((req, res, next) => {
     const secret = req.header('Qat-Key');
 
@@ -14,10 +16,13 @@ router.use((req, res, next) => {
     return next();
 });
 
+
+/* GET users in BN/NAT */
 router.get('/users', async (_, res) => {
     res.json(await User.find({ group: { $in: ['bn', 'nat'] } }));
 });
 
+/* GET users in or previously in BN/NAT */
 router.get('/users/all', async (_, res) => {
     res.json(
         await User.find({
@@ -29,10 +34,31 @@ router.get('/users/all', async (_, res) => {
     );
 });
 
+/* GET specific user info */
 router.get('/users/:osuId', async (req, res) => {
     res.json(await User.findOne({ osuId: req.params.osuId }));
 });
 
+/* GET general reason for BN removal */
+router.get('/bnRemoval/:osuId', async (req, res) => {
+    const user = await User.findOne({ osuId: req.params.osuId });
+
+    if (!user) {
+        return res.status(404).send('User not found');
+    }
+
+    const latestEvalRound = await EvalRound
+        .findOne({ bn: user._id, consensus: 'fail', active: false })
+        .sort({ $natural: -1 });
+
+    if (!latestEvalRound) {
+        return res.status(404).send('User has no BN removal logged');
+    }
+
+    res.json(latestEvalRound.resignedOnGoodTerms || latestEvalRound.resignedOnStandardTerms ? 'Resigned' : 'Kicked');
+});
+
+/* GET events for beatmapsetID */
 router.get('/events/:beatmapsetId', async (req, res) => {
     res.json(
         await Aiess
