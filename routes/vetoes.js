@@ -187,8 +187,19 @@ router.post('/submitMediation/:id', async (req, res) => {
         return res.json({ error: 'Spectators cannot perform this action!' });
     }
 
-    const originalMediation = await Mediation.findById(req.body.mediationId);
-    await Mediation.findByIdAndUpdate(req.body.mediationId, { comment: req.body.comment, vote: req.body.vote });
+    const mediation = await Mediation.findById(req.body.mediationId).orFail();
+    const isFirstComment = mediation.comment === undefined;
+
+    if (!mediation.mediator._id.equals(res.locals.userRequest.id)) {
+        return res.json({
+            error: 'Unauthorized',
+        });
+    }
+
+    mediation.comment = req.body.comment;
+    mediation.vote = req.body.vote;
+    await mediation.save();
+
     const v = await Veto
         .findById(req.params.id)
         .populate(defaultPopulate);
@@ -197,7 +208,7 @@ router.post('/submitMediation/:id', async (req, res) => {
 
     Logger.generate(
         req.session.mongoId,
-        'Submitted vote for a veto'
+        `${isFirstComment ? 'Submitted' : 'Updated'} vote for a veto`
     );
 
     let count = 0;
@@ -205,7 +216,7 @@ router.post('/submitMediation/:id', async (req, res) => {
         if (mediation.comment) count++;
     });
 
-    if (!originalMediation.comment) {
+    if (isFirstComment) {
         api.webhookPost([{
             author: api.defaultWebhookAuthor(req.session),
             color: api.webhookColors.lightPurple,

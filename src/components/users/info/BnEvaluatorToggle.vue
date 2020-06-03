@@ -33,7 +33,7 @@ export default {
     },
     methods: {
         async switchBnEvaluator(e) {
-            const user = await this.executePost('/users/switchBnEvaluator/' + this.selectedUser.id, { isBnEvaluator: this.selectedUser.isBnEvaluator }, e);
+            const user = await this.executePost(`/users/${this.selectedUser.id}/switchBnEvaluator`, {}, e);
 
             if (user && !user.error) {
                 this.$store.dispatch('updateUser', user);

@@ -15,7 +15,7 @@ const router = express.Router();
 router.use(api.isLoggedIn);
 
 /* GET bn app page */
-router.get('/', (req, res) => {
+router.get('/', api.isNat, (req, res) => {
     res.render('evaluations/bneval', {
         title: 'Current BN Evaluations',
         script: '../javascripts/bnEval.js',

@@ -69,6 +69,7 @@
             "singleline": 3,
             "multiline": 1
         }],
+        "vue/no-v-html": "off",
         "no-trailing-spaces": "error",
         "key-spacing": "error",
         "keyword-spacing": "error",

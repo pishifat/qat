@@ -53,12 +53,11 @@
             <section class="card card-body">
                 <nat-activity class="my-2" />
                 <bn-activity classs="my-2" />
-                <badges
-                    v-if="isNat"
-                />
-                <potential-nat-info
-                    v-if="isNat"
-                />
+
+                <template v-if="isNat">
+                    <badges />
+                    <potential-nat-info />
+                </template>
             </section>
         </div>
 
