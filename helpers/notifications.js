@@ -421,19 +421,20 @@ const lowActivityTask = cron.schedule('0 23 1 * *', async () => {
     const lowActivityFields = [];
     const initialDate = new Date();
     initialDate.setMonth(initialDate.getMonth() - 3);
-    console.log('from', initialDate);
 
     const bns = await User.find({ group: 'bn' });
 
     for (const bn of bns) {
-        for (const mode of bn.modes) {
-            if (await hasLowActivity(initialDate, bn, mode)) {
-                lowActivityFields.push({
-                    name: bn.username,
-                    value: `${await findUniqueNominations(initialDate, bn, mode)}`,
-                    inline: true,
-                    mode,
-                });
+        if (new Date(bn.bnDuration[bn.bnDuration.length-1]) < initialDate) {
+            for (const mode of bn.modes) {
+                if (await hasLowActivity(initialDate, bn, mode)) {
+                    lowActivityFields.push({
+                        name: bn.username,
+                        value: `${await findUniqueNominations(initialDate, bn, mode)}`,
+                        inline: true,
+                        mode,
+                    });
+                }
             }
         }
     }
@@ -475,7 +476,7 @@ const lowActivityTask = cron.schedule('0 23 1 * *', async () => {
         await api.webhookPost(
             [{
                 title: 'Low Activity',
-                description: `The following users have low nomination activity from ${initialDate.toLocaleDateString()} to today`,
+                description: `The following users have low activity from ${initialDate.toLocaleDateString()} to today`,
                 color: api.webhookColors.red,
                 fields: modeField,
             }],
@@ -487,7 +488,7 @@ const lowActivityTask = cron.schedule('0 23 1 * *', async () => {
     scheduled: false,
 });
 
-async function findUniqueNominations (initialDate, bn, mode) {
+async function findUniqueNominations (initialDate, bn) {
     const events = await Aiess.distinct('beatmapsetId', {
         userId: bn.osuId,
         eventType: {
@@ -496,17 +497,33 @@ async function findUniqueNominations (initialDate, bn, mode) {
         timestamp: {
             $gt: initialDate,
         },
-        modes: mode,
+    });
+
+    return events.length;
+}
+
+async function findQualityAssuranceChecks (initialDate, bn) {
+    const events = await Aiess.find({
+        qualityAssuranceCheckers: bn.id,
+        updatedAt: { $gt: initialDate },
     });
 
     return events.length;
 }
 
 async function hasLowActivity (initialDate, bn, mode) {
-    const uniqueNominations = await findUniqueNominations(initialDate, bn, mode);
+    const [uniqueNominations, qualityAssuranceChecks] = await Promise.all([
+        findUniqueNominations(initialDate, bn),
+        findQualityAssuranceChecks(initialDate, bn),
+    ]);
 
-    if ((uniqueNominations < 4 && mode == 'mania') ||
-        (uniqueNominations < 6 && mode != 'mania')
+    if (uniqueNominations < 6) {
+        console.log(bn.username);
+        console.log(qualityAssuranceChecks);
+    }
+
+    if ((uniqueNominations + (qualityAssuranceChecks/4) < 4 && mode == 'mania') ||
+        (uniqueNominations + (qualityAssuranceChecks/4) < 6 && mode != 'mania')
     ) {
         return true;
     }
