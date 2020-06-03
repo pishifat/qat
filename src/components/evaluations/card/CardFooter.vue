@@ -1,10 +1,5 @@
 <template>
     <div class="card-footer d-flex justify-content-start align-items-center">
-        <i v-if="mode == 'osu'" class="far fa-circle mx-1" />
-        <i v-else-if="mode == 'taiko'" class="fas fa-drum mx-1" />
-        <i v-else-if="mode == 'catch'" class="fas fa-apple-alt mx-1" />
-        <i v-else-if="mode == 'mania'" class="fas fa-stream mx-1" />
-
         <span
             v-if="isNat && !isDiscuss"
             class="badge badge-info mx-1"
@@ -60,10 +55,6 @@ export default {
         AddVotes,
     },
     props: {
-        mode: {
-            type: String,
-            required: true,
-        },
         nominatorAssessmentMongoId: {
             type: String,
             required: true,

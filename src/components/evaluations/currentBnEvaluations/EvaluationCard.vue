@@ -11,11 +11,11 @@
         >
             <card-header
                 :username="evaluationRound.bn.username"
+                :mode="evaluationRound.mode"
                 :osu-id="evaluationRound.bn.osuId"
                 :consensus="evaluationRound.consensus"
             />
             <card-footer
-                :mode="evaluationRound.mode"
                 :nominator-assessment-mongo-id="evaluationRound.id"
                 :evaluations="evaluationRound.evaluations"
                 :is-discuss="isDiscuss"

@@ -11,11 +11,11 @@
         >
             <card-header
                 :username="application.applicant.username"
+                :mode="application.mode"
                 :osu-id="application.applicant.osuId"
                 :consensus="application.consensus"
             />
             <card-footer
-                :mode="application.mode"
                 :nominator-assessment-mongo-id="application.id"
                 :evaluations="application.evaluations"
                 :date="application.createdAt"
