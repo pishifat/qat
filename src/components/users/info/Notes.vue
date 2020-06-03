@@ -105,7 +105,7 @@ export default {
     },
     methods: {
         async loadUserNotes() {
-            const notes = await this.executeGet('/users/loadUserNotes/' + this.selectedUser.id);
+            const notes = await this.executeGet('/nat/loadUserNotes/' + this.selectedUser.id);
 
             if (notes) {
                 this.notes = notes;
@@ -113,7 +113,7 @@ export default {
         },
         async saveNote(e) {
             if (this.comment.length) {
-                const note = await this.executePost('/users/saveNote/' + this.selectedUser.id, { comment: this.comment }, e);
+                const note = await this.executePost('/nat/saveNote/' + this.selectedUser.id, { comment: this.comment }, e);
 
                 if (note && !note.error) {
                     if (this.notes) {
@@ -128,7 +128,7 @@ export default {
         },
         async editNote(e) {
             if (this.editNoteComment.length) {
-                const note = await this.executePost('/users/editNote/' + this.editNoteId, { comment: this.editNoteComment }, e);
+                const note = await this.executePost('/nat/editNote/' + this.editNoteId, { comment: this.editNoteComment }, e);
 
                 if (note && !note.error) {
                     if (this.notes) {
@@ -147,7 +147,7 @@ export default {
             const result = confirm(`Are you sure?`);
 
             if (result) {
-                await this.executePost('/users/hideNote/' + noteId, { userId: this.selectedUser.id });
+                await this.executePost('/nat/hideNote/' + noteId, { userId: this.selectedUser.id });
 
                 if (this.notes) {
                     const i = this.notes.findIndex(note => note.id == noteId);

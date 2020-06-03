@@ -47,7 +47,7 @@ export default {
     },
     methods: {
         async findUserBadgeInfo() {
-            const users = await this.executeGet('/users/findUserBadgeInfo');
+            const users = await this.executeGet('/nat/findUserBadgeInfo');
 
             if (users) {
                 this.badgeUsers = [];
@@ -78,7 +78,7 @@ export default {
         },
         async editBadgeValue(id, group, add) {
             const u = await this.executePost(
-                '/users/editBadgeValue/' + id,
+                '/nat/editBadgeValue/' + id,
                 { group, add }
             );
 
