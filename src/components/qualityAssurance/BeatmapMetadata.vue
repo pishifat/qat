@@ -1,12 +1,11 @@
 <template>
-    <div>
+    <div class="text-truncate">
         <div class="text-truncate text-secondary">
             {{ splitMetadata[0] }}
         </div>
         <a
             :href="'https://osu.ppy.sh/beatmapsets/' + beatmapsetId"
             target="_blank"
-            class="text-truncate"
         >
             {{ splitMetadata[1] }}
         </a>
