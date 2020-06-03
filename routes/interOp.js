@@ -8,8 +8,8 @@ const router = express.Router();
 router.use((req, res, next) => {
     const secret = req.header('Qat-Key');
 
-    if (!secret || config.apiSecret !== secret)
-        return res.status(401).send('Invalid API key');
+    if (!secret || config.interOpSecret !== secret)
+        return res.status(401).send('Invalid key');
 
     return next();
 });
@@ -22,9 +22,9 @@ router.get('/users/all', async (_, res) => {
     res.json(
         await User.find({
             $or: [
-                { bnDuration: { $ne: [] } },
-                { natDuration: { $ne: [] } },
-            ]
+                { bnDuration: { $ne: [], $exists: true } },
+                { natDuration: { $ne: [], $exists: true } },
+            ],
         })
     );
 });
