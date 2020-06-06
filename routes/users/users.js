@@ -5,6 +5,7 @@ const Logger = require('../../models/log');
 const BnApp = require('../../models/bnApp');
 const EvalRound = require('../../models/evalRound');
 const Aiess = require('../../models/aiess');
+const getGeneralEvents = require('../bnEval').getGeneralEvents;
 
 const router = express.Router();
 
@@ -232,6 +233,18 @@ router.post('/:id/switchBnEvaluator', api.isBnOrNat, async (req, res) => {
 
     res.json(user);
     Logger.generate(req.session.mongoId, `Opted "${user.username}" ${user.isBnEvaluator ? 'in to' : 'out of'} optional BN app evaluation input`);
+});
+
+/* GET aiess info */
+router.get('/activity/:osuId/:modes/:deadline/:mongoId', async (req, res) => {
+    const mongoId = req.params.mongoId;
+    const modes = req.params.modes.split(',');
+    let deadline = parseInt(req.params.deadline);
+    let minDate = new Date(deadline);
+    minDate.setDate(minDate.getDate() - 90);
+    let maxDate = new Date(deadline);
+
+    res.json(await getGeneralEvents(req.params.osuId, mongoId, modes, minDate, maxDate));
 });
 
 module.exports = router;

@@ -13,9 +13,10 @@ const Note = require('../models/note');
 const router = express.Router();
 
 router.use(api.isLoggedIn);
+router.use(api.isNat);
 
 /* GET bn app page */
-router.get('/', api.isNat, (req, res) => {
+router.get('/', (req, res) => {
     res.render('evaluations/bneval', {
         title: 'Current BN Evaluations',
         script: '../javascripts/bnEval.js',
@@ -50,26 +51,14 @@ const notesPopulate = [
     { path: 'author', select: 'username osuId' },
 ];
 
-const applicationPopulate = [
-    {
-        path: 'applicant',
-        select: 'username osuId',
-    },
-    {
-        path: 'evaluations',
-        select: 'evaluator behaviorComment moddingComment vote',
-        populate: {
-            path: 'evaluator',
-            select: 'username osuId group',
-        },
-    },
-];
-
 /* GET applicant listing. */
-router.get('/relevantInfo', api.isNat, async (req, res) => {
+router.get('/relevantInfo', async (req, res) => {
     const er = await EvalRound.findActiveEvaluations();
 
-    res.json({ er, evaluator: res.locals.userRequest });
+    res.json({
+        er,
+        evaluator: res.locals.userRequest,
+    });
 });
 
 function isValidMode(modeToCheck, isOsu, isTaiko, isCatch, isMania) {
@@ -80,7 +69,8 @@ function isValidMode(modeToCheck, isOsu, isTaiko, isCatch, isMania) {
 }
 
 /* POST submit or edit eval */
-router.post('/addEvalRounds/', api.isNat, api.isNotSpectator, async (req, res) => {
+router.post('/addEvalRounds/', api.isNotSpectator, async (req, res) => {
+    // TODO missing asigned users in response??
     const includeFullBns = req.body.groups.includes('fullBn');
     const includeProbationBns = req.body.groups.includes('probationBn');
     const includeNat = req.body.groups.includes('nat');
@@ -96,18 +86,18 @@ router.post('/addEvalRounds/', api.isNat, api.isNotSpectator, async (req, res) =
     let allUsersByMode = await User.getAllByMode(includeFullBns, includeProbationBns, includeNat);
 
     if (allUsersByMode) {
-        allUsersByMode = allUsersByMode.filter(m => {
-            return isValidMode(m._id, isOsu, isTaiko, isCatch, isMania);
-        });
+        allUsersByMode = allUsersByMode.filter(m => isValidMode(m._id, isOsu, isTaiko, isCatch, isMania));
 
         if (req.body.excludeUsers) {
             const excludeUsers = req.body.excludeUsers.split(',');
 
             for (let i = 0; i < excludeUsers.length; i++) {
-                if (parseInt(excludeUsers[i])) {
-                    excludeUsers[i] = parseInt(excludeUsers[i]);
-                } else {
+                const userId = parseInt(excludeUsers[i], 10);
+
+                if (isNaN(userId)) {
                     excludeUsers[i] = excludeUsers[i].trim().toLowerCase();
+                } else {
+                    excludeUsers[i] = userId;
                 }
             }
 
@@ -225,7 +215,7 @@ router.post('/addEvalRounds/', api.isNat, api.isNotSpectator, async (req, res) =
 });
 
 /* POST submit or edit eval */
-router.post('/submitEval/:id', api.isNat, api.isNotSpectator, async (req, res) => {
+router.post('/submitEval/:id', api.isNotSpectator, async (req, res) => {
     if (req.body.evaluationId) {
         await Evaluation.findByIdAndUpdate(req.body.evaluationId, {
             behaviorComment: req.body.behaviorComment,
@@ -294,7 +284,7 @@ router.post('/submitEval/:id', api.isNat, api.isNotSpectator, async (req, res) =
 });
 
 /* POST set group eval */
-router.post('/setGroupEval/', api.isNat, api.isNotSpectator, async (req, res) => {
+router.post('/setGroupEval/', api.isNotSpectator, async (req, res) => {
     for (let i = 0; i < req.body.checkedRounds.length; i++) {
         let er = await EvalRound
             .findByIdAndUpdate(req.body.checkedRounds[i], { discussion: true })
@@ -334,7 +324,7 @@ router.post('/setGroupEval/', api.isNat, api.isNotSpectator, async (req, res) =>
 });
 
 /* POST set invidivual eval */
-router.post('/setIndividualEval/', api.isNat, api.isNotSpectator, async (req, res) => {
+router.post('/setIndividualEval/', api.isNotSpectator, async (req, res) => {
     await EvalRound.updateMany({
         _id: { $in: req.body.checkedRounds },
     }, {
@@ -351,7 +341,7 @@ router.post('/setIndividualEval/', api.isNat, api.isNotSpectator, async (req, re
 });
 
 /* POST set evals as complete */
-router.post('/setComplete/', api.isNat, api.isNotSpectator, async (req, res) => {
+router.post('/setComplete/', api.isNotSpectator, async (req, res) => {
     for (let i = 0; i < req.body.checkedRounds.length; i++) {
         let er = await EvalRound.findById(req.body.checkedRounds[i]);
         let u = await User.findById(er.bn);
@@ -465,7 +455,7 @@ router.post('/setComplete/', api.isNat, api.isNotSpectator, async (req, res) => 
 });
 
 /* POST set consensus of eval */
-router.post('/setConsensus/:id', api.isNat, api.isNotSpectator, async (req, res) => {
+router.post('/setConsensus/:id', api.isNotSpectator, async (req, res) => {
     let er = await EvalRound.findByIdAndUpdate(req.params.id, {
         consensus: req.body.consensus,
         isLowActivity: req.body.isLowActivity ? true : false,
@@ -526,7 +516,7 @@ router.post('/setConsensus/:id', api.isNat, api.isNotSpectator, async (req, res)
 });
 
 /* POST set cooldown */
-router.post('/setCooldownDate/:id', api.isNat, api.isNotSpectator, async (req, res) => {
+router.post('/setCooldownDate/:id', api.isNotSpectator, async (req, res) => {
     let er = await EvalRound
         .findByIdAndUpdate(req.params.id, { cooldownDate: req.body.cooldownDate })
         .populate(defaultPopulate);
@@ -547,7 +537,7 @@ router.post('/setCooldownDate/:id', api.isNat, api.isNotSpectator, async (req, r
 });
 
 /* POST set feedback of eval */
-router.post('/setFeedback/:id', api.isNat, api.isNotSpectator, async (req, res) => {
+router.post('/setFeedback/:id', api.isNotSpectator, async (req, res) => {
     let er = await EvalRound
         .findByIdAndUpdate(req.params.id, { feedback: req.body.feedback })
         .populate(defaultPopulate);
@@ -578,7 +568,7 @@ router.post('/setFeedback/:id', api.isNat, api.isNotSpectator, async (req, res) 
 });
 
 /* GET find previous evaluations */
-router.get('/findPreviousEvaluations/:id', api.isNat, async (req, res) => {
+router.get('/findPreviousEvaluations/:id', async (req, res) => {
     const evalRounds = await EvalRound.find({
         bn: req.params.id,
         active: false,
@@ -610,7 +600,7 @@ router.get('/findPreviousEvaluations/:id', api.isNat, async (req, res) => {
 });
 
 /* GET find user notes */
-router.get('/findUserNotes/:id', api.isNat, async (req, res) => {
+router.get('/findUserNotes/:id', async (req, res) => {
     const userNotes = await Note
         .find({
             user: req.params.id,
@@ -622,7 +612,7 @@ router.get('/findUserNotes/:id', api.isNat, async (req, res) => {
 });
 
 /* GET find user reports */
-router.get('/findUserReports/:id', api.isNat, async (req, res) => {
+router.get('/findUserReports/:id', async (req, res) => {
     const userReports = await Report.find({
         culprit: req.params.id,
         isActive: { $ne: true },
@@ -632,7 +622,7 @@ router.get('/findUserReports/:id', api.isNat, async (req, res) => {
 });
 
 /* POST replace evaluator */
-router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) => {
+router.post('/replaceUser/:id', api.isNotSpectator, async (req, res) => {
     let evalRound = await EvalRound.findById(req.params.id).populate(defaultPopulate);
     let newEvaluator;
 
@@ -685,37 +675,25 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
     );
 });
 
-/* GET aiess info */
-router.get('/userActivity/:id/:modes/:deadline/:mongoId', async (req, res) => {
-    if (isNaN(req.params.id)) {
-        return res.json({ error: 'Something went wrong!' });
+async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
+    const userOsuId = parseInt(osuIdInput);
+
+    if (isNaN(osuIdInput)) {
+        return { error: 'Something went wrong!' };
     }
 
-    const userOsuId = parseInt(req.params.id);
-    const modes = req.params.modes.split(',');
-    let deadline = parseInt(req.params.deadline);
-    let minDate = new Date(deadline);
-    minDate.setDate(minDate.getDate() - 90);
-    let maxDate = new Date(deadline);
-    const [user, allUserEvents, allEvents, qualityAssuranceChecks, assignedApplications] = await Promise.all([
-        User.findById(req.params.mongoId),
+    const [allUserEvents, allEventsByType, qualityAssuranceChecks] = await Promise.all([
         Aiess.getByEventTypeAndUser(userOsuId, minDate, maxDate, modes),
         Aiess.getAllByEventType(minDate, maxDate, modes),
         Aiess.find({
-            qualityAssuranceCheckers: req.params.mongoId,
+            qualityAssuranceCheckers: mongoId,
             updatedAt: { $gte: minDate, $lte: maxDate },
         }),
-        BnApp
-            .find({
-                bnEvaluators: req.params.mongoId,
-                mode: req.params.mode,
-                createdAt: { $gte: minDate },
-            })
-            .populate(applicationPopulate)
-            .sort({ createdAt: 1 }),
     ]);
 
-    if (user.error || allUserEvents.error || allEvents.error || qualityAssuranceChecks.error || assignedApplications.error) return res.json({ error: 'Something went wrong!' });
+    if (allUserEvents.error || allEventsByType.error) {
+        return { error: 'Something went wrong!' };
+    }
 
     // sort events done by user by type
     let nominations = [];
@@ -727,9 +705,7 @@ router.get('/userActivity/:id/:modes/:deadline/:mongoId', async (req, res) => {
         const events = userEvent.events;
 
         if (eventType == 'Qualified' || eventType == 'Bubbled') {
-            events.forEach(event => {
-                nominations.push(event);
-            });
+            nominations = [...events, ...nominations];
         } else if (eventType == 'Disqualified') {
             disqualifications = events;
         } else if (eventType == 'Popped') {
@@ -749,30 +725,21 @@ router.get('/userActivity/:id/:modes/:deadline/:mongoId', async (req, res) => {
 
     // remove duplicate nominations
     let uniqueNominations = [];
-
-    nominations.forEach(event => {
-        if (uniqueNominations.length == 0) {
-            uniqueNominations.push(event);
-        } else if (!uniqueNominations.find(n => n.beatmapsetId == event.beatmapsetId)) {
-            uniqueNominations.push(event);
-        }
-    });
+    uniqueNominations = nominations.filter(event => !uniqueNominations.some(n => n.beatmapsetId == event.beatmapsetId));
 
     // find user's disqualified/popped nominations & disqualified qa checks
     let nominationsDisqualified = [];
     let nominationsPopped = [];
     let disqualifiedQualityAssuranceChecks = [];
 
-    for (let i = 0; i < allEvents.length; i++) {
-        const eventType = allEvents[i]._id;
-        const events = allEvents[i].events;
+    for (let i = 0; i < allEventsByType.length; i++) {
+        const eventType = allEventsByType[i]._id;
+        const events = allEventsByType[i].events;
 
         if (eventType == 'Disqualified') {
-            for (let j = 0; j < events.length; j++) {
-                let event = events[j];
-
+            for (const event of events) {
                 // check if user's nomination was disqualified
-                if (uniqueNominations.find(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
+                if (uniqueNominations.some(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
                     let a = await Aiess
                         .find({
                             beatmapsetId: event.beatmapsetId,
@@ -783,11 +750,12 @@ router.get('/userActivity/:id/:modes/:deadline/:mongoId', async (req, res) => {
                         .limit(3);
 
                     // check if user was the nominator
-                    if (a[1].userId == userOsuId || a[2].userId == userOsuId) {
+                    if ((a[1] && a[1].userId == userOsuId) || (a[2] && a[2].userId == userOsuId)) {
                         nominationsDisqualified.push(event);
                     }
+
                 // check if user's quality assurance check was later disqualified
-                } else if (qualityAssuranceChecks.find(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
+                } else if (qualityAssuranceChecks.some(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
                     let a = await Aiess
                         .findOne({
                             beatmapsetId: event.beatmapsetId,
@@ -804,7 +772,7 @@ router.get('/userActivity/:id/:modes/:deadline/:mongoId', async (req, res) => {
                         .sort({ timestamp: -1 });
 
                     // check if qa check for previous qualification was done by user and they did not dq it
-                    if (a.qualityAssuranceCheckers.includes(req.params.mongoId) && event.userId != userOsuId) {
+                    if (a.qualityAssuranceCheckers.includes(mongoId) && event.userId != userOsuId) {
                         if (a.qualityAssuranceComments) {
                             // add user's qa comment if it exists
                             const qualityAssuranceComment = a.qualityAssuranceComments.find(m => m.mediator.osuId == userOsuId);
@@ -820,11 +788,9 @@ router.get('/userActivity/:id/:modes/:deadline/:mongoId', async (req, res) => {
                 }
             }
         } else if (eventType == 'Popped') {
-            for (let j = 0; j < events.length; j++) {
-                let event = events[j];
-
+            for (const event of events) {
                 // check if user's bubble was popped
-                if (uniqueNominations.find(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
+                if (uniqueNominations.some(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
                     let a = await Aiess
                         .find({
                             beatmapsetId: event.beatmapsetId,
@@ -834,7 +800,7 @@ router.get('/userActivity/:id/:modes/:deadline/:mongoId', async (req, res) => {
                         .sort({ timestamp: -1 })
                         .limit(2);
 
-                    if (a[1].userId == userOsuId) {
+                    if (a[1] && a[1].userId == userOsuId) {
                         nominationsPopped.push(event);
                     }
                 }
@@ -842,58 +808,106 @@ router.get('/userActivity/:id/:modes/:deadline/:mongoId', async (req, res) => {
         }
     }
 
-    // if user is NAT or was NAT during evaluation period...
+    return {
+        uniqueNominations,
+        nominationsDisqualified,
+        nominationsPopped,
+        disqualifications,
+        pops,
+        disqualifiedQualityAssuranceChecks,
+    };
+}
+
+const applicationPopulate = [
+    {
+        path: 'applicant',
+        select: 'username osuId',
+    },
+    {
+        path: 'evaluations',
+        select: 'evaluator behaviorComment moddingComment vote',
+        populate: {
+            path: 'evaluator',
+            select: 'username osuId group',
+        },
+    },
+];
+
+/* GET aiess info */
+router.get('/activity/:osuId/:modes/:deadline/:mongoId', async (req, res) => {
+    const mongoId = req.params.mongoId;
+    const modes = req.params.modes.split(',');
+    let deadline = parseInt(req.params.deadline);
+    let minDate = new Date(deadline);
+    minDate.setDate(minDate.getDate() - 90);
+    let maxDate = new Date(deadline);
+
+    const [user, assignedApplications] = await Promise.all([
+        User.findById(req.params.mongoId).orFail(),
+        BnApp
+            .find({
+                bnEvaluators: mongoId,
+                mode: req.params.mode,
+                createdAt: { $gte: minDate },
+            })
+            .populate(applicationPopulate)
+            .sort({ createdAt: 1 }),
+    ]);
+
     let natApplications = [];
     let natEvalRounds = [];
 
-    if (user.natDuration.length % 2 || user.natDuration[user.natDuration.length - 1] < minDate) {
-        // find all applications & evalRounds
-        const [allApplications, allEvalRounds] = await Promise.all([
-            BnApp
-                .find({
-                    createdAt: { $gte: minDate },
-                    mode: { $in: modes },
-                    active: false,
-                })
-                .populate(applicationPopulate)
-                .sort({ createdAt: 1 }),
+    // find all applications & evalRounds
+    const [allApplications, allEvalRounds] = await Promise.all([
+        BnApp
+            .find({
+                createdAt: { $gte: minDate },
+                mode: { $in: modes },
+                active: false,
+            })
+            .populate(applicationPopulate)
+            .sort({ createdAt: 1 }),
 
-            EvalRound
-                .find({
-                    deadline: { $gte: minDate },
-                    mode: { $in: modes },
-                    active: false,
-                })
-                .populate(defaultPopulate)
-                .sort({ createdAt: 1 }),
-        ]);
+        EvalRound
+            .find({
+                deadline: { $gte: minDate },
+                mode: { $in: modes },
+                active: false,
+            })
+            .populate(defaultPopulate)
+            .sort({ createdAt: 1 }),
+    ]);
 
-        // extract apps that user evaluated or was assigned to
-        allApplications.forEach(application => {
-            for (let i = 0; i < application.evaluations.length; i++) {
-                const evaluation = application.evaluations[i];
+    // extract apps that user evaluated or was assigned to
+    allApplications.forEach(application => {
+        for (let i = 0; i < application.evaluations.length; i++) {
+            const evaluation = application.evaluations[i];
 
-                if (evaluation.evaluator.id == user.id || (application.natEvaluators && application.natEvaluators.includes(user.id))) {
-                    natApplications.push(application);
-                    break;
-                }
+            if (evaluation.evaluator.id == user.id || (application.natEvaluators && application.natEvaluators.includes(user.id))) {
+                natApplications.push(application);
+                break;
             }
-        });
+        }
+    });
 
-        // extract evalRounds that user evaluated or was assigned to
-        allEvalRounds.forEach(evalRound => {
-            for (let i = 0; i < evalRound.evaluations.length; i++) {
-                const evaluation = evalRound.evaluations[i];
+    // extract evalRounds that user evaluated or was assigned to
+    allEvalRounds.forEach(evalRound => {
+        for (let i = 0; i < evalRound.evaluations.length; i++) {
+            const evaluation = evalRound.evaluations[i];
 
-                if (evaluation.evaluator.id == user.id || (evalRound.natEvaluators && evalRound.natEvaluators.includes(user.id))) {
-                    natEvalRounds.push(evalRound);
-                    break;
-                }
+            if (evaluation.evaluator.id == user.id || (evalRound.natEvaluators && evalRound.natEvaluators.includes(user.id))) {
+                natEvalRounds.push(evalRound);
+                break;
             }
-        });
-    }
+        }
+    });
 
-    res.json({ noms: uniqueNominations, nominationsDisqualified, nominationsPopped, disqualifications, pops, qualityAssuranceChecks, disqualifiedQualityAssuranceChecks, assignedApplications, natApplications, natEvalRounds });
+    res.json({
+        ...await getGeneralEvents(req.params.osuId, mongoId, modes, minDate, maxDate),
+        assignedApplications,
+        natApplications,
+        natEvalRounds,
+    });
 });
 
-module.exports = router;
+module.exports = { router, getGeneralEvents };

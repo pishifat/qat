@@ -64,7 +64,7 @@ export default {
             'evaluator',
         ]),
         findRelevantEval () {
-            const evaluation = this.application.evaluations.find(e => e.evaluator.id == this.evaluator.id);
+            const evaluation = this.application.evaluations.find(e => e.evaluator && e.evaluator.id == this.evaluator.id);
 
             if (evaluation) {
                 switch (evaluation.vote) {

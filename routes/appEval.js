@@ -39,12 +39,24 @@ const defaultPopulate = [
     },
 ];
 
+const bnDefaultPopulate = [
+    { path: 'applicant', select: 'username osuId' },
+    {
+        path: 'evaluations',
+        select: 'behaviorComment moddingComment vote',
+        populate: {
+            path: 'evaluator',
+            select: 'username osuId group',
+        },
+    },
+];
+
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res) => {
-    let a = [];
+    let applications = [];
 
     if (res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator) {
-        a = await BnApp
+        applications = await BnApp
             .find({
                 active: true,
                 test: { $exists: true },
@@ -56,20 +68,33 @@ router.get('/relevantInfo', async (req, res) => {
                 feedback: 1,
             });
     } else {
-        a = await BnApp
+        applications = await BnApp
             .find({
                 test: { $exists: true },
                 bnEvaluators: req.session.mongoId,
             })
-            .populate(defaultPopulate)
+            .select(['active', 'applicant', 'discussion', 'evaluations', 'mode', 'mods', 'reasons', 'consensus', 'createdAt', 'updatedAt'])
+            .populate(bnDefaultPopulate)
             .sort({
                 createdAt: 1,
                 consensus: 1,
                 feedback: 1,
             });
+
+        for (const application of applications) {
+            for (const evaluation of application.evaluations) {
+                if (evaluation.evaluator.id != req.session.mongoId) {
+                    evaluation.evaluator.username = null;
+                    evaluation.evaluator.osuId = null;
+                }
+            }
+        }
     }
 
-    res.json({ a, evaluator: res.locals.userRequest });
+    res.json({
+        applications,
+        evaluator: res.locals.userRequest,
+    });
 });
 
 /* POST submit or edit eval */
@@ -79,11 +104,20 @@ router.post('/submitEval/:id', async (req, res) => {
     }
 
     if (req.body.evaluationId) {
-        await Evaluation.findByIdAndUpdate(req.body.evaluationId, {
-            behaviorComment: req.body.behaviorComment,
-            moddingComment: req.body.moddingComment,
-            vote: req.body.vote,
-        });
+        const evaluation = await Evaluation
+            .findById(req.body.evaluationId)
+            .orFail();
+
+        if (evaluation.evaluator != req.session.mongoId) {
+            res.json({
+                error: 'Unauthorized',
+            });
+        }
+
+        evaluation.behaviorComment = req.body.behaviorComment;
+        evaluation.moddingComment = req.body.moddingComment;
+        evaluation.vote = req.body.vote;
+        await evaluation.save();
     } else {
         const ev = await Evaluation.create({
             evaluator: req.session.mongoId,
@@ -141,7 +175,7 @@ router.post('/submitEval/:id', async (req, res) => {
         }
     }
 
-    let a = await BnApp.findById(req.params.id).populate(defaultPopulate);
+    let a = await BnApp.findById(req.params.id).populate(res.locals.userRequest.isNat ? defaultPopulate : bnDefaultPopulate);
     res.json(a);
     Logger.generate(
         req.session.mongoId,
@@ -294,7 +328,7 @@ router.post('/setConsensus/:id', api.isNat, api.isNotSpectator, async (req, res)
 });
 
 /* POST set cooldown */
-router.post('/setCooldownDate/:id', api.isNotSpectator, async (req, res) => {
+router.post('/setCooldownDate/:id', api.isNat, api.isNotSpectator, async (req, res) => {
     const a = await BnApp
         .findByIdAndUpdate(req.params.id, { cooldownDate: req.body.cooldownDate })
         .populate(defaultPopulate);
@@ -350,12 +384,12 @@ router.post('/setFeedback/:id', api.isNat, api.isNotSpectator, async (req, res) 
 /* POST replace evaluator */
 router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) => {
     const replaceNat = Boolean(req.body.replaceNat);
-    let a = await BnApp.findById(req.params.id).populate(defaultPopulate);
+    let application = await BnApp.findById(req.params.id).populate(defaultPopulate);
     let newEvaluator;
 
     if (replaceNat) {
         const invalids = [8129817, 3178418];
-        a.natEvaluators.forEach(user => {
+        application.natEvaluators.forEach(user => {
             invalids.push(user.osuId);
         });
 
@@ -363,12 +397,12 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
         if (!invalids.includes(req.session.osuId)) {
             let currentUser = await User.findById(req.session.mongoId);
 
-            if (currentUser.modes.includes(a.mode)) {
+            if (currentUser.modes.includes(application.mode)) {
                 newEvaluator = currentUser;
             }
         } else {
             const evaluatorArray = await User.aggregate([
-                { $match: { group: 'nat', isSpectator: { $ne: true }, modes: a.mode, osuId: { $nin: invalids } } },
+                { $match: { group: 'nat', isSpectator: { $ne: true }, modes: application.mode, osuId: { $nin: invalids } } },
                 { $sample: { size: 1 } },
             ]);
             newEvaluator = evaluatorArray[0];
@@ -384,11 +418,11 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
         ]);
     } else {
         let invalids = [];
-        a.bnEvaluators.forEach(user => {
+        application.bnEvaluators.forEach(user => {
             invalids.push(user.osuId);
         });
         const evaluatorArray = await User.aggregate([
-            { $match: { group: 'bn', isSpectator: { $ne: true }, modes: a.mode, osuId: { $nin: invalids }, isBnEvaluator: true, probation: { $size: 0 } } },
+            { $match: { group: 'bn', isSpectator: { $ne: true }, modes: application.mode, osuId: { $nin: invalids }, isBnEvaluator: true, probation: { $size: 0 } } },
             { $sample: { size: 1 } },
         ]);
         newEvaluator = evaluatorArray[0];
@@ -403,13 +437,13 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
         ]);
     }
 
-    a = await BnApp.findById(req.params.id).populate(defaultPopulate);
+    application = await BnApp.findById(req.params.id).populate(defaultPopulate);
 
-    res.json(a);
+    res.json(application);
 
     Logger.generate(
         req.session.mongoId,
-        `Re-selected a ${replaceNat ? 'NAT' : 'BN'} evaluator on BN application for ${a.applicant.username}`
+        `Re-selected a ${replaceNat ? 'NAT' : 'BN'} evaluator on BN application for ${application.applicant.username}`
     );
 
     const user = await User.findById(req.body.evaluatorId);
@@ -418,9 +452,9 @@ router.post('/replaceUser/:id', api.isNat, api.isNotSpectator, async (req, res) 
         [{
             author: api.defaultWebhookAuthor(req.session),
             color: api.webhookColors.orange,
-            description: `Replaced **${user.username}** with **${newEvaluator.username}**  as ${replaceNat ? 'NAT' : 'BN'} evaluator for [**${a.applicant.username}**'s BN app](http://bn.mappersguild.com/appeval?eval=${a.id})`,
+            description: `Replaced **${user.username}** with **${newEvaluator.username}**  as ${replaceNat ? 'NAT' : 'BN'} evaluator for [**${application.applicant.username}**'s BN app](http://bn.mappersguild.com/appeval?eval=${application.id})`,
         }],
-        a.mode
+        application.mode
     );
 });
 

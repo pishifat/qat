@@ -8,7 +8,7 @@
             <li v-for="(mod, i) in mods" :key="i" class="small">
                 <a :href="modUrl(mod)" target="_blank">{{ modUrl(mod) }}</a><br>
                 <span
-                    v-if="reasons"
+                    v-if="reasons && reasons.length"
                     class="text-secondary"
                     v-html="$md.render(reasons[i])"
                 />
