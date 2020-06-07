@@ -119,20 +119,12 @@ const store = new Vuex.Store({
         selectedVeto: (state) => {
             return state.vetoes.find(v => v.id === state.selectedVetoId);
         },
-        currentMediators: (state, getters) => {
-            if (state.isUser) return []; // hide mediators from public
-
-            let veto = getters.selectedVeto;
-            let userIds = [];
-
-            veto.mediations.forEach(mediation => {
-                userIds.push(mediation.mediator.id);
-            });
-
-            return userIds;
-        },
         isMediator: (state, getters) => {
-            return getters.currentMediators.indexOf(state.userId) >= 0;
+            if (!getters.selectedVeto) return false;
+
+            return getters.selectedVeto.mediations.some(m =>
+                m.mediator && m.mediator.id == state.userId
+            );
         },
         majorityUphold: (state, getters) => {
             let total = 0;

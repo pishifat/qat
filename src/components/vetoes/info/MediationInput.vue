@@ -98,10 +98,8 @@ export default {
                 this.comment = null;
                 this.vote = null;
 
-                for (let i = 0; i < this.selectedVeto.mediations.length; i++) {
-                    let mediation = this.selectedVeto.mediations[i];
-
-                    if (mediation.mediator.id === this.userId) {
+                for (const mediation of this.selectedVeto.mediations) {
+                    if (mediation.mediator && mediation.mediator.id === this.userId) {
                         if (mediation.comment) this.comment = mediation.comment;
                         if (mediation.vote) this.vote = mediation.vote;
 

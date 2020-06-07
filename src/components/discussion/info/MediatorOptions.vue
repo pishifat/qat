@@ -96,10 +96,8 @@ export default {
             this.mediationId = null;
 
             if (this.selectedDiscussionVote.mediations.length) {
-                for (let i = 0; i < this.selectedDiscussionVote.mediations.length; i++) {
-                    let mediation = this.selectedDiscussionVote.mediations[i];
-
-                    if (mediation.mediator.id == this.userId) {
+                for (const mediation of this.selectedDiscussionVote.mediations) {
+                    if (mediation.mediator && mediation.mediator.id == this.userId) {
                         if (mediation.vote) this.vote = mediation.vote;
                         if (mediation.comment) this.comment = mediation.comment;
                         this.mediationId = mediation.id;
@@ -111,7 +109,6 @@ export default {
         async submitMediation (e) {
             const discussionVote = await this.executePost(
                 '/discussionVote/submitMediation/' + this.selectedDiscussionVote.id, {
-                    mediationId: this.mediationId,
                     vote: this.vote,
                     comment: this.comment,
                 }, e);

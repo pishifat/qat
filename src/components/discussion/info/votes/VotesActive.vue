@@ -3,7 +3,8 @@
         <p>
             <b>Total votes</b> ({{ selectedDiscussionVote.mediations.length }}):
         </p>
-        <ul>
+
+        <ul v-if="isNat">
             <li v-for="mediation in selectedDiscussionVote.mediations" :key="mediation.id" class="small">
                 {{ mediation.mediator.username }}
             </li>
@@ -12,12 +13,15 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 export default {
-    name: 'VotesNatOnlyActive',
+    name: 'VotesActive',
     computed: {
         ...mapGetters([
             'selectedDiscussionVote',
+        ]),
+        ...mapState([
+            'isNat',
         ]),
     },
 };

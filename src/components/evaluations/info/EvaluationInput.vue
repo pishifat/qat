@@ -124,7 +124,7 @@ export default {
             this.vote = 0;
             this.evaluationId = null;
             this.evaluations.forEach(evaluation => {
-                if (evaluation.evaluator.id == this.evaluatorId) {
+                if (evaluation.evaluator && evaluation.evaluator.id == this.evaluatorId) {
                     this.behaviorComment = evaluation.behaviorComment;
                     this.moddingComment = evaluation.moddingComment;
                     this.vote = evaluation.vote;
@@ -141,7 +141,6 @@ export default {
             } else {
                 const result = await this.executePost(
                     `/${this.isApplication ? 'appEval' : 'bnEval'}/submitEval/${this.nominatorAssessmentMongoId}`, {
-                        evaluationId: this.evaluationId,
                         vote: this.vote,
                         moddingComment: this.moddingComment,
                         behaviorComment: this.behaviorComment,

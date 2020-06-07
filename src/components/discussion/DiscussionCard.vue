@@ -59,7 +59,7 @@ export default {
         findRelevantMediation() {
             let vote;
             this.discussion.mediations.forEach(m => {
-                if (m.mediator.id == this.userId) {
+                if (m.mediator && m.mediator.id == this.userId) {
                     if (m.vote == 1) {
                         vote = 'pass';
                     } else if (m.vote == 2) {

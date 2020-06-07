@@ -39,17 +39,22 @@ const defaultPopulate = [
     },
 ];
 
-const bnDefaultPopulate = [
-    { path: 'applicant', select: 'username osuId' },
-    {
-        path: 'evaluations',
-        select: 'behaviorComment moddingComment vote',
-        populate: {
-            path: 'evaluator',
-            select: 'username osuId group',
+function getBnDefaultPopulate (mongoId) {
+    return [
+        { path: 'applicant', select: 'username osuId' },
+        {
+            path: 'evaluations',
+            select: 'behaviorComment moddingComment vote',
+            populate: {
+                path: 'evaluator',
+                select: 'username osuId group',
+                match: {
+                    _id: mongoId,
+                },
+            },
         },
-    },
-];
+    ];
+}
 
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res) => {
@@ -74,21 +79,14 @@ router.get('/relevantInfo', async (req, res) => {
                 bnEvaluators: req.session.mongoId,
             })
             .select(['active', 'applicant', 'discussion', 'evaluations', 'mode', 'mods', 'reasons', 'consensus', 'createdAt', 'updatedAt'])
-            .populate(bnDefaultPopulate)
+            .populate(
+                getBnDefaultPopulate(req.session.mongoId)
+            )
             .sort({
                 createdAt: 1,
                 consensus: 1,
                 feedback: 1,
             });
-
-        for (const application of applications) {
-            for (const evaluation of application.evaluations) {
-                if (evaluation.evaluator.id != req.session.mongoId) {
-                    evaluation.evaluator.username = null;
-                    evaluation.evaluator.osuId = null;
-                }
-            }
-        }
     }
 
     res.json({
@@ -103,65 +101,82 @@ router.post('/submitEval/:id', async (req, res) => {
         return res.json({ error: 'Spectators cannot perform this action!' });
     }
 
-    if (req.body.evaluationId) {
-        const evaluation = await Evaluation
-            .findById(req.body.evaluationId)
-            .orFail();
+    let application = await BnApp
+        .findOne({
+            _id: req.params.id,
+            active: true,
+        })
+        .populate(defaultPopulate)
+        .orFail();
 
-        if (evaluation.evaluator != req.session.mongoId) {
-            res.json({
-                error: 'Unauthorized',
-            });
-        }
-
-        evaluation.behaviorComment = req.body.behaviorComment;
-        evaluation.moddingComment = req.body.moddingComment;
-        evaluation.vote = req.body.vote;
-        await evaluation.save();
-    } else {
-        const ev = await Evaluation.create({
-            evaluator: req.session.mongoId,
-            behaviorComment: req.body.behaviorComment,
-            moddingComment: req.body.moddingComment,
-            vote: req.body.vote,
+    if (
+        res.locals.userRequest.isBn &&
+        !application.bnEvaluators.some(bn => bn._id == req.session.mongoId)
+    ) {
+        return res.json({
+            error: 'You cannot do this.',
         });
-        const a = await BnApp
-            .findByIdAndUpdate(req.params.id, { $push: { evaluations: ev._id } })
-            .populate(defaultPopulate);
+    }
+
+    let evaluation = application.evaluations.find(e => e.evaluator._id == req.session.mongoId);
+    let isNewEvaluation = false;
+
+    if (!evaluation) {
+        isNewEvaluation = true;
+        evaluation = new Evaluation();
+        evaluation.evaluator = req.session.mongoId;
+    }
+
+    evaluation.behaviorComment = req.body.behaviorComment;
+    evaluation.moddingComment = req.body.moddingComment;
+    evaluation.vote = req.body.vote;
+    await evaluation.save();
+
+    if (isNewEvaluation) {
+        application.evaluations.push(evaluation);
+        await application.save();
 
         api.webhookPost(
             [{
                 author: api.defaultWebhookAuthor(req.session),
                 color: api.webhookColors.lightGreen,
-                description: `Submitted eval for [**${a.applicant.username}**'s BN application](http://bn.mappersguild.com/appeval?eval=${a.id})`,
+                description: `Submitted eval for [**${application.applicant.username}**'s BN application](http://bn.mappersguild.com/appeval?eval=${application.id})`,
             }],
-            a.mode
+            application.mode
         );
         const twoEvaluationModes = ['catch', 'mania'];
         const threeEvaluationModes = ['osu', 'taiko'];
 
-        if (!a.discussion && ((threeEvaluationModes.includes(a.mode) && a.evaluations.length > 2) || (twoEvaluationModes.includes(a.mode) && a.evaluations.length > 1))) {
+        if (!application.discussion &&
+            (
+                (threeEvaluationModes.includes(application.mode) && application.evaluations.length > 2) ||
+                (twoEvaluationModes.includes(application.mode) && application.evaluations.length > 1)
+            )
+        ) {
             let pass = 0;
             let neutral = 0;
             let fail = 0;
             let nat = 0;
-            a.evaluations.forEach(evaluation => {
+            application.evaluations.forEach(evaluation => {
                 if (evaluation.evaluator.group == 'nat') nat++;
                 if (evaluation.vote == 1) pass++;
                 else if (evaluation.vote == 2) neutral++;
                 else if (evaluation.vote == 3) fail++;
             });
 
-            if ((threeEvaluationModes.includes(a.mode) && nat > 2) || (twoEvaluationModes.includes(a.mode) && nat > 1)) {
+            if (
+                (threeEvaluationModes.includes(application.mode) && nat > 2) ||
+                (twoEvaluationModes.includes(application.mode) && nat > 1)
+            ) {
                 await BnApp.findByIdAndUpdate(req.params.id, { discussion: true });
 
                 api.webhookPost(
                     [{
                         thumbnail: {
-                            url: `https://a.ppy.sh/${a.applicant.osuId}`,
+                            url: `https://a.ppy.sh/${application.applicant.osuId}`,
                         },
                         color: api.webhookColors.gray,
-                        description: `[**${a.applicant.username}**'s BN app](http://bn.mappersguild.com/appeval?eval=${a.id}) moved to group discussion`,
+                        description: `[**${application.applicant.username}**'s BN app](http://bn.mappersguild.com/appeval?eval=${application.id}) moved to group discussion`,
                         fields: [
                             {
                                 name: 'Votes',
@@ -169,17 +184,23 @@ router.post('/submitEval/:id', async (req, res) => {
                             },
                         ],
                     }],
-                    a.mode
+                    application.mode
                 );
             }
         }
     }
 
-    let a = await BnApp.findById(req.params.id).populate(res.locals.userRequest.isNat ? defaultPopulate : bnDefaultPopulate);
-    res.json(a);
+    application = await BnApp
+        .findById(req.params.id)
+        .populate(
+            res.locals.userRequest.isNat ? defaultPopulate : getBnDefaultPopulate(req.session.mongoId)
+        );
+
+    res.json(application);
+
     Logger.generate(
         req.session.mongoId,
-        `${req.body.evaluationId ? 'Updated' : 'Submitted'} ${a.mode} BN app evaluation for "${a.applicant.username}"`
+        `${isNewEvaluation ? 'Submitted' : 'Updated'} ${application.mode} BN app evaluation for "${application.applicant.username}"`
     );
 });
 

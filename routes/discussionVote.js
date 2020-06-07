@@ -20,6 +20,19 @@ const defaultPopulate = [
     },
 ];
 
+function getBnDefaultPopulate (mongoId) {
+    return {
+        path: 'mediations',
+        populate: {
+            path: 'mediator',
+            select: 'username osuId',
+            match: {
+                _id: mongoId,
+            },
+        },
+    };
+}
+
 /* GET bn app page */
 router.get('/', (req, res) => {
     res.render('discussionvote', {
@@ -45,7 +58,7 @@ router.get('/relevantInfo', async (req, res) => {
     } else {
         discussions = await Discussion
             .find({ isNatOnly: { $ne: true } })
-            .populate(defaultPopulate)
+            .populate(getBnDefaultPopulate(req.session.mongoId))
             .sort({ createdAt: -1 });
     }
 
@@ -106,20 +119,33 @@ router.post('/submitMediation/:id', async (req, res) => {
         });
     }
 
-    let m;
+    const discussion = await Discussion
+        .findById(req.params.id)
+        .populate('mediations');
 
-    if (req.body.mediationId) {
-        m = await Mediation.findById(req.body.mediationId);
-    } else {
-        m = await Mediation.create({ mediator: req.session.mongoId });
-        await Discussion.findByIdAndUpdate(req.params.id, { $push: { mediations: m } });
+    let mediation = discussion.mediations.find(m => m.mediator == req.session.mongoId);
+    let isNewMediation = false;
+
+    if (!mediation) {
+        isNewMediation = true;
+        mediation = new Mediation();
+        mediation.mediator = req.session.mongoId;
     }
 
-    await Mediation.findByIdAndUpdate(m._id, { comment: req.body.comment, vote: req.body.vote });
+    mediation.comment = req.body.comment;
+    mediation.vote = req.body.vote;
+    await mediation.save();
+
+    if (isNewMediation) {
+        discussion.mediations.push(mediation);
+        await discussion.save();
+    }
 
     let d = await Discussion
         .findById(req.params.id)
-        .populate(defaultPopulate);
+        .populate(
+            res.locals.userRequest.isNat ? defaultPopulate : getBnDefaultPopulate(req.session.mongoId)
+        );
 
     res.json(d);
 
@@ -128,7 +154,7 @@ router.post('/submitMediation/:id', async (req, res) => {
         'Submitted vote for a discussion'
     );
 
-    if (!req.body.mediationId && req.session.group == 'nat') {
+    if (isNewMediation && req.session.group == 'nat') {
         api.webhookPost(
             [{
                 author: api.defaultWebhookAuthor(req.session),

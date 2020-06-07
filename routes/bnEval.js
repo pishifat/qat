@@ -216,41 +216,49 @@ router.post('/addEvalRounds/', api.isNotSpectator, async (req, res) => {
 
 /* POST submit or edit eval */
 router.post('/submitEval/:id', api.isNotSpectator, async (req, res) => {
-    if (req.body.evaluationId) {
-        await Evaluation.findByIdAndUpdate(req.body.evaluationId, {
-            behaviorComment: req.body.behaviorComment,
-            moddingComment: req.body.moddingComment,
-            vote: req.body.vote,
-        });
-    } else {
-        let ev = await Evaluation.create({
-            evaluator: req.session.mongoId,
-            behaviorComment: req.body.behaviorComment,
-            moddingComment: req.body.moddingComment,
-            vote: req.body.vote,
-        });
+    let round = await EvalRound
+        .findOne({
+            _id: req.params.id,
+            active: true,
+        })
+        .populate(defaultPopulate)
+        .orFail();
 
-        let er =await EvalRound
-            .findByIdAndUpdate(req.params.id, { $push: { evaluations: ev._id } })
-            .populate(defaultPopulate);
+    let evaluation = round.evaluations.find(e => e.evaluator._id == req.session.mongoId);
+    let isNewEvaluation = false;
+
+    if (!evaluation) {
+        isNewEvaluation = true;
+        evaluation = new Evaluation();
+        evaluation.evaluator = req.session.mongoId;
+    }
+
+    evaluation.behaviorComment = req.body.behaviorComment;
+    evaluation.moddingComment = req.body.moddingComment;
+    evaluation.vote = req.body.vote;
+    await evaluation.save();
+
+    if (isNewEvaluation) {
+        round.evaluations.push(evaluation);
+        await round.save();
 
         api.webhookPost(
             [{
                 author: api.defaultWebhookAuthor(req.session),
                 color: api.webhookColors.lightGreen,
-                description: `Submitted eval for [**${er.bn.username}**'s current BN eval](http://bn.mappersguild.com/bneval?eval=${er.id})`,
+                description: `Submitted eval for [**${round.bn.username}**'s current BN eval](http://bn.mappersguild.com/bneval?eval=${round.id})`,
             }],
-            er.mode
+            round.mode
         );
         const twoEvaluationModes = ['catch', 'mania'];
         const threeEvaluationModes = ['osu', 'taiko'];
 
-        if (!er.discussion && ((threeEvaluationModes.includes(er.mode) && er.evaluations.length > 2) || (twoEvaluationModes.includes(er.mode) && er.evaluations.length > 1))) {
+        if (!round.discussion && ((threeEvaluationModes.includes(round.mode) && round.evaluations.length > 2) || (twoEvaluationModes.includes(round.mode) && round.evaluations.length > 1))) {
             await EvalRound.findByIdAndUpdate(req.params.id, { discussion: true });
             let pass = 0;
             let probation = 0;
             let fail = 0;
-            er.evaluations.forEach(evaluation => {
+            round.evaluations.forEach(evaluation => {
                 if (evaluation.vote == 1) pass++;
                 else if (evaluation.vote == 2) probation++;
                 else if (evaluation.vote == 3) fail++;
@@ -258,10 +266,10 @@ router.post('/submitEval/:id', api.isNotSpectator, async (req, res) => {
             api.webhookPost(
                 [{
                     thumbnail: {
-                        url: `https://a.ppy.sh/${er.bn.osuId}`,
+                        url: `https://a.ppy.sh/${round.bn.osuId}`,
                     },
                     color: api.webhookColors.gray,
-                    description: `[**${er.bn.username}**'s current BN eval](http://bn.mappersguild.com/bneval?eval=${er.id}) moved to group discussion`,
+                    description: `[**${round.bn.username}**'s current BN eval](http://bn.mappersguild.com/bneval?eval=${round.id}) moved to group discussion`,
                     fields: [
                         {
                             name: 'Votes',
@@ -269,17 +277,17 @@ router.post('/submitEval/:id', api.isNotSpectator, async (req, res) => {
                         },
                     ],
                 }],
-                er.mode
+                round.mode
             );
         }
     }
 
-    let ev_ = await EvalRound.findById(req.params.id).populate(defaultPopulate);
+    round = await EvalRound.findById(req.params.id).populate(defaultPopulate);
 
-    res.json(ev_);
+    res.json(round);
     Logger.generate(
         req.session.mongoId,
-        `${req.body.evaluationId ? 'Updated' : 'Submitted'} ${ev_.mode} BN evaluation for "${ev_.bn.username}"`
+        `${isNewEvaluation ? 'Submitted' : 'Updated'} ${round.mode} BN evaluation for "${round.bn.username}"`
     );
 });
 

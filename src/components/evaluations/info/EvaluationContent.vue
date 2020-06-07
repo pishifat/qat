@@ -9,13 +9,11 @@
             />
 
             <div v-else class="small text-center my-2" :class="voteColor(evaluation.vote)">
-                <span v-if="contentType === 'nat'">
-                    NAT
-                </span>
-                <span v-else>
-                    BN
-                    <span v-if="evaluation.evaluator.id == evaluatorId">(this is you!)</span>
-                </span>
+                User {{ index }}
+
+                <div v-if="evaluation.evaluator && evaluation.evaluator.id == evaluatorId">
+                    (this is you!)
+                </div>
             </div>
         </div>
 
@@ -48,9 +46,9 @@ export default {
             type: Object,
             required: true,
         },
-        contentType: {
-            type: String,
-            default: 'bn',
+        index: {
+            type: Number,
+            default: 1,
         },
     },
     computed: {
