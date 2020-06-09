@@ -16,6 +16,7 @@ const store = new Vuex.Store({
         users: [],
         userId: null,
         isNat: false,
+        showOldUsers: false,
         selectedUserId: null,
         filters: {
             mode: '',
@@ -40,6 +41,9 @@ const store = new Vuex.Store({
         },
         setIsNat (state, value) {
             state.isNat = value;
+        },
+        setShowOldUsers (state, value) {
+            state.showOldUsers = value;
         },
         setSelectedUserId (state, id) {
             state.selectedUserId = id;

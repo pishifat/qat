@@ -33,6 +33,8 @@ export default {
 
             if (this.selectedUser.probation.length && this.selectedUser.group != 'nat') {
                 return 'bg-probation';
+            } else if (this.selectedUser.group == 'user') {
+                return 'bg-bright-blue-gray';
             }
 
             return 'bg-' + this.selectedUser.group;
