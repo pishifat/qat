@@ -35,30 +35,33 @@
             :events-id="'disqualifiedQualityAssuranceChecks'"
             :header="'Disqualified Quality Assurance Checks'"
         />
-        <evaluation-list
-            v-if="isNat && assignedApplications && assignedApplications.length"
-            :events="assignedApplications"
-            :events-id="'assignedApplications'"
-            :header="'Application Evaluations (BN)'"
-            :is-application="true"
-            :mongo-id="mongoId"
-        />
-        <evaluation-list
-            v-if="isNat && natApplications && natApplications.length"
-            :events="natApplications"
-            :events-id="'natApplications'"
-            :header="'Application Evaluations (NAT)'"
-            :is-application="true"
-            :mongo-id="mongoId"
-        />
-        <evaluation-list
-            v-if="isNat && natEvalRounds && natEvalRounds.length"
-            :events="natEvalRounds"
-            :events-id="'natEvalRounds'"
-            :header="'Current BN Evaluations (NAT)'"
-            :is-application="false"
-            :mongo-id="mongoId"
-        />
+
+        <template v-if="isNat">
+            <evaluation-list
+                v-if="assignedApplications && assignedApplications.length"
+                :events="assignedApplications"
+                :events-id="'assignedApplications'"
+                :header="'Application Evaluations (BN)'"
+                :is-application="true"
+                :mongo-id="mongoId"
+            />
+            <evaluation-list
+                v-if="natApplications && natApplications.length"
+                :events="natApplications"
+                :events-id="'natApplications'"
+                :header="'Application Evaluations (NAT)'"
+                :is-application="true"
+                :mongo-id="mongoId"
+            />
+            <evaluation-list
+                v-if="natEvalRounds && natEvalRounds.length"
+                :events="natEvalRounds"
+                :events-id="'natEvalRounds'"
+                :header="'Current BN Evaluations (NAT)'"
+                :is-application="false"
+                :mongo-id="mongoId"
+            />
+        </template>
     </div>
 </template>
 
@@ -122,20 +125,36 @@ export default {
         async findRelevantActivity() {
             this.$store.commit('setIsLoading', true);
 
-            const res = await this.executeGet('/bnEval/userActivity/' + this.osuId + '/' + this.modes + '/' + new Date(this.deadline).getTime() + '/' + this.mongoId);
+            if (this.isNat) {
+                const res = await this.executeGet('/bnEval/activity/' + this.osuId + '/' + this.modes + '/' + new Date(this.deadline).getTime() + '/' + this.mongoId);
 
-            if (res) {
-                this.$store.commit('setNominations', res.noms);
-                this.$store.commit('setNominationsDisqualified', res.nominationsDisqualified);
-                this.$store.commit('setNominationsPopped', res.nominationsPopped);
-                this.$store.commit('setDisqualifications', res.disqualifications);
-                this.$store.commit('setPops', res.pops);
-                this.$store.commit('setQualityAssuranceChecks', res.qualityAssuranceChecks);
-                this.$store.commit('setDisqualifiedQualityAssuranceChecks', res.disqualifiedQualityAssuranceChecks);
-                this.$store.commit('setAssignedApplications', res.assignedApplications);
-                this.$store.commit('setNatApplications', res.natApplications);
-                this.$store.commit('setNatEvalRounds', res.natEvalRounds);
-                this.$store.commit('setIsLoading', false);
+                if (res) {
+                    this.$store.commit('setNominations', res.uniqueNominations);
+                    this.$store.commit('setNominationsDisqualified', res.nominationsDisqualified);
+                    this.$store.commit('setNominationsPopped', res.nominationsPopped);
+                    this.$store.commit('setDisqualifications', res.disqualifications);
+                    this.$store.commit('setPops', res.pops);
+                    this.$store.commit('setQualityAssuranceChecks', res.qualityAssuranceChecks);
+                    this.$store.commit('setDisqualifiedQualityAssuranceChecks', res.disqualifiedQualityAssuranceChecks);
+
+                    this.$store.commit('setAssignedApplications', res.assignedApplications);
+                    this.$store.commit('setNatApplications', res.natApplications);
+                    this.$store.commit('setNatEvalRounds', res.natEvalRounds);
+                    this.$store.commit('setIsLoading', false);
+                }
+            } else {
+                const res = await this.executeGet('/users/activity/' + this.osuId + '/' + this.modes + '/' + new Date(this.deadline).getTime() + '/' + this.mongoId);
+
+                if (res) {
+                    this.$store.commit('setNominations', res.uniqueNominations);
+                    this.$store.commit('setNominationsDisqualified', res.nominationsDisqualified);
+                    this.$store.commit('setNominationsPopped', res.nominationsPopped);
+                    this.$store.commit('setDisqualifications', res.disqualifications);
+                    this.$store.commit('setPops', res.pops);
+                    this.$store.commit('setQualityAssuranceChecks', res.qualityAssuranceChecks);
+                    this.$store.commit('setDisqualifiedQualityAssuranceChecks', res.disqualifiedQualityAssuranceChecks);
+                    this.$store.commit('setIsLoading', false);
+                }
             }
         },
     },

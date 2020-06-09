@@ -87,14 +87,34 @@ router.get('/loadMore/:limit/:skip', async (req, res) => {
 
 /* POST assign user */
 router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
-    const event = await Aiess.findById(req.params.id).populate(defaultPopulate);
-    const bubble =
-        await Aiess
+    const event = await Aiess
+        .findById(req.params.id)
+        .populate(defaultPopulate)
+        .orFail();
+
+    const [outDated, bubble] = await Promise.all([
+        Aiess
+            .findOne({
+                beatmapsetId: event.beatmapsetId,
+                $or: [
+                    { eventType: 'Disqualified' },
+                    { eventType: 'Ranked' },
+                ],
+                timestamp: { $gte: event.timestamp },
+            })
+            .sort({ timestamp: -1 }),
+
+        Aiess
             .findOne({
                 beatmapsetId: event.beatmapsetId,
                 eventType: 'Bubbled',
             })
-            .sort({ timestamp: -1 });
+            .sort({ timestamp: -1 }),
+    ]);
+
+    if (outDated || event.qualityAssuranceCheckers.length > (event.modes.length * 2 - 1)) {
+        return res.json({ error: 'Outdated' });
+    }
 
     if (event.userId == req.session.osuId || bubble.userId == req.session.osuId) {
         return res.json({ error: 'You cannot check your nominations!' });

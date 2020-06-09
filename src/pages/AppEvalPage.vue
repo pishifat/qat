@@ -91,7 +91,7 @@ export default {
         const res = await this.executeGet('/appEval/relevantInfo');
 
         if (res) {
-            this.$store.commit('setApplications', res.a);
+            this.$store.commit('setApplications', res.applications);
             this.$store.commit('setEvaluator', res.evaluator);
             this.$store.commit('setFilterMode', res.evaluator.modes[0] || 'osu');
 

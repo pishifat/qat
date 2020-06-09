@@ -25,12 +25,24 @@ const defaultPopulate = [
 ];
 
 // hides mediator info
-const regularUserPopulate = [
-    {
+function getLimitedDefaultPopulate (mongoId) {
+    return {
         path: 'mediations',
-        select: '-mediator',
-    },
-];
+        populate: {
+            path: 'mediator',
+            select: 'username osuId',
+            match: {
+                _id: mongoId,
+            },
+        },
+    };
+}
+
+function getPopulate (isNat, mongoId) {
+    if (isNat) return defaultPopulate;
+
+    return getLimitedDefaultPopulate(mongoId);
+}
 
 /* GET bn app page */
 router.get('/', (req, res) => {
@@ -48,7 +60,9 @@ router.get('/', (req, res) => {
 router.get('/relevantInfo', async (req, res) => {
     let vetoes = await Veto
         .find({})
-        .populate(req.session.group == 'user' ? regularUserPopulate : defaultPopulate)
+        .populate(
+            getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
+        )
         .sort({ createdAt: -1 });
 
     res.json({
@@ -108,7 +122,9 @@ router.post('/submit', api.isNotSpectator, async (req, res) => {
     });
     v = await Veto
         .findById(v._id)
-        .populate(defaultPopulate);
+        .populate(
+            getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
+        );
 
     res.json(v);
     Logger.generate(req.session.mongoId, `Submitted a veto for mediation on "${v.beatmapTitle}"`);
@@ -187,14 +203,13 @@ router.post('/submitMediation/:id', async (req, res) => {
         return res.json({ error: 'Spectators cannot perform this action!' });
     }
 
-    const mediation = await Mediation.findById(req.body.mediationId).orFail();
+    const mediation = await Mediation
+        .findOne({
+            _id: req.body.mediationId,
+            mediator: req.session.mongoId,
+        })
+        .orFail();
     const isFirstComment = mediation.comment === undefined;
-
-    if (!mediation.mediator._id.equals(res.locals.userRequest.id)) {
-        return res.json({
-            error: 'Unauthorized',
-        });
-    }
 
     mediation.comment = req.body.comment;
     mediation.vote = req.body.vote;
@@ -202,7 +217,9 @@ router.post('/submitMediation/:id', async (req, res) => {
 
     const v = await Veto
         .findById(req.params.id)
-        .populate(defaultPopulate);
+        .populate(
+            getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
+        );
 
     res.json(v);
 

@@ -1,5 +1,5 @@
 <template>
-    <div class="d-flex flex-column align-items-center h-100 my-3" :class="alignStart ? '' : 'justify-content-center'">
+    <div class="d-flex flex-column align-items-center h-100 my-3 text-center" :class="alignStart ? '' : 'justify-content-center'">
         <a
             :href="'https://osu.ppy.sh/users/' + user.osuId"
             class="d-flex flex-column align-items-center mb-2"

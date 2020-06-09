@@ -7,10 +7,10 @@
         <div v-if="selectedDiscussionVote" class="container">
             <discussion-context />
 
-            <votes-public-active
+            <votes-active
                 v-if="selectedDiscussionVote.isActive && !selectedDiscussionVote.isNatOnly"
             />
-            <votes-nat-only-active
+            <votes-active
                 v-else-if="selectedDiscussionVote.isActive && selectedDiscussionVote.isNatOnly"
             />
             <votes-inactive
@@ -41,8 +41,7 @@ import { mapState, mapGetters } from 'vuex';
 import postData from '../../mixins/postData.js';
 import ModalHeader from './info/ModalHeader.vue';
 import DiscussionContext from './info/DiscussionContext.vue';
-import VotesPublicActive from './info/votes/VotesPublicActive.vue';
-import VotesNatOnlyActive from './info/votes/VotesNatOnlyActive.vue';
+import VotesActive from './info/votes/VotesActive.vue';
 import VotesInactive from './info/votes/VotesInactive.vue';
 import MediatorOptions from './info/MediatorOptions.vue';
 import ModalDialog from '../ModalDialog.vue';
@@ -52,8 +51,7 @@ export default {
     components: {
         ModalHeader,
         DiscussionContext,
-        VotesPublicActive,
-        VotesNatOnlyActive,
+        VotesActive,
         VotesInactive,
         MediatorOptions,
         ModalDialog,
