@@ -224,9 +224,14 @@ async function webhookPost(message, webhook) {
         case 'beatmapReport':
             url += `${config.beatmapReportWebhook.id}/${config.beatmapReportWebhook.token}`;
             break;
-        default:
+        case 'userReport':
             url += `${config.reportWebhook.id}/${config.reportWebhook.token}`;
             break;
+        case 'natUserReport':
+            url += `${config.natReportWebhook.id}/${config.natReportWebhook.token}`;
+            break;
+        default:
+            return ({ error: 'no webhook specified' });
     }
 
     try {

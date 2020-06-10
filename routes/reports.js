@@ -58,14 +58,32 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
             });
         }
 
-        api.webhookPost([{
-            thumbnail: {
-                url: `https://a.ppy.sh/${u.osuId}`,
-            },
-            color: api.webhookColors.darkRed,
-            description: `[User report](http://bn.mappersguild.com/managereports?report=${r.id}) for **${u.username}**`,
-            fields,
-        }]);
+        // for #user-reportfeed
+        await api.webhookPost(
+            [{
+                thumbnail: {
+                    url: `https://a.ppy.sh/${u.osuId}`,
+                },
+                color: api.webhookColors.darkRed,
+                description: `[User report](http://bn.mappersguild.com/managereports?report=${r.id}) for **${u.username}**`,
+                fields,
+            }],
+            'userReport'
+        );
+
+        // for #nat
+        await api.webhookPost(
+            [{
+                thumbnail: {
+                    url: `https://a.ppy.sh/${u.osuId}`,
+                },
+                color: api.webhookColors.darkRed,
+                description: `[User report](http://bn.mappersguild.com/managereports?report=${r.id}) for **${u.username}**`,
+                fields,
+            }],
+            'natUserReport'
+        );
+
         Logger.generate(
             null,
             `Reported "${u.username}" for reason "${
