@@ -53,23 +53,15 @@
                             </h5>
 
                             <div v-for="option in getActiveOptions(answer.question.options)" :key="option.id">
-                                <div class="form-check mb-2 ml-2">
-                                    <input
-                                        :id="option.id"
-                                        class="form-check-input"
-                                        type="checkbox"
-                                        :value="option.id"
-                                        :checked="answer.optionsChosen.indexOf(option.id) >= 0"
-                                    >
-
+                                <div
+                                    class="mb-2"
+                                    :class="answer.optionsChosen.indexOf(option.id) >= 0 ? 'bg-primary' : ''"
+                                >
                                     <label
                                         v-if="answer.question.questionType === 'text'"
                                         class="form-check-label"
                                         :for="option.id"
-                                        :class="[
-                                            option.score > 0 ? 'text-pass' : 'text-fail',
-                                            answer.optionsChosen.indexOf(option.id) >= 0 ? 'bg-primary' : '',
-                                        ]"
+                                        :class="option.score > 0 ? 'text-pass' : 'text-fail'"
                                     >
                                         {{ option.content }}
                                     </label>
@@ -77,11 +69,7 @@
                                     <label
                                         v-else
                                         :for="option.id"
-                                        :class="
-                                            answer.optionsChosen.indexOf(option.id) >= 0
-                                                ? 'bg-primary'
-                                                : ''
-                                        "
+                                        :class="answer.optionsChosen.indexOf(option.id) >= 0 ? 'bg-primary' : ''"
                                     >
                                         <img :src="option.content" class="test-image">
                                         <span :class="option.score > 0 ? 'text-success' : 'text-danger'">
