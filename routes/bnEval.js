@@ -733,7 +733,14 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
 
     // remove duplicate nominations
     let uniqueNominations = [];
-    uniqueNominations = nominations.filter(event => !uniqueNominations.some(n => n.beatmapsetId == event.beatmapsetId));
+
+    for (const event of nominations) {
+        if (uniqueNominations.length == 0) {
+            uniqueNominations.push(event);
+        } else if (!uniqueNominations.find(n => n.beatmapsetId == event.beatmapsetId)) {
+            uniqueNominations.push(event);
+        }
+    }
 
     // find user's disqualified/popped nominations & disqualified qa checks
     let nominationsDisqualified = [];
