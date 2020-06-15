@@ -157,9 +157,9 @@ export default {
             const res = await this.executeGet('/users/loadPreviousBnAndNat', e);
 
             if (res) {
-                this.$store.commit('setShowOldUsers', true);
-                this.$store.commit('setUsers', res.users);
-                this.$store.dispatch('updateFilterMode', '');
+                this.$store.commit('users/setShowOldUsers', true);
+                this.$store.commit('users/setUsers', res.users);
+                this.$store.dispatch('users/pageFilters/setFilterMode', '');
             }
         },
     },
