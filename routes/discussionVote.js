@@ -1,14 +1,15 @@
 const express = require('express');
-const api = require('../helpers/api');
-const helpers = require('../helpers/helpers');
+const middlewares = require('../helpers/middlewares');
+const discord = require('../helpers/discord');
+const util = require('../helpers/util');
 const Discussion = require('../models/discussion');
 const Mediation = require('../models/mediation');
 const Logger = require('../models/log');
 
 const router = express.Router();
 
-router.use(api.isLoggedIn);
-router.use(api.isBnOrNat);
+router.use(middlewares.isLoggedIn);
+router.use(middlewares.isBnOrNat);
 
 const defaultPopulate = [
     {
@@ -33,19 +34,7 @@ function getBnDefaultPopulate (mongoId) {
     };
 }
 
-/* GET bn app page */
-router.get('/', (req, res) => {
-    res.render('discussionvote', {
-        title: 'Discussion Vote',
-        script: '../javascripts/discussionVote.js',
-        loggedInAs: req.session.mongoId,
-        isDiscussionVote: true,
-        isBn: res.locals.userRequest.isBn,
-        isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
-    });
-});
-
-/* GET applicant listing. */
+/* GET discussions. */
 router.get('/relevantInfo', async (req, res) => {
     let discussions;
 
@@ -64,14 +53,11 @@ router.get('/relevantInfo', async (req, res) => {
 
     res.json({
         discussions,
-        userId: req.session.mongoId,
-        userModes: res.locals.userRequest.modes,
-        isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
     });
 });
 
 /* POST create a new discussion vote. */
-router.post('/submit', api.isNat, async (req, res) => {
+router.post('/submit', middlewares.isNat, async (req, res) => {
     let url = req.body.discussionLink;
 
     if (url.length == 0) {
@@ -79,8 +65,7 @@ router.post('/submit', api.isNat, async (req, res) => {
     }
 
     if (req.body.discussionLink.length) {
-        const validUrl = helpers.isValidUrl(url, 'osu.ppy.sh');
-        if (validUrl.error) return res.json({ error: validUrl.error });
+        util.isValidUrlOrThrow(url, 'osu.ppy.sh');
     }
 
     let d = await Discussion.create({
@@ -95,10 +80,10 @@ router.post('/submit', api.isNat, async (req, res) => {
 
     res.json(d);
     Logger.generate(req.session.mongoId, 'Submitted a discussion for voting');
-    api.webhookPost(
+    discord.webhookPost(
         [{
-            author: api.defaultWebhookAuthor(req.session),
-            color: api.webhookColors.yellow,
+            author: discord.defaultWebhookAuthor(req.session),
+            color: discord.webhookColors.yellow,
             description: `**New discussion up for vote:** [${req.body.title}](http://bn.mappersguild.com/discussionvote?id=${d.id})`,
             fields: [
                 {
@@ -155,10 +140,10 @@ router.post('/submitMediation/:id', async (req, res) => {
     );
 
     if (isNewMediation && req.session.group == 'nat') {
-        api.webhookPost(
+        discord.webhookPost(
             [{
-                author: api.defaultWebhookAuthor(req.session),
-                color: api.webhookColors.lightYellow,
+                author: discord.defaultWebhookAuthor(req.session),
+                color: discord.webhookColors.lightYellow,
                 description: `Submitted vote for [discussion on **${d.title}**](http://bn.mappersguild.com/discussionvote?id=${d.id})`,
             }],
             d.mode
@@ -167,7 +152,7 @@ router.post('/submitMediation/:id', async (req, res) => {
 });
 
 /* POST conclude mediation */
-router.post('/concludeMediation/:id', api.isNat, async (req, res) => {
+router.post('/concludeMediation/:id', middlewares.isNat, async (req, res) => {
     const d = await Discussion
         .findByIdAndUpdate(req.params.id, { isActive: false })
         .populate(defaultPopulate);
@@ -179,39 +164,45 @@ router.post('/concludeMediation/:id', api.isNat, async (req, res) => {
         'Concluded vote for a discussion'
     );
 
-    api.webhookPost(
+    discord.webhookPost(
         [{
-            author: api.defaultWebhookAuthor(req.session),
-            color: api.webhookColors.darkYellow,
+            author: discord.defaultWebhookAuthor(req.session),
+            color: discord.webhookColors.darkYellow,
             description: `Concluded vote for [discussion on **${d.title}**](http://bn.mappersguild.com/discussionvote?id=${d.id})`,
         }],
         d.mode
     );
 });
 
-/* POST save title */
-router.post('/saveTitle/:id', api.isNat, async (req, res) => {
-    const d = await Discussion
-        .findByIdAndUpdate(req.params.id, { title: req.body.title })
-        .populate(defaultPopulate);
+/* POST update discussion */
+router.post('/:id/update', middlewares.isNat, async (req, res) => {
+    const title = req.body.title;
+    const shortReason= req.body.shortReason;
+    console.log(req.body);
 
-    res.json(d);
+    if (!title || !shortReason) {
+        return res.json({
+            error: 'Missing data',
+        });
+    }
+
+    const discussion = await Discussion
+        .findOne({
+            _id: req.params.id,
+            creator: req.session.mongoId,
+            isActive: true,
+        })
+        .populate(defaultPopulate)
+        .orFail();
+
+    discussion.title = title;
+    discussion.shortReason = shortReason;
+    await discussion.save();
+
+    res.json(discussion);
     Logger.generate(
         req.session.mongoId,
-        `Changed discussion title to "${req.body.title}"`
-    );
-});
-
-/* POST save shortReason */
-router.post('/saveProposal/:id', api.isNat, async (req, res) => {
-    const d = await Discussion
-        .findByIdAndUpdate(req.params.id, { shortReason: req.body.shortReason })
-        .populate(defaultPopulate);
-
-    res.json(d);
-    Logger.generate(
-        req.session.mongoId,
-        `Changed discussion proposal to "${req.body.shortReason}"`
+        `Changed discussion title to "${title}" and proposal to "${shortReason}"`
     );
 });
 

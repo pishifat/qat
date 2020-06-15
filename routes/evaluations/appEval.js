@@ -1,0 +1,419 @@
+const express = require('express');
+const AppEvaluation = require('../../models/evaluations/appEvaluation');
+const BnEvaluation = require('../../models/evaluations/bnEvaluation');
+const User = require('../../models/user');
+const Logger = require('../../models/log');
+const { submitEval, setGroupEval, setFeedback, replaceUser } = require('./evaluations');
+const middlewares = require('../../helpers/middlewares');
+const discord = require('../../helpers/discord');
+
+const router = express.Router();
+
+router.use(middlewares.isLoggedIn);
+router.use(middlewares.isBnOrNat);
+
+//population
+const defaultPopulate = [
+    { path: 'user', select: 'username osuId' },
+    { path: 'bnEvaluators', select: 'username osuId' },
+    { path: 'natEvaluators', select: 'username osuId' },
+    { path: 'test', select: 'totalScore comment' },
+    {
+        path: 'reviews',
+        select: 'evaluator behaviorComment moddingComment vote',
+        populate: {
+            path: 'evaluator',
+            select: 'username osuId group',
+        },
+    },
+];
+
+function getBnDefaultPopulate (mongoId) {
+    return [
+        { path: 'user', select: 'username osuId' },
+        {
+            path: 'reviews',
+            select: 'behaviorComment moddingComment vote',
+            populate: {
+                path: 'evaluator',
+                select: 'username osuId group',
+                match: {
+                    _id: mongoId,
+                },
+            },
+        },
+    ];
+}
+
+/* GET applications listing. */
+router.get('/relevantInfo', async (req, res) => {
+    let applications = [];
+
+    if (res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator) {
+        applications = await AppEvaluation
+            .find({
+                active: true,
+                test: { $exists: true },
+            })
+            .populate(defaultPopulate)
+            .sort({
+                createdAt: 1,
+                consensus: 1,
+                feedback: 1,
+            });
+    } else {
+        applications = await AppEvaluation
+            .find({
+                test: { $exists: true },
+                bnEvaluators: req.session.mongoId,
+            })
+            .select(['active', 'user', 'discussion', 'reviews', 'mode', 'mods', 'reasons', 'consensus', 'createdAt', 'updatedAt'])
+            .populate(
+                getBnDefaultPopulate(req.session.mongoId)
+            )
+            .sort({
+                createdAt: 1,
+                consensus: 1,
+                feedback: 1,
+            });
+    }
+
+    res.json({
+        evaluations: applications,
+    });
+});
+
+/* POST submit or edit eval */
+router.post('/submitEval/:id', async (req, res) => {
+    if (res.locals.userRequest.isSpectator && res.locals.userRequest.group != 'bn') {
+        return res.json({ error: 'Spectators cannot perform this action!' });
+    }
+
+    let evaluation = await AppEvaluation
+        .findOne({
+            _id: req.params.id,
+            active: true,
+        })
+        .populate(defaultPopulate)
+        .orFail();
+
+    if (
+        res.locals.userRequest.isBn &&
+        !evaluation.bnEvaluators.some(bn => bn._id == req.session.mongoId)
+    ) {
+        return res.json({
+            error: 'You cannot do this.',
+        });
+    }
+
+    const isNewEvaluation = await submitEval(
+        evaluation,
+        req.session,
+        req.body.behaviorComment,
+        req.body.moddingComment,
+        req.body.vote
+    );
+
+    evaluation = await AppEvaluation
+        .findById(req.params.id)
+        .populate(
+            res.locals.userRequest.isNat ? defaultPopulate : getBnDefaultPopulate(req.session.mongoId)
+        );
+
+    res.json(evaluation);
+    Logger.generate(
+        req.session.mongoId,
+        `${isNewEvaluation ? 'Submitted' : 'Updated'} ${evaluation.mode} BN app evaluation for "${evaluation.user.username}"`
+    );
+});
+
+/* POST set group eval */
+router.post('/setGroupEval/', middlewares.isNat, async (req, res) => {
+    const evaluations = await AppEvaluation
+        .find({
+            _id: {
+                $in: req.body.checkedApps,
+            },
+        })
+        .populate(defaultPopulate);
+
+    await setGroupEval(evaluations, req.session);
+
+    let a = await AppEvaluation.findActiveApps();
+    res.json(a);
+    Logger.generate(
+        req.session.mongoId,
+        `Set ${req.body.checkedApps.length} BN app${req.body.checkedApps.length == 1 ? '' : 's'} as group evaluation`
+    );
+});
+
+/* POST set invidivual eval */
+router.post('/setIndividualEval/', middlewares.isNat, async (req, res) => {
+    await AppEvaluation.updateMany({
+        _id: { $in: req.body.checkedApps },
+    }, {
+        discussion: false,
+    });
+
+    let a = await AppEvaluation.findActiveApps();
+
+    res.json(a);
+    Logger.generate(
+        req.session.mongoId,
+        `Set ${req.body.checkedApps.length} BN app${req.body.checkedApps.length == 1 ? '' : 's'} as individual evaluation`
+    );
+});
+
+/* POST set evals as complete */
+router.post('/setComplete/', middlewares.isNat, async (req, res) => {
+    const evaluations = await AppEvaluation
+        .find({
+            _id: {
+                $in: req.body.checkedApps,
+            },
+        })
+        .populate(defaultPopulate);
+
+    for (const evaluation of evaluations) {
+        let user = await User.findById(evaluation.user);
+
+        if (evaluation.consensus == 'pass') {
+            user.modes.push(evaluation.mode);
+            user.probation.push(evaluation.mode);
+
+            let deadline = new Date();
+            deadline.setDate(deadline.getDate() + 40);
+            await BnEvaluation.create({
+                user: evaluation.user,
+                mode: evaluation.mode,
+                deadline,
+            });
+
+            if (user.group == 'user') {
+                user.group = 'bn';
+                user.bnDuration.push(new Date());
+            }
+
+            await user.save();
+        }
+
+        evaluation.active = false;
+        await evaluation.save();
+
+        discord.webhookPost(
+            [{
+                author: discord.defaultWebhookAuthor(req.session),
+                color: discord.webhookColors.black,
+                description: `Archived [**${user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${evaluation.id}) with **${evaluation.consensus == 'pass' ? 'Pass' : 'Fail'}** consensus`,
+            }],
+            evaluation.mode
+        );
+        Logger.generate(
+            req.session.mongoId,
+            `Set ${user.username}'s ${evaluation.mode} application eval as "${evaluation.consensus}"`
+        );
+    }
+
+    const activeApps = await AppEvaluation.findActiveApps();
+
+    res.json(activeApps);
+    Logger.generate(
+        req.session.mongoId,
+        `Set ${req.body.checkedApps.length} BN app${req.body.checkedApps.length == 1 ? '' : 's'} as completed`
+    );
+});
+
+/* POST set consensus of eval */
+router.post('/setConsensus/:id', middlewares.isNat, middlewares.isNotSpectator, async (req, res) => {
+    let evaluation = await AppEvaluation
+        .findByIdAndUpdate(req.params.id, { consensus: req.body.consensus })
+        .populate(defaultPopulate)
+        .orFail();
+
+    if (req.body.consensus == 'fail') {
+        let date = new Date(evaluation.createdAt);
+        date.setDate(date.getDate() + 90);
+        evaluation.cooldownDate = date;
+        await evaluation.save();
+    }
+
+    res.json(evaluation);
+
+    Logger.generate(
+        req.session.mongoId,
+        `Set consensus of ${evaluation.user.username}'s ${evaluation.mode} BN app as ${req.body.consensus}`
+    );
+
+    discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            color: discord.webhookColors.lightBlue,
+            description: `[**${evaluation.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${evaluation.id}) set to **${req.body.consensus}**`,
+        }],
+        evaluation.mode
+    );
+});
+
+/* POST set cooldown */
+router.post('/setCooldownDate/:id', middlewares.isNat, middlewares.isNotSpectator, async (req, res) => {
+    const evaluation = await AppEvaluation
+        .findByIdAndUpdate(req.params.id, { cooldownDate: req.body.cooldownDate })
+        .populate(defaultPopulate);
+
+    res.json(evaluation);
+    Logger.generate(
+        req.session.mongoId,
+        `Changed cooldown date to ${req.body.cooldownDate.toString().slice(0,10)} for ${evaluation.user.username}'s ${evaluation.mode} BN app`
+    );
+    discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            color: discord.webhookColors.darkBlue,
+            description: `Re-application date set to **${req.body.cooldownDate.toString().slice(0,10)}** from [**${evaluation.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${evaluation.id})`,
+        }],
+        evaluation.mode
+    );
+});
+
+/* POST set feedback of eval */
+router.post('/setFeedback/:id', middlewares.isNat, middlewares.isNotSpectator, async (req, res) => {
+    let evaluation = await AppEvaluation
+        .findById(req.params.id)
+        .populate(defaultPopulate)
+        .orFail();
+
+    evaluation = await setFeedback(evaluation, req.body.feedback, req.session);
+    res.json(evaluation);
+});
+
+/* POST replace evaluator */
+router.post('/replaceUser/:id', middlewares.isNat, middlewares.isNotSpectator, async (req, res) => {
+    const replaceNat = Boolean(req.body.replaceNat);
+    let evaluation = await AppEvaluation
+        .findById(req.params.id)
+        .populate(defaultPopulate)
+        .orFail();
+    let replacement;
+
+    if (replaceNat) {
+        replacement = await replaceUser(evaluation, res.locals.userRequest, req.body.evaluatorId);
+    } else {
+        let invalids = evaluation.bnEvaluators.map(bn => bn.osuId);
+        const evaluatorArray = await User.aggregate([
+            {
+                $match: {
+                    group: 'bn',
+                    isSpectator: { $ne: true },
+                    modes: evaluation.mode,
+                    osuId: { $nin: invalids },
+                    isBnEvaluator: true,
+                    probation: { $size: 0 },
+                },
+            },
+            { $sample: { size: 1 } },
+        ]);
+        replacement = evaluatorArray[0];
+
+        const i = evaluation.bnEvaluators.findIndex(e => e.id == req.body.evaluatorId);
+        evaluation.bnEvaluators.splice(i, 1, replacement._id);
+        await evaluation.save();
+    }
+
+    evaluation = await AppEvaluation
+        .findById(req.params.id)
+        .populate(defaultPopulate);
+
+    res.json(evaluation);
+
+    Logger.generate(
+        req.session.mongoId,
+        `Re-selected a ${replaceNat ? 'NAT' : 'BN'} evaluator on BN application for ${evaluation.user.username}`
+    );
+
+    const user = await User.findById(req.body.evaluatorId);
+
+    discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            color: discord.webhookColors.orange,
+            description: `Replaced **${user.username}** with **${replacement.username}**  as ${replaceNat ? 'NAT' : 'BN'} evaluator for [**${evaluation.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${evaluation.id})`,
+        }],
+        evaluation.mode
+    );
+});
+
+/* POST select BN evaluators */
+router.post('/selectBnEvaluators', middlewares.isNat, async (req, res) => {
+    const allUsers = await User.aggregate([
+        { $match: { group: { $eq: 'bn' }, isBnEvaluator: true, probation: { $size: 0 }, modes: req.body.mode }  },
+        { $sample: { size: 1000 } },
+    ]);
+    let users = [];
+    let excludeUserIds = [];
+    const requiredUsers = req.body.mode == 'osu' ? 6 : 3;
+
+    if (req.body.includeUsers) {
+        const includeUsers = req.body.includeUsers.split(',');
+
+        for (let i = 0; i < includeUsers.length && users.length < requiredUsers; i++) {
+            const userToSearch = includeUsers[i].trim();
+            const user = await User.findByUsername(userToSearch);
+
+            if (user && !user.error && user.modes.includes(req.body.mode)) {
+                users.push(user);
+                excludeUserIds.push(user.id);
+            }
+        }
+    }
+
+
+    if (req.body.excludeUsers) {
+        const excludeUsers = req.body.excludeUsers.split(',');
+
+        for (let i = 0; i < excludeUsers.length; i++) {
+            const userToSearch = excludeUsers[i].trim();
+            const user = await User.findByUsername(userToSearch);
+
+            if (user && !user.error) {
+                excludeUserIds.push(user.id);
+            }
+        }
+    }
+
+    for (let i = 0; users.length < requiredUsers && i < allUsers.length; i++) {
+        const user = allUsers[i];
+        const userId = user._id.toString();
+
+        if (!excludeUserIds.includes(userId)) {
+            users.push(user);
+            excludeUserIds.push(userId);
+        }
+    }
+
+    res.json(users);
+});
+
+/* POST begin BN evaluations */
+router.post('/enableBnEvaluators/:id', middlewares.isNat, async (req, res) => {
+    for (let i = 0; i < req.body.bnEvaluators.length; i++) {
+        let bn = req.body.bnEvaluators[i];
+        await AppEvaluation.findByIdAndUpdate(req.params.id, { $push: { bnEvaluators: bn._id } });
+    }
+
+    let a = await AppEvaluation.findById(req.params.id).populate(defaultPopulate);
+    res.json(a);
+    Logger.generate(
+        req.session.mongoId,
+        `Opened a BN app to evaluation from ${req.body.bnEvaluators.length} current BNs.`
+    );
+    discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            color: discord.webhookColors.lightOrange,
+            description: `Enabled BN evaluators for [**${a.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${a.id})`,
+        }],
+        a.mode
+    );
+});
+
+module.exports = router;

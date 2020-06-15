@@ -2,71 +2,42 @@
     <div class="row">
         <div class="col-md-12">
             <section class="card card-body">
-                <select id="questionType" class="form-control small">
-                    <option value="codeOfConduct">
-                        Code of Conduct
+                <select v-model="selectedCategory" class="form-control small" @change="loadContent($event)">
+                    <option value="" disabled>
+                        Select a category
                     </option>
-                    <option value="general">
-                        General
-                    </option>
-                    <option value="spread">
-                        Spread
-                    </option>
-                    <option value="metadata">
-                        Metadata
-                    </option>
-                    <option value="timing">
-                        Timing
-                    </option>
-                    <option value="audio">
-                        Audio
-                    </option>
-                    <option value="videoBackground">
-                        Video/BG
-                    </option>
-                    <option value="skinning">
-                        Skinning
-                    </option>
-                    <option value="storyboarding">
-                        Storyboarding
-                    </option>
-                    <option value="osu">
-                        osu!
-                    </option>
-                    <option value="taiko">
-                        osu!taiko
-                    </option>
-                    <option value="catch">
-                        osu!catch
-                    </option>
-                    <option value="mania">
-                        osu!mania
-                    </option>
-                    <option value="bn">
-                        BN Rules
+                    <option
+                        v-for="category in categories"
+                        :key="category.id"
+                        :value="category.value"
+                        class="text-capitalize"
+                    >
+                        {{ category.content || category.value }}
                     </option>
                 </select>
 
-                <button id="artistButton" class="btn btn-primary btn-block" @click="loadContent($event);">
-                    Load test content
+                <button id="artistButton" class="btn btn-primary btn-block" @click="loadContent($event)">
+                    Load category content
                 </button>
             </section>
 
-            <section v-if="category" class="card card-body">
+            <section v-if="selectedCategory" class="card card-body">
                 <h2>
-                    {{ category }} - Questions
+                    <span class="text-capitalize">
+                        {{ getCategoryContent() }} - Questions
+                    </span>
+
                     <button
                         class="btn btn-primary btn-sm"
                         data-toggle="modal"
                         data-target="#addQuestion"
-                        @click="resetInput()"
                     >
                         Add question
                     </button>
                 </h2>
 
                 <data-table
-                    v-if="questions && questions.length"
+                    v-if="questions.length"
                     :headers="['Question', 'Updated', '']"
                 >
                     <tr v-for="question in questions" :key="question.id" :class="question.active ? 'border-active' : 'border-inactive'">
@@ -81,8 +52,7 @@
                                 href="#"
                                 data-toggle="modal"
                                 data-target="#editQuestion"
-                                :data-entry="question.id"
-                                @click.prevent="selectQuestion(question)"
+                                @click="selectQuestion(question.id)"
                             >
                                 <i class="fas fa-edit" />
                             </a>
@@ -93,29 +63,23 @@
         </div>
 
         <add-question
-            :category="category"
-            :raw-category="rawCategory"
-            @add-question="addQuestionToList($event)"
+            :category="selectedCategory"
         />
 
-        <edit-question
-            v-if="selectedQuestion"
-            :question="selectedQuestion"
-            :category="category"
-            @update-question="updateQuestion($event)"
-            @delete-question="deleteQuestion($event)"
-        />
+        <edit-question />
 
         <toast-messages />
     </div>
 </template>
 
 <script>
+import manageTestModule from '../store/manageTest';
 import ToastMessages from '../components/ToastMessages.vue';
 import AddQuestion from '../components/rcTest/AddQuestion.vue';
 import EditQuestion from '../components/rcTest/EditQuestion.vue';
 import DataTable from '../components/DataTable.vue';
 import postData from '../mixins/postData.js';
+import { mapState } from 'vuex';
 
 export default {
     name: 'ManageTestPage',
@@ -128,51 +92,48 @@ export default {
     mixins: [ postData ],
     data() {
         return {
-            category: '',
-            rawCategory: '',
-            questions: [],
-            selectedQuestion: null,
+            categories: [
+                { value: 'codeOfConduct', content: 'Code Of Conduct' },
+                { value: 'general' },
+                { value: 'spread' },
+                { value: 'metadata' },
+                { value: 'timing' },
+                { value: 'audio' },
+                { value: 'videoBackground', content: 'Video/BG' },
+                { value: 'skinning' },
+                { value: 'storyboarding' },
+                { value: 'osu', content: 'osu!' },
+                { value: 'taiko', content: 'osu!taiko' },
+                { value: 'catch', content: 'osu!catch' },
+                { value: 'mania', content: 'osu!mania' },
+                { value: 'bn', content: 'BN Rules' },
+            ],
+            selectedCategory: '',
         };
     },
-    watch: {
-
+    computed: {
+        ...mapState('manageTest', [
+            'questions',
+        ]),
     },
-    created() {
-        $('#loading').hide(); //this is temporary
-        $('#main').attr('style', 'visibility: visible');
+    beforeCreate () {
+        if (!this.$store.hasModule('manageTest')) {
+            this.$store.registerModule('manageTest', manageTestModule);
+        }
     },
     methods: {
-        updateQuestion (question) {
-            const i = this.questions.findIndex(q => q.id == question.id);
-            this.questions[i] = question;
-            this.selectedQuestion = question;
-        },
-        deleteQuestion (question) {
-            const i = this.questions.findIndex(q => q.id == question);
-            this.questions.splice(i, 1);
-            this.selectedQuestion = null;
-        },
-        selectQuestion(q) {
-            this.selectedQuestion = q;
-        },
         async loadContent (e) {
-            e.target.disabled = true;
-            let questionType = $('#questionType').val();
-            const res = await this.executeGet('/manageTest/load/' + questionType);
+            const data = await this.executeGet('/manageTest/load/' + this.selectedCategory, e);
 
-            if (res) {
-                this.questions = res.questions;
-                this.category = $('#questionType option:selected').text();
-                this.rawCategory = $('#questionType').val();
+            if (data.questions && data.questions.length) {
+                this.$store.commit('manageTest/setQuestions', data.questions);
             }
-
-            e.target.disabled = false;
         },
-        resetInput() {
-            $('#optionList').text('');
+        selectQuestion (id) {
+            this.$store.commit('manageTest/setSelectedQuestionId', id);
         },
-        addQuestionToList(q) {
-            this.questions.unshift(q);
+        getCategoryContent () {
+            return this.categories.find(c => c.value === this.selectedCategory).content || this.selectedCategory;
         },
     },
 };

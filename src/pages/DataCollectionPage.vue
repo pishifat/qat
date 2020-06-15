@@ -4,6 +4,7 @@
             <filter-box
                 :placeholder="'enter to search event...'"
                 :options="['', 'osu', 'taiko', 'catch', 'mania']"
+                store-module="dataCollection"
             />
 
             <section class="card card-body">
@@ -29,6 +30,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import dataCollectionModule from '../store/dataCollection';
 import ToastMessages from '../components/ToastMessages.vue';
 import postData from '../mixins/postData.js';
 import FilterBox from '../components/FilterBox.vue';
@@ -46,20 +48,26 @@ export default {
     mixins: [postData],
     computed: {
         ...mapGetters([
+            'userMainMode',
+        ]),
+        ...mapGetters('dataCollection', [
             'disqualifications',
             'pops',
         ]),
     },
+    beforeCreate () {
+        if (!this.$store.hasModule('dataCollection')) {
+            this.$store.registerModule('dataCollection', dataCollectionModule);
+        }
+    },
     async created() {
+        this.$store.commit('dataCollection/pageFilters/setFilterMode', this.userMainMode);
+
         const res = await this.executeGet('/dataCollection/relevantInfo');
 
         if (res) {
-            this.$store.commit('setEvents', res.events);
-            this.$store.commit('setFilterMode', res.mode);
+            this.$store.commit('dataCollection/setEvents', res.events);
         }
-
-        $('#loading').fadeOut();
-        $('#main').attr('style', 'visibility: visible').hide().fadeIn();
     },
 };
 </script>

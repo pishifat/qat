@@ -1,24 +1,13 @@
 const express = require('express');
-const api = require('../helpers/api');
 const Logger = require('../models/log');
 const Report = require('../models/report');
 const User = require('../models/user');
+const middlewares = require('../helpers/middlewares');
 
 const router = express.Router();
 
-router.use(api.isLoggedIn);
-router.use(api.isNat);
-
-/* GET bn app page */
-router.get('/', (req, res) => {
-    res.render('managereports', {
-        title: 'Manage Reports',
-        script: '../javascripts/manageReports.js',
-        loggedInAs: req.session.mongoId,
-        isReports: true,
-        isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
-    });
-});
+router.use(middlewares.isLoggedIn);
+router.use(middlewares.isNat);
 
 //population
 const defaultPopulate = [
@@ -37,7 +26,7 @@ router.get('/relevantInfo', async (req, res) => {
 });
 
 /* POST submit or edit eval */
-router.post('/submitReportEval/:id', api.isNotSpectator, async (req, res) => {
+router.post('/submitReportEval/:id', middlewares.isNotSpectator, async (req, res) => {
     if (req.body.feedback && req.body.feedback.length) {
         await Report.findByIdAndUpdate(req.params.id, { feedback: req.body.feedback });
     }

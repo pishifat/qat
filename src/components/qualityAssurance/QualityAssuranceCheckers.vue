@@ -19,14 +19,14 @@
 
         <span v-else-if="isQualityAssuranceChecker">
             <a
-                :href="'https://osu.ppy.sh/users/' + userOsuId"
+                :href="'https://osu.ppy.sh/users/' + loggedInUser.osuId"
                 target="_blank"
             >
                 <img
                     class="avatar-img avatar-img--small"
-                    :src="'https://a.ppy.sh/' + userOsuId"
+                    :src="'https://a.ppy.sh/' + loggedInUser.osuId"
                     data-toggle="tooltip"
-                    :title="username"
+                    :title="loggedInUser.username"
                 >
             </a>
         </span>
@@ -48,11 +48,8 @@ export default {
         showAll: Boolean,
         isQualityAssuranceChecker: Boolean,
     },
-    computed: {
-        ...mapState([
-            'userOsuId',
-            'username',
-        ]),
-    },
+    computed: mapState([
+        'loggedInUser',
+    ]),
 };
 </script>

@@ -20,18 +20,18 @@
                 />
             </div>
             <modding-activity
-                v-if="isNat"
+                v-if="loggedInUser.isNat"
                 :username="selectedUser.username"
                 class="mt-2"
             />
 
             <!-- BN can only see this on their own cards. NAT can see on everyone's cards -->
             <bn-evaluator-toggle
-                v-if="(selectedUser.id == userId || isNat) && selectedUser.group != 'nat'"
+                v-if="(selectedUser.id == loggedInUser.id || loggedInUser.isNat) && selectedUser.group != 'nat'"
             />
 
             <notes
-                v-if="isNat"
+                v-if="loggedInUser.isNat"
             />
         </div>
     </modal-dialog>
@@ -44,8 +44,8 @@ import Duration from './info/Duration.vue';
 import Notes from './info/Notes.vue';
 import NextEvaluation from './info/NextEvaluation.vue';
 import BnEvaluatorToggle from './info/BnEvaluatorToggle.vue';
-import ModdingActivity from '../evaluations/currentBnEvaluations/currentBnInfo/ModdingActivity.vue';
-import UserActivity from '../evaluations/currentBnEvaluations/currentBnInfo/UserActivity.vue';
+import ModdingActivity from '../evaluations/info/currentBns/ModdingActivity.vue';
+import UserActivity from '../evaluations/info/currentBns/userActivity/UserActivity.vue';
 import ModalDialog from '../ModalDialog.vue';
 
 export default {
@@ -62,17 +62,11 @@ export default {
     },
     computed: {
         ...mapState([
-            'userId',
-            'isNat',
+            'loggedInUser',
         ]),
-        ...mapGetters([
+        ...mapGetters('users', [
             'selectedUser',
         ]),
-    },
-    watch: {
-        selectedUser() {
-            history.pushState(null, 'BN/NAT Listing', `/users?id=${this.selectedUser.id}`);
-        },
     },
 };
 </script>

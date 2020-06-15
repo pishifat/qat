@@ -1,34 +1,25 @@
 const express = require('express');
 const config = require('../config.json');
 const crypto = require('crypto');
-const api = require('../helpers/api');
+const { getUserModsCount } = require('../helpers/scrap');
+const middlewares = require('../helpers/middlewares');
+const osu = require('../helpers/osu');
 const User = require('../models/user');
 const Logger = require('../models/log');
-const getUserModsCount = require('../helpers/helpers').getUserModsCount;
+
 const router = express.Router();
 
-/* GET bn app page */
-router.get('/', async (req, res) => {
-    const allUsersByMode = await User.getAllByMode(true, true, true);
-    let user;
+/* GET index bn listing */
+router.get('/relevantInfo', async (req, res) => {
+    res.json({
+        allUsersByMode: await User.getAllByMode(true, true, true),
+    });
+});
 
-    if (req.session.mongoId) {
-        user = await User.findById(req.session.mongoId);
-    }
-
-    let isBnOrNat = user && user.isBnOrNat;
-    let isBn = user && user.isBn && !user.isSpectator;
-    let isNat = user && (user.isNat || user.isSpectator);
-
-    res.render('index', {
-        title: 'NAT',
-        script: '../javascripts/index.js',
-        loggedInAs: req.session.mongoId,
-        isIndex: true,
-        isBnOrNat,
-        isBn,
-        isNat,
-        allUsersByMode,
+/* GET my info */
+router.get('/me', middlewares.isLoggedIn, (req, res) => {
+    res.json({
+        me: res.locals.userRequest,
     });
 });
 
@@ -105,13 +96,9 @@ router.get(
             );
         }
     },
-    api.isLoggedIn,
+    middlewares.isLoggedIn,
     (req, res) => {
-        if (req.session.lastPage) {
-            res.redirect(req.session.lastPage);
-        } else {
-            res.redirect('/');
-        }
+        res.redirect(req.session.lastPage || '/');
     }
 );
 
@@ -130,7 +117,7 @@ router.get('/callback', async (req, res) => {
     }
 
     res.clearCookie('_state');
-    let response = await api.getToken(req.query.code);
+    let response = await osu.getToken(req.query.code);
 
     if (response.error) {
         res.status(500).render('error', { message: response.error });
@@ -141,7 +128,7 @@ router.get('/callback', async (req, res) => {
         req.session.accessToken = response.access_token;
         req.session.refreshToken = response.refresh_token;
 
-        response = await api.getUserInfo(req.session.accessToken);
+        response = await osu.getUserInfo(req.session.accessToken);
 
         let groupIds = [];
 

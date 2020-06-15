@@ -5,7 +5,7 @@
                 v-if="pagination.page > 1"
                 class="btn btn-lg btn-link"
                 type="button"
-                @click="$emit('show-newer')"
+                @click="decreasePage"
             >
                 <i class="fas fa-angle-left px-1" />
             </button>
@@ -16,7 +16,7 @@
                 v-if="pagination.page < pagination.maxPages"
                 class="btn btn-lg btn-link"
                 type="button"
-                @click="$emit('show-older')"
+                @click="increasePage"
             >
                 <i class="fas fa-angle-right px-1" />
             </button>
@@ -25,9 +25,26 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
 export default {
     name: 'PaginationNav',
-    computed: mapState(['pagination']),
+    props: {
+        storeModule: {
+            type: String,
+            required: true,
+        },
+    },
+    computed: {
+        pagination () {
+            return this.$store.state[this.storeModule].pagination;
+        },
+    },
+    methods: {
+        increasePage () {
+            this.$store.commit(this.storeModule + '/pagination/increasePage');
+        },
+        decreasePage () {
+            this.$store.commit(this.storeModule + '/pagination/decreasePage');
+        },
+    },
 };
 </script>

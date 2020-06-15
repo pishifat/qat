@@ -1,55 +1,41 @@
 const express = require('express');
-const api = require('../../helpers/api');
 const User = require('../../models/user');
 const Logger = require('../../models/log');
-const BnApp = require('../../models/bnApp');
-const EvalRound = require('../../models/evalRound');
+const AppEvaluation = require('../../models/evaluations/appEvaluation');
+const BnEvaluation = require('../../models/evaluations/bnEvaluation');
 const Aiess = require('../../models/aiess');
-const getGeneralEvents = require('../bnEval').getGeneralEvents;
+const middlewares = require('../../helpers/middlewares');
+const getGeneralEvents = require('../evaluations/bnEval').getGeneralEvents;
 
 const router = express.Router();
 
-router.use(api.isLoggedIn);
+router.use(middlewares.isLoggedIn);
 
 const evaluationsPopulate = [
     {
-        path: 'evaluations',
+        path: 'reviews',
         select: 'evaluator',
     },
 ];
 
-/* GET bn app page */
-router.get('/', (req, res) => {
-    res.render('users', {
-        title: 'BN/NAT Listing',
-        script: '../javascripts/users.js',
-        loggedInAs: req.session.mongoId,
-        isUsers: true,
-        isBn: res.locals.userRequest.isBn,
-        isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
-    });
-});
-
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res) => {
-    const users = await User.find({
-        $or: [
-            { group: 'nat' },
-            { group: 'bn' },
-        ],
-    }).sort({ username: 1 });
+    const users = await User
+        .find({
+            $or: [
+                { group: 'nat' },
+                { group: 'bn' },
+            ],
+        });
 
     res.json({
         users,
-        userId: req.session.mongoId,
-        isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
-        isBn: res.locals.userRequest.group == 'bn',
     });
 });
 
 /* GET user next evaluation */
 router.get('/loadNextEvaluation/:id', async (req, res) => {
-    let er = await EvalRound.findOne({ bn: req.params.id, active: true });
+    let er = await BnEvaluation.findOne({ user: req.params.id, active: true });
 
     if (!er) {
         return res.json('Never');
@@ -74,7 +60,7 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
             })
             .sort({ username: 1 }),
 
-        BnApp
+        AppEvaluation
             .find({
                 mode: req.params.mode,
                 createdAt: { $gte: minAppDate, $lte: maxDate },
@@ -82,7 +68,7 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
             })
             .populate(evaluationsPopulate),
 
-        EvalRound
+        BnEvaluation
             .find({
                 mode: req.params.mode,
                 deadline: { $gte: minEvalDate, $lte: maxDate },
@@ -100,8 +86,8 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
             let feedbackCount = 0;
 
             bnApps.forEach(app => {
-                app.evaluations.forEach(evaluation => {
-                    if (evaluation.evaluator == user.id) {
+                app.reviews.forEach(review => {
+                    if (review.evaluator == user.id) {
                         evalsOnBnApps++;
                     }
                 });
@@ -112,8 +98,8 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
             });
 
             bnRounds.forEach(round => {
-                round.evaluations.forEach(evaluation => {
-                    if (evaluation.evaluator == user.id) {
+                round.reviews.forEach(review => {
+                    if (review.evaluator == user.id) {
                         evalsOnCurrentBnEvals++;
                     }
                 });
@@ -148,7 +134,7 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
             isSpectator: { $ne: true },
         }).sort({ username: 1 }),
         Aiess.getAllActivity(minDate, maxDate, req.params.mode),
-        EvalRound.find({ active: true }),
+        BnEvaluation.find({ active: true }),
         Aiess.find({ qualityAssuranceCheckers: { $exists: true, $ne: [] }, timestamp: { $gt: minDate } }),
     ]);
 
@@ -219,7 +205,7 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
 });
 
 /* POST switch bn evaluator */
-router.post('/:id/switchBnEvaluator', api.isBnOrNat, async (req, res) => {
+router.post('/:id/switchBnEvaluator', middlewares.isBnOrNat, async (req, res) => {
     const user = await User.findById(req.params.id).orFail();
 
     if (req.session.mongoId != user.id && res.locals.userRequest.group != 'nat') {

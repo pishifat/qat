@@ -1,17 +1,18 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
-const api = require('./api');
-const helper = require('./helpers');
+const cron = require('node-cron');
+const discord = require('./discord');
+const osuv1 = require('./osuv1');
+const util = require('./util');
 const BnApp = require('../models/bnApp');
 const Veto = require('../models/veto');
 const EvalRound = require('../models/evalRound');
 const User = require('../models/user');
 const BeatmapReport = require('../models/beatmapReport');
 const Aiess = require('../models/aiess');
-const cron = require('node-cron');
 
 const defaultAppPopulate = [{
-    path: 'applicant',
+    path: 'user',
     select: 'username osuId',
 }];
 
@@ -64,14 +65,14 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
         }
 
         if (date > veto.deadline || veto.deadline < nearDeadline) {
-            await api.webhookPost(
+            await discord.webhookPost(
                 [{
                     description,
-                    color: api.webhookColors.red,
+                    color: discord.webhookColors.red,
                 }],
                 veto.mode
             );
-            await helper.sleep(500);
+            await util.sleep(500);
         }
     }
 
@@ -84,7 +85,7 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
         if (app.discussion) { addition += 7; }
 
         const deadline = new Date(app.createdAt.setDate(app.createdAt.getDate() + addition));
-        let description = `[**${app.applicant.username}**'s BN app](http://bn.mappersguild.com/appeval?eval=${app.id}) `;
+        let description = `[**${app.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${app.id}) `;
         let generateWebhook;
 
         if (date > deadline) {
@@ -104,14 +105,14 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
         }
 
         if (generateWebhook) {
-            await api.webhookPost(
+            await discord.webhookPost(
                 [{
                     description,
-                    color: api.webhookColors.red,
+                    color: discord.webhookColors.red,
                 }],
                 app.mode
             );
-            await helper.sleep(500);
+            await util.sleep(500);
         }
     }
 
@@ -119,7 +120,7 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
     for (let i = 0; i < activeRounds.length; i++) {
         const round = activeRounds[i];
 
-        let description = `[**${round.bn.username}**'s current BN eval](http://bn.mappersguild.com/bneval?eval=${round.id}) `;
+        let description = `[**${round.user.username}**'s current BN eval](http://bn.mappersguild.com/bneval?id=${round.id}) `;
         let natList = '';
         let generateWebhook;
 
@@ -174,20 +175,20 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
         }
 
         if (generateWebhook && !natList.length) {
-            await api.webhookPost(
+            await discord.webhookPost(
                 [{
                     description,
-                    color: api.webhookColors.red,
+                    color: discord.webhookColors.red,
                 }],
                 round.mode
             );
-            await helper.sleep(500);
+            await util.sleep(500);
         } else if (generateWebhook && natList.length) {
 
-            await api.webhookPost(
+            await discord.webhookPost(
                 [{
                     description,
-                    color: api.webhookColors.pink,
+                    color: discord.webhookColors.pink,
                     fields: [
                         {
                             name: 'Assigned NAT',
@@ -197,15 +198,15 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
                 }],
                 round.mode
             );
-            await helper.sleep(500);
+            await util.sleep(500);
         }
     }
 
     // send highlights if needed
-    if (osuHighlight) api.highlightWebhookPost('time to find a new NAT member?', 'osu');
-    if (taikoHighlight) api.highlightWebhookPost('i wonder who would make the best new NAT...', 'taiko');
-    if (catchHighlight) api.highlightWebhookPost('oh no', 'catch');
-    if (maniaHighlight) api.highlightWebhookPost('so who is the new NAT candidate?', 'mania');
+    if (osuHighlight) discord.highlightWebhookPost('time to find a new NAT member?', 'osu');
+    if (taikoHighlight) discord.highlightWebhookPost('i wonder who would make the best new NAT...', 'taiko');
+    if (catchHighlight) discord.highlightWebhookPost('oh no', 'catch');
+    if (maniaHighlight) discord.highlightWebhookPost('so who is the new NAT candidate?', 'mania');
 });
 
 const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
@@ -256,8 +257,8 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
                 reporterUserId: discussion.starting_post.user_id,
             });
 
-            let userInfo = await api.getUserInfoV1(discussion.starting_post.user_id);
-            await helper.sleep(500);
+            let userInfo = await osuv1.getUserInfoV1(discussion.starting_post.user_id);
+            await util.sleep(500);
 
             // identify modes
             let modes = [];
@@ -267,7 +268,7 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
                 else modes.push(discussion.beatmap.mode);
 
             } else {
-                let beatmapsetInfo = await api.beatmapsetInfo(discussion.beatmapset_id, true);
+                let beatmapsetInfo = await osuv1.beatmapsetInfo(discussion.beatmapset_id, true);
                 beatmapsetInfo.forEach(beatmap => {
                     switch (beatmap.mode) {
                         case '0':
@@ -287,7 +288,7 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
             }
 
             // send webhook
-            await api.webhookPost(
+            await discord.webhookPost(
                 [{
                     author: {
                         name: userInfo.username,
@@ -298,7 +299,7 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
                     thumbnail: {
                         url: `https://b.ppy.sh/thumb/${discussion.beatmapset_id}.jpg`,
                     },
-                    color: discussion.message_type == 'suggestion' ? api.webhookColors.lightOrange : api.webhookColors.red,
+                    color: discussion.message_type == 'suggestion' ? discord.webhookColors.lightOrange : discord.webhookColors.red,
                     fields: [
                         {
                             name: discussion.message_type,
@@ -308,12 +309,12 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
                 }],
                 'beatmapReport'
             );
-            await helper.sleep(500);
+            await util.sleep(500);
 
             // send highlights
             if (discussion.message_type == 'problem') {
                 modes.forEach(mode => {
-                    api.highlightWebhookPost('', `${mode}BeatmapReport`);
+                    discord.highlightWebhookPost('', `${mode}BeatmapReport`);
                 });
             }
         }
@@ -396,10 +397,10 @@ const notifyQualityAssurance = cron.schedule('0 22 * * *', async () => {
             }
         }
 
-        await api.webhookPost(
+        await discord.webhookPost(
             [{
                 title: `${mode == 'osu' ? 'osu!' : 'osu!' + mode} QA activity`,
-                color: api.webhookColors.lightBlue,
+                color: discord.webhookColors.lightBlue,
                 fields: [{
                     name: `all time`,
                     value: topTenText,
@@ -410,7 +411,7 @@ const notifyQualityAssurance = cron.schedule('0 22 * * *', async () => {
             }],
             mode == 'osu' ? 'standardQualityAssurance' : 'taikoCatchManiaQualityAssurance'
         );
-        await helper.sleep(500);
+        await util.sleep(500);
     }
 });
 
@@ -473,16 +474,16 @@ const lowActivityTask = cron.schedule('0 23 1 * *', async () => {
 
     for (let i = 0; i < modeFields.length; i++) {
         const modeField = modeFields[i];
-        await api.webhookPost(
+        await discord.webhookPost(
             [{
                 title: 'Low Activity',
                 description: `The following users have low activity from ${initialDate.toLocaleDateString()} to today`,
-                color: api.webhookColors.red,
+                color: discord.webhookColors.red,
                 fields: modeField,
             }],
             modes[i]
         );
-        await helper.sleep(500);
+        await util.sleep(500);
     }
 }, {
     scheduled: false,

@@ -4,18 +4,19 @@
             <filter-box
                 :placeholder="'enter to search username...'"
                 :options="['', 'osu', 'taiko', 'catch', 'mania']"
+                store-module="evaluations"
             >
-                <template v-if="evaluator && evaluator.isNat">
-                    <button class="btn btn-block btn-primary my-1" @click="$emit('select-all', $event)">
+                <template v-if="loggedInUser.isNat">
+                    <button class="btn btn-block btn-primary my-1" @click="selectAll()">
                         Select all
                     </button>
 
                     <div class="sort-filter">
                         <span class="sort-filter__title--large">Mark selected as</span>
-                        <button class="btn btn-primary btn-sm ml-2" @click="$emit('set-group-eval', $event)">
+                        <button class="btn btn-primary btn-sm ml-2" @click="setGroupEval($event)">
                             Group evaluation
                         </button>
-                        <button class="btn btn-primary btn-sm ml-2" @click="$emit('set-individual-eval', $event)">
+                        <button class="btn btn-primary btn-sm ml-2" @click="setIndividualEval($event)">
                             Individual evaluation
                         </button>
                         <button
@@ -23,7 +24,7 @@
                             data-toggle="tooltip"
                             data-placement="top"
                             title="Moves an evaluation to archives and applies its consensus to its user"
-                            @click="$emit('set-complete', $event)"
+                            @click="setComplete($event)"
                         >
                             Archive
                         </button>
@@ -48,7 +49,13 @@
                 </h2>
 
                 <transition-group name="list" tag="div" class="row">
-                    <slot name="individual-evaluations-cards" />
+                    <evaluation-card
+                        v-for="evaluation in individualEvaluations"
+                        :key="evaluation.id"
+                        :evaluation="evaluation"
+                        target="#evaluationInfo"
+                        store-module="evaluations"
+                    />
                 </transition-group>
 
                 <div class="row">
@@ -60,11 +67,11 @@
 
             <section class="card card-body">
                 <h2>
-                    {{ discussionsEvaluationsTitle }}
+                    {{ discussionEvaluationsTitle }}
                     <sup
                         data-toggle="tooltip"
                         data-placement="top"
-                        :title="discussionsEvaluationsHelp"
+                        :title="discussionEvaluationsHelp"
                     >
                         ?
                     </sup>
@@ -72,7 +79,13 @@
                 </h2>
 
                 <transition-group name="list" tag="div" class="row">
-                    <slot name="discussion-evaluations-cards" />
+                    <evaluation-card
+                        v-for="evaluation in discussionEvaluations"
+                        :key="evaluation.id"
+                        :evaluation="evaluation"
+                        target="#evaluationInfo"
+                        store-module="evaluations"
+                    />
                 </transition-group>
 
                 <div class="row">
@@ -83,51 +96,166 @@
             </section>
         </div>
 
+        <evaluation-info />
+
         <toast-messages />
     </div>
 </template>
 
 <script>
-import { mapState } from 'vuex';
-import ToastMessages from '../ToastMessages.vue';
-import FilterBox from '../FilterBox.vue';
+import { mapState, mapGetters } from 'vuex';
+import evaluationsModule from '../../store/evaluations';
 import filters from '../../mixins/filters.js';
 import postData from '../../mixins/postData.js';
+import ToastMessages from '../ToastMessages.vue';
+import FilterBox from '../FilterBox.vue';
+import EvaluationCard from './card/EvaluationCard.vue';
+import EvaluationInfo from './info/EvaluationInfo.vue';
 
 export default {
     name: 'AppEvalPage',
     components: {
         ToastMessages,
         FilterBox,
+        EvaluationCard,
+        EvaluationInfo,
     },
     mixins: [ postData, filters ],
     props: {
-        discussionsEvaluationsTitle: {
+        discussionEvaluationsTitle: {
             type: String,
             default: 'Group Evaluations',
         },
-        discussionsEvaluationsHelp: {
+        discussionEvaluationsHelp: {
             type: String,
             default: 'After individual evals are completed, their responses are made visible to allow discussion between NAT and form a consensus',
         },
-        individualEvaluations: {
-            type: Array,
+        kind: {
+            type: String,
             required: true,
         },
-        discussionEvaluations: {
-            type: Array,
-            required: true,
-        },
-    },
-    data() {
-        return {
-            allChecked: false,
-        };
     },
     computed: {
         ...mapState([
-            'evaluator',
+            'loggedInUser',
         ]),
+        ...mapGetters([
+            'userMainMode',
+        ]),
+        ...mapState('evaluations', [
+            'evaluations',
+            'checkedEvaluations',
+        ]),
+        ...mapGetters('evaluations', [
+            'individualEvaluations',
+            'discussionEvaluations',
+        ]),
+    },
+    beforeCreate () {
+        if (this.$store.hasModule('evaluations')) {
+            this.$store.commit('evaluations/resetState');
+        } else {
+            this.$store.registerModule('evaluations', evaluationsModule);
+        }
+    },
+    async created () {
+        if (this.userMainMode) {
+            this.$store.commit(`evaluations/pageFilters/setFilterMode`, this.userMainMode);
+        }
+
+        const data = await this.initialRequest(`/${this.kind === 'applications' ? 'appEval' : 'bnEval'}/relevantInfo`);
+
+        if (data) {
+            this.$store.commit(`evaluations/setEvaluations`, data.evaluations);
+            const id = this.$route.query.id;
+
+            if (id) {
+                const i = this.evaluations.findIndex(a => a.id == id);
+
+                if (i >= 0) {
+                    this.$store.commit(`evaluations/setSelectedEvaluationId`, id);
+                    $('#evaluationInfo').modal('show');
+                }
+            }
+        }
+    },
+    mounted () {
+        setInterval(async () => {
+            const data = await this.executeGet(`/${this.kind === 'applications' ? 'appEval' : 'bnEval'}/relevantInfo`);
+
+            if (data) {
+                this.$store.commit(`evaluations/setEvaluations`, data.evaluations);
+            }
+        }, 21600000);
+    },
+    methods: {
+        selectAll() {
+            this.$store.commit(`evaluations/updateCheckedEvaluations`, [
+                ...this.individualEvaluations.map(a => a.id),
+                ...this.discussionEvaluations.map(a => a.id),
+            ]);
+        },
+        commitEvaluations (evaluations, message) {
+            if (evaluations && !evaluations.error) {
+                this.$store.commit(`evaluations/setEvaluations`, evaluations);
+                this.$store.commit(`evaluations/updateCheckedEvaluations`, []);
+                this.$store.dispatch('updateToastMessages', {
+                    message,
+                    type: 'success',
+                });
+            }
+        },
+        async setGroupEval(e) {
+            if (this.checkedEvaluations.length) {
+                const result = confirm(`Are you sure?`);
+
+                if (result) {
+                    let evaluations = [];
+
+                    if (this.kind === 'applications') {
+                        evaluations = await this.executePost('/appEval/setGroupEval/', { checkedApps: this.checkedEvaluations }, e);
+                    } else {
+                        evaluations = await this.executePost('/bnEval/setGroupEval/', { checkedRounds: this.checkedEvaluations }, e);
+                    }
+
+                    this.commitEvaluations(evaluations, 'Set as group eval');
+                }
+            }
+        },
+        async setIndividualEval(e) {
+            if (this.checkedEvaluations.length) {
+                const result = confirm(`Are you sure?`);
+
+                if (result) {
+                    let evaluations = [];
+
+                    if (this.kind === 'applications') {
+                        evaluations = await this.executePost('/appEval/setIndividualEval/', { checkedApps: this.checkedEvaluations }, e);
+                    } else {
+                        evaluations = await this.executePost('/bnEval/setIndividualEval/', { checkedRounds: this.checkedEvaluations }, e);
+                    }
+
+                    this.commitEvaluations(evaluations, 'Set as individual eval');
+                }
+            }
+        },
+        async setComplete(e) {
+            if (this.checkedEvaluations.length) {
+                const result = confirm(`Are you sure? The consensus of any evaluation will affect its respective user.\n\nOnly do this after feedback PMs have been sent.`);
+
+                if (result) {
+                    let evaluations = [];
+
+                    if (this.kind === 'applications') {
+                        evaluations = await this.executePost('/appEval/setComplete/', { checkedApps: this.checkedEvaluations }, e);
+                    } else {
+                        evaluations = await this.executePost('/bnEval/setComplete/', { checkedRounds: this.checkedEvaluations }, e);
+                    }
+
+                    this.commitEvaluations(evaluations, 'Archived');
+                }
+            }
+        },
     },
 };
 </script>

@@ -2,12 +2,11 @@
     <section class="card card-body">
         <input
             id="search"
-            v-model="newFilterValue"
             class="form-control"
             type="text"
             autocomplete="off"
             :placeholder="placeholder || ''"
-            @change="updateFilterValue(newFilterValue)"
+            @change="updateFilterValue($event.target.value)"
         >
 
         <select
@@ -30,8 +29,6 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex';
-
 export default {
     props: {
         placeholder: {
@@ -42,20 +39,23 @@ export default {
             type: Array,
             required: true,
         },
+        storeModule: {
+            type: String,
+            required: true,
+        },
     },
-    data () {
-        return {
-            newFilterValue: '',
-        };
+    computed: {
+        filters () {
+            return this.$store.state[this.storeModule].pageFilters.filters;
+        },
     },
-    computed: mapState([
-        'filters',
-    ]),
     methods: {
-        ...mapActions([
-            'updateFilterValue',
-            'updateFilterMode',
-        ]),
+        updateFilterValue (value) {
+            this.$store.commit(this.storeModule + '/pageFilters/setFilterValue', value);
+        },
+        updateFilterMode (mode) {
+            this.$store.commit(this.storeModule + '/pageFilters/setFilterMode', mode);
+        },
     },
 };
 </script>

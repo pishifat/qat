@@ -49,7 +49,11 @@ export default {
     },
     methods: {
         selectReport () {
-            this.$store.commit('setSelectedReportId', this.report.id);
+            this.$store.commit('manageReports/setSelectedReportId', this.report.id);
+
+            if (this.$route.query.id !== this.report.id) {
+                this.$router.replace(`/managereports?id=${this.report.id}`);
+            }
         },
     },
 };

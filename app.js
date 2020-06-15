@@ -8,7 +8,6 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const config = require('./config.json');
 require('express-async-errors');
-require('./helpers/hbs');
 
 // Return the 'new' updated object by default when doing findByIdAndUpdate
 mongoose.plugin(schema => {
@@ -19,14 +18,14 @@ mongoose.plugin(schema => {
     });
 });
 
-const notifications = require('./helpers/notifications');
+// const notifications = require('./helpers/notifications');
 const indexRouter = require('./routes/index');
 const bnAppRouter = require('./routes/bnApp');
 const reportsRouter = require('./routes/reports');
-const appEvalRouter = require('./routes/appEval');
-const bnEvalRouter = require('./routes/bnEval').router;
+const appEvalRouter = require('./routes/evaluations/appEval');
+const bnEvalRouter = require('./routes/evaluations/bnEval').router;
+const evalArchiveRouter = require('./routes/evaluations/evalArchive');
 const dataCollectionRouter = require('./routes/dataCollection');
-const evalArchiveRouter = require('./routes/evalArchive');
 const manageReportsRouter = require('./routes/manageReports');
 const usersRouter = require('./routes//users/users');
 const natRouter = require('./routes/users/nat');
@@ -93,7 +92,10 @@ app.use('/interOp', interOpRouter);
 
 // catch 404
 app.use(function(req, res) {
-    res.status(404).redirect('/');
+    res.render('index',{
+        layout: false,
+        loggedIn: req.session.mongoId,
+    });
 });
 
 // error handler
@@ -143,10 +145,10 @@ server.on('error', (error) => {
 });
 server.on('listening', () => {
     console.log('Listening on ' + port);
-    notifications.notifyDeadlines.start();
-    notifications.notifyBeatmapReports.start();
-    notifications.lowActivityTask.start();
-    notifications.notifyQualityAssurance.start();
+    // notifications.notifyDeadlines.start();
+    // notifications.notifyBeatmapReports.start();
+    // notifications.lowActivityTask.start();
+    // notifications.notifyQualityAssurance.start();
 });
 
 module.exports = app;

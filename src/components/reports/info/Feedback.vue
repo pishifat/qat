@@ -89,11 +89,9 @@ export default {
             vote: null,
         };
     },
-    computed: {
-        ...mapGetters([
-            'selectedReport',
-        ]),
-    },
+    computed: mapGetters('manageReports', [
+        'selectedReport',
+    ]),
     watch: {
         selectedReport() {
             this.findRelevantReportInfo();
@@ -136,7 +134,7 @@ export default {
                 }
 
                 if (report && !report.error) {
-                    this.$store.dispatch('updateReport', report);
+                    this.$store.dispatch('manageReports/updateReport', report);
                     this.$store.dispatch('updateToastMessages', {
                         message: `Saved evaluation`,
                         type: 'success',

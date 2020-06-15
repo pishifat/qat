@@ -1,24 +1,12 @@
 const express = require('express');
-const api = require('../helpers/api');
 const Aiess = require('../models/aiess');
 const Logger = require('../models/log');
 const Mediation = require('../models/mediation');
+const middlewares = require('../helpers/middlewares');
 
 const router = express.Router();
 
-router.use(api.isLoggedIn);
-
-/* GET bn app page */
-router.get('/', (req, res) => {
-    res.render('qualityassurance', {
-        title: 'Quality Assurance',
-        script: '../javascripts/qualityAssurance.js',
-        loggedInAs: req.session.mongoId,
-        isQualityAssurance: true,
-        isBn: res.locals.userRequest.isBn,
-        isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
-    });
-});
+router.use(middlewares.isLoggedIn);
 
 const defaultPopulate = [
     { path: 'qualityAssuranceCheckers', select: 'username osuId' },
@@ -31,11 +19,11 @@ const defaultPopulate = [
     },
 ];
 
-/* GET applicant listing. */
+/* GET qa listing. */
 router.get('/relevantInfo', async (req, res) => {
     let date = new Date();
     date.setDate(date.getDate() - 7);
-    const [data, overwrite] = await Promise.all([
+    const [events, overwrite] = await Promise.all([
         Aiess
             .find({
                 eventType: 'Qualified',
@@ -55,15 +43,10 @@ router.get('/relevantInfo', async (req, res) => {
             .populate(defaultPopulate)
             .sort({ timestamp: -1 }),
     ]);
+
     res.json({
-        maps: data,
+        events,
         overwrite,
-        userId: res.locals.userRequest.id,
-        userOsuId: res.locals.userRequest.osuId,
-        username: res.locals.userRequest.username,
-        isNat: res.locals.userRequest.isNat,
-        isUser: res.locals.userRequest.group == 'user',
-        mode: res.locals.userRequest.modes[0] || 'osu',
     });
 });
 
@@ -71,7 +54,7 @@ router.get('/relevantInfo', async (req, res) => {
 router.get('/loadMore/:limit/:skip', async (req, res) => {
     let date = new Date();
     date.setDate(date.getDate() - 7);
-    const data = await Aiess
+    const events = await Aiess
         .find({
             eventType: 'Qualified',
             timestamp: { $lte: date },
@@ -82,11 +65,13 @@ router.get('/loadMore/:limit/:skip', async (req, res) => {
         .limit(parseInt(req.params.limit))
         .skip(parseInt(req.params.skip));
 
-    res.json({ maps: data });
+    res.json({
+        events,
+    });
 });
 
 /* POST assign user */
-router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
+router.post('/assignUser/:id', middlewares.isBnOrNat, async (req, res) => {
     const event = await Aiess
         .findById(req.params.id)
         .populate(defaultPopulate)
@@ -163,7 +148,7 @@ router.post('/assignUser/:id', api.isBnOrNat, async (req, res) => {
 });
 
 /* POST unassign user */
-router.post('/unassignUser/:id', api.isBnOrNat, async (req, res) => {
+router.post('/unassignUser/:id', middlewares.isBnOrNat, async (req, res) => {
     const event = await Aiess
         .findByIdAndUpdate(req.params.id, { $pull: { qualityAssuranceCheckers: req.session.mongoId } })
         .populate(defaultPopulate);
@@ -177,7 +162,7 @@ router.post('/unassignUser/:id', api.isBnOrNat, async (req, res) => {
 });
 
 /* POST unassign user */
-router.post('/editComment/:id', api.isBnOrNat, async (req, res) => {
+router.post('/editComment/:id', middlewares.isBnOrNat, async (req, res) => {
     let mediation;
 
     if (req.body.mediationId) {

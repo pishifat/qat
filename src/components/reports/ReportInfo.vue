@@ -33,15 +33,8 @@ export default {
         FeedbackPm,
         ModalDialog,
     },
-    computed: {
-        ...mapGetters([
-            'selectedReport',
-        ]),
-    },
-    watch: {
-        selectedReport() {
-            history.pushState(null, 'Manage Reports', `/managereports?report=${this.selectedReport.id}`);
-        },
-    },
+    computed: mapGetters('manageReports', [
+        'selectedReport',
+    ]),
 };
 </script>

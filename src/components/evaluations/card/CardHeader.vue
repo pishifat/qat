@@ -17,8 +17,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
-
 export default {
     name: 'CardHeader',
     props: {
@@ -38,11 +36,6 @@ export default {
             type: String,
             default: '',
         },
-    },
-    computed: {
-        ...mapState([
-            'isNat',
-        ]),
     },
 };
 </script>

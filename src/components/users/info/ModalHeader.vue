@@ -8,10 +8,9 @@
                 <b>{{ selectedUser.username }}</b>
             </a>
 
-            <i v-if="selectedUser.modes.indexOf('osu') >= 0" class="far fa-circle" />
-            <i v-if="selectedUser.modes.indexOf('taiko') >= 0" class="fas fa-drum" />
-            <i v-if="selectedUser.modes.indexOf('catch') >= 0" class="fas fa-apple-alt" />
-            <i v-if="selectedUser.modes.indexOf('mania') >= 0" class="fas fa-stream" />
+            <mode-display
+                :modes="selectedUser.modes"
+            />
         </h5>
         <button type="button" class="close" data-dismiss="modal">
             <span>&times;</span>
@@ -21,11 +20,15 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import ModeDisplay from '../../ModeDisplay.vue';
 
 export default {
     name: 'ModalHeader',
+    components: {
+        ModeDisplay,
+    },
     computed: {
-        ...mapGetters([
+        ...mapGetters('users', [
             'selectedUser',
         ]),
         headerColor () {

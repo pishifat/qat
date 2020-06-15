@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const helper = require('../helpers/helpers');
+const util = require('../helpers/util');
 
 const userSchema = new mongoose.Schema({
     osuId: { type: Number, required: true },
@@ -31,12 +31,16 @@ class UserService {
         return this.group == 'bn';
     }
 
+    get isUser() {
+        return this.group == 'user';
+    }
+
     /**
      * Find an user by a given username
      * @param {string} username
      */
     static findByUsername(username) {
-        return this.findOne({ username: new RegExp('^' + helper.escapeUsername(username) + '$', 'i') });
+        return this.findOne({ username: new RegExp('^' + util.escapeUsername(username) + '$', 'i') });
     }
 
     /**

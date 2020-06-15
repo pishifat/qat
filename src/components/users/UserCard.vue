@@ -31,20 +31,23 @@
                     Joined NAT: {{ user.natDuration[0].slice(0, 10) }}
                 </small>
 
-                <div class="card-icons">
-                    <i v-if="user.modes.indexOf('osu') >= 0" class="far fa-circle" />
-                    <i v-if="user.modes.indexOf('taiko') >= 0" class="fas fa-drum" />
-                    <i v-if="user.modes.indexOf('catch') >= 0" class="fas fa-apple-alt" />
-                    <i v-if="user.modes.indexOf('mania') >= 0" class="fas fa-stream" />
-                </div>
+                <mode-display
+                    class="card-icons"
+                    :modes="user.modes"
+                />
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import ModeDisplay from '../ModeDisplay.vue';
+
 export default {
     name: 'UserCard',
+    components: {
+        ModeDisplay,
+    },
     props: {
         user: {
             type: Object,
@@ -53,7 +56,11 @@ export default {
     },
     methods: {
         selectUser() {
-            this.$store.commit('setSelectedUserId', this.user.id);
+            this.$store.commit('users/setSelectedUserId', this.user.id);
+
+            if (this.$route.query.id !== this.user.id) {
+                this.$router.replace(`/users?id=${this.user.id}`);
+            }
         },
     },
 };

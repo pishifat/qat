@@ -4,9 +4,10 @@
             <filter-box
                 :placeholder="'enter to search discussion...'"
                 :options="['', 'osu', 'taiko', 'catch', 'mania']"
+                store-module="discussionVote"
             >
                 <button
-                    v-if="isNat"
+                    v-if="loggedInUser.isNat"
                     class="btn btn-block btn-primary my-1"
                     data-toggle="modal"
                     data-target="#addDiscussion"
@@ -27,7 +28,7 @@
                         v-for="discussion in activeDiscussionVotes"
                         :key="discussion.id"
                         :discussion="discussion"
-                        :user-id="userId"
+                        :user-id="loggedInUser.userId"
                     />
                 </transition-group>
             </section>
@@ -46,13 +47,12 @@
                         v-for="discussion in paginatedInactiveDiscussionVotes"
                         :key="discussion.id"
                         :discussion="discussion"
-                        :user-id="userId"
+                        :user-id="loggedInUser.userId"
                     />
                 </transition-group>
 
                 <pagination-nav
-                    @show-newer="showNewer()"
-                    @show-older="showOlder()"
+                    store-module="discussionVote"
                 />
             </section>
         </div>
@@ -67,6 +67,7 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import discussionVoteModule from '../store/discussionVote';
 import ToastMessages from '../components/ToastMessages.vue';
 import DiscussionCard from '../components/discussion/DiscussionCard.vue';
 import DiscussionInfo from '../components/discussion/DiscussionInfo.vue';
@@ -88,68 +89,53 @@ export default {
     mixins: [postData],
     computed: {
         ...mapState([
-            'userId',
-            'userModes',
-            'isNat',
+            'loggedInUser',
         ]),
-        ...mapGetters([
-            'allDiscussionVotes',
+        ...mapState('discussionVote', [
+            'discussionVotes',
+        ]),
+        ...mapGetters('discussionVote', [
             'activeDiscussionVotes',
             'inactiveDiscussionVotes',
             'paginatedInactiveDiscussionVotes',
         ]),
     },
     watch: {
-        paginatedInactiveDiscussionVotes () {
-            this.$store.dispatch('updatePaginationMaxPages');
+        inactiveDiscussionVotes (v) {
+            this.$store.dispatch('discussionVote/pagination/updateMaxPages', v.length);
         },
     },
+    beforeCreate () {
+        if (!this.$store.hasModule('discussionVote')) {
+            this.$store.registerModule('discussionVote', discussionVoteModule);
+        }
+    },
     async created() {
-        const res = await this.executeGet('/discussionVote/relevantInfo');
+        const res = await this.initialRequest('/discussionVote/relevantInfo');
 
         if (res) {
-            this.$store.commit('setDiscussionVotes', res.discussions);
-            this.$store.commit('setUserId', res.userId);
-            this.$store.commit('setUserModes', res.userModes);
-            this.$store.commit('setIsNat', res.isNat);
+            this.$store.commit('discussionVote/setDiscussionVotes', res.discussions);
 
-            const params = new URLSearchParams(document.location.search.substring(1));
+            const id = this.$route.query.id;
 
-            if (params.get('id') && params.get('id').length) {
-                const i = this.allDiscussionVotes.findIndex(a => a.id == params.get('id'));
+            if (id) {
+                const i = this.discussionVotes.findIndex(a => a.id == id);
 
                 if (i >= 0) {
-                    this.$store.commit('setSelectedDiscussionVoteId', params.get('id'));
+                    this.$store.commit('discussionVote/setSelectedDiscussionVoteId', id);
                     $('#extendedInfo').modal('show');
                 }
             }
         }
-
-        $('#loading').fadeOut();
-        $('#main')
-            .attr('style', 'visibility: visible')
-            .hide()
-            .fadeIn();
     },
     mounted() {
         setInterval(async () => {
             const res = await this.executeGet('/discussionVote/relevantInfo');
 
             if (res) {
-                this.$store.commit('setDiscussionVotes', res.discussions);
+                this.$store.commit('discussionVote/setDiscussionVotes', res.discussions);
             }
         }, 21600000);
     },
-    methods: {
-        showOlder() {
-            this.$store.commit('increasePaginationPage');
-        },
-        showNewer() {
-            this.$store.commit('decreasePaginationPage');
-        },
-    },
 };
 </script>
-
-<style>
-</style>

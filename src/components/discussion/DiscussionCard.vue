@@ -20,16 +20,11 @@
                 <div class="card-status" :class="discussion.isActive ? 'status-bar-active' : 'status-bar-inactive'" />
                 <div class="card-icons">
                     <span class="small float-left">{{ discussion.createdAt.slice(0, 10) }}</span>
-                    <i v-if="discussion.mode.includes('osu')" class="far fa-circle" />
-                    <i v-if="discussion.mode.includes('taiko')" class="fas fa-drum" />
-                    <i v-if="discussion.mode.includes('catch')" class="fas fa-apple-alt" />
-                    <i v-if="discussion.mode.includes('mania')" class="fas fa-stream" />
-                    <span v-if="discussion.mode.includes('all')">
-                        <i class="far fa-circle" />
-                        <i class="fas fa-drum" />
-                        <i class="fas fa-apple-alt" />
-                        <i class="fas fa-stream" />
-                    </span>
+
+                    <mode-display
+                        :modes="discussion.mode"
+                        :show-all="true"
+                    />
                 </div>
             </div>
         </div>
@@ -38,9 +33,13 @@
 
 <script>
 import { mapState } from 'vuex';
+import ModeDisplay from '../ModeDisplay.vue';
 
 export default {
     name: 'DiscussionCard',
+    components: {
+        ModeDisplay,
+    },
     props: {
         discussion: {
             type: Object,
@@ -49,17 +48,21 @@ export default {
     },
     computed: {
         ...mapState([
-            'userId',
+            'loggedInUser',
         ]),
     },
     methods: {
         selectDiscussion() {
-            this.$store.commit('setSelectedDiscussionVoteId', this.discussion.id);
+            this.$store.commit('discussionVote/setSelectedDiscussionVoteId', this.discussion.id);
+
+            if (this.$route.query.id !== this.discussion.id) {
+                this.$router.replace(`/discussionvote?id=${this.discussion.id}`);
+            }
         },
         findRelevantMediation() {
             let vote;
             this.discussion.mediations.forEach(m => {
-                if (m.mediator && m.mediator.id == this.userId) {
+                if (m.mediator && m.mediator.id == this.loggedInUser.id) {
                     if (m.vote == 1) {
                         vote = 'pass';
                     } else if (m.vote == 2) {

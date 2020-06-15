@@ -23,8 +23,8 @@
                         <div class="card card-body mb-2">
                             <div>
                                 <b>Applicant:</b>
-                                <a :href="'https://osu.ppy.sh/users/' + app.applicant.osuId" target="_blank">
-                                    {{ app.applicant.username }}
+                                <a :href="'https://osu.ppy.sh/users/' + app.user.osuId" target="_blank">
+                                    {{ app.user.username }}
                                 </a>
                                 -- {{ app.createdAt.slice(0,10) }}
                             </div>
@@ -45,15 +45,15 @@
                         <div class="card card-body">
                             <div class="mb-2">
                                 <b>BN's opinion:</b>
-                                <span :class="findVote(app.evaluations, user.osuId) == 'pass' ? 'text-success' : findVote(app.evaluations, user.osuId) == 'neutral' ? 'text-neutral' : 'text-danger'">
-                                    {{ findVote(app.evaluations, user.osuId) }}
+                                <span :class="findVote(app.reviews, user.osuId) == 'pass' ? 'text-success' : findVote(app.reviews, user.osuId) == 'neutral' ? 'text-neutral' : 'text-danger'">
+                                    {{ findVote(app.reviews, user.osuId) }}
                                 </span>
                             </div>
 
                             <div class="mb-2">
                                 <b>Behavior comment:</b>
                                 <div class="pre-line text-secondary ml-2">
-                                    {{ findBehaviorComment(app.evaluations, user.osuId) }}
+                                    {{ findBehaviorComment(app.reviews, user.osuId) }}
                                 </div>
                             </div>
 
@@ -61,7 +61,7 @@
                                 <b>Modding comment:</b>
 
                                 <div class="pre-line text-secondary ml-2">
-                                    {{ findModdingComment(app.evaluations, user.osuId) }}
+                                    {{ findModdingComment(app.reviews, user.osuId) }}
                                 </div>
                             </div>
                         </div>
@@ -97,33 +97,33 @@ export default {
                 });
             }
         },
-        findVote(evaluations, osuId) {
+        findVote(reviews, osuId) {
             let vote = 'none';
-            evaluations.forEach(evaluation => {
-                if (evaluation.evaluator.osuId == osuId) {
-                    if (evaluation.vote == 1) vote = 'pass';
-                    else if (evaluation.vote == 2) vote = 'neutral';
-                    else if (evaluation.vote == 3) vote = 'fail';
+            reviews.forEach(review => {
+                if (review.evaluator.osuId == osuId) {
+                    if (review.vote == 1) vote = 'pass';
+                    else if (review.vote == 2) vote = 'neutral';
+                    else if (review.vote == 3) vote = 'fail';
                 }
             });
 
             return vote;
         },
-        findBehaviorComment(evaluations, osuId) {
+        findBehaviorComment(reviews, osuId) {
             let behaviorComment = 'none';
-            evaluations.forEach(evaluation => {
-                if (evaluation.evaluator.osuId == osuId) {
-                    behaviorComment = evaluation.behaviorComment;
+            reviews.forEach(review => {
+                if (review.evaluator.osuId == osuId) {
+                    behaviorComment = review.behaviorComment;
                 }
             });
 
             return behaviorComment;
         },
-        findModdingComment(evaluations, osuId) {
+        findModdingComment(reviews, osuId) {
             let moddingComment = 'none';
-            evaluations.forEach(evaluation => {
-                if (evaluation.evaluator.osuId == osuId) {
-                    moddingComment = evaluation.moddingComment;
+            reviews.forEach(review => {
+                if (review.evaluator.osuId == osuId) {
+                    moddingComment = review.moddingComment;
                 }
             });
 
@@ -132,7 +132,3 @@ export default {
     },
 };
 </script>
-
-<style>
-
-</style>

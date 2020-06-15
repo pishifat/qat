@@ -1,18 +1,18 @@
 <template>
     <div class="card-footer d-flex justify-content-start align-items-center">
         <span
-            v-if="isNat && !isDiscuss"
+            v-if="loggedInUser.isNat && !isDiscussion"
             class="badge badge-info mx-1"
             data-toggle="tooltip"
             data-placement="top"
             :title="separateEvals()"
         >
-            {{ evaluations.length }}
+            {{ reviews.length }}
         </span>
 
         <add-votes
-            v-else-if="isNat && isDiscuss"
-            :evaluations="evaluations"
+            v-else-if="loggedInUser.isNat && isDiscussion"
+            :reviews="reviews"
         />
 
         <i
@@ -34,13 +34,12 @@
         </span>
 
         <input
-            v-if="isNat && !isArchive"
-            :id="nominatorAssessmentMongoId + '-check'"
+            v-if="loggedInUser.isNat && isActive"
+            v-model="checkedEvaluations"
             class="mx-1 ml-auto"
             type="checkbox"
-            name="evalTypeCheck"
-            :value="nominatorAssessmentMongoId"
-            @click.stop="$emit('check-selection')"
+            :value="evaluationId"
+            @click.stop
         >
     </div>
 </template>
@@ -55,38 +54,45 @@ export default {
         AddVotes,
     },
     props: {
-        nominatorAssessmentMongoId: {
+        evaluationId: {
             type: String,
             required: true,
         },
-        evaluations: {
+        reviews: {
             type: Array,
             default() {
                 return [];
             },
         },
-        isDiscuss: Boolean,
-        date: {
+        deadline: {
             type: String,
             required: true,
         },
-        isApplication: Boolean,
-        isArchive: Boolean,
         feedback: {
             type: String,
             default: '',
         },
+        isDiscussion: Boolean,
+        isActive: Boolean,
     },
     computed: {
         ...mapState([
-            'isNat',
+            'loggedInUser',
         ]),
+        checkedEvaluations: {
+            get () {
+                return this.$store.state.evaluations.checkedEvaluations;
+            },
+            set (checks) {
+                this.$store.commit('evaluations/updateCheckedEvaluations', checks);
+            },
+        },
     },
     methods: {
         separateEvals() {
             let bn = 0;
             let nat = 0;
-            this.evaluations.forEach(e => {
+            this.reviews.forEach(e => {
                 if (e.evaluator.group == 'bn') bn++;
                 else nat++;
             });
@@ -94,16 +100,7 @@ export default {
             return bn + (bn == 1 ? ' BN eval, ' : ' BN evals, ') + nat + (nat == 1 ? ' NAT eval' : ' NAT evals');
         },
         createDeadline() {
-            let deadline = new Date(this.date);
-
-            if (this.isApplication) {
-                let delay = this.isDiscuss ? 14 : 7;
-                deadline = new Date(deadline.setDate(deadline.getDate() + delay)).toString().slice(4,10);
-
-                return deadline;
-            } else {
-                return deadline.toString().slice(4,10);
-            }
+            return this.deadline.toString().slice(5,10);
         },
     },
 };

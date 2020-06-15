@@ -44,7 +44,7 @@ import { mapGetters } from 'vuex';
 export default {
     name: 'ConclusionPost',
     computed: {
-        ...mapGetters([
+        ...mapGetters('vetoes', [
             'selectedVeto',
             'majorityUphold',
         ]),

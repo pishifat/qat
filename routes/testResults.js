@@ -1,11 +1,11 @@
 const express = require('express');
-const api = require('../helpers/api');
 const TestSubmission = require('../models/bnTest/testSubmission');
 const User = require('../models/user');
+const middlewares = require('../helpers/middlewares');
 
 const router = express.Router();
 
-router.use(api.isLoggedIn);
+router.use(middlewares.isLoggedIn);
 
 const defaultTestPopulate = [
     { path: 'applicant', select: 'username osuId' },
@@ -21,19 +21,6 @@ const defaultTestPopulate = [
     },
 ];
 
-/* GET bn app page */
-router.get('/', (req, res) => {
-    res.render('rcTest/testresults', {
-        title: 'Ranking Criteria Test Results',
-        script: '../javascripts/testResults.js',
-        loggedInAs: req.session.mongoId,
-        isTest: true,
-        isBn: res.locals.userRequest.isBn,
-        isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
-        isBnEvaluator: res.locals.userRequest.group == 'bn' && res.locals.userRequest.isBnEvaluator,
-    });
-});
-
 /* GET relevant info. */
 router.get('/relevantInfo', async (req, res) => {
     let tests = await TestSubmission
@@ -45,13 +32,12 @@ router.get('/relevantInfo', async (req, res) => {
 
     res.json({
         tests,
-        isNat: res.locals.userRequest.isNat,
     });
 });
 
 
 /* GET search for test */
-router.get('/search/:user', api.isNat, async (req, res) => {
+router.get('/search/:user', middlewares.isNat, async (req, res) => {
     let user;
     const userToSearch = decodeURI(req.params.user);
 
@@ -73,7 +59,8 @@ router.get('/search/:user', api.isNat, async (req, res) => {
             applicant: user.id,
             status: 'finished',
         })
-        .populate(defaultTestPopulate);
+        .populate(defaultTestPopulate)
+        .sort({ createdAt: -1 });
 
     if (!tests.length) {
         return res.json({ error: 'No tests saved for that user!', isNat: res.locals.userRequest.group == 'nat' });

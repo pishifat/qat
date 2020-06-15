@@ -31,7 +31,7 @@ import { mapGetters } from 'vuex';
 export default {
     name: 'Duration',
     computed: {
-        ...mapGetters([
+        ...mapGetters('users', [
             'selectedUser',
         ]),
     },

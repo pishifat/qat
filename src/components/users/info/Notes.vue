@@ -41,7 +41,7 @@
                     &times;
                 </a>
                 <a
-                    v-if="note.author.id == userId"
+                    v-if="note.author.id == loggedInUser.id"
                     href="#"
                     data-toggle="tooltip"
                     data-placement="top"
@@ -86,9 +86,9 @@ export default {
     },
     computed: {
         ...mapState([
-            'userId',
+            'loggedInUser',
         ]),
-        ...mapGetters([
+        ...mapGetters('users', [
             'selectedUser',
         ]),
     },

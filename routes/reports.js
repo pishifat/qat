@@ -1,30 +1,37 @@
 const express = require('express');
-const api = require('../helpers/api');
 const Report = require('../models/report');
 const User = require('../models/user');
 const Logger = require('../models/log');
+const middlewares = require('../helpers/middlewares');
+const util = require('../helpers/util');
+const discord = require('../helpers/discord');
 
 const router = express.Router();
 
-router.use(api.isLoggedIn);
-
-/* GET reports page */
-router.get('/', (req, res) => {
-    res.render('reports', {
-        title: 'Reports',
-        script: '../javascripts/reports.js',
-        loggedInAs: req.session.mongoId,
-        isReports: true,
-        isBn: res.locals.userRequest.isBn,
-        isNat: res.locals.userRequest.isNat,
-    });
-});
+router.use(middlewares.isLoggedIn);
 
 /* POST submit or edit eval */
-router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
-    if (!req.body.username && !req.body.username.length && !req.body.link && !req.body.link.length) {
+router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
+    const link = req.body.link;
+    const username = req.body.username;
+    let validUrl = util.isValidUrl(link);
+
+    if (!username && !link) {
         return res.json({ error: 'You must include a username or a link' });
     }
+
+    const report = new Report();
+    report.reporter = req.session.mongoId;
+    report.reason = req.body.reason;
+
+    if (validUrl) {
+        report.link = link;
+    }
+
+    let notificationFields = [{
+        name: 'Report reason',
+        value: req.body.reason.length > 975 ? req.body.reason.slice(0,975) + '... *(truncated)*' : req.body.reason,
+    }];
 
     if (req.body.username) {
         let u = await User.findByUsername(req.body.username);
@@ -37,35 +44,29 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
             return res.json({ error: 'User is not a member of the BN/NAT!' });
         }
 
-        const r = await Report.create({
-            reporter: req.session.mongoId,
-            culprit: u.id,
-            reason: req.body.reason,
-            link: req.body.link,
+        report.culprit = u.id;
+        await report.save();
+
+        res.json({
+            success: 'ok',
         });
 
-        res.json({});
-
-        let fields = [{
-            name: 'Report reason',
-            value: req.body.reason.length > 975 ? req.body.reason.slice(0,975) + '... *(truncated)*' : req.body.reason,
-        }];
-
-        if (req.body.link && req.body.link.length) {
-            fields.push({
+        if (validUrl) {
+            notificationFields.push({
                 name: 'Relevant link',
-                value: req.body.link,
+                value: link,
             });
         }
 
-        api.webhookPost([{
+        discord.webhookPost([{
             thumbnail: {
                 url: `https://a.ppy.sh/${u.osuId}`,
             },
-            color: api.webhookColors.darkRed,
-            description: `[User report](http://bn.mappersguild.com/managereports?report=${r.id}) for **${u.username}**`,
-            fields,
+            color: discord.webhookColors.darkRed,
+            description: `[User report](http://bn.mappersguild.com/managereports?report=${report.id}) for **${u.username}**`,
+            fields: notificationFields,
         }]);
+
         Logger.generate(
             null,
             `Reported "${u.username}" for reason "${
@@ -73,24 +74,24 @@ router.post('/submitReport/', api.isLoggedIn, async (req, res) => {
             }"`
         );
     } else {
-        const r = await Report.create({
-            reporter: req.session.mongoId,
-            reason: req.body.reason,
-            link: req.body.link,
+        if (!validUrl) {
+            return res.json({
+                error: 'Invalid link',
+            });
+        }
+
+        await report.save();
+
+        res.json({
+            success: 'ok',
         });
 
-        res.json({});
-
-        api.webhookPost([{
-            description: `[Non-user report](http://bn.mappersguild.com/managereports?report=${r.id})`,
-            color: api.webhookColors.lightRed,
-            fields: [
-                {
-                    name: 'Report reason',
-                    value: req.body.reason.length > 975 ? req.body.reason.slice(0,975) + '... *(truncated)*' : req.body.reason,
-                },
-            ],
+        discord.webhookPost([{
+            description: `[Non-user report](http://bn.mappersguild.com/managereports?report=${report.id})`,
+            color: discord.webhookColors.lightRed,
+            fields: notificationFields,
         }]);
+
         Logger.generate(
             null,
             'Reported something without a username included'

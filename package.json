@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "run-p -rl watch-app watch-src",
     "watch-app": "set NODE_ENV=development&& nodemon ./app.js",
-    "watch-src": "webpack-dev-server --mode development --port 8080 --watch",
-    "build": "webpack --mode production --config webpack.prod.config.js",
+    "watch-src": "webpack-dev-server --config webpack.dev.config.js",
+    "build": "set NODE_ENV=production&& webpack --mode production --config webpack.prod.config.js",
     "prod": "set NODE_ENV=production&& node ./app.js",
     "lint": "eslint . --ext .js,.vue"
   },
@@ -33,12 +33,14 @@
     "node-cron": "^2.0.3",
     "vue": "^2.6.11",
     "vue-loader": "^15.9.0",
+    "vue-router": "^3.3.2",
     "vue-template-compiler": "^2.6.11",
     "vuex": "^3.4.0",
     "webpack": "^4.42.0",
     "webpack-cli": "^3.3.11"
   },
   "devDependencies": {
+    "babel-eslint": "^10.1.0",
     "eslint": "^6.8.0",
     "eslint-plugin-vue": "^6.2.1",
     "mini-css-extract-plugin": "^0.9.0",

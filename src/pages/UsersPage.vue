@@ -4,6 +4,7 @@
             <filter-box
                 :placeholder="'enter to search username...'"
                 :options="['', 'osu', 'taiko', 'catch', 'mania']"
+                store-module="users"
             >
                 <div class="sort-filter">
                     <span class="sort-filter__title">Sort by</span>
@@ -44,8 +45,7 @@
                 </transition-group>
 
                 <pagination-nav
-                    @show-newer="showNewer()"
-                    @show-older="showOlder()"
+                    store-module="users"
                 />
             </section>
 
@@ -54,7 +54,7 @@
                 <nat-activity class="my-2" />
                 <bn-activity classs="my-2" />
 
-                <template v-if="isNat">
+                <template v-if="loggedInUser.isNat">
                     <badges />
                     <potential-nat-info />
                 </template>
@@ -69,6 +69,7 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import usersModule from '../store/users';
 import ToastMessages from '../components/ToastMessages.vue';
 import UserCard from '../components/users/UserCard.vue';
 import UserInfo from '../components/users/UserInfo.vue';
@@ -96,69 +97,50 @@ export default {
     mixins: [postData],
     computed: {
         ...mapState([
-            'userId',
-            'isNat',
-            'pagination',
+            'loggedInUser',
+        ]),
+        ...mapState('users', [
+            'users',
             'sort',
         ]),
-        ...mapGetters([
+        ...mapGetters('users', [
             'paginatedUsers',
-            'allUsers',
+            'sortedUsers',
         ]),
     },
     watch: {
-        paginatedUsers () {
-            this.$store.dispatch('updatePaginationMaxPages');
+        sortedUsers (v) {
+            this.$store.dispatch('users/pagination/updateMaxPages', v.length);
         },
     },
+    beforeCreate () {
+        if (!this.$store.hasModule('users')) {
+            this.$store.registerModule('users', usersModule);
+        }
+    },
     async created() {
-        const res = await this.executeGet('/users/relevantInfo');
+        if (this.users.length) return;
 
-        if (res) {
-            this.$store.commit('setUsers', res.users);
-            this.$store.commit('setUserId', res.userId);
-            this.$store.commit('setIsNat', res.isNat);
+        const data = await this.initialRequest('/users/relevantInfo');
 
-            const params = new URLSearchParams(document.location.search.substring(1));
+        if (!data.error) {
+            this.$store.commit('users/setUsers', data.users);
 
-            if (params.get('id') && params.get('id').length) {
-                const i = this.allUsers.findIndex(u => u.id == params.get('id'));
+            const id = this.$route.query.id;
+
+            if (id) {
+                const i = this.users.findIndex(u => u.id == id);
 
                 if (i >= 0) {
-                    this.$store.commit('setSelectedUserId', params.get('id'));
+                    this.$store.commit('users/setSelectedUserId', id);
                     $('#extendedInfo').modal('show');
                 }
             }
         }
-
-        $('#loading').fadeOut();
-        $('#main').attr('style', 'visibility: visible').hide().fadeIn();
     },
     methods: {
-        showOlder() {
-            this.$store.commit('increasePaginationPage');
-        },
-        showNewer() {
-            this.$store.commit('decreasePaginationPage');
-        },
         updateSorting(sortBy) {
-            this.$store.dispatch('updateSorting', sortBy);
-        },
-        sortDuration(dateArray) {
-            let days = 0;
-
-            for (let i = 0; i < dateArray.length; i+=2) {
-                let a = new Date(dateArray[i]);
-                let b = new Date(dateArray[i+1]);
-
-                if (dateArray[i+1]) {
-                    days += (Math.abs(b.getTime() - a.getTime())) / (1000 * 3600 * 24);
-                } else {
-                    days += (Math.abs(new Date().getTime() - a.getTime())) / (1000 * 3600 * 24);
-                }
-            }
-
-            return days;
+            this.$store.dispatch('users/updateSorting', sortBy);
         },
     },
 };
@@ -168,15 +150,15 @@ export default {
 /* these are used in BN activity and badge sections */
 
 .background-pass {
-    background-color: rgb(50,255,50,0.25);
+    background-color: rgba(50,255,50,0.25);
 }
 
 .background-warn {
-    background-color: rgb(255,255,0,0.25);
+    background-color: rgba(255,255,0,0.25);
 }
 
 .background-fail {
-    background-color: rgb(255,50,50,0.25);
+    background-color: rgba(255,50,50,0.25);
 }
 
 </style>

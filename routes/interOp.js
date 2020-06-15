@@ -1,7 +1,7 @@
 const express = require('express');
 const config = require('../config.json');
 const Aiess = require('../models/aiess');
-const EvalRound = require('../models/evalRound');
+const BnEvaluation = require('../models/evaluations/bnEvaluation');
 const User = require('../models/user');
 
 const router = express.Router();
@@ -47,7 +47,7 @@ router.get('/bnRemoval/:osuId', async (req, res) => {
         return res.status(404).send('User not found');
     }
 
-    const latestEvalRound = await EvalRound
+    const latestEvalRound = await BnEvaluation
         .findOne({ bn: user._id, consensus: 'fail', active: false })
         .sort({ $natural: -1 });
 

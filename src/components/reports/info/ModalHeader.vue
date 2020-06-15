@@ -22,10 +22,8 @@ import { mapGetters } from 'vuex';
 
 export default {
     name: 'ModalHeader',
-    computed: {
-        ...mapGetters([
-            'selectedReport',
-        ]),
-    },
+    computed: mapGetters('manageReports', [
+        'selectedReport',
+    ]),
 };
 </script>

@@ -1,25 +1,15 @@
 const express = require('express');
-const api = require('../helpers/api');
 const TestSubmission = require('../models/bnTest/testSubmission');
 const TestAnswer = require('../models/bnTest/testAnswer');
 const Logger = require('../models/log');
-const BnApp = require('../models/bnApp');
+const AppEvaluation = require('../models/evaluations/appEvaluation');
 const User = require('../models/user');
+const middlewares = require('../helpers/middlewares');
+const discord = require('../helpers/discord');
 
 const router = express.Router();
 
-router.use(api.isLoggedIn);
-
-/* GET test page */
-router.get('/', (req, res) => {
-    res.render('testsubmission', {
-        title: 'Test Submission',
-        script: '../javascripts/testSubmission.js',
-        loggedInAs: req.session.mongoId,
-        isBn: res.locals.userRequest.isBn,
-        isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
-    });
-});
+router.use(middlewares.isLoggedIn);
 
 /* GET pending tests by user */
 router.get('/tests', async (req, res) => {
@@ -54,7 +44,7 @@ router.get('/tests/:id', async (req, res) => {
 
                     populate: {
                         path: 'options',
-                        select: 'content metadataType',
+                        select: 'content',
                         match: {
                             active: true,
                         },
@@ -105,9 +95,9 @@ router.post('/submitTest', async (req, res) => {
         })
         .orFail();
 
-    const currentBnApp = await BnApp
+    const currentBnApp = await AppEvaluation
         .findOne({
-            applicant: req.session.mongoId,
+            user: req.session.mongoId,
             mode: test.mode,
             active: true,
         })
@@ -170,11 +160,11 @@ router.post('/submitTest', async (req, res) => {
     await currentBnApp.save();
     const natList = assignedNat.map(n => n.username).join(', ');
 
-    api.webhookPost(
+    discord.webhookPost(
         [{
-            author: api.defaultWebhookAuthor(req.session),
-            description: `Submitted [BN application](http://bn.mappersguild.com/appeval?eval=${currentBnApp.id}) with test score of **${totalScore}**`,
-            color: api.webhookColors.green,
+            author: discord.defaultWebhookAuthor(req.session),
+            description: `Submitted [BN application](http://bn.mappersguild.com/appeval?id=${currentBnApp.id}) with test score of **${totalScore}**`,
+            color: discord.webhookColors.green,
             fields: [
                 {
                     name: 'Assigned NAT',
