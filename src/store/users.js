@@ -35,6 +35,7 @@ export default {
             type: 'username',
             descend: true,
         },
+        showOldUsers: false,
     },
     mutations: {
         setUsers (state, users) {
@@ -42,6 +43,9 @@ export default {
         },
         setSelectedUserId (state, id) {
             state.selectedUserId = id;
+        },
+        setShowOldUsers (state, value) {
+            state.showOldUsers = value;
         },
 
         // modify data

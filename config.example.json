@@ -50,5 +50,9 @@
     "reportWebhook": {
         "id": "",
         "token": ""
+    },
+    "natReportWebhook": {
+        "id": "",
+        "token": ""
     }
 }

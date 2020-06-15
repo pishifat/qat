@@ -32,6 +32,11 @@
                     >
                         Time as NAT
                     </a>
+                    <!-- uncomment after importing ex BNs
+                    <button v-if="!showOldUsers" class="btn btn-primary btn-sm ml-2 float-right" @click="loadPreviousBnAndNat($event)">
+                        Show previous BN/NAT
+                    </button>
+                    -->
                 </div>
             </filter-box>
 
@@ -102,6 +107,7 @@ export default {
         ...mapState('users', [
             'users',
             'sort',
+            'showOldUsers',
         ]),
         ...mapGetters('users', [
             'paginatedUsers',
@@ -129,7 +135,12 @@ export default {
             const id = this.$route.query.id;
 
             if (id) {
-                const i = this.users.findIndex(u => u.id == id);
+                let i = this.users.findIndex(u => u.id == id);
+
+                if (i == -1) {
+                    await this.loadPreviousBnAndNat();
+                    i = this.users.findIndex(u => u.id == id);
+                }
 
                 if (i >= 0) {
                     this.$store.commit('users/setSelectedUserId', id);
@@ -141,6 +152,15 @@ export default {
     methods: {
         updateSorting(sortBy) {
             this.$store.dispatch('users/updateSorting', sortBy);
+        },
+        async loadPreviousBnAndNat(e) {
+            const res = await this.executeGet('/users/loadPreviousBnAndNat', e);
+
+            if (res) {
+                this.$store.commit('setShowOldUsers', true);
+                this.$store.commit('setUsers', res.users);
+                this.$store.dispatch('updateFilterMode', '');
+            }
         },
     },
 };

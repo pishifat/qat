@@ -33,6 +33,18 @@ router.get('/relevantInfo', async (req, res) => {
     });
 });
 
+/* GET applicant listing. */
+router.get('/loadPreviousBnAndNat', async (req, res) => {
+    const users = await User.find({
+        $or: [
+            { bnDuration: { $ne: [], $exists: true } },
+            { natDuration: { $ne: [], $exists: true } },
+        ],
+    }).sort({ username: 1 });
+
+    res.json({ users });
+});
+
 /* GET user next evaluation */
 router.get('/loadNextEvaluation/:id', async (req, res) => {
     let er = await BnEvaluation.findOne({ user: req.params.id, active: true });

@@ -6,29 +6,34 @@
 
         <div v-if="selectedUser" class="container">
             <duration />
-            <next-evaluation />
-            <hr>
-            <p class="mb-1">
-                <b>Recent BN activity</b>
-            </p>
-            <div class="container mb-3">
-                <user-activity
-                    :modes="selectedUser.modes"
-                    :deadline="new Date().toString()"
-                    :osu-id="selectedUser.osuId"
-                    :mongo-id="selectedUser.id"
+
+            <div v-if="selectedUser.group != 'user'">
+                <next-evaluation />
+                <hr>
+                <p class="mb-1">
+                    <b>Recent BN activity</b>
+                </p>
+
+                <div class="container mb-3">
+                    <user-activity
+                        :modes="selectedUser.modes"
+                        :deadline="new Date().toString()"
+                        :osu-id="selectedUser.osuId"
+                        :mongo-id="selectedUser.id"
+                    />
+                </div>
+
+                <modding-activity
+                    v-if="loggedInUser.isNat"
+                    :username="selectedUser.username"
+                    class="mt-2"
+                />
+
+                <!-- BN can only see this on their own cards. NAT can see on everyone's cards -->
+                <bn-evaluator-toggle
+                    v-if="(selectedUser.id == loggedInUser.id || loggedInUser.isNat) && selectedUser.group != 'nat'"
                 />
             </div>
-            <modding-activity
-                v-if="loggedInUser.isNat"
-                :username="selectedUser.username"
-                class="mt-2"
-            />
-
-            <!-- BN can only see this on their own cards. NAT can see on everyone's cards -->
-            <bn-evaluator-toggle
-                v-if="(selectedUser.id == loggedInUser.id || loggedInUser.isNat) && selectedUser.group != 'nat'"
-            />
 
             <notes
                 v-if="loggedInUser.isNat"
