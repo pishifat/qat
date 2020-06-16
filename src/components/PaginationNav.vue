@@ -1,6 +1,6 @@
 <template>
     <div class="row">
-        <div class="col-sm-6 text-right">
+        <div class="col-6 text-right">
             <button
                 v-if="pagination.page > 1"
                 class="btn btn-lg btn-link"
@@ -11,7 +11,7 @@
             </button>
         </div>
 
-        <div class="col-sm-6">
+        <div class="col-6">
             <button
                 v-if="pagination.page < pagination.maxPages"
                 class="btn btn-lg btn-link"
