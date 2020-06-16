@@ -586,131 +586,60 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
         return { error: 'Something went wrong!' };
     }
 
-    const [allUserEvents, allEventsByType, qualityAssuranceChecks] = await Promise.all([
-        Aiess.getByEventTypeAndUser(userOsuId, minDate, maxDate, modes),
-        Aiess.getAllByEventType(minDate, maxDate, modes),
+    const [uniqueNominations, disqualifications, pops, qualityAssuranceChecks] = await Promise.all([
+        Aiess.getUniqueUserEvents(userOsuId, minDate, maxDate, modes, ['Bubbled', 'Qualified']),
+        Aiess.getUserEvents(userOsuId, minDate, maxDate, modes, ['Disqualified']),
+        Aiess.getUserEvents(userOsuId, minDate, maxDate, modes, ['Popped']),
         Aiess.find({
             qualityAssuranceCheckers: mongoId,
-            updatedAt: { $gte: minDate, $lte: maxDate },
+            timestamp: { $gte: minDate, $lte: maxDate },
+        }).populate({
+            path: 'qualityAssuranceComments',
+            match: { mediator: mongoId },
+            populate: {
+                path: 'mediator',
+                select: 'username osuId',
+            },
         }),
     ]);
 
-    if (allUserEvents.error || allEventsByType.error) {
-        return { error: 'Something went wrong!' };
-    }
+    const beatmapsetIds = uniqueNominations.map(n => n.beatmapsetId);
+    const qaBeatmapsetIds = qualityAssuranceChecks.map(qa => qa.beatmapsetId);
+    let [nominationsDisqualified, nominationsPopped, disqualifiedQualityAssuranceChecks] = await Promise.all([
+        Aiess.getRelatedBeatmapsetEvents(
+            userOsuId,
+            beatmapsetIds,
+            minDate,
+            maxDate,
+            modes,
+            'Disqualified'
+        ),
+        Aiess.getRelatedBeatmapsetEvents(
+            userOsuId,
+            beatmapsetIds,
+            minDate,
+            maxDate,
+            modes,
+            'Popped'
+        ),
+        Aiess.find({
+            userid: { $ne: userOsuId },
+            beatmapsetId: { $in: qaBeatmapsetIds },
+            timestamp: { $gte: minDate, $lte: maxDate },
+            eventType: 'Disqualified',
+        }),
+    ]);
 
-    // sort events done by user by type
-    let nominations = [];
-    let disqualifications = [];
-    let pops = [];
-
-    allUserEvents.forEach(userEvent => {
-        const eventType = userEvent._id;
-        const events = userEvent.events;
-
-        if (eventType == 'Qualified' || eventType == 'Bubbled') {
-            nominations = [...events, ...nominations];
-        } else if (eventType == 'Disqualified') {
-            disqualifications = events;
-        } else if (eventType == 'Popped') {
-            pops = events;
-        }
-    });
-
-    // sort nominations by date
-    nominations.sort(function(a, b) {
-        let keyA = new Date(a.timestamp);
-        let keyB = new Date(b.timestamp);
-        if (keyA < keyB) return -1;
-        if (keyA > keyB) return 1;
-
-        return 0;
-    });
-
-    // remove duplicate nominations
-    let uniqueNominations = [];
-    uniqueNominations = nominations.filter(event => !uniqueNominations.some(n => n.beatmapsetId == event.beatmapsetId));
-
-    // find user's disqualified/popped nominations & disqualified qa checks
-    let nominationsDisqualified = [];
-    let nominationsPopped = [];
-    let disqualifiedQualityAssuranceChecks = [];
-
-    for (let i = 0; i < allEventsByType.length; i++) {
-        const eventType = allEventsByType[i]._id;
-        const events = allEventsByType[i].events;
-
-        if (eventType == 'Disqualified') {
-            for (const event of events) {
-                // check if user's nomination was disqualified
-                if (uniqueNominations.some(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
-                    let a = await Aiess
-                        .find({
-                            beatmapsetId: event.beatmapsetId,
-                            timestamp: { $lte: event.timestamp },
-                            eventType: { $ne: 'Reported' },
-                        })
-                        .sort({ timestamp: -1 })
-                        .limit(3);
-
-                    // check if user was the nominator
-                    if ((a[1] && a[1].userId == userOsuId) || (a[2] && a[2].userId == userOsuId)) {
-                        nominationsDisqualified.push(event);
-                    }
-
-                // check if user's quality assurance check was later disqualified
-                } else if (qualityAssuranceChecks.some(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
-                    let a = await Aiess
-                        .findOne({
-                            beatmapsetId: event.beatmapsetId,
-                            timestamp: { $lte: event.timestamp },
-                            eventType: 'Qualified',
-                        })
-                        .populate([{
-                            path: 'qualityAssuranceComments',
-                            populate: {
-                                path: 'mediator',
-                                select: 'username osuId id',
-                            },
-                        }])
-                        .sort({ timestamp: -1 });
-
-                    // check if qa check for previous qualification was done by user and they did not dq it
-                    if (a.qualityAssuranceCheckers.includes(mongoId) && event.userId != userOsuId) {
-                        if (a.qualityAssuranceComments) {
-                            // add user's qa comment if it exists
-                            const qualityAssuranceComment = a.qualityAssuranceComments.find(m => m.mediator.osuId == userOsuId);
-
-                            if (qualityAssuranceComment) {
-                                // this isn't part of the model. i'm cheating. sue me
-                                event.userQualityAssuranceComment = qualityAssuranceComment.comment;
-                            }
-                        }
-
-                        disqualifiedQualityAssuranceChecks.push(event);
-                    }
-                }
-            }
-        } else if (eventType == 'Popped') {
-            for (const event of events) {
-                // check if user's bubble was popped
-                if (uniqueNominations.some(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
-                    let a = await Aiess
-                        .find({
-                            beatmapsetId: event.beatmapsetId,
-                            timestamp: { $lte: event.timestamp },
-                            eventType: { $ne: 'Reported' },
-                        })
-                        .sort({ timestamp: -1 })
-                        .limit(2);
-
-                    if (a[1] && a[1].userId == userOsuId) {
-                        nominationsPopped.push(event);
-                    }
-                }
-            }
-        }
-    }
+    // Exclude pops/dqs that happened before this user nomination
+    nominationsPopped = nominationsPopped.filter(pop =>
+        uniqueNominations.some(n => n.beatmapsetId == pop.beatmapsetId && n.timestamp < pop.timestamp)
+    );
+    nominationsDisqualified = nominationsDisqualified.filter(dq =>
+        uniqueNominations.some(n => n.beatmapsetId == dq.beatmapsetId && n.timestamp < dq.timestamp)
+    );
+    disqualifiedQualityAssuranceChecks = disqualifiedQualityAssuranceChecks.filter(dq =>
+        qualityAssuranceChecks.some(qa => qa.beatmapsetId == dq.beatmapsetId && qa.timestamp < dq.timestamp)
+    );
 
     return {
         uniqueNominations,
@@ -718,6 +647,7 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
         nominationsPopped,
         disqualifications,
         pops,
+        qualityAssuranceChecks,
         disqualifiedQualityAssuranceChecks,
     };
 }
@@ -746,23 +676,17 @@ router.get('/activity/:osuId/:modes/:deadline/:mongoId', async (req, res) => {
     minDate.setDate(minDate.getDate() - 90);
     let maxDate = new Date(deadline);
 
-    const [user, assignedApplications] = await Promise.all([
-        User.findById(req.params.mongoId).orFail(),
-        AppEvaluation
-            .find({
-                bnEvaluators: mongoId,
-                mode: req.params.mode,
-                createdAt: { $gte: minDate },
-            })
-            .populate(applicationPopulate)
-            .sort({ createdAt: 1 }),
-    ]);
-
-    let natApplications = [];
-    let natEvalRounds = [];
+    const assignedApplications = await AppEvaluation
+        .find({
+            bnEvaluators: mongoId,
+            mode: req.params.mode,
+            createdAt: { $gte: minDate },
+        })
+        .populate(applicationPopulate)
+        .sort({ createdAt: 1 });
 
     // find all applications & evalRounds
-    const [allApplications, allEvalRounds] = await Promise.all([
+    let [appEvaluations, bnEvaluations] = await Promise.all([
         AppEvaluation
             .find({
                 createdAt: { $gte: minDate },
@@ -783,34 +707,20 @@ router.get('/activity/:osuId/:modes/:deadline/:mongoId', async (req, res) => {
     ]);
 
     // extract apps that user evaluated or was assigned to
-    allApplications.forEach(application => {
-        for (let i = 0; i < application.reviews.length; i++) {
-            const review = application.reviews[i];
-
-            if (review.evaluator.id == user.id || (application.natEvaluators && application.natEvaluators.includes(user.id))) {
-                natApplications.push(application);
-                break;
-            }
-        }
-    });
+    appEvaluations = appEvaluations.filter(a =>
+        a.reviews.some(r => r.evaluator.id == mongoId || a.natEvaluators.includes(mongoId))
+    );
 
     // extract evalRounds that user evaluated or was assigned to
-    allEvalRounds.forEach(evalRound => {
-        for (let i = 0; i < evalRound.reviews.length; i++) {
-            const review = evalRound.reviews[i];
-
-            if (review.evaluator.id == user.id || (evalRound.natEvaluators && evalRound.natEvaluators.includes(user.id))) {
-                natEvalRounds.push(evalRound);
-                break;
-            }
-        }
-    });
+    bnEvaluations = bnEvaluations.filter(e =>
+        e.reviews.some(r => r.evaluator.id == mongoId || e.natEvaluators.includes(mongoId))
+    );
 
     res.json({
         ...await getGeneralEvents(req.params.osuId, mongoId, modes, minDate, maxDate),
         assignedApplications,
-        natApplications,
-        natEvalRounds,
+        appEvaluations,
+        bnEvaluations,
     });
 });
 

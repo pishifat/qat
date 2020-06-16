@@ -140,8 +140,8 @@ export default {
                     this.$store.commit('activity/setDisqualifiedQualityAssuranceChecks', res.disqualifiedQualityAssuranceChecks);
 
                     this.$store.commit('activity/setAssignedApplications', res.assignedApplications);
-                    this.$store.commit('activity/setNatApplications', res.natApplications);
-                    this.$store.commit('activity/setNatEvalRounds', res.natEvalRounds);
+                    this.$store.commit('activity/setNatApplications', res.appEvaluations);
+                    this.$store.commit('activity/setNatEvalRounds', res.bnEvaluations);
                     this.$store.commit('activity/setIsLoading', false);
                 }
             } else {

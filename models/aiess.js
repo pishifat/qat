@@ -6,7 +6,7 @@ const aiessSchema = new mongoose.Schema({
     postId: { type: Number },
     metadata: { type: String },
     modes: [{ type: String, enum: ['osu', 'taiko', 'catch', 'mania'] }],
-    eventType: { type: String, enum: ['Bubbled', 'Qualified', 'Disqualified', 'Popped', 'Ranked'] },
+    eventType: { type: String, enum: ['Bubbled', 'Qualified', 'Disqualified', 'Popped', 'Ranked', 'Reported'] },
     content: { type: String },
     timestamp: { type: Date },
     hostId: { type: Number },
@@ -29,45 +29,93 @@ class AiessService
 {
 
     /**
-     * Group all data by event
+     * Get unique events from an user
+     * @param {number} userId
      * @param {date} minDate
      * @param {date} maxDate
-     * @param {string} mode
+     * @param {array} modes
+     * @param {array} eventTypes
+     * @returns {object} aggregation query
      */
-    static async getAllByEventType(minDate, maxDate, modes) {
-        if (!minDate && !maxDate && !modes) return null;
+    static getUniqueUserEvents (userId, minDate, maxDate, modes, eventTypes) {
+        const aggregation = this.getUserEvents(userId, minDate, maxDate, modes, eventTypes);
 
-        try {
-            return await this.aggregate([
-                {
-                    $match: {
-                        $or: [
-                            { eventType: 'Disqualified' },
-                            { eventType: 'Popped' },
-                            { eventType: 'Reported' },
-                        ],
-                        $and: [
-                            { timestamp: { $gte: minDate } },
-                            { timestamp: { $lte: maxDate } },
-                        ],
-                        modes: { $in: modes },
+        aggregation.group({
+            _id: '$beatmapsetId',
+            event: { $first: '$$ROOT' },
+        }).replaceRoot('event');
+
+        return aggregation;
+    }
+
+    /**
+     * Get all the specified events from an user
+     * @param {number} userId
+     * @param {date} minDate
+     * @param {date} maxDate
+     * @param {array} modes
+     * @param {array} eventTypes
+     * @returns {object} aggregation query
+     */
+    static getUserEvents (userId, minDate, maxDate, modes, eventTypes) {
+        return this.aggregate([
+            {
+                $match: {
+                    userId,
+                    eventType: {
+                        $in: eventTypes,
                     },
+                    $and: [
+                        { timestamp: { $gte: minDate } },
+                        { timestamp: { $lte: maxDate } },
+                    ],
+                    modes: { $in: modes },
                 },
-                {
-                    $sort: {
-                        timestamp: 1,
-                        beatmapsetId: -1,
+            },
+            {
+                $sort: {
+                    timestamp: 1,
+                    beatmapsetId: -1,
+                },
+            },
+        ]);
+    }
+
+    /**
+     * Get all the specified events from an user related to a group of beatmapsets
+     * @param {number} userId
+     * @param {array} beatmapsetIds
+     * @param {date} minDate
+     * @param {date} maxDate
+     * @param {array} modes
+     * @param {string} eventType
+     * @returns {object} aggregation query
+     */
+    static getRelatedBeatmapsetEvents (userId, beatmapsetIds, minDate, maxDate, modes, eventType) {
+        const aggregation = this.aggregate([
+            {
+                $match: {
+                    userId: { $ne: userId },
+                    beatmapsetId: {
+                        $in: beatmapsetIds,
                     },
+                    eventType,
+                    $and: [
+                        { timestamp: { $gte: minDate } },
+                        { timestamp: { $lte: maxDate } },
+                    ],
+                    modes: { $in: modes },
                 },
-                {
-                    $group: {
-                        _id: '$eventType', events: { $push: '$$ROOT' },
-                    },
+            },
+            {
+                $sort: {
+                    timestamp: 1,
+                    beatmapsetId: -1,
                 },
-            ]);
-        } catch (error) {
-            return { error: error._message };
-        }
+            },
+        ]);
+
+        return aggregation;
     }
 
     /**
@@ -88,46 +136,6 @@ class AiessService
                         ],
                         eventType: { $ne: 'Ranked' },
                         modes: mode,
-                    },
-                },
-                {
-                    $sort: {
-                        timestamp: 1,
-                        beatmapsetId: -1,
-                    },
-                },
-                {
-                    $group: {
-                        _id: '$eventType', events: { $push: '$$ROOT' },
-                    },
-                },
-            ]);
-        } catch (error) {
-            return { error: error._message };
-        }
-    }
-
-    /**
-     * Group data of a user by event
-     * @param {number} userId
-     * @param {date} minDate
-     * @param {date} maxDate
-     * @param {string} mode
-     */
-    static async getByEventTypeAndUser(userId, minDate, maxDate, modes) {
-        if (!userId && !minDate && !maxDate && !modes) return null;
-
-        try {
-            return await this.aggregate([
-                {
-                    $match: {
-                        userId,
-                        $and: [
-                            { timestamp: { $gte: minDate } },
-                            { timestamp: { $lte: maxDate } },
-                        ],
-                        eventType: { $ne: 'Ranked' },
-                        modes: { $in: modes },
                     },
                 },
                 {
