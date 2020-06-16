@@ -208,7 +208,7 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
     if (maniaHighlight) api.highlightWebhookPost('so who is the new NAT candidate?', 'mania');
 });
 
-const notifyBeatmapReports = cron.schedule('0 * * * * *', async () => {
+const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
     // find pending discussion posts
     let url = 'https://osu.ppy.sh/beatmapsets/beatmap-discussions?user=&beatmapset_status=qualified&limit=50&message_types%5B%5D=suggestion&message_types%5B%5D=problem&only_unresolved=on';
     const historyHtml = await axios.get(url);
