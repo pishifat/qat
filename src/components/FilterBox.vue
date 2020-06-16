@@ -1,13 +1,20 @@
 <template>
     <section class="card card-body">
-        <input
-            id="search"
-            class="form-control"
-            type="text"
-            autocomplete="off"
-            :placeholder="placeholder || ''"
-            @change="updateFilterValue($event.target.value)"
-        >
+        <div class="input-group">
+            <input
+                id="search"
+                class="form-control"
+                type="text"
+                autocomplete="off"
+                :placeholder="placeholder || ''"
+                @change="updateFilterValue($event.target.value)"
+            >
+            <div class="input-group-append">
+                <button class="btn btn-sm btn-primary px-3">
+                    <i class="fas fa-search" />
+                </button>
+            </div>
+        </div>
 
         <select
             id="mode"
