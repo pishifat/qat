@@ -250,13 +250,42 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
         if (createWebhook) {
             // create event in db
             beatmapsetIds.push(discussion.beatmapset_id);
+
+            // get discussion url, parsing all discussions and fiding the discussion thread.
+            let discussionUrl = `https://osu.ppy.sh/beatmapsets/${discussion.beatmapset_id}/discussion`;
+            const discussionHtml = await axios.get(discussionUrl);
+            const $discussions = cheerio.load(discussionHtml.data);
+            let discussionsAll = JSON.parse($discussions('#json-beatmapset-discussion').html()).beatmapset.discussions;
+            let discussionPost = discussionsAll.find(item => (item != null && item.id == discussion.id));
+
+            // moving discussion to variables, making them editable
+            let discussionMessage = discussion.starting_post.message;
+            let messageType = discussion.message_type;
+            let userId = discussion.starting_post.user_id;
+
+            // finding last reopen if it exists
+            let messageDiscussionPost = discussionPost.posts;
+            messageDiscussionPost.reverse();
+            let lastReopen = messageDiscussionPost.find(p => (p != null && (p.system == true && (p.message.type = 'resolved' && p.message.value == false))));
+
+
+
+            // replace discussion details with the reopen if it is the case
+            if (lastReopen != undefined) {
+                let realDiscussionPost = messageDiscussionPost[messageDiscussionPost.indexOf(lastReopen) +1];
+                messageType = 'issue reopen';
+                discussionMessage = realDiscussionPost.message;
+                userId = lastReopen.user_id;
+            }
+
+            // keep sending the starting post details, even the user id for searchability propurses.
             await BeatmapReport.create({
                 beatmapsetId: discussion.beatmapset_id,
                 postId: discussion.id,
                 reporterUserId: discussion.starting_post.user_id,
             });
 
-            let userInfo = await api.getUserInfoV1(discussion.starting_post.user_id);
+            let userInfo = await api.getUserInfoV1(userId);
             await helper.sleep(500);
 
             // identify modes
@@ -291,18 +320,18 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
                 [{
                     author: {
                         name: userInfo.username,
-                        icon_url: `https://a.ppy.sh/${discussion.starting_post.user_id}`,
-                        url: `https://osu.ppy.sh/users/${discussion.starting_post.user_id}`,
+                        icon_url: `https://a.ppy.sh/${userId}`,
+                        url: `https://osu.ppy.sh/users/${userId}`,
                     },
                     description: `[**${discussion.beatmapset.artist} - ${discussion.beatmapset.title}**](https://osu.ppy.sh/beatmapsets/${discussion.beatmapset_id}/discussion/-/generalAll#/${discussion.id})\nMapped by [${discussion.beatmapset.creator}](https://osu.ppy.sh/users/${discussion.beatmapset.user_id}) [**${modes.join(', ')}**]`,
                     thumbnail: {
                         url: `https://b.ppy.sh/thumb/${discussion.beatmapset_id}.jpg`,
                     },
-                    color: discussion.message_type == 'suggestion' ? api.webhookColors.lightOrange : api.webhookColors.red,
+                    color: (messageType == 'suggestion' || messageType == 'issue reopen') ? api.webhookColors.lightOrange : api.webhookColors.red,
                     fields: [
                         {
-                            name: discussion.message_type,
-                            value: discussion.starting_post.message.length > 500 ? discussion.starting_post.message.slice(0,500) + '... *(truncated)*' : discussion.starting_post.message,
+                            name: messageType,
+                            value: discussionMessage.length > 500 ? discussionMessage.message.slice(0,500) + '... *(truncated)*' : discussionMessage,
                         },
                     ],
                 }],
