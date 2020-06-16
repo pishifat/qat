@@ -30,7 +30,7 @@
                 data-placement="top"
                 title="deadline"
             />
-            {{ createDeadline() }}
+            {{ transformedDeadline }}
         </span>
 
         <input
@@ -87,6 +87,13 @@ export default {
                 this.$store.commit('evaluations/updateCheckedEvaluations', checks);
             },
         },
+        transformedDeadline () {
+            if (this.isActive) {
+                return this.$moment(this.deadline).fromNow();
+            } else {
+                return this.$options.filters.toStandardDate(this.deadline);
+            }
+        },
     },
     methods: {
         separateEvals() {
@@ -98,9 +105,6 @@ export default {
             });
 
             return bn + (bn == 1 ? ' BN eval, ' : ' BN evals, ') + nat + (nat == 1 ? ' NAT eval' : ' NAT evals');
-        },
-        createDeadline() {
-            return this.deadline.toString().slice(5,10);
         },
     },
 };

@@ -11,7 +11,7 @@
                     {{ (log.user && log.user.username) || 'Anonymous' }}
                 </td>
                 <td>
-                    {{ shortAction(log.action) }}
+                    {{ log.action | shorten }}
                 </td>
             </tr>
         </data-table>
@@ -63,15 +63,6 @@ export default {
             if (!data.error) {
                 this.skip += 100;
                 this.logs = [...this.logs, ...data.logs];
-            }
-        },
-        shortAction (action) {
-            if (!action) return '';
-
-            if (action.length > 90) {
-                return action.toString().slice(0, 90) + '...';
-            } else {
-                return action;
             }
         },
     },

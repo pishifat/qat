@@ -17,7 +17,7 @@
                 :key="note.id"
             >
                 <b>
-                    {{ note.updatedAt.slice(0,10) }} -
+                    {{ note.updatedAt | toStandardDate }} -
                     <a :href="'https://osu.ppy.sh/users/' + note.author.osuId" target="_blank">
                         {{ note.author.username }}
                     </a>

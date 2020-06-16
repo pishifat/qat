@@ -32,15 +32,26 @@
             </div>
 
             <div class="card-footer">
-                <span class="small"><i class="fas fa-clock mx-1" /> {{ report.createdAt.slice(0,10) }}</span>
+                <span class="small">
+                    <i class="fas fa-clock mx-1" />
+                    <date-display
+                        :date="report.createdAt"
+                        :include-time="true"
+                    />
+                </span>
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import DateDisplay from '../DateDisplay.vue';
+
 export default {
     name: 'ReportCard',
+    components: {
+        DateDisplay,
+    },
     props: {
         report: {
             type: Object,

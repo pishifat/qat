@@ -11,10 +11,10 @@
                 </a>
             </div>
 
-            <div class="card-footer small d-flex">
+            <div class="card-footer small d-flex align-items-center">
                 <i class="fas fa-trophy mr-2" /> {{ selectedTest.totalScore }}/20
 
-                <i class="fas fa-clock mx-2" /> {{ selectedTest.submittedAt.slice(0, 10) }}
+                <i class="fas fa-clock mx-2" /> {{ selectedTest.submittedAt | toStandardDate }}
 
                 <mode-display
                     class="ml-auto"

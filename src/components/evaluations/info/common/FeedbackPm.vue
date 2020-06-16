@@ -33,7 +33,7 @@
                     <span v-for="(review, i) in natReviews" :key="i">[url=https://osu.ppy.sh/users/{{ review.evaluator.osuId }}]{{ review.evaluator.username }}[/url]{{ i+1 != natReviews.length ? ", " : "" }}</span>
                 </span><br><br>
                 <span>If you disagree with the decision, you may also contact the above users to appeal.</span><br><br>
-                <span>You may apply for BN in this game mode again on {{ defineDate(selectedEvaluation.cooldownDate) }}. Good luck!</span><br><br>
+                <span>You may apply for BN in this game mode again on {{ selectedEvaluation.cooldownDate | toStandardDate }}. Good luck!</span><br><br>
                 <span>Regards, the Nomination Assessment Team</span>
             </div>
         </div>
@@ -95,7 +95,7 @@
 
                 <!-- fail -->
                 <span v-else class="small">After reviewing your work as a BN for the [i]{{ modeString }}[/i] game mode, we have decided to [b]remove you from the Beatmap Nominators[/b].</span><br><br>
-                <span>We would like to thank you for your service to the mapping and modding communities and wish you the best of luck in your future endeavours. Should you wish to apply for the Beatmap Nominators again, you may do so on {{ defineDate() }}, provided you have
+                <span>We would like to thank you for your service to the mapping and modding communities and wish you the best of luck in your future endeavours. Should you wish to apply for the Beatmap Nominators again, you may do so on {{ selectedEvaluation.cooldownDate | toStandardDate }}, provided you have
                     <span v-if="selectedEvaluation.resignedOnGoodTerms">one month of modding activity (3-4 mods).</span>
                     <span v-else-if="selectedEvaluation.resignedOnStandardTerms">two months of modding activity (3-4 mods each month).</span>
                     <span v-else>two months of modding activity (3-4 mods each month) and have shown improvement in the areas mentioned.</span>
@@ -145,13 +145,6 @@ export default {
         },
         isProbation () {
             return this.selectedEvaluation.user.probation.includes(this.selectedEvaluation.mode);
-        },
-    },
-    methods: {
-        defineDate() {
-            const date = this.selectedEvaluation.cooldownDate || new Date();
-
-            return new Date(date).toString().slice(4, 15);
         },
     },
 };

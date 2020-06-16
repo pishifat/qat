@@ -38,9 +38,14 @@
                             data-placement="top"
                             title="deadline"
                         />
-                        {{ veto.deadline.slice(0, 10) }}
+                        <date-display :date="veto.deadline" />
                     </span>
-                    <span v-else class="small float-left">{{ veto.createdAt.slice(0, 10) }}</span>
+
+                    <date-display
+                        v-else
+                        class="small float-left"
+                        :date="veto.createdAt"
+                    />
 
                     <mode-display
                         :modes="veto.mode"
@@ -54,11 +59,13 @@
 
 <script>
 import ModeDisplay from '../ModeDisplay.vue';
+import DateDisplay from '../DateDisplay.vue';
 
 export default {
     name: 'VetoCard',
     components: {
         ModeDisplay,
+        DateDisplay,
     },
     props: {
         veto: {

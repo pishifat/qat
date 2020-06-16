@@ -7,7 +7,7 @@
 
             <ul class="text-secondary">
                 <li v-for="(date, i) in selectedUser.bnDuration" :key="date" class="small">
-                    {{ date.slice(0, 10) }}: {{ i % 2 == 0 ? 'joined' : 'left' }}
+                    {{ date | toStandardDate }}: {{ i % 2 == 0 ? 'joined' : 'left' }}
                 </li>
             </ul>
         </div>
@@ -18,7 +18,7 @@
 
             <ul class="text-secondary">
                 <li v-for="(date, i) in selectedUser.natDuration" :key="date" class="small">
-                    {{ date.slice(0, 10) }}: {{ i % 2 == 0 ? 'joined' : 'left' }}
+                    {{ date | toStandardDate }}: {{ i % 2 == 0 ? 'joined' : 'left' }}
                 </li>
             </ul>
         </div>
@@ -36,19 +36,14 @@ export default {
         ]),
     },
     methods: {
-        calculateDuration(group) {
+        calculateDuration (group) {
             let dateArray = group == 'bn' ? this.selectedUser.bnDuration : this.selectedUser.natDuration;
             let days = 0;
 
             for (let i = 0; i < dateArray.length; i += 2) {
-                let a = new Date(dateArray[i]);
-                let b = new Date(dateArray[i + 1]);
-
-                if (dateArray[i + 1]) {
-                    days += Math.abs(b.getTime() - a.getTime()) / (1000 * 3600 * 24);
-                } else {
-                    days += Math.abs(new Date().getTime() - a.getTime()) / (1000 * 3600 * 24);
-                }
+                let a = this.$moment(dateArray[i]);
+                let b = this.$moment(dateArray[i + 1]); // becomes new date if doesn't exists
+                days += b.diff(a, 'days');
             }
 
             let years = Math.floor(days / 365);

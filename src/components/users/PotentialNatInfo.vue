@@ -26,7 +26,7 @@
                                 <a :href="'https://osu.ppy.sh/users/' + app.user.osuId" target="_blank">
                                     {{ app.user.username }}
                                 </a>
-                                -- {{ app.createdAt.slice(0,10) }}
+                                -- {{ app.createdAt | toStandardDate }}
                             </div>
                         </div>
 

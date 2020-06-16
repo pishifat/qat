@@ -19,7 +19,7 @@
                 </p>
                 <div class="card-status" :class="discussion.isActive ? 'status-bar-active' : 'status-bar-inactive'" />
                 <div class="card-icons">
-                    <span class="small float-left">{{ discussion.createdAt.slice(0, 10) }}</span>
+                    <span class="small float-left">{{ discussion.createdAt | toStandardDate }}</span>
 
                     <mode-display
                         :modes="discussion.mode"

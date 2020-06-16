@@ -45,7 +45,7 @@
                             {{ question.content }}
                         </td>
                         <td class="text-nowrap">
-                            {{ question.updatedAt.slice(0,10) }}
+                            {{ question.updatedAt | toStandardDate }}
                         </td>
                         <td class="text-right">
                             <a

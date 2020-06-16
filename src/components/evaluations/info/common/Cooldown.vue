@@ -10,7 +10,8 @@
         >
 
         <span class="small text-secondary">
-            {{ `User can reapply on ${newCooldownDate.toString().slice(4, 15)}` }}
+            User can reapply on
+            {{ newCooldownDate | toStandardDate }}
 
             <span
                 v-if="hasChanged"

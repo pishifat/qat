@@ -21,14 +21,16 @@
                     v-if="user.bnDuration.length"
                     class="ml-1"
                 >
-                    Joined BN: {{ user.bnDuration[0].slice(0, 10) }}
+                    Joined BN:
+                    <date-display :date="user.bnDuration[0]" />
                 </small>
 
                 <small
                     v-if="user.natDuration.length"
                     class="ml-1"
                 >
-                    Joined NAT: {{ user.natDuration[0].slice(0, 10) }}
+                    Joined NAT:
+                    <date-display :date="user.natDuration[0]" />
                 </small>
 
                 <mode-display
@@ -42,11 +44,13 @@
 
 <script>
 import ModeDisplay from '../ModeDisplay.vue';
+import DateDisplay from '../DateDisplay.vue';
 
 export default {
     name: 'UserCard',
     components: {
         ModeDisplay,
+        DateDisplay,
     },
     props: {
         user: {

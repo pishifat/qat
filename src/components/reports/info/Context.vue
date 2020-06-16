@@ -20,7 +20,7 @@
 
         <p>
             <b>Reported:</b>
-            <span class="text-secondary">{{ selectedReport.createdAt.slice(0,10) }}</span>
+            <span class="text-secondary">{{ selectedReport.createdAt | toStandardDate }}</span>
         </p>
 
         <p v-if="!selectedReport.isActive">
