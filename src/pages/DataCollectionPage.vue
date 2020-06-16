@@ -7,19 +7,17 @@
                 store-module="dataCollection"
             />
 
-            <section class="card card-body">
-                <events-table
-                    :events="disqualifications"
-                    :title="'Disqualifications'"
-                />
-            </section>
+            <events-table
+                :events="disqualifications"
+                title="Disqualifications"
+                target="disqualifications"
+            />
 
-            <section class="card card-body">
-                <events-table
-                    :events="pops"
-                    :title="'Nomination resets'"
-                />
-            </section>
+            <events-table
+                :events="pops"
+                title="Nomination resets"
+                target="resets"
+            />
         </div>
 
         <data-collection-info />
