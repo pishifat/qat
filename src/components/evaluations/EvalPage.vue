@@ -105,7 +105,6 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import evaluationsModule from '../../store/evaluations';
-import filters from '../../mixins/filters.js';
 import postData from '../../mixins/postData.js';
 import ToastMessages from '../ToastMessages.vue';
 import FilterBox from '../FilterBox.vue';
@@ -120,7 +119,7 @@ export default {
         EvaluationCard,
         EvaluationInfo,
     },
-    mixins: [ postData, filters ],
+    mixins: [ postData ],
     props: {
         discussionEvaluationsTitle: {
             type: String,
