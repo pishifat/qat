@@ -322,9 +322,9 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
 });
 
 /**
- * Notify of quality assurance helper activity daily
+ * Notify of quality assurance helper activity every saturday at 22 pm
  */
-const notifyQualityAssurance = cron.schedule('0 22 * * *', async () => {
+const notifyQualityAssurance = cron.schedule('0 22 * * 6', async () => {
     const users = await User.find({
         $or: [
             { group: 'nat' },
