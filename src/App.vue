@@ -29,7 +29,7 @@
                                 BN Application
                             </router-link>
                         </li>
-                        <li v-if="loggedInUser.isNat" class="nav-item dropdown">
+                        <li v-if="loggedInUser.hasFullReadAccess" class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
                                 Reports
                             </a>
@@ -74,7 +74,7 @@
                                 </router-link>
                             </li>
                         </template>
-                        <template v-else-if="loggedInUser.isNat">
+                        <template v-else-if="loggedInUser.hasFullReadAccess">
                             <li class="nav-item">
                                 <router-link class="nav-link" to="/discussionvote">
                                     Discussion Vote

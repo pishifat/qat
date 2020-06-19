@@ -91,7 +91,7 @@ export default {
         select() {
             this.$store.commit('evaluations/setSelectedEvaluationId', this.evaluation.id);
 
-            if (this.$route.query.id !== this.evaluation.id) {
+            if (this.$route.query.id !== this.evaluation.id &&  !this.loggedInUser.isBn) {
                 let url = '/evalarchive';
 
                 if (this.evaluation.active) {

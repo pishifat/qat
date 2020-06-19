@@ -9,7 +9,7 @@
 
             <hr>
 
-            <feedback class="mb-3" />
+            <feedback v-if="loggedInUser.isNat" class="mb-3" />
 
             <feedback-pm />
         </div>
@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import ModalHeader from './info/ModalHeader.vue';
 import Context from './info/Context.vue';
 import Feedback from './info/Feedback.vue';
@@ -33,8 +33,13 @@ export default {
         FeedbackPm,
         ModalDialog,
     },
-    computed: mapGetters('manageReports', [
-        'selectedReport',
-    ]),
+    computed: {
+        ...mapState([
+            'loggedInUser',
+        ]),
+        ...mapGetters('manageReports', [
+            'selectedReport',
+        ]),
+    },
 };
 </script>

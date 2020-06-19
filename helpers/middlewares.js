@@ -46,7 +46,7 @@ function isBnOrNat(req, res, next) {
     if (u.isBnOrNat) {
         next();
     } else {
-        if (req.accepts(['html', 'json'] === 'html')) {
+        if (req.accepts(['html', 'json']) === 'html') {
             res.redirect('/');
         } else {
             res.json({
@@ -62,7 +62,7 @@ function isNat(req, res, next) {
     if (u.isNat) {
         next();
     } else {
-        if (req.accepts(['html', 'json'] === 'html')) {
+        if (req.accepts(['html', 'json']) === 'html') {
             res.redirect('/');
         } else {
             res.json({
@@ -78,7 +78,7 @@ function hasBasicAccess(req, res, next) {
     if (u.hasBasicAccess) {
         next();
     } else {
-        if (req.accepts(['html', 'json'] === 'html')) {
+        if (req.accepts(['html', 'json']) === 'html') {
             res.redirect('/');
         } else {
             res.json({
@@ -94,7 +94,7 @@ function hasFullReadAccess(req, res, next) {
     if (u.hasFullReadAccess) {
         next();
     } else {
-        if (req.accepts(['html', 'json'] === 'html')) {
+        if (req.accepts(['html', 'json']) === 'html') {
             res.redirect('/');
         } else {
             res.json({

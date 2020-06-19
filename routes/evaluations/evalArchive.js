@@ -8,7 +8,7 @@ const discord = require('../../helpers/discord');
 const router = express.Router();
 
 router.use(middlewares.isLoggedIn);
-router.use(middlewares.isNat);
+router.use(middlewares.hasFullReadAccess);
 
 //population
 const defaultAppPopulate = [
