@@ -21,7 +21,7 @@ const defaultAppPopulate = [
         select: 'evaluator behaviorComment moddingComment vote',
         populate: {
             path: 'evaluator',
-            select: 'username osuId group',
+            select: 'username osuId groups',
         },
     },
 ];
@@ -29,7 +29,7 @@ const defaultAppPopulate = [
 const defaultBnPopulate = [
     {
         path: 'user',
-        select: 'username osuId probation modes',
+        select: 'username osuId modesInfo',
     },
     {
         path: 'natEvaluators',
@@ -40,7 +40,7 @@ const defaultBnPopulate = [
         select: 'evaluator behaviorComment moddingComment vote',
         populate: {
             path: 'evaluator',
-            select: 'username osuId group',
+            select: 'username osuId groups',
         },
     },
 ];
@@ -103,91 +103,116 @@ router.get('/search', async (req, res) => {
     });
 });
 
-/* POST set evals as complete */
-router.post('/unarchive/:id', async (req, res) => {
-    if (req.body.type == 'application') {
-        let a = await AppEvaluation.findById(req.params.id);
+/* POST unarchive application evaluation */
+router.post('/:id/unarchiveApp', async (req, res) => {
+    let app = await AppEvaluation.findById(req.params.id).orFail();
+    let user = await User.findById(app.user).orFail();
 
-        if (!a || a.error) {
-            return res.json({ error: 'Could not load evaluation!' });
+    // Remove join history, user modes and BN group if not hybrid
+    if (app.consensus == 'pass') {
+        // TODO find somehow the actual history, relatedEvaluation === evaluation._id?
+        user.history.pop();
+        let i = user.modesInfo.findIndex(m => m.mode === app.mode);
+
+        if (i !== -1) {
+            user.modesInfo.splice(i, 1);
         }
 
-        let u = await User.findById(a.user);
+        if (!user.modesInfo.length) {
+            i = user.groups.findIndex(g => g === 'bn');
 
-        if (!u || u.error) {
-            return res.json({ error: 'Could not load user!' });
-        }
-
-        if (a.consensus == 'pass') {
-            await User.findByIdAndUpdate(u.id, {
-                $pull: {
-                    modes: a.mode,
-                    probation: a.mode,
-                },
-            });
-            await BnEvaluation.deleteManyByUserId(u.id);
-
-            if (u.modes.length == 1) {
-                await User.findByIdAndUpdate(u.id, {
-                    group: 'user',
-                    $pop: { bnDuration: 1 },
-                });
+            if (i !== -1) {
+                user.groups.splice(i, 1);
             }
         }
 
-        await AppEvaluation.findByIdAndUpdate(a.id, { active: true });
-
-        discord.webhookPost(
-            [{
-                author: discord.defaultWebhookAuthor(req.session),
-                color: discord.webhookColors.white,
-                description: `Un-archived [**${u.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${a.id})`,
-            }],
-            a.mode
-        );
-
-    } else if (req.body.type == 'currentBn') {
-        let er = await BnEvaluation.findById(req.params.id);
-
-        if (!er || er.error) {
-            return res.json({ error: 'Could not load evaluation!' });
-        }
-
-        let u = await User.findById(er.user);
-
-        if (!u || u.error) {
-            return res.json({ error: 'Could not load user!' });
-        }
-
-        if (er.consensus == 'fail') {
-            await User.findByIdAndUpdate(u.id, { $push: { modes: er.mode } });
-            await User.findByIdAndUpdate(u.id, { $push: { probation: er.mode } });
-
-            if (!u.modes.length) {
-                await User.findByIdAndUpdate(u.id, { group: 'bn' });
-                await User.findByIdAndUpdate(u.id, { $pop: { bnDuration: 1 } });
-            }
-        }
-
-        if (er.consensus == 'probation' || er.consensus == 'pass') {
-            await BnEvaluation.deleteManyByUserId(u.id);
-
-            if (u.probation.indexOf(er.mode) < 0) {
-                await User.findByIdAndUpdate(u.id, { $push: { probation: er.mode } });
-            }
-        }
-
-        await BnEvaluation.findByIdAndUpdate(req.params.id, { active: true });
-
-        discord.webhookPost(
-            [{
-                author: discord.defaultWebhookAuthor(req.session),
-                color: discord.webhookColors.white,
-                description: `Un-archived [**${u.username}**'s current BN eval](http://bn.mappersguild.com/bneval?id=${er.id})`,
-            }],
-            er.mode
-        );
+        await Promise.all([
+            user.save(),
+            BnEvaluation.deleteUserActiveEvaluations(user.id),
+        ]);
     }
+
+    await AppEvaluation.findByIdAndUpdate(app.id, { active: true });
+
+    discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            color: discord.webhookColors.white,
+            description: `Un-archived [**${user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${app.id})`,
+        }],
+        app.mode
+    );
+
+    res.json({ success: 'ok' });
+});
+
+function resetHistory (user, wasMovedToNat) {
+    // remove left & join
+    user.history.pop();
+    user.history.pop();
+
+    const i = user.groups.findIndex(g => g === (wasMovedToNat ? 'nat' : 'bn'));
+    user.groups.splice(i, 1, (wasMovedToNat ? 'bn' : 'nat'));
+
+    return user;
+}
+
+/* POST unarchive bn evaluation */
+router.post('/:id/unarchiveBn', async (req, res) => {
+    let evaluation = await BnEvaluation.findById(req.params.id).orFail();
+    let user = await User.findById(evaluation.user).orFail();
+
+    // Remove left history. Add mode and BN group back if not hybrid
+    if (evaluation.consensus == 'fail') {
+        // TODO find somehow the actual history, relatedEvaluation === evaluation._id?
+        user.history.pop();
+
+        if (!user.isBn) {
+            user.groups.push('bn');
+        }
+
+        if (!user.isBnFor(evaluation.mode)) {
+            user.modesInfo.push({
+                mode: evaluation.mode,
+                level: 'probation',
+            });
+        }
+
+    // Change mode to probation and restore group if needed
+    } else if (evaluation.consensus == 'probation' || evaluation.consensus == 'pass') {
+        await BnEvaluation.deleteUserActiveEvaluations(user.id);
+
+        const i = user.modesInfo.findIndex(m => m.mode == evaluation.mode);
+
+        if (i !== -1) {
+            user.modesInfo.splice(i, 1);
+        }
+
+        user.modesInfo.push({
+            mode: evaluation.mode,
+            level: 'probation',
+        });
+
+        if (evaluation.isMoveToNat) {
+            user = resetHistory(user, true);
+        } else if (evaluation.isMoveToBn) {
+            user = resetHistory(user, false);
+        }
+    }
+
+    await Promise.all([
+        user.save(),
+        BnEvaluation.findByIdAndUpdate(req.params.id, { active: true }),
+    ]);
+
+    discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            color: discord.webhookColors.white,
+            description: `Un-archived [**${user.username}**'s current BN eval](http://bn.mappersguild.com/bneval?id=${evaluation.id})`,
+        }],
+        evaluation.mode
+    );
 
     res.json({ success: 'ok' });
 });

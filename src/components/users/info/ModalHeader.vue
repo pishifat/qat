@@ -34,13 +34,13 @@ export default {
         headerColor () {
             if (!this.selectedUser) return '';
 
-            if (this.selectedUser.probation.length && this.selectedUser.group != 'nat') {
+            if (this.selectedUser.probationModes.length && !this.selectedUser.isNat) {
                 return 'bg-probation';
-            } else if (this.selectedUser.group == 'user') {
+            } else if (!this.selectedUser.hasBasicAccess) {
                 return 'bg-bright-blue-gray';
             }
 
-            return 'bg-' + this.selectedUser.group;
+            return 'bg-' + this.selectedUser.groups[0];
         },
     },
 };

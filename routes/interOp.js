@@ -19,7 +19,7 @@ router.use((req, res, next) => {
 
 /* GET users in BN/NAT */
 router.get('/users', async (_, res) => {
-    res.json(await User.find({ group: { $in: ['bn', 'nat'] } }));
+    res.json(await User.find({ groups: { $in: ['bn', 'nat'] } }));
 });
 
 /* GET users in or previously in BN/NAT */
@@ -27,8 +27,7 @@ router.get('/users/all', async (_, res) => {
     res.json(
         await User.find({
             $or: [
-                { bnDuration: { $ne: [], $exists: true } },
-                { natDuration: { $ne: [], $exists: true } },
+                { history: { $ne: [], $exists: true } },
             ],
         })
     );

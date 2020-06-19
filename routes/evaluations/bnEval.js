@@ -14,13 +14,13 @@ const util = require('../../helpers/util');
 const router = express.Router();
 
 router.use(middlewares.isLoggedIn);
-router.use(middlewares.isNat);
+router.use(middlewares.hasFullReadAccess);
 
 //population
 const defaultPopulate = [
     {
         path: 'user',
-        select: 'username osuId probation modes group',
+        select: 'username osuId modesInfo groups',
     },
     {
         path: 'natEvaluators',
@@ -31,7 +31,7 @@ const defaultPopulate = [
         select: 'evaluator behaviorComment moddingComment vote',
         populate: {
             path: 'evaluator',
-            select: 'username osuId group',
+            select: 'username osuId groups',
         },
     },
 ];
@@ -57,7 +57,7 @@ function isValidMode(modeToCheck, isOsu, isTaiko, isCatch, isMania) {
 }
 
 /* POST submit or edit eval */
-router.post('/addEvalRounds/', middlewares.isNotSpectator, async (req, res) => {
+router.post('/addEvalRounds/', middlewares.isNat, async (req, res) => {
     // TODO missing asigned users in response??
     const includeFullBns = req.body.groups.includes('fullBn');
     const includeProbationBns = req.body.groups.includes('probationBn');
@@ -73,7 +73,7 @@ router.post('/addEvalRounds/', middlewares.isNotSpectator, async (req, res) => {
     // if user groups are selected
     let allUsersByMode = await User.getAllByMode(includeFullBns, includeProbationBns, includeNat);
 
-    if (allUsersByMode) {
+    if (allUsersByMode.length) {
         allUsersByMode = allUsersByMode.filter(m => isValidMode(m._id, isOsu, isTaiko, isCatch, isMania));
 
         if (req.body.excludeUsers) {
@@ -120,7 +120,7 @@ router.post('/addEvalRounds/', middlewares.isNotSpectator, async (req, res) => {
                 u = await User.findByUsername(includeUsers[i].trim());
             }
 
-            if (u && !u.error) {
+            if (u) {
                 if (u.modes) {
                     u.modes.forEach(m => {
                         if (isValidMode(m, isOsu, isTaiko, isCatch, isMania)) {
@@ -142,7 +142,7 @@ router.post('/addEvalRounds/', middlewares.isNotSpectator, async (req, res) => {
     // delete scheduled evalRounds
     for (let i = 0; i < allEvalsToCreate.length; i++) {
         const round = allEvalsToCreate[i];
-        await BnEvaluation.deleteManyByUserId(round.user);
+        await BnEvaluation.deleteUserActiveEvaluations(round.user);
     }
 
     // create evalRounds
@@ -163,7 +163,7 @@ router.post('/addEvalRounds/', middlewares.isNotSpectator, async (req, res) => {
             const u = await User.findById(er.user);
             const invalids = [8129817, 3178418, u.osuId];
             const assignedNat = await User.aggregate([
-                { $match: { group: 'nat', isSpectator: { $ne: true }, modes: er.mode, osuId: { $nin: invalids } } },
+                { $match: { groups: 'nat', 'modesInfo.mode': er.mode, osuId: { $nin: invalids } } },
                 { $sample: { size: er.mode == 'osu' || er.mode == 'catch' ? 3 : 2 } },
             ]);
             let natList = '';
@@ -203,7 +203,7 @@ router.post('/addEvalRounds/', middlewares.isNotSpectator, async (req, res) => {
 });
 
 /* POST submit or edit eval */
-router.post('/submitEval/:id', middlewares.isNotSpectator, async (req, res) => {
+router.post('/submitEval/:id', middlewares.isNat, async (req, res) => {
     let evaluation = await BnEvaluation
         .findOne({
             _id: req.params.id,
@@ -229,7 +229,7 @@ router.post('/submitEval/:id', middlewares.isNotSpectator, async (req, res) => {
 });
 
 /* POST set group eval */
-router.post('/setGroupEval/', middlewares.isNotSpectator, async (req, res) => {
+router.post('/setGroupEval/', middlewares.isNat, async (req, res) => {
     const evaluations = await BnEvaluation
         .find({
             _id: {
@@ -249,7 +249,7 @@ router.post('/setGroupEval/', middlewares.isNotSpectator, async (req, res) => {
 });
 
 /* POST set invidivual eval */
-router.post('/setIndividualEval/', middlewares.isNotSpectator, async (req, res) => {
+router.post('/setIndividualEval/', middlewares.isNat, async (req, res) => {
     await BnEvaluation.updateMany({
         _id: { $in: req.body.checkedRounds },
     }, {
@@ -266,46 +266,50 @@ router.post('/setIndividualEval/', middlewares.isNotSpectator, async (req, res) 
 });
 
 /* POST set evals as complete */
-router.post('/setComplete/', middlewares.isNotSpectator, async (req, res) => {
-    const evaluations = await AppEvaluation
+router.post('/setComplete/', middlewares.isNat, async (req, res) => {
+    const evaluations = await BnEvaluation
         .find({
             _id: {
-                $in: req.body.checkedApps,
+                $in: req.body.checkedRounds,
             },
+            active: true,
         })
         .populate(defaultPopulate);
 
     for (const evaluation of evaluations) {
         let user = await User.findById(evaluation.user);
+        const i = user.modesInfo.findIndex(m => m.mode === evaluation.mode);
 
         if (evaluation.consensus == 'fail') {
-            const modeIndex = user.modes.findIndex(m => m == evaluation.mode);
-            const probationIndex = user.probation.findIndex(m => m == evaluation.mode);
-
-            if (modeIndex !== -1) {
-                user.modes.splice(modeIndex, 1);
+            if (i !== -1) {
+                user.modesInfo.splice(i, 1);
             }
 
-            if (probationIndex !== -1) {
-                user.modes.splice(probationIndex, 1);
-            }
+            if (!user.modesInfo.length) {
+                const bnIndex = user.groups.findIndex(g => g === 'bn');
 
-            if (!user.modes.length) {
-                if (user.group == 'bn') {
-                    user.bnDuration.push(new Date());
-                } else if (user.group == 'nat') {
-                    user.natDuration.push(new Date());
+                if (bnIndex !== -1) {
+                    user.groups.splice(bnIndex, 1);
                 }
-
-                user.group = 'user';
             }
+
+            user.history.push({
+                date: new Date(),
+                mode: evaluation.mode,
+                kind: 'left',
+                group: user.isNat ? 'nat' : 'bn',
+                relatedEvaluation: evaluation._id,
+            });
 
             await user.save();
         }
 
         else if (evaluation.consensus == 'probation') {
-            if (!user.probation.includes(evaluation.mode)) {
-                user.probation.push(evaluation.mode);
+            if (i !== -1 && user.modesInfo[i].level === 'full') {
+                user.modesInfo.set(i, {
+                    mode: evaluation.mode,
+                    level: 'probation',
+                });
                 await user.save();
             }
 
@@ -319,10 +323,11 @@ router.post('/setComplete/', middlewares.isNotSpectator, async (req, res) => {
         }
 
         else if (evaluation.consensus == 'pass') {
-            const i = user.probation.findIndex(m => m == evaluation.mode);
-
-            if (i !== -1) {
-                user.probation.splice(i, 1);
+            if (i !== -1 && user.modesInfo[i].level === 'probation') {
+                user.modesInfo.set(i, {
+                    mode: evaluation.mode,
+                    level: 'full',
+                });
             }
 
             let deadline = new Date();
@@ -334,13 +339,37 @@ router.post('/setComplete/', middlewares.isNotSpectator, async (req, res) => {
 
                 // process user group changes
                 if (evaluation.isMoveToNat || evaluation.isMoveToBn) {
-                    user.group = evaluation.isMoveToNat ? 'nat' : 'bn';
-                    user.probation = [];
-                    user.bnDuration.push(new Date());
-                    user.natDuration.push(new Date());
+                    if (evaluation.isMoveToNat) {
+                        const i = user.groups.findIndex(g => g === 'bn');
+                        user.groups.splice(i, 1, 'nat');
+                    } else {
+                        const i = user.groups.findIndex(g => g === 'nat');
+                        console.log(i, user.groups);
+                        user.groups.splice(i, 1, 'bn');
+                    }
+
+                    for (const mode of user.modesInfo) {
+                        mode.level = 'full';
+                    }
+
+                    user.history.push({
+                        date: new Date(),
+                        mode: evaluation.mode,
+                        kind: 'left',
+                        group: evaluation.isMoveToNat ? 'bn' : 'nat',
+                        relatedEvaluation: evaluation._id,
+                    });
+                    user.history.push({
+                        date: new Date(),
+                        mode: evaluation.mode,
+                        kind: 'joined',
+                        group: evaluation.isMoveToNat ? 'nat' : 'bn',
+                        relatedEvaluation: evaluation._id,
+                    });
                 }
             }
 
+            await user.save();
             await BnEvaluation.create({
                 user: evaluation.user,
                 mode: evaluation.mode,
@@ -400,7 +429,7 @@ router.post('/setComplete/', middlewares.isNotSpectator, async (req, res) => {
 });
 
 /* POST set consensus of eval */
-router.post('/setConsensus/:id', middlewares.isNotSpectator, async (req, res) => {
+router.post('/setConsensus/:id', middlewares.isNat, async (req, res) => {
     let evaluation = await BnEvaluation
         .findByIdAndUpdate(req.params.id, {
             consensus: req.body.consensus,
@@ -463,7 +492,7 @@ router.post('/setConsensus/:id', middlewares.isNotSpectator, async (req, res) =>
 });
 
 /* POST set cooldown */
-router.post('/setCooldownDate/:id', middlewares.isNotSpectator, async (req, res) => {
+router.post('/setCooldownDate/:id', middlewares.isNat, async (req, res) => {
     let evaluation = await BnEvaluation
         .findByIdAndUpdate(req.params.id, { cooldownDate: req.body.cooldownDate })
         .populate(defaultPopulate);
@@ -484,7 +513,7 @@ router.post('/setCooldownDate/:id', middlewares.isNotSpectator, async (req, res)
 });
 
 /* POST set feedback of eval */
-router.post('/setFeedback/:id', middlewares.isNotSpectator, async (req, res) => {
+router.post('/setFeedback/:id', middlewares.isNat, async (req, res) => {
     let evaluation = await BnEvaluation
         .findById(req.params.id)
         .populate(defaultPopulate)
@@ -549,7 +578,7 @@ router.get('/findUserReports/:id', async (req, res) => {
 });
 
 /* POST replace evaluator */
-router.post('/replaceUser/:id', middlewares.isNotSpectator, async (req, res) => {
+router.post('/replaceUser/:id', middlewares.isNat, async (req, res) => {
     let evaluation = await BnEvaluation
         .findById(req.params.id)
         .populate(defaultPopulate)
@@ -605,7 +634,7 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
 
     const beatmapsetIds = uniqueNominations.map(n => n.beatmapsetId);
     const qaBeatmapsetIds = qualityAssuranceChecks.map(qa => qa.beatmapsetId);
-    let [nominationsDisqualified, nominationsPopped, disqualifiedQualityAssuranceChecks] = await Promise.all([
+    let [nominationsDisqualified, nominationsPopped, disqualifiedQualityAssuranceChecks, othersNominations] = await Promise.all([
         Aiess.getRelatedBeatmapsetEvents(
             userOsuId,
             beatmapsetIds,
@@ -623,20 +652,33 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
             'Popped'
         ),
         Aiess.find({
-            userid: { $ne: userOsuId },
+            userId: { $ne: userOsuId },
             beatmapsetId: { $in: qaBeatmapsetIds },
             timestamp: { $gte: minDate, $lte: maxDate },
             eventType: 'Disqualified',
         }),
+        Aiess.find({
+            userId: { $ne: userOsuId },
+            beatmapsetId: { $in: beatmapsetIds },
+            timestamp: { $gte: minDate, $lte: maxDate },
+            eventType: ['Bubbled', 'Qualified'],
+        }),
     ]);
 
     // Exclude pops/dqs that happened before this user nomination
-    nominationsPopped = nominationsPopped.filter(pop =>
-        uniqueNominations.some(n => n.beatmapsetId == pop.beatmapsetId && n.timestamp < pop.timestamp)
-    );
-    nominationsDisqualified = nominationsDisqualified.filter(dq =>
-        uniqueNominations.some(n => n.beatmapsetId == dq.beatmapsetId && n.timestamp < dq.timestamp)
-    );
+    // And pops/dqs that happened after others bns nominated the set (and current bn wasn't involved in the end)
+    nominationsPopped = nominationsPopped.filter(pop => {
+        const happenedBefore = uniqueNominations.some(n => n.beatmapsetId == pop.beatmapsetId && n.timestamp < pop.timestamp);
+        const nominationsAfterwards = othersNominations.filter(n => n.beatmapsetId == pop.beatmapsetId && n.timestamp < pop.timestamp);
+
+        return !nominationsAfterwards.length && happenedBefore;
+    });
+    nominationsDisqualified = nominationsDisqualified.filter(dq => {
+        const happenedBefore = uniqueNominations.some(n => n.beatmapsetId == dq.beatmapsetId && n.timestamp < dq.timestamp);
+        const nominationsAfterwards = othersNominations.filter(n => n.beatmapsetId == dq.beatmapsetId && n.timestamp < dq.timestamp);
+
+        return nominationsAfterwards.length < 2 && happenedBefore;
+    });
     disqualifiedQualityAssuranceChecks = disqualifiedQualityAssuranceChecks.filter(dq =>
         qualityAssuranceChecks.some(qa => qa.beatmapsetId == dq.beatmapsetId && qa.timestamp < dq.timestamp)
     );
@@ -662,7 +704,7 @@ const applicationPopulate = [
         select: 'evaluator behaviorComment moddingComment vote',
         populate: {
             path: 'evaluator',
-            select: 'username osuId group',
+            select: 'username osuId groups',
         },
     },
 ];

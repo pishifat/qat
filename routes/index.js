@@ -38,85 +38,32 @@ router.get('/modsCount/:user', async (req, res) => {
 /*-------below this line is the intimidating code that i never want to look at----------*/
 
 /* GET 'login' to get user's info */
-router.get(
-    '/login',
-    async (req, res, next) => {
-        if (req.session.osuId && req.session.username) {
-            const u = await User.findOne({ osuId: req.session.osuId });
+router.get('/login', (req, res) => {
+    const state = crypto.randomBytes(48).toString('hex');
+    res.cookie('_state', state, { httpOnly: true });
+    const hashedState = Buffer.from(state).toString('base64');
 
-            if (!u || u.error) {
-                const user = await User.create({
-                    osuId: req.session.osuId,
-                    username: req.session.username,
-                    group: req.session.group,
-                    isSpectator: req.session.isSpectator,
-                });
-
-                if (user && !user.error) {
-                    req.session.mongoId = user._id;
-                    Logger.generate(req.session.mongoId, 'Verified their account for the first time');
-
-                    return next();
-                } else {
-                    return res.status(500).render('error', { message: 'Something went wrong!' });
-                }
-            } else {
-                if (u.username != req.session.username) {
-                    await User.findByIdAndUpdate(u._id, { username: req.session.username });
-                    Logger.generate(u._id, `Username changed from "${u.username}" to "${req.session.username}"`);
-                }
-
-                if (u.isSpectator != req.session.isSpectator && u.isSpectator !== null) {
-                    await User.findByIdAndUpdate(u._id, { isSpectator: req.session.isSpectator });
-                    Logger.generate(u._id, `User toggled spectator role`);
-                }
-
-                if (u.group != req.session.group) {
-                    await User.findByIdAndUpdate(u._id, { group: req.session.group });
-                    Logger.generate(u._id, `User group changed to ${req.session.group.toUpperCase()}`);
-                }
-
-                req.session.mongoId = u._id;
-
-                return next();
-            }
-        }
-
-        if (!req.cookies._state) {
-            crypto.randomBytes(48, function(err, buffer) {
-                res.cookie('_state', buffer.toString('hex'), { httpOnly: true });
-                res.redirect('/login');
-            });
-        } else {
-            let hashedState = Buffer.from(req.cookies._state).toString('base64');
-            res.redirect(
-                `https://osu.ppy.sh/oauth/authorize?response_type=code&client_id=${
-                    config.id
-                }&redirect_uri=${encodeURIComponent(config.redirect)}&state=${hashedState}&scope=identify`
-            );
-        }
-    },
-    middlewares.isLoggedIn,
-    (req, res) => {
-        res.redirect(req.session.lastPage || '/');
-    }
-);
+    res.redirect(
+        `https://osu.ppy.sh/oauth/authorize?response_type=code&client_id=${
+            config.id
+        }&redirect_uri=${encodeURIComponent(config.redirect)}&state=${hashedState}&scope=identify`
+    );
+});
 
 /* GET user's token and user's info to login */
 router.get('/callback', async (req, res) => {
     if (!req.query.code || req.query.error) {
-        return res.redirect('/');
+        return res.status(500).render('error', { message: req.query.error || 'Something went wrong' });
     }
 
     const decodedState = Buffer.from(req.query.state, 'base64').toString('ascii');
+    const savedState = req.cookies._state;
+    res.clearCookie('_state');
 
-    if (decodedState !== req.cookies._state) {
-        res.clearCookie('_state');
-
+    if (decodedState !== savedState) {
         return res.status(403).render('error', { message: 'unauthorized' });
     }
 
-    res.clearCookie('_state');
     let response = await osu.getToken(req.query.code);
 
     if (response.error) {
@@ -130,29 +77,61 @@ router.get('/callback', async (req, res) => {
 
         response = await osu.getUserInfo(req.session.accessToken);
 
-        let groupIds = [];
-
         if (response.error) {
-            res.status(500).render('error');
-        } else {
-            response.groups.forEach(group => {
-                groupIds.push(group.id);
-            });
+            return res.status(500).render('error');
         }
+
+        const groupIds = response.groups.map(g => g.id);
+        const groups = ['user'];
 
         if (groupIds.includes(7)) {
-            req.session.group = 'nat';
-        } else if (groupIds.includes(28) || groupIds.includes(32)) {
-            req.session.group = 'bn';
-        } else {
-            req.session.group = 'user';
+            groups.push('nat');
         }
 
-        req.session.isSpectator = !groupIds.includes(7) && (groupIds.includes(4) || groupIds.includes(11));
+        if (groupIds.includes(28) || groupIds.includes(32)) {
+            groups.push('bn');
+        }
 
-        req.session.username = response.username;
-        req.session.osuId = response.id;
-        res.redirect('/login');
+        if (groupIds.includes(4) || groupIds.includes(11)) {
+            groups.push('gmt');
+        }
+
+        const osuId = response.id;
+        const username = response.username;
+        const user = await User.findOne({ osuId });
+
+        if (!user) {
+            const newUser = new User();
+            newUser.osuId = osuId;
+            newUser.username = username;
+            newUser.groups = groups;
+            await newUser.save();
+
+            req.session.mongoId = newUser._id;
+            Logger.generate(req.session.mongoId, 'Verified their account for the first time');
+        } else {
+            if (user.username != username) {
+                user.username = username;
+                await user.save();
+                Logger.generate(user._id, `Username changed from "${user.username}" to "${response.username}"`);
+            }
+
+            if (groups.some(g => !user.groups.includes(g)) || user.groups.some(g => !groups.includes(g))) {
+                if (!user.groups.includes('gmt') && groups.includes('gmt')) {
+                    Logger.generate(user._id, `User toggled on spectator role`);
+                }
+
+                user.groups = groups;
+                await user.save();
+                Logger.generate(user._id, `User groups changed to ${groups.join(', ')}`);
+            }
+
+            req.session.mongoId = user._id;
+        }
+
+        req.session.osuId = osuId;
+        req.session.username = username;
+        res.redirect(req.session.lastPage || '/');
     }
 });
 

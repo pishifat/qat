@@ -18,7 +18,7 @@ mongoose.plugin(schema => {
     });
 });
 
-// const notifications = require('./helpers/notifications');
+const notifications = require('./helpers/notifications');
 const indexRouter = require('./routes/index');
 const bnAppRouter = require('./routes/bnApp');
 const reportsRouter = require('./routes/reports');
@@ -145,10 +145,10 @@ server.on('error', (error) => {
 });
 server.on('listening', () => {
     console.log('Listening on ' + port);
-    // notifications.notifyDeadlines.start();
-    // notifications.notifyBeatmapReports.start();
-    // notifications.lowActivityTask.start();
-    // notifications.notifyQualityAssurance.start();
+    notifications.notifyDeadlines.start();
+    notifications.notifyBeatmapReports.start();
+    notifications.lowActivityTask.start();
+    notifications.notifyQualityAssurance.start();
 });
 
 module.exports = app;

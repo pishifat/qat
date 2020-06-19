@@ -105,34 +105,8 @@ router.post('/assignUser/:id', middlewares.isBnOrNat, async (req, res) => {
         return res.json({ error: 'You cannot check your nominations!' });
     }
 
-    let validMode;
-
-    for (let i = 0; i < res.locals.userRequest.modes.length; i++) {
-        const mode = res.locals.userRequest.modes[i];
-
-        if (event.modes.includes(mode)) {
-            validMode = true;
-            break;
-        }
-    }
-
-    if (!validMode) {
+    if (!event.modes.some(m => res.locals.userRequest.isFullBnFor(m))) {
         return res.json({ error: 'You are not qualified for this game mode!' });
-    }
-
-    let probation;
-
-    for (let i = 0; i < res.locals.userRequest.probation.length; i++) {
-        const mode = res.locals.userRequest.probation[i];
-
-        if (event.modes.includes(mode)) {
-            probation = true;
-            break;
-        }
-    }
-
-    if (probation) {
-        return res.json({ error: 'Probation users cannot do this!' });
     }
 
     const newEvent = await Aiess

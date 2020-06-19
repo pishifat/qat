@@ -9,7 +9,7 @@ const Logger = require('../models/log');
 const router = express.Router();
 
 router.use(middlewares.isLoggedIn);
-router.use(middlewares.isBnOrNat);
+router.use(middlewares.hasBasicAccess);
 
 const defaultPopulate = [
     {
@@ -38,7 +38,7 @@ function getBnDefaultPopulate (mongoId) {
 router.get('/relevantInfo', async (req, res) => {
     let discussions;
 
-    if (res.locals.userRequest.isNat || res.locals.userRequest.isSpectator) {
+    if (res.locals.userRequest.hasFullReadAccess) {
         discussions = await Discussion
             .find({})
             .populate(defaultPopulate)
@@ -139,7 +139,7 @@ router.post('/submitMediation/:id', async (req, res) => {
         'Submitted vote for a discussion'
     );
 
-    if (isNewMediation && req.session.group == 'nat') {
+    if (isNewMediation && res.locals.userRequest.isNat) {
         discord.webhookPost(
             [{
                 author: discord.defaultWebhookAuthor(req.session),

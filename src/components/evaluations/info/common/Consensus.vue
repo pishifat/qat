@@ -50,15 +50,15 @@
                 Resign on standard terms
             </button>
             <button
-                class="btn btn-sm btn-success mt-2"
+                class="btn btn-sm btn-danger mt-2"
                 :disabled="selectedEvaluation.consensus == 'pass' && selectedEvaluation.isLowActivity"
                 @click="setConsensus('pass', $event, 'isLowActivity');"
             >
                 Low activity warning
             </button>
             <button
-                v-if="selectedEvaluation.user.group == 'bn'"
-                class="btn btn-sm btn-success mt-2"
+                v-if="selectedEvaluation.user.isBn"
+                class="btn btn-sm btn-danger mt-2"
                 :disabled="selectedEvaluation.isMoveToNat"
                 @click="setConsensus('pass', $event, 'isMoveToNat');"
             >
@@ -66,7 +66,7 @@
             </button>
             <button
                 v-else
-                class="btn btn-sm btn-success mt-2"
+                class="btn btn-sm btn-danger mt-2"
                 :disabled="selectedEvaluation.isMoveToBn"
                 @click="setConsensus('pass', $event, 'isMoveToBn');"
             >

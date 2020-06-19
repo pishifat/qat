@@ -2,26 +2,6 @@ import Vue from 'vue';
 import pageFilters from './modules/pageFilters';
 import pagination from './modules/pagination';
 
-function getTotalDuration(dates) {
-    let days = 0;
-
-    for (let i = 0; i < dates.length; i += 2) {
-        const startAt = new Date(dates[i]);
-        const endedAt = dates[i+1] && new Date(dates[i+1]);
-        let time = 0;
-
-        if (endedAt) {
-            time = endedAt - startAt;
-        } else {
-            time = new Date() - startAt;
-        }
-
-        days += Math.abs(time / (1000 * 3600 * 24));
-    }
-
-    return days;
-}
-
 export default {
     namespaced: true,
     modules: {
@@ -92,8 +72,8 @@ export default {
                 );
             } else if (state.sort.type === 'bnDuration' || state.sort.type === 'natDuration') {
                 users.sort((a, b) => {
-                    const aDuration = getTotalDuration(a[state.sort.type]);
-                    const bDuration = getTotalDuration(b[state.sort.type]);
+                    const aDuration = a[state.sort.type];
+                    const bDuration = b[state.sort.type];
 
                     if (aDuration > bDuration) return 1;
                     if (aDuration < bDuration) return -1;

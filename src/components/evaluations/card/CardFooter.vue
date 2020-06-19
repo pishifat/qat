@@ -100,7 +100,7 @@ export default {
             let bn = 0;
             let nat = 0;
             this.reviews.forEach(e => {
-                if (e.evaluator.group == 'bn') bn++;
+                if (e.evaluator.isBn) bn++;
                 else nat++;
             });
 

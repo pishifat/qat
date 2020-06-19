@@ -7,7 +7,7 @@ const middlewares = require('../helpers/middlewares');
 const router = express.Router();
 
 router.use(middlewares.isLoggedIn);
-router.use(middlewares.isNat);
+router.use(middlewares.hasFullReadAccess);
 
 //population
 const defaultPopulate = [
@@ -33,7 +33,7 @@ router.get('/load/:type', async (req, res) => {
 });
 
 /* POST add question */
-router.post('/store', middlewares.isNotSpectator, async (req, res) => {
+router.post('/store', middlewares.isNat, async (req, res) => {
     let q = await Question.create({
         category: req.body.category,
         content: req.body.newQuestion,
@@ -52,7 +52,7 @@ router.post('/store', middlewares.isNotSpectator, async (req, res) => {
 });
 
 /* POST edit question */
-router.post('/:id/update', middlewares.isNotSpectator, async (req, res) => {
+router.post('/:id/update', middlewares.isNat, async (req, res) => {
     const question = await Question
         .findById(req.params.id)
         .populate(defaultPopulate)
@@ -74,7 +74,7 @@ router.post('/:id/update', middlewares.isNotSpectator, async (req, res) => {
 });
 
 /* POST edit activity of question */
-router.post('/:id/toggleActivity', middlewares.isNotSpectator, async (req, res) => {
+router.post('/:id/toggleActivity', middlewares.isNat, async (req, res) => {
     const question = await Question
         .findById(req.params.id)
         .populate(defaultPopulate)
@@ -102,7 +102,7 @@ function validateInput (contentInput, scoreInput) {
 }
 
 /* POST add option */
-router.post('/:id/options/store', middlewares.isNotSpectator, async (req, res) => {
+router.post('/:id/options/store', middlewares.isNat, async (req, res) => {
     const [content, score] = validateInput(req.body.content, req.body.score);
     let option = await Option.create({
         content,
@@ -128,7 +128,7 @@ router.post('/:id/options/store', middlewares.isNotSpectator, async (req, res) =
 });
 
 /* POST edit option */
-router.post('/:id/options/:optionId/update', middlewares.isNotSpectator, async (req, res) => {
+router.post('/:id/options/:optionId/update', middlewares.isNat, async (req, res) => {
     const [content, score] = validateInput(req.body.content, req.body.score);
     let option = await Option.findById(req.params.optionId).orFail();
     option.content = content;
@@ -154,7 +154,7 @@ router.post('/:id/options/:optionId/update', middlewares.isNotSpectator, async (
 });
 
 /* POST edit option activity */
-router.post('/:id/options/:optionId/toggleActivity', middlewares.isNotSpectator, async (req, res) => {
+router.post('/:id/options/:optionId/toggleActivity', middlewares.isNat, async (req, res) => {
     let option = await Option.findById(req.params.optionId).orFail();
     option.active = !option.active;
     await option.save();

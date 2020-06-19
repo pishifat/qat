@@ -39,7 +39,7 @@ class AppEvaluationService {
                     select: 'evaluator behaviorComment moddingComment vote',
                     populate: {
                         path: 'evaluator',
-                        select: 'username osuId group',
+                        select: 'username osuId groups',
                     },
                 },
             ])

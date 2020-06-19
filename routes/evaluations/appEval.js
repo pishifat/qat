@@ -10,7 +10,7 @@ const discord = require('../../helpers/discord');
 const router = express.Router();
 
 router.use(middlewares.isLoggedIn);
-router.use(middlewares.isBnOrNat);
+router.use(middlewares.hasBasicAccess);
 
 //population
 const defaultPopulate = [
@@ -23,7 +23,7 @@ const defaultPopulate = [
         select: 'evaluator behaviorComment moddingComment vote',
         populate: {
             path: 'evaluator',
-            select: 'username osuId group',
+            select: 'username osuId groups',
         },
     },
 ];
@@ -36,7 +36,7 @@ function getBnDefaultPopulate (mongoId) {
             select: 'behaviorComment moddingComment vote',
             populate: {
                 path: 'evaluator',
-                select: 'username osuId group',
+                select: 'username osuId groups',
                 match: {
                     _id: mongoId,
                 },
@@ -49,7 +49,7 @@ function getBnDefaultPopulate (mongoId) {
 router.get('/relevantInfo', async (req, res) => {
     let applications = [];
 
-    if (res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator) {
+    if (res.locals.userRequest.hasFullReadAccess) {
         applications = await AppEvaluation
             .find({
                 active: true,
@@ -85,10 +85,6 @@ router.get('/relevantInfo', async (req, res) => {
 
 /* POST submit or edit eval */
 router.post('/submitEval/:id', async (req, res) => {
-    if (res.locals.userRequest.isSpectator && res.locals.userRequest.group != 'bn') {
-        return res.json({ error: 'Spectators cannot perform this action!' });
-    }
-
     let evaluation = await AppEvaluation
         .findOne({
             _id: req.params.id,
@@ -97,9 +93,11 @@ router.post('/submitEval/:id', async (req, res) => {
         .populate(defaultPopulate)
         .orFail();
 
-    if (
-        res.locals.userRequest.isBn &&
-        !evaluation.bnEvaluators.some(bn => bn._id == req.session.mongoId)
+    if (!res.locals.userRequest.isNat ||
+        (
+            res.locals.userRequest.isBn &&
+            !evaluation.bnEvaluators.some(bn => bn._id == req.session.mongoId)
+        )
     ) {
         return res.json({
             error: 'You cannot do this.',
@@ -171,6 +169,7 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
             _id: {
                 $in: req.body.checkedApps,
             },
+            active: true,
         })
         .populate(defaultPopulate);
 
@@ -178,8 +177,10 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
         let user = await User.findById(evaluation.user);
 
         if (evaluation.consensus == 'pass') {
-            user.modes.push(evaluation.mode);
-            user.probation.push(evaluation.mode);
+            user.modesInfo.push({
+                mode: evaluation.mode,
+                level: 'probation',
+            });
 
             let deadline = new Date();
             deadline.setDate(deadline.getDate() + 40);
@@ -189,10 +190,17 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
                 deadline,
             });
 
-            if (user.group == 'user') {
-                user.group = 'bn';
-                user.bnDuration.push(new Date());
+            if (!user.isBn) {
+                user.groups.push('bn');
             }
+
+            user.history.push({
+                date: new Date(),
+                mode: evaluation.mode,
+                kind: 'joined',
+                group: 'bn',
+                relatedEvaluation: evaluation._id,
+            });
 
             await user.save();
         }
@@ -224,7 +232,7 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
 });
 
 /* POST set consensus of eval */
-router.post('/setConsensus/:id', middlewares.isNat, middlewares.isNotSpectator, async (req, res) => {
+router.post('/setConsensus/:id', middlewares.isNat, async (req, res) => {
     let evaluation = await AppEvaluation
         .findByIdAndUpdate(req.params.id, { consensus: req.body.consensus })
         .populate(defaultPopulate)
@@ -255,7 +263,7 @@ router.post('/setConsensus/:id', middlewares.isNat, middlewares.isNotSpectator, 
 });
 
 /* POST set cooldown */
-router.post('/setCooldownDate/:id', middlewares.isNat, middlewares.isNotSpectator, async (req, res) => {
+router.post('/setCooldownDate/:id', middlewares.isNat, async (req, res) => {
     const evaluation = await AppEvaluation
         .findByIdAndUpdate(req.params.id, { cooldownDate: req.body.cooldownDate })
         .populate(defaultPopulate);
@@ -276,7 +284,7 @@ router.post('/setCooldownDate/:id', middlewares.isNat, middlewares.isNotSpectato
 });
 
 /* POST set feedback of eval */
-router.post('/setFeedback/:id', middlewares.isNat, middlewares.isNotSpectator, async (req, res) => {
+router.post('/setFeedback/:id', middlewares.isNat, async (req, res) => {
     let evaluation = await AppEvaluation
         .findById(req.params.id)
         .populate(defaultPopulate)
@@ -287,7 +295,7 @@ router.post('/setFeedback/:id', middlewares.isNat, middlewares.isNotSpectator, a
 });
 
 /* POST replace evaluator */
-router.post('/replaceUser/:id', middlewares.isNat, middlewares.isNotSpectator, async (req, res) => {
+router.post('/replaceUser/:id', middlewares.isNat, async (req, res) => {
     const replaceNat = Boolean(req.body.replaceNat);
     let evaluation = await AppEvaluation
         .findById(req.params.id)
@@ -302,12 +310,10 @@ router.post('/replaceUser/:id', middlewares.isNat, middlewares.isNotSpectator, a
         const evaluatorArray = await User.aggregate([
             {
                 $match: {
-                    group: 'bn',
-                    isSpectator: { $ne: true },
-                    modes: evaluation.mode,
+                    groups: 'bn',
+                    modesInfo: { $elemMatch: { mode: evaluation.mode, level: 'full' } },
                     osuId: { $nin: invalids },
                     isBnEvaluator: true,
-                    probation: { $size: 0 },
                 },
             },
             { $sample: { size: 1 } },
@@ -345,7 +351,13 @@ router.post('/replaceUser/:id', middlewares.isNat, middlewares.isNotSpectator, a
 /* POST select BN evaluators */
 router.post('/selectBnEvaluators', middlewares.isNat, async (req, res) => {
     const allUsers = await User.aggregate([
-        { $match: { group: { $eq: 'bn' }, isBnEvaluator: true, probation: { $size: 0 }, modes: req.body.mode }  },
+        {
+            $match: {
+                groups: 'bn',
+                isBnEvaluator: true,
+                modesInfo: { $elemMatch: { mode: req.body.mode, level: 'full' } },
+            },
+        },
         { $sample: { size: 1000 } },
     ]);
     let users = [];
@@ -359,7 +371,7 @@ router.post('/selectBnEvaluators', middlewares.isNat, async (req, res) => {
             const userToSearch = includeUsers[i].trim();
             const user = await User.findByUsername(userToSearch);
 
-            if (user && !user.error && user.modes.includes(req.body.mode)) {
+            if (user && !user.error && user.modesInfo.some(m => m.mode === req.body.mode)) {
                 users.push(user);
                 excludeUserIds.push(user.id);
             }

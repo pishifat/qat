@@ -94,10 +94,7 @@ router.post('/editNote/:id', async (req, res) => {
 /* GET all users with badge info */
 router.get('/findUserBadgeInfo', async (req, res) => {
     const u = await User.find({
-        $or: [
-            { 'bnDuration.0': { $exists: true } },
-            { 'natDuration.0': { $exists: true } },
-        ],
+        history: { $exists: true, $ne: [] },
     }).sort({ username: 1 });
 
     res.json(u);
@@ -128,8 +125,7 @@ router.post('/editBadgeValue/:id', async (req, res) => {
 router.get('/findPotentialNatInfo', async (req, res) => {
     const [users, applications] = await Promise.all([
         User.find({
-            group: 'bn',
-            isSpectator: { $ne: true },
+            groups: 'bn',
             isBnEvaluator: true,
         }).sort({ username: 1 }),
 
@@ -148,7 +144,7 @@ router.get('/findPotentialNatInfo', async (req, res) => {
                 select: 'evaluator behaviorComment moddingComment vote',
                 populate: {
                     path: 'evaluator',
-                    select: 'username osuId group',
+                    select: 'username osuId groups',
                 },
             },
         ]),

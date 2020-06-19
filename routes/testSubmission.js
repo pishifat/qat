@@ -143,9 +143,8 @@ router.post('/submitTest', async (req, res) => {
     const assignedNat = await User.aggregate([
         {
             $match: {
-                group: 'nat',
-                isSpectator: { $ne: true },
-                modes: test.mode,
+                groups: 'nat',
+                'modesInfo.mode': test.mode,
                 osuId: { $nin: invalids },
             },
         },

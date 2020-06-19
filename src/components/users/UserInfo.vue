@@ -7,7 +7,7 @@
         <div v-if="selectedUser" class="container">
             <duration />
 
-            <div v-if="selectedUser.group != 'user'">
+            <div v-if="selectedUser.hasBasicAccess">
                 <next-evaluation />
                 <hr>
                 <p class="mb-1">
@@ -31,7 +31,7 @@
 
                 <!-- BN can only see this on their own cards. NAT can see on everyone's cards -->
                 <bn-evaluator-toggle
-                    v-if="(selectedUser.id == loggedInUser.id || loggedInUser.isNat) && selectedUser.group != 'nat'"
+                    v-if="(selectedUser.id == loggedInUser.id || loggedInUser.isNat) && !selectedUser.isNat"
                 />
             </div>
 

@@ -6,7 +6,7 @@ const Logger = require('../models/log');
 const router = express.Router();
 
 router.use(middlewares.isLoggedIn);
-router.use(middlewares.isNat);
+router.use(middlewares.hasFullReadAccess);
 
 /* GET dq/pop listing */
 router.get('/relevantInfo', async (req, res) => {
@@ -28,7 +28,7 @@ router.get('/relevantInfo', async (req, res) => {
 });
 
 /* POST edit reason for dq/pop */
-router.post('/updateContent/:id', middlewares.isNotSpectator, async (req, res) => {
+router.post('/updateContent/:id', middlewares.isNat, async (req, res) => {
     let a = await Aiess.findByIdAndUpdate(req.params.id, { content: req.body.reason });
 
     if (!a) {
@@ -40,7 +40,7 @@ router.post('/updateContent/:id', middlewares.isNotSpectator, async (req, res) =
 });
 
 /* POST edit obviousness */
-router.post('/updateObviousness/:id', middlewares.isNotSpectator, async (req, res) => {
+router.post('/updateObviousness/:id', middlewares.isNat, async (req, res) => {
     let obviousness = parseInt(req.body.obviousness);
     let a = await Aiess.findById(req.params.id).orFail();
 
@@ -56,7 +56,7 @@ router.post('/updateObviousness/:id', middlewares.isNotSpectator, async (req, re
 });
 
 /* POST edit severity */
-router.post('/updateSeverity/:id', middlewares.isNotSpectator, async (req, res) => {
+router.post('/updateSeverity/:id', middlewares.isNat, async (req, res) => {
     let severity = parseInt(req.body.severity);
     let a = await Aiess.findById(req.params.id).orFail();
 

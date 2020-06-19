@@ -40,7 +40,7 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
             return res.json({ error: 'Cannot find user! Make sure you spelled it correctly' });
         }
 
-        if (u.group == 'user') {
+        if (!u.isBnOrNat) {
             return res.json({ error: 'User is not a member of the BN/NAT!' });
         }
 

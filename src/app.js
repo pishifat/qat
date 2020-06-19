@@ -38,14 +38,14 @@ router.beforeEach(async (to, from, next) => {
                     r.path.startsWith('/managetest') ||
                     r.path.startsWith('/logs')
                 ) &&
-                !store.state.loggedInUser.isNat
+                !store.state.loggedInUser.hasFullReadAccess
             ) ||
             (
                 (
                     r.path.startsWith('/discussionvote') ||
                     r.path.startsWith('/appeval')
                 ) &&
-                !store.state.loggedInUser.isBnOrNat
+                !store.state.loggedInUser.hasBasicAccess
             )
         )
     ) {

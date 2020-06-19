@@ -92,7 +92,7 @@ export default {
     },
     methods: {
         findUserMediation() {
-            if (!this.loggedInUser.isUser) { // mediator info is hidden from normal users, so this function wouldn't work
+            if (this.loggedInUser.hasBasicAccess) { // mediator info is hidden from normal users, so this function wouldn't work
                 this.mediationId = null;
                 this.comment = null;
                 this.vote = null;

@@ -43,23 +43,7 @@ async function isLoggedIn(req, res, next) {
 function isBnOrNat(req, res, next) {
     const u = res.locals.userRequest;
 
-    if (u.group == 'bn' || u.group == 'nat' || u.isSpectator) {
-        next();
-    } else {
-        if (req.accepts(['html', 'json'] === 'html')) {
-            res.redirect('/');
-        } else {
-            res.json({
-                error: 'Unauthorized',
-            });
-        }
-    }
-}
-
-function isBn(req, res, next) {
-    const u = res.locals.userRequest;
-
-    if (u.group == 'bn') {
+    if (u.isBnOrNat) {
         next();
     } else {
         if (req.accepts(['html', 'json'] === 'html')) {
@@ -75,7 +59,7 @@ function isBn(req, res, next) {
 function isNat(req, res, next) {
     const u = res.locals.userRequest;
 
-    if (u.group == 'nat' || u.isSpectator) {
+    if (u.isNat) {
         next();
     } else {
         if (req.accepts(['html', 'json'] === 'html')) {
@@ -88,10 +72,10 @@ function isNat(req, res, next) {
     }
 }
 
-function isBnEvaluator(req, res, next) {
+function hasBasicAccess(req, res, next) {
     const u = res.locals.userRequest;
 
-    if (u.isBnEvaluator || u.group == 'nat') {
+    if (u.hasBasicAccess) {
         next();
     } else {
         if (req.accepts(['html', 'json'] === 'html')) {
@@ -104,17 +88,17 @@ function isBnEvaluator(req, res, next) {
     }
 }
 
-function isNotSpectator(req, res, next) {
+function hasFullReadAccess(req, res, next) {
     const u = res.locals.userRequest;
 
-    if (!u.isSpectator) {
+    if (u.hasFullReadAccess) {
         next();
     } else {
         if (req.accepts(['html', 'json'] === 'html')) {
             res.redirect('/');
         } else {
             res.json({
-                error: 'Spectators cannot perform this action!',
+                error: 'Unauthorized',
             });
         }
     }
@@ -123,8 +107,7 @@ function isNotSpectator(req, res, next) {
 module.exports = {
     isLoggedIn,
     isBnOrNat,
-    isBn,
     isNat,
-    isBnEvaluator,
-    isNotSpectator,
+    hasBasicAccess,
+    hasFullReadAccess,
 };

@@ -1,7 +1,12 @@
 <template>
     <td>
         <template v-if="!editing">
-            <span v-if="hasData" :class="calculateColor">
+            <span
+                v-if="hasData"
+                :class="calculateColor"
+                data-toggle="tooltip"
+                :title="getSeverityTooltip(event.obviousness, event.severity)"
+            >
                 ({{ event.obviousness }}/{{ event.severity }})
             </span>
             <span v-if="loggedInUser.isNat">
@@ -9,7 +14,7 @@
                     <i class="fas fa-edit" />
                 </a>
             </span>
-            <span v-html="$md.render(event.content)" />
+            <span v-html="$md.renderInline(event.content)" />
 
             <div v-if="event.userQualityAssuranceComment && loggedInUser.isNat" class="mt-2">
                 <b>QA comment:</b>
@@ -18,15 +23,20 @@
         </template>
 
         <template v-else>
-            <span>
-                <span v-if="hasData" :class="calculateColor">
-                    ({{ event.obviousness }}/{{ event.severity }})
-                </span>
-                <a href="#" @click.prevent="editing = !editing">
-                    <i class="fas fa-edit" />
-                </a>
-                <p class="mt-2 mb-1">Shorten the "reason" field:</p>
+            <span
+                v-if="hasData"
+                :class="calculateColor"
+                data-toggle="tooltip"
+                :title="getSeverityTooltip(event.obviousness, event.severity)"
+            >
+                ({{ event.obviousness }}/{{ event.severity }})
             </span>
+            <a href="#" @click.prevent="editing = !editing">
+                <i class="fas fa-edit" />
+            </a>
+            <p class="mt-2 mb-1">
+                Shorten the "reason" field:
+            </p>
             <textarea
                 v-model="newEventContent"
                 class="form-control form-control-sm mr-2"
@@ -107,6 +117,38 @@ export default {
                 message: `Updated content`,
                 type: 'success',
             });
+        },
+        getSeverityTooltip (obviousness, severity) {
+            let tooltip = '';
+
+            switch (obviousness) {
+                case 0:
+                    tooltip += 'Not obvious';
+                    break;
+                case 1:
+                    tooltip += 'Can be found with experience';
+                    break;
+                case 2:
+                    tooltip += 'Can be found at a glance';
+                    break;
+            }
+
+            switch (severity) {
+                case 0:
+                    tooltip += ' / Not severe';
+                    break;
+                case 1:
+                    tooltip += ' / Slightly detrimental to gameplay';
+                    break;
+                case 2:
+                    tooltip += ' / Noticably detrimental to gameplay';
+                    break;
+                case 3:
+                    tooltip += ' / More or less unplayable';
+                    break;
+            }
+
+            return tooltip;
         },
     },
 };

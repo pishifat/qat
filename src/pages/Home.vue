@@ -22,14 +22,7 @@
                     <tbody>
                         <tr v-for="user in usersByMode.users" :key="user.id">
                             <td
-                                :style="
-                                    user.probation && user.probation.length ?
-                                        'border-left: 3px solid var(--probation);'
-                                        : user.group == 'nat' ?
-                                            'border-left: 3px solid var(--danger);'
-                                            :
-                                            'border-left: 3px solid var(--bn);'
-                                "
+                                :style="getGroupColor(user)"
                             >
                                 <a
                                     :href="`https://osu.ppy.sh/users/${user.osuId}`"
@@ -85,6 +78,21 @@ export default {
         if (data.allUsersByMode) {
             this.$store.commit('setHomeData', data.allUsersByMode);
         }
+    },
+    methods: {
+        getGroupColor (user) {
+            if (user.group === 'nat') {
+                return 'border-left: 3px solid var(--danger);';
+            }
+
+            if (user.level === 'probation') {
+                return 'border-left: 3px solid var(--probation);';
+            }
+
+            if (user.level === 'full') {
+                return 'border-left: 3px solid var(--bn);';
+            }
+        },
     },
 };
 </script>

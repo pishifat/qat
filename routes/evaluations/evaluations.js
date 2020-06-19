@@ -55,7 +55,7 @@ async function submitEval (evaluation, session, behaviorComment, moddingComment,
             let totalNat = 0;
 
             evaluation.reviews.forEach(r => {
-                if (r.evaluator.group == 'nat') totalNat++;
+                if (r.evaluator.isNat) totalNat++;
                 if (r.vote == 1) totalPass++;
                 else if (r.vote == 2) totalNeutral++;
                 else if (r.vote == 3) totalFail++;
@@ -182,15 +182,14 @@ async function replaceUser (evaluation, currentUser, evaluatorId) {
     let newEvaluator;
 
     // assigns current user if possible. rng otherwise
-    if (!invalids.includes(currentUser.osuId) && currentUser.modes.includes(evaluation.mode)) {
+    if (!invalids.includes(currentUser.osuId) && currentUser.isBnFor(evaluation.mode)) {
         newEvaluator = currentUser;
     } else {
         const evaluatorArray = await User.aggregate([
             {
                 $match: {
-                    group: 'nat',
-                    isSpectator: { $ne: true },
-                    modes: evaluation.mode,
+                    groups: 'nat',
+                    'modesInfo.mode': evaluation.mode,
                     osuId: { $nin: invalids },
                 },
             },

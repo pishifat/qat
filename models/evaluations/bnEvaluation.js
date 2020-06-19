@@ -30,7 +30,7 @@ class BnEvaluationService {
             .populate([
                 {
                     path: 'user',
-                    select: 'username osuId probation modes group',
+                    select: 'username osuId modesInfo groups',
                 },
                 {
                     path: 'natEvaluators',
@@ -41,14 +41,14 @@ class BnEvaluationService {
                     select: 'evaluator behaviorComment moddingComment vote',
                     populate: {
                         path: 'evaluator',
-                        select: 'username osuId group',
+                        select: 'username osuId groups',
                     },
                 },
             ])
             .sort({ deadline: 1, consensus: 1, feedback: 1 });
     }
 
-    static deleteManyByUserId(userId) {
+    static deleteUserActiveEvaluations(userId) {
         let minDate = new Date();
         minDate.setDate(minDate.getDate() + 14);
 

@@ -39,7 +39,7 @@
                             />
 
                             <assignment-buttons
-                                v-if="!isOutdated && !loggedInUser.isUser"
+                                v-if="!isOutdated && loggedInUser.hasBasicAccess"
                                 class="col-sm-2 ml-2 ml-sm-0 text-center"
                                 :event-id="event.id"
                                 :is-quality-assurance-checker="isQualityAssuranceChecker"
@@ -50,9 +50,9 @@
                 </div>
 
                 <comments
-                    v-if="!loggedInUser.isUser || (loggedInUser.isUser && event.qualityAssuranceComments.length)"
+                    v-if="loggedInUser.hasBasicAccess || (!loggedInUser.hasBasicAccess && event.qualityAssuranceComments.length)"
                     class="row small"
-                    :class="loggedInUser.isUser ? 'mt-2' : ''"
+                    :class="loggedInUser.hasBasicAccess ? 'mt-2' : ''"
                     :quality-assurance-comments="event.qualityAssuranceComments"
                     :event-id="event.id"
                     :is-max-checks="isMaxChecks"

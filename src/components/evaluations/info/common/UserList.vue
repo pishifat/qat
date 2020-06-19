@@ -56,7 +56,6 @@ export default {
                     evaluatorId,
                     replaceNat: this.replaceNat,
                 }, e);
-                console.log(r);
 
                 if (r && !r.error) {
                     this.$store.commit('evaluations/updateEvaluation', r);

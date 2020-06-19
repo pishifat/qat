@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-if="!loggedInUser.isUser" class="col-sm-12 my-2" :class="otherUserComments.length ? 'mb-1' : ''">
+        <div v-if="loggedInUser.hasBasicAccess" class="col-sm-12 my-2" :class="otherUserComments.length ? 'mb-1' : ''">
             <a
                 href="#"
                 class="ml-2"

@@ -50,7 +50,6 @@ router.get('/search/:user', middlewares.isNat, async (req, res) => {
     if (!user) {
         return res.json({
             error: 'Cannot find user!',
-            isNat: res.locals.userRequest.group == 'nat',
         });
     }
 
@@ -63,12 +62,13 @@ router.get('/search/:user', middlewares.isNat, async (req, res) => {
         .sort({ createdAt: -1 });
 
     if (!tests.length) {
-        return res.json({ error: 'No tests saved for that user!', isNat: res.locals.userRequest.group == 'nat' });
+        return res.json({
+            error: 'No tests saved for that user!',
+        });
     }
 
     res.json({
         tests,
-        isNat: res.locals.userRequest.group == 'nat',
     });
 });
 

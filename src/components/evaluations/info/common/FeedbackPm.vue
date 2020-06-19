@@ -144,7 +144,7 @@ export default {
             return this.selectedEvaluation.mode == 'osu' ? 'osu!' : 'osu!' + this.selectedEvaluation.mode;
         },
         isProbation () {
-            return this.selectedEvaluation.user.probation.includes(this.selectedEvaluation.mode);
+            return this.selectedEvaluation.user.probationModes.includes(this.selectedEvaluation.mode);
         },
     },
 };

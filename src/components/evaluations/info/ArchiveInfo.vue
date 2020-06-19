@@ -75,9 +75,10 @@ export default {
                 const result = confirm(`Are you sure? ${this.selectedEvaluation.consensus == 'pass' ? 'This will remove the user from the BN' : ''}`);
 
                 if (result) {
-                    const er = await this.executePost('/evalArchive/unarchive/' + this.selectedEvaluation.id, { type: 'application' }, e);
+                    const data = await this.executePost(`/evalArchive/${this.selectedEvaluation.id}/unarchiveApp`, e);
 
-                    if (er) {
+                    if (!data.error) {
+                        $('#evaluationArchiveInfo').modal('hide');
                         this.$router.push('/appeval?id=' + this.selectedEvaluation.id);
                     }
                 }
@@ -85,9 +86,10 @@ export default {
                 const result = confirm(`Are you sure? This will place the user on probation`);
 
                 if (result) {
-                    const er = await this.executePost('/evalArchive/unarchive/' + this.selectedEvaluation.id, { type: 'currentBn' }, e);
+                    const data = await this.executePost(`/evalArchive/${this.selectedEvaluation.id}/unarchiveBn`, e);
 
-                    if (er) {
+                    if (!data.error) {
+                        $('#evaluationArchiveInfo').modal('hide');
                         this.$router.push('/bnEval?id=' + this.selectedEvaluation.id);
                     }
                 }
