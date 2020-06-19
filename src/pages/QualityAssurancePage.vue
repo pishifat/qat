@@ -16,7 +16,7 @@
                         :key="event.id"
                         :event="event"
                         :is-outdated="isOutdated(event.beatmapsetId, event.timestamp)"
-                        :is-max-checks="event.qualityAssuranceCheckers.length > event.modes.length * 2 - 1"
+                        :is-max-checks="isMaxChecks(event)"
                     />
                 </transition-group>
 
@@ -62,6 +62,9 @@ export default {
         };
     },
     computed: {
+        ...mapState([
+            'loggedInUser',
+        ]),
         ...mapGetters([
             'userMainMode',
         ]),
@@ -125,6 +128,17 @@ export default {
 
                 return isOutdated;
             }
+        },
+        isMaxChecks (event) {
+            for (const mode of event.modes) {
+                const checkers = event.qualityAssuranceCheckers.filter(checker => checker.fullModes.includes(mode)).length;
+
+                if (checkers < 2 && this.loggedInUser.fullModes.includes(mode)) {
+                    return false;
+                }
+            }
+
+            return true;
         },
         async loadMore (e) {
             const res = await this.executeGet('/qualityAssurance/loadMore/' + this.limit + '/' + (this.limit - 200), e);

@@ -9,7 +9,7 @@ const router = express.Router();
 router.use(middlewares.isLoggedIn);
 
 const defaultPopulate = [
-    { path: 'qualityAssuranceCheckers', select: 'username osuId' },
+    { path: 'qualityAssuranceCheckers', select: 'username osuId modesInfo' },
     {
         path: 'qualityAssuranceComments',
         populate: {
@@ -97,20 +97,33 @@ router.post('/assignUser/:id', middlewares.isBnOrNat, async (req, res) => {
             .sort({ timestamp: -1 }),
     ]);
 
-    if (outDated || event.qualityAssuranceCheckers.length > (event.modes.length * 2 - 1)) {
+    if (outDated) {
         return res.json({ error: 'Outdated' });
     }
 
-    if (event.userId == req.session.osuId || bubble.userId == req.session.osuId) {
+    const newChecker = res.locals.userRequest;
+    let isFull = true;
+
+    // TODO kinda breaks if checkers change their game modes within the week or so, real fix is to change the way QA is saved
+    for (const mode of event.modes) {
+        const checkers = event.qualityAssuranceCheckers.filter(checker => checker.fullModes.includes(mode)).length;
+
+        if (checkers < 2 && newChecker.isFullBnFor(mode)) {
+            isFull = false;
+            break;
+        }
+    }
+
+    if (isFull) {
+        return res.json({ error: 'You cannot check filled maps or not related to your game mode' });
+    }
+
+    if (event.userId == newChecker.osuId || bubble.userId == newChecker.osuId) {
         return res.json({ error: 'You cannot check your nominations!' });
     }
 
-    if (!event.modes.some(m => res.locals.userRequest.isFullBnFor(m))) {
-        return res.json({ error: 'You are not qualified for this game mode!' });
-    }
-
     const newEvent = await Aiess
-        .findByIdAndUpdate(req.params.id, { $push: { qualityAssuranceCheckers: req.session.mongoId } })
+        .findByIdAndUpdate(req.params.id, { $push: { qualityAssuranceCheckers: newChecker._id } })
         .populate(defaultPopulate);
 
     res.json(newEvent);
