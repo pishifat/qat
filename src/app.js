@@ -16,7 +16,7 @@ const store = new Vuex.Store(main);
 const router = new VueRouter({
     mode: 'history',
     routes,
-    linkExactActiveClass: 'active',
+    linkActiveClass: 'active',
 });
 
 router.beforeEach(async (to, from, next) => {

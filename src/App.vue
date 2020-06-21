@@ -20,7 +20,7 @@
                 <div id="navbar" class="collapse navbar-collapse justify-content-center">
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <router-link class="nav-link" to="/">
+                            <router-link class="nav-link" to="/home">
                                 Home
                             </router-link>
                         </li>
