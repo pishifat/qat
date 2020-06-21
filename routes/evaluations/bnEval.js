@@ -752,6 +752,7 @@ router.get('/activity', async (req, res) => {
                 createdAt: { $gte: minDate },
                 mode: { $in: modes },
                 active: false,
+                bnEvaluators: { $ne: mongoId },
             })
             .populate(applicationPopulate)
             .sort({ createdAt: 1 }),
@@ -768,12 +769,12 @@ router.get('/activity', async (req, res) => {
 
     // extract apps that user evaluated or was assigned to
     appEvaluations = appEvaluations.filter(a =>
-        a.reviews.some(r => (r.evaluator.id == mongoId || a.natEvaluators.includes(mongoId)) && !a.bnEvaluators.includes(mongoId))
+        a.reviews.some(r => r.evaluator.id == mongoId || a.natEvaluators.includes(mongoId))
     );
 
     // extract evalRounds that user evaluated or was assigned to
     bnEvaluations = bnEvaluations.filter(e =>
-        e.reviews.some(r => (r.evaluator.id == mongoId || e.natEvaluators.includes(mongoId)) && !e.bnEvaluators.includes(mongoId))
+        e.reviews.some(r => r.evaluator.id == mongoId || e.natEvaluators.includes(mongoId))
     );
 
     res.json({
