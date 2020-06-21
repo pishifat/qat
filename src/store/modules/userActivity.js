@@ -10,7 +10,7 @@ export default {
         disqualifications: [],
         qualityAssuranceChecks: [],
         disqualifiedQualityAssuranceChecks: [],
-        assignedApplications: [],
+        assignedBnApplications: [],
         natApplications: [],
         natEvalRounds: [],
         isLoading: true,
@@ -40,8 +40,8 @@ export default {
         setDisqualifiedQualityAssuranceChecks (state, events) {
             state.disqualifiedQualityAssuranceChecks = events;
         },
-        setAssignedApplications (state, applications) {
-            state.assignedApplications = applications;
+        setBnApplications (state, applications) {
+            state.assignedBnApplications = applications;
         },
         setNatApplications (state, applications) {
             state.natApplications = applications;

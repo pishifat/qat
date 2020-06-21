@@ -725,16 +725,17 @@ router.get('/activity/:osuId/:modes/:deadline/:mongoId', async (req, res) => {
     minDate.setDate(minDate.getDate() - 90);
     let maxDate = new Date(deadline);
 
-    const assignedApplications = await AppEvaluation
+    // find all assigned applications for BN
+    const assignedBnApplications = await AppEvaluation
         .find({
             bnEvaluators: mongoId,
-            mode: req.params.mode,
+            mode: req.params.modes,
             createdAt: { $gte: minDate },
         })
         .populate(applicationPopulate)
         .sort({ createdAt: 1 });
 
-    // find all applications & evalRounds
+    // find all applications & evalRounds for NAT
     let [appEvaluations, bnEvaluations] = await Promise.all([
         AppEvaluation
             .find({
@@ -757,17 +758,17 @@ router.get('/activity/:osuId/:modes/:deadline/:mongoId', async (req, res) => {
 
     // extract apps that user evaluated or was assigned to
     appEvaluations = appEvaluations.filter(a =>
-        a.reviews.some(r => r.evaluator.id == mongoId || a.natEvaluators.includes(mongoId))
+        a.reviews.some(r => (r.evaluator.id == mongoId || a.natEvaluators.includes(mongoId)) && !a.bnEvaluators.includes(mongoId))
     );
 
     // extract evalRounds that user evaluated or was assigned to
     bnEvaluations = bnEvaluations.filter(e =>
-        e.reviews.some(r => r.evaluator.id == mongoId || e.natEvaluators.includes(mongoId))
+        e.reviews.some(r => (r.evaluator.id == mongoId || e.natEvaluators.includes(mongoId)) && !e.bnEvaluators.includes(mongoId))
     );
 
     res.json({
         ...await getGeneralEvents(req.params.osuId, mongoId, modes, minDate, maxDate),
-        assignedApplications,
+        assignedBnApplications,
         appEvaluations,
         bnEvaluations,
     });

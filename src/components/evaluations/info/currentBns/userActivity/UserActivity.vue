@@ -38,9 +38,9 @@
 
         <template v-if="loggedInUser.isNat">
             <evaluation-list
-                v-if="assignedApplications && assignedApplications.length"
-                :events="assignedApplications"
-                :events-id="'assignedApplications'"
+                v-if="assignedBnApplications && assignedBnApplications.length"
+                :events="assignedBnApplications"
+                :events-id="'assignedBnApplications'"
                 :header="'Application Evaluations (BN)'"
                 :is-application="true"
                 :mongo-id="mongoId"
@@ -110,7 +110,7 @@ export default {
             'pops',
             'qualityAssuranceChecks',
             'disqualifiedQualityAssuranceChecks',
-            'assignedApplications',
+            'assignedBnApplications',
             'natApplications',
             'natEvalRounds',
         ]),
@@ -139,7 +139,7 @@ export default {
                     this.$store.commit('activity/setQualityAssuranceChecks', res.qualityAssuranceChecks);
                     this.$store.commit('activity/setDisqualifiedQualityAssuranceChecks', res.disqualifiedQualityAssuranceChecks);
 
-                    this.$store.commit('activity/setAssignedApplications', res.assignedApplications);
+                    this.$store.commit('activity/setBnApplications', res.assignedBnApplications);
                     this.$store.commit('activity/setNatApplications', res.appEvaluations);
                     this.$store.commit('activity/setNatEvalRounds', res.bnEvaluations);
                     this.$store.commit('activity/setIsLoading', false);
