@@ -690,6 +690,16 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
         qualityAssuranceChecks.some(qa => qa.beatmapsetId == dq.beatmapsetId && qa.timestamp < dq.timestamp)
     );
 
+    for (let i = 0; i < disqualifiedQualityAssuranceChecks.length; i++) {
+        const event = disqualifiedQualityAssuranceChecks[i];
+
+        const related = qualityAssuranceChecks.find(qa => qa.beatmapsetId == event.beatmapsetId && qa.timestamp < event.timestamp);
+
+        if (related && related.qualityAssuranceComments.length) {
+            disqualifiedQualityAssuranceChecks[i].qualityAssuranceComments = related.qualityAssuranceComments.filter(c => c.mediator.id == mongoId);
+        }
+    }
+
     return {
         uniqueNominations,
         nominationsDisqualified,

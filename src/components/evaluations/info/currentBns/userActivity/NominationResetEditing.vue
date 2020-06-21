@@ -99,7 +99,11 @@ export default {
             else return 'text-danger';
         },
         userQualityAssuranceComment () {
-            return this.event.qualityAssuranceComments.find(c => c.mediator.id == this.loggedInUser.id);
+            if (this.event.qualityAssuranceComments && this.event.qualityAssuranceComments.length) {
+                return this.event.qualityAssuranceComments[0].comment;
+            } else {
+                return null;
+            }
         },
     },
     watch: {
