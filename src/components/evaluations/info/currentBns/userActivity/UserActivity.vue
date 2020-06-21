@@ -128,7 +128,7 @@ export default {
             this.$store.commit('activity/setIsLoading', true);
 
             if (this.loggedInUser.isNat) {
-                const res = await this.executeGet('/bnEval/activity/' + this.osuId + '/' + this.modes + '/' + new Date(this.deadline).getTime() + '/' + this.mongoId);
+                const res = await this.executeGet(`/bnEval/activity?osuId=${this.osuId}&modes=${this.modes}&deadline=${parseInt(new Date(this.deadline).getTime())}&mongoId=${this.mongoId}`);
 
                 if (res) {
                     this.$store.commit('activity/setNominations', res.uniqueNominations);
@@ -145,7 +145,7 @@ export default {
                     this.$store.commit('activity/setIsLoading', false);
                 }
             } else {
-                const res = await this.executeGet('/users/activity/' + this.osuId + '/' + this.modes + '/' + new Date(this.deadline).getTime() + '/' + this.mongoId);
+                const res = await this.executeGet(`/bnEval/activity?osuId=${this.osuId}&modes=${this.modes}&deadline=${parseInt(new Date(this.deadline).getTime())}&mongoId=${this.mongoId}`);
 
                 if (res) {
                     this.$store.commit('activity/setNominations', res.uniqueNominations);

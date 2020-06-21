@@ -195,15 +195,15 @@ router.post('/:id/switchBnEvaluator', middlewares.isBnOrNat, async (req, res) =>
 });
 
 /* GET aiess info */
-router.get('/activity/:osuId/:modes/:deadline/:mongoId', async (req, res) => {
-    const mongoId = req.params.mongoId;
-    const modes = req.params.modes.split(',');
-    let deadline = parseInt(req.params.deadline);
+router.get('/activity', async (req, res) => {
+    const { osuId, mongoId } = req.query;
+    const modes = req.query.modes.split(',');
+    const deadline = parseInt(req.query.deadline);
     let minDate = new Date(deadline);
     minDate.setDate(minDate.getDate() - 90);
     let maxDate = new Date(deadline);
 
-    res.json(await getGeneralEvents(req.params.osuId, mongoId, modes, minDate, maxDate));
+    res.json(await getGeneralEvents(osuId, mongoId, modes, minDate, maxDate));
 });
 
 module.exports = router;

@@ -717,10 +717,10 @@ const applicationPopulate = [
 ];
 
 /* GET aiess info */
-router.get('/activity/:osuId/:modes/:deadline/:mongoId', async (req, res) => {
-    const mongoId = req.params.mongoId;
-    const modes = req.params.modes.split(',');
-    let deadline = parseInt(req.params.deadline);
+router.get('/activity', async (req, res) => {
+    const { osuId, mongoId } = req.query;
+    const modes = req.query.modes.split(',');
+    const deadline = parseInt(req.query.deadline);
     let minDate = new Date(deadline);
     minDate.setDate(minDate.getDate() - 90);
     let maxDate = new Date(deadline);
@@ -729,7 +729,7 @@ router.get('/activity/:osuId/:modes/:deadline/:mongoId', async (req, res) => {
     const assignedBnApplications = await AppEvaluation
         .find({
             bnEvaluators: mongoId,
-            mode: req.params.modes,
+            mode: modes,
             createdAt: { $gte: minDate },
         })
         .populate(applicationPopulate)
@@ -767,7 +767,7 @@ router.get('/activity/:osuId/:modes/:deadline/:mongoId', async (req, res) => {
     );
 
     res.json({
-        ...await getGeneralEvents(req.params.osuId, mongoId, modes, minDate, maxDate),
+        ...await getGeneralEvents(osuId, mongoId, modes, minDate, maxDate),
         assignedBnApplications,
         appEvaluations,
         bnEvaluations,
