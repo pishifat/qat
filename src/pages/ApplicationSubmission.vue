@@ -68,7 +68,7 @@
             <div class="row">
                 <div class="col-sm-12 text-center">
                     <template v-if="hasPendingTest">
-                        <a href="/testsubmission" class="btn btn-primary btn-block">
+                        <a href="/testsubmission" class="btn btn-success btn-block">
                             Begin Ranking Criteria Test
                         </a>
 
