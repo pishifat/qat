@@ -62,7 +62,7 @@
                                 Quality Assurance
                             </router-link>
                         </li>
-                        <template v-if="loggedInUser.isBn">
+                        <template v-if="loggedInUser.isBn && !loggedInUser.isNat">
                             <li class="nav-item">
                                 <router-link class="nav-link" to="/discussionvote">
                                     Discussion Vote
