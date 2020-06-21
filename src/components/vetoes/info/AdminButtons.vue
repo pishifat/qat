@@ -110,6 +110,11 @@ export default {
             'majorityUphold',
         ]),
     },
+    watch: {
+        selectedVeto() {
+            this.mediators = null;
+        },
+    },
     methods: {
         commitVeto (veto, message) {
             if (veto && !veto.error) {

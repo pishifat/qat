@@ -69,11 +69,11 @@ export default {
         selectedVeto: (state) => {
             return state.vetoes.find(v => v.id === state.selectedVetoId);
         },
-        isMediator: (state, getters, rootState, rootGetters) => {
+        isMediator: (state, getters, rootState) => {
             if (!getters.selectedVeto) return false;
 
             return getters.selectedVeto.mediations.some(m =>
-                m.mediator && m.mediator.id == rootGetters.userId
+                m.mediator && m.mediator.id == rootState.loggedInUser.id
             );
         },
         majorityUphold: (state, getters) => {

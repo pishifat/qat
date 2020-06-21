@@ -19,7 +19,7 @@
 
             <!-- show admin buttons to NAT who aren't active mediators -->
             <admin-buttons
-                v-if="loggedInUser.isNat && !isMediator"
+                v-if="loggedInUser.isNat && (selectedVeto.status != 'wip' || !isMediator)"
             />
 
             <!-- show mediation input for active mediators -->
