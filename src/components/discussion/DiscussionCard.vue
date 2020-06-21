@@ -2,7 +2,7 @@
     <div class="col-md-6 col-lg-4 my-2" @click="selectDiscussion()">
         <div
             class="card card-individual"
-            :class="['border-' + findRelevantMediation(), discussion.isNatOnly ? 'bg-primary' : '']"
+            :class="['border-' + findRelevantMediation(), discussion.isNatOnly ? 'bg-info' : '']"
             data-toggle="modal"
             data-target="#extendedInfo"
             :data-discussion="discussion.id"
