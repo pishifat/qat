@@ -43,7 +43,11 @@ class AppEvaluationService {
                     },
                 },
             ])
-            .sort({ deadline: 1 });
+            .sort({
+                createdAt: 1,
+                consensus: 1,
+                feedback: 1,
+            });
     }
 
 }
