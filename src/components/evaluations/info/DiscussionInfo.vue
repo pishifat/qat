@@ -2,12 +2,12 @@
     <div>
         <template v-if="loggedInUser.isNat">
             <p>
-                <a href="#additionalDiscussionInfo" data-toggle="collapse">
-                    Additional Discussion info <i class="fas fa-angle-down" />
+                <a href="#consensusSettings" data-toggle="collapse">
+                    Consensus settings <i class="fas fa-angle-down" />
                 </a>
             </p>
 
-            <div id="additionalDiscussionInfo" class="collapse container">
+            <div id="consensusSettings" class="collapse container">
                 <consensus />
                 <cooldown
                     v-if="selectedEvaluation && selectedEvaluation.consensus == 'fail'"

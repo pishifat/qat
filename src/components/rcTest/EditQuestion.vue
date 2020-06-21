@@ -30,7 +30,6 @@
                     {{ selectedQuestion.active ? "Mark as inactive" : "Mark as active" }}
                 </button>
             </div>
-            {{ test }} a
             <hr>
 
             <edit-options />
@@ -59,7 +58,6 @@ export default {
         return {
             questionContent: '',
             questionType: '',
-            test: 'z112x31zcaqwesd',
         };
     },
     computed: mapGetters('manageTest', [

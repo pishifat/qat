@@ -15,15 +15,11 @@
                         {{ category.content || category.value }}
                     </option>
                 </select>
-
-                <button id="artistButton" class="btn btn-primary btn-block" @click="loadContent($event)">
-                    Load category content
-                </button>
             </section>
 
             <section v-if="selectedCategory" class="card card-body">
                 <h2>
-                    <span class="text-capitalize">
+                    <span :class="!isMode ? 'text-capitalize' : ''">
                         {{ getCategoryContent() }} - Questions
                     </span>
 
@@ -38,14 +34,11 @@
 
                 <data-table
                     v-if="questions.length"
-                    :headers="['Question', 'Updated', '']"
+                    :headers="['Question', '']"
                 >
                     <tr v-for="question in questions" :key="question.id" :class="question.active ? 'border-active' : 'border-inactive'">
                         <td>
                             {{ question.content }}
-                        </td>
-                        <td class="text-nowrap">
-                            {{ question.updatedAt | toStandardDate }}
                         </td>
                         <td class="text-right">
                             <a
@@ -115,6 +108,11 @@ export default {
         ...mapState('manageTest', [
             'questions',
         ]),
+        isMode () {
+            const modes = ['osu', 'taiko', 'catch', 'mania'];
+
+            return modes.includes(this.selectedCategory);
+        },
     },
     beforeCreate () {
         if (!this.$store.hasModule('manageTest')) {

@@ -36,21 +36,21 @@
 
         <p v-if="selectedEvaluation.active && !isApplication">
             <button
-                class="btn btn-sm btn-danger mt-2"
+                class="btn btn-sm btn-primary mt-2"
                 :disabled="selectedEvaluation.consensus == 'fail' && selectedEvaluation.resignedOnGoodTerms"
                 @click="setConsensus('fail', $event, 'resignedOnGoodTerms');"
             >
                 Resign on good terms
             </button>
             <button
-                class="btn btn-sm btn-danger mt-2"
+                class="btn btn-sm btn-primary mt-2"
                 :disabled="selectedEvaluation.consensus == 'fail' && selectedEvaluation.resignedOnStandardTerms"
                 @click="setConsensus('fail', $event, 'resignedOnStandardTerms');"
             >
                 Resign on standard terms
             </button>
             <button
-                class="btn btn-sm btn-danger mt-2"
+                class="btn btn-sm btn-primary mt-2"
                 :disabled="selectedEvaluation.consensus == 'pass' && selectedEvaluation.isLowActivity"
                 @click="setConsensus('pass', $event, 'isLowActivity');"
             >
@@ -58,7 +58,7 @@
             </button>
             <button
                 v-if="selectedEvaluation.user.isBn"
-                class="btn btn-sm btn-danger mt-2"
+                class="btn btn-sm btn-primary mt-2"
                 :disabled="selectedEvaluation.isMoveToNat"
                 @click="setConsensus('pass', $event, 'isMoveToNat');"
             >
@@ -66,7 +66,7 @@
             </button>
             <button
                 v-else
-                class="btn btn-sm btn-danger mt-2"
+                class="btn btn-sm btn-primary mt-2"
                 :disabled="selectedEvaluation.isMoveToBn"
                 @click="setConsensus('pass', $event, 'isMoveToBn');"
             >
