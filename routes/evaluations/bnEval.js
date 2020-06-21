@@ -656,6 +656,13 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
             beatmapsetId: { $in: qaBeatmapsetIds },
             timestamp: { $gte: minDate, $lte: maxDate },
             eventType: 'Disqualified',
+        }).populate({
+            path: 'qualityAssuranceComments',
+            match: { mediator: mongoId },
+            populate: {
+                path: 'mediator',
+                select: 'username osuId',
+            },
         }),
         Aiess.find({
             userId: { $ne: userOsuId },
