@@ -72,9 +72,9 @@ async function submitEval (evaluation, session, behaviorComment, moddingComment,
                 let neutralText = 'Neutral';
 
                 if (evaluation.kind === 'application') {
-                    neutralText = 'Probation';
                     description = `[**${evaluation.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${evaluation.id}) moved to group discussion`;
                 } else {
+                    neutralText = 'Probation';
                     description = `[**${evaluation.user.username}**'s current BN eval](http://bn.mappersguild.com/bneval?id=${evaluation.id}) moved to group discussion`;
                 }
 
@@ -121,9 +121,9 @@ async function setGroupEval (evaluations, session) {
         let neutralText = 'Neutral';
 
         if (evaluation.kind === 'application') {
-            neutralText = 'Probation';
             description =  `Moved [**${evaluation.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${evaluation.id}) to group discussion`;
         } else {
+            neutralText = 'Probation';
             description = `Moved [**${evaluation.user.username}**'s current BN eval](http://bn.mappersguild.com/bneval?id=${evaluation.id}) to group discussion`;
         }
 
