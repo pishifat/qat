@@ -155,7 +155,6 @@ async function setFeedback (evaluation, feedback, session) {
             session.mongoId,
             `Created feedback for ${evaluation.user.username}'s ${evaluation.mode} evaluation`
         );
-        evaluation.feedbackAuthor = session.mongoId;
     }
 
     evaluation.feedback = feedback;

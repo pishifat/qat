@@ -51,7 +51,6 @@
                 <ul>
                     <li>{{ user.totalBnAppEvals }} application evaluations</li>
                     <li>{{ user.totalCurrentBnEvals }} current BN evaluations</li>
-                    <li>{{ user.totalWrittenFeedbacks }} total written feedback</li>
                 </ul>
             </div>
 

@@ -86,22 +86,13 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
         if (invalids.indexOf(user.osuId) == -1) {
             let evalsOnBnApps = 0;
             let evalsOnCurrentBnEvals = 0;
-            let feedbackCount = 0;
 
             bnApps.forEach(app => {
                 evalsOnBnApps += app.reviews.filter(r => r.evaluator == user.id).length;
-
-                if (app.feedbackAuthor == user.id) {
-                    feedbackCount++;
-                }
             });
 
             bnRounds.forEach(round => {
                 evalsOnCurrentBnEvals += round.reviews.filter(r => r.evaluator == user.id).length;
-
-                if (round.feedbackAuthor == user.id) {
-                    feedbackCount++;
-                }
             });
 
             const joinHistory = user.history.filter(h => h.kind === 'joined' &&  h.group === 'nat');
@@ -112,7 +103,6 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
                 osuId: user.osuId,
                 totalBnAppEvals: evalsOnBnApps,
                 totalCurrentBnEvals: evalsOnCurrentBnEvals,
-                totalWrittenFeedbacks: feedbackCount,
                 joinDate: lastJoin && lastJoin.date,
             });
         }

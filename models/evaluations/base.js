@@ -5,7 +5,6 @@ const baseSchema = {
     active: { type: Boolean, default: true },
     discussion: { type: Boolean, default: false },
     feedback: { type: String },
-    feedbackAuthor: { type: 'ObjectId', ref: 'User' },
     cooldownDate: { type: Date },
     natEvaluators: [{ type: 'ObjectId', ref: 'User' }],
 };
