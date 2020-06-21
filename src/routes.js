@@ -19,8 +19,7 @@ const Logs = () => import(/* webpackChunkName: "nat", webpackPrefetch: true */ '
 
 const routes = [
     // Public
-    { path: '/', component: Home },
-    { path: '/home', component: Home },
+    { path: '/', component: Home, alias: '/home' },
     { path: '/bnapps', component: ApplicationSubmission, meta: { title: 'Beatmap Nominator Application' } },
     { path: '/testsubmission', component: TestSubmission, meta: { title: 'Test Submission' } },
     { path: '/reports', component: ReportSubmission, meta: { title: 'Reports Submission' } },
