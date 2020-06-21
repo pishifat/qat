@@ -127,8 +127,6 @@ export default {
         optionEditingId (id) {
             if (!id) return;
 
-            console.log(id);
-
             const option = this.selectedQuestion.options.find(o => o.id == id);
             this.content = option.content;
             this.score = option.score;
