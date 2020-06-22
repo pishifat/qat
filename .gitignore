@@ -28,3 +28,4 @@ config.json
 dist/
 public/javascripts/
 public/css/
+migration.js
