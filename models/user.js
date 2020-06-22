@@ -1,17 +1,26 @@
 const mongoose = require('mongoose');
-const helper = require('../helpers/helpers');
+const util = require('../helpers/util');
+const moment = require('moment');
 
 const userSchema = new mongoose.Schema({
     osuId: { type: Number, required: true },
     username: { type: String, required: true },
-    group: { type: String, enum: ['bn', 'nat', 'user'], default: 'user' },
-    modes: [{ type: String, enum: ['osu', 'taiko', 'catch', 'mania'] }],
-    probation: [{ type: String, enum: ['osu', 'taiko', 'catch', 'mania'] }],
-    vetoMediator: { type: Boolean, default: true },
+    groups: [{ type: String, enum: ['user', 'bn', 'nat', 'gmt'], default: ['user'] }],
+    modesInfo: [{
+        _id: false,
+        mode: { type: String, enum: ['osu', 'taiko', 'catch', 'mania'], required: true },
+        level: { type: String, enum: ['full', 'probation'], required: true },
+    }],
+    history: [{
+        _id: false,
+        date: { type: Date, required: true },
+        mode: { type: String, enum: ['osu', 'taiko', 'catch', 'mania'], required: true },
+        kind: { type: String, enum: ['joined','left'], required: true },
+        group: { type: String, enum: ['bn', 'nat'], default: 'bn' },
+        relatedEvaluation: { type: 'ObjectId', ref: 'EvalRound' },
+    }],
+    isVetoMediator: { type: Boolean, default: true },
     isBnEvaluator: { type: Boolean, default: true },
-    isSpectator: { type: Boolean, default: false },
-    bnDuration: [{ type: Date }],
-    natDuration: [{ type: Date }],
     bnProfileBadge: { type: Number, default: 0 },
     natProfileBadge: { type: Number, default: 0 },
     discordId: { type: Number },
@@ -19,152 +28,173 @@ const userSchema = new mongoose.Schema({
 
 class UserService {
 
-    get isBnOrNat() {
-        return this.group == 'bn' || this.group == 'nat' || this.isSpectator;
+    // Groups
+    get isNat () {
+        return this.groups && this.groups.includes('nat');
     }
 
-    get isNat() {
-        return this.group == 'nat' || this.isSpectator;
+    get isBn () {
+        return this.groups && this.groups.includes('bn');
     }
 
-    get isBn() {
-        return this.group == 'bn';
+    get isBnOrNat () {
+        return this.groups && (this.groups.includes('bn') || this.groups.includes('nat'));
+    }
+
+    get hasBasicAccess () {
+        return this.groups && (this.groups.includes('bn') || this.groups.includes('nat') || this.groups.includes('gmt'));
+    }
+
+    get hasFullReadAccess () {
+        return this.groups && (this.groups.includes('nat') || this.groups.includes('gmt'));
+    }
+
+    // Modes
+    get modes () {
+        return this.modesInfo && this.modesInfo.map(m => m.mode);
+    }
+
+    get fullModes () {
+        return this.modesInfo && this.modesInfo.filter(m => m.level === 'full').map(m => m.mode);
+    }
+
+    get probationModes () {
+        return this.modesInfo && this.modesInfo.filter(m => m.level === 'probation').map(m => m.mode);
+    }
+
+    // History
+    get bnDuration () {
+        return this.getDuration('bn');
+    }
+
+    get natDuration () {
+        return this.getDuration('nat');
+    }
+
+    /**
+     * @param {string} group
+     * @returns {number} Duration in days
+     */
+    getDuration (group) {
+        if (!this.history) return null;
+
+        const bnHistory = this.history.filter(h => h.group === group);
+        const joinedHistory = bnHistory.filter(h => h.kind === 'joined');
+        const leftHistory = bnHistory.filter(h => h.kind === 'left');
+        let bnDuration = 0;
+        let unendingDate;
+
+        for (const history of joinedHistory) {
+            const i = leftHistory.findIndex(d => d.date > history.date && d.mode === history.mode);
+            const leftDate = leftHistory[i];
+            leftHistory.splice(i, 1);
+
+            if (leftDate) {
+                bnDuration += moment(leftDate.date).diff(history.date, 'days');
+            } else {
+                unendingDate = history.date;
+            }
+        }
+
+        if (unendingDate) {
+            bnDuration += moment().diff(unendingDate, 'days');
+        }
+
+        return bnDuration;
+    }
+
+    isBnFor (mode) {
+        return this.modesInfo.some(m => m.mode === mode);
+    }
+
+    isFullBnFor (mode) {
+        return this.modesInfo.some(m => m.mode === mode && m.level === 'full');
     }
 
     /**
      * Find an user by a given username
      * @param {string} username
      */
-    static findByUsername(username) {
-        return this.findOne({ username: new RegExp('^' + helper.escapeUsername(username) + '$', 'i') });
+    static findByUsername (username) {
+        return this.findOne({ username: new RegExp('^' + util.escapeUsername(username) + '$', 'i') });
     }
 
     /**
      * @param {boolean} includeFullBns
      * @param {boolean} includeProbation
      * @param {boolean} includeNat
+     * @returns {array} [{ _id: 'osu', users: [{ id, username, osuId, group, level }] }]
      */
-    static async getAllByMode(includeFullBns, includeProbation, includeNat) {
-        if (!includeFullBns && !includeProbation && !includeNat) return null;
+    static async getAllByMode (includeFullBns, includeProbation, includeNat) {
+        if (!includeFullBns && !includeProbation && !includeNat) return [];
 
         try {
-            let allUsers;
-            let allBns;
-            let allNats;
+            let query = this.aggregate([
+                {
+                    $unwind: '$modesInfo',
+                },
+                {
+                    $unwind: '$modesInfo.mode',
+                },
+                {
+                    $unwind: '$groups',
+                },
+            ]);
 
             if (includeFullBns && includeProbation && includeNat) {
-                allUsers = await this.aggregate([
-                    {
-                        $unwind: '$modes',
-                    },
-                    {
-                        $match: {
-                            $or: [{ group: 'bn' },
-                                { $and:
-                                    [{ group: 'nat',
-                                        isSpectator: { $ne: true },
-                                    }],
-                                }],
-                        },
-                    },
-                    {
-                        $group: {
-                            _id: '$modes', users: { $push: { id: '$_id', username: '$username', osuId: '$osuId', probation: '$probation', group: '$group' } },
-                        },
-                    },
-                ]);
-            } else if (includeFullBns || includeProbation) {
-                allBns = await this.aggregate([
-                    {
-                        $unwind: '$modes',
-                    },
-                    {
-                        $match: {
-                            group: 'bn',
-                        },
-                    },
-                    {
-                        $group: {
-                            _id: '$modes', users: { $push: { id: '$_id', username: '$username', osuId: '$osuId', probation: '$probation', group: '$group' } },
-                        },
-                    },
-                ]);
+                query.match({
+                    groups: { $in: ['bn', 'nat'] },
+                });
+            } else if ((includeFullBns || includeProbation) && !includeNat) {
+                query.match({
+                    groups: 'bn',
+                });
+            } else if (!includeFullBns && !includeProbation && includeNat) {
+                query.match({
+                    groups: 'nat',
+                });
             }
 
-            if (includeNat && (!includeFullBns || !includeProbation)) {
-                allNats = await this.aggregate([
-                    {
-                        $unwind: '$modes',
-                    },
-                    {
-                        $match: {
-                            group: 'nat',
-                            isSpectator: { $ne: true },
-                        },
-                    },
-                    {
-                        $group: {
-                            _id: '$modes', users: { $push: { id: '$_id', username: '$username', osuId: '$osuId', group: '$group' } },
-                        },
-                    },
-                ]);
+            if (includeFullBns && !includeProbation) {
+                query.match({
+                    'modesInfo.level': 'full',
+                });
+            } else if (!includeFullBns && includeProbation) {
+                query.match({
+                    'modesInfo.level': 'probation',
+                });
             }
 
-            if (includeFullBns && includeProbation && includeNat) {
-                for (let i = 0; i < allUsers.length; i++) {
-                    allUsers[i].users.sort(function(a, b) {
-                        if (a.username.toLowerCase() < b.username.toLowerCase()) return -1;
-                        if (a.username.toLowerCase() > b.username.toLowerCase()) return 1;
-
-                        return 0;
-                    });
-                    allUsers[i].users.sort(function(a, b) {
-                        if (a.group < b.group) return 1;
-                        if (a.group > b.group) return -1;
-
-                        return 0;
-                    });
-                }
-
-                return allUsers;
-            } else if (!includeFullBns && !includeProbation) {
-                return allNats;
-            } else if (!includeNat && includeProbation && includeFullBns) {
-                return allBns;
-            } else if (includeProbation && !includeFullBns) {
-                for (let i = 0; i < allBns.length; i++) {
-                    allBns[i].users = allBns[i].users.filter(u => u.probation && u.probation.length);
-                }
-
-                allUsers = allBns;
-
-                if (includeNat) {
-                    allUsers = allUsers.concat(allNats);
-                }
-
-                return allUsers;
-            } else if (!includeProbation && includeFullBns) {
-                for (let i = 0; i < allBns.length; i++) {
-                    allBns[i].users = allBns[i].users.filter(u => !u.probation || (u.probation && !u.probation.length));
-                }
-
-                allUsers = allBns;
-
-                if (includeNat) {
-                    allUsers = allUsers.concat(allNats);
-                }
-
-                return allUsers;
-            }
+            return await query.collation({ locale: 'en' }).sort({
+                'groups': -1,
+                'username': 1,
+            }).group({
+                _id: '$modesInfo.mode',
+                users: {
+                    $push: {
+                        id: '$_id',
+                        username: '$username',
+                        osuId: '$osuId',
+                        group: '$groups',
+                        level: '$modesInfo.level',
+                    },
+                },
+            });
         } catch (error) {
             return { error: error._message };
         }
     }
 
-    static async getAllMediators() {
+    static async getAllMediators () {
         try {
             return await this.aggregate([
-                { $match: { group: { $ne: 'user' }, vetoMediator: true, isSpectator: { $ne: true }, probation: { $size: 0 } } },
+                {
+                    $match: {
+                        groups: { $in: ['bn', 'nat'] },
+                        isVetoMediator: true,
+                        'modesInfo.level': 'full',
+                    },
+                },
                 { $sample: { size: 1000 } },
             ]);
         } catch (error) {

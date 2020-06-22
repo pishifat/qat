@@ -1,135 +1,72 @@
-{{#unless loggedInAs}}
-<div class="card card-body my-1 mx-auto">
-    <div class="row">
-        <div class="col-lg-5 text-center mb-3 mb-lg-0">
-            <div class="my-3">
-                <img src="/images/qatlogo.png" alt="NAT" class="mr-1" style="border-radius: 100%; box-shadow: 0px 1px 5px #41bba12e; width: 130px;">
-            </div>
-            <form class="" action="/login" method="GET">
-                <button class="btn btn-lg btn-primary" type="submit">Authorize your osu! account</button>
-            </form>
-        </div>
+<!DOCTYPE html>
+<html>
 
-        <div class="col-lg-7 d-flex flex-column justify-content-center">
-            <p>"Authorizing" will identify you through your osu! account.</p>
-            <p>You can do any of these after authorization:</p>
-            <ul>
-                <li>Apply to join the Beatmap Nominators</li>
-                <li>Report members of the BN/NAT</li>
-                <li>View detailed BN/NAT listings, beatmap vetoes, and beatmap quality assurance info</li>
-            </ul>
-        </div>
-    </div>
-</div>
-{{/unless}}
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-<section class="card card-body">
-    <div class="d-flex align-items-center mb-1">
-        <h4 class="mb-0">Mod score calculator</h4>
-        <small id="totalScore" class="ml-3"></small>
-        <small id="calcWait" class="ml-3"></small>
-    </div>
+    <title>NAT/BN Management</title>
+    <meta name="keywords" content="beatmap nominators, nomination assesment team, nat, bn, osu">
 
-    <div class="form-inline mb-3 justify-content-between">
-        <div class="form-group">
-            <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!"/>
-                <input type="radio" class="osu-radio hide-default" name="mode" value="osu" checked/>
-                <i class="fas fa-circle fa-lg"></i>
-            </label>
-            <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!taiko">
-                <input type="radio" class="taiko-radio hide-default" name="mode" value="taiko"/>
-                <i class="fas fa-drum fa-lg"></i>
-            </label>
-            <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!catch">
-                <input type="radio" class="catch-radio hide-default" name="mode" value="catch"/>
-                <i class="fas fa-apple-alt fa-lg"></i>
-            </label>
-            <label class="mx-1" data-toggle="tooltip" data-placement="top" title="osu!mania">
-                <input type="radio" class="mania-radio hide-default" name="mode" value="mania"/>
-                <i class="fas fa-stream fa-lg"></i>
-            </label>
-        </div>
+    <link rel="icon" type="image/png" href="/images/qatlogo.png">
+    <link
+        rel="stylesheet" 
+        href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" 
+        integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf"
+        crossorigin="anonymous"
+    >
 
-        <div class="input-group">
-            <input class="form-control" type="text" id="userId" placeholder="username / id">
-            <div class="input-group-append">
-                <button
-                    class="btn btn-sm btn-primary"
-                    id="calculateScore"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="Automatically detect your mod score based on your modding history"
-                >
-                    Auto-calculate
-                </button>
-            </div>
-        </div>
-    </div>
+    <link href="/css/app.css" rel="stylesheet">
+</head>
 
-    <div class="form-group">
-        <div class="input-group mb-3">
-            <input class="modCount form-control" id="modCount1" type="number" placeholder="# mods in month 1...">
-        </div>
-        <div class="input-group mb-3">
-            <input class="modCount form-control" id="modCount2" type="number" placeholder="# mods in month 2...">
-        </div>
-        <div class="input-group">
-            <input class="modCount form-control" id="modCount3" type="number" placeholder="# mods in month 3...">
-        </div>
-    </div>
-
-    <ul class="small">
-        <li>You can either write your username and auto-calculate your score, or manually write your mods count in the boxes above</li>
-        <li>A "mod" is counted for each beatmapset through which you have received at least one Kudosu ("thumbs up" on discussion page)</li>
-        <li>Scores 0 or higher are passing</li>
-        <li>Selecting a different game mode above may impact your mod score (osu! has stricter requirements than taiko/catch/mania)</li>
-    </ul>
-</section>
-
-<section class="card card-body">
-    <h4 class="mx-auto mb-3">
-        Current BNs
-    </h4>
-
-    <div class="row">
-        {{#each allUsersByMode}}
-        <table class="table table-sm table-dark table-hover col-6 col-md-3">
-            <thead>
-                <td>{{this._id}}</td>
-            </thead>
-            <tbody>
-                {{#each this.users}}
-                <tr>
-                    <td style="
-                        {{#if this.probation}}
-                            border-left: 3px solid var(--probation);
-                        {{else}} 
-                        {{#ifCond this.group 'nat'}}
-                            border-left: 3px solid var(--danger);
-                        {{else}}
-                            border-left: 3px solid var(--bn);
-                        {{/ifCond}}
-                        {{/if}}
-                    ">
-                        <a href="https://osu.ppy.sh/users/{{this.osuId}}" target="_blank">{{this.username}}</a>
-                    </td>
-                </tr>
-                {{/each}}
-            </tbody>
-        </table>
-        {{/each}}
-    </div>
-</section>
-
-<a
-    id="mgsite"
-    class="btn btn-sm btn-primary" 
-    href="https://mappersguild.com/"
-    style="
-        position: fixed; 
-        z-index: 1060; 
-        bottom: 20px; 
-        right: 20px;"
+<body
+    {{#unless loggedIn}}
+    class="body-triangles"
+    {{/unless}}
 >
-    visit Mappers' Guild
-</a>
+
+    {{#if loggedIn}}
+    <div id="app"></div>
+    {{else}}
+    <div class="container py-4">
+        <section class="card card-body">
+            <div class="row">
+                <div class="col-lg-5 text-center mb-3 mb-lg-0">
+                    <div class="my-3">
+                        <img src="/images/qatlogo.png" alt="NAT" class="mr-1" style="border-radius: 100%; box-shadow: 0px 1px 5px #41bba12e; width: 130px;">
+                    </div>
+                    <form class="" action="/login" method="GET">
+                        <button class="btn btn-lg btn-primary" type="submit">Authorize your osu! account</button>
+                    </form>
+                </div>
+
+                <div class="col-lg-7 d-flex flex-column justify-content-center">
+                    <p>"Authorizing" will identify you through your osu! account.</p>
+                    <p>You can do any of these after authorization:</p>
+                    <ul>
+                        <li>Apply to join the Beatmap Nominators</li>
+                        <li>Report members of the BN/NAT</li>
+                        <li>View detailed BN/NAT listings, beatmap vetoes, and beatmap quality assurance info</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <div id="app"></div>
+    </div>
+    {{/if}}
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+        integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+        crossorigin="anonymous"></script>
+
+    <script src="/js/app.js"></script>
+</body>
+
+</html>

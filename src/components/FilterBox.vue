@@ -1,14 +1,20 @@
 <template>
     <section class="card card-body">
-        <input
-            id="search"
-            v-model="newFilterValue"
-            class="form-control"
-            type="text"
-            autocomplete="off"
-            :placeholder="placeholder || ''"
-            @change="updateFilterValue(newFilterValue)"
-        >
+        <div class="input-group">
+            <input
+                id="search"
+                class="form-control"
+                type="text"
+                autocomplete="off"
+                :placeholder="placeholder || ''"
+                @change="updateFilterValue($event.target.value)"
+            >
+            <div class="input-group-append">
+                <button class="btn btn-sm btn-primary px-3">
+                    <i class="fas fa-search" />
+                </button>
+            </div>
+        </div>
 
         <select
             id="mode"
@@ -30,8 +36,6 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex';
-
 export default {
     props: {
         placeholder: {
@@ -42,20 +46,23 @@ export default {
             type: Array,
             required: true,
         },
+        storeModule: {
+            type: String,
+            required: true,
+        },
     },
-    data () {
-        return {
-            newFilterValue: '',
-        };
+    computed: {
+        filters () {
+            return this.$store.state[this.storeModule].pageFilters.filters;
+        },
     },
-    computed: mapState([
-        'filters',
-    ]),
     methods: {
-        ...mapActions([
-            'updateFilterValue',
-            'updateFilterMode',
-        ]),
+        updateFilterValue (value) {
+            this.$store.commit(this.storeModule + '/pageFilters/setFilterValue', value);
+        },
+        updateFilterMode (mode) {
+            this.$store.commit(this.storeModule + '/pageFilters/setFilterMode', mode);
+        },
     },
 };
 </script>

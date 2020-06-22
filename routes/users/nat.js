@@ -1,14 +1,15 @@
 const express = require('express');
-const api = require('../../helpers/api');
 const User = require('../../models/user');
 const Logger = require('../../models/log');
 const Note = require('../../models/note');
-const BnApp = require('../../models/bnApp');
+const AppEvaluation = require('../../models/evaluations/appEvaluation');
+const middlewares = require('../../helpers/middlewares');
+const discord = require('../../helpers/discord');
 
 const router = express.Router();
 
-router.use(api.isLoggedIn);
-router.use(api.isNat);
+router.use(middlewares.isLoggedIn);
+router.use(middlewares.isNat);
 
 const defaultNotePopulate = [
     { path: 'author', select: 'username osuId' },
@@ -48,10 +49,10 @@ router.post('/saveNote/:id', async (req, res) => {
         `Added user note to "${u.username}"`
     );
 
-    api.webhookPost(
+    discord.webhookPost(
         [{
-            author: api.defaultWebhookAuthor(req.session),
-            color: api.webhookColors.brown,
+            author: discord.defaultWebhookAuthor(req.session),
+            color: discord.webhookColors.brown,
             description: `Added note to [**${note.user.username}**'s profile](http://bn.mappersguild.com/users?id=${note.user.id})`,
             fields: [
                 {
@@ -93,10 +94,7 @@ router.post('/editNote/:id', async (req, res) => {
 /* GET all users with badge info */
 router.get('/findUserBadgeInfo', async (req, res) => {
     const u = await User.find({
-        $or: [
-            { 'bnDuration.0': { $exists: true } },
-            { 'natDuration.0': { $exists: true } },
-        ],
+        history: { $exists: true, $ne: [] },
     }).sort({ username: 1 });
 
     res.json(u);
@@ -127,27 +125,26 @@ router.post('/editBadgeValue/:id', async (req, res) => {
 router.get('/findPotentialNatInfo', async (req, res) => {
     const [users, applications] = await Promise.all([
         User.find({
-            group: 'bn',
-            isSpectator: { $ne: true },
+            groups: 'bn',
             isBnEvaluator: true,
         }).sort({ username: 1 }),
 
-        BnApp.find({
+        AppEvaluation.find({
             bnEvaluators: {
                 $exists: true,
                 $not: { $size: 0 },
             },
             active: false,
         }).populate([
-            { path: 'applicant', select: 'username osuId' },
+            { path: 'user', select: 'username osuId' },
             { path: 'bnEvaluators', select: 'username osuId' },
             { path: 'test', select: 'totalScore' },
             {
-                path: 'evaluations',
+                path: 'reviews',
                 select: 'evaluator behaviorComment moddingComment vote',
                 populate: {
                     path: 'evaluator',
-                    select: 'username osuId group',
+                    select: 'username osuId groups',
                 },
             },
         ]),
@@ -156,7 +153,7 @@ router.get('/findPotentialNatInfo', async (req, res) => {
     let info = [];
     users.forEach(user => {
         const evaluatedApps = applications.filter(app => {
-            return app.evaluations.some(evaluation => evaluation.evaluator.id == user.id);
+            return app.reviews.some(review => review.evaluator.id == user.id);
         });
 
         info.push({

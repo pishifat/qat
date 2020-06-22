@@ -18,13 +18,13 @@
             <div v-for="user in badgeUsers" :key="user.id" class="small mb-1">
                 <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a>
                 <ul>
-                    <li :class="user.bnProfileBadge != calculateDuration(user.bnDuration) && calculateDuration(user.bnDuration) >= 1 ? 'background-fail' : ''">
-                        BN: {{ calculateDuration(user.bnDuration) }} -- badge: {{ user.bnProfileBadge }}
+                    <li :class="compareBadgeDuration(user.bnProfileBadge, user.bnDuration) ? 'background-fail' : ''">
+                        BN: {{ yearsDuration(user.bnDuration) }} -- badge: {{ user.bnProfileBadge }}
                         <a href="#" @click.prevent="editBadgeValue(user.id, 'bn', true)"><i class="fas fa-plus" /></a>
                         <a href="#" @click.prevent="editBadgeValue(user.id, 'bn', false)"><i class="fas fa-minus" /></a>
                     </li>
-                    <li :class="user.natProfileBadge != calculateDuration(user.natDuration) && calculateDuration(user.natDuration) >= 1 ? 'background-fail' : ''">
-                        NAT: {{ calculateDuration(user.natDuration) }} -- badge: {{ user.natProfileBadge }}
+                    <li :class="compareBadgeDuration(user.natProfileBadge, user.natDuration) ? 'background-fail' : ''">
+                        NAT: {{ yearsDuration(user.natDuration) }} -- badge: {{ user.natProfileBadge }}
                         <a href="#" @click.prevent="editBadgeValue(user.id, 'nat', true)"><i class="fas fa-plus" /></a>
                         <a href="#" @click.prevent="editBadgeValue(user.id, 'nat', false)"><i class="fas fa-minus" /></a>
                     </li>
@@ -40,7 +40,7 @@ import postData from '../../mixins/postData.js';
 export default {
     name: 'Badges',
     mixins: [postData],
-    data() {
+    data () {
         return {
             badgeUsers: [],
         };
@@ -50,31 +50,16 @@ export default {
             const users = await this.executeGet('/users/nat/findUserBadgeInfo');
 
             if (users) {
-                this.badgeUsers = [];
-                users.forEach(user => {
-                    if ((this.calculateDuration(user.bnDuration) >= 1) || (this.calculateDuration(user.natDuration) >= 1)) {
-                        this.badgeUsers.push(user);
-                    }
-                });
+                this.badgeUsers = users.filter(user =>
+                    (this.yearsDuration(user.bnDuration) >= 1) || (this.yearsDuration(user.natDuration) >= 1)
+                );
             }
         },
-        calculateDuration(dateArray) {
-            let days = 0;
-
-            for (let i = 0; i < dateArray.length; i += 2) {
-                let a = new Date(dateArray[i]);
-                let b = new Date(dateArray[i + 1]);
-
-                if (dateArray[i + 1]) {
-                    days += Math.abs(b.getTime() - a.getTime()) / (1000 * 3600 * 24);
-                } else {
-                    days += Math.abs(new Date().getTime() - a.getTime()) / (1000 * 3600 * 24);
-                }
-            }
-
-            let years = Math.floor(days / 365);
-
-            return years;
+        compareBadgeDuration (currentBadge, days) {
+            return (currentBadge || 0) < this.yearsDuration(days);
+        },
+        yearsDuration (days) {
+            return Math.floor(days / 365);
         },
         async editBadgeValue(id, group, add) {
             const u = await this.executePost(
@@ -90,7 +75,3 @@ export default {
     },
 };
 </script>
-
-<style>
-
-</style>

@@ -4,62 +4,11 @@
             <div class="row mb-3">
                 <div class="col-sm-12">
                     <b class="mr-4">Game mode:</b>
-                    <label
-                        class="mx-1"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        title="osu!"
-                    >
-                        <input
-                            type="checkbox"
-                            class="osu-radio hide-default"
-                            name="mode"
-                            value="osu"
-                        >
-                        <i class="fas fa-circle fa-lg" />
-                    </label>
-                    <label
-                        class="mx-1"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        title="osu!taiko"
-                    >
-                        <input
-                            type="checkbox"
-                            class="taiko-radio hide-default"
-                            name="mode"
-                            value="taiko"
-                        >
-                        <i class="fas fa-drum fa-lg" />
-                    </label>
-                    <label
-                        class="mx-1"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        title="osu!catch"
-                    >
-                        <input
-                            type="checkbox"
-                            class="catch-radio hide-default"
-                            name="mode"
-                            value="catch"
-                        >
-                        <i class="fas fa-apple-alt fa-lg" />
-                    </label>
-                    <label
-                        class="mx-1"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        title="osu!mania"
-                    >
-                        <input
-                            type="checkbox"
-                            class="mania-radio hide-default"
-                            name="mode"
-                            value="mania"
-                        >
-                        <i class="fas fa-stream fa-lg" />
-                    </label>
+
+                    <mode-radio-display
+                        v-model="selectedModes"
+                        input-type="checkbox"
+                    />
 
                     <p class="small text-secondary ml-2">
                         Specify mode(s) for evaluations. Multi-mode BNs can generate multiple evaluations.
@@ -145,12 +94,9 @@
                     <div class="form-inline">
                         <b>Deadline:</b>
                         <input
-                            v-model="dateInput"
+                            v-model="deadline"
                             class="ml-1 form-control"
-                            type="text"
-                            placeholder="MM-DD-YYYY"
-                            maxlength="10"
-                            style="min-width: 125px; width: 125px;"
+                            type="date"
                         >
                     </div>
 
@@ -171,19 +117,22 @@
 
 <script>
 import ModalDialog from '../ModalDialog.vue';
+import ModeRadioDisplay from '../ModeRadioDisplay.vue';
 import postData from '../../mixins/postData.js';
 
 export default {
     name: 'AddEvalRounds',
     components: {
         ModalDialog,
+        ModeRadioDisplay,
     },
     mixins: [postData],
     data() {
         return {
             includeUsers: null,
             excludeUsers: null,
-            dateInput: this.setDefaultDate(),
+            deadline: this.setDefaultDate(),
+            selectedModes: [],
         };
     },
     methods: {
@@ -191,13 +140,7 @@ export default {
             const confirmInput = confirm(`Are you sure?`);
 
             if (confirmInput) {
-                let modes = [];
-
-                $('input[name="mode"]:checked').each(function () {
-                    modes.push(this.value);
-                });
-
-                if (!modes.length) {
+                if (!this.selectedModes.length) {
                     this.$store.dispatch('updateToastMessages', {
                         message: `Must select game mode!`,
                         type: 'danger',
@@ -222,36 +165,20 @@ export default {
                     return;
                 }
 
-                const dateSplit = this.dateInput.split('-');
-                const deadline = new Date(
-                    parseInt(dateSplit[2], 10),
-                    parseInt(dateSplit[0], 10) - 1,
-                    parseInt(dateSplit[1], 10)
-                );
-
-                if (!(deadline instanceof Date) || isNaN(deadline)) {
-                    this.$store.dispatch('updateToastMessages', {
-                        message: `Invalid date!`,
-                        type: 'danger',
-                    });
-
-                    return;
-                }
-
                 const result = await this.executePost(
                     '/bnEval/addEvalRounds/',
                     {
-                        modes,
+                        modes: this.selectedModes,
                         groups,
                         includeUsers: this.includeUsers,
                         excludeUsers: this.excludeUsers,
-                        deadline,
+                        deadline: this.deadline,
                     },
                     e
                 );
 
                 if (result && !result.error) {
-                    this.$store.commit('setEvalRounds', result.ers);
+                    this.$store.commit('evaluations/setEvaluations', result.ers);
                     this.$store.dispatch('updateToastMessages', {
                         message: `Generated evaluations`,
                         type: 'success',
@@ -303,11 +230,8 @@ export default {
 
             const year = date.getFullYear();
 
-            return month + '-' + day + '-' + year;
+            return year + '-' + month + '-' + day;
         },
     },
 };
 </script>
-
-<style>
-</style>

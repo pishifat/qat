@@ -149,7 +149,7 @@ export default {
 
                 if (veto && !veto.error) {
                     $('#addVeto').modal('hide');
-                    this.$store.commit('addVeto', veto);
+                    this.$store.commit('vetoes/addVeto', veto);
                     this.$store.dispatch('updateToastMessages', {
                         message: `Submitted veto`,
                         type: 'success',

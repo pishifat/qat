@@ -1,7 +1,7 @@
 const express = require('express');
 const config = require('../config.json');
 const Aiess = require('../models/aiess');
-const EvalRound = require('../models/evalRound');
+const BnEvaluation = require('../models/evaluations/bnEvaluation');
 const User = require('../models/user');
 
 const router = express.Router();
@@ -19,7 +19,7 @@ router.use((req, res, next) => {
 
 /* GET users in BN/NAT */
 router.get('/users', async (_, res) => {
-    res.json(await User.find({ group: { $in: ['bn', 'nat'] } }));
+    res.json(await User.find({ groups: { $in: ['bn', 'nat'] } }));
 });
 
 /* GET users in or previously in BN/NAT */
@@ -27,8 +27,7 @@ router.get('/users/all', async (_, res) => {
     res.json(
         await User.find({
             $or: [
-                { bnDuration: { $ne: [], $exists: true } },
-                { natDuration: { $ne: [], $exists: true } },
+                { history: { $ne: [], $exists: true } },
             ],
         })
     );
@@ -47,7 +46,7 @@ router.get('/bnRemoval/:osuId', async (req, res) => {
         return res.status(404).send('User not found');
     }
 
-    const latestEvalRound = await EvalRound
+    const latestEvalRound = await BnEvaluation
         .findOne({ bn: user._id, consensus: 'fail', active: false })
         .sort({ $natural: -1 });
 

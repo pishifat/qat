@@ -51,7 +51,7 @@ export default {
             const event = await this.executePost('/qualityAssurance/assignUser/' + this.eventId, {});
 
             if (event) {
-                this.$store.commit('updateEvent', event);
+                this.$store.commit('qualityAssurance/updateEvent', event);
                 this.forceDisabled = false;
             }
         },
@@ -60,7 +60,7 @@ export default {
             const event = await this.executePost('/qualityAssurance/unassignUser/' + this.eventId, {});
 
             if (event && !event.error) {
-                this.$store.commit('updateEvent', event);
+                this.$store.commit('qualityAssurance/updateEvent', event);
                 this.forceDisabled = false;
             }
         },

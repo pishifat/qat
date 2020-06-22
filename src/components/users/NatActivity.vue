@@ -47,11 +47,10 @@
                 :key="user.username"
                 class="small mb-1"
             >
-                <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a> (joined {{ user.joinDate.toString().slice(0, 10) }})
+                <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a> (joined {{ user.joinDate | toStandardDate }})
                 <ul>
                     <li>{{ user.totalBnAppEvals }} application evaluations</li>
                     <li>{{ user.totalCurrentBnEvals }} current BN evaluations</li>
-                    <li>{{ user.totalWrittenFeedbacks }} total written feedback</li>
                 </ul>
             </div>
 

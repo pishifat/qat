@@ -8,10 +8,9 @@
                 <b>{{ selectedUser.username }}</b>
             </a>
 
-            <i v-if="selectedUser.modes.indexOf('osu') >= 0" class="far fa-circle" />
-            <i v-if="selectedUser.modes.indexOf('taiko') >= 0" class="fas fa-drum" />
-            <i v-if="selectedUser.modes.indexOf('catch') >= 0" class="fas fa-apple-alt" />
-            <i v-if="selectedUser.modes.indexOf('mania') >= 0" class="fas fa-stream" />
+            <mode-display
+                :modes="selectedUser.modes"
+            />
         </h5>
         <button type="button" class="close" data-dismiss="modal">
             <span>&times;</span>
@@ -21,23 +20,27 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import ModeDisplay from '../../ModeDisplay.vue';
 
 export default {
     name: 'ModalHeader',
+    components: {
+        ModeDisplay,
+    },
     computed: {
-        ...mapGetters([
+        ...mapGetters('users', [
             'selectedUser',
         ]),
         headerColor () {
             if (!this.selectedUser) return '';
 
-            if (this.selectedUser.probation.length && this.selectedUser.group != 'nat') {
+            if (this.selectedUser.probationModes.length && !this.selectedUser.isNat) {
                 return 'bg-probation';
-            } else if (this.selectedUser.group == 'user') {
+            } else if (!this.selectedUser.hasBasicAccess) {
                 return 'bg-bright-blue-gray';
             }
 
-            return 'bg-' + this.selectedUser.group;
+            return 'bg-' + this.selectedUser.groups[0];
         },
     },
 };

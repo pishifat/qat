@@ -4,7 +4,6 @@
 
         <p class="small px-4">
             <span v-html="$md.render(selectedVeto.shortReason)" />
-            --
             <a :href="selectedVeto.discussionLink" target="_blank">Read the full veto discussion here!</a>
         </p>
 
@@ -23,7 +22,7 @@ import { mapGetters } from 'vuex';
 export default {
     name: 'Context',
     computed: {
-        ...mapGetters([
+        ...mapGetters('vetoes', [
             'selectedVeto',
         ]),
     },

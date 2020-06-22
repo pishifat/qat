@@ -26,5 +26,6 @@ jspm_packages/
 
 config.json
 dist/
-public/javascripts/
+public/js/
 public/css/
+migration.js

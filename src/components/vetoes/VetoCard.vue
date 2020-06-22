@@ -38,19 +38,19 @@
                             data-placement="top"
                             title="deadline"
                         />
-                        {{ veto.deadline.slice(0, 10) }}
+                        <date-display :date="veto.deadline" />
                     </span>
-                    <span v-else class="small float-left">{{ veto.createdAt.slice(0, 10) }}</span>
-                    <i v-if="veto.mode.indexOf('osu') >= 0" class="far fa-circle" />
-                    <i v-else-if="veto.mode.indexOf('taiko') >= 0" class="fas fa-drum" />
-                    <i v-else-if="veto.mode.indexOf('catch') >= 0" class="fas fa-apple-alt" />
-                    <i v-else-if="veto.mode.indexOf('mania') >= 0" class="fas fa-stream" />
-                    <span v-else>
-                        <i class="far fa-circle" />
-                        <i class="fas fa-drum" />
-                        <i class="fas fa-apple-alt" />
-                        <i class="fas fa-stream" />
-                    </span>
+
+                    <date-display
+                        v-else
+                        class="small float-left"
+                        :date="veto.createdAt"
+                    />
+
+                    <mode-display
+                        :modes="veto.mode"
+                        :show-all="true"
+                    />
                 </div>
             </div>
         </div>
@@ -58,8 +58,15 @@
 </template>
 
 <script>
+import ModeDisplay from '../ModeDisplay.vue';
+import DateDisplay from '../DateDisplay.vue';
+
 export default {
     name: 'VetoCard',
+    components: {
+        ModeDisplay,
+        DateDisplay,
+    },
     props: {
         veto: {
             type: Object,
@@ -77,7 +84,11 @@ export default {
     },
     methods: {
         selectVeto () {
-            this.$store.commit('setSelectedVetoId', this.veto.id);
+            this.$store.commit('vetoes/setSelectedVetoId', this.veto.id);
+
+            if (this.$route.query.id !== this.veto.id) {
+                this.$router.replace(`/vetoes?id=${this.veto.id}`);
+            }
         },
     },
 };

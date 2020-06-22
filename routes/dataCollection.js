@@ -1,23 +1,12 @@
 const express = require('express');
-const api = require('../helpers/api');
+const middlewares = require('../helpers/middlewares');
 const Aiess = require('../models/aiess');
 const Logger = require('../models/log');
 
 const router = express.Router();
 
-router.use(api.isLoggedIn);
-router.use(api.isNat);
-
-/* GET eval archive page */
-router.get('/', (req, res) => {
-    res.render('evaluations/datacollection', {
-        title: 'Data Collection',
-        script: '../javascripts/dataCollection.js',
-        loggedInAs: req.session.mongoId,
-        isEval: true,
-        isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
-    });
-});
+router.use(middlewares.isLoggedIn);
+router.use(middlewares.hasFullReadAccess);
 
 /* GET dq/pop listing */
 router.get('/relevantInfo', async (req, res) => {
@@ -35,12 +24,11 @@ router.get('/relevantInfo', async (req, res) => {
 
     res.json({
         events: data,
-        mode: res.locals.userRequest.modes[0],
     });
 });
 
 /* POST edit reason for dq/pop */
-router.post('/updateContent/:id', api.isNotSpectator, async (req, res) => {
+router.post('/updateContent/:id', middlewares.isNat, async (req, res) => {
     let a = await Aiess.findByIdAndUpdate(req.params.id, { content: req.body.reason });
 
     if (!a) {
@@ -52,7 +40,7 @@ router.post('/updateContent/:id', api.isNotSpectator, async (req, res) => {
 });
 
 /* POST edit obviousness */
-router.post('/updateObviousness/:id', api.isNotSpectator, async (req, res) => {
+router.post('/updateObviousness/:id', middlewares.isNat, async (req, res) => {
     let obviousness = parseInt(req.body.obviousness);
     let a = await Aiess.findById(req.params.id).orFail();
 
@@ -68,7 +56,7 @@ router.post('/updateObviousness/:id', api.isNotSpectator, async (req, res) => {
 });
 
 /* POST edit severity */
-router.post('/updateSeverity/:id', api.isNotSpectator, async (req, res) => {
+router.post('/updateSeverity/:id', middlewares.isNat, async (req, res) => {
     let severity = parseInt(req.body.severity);
     let a = await Aiess.findById(req.params.id).orFail();
 

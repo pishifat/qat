@@ -3,7 +3,7 @@
         <div v-for="(mediation, i) in selectedVeto.mediations" :key="mediation.id" class="row my-3">
             <div class="col-sm-2 small">
                 <user-avatar
-                    v-if="isNat"
+                    v-if="loggedInUser.isNat"
                     :user="mediation.mediator"
                     :text-color="voteColor(mediation.vote)"
                 >
@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import postData from '../../../mixins/postData';
 import UserAvatar from '../../UserAvatar.vue';
 
@@ -49,9 +49,9 @@ export default {
     mixins: [ postData ],
     computed: {
         ...mapState([
-            'isNat',
+            'loggedInUser',
         ]),
-        ...mapGetters([
+        ...mapGetters('vetoes', [
             'selectedVeto',
         ]),
     },
@@ -73,7 +73,7 @@ export default {
                 const veto = await this.executePost(`/vetoes/replaceMediator/${this.selectedVeto.id}`, { mediationId });
 
                 if (veto && !veto.error) {
-                    this.$store.dispatch('updateVeto', veto);
+                    this.$store.commit('vetoes/updateVeto', veto);
                     this.$store.dispatch('updateToastMessages', {
                         message: `Replaced mediator`,
                         type: 'success',

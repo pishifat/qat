@@ -1,7 +1,7 @@
 <template>
     <div class="row">
         <div class="col-md-12">
-            <section v-if="isNat" class="card card-body">
+            <section v-if="loggedInUser.isNat" class="card card-body">
                 <input
                     v-model="searchValue"
                     type="text"
@@ -44,7 +44,7 @@
                     <div v-for="(answer, i) in selectedTest.answers" :key="answer.id" class="card card-body my-1">
                         <small class="text-right">
                             Q{{ ++i }} -- {{ answer.question.category }}
-                            <span v-if="isNat && answer.question.questionType != 'fill'"> -- total: {{ calculateQuestionScore(answer) }}</span>
+                            <span v-if="loggedInUser.isNat && answer.question.questionType != 'fill'"> -- total: {{ calculateQuestionScore(answer) }}</span>
                         </small>
 
                         <div>
@@ -52,8 +52,12 @@
                                 {{ answer.question.content }}
                             </h5>
 
-                            <div v-for="option in getActiveOptions(answer.question.options)" :key="option.id">
-                                <div class="form-check mb-2 ml-2">
+                            <div
+                                v-for="option in getActiveOptions(answer.question.options)"
+                                :key="option.id"
+                                class="d-flex"
+                            >
+                                <div class="form-check mb-2 mx-2">
                                     <input
                                         :id="option.id"
                                         class="form-check-input"
@@ -88,9 +92,14 @@
                                             {{ option.score > 0 ? 'Correct' : 'Incorrect' }}
                                         </span>
                                     </label>
-
-                                    <small v-if="isNat" class="float-right">{{ option.score }}</small>
                                 </div>
+
+                                <small
+                                    v-if="loggedInUser.isNat"
+                                    class="ml-auto"
+                                >
+                                    {{ option.score }}
+                                </small>
                             </div>
                         </div>
                     </div>
@@ -102,6 +111,7 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import testResultsModule from '../store/testResults';
 import postData from '../mixins/postData.js';
 import ResultCard from '../components/rcTest/ResultCard.vue';
 
@@ -119,45 +129,37 @@ export default {
     },
     computed: {
         ...mapState([
-            'tests',
-            'isNat',
+            'loggedInUser',
         ]),
-        ...mapGetters([
+        ...mapState('testResults', [
+            'tests',
+        ]),
+        ...mapGetters('testResults', [
             'selectedTest',
         ]),
     },
-    watch: {
-        selectedTest(v) {
-            if (v) {
-                this.getOptionIds();
-            }
-        },
+    beforeCreate () {
+        if (!this.$store.hasModule('testResults')) {
+            this.$store.registerModule('testResults', testResultsModule);
+        }
     },
     async created() {
-        const params = new URLSearchParams(document.location.search.substring(1));
-
+        const user = this.$route.query.user;
         let res;
 
-        if (params.get('user') && params.get('user').length) {
-            res = await this.executeGet(`/testResults/search/${params.get('user')}`);
+        if (user) {
+            res = await this.initialRequest(`/testResults/search/${user}`);
         } else {
-            res = await this.executeGet('/testResults/relevantInfo');
+            res = await this.initialRequest('/testResults/relevantInfo');
         }
 
         if (res) {
-            this.$store.commit('setIsNat', res.isNat);
-            this.$store.commit('setTests', res.tests);
+            this.$store.commit('testResults/setTests', res.tests);
 
             if (this.tests && this.tests.length == 1) {
-                this.$store.commit('setSelectedTestId', this.tests[0].id);
+                this.$store.commit('testResults/setSelectedTestId', this.tests[0].id);
             }
         }
-
-        $('#loading').fadeOut();
-        $('#main')
-            .attr('style', 'visibility: visible')
-            .hide()
-            .fadeIn();
     },
     methods: {
         calculateTotalScore() {
@@ -184,14 +186,6 @@ export default {
         getActiveOptions(options) {
             return options.filter(o => o.active);
         },
-        getOptionIds() {
-            this.selectedOptionIds = [];
-            this.selectedTest.answers.forEach(answer => {
-                answer.optionsChosen.forEach(option => {
-                    this.selectedOptionIds.push(option.id);
-                });
-            });
-        },
         async query(e) {
             let user = this.searchValue;
 
@@ -201,16 +195,19 @@ export default {
                     type: 'danger',
                 });
             } else {
-                history.pushState(null, 'Ranking Criteria Test Results', `/testresults?user=${user}`);
+                if (this.$route.query.user !== user) {
+                    this.$router.replace(`/testresults?user=${user}`);
+                }
+
                 const result = await this.executeGet(`/testResults/search/${user}`, e);
 
                 if (result && !result.error) {
-                    this.$store.commit('setTests', result.tests);
+                    this.$store.commit('testResults/setTests', result.tests);
 
                     if (this.tests && this.tests.length == 1) {
-                        this.$store.commit('setSelectedTestId', this.tests[0].id);
+                        this.$store.commit('testResults/setSelectedTestId', this.tests[0].id);
                     } else {
-                        this.$store.commit('setSelectedTestId', null);
+                        this.$store.commit('testResults/setSelectedTestId', null);
                     }
                 }
             }
@@ -222,13 +219,5 @@ export default {
 <style>
 .option-chosen {
     font-weight: bold;
-}
-
-.test-image {
-    border-radius: 5px 5px 5px 5px;
-    -o-object-fit: contain;
-    object-fit: contain;
-    max-width: 500px;
-    max-height: 500px;
 }
 </style>

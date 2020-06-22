@@ -4,18 +4,19 @@
             <filter-box
                 :placeholder="'enter to search beatmap...'"
                 :options="['osu', 'taiko', 'catch', 'mania']"
+                store-module="qualityAssurance"
             />
 
             <handbook />
 
-            <section v-if="allEvents" class="card card-body">
+            <section class="card card-body">
                 <transition-group name="list" tag="div">
                     <event-row
                         v-for="event in filteredEvents"
                         :key="event.id"
                         :event="event"
                         :is-outdated="isOutdated(event.beatmapsetId, event.timestamp)"
-                        :is-max-checks="event.qualityAssuranceCheckers.length > event.modes.length * 2 - 1"
+                        :is-max-checks="isMaxChecks(event)"
                     />
                 </transition-group>
 
@@ -39,6 +40,7 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import qualityAssuranceModule from '../store/qualityAssurance';
 import ToastMessages from '../components/ToastMessages.vue';
 import postData from '../mixins/postData.js';
 import FilterBox from '../components/FilterBox.vue';
@@ -61,10 +63,16 @@ export default {
     },
     computed: {
         ...mapState([
-            'overwriteEvents',
+            'loggedInUser',
         ]),
         ...mapGetters([
-            'allEvents',
+            'userMainMode',
+        ]),
+        ...mapState('qualityAssurance', [
+            'events',
+            'overwriteEvents',
+        ]),
+        ...mapGetters('qualityAssurance', [
             'filteredEvents',
         ]),
         sevenDaysAgo() {
@@ -74,39 +82,32 @@ export default {
             return date;
         },
     },
-    async created() {
-        const res = await this.executeGet('/qualityAssurance/relevantInfo');
-
-        if (res) {
-            this.$store.commit('setEvents', res.maps);
-            this.$store.commit('setOverwriteEvents', res.overwrite);
-            this.$store.commit('setUserId', res.userId);
-            this.$store.commit('setUserOsuId', res.userOsuId);
-            this.$store.commit('setUsername', res.username);
-            this.$store.commit('setIsNat', res.isNat);
-            this.$store.commit('setIsUser', res.isUser);
-            this.$store.commit('setFilterMode', res.mode);
+    beforeCreate () {
+        if (!this.$store.hasModule('qualityAssurance')) {
+            this.$store.registerModule('qualityAssurance', qualityAssuranceModule);
         }
+    },
+    async created() {
+        this.$store.commit('qualityAssurance/pageFilters/setFilterMode', this.userMainMode);
+        const data = await this.initialRequest('/qualityAssurance/relevantInfo');
 
-        $('#loading').fadeOut();
-        $('#main')
-            .attr('style', 'visibility: visible')
-            .hide()
-            .fadeIn();
-
+        if (data) {
+            this.$store.commit('qualityAssurance/setEvents', data.events);
+            this.$store.commit('qualityAssurance/setOverwriteEvents', data.overwrite);
+        }
     },
     mounted() {
         setInterval(async () => {
-            const res = await this.executeGet('/qualityAssurance/relevantInfo');
+            const data = await this.executeGet('/qualityAssurance/relevantInfo');
 
-            if (res) {
-                this.$store.commit('setEvents', res.maps);
-                this.$store.commit('setOverwriteEvents', res.overwrite);
+            if (data) {
+                this.$store.commit('qualityAssurance/setEvents', data.events);
+                this.$store.commit('qualityAssurance/setOverwriteEvents', data.overwrite);
             }
         }, 600000);
     },
     methods: {
-        isOutdated(beatmapsetId, timestamp) {
+        isOutdated (beatmapsetId, timestamp) {
             timestamp = new Date(timestamp);
 
             if (timestamp < this.sevenDaysAgo) {
@@ -128,11 +129,22 @@ export default {
                 return isOutdated;
             }
         },
-        async loadMore(e) {
+        isMaxChecks (event) {
+            for (const mode of event.modes) {
+                const checkers = event.qualityAssuranceCheckers.filter(checker => checker.fullModes.includes(mode)).length;
+
+                if (checkers < 2 && this.loggedInUser.fullModes.includes(mode)) {
+                    return false;
+                }
+            }
+
+            return true;
+        },
+        async loadMore (e) {
             const res = await this.executeGet('/qualityAssurance/loadMore/' + this.limit + '/' + (this.limit - 200), e);
 
             if (res) {
-                this.$store.commit('addEvents', res.maps);
+                this.$store.commit('qualityAssurance/addEvents', res.events);
                 this.limit += 200;
             }
         },

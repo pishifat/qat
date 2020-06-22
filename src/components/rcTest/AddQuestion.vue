@@ -1,38 +1,16 @@
 <template>
-    <modal-dialog id="addQuestion" :title="`Add question: ${category}`">
-        <div class="container">
-            <div class="form-inline mb-2">
-                <b>Question type:</b>
+    <modal-dialog
+        id="addQuestion"
+        title="Add question"
+    >
+        <div v-if="category" class="container">
+            <question-type
+                v-model="questionType"
+                :for-label="'add'"
+            />
 
-                <div class="form-check form-check-inline ml-2">
-                    <input
-                        id="text"
-                        class="form-check-input"
-                        type="radio"
-                        name="questionType"
-                        value="text"
-                    >
-                    <label class="form-check-label" for="text">Select text</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input
-                        id="image"
-                        class="form-check-input"
-                        type="radio"
-                        name="questionType"
-                        value="image"
-                    >
-                    <label class="form-check-label" for="image">Select Image</label>
-                </div>
-            </div>
-
-            <textarea
-                id="newQuestion"
-                class="form-control mb-2"
-                placeholder="question..."
-                maxlength="300"
-                rows="4"
-                @keyup.enter="addQuestion($event)"
+            <question-content
+                v-model="questionContent"
             />
 
             <hr>
@@ -45,45 +23,47 @@
 </template>
 
 <script>
-import ModalDialog from '../../components/ModalDialog.vue';
 import postData from '../../mixins/postData.js';
+import ModalDialog from '../../components/ModalDialog.vue';
+import QuestionType from './QuestionType.vue';
+import QuestionContent from './QuestionContent.vue';
 
 export default {
     name: 'AddQuestion',
     components: {
         ModalDialog,
+        QuestionType,
+        QuestionContent,
     },
     mixins: [ postData ],
     props: {
         category: {
             type: String,
-            required: true,
-        },
-        rawCategory: {
-            type: String,
-            required: true,
+            default: '',
         },
     },
     data() {
         return {
-            type: null,
+            questionContent: '',
+            questionType: '',
         };
     },
     methods: {
         async addQuestion (e) {
-            let questionType = $('input[name=questionType]:checked').val();
-            let newQuestion = $('#newQuestion').val();
-
-            if (!newQuestion || !newQuestion.length || !questionType || !questionType.length) {
+            if (!this.questionContent || !this.questionType) {
                 this.$store.dispatch('updateToastMessages', {
                     message: `Cannot leave fields blank!`,
                     type: 'danger',
                 });
             } else {
-                const question = await this.executePost('/manageTest/addQuestion', { questionType, newQuestion: newQuestion.trim(), category: this.rawCategory }, e);
+                const question = await this.executePost('/manageTest/store', {
+                    questionType: this.questionType,
+                    newQuestion: this.questionContent,
+                    category: this.category,
+                }, e);
 
                 if (question && !question.error) {
-                    this.$emit('add-question', question);
+                    this.$store.commit('manageTest/addQuestion', question);
                     this.$store.dispatch('updateToastMessages', {
                         message: `Question added`,
                         type: 'success',
@@ -94,7 +74,3 @@ export default {
     },
 };
 </script>
-
-<style>
-
-</style>

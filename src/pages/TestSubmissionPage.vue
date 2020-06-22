@@ -30,8 +30,8 @@
                     </p>
                     <p>Feel free to reference those pages while taking this test. Maybe you'll learn something you didn't already know, which will make you more prepared than you would be otherwise!</p>
                     <br>
-                    <p>There are 20 questions total, all of which require you to select all applicable answers. Categories of questions are listed in the upper left for you to reference on their respective wiki pages.</p>
-                    <p>The test has no time limit. If you close this page, your answers will not be saved, however you can still take the test at a later time.</p>
+                    <p>There are 20 questions total, all of which require you to select all applicable answers. Categories of questions are listed in the upper right for you to reference on their respective wiki pages.</p>
+                    <p>The test has no time limit. If you close this page, your answers will be saved to continue at another time.</p>
                     <p>After submitting your answers, you will see a score out of 20 possible points. When your application is fully evaluated, you will be able to view which questions you answered correctly/incorrectly.</p>
                     <br>
                     Good luck!
@@ -102,7 +102,11 @@
         <div v-else class="card card-body">
             <div v-if="displayScore || displayScore == 0">
                 <p class="small">
-                    If you see nonsense below this line, you'll need to visit the <a href="http://bn.mappersguild.com/bnapps">BN Application page</a> and re-submit your test. Sorry!
+                    If you see nonsense below this line, you'll need to visit the
+                    <router-link to="/bnapps">
+                        BN Application page
+                    </router-link>
+                    and re-submit your test. Sorry!
                 </p>
 
                 <p>Your test has been submitted! Your score is {{ displayScore }}/20.</p>
@@ -139,7 +143,7 @@ export default {
         };
     },
     async created() {
-        const data = await this.executeGet('/testSubmission/tests');
+        const data = await this.initialRequest('/testSubmission/tests');
 
         if (data && data.testList && data.testList.length) {
             this.testList = data.testList;
@@ -149,12 +153,6 @@ export default {
                 await this.loadTest();
             }
         }
-
-        $('#loading').fadeOut();
-        $('#main')
-            .attr('style', 'visibility: visible')
-            .hide()
-            .fadeIn();
     },
     methods: {
         randomSort (options) {
@@ -239,14 +237,3 @@ export default {
     },
 };
 </script>
-
-<style>
-
-.test-image {
-    border-radius: 5px 5px 5px 5px;
-    -o-object-fit: contain;
-    object-fit: contain;
-    max-width: 500px;
-    max-height: 500px;
-}
-</style>

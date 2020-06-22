@@ -33,7 +33,7 @@
                 </div>
             </section>
 
-            <section v-if="isQueried" class="card card-body">
+            <section v-if="wasLoaded" class="card card-body">
                 <h2>Application Evaluations</h2>
 
                 <transition-group
@@ -42,12 +42,12 @@
                     tag="div"
                     class="row"
                 >
-                    <application-discussion-card
+                    <evaluation-card
                         v-for="application in applications"
                         :key="application.id"
-                        :application="application"
-                        :mode="application.mode"
-                        :is-archive="true"
+                        :evaluation="application"
+                        store-module="evaluations"
+                        target="#evaluationArchiveInfo"
                     />
                 </transition-group>
 
@@ -56,20 +56,21 @@
                 </p>
             </section>
 
-            <section v-if="isQueried" class="card card-body">
+            <section v-if="wasLoaded" class="card card-body">
                 <h2>BN Evaluations</h2>
 
                 <transition-group
-                    v-if="evalRounds.length"
+                    v-if="currentBnsEvaluations.length"
                     name="list"
                     tag="div"
                     class="row"
                 >
-                    <current-bn-discussion-card
-                        v-for="evalRound in evalRounds"
-                        :key="evalRound.id"
-                        :eval-round="evalRound"
-                        :is-archive="true"
+                    <evaluation-card
+                        v-for="evaluation in currentBnsEvaluations"
+                        :key="evaluation.id"
+                        :evaluation="evaluation"
+                        store-module="evaluations"
+                        target="#evaluationArchiveInfo"
                     />
                 </transition-group>
 
@@ -78,94 +79,83 @@
                 </p>
             </section>
 
-            <application-archive-info />
-
-            <current-bn-archive-info />
+            <archive-info />
 
             <toast-messages />
         </div>
     </div>
 </template>
 
-
-
 <script>
-import { mapState } from 'vuex';
-import ToastMessages from '../components/ToastMessages.vue';
-import ApplicationDiscussionCard from '../components/evaluations/applications/ApplicationDiscussionCard.vue';
-import CurrentBnDiscussionCard from '../components/evaluations/currentBnEvaluations/CurrentBnDiscussionCard.vue';
-import ApplicationArchiveInfo from '../components/evaluations/applications/ApplicationArchiveInfo.vue';
-import CurrentBnArchiveInfo from '../components/evaluations/currentBnEvaluations/CurrentBnArchiveInfo.vue';
+import { mapState, mapGetters } from 'vuex';
 import postData from '../mixins/postData.js';
+import evaluationsModule from '../store/evaluations';
+import ToastMessages from '../components/ToastMessages.vue';
+import EvaluationCard from '../components/evaluations/card/EvaluationCard.vue';
+import ArchiveInfo from '../components/evaluations/info/ArchiveInfo.vue';
 
 export default {
     name: 'EvalArchivePage',
     components: {
         ToastMessages,
-        ApplicationDiscussionCard,
-        CurrentBnDiscussionCard,
-        ApplicationArchiveInfo,
-        CurrentBnArchiveInfo,
+        EvaluationCard,
+        ArchiveInfo,
     },
     mixins: [postData],
     data() {
         return {
             searchValue: null,
             limit: null,
+            wasLoaded: false,
         };
     },
     computed: {
-        ...mapState([
-            'applications',
-            'evalRounds',
-            'isQueried',
+        ...mapState('evaluations', [
+            'evaluations',
         ]),
+        ...mapGetters('evaluations', [
+            'selectedEvaluation',
+        ]),
+        applications () {
+            return this.evaluations.filter(e => e.kind === 'application');
+        },
+        currentBnsEvaluations () {
+            return this.evaluations.filter(e => e.kind === 'currentBn');
+        },
+    },
+    beforeCreate () {
+        if (this.$store.hasModule('evaluations')) {
+            this.$store.commit('evaluations/resetState');
+        } else {
+            this.$store.registerModule('evaluations', evaluationsModule);
+        }
     },
     async created() {
-        const params = new URLSearchParams(document.location.search.substring(1));
+        const id = this.$route.query.id;
+        const user = this.$route.query.user;
+        let query = '';
+        query += id ? `id=${id}` : '';
+        query += user ? `user=${user}` : '';
 
-        if (params.get('user') && params.get('user').length) {
-            const res = await this.executeGet(`/evalArchive/search/${params.get('user')}`);
+        const data = await this.initialRequest(`/evalArchive/search?${query}`);
 
-            if (res) {
-                this.$store.commit('setIsQueried', true);
-                this.$store.commit('setEvaluator', res.evaluator);
-                this.$store.commit('setApplications', res.bnApplications);
-                this.$store.commit('setEvalRounds', res.evalRounds);
-            }
-        } else if (params.get('eval') && params.get('eval').length) {
-            const res = await this.executeGet(`/evalArchive/searchById/${params.get('eval')}`);
-
-            if (res) {
-                this.$store.commit('setEvaluator', res.evaluator);
-
-                if (res.round) {
-                    this.$store.commit('setIsQueried', true);
-
-                    if (res.round.applicant) {
-                        this.$store.commit('setSelectedDiscussApplicationId', res.round.id);
-                        this.$store.commit('setApplications', [res.round]);
-                        $('#applicationArchiveInfo').modal('show');
-                    } else {
-                        this.$store.commit('setSelectedDiscussRoundId', res.round.id);
-                        this.$store.commit('setEvalRounds', [res.round]);
-                        $('#currentBnArchiveInfo').modal('show');
-                    }
-                }
-            }
-        } else {
-            const res = await this.executeGet('/evalArchive/relevantInfo');
-
-            if (res) {
-                this.$store.commit('setEvaluator', res.evaluator);
-            }
+        if (data.bnApplications || data.evalRounds) {
+            this.$store.commit('evaluations/setEvaluations', [...data.evalRounds, ...data.bnApplications]);
+            this.wasLoaded = true;
         }
 
-        $('#loading').fadeOut();
-        $('#main')
-            .attr('style', 'visibility: visible')
-            .hide()
-            .fadeIn();
+        if (id) {
+            this.$store.commit('evaluations/setSelectedEvaluationId', id);
+
+            if (this.selectedEvaluation) {
+                $('#evaluationArchiveInfo').modal('show');
+            } else {
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Couldn't find the evaluation!`,
+                    type: 'danger',
+                });
+            }
+        }
     },
     methods: {
         async query(e) {
@@ -175,13 +165,14 @@ export default {
                     type: 'danger',
                 });
             } else {
-                history.pushState(null, 'Evaluation Archives', `/evalArchive?user=${this.searchValue}`);
-                const res = await this.executeGet('/evalArchive/search/' + this.searchValue, e);
+                if (this.$route.query.user !== this.searchValue) {
+                    this.$router.replace(`/evalarchive?user=${this.searchValue}`);
+                }
+
+                const res = await this.executeGet(`/evalArchive/search?user=${this.searchValue}`, e);
 
                 if (res && !res.error) {
-                    this.$store.commit('setIsQueried', true);
-                    this.$store.commit('setApplications', res.bnApplications);
-                    this.$store.commit('setEvalRounds', res.evalRounds);
+                    this.$store.commit('evaluations/setEvaluations', [...res.bnApplications, ...res.evalRounds]);
                 }
             }
         },
@@ -192,12 +183,10 @@ export default {
                     type: 'danger',
                 });
             } else {
-                const res = await this.executeGet('/evalArchive/searchRecent/' + this.limit, e);
+                const res = await this.executeGet(`/evalarchive/search?limit=${this.limit}`, e);
 
                 if (res && !res.error) {
-                    this.$store.commit('setIsQueried', true);
-                    this.$store.commit('setApplications', res.bnApplications);
-                    this.$store.commit('setEvalRounds', res.evalRounds);
+                    this.$store.commit('evaluations/setEvaluations', [...res.bnApplications, ...res.evalRounds]);
                 }
             }
         },

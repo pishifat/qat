@@ -10,7 +10,7 @@
                 data-toggle="tooltip"
                 data-placement="top"
                 title="edit title"
-                @click.prevent="isEditTitle ? saveTitle() : isEditTitle = true"
+                @click.prevent="isEditingTitle ? update() : isEditingTitle = true"
             >
                 <i class="fas fa-edit" />
             </a>
@@ -18,12 +18,12 @@
             <b>Title:</b>
 
             <input
-                v-if="isEditTitle"
+                v-if="isEditingTitle"
                 v-model="editTitleContent"
                 class="form-control form-control-sm w-50"
                 type="text"
                 placeholder="enter to submit new title..."
-                @keyup.enter="saveTitle()"
+                @keyup.enter="update()"
             >
 
             <span v-else class="small">{{ selectedDiscussionVote.title }}</span>
@@ -36,7 +36,7 @@
                 data-toggle="tooltip"
                 data-placement="top"
                 title="edit title"
-                @click.prevent="isEditProposal ? saveProposal() : isEditProposal = true"
+                @click.prevent="isEditingProposal ? update() : isEditingProposal = true"
             >
                 <i class="fas fa-edit" />
             </a>
@@ -44,12 +44,12 @@
             <b>Proposal:</b>
 
             <input
-                v-if="isEditProposal"
+                v-if="isEditingProposal"
                 v-model="editProposalContent"
                 class="form-control form-control-sm w-75"
                 type="text"
                 placeholder="enter to submit new proposal..."
-                @keyup.enter="saveProposal()"
+                @keyup.enter="update()"
             >
 
             <span v-else class="small" v-html="$md.render(selectedDiscussionVote.shortReason)" />
@@ -66,56 +66,56 @@ export default {
     mixins: [ postData ],
     data() {
         return {
-            isEditTitle: false,
-            editTitleContent: this.title,
-            isEditProposal: false,
-            editProposalContent: this.shortReason,
+            isEditingTitle: false,
+            editTitleContent: '',
+            isEditingProposal: false,
+            editProposalContent: '',
         };
     },
     computed: {
         ...mapState([
-            'userId',
+            'loggedInUser',
         ]),
-        ...mapGetters([
+        ...mapGetters('discussionVote', [
             'selectedDiscussionVote',
         ]),
         isEditable() {
-            return this.selectedDiscussionVote.creator == this.userId && this.selectedDiscussionVote.isActive;
+            return this.loggedInUser.isNat &&
+                this.selectedDiscussionVote.creator == this.loggedInUser.id &&
+                this.selectedDiscussionVote.isActive;
         },
     },
     watch: {
         selectedDiscussionVote () {
-            this.isEditTitle = false;
+            this.isEditingTitle = false;
             this.editTitleContent = this.selectedDiscussionVote.title;
-            this.isEditProposal = false;
+            this.isEditingProposal = false;
             this.editProposalContent = this.selectedDiscussionVote.shortReason;
         },
     },
+    created () {
+        if (this.selectedDiscussionVote) {
+            this.editTitleContent = this.selectedDiscussionVote.title;
+            this.editProposalContent = this.selectedDiscussionVote.shortReason;
+        }
+    },
     methods: {
-        async saveTitle () {
+        async update () {
             const discussionVote = await this.executePost(
-                '/discussionVote/saveTitle/' + this.selectedDiscussionVote.id, { title: this.editTitleContent });
+                `/discussionVote/${this.selectedDiscussionVote.id}/update`, {
+                    title: this.editTitleContent,
+                    shortReason: this.editProposalContent,
+                });
 
             if (discussionVote && !discussionVote.error) {
-                this.$store.dispatch('updateDiscussionVote', discussionVote);
+                this.$store.commit('discussionVote/updateDiscussionVote', discussionVote);
                 this.$store.dispatch('updateToastMessages', {
-                    message: `Saved title`,
+                    message: `Updated`,
                     type: 'info',
                 });
-                this.isEditTitle = !this.isEditTitle;
-            }
-        },
-        async saveProposal () {
-            const discussionVote = await this.executePost(
-                '/discussionVote/saveProposal/' + this.selectedDiscussionVote.id , { shortReason: this.editProposalContent });
 
-            if (discussionVote && !discussionVote.error) {
-                this.$store.dispatch('updateDiscussionVote', discussionVote);
-                this.$store.dispatch('updateToastMessages', {
-                    message: `Saved proposal`,
-                    type: 'info',
-                });
-                this.isEditProposal = !this.isEditProposal;
+                this.isEditingTitle = false;
+                this.isEditingProposal = false;
             }
         },
     },

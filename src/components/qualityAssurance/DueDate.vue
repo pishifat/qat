@@ -1,7 +1,7 @@
 <template>
     <div class="small">
         <div>
-            Due by
+            Due
         </div>
 
         <div class="text-truncate text-danger">
@@ -21,10 +21,7 @@ export default {
     },
     computed: {
         deadline() {
-            let date = new Date(this.timestamp);
-            date.setDate(date.getDate() + 7);
-
-            return date.toISOString().slice(5,10);
+            return this.$moment(this.timestamp).add(7, 'days').fromNow();
         },
     },
 };

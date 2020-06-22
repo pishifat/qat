@@ -1,44 +1,16 @@
 <template>
     <modal-dialog
         id="editQuestion"
-        :title="`Edit ${category} question`"
+        title="Editing question"
     >
-        <div class="container">
-            <div class="form-inline mb-2">
-                <b>Question type:</b>
+        <div v-if="selectedQuestion" class="container">
+            <question-type
+                v-model="questionType"
+                :for-label="'edit'"
+            />
 
-                <div class="form-check form-check-inline ml-2">
-                    <input
-                        id="text"
-                        class="form-check-input"
-                        type="radio"
-                        name="questionTypeEdit"
-                        value="text"
-                        :checked="question.questionType == 'text'"
-                    >
-                    <label class="form-check-label" for="text">Select text</label>
-                </div>
-                <div class="form-check form-check-inline ml-2">
-                    <input
-                        id="image"
-                        class="form-check-input"
-                        type="radio"
-                        name="questionTypeEdit"
-                        value="image"
-                        :checked="question.questionType == 'image'"
-                    >
-                    <label class="form-check-label" for="image">Select Image</label>
-                </div>
-            </div>
-
-            <textarea
-                id="newQuestionEdit"
-                v-model="question.content"
-                class="form-control mb-2"
-                placeholder="question..."
-                maxlength="300"
-                rows="4"
-                @keyup.enter="editQuestion($event)"
+            <question-content
+                v-model="questionContent"
             />
 
             <div class="text-right">
@@ -49,117 +21,71 @@
                 <button
                     type="submit"
                     class="btn btn-sm ml-2"
-                    :class="question.active ? 'btn-danger' : 'btn-success'"
+                    :class="selectedQuestion.active ? 'btn-danger' : 'btn-success'"
                     data-toggle="tooltip"
                     data-placement="top"
                     title="Changes whether or not question appears on newly generated tests"
-                    @click="toggleActive($event)"
+                    @click="toggleActivity($event)"
                 >
-                    {{ question.active ? "Mark as inactive" : "Mark as active" }}
+                    {{ selectedQuestion.active ? "Mark as inactive" : "Mark as active" }}
                 </button>
             </div>
-
             <hr>
 
-            <data-table :headers="['Option', 'Score', 'Select']">
-                <tr v-for="option in sortedOptions" :key="option.id" :class="option.active ? 'border-active' : 'border-inactive'">
-                    <td>
-                        <a v-if="question.questionType == 'image'" :href="option.content" target="_blank">{{ option.content }}</a>
-                        <span v-else>{{ option.content }}</span>
-                    </td>
-                    <td>
-                        {{ option.score }}
-                    </td>
-                    <td>
-                        <input type="checkbox" name="optionList" :value="option.id">
-                    </td>
-                </tr>
-            </data-table>
-
-            <div class="form-inline mb-2">
-                <input
-                    id="option"
-                    class="form-control w-75"
-                    type="text"
-                    maxlength="200"
-                    placeholder="potential answer... (if image, post link)"
-                >
-                <input
-                    id="score"
-                    class="form-control w-25"
-                    type="text"
-                    maxlength="5"
-                    placeholder="points..."
-                >
-            </div>
-
-            <div class="text-right">
-                <button type="submit" class="btn btn-sm btn-danger" @click="toggleActiveOption($event)">
-                    Toggle activity
-                </button>
-                <button type="submit" class="btn btn-sm btn-success ml-2" @click="updateOption($event)">
-                    Update Selected Option
-                </button>
-                <button type="submit" class="btn btn-sm btn-success ml-2" @click="addOption($event)">
-                    Add Option
-                </button>
-            </div>
+            <edit-options />
         </div>
     </modal-dialog>
 </template>
 
 <script>
-import ModalDialog from '../../components/ModalDialog.vue';
-import DataTable from '../../components/DataTable.vue';
+import { mapGetters } from 'vuex';
 import postData from '../../mixins/postData.js';
+import ModalDialog from '../../components/ModalDialog.vue';
+import EditOptions from './EditOptions.vue';
+import QuestionType from './QuestionType.vue';
+import QuestionContent from './QuestionContent.vue';
 
 export default {
     name: 'EditQuestion',
     components: {
         ModalDialog,
-        DataTable,
+        QuestionType,
+        QuestionContent,
+        EditOptions,
     },
     mixins: [ postData ],
-    props: {
-        question: {
-            type: Object,
-            required: true,
-        },
-        category: {
-            type: String,
-            required: true,
-        },
+    data() {
+        return {
+            questionContent: '',
+            questionType: '',
+        };
     },
-    computed: {
-        sortedOptions() {
-            let sorted = this.question.options;
+    computed: mapGetters('manageTest', [
+        'selectedQuestion',
+    ]),
+    watch: {
+        selectedQuestion (q) {
+            if (!q) return;
 
-            for (let i = 0; i < sorted.length; i++) {
-                let option = sorted[i];
-
-                if (!option.active) {
-                    sorted.splice(sorted.length, 0, sorted.splice(i, 1)[0]);
-                }
-            }
-
-            return sorted;
+            this.questionContent = q.content;
+            this.questionType = q.questionType;
         },
     },
     methods: {
         async updateQuestion (e) {
-            let questionType = $('input[name=questionTypeEdit]:checked').val();
-            let newQuestion = $('#newQuestionEdit').val();
-
-            if (!newQuestion || !newQuestion.length || !questionType || !questionType.length) {
+            if (!this.questionContent || !this.questionType) {
                 this.$store.dispatch('updateToastMessages', {
                     message: `Cannot leave question fields blank!`,
                     type: 'danger',
                 });
             } else {
-                const question = await this.executePost('/manageTest/updateQuestion/' + this.question.id, { questionType, newQuestion }, e);
+                const question = await this.executePost(`/manageTest/${this.selectedQuestion.id}/update`, {
+                    questionType: this.questionType,
+                    newQuestion: this.questionContent,
+                }, e);
 
                 if (question && !question.error) {
-                    this.$emit('update-question', question);
+                    this.$store.commit('manageTest/updateQuestion', question);
                     this.$store.dispatch('updateToastMessages', {
                         message: `Question content updated`,
                         type: 'success',
@@ -167,95 +93,15 @@ export default {
                 }
             }
         },
-        async toggleActive(e) {
-            const question = await this.executePost('/manageTest/toggleActive/' + this.question.id, { status: !this.question.active }, e);
+        async toggleActivity(e) {
+            const question = await this.executePost(`/manageTest/${this.selectedQuestion.id}/toggleActivity`, {}, e);
 
             if (question && !question.error) {
-                this.$emit('update-question', question);
+                this.$store.commit('manageTest/updateQuestion', question);
                 this.$store.dispatch('updateToastMessages', {
                     message: `Question activity updated`,
                     type: 'success',
                 });
-            }
-        },
-        async addOption(e) {
-            let option = $('#option').val();
-            let score = parseFloat($('#score').val());
-
-            if ((!option || !option.length) || (!score && score != 0)) {
-                this.$store.dispatch('updateToastMessages', {
-                    message: `Cannot leave option fields blank!`,
-                    type: 'danger',
-                });
-            } else {
-                const question = await this.executePost('/manageTest/addOption/' + this.question.id, { option, score }, e);
-
-                if (question && !question.error) {
-                    this.$emit('update-question', question);
-                    this.$store.dispatch('updateToastMessages', {
-                        message: `Option added`,
-                        type: 'success',
-                    });
-                }
-            }
-        },
-        async updateOption(e) {
-            let id = $('input[name=\'optionList\']:checked').val();
-            let option = $('#option').val();
-            let score = parseFloat($('#score').val());
-            let checked = $('input[name=\'optionList\']:checked').length;
-
-            if (checked != 1) {
-                this.$store.dispatch('updateToastMessages', {
-                    message: `Select only one option!`,
-                    type: 'danger',
-                });
-                this.$store.dispatch('updateToastMessages', {
-                    message: `Apologies for how terribly designed this part of the website is. I can't justify improving it because nobody uses it`,
-                    type: 'info',
-                });
-            } else if (!option || !option.length || (!score && score != 0)) {
-                this.$store.dispatch('updateToastMessages', {
-                    message: `Cannot leave option fields blank!`,
-                    type: 'danger',
-                });
-                this.$store.dispatch('updateToastMessages', {
-                    message: `Apologies for how terribly designed this part of the website is. I can't justify improving it because nobody uses it`,
-                    type: 'info',
-                });
-            } else {
-                const question = await this.executePost('/manageTest/updateOption/' + id, { option, score, questionId: this.question.id }, e);
-
-                if (question && !question.error) {
-                    this.$emit('update-question', question);
-                    this.$store.dispatch('updateToastMessages', {
-                        message: `Option added`,
-                        type: 'success',
-                    });
-                }
-            }
-        },
-        async toggleActiveOption(e) {
-            let checkedOptions = [];
-            $('input[name=\'optionList\']:checked').each(function() {
-                checkedOptions.push( $(this).val() );
-            });
-
-            if (!checkedOptions.length) {
-                this.$store.dispatch('updateToastMessages', {
-                    message: `Must select options!`,
-                    type: 'danger',
-                });
-            } else {
-                const question = await this.executePost('/manageTest/toggleActiveOption/', { checkedOptions, questionId: this.question.id }, e);
-
-                if (question && !question.error) {
-                    this.$emit('update-question', question);
-                    this.$store.dispatch('updateToastMessages', {
-                        message: `Question updated`,
-                        type: 'success',
-                    });
-                }
             }
         },
     },

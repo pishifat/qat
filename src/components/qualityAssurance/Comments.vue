@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-if="!isUser" class="col-sm-12 my-2" :class="otherUserComments.length ? 'mb-1' : ''">
+        <div v-if="loggedInUser.hasBasicAccess" class="col-sm-12 my-2" :class="otherUserComments.length ? 'mb-1' : ''">
             <a
                 href="#"
                 class="ml-2"
@@ -34,7 +34,7 @@
             <ul class="small mb-0">
                 <!-- if not maxchecks/outdated/currentuser, show Anoynmous: comment, otherwise show username: comment -->
                 <li v-for="mediation in otherUserComments" :key="mediation.id">
-                    {{ isNat || isMaxChecks || isOutdated ? mediation.mediator.username + ':' : 'anonymous:' }}
+                    {{ loggedInUser.isNat || isMaxChecks || isOutdated ? mediation.mediator.username + ':' : 'anonymous:' }}
                     <span v-html="$md.render(mediation.comment)" />
                 </li>
             </ul>
@@ -72,12 +72,10 @@ export default {
     },
     computed: {
         ...mapState([
-            'userId',
-            'isNat',
-            'isUser',
+            'loggedInUser',
         ]),
         otherUserComments() {
-            return this.qualityAssuranceComments.filter(m => m.mediator.id != this.userId && m.comment.length);
+            return this.qualityAssuranceComments.filter(m => m.mediator.id != this.loggedInUser.id && m.comment.length);
         },
     },
     watch: {
@@ -93,7 +91,7 @@ export default {
             this.userComment = null;
             this.mediationId = null;
 
-            const userMediation = this.qualityAssuranceComments.find(m => m.mediator.id == this.userId);
+            const userMediation = this.qualityAssuranceComments.find(m => m.mediator.id == this.loggedInUser.id);
 
             if (userMediation) {
                 this.userComment = userMediation.comment;
@@ -105,7 +103,7 @@ export default {
             const event = await this.executePost('/qualityAssurance/editComment/' + this.eventId, { mediationId: this.mediationId, comment: this.userComment }, e);
 
             if (event && !event.error) {
-                this.$store.commit('updateEvent', event);
+                this.$store.commit('qualityAssurance/updateEvent', event);
                 this.findRelevantComment();
             }
         },
