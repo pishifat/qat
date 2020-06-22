@@ -13,7 +13,6 @@
         <add-votes
             v-else-if="isNat && isDiscuss"
             :evaluations="evaluations"
-            :is-application="isApplication"
         />
 
         <i
