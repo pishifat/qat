@@ -96,7 +96,7 @@ router.post('/submitEval/:id', async (req, res) => {
     if (!res.locals.userRequest.isNat ||
         (
             res.locals.userRequest.isBn &&
-            !evaluation.bnEvaluators.some(bn => bn._id == req.session.mongoId)
+            !evaluation.bnEvaluators.some(bn => bn.id == req.session.mongoId)
         )
     ) {
         return res.json({
