@@ -1,28 +1,17 @@
 const express = require('express');
-const api = require('../helpers/api');
 const Logger = require('../models/log');
 const Report = require('../models/report');
 const User = require('../models/user');
+const middlewares = require('../helpers/middlewares');
 
 const router = express.Router();
 
-router.use(api.isLoggedIn);
-router.use(api.isNat);
-
-/* GET bn app page */
-router.get('/', (req, res) => {
-    res.render('managereports', {
-        title: 'Manage Reports',
-        script: '../javascripts/manageReports.js',
-        loggedInAs: req.session.mongoId,
-        isReports: true,
-        isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
-    });
-});
+router.use(middlewares.isLoggedIn);
+router.use(middlewares.hasFullReadAccess);
 
 //population
 const defaultPopulate = [
-    { path: 'culprit', select: 'username osuId group' },
+    { path: 'culprit', select: 'username osuId groups' },
     { path: 'reporter', select: 'username osuId' },
 ];
 
@@ -34,44 +23,6 @@ router.get('/relevantInfo', async (req, res) => {
         .sort({ createdAt: -1 });
 
     res.json({ openReports });
-});
-
-/* POST submit or edit eval */
-router.post('/submitReportEval/:id', api.isNotSpectator, async (req, res) => {
-    if (req.body.feedback && req.body.feedback.length) {
-        await Report.findByIdAndUpdate(req.params.id, { feedback: req.body.feedback });
-    }
-
-    if (req.body.vote) {
-        await Report.findByIdAndUpdate(req.params.id, { valid: req.body.vote });
-    }
-
-    if (req.body.close) {
-        await Report.findByIdAndUpdate(req.params.id, { isActive: false });
-    }
-
-    let r = await Report
-        .findById(req.params.id)
-        .populate(defaultPopulate);
-
-    res.json(r);
-
-    if (req.body.feedback && req.body.feedback.length) {
-        Logger.generate(
-            req.session.mongoId,
-            `Set feedback on report to "${
-                req.body.feedback.length > 50 ? req.body.feedback.slice(0, 50) + '...' : req.body.feedback
-            }"`
-        );
-    }
-
-    if (req.body.vote) {
-        Logger.generate(
-            req.session.mongoId,
-            `Set validity of report to
-            "${req.body.vote == 1 ? 'valid' : req.body.vote == 2 ? 'partially valid' : 'invalid'}"`
-        );
-    }
 });
 
 /* GET search for user */
@@ -123,6 +74,44 @@ router.get('/searchById/:id', async (req, res) => {
     }
 
     res.json(report);
+});
+
+/* POST submit or edit eval */
+router.post('/submitReportEval/:id', middlewares.isNat, async (req, res) => {
+    if (req.body.feedback && req.body.feedback.length) {
+        await Report.findByIdAndUpdate(req.params.id, { feedback: req.body.feedback });
+    }
+
+    if (req.body.vote) {
+        await Report.findByIdAndUpdate(req.params.id, { valid: req.body.vote });
+    }
+
+    if (req.body.close) {
+        await Report.findByIdAndUpdate(req.params.id, { isActive: false });
+    }
+
+    let r = await Report
+        .findById(req.params.id)
+        .populate(defaultPopulate);
+
+    res.json(r);
+
+    if (req.body.feedback && req.body.feedback.length) {
+        Logger.generate(
+            req.session.mongoId,
+            `Set feedback on report to "${
+                req.body.feedback.length > 50 ? req.body.feedback.slice(0, 50) + '...' : req.body.feedback
+            }"`
+        );
+    }
+
+    if (req.body.vote) {
+        Logger.generate(
+            req.session.mongoId,
+            `Set validity of report to
+            "${req.body.vote == 1 ? 'valid' : req.body.vote == 2 ? 'partially valid' : 'invalid'}"`
+        );
+    }
 });
 
 module.exports = router;

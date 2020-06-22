@@ -39,7 +39,7 @@
                             />
 
                             <assignment-buttons
-                                v-if="!isOutdated && !isUser"
+                                v-if="!isOutdated && loggedInUser.hasBasicAccess"
                                 class="col-sm-2 ml-2 ml-sm-0 text-center"
                                 :event-id="event.id"
                                 :is-quality-assurance-checker="isQualityAssuranceChecker"
@@ -50,9 +50,9 @@
                 </div>
 
                 <comments
-                    v-if="!isUser || (isUser && event.qualityAssuranceComments.length)"
+                    v-if="loggedInUser.hasBasicAccess || (!loggedInUser.hasBasicAccess && event.qualityAssuranceComments.length)"
                     class="row small"
-                    :class="isUser ? 'mt-2' : ''"
+                    :class="loggedInUser.hasBasicAccess ? 'mt-2' : ''"
                     :quality-assurance-comments="event.qualityAssuranceComments"
                     :event-id="event.id"
                     :is-max-checks="isMaxChecks"
@@ -94,16 +94,12 @@ export default {
     },
     computed: {
         ...mapState([
-            'userId',
-            'userOsuId',
-            'username',
-            'isNat',
-            'isUser',
+            'loggedInUser',
         ]),
         isQualityAssuranceChecker() {
             let valid;
             this.event.qualityAssuranceCheckers.forEach(user => {
-                if (user.id == this.userId) {
+                if (user.id == this.loggedInUser.id) {
                     valid = true;
                 }
             });
@@ -111,7 +107,7 @@ export default {
             return valid;
         },
         showAll() {
-            if (this.event.qualityAssuranceCheckers && (this.isNat || this.isMaxChecks || this.isOutdated)) return true;
+            if (this.event.qualityAssuranceCheckers && (this.loggedInUser.isNat || this.isMaxChecks || this.isOutdated)) return true;
             else return false;
         },
     },

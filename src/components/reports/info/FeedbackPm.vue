@@ -28,10 +28,8 @@ import { mapGetters } from 'vuex';
 
 export default {
     name: 'FeedbackPm',
-    computed: {
-        ...mapGetters([
-            'selectedReport',
-        ]),
-    },
+    computed: mapGetters('manageReports', [
+        'selectedReport',
+    ]),
 };
 </script>

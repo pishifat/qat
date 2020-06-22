@@ -1,28 +1,23 @@
 const express = require('express');
-const api = require('../helpers/api');
 const Question = require('../models/bnTest/question');
 const Option = require('../models/bnTest/option');
 const Logger = require('../models/log');
+const middlewares = require('../helpers/middlewares');
 
 const router = express.Router();
 
-router.use(api.isLoggedIn);
-router.use(api.isNat);
-
-/* GET bn app page */
-router.get('/', (req, res) => {
-    res.render('rcTest/managetest', {
-        title: 'Manage RC Test',
-        script: '../javascripts/manageTest.js',
-        loggedInAs: req.session.mongoId,
-        isTest: true,
-        isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
-    });
-});
+router.use(middlewares.isLoggedIn);
+router.use(middlewares.hasFullReadAccess);
 
 //population
 const defaultPopulate = [
-    { path: 'options', select: 'content score active' },
+    {
+        path: 'options',
+        select: 'content score active',
+        sort: {
+            active: 1,
+        },
+    },
 ];
 
 /* GET applicant listing. */
@@ -30,13 +25,15 @@ router.get('/load/:type', async (req, res) => {
     let questions = await Question
         .find({ category: req.params.type })
         .populate(defaultPopulate)
-        .sort({ createdAt: -1 });
+        .sort({
+            createdAt: -1,
+        });
 
     res.json({ questions });
 });
 
 /* POST add question */
-router.post('/addQuestion/', api.isNotSpectator, async (req, res) => {
+router.post('/store', middlewares.isNat, async (req, res) => {
     let q = await Question.create({
         category: req.body.category,
         content: req.body.newQuestion,
@@ -55,13 +52,15 @@ router.post('/addQuestion/', api.isNotSpectator, async (req, res) => {
 });
 
 /* POST edit question */
-router.post('/updateQuestion/:id', api.isNotSpectator, async (req, res) => {
-    let question = await Question
-        .findByIdAndUpdate(req.params.id, {
-            content: req.body.newQuestion,
-            questionType: req.body.questionType,
-        })
-        .populate(defaultPopulate);
+router.post('/:id/update', middlewares.isNat, async (req, res) => {
+    const question = await Question
+        .findById(req.params.id)
+        .populate(defaultPopulate)
+        .orFail();
+
+    question.content = req.body.newQuestion;
+    question.questionType = req.body.questionType;
+    await question.save();
 
     res.json(question);
     Logger.generate(
@@ -75,10 +74,14 @@ router.post('/updateQuestion/:id', api.isNotSpectator, async (req, res) => {
 });
 
 /* POST edit activity of question */
-router.post('/toggleActive/:id', api.isNotSpectator, async (req, res) => {
-    let question = await Question
-        .findByIdAndUpdate(req.params.id, { active: req.body.status })
-        .populate(defaultPopulate);
+router.post('/:id/toggleActivity', middlewares.isNat, async (req, res) => {
+    const question = await Question
+        .findById(req.params.id)
+        .populate(defaultPopulate)
+        .orFail();
+
+    question.active = !question.active;
+    await question.save();
 
     res.json(question);
     Logger.generate(
@@ -87,72 +90,84 @@ router.post('/toggleActive/:id', api.isNotSpectator, async (req, res) => {
     );
 });
 
+function validateInput (contentInput, scoreInput) {
+    const content = contentInput;
+    const score = parseFloat(scoreInput);
+
+    if (!content || isNaN(score)) {
+        throw new Error('Cannot leave option fields blank');
+    }
+
+    return [content, score];
+}
+
 /* POST add option */
-router.post('/addOption/:id', api.isNotSpectator, async (req, res) => {
-    let o = await Option.create({
-        content: req.body.option,
-        score: req.body.score,
+router.post('/:id/options/store', middlewares.isNat, async (req, res) => {
+    const [content, score] = validateInput(req.body.content, req.body.score);
+    let option = await Option.create({
+        content,
+        score,
     });
 
-    if (!o || o.error) {
+    if (!option) {
         return res.json({ error: 'Something went wrong!' });
     }
 
-    let q = await Question
-        .findByIdAndUpdate(req.params.id, { $push: { options: o.id } })
-        .populate(defaultPopulate);
+    let question = await Question
+        .findByIdAndUpdate(req.params.id, { $push: { options: option.id } })
+        .populate(defaultPopulate)
+        .orFail();
 
-    res.json(q);
+    res.json(question);
     Logger.generate(
         req.session.mongoId,
         `Added option for RC test question: "${
-            req.body.option.length > 50 ? req.body.option.slice(0, 50) + '...' : req.body.option
+            content.length > 50 ? content.slice(0, 50) + '...' : content
         }"`
     );
 });
 
 /* POST edit option */
-router.post('/updateOption/:id', api.isNotSpectator, async (req, res) => {
-    let o = await Option.findByIdAndUpdate(req.params.id, {
-        content: req.body.option,
-        score: req.body.score,
-    });
+router.post('/:id/options/:optionId/update', middlewares.isNat, async (req, res) => {
+    const [content, score] = validateInput(req.body.content, req.body.score);
+    let option = await Option.findById(req.params.optionId).orFail();
+    option.content = content;
+    option.score = score;
+    await option.save();
 
-    if (!o) {
+    if (!option) {
         return res.json({ error: 'Something went wrong!' });
     }
 
-    let q = await Question
-        .findById(req.body.questionId)
-        .populate(defaultPopulate);
+    let question = await Question
+        .findById(req.params.id)
+        .populate(defaultPopulate)
+        .orFail();
 
-    res.json(q);
+    res.json(question);
     Logger.generate(
         req.session.mongoId,
         `Updated option for RC test question: "${
-            req.body.option.length > 50 ? req.body.option.slice(0, 50) + '...' : req.body.option
+            content.length > 50 ? content.slice(0, 50) + '...' : content
         }"`
     );
 });
 
 /* POST edit option activity */
-router.post('/toggleActiveOption/', api.isNotSpectator, async (req, res) => {
-    for (let i = 0; i < req.body.checkedOptions.length; i++) {
-        let o = await Option.findById(req.body.checkedOptions[i]);
-        o.active = !o.active;
-        await o.save();
-    }
+router.post('/:id/options/:optionId/toggleActivity', middlewares.isNat, async (req, res) => {
+    let option = await Option.findById(req.params.optionId).orFail();
+    option.active = !option.active;
+    await option.save();
 
-    let q = await Question
-        .findById(req.body.questionId)
-        .populate(defaultPopulate);
+    let question = await Question
+        .findById(req.params.id)
+        .populate(defaultPopulate)
+        .orFail();
 
-    res.json(q);
+    res.json(question);
     Logger.generate(
         req.session.mongoId,
-        `Changed active status of ${req.body.checkedOptions.length} RC test question option${
-            req.body.checkedOptions.length == 1 ? '' : 's'
-        }`
+        `Changed active status of a RC test question option`
     );
 });
 

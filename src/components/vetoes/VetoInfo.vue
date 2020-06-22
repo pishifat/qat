@@ -19,7 +19,7 @@
 
             <!-- show admin buttons to NAT who aren't active mediators -->
             <admin-buttons
-                v-if="isNat && !isMediator"
+                v-if="loggedInUser.isNat && (selectedVeto.status != 'wip' || !isMediator)"
             />
 
             <!-- show mediation input for active mediators -->
@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import ModalHeader from './info/ModalHeader.vue';
 import Context from './info/Context.vue';
 import Mediations from './info/Mediations.vue';
@@ -51,18 +51,16 @@ export default {
     },
     computed: {
         ...mapState([
-            'userId',
-            'userOsuId',
-            'isNat',
+            'loggedInUser',
         ]),
-        ...mapGetters([
+        ...mapGetters('vetoes', [
             'selectedVeto',
             'isMediator',
         ]),
         showMediations() {
             if (this.selectedVeto.mediations.length) {
                 // NAT can see only if they're not mediators
-                if (this.isNat && !this.isMediator) {
+                if (this.loggedInUser.isNat && !this.isMediator) {
                     return true;
                 // everyone can see when upheld/withdrawn
                 } else if (this.selectedVeto.status == 'upheld' || this.selectedVeto.status == 'withdrawn') {
@@ -71,11 +69,6 @@ export default {
             }
 
             return false;
-        },
-    },
-    watch: {
-        selectedVeto () {
-            history.pushState(null, 'Vetoes', `/vetoes?id=${this.selectedVeto.id}`);
         },
     },
 };

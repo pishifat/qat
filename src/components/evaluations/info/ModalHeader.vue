@@ -9,10 +9,8 @@
             >
                 {{ username }}
             </a>
-            <i v-if="mode == 'osu'" class="far fa-circle" />
-            <i v-else-if="mode == 'taiko'" class="fas fa-drum" />
-            <i v-else-if="mode == 'catch'" class="fas fa-apple-alt" />
-            <i v-else-if="mode == 'mania'" class="fas fa-stream" />
+
+            <mode-display :modes="mode" />
         </h5>
         <button type="button" class="close" data-dismiss="modal">
             <span>&times;</span>
@@ -21,10 +19,14 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState } from 'vuex';
+import ModeDisplay from '../../ModeDisplay.vue';
 
 export default {
     name: 'ModalHeader',
+    components: {
+        ModeDisplay,
+    },
     props: {
         isApplication: Boolean,
         osuId: {
@@ -46,17 +48,15 @@ export default {
             },
         },
     },
-    computed: {
-        ...mapGetters([
-            'evaluatorId',
-        ]),
-    },
+    computed: mapState([
+        'loggedInUser',
+    ]),
     methods: {
         isNatEvaluator() {
             for (let i = 0; i < this.natEvaluators.length; i++) {
                 let user = this.natEvaluators[i];
 
-                if (user.id == this.evaluatorId) {
+                if (user.id == this.loggedInUser.id) {
                     return true;
                 }
             }

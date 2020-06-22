@@ -17,7 +17,7 @@ import { mapGetters } from 'vuex';
 export default {
     name: 'ForumPm',
     computed: {
-        ...mapGetters([
+        ...mapGetters('vetoes', [
             'selectedVeto',
         ]),
     },

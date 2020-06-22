@@ -231,7 +231,7 @@ export default {
 
                 if (discussionVote && !discussionVote.error) {
                     $('#addDiscussion').modal('hide');
-                    this.$store.commit('addDiscussionVote', discussionVote);
+                    this.$store.commit('discussionVote/addDiscussionVote', discussionVote);
                     this.$store.dispatch('updateToastMessages', {
                         message: `Submitted discussion`,
                         type: 'success',

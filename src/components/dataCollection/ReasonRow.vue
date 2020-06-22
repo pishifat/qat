@@ -6,7 +6,7 @@
             data-toggle="modal"
             data-target="#editReason"
             :data-entry="event.id"
-            @click.prevent="selectEvent()"
+            @click="selectEvent()"
         >
             <i class="fas fa-edit" />
         </a>
@@ -43,7 +43,7 @@ export default {
     },
     methods: {
         selectEvent () {
-            this.$store.commit('setSelectedEventId', this.event.id);
+            this.$store.commit('dataCollection/setSelectedEventId', this.event.id);
         },
     },
 };

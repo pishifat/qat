@@ -27,7 +27,7 @@ export default {
     name: 'BnEvaluatorToggle',
     mixins: [postData],
     computed: {
-        ...mapGetters([
+        ...mapGetters('users', [
             'selectedUser',
         ]),
     },
@@ -36,7 +36,7 @@ export default {
             const user = await this.executePost(`/users/${this.selectedUser.id}/switchBnEvaluator`, {}, e);
 
             if (user && !user.error) {
-                this.$store.dispatch('updateUser', user);
+                this.$store.commit('users/updateUser', user);
                 this.$store.dispatch('updateToastMessages', {
                     message: `Toggled BN evaluator`,
                     type: 'success',

@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapGetters } from 'vuex';
 import VotesInactiveType from './VotesInactiveType.vue';
 
 export default {
@@ -34,10 +34,7 @@ export default {
         VotesInactiveType,
     },
     computed: {
-        ...mapState([
-            'isNat',
-        ]),
-        ...mapGetters([
+        ...mapGetters('discussionVote', [
             'selectedDiscussionVote',
         ]),
         totalMediations() {

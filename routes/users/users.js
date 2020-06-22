@@ -1,59 +1,39 @@
 const express = require('express');
-const api = require('../../helpers/api');
 const User = require('../../models/user');
 const Logger = require('../../models/log');
-const BnApp = require('../../models/bnApp');
-const EvalRound = require('../../models/evalRound');
+const AppEvaluation = require('../../models/evaluations/appEvaluation');
+const BnEvaluation = require('../../models/evaluations/bnEvaluation');
 const Aiess = require('../../models/aiess');
-const getGeneralEvents = require('../bnEval').getGeneralEvents;
+const middlewares = require('../../helpers/middlewares');
+const getGeneralEvents = require('../evaluations/bnEval').getGeneralEvents;
 
 const router = express.Router();
 
-router.use(api.isLoggedIn);
+router.use(middlewares.isLoggedIn);
 
 const evaluationsPopulate = [
     {
-        path: 'evaluations',
+        path: 'reviews',
         select: 'evaluator',
     },
 ];
 
-/* GET bn app page */
-router.get('/', (req, res) => {
-    res.render('users', {
-        title: 'BN/NAT Listing',
-        script: '../javascripts/users.js',
-        loggedInAs: req.session.mongoId,
-        isUsers: true,
-        isBn: res.locals.userRequest.isBn,
-        isNat: res.locals.userRequest.isNat || res.locals.userRequest.isSpectator,
-    });
-});
-
 /* GET applicant listing. */
 router.get('/relevantInfo', async (req, res) => {
-    const users = await User.find({
-        $or: [
-            { group: 'nat' },
-            { group: 'bn' },
-        ],
-    }).sort({ username: 1 });
+    const users = await User
+        .find({
+            groups: { $in: ['bn', 'nat'] },
+        });
 
     res.json({
         users,
-        userId: req.session.mongoId,
-        isNat: res.locals.userRequest.group == 'nat' || res.locals.userRequest.isSpectator,
-        isBn: res.locals.userRequest.group == 'bn',
     });
 });
 
 /* GET applicant listing. */
 router.get('/loadPreviousBnAndNat', async (req, res) => {
     const users = await User.find({
-        $or: [
-            { bnDuration: { $ne: [], $exists: true } },
-            { natDuration: { $ne: [], $exists: true } },
-        ],
+        history: { $exists: true, $ne: [] },
     }).sort({ username: 1 });
 
     res.json({ users });
@@ -61,7 +41,7 @@ router.get('/loadPreviousBnAndNat', async (req, res) => {
 
 /* GET user next evaluation */
 router.get('/loadNextEvaluation/:id', async (req, res) => {
-    let er = await EvalRound.findOne({ bn: req.params.id, active: true });
+    let er = await BnEvaluation.findOne({ user: req.params.id, active: true });
 
     if (!er) {
         return res.json('Never');
@@ -80,13 +60,12 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
     const [users, bnApps, bnRounds] = await Promise.all([
         User
             .find({
-                group: 'nat',
-                modes: req.params.mode,
-                isSpectator: { $ne: true },
+                groups: 'nat',
+                'modesInfo.mode': req.params.mode,
             })
             .sort({ username: 1 }),
 
-        BnApp
+        AppEvaluation
             .find({
                 mode: req.params.mode,
                 createdAt: { $gte: minAppDate, $lte: maxDate },
@@ -94,7 +73,7 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
             })
             .populate(evaluationsPopulate),
 
-        EvalRound
+        BnEvaluation
             .find({
                 mode: req.params.mode,
                 deadline: { $gte: minEvalDate, $lte: maxDate },
@@ -102,51 +81,38 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
             })
             .populate(evaluationsPopulate),
     ]);
-    const bnAppsCount = bnApps.length;
-    const evalRoundsCount = bnRounds.length;
     let info = [];
     users.forEach(user => {
         if (invalids.indexOf(user.osuId) == -1) {
             let evalsOnBnApps = 0;
             let evalsOnCurrentBnEvals = 0;
-            let feedbackCount = 0;
 
             bnApps.forEach(app => {
-                app.evaluations.forEach(evaluation => {
-                    if (evaluation.evaluator == user.id) {
-                        evalsOnBnApps++;
-                    }
-                });
-
-                if (app.feedbackAuthor == user.id) {
-                    feedbackCount++;
-                }
+                evalsOnBnApps += app.reviews.filter(r => r.evaluator == user.id).length;
             });
 
             bnRounds.forEach(round => {
-                round.evaluations.forEach(evaluation => {
-                    if (evaluation.evaluator == user.id) {
-                        evalsOnCurrentBnEvals++;
-                    }
-                });
-
-                if (round.feedbackAuthor == user.id) {
-                    feedbackCount++;
-                }
+                evalsOnCurrentBnEvals += round.reviews.filter(r => r.evaluator == user.id).length;
             });
+
+            const joinHistory = user.history.filter(h => h.kind === 'joined' &&  h.group === 'nat');
+            const lastJoin = joinHistory[joinHistory.length - 1];
 
             info.push({
                 username: user.username,
                 osuId: user.osuId,
                 totalBnAppEvals: evalsOnBnApps,
                 totalCurrentBnEvals: evalsOnCurrentBnEvals,
-                totalWrittenFeedbacks: feedbackCount,
-                joinDate: user.natDuration[user.natDuration.length - 1],
+                joinDate: lastJoin && lastJoin.date,
             });
         }
     });
 
-    res.json({ info, bnAppsCount, evalRoundsCount });
+    res.json({
+        info,
+        bnAppsCount: bnApps.length,
+        evalRoundsCount: bnRounds.length,
+    });
 });
 
 router.get('/findBnActivity/:days/:mode', async (req, res) => {
@@ -155,12 +121,11 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
     let maxDate = new Date();
     const [users, allEvents, allActiveEvalRounds, allQualityAssuranceChecks] = await Promise.all([
         User.find({
-            group: 'bn',
-            modes: req.params.mode,
-            isSpectator: { $ne: true },
+            groups: 'bn',
+            'modesInfo.mode': req.params.mode,
         }).sort({ username: 1 }),
         Aiess.getAllActivity(minDate, maxDate, req.params.mode),
-        EvalRound.find({ active: true }),
+        BnEvaluation.find({ active: true, mode: req.params.mode }),
         Aiess.find({ qualityAssuranceCheckers: { $exists: true, $ne: [] }, timestamp: { $gt: minDate } }),
     ]);
 
@@ -168,7 +133,7 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
     users.forEach(user => {
         let uniqueNominations = [];
         let nominationResets = 0;
-        let qualityAssuranceChecks = 0;
+        let qualityAssuranceChecks = allQualityAssuranceChecks.filter(qa => qa.qualityAssuranceCheckers.includes(user.id)).length;
 
         for (let i = 0; i < allEvents.length; i++) {
             const eventType = allEvents[i]._id;
@@ -187,41 +152,23 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
                     }
                 }
             } else if (eventType == 'Popped' || eventType == 'Disqualified') {
-                for (let j = 0; j < events.length; j++) {
-                    if (events[j].userId == user.osuId) {
-                        nominationResets++;
-                    }
-                }
+                nominationResets += events.filter(e => e.userId == user.osuId).length;
             }
         }
 
-        for (let i = 0; i < allQualityAssuranceChecks.length; i++) {
-            const event = allQualityAssuranceChecks[i];
+        let activeEval = allActiveEvalRounds.find(e => e.user == user.id);
+        let deadline = 'Never';
+        if (activeEval) deadline = activeEval.deadline;
 
-            if (event.qualityAssuranceCheckers.includes(user.id)) {
-                qualityAssuranceChecks++;
-            }
-        }
-
-        let deadline;
-
-        for (let i = 0; i < allActiveEvalRounds.length; i++) {
-            const evalRound = allActiveEvalRounds[i];
-
-            if (evalRound.bn == user.id) {
-                deadline = evalRound.deadline;
-                break;
-            }
-        }
-
-        if (!deadline) deadline = 'Never';
+        const joinHistory = user.history.filter(h => h.kind === 'joined' &&  h.group === 'bn');
+        const lastJoin = joinHistory[joinHistory.length - 1];
 
         info.push({
             username: user.username,
             osuId: user.osuId,
             uniqueNominations: uniqueNominations.length,
             nominationResets,
-            joinDate: user.bnDuration[user.bnDuration.length - 1],
+            joinDate: lastJoin && lastJoin.date,
             nextEvaluation: deadline,
             qualityAssuranceChecks,
         });
@@ -231,10 +178,10 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
 });
 
 /* POST switch bn evaluator */
-router.post('/:id/switchBnEvaluator', api.isBnOrNat, async (req, res) => {
+router.post('/:id/switchBnEvaluator', middlewares.isBnOrNat, async (req, res) => {
     const user = await User.findById(req.params.id).orFail();
 
-    if (req.session.mongoId != user.id && res.locals.userRequest.group != 'nat') {
+    if (req.session.mongoId != user.id && !res.locals.userRequest.isNat) {
         return res.json({
             error: 'Unauthorized',
         });
@@ -248,15 +195,15 @@ router.post('/:id/switchBnEvaluator', api.isBnOrNat, async (req, res) => {
 });
 
 /* GET aiess info */
-router.get('/activity/:osuId/:modes/:deadline/:mongoId', async (req, res) => {
-    const mongoId = req.params.mongoId;
-    const modes = req.params.modes.split(',');
-    let deadline = parseInt(req.params.deadline);
+router.get('/activity', async (req, res) => {
+    const { osuId, mongoId } = req.query;
+    const modes = req.query.modes.split(',');
+    const deadline = parseInt(req.query.deadline);
     let minDate = new Date(deadline);
     minDate.setDate(minDate.getDate() - 90);
     let maxDate = new Date(deadline);
 
-    res.json(await getGeneralEvents(req.params.osuId, mongoId, modes, minDate, maxDate));
+    res.json(await getGeneralEvents(osuId, mongoId, modes, minDate, maxDate));
 });
 
 module.exports = router;

@@ -1,54 +1,47 @@
 import Axios from 'axios';
 
-const postData = {
+async function executeRequest (requestType, url, data, e, updateLoadingState, store) {
+    if (updateLoadingState) store.commit('updateLoadingState');
+    if (e) e.target.disabled = true;
+
+    $(`[data-toggle='tooltip']`).tooltip('hide');
+
+    try {
+        let res;
+
+        if (requestType == 'post') {
+            res = await Axios.post(url, data);
+        } else {
+            res = await Axios.get(url);
+        }
+
+        if (res.data.error) {
+            store.dispatch('updateToastMessages', { message: res.data.error });
+        }
+
+        return res.data;
+    } catch (error) {
+        store.dispatch('updateToastMessages', { message: 'Something went wrong!' });
+
+        return { error: 'Something went wrong' };
+    } finally {
+        if (e) e.target.disabled = false;
+        if (updateLoadingState) store.commit('updateLoadingState');
+    }
+}
+
+export default {
     methods: {
-        async executePost(path, data, e) {
-            if (e) e.target.disabled = true;
-
-            $(`[data-toggle='tooltip']`).tooltip('hide');
-
-            try {
-                const res = await Axios.post(path, data);
-
-                if (res.data.error) {
-                    this.$store.dispatch('updateToastMessages', { message: res.data.error });
-
-                    return { error: res.data.error };
-                } else {
-                    return res.data;
-                }
-            } catch (error) {
-                this.$store.dispatch('updateToastMessages', { message: 'Something went wrong!' });
-
-                return { error: 'Something went wrong' };
-            } finally {
-                if (e) e.target.disabled = false;
-            }
+        async executePost(url, data, e) {
+            return await executeRequest('post', url, data, e, false, this.$store);
         },
-        async executeGet(path, e) {
-            if (e) e.target.disabled = true;
 
-            $(`[data-toggle='tooltip']`).tooltip('hide');
+        async executeGet(url, e, updateLoadingState) {
+            return await executeRequest('get', url, null, e, updateLoadingState, this.$store);
+        },
 
-            try {
-                const res = await Axios(path);
-
-                if (res.data.error) {
-                    this.$store.dispatch('updateToastMessages', { message: res.data.error });
-
-                    return { error: res.data.error };
-                } else {
-                    return res.data;
-                }
-            } catch (error) {
-                this.$store.dispatch('updateToastMessages', { message: 'Something went wrong!' });
-
-                return { error: 'Something went wrong' };
-            } finally {
-                if (e) e.target.disabled = false;
-            }
+        async initialRequest(url) {
+            return await executeRequest('get', url, null, null, true, this.$store);
         },
     },
 };
-
-export default postData;

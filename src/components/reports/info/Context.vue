@@ -6,14 +6,23 @@
 
         <div class="small ml-4 mb-3 text-secondary" v-html="$md.render(selectedReport.reason)" />
 
-        <p v-if="selectedReport.link">
-            <b>Relevant link:</b>
-            <span class="text-secondary" v-html="$md.render(selectedReport.link)" />
-        </p>
+        <template v-if="selectedReport.link">
+            <p>
+                <b>Relevant link:</b>
+            </p>
+
+            <div class="small ml-4 mb-3 text-secondary text-truncate">
+                <a :href="selectedReport.link" target="_blank">
+                    {{ selectedReport.link }}
+                </a>
+            </div>
+        </template>
+
         <p>
             <b>Reported:</b>
-            <span class="text-secondary">{{ selectedReport.createdAt.slice(0,10) }}</span>
+            <span class="text-secondary">{{ selectedReport.createdAt | toStandardDate }}</span>
         </p>
+
         <p v-if="!selectedReport.isActive">
             <b>Reported by:</b>
 
@@ -29,10 +38,8 @@ import { mapGetters } from 'vuex';
 
 export default {
     name: 'Context',
-    computed: {
-        ...mapGetters([
-            'selectedReport',
-        ]),
-    },
+    computed: mapGetters('manageReports', [
+        'selectedReport',
+    ]),
 };
 </script>

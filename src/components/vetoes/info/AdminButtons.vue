@@ -105,25 +105,33 @@ export default {
         };
     },
     computed: {
-        ...mapGetters([
+        ...mapGetters('vetoes', [
             'selectedVeto',
             'majorityUphold',
         ]),
     },
+    watch: {
+        selectedVeto() {
+            this.mediators = null;
+        },
+    },
     methods: {
+        commitVeto (veto, message) {
+            if (veto && !veto.error) {
+                this.$store.commit('vetoes/updateVeto', veto);
+                this.$store.dispatch('updateToastMessages', {
+                    message,
+                    type: 'success',
+                });
+            }
+        },
         async beginMediation (e) {
             const result = confirm(`Are you sure?`);
 
             if (result) {
                 const veto = await this.executePost(`/vetoes/beginMediation/${this.selectedVeto.id}`, { mediators: this.mediators }, e);
 
-                if (veto && !veto.error) {
-                    this.$store.dispatch('updateVeto', veto);
-                    this.$store.dispatch('updateToastMessages', {
-                        message: `Started veto mediation`,
-                        type: 'success',
-                    });
-                }
+                this.commitVeto(veto, 'Started veto mediation');
             }
         },
         async concludeMediation (e, dismiss) {
@@ -139,13 +147,7 @@ export default {
                     e
                 );
 
-                if (veto && !veto.error) {
-                    this.$store.dispatch('updateVeto', veto);
-                    this.$store.dispatch('updateToastMessages', {
-                        message: `Concluded mediation`,
-                        type: 'success',
-                    });
-                }
+                this.commitVeto(veto, 'Concluded mediation');
             }
         },
 
@@ -155,13 +157,7 @@ export default {
             if (result) {
                 const veto = await this.executePost(`/vetoes/continueMediation/${this.selectedVeto.id}`, {}, e);
 
-                if (veto && !veto.error) {
-                    this.$store.dispatch('updateVeto', veto);
-                    this.$store.dispatch('updateToastMessages', {
-                        message: `Re-opened mediation`,
-                        type: 'success',
-                    });
-                }
+                this.commitVeto(veto, 'Re-opened mediation');
             }
         },
         async selectMediators (e) {

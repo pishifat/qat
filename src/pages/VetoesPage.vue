@@ -4,6 +4,7 @@
             <filter-box
                 :placeholder="'enter to search beatmap...'"
                 :options="['', 'osu', 'taiko', 'catch', 'mania']"
+                store-module="vetoes"
             >
                 <button class="btn btn-block btn-primary my-1" data-toggle="modal" data-target="#addVeto">
                     Submit veto
@@ -34,8 +35,7 @@
                 </transition-group>
 
                 <pagination-nav
-                    @show-newer="showNewer()"
-                    @show-older="showOlder()"
+                    store-module="vetoes"
                 />
             </section>
         </div>
@@ -50,6 +50,7 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import vetoesModule from '../store/vetoes';
 import ToastMessages from '../components/ToastMessages.vue';
 import VetoCard from '../components/vetoes/VetoCard.vue';
 import VetoInfo from '../components/vetoes/VetoInfo.vue';
@@ -70,66 +71,53 @@ export default {
     },
     mixins: [postData],
     computed: {
-        ...mapState([
-            'pagination',
+        ...mapState('vetoes', [
+            'vetoes',
         ]),
-        ...mapGetters([
-            'allVetoes',
+        ...mapGetters('vetoes', [
             'activeVetoes',
             'resolvedVetoes',
             'paginatedResolvedVetoes',
         ]),
     },
     watch: {
-        paginatedResolvedVetoes () {
-            this.$store.dispatch('updatePaginationMaxPages');
+        resolvedVetoes (v) {
+            this.$store.dispatch('vetoes/pagination/updateMaxPages', v.length);
         },
     },
+    beforeCreate () {
+        if (!this.$store.hasModule('vetoes')) {
+            this.$store.registerModule('vetoes', vetoesModule);
+        }
+    },
     async created () {
-        const res = await this.executeGet('/vetoes/relevantInfo/');
+        if (this.vetoes.length) return;
 
-        if (res) {
-            this.$store.commit('setVetoes', res.vetoes);
-            this.$store.commit('setUserId', res.userId);
-            this.$store.commit('setUserOsuId', res.userOsuId);
-            this.$store.commit('setIsNat', res.isNat);
-            this.$store.commit('setIsUser', res.isUser);
+        const data = await this.initialRequest('/vetoes/relevantInfo');
 
-            const params = new URLSearchParams(document.location.search);
-            const id = params.get('id');
+        if (data.vetoes) {
+            this.$store.commit('vetoes/setVetoes', data.vetoes);
 
-            if (id && id.length) {
-                const i = this.allVetoes.findIndex(v => v.id == id);
+            const id = this.$route.query.id;
+
+            if (id) {
+                const i = this.vetoes.findIndex(v => v.id == id);
 
                 if (i >= 0) {
-                    this.$store.commit('setSelectedVetoId', id);
+                    this.$store.commit('vetoes/setSelectedVetoId', id);
                     $('#extendedInfo').modal('show');
                 }
             }
         }
-
-        $('#loading').fadeOut();
-        $('#main')
-            .attr('style', 'visibility: visible')
-            .hide()
-            .fadeIn();
     },
     mounted () {
         setInterval(async () => {
             const res = await this.executeGet('/vetoes/relevantInfo/');
 
             if (res) {
-                this.$store.commit('setVetoes', res.vetoes);
+                this.$store.commit('vetoes/setVetoes', res.vetoes);
             }
         }, 21600000);
-    },
-    methods: {
-        showOlder() {
-            this.$store.commit('increasePaginationPage');
-        },
-        showNewer() {
-            this.$store.commit('decreasePaginationPage');
-        },
     },
 };
 </script>

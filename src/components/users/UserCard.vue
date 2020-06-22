@@ -4,7 +4,7 @@
             class="card card-individual"
             data-toggle="modal"
             data-target="#extendedInfo"
-            :class="`card-bg-${user.probation.length && user.group != 'nat' ? 'probation' : user.group}`"
+            :class="`card-bg-${user.probationModes.length && !user.isNat ? 'probation' : user.groups[0]}`"
         >
             <img :src="'https://a.ppy.sh/' + user.osuId" class="card-avatar-img">
             <div class="card-body">
@@ -18,42 +18,65 @@
                 </a>
 
                 <small
-                    v-if="user.bnDuration.length"
+                    v-if="firstBnDate"
                     class="ml-1"
                 >
-                    Joined BN: {{ user.bnDuration[0].slice(0, 10) }}
+                    Joined BN:
+                    <date-display :date="firstBnDate" />
                 </small>
 
                 <small
-                    v-if="user.natDuration.length"
+                    v-if="firstNatDate"
                     class="ml-1"
                 >
-                    Joined NAT: {{ user.natDuration[0].slice(0, 10) }}
+                    Joined NAT:
+                    <date-display :date="firstNatDate" />
                 </small>
 
-                <div class="card-icons">
-                    <i v-if="user.modes.indexOf('osu') >= 0" class="far fa-circle" />
-                    <i v-if="user.modes.indexOf('taiko') >= 0" class="fas fa-drum" />
-                    <i v-if="user.modes.indexOf('catch') >= 0" class="fas fa-apple-alt" />
-                    <i v-if="user.modes.indexOf('mania') >= 0" class="fas fa-stream" />
-                </div>
+                <mode-display
+                    class="card-icons"
+                    :modes="user.modes"
+                />
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import ModeDisplay from '../ModeDisplay.vue';
+import DateDisplay from '../DateDisplay.vue';
+
 export default {
     name: 'UserCard',
+    components: {
+        ModeDisplay,
+        DateDisplay,
+    },
     props: {
         user: {
             type: Object,
             required: true,
         },
     },
+    computed: {
+        firstBnDate () {
+            const bnHistory = this.user.history.filter(h => h.group === 'bn');
+
+            return bnHistory.length && bnHistory[0].date;
+        },
+        firstNatDate () {
+            const natHistory = this.user.history.filter(h => h.group === 'nat');
+
+            return natHistory.length && natHistory[0].date;
+        },
+    },
     methods: {
         selectUser() {
-            this.$store.commit('setSelectedUserId', this.user.id);
+            this.$store.commit('users/setSelectedUserId', this.user.id);
+
+            if (this.$route.query.id !== this.user.id) {
+                this.$router.replace(`/users?id=${this.user.id}`);
+            }
         },
     },
 };

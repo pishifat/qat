@@ -8,22 +8,12 @@ const config =  {
     module: {
         rules: [
             ...rules,
-            {
-                test: /\.s[ac]ss$/i,
-                use: [
-                    {
-                        loader: MiniCssExtractPlugin.loader,
-                    },
-                    'css-loader',
-                    'sass-loader',
-                ],
-            },
         ],
     },
     plugins: [
         ...plugins,
         new MiniCssExtractPlugin({
-            filename: '../css/[name].css',
+            filename: 'css/[name].css',
         }),
     ],
     resolve: {
@@ -31,7 +21,6 @@ const config =  {
             vue: 'vue/dist/vue.min.js',
         },
     },
-    stats: 'minimal',
 };
 
 module.exports = config;

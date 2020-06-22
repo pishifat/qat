@@ -75,6 +75,7 @@
 
 <script>
 import { mapState } from 'vuex';
+import manageReportsModule from '../store/manageReports';
 import ToastMessages from '../components/ToastMessages.vue';
 import ReportCard from '../components/reports/ReportCard.vue';
 import ReportInfo from '../components/reports/ReportInfo.vue';
@@ -95,47 +96,60 @@ export default {
         };
     },
     computed: {
-        ...mapState([
+        ...mapState('manageReports', [
             'openReports',
             'closedReports',
             'isQueried',
         ]),
     },
+    beforeCreate () {
+        if (!this.$store.hasModule('manageReports')) {
+            this.$store.registerModule('manageReports', manageReportsModule);
+        }
+    },
     async created() {
-        const res = await this.executeGet('/manageReports/relevantInfo');
+        const res = await this.initialRequest('/manageReports/relevantInfo');
 
         if (res) {
-            this.$store.commit('setOpenReports', res.openReports);
-            const params = new URLSearchParams(document.location.search.substring(1));
+            this.$store.commit('manageReports/setOpenReports', res.openReports);
+            const id = this.$route.query.id;
+            const user = this.$route.query.user;
 
-            if (params.get('report') && params.get('report').length) {
-                const i = this.openReports.findIndex(r => r.id == params.get('report'));
+            if (id) {
+                const i = this.openReports.findIndex(r => r.id == id);
 
                 if (i >= 0) {
-                    this.$store.commit('setSelectedReportId', params.get('report'));
+                    this.$store.commit('manageReports/setSelectedReportId', id);
                     $('#reportInfo').modal('show');
                 } else {
-                    const report = await this.executeGet(`/manageReports/searchById/${params.get('report')}`);
+                    const report = await this.executeGet(`/manageReports/searchById/${id}`);
 
                     if (report && !report.error) {
-                        this.$store.commit('setClosedReports', [report]);
-                        this.$store.commit('setSelectedReportId', params.get('report'));
-                        this.$store.commit('setIsQueried', true);
+                        this.$store.commit('manageReports/setClosedReports', [report]);
+                        this.$store.commit('manageReports/setSelectedReportId', id);
+                        this.$store.commit('manageReports/setIsQueried', true);
                         $('#reportInfo').modal('show');
                     }
                 }
             }
 
-            if (params.get('user') && params.get('user').length) {
-                this.searchValue = params.get('user');
+            if (user && user) {
+                this.searchValue = user;
                 await this.query();
             }
         }
-
-        $('#loading').fadeOut();
-        $('#main').attr('style', 'visibility: visible').hide().fadeIn();
     },
     methods: {
+        updateReports (data) {
+            if (data && !data.error) {
+                this.$store.commit('manageReports/setIsQueried', true);
+                this.$store.commit('manageReports/setClosedReports', data);
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Reports loaded`,
+                    type: 'info',
+                });
+            }
+        },
         async query(e) {
             if (!this.searchValue || !this.searchValue.length) {
                 this.$store.dispatch('updateToastMessages', {
@@ -143,17 +157,12 @@ export default {
                     type: 'danger',
                 });
             } else {
-                history.pushState(null, 'Evaluation Archives', `/manageReports?user=${this.searchValue}`);
-                const res = await this.executeGet('/manageReports/search/' + this.searchValue, e);
-
-                if (res && !res.error) {
-                    this.$store.commit('setIsQueried', true);
-                    this.$store.commit('setClosedReports', res);
-                    this.$store.dispatch('updateToastMessages', {
-                        message: `Reports loaded`,
-                        type: 'info',
-                    });
+                if (this.$route.query.user !== this.searchValue) {
+                    this.$router.replace(`/managereports?user=${this.searchValue}`);
                 }
+
+                const data = await this.executeGet('/manageReports/search/' + this.searchValue, e);
+                this.updateReports(data);
             }
         },
         async queryRecent(e) {
@@ -163,16 +172,8 @@ export default {
                     type: 'danger',
                 });
             } else {
-                const res = await this.executeGet('/manageReports/searchRecent/' + this.limit, e);
-
-                if (res && !res.error) {
-                    this.$store.commit('setIsQueried', true);
-                    this.$store.commit('setClosedReports', res);
-                    this.$store.dispatch('updateToastMessages', {
-                        message: `Reports loaded`,
-                        type: 'info',
-                    });
-                }
+                const data = await this.executeGet('/manageReports/searchRecent/' + this.limit, e);
+                this.updateReports(data);
             }
         },
     },

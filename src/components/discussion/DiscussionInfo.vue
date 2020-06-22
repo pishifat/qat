@@ -17,7 +17,7 @@
                 v-else-if="!selectedDiscussionVote.isActive"
             />
 
-            <button v-if="selectedDiscussionVote.isActive && isNat" class="btn btn-sm btn-primary mt-3" @click="concludeMediation($event)">
+            <button v-if="selectedDiscussionVote.isActive && loggedInUser.isNat" class="btn btn-sm btn-primary mt-3" @click="concludeMediation($event)">
                 Conclude Vote
             </button>
 
@@ -26,7 +26,7 @@
 
                 <!-- only show voting options for users of specified mode -->
                 <mediator-options
-                    v-if="userModes.indexOf(selectedDiscussionVote.mode) >= 0 || selectedDiscussionVote.mode == 'all'"
+                    v-if="loggedInUser.modes.includes(selectedDiscussionVote.mode) || selectedDiscussionVote.mode == 'all'"
                 />
                 <p v-else class="small">
                     Because you're not proficient in this proposal's game mode, you're not able to vote :(
@@ -59,18 +59,11 @@ export default {
     mixins: [ postData ],
     computed: {
         ...mapState([
-            'userId',
-            'userModes',
-            'isNat',
+            'loggedInUser',
         ]),
-        ...mapGetters([
+        ...mapGetters('discussionVote', [
             'selectedDiscussionVote',
         ]),
-    },
-    watch: {
-        selectedDiscussionVote() {
-            history.pushState(null, 'Discussion Vote', `/discussionvote?id=${this.selectedDiscussionVote.id}`);
-        },
     },
     methods: {
         async concludeMediation (e) {
@@ -81,7 +74,7 @@ export default {
                     '/discussionVote/concludeMediation/' + this.selectedDiscussionVote.id, e);
 
                 if (discussionVote && !discussionVote.error) {
-                    this.$store.dispatch('updateDiscussionVote', discussionVote);
+                    this.$store.commit('discussionVote/updateDiscussionVote', discussionVote);
                     this.$store.dispatch('updateToastMessages', {
                         message: `Concluded vote`,
                         type: 'success',

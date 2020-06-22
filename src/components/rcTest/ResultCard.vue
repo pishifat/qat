@@ -11,25 +11,28 @@
                 </a>
             </div>
 
-            <div class="card-footer small d-flex">
+            <div class="card-footer small d-flex align-items-center">
                 <i class="fas fa-trophy mr-2" /> {{ selectedTest.totalScore }}/20
 
-                <i class="fas fa-clock mx-2" /> {{ selectedTest.submittedAt.slice(0, 10) }}
+                <i class="fas fa-clock mx-2" /> {{ selectedTest.submittedAt | toStandardDate }}
 
-                <div class="ml-auto">
-                    <i v-if="selectedTest.mode == 'osu'" class="far fa-circle" />
-                    <i v-else-if="selectedTest.mode == 'taiko'" class="fas fa-drum" />
-                    <i v-else-if="selectedTest.mode == 'catch'" class="fas fa-apple-alt" />
-                    <i v-else-if="selectedTest.mode == 'mania'" class="fas fa-stream" />
-                </div>
+                <mode-display
+                    class="ml-auto"
+                    :modes="selectedTest.mode"
+                />
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import ModeDisplay from '../ModeDisplay.vue';
+
 export default {
     name: 'ResultCard',
+    components: {
+        ModeDisplay,
+    },
     props: {
         selectedTest: {
             type: Object,
@@ -38,7 +41,7 @@ export default {
     },
     methods: {
         selectTest() {
-            this.$store.commit('setSelectedTestId', this.selectedTest.id);
+            this.$store.commit('testResults/setSelectedTestId', this.selectedTest.id);
         },
     },
 };

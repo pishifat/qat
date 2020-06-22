@@ -5,7 +5,7 @@
             <b>{{ Math.round((mediations.length/totalMediations)*100) || 0 }}%</b>
         </p>
 
-        <ul v-if="isNat">
+        <ul v-if="loggedInUser.isNat">
             <li v-for="mediation in mediations" :key="mediation.id" class="small ml-2">
                 {{ mediation.mediator.username }}
 
@@ -19,6 +19,7 @@
 
 <script>
 import { mapState } from 'vuex';
+
 export default {
     name: 'VotesInactiveType',
     props: {
@@ -36,7 +37,7 @@ export default {
         },
     },
     computed: mapState([
-        'isNat',
+        'loggedInUser',
     ]),
 };
 </script>

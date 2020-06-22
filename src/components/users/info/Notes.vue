@@ -25,7 +25,7 @@
                 class="small"
             >
                 <b>
-                    {{ note.updatedAt.slice(0,10) }} -
+                    {{ note.updatedAt | toStandardDate }} -
                     <a :href="'https://osu.ppy.sh/users/' + note.author.osuId" target="_blank">
                         {{ note.author.username }}
                     </a>
@@ -41,7 +41,7 @@
                     &times;
                 </a>
                 <a
-                    v-if="note.author.id == userId"
+                    v-if="note.author.id == loggedInUser.id"
                     href="#"
                     data-toggle="tooltip"
                     data-placement="top"
@@ -86,9 +86,9 @@ export default {
     },
     computed: {
         ...mapState([
-            'userId',
+            'loggedInUser',
         ]),
-        ...mapGetters([
+        ...mapGetters('users', [
             'selectedUser',
         ]),
     },

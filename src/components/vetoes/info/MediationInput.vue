@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import postData from '../../../mixins/postData';
 
 export default {
@@ -76,10 +76,9 @@ export default {
     },
     computed: {
         ...mapState([
-            'userId',
-            'isUser',
+            'loggedInUser',
         ]),
-        ...mapGetters([
+        ...mapGetters('vetoes', [
             'selectedVeto',
         ]),
     },
@@ -93,13 +92,13 @@ export default {
     },
     methods: {
         findUserMediation() {
-            if (!this.isUser) { // mediator info is hidden from normal users, so this function wouldn't work
+            if (this.loggedInUser.hasBasicAccess) { // mediator info is hidden from normal users, so this function wouldn't work
                 this.mediationId = null;
                 this.comment = null;
                 this.vote = null;
 
                 for (const mediation of this.selectedVeto.mediations) {
-                    if (mediation.mediator && mediation.mediator.id === this.userId) {
+                    if (mediation.mediator && mediation.mediator.id === this.loggedInUser.id) {
                         if (mediation.comment) this.comment = mediation.comment;
                         if (mediation.vote) this.vote = mediation.vote;
 
@@ -127,7 +126,7 @@ export default {
                 );
 
                 if (veto && !veto.error) {
-                    this.$store.dispatch('updateVeto', veto);
+                    this.$store.commit('vetoes/updateVeto', veto);
                     this.$store.dispatch('updateToastMessages', {
                         message: `Submitted mediation`,
                         type: 'success',

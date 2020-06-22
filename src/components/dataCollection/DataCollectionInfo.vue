@@ -41,7 +41,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import postData from '../../mixins/postData.js';
-import ObviousnessSeverity from '../evaluations/currentBnEvaluations/currentBnInfo/ObviousnessSeverity.vue';
+import ObviousnessSeverity from '../evaluations/info/currentBns/ObviousnessSeverity.vue';
 import ModalDialog from '../ModalDialog.vue';
 
 export default {
@@ -57,7 +57,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters([
+        ...mapGetters('dataCollection', [
             'selectedEvent',
         ]),
         title () {
@@ -74,7 +74,7 @@ export default {
     methods: {
         async updateContent(e) {
             const result = await this.executePost('/dataCollection/updateContent/' + this.selectedEvent.id, { reason: this.newEventContent }, e);
-            this.$store.commit('updateEvent', {
+            this.$store.commit('dataCollection/updateEvent', {
                 id: this.selectedEvent.id,
                 type: this.selectedEvent.eventType,
                 modifiedField: 'content',

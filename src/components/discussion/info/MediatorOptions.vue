@@ -75,9 +75,9 @@ export default {
     },
     computed: {
         ...mapState([
-            'userId',
+            'loggedInUser',
         ]),
-        ...mapGetters([
+        ...mapGetters('discussionVote', [
             'selectedDiscussionVote',
         ]),
     },
@@ -97,7 +97,7 @@ export default {
 
             if (this.selectedDiscussionVote.mediations.length) {
                 for (const mediation of this.selectedDiscussionVote.mediations) {
-                    if (mediation.mediator && mediation.mediator.id == this.userId) {
+                    if (mediation.mediator && mediation.mediator.id == this.loggedInUser.id) {
                         if (mediation.vote) this.vote = mediation.vote;
                         if (mediation.comment) this.comment = mediation.comment;
                         this.mediationId = mediation.id;
@@ -114,7 +114,7 @@ export default {
                 }, e);
 
             if (discussionVote && !discussionVote.error) {
-                this.$store.dispatch('updateDiscussionVote', discussionVote);
+                this.$store.commit('discussionVote/updateDiscussionVote', discussionVote);
                 this.$store.dispatch('updateToastMessages', {
                     message: `Submitted vote`,
                     type: 'success',

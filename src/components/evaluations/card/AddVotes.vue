@@ -36,7 +36,7 @@
 export default {
     name: 'AddVotes',
     props: {
-        evaluations: {
+        reviews: {
             type: Array,
             default() {
                 return [];
@@ -53,7 +53,7 @@ export default {
         };
     },
     watch: {
-        evaluations() {
+        reviews() {
             this.addVotes();
         },
     },
@@ -65,12 +65,12 @@ export default {
             this.pass = 0;
             this.neutralOrProbation = 0;
             this.fail = 0;
-            this.evaluations.forEach(evaluation => {
-                if (evaluation.vote == 1) {
+            this.reviews.forEach(review => {
+                if (review.vote == 1) {
                     this.pass++;
-                } else if (evaluation.vote == 2) {
+                } else if (review.vote == 2) {
                     this.neutralOrProbation++;
-                } else if (evaluation.vote == 3) {
+                } else if (review.vote == 3) {
                     this.fail++;
                 }
             });
