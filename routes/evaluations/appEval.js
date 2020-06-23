@@ -84,7 +84,7 @@ router.get('/relevantInfo', async (req, res) => {
 });
 
 /* POST submit or edit eval */
-router.post('/submitEval/:id', async (req, res) => {
+router.post('/submitEval/:id', middlewares.isBnOrNat, async (req, res) => {
     let evaluation = await AppEvaluation
         .findOne({
             _id: req.params.id,
@@ -93,11 +93,9 @@ router.post('/submitEval/:id', async (req, res) => {
         .populate(defaultPopulate)
         .orFail();
 
-    if (!res.locals.userRequest.isNat ||
-        (
-            res.locals.userRequest.isBn &&
-            !evaluation.bnEvaluators.some(bn => bn.id == req.session.mongoId)
-        )
+    if (
+        !res.locals.userRequest.isNat &&
+        !evaluation.bnEvaluators.some(bn => bn.id == req.session.mongoId)
     ) {
         return res.json({
             error: 'You cannot do this.',
