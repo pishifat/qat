@@ -112,7 +112,12 @@ router.post('/submit', async (req, res) => {
         );
 
     res.json(v);
-    Logger.generate(req.session.mongoId, `Submitted a veto for mediation on "${v.beatmapTitle}"`);
+    Logger.generate(
+        req.session.mongoId,
+        `Submitted a veto for mediation on "${v.beatmapTitle}"`,
+        'veto',
+        v._id
+    );
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),
         color: discord.webhookColors.darkPurple,
@@ -145,7 +150,9 @@ router.post('/submitMediation/:id', middlewares.isBnOrNat, async (req, res) => {
 
     Logger.generate(
         req.session.mongoId,
-        `${isFirstComment ? 'Submitted' : 'Updated'} vote for a veto`
+        `${isFirstComment ? 'Submitted' : 'Updated'} vote for a veto`,
+        'veto',
+        v._id
     );
 
     let count = 0;
@@ -216,7 +223,9 @@ router.post('/beginMediation/:id', middlewares.isNat, async (req, res) => {
     res.json(v);
     Logger.generate(
         req.session.mongoId,
-        `Started veto mediation for "${v.beatmapTitle}"`
+        `Started veto mediation for "${v.beatmapTitle}"`,
+        'veto',
+        v._id
     );
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),
@@ -242,7 +251,9 @@ router.post('/concludeMediation/:id', middlewares.isNat, async (req, res) => {
     res.json(veto);
     Logger.generate(
         req.session.mongoId,
-        `Veto ${veto.status.charAt(0).toUpperCase() + veto.status.slice(1)} for "${veto.beatmapTitle}" ${req.body.dismiss ? 'without mediation' : ''}`
+        `Veto ${veto.status.charAt(0).toUpperCase() + veto.status.slice(1)} for "${veto.beatmapTitle}" ${req.body.dismiss ? 'without mediation' : ''}`,
+        'veto',
+        veto._id
     );
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),
@@ -261,7 +272,9 @@ router.post('/continueMediation/:id', middlewares.isNat, async (req, res) => {
     res.json(veto);
     Logger.generate(
         req.session.mongoId,
-        `Veto mediation for "${veto.beatmapTitle}" re-initiated`
+        `Veto mediation for "${veto.beatmapTitle}" re-initiated`,
+        'veto',
+        veto._id
     );
 });
 
@@ -314,7 +327,9 @@ router.post('/replaceMediator/:id', middlewares.isNat, async (req, res) => {
 
     Logger.generate(
         req.session.mongoId,
-        'Re-selected a single veto mediator'
+        'Re-selected a single veto mediator',
+        'veto',
+        veto._id
     );
 
     discord.webhookPost([{

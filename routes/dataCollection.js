@@ -35,7 +35,7 @@ router.post('/updateContent/:id', middlewares.isNat, async (req, res) => {
         res.json({ error: 'Something went wrong' });
     } else {
         res.json(req.body.reason);
-        Logger.generate(req.session.mongoId, `Updated DQ reason of s/${a.beatmapsetId} to "${a.content}"`);
+        Logger.generate(req.session.mongoId, `Updated DQ reason of s/${a.beatmapsetId} to "${a.content}"`, 'dataCollection', a._id);
     }
 });
 
@@ -52,7 +52,7 @@ router.post('/updateObviousness/:id', middlewares.isNat, async (req, res) => {
     await a.save();
 
     res.json(req.body.obviousness);
-    Logger.generate(req.session.mongoId, `Updated obviousness of s/${a.beatmapsetId} to "${obviousness}"`);
+    Logger.generate(req.session.mongoId, `Updated obviousness of s/${a.beatmapsetId} to "${obviousness}"`, 'dataCollection', a._id);
 });
 
 /* POST edit severity */
@@ -68,7 +68,7 @@ router.post('/updateSeverity/:id', middlewares.isNat, async (req, res) => {
     await a.save();
 
     res.json(req.body.severity);
-    Logger.generate(req.session.mongoId, `Updated severity of s/${a.beatmapsetId} to "${severity}"`);
+    Logger.generate(req.session.mongoId, `Updated severity of s/${a.beatmapsetId} to "${severity}"`, 'dataCollection', a._id);
 });
 
 module.exports = router;

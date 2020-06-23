@@ -191,7 +191,12 @@ router.post('/:id/switchBnEvaluator', middlewares.isBnOrNat, async (req, res) =>
     await user.save();
 
     res.json(user);
-    Logger.generate(req.session.mongoId, `Opted "${user.username}" ${user.isBnEvaluator ? 'in to' : 'out of'} optional BN app evaluation input`);
+    Logger.generate(
+        req.session.mongoId,
+        `Opted "${user.username}" ${user.isBnEvaluator ? 'in to' : 'out of'} optional BN app evaluation input`,
+        'user',
+        user._id
+    );
 });
 
 /* GET aiess info */

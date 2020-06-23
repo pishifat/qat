@@ -46,7 +46,9 @@ router.post('/saveNote/:id', async (req, res) => {
 
     Logger.generate(
         req.session.mongoId,
-        `Added user note to "${u.username}"`
+        `Added user note to "${u.username}"`,
+        'user',
+        u._id
     );
 
     discord.webhookPost(
@@ -73,7 +75,9 @@ router.post('/hideNote/:id', async (req, res) => {
     let u = await User.findById(req.body.userId);
     Logger.generate(
         req.session.mongoId,
-        `Removed user note from "${u.username}"`
+        `Removed user note from "${u.username}"`,
+        'user',
+        u._id
     );
 });
 
@@ -87,7 +91,9 @@ router.post('/editNote/:id', async (req, res) => {
     let u = await User.findById(n.user);
     Logger.generate(
         req.session.mongoId,
-        `edited user note for "${u.username}"`
+        `edited user note for "${u.username}"`,
+        'user',
+        u._id
     );
 });
 

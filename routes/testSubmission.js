@@ -136,7 +136,12 @@ router.post('/submitTest', async (req, res) => {
         totalScore,
     });
 
-    Logger.generate(req.session.mongoId, `Completed ${test.mode} BN app test`);
+    Logger.generate(
+        req.session.mongoId,
+        `Completed ${test.mode} BN app test`,
+        'application',
+        currentBnApp._id
+    );
 
     const twoEvaluationModes = ['catch', 'mania'];
     const invalids = [8129817, 3178418];

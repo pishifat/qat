@@ -3,6 +3,7 @@ const Question = require('../models/bnTest/question');
 const Option = require('../models/bnTest/option');
 const Logger = require('../models/log');
 const middlewares = require('../helpers/middlewares');
+const util = require('../helpers/util');
 
 const router = express.Router();
 
@@ -34,20 +35,18 @@ router.get('/load/:type', async (req, res) => {
 
 /* POST add question */
 router.post('/store', middlewares.isNat, async (req, res) => {
-    let q = await Question.create({
+    let question = await Question.create({
         category: req.body.category,
         content: req.body.newQuestion,
         questionType: req.body.questionType,
     });
 
-    res.json(q);
+    res.json(question);
     Logger.generate(
         req.session.mongoId,
-        `Added new "${req.body.category}" question to RC test: "${
-            req.body.newQuestion.length > 50
-                ? req.body.newQuestion.slice(0, 50) + '...'
-                : req.body.newQuestion
-        }"`
+        `Added new "${question.category}" question to RC test: "${util.shorten(question.content)}"`,
+        'test',
+        question._id
     );
 });
 
@@ -69,7 +68,9 @@ router.post('/:id/update', middlewares.isNat, async (req, res) => {
             req.body.newQuestion.length > 50
                 ? req.body.newQuestion.slice(0, 50) + '...'
                 : req.body.newQuestion
-        }"`
+        }"`,
+        'test',
+        question._id
     );
 });
 
@@ -86,7 +87,9 @@ router.post('/:id/toggleActivity', middlewares.isNat, async (req, res) => {
     res.json(question);
     Logger.generate(
         req.session.mongoId,
-        `Marked RC test question as "${req.body.status ? 'active' : 'inactive'}"`
+        `Marked RC test question as "${req.body.status ? 'active' : 'inactive'}"`,
+        'test',
+        question._id
     );
 });
 
@@ -104,7 +107,7 @@ function validateInput (contentInput, scoreInput) {
 /* POST add option */
 router.post('/:id/options/store', middlewares.isNat, async (req, res) => {
     const [content, score] = validateInput(req.body.content, req.body.score);
-    let option = await Option.create({
+    const option = await Option.create({
         content,
         score,
     });
@@ -113,7 +116,7 @@ router.post('/:id/options/store', middlewares.isNat, async (req, res) => {
         return res.json({ error: 'Something went wrong!' });
     }
 
-    let question = await Question
+    const question = await Question
         .findByIdAndUpdate(req.params.id, { $push: { options: option.id } })
         .populate(defaultPopulate)
         .orFail();
@@ -121,9 +124,9 @@ router.post('/:id/options/store', middlewares.isNat, async (req, res) => {
     res.json(question);
     Logger.generate(
         req.session.mongoId,
-        `Added option for RC test question: "${
-            content.length > 50 ? content.slice(0, 50) + '...' : content
-        }"`
+        `Added option for RC test question: "${util.shorten(content)}"`,
+        'test',
+        option._id
     );
 });
 
@@ -147,9 +150,9 @@ router.post('/:id/options/:optionId/update', middlewares.isNat, async (req, res)
     res.json(question);
     Logger.generate(
         req.session.mongoId,
-        `Updated option for RC test question: "${
-            content.length > 50 ? content.slice(0, 50) + '...' : content
-        }"`
+        `Updated option for RC test question: "${util.shorten(content)}"`,
+        'test',
+        option._id
     );
 });
 
@@ -167,7 +170,9 @@ router.post('/:id/options/:optionId/toggleActivity', middlewares.isNat, async (r
     res.json(question);
     Logger.generate(
         req.session.mongoId,
-        `Changed active status of a RC test question option`
+        `Changed active status of a RC test question option`,
+        'test',
+        option._id
     );
 });
 

@@ -121,7 +121,9 @@ router.post('/submitEval/:id', async (req, res) => {
     res.json(evaluation);
     Logger.generate(
         req.session.mongoId,
-        `${isNewEvaluation ? 'Submitted' : 'Updated'} ${evaluation.mode} BN app evaluation for "${evaluation.user.username}"`
+        `${isNewEvaluation ? 'Submitted' : 'Updated'} ${evaluation.mode} BN app evaluation for "${evaluation.user.username}"`,
+        'appEvaluation',
+        evaluation._id
     );
 });
 
@@ -141,7 +143,8 @@ router.post('/setGroupEval/', middlewares.isNat, async (req, res) => {
     res.json(a);
     Logger.generate(
         req.session.mongoId,
-        `Set ${req.body.checkedApps.length} BN app${req.body.checkedApps.length == 1 ? '' : 's'} as group evaluation`
+        `Set ${req.body.checkedApps.length} BN app${req.body.checkedApps.length == 1 ? '' : 's'} as group evaluation`,
+        'appEvaluation'
     );
 });
 
@@ -158,7 +161,8 @@ router.post('/setIndividualEval/', middlewares.isNat, async (req, res) => {
     res.json(a);
     Logger.generate(
         req.session.mongoId,
-        `Set ${req.body.checkedApps.length} BN app${req.body.checkedApps.length == 1 ? '' : 's'} as individual evaluation`
+        `Set ${req.body.checkedApps.length} BN app${req.body.checkedApps.length == 1 ? '' : 's'} as individual evaluation`,
+        'appEvaluation'
     );
 });
 
@@ -206,6 +210,7 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
         }
 
         evaluation.active = false;
+        evaluation.consensusSetAt = new Date();
         await evaluation.save();
 
         discord.webhookPost(
@@ -218,7 +223,9 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
         );
         Logger.generate(
             req.session.mongoId,
-            `Set ${user.username}'s ${evaluation.mode} application eval as "${evaluation.consensus}"`
+            `Set ${user.username}'s ${evaluation.mode} application eval as "${evaluation.consensus}"`,
+            'appEvaluation',
+            evaluation._id
         );
     }
 
@@ -227,7 +234,8 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
     res.json(activeApps);
     Logger.generate(
         req.session.mongoId,
-        `Set ${req.body.checkedApps.length} BN app${req.body.checkedApps.length == 1 ? '' : 's'} as completed`
+        `Set ${req.body.checkedApps.length} BN app${req.body.checkedApps.length == 1 ? '' : 's'} as completed`,
+        'appEvaluation'
     );
 });
 
@@ -249,7 +257,9 @@ router.post('/setConsensus/:id', middlewares.isNat, async (req, res) => {
 
     Logger.generate(
         req.session.mongoId,
-        `Set consensus of ${evaluation.user.username}'s ${evaluation.mode} BN app as ${req.body.consensus}`
+        `Set consensus of ${evaluation.user.username}'s ${evaluation.mode} BN app as ${req.body.consensus}`,
+        'appEvaluation',
+        evaluation._id
     );
 
     discord.webhookPost(
@@ -271,7 +281,9 @@ router.post('/setCooldownDate/:id', middlewares.isNat, async (req, res) => {
     res.json(evaluation);
     Logger.generate(
         req.session.mongoId,
-        `Changed cooldown date to ${req.body.cooldownDate.toString().slice(0,10)} for ${evaluation.user.username}'s ${evaluation.mode} BN app`
+        `Changed cooldown date to ${req.body.cooldownDate.toString().slice(0,10)} for ${evaluation.user.username}'s ${evaluation.mode} BN app`,
+        'appEvaluation',
+        evaluation._id
     );
     discord.webhookPost(
         [{
@@ -333,7 +345,9 @@ router.post('/replaceUser/:id', middlewares.isNat, async (req, res) => {
 
     Logger.generate(
         req.session.mongoId,
-        `Re-selected a ${replaceNat ? 'NAT' : 'BN'} evaluator on BN application for ${evaluation.user.username}`
+        `Re-selected a ${replaceNat ? 'NAT' : 'BN'} evaluator on BN application for ${evaluation.user.username}`,
+        'appEvaluation',
+        evaluation._id
     );
 
     const user = await User.findById(req.body.evaluatorId);
@@ -416,7 +430,9 @@ router.post('/enableBnEvaluators/:id', middlewares.isNat, async (req, res) => {
     res.json(a);
     Logger.generate(
         req.session.mongoId,
-        `Opened a BN app to evaluation from ${req.body.bnEvaluators.length} current BNs.`
+        `Opened a BN app to evaluation from ${req.body.bnEvaluators.length} current BNs.`,
+        'appEvaluation',
+        a._id
     );
     discord.webhookPost(
         [{

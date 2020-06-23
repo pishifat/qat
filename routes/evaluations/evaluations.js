@@ -145,17 +145,14 @@ async function setGroupEval (evaluations, session) {
 }
 
 async function setFeedback (evaluation, feedback, session) {
-    if (evaluation.feedback) {
-        Logger.generate(
-            session.mongoId,
-            `Edited feedback of ${evaluation.user.username}'s ${evaluation.mode} evaluation`
-        );
-    } else {
-        Logger.generate(
-            session.mongoId,
-            `Created feedback for ${evaluation.user.username}'s ${evaluation.mode} evaluation`
-        );
-    }
+    const action = evaluation.feedback ? 'Edited' : 'Created';
+
+    Logger.generate(
+        session.mongoId,
+        `${action} feedback of ${evaluation.user.username}'s ${evaluation.mode} evaluation`,
+        evaluation.kind === 'application' ? 'appEvaluation' : 'bnEvaluation',
+        evaluation._id
+    );
 
     evaluation.feedback = feedback;
     await evaluation.save();

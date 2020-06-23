@@ -198,7 +198,8 @@ router.post('/addEvalRounds/', middlewares.isNat, async (req, res) => {
 
     Logger.generate(
         req.session.mongoId,
-        `Added BN evaluations for ${allEvalsToCreate.length} user${allEvalsToCreate.length == 1 ? '' : 's'}`
+        `Added BN evaluations for ${allEvalsToCreate.length} user${allEvalsToCreate.length == 1 ? '' : 's'}`,
+        'bnEvaluation'
     );
 });
 
@@ -224,13 +225,15 @@ router.post('/submitEval/:id', middlewares.isNat, async (req, res) => {
     res.json(evaluation);
     Logger.generate(
         req.session.mongoId,
-        `${isNewEvaluation ? 'Submitted' : 'Updated'} ${evaluation.mode} BN evaluation for "${evaluation.user.username}"`
+        `${isNewEvaluation ? 'Submitted' : 'Updated'} ${evaluation.mode} BN evaluation for "${evaluation.user.username}"`,
+        'bnEvaluation',
+        evaluation._id
     );
 });
 
 /* POST set group eval */
 router.post('/setGroupEval/', middlewares.isNat, async (req, res) => {
-    const evaluations = await BnEvaluation
+    let evaluations = await BnEvaluation
         .find({
             _id: {
                 $in: req.body.checkedRounds,
@@ -240,11 +243,12 @@ router.post('/setGroupEval/', middlewares.isNat, async (req, res) => {
 
     await setGroupEval(evaluations, req.session);
 
-    let ev = await BnEvaluation.findActiveEvaluations();
-    res.json(ev);
+    evaluations = await BnEvaluation.findActiveEvaluations();
+    res.json(evaluations);
     Logger.generate(
         req.session.mongoId,
-        `Set ${req.body.checkedRounds.length} BN eval${req.body.checkedRounds.length == 1 ? '' : 's'} as group evaluation`
+        `Set ${req.body.checkedRounds.length} BN eval${req.body.checkedRounds.length == 1 ? '' : 's'} as group evaluation`,
+        'bnEvaluation'
     );
 });
 
@@ -256,18 +260,19 @@ router.post('/setIndividualEval/', middlewares.isNat, async (req, res) => {
         discussion: false,
     });
 
-    let ev = await BnEvaluation.findActiveEvaluations();
+    let evaluations = await BnEvaluation.findActiveEvaluations();
 
-    res.json(ev);
+    res.json(evaluations);
     Logger.generate(
         req.session.mongoId,
-        `Set ${req.body.checkedRounds.length} BN eval${req.body.checkedRounds.length == 1 ? '' : 's'} as individual evaluation`
+        `Set ${req.body.checkedRounds.length} BN eval${req.body.checkedRounds.length == 1 ? '' : 's'} as individual evaluation`,
+        'bnEvaluation'
     );
 });
 
 /* POST set evals as complete */
 router.post('/setComplete/', middlewares.isNat, async (req, res) => {
-    const evaluations = await BnEvaluation
+    let evaluations = await BnEvaluation
         .find({
             _id: {
                 $in: req.body.checkedRounds,
@@ -378,6 +383,7 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
         }
 
         evaluation.active = false;
+        evaluation.consensusSetAt = new Date();
         await evaluation.save();
 
         let consensusText;
@@ -406,7 +412,9 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
 
         Logger.generate(
             req.session.mongoId,
-            `Set ${user.username}'s ${evaluation.mode} BN eval as "${consensusText}"`
+            `Set ${user.username}'s ${evaluation.mode} BN eval as "${consensusText}"`,
+            'bnEvaluation',
+            evaluation._id
         );
 
         discord.webhookPost(
@@ -419,12 +427,13 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
         );
     }
 
-    let ev = await BnEvaluation.findActiveEvaluations();
+    evaluations = await BnEvaluation.findActiveEvaluations();
 
-    res.json(ev);
+    res.json(evaluations);
     Logger.generate(
         req.session.mongoId,
-        `Set ${req.body.checkedRounds.length} BN eval${req.body.checkedRounds.length == 1 ? '' : 's'} as completed`
+        `Set ${req.body.checkedRounds.length} BN eval${req.body.checkedRounds.length == 1 ? '' : 's'} as completed`,
+        'bnEvaluation'
     );
 });
 
@@ -478,7 +487,10 @@ router.post('/setConsensus/:id', middlewares.isNat, async (req, res) => {
     }
 
     Logger.generate(
-        req.session.mongoId,`Set consensus of ${evaluation.user.username}'s ${evaluation.mode} BN eval as "${consensusText}"`
+        req.session.mongoId,
+        `Set consensus of ${evaluation.user.username}'s ${evaluation.mode} BN eval as "${consensusText}"`,
+        'bnEvaluation',
+        evaluation._id
     );
 
     discord.webhookPost(
@@ -500,7 +512,9 @@ router.post('/setCooldownDate/:id', middlewares.isNat, async (req, res) => {
     res.json(evaluation);
     Logger.generate(
         req.session.mongoId,
-        `Changed cooldown date to ${req.body.cooldownDate.toString().slice(0,10)} for ${evaluation.user.username}'s ${evaluation.mode} current BN evaluation`
+        `Changed cooldown date to ${req.body.cooldownDate.toString().slice(0,10)} for ${evaluation.user.username}'s ${evaluation.mode} current BN evaluation`,
+        'bnEvaluation',
+        evaluation._id
     );
     discord.webhookPost(
         [{
@@ -593,7 +607,9 @@ router.post('/replaceUser/:id', middlewares.isNat, async (req, res) => {
 
     Logger.generate(
         req.session.mongoId,
-        'Re-selected an evaluator on current BN eval'
+        'Re-selected an evaluator on current BN eval',
+        'bnEvaluation',
+        evaluation._id
     );
 
     const user = await User.findById(req.body.evaluatorId);

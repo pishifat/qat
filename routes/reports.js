@@ -86,9 +86,9 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
 
         Logger.generate(
             null,
-            `Reported "${u.username}" for reason "${
-                req.body.reason.length > 50 ? req.body.reason.slice(0, 50) + '...' : req.body.reason
-            }"`
+            `Reported "${u.username}" for reason "${util.shorten(req.body.reason)}"`,
+            'report',
+            report._id
         );
     } else {
         if (!validUrl) {
@@ -111,7 +111,9 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
 
         Logger.generate(
             null,
-            'Reported something without a username included'
+            'Reported something without a username included',
+            'report',
+            report._id
         );
     }
 

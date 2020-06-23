@@ -79,7 +79,13 @@ router.post('/submit', middlewares.isNat, async (req, res) => {
     });
 
     res.json(d);
-    Logger.generate(req.session.mongoId, 'Submitted a discussion for voting');
+    Logger.generate(
+        req.session.mongoId,
+        'Submitted a discussion for voting',
+        'discussionVote',
+        d._id
+    );
+
     discord.webhookPost(
         [{
             author: discord.defaultWebhookAuthor(req.session),
@@ -136,7 +142,9 @@ router.post('/submitMediation/:id', async (req, res) => {
 
     Logger.generate(
         req.session.mongoId,
-        'Submitted vote for a discussion'
+        'Submitted vote for a discussion',
+        'discussionVote',
+        d._id
     );
 
     if (isNewMediation && res.locals.userRequest.isNat) {
@@ -161,7 +169,9 @@ router.post('/concludeMediation/:id', middlewares.isNat, async (req, res) => {
 
     Logger.generate(
         req.session.mongoId,
-        'Concluded vote for a discussion'
+        'Concluded vote for a discussion',
+        'discussionVote',
+        d._id
     );
 
     discord.webhookPost(
@@ -202,7 +212,9 @@ router.post('/:id/update', middlewares.isNat, async (req, res) => {
     res.json(discussion);
     Logger.generate(
         req.session.mongoId,
-        `Changed discussion title to "${title}" and proposal to "${shortReason}"`
+        `Changed discussion title to "${title}" and proposal to "${shortReason}"`,
+        'discussionVote',
+        discussion._id
     );
 });
 

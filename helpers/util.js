@@ -55,8 +55,25 @@ function isValidUrlOrThrow(url, contain, throwMessage) {
     }
 }
 
+/**
+ * Shorten text to a specific length if needed
+ * @param {string} text
+ * @param {string} length 50 by default
+ */
+function shorten(text, length) {
+    if (!text) return '';
+
+    length = length || 50;
+
+    if (text.length > length) {
+        return text.slice(0, length) + '...';
+    }
+
+    return text;
+}
+
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-module.exports = { escapeUsername, getBeatmapsetIdFromUrl, isValidUrl, isValidUrlOrThrow, sleep };
+module.exports = { escapeUsername, getBeatmapsetIdFromUrl, isValidUrl, isValidUrlOrThrow, shorten, sleep };

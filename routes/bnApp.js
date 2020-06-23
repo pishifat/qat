@@ -140,7 +140,7 @@ router.post('/apply', async (req, res) => {
                 success: 'ok',
             });
 
-            Logger.generate(req.session.mongoId, `Applied for ${mode} BN`);
+            Logger.generate(req.session.mongoId, `Applied for ${mode} BN`, 'application', newBnApp._id);
         }
     } else {
         if (currentBnApp) {

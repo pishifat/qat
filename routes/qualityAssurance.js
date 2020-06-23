@@ -130,7 +130,9 @@ router.post('/assignUser/:id', middlewares.isBnOrNat, async (req, res) => {
 
     Logger.generate(
         req.session.mongoId,
-        `Added ${req.session.username} as QA checker for s/${newEvent.beatmapsetId}`
+        `Added ${req.session.username} as QA checker for s/${newEvent.beatmapsetId}`,
+        'qualityAssurance',
+        newEvent._id
     );
 });
 
@@ -144,7 +146,9 @@ router.post('/unassignUser/:id', middlewares.isBnOrNat, async (req, res) => {
 
     Logger.generate(
         req.session.mongoId,
-        `Removed ${req.session.username} from QA checker for s/${event.beatmapsetId}`
+        `Removed ${req.session.username} from QA checker for s/${event.beatmapsetId}`,
+        'qualityAssurance',
+        event._id
     );
 });
 

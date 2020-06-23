@@ -3,6 +3,7 @@ const Logger = require('../models/log');
 const Report = require('../models/report');
 const User = require('../models/user');
 const middlewares = require('../helpers/middlewares');
+const util = require('../helpers/util');
 
 const router = express.Router();
 
@@ -90,7 +91,7 @@ router.post('/submitReportEval/:id', middlewares.isNat, async (req, res) => {
         await Report.findByIdAndUpdate(req.params.id, { isActive: false });
     }
 
-    let r = await Report
+    const r = await Report
         .findById(req.params.id)
         .populate(defaultPopulate);
 
@@ -99,17 +100,20 @@ router.post('/submitReportEval/:id', middlewares.isNat, async (req, res) => {
     if (req.body.feedback && req.body.feedback.length) {
         Logger.generate(
             req.session.mongoId,
-            `Set feedback on report to "${
-                req.body.feedback.length > 50 ? req.body.feedback.slice(0, 50) + '...' : req.body.feedback
-            }"`
+            `Set feedback on report to "${util.shorten(req.body.feedback)}"`,
+            'report',
+            r._id
         );
     }
 
     if (req.body.vote) {
+        const validity = req.body.vote == 1 ? 'valid' : req.body.vote == 2 ? 'partially valid' : 'invalid';
+
         Logger.generate(
             req.session.mongoId,
-            `Set validity of report to
-            "${req.body.vote == 1 ? 'valid' : req.body.vote == 2 ? 'partially valid' : 'invalid'}"`
+            `Set validity of report to "${validity}"`,
+            'report',
+            r._id
         );
     }
 });

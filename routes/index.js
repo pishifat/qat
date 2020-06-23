@@ -108,22 +108,42 @@ router.get('/callback', async (req, res) => {
             await newUser.save();
 
             req.session.mongoId = newUser._id;
-            Logger.generate(req.session.mongoId, 'Verified their account for the first time');
+            Logger.generate(
+                req.session.mongoId,
+                'Verified their account for the first time',
+                'account',
+                req.session.mongoId
+            );
         } else {
             if (user.username != username) {
                 user.username = username;
                 await user.save();
-                Logger.generate(user._id, `Username changed from "${user.username}" to "${response.username}"`);
+                Logger.generate(
+                    user._id,
+                    `Username changed from "${user.username}" to "${response.username}"`,
+                    'account',
+                    user._id
+                );
             }
 
             if (groups.some(g => !user.groups.includes(g)) || user.groups.some(g => !groups.includes(g))) {
                 if (!user.groups.includes('gmt') && groups.includes('gmt')) {
-                    Logger.generate(user._id, `User toggled on spectator role`);
+                    Logger.generate(
+                        user._id,
+                        `User toggled on spectator role`,
+                        'account',
+                        user._id
+                    );
                 }
 
                 user.groups = groups;
                 await user.save();
-                Logger.generate(user._id, `User groups changed to ${groups.join(', ')}`);
+                Logger.generate(
+                    user._id,
+                    `User groups changed to ${groups.join(', ')}`,
+                    'account',
+                    user._id
+                );
             }
 
             req.session.mongoId = user._id;
