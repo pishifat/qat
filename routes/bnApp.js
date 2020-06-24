@@ -74,13 +74,13 @@ router.post('/apply', async (req, res) => {
             ],
         }),
         await BnEvaluation.findOne({
-            bn: req.session.mongoId,
+            user: req.session.mongoId,
             mode,
             consensus: 'fail',
             cooldownDate: { $gte: cooldownDate },
         }),
         await BnEvaluation.findOne({
-            bn: req.session.mongoId,
+            user: req.session.mongoId,
             mode,
             resignedOnGoodTerms: true,
         }),

@@ -47,7 +47,7 @@ router.get('/bnRemoval/:osuId', async (req, res) => {
     }
 
     const latestEvalRound = await BnEvaluation
-        .findOne({ bn: user._id, consensus: 'fail', active: false })
+        .findOne({ user: user._id, consensus: 'fail', active: false })
         .sort({ $natural: -1 });
 
     if (!latestEvalRound) {

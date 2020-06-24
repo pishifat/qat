@@ -53,7 +53,7 @@ class BnEvaluationService {
         minDate.setDate(minDate.getDate() + 14);
 
         return BnEvaluation.deleteMany({
-            bn: userId,
+            user: userId,
             active: true,
             deadline: { $gte: minDate },
         });
