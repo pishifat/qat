@@ -23,7 +23,6 @@ const userSchema = new mongoose.Schema({
     isBnEvaluator: { type: Boolean, default: true },
     bnProfileBadge: { type: Number, default: 0 },
     natProfileBadge: { type: Number, default: 0 },
-    discordId: { type: Number },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 class UserService {
