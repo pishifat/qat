@@ -11,13 +11,8 @@ const User = require('../models/user');
 const BeatmapReport = require('../models/beatmapReport');
 const Aiess = require('../models/aiess');
 
-const defaultAppPopulate = [{
+const defaultPopulate = [{
     path: 'user',
-    select: 'username osuId',
-}];
-
-const defaultRoundPopulate = [{
-    path: 'bn',
     select: 'username osuId modesInfo',
 }];
 
@@ -38,11 +33,11 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
                 active: true,
                 test: { $exists: true },
             })
-            .populate(defaultAppPopulate),
+            .populate(defaultPopulate),
 
         BnEvaluation
             .find({ active: true })
-            .populate(defaultRoundPopulate),
+            .populate(defaultPopulate),
 
         Veto.find({ status: 'wip' }),
     ]);
