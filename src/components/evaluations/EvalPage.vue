@@ -174,6 +174,8 @@ export default {
                 if (i >= 0) {
                     this.$store.commit(`evaluations/setSelectedEvaluationId`, id);
                     $('#evaluationInfo').modal('show');
+                } else {
+                    window.location.replace(`evalarchive?id=${id}`);
                 }
             }
         }

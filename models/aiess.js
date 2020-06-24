@@ -43,7 +43,10 @@ class AiessService
         aggregation.group({
             _id: '$beatmapsetId',
             event: { $first: '$$ROOT' },
-        }).replaceRoot('event');
+        }).replaceRoot('event'
+        ).sort({
+            timestamp: 1,
+        });
 
         return aggregation;
     }
