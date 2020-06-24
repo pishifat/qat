@@ -175,7 +175,7 @@ export default {
                     this.$store.commit(`evaluations/setSelectedEvaluationId`, id);
                     $('#evaluationInfo').modal('show');
                 } else {
-                    window.location.replace(`evalarchive?id=${id}`);
+                    this.$router.push(`evalarchive?id=${id}`);
                 }
             }
         }
