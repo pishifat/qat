@@ -8,6 +8,13 @@
             <i v-else-if="mode == 'taiko'" class="fas fa-drum mx-1" />
             <i v-else-if="mode == 'catch'" class="fas fa-apple-alt mx-1" />
             <i v-else-if="mode == 'mania'" class="fas fa-stream mx-1" />
+            <i
+                v-if="feedback"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="feedback written"
+                class="fas fa-comment mx-1"
+            />
         </p>
         <div v-if="consensus">
             Consensus:
@@ -33,6 +40,10 @@ export default {
             required: true,
         },
         consensus: {
+            type: String,
+            default: '',
+        },
+        feedback: {
             type: String,
             default: '',
         },

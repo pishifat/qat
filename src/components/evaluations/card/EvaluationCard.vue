@@ -14,13 +14,13 @@
                 :username="username"
                 :osu-id="osuId"
                 :consensus="evaluation.consensus"
+                :feedback="evaluation.feedback"
             />
 
             <card-footer
                 :evaluation-id="evaluation.id"
                 :reviews="evaluation.reviews"
                 :deadline="evaluation.deadline"
-                :feedback="evaluation.feedback"
                 :is-discussion="evaluation.discussion"
                 :is-active="evaluation.active"
             />

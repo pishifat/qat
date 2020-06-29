@@ -15,14 +15,6 @@
             :reviews="reviews"
         />
 
-        <i
-            v-if="feedback"
-            data-toggle="tooltip"
-            data-placement="top"
-            title="feedback written"
-            class="fas fa-comment mx-1"
-        />
-
         <span class="mr-1 ml-auto small">
             <i
                 class="fas fa-clock mr-1"
@@ -67,10 +59,6 @@ export default {
         deadline: {
             type: String,
             required: true,
-        },
-        feedback: {
-            type: String,
-            default: '',
         },
         isDiscussion: Boolean,
         isActive: Boolean,

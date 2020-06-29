@@ -111,7 +111,7 @@ router.post('/apply', async (req, res) => {
             return res.json({ error: `You do not meet the required ${requiredKudosu} kudosu to apply. You currently have ${userInfo.kudosu.total} kudosu.` });
         }
 
-        if (modScore <= 0) {
+        if (modScore < 0) {
             let additionalInfo = `Your mod score was calculated based on ${months} month${months == 1 ? '' : 's'} of activity because `;
             if (resignedOnGoodTerms) additionalInfo += 'you resigned from the BN on good terms.';
             else if (wasBnForThisMode) additionalInfo += 'you were BN for this game mode in the past.';
