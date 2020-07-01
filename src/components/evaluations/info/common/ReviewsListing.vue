@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-for="(review, i) in selectedEvaluation.reviews" :key="review.id">
+        <div v-for="(review, i) in sortedReviews" :key="review.id">
             <review-content
                 :review="review"
                 :index="i + 1"
@@ -20,8 +20,16 @@ export default {
     components: {
         ReviewContent,
     },
-    computed: mapGetters('evaluations', [
-        'selectedEvaluation',
-    ]),
+    computed: {
+        ...mapGetters('evaluations', [
+            'selectedEvaluation',
+        ]),
+        sortedReviews () {
+            const natReviews = this.selectedEvaluation.reviews.filter(r => r.evaluator.isNat);
+            const bnReviews = this.selectedEvaluation.reviews.filter(r => !r.evaluator.isNat);
+
+            return natReviews.concat(bnReviews);
+        },
+    },
 };
 </script>
