@@ -120,14 +120,22 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
     minDate.setDate(minDate.getDate() - parseInt(req.params.days));
     let maxDate = new Date();
     const [users, allEvents, allActiveEvalRounds, allQualityAssuranceChecks] = await Promise.all([
-        User.find({
-            groups: 'bn',
-            'modesInfo.mode': req.params.mode,
-        }).sort({ username: 1 }),
+        User
+            .find({
+                groups: 'bn',
+                'modesInfo.mode': req.params.mode,
+            })
+            .sort({ username: 1 }),
         Aiess.getAllActivity(minDate, maxDate, req.params.mode),
         BnEvaluation.find({ active: true, mode: req.params.mode }),
         Aiess.find({ qualityAssuranceCheckers: { $exists: true, $ne: [] }, timestamp: { $gt: minDate } }),
     ]);
+
+    if (allEvents.error) {
+        return res.json({
+            error: 'Something went wrong',
+        });
+    }
 
     let info = [];
     users.forEach(user => {
@@ -144,9 +152,7 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
                     let event = events[j];
 
                     if (event.userId == user.osuId) {
-                        if (uniqueNominations.length == 0) {
-                            uniqueNominations.push(events);
-                        } else if (!uniqueNominations.find(n => n.beatmapsetId == event.beatmapsetId)) {
+                        if (uniqueNominations.length == 0 || !uniqueNominations.find(n => n.beatmapsetId == event.beatmapsetId)) {
                             uniqueNominations.push(event);
                         }
                     }
@@ -157,7 +163,7 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
         }
 
         let activeEval = allActiveEvalRounds.find(e => e.user == user.id);
-        let deadline = 'Never';
+        let deadline;
         if (activeEval) deadline = activeEval.deadline;
 
         const joinHistory = user.history.filter(h => h.kind === 'joined' &&  h.group === 'bn');

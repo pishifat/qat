@@ -10,7 +10,7 @@ const appEvaluationSchema = new mongoose.Schema({
     test: { type: 'ObjectId', ref: 'TestSubmission' },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-class AppEvaluationService {
+class AppEvaluationService extends mongoose.Model {
 
     get deadline () {
         let delay = this.discussion ? 14 : 7;
@@ -53,6 +53,9 @@ class AppEvaluationService {
 }
 
 appEvaluationSchema.loadClass(AppEvaluationService);
+/**
+ * @type {import('../interfaces/evaluations').IAppEvaluationModel}
+ */
 const AppEvaluation = mongoose.model('BnApp', appEvaluationSchema);
 
 module.exports = AppEvaluation;

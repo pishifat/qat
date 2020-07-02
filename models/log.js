@@ -32,6 +32,9 @@ class LogService
 }
 
 logSchema.loadClass(LogService);
+/**
+ * @type {import('./interfaces/log').default}
+ */
 const Log = mongoose.model('Log', logSchema);
 
 module.exports = Log;

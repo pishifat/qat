@@ -10,6 +10,9 @@ const reportSchema = new mongoose.Schema({
     isActive: { type: Boolean, default: true },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
+/**
+ * @type {import('./interfaces/report').default}
+ */
 const Report = mongoose.model('Report', reportSchema);
 
 module.exports = Report;

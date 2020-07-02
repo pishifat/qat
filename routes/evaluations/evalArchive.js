@@ -71,13 +71,7 @@ router.get('/search', async (req, res) => {
         .limit(limit);
 
     if (userToSearch) {
-        let user;
-
-        if (isNaN(userToSearch)) {
-            user = await User.findByUsername(userToSearch);
-        } else {
-            user = await User.findOne({ osuId: parseInt(userToSearch) });
-        }
+        const user = await User.findByUsernameOrOsuId(userToSearch);
 
         if (!user) {
             return res.json({ error: 'Cannot find user!' });

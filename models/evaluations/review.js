@@ -7,6 +7,9 @@ const reviewSchema = new mongoose.Schema({
     vote: { type: Number, enum: [1, 2, 3] },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
+/**
+ * @type {import('../interfaces/review').IReviewModel}
+ */
 const Review = mongoose.model('Review', reviewSchema);
 
 module.exports = Review;

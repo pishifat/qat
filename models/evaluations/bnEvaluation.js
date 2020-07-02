@@ -62,6 +62,9 @@ class BnEvaluationService {
 }
 
 bnEvaluationSchema.loadClass(BnEvaluationService);
+/**
+ * @type {import('../interfaces/evaluations').IBnEvaluationModel}
+ */
 const BnEvaluation = mongoose.model('EvalRound', bnEvaluationSchema);
 
 module.exports = BnEvaluation;

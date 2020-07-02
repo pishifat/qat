@@ -7,6 +7,9 @@ const noteSchema = new mongoose.Schema({
     isHidden: { type: Boolean },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
+/**
+ * @type {import('./interfaces/note').default}
+ */
 const Note = mongoose.model('Note', noteSchema);
 
 module.exports = Note;

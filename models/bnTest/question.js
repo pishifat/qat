@@ -13,6 +13,9 @@ const questionSchema = new mongoose.Schema({
     options: [{ type: 'ObjectId', ref: 'Option' }],
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
+/**
+ * @type {import('../interfaces/question').IQuestionModel}
+ */
 const Question = mongoose.model('Question', questionSchema);
 
 module.exports = Question;

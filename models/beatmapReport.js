@@ -6,6 +6,9 @@ const beatmapReportSchema = new mongoose.Schema({
     reporterUserId: { type: Number, required: true },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
+/**
+ * @type {import('./interfaces/beatmapReport').default}
+ */
 const BeatmapReport = mongoose.model('BeatmapReport', beatmapReportSchema);
 
 module.exports = BeatmapReport;

@@ -1,5 +1,5 @@
 const config = require('../config.json');
-const axios = require('axios');
+const { default: axios } = require('axios');
 
 async function beatmapsetOwnerMaps(userId) {
     const url = `https://osu.ppy.sh/api/get_beatmaps?k=${config.v1token}&u=${userId}`;

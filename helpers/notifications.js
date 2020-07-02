@@ -1,6 +1,7 @@
-const axios = require('axios');
+const { default: axios } = require('axios');
 const cheerio = require('cheerio');
 const cron = require('node-cron');
+const moment = require('moment');
 const discord = require('./discord');
 const osuv1 = require('./osuv1');
 const util = require('./util');
@@ -324,38 +325,34 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
  * Notify of quality assurance helper activity every saturday at 22 pm
  */
 const notifyQualityAssurance = cron.schedule('0 22 * * 6', async () => {
-    const users = await User.find({
-        $or: [
-            { groups: 'nat' },
-            { groups: 'bn' },
-        ],
-    }).sort({ username: 1 });
+    const users = await User
+        .find({
+            $or: [
+                { groups: 'nat' },
+                { groups: 'bn' },
+            ],
+        })
+        .populate({
+            path: 'qualityAssuranceChecks',
+        })
+        .sort({ username: 1 });
 
     for (let i = 0; i < users.length; i++) {
-        const qualityAssuranceChecks = await Aiess.find(
-            {
-                qualityAssuranceCheckers: users[i].id,
-            }
-        );
-        users[i].qualityAssuranceChecks = qualityAssuranceChecks.length;
+        const sevenDaysAgo = moment().subtract(7, 'days');
 
-        let recentCount = 0;
-        let sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-        qualityAssuranceChecks.forEach(event => {
-            if (event.timestamp > sevenDaysAgo) recentCount++;
-        });
+        const recentCount = users[i].qualityAssuranceChecks.filter(event =>
+            moment(event.timestamp).isAfter(sevenDaysAgo)
+        ).length;
 
         users[i].recentQualityAssuranceChecks = recentCount;
     }
 
-    let overallUsers = [...users];
-    let recentUsers = [...users];
+    const overallUsers = [...users];
+    const recentUsers = [...users];
 
     overallUsers.sort((a, b) => {
-        if (a.qualityAssuranceChecks > b.qualityAssuranceChecks) return -1;
-        if (a.qualityAssuranceChecks < b.qualityAssuranceChecks) return 1;
+        if (a.qualityAssuranceChecks.length > b.qualityAssuranceChecks.length) return -1;
+        if (a.qualityAssuranceChecks.length < b.qualityAssuranceChecks.length) return 1;
 
         return 0;
     });
@@ -369,23 +366,21 @@ const notifyQualityAssurance = cron.schedule('0 22 * * 6', async () => {
 
     const modes = ['osu', 'taiko', 'catch', 'mania'];
 
-    for (let modesIndex = 0; modesIndex < modes.length; modesIndex++) {
-        const mode = modes[modesIndex];
-
+    for (const mode of modes) {
         let topTenText = '';
         let topTenCount = 0;
 
         for (let i = 0; topTenCount < 10 && i < users.length; i++) {
             const user = overallUsers[i];
 
-            if (user.isBnFor(mode) && user.qualityAssuranceChecks > 0) {
+            if (user.isBnFor(mode) && user.qualityAssuranceChecks.length > 0) {
                 topTenCount++;
-                topTenText += `${topTenCount}. ${user.username}: **${user.qualityAssuranceChecks}**\n`;
+                topTenText += `${topTenCount}. ${user.username}: **${user.qualityAssuranceChecks.length}**\n`;
             }
         }
 
         let recentText = '';
-        let recentCount = '';
+        let recentCount = 0;
 
         for (let i = 0; recentCount < 3 && i < users.length; i++) {
             const user = recentUsers[i];
@@ -421,21 +416,20 @@ const notifyQualityAssurance = cron.schedule('0 22 * * 6', async () => {
  */
 const lowActivityTask = cron.schedule('0 23 1 * *', async () => {
     const lowActivityFields = [];
-    const initialDate = new Date();
-    initialDate.setMonth(initialDate.getMonth() - 3);
+    const initialDate = moment().subtract(3, 'months').toDate();
 
     const bns = await User.find({ groups: 'bn' });
 
     for (const bn of bns) {
         const joinedHistory = bn.history.filter(h => h.kind === 'joined');
-        const date = joinedHistory[joinedHistory - 1].date;
+        const date = joinedHistory[joinedHistory.length - 1].date;
 
         if (new Date(date) < initialDate) {
             for (const mode of bn.modes) {
                 if (await hasLowActivity(initialDate, bn, mode)) {
                     lowActivityFields.push({
                         name: bn.username,
-                        value: `${await findUniqueNominations(initialDate, bn, mode)}`,
+                        value: `${await findUniqueNominations(initialDate, bn)}`,
                         inline: true,
                         mode,
                     });
@@ -493,6 +487,11 @@ const lowActivityTask = cron.schedule('0 23 1 * *', async () => {
     scheduled: false,
 });
 
+/**
+ * @param {Date} initialDate
+ * @param {object} bn
+ * @returns {Promise<number>} number of unique bubbled/qualified
+ */
 async function findUniqueNominations (initialDate, bn) {
     const events = await Aiess.distinct('beatmapsetId', {
         userId: bn.osuId,
@@ -507,6 +506,11 @@ async function findUniqueNominations (initialDate, bn) {
     return events.length;
 }
 
+/**
+ * @param {Date} initialDate
+ * @param {object} bn
+ * @returns {Promise<number>} number of qa checks
+ */
 async function findQualityAssuranceChecks (initialDate, bn) {
     const events = await Aiess.find({
         qualityAssuranceCheckers: bn.id,
@@ -516,19 +520,21 @@ async function findQualityAssuranceChecks (initialDate, bn) {
     return events.length;
 }
 
+/**
+ * @param {Date} initialDate
+ * @param {object} bn
+ * @param {string} mode
+ * @returns {Promise<boolean>} whether or not the user has 'low activity'
+ */
 async function hasLowActivity (initialDate, bn, mode) {
     const [uniqueNominations, qualityAssuranceChecks] = await Promise.all([
         findUniqueNominations(initialDate, bn),
         findQualityAssuranceChecks(initialDate, bn),
     ]);
 
-    if (uniqueNominations < 6) {
-        console.log(bn.username);
-        console.log(qualityAssuranceChecks);
-    }
-
-    if ((uniqueNominations + (qualityAssuranceChecks/4) < 4 && mode == 'mania') ||
-        (uniqueNominations + (qualityAssuranceChecks/4) < 6 && mode != 'mania')
+    if (
+        (uniqueNominations + (qualityAssuranceChecks / 4) < 4 && mode == 'mania') ||
+        (uniqueNominations + (qualityAssuranceChecks / 4) < 6 && mode != 'mania')
     ) {
         return true;
     }
