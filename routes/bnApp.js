@@ -64,7 +64,7 @@ router.post('/apply', async (req, res) => {
     }
 
     let cooldownDate = new Date();
-    const [currentBnApp, currentBnEval, resignedOnGoodTerms, wasBnForThisMode] = await Promise.all([
+    const [currentBnApp, currentBnEval, resignedOnGoodTerms] = await Promise.all([
         await AppEvaluation.findOne({
             user: req.session.mongoId,
             mode,
@@ -84,16 +84,15 @@ router.post('/apply', async (req, res) => {
             mode,
             resignedOnGoodTerms: true,
         }),
-        await AppEvaluation.findOne({
-            user: req.session.mongoId,
-            mode,
-        }),
     ]);
+
+    const wasBn = res.locals.userRequest.history && res.locals.userRequest.history.length;
 
     if (!currentBnApp && !currentBnEval) {
         let months = 3;
+
         if (resignedOnGoodTerms) months = 1;
-        else if (wasBnForThisMode) months = 2;
+        else if (wasBn) months = 2;
 
         // Check user kudosu total count & mod score
         const [userInfo, modScore] = await Promise.all([
@@ -114,10 +113,10 @@ router.post('/apply', async (req, res) => {
         if (modScore < 0) {
             let additionalInfo = `Your mod score was calculated based on ${months} month${months == 1 ? '' : 's'} of activity because `;
             if (resignedOnGoodTerms) additionalInfo += 'you resigned from the BN on good terms.';
-            else if (wasBnForThisMode) additionalInfo += 'you were BN for this game mode in the past.';
+            else if (wasBn) additionalInfo += 'you were BN for this game mode in the past.';
 
             return res.json({ error: `Your mod score needs to be higher or equal than 0. Currently it is ${modScore}.
-                ${resignedOnGoodTerms || wasBnForThisMode ? additionalInfo : ''}` });
+                ${resignedOnGoodTerms || wasBn ? additionalInfo : ''}` });
         }
 
         // Create app & test
