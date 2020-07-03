@@ -73,6 +73,12 @@ router.post('/addEvalRounds/', middlewares.isNat, async (req, res) => {
     // if user groups are selected
     let allUsersByMode = await User.getAllByMode(includeFullBns, includeProbationBns, includeNat);
 
+    if (allUsersByMode.error) {
+        return {
+            error: 'Something went wrong',
+        };
+    }
+
     if (allUsersByMode.length) {
         allUsersByMode = allUsersByMode.filter(m => isValidMode(m._id, isOsu, isTaiko, isCatch, isMania));
 
@@ -148,7 +154,9 @@ router.post('/addEvalRounds/', middlewares.isNat, async (req, res) => {
     // create evalRounds
     const result = await BnEvaluation.insertMany(allEvalsToCreate);
 
-    if (result.error) return res.json(result);
+    if (!result.length) return res.json({
+        error: `Didn't create any`,
+    });
 
     let ers = await BnEvaluation.findActiveEvaluations();
 
@@ -311,7 +319,7 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
 
         else if (evaluation.consensus == 'probation') {
             if (i !== -1 && user.modesInfo[i].level === 'full') {
-                user.modesInfo.set(i, {
+                user.modesInfo.splice(i, 1, {
                     mode: evaluation.mode,
                     level: 'probation',
                 });
@@ -329,7 +337,7 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
 
         else if (evaluation.consensus == 'pass') {
             if (i !== -1 && user.modesInfo[i].level === 'probation') {
-                user.modesInfo.set(i, {
+                user.modesInfo.splice(i, 1, {
                     mode: evaluation.mode,
                     level: 'full',
                 });
@@ -557,10 +565,10 @@ router.get('/findPreviousEvaluations/:userId', async (req, res) => {
 
     if (evalRounds.length && applications.length) {
         previousEvaluations.sort((a, b) => {
-            a.date = (a.deadline ? a.deadline : a.createdAt);
-            b.date = (b.deadline ? b.deadline : b.createdAt);
-            if (a.date > b.date) return 1;
-            if (a.date < b.date) return -1;
+            const dateA = (a.deadline ? a.deadline : a.createdAt);
+            const dateB = (b.deadline ? b.deadline : b.createdAt);
+            if (dateA > dateB) return 1;
+            if (dateA < dateB) return -1;
 
             return 0;
         });
@@ -684,7 +692,7 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
             userId: { $ne: userOsuId },
             beatmapsetId: { $in: beatmapsetIds },
             timestamp: { $gte: minDate, $lte: maxDate },
-            eventType: ['Bubbled', 'Qualified'],
+            eventType: { $in: ['Bubbled', 'Qualified'] },
         }),
     ]);
 

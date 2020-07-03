@@ -1,7 +1,7 @@
 const express = require('express');
 const middlewares = require('../helpers/middlewares');
 const util = require('../helpers/util');
-const { getUserModsCount } = require('../helpers/scrap');
+const { getUserModScore } = require('../helpers/scrap');
 const osu = require('../helpers/osu');
 const AppEvaluation = require('../models/evaluations/appEvaluation.js');
 const BnEvaluation = require('../models/evaluations/bnEvaluation');
@@ -97,10 +97,10 @@ router.post('/apply', async (req, res) => {
         // Check user kudosu total count & mod score
         const [userInfo, modScore] = await Promise.all([
             await osu.getUserInfo(req.session.accessToken),
-            await getUserModsCount(req.session.username, mode, months),
+            await getUserModScore(req.session.username, months, mode),
         ]);
 
-        if (!userInfo || userInfo.error || !modScore || modScore.error) {
+        if (!userInfo || userInfo.error || !modScore) {
             return res.json({ error: 'Something went wrong! Please retry again.' });
         }
 
@@ -130,7 +130,7 @@ router.post('/apply', async (req, res) => {
             }),
         ]);
 
-        if (!newBnApp || newBnApp.error || !test || test.error) {
+        if (!newBnApp || newBnApp.error || !test) {
             return res.json({ error: 'Failed to process application!' });
         } else {
             await AppEvaluation.findByIdAndUpdate(newBnApp.id, { test: test._id });
@@ -143,27 +143,21 @@ router.post('/apply', async (req, res) => {
         }
     } else {
         if (currentBnApp) {
-            if (currentBnApp.error) {
-                return res.json(currentBnApp.error);
-            } else if (currentBnApp.active) {
+            if (currentBnApp.active) {
                 return res.json({ error: 'Your application is still being evaluated!' });
             } else {
                 return res.json({
                     error: `Your previous application was rejected (check your osu! forum PMs for details). 
-                        You may apply for this game mode again on 
-                        ${new Date(currentBnApp.cooldownDate).toString().slice(4, 15)}.`,
+                            You may apply for this game mode again on 
+                            ${new Date(currentBnApp.cooldownDate).toString().slice(4, 15)}.`,
                 });
             }
         } else if (currentBnEval) {
-            if (currentBnEval.error) {
-                return res.json(currentBnEval.error);
-            } else {
-                return res.json({
-                    error: `You were recently removed from the Beatmap Nominators in this game mode. 
+            return res.json({
+                error: `You were recently removed from the Beatmap Nominators in this game mode. 
                         You may apply for this game mode again on 
                         ${new Date(currentBnEval.cooldownDate).toString().slice(4, 15)}.`,
-                });
-            }
+            });
         }
     }
 });

@@ -28,21 +28,13 @@ router.get('/relevantInfo', async (req, res) => {
 
 /* GET search for user */
 router.get('/search/:user', async (req, res) => {
-    let u;
     const userToSearch = decodeURI(req.params.user);
-
-    if (isNaN(userToSearch)) {
-        u = await User.findByUsername(userToSearch);
-    } else {
-        u = await User.findOne({ osuId: parseInt(userToSearch) });
-    }
-
-    if (!u) {
-        return res.json({ error: 'Cannot find user!' });
-    }
+    const user = await User
+        .findByUsernameOrOsuId(userToSearch)
+        .orFail();
 
     const closedReports = await Report
-        .find({ isActive: false, culprit: u.id })
+        .find({ isActive: false, culprit: user.id })
         .populate(defaultPopulate)
         .sort({ createdAt: -1 });
 

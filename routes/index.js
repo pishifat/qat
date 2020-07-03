@@ -29,8 +29,13 @@ router.get('/modsCount/:user', async (req, res) => {
         return res.json({ error: 'Missing user input' });
     }
 
-    const modCount = await getUserModsCount(req.params.user);
-    if (modCount.error) return res.json(modCount.error);
+    const modCount = await getUserModsCount(req.params.user.trim());
+
+    if (!modCount.length) {
+        return res.json({
+            error: `Couldn't calculate your score`,
+        });
+    }
 
     return res.json({ modCount });
 });

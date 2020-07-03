@@ -18,13 +18,14 @@ testSubmissionSchema.virtual('answers', {
     foreignField: 'test',
 });
 
-class TestSubmissionService
+class TestSubmissionService extends mongoose.Model
 {
 
     /**
      * Creates a test, including all the questions needed
      * @param {object} applicant UserId of applicant
      * @param {string} mode Options: 'osu', 'taiko', 'catch', 'mania'
+     * @returns {Promise<object>} the test
      */
     static async generateTest(applicant, mode) {
         try {
@@ -76,13 +77,18 @@ class TestSubmissionService
 
             return test;
         } catch (error) {
-            return { error: 'could not create the test' };
+            return {
+                error: 'could not create the test',
+            };
         }
     }
 
 }
 
 testSubmissionSchema.loadClass(TestSubmissionService);
+/**
+ * @type {import('../interfaces/testSubmission').ITestSubmissionModel}
+ */
 const TestSubmission = mongoose.model('TestSubmission', testSubmissionSchema);
 
 module.exports = TestSubmission;

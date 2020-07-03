@@ -7,6 +7,9 @@ const testAnswerSchema = new mongoose.Schema({
     feedback: { type: String },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
+/**
+ * @type {import('../interfaces/testAnswer').ITestAnswerModel}
+ */
 const TestAnswer = mongoose.model('TestAnswer', testAnswerSchema);
 
 module.exports = TestAnswer;

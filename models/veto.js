@@ -14,6 +14,9 @@ const vetoesSchema = new mongoose.Schema({
     deadline: { type: Date },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
+/**
+ * @type {import('./interfaces/veto').default}
+ */
 const Veto = mongoose.model('Veto', vetoesSchema);
 
 module.exports = Veto;

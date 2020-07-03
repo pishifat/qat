@@ -25,7 +25,13 @@ const userSchema = new mongoose.Schema({
     natProfileBadge: { type: Number, default: 0 },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-class UserService {
+userSchema.virtual('qualityAssuranceChecks', {
+    ref: 'aiess',
+    localField: '_id',
+    foreignField: 'qualityAssuranceCheckers',
+});
+
+class UserService extends mongoose.Model {
 
     // Groups
     get isNat () {
@@ -119,10 +125,24 @@ class UserService {
     }
 
     /**
+     * Find an user by a given username
+     * @param {string} user
+     */
+    static findByUsernameOrOsuId (user) {
+        const osuId = parseInt(user);
+
+        if (isNaN(osuId)) {
+            return User.findByUsername(user);
+        } else {
+            return User.findOne({ osuId });
+        }
+    }
+
+    /**
      * @param {boolean} includeFullBns
      * @param {boolean} includeProbation
      * @param {boolean} includeNat
-     * @returns {array} [{ _id: 'osu', users: [{ id, username, osuId, group, level }] }]
+     * @returns {Promise<array|object>} [{ _id: 'osu', users: [{ id, username, osuId, group, level }] }]
      */
     static async getAllByMode (includeFullBns, includeProbation, includeNat) {
         if (!includeFullBns && !includeProbation && !includeNat) return [];
@@ -204,6 +224,9 @@ class UserService {
 }
 
 userSchema.loadClass(UserService);
+/**
+ * @type {import('./interfaces/user').IUserModel}
+ */
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;

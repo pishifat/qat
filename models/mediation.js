@@ -6,6 +6,9 @@ const mediationSchema = new mongoose.Schema({
     vote: { type: Number, enum: [1, 2, 3] },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
+/**
+ * @type {import('./interfaces/mediation').IMediationModel}
+ */
 const Mediation = mongoose.model('Mediation', mediationSchema);
 
 module.exports = Mediation;

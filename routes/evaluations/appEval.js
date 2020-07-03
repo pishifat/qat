@@ -383,7 +383,7 @@ router.post('/selectBnEvaluators', middlewares.isNat, async (req, res) => {
             const userToSearch = includeUsers[i].trim();
             const user = await User.findByUsername(userToSearch);
 
-            if (user && !user.error && user.modesInfo.some(m => m.mode === req.body.mode)) {
+            if (user && user.modesInfo.some(m => m.mode === req.body.mode)) {
                 users.push(user);
                 excludeUserIds.push(user.id);
             }
@@ -398,7 +398,7 @@ router.post('/selectBnEvaluators', middlewares.isNat, async (req, res) => {
             const userToSearch = excludeUsers[i].trim();
             const user = await User.findByUsername(userToSearch);
 
-            if (user && !user.error) {
+            if (user) {
                 excludeUserIds.push(user.id);
             }
         }

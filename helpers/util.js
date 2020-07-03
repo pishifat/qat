@@ -29,7 +29,7 @@ function getBeatmapsetIdFromUrl(url) {
 /**
  * check if it's a valid url
  * @param {string} url
- * @param {string} contain url must contain ...
+ * @param {string} [contain] url must contain ...
  * @returns {boolean}
  */
 function isValidUrl(url, contain) {
@@ -46,7 +46,7 @@ function isValidUrl(url, contain) {
  * check if it's a valid url and throws an error if not
  * @param {string} url
  * @param {string} contain url must contain ...
- * @param {string} throwMessage error message
+ * @param {string} [throwMessage] error message
  * @returns {void}
  */
 function isValidUrlOrThrow(url, contain, throwMessage) {
@@ -58,7 +58,7 @@ function isValidUrlOrThrow(url, contain, throwMessage) {
 /**
  * Shorten text to a specific length if needed
  * @param {string} text
- * @param {string} length 50 by default
+ * @param {number} [length] 50 by default
  */
 function shorten(text, length) {
     if (!text) return '';

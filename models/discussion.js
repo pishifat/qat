@@ -12,6 +12,9 @@ const discussionSchema = new mongoose.Schema({
     creator: { type: 'ObjectId', ref: 'User' },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
+/**
+ * @type {import('./interfaces/discussion').default}
+ */
 const Discussion = mongoose.model('Discussion', discussionSchema);
 
 module.exports = Discussion;

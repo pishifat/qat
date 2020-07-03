@@ -25,28 +25,30 @@ const aiessSchema = new mongoose.Schema({
     qualityAssuranceComments: [{ type: 'ObjectId', ref: 'Mediation' }],
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-class AiessService
+class AiessService extends mongoose.Model
 {
 
     /**
      * Get unique events from an user
      * @param {number} userId
-     * @param {date} minDate
-     * @param {date} maxDate
+     * @param {Date} minDate
+     * @param {Date} maxDate
      * @param {array} modes
      * @param {array} eventTypes
-     * @returns {object} aggregation query
+     * @returns {mongoose.Aggregate} aggregation query
      */
     static getUniqueUserEvents (userId, minDate, maxDate, modes, eventTypes) {
         const aggregation = this.getUserEvents(userId, minDate, maxDate, modes, eventTypes);
 
-        aggregation.group({
-            _id: '$beatmapsetId',
-            event: { $first: '$$ROOT' },
-        }).replaceRoot('event'
-        ).sort({
-            timestamp: 1,
-        });
+        aggregation
+            .group({
+                _id: '$beatmapsetId',
+                event: { $first: '$$ROOT' },
+            })
+            .replaceRoot('event')
+            .sort({
+                timestamp: 1,
+            });
 
         return aggregation;
     }
@@ -54,11 +56,11 @@ class AiessService
     /**
      * Get all the specified events from an user
      * @param {number} userId
-     * @param {date} minDate
-     * @param {date} maxDate
+     * @param {Date} minDate
+     * @param {Date} maxDate
      * @param {array} modes
      * @param {array} eventTypes
-     * @returns {object} aggregation query
+     * @returns {mongoose.Aggregate} aggregation query
      */
     static getUserEvents (userId, minDate, maxDate, modes, eventTypes) {
         return this.aggregate([
@@ -88,8 +90,8 @@ class AiessService
      * Get all the specified events from an user related to a group of beatmapsets
      * @param {number} userId
      * @param {array} beatmapsetIds
-     * @param {date} minDate
-     * @param {date} maxDate
+     * @param {Date} minDate
+     * @param {Date} maxDate
      * @param {array} modes
      * @param {string} eventType
      * @returns {object} aggregation query
@@ -123,8 +125,9 @@ class AiessService
 
     /**
      * Group all data by event without mode and including nominations
-     * @param {date} minDate
-     * @param {date} maxDate
+     * @param {Date} minDate
+     * @param {Date} maxDate
+     * @param {string} mode
      */
     static async getAllActivity(minDate, maxDate, mode) {
         if (!minDate && !maxDate) return null;
@@ -160,6 +163,9 @@ class AiessService
 }
 
 aiessSchema.loadClass(AiessService);
+/**
+ * @type {import('./interfaces/aiess').IAiessModel}
+ */
 const Aiess = mongoose.model('aiess', aiessSchema, 'aiess');
 
 module.exports = Aiess;

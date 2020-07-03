@@ -38,20 +38,10 @@ router.get('/relevantInfo', async (req, res) => {
 
 /* GET search for test */
 router.get('/search/:user', middlewares.isNat, async (req, res) => {
-    let user;
     const userToSearch = decodeURI(req.params.user);
-
-    if (isNaN(userToSearch)) {
-        user = await User.findByUsername(userToSearch);
-    } else {
-        user = await User.findOne({ osuId: parseInt(userToSearch) });
-    }
-
-    if (!user) {
-        return res.json({
-            error: 'Cannot find user!',
-        });
-    }
+    const user = await User
+        .findByUsernameOrOsuId(userToSearch)
+        .orFail();
 
     const tests = await TestSubmission
         .find({
@@ -59,13 +49,8 @@ router.get('/search/:user', middlewares.isNat, async (req, res) => {
             status: 'finished',
         })
         .populate(defaultTestPopulate)
-        .sort({ createdAt: -1 });
-
-    if (!tests.length) {
-        return res.json({
-            error: 'No tests saved for that user!',
-        });
-    }
+        .sort({ createdAt: -1 })
+        .orFail(new Error('No tests saved for that user!'));
 
     res.json({
         tests,

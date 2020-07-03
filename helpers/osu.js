@@ -1,6 +1,6 @@
 const querystring = require('querystring');
 const config = require('../config.json');
-const axios = require('axios');
+const { default: axios } = require('axios');
 
 async function getToken(code) {
     const postData = querystring.stringify({

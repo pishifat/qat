@@ -56,7 +56,7 @@ router.get('/tests/:id', async (req, res) => {
         .orFail();
 
     if (!test.startedAt) {
-        test.startedAt = Date.now();
+        test.startedAt = new Date();
         test.status = 'wip';
         await test.save();
     }
@@ -70,10 +70,13 @@ router.get('/tests/:id', async (req, res) => {
 router.post('/submitAnswer', async (req, res) => {
     if (!req.body.answerId || !req.body.checkedOptions) return res.json({ error: 'Something went wrong!' });
 
-    const answer = await TestAnswer.findByIdAndUpdate(req.body.answerId, { optionsChosen: req.body.checkedOptions });
+    await TestAnswer
+        .findByIdAndUpdate(req.body.answerId, { optionsChosen: req.body.checkedOptions })
+        .orFail();
 
-    if (!answer || answer.error) return res.json({ error: 'Something went wrong!' });
-    else return res.json({ success: 'ok' });
+    return res.json({
+        success: 'ok',
+    });
 });
 
 /* POST submit test */
@@ -120,8 +123,8 @@ router.post('/submitTest', async (req, res) => {
         }
     }
 
-    totalScore = totalScore.toFixed(1);
-    test.submittedAt = Date.now();
+    totalScore = Math.round(totalScore * 10) / 10;
+    test.submittedAt = new Date;
     test.status = 'finished';
     test.totalScore = totalScore;
     test.comment = req.body.comment;
