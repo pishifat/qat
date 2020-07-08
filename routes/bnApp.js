@@ -41,7 +41,7 @@ router.post('/apply', async (req, res) => {
 
     for (let i = 0; i < mods.length; i++) {
         mods[i] = mods[i].trim();
-        reasons[i] = reasons[i].trim();
+        reasons[i] = reasons[i] && reasons[i].trim();
 
         util.isValidUrlOrThrow(mods[i], 'https://osu.ppy.sh/beatmapsets', `One of your mods' link is not valid`);
 
@@ -60,7 +60,7 @@ router.post('/apply', async (req, res) => {
 
     let cooldownDate = new Date();
     const [currentBnApp, currentBnEval, resignedOnGoodTerms] = await Promise.all([
-        await AppEvaluation.findOne({
+        AppEvaluation.findOne({
             user: req.session.mongoId,
             mode,
             $or: [
@@ -68,13 +68,13 @@ router.post('/apply', async (req, res) => {
                 { active: true },
             ],
         }),
-        await BnEvaluation.findOne({
+        BnEvaluation.findOne({
             user: req.session.mongoId,
             mode,
             consensus: 'fail',
             cooldownDate: { $gte: cooldownDate },
         }),
-        await BnEvaluation.findOne({
+        BnEvaluation.findOne({
             user: req.session.mongoId,
             mode,
             resignedOnGoodTerms: true,
@@ -91,8 +91,8 @@ router.post('/apply', async (req, res) => {
 
         // Check user kudosu total count & mod score
         const [userInfo, modScore] = await Promise.all([
-            await osu.getUserInfo(req.session.accessToken),
-            await getUserModScore(req.session.username, months, mode),
+            osu.getUserInfo(req.session.accessToken),
+            getUserModScore(req.session.username, months, mode),
         ]);
 
         if (!userInfo || userInfo.error || !modScore) {
