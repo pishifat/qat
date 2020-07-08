@@ -7,7 +7,6 @@ export interface ITestAnswerDocument extends Document {
     test: ITestSubmissionDocument;
     question: IQuestionDocument;
     optionsChosen: IOptionDocument[];
-    feedback: string;
 }
 
 export interface ITestAnswerModel extends Model<ITestAnswerDocument> { }

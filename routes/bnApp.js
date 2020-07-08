@@ -26,9 +26,7 @@ router.get('/relevantInfo', async (req, res) => {
 
 /* POST a bn application */
 router.post('/apply', async (req, res) => {
-    const mods = req.body.mods;
-    const reasons = req.body.reasons;
-    const mode = req.body.mode;
+    const { mods, reasons, mode } = req.body;
 
     if (!mods || !mods.length || !Array.isArray(mods) ||
         !reasons || !reasons.length || !Array.isArray(reasons) ||
@@ -43,12 +41,9 @@ router.post('/apply', async (req, res) => {
 
     for (let i = 0; i < mods.length; i++) {
         mods[i] = mods[i].trim();
+        reasons[i] = reasons[i].trim();
 
         util.isValidUrlOrThrow(mods[i], 'https://osu.ppy.sh/beatmapsets', `One of your mods' link is not valid`);
-
-        if (reasons[i]) {
-            reasons[i] = reasons[i].trim();
-        }
 
         if (!reasons[i]) {
             return res.json({
@@ -125,8 +120,8 @@ router.post('/apply', async (req, res) => {
             AppEvaluation.create({
                 user: req.session.mongoId,
                 mode,
-                mods: req.body.mods,
-                reasons: req.body.reasons,
+                mods,
+                reasons,
             }),
         ]);
 
