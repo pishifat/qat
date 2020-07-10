@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
         mode: { type: String, enum: ['osu', 'taiko', 'catch', 'mania'], required: true },
         kind: { type: String, enum: ['joined','left'], required: true },
         group: { type: String, enum: ['bn', 'nat'], default: 'bn' },
-        relatedEvaluation: { type: 'ObjectId', ref: 'EvalRound' },
+        relatedEvaluation: { type: 'ObjectId' },
     }],
     isVetoMediator: { type: Boolean, default: true },
     isBnEvaluator: { type: Boolean, default: true },
