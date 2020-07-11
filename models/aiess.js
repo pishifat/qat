@@ -12,7 +12,7 @@ const aiessSchema = new mongoose.Schema({
     hostId: { type: Number },
     hostName: { type: String },
 
-    valid: { type: Number, enum: [1, 2, 3] },
+    valid: { type: Number, enum: [1, 2, 3] }, // TODO check if not used anymore?
     obviousness: { type: Number, default: null },
     severity: { type: Number, default: null },
     mapperId: { type: Number },

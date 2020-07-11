@@ -71,15 +71,6 @@ export default {
         veto: {
             type: Object,
             required: true,
-            beatmapId: Number,
-            beatmapMapper: String,
-            beatmapMapperId: Number,
-            beatmapTitle: String,
-            createdAt: Date,
-            deadline: Date,
-            id: String,
-            mode: String,
-            status: String,
         },
     },
     methods: {
