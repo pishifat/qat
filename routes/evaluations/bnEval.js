@@ -426,7 +426,6 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
         evaluation.consensusSetAt = new Date();
         await evaluation.save();
 
-
         const consensusText = getConsensusText(evaluation);
 
         Logger.generate(

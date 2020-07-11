@@ -102,15 +102,10 @@ export default {
     },
     methods: {
         getPlaceholder (monthOffset) {
-            let to = new Date();
-            let from = new Date();
-            to.setMonth(to.getMonth() - monthOffset);
+            const from = this.$moment.utc().subtract(monthOffset + 1, 'month');
+            const to = this.$moment.utc().subtract(monthOffset, 'month');
 
-            if (monthOffset > 0) {
-                from.setMonth(from.getMonth() - monthOffset - 1);
-            }
-
-            return `# mods from ${from.toLocaleDateString()} to ${to.toLocaleDateString()}`;
+            return `# mods from ${from.format('MM-DD-YYYY')} to ${to.format('MM-DD-YYYY')}`;
         },
         calculateMonthScore (modCount, modeValue) {
             if (!modCount) modCount = 0;
