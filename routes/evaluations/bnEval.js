@@ -278,6 +278,38 @@ router.post('/setIndividualEval/', middlewares.isNat, async (req, res) => {
     );
 });
 
+/**
+ * @param {object} evaluation
+ * @returns {string}
+ */
+function getConsensusText (evaluation) {
+    let consensusText;
+
+    if (evaluation.consensus == 'pass') {
+        consensusText = 'Pass';
+
+        if (evaluation.addition == 'lowActivity') {
+            consensusText += ' + Low activity warning';
+        } else if (evaluation.addition == 'movedToNat') {
+            consensusText += ' + Move to NAT';
+        } else if (evaluation.addition == 'movedToBn') {
+            consensusText += ' + Move to BN';
+        }
+    } else if (evaluation.consensus == 'probation') {
+        consensusText = 'Probation';
+    } else if (evaluation.consensus == 'fail') {
+        consensusText = 'Fail';
+
+        if (evaluation.addition == 'resignedOnGoodTerms') {
+            consensusText += ' + Resigned on good terms';
+        }
+    } else {
+        consensusText = 'No consensus set';
+    }
+
+    return consensusText;
+}
+
 /* POST set evals as complete */
 router.post('/setComplete/', middlewares.isNat, async (req, res) => {
     let evaluations = await BnEvaluation
@@ -394,29 +426,8 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
         evaluation.consensusSetAt = new Date();
         await evaluation.save();
 
-        let consensusText;
 
-        if (evaluation.consensus == 'pass') {
-            consensusText = 'Pass';
-
-            if (evaluation.isLowActivity) {
-                consensusText += ' + Low activity warning';
-            } else if (evaluation.isMoveToNat) {
-                consensusText += ' + Move to NAT';
-            } else if (evaluation.isMoveToBn) {
-                consensusText += ' + Move to BN';
-            }
-        } else if (evaluation.consensus == 'probation') {
-            consensusText = 'Probation';
-        } else if (evaluation.consensus == 'fail') {
-            consensusText = 'Fail';
-
-            if (evaluation.resignedOnGoodTerms) {
-                consensusText += ' + Resigned on good terms';
-            }
-        } else {
-            consensusText = 'No consensus set';
-        }
+        const consensusText = getConsensusText(evaluation);
 
         Logger.generate(
             req.session.mongoId,
@@ -447,52 +458,28 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
 
 /* POST set consensus of eval */
 router.post('/setConsensus/:id', middlewares.isNat, async (req, res) => {
-    let evaluation = await BnEvaluation
-        .findByIdAndUpdate(req.params.id, {
-            consensus: req.body.consensus,
-            isLowActivity: req.body.isLowActivity ? true : false,
-            resignedOnGoodTerms: req.body.resignedOnGoodTerms ? true : false,
-            resignedOnStandardTerms: req.body.resignedOnStandardTerms ? true : false,
-            isMoveToNat: req.body.isMoveToNat ? true : false,
-            isMoveToBn: req.body.isMoveToBn ? true : false,
-        })
+    const evaluation = await BnEvaluation
+        .findById(req.params.id)
         .populate(defaultPopulate)
         .orFail();
 
+    evaluation.consensus = req.body.consensus;
+    evaluation.isLowActivity = req.body.isLowActivity ? true : false;
+    evaluation.resignedOnGoodTerms = req.body.resignedOnGoodTerms ? true : false;
+    evaluation.resignedOnStandardTerms = req.body.resignedOnStandardTerms ? true : false;
+    evaluation.isMoveToNat = req.body.isMoveToNat ? true : false;
+    evaluation.isMoveToBn = req.body.isMoveToBn ? true : false;
+
     if (req.body.consensus == 'fail') {
-        let date = new Date(evaluation.updatedAt);
+        const date = new Date();
         date.setDate(date.getDate() + 90);
         evaluation.cooldownDate = date;
-        await evaluation.save();
     }
 
+    await evaluation.save();
     res.json(evaluation);
 
-    let consensusText;
-
-    if (evaluation.consensus == 'pass') {
-        consensusText = 'Pass';
-
-        if (evaluation.isLowActivity) {
-            consensusText += ' + Low activity warning';
-        } else if (evaluation.isMoveToNat) {
-            consensusText += ' + Move to NAT';
-        } else if (evaluation.isMoveToBn) {
-            consensusText += ' + Move to BN';
-        }
-    } else if (evaluation.consensus == 'probation') {
-        consensusText = 'Probation';
-    } else if (evaluation.consensus == 'fail') {
-        consensusText = 'Fail';
-
-        if (evaluation.resignedOnGoodTerms) {
-            consensusText += ' + Resigned on good terms';
-        } else if (evaluation.resignedOnStandardTerms) {
-            consensusText += ' + Resigned on standard terms';
-        }
-    } else {
-        consensusText = 'No consensus set';
-    }
+    const consensusText = getConsensusText(evaluation);
 
     Logger.generate(
         req.session.mongoId,
