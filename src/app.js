@@ -24,7 +24,10 @@ router.beforeEach(async (to, from, next) => {
 
     if (!store.state.initialized) {
         const { data } = await Axios.get('/me');
-        store.commit('setInitialData', data);
+
+        if (!data.error) {
+            store.commit('setInitialData', data);
+        }
     }
 
     if (

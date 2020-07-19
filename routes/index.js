@@ -51,7 +51,7 @@ router.get('/login', (req, res) => {
     res.redirect(
         `https://osu.ppy.sh/oauth/authorize?response_type=code&client_id=${
             config.id
-        }&redirect_uri=${encodeURIComponent(config.redirect)}&state=${hashedState}&scope=identify`
+        }&redirect_uri=${encodeURIComponent(config.redirect)}&state=${hashedState}&scope=identify+public`
     );
 });
 
@@ -103,6 +103,7 @@ router.get('/callback', async (req, res) => {
 
         const osuId = response.id;
         const username = response.username;
+        const rankedBeatmapsets = response.ranked_and_approved_beatmapset_count;
         const user = await User.findOne({ osuId });
 
         if (!user) {
@@ -110,6 +111,7 @@ router.get('/callback', async (req, res) => {
             newUser.osuId = osuId;
             newUser.username = username;
             newUser.groups = groups;
+            newUser.rankedBeatmapsets = rankedBeatmapsets;
             await newUser.save();
 
             req.session.mongoId = newUser._id;
@@ -129,6 +131,11 @@ router.get('/callback', async (req, res) => {
                     'account',
                     user._id
                 );
+            }
+
+            if (user.rankedBeatmapsets != rankedBeatmapsets) {
+                user.rankedBeatmapsets = rankedBeatmapsets;
+                await user.save();
             }
 
             if (groups.some(g => !user.groups.includes(g)) || user.groups.some(g => !groups.includes(g))) {

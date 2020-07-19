@@ -21,6 +21,7 @@ interface IUser {
     isBnEvaluator: boolean;
     bnProfileBadge: number;
     natProfileBadge: number;
+    rankedBeatmapsets: number;
 }
 
 export interface IUserDocument extends IUser, Document {

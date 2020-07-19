@@ -23,6 +23,7 @@ const userSchema = new mongoose.Schema({
     isBnEvaluator: { type: Boolean, default: true },
     bnProfileBadge: { type: Number, default: 0 },
     natProfileBadge: { type: Number, default: 0 },
+    rankedBeatmapsets: { type: Number, default: 0 },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 userSchema.virtual('qualityAssuranceChecks', {

@@ -45,7 +45,7 @@ function isValidUrl(url, contain) {
 /**
  * check if it's a valid url and throws an error if not
  * @param {string} url
- * @param {string} contain url must contain ...
+ * @param {string} [contain] url must contain ...
  * @param {string} [throwMessage] error message
  * @returns {void}
  */

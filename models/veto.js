@@ -4,7 +4,7 @@ const vetoesSchema = new mongoose.Schema({
     vetoer: { type: 'ObjectId', ref: 'User', required: true },
     mode: { type: String, enum: ['osu', 'taiko', 'catch', 'mania', 'all'] },
     discussionLink: { type: String, required: true },
-    beatmapId: { type: String },
+    beatmapId: { type: Number },
     beatmapTitle: { type: String },
     beatmapMapper: { type: String },
     beatmapMapperId: { type: Number },

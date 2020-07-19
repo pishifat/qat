@@ -73,8 +73,21 @@ async function getUserInfo(token) {
     }
 }
 
+async function getBeatmapsetInfo(token, setId) {
+    const options = {
+        method: 'GET',
+        url: `https://osu.ppy.sh/api/v2/beatmapsets/${setId}`,
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    };
+
+    return (await axios(options)).data;
+}
+
 module.exports = {
     getToken,
     refreshToken,
     getUserInfo,
+    getBeatmapsetInfo,
 };
