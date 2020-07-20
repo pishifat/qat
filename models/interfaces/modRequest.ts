@@ -17,8 +17,11 @@ interface IModRequestDocument extends Document {
         submittedAt: Date;
     };
     comment: string;
-    status: 'sent' | 'denied' | 'accepted';
-    reply: string;
+    reviews: {
+        user: IUserDocument,
+        action: string,
+        comment: string,
+    }[],
 }
 
 export default interface IModRequestModel extends Model<IModRequestDocument> { }

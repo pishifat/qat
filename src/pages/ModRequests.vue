@@ -39,10 +39,9 @@
                                 <ul>
                                     <li>You can submit once every month</li>
                                     <li>
-                                        Even though categorizing a map isn't something worth doing, it helps me to quickly know what i'll be looking at. Examples:
-                                        <a href="https://osu.ppy.sh/beatmapsets/406467" target="_blank">simple</a>,
+                                        Even though categorizing a map isn't something right or worth doing, it helps to quickly know what your map may look like. Examples:
+                                        <a href="https://osu.ppy.sh/beatmapsets/703956" target="_blank">simple</a>,
                                         <a href="https://osu.ppy.sh/beatmapsets/705788" target="_blank">tech</a>,
-                                        <a href="https://osu.ppy.sh/beatmapsets/703956" target="_blank">flow</a>,
                                         <a href="https://osu.ppy.sh/beatmapsets/414289" target="_blank">double bpm</a>,
                                         <a href="https://osu.ppy.sh/beatmapsets/604486" target="_blank">conceptual</a>
                                     </li>
@@ -117,27 +116,23 @@
                                 v-for="request in ownRequests"
                                 :key="request.id"
                                 class="row no-gutters rounded"
-                                style="position: relative"
+                                style="position: relative; min-height: 40px"
                             >
                                 <div
                                     :style="`background-image: url('https://assets.ppy.sh/beatmaps/${request.beatmapset.osuId}/covers/cover.jpg'; position: absolute; `"
                                     style="width: 100%; height: 100%; opacity: 0.2; background-size: cover;"
                                     class="rounded"
                                 />
-                                <div class="col-sm-10">
-                                    <img class="rounded-left mr-2" style="width: 40px; height: 40px;" :src="`https://a.ppy.sh/${request.user.osuId}`">
+                                <div class="col-sm-10 d-flex align-items-center pl-2">
                                     <a :href="`https://osu.ppy.sh/beatmapsets/${request.beatmapset.osuId}`" target="_blank">
                                         {{ request.beatmapset.title }} -
                                         {{ request.beatmapset.artist }}
                                     </a>
-                                    (by <a :href="`https://osu.ppy.sh/users/${request.user.osuId}`" target="_blank">
-                                        {{ request.user.username }}
-                                    </a>)
                                 </div>
                                 <div class="col-sm-2 d-flex justify-content-around align-items-center pr-2">
                                     <div>{{ request.createdAt | toMonthDay }}</div>
-                                    <div :class="getStatusClass(request.status)">
-                                        {{ getStatus(request.status) }}
+                                    <div :class="getStatusClass(request.reviews)">
+                                        {{ getStatus(request.reviews) }}
                                     </div>
                                 </div>
                             </div>
@@ -145,7 +140,7 @@
                     </section>
 
                     <section
-                        v-if="user && user.osuId === 1052994"
+                        v-if="user && user.isFeatureTester"
                         class="card"
                     >
                         <h5 class="card-header">
@@ -172,20 +167,42 @@
                                     (by <a :href="`https://osu.ppy.sh/users/${request.user.osuId}`" target="_blank">
                                         {{ request.user.username }}
                                     </a>)
+                                    <span
+                                        v-if="request.user.rankedBeatmapsets > 5"
+                                        class="badge badge-pill badge-primary"
+                                    >
+                                        experienced ({{ request.user.rankedBeatmapsets }})
+                                    </span>
+                                    <span class="badge badge-pill badge-primary">
+                                        {{ getTotalLength(request.beatmapset) > 600 ? 'long' : 'short' }} ({{ (request.beatmapset.length / 60).toFixed(1) }} min | {{ (getTotalLength(request.beatmapset) / 60).toFixed(1) }} min)
+                                    </span>
+                                    <span class="badge badge-pill badge-primary">
+                                        {{ request.beatmapset.genre }} / {{ request.beatmapset.language }}
+                                    </span>
+                                    <span
+                                        v-if="request.reviews.length > 0"
+                                        class="badge badge-pill badge-success"
+                                    >
+                                        reviewed ({{ request.reviews.length }})
+                                    </span>
+                                    <span
+                                        v-else
+                                        class="badge badge-pill badge-danger"
+                                    >
+                                        not reviewed
+                                    </span>
                                 </div>
                                 <div class="col-sm-2 d-flex justify-content-around align-items-center pr-2">
                                     {{ request.createdAt | toMonthDay }}
                                     <a
                                         href="#"
-                                        @click.prevent="setStatus(request.id, 'denied')"
+                                        data-toggle="modal"
+                                        data-target="#modRequestDetail"
+                                        @click.prevent="editing = request.id"
                                     >
-                                        <i class="fas fa-times" :class="request.status === 'denied' ? 'text-danger' : ''" />
-                                    </a>
-                                    <a
-                                        href="#"
-                                        @click.prevent="setStatus(request.id, 'accepted')"
-                                    >
-                                        <i class="fas fa-check" :class="request.status === 'accepted' ? 'text-success' : ''" />
+                                        <i
+                                            class="fas fa-ellipsis-v"
+                                        />
                                     </a>
                                 </div>
                             </div>
@@ -194,14 +211,73 @@
                 </div>
             </div>
         </div>
+
+        <modal-dialog
+            id="modRequestDetail"
+            :title="`${selectedRequest && selectedRequest.beatmapset.title} - ${selectedRequest && selectedRequest.beatmapset.artist}`"
+        >
+            <div v-if="selectedRequest" class="container">
+                <div class="row">
+                    <div class="col-sm-7">
+                        <input
+                            v-model.trim="reviewComment"
+                            type="text"
+                            class="form-control"
+                            placeholder="comment (optional)"
+                        >
+                    </div>
+                    <div class="col-sm-5 form-inline justify-content-around">
+                        <div class="custom-control custom-radio">
+                            <input
+                                id="denied"
+                                v-model="reviewAction"
+                                value="denied"
+                                type="radio"
+                                class="custom-control-input"
+                            >
+                            <label class="custom-control-label" for="denied">Denied</label>
+                        </div>
+                        <div class="custom-control custom-radio">
+                            <input
+                                id="accepted"
+                                v-model="reviewAction"
+                                value="accepted"
+                                type="radio"
+                                class="custom-control-input"
+                            >
+                            <label class="custom-control-label" for="accepted">Accepted</label>
+                        </div>
+                        <button class="btn btn-primary" @click="submitReview($event)">
+                            Save
+                        </button>
+                    </div>
+                </div>
+
+                <hr>
+
+                <b>Reviews:</b>
+                <div v-for="review in selectedRequest.reviews" :key="review.id" class="row text-secondary my-2">
+                    <div class="col-sm-3">
+                        {{ review.action }}
+                    </div>
+                    <div class="col-sm-9">
+                        {{ review.comment }}
+                    </div>
+                </div>
+            </div>
+        </modal-dialog>
     </div>
 </template>
 
 <script>
 import Axios from 'axios';
+import ModalDialog from '../components/ModalDialog.vue';
 
 export default {
     name: 'ModRequests',
+    components: {
+        ModalDialog,
+    },
     data () {
         return {
             isLoading: true,
@@ -211,7 +287,22 @@ export default {
             category: '',
             comment: '',
             user: null,
+            editing: null,
+            selectedRequest: null,
+            reviewAction: '',
+            reviewComment: '',
         };
+    },
+    watch: {
+        editing (id) {
+            this.selectedRequest = this.requests.find(r => r.id == id);
+
+            if (this.selectedRequest) {
+                const userReview = this.selectedRequest.reviews.find(r => r.user.id == this.user.id);
+                this.reviewAction = (userReview && userReview.action) || '';
+                this.reviewComment = (userReview && userReview.comment) || '';
+            }
+        },
     },
     async created () {
         await this.getData();
@@ -242,24 +333,28 @@ export default {
             alert(data.success || data.error);
             await this.getData();
         },
-        async setStatus (id, status) {
-            const { data } = await Axios.post(`/modRequests/${id}/update`, {
-                status,
+        async submitReview () {
+            const { data } = await Axios.post(`/modRequests/${this.editing}/review`, {
+                action: this.reviewAction,
+                comment: this.reviewComment,
             });
             alert(data.success || data.error);
             await this.getData();
         },
-        getStatus (status) {
-            if (status === 'denied') return 'Not accepted';
-            if (status === 'accepted') return 'Accepted';
+        getStatus (reviews) {
+            if (reviews.find(r => r.action === 'accepted')) return 'Accepted';
+            if (reviews.find(r => r.action === 'denied')) return 'Not Accepted';
 
             return 'Pending';
         },
-        getStatusClass (status) {
-            if (status === 'denied') return 'text-danger';
-            if (status === 'accepted') return 'text-success';
+        getStatusClass (reviews) {
+            if (reviews.find(r => r.action === 'accepted')) return 'text-success';
+            if (reviews.find(r => r.action === 'denied')) return 'text-danger';
 
             return '';
+        },
+        getTotalLength (beatmapset) {
+            return beatmapset.numberDiffs * beatmapset.length;
         },
     },
 };

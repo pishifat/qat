@@ -5,6 +5,16 @@ const middlewares = require('../helpers/middlewares');
 const util = require('../helpers/util');
 const osu = require('../helpers/osu');
 
+const defaultPopulate = [
+    { path: 'user' },
+    {
+        path: 'reviews',
+        populate: {
+            path: 'user',
+        },
+    },
+];
+
 const router = express.Router();
 
 /* GET show index */
@@ -23,13 +33,13 @@ router.get('/relevantInfo', middlewares.isLoggedIn, async (req, res) => {
     const user = res.locals.userRequest;
     const ownRequests = await ModRequest
         .find({ user: user._id })
-        .populate({ path: 'user' });
+        .populate(defaultPopulate);
     let requests = [];
 
-    if (user.osuId === 1052994) {
+    if (user.isFeatureTester) {
         requests = await ModRequest
             .find({})
-            .populate({ path: 'user' });
+            .populate(defaultPopulate);
     }
 
     res.json({
@@ -47,6 +57,7 @@ router.post('/store', middlewares.isLoggedIn, async (req, res) => {
     const beatmapsetId = util.getBeatmapsetIdFromUrl(link);
     const cooldown = moment().subtract(1, 'month');
     const hasRequested = await ModRequest.findOne({
+        user: req.session.mongoId,
         $or: [
             { 'beatmapset.osuId': parseInt(beatmapsetId, 10) },
             { createdAt: { $gte: cooldown.toDate() } },
@@ -92,15 +103,31 @@ router.post('/store', middlewares.isLoggedIn, async (req, res) => {
     });
 });
 
-router.post('/:id/update', middlewares.isLoggedIn, async (req, res) => {
-    if (res.locals.userRequest.osuId !== 1052994) {
+router.post('/:id/review', middlewares.isLoggedIn, async (req, res) => {
+    if (!res.locals.userRequest.isFeatureTester) {
         return res.json({
-            error: 'nope',
+            error: 'Unauthorized',
         });
     }
 
-    const request = await ModRequest.findById(req.params.id).orFail();
-    request.status = req.body.status;
+    const request = await ModRequest
+        .findById(req.params.id)
+        .populate(defaultPopulate)
+        .orFail();
+
+    const review = {
+        user: req.session.mongoId,
+        action: req.body.action,
+        comment: req.body.comment,
+    };
+    const i = request.reviews.findIndex(r => r.user.id == req.session.mongoId);
+
+    if (i !== -1) {
+        request.reviews.splice(i, 1, review);
+    } else {
+        request.reviews.push(review);
+    }
+
     await request.save();
 
     res.json({

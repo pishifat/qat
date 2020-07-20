@@ -24,6 +24,7 @@ const userSchema = new mongoose.Schema({
     bnProfileBadge: { type: Number, default: 0 },
     natProfileBadge: { type: Number, default: 0 },
     rankedBeatmapsets: { type: Number, default: 0 },
+    isFeatureTester: { type: Boolean, default: false },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 userSchema.virtual('qualityAssuranceChecks', {
