@@ -177,6 +177,9 @@
                                         {{ getTotalLength(request.beatmapset) > 600 ? 'long' : 'short' }} ({{ (request.beatmapset.length / 60).toFixed(1) }} min | {{ (getTotalLength(request.beatmapset) / 60).toFixed(1) }} min)
                                     </span>
                                     <span class="badge badge-pill badge-primary">
+                                        {{ request.category }}
+                                    </span>
+                                    <span class="badge badge-pill badge-primary">
                                         {{ request.beatmapset.genre }} / {{ request.beatmapset.language }}
                                     </span>
                                     <span
