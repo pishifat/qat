@@ -37,17 +37,19 @@
                         <div class="row">
                             <div class="col-sm-12">
                                 <ul>
-                                    <li>You can submit once every month</li>
+                                    <li>You can submit once per month</li>
+                                    <li>Only submit beatmaps that are ready for ranking</li>
+                                    <li>Set your map's language/genre before submitting</li>
                                     <li>
-                                        Even though categorizing a map isn't something right or worth doing, it helps to quickly know what your map may look like. Examples:
-                                        <a href="https://osu.ppy.sh/beatmapsets/703956" target="_blank">simple</a>,
-                                        <a href="https://osu.ppy.sh/beatmapsets/705788" target="_blank">tech</a>,
-                                        <a href="https://osu.ppy.sh/beatmapsets/414289" target="_blank">double bpm</a>,
-                                        <a href="https://osu.ppy.sh/beatmapsets/604486" target="_blank">conceptual</a>
+                                        Categorizing isn't 100% accurate, but it can help BNs find what they're interested in. Examples:
+                                        <a href="https://osu.ppy.sh/beatmapsets/703956" target="_blank">Simple</a>,
+                                        <a href="https://osu.ppy.sh/beatmapsets/694402" target="_blank">Tech</a>,
+                                        <a href="https://osu.ppy.sh/beatmapsets/302756" target="_blank">Double BPM</a>,
+                                        <a href="https://osu.ppy.sh/beatmapsets/364574" target="_blank">Conceptual</a>
                                     </li>
                                     <li>
                                         If you're mapping a featured artist, consider joining the
-                                        <a href="https://mappersguild.com/" target="_blank">mappers' guild</a> for some extra rewards!
+                                        <a href="https://mappersguild.com/" target="_blank">Mappers' Guild</a> for some extra rewards!
                                     </li>
                                 </ul>
 
@@ -150,7 +152,7 @@
                             <div
                                 v-for="request in requests"
                                 :key="request.id"
-                                class="row no-gutters rounded"
+                                class="row no-gutters rounded my-1"
                                 style="position: relative"
                             >
                                 <div
@@ -158,25 +160,33 @@
                                     style="width: 100%; height: 100%; opacity: 0.2; background-size: cover;"
                                     class="rounded"
                                 />
-                                <div class="col-sm-10">
-                                    <img class="rounded-left mr-2" style="width: 40px; height: 40px;" :src="`https://a.ppy.sh/${request.user.osuId}`">
-                                    <a :href="`https://osu.ppy.sh/beatmapsets/${request.beatmapset.osuId}`" target="_blank">
-                                        {{ request.beatmapset.title }} -
-                                        {{ request.beatmapset.artist }}
-                                    </a>
-                                    (by <a :href="`https://osu.ppy.sh/users/${request.user.osuId}`" target="_blank">
-                                        {{ request.user.username }}
-                                    </a>)
+                                <div class="col-sm-1 d-md-block d-none">
+                                    <img class="rounded-left mr-2" style="width: 48px; height: 48px;" :src="`https://a.ppy.sh/${request.user.osuId}`">
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="text-truncate">
+                                        <a :href="`https://osu.ppy.sh/beatmapsets/${request.beatmapset.osuId}`" target="_blank">
+                                            {{ request.beatmapset.title }} -
+                                            {{ request.beatmapset.artist }}
+                                        </a>
+                                    </div>
+                                    <div class="text-truncate">
+                                        by <a :href="`https://osu.ppy.sh/users/${request.user.osuId}`" target="_blank">
+                                            {{ request.user.username }}
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 d-flex align-items-center flex-wrap">
                                     <span
                                         v-if="request.user.rankedBeatmapsets > 5"
                                         class="badge badge-pill badge-primary"
                                     >
-                                        experienced ({{ request.user.rankedBeatmapsets }})
+                                        Ranked ({{ request.user.rankedBeatmapsets }})
                                     </span>
                                     <span class="badge badge-pill badge-primary">
-                                        {{ getTotalLength(request.beatmapset) > 600 ? 'long' : 'short' }} ({{ (request.beatmapset.length / 60).toFixed(1) }} min | {{ (getTotalLength(request.beatmapset) / 60).toFixed(1) }} min)
+                                        {{ getTotalLength(request.beatmapset) > 600 ? 'Long' : 'Short' }} ({{ (request.beatmapset.length / 60).toFixed(1) }} min | {{ (getTotalLength(request.beatmapset) / 60).toFixed(1) }} min)
                                     </span>
-                                    <span class="badge badge-pill badge-primary">
+                                    <span class="badge badge-pill badge-primary text-capitalize">
                                         {{ request.category }}
                                     </span>
                                     <span class="badge badge-pill badge-primary">
@@ -204,7 +214,7 @@
                                         @click.prevent="editing = request.id"
                                     >
                                         <i
-                                            class="fas fa-ellipsis-v"
+                                            class="fas fa-ellipsis-v px-3"
                                         />
                                     </a>
                                 </div>
@@ -343,6 +353,9 @@ export default {
             });
             alert(data.success || data.error);
             await this.getData();
+
+            const i = this.requests.findIndex(r => r.id == this.selectedRequest.id);
+            if (i !== -1) this.selectedRequest = this.requests[i];
         },
         getStatus (reviews) {
             if (reviews.find(r => r.action === 'accepted')) return 'Accepted';

@@ -4,7 +4,7 @@ const User = require('../../models/user');
 const discord = require('../../helpers/discord');
 
 async function submitEval (evaluation, session, behaviorComment, moddingComment, vote) {
-    let review = evaluation.reviews.find(e => e.evaluator._id == session.mongoId);
+    let review = evaluation.reviews.find(e => e.evaluator._id.toString() == session.mongoId);
     let isNewEvaluation = false;
 
     if (!review) {

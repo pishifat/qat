@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import ReviewContent from './ReviewContent.vue';
 
 export default {
@@ -21,14 +21,21 @@ export default {
         ReviewContent,
     },
     computed: {
+        ...mapState([
+            'loggedInUser',
+        ]),
         ...mapGetters('evaluations', [
             'selectedEvaluation',
         ]),
         sortedReviews () {
-            const natReviews = this.selectedEvaluation.reviews.filter(r => r.evaluator.isNat);
-            const bnReviews = this.selectedEvaluation.reviews.filter(r => !r.evaluator.isNat);
+            if (this.loggedInUser.isNat) {
+                const natReviews = this.selectedEvaluation.reviews.filter(r => r.evaluator.isNat);
+                const bnReviews = this.selectedEvaluation.reviews.filter(r => !r.evaluator.isNat);
 
-            return natReviews.concat(bnReviews);
+                return natReviews.concat(bnReviews);
+            } else {
+                return this.selectedEvaluation.reviews;
+            }
         },
     },
 };

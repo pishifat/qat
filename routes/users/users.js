@@ -211,7 +211,7 @@ router.get('/activity', async (req, res) => {
     const modes = req.query.modes.split(',');
     const deadline = parseInt(req.query.deadline);
     let minDate = new Date(deadline);
-    minDate.setDate(minDate.getDate() - 90);
+    minDate.setDate(minDate.getDate() - 120);
     let maxDate = new Date(deadline);
 
     res.json(await getGeneralEvents(osuId, mongoId, modes, minDate, maxDate));
