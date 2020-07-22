@@ -1,5 +1,5 @@
 <template>
-    <div v-cloak class="align-items-center container d-flex py-4 vh-100">
+    <div v-cloak class="container py-4 vh-100" :class="user && user.isFeatureTester ? '' : 'align-items-center d-flex'">
         <div
             v-if="isLoading"
             class="loading-container"
