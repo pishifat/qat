@@ -112,7 +112,7 @@ import EvaluationCard from './card/EvaluationCard.vue';
 import EvaluationInfo from './info/EvaluationInfo.vue';
 
 export default {
-    name: 'AppEvalPage',
+    name: 'EvalPage',
     components: {
         ToastMessages,
         FilterBox,
