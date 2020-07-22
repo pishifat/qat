@@ -5,6 +5,67 @@ const middlewares = require('../helpers/middlewares');
 const util = require('../helpers/util');
 const osu = require('../helpers/osu');
 
+function getGenreName (id) {
+    // note that there's no 8, 11, 12
+    switch (id) {
+        case 0:
+            return 'Any';
+        case 1:
+            return 'Unspecified';
+        case 2:
+            return 'video game';
+        case 3:
+            return 'anime';
+        case 4:
+            return 'rock';
+        case 5:
+            return 'pop';
+        case 6:
+            return 'other';
+        case 7:
+            return 'novelty';
+        case 9:
+            return 'hip hop';
+        case 10:
+            return 'electronic';
+        case 13:
+            return 'folk';
+        default:
+            return 'Unknown';
+    }
+}
+
+function getLanguageName (id) {
+    switch (id) {
+        case 0:
+            return 'Any';
+        case 1:
+            return 'other';
+        case 2:
+            return 'english';
+        case 3:
+            return 'japanese';
+        case 4:
+            return 'chinese';
+        case 5:
+            return 'instrumental';
+        case 6:
+            return 'korean';
+        case 7:
+            return 'french';
+        case 8:
+            return 'german';
+        case 9:
+            return 'swedish';
+        case 10:
+            return 'spanish';
+        case 11:
+            return 'italian';
+        default:
+            return 'Unknown';
+    }
+}
+
 const defaultPopulate = [
     { path: 'user' },
     {
@@ -89,8 +150,8 @@ router.post('/store', middlewares.isLoggedIn, async (req, res) => {
         artist: beatmapsetInfo.artist,
         title: beatmapsetInfo.title,
         modes,
-        genre: beatmapsetInfo.genre.name,
-        language: beatmapsetInfo.language.name,
+        genre: getGenreName(beatmapsetInfo.genre.id),
+        language: getLanguageName(beatmapsetInfo.language.id),
         numberDiffs: beatmapsetInfo.beatmaps.length,
         length: beatmapsetInfo.beatmaps[0].total_length,
         bpm: beatmapsetInfo.bpm,

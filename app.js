@@ -69,6 +69,8 @@ app.use(
         store: new MongoStore({ mongooseConnection: db }),
         resave: false,
         saveUninitialized: false,
+        secure: true,
+        sameSite: 'lax',
     })
 );
 

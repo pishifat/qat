@@ -123,7 +123,7 @@
                             <div
                                 v-for="request in ownRequests"
                                 :key="request.id"
-                                class="row no-gutters rounded"
+                                class="row no-gutters rounded my-1"
                                 style="position: relative; min-height: 40px"
                             >
                                 <div
@@ -246,25 +246,25 @@
                         >
                     </div>
                     <div class="col-sm-5 form-inline justify-content-around">
-                        <div class="custom-control custom-radio">
+                        <div class="form-check">
                             <input
                                 id="denied"
                                 v-model="reviewAction"
                                 value="denied"
                                 type="radio"
-                                class="custom-control-input"
+                                class="form-check-input"
                             >
-                            <label class="custom-control-label" for="denied">Denied</label>
+                            <label class="form-check-label" for="denied">Denied</label>
                         </div>
-                        <div class="custom-control custom-radio">
+                        <div class="form-check">
                             <input
                                 id="accepted"
                                 v-model="reviewAction"
                                 value="accepted"
                                 type="radio"
-                                class="custom-control-input"
+                                class="form-check-input"
                             >
-                            <label class="custom-control-label" for="accepted">Accepted</label>
+                            <label class="form-check-label" for="accepted">Accepted</label>
                         </div>
                         <button class="btn btn-primary" @click="submitReview($event)">
                             Save
@@ -272,14 +272,25 @@
                     </div>
                 </div>
 
+                <template v-if="selectedRequest.comment">
+                    <hr>
+
+                    <div class="row mb-2">
+                        <div class="col-sm-12">
+                            <b>Mapper' comment:</b>
+                            {{ selectedRequest.comment }}
+                        </div>
+                    </div>
+                </template>
+
                 <hr>
 
                 <b>Reviews:</b>
                 <div v-for="review in selectedRequest.reviews" :key="review.id" class="row text-secondary my-2">
-                    <div class="col-sm-3">
+                    <div class="col-sm-2">
                         {{ review.action }}
                     </div>
-                    <div class="col-sm-9">
+                    <div class="col-sm-10">
                         {{ review.comment }}
                     </div>
                 </div>
