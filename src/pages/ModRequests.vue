@@ -133,8 +133,8 @@
                                 />
                                 <div class="col-sm-10 d-flex align-items-center pl-2">
                                     <a :href="`https://osu.ppy.sh/beatmapsets/${request.beatmapset.osuId}`" target="_blank">
-                                        {{ request.beatmapset.title }} -
-                                        {{ request.beatmapset.artist }}
+                                        {{ request.beatmapset.artist }} -
+                                        {{ request.beatmapset.title }}
                                     </a>
                                 </div>
                                 <div class="col-sm-2 d-flex justify-content-around align-items-center pr-2">
