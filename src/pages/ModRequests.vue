@@ -36,6 +36,12 @@
                     <section class="card card-body">
                         <div class="row">
                             <div class="col-sm-12">
+                                <h5>Mod Requests</h5>
+                                <p>If you're a mapper, this page lets you submit requests to Beatmap Nominators without asking people individually.</p>
+                                <p>If you're a Beatmap Nominator, this page lets you view maps from a variety of creators and select any that you're interested in modding.</p>
+                                <p><b>Not every beatmap submitted will be modded.</b></p>
+                                <hr>
+                                <p>Submission info:</p>
                                 <ul>
                                     <li>You can submit once per month</li>
                                     <li>Only submit beatmaps that are ready for ranking</li>
