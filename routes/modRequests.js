@@ -39,8 +39,11 @@ router.get('/relevantInfo', middlewares.isLoggedIn, async (req, res) => {
     if (user.isFeatureTester) {
         requests = await ModRequest
             .find({})
-            .populate(defaultPopulate);
+            .populate(defaultPopulate)
+            .sort({ createdAt: -1 });
     }
+
+    console.log(requests);
 
     res.json({
         ownRequests,
@@ -74,7 +77,7 @@ router.post('/store', middlewares.isLoggedIn, async (req, res) => {
 
     if (beatmapsetInfo.user_id != res.locals.userRequest.osuId) {
         return res.json({
-            error: 'Cannot submit others people maps.. for now',
+            error: `Cannot submit others people's maps.. for now`,
         });
     }
 
