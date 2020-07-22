@@ -58,6 +58,8 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
             });
         }
 
+        console.log(notificationFields);
+
         // for #user-reportfeed
         await discord.webhookPost(
             [{
@@ -66,7 +68,7 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
                 },
                 color: discord.webhookColors.darkRed,
                 description: `[User report](http://bn.mappersguild.com/managereports?id=${report.id}) for **${u.username}**`,
-                notificationFields,
+                fields: notificationFields,
             }],
             'userReport'
         );
@@ -79,7 +81,7 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
                 },
                 color: discord.webhookColors.darkRed,
                 description: `[User report](http://bn.mappersguild.com/managereports?id=${report.id}) for **${u.username}**`,
-                notificationFields,
+                fields: notificationFields,
             }],
             'natUserReport'
         );
