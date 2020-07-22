@@ -3,7 +3,7 @@ const Logger = require('../../models/log');
 const User = require('../../models/user');
 const discord = require('../../helpers/discord');
 
-async function submitEval (evaluation, session, behaviorComment, moddingComment, vote) {
+async function submitEval (evaluation, session, isNat, behaviorComment, moddingComment, vote) {
     let review = evaluation.reviews.find(e => e.evaluator._id.toString() == session.mongoId);
     let isNewEvaluation = false;
 
@@ -62,8 +62,9 @@ async function submitEval (evaluation, session, behaviorComment, moddingComment,
             });
 
             if (
-                (threeEvaluationModes.includes(evaluation.mode) && totalNat > 2) ||
-                (twoEvaluationModes.includes(evaluation.mode) && totalNat > 1)
+                isNat &&
+                (threeEvaluationModes.includes(evaluation.mode) && totalNat >= 2) ||
+                (twoEvaluationModes.includes(evaluation.mode) && totalNat >= 1)
             ) {
                 evaluation.discussion = true;
                 await evaluation.save();

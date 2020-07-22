@@ -105,6 +105,7 @@ router.post('/submitEval/:id', middlewares.isBnOrNat, async (req, res) => {
     const isNewEvaluation = await submitEval(
         evaluation,
         req.session,
+        res.locals.userRequest.isNat,
         req.body.behaviorComment,
         req.body.moddingComment,
         req.body.vote
