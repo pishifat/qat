@@ -43,8 +43,6 @@ router.get('/relevantInfo', middlewares.isLoggedIn, async (req, res) => {
             .sort({ createdAt: -1 });
     }
 
-    console.log(requests);
-
     res.json({
         ownRequests,
         user,
