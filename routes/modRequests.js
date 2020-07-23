@@ -67,11 +67,15 @@ function getLanguageName (id) {
 }
 
 const defaultPopulate = [
-    { path: 'user' },
+    {
+        path: 'user',
+        select: 'osuId username groups',
+    },
     {
         path: 'reviews',
         populate: {
             path: 'user',
+            select: 'osuId username groups',
         },
     },
 ];
