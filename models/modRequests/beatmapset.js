@@ -13,6 +13,15 @@ const beatmapsetsSchema = new mongoose.Schema({
     numberDiffs: { type: Number, required: true },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
+beatmapsetsSchema.virtual('events', {
+    ref: 'aiess',
+    localField: 'osuId',
+    foreignField: 'beatmapsetId',
+    options: {
+        select: 'eventType timestamp',
+    },
+});
+
 /**
  * @type {import('../interfaces/modRequests/beatmapset').IBeatmapsetModel}
  */

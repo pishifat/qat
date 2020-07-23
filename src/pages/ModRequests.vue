@@ -1,5 +1,5 @@
 <template>
-    <div v-cloak class="container py-4 vh-100" :class="user && user.isFeatureTester ? '' : 'align-items-center d-flex'">
+    <div v-cloak class="container py-4 vh-100" :class="user && user.isFeatureTester ? '' : 'align-items-center d-flex justify-content-center'">
         <div
             v-if="isLoading"
             class="loading-container"
@@ -112,242 +112,67 @@
                         </div>
                     </section>
 
-                    <section
+                    <requests-listing
                         v-if="ownRequests.length"
-                        class="card"
+                        v-slot="{ request }"
+                        title="My Requests"
+                        :requests="ownRequests"
                     >
-                        <h5 class="card-header">
-                            My Requests
-                        </h5>
-                        <div class="card-body">
-                            <div
-                                v-for="request in ownRequests"
-                                :key="request.id"
-                                class="row no-gutters rounded my-1"
-                                style="position: relative; min-height: 40px"
-                            >
-                                <div
-                                    :style="`background-image: url('https://assets.ppy.sh/beatmaps/${request.beatmapset.osuId}/covers/cover.jpg'; position: absolute; `"
-                                    style="width: 100%; height: 100%; opacity: 0.2; background-size: cover;"
-                                    class="rounded"
-                                />
-                                <div class="col-sm-10 d-flex align-items-center pl-2">
-                                    <a :href="`https://osu.ppy.sh/beatmapsets/${request.beatmapset.osuId}`" target="_blank">
-                                        {{ request.beatmapset.artist }} -
-                                        {{ request.beatmapset.title }}
-                                    </a>
-                                </div>
-                                <div class="col-sm-2 d-flex justify-content-around align-items-center pr-2">
-                                    <div>{{ request.createdAt | toMonthDay }}</div>
-                                    <div :class="getStatusClass(request.modReviews)">
-                                        {{ getStatus(request.modReviews) }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
+                        <my-request-row :request="request" />
+                    </requests-listing>
 
-                    <section
+                    <requests-listing
                         v-if="user && user.isFeatureTester"
-                        class="card"
+                        v-slot="{ request }"
+                        :requests="requests"
                     >
-                        <h5 class="card-header">
-                            Requests
-                        </h5>
-                        <div class="card-body">
-                            <div
-                                v-for="request in requests"
-                                :key="request.id"
-                                class="row no-gutters rounded my-1"
-                                style="position: relative"
-                            >
-                                <div
-                                    :style="`background-image: url('https://assets.ppy.sh/beatmaps/${request.beatmapset.osuId}/covers/cover.jpg'; position: absolute; `"
-                                    style="width: 100%; height: 100%; opacity: 0.2; background-size: cover;"
-                                    class="rounded"
-                                />
-                                <div class="col-sm-1 d-md-block d-none">
-                                    <img class="rounded-left mr-2" style="width: 48px; height: 48px;" :src="`https://a.ppy.sh/${request.user.osuId}`">
-                                </div>
-                                <div class="col-sm-3">
-                                    <div class="text-truncate">
-                                        <a :href="`https://osu.ppy.sh/beatmapsets/${request.beatmapset.osuId}`" target="_blank">
-                                            {{ request.beatmapset.title }} -
-                                            {{ request.beatmapset.artist }}
-                                        </a>
-                                    </div>
-                                    <div class="text-truncate">
-                                        by <a :href="`https://osu.ppy.sh/users/${request.user.osuId}`" target="_blank">
-                                            {{ request.user.username }}
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 d-flex align-items-center flex-wrap">
-                                    <span
-                                        v-if="request.user.rankedBeatmapsets"
-                                        class="badge badge-pill badge-info mx-1"
-                                    >
-                                        Ranked ({{ request.user.rankedBeatmapsets }})
-                                    </span>
-                                    <span class="badge badge-pill badge-info mx-1">
-                                        {{ getTotalLength(request.beatmapset) > 600 ? 'Long' : 'Short' }} ({{ (request.beatmapset.length / 60).toFixed(1) }} min | {{ (getTotalLength(request.beatmapset) / 60).toFixed(1) }} min)
-                                    </span>
-                                    <span class="badge badge-pill badge-info mx-1 text-capitalize">
-                                        {{ request.category }}
-                                    </span>
-                                    <span class="badge badge-pill badge-info mx-1">
-                                        {{ request.beatmapset.genre }} / {{ request.beatmapset.language }}
-                                    </span>
-                                    <span
-                                        v-if="request.modReviews.length > 0"
-                                        class="badge badge-pill badge-success mx-1"
-                                    >
-                                        reviewed ({{ request.modReviews.length }})
-                                    </span>
-                                    <span
-                                        v-else
-                                        class="badge badge-pill badge-danger mx-1"
-                                    >
-                                        not reviewed
-                                    </span>
-                                </div>
-                                <div class="col-sm-2 d-flex justify-content-around align-items-center pr-2">
-                                    {{ request.createdAt | toMonthDay }}
-                                    <a
-                                        href="#"
-                                        data-toggle="modal"
-                                        data-target="#modRequestDetail"
-                                        @click.prevent="editing = request.id"
-                                    >
-                                        <i
-                                            class="fas fa-ellipsis-v px-3"
-                                        />
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
+                        <request-row
+                            :request="request"
+                            @update:editing="editing = $event"
+                        />
+                    </requests-listing>
                 </div>
             </div>
         </div>
 
-        <modal-dialog
-            id="modRequestDetail"
-            :title="`${selectedRequest && selectedRequest.beatmapset.title} - ${selectedRequest && selectedRequest.beatmapset.artist}`"
-        >
-            <div v-if="selectedRequest" class="container">
-                <div class="row">
-                    <div class="col-sm-7">
-                        <input
-                            v-model.trim="reviewComment"
-                            type="text"
-                            class="form-control"
-                            placeholder="comment (optional)"
-                        >
-                    </div>
-                    <div class="col-sm-5 form-inline justify-content-around">
-                        <div class="form-check">
-                            <input
-                                id="denied"
-                                v-model="reviewAction"
-                                value="denied"
-                                type="radio"
-                                class="form-check-input"
-                            >
-                            <label class="form-check-label" for="denied">Denied</label>
-                        </div>
-                        <div class="form-check">
-                            <input
-                                id="accepted"
-                                v-model="reviewAction"
-                                value="accepted"
-                                type="radio"
-                                class="form-check-input"
-                            >
-                            <label class="form-check-label" for="accepted">Accepted</label>
-                        </div>
-                        <button class="btn btn-primary" @click="submitReview($event)">
-                            Save
-                        </button>
-                    </div>
-                </div>
-
-                <template v-if="selectedRequest.comment">
-                    <hr>
-
-                    <div class="row mb-2">
-                        <div class="col-sm-12">
-                            <b>Mapper' comment:</b>
-                            {{ selectedRequest.comment }}
-                        </div>
-                    </div>
-                </template>
-
-                <hr>
-
-                <b>Reviews:</b>
-                <div v-for="review in selectedRequest.modReviews" :key="review.id" class="row text-secondary my-2">
-                    <div class="col-sm-2">
-                        {{ review.action }}
-                    </div>
-                    <div class="col-sm-10">
-                        {{ review.comment }}
-                    </div>
-                </div>
-            </div>
-        </modal-dialog>
+        <request-info />
     </div>
 </template>
 
 <script>
 import Axios from 'axios';
-import ModalDialog from '../components/ModalDialog.vue';
+import RequestsListing from '../components/modRequests/RequestsListing.vue';
+import MyRequestRow from '../components/modRequests/MyRequestRow.vue';
+import RequestRow from '../components/modRequests/RequestRow.vue';
+import RequestInfo from '../components/modRequests/RequestInfo.vue';
+import { mapState } from 'vuex';
 
 export default {
     name: 'ModRequests',
     components: {
-        ModalDialog,
+        RequestsListing,
+        MyRequestRow,
+        RequestRow,
+        RequestInfo,
     },
     data () {
         return {
             isLoading: true,
-            ownRequests: [],
-            requests: [],
             link: '',
             category: '',
             comment: '',
-            user: null,
-            editing: null,
-            selectedRequest: null,
-            reviewAction: '',
-            reviewComment: '',
         };
     },
-    watch: {
-        editing (id) {
-            this.selectedRequest = this.requests.find(r => r.id == id);
-
-            if (this.selectedRequest) {
-                const userReview = this.selectedRequest.modReviews.find(r => r.user.id == this.user.id);
-                this.reviewAction = (userReview && userReview.action) || '';
-                this.reviewComment = (userReview && userReview.comment) || '';
-            }
-        },
-    },
+    computed: mapState([
+        'ownRequests',
+        'requests',
+        'user',
+    ]),
     async created () {
-        await this.getData();
+        await this.$store.dispatch('getData');
         this.isLoading = !this.isLoading;
     },
     methods: {
-        async getData () {
-            const { data } = await Axios.get('/modRequests/relevantInfo');
-
-            if (!data.error) {
-                this.ownRequests = data.ownRequests;
-                this.user = data.user;
-                this.requests = data.requests;
-            }
-        },
         async submit () {
             if (!this.category || !this.link) {
                 alert('Missing link or category');
@@ -361,33 +186,7 @@ export default {
                 comment: this.comment,
             });
             alert(data.success || data.error);
-            await this.getData();
-        },
-        async submitReview () {
-            const { data } = await Axios.post(`/modRequests/${this.editing}/review`, {
-                action: this.reviewAction,
-                comment: this.reviewComment,
-            });
-            alert(data.success || data.error);
-            await this.getData();
-
-            const i = this.requests.findIndex(r => r.id == this.selectedRequest.id);
-            if (i !== -1) this.selectedRequest = this.requests[i];
-        },
-        getStatus (reviews) {
-            if (reviews.find(r => r.action === 'accepted')) return 'Accepted';
-            if (reviews.find(r => r.action === 'denied')) return 'Not Accepted';
-
-            return 'Pending';
-        },
-        getStatusClass (reviews) {
-            if (reviews.find(r => r.action === 'accepted')) return 'text-success';
-            if (reviews.find(r => r.action === 'denied')) return 'text-danger';
-
-            return '';
-        },
-        getTotalLength (beatmapset) {
-            return beatmapset.numberDiffs * beatmapset.length;
+            await this.$store.dispatch('getData');
         },
     },
 };

@@ -1,0 +1,98 @@
+<template>
+    <div class="row align-items-center">
+        <div class="col-10 col-sm-8 col-lg-4 d-flex">
+            <img class="rounded-left d-none d-sm-block" style="width: 48px; height: 48px;" :src="`https://a.ppy.sh/${request.user.osuId}`">
+            <div class="text-truncate ml-2">
+                <a :href="`https://osu.ppy.sh/beatmapsets/${request.beatmapset.osuId}`" target="_blank">
+                    {{ request.beatmapset.artist }} -
+                    {{ request.beatmapset.title }}
+                </a>
+                <div>
+                    by <a :href="`https://osu.ppy.sh/users/${request.user.osuId}`" target="_blank">
+                        {{ request.user.username }}
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6 order-2 order-lg-1 my-2 my-lg-0">
+            <request-tag v-if="request.user.rankedBeatmapsets">
+                Ranked ({{ request.user.rankedBeatmapsets }})
+            </request-tag>
+            <request-tag>
+                {{ getTotalLength(request.beatmapset) > 600 ? 'Long' : 'Short' }} ({{ (request.beatmapset.length / 60).toFixed(1) }} min | {{ (getTotalLength(request.beatmapset) / 60).toFixed(1) }} min)
+            </request-tag>
+            <request-tag>
+                {{ request.category }}
+            </request-tag>
+            <request-tag>
+                {{ request.beatmapset.genre }} / {{ request.beatmapset.language }}
+            </request-tag>
+            <request-tag v-for="(mode, i) in request.beatmapset.modes" :key="i">
+                {{ mode }}
+            </request-tag>
+            <template v-if="request.modReviews.length > 0">
+                <request-tag
+                    v-if="acceptedReviews.length"
+                    class-list="badge-success"
+                >
+                    Accepted ({{ acceptedReviews.length }})
+                </request-tag>
+                <request-tag
+                    v-else
+                    class-list="badge-danger"
+                >
+                    Denied ({{ deniedReviews.length }})
+                </request-tag>
+            </template>
+            <request-tag
+                v-else
+                class-list="badge-danger"
+            >
+                Not Reviewed
+            </request-tag>
+        </div>
+        <div class="col-2 col-sm-4 col-lg-2 d-flex justify-content-end align-items-center order-1 order-lg-2 h-100">
+            <span class="d-none d-sm-block">
+                {{ $moment(request.createdAt).fromNow() }}
+            </span>
+            <a
+                href="#"
+                data-toggle="modal"
+                data-target="#modRequestDetail"
+                @click.prevent="$store.commit('updateSelectRequestId', request.id)"
+            >
+                <i class="fas fa-ellipsis-v px-3" />
+            </a>
+        </div>
+    </div>
+</template>
+
+<script>
+import RequestTag from './RequestTag.vue';
+
+export default {
+    name: 'RequestRow',
+    components: {
+        RequestTag,
+    },
+    props: {
+        request: {
+            type: Object,
+            required: true,
+        },
+    },
+    computed: {
+        acceptedReviews () {
+            return this.request.modReviews.filter(r => r.action === 'accepted');
+        },
+        deniedReviews () {
+            return this.request.modReviews.filter(r => r.action === 'denied');
+        },
+    },
+    methods: {
+        getTotalLength (beatmapset) {
+            return beatmapset.numberDiffs * beatmapset.length;
+        },
+    },
+};
+</script>

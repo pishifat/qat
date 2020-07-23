@@ -69,7 +69,12 @@ function getLanguageName (id) {
 }
 
 const defaultPopulate = [
-    { path: 'beatmapset' },
+    {
+        path: 'beatmapset',
+        populate: {
+            path: 'events',
+        },
+    },
     {
         path: 'user',
         select: 'osuId username groups rankedBeatmapsets',
