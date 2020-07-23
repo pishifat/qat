@@ -1,0 +1,21 @@
+const mongoose = require('mongoose');
+
+const beatmapsetsSchema = new mongoose.Schema({
+    osuId: { type: Number, required: true },
+    artist: { type: String, required: true },
+    title: { type: String, required: true },
+    modes: [{ type: String, enum: ['osu', 'taiko', 'catch', 'mania'], required: true }],
+    length: { type: Number, required: true },
+    bpm: { type: Number, required: true },
+    submittedAt: { type: Date, required: true },
+    genre: { type: String, required: true },
+    language: { type: String, required: true },
+    numberDiffs: { type: Number, required: true },
+}, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
+
+/**
+ * @type {import('../interfaces/modRequests/beatmapset').IBeatmapsetModel}
+ */
+const Beatmapset = mongoose.model('Beatmapset', beatmapsetsSchema);
+
+module.exports = Beatmapset;

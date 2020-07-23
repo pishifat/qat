@@ -1,6 +1,8 @@
 const express = require('express');
 const moment = require('moment');
-const ModRequest = require('../models/modRequest');
+const ModRequest = require('../models/modRequests/modRequest');
+const Beatmapset = require('../models/modRequests/beatmapset');
+const ModReview = require('../models/modRequests/modReview');
 const middlewares = require('../helpers/middlewares');
 const util = require('../helpers/util');
 const osu = require('../helpers/osu');
@@ -67,12 +69,13 @@ function getLanguageName (id) {
 }
 
 const defaultPopulate = [
+    { path: 'beatmapset' },
     {
         path: 'user',
-        select: 'osuId username groups',
+        select: 'osuId username groups rankedBeatmapsets',
     },
     {
-        path: 'reviews',
+        path: 'modReviews',
         populate: {
             path: 'user',
             select: 'osuId username groups',
@@ -98,7 +101,8 @@ router.get('/relevantInfo', middlewares.isLoggedIn, async (req, res) => {
     const user = res.locals.userRequest;
     const ownRequests = await ModRequest
         .find({ user: user._id })
-        .populate(defaultPopulate);
+        .populate(defaultPopulate)
+        .sort({ createdAt: -1 });
     let requests = [];
 
     if (user.isFeatureTester) {
@@ -122,15 +126,15 @@ router.post('/store', middlewares.isLoggedIn, async (req, res) => {
     util.isValidUrlOrThrow(link, 'https://osu.ppy.sh/beatmapsets/');
     const beatmapsetId = util.getBeatmapsetIdFromUrl(link);
     const cooldown = moment().subtract(1, 'month');
-    const hasRequested = await ModRequest.findOne({
-        user: req.session.mongoId,
-        $or: [
-            { 'beatmapset.osuId': parseInt(beatmapsetId, 10) },
-            { createdAt: { $gte: cooldown.toDate() } },
-        ],
-    });
+    const [hasRequested, beatmapsetRequested] = await Promise.all([
+        ModRequest.findOne({
+            user: req.session.mongoId,
+            createdAt: { $gte: cooldown.toDate() },
+        }),
+        Beatmapset.findOne({ osuId: parseInt(beatmapsetId, 10) }),
+    ]);
 
-    if (hasRequested) {
+    if (hasRequested || beatmapsetRequested) {
         return res.json({
             error: 'Already requested within the month',
         });
@@ -146,59 +150,58 @@ router.post('/store', middlewares.isLoggedIn, async (req, res) => {
 
     const modes = [...new Set(beatmapsetInfo.beatmaps.map(b => b.mode))];
 
+    const beatmapset = new Beatmapset();
+    beatmapset.osuId = beatmapsetInfo.id;
+    beatmapset.artist = beatmapsetInfo.artist;
+    beatmapset.title = beatmapsetInfo.title;
+    beatmapset.modes = modes;
+    beatmapset.genre = getGenreName(beatmapsetInfo.genre.id);
+    beatmapset.language = getLanguageName(beatmapsetInfo.language.id);
+    beatmapset.numberDiffs = beatmapsetInfo.beatmaps.length;
+    beatmapset.length = beatmapsetInfo.beatmaps[0].total_length;
+    beatmapset.bpm = beatmapsetInfo.bpm;
+    beatmapset.submittedAt = beatmapsetInfo.submitted_date;
+
     const request = new ModRequest();
     request.user = req.session.mongoId;
     request.category = category;
-    request.beatmapset = {
-        osuId: beatmapsetInfo.id,
-        artist: beatmapsetInfo.artist,
-        title: beatmapsetInfo.title,
-        modes,
-        genre: getGenreName(beatmapsetInfo.genre.id),
-        language: getLanguageName(beatmapsetInfo.language.id),
-        numberDiffs: beatmapsetInfo.beatmaps.length,
-        length: beatmapsetInfo.beatmaps[0].total_length,
-        bpm: beatmapsetInfo.bpm,
-        submittedAt: beatmapsetInfo.submitted_date,
-    };
+    request.beatmapset = beatmapset;
     request.comment = comment;
-    await request.save();
+
+    await Promise.all([
+        beatmapset.save(),
+        request.save(),
+    ]);
 
     res.json({
         success: 'Saved',
     });
 });
 
-router.post('/:id/review', middlewares.isLoggedIn, async (req, res) => {
+router.post('/:id/review', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
     if (!res.locals.userRequest.isFeatureTester) {
         return res.json({
             error: 'Unauthorized',
         });
     }
 
-    const request = await ModRequest
-        .findById(req.params.id)
-        .populate(defaultPopulate)
-        .orFail();
-
-    const review = {
+    let review = await ModReview.findOne({
+        modRequest: req.params.id,
         user: req.session.mongoId,
-        action: req.body.action,
-        comment: req.body.comment,
-    };
-    const i = request.reviews.findIndex(r => r.user.id == req.session.mongoId);
+    });
 
-    if (i !== -1) {
-        request.reviews.splice(i, 1, review);
-    } else {
-        request.reviews.push(review);
+    if (!review) {
+        review = new ModReview();
+        review.modRequest = req.params.id;
+        review.user = req.session.mongoId;
     }
 
-    await request.save();
+    review.action = req.body.action;
+    review.comment = req.body.comment;
+    await review.save();
 
     res.json({
         success: 'Saved',
-        request,
     });
 });
 

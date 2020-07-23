@@ -139,8 +139,8 @@
                                 </div>
                                 <div class="col-sm-2 d-flex justify-content-around align-items-center pr-2">
                                     <div>{{ request.createdAt | toMonthDay }}</div>
-                                    <div :class="getStatusClass(request.reviews)">
-                                        {{ getStatus(request.reviews) }}
+                                    <div :class="getStatusClass(request.modReviews)">
+                                        {{ getStatus(request.modReviews) }}
                                     </div>
                                 </div>
                             </div>
@@ -184,29 +184,29 @@
                                 </div>
                                 <div class="col-sm-6 d-flex align-items-center flex-wrap">
                                     <span
-                                        v-if="request.user.rankedBeatmapsets > 5"
-                                        class="badge badge-pill badge-primary"
+                                        v-if="request.user.rankedBeatmapsets"
+                                        class="badge badge-pill badge-info mx-1"
                                     >
                                         Ranked ({{ request.user.rankedBeatmapsets }})
                                     </span>
-                                    <span class="badge badge-pill badge-primary">
+                                    <span class="badge badge-pill badge-info mx-1">
                                         {{ getTotalLength(request.beatmapset) > 600 ? 'Long' : 'Short' }} ({{ (request.beatmapset.length / 60).toFixed(1) }} min | {{ (getTotalLength(request.beatmapset) / 60).toFixed(1) }} min)
                                     </span>
-                                    <span class="badge badge-pill badge-primary text-capitalize">
+                                    <span class="badge badge-pill badge-info mx-1 text-capitalize">
                                         {{ request.category }}
                                     </span>
-                                    <span class="badge badge-pill badge-primary">
+                                    <span class="badge badge-pill badge-info mx-1">
                                         {{ request.beatmapset.genre }} / {{ request.beatmapset.language }}
                                     </span>
                                     <span
-                                        v-if="request.reviews.length > 0"
-                                        class="badge badge-pill badge-success"
+                                        v-if="request.modReviews.length > 0"
+                                        class="badge badge-pill badge-success mx-1"
                                     >
-                                        reviewed ({{ request.reviews.length }})
+                                        reviewed ({{ request.modReviews.length }})
                                     </span>
                                     <span
                                         v-else
-                                        class="badge badge-pill badge-danger"
+                                        class="badge badge-pill badge-danger mx-1"
                                     >
                                         not reviewed
                                     </span>
@@ -286,7 +286,7 @@
                 <hr>
 
                 <b>Reviews:</b>
-                <div v-for="review in selectedRequest.reviews" :key="review.id" class="row text-secondary my-2">
+                <div v-for="review in selectedRequest.modReviews" :key="review.id" class="row text-secondary my-2">
                     <div class="col-sm-2">
                         {{ review.action }}
                     </div>
@@ -328,7 +328,7 @@ export default {
             this.selectedRequest = this.requests.find(r => r.id == id);
 
             if (this.selectedRequest) {
-                const userReview = this.selectedRequest.reviews.find(r => r.user.id == this.user.id);
+                const userReview = this.selectedRequest.modReviews.find(r => r.user.id == this.user.id);
                 this.reviewAction = (userReview && userReview.action) || '';
                 this.reviewComment = (userReview && userReview.comment) || '';
             }
