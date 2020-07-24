@@ -4,21 +4,27 @@
             {{ title }}
         </h5>
         <div class="card-body">
-            <div
-                v-for="request in requests"
-                :key="request.id"
-                class="row no-gutters rounded my-1"
-                style="position: relative"
+            <transition-group
+                appear
+                name="list"
+                tag="div"
             >
                 <div
-                    :style="`background-image: url('https://assets.ppy.sh/beatmaps/${request.beatmapset.osuId}/covers/cover.jpg'; position: absolute; `"
-                    style="width: 100%; height: 100%; opacity: 0.2; background-size: cover;"
-                    class="rounded"
-                />
-                <div class="col-sm-12">
-                    <slot :request="request" />
+                    v-for="request in requests"
+                    :key="request.id"
+                    class="row no-gutters rounded my-1"
+                    style="position: relative"
+                >
+                    <div
+                        :style="`background-image: url('https://assets.ppy.sh/beatmaps/${request.beatmapset.osuId}/covers/cover.jpg'; position: absolute; `"
+                        style="width: 100%; height: 100%; opacity: 0.2; background-size: cover;"
+                        class="rounded"
+                    />
+                    <div class="col-sm-12">
+                        <slot :request="request" />
+                    </div>
                 </div>
-            </div>
+            </transition-group>
         </div>
     </section>
 </template>

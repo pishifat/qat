@@ -4,8 +4,7 @@
             <img class="rounded-left d-none d-sm-block" style="width: 48px; height: 48px;" :src="`https://a.ppy.sh/${request.user.osuId}`">
             <div class="text-truncate ml-2">
                 <a :href="`https://osu.ppy.sh/beatmapsets/${request.beatmapset.osuId}`" target="_blank">
-                    {{ request.beatmapset.artist }} -
-                    {{ request.beatmapset.title }}
+                    {{ request.beatmapset.fullTitle }}
                 </a>
                 <div>
                     by <a :href="`https://osu.ppy.sh/users/${request.user.osuId}`" target="_blank">
@@ -19,7 +18,7 @@
                 Ranked ({{ request.user.rankedBeatmapsets }})
             </request-tag>
             <request-tag>
-                {{ getTotalLength(request.beatmapset) > 600 ? 'Long' : 'Short' }} ({{ (request.beatmapset.length / 60).toFixed(1) }} min | {{ (getTotalLength(request.beatmapset) / 60).toFixed(1) }} min)
+                {{ request.beatmapset.totalLengthString }} ({{ (request.beatmapset.totalLength / 60).toFixed(1) }} min | {{ (request.beatmapset.totalLength / 60).toFixed(1) }} min)
             </request-tag>
             <request-tag>
                 {{ request.category }}
@@ -87,11 +86,6 @@ export default {
         },
         deniedReviews () {
             return this.request.modReviews.filter(r => r.action === 'denied');
-        },
-    },
-    methods: {
-        getTotalLength (beatmapset) {
-            return beatmapset.numberDiffs * beatmapset.length;
         },
     },
 };

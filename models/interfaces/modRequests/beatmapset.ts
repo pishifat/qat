@@ -11,6 +11,10 @@ export interface IBeatmapsetDocument extends Document {
     length: number;
     bpm: number;
     submittedAt: Date;
+
+    fullTitle: string;
+    totalLength: number;
+    totalLengthString: string;
 }
 
 export interface IBeatmapsetModel extends Model<IBeatmapsetDocument> { }

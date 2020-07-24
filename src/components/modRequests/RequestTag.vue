@@ -1,5 +1,5 @@
 <template>
-    <span class="badge badge-pill my-1 text-capitalize" :class="classList">
+    <span class="badge badge-pill my-1 mx-1 text-capitalize" :class="classList">
         <slot />
     </span>
 </template>

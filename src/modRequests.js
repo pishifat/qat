@@ -13,6 +13,7 @@ const store = new Vuex.Store({
         ownRequests: [],
         requests: [],
         selectedRequestId: null,
+        filters: [],
     },
     mutations: {
         setInitialData (state, payload) {
@@ -23,8 +24,33 @@ const store = new Vuex.Store({
         updateSelectRequestId (state, id) {
             state.selectedRequestId = id;
         },
+        updateFilters (state, filter) {
+            const i = state.filters.findIndex(f => f === filter);
+            if (i !== -1) state.filters.splice(i, 1);
+            else state.filters.push(filter);
+        },
     },
     getters: {
+        filteredRequests (state) {
+            return state.requests.filter(r => {
+
+                if (
+                    (state.filters.includes('osu') && r.beatmapset.modes.includes('osu')) ||
+                    (state.filters.includes('taiko') && r.beatmapset.modes.includes('taiko')) ||
+                    (state.filters.includes('ranked') && r.user.rankedBeatmapsets > 0) ||
+                    (state.filters.includes('long') && r.beatmapset.totalLengthString === 'long') ||
+                    (state.filters.includes('short') && r.beatmapset.totalLengthString === 'short') ||
+                    (state.filters.includes('simple') && r.category === 'simple') ||
+                    (state.filters.includes('tech') && r.category === 'tech') ||
+                    (state.filters.includes('doubleBpm') && r.category === 'doubleBpm') ||
+                    (state.filters.includes('conceptual') && r.category === 'conceptual')
+                ) {
+                    return false;
+                }
+
+                return true;
+            });
+        },
         selectedRequest (state) {
             return state.requests.find(r => r.id == state.selectedRequestId);
         },

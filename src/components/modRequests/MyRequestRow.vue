@@ -6,8 +6,7 @@
                 :href="`https://osu.ppy.sh/beatmapsets/${request.beatmapset.osuId}`"
                 target="_blank"
             >
-                {{ request.beatmapset.artist }} -
-                {{ request.beatmapset.title }}
+                {{ request.beatmapset.fullTitle }}
             </a>
         </div>
         <div class="col-sm-3 d-flex justify-content-around">

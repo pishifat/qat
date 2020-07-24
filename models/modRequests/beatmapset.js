@@ -22,6 +22,23 @@ beatmapsetsSchema.virtual('events', {
     },
 });
 
+class BeatmapsetService extends mongoose.Model {
+
+    get fullTitle () {
+        return `${this.artist} - ${this.title}`;
+    }
+
+    get totalLength () {
+        return this.length * this.numberDiffs;
+    }
+
+    get totalLengthString () {
+        return this.totalLength > 600 ? 'long' : 'short';
+    }
+
+}
+
+beatmapsetsSchema.loadClass(BeatmapsetService);
 /**
  * @type {import('../interfaces/modRequests/beatmapset').IBeatmapsetModel}
  */

@@ -121,10 +121,27 @@
                         <my-request-row :request="request" />
                     </requests-listing>
 
+                    <section class="card card-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <a
+                                    v-for="filter in possibleFilters"
+                                    :key="filter"
+                                    href="#"
+                                    @click.prevent="$store.commit('updateFilters', filter)"
+                                >
+                                    <request-tag :class-list="filters.includes(filter) ? 'badge-bright-blue-gray' : 'badge-info'">
+                                        {{ filter }}
+                                    </request-tag>
+                                </a>
+                            </div>
+                        </div>
+                    </section>
+
                     <requests-listing
                         v-if="user && user.isFeatureTester"
                         v-slot="{ request }"
-                        :requests="requests"
+                        :requests="filteredRequests"
                     >
                         <request-row
                             :request="request"
@@ -145,7 +162,8 @@ import RequestsListing from '../components/modRequests/RequestsListing.vue';
 import MyRequestRow from '../components/modRequests/MyRequestRow.vue';
 import RequestRow from '../components/modRequests/RequestRow.vue';
 import RequestInfo from '../components/modRequests/RequestInfo.vue';
-import { mapState } from 'vuex';
+import RequestTag from '../components/modRequests/RequestTag.vue';
+import { mapState, mapGetters } from 'vuex';
 
 export default {
     name: 'ModRequests',
@@ -154,6 +172,7 @@ export default {
         MyRequestRow,
         RequestRow,
         RequestInfo,
+        RequestTag,
     },
     data () {
         return {
@@ -161,13 +180,29 @@ export default {
             link: '',
             category: '',
             comment: '',
+            possibleFilters: [
+                'osu',
+                'taiko',
+                'ranked',
+                'long',
+                'short',
+                'simple',
+                'tech',
+                'doubleBpm',
+                'conceptual',
+            ],
         };
     },
-    computed: mapState([
-        'ownRequests',
-        'requests',
-        'user',
-    ]),
+    computed: {
+        ...mapState([
+            'ownRequests',
+            'user',
+            'filters',
+        ]),
+        ...mapGetters([
+            'filteredRequests',
+        ]),
+    },
     async created () {
         await this.$store.dispatch('getData');
         this.isLoading = !this.isLoading;
