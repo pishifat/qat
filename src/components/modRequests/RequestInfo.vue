@@ -4,6 +4,9 @@
         :title="fullTitle"
     >
         <div v-if="selectedRequest" class="container">
+            <span class="text-secondary">
+                Only accept/deny a request if you looked at the map and have a reason for your choice!
+            </span>
             <div class="row">
                 <div class="col-sm-7">
                     <input
