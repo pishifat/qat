@@ -17,7 +17,13 @@
         </div>
         <div v-if="request.modReviews.length" class="col-sm-12">
             <div v-for="review in request.modReviews" :key="review._id" class="ml-2 text-secondary">
-                {{ review.action }}: {{ review.comment }}
+                <a :href="'https://osu.ppy.sh/users/' + review.user.osuId" target="_blank">
+                    {{ review.user.username }}
+                </a>
+                <span :class="review.action == 'accepted' ? 'text-success' : 'text-danger'">
+                    {{ review.action }}
+                </span>
+                - {{ review.comment }}
             </div>
         </div>
     </div>

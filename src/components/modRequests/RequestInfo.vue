@@ -78,9 +78,14 @@
             <b>Reviews:</b>
             <div v-for="review in selectedRequest.modReviews" :key="review.id" class="row text-secondary">
                 <div class="col-sm-2">
+                    <a :href="'https://osu.ppy.sh/users/' + review.user.osuId" target="_blank">
+                        {{ review.user.username }}
+                    </a>
+                </div>
+                <div class="col-sm-2 text-capitalize" :class="review.action == 'accepted' ? 'text-success' : 'text-danger'">
                     {{ review.action }}
                 </div>
-                <div class="col-sm-10">
+                <div class="col-sm-8">
                     {{ review.comment }}
                 </div>
             </div>
