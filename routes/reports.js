@@ -58,8 +58,6 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
             });
         }
 
-        console.log(notificationFields);
-
         // for #user-reportfeed
         await discord.webhookPost(
             [{

@@ -188,7 +188,6 @@ router.post('/concludeMediation/:id', middlewares.isNat, async (req, res) => {
 router.post('/:id/update', middlewares.isNat, async (req, res) => {
     const title = req.body.title;
     const shortReason= req.body.shortReason;
-    console.log(req.body);
 
     if (!title || !shortReason) {
         return res.json({

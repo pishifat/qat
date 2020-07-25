@@ -90,14 +90,15 @@ export default {
             modsCount: [null, null, null],
             user: '',
             info: '',
+            months: 3,
         };
     },
     watch: {
         modsCount () {
-            this.manualCalculate();
+            this.calculateTotalScore();
         },
         selectedMode () {
-            this.manualCalculate();
+            this.calculateTotalScore();
         },
     },
     methods: {
@@ -113,10 +114,16 @@ export default {
 
             return Math.log(1 + modCount) / Math.log(Math.sqrt(1 + modeValue)) - (2 * (1 + modeValue)) / (1 + modCount);
         },
-        manualCalculate () {
+        calculateTotalScore () {
             let modeValue = this.selectedMode == 'osu' ? 4 : 3;
-            let totalScore = this.modsCount.reduce((acc, c) => acc + this.calculateMonthScore(c, modeValue), 0);
+            let totalScore = this.modsCount.reduce((acc, c) => {
+                if (!c && c !== 0) return acc;
+
+                return acc + this.calculateMonthScore(c, modeValue);
+            }, 0);
             this.info = totalScore.toFixed(2);
+            this.info += this.months !== 3 ? ` (For your previous work as BN, just the previous ${this.months} months are taken into account!)` : '';
+            this.months = 3; // Reset so message disapper after an edit
         },
         async autoCalculate (e) {
             if (!this.user) {
@@ -129,12 +136,13 @@ export default {
             }
 
             this.info = 'Retrieving info... (this will take a few seconds)';
-            const data = await this.executeGet(`/modsCount/${this.user}`, e);
+            const data = await this.executeGet(`/modsCount/${this.user}/${this.selectedMode}`, e);
 
             if (!data.error) {
                 this.$set(this.modsCount, 0, data.modCount[0]);
                 this.$set(this.modsCount, 1, data.modCount[1]);
                 this.$set(this.modsCount, 2, data.modCount[2]);
+                this.months = data.months;
             }
         },
     },

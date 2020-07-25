@@ -6,6 +6,7 @@ const middlewares = require('../helpers/middlewares');
 const osu = require('../helpers/osu');
 const User = require('../models/user');
 const Logger = require('../models/log');
+const BnEvaluation = require('../models/evaluations/bnEvaluation');
 
 const router = express.Router();
 
@@ -24,12 +25,31 @@ router.get('/me', middlewares.isLoggedIn, (req, res) => {
 });
 
 /* GET mod count from specified user */
-router.get('/modsCount/:user', async (req, res) => {
-    if (!req.params.user || req.params.user.trim() == '') {
+router.get('/modsCount/:user/:mode', async (req, res) => {
+    const userInput = req.params.user && req.params.user.trim();
+    const modeInput = req.params.mode && req.params.mode.trim();
+
+    if (!userInput || !modeInput) {
         return res.json({ error: 'Missing user input' });
     }
 
-    const modCount = await getUserModsCount(req.params.user.trim());
+    const user = await User.findByUsernameOrOsuId(userInput).select('_id history');
+    let months = 3;
+
+    if (user) {
+        const wasBn = user.history && user.history.length;
+        const lastEvaluation = await BnEvaluation
+            .findOne({
+                user: user._id,
+                mode: modeInput,
+            })
+            .sort({ updatedAt: -1 });
+
+        if (lastEvaluation &&  lastEvaluation.resignedOnGoodTerms) months = 1;
+        else if (wasBn) months = 2;
+    }
+
+    const modCount = await getUserModsCount(userInput, months);
 
     if (!modCount.length) {
         return res.json({
@@ -37,7 +57,10 @@ router.get('/modsCount/:user', async (req, res) => {
         });
     }
 
-    return res.json({ modCount });
+    return res.json({
+        modCount,
+        months,
+    });
 });
 
 /*-------below this line is the intimidating code that i never want to look at----------*/
