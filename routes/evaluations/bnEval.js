@@ -390,7 +390,6 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
                         user.groups.splice(i, 1, 'nat');
                     } else {
                         const i = user.groups.findIndex(g => g === 'nat');
-                        console.log(i, user.groups);
                         user.groups.splice(i, 1, 'bn');
                     }
 

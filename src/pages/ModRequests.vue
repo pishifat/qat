@@ -183,6 +183,8 @@ export default {
             possibleFilters: [
                 'osu',
                 'taiko',
+                'catch',
+                'mania',
                 'hasRankedMaps',
                 'long',
                 'short',
