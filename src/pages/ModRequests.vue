@@ -183,7 +183,7 @@ export default {
             possibleFilters: [
                 'osu',
                 'taiko',
-                'ranked',
+                'hasRankedMaps',
                 'long',
                 'short',
                 'simple',

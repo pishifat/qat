@@ -37,7 +37,7 @@ const store = new Vuex.Store({
                 if (
                     (state.filters.includes('osu') && r.beatmapset.modes.includes('osu')) ||
                     (state.filters.includes('taiko') && r.beatmapset.modes.includes('taiko')) ||
-                    (state.filters.includes('ranked') && r.user.rankedBeatmapsets > 0) ||
+                    (state.filters.includes('hasRankedMaps') && r.user.rankedBeatmapsets > 0) ||
                     (state.filters.includes('long') && r.beatmapset.totalLengthString === 'long') ||
                     (state.filters.includes('short') && r.beatmapset.totalLengthString === 'short') ||
                     (state.filters.includes('simple') && r.category === 'simple') ||

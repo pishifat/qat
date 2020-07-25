@@ -15,7 +15,7 @@
         </div>
         <div class="col-12 col-lg-6 order-2 order-lg-1 my-2 my-lg-0">
             <request-tag v-if="request.user.rankedBeatmapsets">
-                Ranked ({{ request.user.rankedBeatmapsets }})
+                hasRankedMaps ({{ request.user.rankedBeatmapsets }})
             </request-tag>
             <request-tag>
                 {{ request.beatmapset.totalLengthString }} ({{ (request.beatmapset.totalLength / 60).toFixed(1) }} min | {{ (request.beatmapset.totalLength / 60).toFixed(1) }} min)
