@@ -11,9 +11,9 @@ function getGenreName (id) {
     // note that there's no 8, 11, 12
     switch (id) {
         case 0:
-            return 'Any';
+            return 'any';
         case 1:
-            return 'Unspecified';
+            return 'unspecified';
         case 2:
             return 'video game';
         case 3:
@@ -33,14 +33,14 @@ function getGenreName (id) {
         case 13:
             return 'folk';
         default:
-            return 'Unknown';
+            return 'unknown';
     }
 }
 
 function getLanguageName (id) {
     switch (id) {
         case 0:
-            return 'Any';
+            return 'any';
         case 1:
             return 'other';
         case 2:
@@ -64,7 +64,7 @@ function getLanguageName (id) {
         case 11:
             return 'italian';
         default:
-            return 'Unknown';
+            return 'unknown';
     }
 }
 
@@ -146,6 +146,13 @@ router.post('/store', middlewares.isLoggedIn, async (req, res) => {
     }
 
     const beatmapsetInfo = await osu.getBeatmapsetInfo(req.session.accessToken, beatmapsetId);
+
+    // 4 = loved, 3 = qualified, 2 = approved, 1 = ranked, 0 = pending, -1 = WIP, -2 = graveyard
+    if (beatmapsetInfo.ranked > 0) {
+        return res.json({
+            error: `Cannot submit ranked maps`,
+        });
+    }
 
     if (beatmapsetInfo.user_id != res.locals.userRequest.osuId) {
         return res.json({

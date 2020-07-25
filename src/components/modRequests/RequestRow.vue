@@ -29,6 +29,9 @@
             <request-tag v-for="(mode, i) in request.beatmapset.modes" :key="i">
                 {{ mode }}
             </request-tag>
+            <request-tag>
+                {{ bpmSpeed }} ({{ request.beatmapset.bpm }} BPM)
+            </request-tag>
             <template v-if="request.modReviews.length > 0">
                 <request-tag
                     v-if="acceptedReviews.length"
@@ -48,6 +51,9 @@
                 class-list="badge-danger"
             >
                 Not Reviewed
+            </request-tag>
+            <request-tag v-if="request.beatmapset.events.length">
+                {{ request.beatmapset.events[0].eventType }}
             </request-tag>
         </div>
         <div class="col-2 col-sm-4 col-lg-2 d-flex justify-content-end align-items-center order-1 order-lg-2 h-100">
@@ -81,11 +87,20 @@ export default {
         },
     },
     computed: {
+        /** @returns {array} */
         acceptedReviews () {
             return this.request.modReviews.filter(r => r.action === 'accepted');
         },
+        /** @returns {array} */
         deniedReviews () {
             return this.request.modReviews.filter(r => r.action === 'denied');
+        },
+        /** @returns {string} */
+        bpmSpeed () {
+            const bpm = this.request.beatmapset.bpm;
+            if (bpm < 160) return 'slow';
+            else if (bpm >= 190) return 'fast';
+            else return 'average';
         },
     },
 };

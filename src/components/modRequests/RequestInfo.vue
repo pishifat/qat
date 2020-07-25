@@ -120,7 +120,7 @@ export default {
         /** @returns {string} */
         fullTitle () {
             if (this.selectedRequest) {
-                return `${this.selectedRequest.beatmapset.artist} - ${this.selectedRequest.beatmapset.title}`;
+                return this.selectedRequest.beatmapset.fullTitle;
             }
 
             return '';

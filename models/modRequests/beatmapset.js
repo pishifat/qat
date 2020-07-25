@@ -19,6 +19,7 @@ beatmapsetsSchema.virtual('events', {
     foreignField: 'beatmapsetId',
     options: {
         select: 'eventType timestamp',
+        sort: { timestamp: -1 },
     },
 });
 

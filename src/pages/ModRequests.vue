@@ -121,33 +121,34 @@
                         <my-request-row :request="request" />
                     </requests-listing>
 
-                    <section class="card card-body">
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <a
-                                    v-for="filter in possibleFilters"
-                                    :key="filter"
-                                    href="#"
-                                    @click.prevent="$store.commit('updateFilters', filter)"
-                                >
-                                    <request-tag :class-list="filters.includes(filter) ? 'badge-bright-blue-gray' : 'badge-info'">
-                                        {{ filter }}
-                                    </request-tag>
-                                </a>
+                    <template v-if="user && user.isFeatureTester">
+                        <section class="card card-body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <a
+                                        v-for="filter in possibleFilters"
+                                        :key="filter"
+                                        href="#"
+                                        @click.prevent="$store.commit('updateFilters', filter)"
+                                    >
+                                        <request-tag :class-list="filters.includes(filter) ? 'badge-bright-blue-gray' : 'badge-info'">
+                                            {{ filter }}
+                                        </request-tag>
+                                    </a>
+                                </div>
                             </div>
-                        </div>
-                    </section>
+                        </section>
 
-                    <requests-listing
-                        v-if="user && user.isFeatureTester"
-                        v-slot="{ request }"
-                        :requests="filteredRequests"
-                    >
-                        <request-row
-                            :request="request"
-                            @update:editing="editing = $event"
-                        />
-                    </requests-listing>
+                        <requests-listing
+                            v-slot="{ request }"
+                            :requests="filteredRequests"
+                        >
+                            <request-row
+                                :request="request"
+                                @update:editing="editing = $event"
+                            />
+                        </requests-listing>
+                    </template>
                 </div>
             </div>
         </div>
@@ -180,19 +181,6 @@ export default {
             link: '',
             category: '',
             comment: '',
-            possibleFilters: [
-                'osu',
-                'taiko',
-                'catch',
-                'mania',
-                'hasRankedMaps',
-                'long',
-                'short',
-                'simple',
-                'tech',
-                'doubleBpm',
-                'conceptual',
-            ],
         };
     },
     computed: {
@@ -200,6 +188,7 @@ export default {
             'ownRequests',
             'user',
             'filters',
+            'possibleFilters',
         ]),
         ...mapGetters([
             'filteredRequests',
