@@ -147,6 +147,12 @@ router.post('/store', middlewares.isLoggedIn, async (req, res) => {
 
     const beatmapsetInfo = await osu.getBeatmapsetInfo(req.session.accessToken, beatmapsetId);
 
+    if (!beatmapsetInfo || beatmapsetInfo.error || !beatmapsetInfo.id) {
+        return res.json({
+            error: `Couldn't retrieve beatmap info`,
+        });
+    }
+
     // 4 = loved, 3 = qualified, 2 = approved, 1 = ranked, 0 = pending, -1 = WIP, -2 = graveyard
     if (beatmapsetInfo.ranked > 0) {
         return res.json({

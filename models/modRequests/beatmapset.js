@@ -4,7 +4,7 @@ const beatmapsetsSchema = new mongoose.Schema({
     osuId: { type: Number, required: true },
     artist: { type: String, required: true },
     title: { type: String, required: true },
-    modes: [{ type: String, enum: ['osu', 'taiko', 'catch', 'mania'], required: true }],
+    modes: [{ type: String, enum: ['osu', 'taiko', 'fruits', 'mania'], required: true }],
     length: { type: Number, required: true },
     bpm: { type: Number, required: true },
     submittedAt: { type: Date, required: true },

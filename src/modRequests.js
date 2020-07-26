@@ -20,7 +20,7 @@ const store = new Vuex.Store({
         possibleFilters: [
             'osu',
             'taiko',
-            'catch',
+            'fruits',
             'mania',
             'hasRankedMaps',
             'long',
@@ -61,7 +61,7 @@ const store = new Vuex.Store({
                     (state.filters.includes('osu') && r.beatmapset.modes.includes('osu')) ||
                     (state.filters.includes('taiko') && r.beatmapset.modes.includes('taiko')) ||
                     (state.filters.includes('mania') && r.beatmapset.modes.includes('mania')) ||
-                    (state.filters.includes('catch') && r.beatmapset.modes.includes('catch')) ||
+                    (state.filters.includes('fruits') && r.beatmapset.modes.includes('fruits')) ||
                     (state.filters.includes('hasRankedMaps') && r.user.rankedBeatmapsets > 0) ||
                     (state.filters.includes('long') && r.beatmapset.totalLengthString === 'long') ||
                     (state.filters.includes('short') && r.beatmapset.totalLengthString === 'short') ||
