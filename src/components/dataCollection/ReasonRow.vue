@@ -31,6 +31,7 @@ export default {
         },
     },
     computed: {
+        /** @returns {boolean} */
         hasData() {
             return (this.event.obviousness || this.event.obviousness == 0) && (this.event.severity || this.event.severity == 0);
         },
