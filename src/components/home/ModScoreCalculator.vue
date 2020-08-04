@@ -122,7 +122,7 @@ export default {
                 return acc + this.calculateMonthScore(c, modeValue);
             }, 0);
             this.info = totalScore.toFixed(2);
-            this.info += this.months !== 3 ? ` (For your previous work as BN, just the previous ${this.months} months are taken into account!)` : '';
+            this.info += this.months !== 3 ? ` (Only the last ${this.months} months are considered because of your previous BN experience!)` : '';
             this.months = 3; // Reset so message disapper after an edit
         },
         async autoCalculate (e) {

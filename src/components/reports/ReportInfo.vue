@@ -11,7 +11,9 @@
 
             <feedback v-if="loggedInUser.isNat" class="mb-3" />
 
-            <feedback-pm />
+            <feedback-pm
+                v-if="!selectedReport.isActive"
+            />
         </div>
     </modal-dialog>
 </template>

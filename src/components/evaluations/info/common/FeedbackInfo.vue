@@ -7,34 +7,22 @@
             </span>
         </p>
 
-        <textarea
-            v-model="feedback"
-            class="form-control mb-2"
-            rows="4"
-        />
+        <div v-if="!resigned">
+            <textarea
+                v-model="feedback"
+                class="form-control mb-2"
+                rows="4"
+            />
 
-        <input
-            v-if="isApplication && selectedEvaluation.consensus == 'pass'"
-            v-model="discordLink"
-            class="form-control"
-            type="text"
-            placeholder="discord invite link..."
-        >
-
-        <div class="form-inline">
-            <button class="btn btn-sm btn-primary mr-2 mt-2" data-toggle="collapse" :data-target="isApplication ? '#applicationForumPmBox' : '#currentBnForumPmBox'">
-                See full message <i class="fas fa-angle-down" />
-            </button>
-
-            <a
-                :href="'https://osu.ppy.sh/forum/ucp.php?i=pm&mode=compose&u=' + selectedEvaluation.user.osuId"
-                target="_blank"
-                class="btn btn-sm btn-primary mr-2 mt-2"
+            <input
+                v-if="isApplication && selectedEvaluation.consensus == 'pass'"
+                v-model="discordLink"
+                class="form-control"
+                type="text"
+                placeholder="discord invite link..."
             >
-                Open osu! PM
-            </a>
 
-            <button class="btn btn-sm btn-primary mt-2 ml-0 ml-sm-auto" @click="setFeedback($event)">
+            <button class="btn btn-sm btn-block btn-primary my-2 ml-0 ml-sm-auto" @click="setFeedback($event)">
                 Save
             </button>
         </div>
@@ -63,12 +51,9 @@ export default {
         };
     },
     computed: {
+        /** @returns {boolean} */
         resigned() {
-            if (this.selectedEvaluation.resignedOnGoodTerms || this.selectedEvaluation.resignedOnStandardTerms) {
-                return true;
-            } else {
-                return false;
-            }
+            return this.selectedEvaluation.resignedOnGoodTerms || this.selectedEvaluation.resignedOnStandardTerms;
         },
         ...mapGetters('evaluations', [
             'selectedEvaluation',

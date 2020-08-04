@@ -1,13 +1,30 @@
 <template>
-    <div id="copyText" class="card card-body pre-line small" @click="copy">
-        <slot />
+    <div>
+        <button class="btn btn-sm btn-block btn-primary mb-2" data-toggle="collapse" data-target="#chatMessage">
+            See full chat message <i class="fas fa-angle-down" />
+        </button>
+
+        <div id="chatMessage" class="collapse">
+            <div id="copyText" class="card card-body small mb-2" @click="copy">
+                <slot />
+            </div>
+            <a :href="'https://osu.ppy.sh/community/chat?sendto=' + osuId" target="_blank" class="btn btn-sm btn-block btn-primary mb-2">
+                Open osu! chat
+            </a>
+        </div>
     </div>
 </template>
 
 <script>
 
 export default {
-    name: 'ForumPmContainer',
+    name: 'ChatMessageContainer',
+    props: {
+        osuId: {
+            type: Number,
+            required: true,
+        },
+    },
     methods: {
         copy () {
             const el = document.querySelector('#copyText');
@@ -46,6 +63,10 @@ export default {
     -webkit-animation: flickerAnimation .5s;
     -moz-animation: flickerAnimation .5s;
     animation: flickerAnimation .5s;
+}
+
+#copyText {
+    cursor: pointer;
 }
 
 </style>
