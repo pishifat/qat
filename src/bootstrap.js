@@ -7,7 +7,7 @@ const md = new MarkdownIt('zero', {
     breaks: true,
     linkify: true,
     typographer: false,
-}).enable(['emphasis', 'linkify', 'newline']);
+}).enable(['emphasis', 'linkify', 'newline', 'link']);
 
 // Remember old renderer, if overridden, or proxy to default renderer
 const defaultRender = md.renderer.rules.link_open || function (tokens, idx, options, env, self) {
