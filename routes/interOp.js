@@ -70,4 +70,19 @@ router.get('/events/:beatmapsetId', async (req, res) => {
     );
 });
 
+/* GET quality assurance events by user osu! ID */
+router.get('/qaEventsByUser/:osuId', async (req, res) => {
+    let user = await User.findOne({ osuId: parseInt(req.params.osuId) });
+
+    res.json(
+        await Aiess
+            .find({ qualityAssuranceCheckers: user.id })
+            .populate([
+                { path: 'qualityAssuranceCheckers', select: 'osuId username' },
+                { path: 'qualityAssuranceComments', populate: { path: 'mediator', select: 'osuId username' } },
+            ])
+            .sort({ timestamp: 1 })
+    );
+});
+
 module.exports = router;
