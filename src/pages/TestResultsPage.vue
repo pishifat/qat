@@ -36,7 +36,8 @@
                     <div>
                         <b>User:</b> {{ selectedTest.applicant.username }} -
                         <b>Mode:</b> {{ selectedTest.mode }} -
-                        <b>Score:</b> {{ selectedTest.totalScore }}
+                        <b>Score:</b> {{ selectedTest.totalScore }} -
+                        <b><a :href="'https://bn.mappersguild.com/evaluationresults?id=' + relevantApplicationId" target="_blank">Evaluation results</a></b>
                     </div>
                 </section>
 
@@ -133,10 +134,20 @@ export default {
         ]),
         ...mapState('testResults', [
             'tests',
+            'relevantApplicationId',
         ]),
         ...mapGetters('testResults', [
             'selectedTest',
         ]),
+    },
+    watch: {
+        async selectedTest () {
+            const application = await this.initialRequest(`testResults/findApplication/${this.selectedTest.id}`);
+
+            if (application) {
+                this.$store.commit('testResults/setRelevantApplicationId', application.id);
+            }
+        },
     },
     beforeCreate () {
         if (!this.$store.hasModule('testResults')) {

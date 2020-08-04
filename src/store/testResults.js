@@ -3,6 +3,7 @@ export default {
     state: {
         tests: [],
         selectedTestId: null,
+        relevantApplicationId: null,
     },
     mutations: {
         setTests (state, tests) {
@@ -10,6 +11,9 @@ export default {
         },
         setSelectedTestId (state, id) {
             state.selectedTestId = id;
+        },
+        setRelevantApplicationId (state, id) {
+            state.relevantApplicationId = id;
         },
     },
     getters: {

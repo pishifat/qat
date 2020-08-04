@@ -119,8 +119,6 @@ export default {
 
         const evaluation = await this.initialRequest('/evaluationResults/evaluation/' + id);
 
-        console.log(evaluation);
-
         if (evaluation) {
             this.evaluation = evaluation;
         }

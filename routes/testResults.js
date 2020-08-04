@@ -1,6 +1,7 @@
 const express = require('express');
 const TestSubmission = require('../models/bnTest/testSubmission');
 const User = require('../models/user');
+const AppEvaluation = require('../models/evaluations/appEvaluation');
 const middlewares = require('../helpers/middlewares');
 
 const router = express.Router();
@@ -55,6 +56,11 @@ router.get('/search/:user', middlewares.isNat, async (req, res) => {
     res.json({
         tests,
     });
+});
+
+/* GET search for test */
+router.get('/findApplication/:id', middlewares.isNat, async (req, res) => {
+    res.json(await AppEvaluation.findOne({ test: req.params.id }));
 });
 
 module.exports = router;
