@@ -472,15 +472,19 @@ const lowActivityTask = cron.schedule('0 23 1 * *', async () => {
 
     for (let i = 0; i < modeFields.length; i++) {
         const modeField = modeFields[i];
-        await discord.webhookPost(
-            [{
-                title: 'Low Activity',
-                description: `The following users have low activity from ${initialDate.toLocaleDateString()} to today`,
-                color: discord.webhookColors.red,
-                fields: modeField,
-            }],
-            modes[i]
-        );
+
+        if (modeField.length > 1) { // only create webhook if there are users with low activity in mode
+            await discord.webhookPost(
+                [{
+                    title: 'Low Activity',
+                    description: `The following users have low activity from ${initialDate.toISOString().slice(0,10)} to today`,
+                    color: discord.webhookColors.red,
+                    fields: modeField,
+                }],
+                modes[i]
+            );
+        }
+
         await util.sleep(500);
     }
 }, {
