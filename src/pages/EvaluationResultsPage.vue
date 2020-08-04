@@ -44,7 +44,7 @@
                     <p>Contact any member of the NAT below if you have questions about your evaluation!</p>
                     <div class="card card-body">
                         <ul>
-                            <li v-for="review in sortedReviews" :key="review.id">
+                            <li v-for="review in natReviews" :key="review.id">
                                 <a :href="'https://osu.ppy.sh/users/' + review.evaluator.osuId" target="_blank" :class="review.evaluator.groups.includes('nat') ? 'text-nat' : review.evaluator.groups.includes('bn') ? 'text-probation' : ''">
                                     {{ review.evaluator.username }}
                                 </a>
@@ -70,11 +70,8 @@ export default {
     },
     computed: {
         /** @returns {array} */
-        sortedReviews () {
-            const natReviews = this.evaluation.reviews.filter(r => r.evaluator.isNat);
-            const bnReviews = this.evaluation.reviews.filter(r => !r.evaluator.isNat);
-
-            return natReviews.concat(bnReviews);
+        natReviews () {
+            return this.evaluation.reviews.filter(r => r.evaluator.isNat);
         },
         /** @returns {string} */
         scoreColor() {
