@@ -62,27 +62,23 @@ router.get('/relevantInfo', async (req, res) => {
 
 /* POST create a new veto. */
 router.post('/submit', async (req, res) => {
-    let url = req.body.discussionLink;
-
-    if (url.length == 0) {
-        url = undefined;
+    if (!req.body.reasons.length) {
+        return res.json({ error: 'Veto must include reasons!' });
     }
 
-    const containChecks = ['osu.ppy.sh/beatmapsets', 'discussion'];
+    const bmId = util.getBeatmapsetIdFromUrl(req.body.reasons[0].link);
+
+    let containChecks = ['osu.ppy.sh/beatmapsets', 'discussion'];
+    containChecks.push(bmId);
 
     for (let i = 0; i < containChecks.length; i++) {
         const contain = containChecks[i];
-        util.isValidUrlOrThrow(url, contain);
-    }
 
-    let indexStart = url.indexOf('beatmapsets/') + 'beatmapsets/'.length;
-    let indexEnd = url.indexOf('#');
-    let bmId;
+        for (let j = 0; j < req.body.reasons.length; j++) {
+            const reason = req.body.reasons[j];
+            util.isValidUrlOrThrow(reason.link, contain);
+        }
 
-    if (indexEnd !== -1) {
-        bmId = url.slice(indexStart, indexEnd);
-    } else {
-        bmId = url.slice(indexStart);
     }
 
     const bmInfo = await osuv1.beatmapsetInfo(bmId);
@@ -97,12 +93,11 @@ router.post('/submit', async (req, res) => {
 
     let v = await Veto.create({
         vetoer: req.session.mongoId,
-        discussionLink: req.body.discussionLink,
+        reasons: req.body.reasons,
         beatmapId: bmInfo.beatmapset_id,
         beatmapTitle: bmInfo.artist + ' - ' + bmInfo.title,
         beatmapMapper: bmInfo.creator,
         beatmapMapperId: bmInfo.creator_id,
-        shortReason: req.body.shortReason,
         mode: req.body.mode,
     });
     v = await Veto

@@ -3,7 +3,7 @@
         <hr>
         Reason for vote:
         <div class="small px-4 mb-2">
-            This comment will be displayed anonymously alongside the verdict post. If your response is deemed inappropriate, your vote will be marked as invalid.
+            This comment will be displayed anonymously alongside the verdict post. If you partially agree with the veto, clearly say which points you agree/disagree with. Inappropriate responses will be discarded.
         </div>
 
         <textarea
@@ -36,7 +36,7 @@
                     name="vote"
                     value="2"
                 >
-                <label class="form-check-label text-neutral" for="2">Neutral</label>
+                <label class="form-check-label text-neutral" for="2">Partially agree</label>
             </div>
 
             <div class="form-check form-check-inline">

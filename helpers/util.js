@@ -14,7 +14,7 @@ function escapeUsername(username) {
  */
 function getBeatmapsetIdFromUrl(url) {
     let indexStart = url.indexOf('beatmapsets/') + 'beatmapsets/'.length;
-    let indexEnd = url.indexOf('/discussion#');
+    let indexEnd = url.indexOf('/discussion');
     let bmId;
 
     if (indexEnd !== -1) {

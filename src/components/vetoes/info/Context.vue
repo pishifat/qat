@@ -1,11 +1,12 @@
 <template>
     <div class="mb-2">
-        Veto reason:
+        Veto reasons:
 
-        <p class="small px-4">
-            <span v-html="$md.render(selectedVeto.shortReason)" />
-            <a :href="selectedVeto.discussionLink" target="_blank">Read the full veto discussion here!</a>
-        </p>
+        <ul>
+            <li v-for="reason in selectedVeto.reasons" :key="reason.summary">
+                <a :href="reason.link" target="_blank">{{ reason.summary }}</a>
+            </li>
+        </ul>
 
         <div v-if="selectedVeto.status == 'upheld' || selectedVeto.status == 'withdrawn'" class="mt-2">
             Consensus:

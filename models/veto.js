@@ -3,12 +3,15 @@ const mongoose = require('mongoose');
 const vetoesSchema = new mongoose.Schema({
     vetoer: { type: 'ObjectId', ref: 'User', required: true },
     mode: { type: String, enum: ['osu', 'taiko', 'catch', 'mania', 'all'] },
-    discussionLink: { type: String, required: true },
+    reasons: [{
+        _id: false,
+        link: { type: String, required: true },
+        summary: { type: String, required: true },
+    }],
     beatmapId: { type: Number },
     beatmapTitle: { type: String },
     beatmapMapper: { type: String },
     beatmapMapperId: { type: Number },
-    shortReason: { type: String, required: true },
     status: { type: String, enum: ['available', 'wip', 'upheld', 'withdrawn'], default: 'available' },
     mediations: [{ type: 'ObjectId', ref: 'Mediation' }],
     deadline: { type: Date },

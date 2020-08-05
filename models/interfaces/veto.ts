@@ -5,12 +5,11 @@ import { IMediationDocument } from './mediation';
 interface IVetoDocument extends Document {
     vetoer: IUserDocument;
     mode: string;
-    discussionLink: string;
+    reasons: Array<String>;
     beatmapId: string;
     beatmapTitle: string;
     beatmapMapper: string;
     beatmapMapperId: number;
-    shortReason: string;
     status?: string;
     mediations?: IMediationDocument[];
     deadline?: Date;
