@@ -44,8 +44,8 @@ export default {
 
             if (value) {
                 events = events.filter(e =>
-                    e.metadata.toLowerCase().includes(value.toLowerCase()) ||
-                    e.hostName.toLowerCase().includes(value.toLowerCase())
+                    e.artistTitle.toLowerCase().includes(value.toLowerCase()) ||
+                    e.creatorName.toLowerCase().includes(value.toLowerCase())
                 );
             }
 

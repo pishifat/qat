@@ -75,9 +75,9 @@ const store = new Vuex.Store({
                     (
                         lastEvent &&
                         (
-                            (state.filters.includes('ranked') && lastEvent.eventType === 'Ranked') ||
-                            (state.filters.includes('qualified') && lastEvent.eventType === 'Qualified') ||
-                            (state.filters.includes('bubbled') && lastEvent.eventType === 'Bubbled')
+                            (state.filters.includes('ranked') && lastEvent.type === 'rank') ||
+                            (state.filters.includes('qualified') && lastEvent.type === 'qualify') ||
+                            (state.filters.includes('bubbled') && lastEvent.type === 'nominate')
                         )
                     )
                 ) {

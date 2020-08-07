@@ -20,17 +20,17 @@
                 >
                     <!-- date -->
                     <td class="text-nowrap">
-                        {{ event.timestamp | toMonthDay }}
+                        {{ event.time | toMonthDay }}
                     </td>
                     <!-- metadata -->
                     <td>
                         <a
-                            :href="event.postId ?
-                                'https://osu.ppy.sh/beatmapsets/' + event.beatmapsetId + '/discussion/-/generalAll#/' + event.postId :
+                            :href="event.discussionId ?
+                                'https://osu.ppy.sh/beatmapsets/' + event.beatmapsetId + '/discussion/-/generalAll#/' + event.discussionId :
                                 'https://osu.ppy.sh/beatmapsets/' + event.beatmapsetId + '/discussion/-/events'"
                             target="_blank"
                         >
-                            {{ event.metadata }}
+                            {{ event.artistTitle }}
                         </a>
                     </td>
                     <!-- reason -->

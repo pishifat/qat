@@ -13,7 +13,7 @@
 
                         <beatmap-metadata
                             class="mt-2 ml-2"
-                            :metadata="event.metadata"
+                            :artist-title="event.artistTitle"
                             :beatmapset-id="event.beatmapsetId"
                         />
                     </div>
@@ -22,13 +22,13 @@
                         <div class="row">
                             <beatmap-host
                                 class="col-sm-3 ml-2 ml-sm-0"
-                                :host-id="event.hostId"
-                                :host-name="event.hostName"
+                                :creator-id="event.creatorId"
+                                :creator-name="event.creatorName"
                             />
 
                             <due-date
                                 class="col-sm-3 ml-2 ml-sm-0"
-                                :timestamp="event.timestamp"
+                                :time="event.time"
                             />
 
                             <quality-assurance-checkers

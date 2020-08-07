@@ -3,14 +3,14 @@ const mongoose = require('mongoose');
 const aiessSchema = new mongoose.Schema({
     beatmapsetId: { type: Number },
     userId: { type: Number },
-    postId: { type: Number },
-    metadata: { type: String },
+    discussionId: { type: Number },
+    artistTitle: { type: String },
     modes: [{ type: String, enum: ['osu', 'taiko', 'catch', 'mania'] }],
-    eventType: { type: String, enum: ['Bubbled', 'Qualified', 'Disqualified', 'Popped', 'Ranked', 'Reported'] },
+    type: { type: String, enum: ['nominate', 'qualify', 'disqualify', 'nomination_reset', 'rank'] },
     content: { type: String },
-    timestamp: { type: Date },
-    hostId: { type: Number },
-    hostName: { type: String },
+    time: { type: Date },
+    creatorId: { type: Number },
+    creatorName: { type: String },
 
     valid: { type: Number, enum: [1, 2, 3] }, // TODO check if not used anymore?
     obviousness: { type: Number, default: null },
@@ -34,11 +34,11 @@ class AiessService extends mongoose.Model
      * @param {Date} minDate
      * @param {Date} maxDate
      * @param {array} modes
-     * @param {array} eventTypes
+     * @param {array} types
      * @returns {mongoose.Aggregate} aggregation query
      */
-    static getUniqueUserEvents (userId, minDate, maxDate, modes, eventTypes) {
-        const aggregation = this.getUserEvents(userId, minDate, maxDate, modes, eventTypes);
+    static getUniqueUserEvents (userId, minDate, maxDate, modes, types) {
+        const aggregation = this.getUserEvents(userId, minDate, maxDate, modes, types);
 
         aggregation
             .group({
@@ -47,7 +47,7 @@ class AiessService extends mongoose.Model
             })
             .replaceRoot('event')
             .sort({
-                timestamp: 1,
+                time: 1,
             });
 
         return aggregation;
@@ -59,27 +59,27 @@ class AiessService extends mongoose.Model
      * @param {Date} minDate
      * @param {Date} maxDate
      * @param {array} modes
-     * @param {array} eventTypes
+     * @param {array} types
      * @returns {mongoose.Aggregate} aggregation query
      */
-    static getUserEvents (userId, minDate, maxDate, modes, eventTypes) {
+    static getUserEvents (userId, minDate, maxDate, modes, types) {
         return this.aggregate([
             {
                 $match: {
                     userId,
-                    eventType: {
-                        $in: eventTypes,
+                    type: {
+                        $in: types,
                     },
                     $and: [
-                        { timestamp: { $gte: minDate } },
-                        { timestamp: { $lte: maxDate } },
+                        { time: { $gte: minDate } },
+                        { time: { $lte: maxDate } },
                     ],
                     modes: { $in: modes },
                 },
             },
             {
                 $sort: {
-                    timestamp: 1,
+                    time: 1,
                     beatmapsetId: -1,
                 },
             },
@@ -93,10 +93,10 @@ class AiessService extends mongoose.Model
      * @param {Date} minDate
      * @param {Date} maxDate
      * @param {array} modes
-     * @param {string} eventType
+     * @param {string} type
      * @returns {object} aggregation query
      */
-    static getRelatedBeatmapsetEvents (userId, beatmapsetIds, minDate, maxDate, modes, eventType) {
+    static getRelatedBeatmapsetEvents (userId, beatmapsetIds, minDate, maxDate, modes, type) {
         const aggregation = this.aggregate([
             {
                 $match: {
@@ -104,17 +104,17 @@ class AiessService extends mongoose.Model
                     beatmapsetId: {
                         $in: beatmapsetIds,
                     },
-                    eventType,
+                    type,
                     $and: [
-                        { timestamp: { $gte: minDate } },
-                        { timestamp: { $lte: maxDate } },
+                        { time: { $gte: minDate } },
+                        { time: { $lte: maxDate } },
                     ],
                     modes: { $in: modes },
                 },
             },
             {
                 $sort: {
-                    timestamp: 1,
+                    time: 1,
                     beatmapsetId: -1,
                 },
             },
@@ -137,22 +137,22 @@ class AiessService extends mongoose.Model
                 {
                     $match: {
                         $and: [
-                            { timestamp: { $gte: minDate } },
-                            { timestamp: { $lte: maxDate } },
+                            { time: { $gte: minDate } },
+                            { time: { $lte: maxDate } },
                         ],
-                        eventType: { $ne: 'Ranked' },
+                        type: { $ne: 'rank' },
                         modes: mode,
                     },
                 },
                 {
                     $sort: {
-                        timestamp: 1,
+                        time: 1,
                         beatmapsetId: -1,
                     },
                 },
                 {
                     $group: {
-                        _id: '$eventType', events: { $push: '$$ROOT' },
+                        _id: '$type', events: { $push: '$$ROOT' },
                     },
                 },
             ]);

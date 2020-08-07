@@ -67,7 +67,7 @@
                 <div class="row mb-2 text-secondary">
                     <div class="col-sm-12">
                         <div v-for="event in selectedRequest.beatmapset.events" :key="event._id">
-                            {{ event.timestamp | toStandardDate }}: {{ event.eventType }}
+                            {{ event.time | toStandardDate }}: {{ event.type }}
                         </div>
                     </div>
                 </div>

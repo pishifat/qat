@@ -1,13 +1,13 @@
 <template>
     <div class="text-truncate">
         <div class="text-truncate text-secondary">
-            {{ splitMetadata[0] }}
+            {{ splitArtistTitle[0] }}
         </div>
         <a
             :href="'https://osu.ppy.sh/beatmapsets/' + beatmapsetId"
             target="_blank"
         >
-            {{ splitMetadata[1] }}
+            {{ splitArtistTitle[1] }}
         </a>
     </div>
 </template>
@@ -16,7 +16,7 @@
 export default {
     name: 'BeatmapMetadata',
     props: {
-        metadata: {
+        artistTitle: {
             type: String,
             required: true,
         },
@@ -26,8 +26,9 @@ export default {
         },
     },
     computed: {
-        splitMetadata() {
-            return this.metadata.split(' - ');
+        /** @returns {Array} */
+        splitArtistTitle() {
+            return this.artistTitle.split(' - ');
         },
     },
 };

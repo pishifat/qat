@@ -128,7 +128,7 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
             .sort({ username: 1 }),
         Aiess.getAllActivity(minDate, maxDate, req.params.mode),
         BnEvaluation.find({ active: true, mode: req.params.mode }),
-        Aiess.find({ qualityAssuranceCheckers: { $exists: true, $ne: [] }, timestamp: { $gt: minDate } }),
+        Aiess.find({ qualityAssuranceCheckers: { $exists: true, $ne: [] }, time: { $gt: minDate } }),
     ]);
 
     if (allEvents.error) {
@@ -144,10 +144,10 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
         let qualityAssuranceChecks = allQualityAssuranceChecks.filter(qa => qa.qualityAssuranceCheckers.includes(user.id)).length;
 
         for (let i = 0; i < allEvents.length; i++) {
-            const eventType = allEvents[i]._id;
+            const type = allEvents[i]._id;
             const events = allEvents[i].events;
 
-            if (eventType == 'Bubbled' || eventType == 'Qualified') {
+            if (type == 'nominate' || type == 'qualify') {
                 for (let j = 0; j < events.length; j++) {
                     let event = events[j];
 
@@ -157,7 +157,7 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
                         }
                     }
                 }
-            } else if (eventType == 'Popped' || eventType == 'Disqualified') {
+            } else if (type == 'nomination_reset' || type == 'disqualify') {
                 nominationResets += events.filter(e => e.userId == user.osuId).length;
             }
         }

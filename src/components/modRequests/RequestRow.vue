@@ -53,7 +53,7 @@
                 Not Reviewed
             </request-tag>
             <request-tag v-if="request.beatmapset.events.length">
-                {{ request.beatmapset.events[0].eventType }}
+                {{ request.beatmapset.events[0].type }}
             </request-tag>
         </div>
         <div class="col-2 col-sm-4 col-lg-2 d-flex justify-content-end align-items-center order-1 order-lg-2 h-100">

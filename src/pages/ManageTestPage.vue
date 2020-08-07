@@ -108,6 +108,7 @@ export default {
         ...mapState('manageTest', [
             'questions',
         ]),
+        /** @returns {boolean} */
         isMode () {
             const modes = ['osu', 'taiko', 'catch', 'mania'];
 

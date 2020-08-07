@@ -52,7 +52,7 @@ export default {
         updateEvent (state, event) {
             let i;
 
-            if (event.type == 'Disqualified') {
+            if (event.type == 'disqualify') {
                 i = state.disqualifications.findIndex(e => e._id == event.id);
                 if (i >= 0) Vue.set(state.disqualifications[i], event.modifiedField, event.value);
 
@@ -61,7 +61,7 @@ export default {
 
                 i = state.disqualifiedQualityAssuranceChecks.findIndex(e => e._id == event.id);
                 if (i >= 0) Vue.set(state.disqualifiedQualityAssuranceChecks[i], event.modifiedField, event.value);
-            } else if (event.type == 'Popped') {
+            } else if (event.type == 'nomination_reset') {
                 i = state.pops.findIndex(e => e._id == event.id);
                 if (i >= 0) Vue.set(state.pops[i], event.modifiedField, event.value);
 

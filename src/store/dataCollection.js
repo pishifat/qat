@@ -36,17 +36,17 @@ export default {
 
             if (value) {
                 events = events.filter(e => {
-                    return e.metadata.toLowerCase().includes(value.toLowerCase());
+                    return e.artistTitle.toLowerCase().includes(value.toLowerCase());
                 });
             }
 
             return events;
         },
         disqualifications: (state, getters) => {
-            return getters.filteredEvents.filter(e => e.eventType == 'Disqualified');
+            return getters.filteredEvents.filter(e => e.type == 'disqualify');
         },
         pops: (state, getters) => {
-            return getters.filteredEvents.filter(e => e.eventType == 'Popped');
+            return getters.filteredEvents.filter(e => e.type == 'nomination_reset');
         },
         selectedEvent: (state) => {
             return state.events.find(e => e.id === state.selectedEventId);

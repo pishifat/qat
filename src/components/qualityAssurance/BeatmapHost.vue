@@ -4,11 +4,11 @@
 
         <div class="text-truncate">
             <a
-                :href="'https://osu.ppy.sh/users/' + hostId"
+                :href="'https://osu.ppy.sh/users/' + creatorId"
                 target="_blank"
                 @click.stop
             >
-                {{ hostName }}
+                {{ creatorName }}
             </a>
         </div>
     </div>
@@ -18,11 +18,11 @@
 export default {
     name: 'BeatmapHost',
     props: {
-        hostName: {
+        creatorName: {
             type: String,
             required: true,
         },
-        hostId: {
+        creatorId: {
             type: Number,
             required: true,
         },

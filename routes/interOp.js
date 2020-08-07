@@ -66,7 +66,7 @@ router.get('/events/:beatmapsetId', async (req, res) => {
                 { path: 'qualityAssuranceCheckers', select: 'osuId username' },
                 { path: 'qualityAssuranceComments', populate: { path: 'mediator', select: 'osuId username' } },
             ])
-            .sort({ timestamp: 1 })
+            .sort({ time: 1 })
     );
 });
 
@@ -81,7 +81,7 @@ router.get('/qaEventsByUser/:osuId', async (req, res) => {
                 { path: 'qualityAssuranceCheckers', select: 'osuId username' },
                 { path: 'qualityAssuranceComments', populate: { path: 'mediator', select: 'osuId username' } },
             ])
-            .sort({ timestamp: 1 })
+            .sort({ time: 1 })
     );
 });
 

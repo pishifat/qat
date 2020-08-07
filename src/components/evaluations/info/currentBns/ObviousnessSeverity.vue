@@ -68,7 +68,7 @@ export default {
             type: String,
             required: true,
         },
-        eventType: {
+        type: {
             type: String,
             required: true,
         },
@@ -77,7 +77,7 @@ export default {
         async updateObviousness(obviousness) {
             let result = await this.executePost('/dataCollection/updateObviousness/' + this.eventId, { obviousness });
             if (result == this.obviousness) result = null;
-            this.$store.commit('dataCollection/updateEvent', { id: this.eventId, type: this.eventType, modifiedField: 'obviousness', value: result });
+            this.$store.commit('dataCollection/updateEvent', { id: this.eventId, type: this.type, modifiedField: 'obviousness', value: result });
             this.$store.dispatch('updateToastMessages', {
                 message: `Updated obviousness`,
                 type: 'success',
@@ -86,7 +86,7 @@ export default {
         async updateSeverity(severity) {
             let result = await this.executePost('/dataCollection/updateSeverity/' + this.eventId, { severity });
             if (result == this.severity) result = null;
-            this.$store.commit('dataCollection/updateEvent', { id: this.eventId, type: this.eventType, modifiedField: 'severity', value: result });
+            this.$store.commit('dataCollection/updateEvent', { id: this.eventId, type: this.type, modifiedField: 'severity', value: result });
             this.$store.dispatch('updateToastMessages', {
                 message: `Updated severity`,
                 type: 'success',

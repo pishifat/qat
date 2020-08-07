@@ -15,7 +15,7 @@
                         v-for="event in filteredEvents"
                         :key="event.id"
                         :event="event"
-                        :is-outdated="isOutdated(event.beatmapsetId, event.timestamp)"
+                        :is-outdated="isOutdated(event.beatmapsetId, event.time)"
                         :is-max-checks="isMaxChecks(event)"
                     />
                 </transition-group>
@@ -107,20 +107,20 @@ export default {
         }, 600000);
     },
     methods: {
-        isOutdated (beatmapsetId, timestamp) {
-            timestamp = new Date(timestamp);
+        isOutdated (beatmapsetId, time) {
+            time = new Date(time);
 
-            if (timestamp < this.sevenDaysAgo) {
+            if (time < this.sevenDaysAgo) {
                 return true;
             } else {
-                let beatmaps = this.filteredEvents.filter(b => b.beatmapsetId == beatmapsetId && b.timestamp != timestamp);
+                let beatmaps = this.filteredEvents.filter(b => b.beatmapsetId == beatmapsetId && b.time != time);
                 beatmaps = beatmaps.concat(this.overwriteEvents.filter(b => b.beatmapsetId == beatmapsetId));
                 let isOutdated = false;
 
                 for (let i = 0; i < beatmaps.length; i++) {
                     const b = beatmaps[i];
 
-                    if (new Date(b.timestamp) > timestamp) {
+                    if (new Date(b.time) > time) {
                         isOutdated = true;
                         break;
                     }

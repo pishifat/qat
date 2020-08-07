@@ -341,7 +341,7 @@ const notifyQualityAssurance = cron.schedule('0 22 * * 6', async () => {
         const sevenDaysAgo = moment().subtract(7, 'days');
 
         const recentCount = users[i].qualityAssuranceChecks.filter(event =>
-            moment(event.timestamp).isAfter(sevenDaysAgo)
+            moment(event.time).isAfter(sevenDaysAgo)
         ).length;
 
         users[i].recentQualityAssuranceChecks = recentCount;
@@ -499,10 +499,10 @@ const lowActivityTask = cron.schedule('0 23 1 * *', async () => {
 async function findUniqueNominations (initialDate, bn) {
     const events = await Aiess.distinct('beatmapsetId', {
         userId: bn.osuId,
-        eventType: {
-            $in: ['Bubbled', 'Qualified'],
+        type: {
+            $in: ['nominate', 'qualify'],
         },
-        timestamp: {
+        time: {
             $gt: initialDate,
         },
     });

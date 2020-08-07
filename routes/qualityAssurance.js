@@ -26,22 +26,22 @@ router.get('/relevantInfo', async (req, res) => {
     const [events, overwrite] = await Promise.all([
         Aiess
             .find({
-                eventType: 'Qualified',
-                timestamp: { $gte: date },
+                type: 'qualify',
+                time: { $gte: date },
             })
             .populate(defaultPopulate)
-            .sort({ timestamp: -1 }),
+            .sort({ time: -1 }),
 
         Aiess
             .find({
                 $or: [
-                    { eventType: 'Disqualified' },
-                    { eventType: 'Ranked' },
+                    { type: 'disqualify' },
+                    { type: 'rank' },
                 ],
-                timestamp: { $gte: date },
+                time: { $gte: date },
             })
             .populate(defaultPopulate)
-            .sort({ timestamp: -1 }),
+            .sort({ time: -1 }),
     ]);
 
     res.json({
@@ -56,12 +56,12 @@ router.get('/loadMore/:limit/:skip', async (req, res) => {
     date.setDate(date.getDate() - 7);
     const events = await Aiess
         .find({
-            eventType: 'Qualified',
-            timestamp: { $lte: date },
-            hostId: { $exists: true },
+            type: 'qualify',
+            time: { $lte: date },
+            creatorId: { $exists: true },
         })
         .populate(defaultPopulate)
-        .sort({ timestamp: -1 })
+        .sort({ time: -1 })
         .limit(parseInt(req.params.limit))
         .skip(parseInt(req.params.skip));
 
@@ -82,19 +82,19 @@ router.post('/assignUser/:id', middlewares.isBnOrNat, async (req, res) => {
             .findOne({
                 beatmapsetId: event.beatmapsetId,
                 $or: [
-                    { eventType: 'Disqualified' },
-                    { eventType: 'Ranked' },
+                    { type: 'disqualify' },
+                    { type: 'rank' },
                 ],
-                timestamp: { $gte: event.timestamp },
+                time: { $gte: event.time },
             })
-            .sort({ timestamp: -1 }),
+            .sort({ time: -1 }),
 
         Aiess
             .findOne({
                 beatmapsetId: event.beatmapsetId,
-                eventType: 'Bubbled',
+                type: 'nominate',
             })
-            .sort({ timestamp: -1 }),
+            .sort({ time: -1 }),
     ]);
 
     if (outDated) {

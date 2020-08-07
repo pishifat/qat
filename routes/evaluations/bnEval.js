@@ -626,12 +626,12 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
     }
 
     const [uniqueNominations, disqualifications, pops, qualityAssuranceChecks] = await Promise.all([
-        Aiess.getUniqueUserEvents(userOsuId, minDate, maxDate, modes, ['Bubbled', 'Qualified']),
-        Aiess.getUserEvents(userOsuId, minDate, maxDate, modes, ['Disqualified']),
-        Aiess.getUserEvents(userOsuId, minDate, maxDate, modes, ['Popped']),
+        Aiess.getUniqueUserEvents(userOsuId, minDate, maxDate, modes, ['nominate', 'qualify']),
+        Aiess.getUserEvents(userOsuId, minDate, maxDate, modes, ['disqualify']),
+        Aiess.getUserEvents(userOsuId, minDate, maxDate, modes, ['nomination_reset']),
         Aiess.find({
             qualityAssuranceCheckers: mongoId,
-            timestamp: { $gte: minDate, $lte: maxDate },
+            time: { $gte: minDate, $lte: maxDate },
         }).populate({
             path: 'qualityAssuranceComments',
             match: { mediator: mongoId },
@@ -651,7 +651,7 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
             minDate,
             maxDate,
             modes,
-            'Disqualified'
+            'disqualify'
         ),
         Aiess.getRelatedBeatmapsetEvents(
             userOsuId,
@@ -659,13 +659,13 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
             minDate,
             maxDate,
             modes,
-            'Popped'
+            'nomination_reset'
         ),
         Aiess.find({
             userId: { $ne: userOsuId },
             beatmapsetId: { $in: qaBeatmapsetIds },
-            timestamp: { $gte: minDate, $lte: maxDate },
-            eventType: 'Disqualified',
+            time: { $gte: minDate, $lte: maxDate },
+            type: 'disqualify',
         }).populate({
             path: 'qualityAssuranceComments',
             match: { mediator: mongoId },
@@ -677,33 +677,33 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
         Aiess.find({
             userId: { $ne: userOsuId },
             beatmapsetId: { $in: beatmapsetIds },
-            timestamp: { $gte: minDate, $lte: maxDate },
-            eventType: { $in: ['Bubbled', 'Qualified'] },
+            time: { $gte: minDate, $lte: maxDate },
+            type: { $in: ['nominate', 'qualify'] },
         }),
     ]);
 
     // Exclude pops/dqs that happened before this user nomination
     // And pops/dqs that happened after others bns nominated the set (and current bn wasn't involved in the end)
     nominationsPopped = nominationsPopped.filter(pop => {
-        const happenedBefore = uniqueNominations.some(n => n.beatmapsetId == pop.beatmapsetId && n.timestamp < pop.timestamp);
-        const nominationsAfterwards = othersNominations.filter(n => n.beatmapsetId == pop.beatmapsetId && n.timestamp < pop.timestamp);
+        const happenedBefore = uniqueNominations.some(n => n.beatmapsetId == pop.beatmapsetId && n.time < pop.time);
+        const nominationsAfterwards = othersNominations.filter(n => n.beatmapsetId == pop.beatmapsetId && n.time < pop.time);
 
         return !nominationsAfterwards.length && happenedBefore;
     });
     nominationsDisqualified = nominationsDisqualified.filter(dq => {
-        const happenedBefore = uniqueNominations.some(n => n.beatmapsetId == dq.beatmapsetId && n.timestamp < dq.timestamp);
-        const nominationsAfterwards = othersNominations.filter(n => n.beatmapsetId == dq.beatmapsetId && n.timestamp < dq.timestamp);
+        const happenedBefore = uniqueNominations.some(n => n.beatmapsetId == dq.beatmapsetId && n.time < dq.time);
+        const nominationsAfterwards = othersNominations.filter(n => n.beatmapsetId == dq.beatmapsetId && n.time < dq.time);
 
         return nominationsAfterwards.length < 2 && happenedBefore;
     });
     disqualifiedQualityAssuranceChecks = disqualifiedQualityAssuranceChecks.filter(dq =>
-        qualityAssuranceChecks.some(qa => qa.beatmapsetId == dq.beatmapsetId && qa.timestamp < dq.timestamp)
+        qualityAssuranceChecks.some(qa => qa.beatmapsetId == dq.beatmapsetId && qa.time < dq.time)
     );
 
     for (let i = 0; i < disqualifiedQualityAssuranceChecks.length; i++) {
         const event = disqualifiedQualityAssuranceChecks[i];
 
-        const related = qualityAssuranceChecks.find(qa => qa.beatmapsetId == event.beatmapsetId && qa.timestamp < event.timestamp);
+        const related = qualityAssuranceChecks.find(qa => qa.beatmapsetId == event.beatmapsetId && qa.time < event.time);
 
         if (related && related.qualityAssuranceComments.length) {
             disqualifiedQualityAssuranceChecks[i].qualityAssuranceComments = related.qualityAssuranceComments.filter(c => c.mediator.id == mongoId);

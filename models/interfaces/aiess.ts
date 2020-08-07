@@ -6,14 +6,14 @@ interface IAiess {
     _id: any;
     beatmapsetId: number;
     userId: number;
-    postId: number;
-    metadata: string;
+    discussionId: number;
+    artistTitle: string;
     modes: string[];
-    eventType: string;
+    type: string;
     content: string;
-    timestamp: Date;
-    hostId: number;
-    hostName: string;
+    time: Date;
+    creatorId: number;
+    creatorName: string;
     valid: number;
     obviousness: number;
     severity: number;
@@ -29,14 +29,14 @@ interface IAiess {
 
 export interface IAiessDocument extends IAiess, Document { }
 
-interface IAiessByEventType {
+interface IAiessByType {
     _id: string;
     events: IAiess[];
 }
 
 export interface IAiessModel extends Model<IAiessDocument> {
-    getUniqueUserEvents?: (userId: number, minDate: Date, maxDate: Date, modes: string[], eventTypes: string[]) => Aggregate<IAiess[]>;
-    getUserEvents?: (userId: number, minDate: Date, maxDate: Date, modes: string[], eventTypes: string[]) => Aggregate<IAiess[]>;
-    getRelatedBeatmapsetEvents?: (userId: number, beatmapsetIds: number[], minDate: Date, maxDate: Date, modes: string[], eventType: string) => Aggregate<IAiess[]>;
-    getAllActivity?: (minDate: Date, maxDate: Date, mode: string) => Promise<IAiessByEventType[] & { error?: string }>;
+    getUniqueUserEvents?: (userId: number, minDate: Date, maxDate: Date, modes: string[], types: string[]) => Aggregate<IAiess[]>;
+    getUserEvents?: (userId: number, minDate: Date, maxDate: Date, modes: string[], types: string[]) => Aggregate<IAiess[]>;
+    getRelatedBeatmapsetEvents?: (userId: number, beatmapsetIds: number[], minDate: Date, maxDate: Date, modes: string[], type: string) => Aggregate<IAiess[]>;
+    getAllActivity?: (minDate: Date, maxDate: Date, mode: string) => Promise<IAiessByType[] & { error?: string }>;
 }

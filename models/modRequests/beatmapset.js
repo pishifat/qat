@@ -18,8 +18,8 @@ beatmapsetsSchema.virtual('events', {
     localField: 'osuId',
     foreignField: 'beatmapsetId',
     options: {
-        select: 'eventType timestamp',
-        sort: { timestamp: -1 },
+        select: 'type time',
+        sort: { time: -1 },
     },
 });
 

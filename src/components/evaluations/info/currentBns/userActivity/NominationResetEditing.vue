@@ -52,7 +52,7 @@
                 :obviousness="event.obviousness"
                 :severity="event.severity"
                 :event-id="event._id"
-                :event-type="event.eventType"
+                :type="event.type"
             />
         </template>
     </td>
@@ -85,6 +85,7 @@ export default {
         ...mapState([
             'loggedInUser',
         ]),
+        /** @returns {boolean} */
         hasData () {
             if ((this.event.obviousness || this.event.obviousness == 0) && (this.event.severity || this.event.severity == 0)) {
                 return true;
@@ -92,12 +93,14 @@ export default {
                 return false;
             }
         },
+        /** @returns {string} */
         calculateColor () {
             let total = this.event.obviousness + this.event.severity;
             if (total >= 4 || this.event.obviousness == 2 || this.event.severity == 3) return 'text-success';
             else if (total >= 2) return 'text-neutral';
             else return 'text-danger';
         },
+        /** @returns {string | null} */
         userQualityAssuranceComment () {
             if (this.event.qualityAssuranceComments && this.event.qualityAssuranceComments.length) {
                 return this.event.qualityAssuranceComments[0].comment;
@@ -116,7 +119,7 @@ export default {
             const result = await this.executePost('/dataCollection/updateContent/' + this.event._id, { reason: this.newEventContent }, e);
             this.$store.commit('dataCollection/updateEvent', {
                 id: this.event._id,
-                type: this.event.eventType,
+                type: this.event.type,
                 modifiedField: 'content',
                 value: result,
             });

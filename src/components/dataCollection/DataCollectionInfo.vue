@@ -7,12 +7,12 @@
             <p>
                 <b>Mapset:</b>
                 <a
-                    :href="selectedEvent.postId ?
-                        'https://osu.ppy.sh/beatmapsets/' + selectedEvent.beatmapsetId + '/discussion/-/generalAll#/' + selectedEvent.postId :
+                    :href="selectedEvent.discussionId ?
+                        'https://osu.ppy.sh/beatmapsets/' + selectedEvent.beatmapsetId + '/discussion/-/generalAll#/' + selectedEvent.discussionId :
                         'https://osu.ppy.sh/beatmapsets/' + selectedEvent.beatmapsetId + '/discussion/-/events'"
                     target="_blank"
                 >
-                    {{ selectedEvent.metadata }}
+                    {{ selectedEvent.artistTitle }}
                 </a>
             </p>
 
@@ -32,7 +32,7 @@
                 :obviousness="selectedEvent.obviousness"
                 :severity="selectedEvent.severity"
                 :event-id="selectedEvent._id"
-                :event-type="selectedEvent.eventType"
+                :type="selectedEvent.type"
             />
         </div>
     </modal-dialog>
@@ -60,10 +60,11 @@ export default {
         ...mapGetters('dataCollection', [
             'selectedEvent',
         ]),
+        /** @returns {string} */
         title () {
             if (!this.selectedEvent) return '';
 
-            return `Edit ${this.selectedEvent.eventType == 'Disqualified' ? 'disqualification' : 'nomination reset'}`;
+            return `Edit ${this.selectedEvent.type == 'disqualify' ? 'disqualification' : 'nomination reset'}`;
         },
     },
     watch: {
@@ -76,7 +77,7 @@ export default {
             const result = await this.executePost('/dataCollection/updateContent/' + this.selectedEvent.id, { reason: this.newEventContent }, e);
             this.$store.commit('dataCollection/updateEvent', {
                 id: this.selectedEvent.id,
-                type: this.selectedEvent.eventType,
+                type: this.selectedEvent.type,
                 modifiedField: 'content',
                 value: result,
             });

@@ -11,15 +11,15 @@
             >
                 <tr v-for="event in events" :key="event._id">
                     <td class="text-nowrap">
-                        {{ event.timestamp | toMonthDay }}
+                        {{ event.time | toMonthDay }}
                     </td>
                     <td class="w-25">
-                        <a :href="event.postId ? 'https://osu.ppy.sh/beatmapsets/' + event.beatmapsetId + '/discussion/-/generalAll#/' + event.postId : 'https://osu.ppy.sh/beatmapsets/' + event.beatmapsetId + '/discussion/-/events'" target="_blank">
+                        <a :href="event.discussionId ? 'https://osu.ppy.sh/beatmapsets/' + event.beatmapsetId + '/discussion/-/generalAll#/' + event.discussionId : 'https://osu.ppy.sh/beatmapsets/' + event.beatmapsetId + '/discussion/-/events'" target="_blank">
                             <mode-display
                                 :modes="event.modes"
                             />
 
-                            {{ event.metadata }}
+                            {{ event.artistTitle }}
                         </a>
                     </td>
                     <nomination-reset-editing

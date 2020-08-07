@@ -15,12 +15,12 @@ router.get('/relevantInfo', async (req, res) => {
     let data = await Aiess
         .find({
             $or: [
-                { eventType: 'Disqualified' },
-                { eventType: 'Popped' },
+                { type: 'disqualify' },
+                { type: 'nomination_reset' },
             ],
-            timestamp: { $gte: date },
+            time: { $gte: date },
         })
-        .sort({ timestamp: -1 });
+        .sort({ time: -1 });
 
     res.json({
         events: data,

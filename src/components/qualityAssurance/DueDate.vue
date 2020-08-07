@@ -14,14 +14,14 @@
 export default {
     name: 'DueDate',
     props: {
-        timestamp: {
+        time: {
             type: String,
             required: true,
         },
     },
     computed: {
         deadline() {
-            return this.$moment(this.timestamp).add(7, 'days').fromNow();
+            return this.$moment(this.time).add(7, 'days').fromNow();
         },
     },
 };
