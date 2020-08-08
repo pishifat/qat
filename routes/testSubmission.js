@@ -147,7 +147,7 @@ router.post('/submitTest', async (req, res) => {
     );
 
     const twoEvaluationModes = ['catch', 'mania'];
-    const invalids = [8129817, 3178418];
+    const invalids = [8129817, 3178418, 2204515, 2857314];
     const assignedNat = await User.aggregate([
         {
             $match: {
