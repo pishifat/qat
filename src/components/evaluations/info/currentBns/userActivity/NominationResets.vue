@@ -11,7 +11,7 @@
             >
                 <tr v-for="event in events" :key="event._id">
                     <td class="text-nowrap">
-                        {{ event.time | toMonthDay }}
+                        {{ event.timestamp | toMonthDay }}
                     </td>
                     <td class="w-25">
                         <a :href="event.discussionId ? 'https://osu.ppy.sh/beatmapsets/' + event.beatmapsetId + '/discussion/-/generalAll#/' + event.discussionId : 'https://osu.ppy.sh/beatmapsets/' + event.beatmapsetId + '/discussion/-/events'" target="_blank">

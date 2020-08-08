@@ -11,7 +11,7 @@ interface IAiess {
     modes: string[];
     type: string;
     content: string;
-    time: Date;
+    timestamp: Date;
     creatorId: number;
     creatorName: string;
     valid: number;

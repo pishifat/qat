@@ -20,7 +20,7 @@
                 >
                     <!-- date -->
                     <td class="text-nowrap">
-                        {{ event.time | toMonthDay }}
+                        {{ event.timestamp | toMonthDay }}
                     </td>
                     <!-- metadata -->
                     <td>

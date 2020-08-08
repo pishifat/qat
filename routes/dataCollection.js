@@ -18,9 +18,9 @@ router.get('/relevantInfo', async (req, res) => {
                 { type: 'disqualify' },
                 { type: 'nomination_reset' },
             ],
-            time: { $gte: date },
+            timestamp: { $gte: date },
         })
-        .sort({ time: -1 });
+        .sort({ timestamp: -1 });
 
     res.json({
         events: data,

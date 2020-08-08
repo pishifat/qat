@@ -28,7 +28,7 @@
 
                             <due-date
                                 class="col-sm-3 ml-2 ml-sm-0"
-                                :time="event.time"
+                                :timestamp="event.timestamp"
                             />
 
                             <quality-assurance-checkers

@@ -128,7 +128,7 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
             .sort({ username: 1 }),
         Aiess.getAllActivity(minDate, maxDate, req.params.mode),
         BnEvaluation.find({ active: true, mode: req.params.mode }),
-        Aiess.find({ qualityAssuranceCheckers: { $exists: true, $ne: [] }, time: { $gt: minDate } }),
+        Aiess.find({ qualityAssuranceCheckers: { $exists: true, $ne: [] }, timestamp: { $gt: minDate } }),
     ]);
 
     if (allEvents.error) {

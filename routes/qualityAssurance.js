@@ -27,10 +27,10 @@ router.get('/relevantInfo', async (req, res) => {
         Aiess
             .find({
                 type: 'qualify',
-                time: { $gte: date },
+                timestamp: { $gte: date },
             })
             .populate(defaultPopulate)
-            .sort({ time: -1 }),
+            .sort({ timestamp: -1 }),
 
         Aiess
             .find({
@@ -38,10 +38,10 @@ router.get('/relevantInfo', async (req, res) => {
                     { type: 'disqualify' },
                     { type: 'rank' },
                 ],
-                time: { $gte: date },
+                timestamp: { $gte: date },
             })
             .populate(defaultPopulate)
-            .sort({ time: -1 }),
+            .sort({ timestamp: -1 }),
     ]);
 
     res.json({
@@ -57,11 +57,11 @@ router.get('/loadMore/:limit/:skip', async (req, res) => {
     const events = await Aiess
         .find({
             type: 'qualify',
-            time: { $lte: date },
+            timestamp: { $lte: date },
             creatorId: { $exists: true },
         })
         .populate(defaultPopulate)
-        .sort({ time: -1 })
+        .sort({ timestamp: -1 })
         .limit(parseInt(req.params.limit))
         .skip(parseInt(req.params.skip));
 
@@ -85,16 +85,16 @@ router.post('/assignUser/:id', middlewares.isBnOrNat, async (req, res) => {
                     { type: 'disqualify' },
                     { type: 'rank' },
                 ],
-                time: { $gte: event.time },
+                timestamp: { $gte: event.timestamp },
             })
-            .sort({ time: -1 }),
+            .sort({ timestamp: -1 }),
 
         Aiess
             .findOne({
                 beatmapsetId: event.beatmapsetId,
                 type: 'nominate',
             })
-            .sort({ time: -1 }),
+            .sort({ timestamp: -1 }),
     ]);
 
     if (outDated) {

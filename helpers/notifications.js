@@ -341,7 +341,7 @@ const notifyQualityAssurance = cron.schedule('0 22 * * 6', async () => {
         const sevenDaysAgo = moment().subtract(7, 'days');
 
         const recentCount = users[i].qualityAssuranceChecks.filter(event =>
-            moment(event.time).isAfter(sevenDaysAgo)
+            moment(event.timestamp).isAfter(sevenDaysAgo)
         ).length;
 
         users[i].recentQualityAssuranceChecks = recentCount;
@@ -502,7 +502,7 @@ async function findUniqueNominations (initialDate, bn) {
         type: {
             $in: ['nominate', 'qualify'],
         },
-        time: {
+        timestamp: {
             $gt: initialDate,
         },
     });

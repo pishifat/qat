@@ -8,7 +8,7 @@ const aiessSchema = new mongoose.Schema({
     modes: [{ type: String, enum: ['osu', 'taiko', 'catch', 'mania'] }],
     type: { type: String, enum: ['nominate', 'qualify', 'disqualify', 'nomination_reset', 'rank'] },
     content: { type: String },
-    time: { type: Date },
+    timestamp: { type: Date },
     creatorId: { type: Number },
     creatorName: { type: String },
 
@@ -47,7 +47,7 @@ class AiessService extends mongoose.Model
             })
             .replaceRoot('event')
             .sort({
-                time: 1,
+                timestamp: 1,
             });
 
         return aggregation;
@@ -71,15 +71,15 @@ class AiessService extends mongoose.Model
                         $in: types,
                     },
                     $and: [
-                        { time: { $gte: minDate } },
-                        { time: { $lte: maxDate } },
+                        { timestamp: { $gte: minDate } },
+                        { timestamp: { $lte: maxDate } },
                     ],
                     modes: { $in: modes },
                 },
             },
             {
                 $sort: {
-                    time: 1,
+                    timestamp: 1,
                     beatmapsetId: -1,
                 },
             },
@@ -106,15 +106,15 @@ class AiessService extends mongoose.Model
                     },
                     type,
                     $and: [
-                        { time: { $gte: minDate } },
-                        { time: { $lte: maxDate } },
+                        { timestamp: { $gte: minDate } },
+                        { timestamp: { $lte: maxDate } },
                     ],
                     modes: { $in: modes },
                 },
             },
             {
                 $sort: {
-                    time: 1,
+                    timestamp: 1,
                     beatmapsetId: -1,
                 },
             },
@@ -137,8 +137,8 @@ class AiessService extends mongoose.Model
                 {
                     $match: {
                         $and: [
-                            { time: { $gte: minDate } },
-                            { time: { $lte: maxDate } },
+                            { timestamp: { $gte: minDate } },
+                            { timestamp: { $lte: maxDate } },
                         ],
                         type: { $ne: 'rank' },
                         modes: mode,
@@ -146,7 +146,7 @@ class AiessService extends mongoose.Model
                 },
                 {
                     $sort: {
-                        time: 1,
+                        timestamp: 1,
                         beatmapsetId: -1,
                     },
                 },

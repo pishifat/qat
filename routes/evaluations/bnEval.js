@@ -631,7 +631,7 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
         Aiess.getUserEvents(userOsuId, minDate, maxDate, modes, ['nomination_reset']),
         Aiess.find({
             qualityAssuranceCheckers: mongoId,
-            time: { $gte: minDate, $lte: maxDate },
+            timestamp: { $gte: minDate, $lte: maxDate },
         }).populate({
             path: 'qualityAssuranceComments',
             match: { mediator: mongoId },
@@ -664,7 +664,7 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
         Aiess.find({
             userId: { $ne: userOsuId },
             beatmapsetId: { $in: qaBeatmapsetIds },
-            time: { $gte: minDate, $lte: maxDate },
+            timestamp: { $gte: minDate, $lte: maxDate },
             type: 'disqualify',
         }).populate({
             path: 'qualityAssuranceComments',
@@ -677,7 +677,7 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
         Aiess.find({
             userId: { $ne: userOsuId },
             beatmapsetId: { $in: beatmapsetIds },
-            time: { $gte: minDate, $lte: maxDate },
+            timestamp: { $gte: minDate, $lte: maxDate },
             type: { $in: ['nominate', 'qualify'] },
         }),
     ]);
@@ -685,25 +685,25 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
     // Exclude pops/dqs that happened before this user nomination
     // And pops/dqs that happened after others bns nominated the set (and current bn wasn't involved in the end)
     nominationsPopped = nominationsPopped.filter(pop => {
-        const happenedBefore = uniqueNominations.some(n => n.beatmapsetId == pop.beatmapsetId && n.time < pop.time);
-        const nominationsAfterwards = othersNominations.filter(n => n.beatmapsetId == pop.beatmapsetId && n.time < pop.time);
+        const happenedBefore = uniqueNominations.some(n => n.beatmapsetId == pop.beatmapsetId && n.timestamp < pop.timestamp);
+        const nominationsAfterwards = othersNominations.filter(n => n.beatmapsetId == pop.beatmapsetId && n.timestamp < pop.timestamp);
 
         return !nominationsAfterwards.length && happenedBefore;
     });
     nominationsDisqualified = nominationsDisqualified.filter(dq => {
-        const happenedBefore = uniqueNominations.some(n => n.beatmapsetId == dq.beatmapsetId && n.time < dq.time);
-        const nominationsAfterwards = othersNominations.filter(n => n.beatmapsetId == dq.beatmapsetId && n.time < dq.time);
+        const happenedBefore = uniqueNominations.some(n => n.beatmapsetId == dq.beatmapsetId && n.timestamp < dq.timestamp);
+        const nominationsAfterwards = othersNominations.filter(n => n.beatmapsetId == dq.beatmapsetId && n.timestamp < dq.timestamp);
 
         return nominationsAfterwards.length < 2 && happenedBefore;
     });
     disqualifiedQualityAssuranceChecks = disqualifiedQualityAssuranceChecks.filter(dq =>
-        qualityAssuranceChecks.some(qa => qa.beatmapsetId == dq.beatmapsetId && qa.time < dq.time)
+        qualityAssuranceChecks.some(qa => qa.beatmapsetId == dq.beatmapsetId && qa.timestamp < dq.timestamp)
     );
 
     for (let i = 0; i < disqualifiedQualityAssuranceChecks.length; i++) {
         const event = disqualifiedQualityAssuranceChecks[i];
 
-        const related = qualityAssuranceChecks.find(qa => qa.beatmapsetId == event.beatmapsetId && qa.time < event.time);
+        const related = qualityAssuranceChecks.find(qa => qa.beatmapsetId == event.beatmapsetId && qa.timestamp < event.timestamp);
 
         if (related && related.qualityAssuranceComments.length) {
             disqualifiedQualityAssuranceChecks[i].qualityAssuranceComments = related.qualityAssuranceComments.filter(c => c.mediator.id == mongoId);
