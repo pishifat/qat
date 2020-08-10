@@ -40,8 +40,8 @@ async function submitEval (evaluation, session, isNat, behaviorComment, moddingC
             evaluation.mode
         );
 
-        const twoEvaluationModes = ['catch', 'mania'];
-        const threeEvaluationModes = ['osu', 'taiko'];
+        const twoEvaluationModes = ['catch'];
+        const threeEvaluationModes = ['osu', 'taiko', 'mania'];
 
         if (!evaluation.discussion &&
             (

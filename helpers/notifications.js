@@ -138,8 +138,8 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
             description += 'is due in two weeks!';
             generateWebhook = true;
 
-            const twoEvaluationModes = ['catch', 'mania'];
-            //const threeEvaluationModes = ['osu', 'taiko'];
+            const twoEvaluationModes = ['catch'];
+            //const threeEvaluationModes = ['osu', 'taiko', 'mania'];
 
             if (!round.natEvaluators || !round.natEvaluators.length) {
                 const invalids = [8129817, 3178418, 2204515, 2857314];
