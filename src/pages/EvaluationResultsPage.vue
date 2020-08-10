@@ -24,6 +24,14 @@
                 </div>
 
                 <div>
+                    <div v-if="evaluation.kind == 'application' && evaluation.consensus == 'pass'">
+                        <h5>New BN Information</h5>
+                        <p>You will be a Probationary Beatmap Nominator for about one month (exact date of your next evaluation can be seen from your <a :href="'/users?id=' + evaluation.user.id" target="_blank">user card</a>). This means you can only nominate beatmaps that have been nominated by Full Beatmap Nominators and you cannot disqualify maps.</p>
+                        <p>During your evaluation, your activity/attitude/nomination quality will be evaluated by members of the NAT. If each of these areas are satisfactory, you will be promoted to Full Beatmap Nominator. If not, your probation period will be extended for another month or you'll be dismissed from the BN. In that second case, you will not be able to re-apply for another 90 days.</p>
+                        <p>Read the following pages: <a href="https://osu.ppy.sh/help/wiki/People/Beatmap_Nominators/Rules" target="_blank">BN Rules</a>,  <a href="https://osu.ppy.sh/help/wiki/People/Beatmap_Nominators/General_Information" target="_blank">General Information for BNs</a>, and  <a href="https://osu.ppy.sh/help/wiki/People/The_Team/Beatmap_Nominators/Beatmap_Veto" target="_blank">Veto Information</a>.</p>
+                        <p>Follow the golden rule: <b>don't fuck up</b></p>
+                    </div>
+
                     <div v-if="evaluation.feedback">
                         <h5>Feedback</h5>
                         <div class="card card-body small mb-4" v-html="$md.render(evaluation.feedback)" />
