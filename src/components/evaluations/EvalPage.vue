@@ -11,7 +11,7 @@
                         Select all
                     </button>
 
-                    <div class="sort-filter">
+                    <div class="sort-filter sort-filter--small">
                         <span class="sort-filter__title--large">Mark selected as</span>
                         <button class="btn btn-primary btn-sm ml-2" @click="setGroupEval($event)">
                             Group evaluation

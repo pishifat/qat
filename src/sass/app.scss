@@ -61,15 +61,31 @@ section {
 }
 
 .sort-filter {
-    @extend .small, .mt-3, .ml-3;
+    @extend .mt-3, .ml-3;
+
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+
+    &--small {
+        @extend .small;
+    }
 
     &__title {
-        width: 60px; 
+        @extend .small;
+        width: 60px;
         display: inline-block;
 
         &--large {
             width: 120px;
         }
+    }
+
+    &__items {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        flex: 1;
     }
 
     &__item {
@@ -80,7 +96,12 @@ section {
             font-weight: bold;
         }
     }
+}
 
+@include media-breakpoint-down(sm) {
+    .sort-filter {
+        flex-direction: column;
+    }
 }
 
 .avatar-img {

@@ -1,7 +1,7 @@
 <template>
     <section class="card">
         <h5 class="card-header">
-            {{ title }}
+            {{ title }} ({{ requests.length }})
         </h5>
         <div class="card-body">
             <transition-group
@@ -26,6 +26,7 @@
                 </div>
             </transition-group>
         </div>
+        <slot name="footer" />
     </section>
 </template>
 

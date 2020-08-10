@@ -33,10 +33,12 @@
                         </div>
                     </section>
 
-                    <section class="card card-body">
-                        <div class="row">
+                    <section class="card">
+                        <h5 class="card-header">
+                            Mod Requests
+                        </h5>
+                        <div class="card-body row">
                             <div class="col-sm-12">
-                                <h5>Mod Requests</h5>
                                 <p>If you're a mapper, this page lets you submit requests to Beatmap Nominators without asking people individually.</p>
                                 <p>If you're a Beatmap Nominator, this page lets you view maps from a variety of creators and select any that you're interested in modding.</p>
                                 <p><b>Not every beatmap submitted will be modded.</b></p>
@@ -112,29 +114,67 @@
                         </div>
                     </section>
 
+                    <template v-if="ownRequests.length">
+                        <requests-listing
+                            title="My Requests"
+                            :requests="ownRequests"
+                        >
+                            <template v-slot="{ request }">
+                                <my-request-row :request="request" />
+                            </template>
+
+                            <template #footer>
+                                <div class="card-footer text-secondary">
+                                    Please keep in mind:
+
+                                    <ul class="mb-0">
+                                        <li>Comments made aren't mods, just quick notes for reference, if you want a deeper answer talk with the involved BN privately.</li>
+                                        <li>If your request was denied by someone, it doesn't mean that all people think the same. But still better than no answer at all.</li>
+                                    </ul>
+                                </div>
+                            </template>
+                        </requests-listing>
+                    </template>
+
                     <requests-listing
-                        v-if="ownRequests.length"
+                        v-if="involvedRequests.length"
                         v-slot="{ request }"
-                        title="My Requests"
-                        :requests="ownRequests"
+                        title="Requests You're Involved In"
+                        :requests="involvedRequests"
                     >
-                        <my-request-row :request="request" />
+                        <request-row
+                            :request="request"
+                            @update:editing="editing = $event"
+                        />
                     </requests-listing>
 
                     <template v-if="user && user.isFeatureTester">
                         <section class="card card-body">
                             <div class="row">
                                 <div class="col-sm-12">
-                                    <a
-                                        v-for="filter in possibleFilters"
-                                        :key="filter"
-                                        href="#"
-                                        @click.prevent="$store.commit('updateFilters', filter)"
+                                    <div
+                                        v-for="(items, filterType) in possibleFilters"
+                                        :key="filterType"
+                                        class="sort-filter"
                                     >
-                                        <request-tag :class-list="filters.includes(filter) ? 'badge-bright-blue-gray' : 'badge-info'">
-                                            {{ filter }}
-                                        </request-tag>
-                                    </a>
+                                        <div class="sort-filter__title">
+                                            {{ filterType }}
+                                        </div>
+                                        <div class="sort-filter__items">
+                                            <a
+                                                v-for="filter in items"
+                                                :key="filter"
+                                                class="sort-filter__item"
+                                                :class="filters.includes(filter) ? '' : 'sort-filter__item--selected'"
+                                                href="#"
+                                                @click.prevent="$store.commit('updateFilters', filter)"
+                                            >
+                                                <request-tag :class-list="filters.includes(filter) ? 'badge-bright-blue-gray' : 'badge-info'">
+                                                    {{ filter }}
+                                                </request-tag>
+                                            </a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </section>
@@ -191,6 +231,7 @@ export default {
             'possibleFilters',
         ]),
         ...mapGetters([
+            'involvedRequests',
             'filteredRequests',
         ]),
     },

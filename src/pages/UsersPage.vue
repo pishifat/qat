@@ -6,32 +6,34 @@
                 :options="['', 'osu', 'taiko', 'catch', 'mania']"
                 store-module="users"
             >
-                <div class="sort-filter">
+                <div class="sort-filter sort-filter--small">
                     <span class="sort-filter__title">Sort by</span>
-                    <a
-                        class="sort-filter__item"
-                        :class="sort.type === 'username' ? 'sort-filter__item--selected' : ''"
-                        href="#"
-                        @click.prevent="updateSorting('username')"
-                    >
-                        Name
-                    </a>
-                    <a
-                        class="sort-filter__item"
-                        :class="sort.type === 'bnDuration' ? 'sort-filter__item--selected' : ''"
-                        href="#"
-                        @click.prevent="updateSorting('bnDuration')"
-                    >
-                        Time as BN
-                    </a>
-                    <a
-                        class="sort-filter__item"
-                        :class="sort.type === 'natDuration' ? 'sort-filter__item--selected' : ''"
-                        href="#"
-                        @click.prevent="updateSorting('natDuration')"
-                    >
-                        Time as NAT
-                    </a>
+                    <div class="sort-filter__items">
+                        <a
+                            class="sort-filter__item"
+                            :class="sort.type === 'username' ? 'sort-filter__item--selected' : ''"
+                            href="#"
+                            @click.prevent="updateSorting('username')"
+                        >
+                            Name
+                        </a>
+                        <a
+                            class="sort-filter__item"
+                            :class="sort.type === 'bnDuration' ? 'sort-filter__item--selected' : ''"
+                            href="#"
+                            @click.prevent="updateSorting('bnDuration')"
+                        >
+                            Time as BN
+                        </a>
+                        <a
+                            class="sort-filter__item"
+                            :class="sort.type === 'natDuration' ? 'sort-filter__item--selected' : ''"
+                            href="#"
+                            @click.prevent="updateSorting('natDuration')"
+                        >
+                            Time as NAT
+                        </a>
+                    </div>
                     <!-- uncomment after importing ex BNs
                     <button v-if="!showOldUsers" class="btn btn-primary btn-sm ml-2 float-right" @click="loadPreviousBnAndNat($event)">
                         Show previous BN/NAT

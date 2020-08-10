@@ -7,6 +7,18 @@ import ModRequests from './pages/ModRequests.vue';
 
 Vue.use(Vuex);
 
+/**
+ * Check if there's any mode remaning after applying the modes filters
+ * @param {array} filters
+ * @param {array} beatmapModes
+ * @returns {boolean}
+ */
+function checkModes(filters, beatmapModes) {
+    const filteredModes = beatmapModes.filter(m => filters.includes(m));
+
+    return filteredModes.length === beatmapModes.length;
+}
+
 const store = new Vuex.Store({
     state: {
         user: null,
@@ -17,25 +29,42 @@ const store = new Vuex.Store({
             'ranked',
             'qualified',
         ],
-        possibleFilters: [
-            'osu',
-            'taiko',
-            'fruits',
-            'mania',
-            'hasRankedMaps',
-            'long',
-            'short',
-            'simple',
-            'tech',
-            'doubleBpm',
-            'conceptual',
-            'slow',
-            'average',
-            'fast',
-            'ranked',
-            'qualified',
-            'bubbled',
-        ],
+        possibleFilters: {
+            Mode: [
+                'osu',
+                'taiko',
+                'fruits',
+                'mania',
+            ],
+            Length: [
+                'long',
+                'short',
+            ],
+            Category: [
+                'simple',
+                'tech',
+                'doubleBpm',
+                'conceptual',
+            ],
+            BPM: [
+                'slow',
+                'average',
+                'fast',
+            ],
+            Status: [
+                'ranked',
+                'qualified',
+                'bubbled',
+            ],
+            Reviews: [
+                'not reviewed',
+                'denied',
+                'accepted',
+            ],
+            Others: [
+                'hasRankedMaps',
+            ],
+        },
     },
     mutations: {
         setInitialData (state, payload) {
@@ -53,16 +82,17 @@ const store = new Vuex.Store({
         },
     },
     getters: {
+        involvedRequests (state) {
+            if (!state.user) return [];
+
+            return state.requests.filter(r => r.modReviews.some(r => r.user.id === state.user.id));
+        },
         filteredRequests (state) {
             return state.requests.filter(r => {
                 const lastEvent = r.beatmapset.events.length && r.beatmapset.events[0];
 
                 if (
-                    (state.filters.includes('osu') && r.beatmapset.modes.includes('osu')) ||
-                    (state.filters.includes('taiko') && r.beatmapset.modes.includes('taiko')) ||
-                    (state.filters.includes('mania') && r.beatmapset.modes.includes('mania')) ||
-                    (state.filters.includes('fruits') && r.beatmapset.modes.includes('fruits')) ||
-                    (state.filters.includes('hasRankedMaps') && r.user.rankedBeatmapsets > 0) ||
+                    checkModes(state.filters, r.beatmapset.modes) ||
                     (state.filters.includes('long') && r.beatmapset.totalLengthString === 'long') ||
                     (state.filters.includes('short') && r.beatmapset.totalLengthString === 'short') ||
                     (state.filters.includes('simple') && r.category === 'simple') ||
@@ -79,7 +109,11 @@ const store = new Vuex.Store({
                             (state.filters.includes('qualified') && lastEvent.type === 'qualify') ||
                             (state.filters.includes('bubbled') && lastEvent.type === 'nominate')
                         )
-                    )
+                    ) ||
+                    (state.filters.includes('not reviewed') && r.modReviews.length === 0) ||
+                    (state.filters.includes('denied') && r.modReviews.some(r => r.action === 'denied')) ||
+                    (state.filters.includes('accepted') && r.modReviews.some(r => r.action === 'accepted')) ||
+                    (state.filters.includes('hasRankedMaps') && r.user.rankedBeatmapsets > 0)
                 ) {
                     return false;
                 }
