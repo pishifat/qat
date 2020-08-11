@@ -10,29 +10,27 @@ router.use(middlewares.hasFullReadAccess);
 const defaultPopulate = [{ path: 'user', select: 'username' }];
 
 router.get('/search', async (req, res) => {
+    let errors = [];
+
+    if (req.session.osuId == 1052994 || req.session.osuId == 3178418) {
+        errors = await Logger
+            .find({ isError: true })
+            .populate(defaultPopulate)
+            .sort({ createdAt: -1 })
+            .limit(100)
+            .skip(parseInt(req.params.skip));
+    }
+
     res.json({
+        errors,
         logs: await Logger
-            .find({})
+            .find({ isError: false })
+            .select('user action category relatedId createdAt')
             .populate(defaultPopulate)
             .sort({ createdAt: -1 })
             .limit(100)
             .skip(parseInt(req.query.skip) || 0),
     });
-});
-
-router.get('/showErrors', async (req, res) => {
-    if (req.session.osuId == 1052994 || req.session.osuId == 3178418) {
-        res.json(
-            await Logger
-                .find({ isError: true })
-                .populate(defaultPopulate)
-                .sort({ createdAt: -1 })
-                .limit(100)
-                .skip(parseInt(req.params.skip))
-        );
-    } else {
-        res.redirect('/');
-    }
 });
 
 module.exports = router;

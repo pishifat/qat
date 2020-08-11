@@ -1,5 +1,36 @@
 <template>
     <div class="card card-body">
+        <template v-if="loggedInUser.osuId == 1052994 || loggedInUser.osuId == 3178418">
+            <a class="btn btn-primary mb-2" data-toggle="collapse" href="#collapseErrors">
+                Show errors
+            </a>
+
+            <data-table
+                id="collapseErrors"
+                :headers="['date', 'user', 'action', 'stack', 'extra']"
+            >
+                <tr v-for="log in errors" :key="log.id">
+                    <td>
+                        {{ log.createdAt }} GMT
+                    </td>
+                    <td>
+                        {{ (log.user && log.user.username) || 'Anonymous' }}
+                    </td>
+                    <td>
+                        {{ log.action | shorten }}
+                    </td>
+                    <td>
+                        {{ log.stack | shorten }}
+                    </td>
+                    <td>
+                        {{ log.extraInfo | shorten }}
+                    </td>
+                </tr>
+            </data-table>
+
+            <hr>
+        </template>
+
         <data-table
             :headers="['date', 'user', 'action']"
         >
@@ -32,6 +63,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import postData from '../mixins/postData';
 import ToastMessages from '../components/ToastMessages.vue';
 import DataTable from '../components/DataTable.vue';
@@ -46,14 +78,19 @@ export default {
     data () {
         return {
             logs: [],
+            errors: [],
             skip: 100,
         };
     },
+    computed: mapState([
+        'loggedInUser',
+    ]),
     async created () {
         const data = await this.initialRequest(`/logs/search`);
 
         if (!data.error) {
             this.logs = data.logs;
+            this.errors = data.errors;
         }
     },
     methods: {

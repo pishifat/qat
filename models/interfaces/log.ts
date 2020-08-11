@@ -10,5 +10,6 @@ interface ILogDocument extends Document {
 }
 
 export default interface ILogModel extends Model<ILogDocument> { 
-    generate?: (userId: number, action: string, category: string, relatedId?: any) => Promise<void>;
+    generate?: (userId: string, action: string, category: string, relatedId?: any) => Promise<void>;
+    generateError?: (action: string, stack: string, extraInfo: string, userId?: string) => Promise<void>;
 }

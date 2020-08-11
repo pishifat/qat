@@ -1,13 +1,31 @@
 const mongoose = require('mongoose');
 
-let logSchema = new mongoose.Schema({
+const logSchema = new mongoose.Schema({
     user: { type: 'ObjectId', ref: 'User' },
     action: { type: String, required: true },
-    category: { type: String, enum: ['account', 'user', 'application', 'appEvaluation', 'bnEvaluation', 'dataCollection', 'discussionVote', 'report', 'test', 'qualityAssurance', 'veto'] },
+    category: {
+        type: String,
+        enum: [
+            'account',
+            'user',
+            'application',
+            'appEvaluation',
+            'bnEvaluation',
+            'dataCollection',
+            'discussionVote',
+            'report',
+            'test',
+            'qualityAssurance',
+            'veto',
+        ],
+    },
     relatedId: { type: 'ObjectId' },
-    isError: { type: Boolean, default: false },
-}, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
+    // For errors
+    isError: { type: Boolean, default: false },
+    stack: { type: String },
+    extraInfo: { type: String },
+}, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 class LogService
 {
@@ -25,6 +43,24 @@ class LogService
             action,
             category,
             relatedId,
+        });
+        log.save();
+    }
+
+    /**
+     *
+     * @param {string} action short comment
+     * @param {string} stack
+     * @param {string} extraInfo any extra info as object
+     * @param {string} [userId] UserId of the action
+     */
+    static generateError(action, stack, extraInfo, userId) {
+        const log = new Log({
+            action,
+            stack,
+            extraInfo,
+            user: userId,
+            isError: true,
         });
         log.save();
     }

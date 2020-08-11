@@ -1,5 +1,4 @@
 const express = require('express');
-const http = require('http');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
@@ -19,6 +18,7 @@ mongoose.plugin(schema => {
     });
 });
 
+const Logger = require('./models/log');
 const notifications = require('./helpers/notifications');
 const indexRouter = require('./routes/index');
 const bnAppRouter = require('./routes/bnApp');
@@ -112,9 +112,14 @@ app.use(function(err, req, res, next) {
 
     // set locals, only providing error in development
     res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
+    res.locals.error = {};
 
-    // render the error page or return error obj for json
+    if (req.app.get('env') === 'development') {
+        console.log(err);
+        res.locals.error = err;
+    }
+
+    // render the error page or return json error obj
     if (req.accepts(['html', 'json']) === 'json') {
         res.json({ error: err.message || 'Something went wrong!' });
     } else if (err instanceof UnauthorizedError) {
@@ -123,6 +128,13 @@ app.use(function(err, req, res, next) {
         res.status(err.status || 500);
         res.render('error');
     }
+
+    Logger.generateError(
+        err.message,
+        err.stack,
+        JSON.stringify(err.response),
+        req.session.mongoId
+    );
 });
 
 
@@ -130,13 +142,7 @@ app.use(function(err, req, res, next) {
 const port = process.env.PORT || '3001';
 app.set('port', port);
 
-const server = http.createServer(app);
-
-server.listen(port);
-server.on('error', (error) => {
-    console.log(error);
-});
-server.on('listening', () => {
+app.listen(port, () => {
     console.log('Listening on ' + port);
     notifications.notifyDeadlines.start();
     notifications.notifyBeatmapReports.start();
