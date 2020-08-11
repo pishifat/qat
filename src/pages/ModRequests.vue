@@ -128,8 +128,8 @@
                                     Please keep in mind:
 
                                     <ul class="mb-0">
-                                        <li>Comments made aren't mods, just quick notes for reference, if you want a deeper answer talk with the involved BN privately.</li>
-                                        <li>If your request was denied by someone, it doesn't mean that all people think the same. But still better than no answer at all.</li>
+                                        <li>Comments are quick reference notes, NOT mods. If you want a deeper explanation talk with the involved BN privately.</li>
+                                        <li>If your request was denied by someone, other BNs can still accept it. A denial is better than no response! :)</li>
                                     </ul>
                                 </div>
                             </template>

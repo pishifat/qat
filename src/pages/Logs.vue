@@ -2,11 +2,12 @@
     <div class="card card-body">
         <template v-if="loggedInUser.osuId == 1052994 || loggedInUser.osuId == 3178418">
             <a class="btn btn-primary mb-2" data-toggle="collapse" href="#collapseErrors">
-                Show errors
+                Toggle error logs
             </a>
 
             <data-table
                 id="collapseErrors"
+                class="collapse"
                 :headers="['date', 'user', 'action', 'stack', 'extra']"
             >
                 <tr v-for="log in errors" :key="log.id">
