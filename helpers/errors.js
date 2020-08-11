@@ -1,8 +1,3 @@
-class UnauthorizedError extends Error {
-    status = 401;
-    message = 'Unauthorized - Login first';
-}
-
 class OsuResponseError extends Error {
     constructor(response = {}, ...params) {
         super(...params);
@@ -18,6 +13,5 @@ class OsuResponseError extends Error {
 }
 
 module.exports = {
-    UnauthorizedError,
     OsuResponseError,
 };

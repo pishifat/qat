@@ -2,7 +2,15 @@
 const User = require('../models/user');
 const { refreshToken } = require('./osu');
 const { setSession } = require('./util');
-const { UnauthorizedError } = require('./errors');
+const { OsuResponseError } = require('./errors');
+
+function unauthorize(req, res) {
+    if (req.accepts(['html', 'json']) === 'json') {
+        res.json({ error: 'Unauthorized - Login first' });
+    } else {
+        res.redirect('/');
+    }
+}
 
 async function isLoggedIn(req, res, next) {
     if (!req.session.mongoId) {
@@ -10,7 +18,7 @@ async function isLoggedIn(req, res, next) {
             req.session.lastPage = req.originalUrl;
         }
 
-        throw new UnauthorizedError;
+        return unauthorize(req, res);
     }
 
     const u = await User.findById(req.session.mongoId);
@@ -26,7 +34,7 @@ async function isLoggedIn(req, res, next) {
         if (response.error) {
             req.session.destroy();
 
-            return res.redirect('/');
+            throw new OsuResponseError(response, 'Error refreshing token');
         }
 
         setSession(req.session, response);
@@ -38,28 +46,28 @@ async function isLoggedIn(req, res, next) {
 
 function isBnOrNat(req, res, next) {
     const u = res.locals.userRequest;
-    if (!u.isBnOrNat) throw new UnauthorizedError;
+    if (!u.isBnOrNat) return unauthorize(req, res);
 
     next();
 }
 
 function isNat(req, res, next) {
     const u = res.locals.userRequest;
-    if (!u.isNat) throw new UnauthorizedError;
+    if (!u.isNat) return unauthorize(req, res);
 
     next();
 }
 
 function hasBasicAccess(req, res, next) {
     const u = res.locals.userRequest;
-    if (!u.hasBasicAccess) throw new UnauthorizedError;
+    if (!u.hasBasicAccess) return unauthorize(req, res);
 
     next();
 }
 
 function hasFullReadAccess(req, res, next) {
     const u = res.locals.userRequest;
-    if (!u.hasFullReadAccess) throw new UnauthorizedError;
+    if (!u.hasFullReadAccess) return unauthorize(req, res);
 
     next();
 }
