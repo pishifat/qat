@@ -1,107 +1,67 @@
 
 const User = require('../models/user');
 const { refreshToken } = require('./osu');
+const { setSession } = require('./util');
+const { UnauthorizedError } = require('./errors');
 
 async function isLoggedIn(req, res, next) {
-    if (req.session.mongoId) {
-        const u = await User.findById(req.session.mongoId);
+    if (!req.session.mongoId) {
+        if (req.accepts(['html', 'json']) !== 'json') {
+            req.session.lastPage = req.originalUrl;
+        }
 
-        if (!u) {
+        throw new UnauthorizedError;
+    }
+
+    const u = await User.findById(req.session.mongoId);
+
+    if (!u) {
+        return res.redirect('/');
+    }
+
+    // Refresh if less than 1 hours left for some possible edge cases
+    if (new Date() > new Date(req.session.expireDate - (1 * 3600 * 1000))) {
+        const response = await refreshToken(req.session.refreshToken);
+
+        if (response.error) {
+            req.session.destroy();
+
             return res.redirect('/');
         }
 
-        // Refresh if less than 10 hours left
-        if (new Date() > new Date(req.session.expireDate - (10 * 3600 * 1000))) {
-            const response = await refreshToken(req.session.refreshToken);
-
-            if (!response || response.error) {
-                req.session.destroy();
-                res.redirect('/');
-            }
-
-            // *1000 because maxAge is miliseconds, oauth is seconds
-            req.session.cookie.maxAge = response.expires_in * 2 * 1000;
-            req.session.expireDate = Date.now() + (response.expires_in * 1000);
-            req.session.accessToken = response.access_token;
-            req.session.refreshToken = response.refresh_token;
-        }
-
-        res.locals.userRequest = u;
-        next();
-    } else {
-        if (req.accepts(['html', 'json']) === 'html') {
-            req.session.lastPage = req.originalUrl;
-            res.redirect('/');
-        } else {
-            res.json({
-                error: 'Unauthorized',
-            });
-        }
+        setSession(req.session, response);
     }
+
+    res.locals.userRequest = u;
+    next();
 }
 
 function isBnOrNat(req, res, next) {
     const u = res.locals.userRequest;
+    if (!u.isBnOrNat) throw new UnauthorizedError;
 
-    if (u.isBnOrNat) {
-        next();
-    } else {
-        if (req.accepts(['html', 'json']) === 'html') {
-            res.redirect('/');
-        } else {
-            res.json({
-                error: 'Unauthorized',
-            });
-        }
-    }
+    next();
 }
 
 function isNat(req, res, next) {
     const u = res.locals.userRequest;
+    if (!u.isNat) throw new UnauthorizedError;
 
-    if (u.isNat) {
-        next();
-    } else {
-        if (req.accepts(['html', 'json']) === 'html') {
-            res.redirect('/');
-        } else {
-            res.json({
-                error: 'Unauthorized',
-            });
-        }
-    }
+    next();
 }
 
 function hasBasicAccess(req, res, next) {
     const u = res.locals.userRequest;
+    if (!u.hasBasicAccess) throw new UnauthorizedError;
 
-    if (u.hasBasicAccess) {
-        next();
-    } else {
-        if (req.accepts(['html', 'json']) === 'html') {
-            res.redirect('/');
-        } else {
-            res.json({
-                error: 'Unauthorized',
-            });
-        }
-    }
+    next();
 }
 
 function hasFullReadAccess(req, res, next) {
     const u = res.locals.userRequest;
+    if (!u.hasFullReadAccess) throw new UnauthorizedError;
 
-    if (u.hasFullReadAccess) {
-        next();
-    } else {
-        if (req.accepts(['html', 'json']) === 'html') {
-            res.redirect('/');
-        } else {
-            res.json({
-                error: 'Unauthorized',
-            });
-        }
-    }
+    next();
 }
 
 module.exports = {

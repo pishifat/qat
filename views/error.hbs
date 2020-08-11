@@ -1,5 +1,26 @@
-<div id="push">
-<h1>{{message}}</h1>
-<h2 class="text-white">{{error.status}}</h2>
-<pre class="text-white">{{error.stack}}</pre>
-</div>
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Oops</title>
+    <link rel="icon" type="image/png" href="/images/qatlogo.png">
+    <link href="/css/app.css" rel="stylesheet">
+</head>
+
+<body class="body-triangles">
+
+    <div class="container py-4 vh-100 align-items-center d-flex justify-content-center">
+        <section class="card card-body">
+            <h1 class="text-center">{{message}}</h1>
+            <h2 class="text-secondary text-center">{{error.status}}</h2>
+            <pre class="text-secondary">{{error.stack}}</pre>
+        </section>
+    </div>
+
+</body>
+
+</html>

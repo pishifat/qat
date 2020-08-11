@@ -4,6 +4,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mongoose = require('mongoose');
+const { UnauthorizedError } = require('./helpers/errors');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const config = require('./config.json');
@@ -116,6 +117,8 @@ app.use(function(err, req, res, next) {
     // render the error page or return error obj for json
     if (req.accepts(['html', 'json']) === 'json') {
         res.json({ error: err.message || 'Something went wrong!' });
+    } else if (err instanceof UnauthorizedError) {
+        res.redirect('/');
     } else {
         res.status(err.status || 500);
         res.render('error');

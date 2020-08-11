@@ -7,6 +7,8 @@ const osu = require('../helpers/osu');
 const User = require('../models/user');
 const Logger = require('../models/log');
 const BnEvaluation = require('../models/evaluations/bnEvaluation');
+const { setSession } = require('../helpers/util');
+const { OsuResponseError } = require('../helpers/errors');
 
 const router = express.Router();
 
@@ -95,18 +97,14 @@ router.get('/callback', async (req, res) => {
     let response = await osu.getToken(req.query.code);
 
     if (response.error) {
-        res.status(500).render('error', { message: response.error });
+        throw new OsuResponseError(response, 'Error on getting token');
     } else {
-        // *1000 because maxAge is miliseconds, oauth is seconds
-        req.session.cookie.maxAge = response.expires_in * 2 * 1000;
-        req.session.expireDate = Date.now() + (response.expires_in * 1000);
-        req.session.accessToken = response.access_token;
-        req.session.refreshToken = response.refresh_token;
-
+        setSession(req.session, response);
         response = await osu.getUserInfo(req.session.accessToken);
 
         if (response.error) {
-            return res.status(500).render('error');
+            req.session.destroy();
+            throw new OsuResponseError(response, 'Error on getting user info');
         }
 
         const groupIds = response.groups.map(g => g.id);

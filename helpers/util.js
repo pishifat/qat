@@ -1,3 +1,5 @@
+const moment = require('moment');
+
 /**
  * Just replaces () and [] for now..
  * @param {string} username
@@ -72,8 +74,25 @@ function shorten(text, length) {
     return text;
 }
 
+/**
+ * Halt a process
+ * @param {number} ms
+ */
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-module.exports = { escapeUsername, getBeatmapsetIdFromUrl, isValidUrl, isValidUrlOrThrow, shorten, sleep };
+/**
+ * Set tokens and session age
+ * @param {object} session
+ * @param {object} response
+ */
+function setSession(session, response) {
+    // *1000 because maxAge is miliseconds, oauth is seconds
+    session.cookie.maxAge = moment.duration(7, 'days').asMilliseconds();
+    session.expireDate = Date.now() + (response.expires_in * 1000);
+    session.accessToken = response.access_token;
+    session.refreshToken = response.refresh_token;
+}
+
+module.exports = { escapeUsername, getBeatmapsetIdFromUrl, isValidUrl, isValidUrlOrThrow, shorten, sleep, setSession };
