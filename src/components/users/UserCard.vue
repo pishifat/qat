@@ -4,7 +4,7 @@
             class="card card-individual"
             data-toggle="modal"
             data-target="#extendedInfo"
-            :class="`card-bg-${user.probationModes.length && !user.isNat ? 'probation' : user.groups[0]}`"
+            :class="`card-bg-${user.probationModes.length && !user.isNat ? 'probation' : user.groups.includes('bn') ? 'bn' : user.groups.includes('nat') ? 'nat' : ''}`"
         >
             <img :src="'https://a.ppy.sh/' + user.osuId" class="card-avatar-img">
             <div class="card-body">
