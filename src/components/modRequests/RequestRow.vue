@@ -41,7 +41,7 @@
                 </request-tag>
                 <request-tag
                     v-else
-                    class-list="badge-danger"
+                    class-list="badge-warning"
                 >
                     Denied ({{ deniedReviews.length }})
                 </request-tag>
