@@ -42,7 +42,7 @@
                     name="vote"
                     value="1"
                 >
-                <label class="form-check-label text-pass" for="1">Pass</label>
+                <label class="form-check-label text-pass" for="1">{{ isApplication ? 'Pass' : 'Full BN' }}</label>
             </div>
             <div class="form-check form-check-inline">
                 <input
@@ -53,7 +53,7 @@
                     name="vote"
                     value="2"
                 >
-                <label class="form-check-label text-neutral" for="2">{{ isApplication ? 'Neutral' : 'Probation' }}</label>
+                <label class="form-check-label text-neutral" for="2">{{ isApplication ? 'Neutral' : 'Probation BN' }}</label>
             </div>
             <div class="form-check form-check-inline">
                 <input
@@ -64,7 +64,7 @@
                     name="vote"
                     value="3"
                 >
-                <label class="form-check-label text-fail" for="3">Fail</label>
+                <label class="form-check-label text-fail" for="3">{{ isApplication ? 'Fail' : 'Remove from BN' }}</label>
             </div>
 
             <button class="btn btn-sm btn-primary" @click="submitEval($event)">

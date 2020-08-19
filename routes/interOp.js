@@ -54,7 +54,7 @@ router.get('/bnRemoval/:osuId', async (req, res) => {
         return res.status(404).send('User has no BN removal logged');
     }
 
-    res.json(latestEvalRound.resignedOnGoodTerms || latestEvalRound.resignedOnStandardTerms ? 'Resigned' : 'Kicked');
+    res.json(latestEvalRound.addition == 'resignedOnGoodTerms' || latestEvalRound.addition == 'resignedOnStandardTerms' ? 'Resigned' : 'Kicked');
 });
 
 /* GET events for beatmapsetID */

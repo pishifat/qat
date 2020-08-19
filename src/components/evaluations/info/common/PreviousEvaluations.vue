@@ -27,8 +27,11 @@
                     {{ evaluation.kind === 'application' ? "APPLICATION" : "BN EVAL" }}
                 </router-link>
                 -
-                <span :class="'text-' + evaluation.consensus">
+                <span :class="consensusColor(evaluation.consensus)">
                     {{ evaluation.consensus.toUpperCase() }}
+                </span>
+                <span v-if="evaluation.addition" :class="consensusColor(evaluation.consensus)">
+                    + {{ evaluation.addition.toUpperCase() }}
                 </span>
 
                 <div v-if="evaluation.feedback" v-html="$md.render(evaluation.feedback)" />
@@ -76,6 +79,22 @@ export default {
             if (data) {
                 this.previousEvaluations = data.previousEvaluations;
                 this.isLoading = false;
+            }
+        },
+        consensusColor(consensus) {
+            switch (consensus) {
+                case 'pass':
+                    return 'text-pass';
+                case 'fullBn':
+                    return 'text-pass';
+                case 'fail':
+                    return 'text-fail';
+                case 'removeFromBn':
+                    return 'text-fail';
+                case 'probationBn':
+                    return 'text-probation';
+                default:
+                    return '';
             }
         },
     },

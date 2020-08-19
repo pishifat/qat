@@ -4,74 +4,78 @@
             <b>Consensus:</b>
             <span
                 v-if="selectedEvaluation.consensus"
+                class="mr-2"
                 :class="consensusColor"
             >
                 {{ consensusText }}
             </span>
             <span v-if="selectedEvaluation.active">
                 <button
-                    class="btn btn-sm btn-pass ml-2"
-                    :disabled="selectedEvaluation.consensus == 'pass' && !selectedEvaluation.isLowActivity"
-                    @click="setConsensus('pass', $event);"
+                    class="btn btn-sm btn-pass"
+                    :disabled="selectedEvaluation.consensus == 'pass' || selectedEvaluation.consensus == 'fullBn'"
+                    @click="setConsensus(isApplication ? 'pass' : 'fullBn', $event);"
                 >
-                    Pass
+                    {{ isApplication ? 'Pass' : 'Full BN' }}
                 </button>
                 <button
                     v-if="!isApplication"
                     class="btn btn-sm btn-probation"
-                    :disabled="selectedEvaluation.consensus == 'probation'"
-                    @click="setConsensus('probation', $event);"
+                    :disabled="selectedEvaluation.consensus == 'probationBn'"
+                    @click="setConsensus('probationBn', $event);"
                 >
-                    Probation
+                    Probation BN
                 </button>
                 <button
                     class="btn btn-sm btn-fail"
-                    :disabled="selectedEvaluation.consensus == 'fail' && !selectedEvaluation.resignedOnGoodTerms && !selectedEvaluation.resignedOnStandardTerms"
-                    @click="setConsensus('fail', $event);"
+                    :disabled="selectedEvaluation.consensus == 'fail' || selectedEvaluation.consensus == 'removeFromBn'"
+                    @click="setConsensus(isApplication ? 'fail' : 'removeFromBn', $event);"
                 >
-                    Fail
+                    {{ isApplication ? 'Fail' : 'Remove from BN' }}
                 </button>
             </span>
         </p>
 
-        <p v-if="selectedEvaluation.active && !isApplication">
-            <button
-                class="btn btn-sm btn-primary mt-2"
-                :disabled="selectedEvaluation.consensus == 'fail' && selectedEvaluation.resignedOnGoodTerms"
-                @click="setConsensus('fail', $event, 'resignedOnGoodTerms');"
+        <p v-if="!isApplication && selectedEvaluation.consensus !== 'probationBn'">
+            <b>Addition:</b>
+            <span
+                class="mr-2"
+                :class="consensusColor"
             >
-                Resign on good terms
-            </button>
-            <button
-                class="btn btn-sm btn-primary mt-2"
-                :disabled="selectedEvaluation.consensus == 'fail' && selectedEvaluation.resignedOnStandardTerms"
-                @click="setConsensus('fail', $event, 'resignedOnStandardTerms');"
-            >
-                Resign on standard terms
-            </button>
-            <button
-                class="btn btn-sm btn-primary mt-2"
-                :disabled="selectedEvaluation.consensus == 'pass' && selectedEvaluation.isLowActivity"
-                @click="setConsensus('pass', $event, 'isLowActivity');"
-            >
-                Low activity warning
-            </button>
-            <button
-                v-if="selectedEvaluation.user.isBn"
-                class="btn btn-sm btn-primary mt-2"
-                :disabled="selectedEvaluation.isMoveToNat"
-                @click="setConsensus('pass', $event, 'isMoveToNat');"
-            >
-                Move to NAT
-            </button>
-            <button
-                v-else
-                class="btn btn-sm btn-primary mt-2"
-                :disabled="selectedEvaluation.isMoveToBn"
-                @click="setConsensus('pass', $event, 'isMoveToBn');"
-            >
-                Move to BN
-            </button>
+                {{ additionText }}
+            </span>
+            <span v-if="selectedEvaluation.active">
+                <button
+                    v-if="selectedEvaluation.consensus == 'removeFromBn'"
+                    class="btn btn-sm btn-primary"
+                    :disabled="selectedEvaluation.addition == 'resignedOnGoodTerms'"
+                    @click="setAddition('resignedOnGoodTerms', $event);"
+                >
+                    Resign on good terms
+                </button>
+                <button
+                    v-if="selectedEvaluation.consensus == 'removeFromBn'"
+                    class="btn btn-sm btn-primary"
+                    :disabled="selectedEvaluation.addition == 'resignedOnStandardTerms'"
+                    @click="setAddition('resignedOnStandardTerms', $event);"
+                >
+                    Resign on standard terms
+                </button>
+                <button
+                    v-if="selectedEvaluation.consensus == 'fullBn'"
+                    class="btn btn-sm btn-primary"
+                    :disabled="selectedEvaluation.addition == 'lowActivity'"
+                    @click="setAddition('lowActivity', $event);"
+                >
+                    Low activity warning
+                </button>
+                <button
+                    class="btn btn-sm btn-primary"
+                    :disabled="!selectedEvaluation.addition || selectedEvaluation.addition == 'none'"
+                    @click="setAddition('none', $event);"
+                >
+                    None
+                </button>
+            </span>
         </p>
     </div>
 </template>
@@ -89,50 +93,75 @@ export default {
             'isApplication',
         ]),
         consensusText() {
-            if (!this.selectedEvaluation.consensus) {
-                return 'none';
-            } else if (this.selectedEvaluation.consensus == 'pass') {
-                if (this.selectedEvaluation.isLowActivity) {
-                    return 'pass + low activity warning';
-                } else if (this.selectedEvaluation.isMoveToNat) {
-                    return 'pass + move to NAT';
-                } else if (this.selectedEvaluation.isMoveToBn) {
-                    return 'pass + move to BN';
-                } else {
-                    return this.selectedEvaluation.consensus;
-                }
-            } else if (this.selectedEvaluation.resignedOnGoodTerms) {
-                return 'fail + resigned on good terms';
-            } else if (this.selectedEvaluation.resignedOnStandardTerms) {
-                return 'fail + resigned on standard terms';
-            } else {
-                return this.selectedEvaluation.consensus;
+            const consensus = this.selectedEvaluation.consensus;
+
+            switch (consensus) {
+                case null:
+                    return 'None';
+                case 'fullBn':
+                    return 'Full BN';
+                case 'probationBn':
+                    return 'Probation BN';
+                case 'removeFromBn':
+                    return 'Remove from BN';
+                default:
+                    return consensus;
+            }
+        },
+        additionText() {
+            const addition = this.selectedEvaluation.addition;
+
+            switch (addition) {
+                case 'lowActivity':
+                    return 'Low activity warning';
+                case 'resignedOnGoodTerms':
+                    return 'Resigned on good terms';
+                case 'resignedOnStandardTerms':
+                    return 'Resigned on standard terms';
+                default:
+                    return 'None';
             }
         },
         consensusColor() {
-            if (!this.selectedEvaluation.consensus) {
-                return '';
-            } else {
-                return 'text-' + this.selectedEvaluation.consensus;
+            const consensus = this.selectedEvaluation.consensus;
+
+            switch (consensus) {
+                case 'pass':
+                    return 'text-pass';
+                case 'fullBn':
+                    return 'text-pass';
+                case 'fail':
+                    return 'text-fail';
+                case 'removeFromBn':
+                    return 'text-fail';
+                case 'probationBn':
+                    return 'text-probation';
+                default:
+                    return '';
             }
         },
     },
     methods: {
-        async setConsensus(consensus, e, addition) {
+        async setConsensus(consensus, e) {
             const result = await this.executePost(
-                `/${this.isApplication ? 'appEval' : 'bnEval'}/setConsensus/` + this.selectedEvaluation.id, {
-                    consensus,
-                    isLowActivity: addition == 'isLowActivity',
-                    resignedOnGoodTerms: addition == 'resignedOnGoodTerms',
-                    resignedOnStandardTerms: addition == 'resignedOnStandardTerms',
-                    isMoveToNat: addition == 'isMoveToNat',
-                    isMoveToBn: addition == 'isMoveToBn',
-                }, e);
+                `/${this.isApplication ? 'appEval' : 'bnEval'}/setConsensus/` + this.selectedEvaluation.id, { consensus }, e);
 
             if (result && !result.error) {
                 this.$store.commit('evaluations/updateEvaluation', result);
                 this.$store.dispatch('updateToastMessages', {
                     message: `Saved consensus`,
+                    type: 'success',
+                });
+            }
+        },
+        async setAddition(addition, e) {
+            const result = await this.executePost(
+                `/${this.isApplication ? 'appEval' : 'bnEval'}/setAddition/` + this.selectedEvaluation.id, { addition }, e);
+
+            if (result && !result.error) {
+                this.$store.commit('evaluations/updateEvaluation', result);
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Saved addition`,
                     type: 'success',
                 });
             }

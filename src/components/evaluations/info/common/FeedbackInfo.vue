@@ -53,7 +53,7 @@ export default {
     computed: {
         /** @returns {boolean} */
         resigned() {
-            return this.selectedEvaluation.resignedOnGoodTerms || this.selectedEvaluation.resignedOnStandardTerms;
+            return this.selectedEvaluation.addition == 'resignedOnGoodTerms' || this.selectedEvaluation.addition == 'resignedOnStandardTerms';
         },
         ...mapGetters('evaluations', [
             'selectedEvaluation',

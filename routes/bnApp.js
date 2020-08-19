@@ -83,7 +83,7 @@ router.post('/apply', async (req, res) => {
     ]);
 
     const wasBn = res.locals.userRequest.history && res.locals.userRequest.history.length;
-    const resignedOnGoodTerms = lastEvaluation && lastEvaluation.resignedOnGoodTerms;
+    const resignedOnGoodTerms = lastEvaluation && lastEvaluation.addition == 'resignedOnGoodTerms';
 
     if (!currentBnApp && !currentBnEval) {
         let months = 3;

@@ -121,7 +121,7 @@ const webhookColors = {
     yellow: 16777022,         // submitMediationDiscussionVote
 
     lightGreen: 8847214,      // submitEval, submitQA
-    darkGreen: 1921053,
+    darkGreen: 1921053,       // switchUserGroup
     green: 4380222,           // newBnApplication
 
     lightBlue: 8643583,       // setConsensus
@@ -133,7 +133,7 @@ const webhookColors = {
     purple: 8536232,          // startVetoMediation, concludeVetoMediation
 
     pink: 16728232,       // revealedCurrentBnEvalNotification
-    white: 15724527,      // unarchive, addEvalRound, maxQAChecks
+    white: 15724527,      // unarchive, addEvalRound
     brown: 7554849,       // submitUserNote
     gray: 8815494,        // passive: moveToGroupDiscussion,
     black: 2564903,       // archive

@@ -13,7 +13,7 @@
                     v-if="selectedEvaluation && selectedEvaluation.consensus == 'fail'"
                 />
                 <feedback-info
-                    v-if="selectedEvaluation.consensus && !(selectedEvaluation.isMoveToNat || selectedEvaluation.isMoveToBn)"
+                    v-if="selectedEvaluation.consensus"
                 />
             </div>
         </template>

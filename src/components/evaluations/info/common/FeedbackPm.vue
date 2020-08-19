@@ -49,14 +49,14 @@
                 <!-- current BN eval -->
 
                 <!-- pass -->
-                <div v-if="selectedEvaluation.consensus == 'pass'">
+                <div v-if="selectedEvaluation.consensus == 'fullBn'">
                     Following an evaluation of your recent {{ modeString }} BN work,
                     <!-- probation to full -->
                     <span v-if="isProbation">
                         you have been promoted from Probation to a Full Beatmap Nominator! Review your evaluation here: https://bn.mappersguild.com/evaluationResults?id={{ selectedEvaluation.id }}
                     </span>
                     <!-- low activity warning -->
-                    <span v-else-if="selectedEvaluation.isLowActivity">
+                    <span v-else-if="selectedEvaluation.addition == 'lowActivity'">
                         the NAT have noticed that your nomination activity is too low to effectively form a conclusion. We will evaluate again 1 month from now! Review your evaluation here: https://bn.mappersguild.com/evaluationResults?id={{ selectedEvaluation.id }}
                     </span>
                     <!-- full to full -->
@@ -83,7 +83,7 @@
                     -->
 
                 <!-- probation -->
-                <div v-else-if="selectedEvaluation.consensus == 'probation'">
+                <div v-else-if="selectedEvaluation.consensus == 'probationBn'">
                     Following an evaluation of your recent {{ modeString }} BN work,
                     <!-- probation to probation -->
                     <span v-if="isProbation">
@@ -119,7 +119,7 @@
                     <!-- resign -->
                     <span v-if="resigned">
                         Following your {{ modeString }} BN resignation, the NAT evaluated your recent BN work and concluded that
-                        <span v-if="selectedEvaluation.resignedOnGoodTerms">you are still a capable Beatmap Nominator!</span>
+                        <span v-if="selectedEvaluation.addition == 'resignedOnGoodTerms'">you are still a capable Beatmap Nominator!</span>
                         <span v-else>your resignation will be on standard terms.</span>
                     </span>
                     <!-- kick -->
@@ -128,8 +128,8 @@
                     </span>
                     <!-- reapply info -->
                     If you want to apply for BN again, you may do so on {{ selectedEvaluation.cooldownDate | toStandardDate }}, provided you have
-                    <span v-if="selectedEvaluation.resignedOnGoodTerms">one month of modding activity (3-4 mods).</span>
-                    <span v-else-if="selectedEvaluation.resignedOnStandardTerms">two months of modding activity (3-4 mods each month).</span>
+                    <span v-if="selectedEvaluation.addition == 'resignedOnGoodTerms'">one month of modding activity (3-4 mods).</span>
+                    <span v-else-if="selectedEvaluation.addition == 'resignedOnStandardTerms'">two months of modding activity (3-4 mods each month).</span>
                     <span v-else>shown improvement in the areas mentioned. Review reasons for your removal here: https://bn.mappersguild.com/evaluationResults?id={{ selectedEvaluation.id }}</span>
                     Good luck!
 
@@ -187,7 +187,7 @@ export default {
             return this.selectedEvaluation.reviews.filter(r => r.evaluator.isNat);
         },
         resigned() {
-            if (this.selectedEvaluation.resignedOnGoodTerms || this.selectedEvaluation.resignedOnStandardTerms) {
+            if (this.selectedEvaluation.addition == 'resignedOnGoodTerms' || this.selectedEvaluation.addition == 'resignedOnStandardTerms') {
                 return true;
             } else {
                 return false;

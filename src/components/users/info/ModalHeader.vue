@@ -40,7 +40,7 @@ export default {
                 return 'bg-bright-blue-gray';
             }
 
-            return 'bg-' + this.selectedUser.groups[0];
+            return 'bg-' + (this.selectedUser.groups.includes('nat') ? 'nat' : this.selectedUser.groups.includes('bn') ? 'bn' : '');
         },
     },
 };

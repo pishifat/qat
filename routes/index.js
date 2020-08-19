@@ -47,7 +47,7 @@ router.get('/modsCount/:user/:mode', async (req, res) => {
             })
             .sort({ updatedAt: -1 });
 
-        if (lastEvaluation &&  lastEvaluation.resignedOnGoodTerms) months = 1;
+        if (lastEvaluation && lastEvaluation.addition == 'resignedOnGoodTerms') months = 1;
         else if (wasBn) months = 2;
     }
 

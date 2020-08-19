@@ -140,24 +140,13 @@ router.post('/:id/unarchiveApp', async (req, res) => {
     res.json({ success: 'ok' });
 });
 
-function resetHistory (user, wasMovedToNat) {
-    // remove left & join
-    user.history.pop();
-    user.history.pop();
-
-    const i = user.groups.findIndex(g => g === (wasMovedToNat ? 'nat' : 'bn'));
-    user.groups.splice(i, 1, (wasMovedToNat ? 'bn' : 'nat'));
-
-    return user;
-}
-
 /* POST unarchive bn evaluation */
 router.post('/:id/unarchiveBn', async (req, res) => {
     let evaluation = await BnEvaluation.findById(req.params.id).orFail();
     let user = await User.findById(evaluation.user).orFail();
 
     // Remove left history. Add mode and BN group back if not hybrid
-    if (evaluation.consensus == 'fail') {
+    if (evaluation.consensus == 'removeFromBn') {
         // TODO find somehow the actual history, relatedEvaluation === evaluation._id?
         user.history.pop();
 
@@ -173,7 +162,7 @@ router.post('/:id/unarchiveBn', async (req, res) => {
         }
 
     // Change mode to probation and restore group if needed
-    } else if (evaluation.consensus == 'probation' || evaluation.consensus == 'pass') {
+    } else if (evaluation.consensus == 'probationBn' || evaluation.consensus == 'fullBn') {
         await BnEvaluation.deleteUserActiveEvaluations(user.id);
 
         const i = user.modesInfo.findIndex(m => m.mode == evaluation.mode);
@@ -186,12 +175,6 @@ router.post('/:id/unarchiveBn', async (req, res) => {
             mode: evaluation.mode,
             level: 'probation',
         });
-
-        if (evaluation.isMoveToNat) {
-            user = resetHistory(user, true);
-        } else if (evaluation.isMoveToBn) {
-            user = resetHistory(user, false);
-        }
     }
 
     await Promise.all([

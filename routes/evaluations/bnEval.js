@@ -280,35 +280,39 @@ router.post('/setIndividualEval/', middlewares.isNat, async (req, res) => {
 });
 
 /**
- * @param {object} evaluation
+ * @param {string} consensus
  * @returns {string}
  */
-function getConsensusText (evaluation) {
-    let consensusText;
-
-    if (evaluation.consensus == 'pass') {
-        consensusText = 'Pass';
-
-        if (evaluation.addition == 'lowActivity') {
-            consensusText += ' + Low activity warning';
-        } else if (evaluation.addition == 'movedToNat') {
-            consensusText += ' + Move to NAT';
-        } else if (evaluation.addition == 'movedToBn') {
-            consensusText += ' + Move to BN';
-        }
-    } else if (evaluation.consensus == 'probation') {
-        consensusText = 'Probation';
-    } else if (evaluation.consensus == 'fail') {
-        consensusText = 'Fail';
-
-        if (evaluation.addition == 'resignedOnGoodTerms') {
-            consensusText += ' + Resigned on good terms';
-        }
-    } else {
-        consensusText = 'No consensus set';
+function getConsensusText (consensus) {
+    switch (consensus) {
+        case null:
+            return 'None';
+        case 'fullBn':
+            return 'Full BN';
+        case 'probationBn':
+            return 'Probation BN';
+        case 'removeFromBn':
+            return 'Remove from BN';
+        default:
+            return consensus.charAt(0).toUpperCase() + consensus.slice(1);
     }
+}
 
-    return consensusText;
+/**
+ * @param {string} addition
+ * @returns {string}
+ */
+function getAdditionText (addition) {
+    switch (addition) {
+        case 'lowActivity':
+            return 'Low activity warning';
+        case 'resignedOnGoodTerms':
+            return 'Resigned on good terms';
+        case 'resignedOnStandardTerms':
+            return 'Resigned on standard terms';
+        default:
+            return 'None';
+    }
 }
 
 /* POST set evals as complete */
@@ -326,7 +330,7 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
         let user = await User.findById(evaluation.user);
         const i = user.modesInfo.findIndex(m => m.mode === evaluation.mode);
 
-        if (evaluation.consensus == 'fail') {
+        if (evaluation.consensus == 'removeFromBn') {
             if (i !== -1) {
                 user.modesInfo.splice(i, 1);
             }
@@ -350,7 +354,7 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
             await user.save();
         }
 
-        else if (evaluation.consensus == 'probation') {
+        else if (evaluation.consensus == 'probationBn') {
             if (i !== -1 && user.modesInfo[i].level === 'full') {
                 user.modesInfo.splice(i, 1, {
                     mode: evaluation.mode,
@@ -368,7 +372,7 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
             });
         }
 
-        else if (evaluation.consensus == 'pass') {
+        else if (evaluation.consensus == 'fullBn') {
             if (i !== -1 && user.modesInfo[i].level === 'probation') {
                 user.modesInfo.splice(i, 1, {
                     mode: evaluation.mode,
@@ -378,40 +382,10 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
 
             let deadline = new Date();
 
-            if (evaluation.isLowActivity) {
+            if (evaluation.addition == 'lowActivity') {
                 deadline.setDate(deadline.getDate() + 40);
             } else {
                 deadline.setDate(deadline.getDate() + 100);
-
-                // process user group changes
-                if (evaluation.isMoveToNat || evaluation.isMoveToBn) {
-                    if (evaluation.isMoveToNat) {
-                        const i = user.groups.findIndex(g => g === 'bn');
-                        user.groups.splice(i, 1, 'nat');
-                    } else {
-                        const i = user.groups.findIndex(g => g === 'nat');
-                        user.groups.splice(i, 1, 'bn');
-                    }
-
-                    for (const mode of user.modesInfo) {
-                        mode.level = 'full';
-                    }
-
-                    user.history.push({
-                        date: new Date(),
-                        mode: evaluation.mode,
-                        kind: 'left',
-                        group: evaluation.isMoveToNat ? 'bn' : 'nat',
-                        relatedEvaluation: evaluation._id,
-                    });
-                    user.history.push({
-                        date: new Date(),
-                        mode: evaluation.mode,
-                        kind: 'joined',
-                        group: evaluation.isMoveToNat ? 'nat' : 'bn',
-                        relatedEvaluation: evaluation._id,
-                    });
-                }
             }
 
             await user.save();
@@ -426,7 +400,8 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
         evaluation.consensusSetAt = new Date();
         await evaluation.save();
 
-        const consensusText = getConsensusText(evaluation);
+        const consensusText = getConsensusText(evaluation.consensus);
+        const additionText = getAdditionText(evaluation.addition);
 
         Logger.generate(
             req.session.mongoId,
@@ -439,7 +414,7 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
             [{
                 author: discord.defaultWebhookAuthor(req.session),
                 color: discord.webhookColors.black,
-                description: `Archived [**${user.username}**'s current BN eval](http://bn.mappersguild.com/bneval?id=${evaluation.id}) with **${consensusText}** consensus`,
+                description: `Archived [**${user.username}**'s current BN eval](http://bn.mappersguild.com/bneval?id=${evaluation.id}) with **${consensusText}** consensus and **${additionText}** addition.`,
             }],
             evaluation.mode
         );
@@ -463,13 +438,9 @@ router.post('/setConsensus/:id', middlewares.isNat, async (req, res) => {
         .orFail();
 
     evaluation.consensus = req.body.consensus;
-    evaluation.isLowActivity = req.body.isLowActivity ? true : false;
-    evaluation.resignedOnGoodTerms = req.body.resignedOnGoodTerms ? true : false;
-    evaluation.resignedOnStandardTerms = req.body.resignedOnStandardTerms ? true : false;
-    evaluation.isMoveToNat = req.body.isMoveToNat ? true : false;
-    evaluation.isMoveToBn = req.body.isMoveToBn ? true : false;
+    evaluation.addition = 'none';
 
-    if (req.body.consensus == 'fail') {
+    if (req.body.consensus == 'removeFromBn') {
         const date = new Date();
         date.setDate(date.getDate() + 90);
         evaluation.cooldownDate = date;
@@ -478,7 +449,7 @@ router.post('/setConsensus/:id', middlewares.isNat, async (req, res) => {
     await evaluation.save();
     res.json(evaluation);
 
-    const consensusText = getConsensusText(evaluation);
+    const consensusText = getConsensusText(evaluation.consensus);
 
     Logger.generate(
         req.session.mongoId,
@@ -491,7 +462,38 @@ router.post('/setConsensus/:id', middlewares.isNat, async (req, res) => {
         [{
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.lightBlue,
-            description: `[**${evaluation.user.username}**'s current BN eval](http://bn.mappersguild.com/bneval?id=${evaluation.id}) set to **${consensusText}**`,
+            description: `[**${evaluation.user.username}**'s current BN eval](http://bn.mappersguild.com/bneval?id=${evaluation.id}) consensus set to **${consensusText}**`,
+        }],
+        evaluation.mode
+    );
+});
+
+/* POST set addition of eval */
+router.post('/setAddition/:id', middlewares.isNat, async (req, res) => {
+    const evaluation = await BnEvaluation
+        .findById(req.params.id)
+        .populate(defaultPopulate)
+        .orFail();
+
+    evaluation.addition = req.body.addition;
+
+    await evaluation.save();
+    res.json(evaluation);
+
+    const additionText = getAdditionText(evaluation.addition);
+
+    Logger.generate(
+        req.session.mongoId,
+        `Set addition of ${evaluation.user.username}'s ${evaluation.mode} BN eval as "${additionText}"`,
+        'bnEvaluation',
+        evaluation._id
+    );
+
+    discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            color: discord.webhookColors.lightBlue,
+            description: `[**${evaluation.user.username}**'s current BN eval](http://bn.mappersguild.com/bneval?id=${evaluation.id}) addition set to **${additionText}**`,
         }],
         evaluation.mode
     );

@@ -14,6 +14,7 @@
                 :username="username"
                 :osu-id="osuId"
                 :consensus="evaluation.consensus"
+                :addition="evaluation.addition"
                 :feedback="evaluation.feedback"
             />
 

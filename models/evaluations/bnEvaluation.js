@@ -3,13 +3,9 @@ const baseSchema = require('./base');
 
 const bnEvaluationSchema = new mongoose.Schema({
     ...baseSchema,
-    consensus: { type: String, enum: ['pass', 'probation', 'fail'] },
+    consensus: { type: String, enum: ['fullBn', 'probationBn', 'removeFromBn'] },
     deadline: { type: Date , required: true },
-    isLowActivity: { type: Boolean, default: false },
-    resignedOnGoodTerms: { type: Boolean, default: false },
-    resignedOnStandardTerms: { type: Boolean, default: false },
-    isMoveToNat: { type: Boolean, default: false },
-    isMoveToBn: { type: Boolean, default: false },
+    addition: { type: String, enum: ['lowActivity', 'resignedOnGoodTerms', 'resignedOnStandardTerms', 'none'] },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 class BnEvaluationService {

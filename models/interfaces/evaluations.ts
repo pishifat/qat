@@ -34,11 +34,7 @@ export interface IAppEvaluationModel extends Model<IAppEvaluationDocument> {
 export interface IBnEvaluationDocument extends IEvaluationBase, Document {
     consensus?: string;
     deadline?: Date;
-    isLowActivity?: boolean;
-    resignedOnGoodTerms?: boolean;
-    resignedOnStandardTerms?: boolean;
-    isMoveToNat?: boolean;
-    isMoveToBn?: boolean;
+    addition?: string;
     kind?: string;
 }
 

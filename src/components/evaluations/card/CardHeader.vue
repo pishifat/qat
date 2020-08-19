@@ -18,7 +18,11 @@
         </p>
         <div v-if="consensus">
             Consensus:
-            <span :class="`text-${consensus}`">{{ consensus }}</span>
+            <span :class="consensusColor">{{ consensusText }}</span>
+        </div>
+        <div v-if="addition && addition != 'none'">
+            Addition:
+            <span :class="consensusColor">{{ additionText }}</span>
         </div>
     </div>
 </template>
@@ -43,9 +47,61 @@ export default {
             type: String,
             default: '',
         },
+        addition: {
+            type: String,
+            default: 'none',
+        },
         feedback: {
             type: String,
             default: '',
+        },
+    },
+    computed: {
+        consensusText() {
+            switch (this.consensus) {
+                case null:
+                    return 'None';
+                case 'fullBn':
+                    return 'Full BN';
+                case 'probationBn':
+                    return 'Probation BN';
+                case 'removeFromBn':
+                    return 'Remove from BN';
+                default:
+                    return this.consensus.charAt(0).toUpperCase() + this.consensus.slice(1);
+            }
+        },
+        additionText() {
+            const addition = this.addition;
+
+            switch (addition) {
+                case 'lowActivity':
+                    return 'Low activity warning';
+                case 'resignedOnGoodTerms':
+                    return 'Resigned on good terms';
+                case 'resignedOnStandardTerms':
+                    return 'Resigned on standard terms';
+                default:
+                    return 'None';
+            }
+        },
+        consensusColor() {
+            const consensus = this.consensus;
+
+            switch (consensus) {
+                case 'pass':
+                    return 'text-pass';
+                case 'fullBn':
+                    return 'text-pass';
+                case 'fail':
+                    return 'text-fail';
+                case 'removeFromBn':
+                    return 'text-fail';
+                case 'probationBn':
+                    return 'text-probation';
+                default:
+                    return '';
+            }
         },
     },
 };

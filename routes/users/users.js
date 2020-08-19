@@ -5,6 +5,7 @@ const AppEvaluation = require('../../models/evaluations/appEvaluation');
 const BnEvaluation = require('../../models/evaluations/bnEvaluation');
 const Aiess = require('../../models/aiess');
 const middlewares = require('../../helpers/middlewares');
+const discord = require('../../helpers/discord');
 const getGeneralEvents = require('../evaluations/bnEval').getGeneralEvents;
 
 const router = express.Router();
@@ -200,6 +201,58 @@ router.post('/:id/switchBnEvaluator', middlewares.isBnOrNat, async (req, res) =>
     Logger.generate(
         req.session.mongoId,
         `Opted "${user.username}" ${user.isBnEvaluator ? 'in to' : 'out of'} optional BN app evaluation input`,
+        'user',
+        user._id
+    );
+});
+
+/* POST switch user group */
+router.post('/:id/switchUserGroup', middlewares.isNat, async (req, res) => {
+    const user = await User.findById(req.params.id).orFail();
+
+    if (user.isNat) {
+        const i = user.groups.findIndex(g => g === 'nat');
+        if (i !== -1) user.groups.splice(i, 1, 'bn');
+    } else {
+        const i = user.groups.findIndex(g => g === 'bn');
+        if (i !== -1) user.groups.splice(i, 1, 'nat');
+    }
+
+    for (const mode of user.modesInfo) {
+        mode.level = 'full';
+
+        user.history.push({
+            date: new Date(),
+            mode: mode.mode,
+            kind: 'left',
+            group: user.isNat ? 'nat' : 'bn',
+            relatedEvaluation: null,
+        });
+
+        user.history.push({
+            date: new Date(),
+            mode: mode.mode,
+            kind: 'joined',
+            group: user.isNat ? 'bn' : 'nat',
+            relatedEvaluation: null,
+        });
+    }
+
+    await user.save();
+
+    discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            color: discord.webhookColors.darkGreen,
+            description: `Moved [**${user.username}**](http://osu.ppy.sh/users/${user.osuId}) from **${user.isNat ? 'NAT' : 'BN'}** to **${user.isNat ? 'BN' : 'NAT'}**.`,
+        }],
+        'all'
+    );
+
+    res.json(user);
+    Logger.generate(
+        req.session.mongoId,
+        `Moved "${user.username}" from "${user.isNat ? 'NAT' : 'BN'}" to "${user.isNat ? 'BN' : 'NAT'}"`,
         'user',
         user._id
     );

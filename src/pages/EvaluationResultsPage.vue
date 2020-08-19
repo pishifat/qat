@@ -93,32 +93,59 @@ export default {
         },
         /** @returns {string} */
         consensusText() {
-            if (!this.evaluation.consensus) {
-                return 'none';
-            } else if (this.evaluation.consensus == 'pass') {
-                if (this.evaluation.isLowActivity) {
-                    return 'pass + low activity warning';
-                } else if (this.evaluation.isMoveToNat) {
-                    return 'pass + move to NAT';
-                } else if (this.evaluation.isMoveToBn) {
-                    return 'pass + move to BN';
-                } else {
-                    return this.evaluation.consensus;
-                }
-            } else if (this.evaluation.resignedOnGoodTerms) {
-                return 'fail + resigned on good terms';
-            } else if (this.evaluation.resignedOnStandardTerms) {
-                return 'fail + resigned on standard terms';
-            } else {
-                return this.evaluation.consensus;
+            const consensus = this.evaluation.consensus;
+            const addition = this.evaluation.addition;
+            let text = '';
+
+            switch (consensus) {
+                case null:
+                    text = 'none';
+                    break;
+                case 'fullBn':
+                    text = 'Full BN';
+                    break;
+                case 'probationBn':
+                    text = 'Probation BN';
+                    break;
+                case 'removeFromBn':
+                    text = 'Remove from BN';
+                    break;
+                default:
+                    text = consensus;
+                    break;
             }
+
+            switch (addition) {
+                case 'lowActivity':
+                    text += ' + low activity warning';
+                    break;
+                case 'resignedOnGoodTerms':
+                    text += ' + resigned on good terms';
+                    break;
+                case 'resignedOnStandardTerms':
+                    text += ' + resigned on standard terms';
+                    break;
+            }
+
+            return text;
         },
         /** @returns {string} */
         consensusColor() {
-            if (!this.evaluation.consensus) {
-                return '';
-            } else {
-                return 'text-' + this.evaluation.consensus;
+            const consensus = this.evaluation.consensus;
+
+            switch (consensus) {
+                case 'pass':
+                    return 'text-pass';
+                case 'fullBn':
+                    return 'text-pass';
+                case 'fail':
+                    return 'text-fail';
+                case 'removeFromBn':
+                    return 'text-fail';
+                case 'probationBn':
+                    return 'text-probation';
+                default:
+                    return '';
             }
         },
     },
