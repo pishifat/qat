@@ -9,7 +9,7 @@
                 :nat-evaluators="selectedEvaluation.natEvaluators"
                 :osu-id="selectedEvaluation.user.osuId"
                 :username="selectedEvaluation.user.username"
-                :is-application="isApplication"
+                :kind="selectedEvaluation.kind"
             />
         </template>
 

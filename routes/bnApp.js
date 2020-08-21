@@ -7,6 +7,7 @@ const AppEvaluation = require('../models/evaluations/appEvaluation.js');
 const BnEvaluation = require('../models/evaluations/bnEvaluation');
 const Logger = require('../models/log.js');
 const TestSubmission = require('../models/bnTest/testSubmission');
+const ResignationEvaluation = require('../models/evaluations/resignationEvaluation');
 
 const router = express.Router();
 
@@ -59,7 +60,7 @@ router.post('/apply', async (req, res) => {
     }
 
     let cooldownDate = new Date();
-    const [currentBnApp, currentBnEval, lastEvaluation] = await Promise.all([
+    const [currentBnApp, currentBnEval, lastResignation] = await Promise.all([
         AppEvaluation.findOne({
             user: req.session.mongoId,
             mode,
@@ -74,7 +75,7 @@ router.post('/apply', async (req, res) => {
             consensus: 'fail',
             cooldownDate: { $gte: cooldownDate },
         }),
-        BnEvaluation
+        ResignationEvaluation
             .findOne({
                 user: req.session.mongoId,
                 mode,
@@ -83,7 +84,7 @@ router.post('/apply', async (req, res) => {
     ]);
 
     const wasBn = res.locals.userRequest.history && res.locals.userRequest.history.length;
-    const resignedOnGoodTerms = lastEvaluation && lastEvaluation.addition == 'resignedOnGoodTerms';
+    const resignedOnGoodTerms = lastResignation && lastResignation.consensus == 'resignedOnGoodTerms';
 
     if (!currentBnApp && !currentBnEval) {
         let months = 3;

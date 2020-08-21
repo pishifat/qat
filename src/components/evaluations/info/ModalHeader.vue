@@ -1,7 +1,7 @@
 <template>
     <div class="modal-header" :class="isNatEvaluator() ? 'bg-info' : 'bg-primary'">
         <h5 class="modal-title">
-            {{ isApplication ? 'Application Evaluation:' : 'BN Evaluation:' }}
+            {{ kind == 'application' ? 'Application Evaluation:' : kind == 'currentBn' ? 'BN Evaluation:' : 'Resignation Evaluation:' }}
             <a
                 :href="'https://osu.ppy.sh/users/' + osuId"
                 target="_blank"
@@ -28,7 +28,10 @@ export default {
         ModeDisplay,
     },
     props: {
-        isApplication: Boolean,
+        kind: {
+            type: String,
+            required: true,
+        },
         osuId: {
             type: Number,
             required: true,

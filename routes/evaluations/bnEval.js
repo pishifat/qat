@@ -2,6 +2,7 @@ const express = require('express');
 const Logger = require('../../models/log');
 const Report = require('../../models/report');
 const BnEvaluation = require('../../models/evaluations/bnEvaluation');
+const ResignationEvaluation = require('../../models/evaluations/resignationEvaluation');
 const AppEvaluation = require('../../models/evaluations/appEvaluation');
 const User = require('../../models/user');
 const Aiess = require('../../models/aiess');
@@ -40,12 +41,13 @@ const notesPopulate = [
     { path: 'author', select: 'username osuId' },
 ];
 
-/* GET applicant listing. */
+/* GET current BN eval listing. */
 router.get('/relevantInfo', async (req, res) => {
-    const evalRounds = await BnEvaluation.findActiveEvaluations();
+    const evaluations = await BnEvaluation.findActiveEvaluations();
+    const resignations = await ResignationEvaluation.findActiveResignations();
 
     res.json({
-        evaluations: evalRounds,
+        evaluations: resignations.concat(evaluations),
     });
 });
 
@@ -66,9 +68,10 @@ router.post('/addEvalRounds/', middlewares.isNat, async (req, res) => {
     const isTaiko = req.body.modes.includes('taiko');
     const isCatch = req.body.modes.includes('catch');
     const isMania = req.body.modes.includes('mania');
+    const isResignation = req.body.isResignation;
+    const deadline = isResignation ? new Date() : new Date(req.body.deadline); // deadline for resignations is Today
     let allEvalsToCreate = [];
     let failed = [];
-    const deadline = new Date(req.body.deadline);
 
     // if user groups are selected
     let allUsersByMode = await User.getAllByMode(includeFullBns, includeProbationBns, includeNat);
@@ -151,19 +154,23 @@ router.post('/addEvalRounds/', middlewares.isNat, async (req, res) => {
         await BnEvaluation.deleteUserActiveEvaluations(round.user);
     }
 
-    // create evalRounds
-    const result = await BnEvaluation.insertMany(allEvalsToCreate);
+    // create evalRounds or resignations
+    const result = isResignation ? await ResignationEvaluation.insertMany(allEvalsToCreate) : await BnEvaluation.insertMany(allEvalsToCreate);
 
     if (!result.length) return res.json({
         error: `Didn't create any`,
     });
 
-    let ers = await BnEvaluation.findActiveEvaluations();
+    const evaluations = await BnEvaluation.findActiveEvaluations();
+    const resignations = await ResignationEvaluation.findActiveResignations();
 
-    res.json({ ers, failed });
+    res.json({ ers: resignations.concat(evaluations), failed });
 
     let minDate = new Date();
     minDate.setDate(minDate.getDate() + 14);
+
+    const twoEvaluationModes = ['catch'];
+    //const threeEvaluationModes = ['osu', 'taiko', 'mania'];
 
     if (deadline < minDate) {
         for (let i = 0; i < result.length; i++) {
@@ -172,13 +179,13 @@ router.post('/addEvalRounds/', middlewares.isNat, async (req, res) => {
             const invalids = [8129817, 3178418, 2204515, 2857314, u.osuId];
             const assignedNat = await User.aggregate([
                 { $match: { groups: 'nat', 'modesInfo.mode': er.mode, osuId: { $nin: invalids } } },
-                { $sample: { size: er.mode == 'osu' || er.mode == 'catch' ? 3 : 2 } },
+                { $sample: { size: twoEvaluationModes.includes(er.mode) ? 2 : 3 } },
             ]);
             let natList = '';
 
             for (let i = 0; i < assignedNat.length; i++) {
                 let user = assignedNat[i];
-                await BnEvaluation.findByIdAndUpdate(er.id, { $push: { natEvaluators: user._id } });
+                isResignation ? await ResignationEvaluation.findByIdAndUpdate(er.id, { $push: { natEvaluators: user._id } }) : await BnEvaluation.findByIdAndUpdate(er.id, { $push: { natEvaluators: user._id } });
                 natList += user.username;
 
                 if (i + 1 < assignedNat.length) {
@@ -190,7 +197,7 @@ router.post('/addEvalRounds/', middlewares.isNat, async (req, res) => {
                 [{
                     author: discord.defaultWebhookAuthor(req.session),
                     color: discord.webhookColors.white,
-                    description: `Created [**${u.username}**'s current BN eval](http://bn.mappersguild.com/bneval?id=${er.id})`,
+                    description: `Created [**${u.username}**'s ${isResignation ? 'resignation' : 'current BN'} eval](http://bn.mappersguild.com/bneval?id=${er.id})`,
                     fields: [
                         {
                             name: 'Assigned NAT',
@@ -218,8 +225,17 @@ router.post('/submitEval/:id', middlewares.isNat, async (req, res) => {
             _id: req.params.id,
             active: true,
         })
-        .populate(defaultPopulate)
-        .orFail();
+        .populate(defaultPopulate);
+
+    if (!evaluation) {
+        evaluation = await ResignationEvaluation
+            .findOne({
+                _id: req.params.id,
+                active: true,
+            })
+            .populate(defaultPopulate)
+            .orFail();
+    }
 
     const isNewEvaluation = await submitEval(
         evaluation,
@@ -231,6 +247,7 @@ router.post('/submitEval/:id', middlewares.isNat, async (req, res) => {
     );
 
     evaluation = await BnEvaluation.findById(req.params.id).populate(defaultPopulate);
+    if (!evaluation) evaluation = await ResignationEvaluation.findById(req.params.id).populate(defaultPopulate);
     res.json(evaluation);
     Logger.generate(
         req.session.mongoId,
@@ -250,10 +267,19 @@ router.post('/setGroupEval/', middlewares.isNat, async (req, res) => {
         })
         .populate(defaultPopulate);
 
-    await setGroupEval(evaluations, req.session);
+    let resignations = await ResignationEvaluation
+        .find({
+            _id: {
+                $in: req.body.checkedRounds,
+            },
+        })
+        .populate(defaultPopulate);
+
+    await setGroupEval(evaluations.concat(resignations), req.session);
 
     evaluations = await BnEvaluation.findActiveEvaluations();
-    res.json(evaluations);
+    resignations = await ResignationEvaluation.findActiveResignations();
+    res.json(resignations.concat(evaluations));
     Logger.generate(
         req.session.mongoId,
         `Set ${req.body.checkedRounds.length} BN eval${req.body.checkedRounds.length == 1 ? '' : 's'} as group evaluation`,
@@ -269,9 +295,16 @@ router.post('/setIndividualEval/', middlewares.isNat, async (req, res) => {
         discussion: false,
     });
 
-    let evaluations = await BnEvaluation.findActiveEvaluations();
+    await ResignationEvaluation.updateMany({
+        _id: { $in: req.body.checkedRounds },
+    }, {
+        discussion: false,
+    });
 
-    res.json(evaluations);
+    let evaluations = await BnEvaluation.findActiveEvaluations();
+    const resignations = await ResignationEvaluation.findActiveResignations();
+
+    res.json(resignations.concat(evaluations));
     Logger.generate(
         req.session.mongoId,
         `Set ${req.body.checkedRounds.length} BN eval${req.body.checkedRounds.length == 1 ? '' : 's'} as individual evaluation`,
@@ -285,7 +318,7 @@ router.post('/setIndividualEval/', middlewares.isNat, async (req, res) => {
  */
 function getConsensusText (consensus) {
     switch (consensus) {
-        case null:
+        case undefined:
             return 'None';
         case 'fullBn':
             return 'Full BN';
@@ -293,6 +326,10 @@ function getConsensusText (consensus) {
             return 'Probation BN';
         case 'removeFromBn':
             return 'Remove from BN';
+        case 'resignedOnGoodTerms':
+            return 'Resigned on good terms';
+        case 'resignedOnStandardTerms':
+            return 'Resigned on standard terms';
         default:
             return consensus.charAt(0).toUpperCase() + consensus.slice(1);
     }
@@ -306,10 +343,6 @@ function getAdditionText (addition) {
     switch (addition) {
         case 'lowActivity':
             return 'Low activity warning';
-        case 'resignedOnGoodTerms':
-            return 'Resigned on good terms';
-        case 'resignedOnStandardTerms':
-            return 'Resigned on standard terms';
         default:
             return 'None';
     }
@@ -326,11 +359,22 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
         })
         .populate(defaultPopulate);
 
+    let resignations = await ResignationEvaluation
+        .find({
+            _id: {
+                $in: req.body.checkedRounds,
+            },
+            active: true,
+        })
+        .populate(defaultPopulate);
+
+    evaluations = evaluations.concat(resignations);
+
     for (const evaluation of evaluations) {
         let user = await User.findById(evaluation.user);
         const i = user.modesInfo.findIndex(m => m.mode === evaluation.mode);
 
-        if (evaluation.consensus == 'removeFromBn') {
+        if (evaluation.consensus == 'removeFromBn' || evaluation.kind == 'resignation') {
             if (i !== -1) {
                 user.modesInfo.splice(i, 1);
             }
@@ -405,7 +449,7 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
 
         Logger.generate(
             req.session.mongoId,
-            `Set ${user.username}'s ${evaluation.mode} BN eval as "${consensusText}"`,
+            `Set ${user.username}'s ${evaluation.mode} ${evaluation.kind === 'resignation' ? 'resignation' : 'BN eval'} as "${consensusText}"`,
             'bnEvaluation',
             evaluation._id
         );
@@ -414,15 +458,16 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
             [{
                 author: discord.defaultWebhookAuthor(req.session),
                 color: discord.webhookColors.black,
-                description: `Archived [**${user.username}**'s current BN eval](http://bn.mappersguild.com/bneval?id=${evaluation.id}) with **${consensusText}** consensus and **${additionText}** addition.`,
+                description: `Archived [**${user.username}**'s ${evaluation.kind === 'resignation' ? 'resignation' : 'current BN'} eval](http://bn.mappersguild.com/bneval?id=${evaluation.id}) with **${consensusText}** consensus and **${additionText}** addition.`,
             }],
             evaluation.mode
         );
     }
 
     evaluations = await BnEvaluation.findActiveEvaluations();
+    resignations = await ResignationEvaluation.findActiveResignations();
 
-    res.json(evaluations);
+    res.json(resignations.concat(evaluations));
     Logger.generate(
         req.session.mongoId,
         `Set ${req.body.checkedRounds.length} BN eval${req.body.checkedRounds.length == 1 ? '' : 's'} as completed`,
@@ -432,15 +477,21 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
 
 /* POST set consensus of eval */
 router.post('/setConsensus/:id', middlewares.isNat, async (req, res) => {
-    const evaluation = await BnEvaluation
+    let evaluation = await BnEvaluation
         .findById(req.params.id)
-        .populate(defaultPopulate)
-        .orFail();
+        .populate(defaultPopulate);
+
+    if (!evaluation) {
+        evaluation = await ResignationEvaluation
+            .findById(req.params.id)
+            .populate(defaultPopulate)
+            .orFail();
+    }
 
     evaluation.consensus = req.body.consensus;
     evaluation.addition = 'none';
 
-    if (req.body.consensus == 'removeFromBn') {
+    if (req.body.consensus == 'removeFromBn' || evaluation.kind === 'resignation') {
         const date = new Date();
         date.setDate(date.getDate() + 90);
         evaluation.cooldownDate = date;
@@ -453,7 +504,7 @@ router.post('/setConsensus/:id', middlewares.isNat, async (req, res) => {
 
     Logger.generate(
         req.session.mongoId,
-        `Set consensus of ${evaluation.user.username}'s ${evaluation.mode} BN eval as "${consensusText}"`,
+        `Set consensus of ${evaluation.user.username}'s ${evaluation.mode} ${evaluation.kind === 'resignation' ? 'resignation' : 'BN eval'} as "${consensusText}"`,
         'bnEvaluation',
         evaluation._id
     );

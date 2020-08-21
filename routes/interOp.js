@@ -1,7 +1,6 @@
 const express = require('express');
 const config = require('../config.json');
 const Aiess = require('../models/aiess');
-const BnEvaluation = require('../models/evaluations/bnEvaluation');
 const User = require('../models/user');
 
 const router = express.Router();
@@ -36,25 +35,6 @@ router.get('/users/all', async (_, res) => {
 /* GET specific user info */
 router.get('/users/:osuId', async (req, res) => {
     res.json(await User.findOne({ osuId: req.params.osuId }));
-});
-
-/* GET general reason for BN removal */
-router.get('/bnRemoval/:osuId', async (req, res) => {
-    const user = await User.findOne({ osuId: req.params.osuId });
-
-    if (!user) {
-        return res.status(404).send('User not found');
-    }
-
-    const latestEvalRound = await BnEvaluation
-        .findOne({ user: user._id, consensus: 'fail', active: false })
-        .sort({ $natural: -1 });
-
-    if (!latestEvalRound) {
-        return res.status(404).send('User has no BN removal logged');
-    }
-
-    res.json(latestEvalRound.addition == 'resignedOnGoodTerms' || latestEvalRound.addition == 'resignedOnStandardTerms' ? 'Resigned' : 'Kicked');
 });
 
 /* GET events for beatmapsetID */

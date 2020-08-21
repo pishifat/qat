@@ -74,5 +74,10 @@ export default {
 
             return getters.selectedEvaluation.kind === 'currentBn';
         },
+        isResignation: (state, getters) => {
+            if (!getters.selectedEvaluation) return false;
+
+            return getters.selectedEvaluation.kind === 'resignation';
+        },
     },
 };

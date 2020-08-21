@@ -27,8 +27,10 @@ async function submitEval (evaluation, session, isNat, behaviorComment, moddingC
 
         if (evaluation.kind === 'application') {
             description = `Submitted eval for [**${evaluation.user.username}**'s BN application](http://bn.mappersguild.com/appeval?id=${evaluation.id})`;
-        } else {
+        } else if (evaluation.kind === 'currentBn') {
             description = `Submitted eval for [**${evaluation.user.username}**'s current BN eval](http://bn.mappersguild.com/bneval?id=${evaluation.id})`;
+        } else {
+            description = `Submitted eval for [**${evaluation.user.username}**'s resignation eval](http://bn.mappersguild.com/bneval?id=${evaluation.id})`;
         }
 
         discord.webhookPost(
@@ -70,13 +72,27 @@ async function submitEval (evaluation, session, isNat, behaviorComment, moddingC
                 await evaluation.save();
 
                 // Send moved to discussion notification
+                let passText = 'Pass';
                 let neutralText = 'Neutral';
+                let failText = 'Fail';
 
                 if (evaluation.kind === 'application') {
                     description = `[**${evaluation.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${evaluation.id}) moved to group discussion`;
-                } else {
-                    neutralText = 'Probation';
+                } else if (evaluation.kind === 'currentBn') {
+                    passText = 'Full BN';
+                    neutralText = 'Probation BN';
+                    failText = 'Remove from BN';
                     description = `[**${evaluation.user.username}**'s current BN eval](http://bn.mappersguild.com/bneval?id=${evaluation.id}) moved to group discussion`;
+                } else {
+                    passText = 'Resign on good terms';
+                    neutralText = 'Resign on standard terms';
+                    description = `[**${evaluation.user.username}**'s resignation eval](http://bn.mappersguild.com/bneval?id=${evaluation.id}) moved to group discussion`;
+                }
+
+                let value = `${passText}: **${totalPass}**, ${neutralText}: **${totalNeutral}**`;
+
+                if (evaluation.kind !== 'resignation') {
+                    value += `, ${failText}: **${totalFail}**`;
                 }
 
                 discord.webhookPost(
@@ -89,7 +105,7 @@ async function submitEval (evaluation, session, isNat, behaviorComment, moddingC
                         fields: [
                             {
                                 name: 'Votes',
-                                value: `Pass: **${totalPass}**, ${neutralText}: **${totalNeutral}**, Fail: **${totalFail}**`,
+                                value,
                             },
                         ],
                     }],
@@ -119,13 +135,27 @@ async function setGroupEval (evaluations, session) {
 
         // Send moved notification
         let description = '';
+        let passText = 'Pass';
         let neutralText = 'Neutral';
+        let failText = 'Fail';
 
         if (evaluation.kind === 'application') {
             description =  `Moved [**${evaluation.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${evaluation.id}) to group discussion`;
-        } else {
-            neutralText = 'Probation';
+        } else if (evaluation.kind === 'currentBn') {
+            passText = 'Full BN';
+            neutralText = 'Probation BN';
+            failText = 'Remove from BN';
             description = `Moved [**${evaluation.user.username}**'s current BN eval](http://bn.mappersguild.com/bneval?id=${evaluation.id}) to group discussion`;
+        } else {
+            passText = 'Resign on good terms';
+            neutralText = 'Resign on standard terms';
+            description = `Moved [**${evaluation.user.username}**'s resignation eval](http://bn.mappersguild.com/bneval?id=${evaluation.id}) to group discussion`;
+        }
+
+        let value = `${passText}: **${pass}**, ${neutralText}: **${neutral}**`;
+
+        if (evaluation.kind !== 'resignation') {
+            value += `, ${failText}: **${fail}**`;
         }
 
         discord.webhookPost(
@@ -136,7 +166,7 @@ async function setGroupEval (evaluations, session) {
                 fields: [
                     {
                         name: 'Votes',
-                        value: `Pass: **${pass}**, ${neutralText}: **${neutral}**, Fail: **${fail}**`,
+                        value,
                     },
                 ],
             }],

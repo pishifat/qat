@@ -1,24 +1,23 @@
 const mongoose = require('mongoose');
 const baseSchema = require('./base');
 
-const bnEvaluationSchema = new mongoose.Schema({
+const resignationEvaluationSchema = new mongoose.Schema({
     ...baseSchema,
-    consensus: { type: String, enum: ['fullBn', 'probationBn', 'removeFromBn'] },
+    consensus: { type: String, enum: ['resignedOnGoodTerms', 'resignedOnStandardTerms'] },
     deadline: { type: Date , required: true },
-    addition: { type: String, enum: ['lowActivity', 'none'] },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-class BnEvaluationService {
+class ResignationEvaluationService {
 
     get kind () {
-        return 'currentBn';
+        return 'resignation';
     }
 
-    static findActiveEvaluations() {
+    static findActiveResignations() {
         let minDate = new Date();
         minDate.setDate(minDate.getDate() + 14);
 
-        return BnEvaluation
+        return ResignationEvaluation
             .find({
                 active: true,
                 deadline: { $lte: minDate },
@@ -43,24 +42,12 @@ class BnEvaluationService {
             ])
             .sort({ deadline: 1, consensus: 1, feedback: 1 });
     }
-
-    static deleteUserActiveEvaluations(userId) {
-        let minDate = new Date();
-        minDate.setDate(minDate.getDate() + 14);
-
-        return BnEvaluation.deleteMany({
-            user: userId,
-            active: true,
-            deadline: { $gte: minDate },
-        });
-    }
-
 }
 
-bnEvaluationSchema.loadClass(BnEvaluationService);
+resignationEvaluationSchema.loadClass(ResignationEvaluationService);
 /**
- * @type {import('../interfaces/evaluations').IBnEvaluationModel}
+ * @type {import('../interfaces/evaluations').IResignationEvaluationModel}
  */
-const BnEvaluation = mongoose.model('EvalRound', bnEvaluationSchema);
+const ResignationEvaluation = mongoose.model('resignation', resignationEvaluationSchema);
 
-module.exports = BnEvaluation;
+module.exports = ResignationEvaluation;

@@ -42,3 +42,13 @@ export interface IBnEvaluationModel extends Model<IBnEvaluationDocument> {
     findActiveEvaluations?: () => Promise<IBnEvaluationDocument[]>;
     deleteUserActiveEvaluations?: (userId: number) => Promise<{ ok: number, deletedCount: number, n: number }>;
 }
+
+export interface IResignationEvaluationDocument extends IEvaluationBase, Document {
+    consensus?: string;
+    deadline?: Date;
+    kind?: string;
+}
+
+export interface IResignationEvaluationModel extends Model<IResignationEvaluationDocument> {
+    findActiveResignations?: () => Promise<IResignationEvaluationDocument[]>;
+}

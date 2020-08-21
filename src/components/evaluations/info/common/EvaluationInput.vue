@@ -42,7 +42,7 @@
                     name="vote"
                     value="1"
                 >
-                <label class="form-check-label text-pass" for="1">{{ isApplication ? 'Pass' : 'Full BN' }}</label>
+                <label class="form-check-label text-pass" for="1">{{ selectedEvaluation.kind == 'application' ? 'Pass' : selectedEvaluation.kind == 'currentBn' ? 'Full BN' : 'Resign on good terms' }}</label>
             </div>
             <div class="form-check form-check-inline">
                 <input
@@ -53,9 +53,9 @@
                     name="vote"
                     value="2"
                 >
-                <label class="form-check-label text-neutral" for="2">{{ isApplication ? 'Neutral' : 'Probation BN' }}</label>
+                <label class="form-check-label text-neutral" for="2">{{ selectedEvaluation.kind == 'application' ? 'Neutral' : selectedEvaluation.kind == 'currentBn' ? 'Probation BN' : 'Resign on standard terms' }}</label>
             </div>
-            <div class="form-check form-check-inline">
+            <div v-if="selectedEvaluation.kind !== 'resignation'" class="form-check form-check-inline">
                 <input
                     id="3"
                     v-model="vote"

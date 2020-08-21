@@ -91,6 +91,46 @@
 
             <div class="row">
                 <div class="col-sm-12">
+                    <b class="mr-4">Resignation:</b>
+
+                    <div class="row ml-4">
+                        <label
+                            class="mx-1"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            title="evaluation is NOT a resignation"
+                        >
+                            <input
+                                v-model="isResignation"
+                                type="radio"
+                                class="cross-radio hide-default"
+                                name="isResignation"
+                                value="0"
+                            >
+                            <i class="fas fa-times fa-lg" />
+                        </label>
+                        <label
+                            class="mx-1"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            title="evaluation is a resignation"
+                        >
+                            <input
+                                v-model="isResignation"
+                                type="radio"
+                                class="checkmark-radio hide-default"
+                                name="isResignation"
+                                value="1"
+                            >
+                            <i class="fas fa-check fa-lg" />
+                        </label>
+                    </div>
+
+                    <p class="small text-secondary ml-2">
+                        Checking this will replace vote/consensus options with "resigned on good/standard terms" and set deadline to today.
+                    </p>
+                </div>
+                <div v-if="isResignation == '0'" class="col-sm-12">
                     <div class="form-inline">
                         <b>Deadline:</b>
                         <input
@@ -133,6 +173,7 @@ export default {
             excludeUsers: null,
             deadline: this.setDefaultDate(),
             selectedModes: [],
+            isResignation: '0',
         };
     },
     methods: {
@@ -173,6 +214,7 @@ export default {
                         includeUsers: this.includeUsers,
                         excludeUsers: this.excludeUsers,
                         deadline: this.deadline,
+                        isResignation: new Boolean(parseInt(this.isResignation)),
                     },
                     e
                 );

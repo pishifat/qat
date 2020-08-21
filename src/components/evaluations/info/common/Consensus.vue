@@ -12,30 +12,32 @@
             <span v-if="selectedEvaluation.active">
                 <button
                     class="btn btn-sm btn-pass"
-                    :disabled="selectedEvaluation.consensus == 'pass' || selectedEvaluation.consensus == 'fullBn'"
-                    @click="setConsensus(isApplication ? 'pass' : 'fullBn', $event);"
+                    :disabled="selectedEvaluation.consensus == 'pass' || selectedEvaluation.consensus == 'fullBn' || selectedEvaluation.consensus == 'resignedOnGoodTerms'"
+                    @click="setConsensus(selectedEvaluation.kind === 'application' ? 'pass' : selectedEvaluation.kind === 'currentBn' ? 'fullBn' : 'resignedOnGoodTerms', $event);"
                 >
-                    {{ isApplication ? 'Pass' : 'Full BN' }}
+                    {{ selectedEvaluation.kind === 'application' ? 'Pass' : selectedEvaluation.kind === 'currentBn' ? 'Full BN' : 'Resigned on good terms' }}
                 </button>
                 <button
                     v-if="!isApplication"
-                    class="btn btn-sm btn-probation"
-                    :disabled="selectedEvaluation.consensus == 'probationBn'"
-                    @click="setConsensus('probationBn', $event);"
+                    class="btn btn-sm"
+                    :class="selectedEvaluation.kind === 'currentBn' ? 'btn-probation' : 'btn-neutral'"
+                    :disabled="selectedEvaluation.consensus == 'probationBn' || selectedEvaluation.consensus == 'resignedOnStandardTerms'"
+                    @click="setConsensus(selectedEvaluation.kind === 'currentBn' ? 'probationBn' : 'resignedOnStandardTerms', $event);"
                 >
-                    Probation BN
+                    {{ selectedEvaluation.kind === 'currentBn' ? 'Probation BN' : 'Resigned on standard terms' }}
                 </button>
                 <button
+                    v-if="selectedEvaluation.kind !== 'resignation'"
                     class="btn btn-sm btn-fail"
                     :disabled="selectedEvaluation.consensus == 'fail' || selectedEvaluation.consensus == 'removeFromBn'"
-                    @click="setConsensus(isApplication ? 'fail' : 'removeFromBn', $event);"
+                    @click="setConsensus(selectedEvaluation.kind === 'application' ? 'fail' : 'removeFromBn', $event);"
                 >
-                    {{ isApplication ? 'Fail' : 'Remove from BN' }}
+                    {{ selectedEvaluation.kind === 'application' ? 'Fail' : 'Remove from BN' }}
                 </button>
             </span>
         </p>
 
-        <p v-if="!isApplication && selectedEvaluation.consensus !== 'probationBn'">
+        <p v-if="selectedEvaluation.kind === 'currentBn' && selectedEvaluation.consensus !== 'probationBn'">
             <b>Addition:</b>
             <span
                 class="mr-2"
@@ -44,22 +46,6 @@
                 {{ additionText }}
             </span>
             <span v-if="selectedEvaluation.active">
-                <button
-                    v-if="selectedEvaluation.consensus == 'removeFromBn'"
-                    class="btn btn-sm btn-primary"
-                    :disabled="selectedEvaluation.addition == 'resignedOnGoodTerms'"
-                    @click="setAddition('resignedOnGoodTerms', $event);"
-                >
-                    Resign on good terms
-                </button>
-                <button
-                    v-if="selectedEvaluation.consensus == 'removeFromBn'"
-                    class="btn btn-sm btn-primary"
-                    :disabled="selectedEvaluation.addition == 'resignedOnStandardTerms'"
-                    @click="setAddition('resignedOnStandardTerms', $event);"
-                >
-                    Resign on standard terms
-                </button>
                 <button
                     v-if="selectedEvaluation.consensus == 'fullBn'"
                     class="btn btn-sm btn-primary"
@@ -96,7 +82,7 @@ export default {
             const consensus = this.selectedEvaluation.consensus;
 
             switch (consensus) {
-                case null:
+                case undefined:
                     return 'None';
                 case 'fullBn':
                     return 'Full BN';
@@ -104,6 +90,10 @@ export default {
                     return 'Probation BN';
                 case 'removeFromBn':
                     return 'Remove from BN';
+                case 'resignedOnGoodTerms':
+                    return 'Resigned on good terms';
+                case 'resignedOnStandardTerms':
+                    return 'Resigned on standard terms';
                 default:
                     return consensus;
             }
@@ -114,10 +104,6 @@ export default {
             switch (addition) {
                 case 'lowActivity':
                     return 'Low activity warning';
-                case 'resignedOnGoodTerms':
-                    return 'Resigned on good terms';
-                case 'resignedOnStandardTerms':
-                    return 'Resigned on standard terms';
                 default:
                     return 'None';
             }
@@ -130,12 +116,16 @@ export default {
                     return 'text-pass';
                 case 'fullBn':
                     return 'text-pass';
+                case 'resignedOnGoodTerms':
+                    return 'text-pass';
                 case 'fail':
                     return 'text-fail';
                 case 'removeFromBn':
                     return 'text-fail';
                 case 'probationBn':
                     return 'text-probation';
+                case 'resignedOnStandardTerms':
+                    return 'text-neutral';
                 default:
                     return '';
             }

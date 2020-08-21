@@ -67,6 +67,10 @@ export default {
                     return 'Probation BN';
                 case 'removeFromBn':
                     return 'Remove from BN';
+                case 'resignedOnGoodTerms':
+                    return 'Resigned on good terms';
+                case 'resignedOnStandardTerms':
+                    return 'Resigned on standard terms';
                 default:
                     return this.consensus.charAt(0).toUpperCase() + this.consensus.slice(1);
             }
@@ -77,10 +81,6 @@ export default {
             switch (addition) {
                 case 'lowActivity':
                     return 'Low activity warning';
-                case 'resignedOnGoodTerms':
-                    return 'Resigned on good terms';
-                case 'resignedOnStandardTerms':
-                    return 'Resigned on standard terms';
                 default:
                     return 'None';
             }
@@ -93,12 +93,16 @@ export default {
                     return 'text-pass';
                 case 'fullBn':
                     return 'text-pass';
+                case 'resignedOnGoodTerms':
+                    return 'text-pass';
                 case 'fail':
                     return 'text-fail';
                 case 'removeFromBn':
                     return 'text-fail';
                 case 'probationBn':
                     return 'text-probation';
+                case 'resignedOnStandardTerms':
+                    return 'text-neutral';
                 default:
                     return '';
             }

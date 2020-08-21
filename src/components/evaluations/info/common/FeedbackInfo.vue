@@ -1,13 +1,9 @@
 <template>
     <div>
-        <p class="mb-2">
-            <b>Application feedback:</b>
-            <span v-if="resigned" class="text-secondary">
-                resigned
-            </span>
-        </p>
-
-        <div v-if="!resigned">
+        <div v-if="selectedEvaluation.kind !== 'resignation'">
+            <p class="mb-2">
+                <b>Feedback:</b>
+            </p>
             <textarea
                 v-model="feedback"
                 class="form-control mb-2"
@@ -53,7 +49,7 @@ export default {
     computed: {
         /** @returns {boolean} */
         resigned() {
-            return this.selectedEvaluation.addition == 'resignedOnGoodTerms' || this.selectedEvaluation.addition == 'resignedOnStandardTerms';
+            return this.selectedEvaluation.consensus == 'resignedOnGoodTerms' || this.selectedEvaluation.consensus == 'resignedOnStandardTerms';
         },
         ...mapGetters('evaluations', [
             'selectedEvaluation',

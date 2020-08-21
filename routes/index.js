@@ -6,7 +6,7 @@ const middlewares = require('../helpers/middlewares');
 const osu = require('../helpers/osu');
 const User = require('../models/user');
 const Logger = require('../models/log');
-const BnEvaluation = require('../models/evaluations/bnEvaluation');
+const ResignationEvaluation = require('../models/evaluations/resignationEvaluation');
 const { setSession } = require('../helpers/util');
 const { OsuResponseError } = require('../helpers/errors');
 
@@ -40,14 +40,14 @@ router.get('/modsCount/:user/:mode', async (req, res) => {
 
     if (user) {
         const wasBn = user.history && user.history.length;
-        const lastEvaluation = await BnEvaluation
+        const lastEvaluation = await ResignationEvaluation
             .findOne({
                 user: user._id,
                 mode: modeInput,
             })
             .sort({ updatedAt: -1 });
 
-        if (lastEvaluation && lastEvaluation.addition == 'resignedOnGoodTerms') months = 1;
+        if (lastEvaluation && lastEvaluation.consensus == 'resignedOnGoodTerms') months = 1;
         else if (wasBn) months = 2;
     }
 
@@ -64,8 +64,6 @@ router.get('/modsCount/:user/:mode', async (req, res) => {
         months,
     });
 });
-
-/*-------below this line is the intimidating code that i never want to look at----------*/
 
 /* GET 'login' to get user's info */
 router.get('/login', (req, res) => {
