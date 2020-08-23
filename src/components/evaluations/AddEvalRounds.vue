@@ -7,6 +7,7 @@
 
                     <mode-radio-display
                         v-model="selectedModes"
+                        class="ml-2"
                         input-type="checkbox"
                     />
 
@@ -26,9 +27,9 @@
                         title="probation BN"
                     >
                         <input
+                            v-model="groups"
                             type="checkbox"
                             class="probation-bn-radio hide-default"
-                            name="group"
                             value="probationBn"
                         >
                         <i class="fab fa-accessible-icon" />
@@ -40,9 +41,9 @@
                         title="full BN"
                     >
                         <input
+                            v-model="groups"
                             type="checkbox"
                             class="full-bn-radio hide-default"
-                            name="group"
                             value="fullBn"
                         >
                         <i class="fas fa-walking" />
@@ -54,9 +55,9 @@
                         title="NAT"
                     >
                         <input
+                            v-model="groups"
                             type="checkbox"
                             class="nat-radio hide-default"
-                            name="group"
                             value="nat"
                         >
                         <i class="fas fa-running" />
@@ -91,46 +92,21 @@
 
             <div class="row">
                 <div class="col-sm-12">
-                    <b class="mr-4">Resignation:</b>
+                    <b>Resignation:</b>
 
-                    <div class="row ml-4">
-                        <label
-                            class="mx-1"
-                            data-toggle="tooltip"
-                            data-placement="top"
-                            title="evaluation is NOT a resignation"
+                    <div class="form-check ml-2">
+                        <input
+                            id="isResignation"
+                            v-model="isResignation"
+                            class="form-check-input"
+                            type="checkbox"
                         >
-                            <input
-                                v-model="isResignation"
-                                type="radio"
-                                class="cross-radio hide-default"
-                                name="isResignation"
-                                value="0"
-                            >
-                            <i class="fas fa-times fa-lg" />
-                        </label>
-                        <label
-                            class="mx-1"
-                            data-toggle="tooltip"
-                            data-placement="top"
-                            title="evaluation is a resignation"
-                        >
-                            <input
-                                v-model="isResignation"
-                                type="radio"
-                                class="checkmark-radio hide-default"
-                                name="isResignation"
-                                value="1"
-                            >
-                            <i class="fas fa-check fa-lg" />
+                        <label class="form-check-label text-secondary small" for="isResignation">
+                            Checking this will replace vote/consensus options with "resigned on good/standard terms" and set deadline to today.
                         </label>
                     </div>
-
-                    <p class="small text-secondary ml-2">
-                        Checking this will replace vote/consensus options with "resigned on good/standard terms" and set deadline to today.
-                    </p>
                 </div>
-                <div v-if="isResignation == '0'" class="col-sm-12">
+                <div v-if="!isResignation" class="col-sm-12">
                     <div class="form-inline">
                         <b>Deadline:</b>
                         <input
@@ -171,9 +147,10 @@ export default {
         return {
             includeUsers: null,
             excludeUsers: null,
-            deadline: this.setDefaultDate(),
+            deadline: this.$moment().add(12, 'days').add(1, 'month').format('YYYY-MM-DD'),
             selectedModes: [],
-            isResignation: '0',
+            isResignation: false,
+            groups: [],
         };
     },
     methods: {
@@ -190,14 +167,7 @@ export default {
                     return;
                 }
 
-                let groups = [];
-
-                $('input[name="group"]:checked').each(function () {
-                    groups.push(this.value);
-                });
-
-
-                if (!groups.length && !this.includeUsers) {
+                if (!this.groups.length && !this.includeUsers) {
                     this.$store.dispatch('updateToastMessages', {
                         message: `Must select user group or include specific users!`,
                         type: 'danger',
@@ -210,11 +180,11 @@ export default {
                     '/bnEval/addEvalRounds/',
                     {
                         modes: this.selectedModes,
-                        groups,
+                        groups: this.groups,
                         includeUsers: this.includeUsers,
                         excludeUsers: this.excludeUsers,
                         deadline: this.deadline,
-                        isResignation: new Boolean(parseInt(this.isResignation)),
+                        isResignation: this.isResignation,
                     },
                     e
                 );
@@ -254,25 +224,6 @@ export default {
                     }
                 }
             }
-        },
-        setDefaultDate() {
-            const date = new Date();
-            date.setDate(date.getDate() + 12);
-            let month = (date.getMonth() + 1).toString();
-
-            if (month.length == 1) {
-                month = '0' + month;
-            }
-
-            let day = date.getDate().toString();
-
-            if (day.length == 1) {
-                day = '0' + day;
-            }
-
-            const year = date.getFullYear();
-
-            return year + '-' + month + '-' + day;
         },
     },
 };

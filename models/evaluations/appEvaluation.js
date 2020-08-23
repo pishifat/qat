@@ -56,6 +56,6 @@ appEvaluationSchema.loadClass(AppEvaluationService);
 /**
  * @type {import('../interfaces/evaluations').IAppEvaluationModel}
  */
-const AppEvaluation = mongoose.model('BnApp', appEvaluationSchema);
+const AppEvaluation = mongoose.model('AppEvaluation', appEvaluationSchema);
 
 module.exports = AppEvaluation;

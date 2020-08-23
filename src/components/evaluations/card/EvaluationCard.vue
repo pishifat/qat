@@ -33,6 +33,7 @@
 import { mapState } from 'vuex';
 import CardHeader from './CardHeader.vue';
 import CardFooter from './CardFooter.vue';
+import { EvaluationKind } from '../../../../shared/enums';
 
 export default {
     name: 'EvaluationCard',
@@ -96,7 +97,7 @@ export default {
                 let url = '/evalarchive';
 
                 if (this.evaluation.active) {
-                    if (this.evaluation.kind === 'application') {
+                    if (this.evaluation.kind === EvaluationKind.AppEvaluation) {
                         url = '/appeval';
                     } else {
                         url = '/bneval';

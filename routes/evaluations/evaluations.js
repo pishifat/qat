@@ -2,6 +2,60 @@ const Review = require('../../models/evaluations/review');
 const Logger = require('../../models/log');
 const User = require('../../models/user');
 const discord = require('../../helpers/discord');
+const { EvaluationKind } = require('../../shared/enums');
+const util = require('../../helpers/util');
+
+/**
+ * @param {import('../../models/interfaces/evaluations').IEvaluationDocument} evaluation
+ * @param {string} preText
+ * @param {string} [postText]
+ * @returns {string} {preText} [**Someone**'s {kind}](http://bn.mappersguild.com/{route}?id={id}) {postText}
+ */
+function formatDescription(evaluation, preText, postText) {
+    let route = 'bneval';
+    let kindText = '';
+
+    if (evaluation.kind === EvaluationKind.AppEvaluation) {
+        kindText = 'BN application';
+        route = 'appeval';
+    } else if (evaluation.kind === EvaluationKind.BnEvaluation) {
+        kindText = 'current BN eval';
+    } else {
+        kindText = 'resignation eval';
+    }
+
+    return `${preText} [**${evaluation.user.username}**'s ${kindText}](http://bn.mappersguild.com/${route}?id=${evaluation.id}) ${postText}`;
+}
+
+/**
+ * @param {string} evaluationKind
+ * @param {number} totalPass
+ * @param {number} totalNeutral
+ * @param {number} totalFail
+ * @returns {string} ${passText}: **${totalPass}**, ${neutralText}: **${totalNeutral}**, ${failText}: **${totalFail}**
+ */
+function formatConsensus(evaluationKind, totalPass, totalNeutral, totalFail) {
+    let passText = 'Pass';
+    let neutralText = 'Neutral';
+    let failText = 'Fail';
+
+    if (evaluationKind === EvaluationKind.BnEvaluation) {
+        passText = 'Full BN';
+        neutralText = 'Probation BN';
+        failText = 'Remove from BN';
+    } else if (evaluationKind === EvaluationKind.Resignation) {
+        passText = 'Resign on good terms';
+        neutralText = 'Resign on standard terms';
+    }
+
+    let consensus = `${passText}: **${totalPass}**, ${neutralText}: **${totalNeutral}**`;
+
+    if (evaluationKind !== EvaluationKind.Resignation) {
+        consensus += `, ${failText}: **${totalFail}**`;
+    }
+
+    return consensus;
+}
 
 async function submitEval (evaluation, session, isNat, behaviorComment, moddingComment, vote) {
     let review = evaluation.reviews.find(e => e.evaluator._id.toString() == session.mongoId);
@@ -23,15 +77,7 @@ async function submitEval (evaluation, session, isNat, behaviorComment, moddingC
         await evaluation.save();
 
         // Send new review notification
-        let description = '';
-
-        if (evaluation.kind === 'application') {
-            description = `Submitted eval for [**${evaluation.user.username}**'s BN application](http://bn.mappersguild.com/appeval?id=${evaluation.id})`;
-        } else if (evaluation.kind === 'currentBn') {
-            description = `Submitted eval for [**${evaluation.user.username}**'s current BN eval](http://bn.mappersguild.com/bneval?id=${evaluation.id})`;
-        } else {
-            description = `Submitted eval for [**${evaluation.user.username}**'s resignation eval](http://bn.mappersguild.com/bneval?id=${evaluation.id})`;
-        }
+        let description = formatDescription(evaluation, 'Submitted eval for');
 
         discord.webhookPost(
             [{
@@ -72,40 +118,17 @@ async function submitEval (evaluation, session, isNat, behaviorComment, moddingC
                 await evaluation.save();
 
                 // Send moved to discussion notification
-                let passText = 'Pass';
-                let neutralText = 'Neutral';
-                let failText = 'Fail';
-
-                if (evaluation.kind === 'application') {
-                    description = `[**${evaluation.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${evaluation.id}) moved to group discussion`;
-                } else if (evaluation.kind === 'currentBn') {
-                    passText = 'Full BN';
-                    neutralText = 'Probation BN';
-                    failText = 'Remove from BN';
-                    description = `[**${evaluation.user.username}**'s current BN eval](http://bn.mappersguild.com/bneval?id=${evaluation.id}) moved to group discussion`;
-                } else {
-                    passText = 'Resign on good terms';
-                    neutralText = 'Resign on standard terms';
-                    description = `[**${evaluation.user.username}**'s resignation eval](http://bn.mappersguild.com/bneval?id=${evaluation.id}) moved to group discussion`;
-                }
-
-                let value = `${passText}: **${totalPass}**, ${neutralText}: **${totalNeutral}**`;
-
-                if (evaluation.kind !== 'resignation') {
-                    value += `, ${failText}: **${totalFail}**`;
-                }
-
                 discord.webhookPost(
                     [{
                         thumbnail: {
                             url: `https://a.ppy.sh/${evaluation.user.osuId}`,
                         },
                         color: discord.webhookColors.gray,
-                        description,
+                        description: formatDescription(evaluation, '', 'moved to group discussion'),
                         fields: [
                             {
                                 name: 'Votes',
-                                value,
+                                value: formatConsensus(evaluation.kind, totalPass, totalNeutral, totalFail),
                             },
                         ],
                     }],
@@ -123,50 +146,27 @@ async function setGroupEval (evaluations, session) {
         evaluation.discussion = true;
         await evaluation.save();
 
-        let pass = 0;
-        let neutral = 0;
-        let fail = 0;
+        let totalPass = 0;
+        let totalNeutral = 0;
+        let totalFail = 0;
 
         evaluation.reviews.forEach(review => {
-            if (review.vote == 1) pass++;
-            else if (review.vote == 2) neutral++;
-            else if (review.vote == 3) fail++;
+            if (review.vote == 1) totalPass++;
+            else if (review.vote == 2) totalNeutral++;
+            else if (review.vote == 3) totalFail++;
         });
 
         // Send moved notification
-        let description = '';
-        let passText = 'Pass';
-        let neutralText = 'Neutral';
-        let failText = 'Fail';
-
-        if (evaluation.kind === 'application') {
-            description =  `Moved [**${evaluation.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${evaluation.id}) to group discussion`;
-        } else if (evaluation.kind === 'currentBn') {
-            passText = 'Full BN';
-            neutralText = 'Probation BN';
-            failText = 'Remove from BN';
-            description = `Moved [**${evaluation.user.username}**'s current BN eval](http://bn.mappersguild.com/bneval?id=${evaluation.id}) to group discussion`;
-        } else {
-            passText = 'Resign on good terms';
-            neutralText = 'Resign on standard terms';
-            description = `Moved [**${evaluation.user.username}**'s resignation eval](http://bn.mappersguild.com/bneval?id=${evaluation.id}) to group discussion`;
-        }
-
-        let value = `${passText}: **${pass}**, ${neutralText}: **${neutral}**`;
-
-        if (evaluation.kind !== 'resignation') {
-            value += `, ${failText}: **${fail}**`;
-        }
 
         discord.webhookPost(
             [{
                 author: discord.defaultWebhookAuthor(session),
                 color: discord.webhookColors.lightRed,
-                description,
+                description: formatDescription(evaluation, 'Moved', 'to group discussion'),
                 fields: [
                     {
                         name: 'Votes',
-                        value,
+                        value: formatConsensus(evaluation.kind, totalPass, totalNeutral, totalFail),
                     },
                 ],
             }],
@@ -181,7 +181,7 @@ async function setFeedback (evaluation, feedback, session) {
     Logger.generate(
         session.mongoId,
         `${action} feedback of ${evaluation.user.username}'s ${evaluation.mode} evaluation`,
-        evaluation.kind === 'application' ? 'appEvaluation' : 'bnEvaluation',
+        evaluation.kind === EvaluationKind.AppEvaluation ? 'appEvaluation' : 'bnEvaluation',
         evaluation._id
     );
 
@@ -192,7 +192,7 @@ async function setFeedback (evaluation, feedback, session) {
         [{
             author: discord.defaultWebhookAuthor(session),
             color: discord.webhookColors.blue,
-            description: `**[${evaluation.user.username}'s evaluation](http://bn.mappersguild.com/${evaluation.kind === 'application' ? 'appeval' : 'bneval'}?id=${evaluation.id}) feedback**: ${feedback.length > 925 ? feedback.slice(0,925) + '... *(truncated)*' : feedback}`,
+            description: formatDescription(evaluation, '', `: ${util.shorten(feedback, 925, '... *(truncated)*')}`),
         }],
         evaluation.mode
     );

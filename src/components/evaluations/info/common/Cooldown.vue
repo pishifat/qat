@@ -42,21 +42,22 @@ export default {
             'selectedEvaluation',
             'isApplication',
         ]),
+        /** @returns {Date} */
         originDate () {
             return this.isApplication ? new Date(this.selectedEvaluation.createdAt) : new Date(this.selectedEvaluation.updatedAt);
         },
+        /** @returns {number} */
         originalCooldownDays () {
-            let origin = new Date(this.originDate);
-            let cooldown = new Date(this.selectedEvaluation.cooldownDate);
-
-            return Math.round((cooldown - origin) / (1000*60*60*24));
+            return this.$moment(this.originDate).diff(this.selectedEvaluation.cooldownDate, 'days');
         },
+        /** @returns {Date} */
         newCooldownDate () {
             const newDate = new Date(this.originDate);
             newDate.setDate(newDate.getDate() + this.newCooldownDays);
 
             return newDate;
         },
+        /** @returns {boolean} */
         hasChanged () {
             return this.originalCooldownDays !== this.newCooldownDays;
         },

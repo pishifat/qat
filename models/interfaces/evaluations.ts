@@ -52,3 +52,11 @@ export interface IResignationEvaluationDocument extends IEvaluationBase, Documen
 export interface IResignationEvaluationModel extends Model<IResignationEvaluationDocument> {
     findActiveResignations?: () => Promise<IResignationEvaluationDocument[]>;
 }
+
+export interface IEvaluationDocument extends IEvaluationBase, IBnEvaluationDocument, Document {
+}
+
+export interface IEvaluationModel extends Model<IEvaluationDocument> {
+    findActiveEvaluations?: () => Promise<IEvaluationDocument[]>;
+    deleteUserActiveEvaluations?: (userId: number) => Promise<{ ok: number, deletedCount: number, n: number }>;
+}

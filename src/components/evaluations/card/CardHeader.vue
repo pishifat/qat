@@ -28,8 +28,11 @@
 </template>
 
 <script>
+import evaluations from '../../../mixins/evaluations';
+
 export default {
     name: 'CardHeader',
+    mixins: [ evaluations ],
     props: {
         username: {
             type: String,
@@ -54,58 +57,6 @@ export default {
         feedback: {
             type: String,
             default: '',
-        },
-    },
-    computed: {
-        consensusText() {
-            switch (this.consensus) {
-                case null:
-                    return 'None';
-                case 'fullBn':
-                    return 'Full BN';
-                case 'probationBn':
-                    return 'Probation BN';
-                case 'removeFromBn':
-                    return 'Remove from BN';
-                case 'resignedOnGoodTerms':
-                    return 'Resigned on good terms';
-                case 'resignedOnStandardTerms':
-                    return 'Resigned on standard terms';
-                default:
-                    return this.consensus.charAt(0).toUpperCase() + this.consensus.slice(1);
-            }
-        },
-        additionText() {
-            const addition = this.addition;
-
-            switch (addition) {
-                case 'lowActivity':
-                    return 'Low activity warning';
-                default:
-                    return 'None';
-            }
-        },
-        consensusColor() {
-            const consensus = this.consensus;
-
-            switch (consensus) {
-                case 'pass':
-                    return 'text-pass';
-                case 'fullBn':
-                    return 'text-pass';
-                case 'resignedOnGoodTerms':
-                    return 'text-pass';
-                case 'fail':
-                    return 'text-fail';
-                case 'removeFromBn':
-                    return 'text-fail';
-                case 'probationBn':
-                    return 'text-probation';
-                case 'resignedOnStandardTerms':
-                    return 'text-neutral';
-                default:
-                    return '';
-            }
         },
     },
 };

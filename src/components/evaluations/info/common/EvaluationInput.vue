@@ -55,7 +55,7 @@
                 >
                 <label class="form-check-label text-neutral" for="2">{{ selectedEvaluation.kind == 'application' ? 'Neutral' : selectedEvaluation.kind == 'currentBn' ? 'Probation BN' : 'Resign on standard terms' }}</label>
             </div>
-            <div v-if="selectedEvaluation.kind !== 'resignation'" class="form-check form-check-inline">
+            <div v-if="selectedEvaluation.kind !== 'Resignation'" class="form-check form-check-inline">
                 <input
                     id="3"
                     v-model="vote"

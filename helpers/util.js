@@ -61,14 +61,15 @@ function isValidUrlOrThrow(url, contain, throwMessage) {
  * Shorten text to a specific length if needed
  * @param {string} text
  * @param {number} [length] 50 by default
+ * @param {string} [trail] ...
  */
-function shorten(text, length) {
+function shorten(text, length, trail) {
     if (!text) return '';
 
     length = length || 50;
 
     if (text.length > length) {
-        return text.slice(0, length) + '...';
+        return text.slice(0, length) + (trail ? trail : '...');
     }
 
     return text;
