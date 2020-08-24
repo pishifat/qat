@@ -42,7 +42,7 @@
                     name="vote"
                     value="1"
                 >
-                <label class="form-check-label text-pass" for="1">Pass</label>
+                <label class="form-check-label text-pass" for="1">{{ selectedEvaluation.isApplication ? 'Pass' : selectedEvaluation.isBnEvaluation ? 'Full BN' : 'Resign on good terms' }}</label>
             </div>
             <div class="form-check form-check-inline">
                 <input
@@ -53,9 +53,9 @@
                     name="vote"
                     value="2"
                 >
-                <label class="form-check-label text-neutral" for="2">{{ isApplication ? 'Neutral' : 'Probation' }}</label>
+                <label class="form-check-label text-neutral" for="2">{{ selectedEvaluation.isApplication ? 'Neutral' : selectedEvaluation.isBnEvaluation ? 'Probation BN' : 'Resign on standard terms' }}</label>
             </div>
-            <div class="form-check form-check-inline">
+            <div v-if="!selectedEvaluation.isResignation" class="form-check form-check-inline">
                 <input
                     id="3"
                     v-model="vote"
@@ -64,7 +64,7 @@
                     name="vote"
                     value="3"
                 >
-                <label class="form-check-label text-fail" for="3">Fail</label>
+                <label class="form-check-label text-fail" for="3">{{ selectedEvaluation.isApplication ? 'Fail' : 'Remove from BN' }}</label>
             </div>
 
             <button class="btn btn-sm btn-primary" @click="submitEval($event)">
@@ -95,7 +95,6 @@ export default {
         ]),
         ...mapGetters('evaluations', [
             'selectedEvaluation',
-            'isApplication',
         ]),
     },
     watch: {
@@ -129,7 +128,7 @@ export default {
                 });
             } else {
                 const result = await this.executePost(
-                    `/${this.isApplication ? 'appEval' : 'bnEval'}/submitEval/${this.selectedEvaluation.id}`, {
+                    `/${this.selectedEvaluation.isApplication ? 'appEval' : 'bnEval'}/submitEval/${this.selectedEvaluation.id}`, {
                         vote: this.vote,
                         moddingComment: this.moddingComment,
                         behaviorComment: this.behaviorComment,

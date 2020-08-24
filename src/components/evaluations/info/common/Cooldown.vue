@@ -40,23 +40,23 @@ export default {
     computed: {
         ...mapGetters('evaluations', [
             'selectedEvaluation',
-            'isApplication',
         ]),
+        /** @returns {Date} */
         originDate () {
-            return this.isApplication ? new Date(this.selectedEvaluation.createdAt) : new Date(this.selectedEvaluation.updatedAt);
+            return this.selectedEvaluation.isApplication ? new Date(this.selectedEvaluation.createdAt) : new Date(this.selectedEvaluation.updatedAt);
         },
+        /** @returns {number} */
         originalCooldownDays () {
-            let origin = new Date(this.originDate);
-            let cooldown = new Date(this.selectedEvaluation.cooldownDate);
-
-            return Math.round((cooldown - origin) / (1000*60*60*24));
+            return this.$moment(this.selectedEvaluation.cooldownDate).diff(this.originDate, 'days');
         },
+        /** @returns {Date} */
         newCooldownDate () {
             const newDate = new Date(this.originDate);
             newDate.setDate(newDate.getDate() + this.newCooldownDays);
 
             return newDate;
         },
+        /** @returns {boolean} */
         hasChanged () {
             return this.originalCooldownDays !== this.newCooldownDays;
         },
@@ -72,7 +72,7 @@ export default {
     methods: {
         async setCooldownDate(e) {
             const result = await this.executePost(
-                `/${this.isApplication ? 'appEval' : 'bnEval'}/setCooldownDate/` + this.selectedEvaluation.id,
+                `/${this.selectedEvaluation.isApplication ? 'appEval' : 'bnEval'}/setCooldownDate/` + this.selectedEvaluation.id,
                 { cooldownDate: this.newCooldownDate },
                 e
             );

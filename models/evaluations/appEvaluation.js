@@ -12,6 +12,10 @@ const appEvaluationSchema = new mongoose.Schema({
 
 class AppEvaluationService extends mongoose.Model {
 
+    get isApplication () {
+        return true;
+    }
+
     get deadline () {
         let delay = this.discussion ? 14 : 7;
         let createdAt = this.createdAt;
@@ -56,6 +60,6 @@ appEvaluationSchema.loadClass(AppEvaluationService);
 /**
  * @type {import('../interfaces/evaluations').IAppEvaluationModel}
  */
-const AppEvaluation = mongoose.model('BnApp', appEvaluationSchema);
+const AppEvaluation = mongoose.model('AppEvaluation', appEvaluationSchema);
 
 module.exports = AppEvaluation;

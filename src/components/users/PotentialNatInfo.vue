@@ -33,7 +33,7 @@
                         <div class="card card-body mb-2">
                             <div class="mb-2">
                                 <b>NAT Consensus:</b>
-                                <span :class="app.consensus == 'pass' ? 'text-success' : 'text-danger'">{{ app.consensus }}</span>
+                                <span :class="isPass(app.consensus) ? 'text-success' : 'text-danger'">{{ app.consensus }}</span>
                             </div>
 
                             <b>Feedback:</b>
@@ -76,6 +76,7 @@
 
 <script>
 import postData from '../../mixins/postData.js';
+import { AppEvaluationConsensus } from '../../../shared/enums';
 
 export default {
     name: 'PotentialNatInfo',
@@ -84,6 +85,12 @@ export default {
         return {
             potentialNatInfo: [],
         };
+    },
+    computed: {
+        /** @returns {Boolean} */
+        isPass (consensus) {
+            return consensus === AppEvaluationConsensus.Pass;
+        },
     },
     methods: {
         async findPotentialNatInfo() {

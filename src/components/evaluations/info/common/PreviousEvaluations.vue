@@ -17,21 +17,9 @@
                 :key="evaluation.id"
                 class="small"
             >
-                <router-link :to="'/evalarchive?id=' + evaluation.id" class="small">
-                    {{ evaluation.kind === 'application' ? evaluation.updatedAt.slice(0,10) : evaluation.deadline.slice(0,10) }}
-                    -
-                    <mode-display
-                        :modes="evaluation.mode"
-                    />
-
-                    {{ evaluation.kind === 'application' ? "APPLICATION" : "BN EVAL" }}
-                </router-link>
-                -
-                <span :class="'text-' + evaluation.consensus">
-                    {{ evaluation.consensus.toUpperCase() }}
-                </span>
-
-                <div v-if="evaluation.feedback" v-html="$md.render(evaluation.feedback)" />
+                <previous-evaluation-entry
+                    :evaluation="evaluation"
+                />
             </li>
         </ul>
     </div>
@@ -39,12 +27,12 @@
 
 <script>
 import postData from '../../../../mixins/postData.js';
-import ModeDisplay from '../../../ModeDisplay.vue';
+import PreviousEvaluationEntry from './PreviousEvaluationEntry.vue';
 
 export default {
     name: 'PreviousEvaluations',
     components: {
-        ModeDisplay,
+        PreviousEvaluationEntry,
     },
     mixins: [ postData ],
     props: {

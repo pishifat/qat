@@ -60,13 +60,13 @@
                 <h2>BN Evaluations</h2>
 
                 <transition-group
-                    v-if="currentBnsEvaluations.length"
+                    v-if="currentBnEvaluations.length"
                     name="list"
                     tag="div"
                     class="row"
                 >
                     <evaluation-card
-                        v-for="evaluation in currentBnsEvaluations"
+                        v-for="evaluation in currentBnEvaluations"
                         :key="evaluation.id"
                         :evaluation="evaluation"
                         store-module="evaluations"
@@ -116,11 +116,13 @@ export default {
         ...mapGetters('evaluations', [
             'selectedEvaluation',
         ]),
+        /** @returns {Array} */
         applications () {
-            return this.evaluations.filter(e => e.kind === 'application');
+            return this.evaluations.filter(e => e.isApplication);
         },
-        currentBnsEvaluations () {
-            return this.evaluations.filter(e => e.kind === 'currentBn');
+        /** @returns {Array} */
+        currentBnEvaluations () {
+            return this.evaluations.filter(e => e.isBnEvaluation || e.isResignation);
         },
     },
     beforeCreate () {
@@ -139,8 +141,8 @@ export default {
 
         const data = await this.initialRequest(`/evalArchive/search?${query}`);
 
-        if (data.bnApplications || data.evalRounds) {
-            this.$store.commit('evaluations/setEvaluations', [...data.evalRounds, ...data.bnApplications]);
+        if (data.bnApplications || data.evaluations) {
+            this.$store.commit('evaluations/setEvaluations', [...data.evaluations, ...data.bnApplications]);
             this.wasLoaded = true;
         }
 
@@ -172,7 +174,7 @@ export default {
                 const res = await this.executeGet(`/evalArchive/search?user=${this.searchValue}`, e);
 
                 if (res && !res.error) {
-                    this.$store.commit('evaluations/setEvaluations', [...res.bnApplications, ...res.evalRounds]);
+                    this.$store.commit('evaluations/setEvaluations', [...res.bnApplications, ...res.evaluations]);
                 }
             }
         },
@@ -186,7 +188,7 @@ export default {
                 const res = await this.executeGet(`/evalarchive/search?limit=${this.limit}`, e);
 
                 if (res && !res.error) {
-                    this.$store.commit('evaluations/setEvaluations', [...res.bnApplications, ...res.evalRounds]);
+                    this.$store.commit('evaluations/setEvaluations', [...res.bnApplications, ...res.evaluations]);
                 }
             }
         },

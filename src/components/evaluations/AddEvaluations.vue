@@ -1,5 +1,5 @@
 <template>
-    <modal-dialog id="addEvalRounds" title="Add BNs to evaluate">
+    <modal-dialog id="addEvaluations" title="Add BNs to evaluate">
         <div class="container">
             <div class="row mb-3">
                 <div class="col-sm-12">
@@ -7,6 +7,7 @@
 
                     <mode-radio-display
                         v-model="selectedModes"
+                        class="ml-2"
                         input-type="checkbox"
                     />
 
@@ -26,9 +27,9 @@
                         title="probation BN"
                     >
                         <input
+                            v-model="groups"
                             type="checkbox"
                             class="probation-bn-radio hide-default"
-                            name="group"
                             value="probationBn"
                         >
                         <i class="fab fa-accessible-icon" />
@@ -40,9 +41,9 @@
                         title="full BN"
                     >
                         <input
+                            v-model="groups"
                             type="checkbox"
                             class="full-bn-radio hide-default"
-                            name="group"
                             value="fullBn"
                         >
                         <i class="fas fa-walking" />
@@ -54,9 +55,9 @@
                         title="NAT"
                     >
                         <input
+                            v-model="groups"
                             type="checkbox"
                             class="nat-radio hide-default"
-                            name="group"
                             value="nat"
                         >
                         <i class="fas fa-running" />
@@ -91,6 +92,21 @@
 
             <div class="row">
                 <div class="col-sm-12">
+                    <b>Resignation:</b>
+
+                    <div class="form-check ml-2">
+                        <input
+                            id="isResignation"
+                            v-model="isResignation"
+                            class="form-check-input"
+                            type="checkbox"
+                        >
+                        <label class="form-check-label text-secondary small" for="isResignation">
+                            Checking this will replace vote/consensus options with "resigned on good/standard terms" and set deadline to today.
+                        </label>
+                    </div>
+                </div>
+                <div v-if="!isResignation" class="col-sm-12">
                     <div class="form-inline">
                         <b>Deadline:</b>
                         <input
@@ -108,7 +124,7 @@
 
             <hr>
 
-            <button class="btn btn-primary mb-2 mt-4 btn-block" @click="addEvalRounds($event)">
+            <button class="btn btn-primary mb-2 mt-4 btn-block" @click="addEvaluations($event)">
                 Generate evaluations
             </button>
         </div>
@@ -121,7 +137,7 @@ import ModeRadioDisplay from '../ModeRadioDisplay.vue';
 import postData from '../../mixins/postData.js';
 
 export default {
-    name: 'AddEvalRounds',
+    name: 'AddEvaluations',
     components: {
         ModalDialog,
         ModeRadioDisplay,
@@ -131,12 +147,14 @@ export default {
         return {
             includeUsers: null,
             excludeUsers: null,
-            deadline: this.setDefaultDate(),
+            deadline: this.$moment().add(12, 'days').format('YYYY-MM-DD'),
             selectedModes: [],
+            isResignation: false,
+            groups: [],
         };
     },
     methods: {
-        async addEvalRounds(e) {
+        async addEvaluations(e) {
             const confirmInput = confirm(`Are you sure?`);
 
             if (confirmInput) {
@@ -149,14 +167,7 @@ export default {
                     return;
                 }
 
-                let groups = [];
-
-                $('input[name="group"]:checked').each(function () {
-                    groups.push(this.value);
-                });
-
-
-                if (!groups.length && !this.includeUsers) {
+                if (!this.groups.length && !this.includeUsers) {
                     this.$store.dispatch('updateToastMessages', {
                         message: `Must select user group or include specific users!`,
                         type: 'danger',
@@ -166,13 +177,14 @@ export default {
                 }
 
                 const result = await this.executePost(
-                    '/bnEval/addEvalRounds/',
+                    '/bnEval/addEvaluations/',
                     {
                         modes: this.selectedModes,
-                        groups,
+                        groups: this.groups,
                         includeUsers: this.includeUsers,
                         excludeUsers: this.excludeUsers,
                         deadline: this.deadline,
+                        isResignation: this.isResignation,
                     },
                     e
                 );
@@ -202,7 +214,7 @@ export default {
                                 type: 'danger',
                             });
                         } else {
-                            $('#addEvalRounds').modal('hide');
+                            $('#addEvaluations').modal('hide');
                         }
                     } else {
                         this.$store.dispatch('updateToastMessages', {
@@ -212,25 +224,6 @@ export default {
                     }
                 }
             }
-        },
-        setDefaultDate() {
-            const date = new Date();
-            date.setDate(date.getDate() + 12);
-            let month = (date.getMonth() + 1).toString();
-
-            if (month.length == 1) {
-                month = '0' + month;
-            }
-
-            let day = date.getDate().toString();
-
-            if (day.length == 1) {
-                day = '0' + day;
-            }
-
-            const year = date.getFullYear();
-
-            return year + '-' + month + '-' + day;
         },
     },
 };

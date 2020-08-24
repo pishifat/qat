@@ -7,32 +7,32 @@
                 <button
                     class="btn btn-primary"
                     data-toggle="modal"
-                    data-target="#addEvalRounds"
-                    @click="openAddEvalRounds()"
+                    data-target="#addEvaluations"
+                    @click="openAddEvaluations()"
                 >
                     Add users to evaluate
                 </button>
             </template>
         </eval-page>
 
-        <add-eval-rounds />
+        <add-evaluations />
     </div>
 </template>
 
 <script>
-import AddEvalRounds from '../components/evaluations/AddEvalRounds.vue';
+import AddEvaluations from '../components/evaluations/AddEvaluations.vue';
 import EvalPage from '../components/evaluations/EvalPage.vue';
 import postData from '../mixins/postData.js';
 
 export default {
     name: 'BnEvalPage',
     components: {
-        AddEvalRounds,
+        AddEvaluations,
         EvalPage,
     },
     mixins: [ postData ],
     methods: {
-        openAddEvalRounds() {
+        openAddEvaluations() {
             this.$store.commit('evaluations/updateCheckedEvaluations', []);
         },
     },

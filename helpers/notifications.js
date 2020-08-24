@@ -6,7 +6,7 @@ const discord = require('./discord');
 const osuv1 = require('./osuv1');
 const util = require('./util');
 const AppEvaluation = require('../models/evaluations/appEvaluation');
-const BnEvaluation = require('../models/evaluations/bnEvaluation');
+const Evaluation = require('../models/evaluations/evaluation');
 const Veto = require('../models/veto');
 const User = require('../models/user');
 const BeatmapReport = require('../models/beatmapReport');
@@ -36,7 +36,7 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
             })
             .populate(defaultPopulate),
 
-        BnEvaluation
+        Evaluation
             .find({ active: true })
             .populate(defaultPopulate),
 
@@ -150,7 +150,7 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
 
                 for (let i = 0; i < assignedNat.length; i++) {
                     let user = assignedNat[i];
-                    await BnEvaluation.findByIdAndUpdate(round.id, { $push: { natEvaluators: user._id } });
+                    await Evaluation.findByIdAndUpdate(round.id, { $push: { natEvaluators: user._id } });
                     natList += user.username;
 
                     if (i + 1 < assignedNat.length) {

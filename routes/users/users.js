@@ -3,9 +3,12 @@ const User = require('../../models/user');
 const Logger = require('../../models/log');
 const AppEvaluation = require('../../models/evaluations/appEvaluation');
 const BnEvaluation = require('../../models/evaluations/bnEvaluation');
+const Evaluation = require('../../models/evaluations/evaluation');
 const Aiess = require('../../models/aiess');
 const middlewares = require('../../helpers/middlewares');
+const discord = require('../../helpers/discord');
 const getGeneralEvents = require('../evaluations/bnEval').getGeneralEvents;
+const getUserModsCount = require('../../helpers/scrap').getUserModsCount;
 
 const router = express.Router();
 
@@ -57,7 +60,7 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
     minEvalDate.setDate(minEvalDate.getDate() - (parseInt(req.params.days)));
     const maxDate = new Date();
     const invalids = [8129817, 3178418, 2204515, 2857314];
-    const [users, bnApps, bnRounds] = await Promise.all([
+    const [users, applicationEvaluations, bnEvaluations] = await Promise.all([
         User
             .find({
                 groups: 'nat',
@@ -73,7 +76,7 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
             })
             .populate(evaluationsPopulate),
 
-        BnEvaluation
+        Evaluation
             .find({
                 mode: req.params.mode,
                 deadline: { $gte: minEvalDate, $lte: maxDate },
@@ -87,11 +90,11 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
             let evalsOnBnApps = 0;
             let evalsOnCurrentBnEvals = 0;
 
-            bnApps.forEach(app => {
+            applicationEvaluations.forEach(app => {
                 evalsOnBnApps += app.reviews.filter(r => r.evaluator == user.id).length;
             });
 
-            bnRounds.forEach(round => {
+            bnEvaluations.forEach(round => {
                 evalsOnCurrentBnEvals += round.reviews.filter(r => r.evaluator == user.id).length;
             });
 
@@ -110,8 +113,8 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
 
     res.json({
         info,
-        bnAppsCount: bnApps.length,
-        evalRoundsCount: bnRounds.length,
+        bnAppsCount: applicationEvaluations.length,
+        bnEvaluationsCount: bnEvaluations.length,
     });
 });
 
@@ -119,7 +122,7 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
     let minDate = new Date();
     minDate.setDate(minDate.getDate() - parseInt(req.params.days));
     let maxDate = new Date();
-    const [users, allEvents, allActiveEvalRounds, allQualityAssuranceChecks] = await Promise.all([
+    const [users, allEvents, allActiveBnEvaluations, allQualityAssuranceChecks] = await Promise.all([
         User
             .find({
                 groups: 'bn',
@@ -162,7 +165,7 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
             }
         }
 
-        let activeEval = allActiveEvalRounds.find(e => e.user == user.id);
+        let activeEval = allActiveBnEvaluations.find(e => e.user == user.id);
         let deadline;
         if (activeEval) deadline = activeEval.deadline;
 
@@ -205,6 +208,58 @@ router.post('/:id/switchBnEvaluator', middlewares.isBnOrNat, async (req, res) =>
     );
 });
 
+/* POST switch user group */
+router.post('/:id/switchUserGroup', middlewares.isNat, async (req, res) => {
+    const user = await User.findById(req.params.id).orFail();
+
+    if (user.isNat) {
+        const i = user.groups.findIndex(g => g === 'nat');
+        if (i !== -1) user.groups.splice(i, 1, 'bn');
+    } else {
+        const i = user.groups.findIndex(g => g === 'bn');
+        if (i !== -1) user.groups.splice(i, 1, 'nat');
+    }
+
+    for (const mode of user.modesInfo) {
+        mode.level = 'full';
+
+        user.history.push({
+            date: new Date(),
+            mode: mode.mode,
+            kind: 'left',
+            group: user.isNat ? 'nat' : 'bn',
+            relatedEvaluation: null,
+        });
+
+        user.history.push({
+            date: new Date(),
+            mode: mode.mode,
+            kind: 'joined',
+            group: user.isNat ? 'bn' : 'nat',
+            relatedEvaluation: null,
+        });
+    }
+
+    await user.save();
+
+    discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            color: discord.webhookColors.darkGreen,
+            description: `Moved [**${user.username}**](http://osu.ppy.sh/users/${user.osuId}) from **${user.isNat ? 'NAT' : 'BN'}** to **${user.isNat ? 'BN' : 'NAT'}**.`,
+        }],
+        'all'
+    );
+
+    res.json(user);
+    Logger.generate(
+        req.session.mongoId,
+        `Moved "${user.username}" from "${user.isNat ? 'NAT' : 'BN'}" to "${user.isNat ? 'BN' : 'NAT'}"`,
+        'user',
+        user._id
+    );
+});
+
 /* GET aiess info */
 router.get('/activity', async (req, res) => {
     const { osuId, mongoId } = req.query;
@@ -215,6 +270,11 @@ router.get('/activity', async (req, res) => {
     let maxDate = new Date(deadline);
 
     res.json(await getGeneralEvents(osuId, mongoId, modes, minDate, maxDate));
+});
+
+/* GET modding info */
+router.get('/findModsCount/:username', async (req, res) => {
+    res.json(await getUserModsCount(req.params.username));
 });
 
 module.exports = router;

@@ -15,6 +15,9 @@ interface IEvaluationBase {
     consensusSetAt?: Date;
     createdAt?: Date;
     updatedAt?: Date;
+    isApplication?: boolean;
+    isBnEvaluation?: boolean;
+    isResignation?: boolean;
 }
 
 export interface IAppEvaluationDocument extends IEvaluationBase, Document {
@@ -34,15 +37,29 @@ export interface IAppEvaluationModel extends Model<IAppEvaluationDocument> {
 export interface IBnEvaluationDocument extends IEvaluationBase, Document {
     consensus?: string;
     deadline?: Date;
-    isLowActivity?: boolean;
-    resignedOnGoodTerms?: boolean;
-    resignedOnStandardTerms?: boolean;
-    isMoveToNat?: boolean;
-    isMoveToBn?: boolean;
+    addition?: string;
     kind?: string;
 }
 
 export interface IBnEvaluationModel extends Model<IBnEvaluationDocument> {
     findActiveEvaluations?: () => Promise<IBnEvaluationDocument[]>;
+    deleteUserActiveEvaluations?: (userId: number) => Promise<{ ok: number, deletedCount: number, n: number }>;
+}
+
+export interface IResignationEvaluationDocument extends IEvaluationBase, Document {
+    consensus?: string;
+    deadline?: Date;
+    kind?: string;
+}
+
+export interface IResignationEvaluationModel extends Model<IResignationEvaluationDocument> {
+    findActiveResignations?: () => Promise<IResignationEvaluationDocument[]>;
+}
+
+export interface IEvaluationDocument extends IEvaluationBase, IBnEvaluationDocument, Document {
+}
+
+export interface IEvaluationModel extends Model<IEvaluationDocument> {
+    findActiveEvaluations?: () => Promise<IEvaluationDocument[]>;
     deleteUserActiveEvaluations?: (userId: number) => Promise<{ ok: number, deletedCount: number, n: number }>;
 }

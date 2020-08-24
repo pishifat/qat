@@ -50,6 +50,7 @@ export default {
             type: String,
             required: true,
         },
+        /** @type {import('vue').PropOptions<Object[]>} */
         reviews: {
             type: Array,
             default() {

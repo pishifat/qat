@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p>
+        <p class="ml-4">
             <a :href="events && `#${eventsId}`" data-toggle="collapse">{{ header }} <i class="fas fa-angle-down" /></a>
             ({{ isLoading ? '...' : events ? events.length : '0' }})
         </p>

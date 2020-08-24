@@ -18,14 +18,21 @@
         </p>
         <div v-if="consensus">
             Consensus:
-            <span :class="`text-${consensus}`">{{ consensus }}</span>
+            <span :class="consensusColor" class="text-capitalize">{{ consensusText }}</span>
+        </div>
+        <div v-if="addition && addition != 'none'">
+            Addition:
+            <span :class="consensusColor" class="text-capitalize">{{ additionText }}</span>
         </div>
     </div>
 </template>
 
 <script>
+import evaluations from '../../../mixins/evaluations';
+
 export default {
     name: 'CardHeader',
+    mixins: [ evaluations ],
     props: {
         username: {
             type: String,
@@ -42,6 +49,10 @@ export default {
         consensus: {
             type: String,
             default: '',
+        },
+        addition: {
+            type: String,
+            default: 'none',
         },
         feedback: {
             type: String,

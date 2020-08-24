@@ -14,6 +14,7 @@
                 :username="username"
                 :osu-id="osuId"
                 :consensus="evaluation.consensus"
+                :addition="evaluation.addition"
                 :feedback="evaluation.feedback"
             />
 
@@ -91,11 +92,11 @@ export default {
         select() {
             this.$store.commit('evaluations/setSelectedEvaluationId', this.evaluation.id);
 
-            if (this.$route.query.id !== this.evaluation.id &&  !this.loggedInUser.isBn) {
+            if (this.$route.query.id !== this.evaluation.id && !this.loggedInUser.isBn) {
                 let url = '/evalarchive';
 
                 if (this.evaluation.active) {
-                    if (this.evaluation.kind === 'application') {
+                    if (this.evaluation.isApplication) {
                         url = '/appeval';
                     } else {
                         url = '/bneval';

@@ -38,6 +38,10 @@
             <notes
                 v-if="loggedInUser.isNat"
             />
+
+            <user-group-toggle
+                v-if="loggedInUser.isNat"
+            />
         </div>
     </modal-dialog>
 </template>
@@ -49,6 +53,7 @@ import Duration from './info/Duration.vue';
 import Notes from './info/Notes.vue';
 import NextEvaluation from './info/NextEvaluation.vue';
 import BnEvaluatorToggle from './info/BnEvaluatorToggle.vue';
+import UserGroupToggle from './info/UserGroupToggle.vue';
 import ModdingActivity from '../evaluations/info/currentBns/ModdingActivity.vue';
 import UserActivity from '../evaluations/info/currentBns/userActivity/UserActivity.vue';
 import ModalDialog from '../ModalDialog.vue';
@@ -61,6 +66,7 @@ export default {
         Notes,
         NextEvaluation,
         BnEvaluatorToggle,
+        UserGroupToggle,
         ModdingActivity,
         UserActivity,
         ModalDialog,
