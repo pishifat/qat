@@ -72,12 +72,17 @@
                     <b>Forum message:</b>
                 </p>
                 <div id="forumMessage" class="card card-body small">
-                    <span>Hello!</span><br><br>
-                    <span>You have been selected to help evaluate the [i]{{ selectedEvaluation.mode == 'osu' ? 'osu!' : 'osu!' + selectedEvaluation.mode }}[/i] mode BN application for [url=https://osu.ppy.sh/users/{{ selectedEvaluation.user.osuId }}]{{ selectedEvaluation.user.username }}[/url].</span><br><br>
-                    <span>Please post your thoughts on the applicant's behavior and modding quality (based on submitted mods and anything else you may know) on the [url=http://bn.mappersguild.com/appeval]BN/NAT website[/url].</span><br><br>
-                    <span>If the user's application is not visible, that means it has received enough evaluations for a consensus to be reached -- this usually [b]3-5 days[/b] after you receive this message. Your decision will be anonymous to everyone but members of the NAT.</span><br><br>
-                    <span>Keep in mind that this is a 100% optional activity. If you do not want to participate in BN application evaluations, opt-out from your card on the [url=http://bn.mappersguild.com/users]users page[/url]. Failing to finish on time has no penalty.</span><br><br>
-                    <span>Thank you for your hard work!</span>
+                    <div>Hello!</div>
+                    <br>
+                    <div>You have been selected to help evaluate the [i]{{ selectedEvaluation.mode == 'osu' ? 'osu!' : 'osu!' + selectedEvaluation.mode }}[/i] mode BN application for [url=https://osu.ppy.sh/users/{{ selectedEvaluation.user.osuId }}]{{ selectedEvaluation.user.username }}[/url].</div>
+                    <br>
+                    <div>Please post your thoughts on the applicant's behavior and modding quality (based on submitted mods and anything else you may know) on the [url=http://bn.mappersguild.com/appeval]BN/NAT website[/url].</div>
+                    <br>
+                    <div>If the user's application is not visible, that means it has received enough evaluations for a consensus to be reached -- this usually [b]3-5 days[/b] after you receive this message. Your decision will be anonymous to everyone but members of the NAT.</div>
+                    <br>
+                    <div>Keep in mind that this is a 100% optional activity. If you do not want to participate in BN application evaluations, opt-out from your card on the [url=http://bn.mappersguild.com/users]users page[/url]. Failing to finish on time has no penalty.</div>
+                    <br>
+                    <div>Thank you for your hard work!</div>
                 </div>
             </div>
         </div>
