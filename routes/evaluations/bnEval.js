@@ -166,7 +166,7 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
         for (let i = 0; i < result.length; i++) {
             const er = result[i];
             const u = await User.findById(er.user);
-            const invalids = [8129817, 3178418, 2204515, 2857314, u.osuId];
+            const invalids = [8129817, 3178418, 2857314, u.osuId];
             const assignedNat = await User.aggregate([
                 { $match: { groups: 'nat', 'modesInfo.mode': er.mode, osuId: { $nin: invalids } } },
                 { $sample: { size: twoEvaluationModes.includes(er.mode) ? 2 : 3 } },

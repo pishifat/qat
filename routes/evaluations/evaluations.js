@@ -204,7 +204,6 @@ async function replaceUser (evaluation, currentUser, evaluatorId) {
     const invalids = [
         8129817,
         3178418,
-        2204515,
         2857314,
         ...evaluation.natEvaluators.map(u => u.osuId),
     ];

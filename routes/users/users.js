@@ -59,7 +59,7 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
     const minEvalDate = new Date();
     minEvalDate.setDate(minEvalDate.getDate() - (parseInt(req.params.days)));
     const maxDate = new Date();
-    const invalids = [8129817, 3178418, 2204515, 2857314];
+    const invalids = [8129817, 3178418, 2857314];
     const [users, applicationEvaluations, bnEvaluations] = await Promise.all([
         User
             .find({

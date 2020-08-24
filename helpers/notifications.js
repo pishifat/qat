@@ -142,7 +142,7 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
             //const threeEvaluationModes = ['osu', 'taiko', 'mania'];
 
             if (!round.natEvaluators || !round.natEvaluators.length) {
-                const invalids = [8129817, 3178418, 2204515, 2857314];
+                const invalids = [8129817, 3178418, 2857314];
                 const assignedNat = await User.aggregate([
                     { $match: { groups: 'nat', 'modesInfo.mode': round.mode, osuId: { $nin: invalids } } },
                     { $sample: { size: twoEvaluationModes.includes(round.mode) ? 2 : 3 } },
