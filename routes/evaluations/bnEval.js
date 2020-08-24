@@ -305,7 +305,7 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
         let user = await User.findById(evaluation.user);
         const i = user.modesInfo.findIndex(m => m.mode === evaluation.mode);
 
-        if (evaluation.consensus === BnEvaluationConsensus.RemoveFromBn || evaluation.isResignation) {
+        if (evaluation.consensus === BnEvaluationConsensus.RemoveFromBn || (evaluation.isResignation && evaluation.consensus)) {
             if (i !== -1) {
                 user.modesInfo.splice(i, 1);
             }

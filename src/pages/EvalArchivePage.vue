@@ -122,7 +122,7 @@ export default {
         },
         /** @returns {Array} */
         currentBnEvaluations () {
-            return this.evaluations.filter(e => e.isBnEvaluation);
+            return this.evaluations.filter(e => e.isBnEvaluation || e.isResignation);
         },
     },
     beforeCreate () {

@@ -77,7 +77,7 @@ async function submitEval (evaluation, session, isNat, behaviorComment, moddingC
         await evaluation.save();
 
         // Send new review notification
-        let description = formatDescription(evaluation, 'Submitted eval for');
+        let description = formatDescription(evaluation, 'Submitted eval for', '');
 
         discord.webhookPost(
             [{
