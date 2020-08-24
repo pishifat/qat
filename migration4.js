@@ -13,7 +13,7 @@ Mongoose.connect(config.connection, { useNewUrlParser: true }, async function (e
     for (const evaluation of allEvaluations) {
         console.log(evaluation.consensus);
 
-        if (evaluation.consensus === 'pass') {
+        /*if (evaluation.consensus === 'pass') {
             evaluation.consensus = 'fullBn';
             evaluation.kind = 'currentBn';
 
@@ -40,7 +40,11 @@ Mongoose.connect(config.connection, { useNewUrlParser: true }, async function (e
         delete evaluation.resignedOnGoodTerms;
         delete evaluation.resignedOnStandardTerms;
         delete evaluation.isMoveToNat;
-        delete evaluation.isMoveToBn;
+        delete evaluation.isMoveToBn;*/
+
+        if (!evaluation.consensus) {
+            evaluation.kind = 'currentBn';
+        }
 
         await evaluations.replaceOne({
             _id: evaluation._id,
