@@ -4,10 +4,10 @@
             <input
                 v-model="natDays"
                 class="form-control"
-                type="text"
-                autocomplete="off"
+                type="number"
                 placeholder="days of activity..."
-                maxlength="3"
+                min="1"
+                max="100"
                 @keyup.enter="findNatActivity()"
             >
 
@@ -75,7 +75,7 @@ export default {
     data() {
         return {
             natActivity: null,
-            natDays: '',
+            natDays: null,
             natMode: 'osu',
             natTotal: null,
             totalBnApps: null,
@@ -84,9 +84,9 @@ export default {
     },
     methods: {
         async findNatActivity() {
-            if (!this.natDays.length) this.natDays = '30';
+            if (!this.natDays.length) this.natDays = 30;
 
-            const res = await this.executeGet('/users/findNatActivity/' + this.natDays + '/' + this.natMode);
+            const res = await this.executeGet(`/users/findNatActivity/${this.natDays}/${this.natMode}`);
 
             if (res) {
                 this.natActivity = res.info;

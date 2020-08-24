@@ -10,11 +10,11 @@ const appEvaluationSchema = new mongoose.Schema({
     test: { type: 'ObjectId', ref: 'TestSubmission' },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-appEvaluationSchema.virtual('isApplication').get(function () {
-    return true;
-});
-
 class AppEvaluationService extends mongoose.Model {
+
+    get isApplication () {
+        return true;
+    }
 
     get deadline () {
         let delay = this.discussion ? 14 : 7;

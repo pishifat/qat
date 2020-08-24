@@ -62,7 +62,7 @@ router.get('/search', async (req, res) => {
         .sort({ createdAt: -1 })
         .limit(limit);
 
-    let BnEvaluationsQuery = Evaluation
+    let bnEvaluationsQuery = Evaluation
         .find({
             active: false,
             consensus: { $exists: true },
@@ -79,17 +79,17 @@ router.get('/search', async (req, res) => {
         }
 
         bnApplicationsQuery.where('user', user.id);
-        BnEvaluationsQuery.where('user', user.id);
+        bnEvaluationsQuery.where('user', user.id);
     }
 
     if (idToSearch) {
         bnApplicationsQuery.where('_id', idToSearch);
-        BnEvaluationsQuery.where('_id', idToSearch);
+        bnEvaluationsQuery.where('_id', idToSearch);
     }
 
     const [bnApplications, evaluations] = await Promise.all([
         bnApplicationsQuery,
-        BnEvaluationsQuery,
+        bnEvaluationsQuery,
     ]);
 
     res.json({
