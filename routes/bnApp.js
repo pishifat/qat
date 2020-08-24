@@ -76,10 +76,12 @@ router.post('/apply', async (req, res) => {
             consensus: 'fail',
             cooldownDate: { $gte: cooldownDate },
         }),
-        ResignationEvaluation.findOne({
-            user: req.session.mongoId,
-            mode,
-        }),
+        ResignationEvaluation
+            .findOne({
+                user: req.session.mongoId,
+                mode,
+            })
+            .sort({ updatedAt: -1 }),
     ]);
 
     const wasBn = res.locals.userRequest.history && res.locals.userRequest.history.length;
