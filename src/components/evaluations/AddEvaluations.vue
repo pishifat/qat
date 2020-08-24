@@ -1,5 +1,5 @@
 <template>
-    <modal-dialog id="addEvalRounds" title="Add BNs to evaluate">
+    <modal-dialog id="addEvaluations" title="Add BNs to evaluate">
         <div class="container">
             <div class="row mb-3">
                 <div class="col-sm-12">
@@ -124,7 +124,7 @@
 
             <hr>
 
-            <button class="btn btn-primary mb-2 mt-4 btn-block" @click="addEvalRounds($event)">
+            <button class="btn btn-primary mb-2 mt-4 btn-block" @click="addEvaluations($event)">
                 Generate evaluations
             </button>
         </div>
@@ -137,7 +137,7 @@ import ModeRadioDisplay from '../ModeRadioDisplay.vue';
 import postData from '../../mixins/postData.js';
 
 export default {
-    name: 'AddEvalRounds',
+    name: 'AddEvaluations',
     components: {
         ModalDialog,
         ModeRadioDisplay,
@@ -147,14 +147,14 @@ export default {
         return {
             includeUsers: null,
             excludeUsers: null,
-            deadline: this.$moment().add(12, 'days').add(1, 'month').format('YYYY-MM-DD'),
+            deadline: this.$moment().add(12, 'days').format('YYYY-MM-DD'),
             selectedModes: [],
             isResignation: false,
             groups: [],
         };
     },
     methods: {
-        async addEvalRounds(e) {
+        async addEvaluations(e) {
             const confirmInput = confirm(`Are you sure?`);
 
             if (confirmInput) {
@@ -177,7 +177,7 @@ export default {
                 }
 
                 const result = await this.executePost(
-                    '/bnEval/addEvalRounds/',
+                    '/bnEval/addEvaluations/',
                     {
                         modes: this.selectedModes,
                         groups: this.groups,
@@ -214,7 +214,7 @@ export default {
                                 type: 'danger',
                             });
                         } else {
-                            $('#addEvalRounds').modal('hide');
+                            $('#addEvaluations').modal('hide');
                         }
                     } else {
                         this.$store.dispatch('updateToastMessages', {

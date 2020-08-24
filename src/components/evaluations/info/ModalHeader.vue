@@ -1,7 +1,7 @@
 <template>
     <div class="modal-header" :class="isNatEvaluator() ? 'bg-info' : 'bg-primary'">
         <h5 class="modal-title">
-            {{ kind == 'application' ? 'Application Evaluation:' : kind == 'currentBn' ? 'BN Evaluation:' : 'Resignation Evaluation:' }}
+            {{ isApplication ? 'Application Evaluation:' : isBnEvaluation ? 'BN Evaluation:' : 'Resignation Evaluation:' }}
             <a
                 :href="'https://osu.ppy.sh/users/' + osuId"
                 target="_blank"
@@ -28,10 +28,6 @@ export default {
         ModeDisplay,
     },
     props: {
-        kind: {
-            type: String,
-            required: true,
-        },
         osuId: {
             type: Number,
             required: true,
@@ -50,10 +46,14 @@ export default {
                 return [];
             },
         },
+        isApplication: Boolean,
+        isBnEvaluation: Boolean,
     },
-    computed: mapState([
-        'loggedInUser',
-    ]),
+    computed: {
+        ...mapState([
+            'loggedInUser',
+        ]),
+    },
     methods: {
         isNatEvaluator() {
             for (let i = 0; i < this.natEvaluators.length; i++) {

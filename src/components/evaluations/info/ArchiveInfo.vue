@@ -9,12 +9,13 @@
                 :nat-evaluators="selectedEvaluation.natEvaluators"
                 :osu-id="selectedEvaluation.user.osuId"
                 :username="selectedEvaluation.user.username"
-                :kind="selectedEvaluation.kind"
+                :is-application="selectedEvaluation.isApplication"
+                :is-bn-evaluation="selectedEvaluation.isBnEvaluation"
             />
         </template>
 
         <div v-if="selectedEvaluation" class="container">
-            <main-application-info v-if="isApplication" />
+            <main-application-info v-if="selectedEvaluation.isApplication" />
             <main-current-bn-info v-else />
 
             <consensus />
@@ -48,6 +49,7 @@ import ReviewsListing from './common/ReviewsListing.vue';
 import ModalDialog from '../../ModalDialog.vue';
 import MainApplicationInfo from './applications/MainApplicationInfo.vue';
 import MainCurrentBnInfo from './currentBns/MainCurrentBnInfo.vue';
+import { AppEvaluationConsensus } from '../../../../shared/enums';
 
 export default {
     name: 'ArchiveInfo',
@@ -66,13 +68,12 @@ export default {
         ]),
         ...mapGetters('evaluations', [
             'selectedEvaluation',
-            'isApplication',
         ]),
     },
     methods: {
         async unarchive(e) {
-            if (this.isApplication) {
-                const result = confirm(`Are you sure? ${this.selectedEvaluation.consensus == 'pass' ? 'This will remove the user from the BN' : ''}`);
+            if (this.selectedEvaluation.isApplication) {
+                const result = confirm(`Are you sure? ${this.selectedEvaluation.consensus === AppEvaluationConsensus.Pass ? 'This will remove the user from the BN' : ''}`);
 
                 if (result) {
                     const data = await this.executePost(`/evalArchive/${this.selectedEvaluation.id}/unarchiveApp`, e);

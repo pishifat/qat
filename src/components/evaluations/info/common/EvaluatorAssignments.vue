@@ -4,7 +4,7 @@
             <user-list
                 :header="'Assigned NAT:'"
                 :user-list="selectedEvaluation.natEvaluators"
-                :is-application="isApplication"
+                :is-application="selectedEvaluation.isApplication"
                 :nominator-assessment-mongo-id="selectedEvaluation.id"
                 :replace-nat="true"
             />
@@ -13,7 +13,7 @@
             <user-list
                 :header="'Assigned BN:'"
                 :user-list="selectedEvaluation.bnEvaluators"
-                :is-application="isApplication"
+                :is-application="selectedEvaluation.isApplication"
                 :nominator-assessment-mongo-id="selectedEvaluation.id"
             />
         </div>
@@ -24,7 +24,7 @@
             />
         </div>
 
-        <div v-if="(!selectedEvaluation.bnEvaluators || !selectedEvaluation.bnEvaluators.length) && isApplication" class="col-sm-12">
+        <div v-if="(!selectedEvaluation.bnEvaluators || !selectedEvaluation.bnEvaluators.length) && selectedEvaluation.isApplication" class="col-sm-12">
             <hr>
 
             <div class="row">
@@ -105,7 +105,6 @@ export default {
     computed: {
         ...mapGetters('evaluations', [
             'selectedEvaluation',
-            'isApplication',
         ]),
         submittedEvaluators() {
             return this.selectedEvaluation.reviews.map(review => review.evaluator);

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-if="selectedEvaluation.kind !== 'resignation'">
+        <div v-if="!selectedEvaluation.isResignation">
             <p class="mb-2">
                 <b>Feedback:</b>
             </p>
@@ -11,7 +11,7 @@
             />
 
             <input
-                v-if="isApplication && selectedEvaluation.consensus == 'pass'"
+                v-if="selectedEvaluation.isApplication && positiveConsensus"
                 v-model="discordLink"
                 class="form-control"
                 type="text"
@@ -32,6 +32,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import postData from '../../../../mixins/postData.js';
+import evaluations from '../../../../mixins/evaluations.js';
 import FeedbackPm from './FeedbackPm.vue';
 
 export default {
@@ -39,7 +40,7 @@ export default {
     components: {
         FeedbackPm,
     },
-    mixins: [ postData ],
+    mixins: [ postData, evaluations ],
     data() {
         return {
             feedback: '',
@@ -47,14 +48,12 @@ export default {
         };
     },
     computed: {
-        /** @returns {boolean} */
-        resigned() {
-            return this.selectedEvaluation.consensus == 'resignedOnGoodTerms' || this.selectedEvaluation.consensus == 'resignedOnStandardTerms';
-        },
         ...mapGetters('evaluations', [
             'selectedEvaluation',
-            'isApplication',
         ]),
+        consensus () {
+            return this.selectedEvaluation.consensus;
+        },
     },
     watch: {
         selectedEvaluation () {
@@ -67,7 +66,7 @@ export default {
     methods: {
         async setFeedback (e) {
             const result = await this.executePost(
-                `/${this.isApplication ? 'appEval' : 'bnEval'}/setFeedback/` + this.selectedEvaluation.id, { feedback: this.feedback }, e);
+                `/${this.selectedEvaluation.isApplication ? 'appEval' : 'bnEval'}/setFeedback/` + this.selectedEvaluation.id, { feedback: this.feedback }, e);
 
             if (result && !result.error) {
                 this.$store.commit('evaluations/updateEvaluation', result);

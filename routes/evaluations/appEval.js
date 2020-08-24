@@ -6,6 +6,7 @@ const Logger = require('../../models/log');
 const { submitEval, setGroupEval, setFeedback, replaceUser } = require('./evaluations');
 const middlewares = require('../../helpers/middlewares');
 const discord = require('../../helpers/discord');
+const { AppEvaluationConsensus } = require('../../shared/enums');
 
 const router = express.Router();
 
@@ -179,7 +180,7 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
     for (const evaluation of evaluations) {
         let user = await User.findById(evaluation.user);
 
-        if (evaluation.consensus == 'pass') {
+        if (evaluation.consensus === AppEvaluationConsensus.Pass) {
             user.modesInfo.push({
                 mode: evaluation.mode,
                 level: 'probation',
@@ -216,7 +217,7 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
             [{
                 author: discord.defaultWebhookAuthor(req.session),
                 color: discord.webhookColors.black,
-                description: `Archived [**${user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${evaluation.id}) with **${evaluation.consensus == 'pass' ? 'Pass' : 'Fail'}** consensus`,
+                description: `Archived [**${user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${evaluation.id}) with **${evaluation.consensus === AppEvaluationConsensus.Pass ? 'Pass' : 'Fail'}** consensus`,
             }],
             evaluation.mode
         );
@@ -245,7 +246,7 @@ router.post('/setConsensus/:id', middlewares.isNat, async (req, res) => {
         .populate(defaultPopulate)
         .orFail();
 
-    if (req.body.consensus == 'fail') {
+    if (req.body.consensus === AppEvaluationConsensus.Fail) {
         let date = new Date(evaluation.createdAt);
         date.setDate(date.getDate() + 90);
         evaluation.cooldownDate = date;

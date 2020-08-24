@@ -15,6 +15,9 @@ interface IEvaluationBase {
     consensusSetAt?: Date;
     createdAt?: Date;
     updatedAt?: Date;
+    isApplication?: boolean;
+    isBnEvaluation?: boolean;
+    isResignation?: boolean;
 }
 
 export interface IAppEvaluationDocument extends IEvaluationBase, Document {

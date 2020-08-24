@@ -6,9 +6,13 @@ const resignationEvaluationSchema = new mongoose.Schema({
     deadline: { type: Date , required: true },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true }, discriminatorKey: 'kind' });
 
+resignationEvaluationSchema.virtual('isResignation').get(function () {
+    return true;
+});
+
 /**
  * @type {import('../interfaces/evaluations').IResignationEvaluationModel}
  */
-const ResignationEvaluation = Evaluation.discriminator('Resignation', resignationEvaluationSchema);
+const ResignationEvaluation = Evaluation.discriminator('resignation', resignationEvaluationSchema);
 
 module.exports = ResignationEvaluation;

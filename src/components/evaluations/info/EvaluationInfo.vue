@@ -9,12 +9,13 @@
                 :nat-evaluators="selectedEvaluation.natEvaluators || []"
                 :osu-id="selectedEvaluation.user.osuId"
                 :username="selectedEvaluation.user.username"
-                :kind="selectedEvaluation.kind"
+                :is-application="selectedEvaluation.isApplication"
+                :is-bn-evaluation="selectedEvaluation.isBnEvaluation"
             />
         </template>
 
         <div v-if="selectedEvaluation" class="container">
-            <main-application-info v-if="isApplication" />
+            <main-application-info v-if="selectedEvaluation.isApplication" />
             <main-current-bn-info v-else />
 
             <template v-if="loggedInUser.isNat">
@@ -87,7 +88,6 @@ export default {
         ]),
         ...mapGetters('evaluations', [
             'selectedEvaluation',
-            'isApplication',
         ]),
     },
 };

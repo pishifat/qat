@@ -1,33 +1,12 @@
-import { BnEvaluationConsensus, AppEvaluationConsensus, ResignationConsensus } from '../../shared/enums';
+import { BnEvaluationConsensus, AppEvaluationConsensus, ResignationConsensus, BnEvaluationAddition } from '../../shared/enums';
 
 export default {
     computed: {
         consensusText () {
-            if (!this.consensus) return 'None';
-
-            switch (this.consensus) {
-                case 'fullBn':
-                    return 'Full BN';
-                case 'probationBn':
-                    return 'Probation BN';
-                case 'removeFromBn':
-                    return 'Remove from BN';
-                case 'resignedOnGoodTerms':
-                    return 'Resigned on good terms';
-                case 'resignedOnStandardTerms':
-                    return 'Resigned on standard terms';
-                default:
-                    // Pass | Fail
-                    return this.consensus.charAt(0).toUpperCase() + this.consensus.slice(1);
-            }
+            return this.makeWordFromField(this.consensus);
         },
         additionText () {
-            switch (this.addition) {
-                case 'lowActivity':
-                    return 'Low activity warning';
-                default:
-                    return 'None';
-            }
+            return this.makeWordFromField(this.addition);
         },
         consensusColor () {
             switch (this.consensus) {
@@ -59,10 +38,22 @@ export default {
         negativeConsensus () {
             return this.consensus === AppEvaluationConsensus.Fail || this.consensus === BnEvaluationConsensus.RemoveFromBn;
         },
+        lowActivityWarning () {
+            return this.addition === BnEvaluationAddition.LowActivityWarning;
+        },
+        noAddition () {
+            return this.addition === BnEvaluationAddition.None;
+        },
     },
     methods: {
         makeWordFromField (field) {
-            return field.replace(/([a-zA-Z])([A-Z])([a-z])/g, '$1 $2$3');
+            if (!field) return 'none';
+
+            let word = field.replace(/([a-zA-Z])([A-Z])([a-z])/g, '$1 $2$3');
+
+            if (word.charAt(word.length-1) === 'n') word = word.replace(/.$/,'N'); // Bn --> BN
+
+            return word;
         },
     },
 };

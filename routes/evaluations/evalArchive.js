@@ -1,9 +1,10 @@
 const express = require('express');
 const AppEvaluation = require('../../models/evaluations/appEvaluation');
-const BnEvaluation = require('../../models/evaluations/bnEvaluation');
+const Evaluation = require('../../models/evaluations/evaluation');
 const User = require('../../models/user');
 const middlewares = require('../../helpers/middlewares');
 const discord = require('../../helpers/discord');
+const { AppEvaluationConsensus, BnEvaluationConsensus } = require('../../shared/enums');
 
 const router = express.Router();
 
@@ -61,7 +62,7 @@ router.get('/search', async (req, res) => {
         .sort({ createdAt: -1 })
         .limit(limit);
 
-    let evalRoundsQuery = BnEvaluation
+    let BnEvaluationsQuery = Evaluation
         .find({
             active: false,
             consensus: { $exists: true },
@@ -78,22 +79,22 @@ router.get('/search', async (req, res) => {
         }
 
         bnApplicationsQuery.where('user', user.id);
-        evalRoundsQuery.where('user', user.id);
+        BnEvaluationsQuery.where('user', user.id);
     }
 
     if (idToSearch) {
         bnApplicationsQuery.where('_id', idToSearch);
-        evalRoundsQuery.where('_id', idToSearch);
+        BnEvaluationsQuery.where('_id', idToSearch);
     }
 
-    const [bnApplications, evalRounds] = await Promise.all([
+    const [bnApplications, evaluations] = await Promise.all([
         bnApplicationsQuery,
-        evalRoundsQuery,
+        BnEvaluationsQuery,
     ]);
 
     res.json({
         bnApplications,
-        evalRounds,
+        evaluations,
     });
 });
 
@@ -103,7 +104,7 @@ router.post('/:id/unarchiveApp', async (req, res) => {
     let user = await User.findById(app.user).orFail();
 
     // Remove join history, user modes and BN group if not hybrid
-    if (app.consensus == 'pass') {
+    if (app.consensus === AppEvaluationConsensus.Pass) {
         // TODO find somehow the actual history, relatedEvaluation === evaluation._id?
         user.history.pop();
         let i = user.modesInfo.findIndex(m => m.mode === app.mode);
@@ -122,7 +123,7 @@ router.post('/:id/unarchiveApp', async (req, res) => {
 
         await Promise.all([
             user.save(),
-            BnEvaluation.deleteUserActiveEvaluations(user.id),
+            Evaluation.deleteUserActiveEvaluations(user.id),
         ]);
     }
 
@@ -142,11 +143,11 @@ router.post('/:id/unarchiveApp', async (req, res) => {
 
 /* POST unarchive bn evaluation */
 router.post('/:id/unarchiveBn', async (req, res) => {
-    let evaluation = await BnEvaluation.findById(req.params.id).orFail();
+    let evaluation = await Evaluation.findById(req.params.id).orFail();
     let user = await User.findById(evaluation.user).orFail();
 
     // Remove left history. Add mode and BN group back if not hybrid
-    if (evaluation.consensus == 'removeFromBn') {
+    if (evaluation.consensus === BnEvaluationConsensus.RemoveFromBn || evaluation.isResignation) {
         // TODO find somehow the actual history, relatedEvaluation === evaluation._id?
         user.history.pop();
 
@@ -161,9 +162,9 @@ router.post('/:id/unarchiveBn', async (req, res) => {
             });
         }
 
-    // Change mode to probation and restore group if needed
-    } else if (evaluation.consensus == 'probationBn' || evaluation.consensus == 'fullBn') {
-        await BnEvaluation.deleteUserActiveEvaluations(user.id);
+    // Change mode to probation and restore mode if needed
+    } else if (evaluation.consensus === BnEvaluationConsensus.ProbationBn || evaluation.consensus === BnEvaluationConsensus.FullBn) {
+        await Evaluation.deleteUserActiveEvaluations(user.id);
 
         const i = user.modesInfo.findIndex(m => m.mode == evaluation.mode);
 
@@ -179,7 +180,7 @@ router.post('/:id/unarchiveBn', async (req, res) => {
 
     await Promise.all([
         user.save(),
-        BnEvaluation.findByIdAndUpdate(req.params.id, { active: true }),
+        Evaluation.findByIdAndUpdate(req.params.id, { active: true }),
     ]);
 
     discord.webhookPost(

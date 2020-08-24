@@ -3,29 +3,20 @@
         <span
             v-if="pass"
             class="badge badge-pass mx-1"
-            data-toggle="tooltip"
-            data-placement="top"
-            title="pass"
         >
             {{ pass }}
         </span>
 
         <span
-            v-if="neutralOrProbation"
+            v-if="neutral"
             class="badge badge-light mx-1"
-            data-toggle="tooltip"
-            data-placement="top"
-            :title="isApplication ? 'neutral' : 'probation'"
         >
-            {{ neutralOrProbation }}
+            {{ neutral }}
         </span>
 
         <span
             v-if="fail"
             class="badge badge-fail mx-1"
-            data-toggle="tooltip"
-            data-placement="top"
-            title="fail"
         >
             {{ fail }}
         </span>
@@ -42,12 +33,11 @@ export default {
                 return [];
             },
         },
-        isApplication: Boolean,
     },
     data() {
         return {
             pass: 0,
-            neutralOrProbation: 0,
+            neutral: 0,
             fail: 0,
             isSelected: false,
         };
@@ -63,13 +53,13 @@ export default {
     methods: {
         addVotes() {
             this.pass = 0;
-            this.neutralOrProbation = 0;
+            this.neutral = 0;
             this.fail = 0;
             this.reviews.forEach(review => {
                 if (review.vote == 1) {
                     this.pass++;
                 } else if (review.vote == 2) {
-                    this.neutralOrProbation++;
+                    this.neutral++;
                 } else if (review.vote == 3) {
                     this.fail++;
                 }

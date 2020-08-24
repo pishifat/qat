@@ -64,20 +64,5 @@ export default {
         selectedEvaluation: (state) => {
             return state.evaluations.find(e => e.id === state.selectedEvaluationId);
         },
-        isApplication: (state, getters) => {
-            if (!getters.selectedEvaluation) return false;
-
-            return getters.selectedEvaluation.kind === 'application';
-        },
-        isCurrentBn: (state, getters) => {
-            if (!getters.selectedEvaluation) return false;
-
-            return getters.selectedEvaluation.kind === 'currentBn';
-        },
-        isResignation: (state, getters) => {
-            if (!getters.selectedEvaluation) return false;
-
-            return getters.selectedEvaluation.kind === 'resignation';
-        },
     },
 };

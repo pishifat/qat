@@ -2,8 +2,8 @@ const Review = require('../../models/evaluations/review');
 const Logger = require('../../models/log');
 const User = require('../../models/user');
 const discord = require('../../helpers/discord');
-const { EvaluationKind } = require('../../shared/enums');
 const util = require('../../helpers/util');
+const { EvaluationKind } = require('../../shared/enums');
 
 /**
  * @param {import('../../models/interfaces/evaluations').IEvaluationDocument} evaluation
@@ -15,10 +15,10 @@ function formatDescription(evaluation, preText, postText) {
     let route = 'bneval';
     let kindText = '';
 
-    if (evaluation.kind === EvaluationKind.AppEvaluation) {
+    if (evaluation.isApplication) {
         kindText = 'BN application';
         route = 'appeval';
-    } else if (evaluation.kind === EvaluationKind.BnEvaluation) {
+    } else if (evaluation.isBnEvaluation) {
         kindText = 'current BN eval';
     } else {
         kindText = 'resignation eval';
@@ -181,7 +181,7 @@ async function setFeedback (evaluation, feedback, session) {
     Logger.generate(
         session.mongoId,
         `${action} feedback of ${evaluation.user.username}'s ${evaluation.mode} evaluation`,
-        evaluation.kind === EvaluationKind.AppEvaluation ? 'appEvaluation' : 'bnEvaluation',
+        evaluation.isApplication ? 'appEvaluation' : 'bnEvaluation',
         evaluation._id
     );
 

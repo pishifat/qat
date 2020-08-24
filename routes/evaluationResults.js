@@ -1,7 +1,7 @@
 const express = require('express');
 const middlewares = require('../helpers/middlewares');
 const AppEvaluation = require('../models/evaluations/appEvaluation');
-const BnEvaluation = require('../models/evaluations/bnEvaluation');
+const Evaluation = require('../models/evaluations/evaluation');
 
 const router = express.Router();
 
@@ -41,7 +41,7 @@ router.get('/evaluation/:id', async (req, res) => {
     let evaluation;
 
     evaluation = await AppEvaluation.findById(req.params.id).populate(appPopulate);
-    if (!evaluation) evaluation = await BnEvaluation.findById(req.params.id).populate(bnEvalPopulate);
+    if (!evaluation) evaluation = await Evaluation.findById(req.params.id).populate(bnEvalPopulate);
 
     return res.json(evaluation);
 });

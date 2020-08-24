@@ -12,7 +12,7 @@ export default {
         disqualifiedQualityAssuranceChecks: [],
         assignedBnApplications: [],
         natApplications: [],
-        natEvalRounds: [],
+        natBnEvaluations: [],
         isLoading: true,
     }),
     mutations: {
@@ -46,8 +46,8 @@ export default {
         setNatApplications (state, applications) {
             state.natApplications = applications;
         },
-        setNatEvalRounds (state, evalRounds) {
-            state.natEvalRounds = evalRounds;
+        setNatBnEvaluations (state, evaluations) {
+            state.natBnEvaluations = evaluations;
         },
         updateEvent (state, event) {
             let i;

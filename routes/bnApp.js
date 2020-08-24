@@ -8,6 +8,7 @@ const BnEvaluation = require('../models/evaluations/bnEvaluation');
 const Logger = require('../models/log.js');
 const TestSubmission = require('../models/bnTest/testSubmission');
 const ResignationEvaluation = require('../models/evaluations/resignationEvaluation');
+const { ResignationConsensus } = require('../shared/enums');
 
 const router = express.Router();
 
@@ -75,16 +76,14 @@ router.post('/apply', async (req, res) => {
             consensus: 'fail',
             cooldownDate: { $gte: cooldownDate },
         }),
-        ResignationEvaluation
-            .findOne({
-                user: req.session.mongoId,
-                mode,
-            })
-            .sort({ updatedAt: -1 }),
+        ResignationEvaluation.findOne({
+            user: req.session.mongoId,
+            mode,
+        }),
     ]);
 
     const wasBn = res.locals.userRequest.history && res.locals.userRequest.history.length;
-    const resignedOnGoodTerms = lastResignation && lastResignation.consensus == 'resignedOnGoodTerms';
+    const resignedOnGoodTerms = lastResignation && lastResignation.consensus === ResignationConsensus.ResignedOnGoodTerms;
 
     if (!currentBnApp && !currentBnEval) {
         let months = 3;

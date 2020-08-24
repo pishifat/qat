@@ -14,17 +14,19 @@
                     </a>
                 </h4>
                 <h5 class="text-center">
-                    {{ evaluation.mode == 'osu' ? 'osu!' : 'osu!' + evaluation.mode }} {{ evaluation.kind == 'application' ? 'BN application' : 'nomination assessment' }}
+                    {{ evaluation.mode == 'osu' ? 'osu!' : 'osu!' + evaluation.mode }} {{ evaluation.isApplication ? 'BN application' : 'nomination assessment' }}
                 </h5>
-                <h5 v-if="evaluation.consensus" class="text-center">
-                    Consensus: <span :class="consensusColor">{{ consensusText }}</span>
+                <h5 v-if="consensus" class="text-center">
+                    Consensus:
+                    <span :class="consensusColor">{{ consensusText }}</span>
+                    <span v-if="addition" :class="consensusColor"> + {{ additionText }}</span>
                 </h5>
                 <div v-else class="text-center">
                     The NAT are busy evaluating! Come back soon.
                 </div>
 
                 <div>
-                    <div v-if="evaluation.kind == 'application' && evaluation.consensus == 'pass'">
+                    <div v-if="evaluation.isApplication && positiveConsensus">
                         <h5>New BN Information</h5>
                         <p>You will be a Probationary Beatmap Nominator for about one month (exact date of your next evaluation can be seen from your <a :href="'/users?id=' + evaluation.user.id" target="_blank">user card</a>). This means you can only nominate beatmaps that have been nominated by Full Beatmap Nominators and you cannot disqualify maps.</p>
                         <p>During your evaluation, your activity/attitude/nomination quality will be evaluated by members of the NAT. If each of these areas are satisfactory, you will be promoted to Full Beatmap Nominator. If not, your probation period will be extended for another month or you'll be dismissed from the BN. In that second case, you will not be able to re-apply for another 90 days.</p>
@@ -37,7 +39,7 @@
                         <div class="card card-body small mb-4" v-html="$md.render(evaluation.feedback)" />
                     </div>
 
-                    <div v-if="evaluation.kind == 'application'">
+                    <div v-if="evaluation.isApplication">
                         <h5>Test results</h5>
                         <p>
                             Final score:
@@ -67,10 +69,12 @@
 
 <script>
 import postData from '../mixins/postData.js';
+import evaluations from '../mixins/evaluations.js';
+import { BnEvaluationAddition } from '../../shared/enums';
 
 export default {
     name: 'EvaluationResultsPage',
-    mixins: [ postData ],
+    mixins: [ postData, evaluations ],
     data() {
         return {
             evaluation: { error: 'No result from initial request' },
@@ -92,61 +96,13 @@ export default {
             }
         },
         /** @returns {string} */
-        consensusText() {
-            const consensus = this.evaluation.consensus;
-            const addition = this.evaluation.addition;
-            let text = '';
-
-            switch (consensus) {
-                case null:
-                    text = 'none';
-                    break;
-                case 'fullBn':
-                    text = 'Full BN';
-                    break;
-                case 'probationBn':
-                    text = 'Probation BN';
-                    break;
-                case 'removeFromBn':
-                    text = 'Remove from BN';
-                    break;
-                default:
-                    text = consensus;
-                    break;
-            }
-
-            switch (addition) {
-                case 'lowActivity':
-                    text += ' + low activity warning';
-                    break;
-                case 'resignedOnGoodTerms':
-                    text += ' + resigned on good terms';
-                    break;
-                case 'resignedOnStandardTerms':
-                    text += ' + resigned on standard terms';
-                    break;
-            }
-
-            return text;
+        consensus () {
+            return this.evaluation.consensus;
         },
-        /** @returns {string} */
-        consensusColor() {
-            const consensus = this.evaluation.consensus;
-
-            switch (consensus) {
-                case 'pass':
-                    return 'text-pass';
-                case 'fullBn':
-                    return 'text-pass';
-                case 'fail':
-                    return 'text-fail';
-                case 'removeFromBn':
-                    return 'text-fail';
-                case 'probationBn':
-                    return 'text-probation';
-                default:
-                    return '';
-            }
+        /** @returns {string | undefined} */
+        addition () {
+            if (this.evaluation.addition !== BnEvaluationAddition.None) return this.evaluation.addition;
+            else return null;
         },
     },
     async created() {

@@ -18,11 +18,11 @@
         </p>
         <div v-if="consensus">
             Consensus:
-            <span :class="consensusColor">{{ consensusText }}</span>
+            <span :class="consensusColor" class="text-capitalize">{{ consensusText }}</span>
         </div>
         <div v-if="addition && addition != 'none'">
             Addition:
-            <span :class="consensusColor">{{ additionText }}</span>
+            <span :class="consensusColor" class="text-capitalize">{{ additionText }}</span>
         </div>
     </div>
 </template>

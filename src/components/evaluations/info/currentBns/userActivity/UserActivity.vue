@@ -54,9 +54,9 @@
                 :mongo-id="mongoId"
             />
             <evaluation-list
-                v-if="natEvalRounds && natEvalRounds.length"
-                :events="natEvalRounds"
-                :events-id="'natEvalRounds'"
+                v-if="natBnEvaluations && natBnEvaluations.length"
+                :events="natBnEvaluations"
+                :events-id="'natBnEvaluations'"
                 :header="'Current BN Evaluations (NAT)'"
                 :is-application="false"
                 :mongo-id="mongoId"
@@ -112,7 +112,7 @@ export default {
             'disqualifiedQualityAssuranceChecks',
             'assignedBnApplications',
             'natApplications',
-            'natEvalRounds',
+            'natBnEvaluations',
         ]),
     },
     watch: {
@@ -141,7 +141,7 @@ export default {
 
                     this.$store.commit('activity/setBnApplications', res.assignedBnApplications);
                     this.$store.commit('activity/setNatApplications', res.appEvaluations);
-                    this.$store.commit('activity/setNatEvalRounds', res.bnEvaluations);
+                    this.$store.commit('activity/setNatBnEvaluations', res.bnEvaluations);
                     this.$store.commit('activity/setIsLoading', false);
                 }
             } else {

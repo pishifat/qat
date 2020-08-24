@@ -10,6 +10,10 @@ const appEvaluationSchema = new mongoose.Schema({
     test: { type: 'ObjectId', ref: 'TestSubmission' },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
+appEvaluationSchema.virtual('isApplication').get(function () {
+    return true;
+});
+
 class AppEvaluationService extends mongoose.Model {
 
     get deadline () {

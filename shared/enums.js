@@ -1,7 +1,7 @@
 const EvaluationKind = Object.freeze({
-    BnEvaluation: 'BnEvaluation',
-    Resignation: 'Resignation',
     AppEvaluation: 'application',
+    BnEvaluation: 'currentBn',
+    Resignation: 'resignation',
 });
 
 const AppEvaluationConsensus = Object.freeze({
@@ -20,9 +20,15 @@ const ResignationConsensus = Object.freeze({
     ResignedOnStandardTerms: 'resignedOnStandardTerms',
 });
 
+const BnEvaluationAddition = Object.freeze({
+    LowActivityWarning: 'lowActivityWarning',
+    None: 'none',
+});
+
 module.exports = {
     EvaluationKind,
     AppEvaluationConsensus,
     BnEvaluationConsensus,
     ResignationConsensus,
+    BnEvaluationAddition,
 };

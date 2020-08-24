@@ -4,7 +4,7 @@
             <b>Consensus:</b>
             <span
                 v-if="selectedEvaluation.consensus"
-                class="mr-2"
+                class="mr-2 text-capitalize"
                 :class="consensusColor"
             >
                 {{ consensusText }}
@@ -26,7 +26,7 @@
         <p v-if="canHaveAddition">
             <b>Addition:</b>
             <span
-                class="mr-2"
+                class="mr-2 text-capitalize"
                 :class="consensusColor"
             >
                 {{ additionText }}
@@ -34,14 +34,14 @@
             <span v-if="selectedEvaluation.active" class="btn-group">
                 <button
                     class="btn btn-sm btn-primary"
-                    :disabled="selectedEvaluation.addition === 'lowActivity'"
-                    @click="setAddition('lowActivity', $event);"
+                    :disabled="lowActivityWarning"
+                    @click="setAddition('lowActivityWarning', $event);"
                 >
-                    Low activity warning
+                    Low Activity Warning
                 </button>
                 <button
                     class="btn btn-sm btn-primary"
-                    :disabled="!selectedEvaluation.addition || selectedEvaluation.addition == 'none'"
+                    :disabled="!selectedEvaluation.addition || noAddition"
                     @click="setAddition('none', $event);"
                 >
                     None
@@ -63,7 +63,6 @@ export default {
     computed: {
         ...mapGetters('evaluations', [
             'selectedEvaluation',
-            'isApplication',
         ]),
         consensus () {
             return this.selectedEvaluation.consensus;
@@ -72,22 +71,22 @@ export default {
             return this.selectedEvaluation.addition;
         },
         buttons () {
-            if (this.selectedEvaluation.kind === EvaluationKind.BnEvaluation) {
+            if (this.selectedEvaluation.isBnEvaluation) {
                 return [
                     { consensus: 'fullBn', color: 'btn-success' },
-                    { consensus: 'probationBn', color: 'btn-neutral' },
+                    { consensus: 'probationBn', color: 'btn-probation' },
                     { consensus: 'removeFromBn', color: 'btn-danger' },
                 ];
             }
 
-            if (this.selectedEvaluation.kind === EvaluationKind.Resignation) {
+            if (this.selectedEvaluation.isResignation) {
                 return [
                     { consensus: 'resignedOnGoodTerms', color: 'btn-success' },
                     { consensus: 'resignedOnStandardTerms', color: 'btn-neutral' },
                 ];
             }
 
-            if (this.selectedEvaluation.kind === EvaluationKind.AppEvaluation) {
+            if (this.selectedEvaluation.isApplication) {
                 return [
                     { consensus: 'pass', color: 'btn-success' },
                     { consensus: 'fail', color: 'btn-danger' },
@@ -105,7 +104,7 @@ export default {
         async setConsensus(consensus, e) {
 
             const result = await this.executePost(
-                `/${this.isApplication ? 'appEval' : 'bnEval'}/setConsensus/` + this.selectedEvaluation.id, { consensus }, e);
+                `/${this.selectedEvaluation.isApplication ? 'appEval' : 'bnEval'}/setConsensus/` + this.selectedEvaluation.id, { consensus }, e);
 
             if (result && !result.error) {
                 this.$store.commit('evaluations/updateEvaluation', result);
@@ -117,7 +116,7 @@ export default {
         },
         async setAddition(addition, e) {
             const result = await this.executePost(
-                `/${this.isApplication ? 'appEval' : 'bnEval'}/setAddition/` + this.selectedEvaluation.id, { addition }, e);
+                `/${this.selectedEvaluation.isApplication ? 'appEval' : 'bnEval'}/setAddition/` + this.selectedEvaluation.id, { addition }, e);
 
             if (result && !result.error) {
                 this.$store.commit('evaluations/updateEvaluation', result);

@@ -59,10 +59,7 @@
                     Total BN applications evaluated: {{ totalBnApps }}
                 </div>
                 <div>
-                    Total current BNs evaluated: {{ totalEvalRounds }}
-                </div>
-                <div>
-                    Note: Evaluations only counted after May 5th 2019. Written feedback only counted after September 9th 2019.
+                    Total current BNs evaluated: {{ totalBnEvaluations }}
                 </div>
             </div>
         </div>
@@ -82,20 +79,20 @@ export default {
             natMode: 'osu',
             natTotal: null,
             totalBnApps: null,
-            totalEvalRounds: null,
+            totalBnEvaluations: null,
         };
     },
     methods: {
         async findNatActivity() {
-            if (!this.natDays.length) this.natDays = 30;
+            if (!this.natDays.length) this.natDays = '30';
 
             const res = await this.executeGet('/users/findNatActivity/' + this.natDays + '/' + this.natMode);
 
             if (res) {
                 this.natActivity = res.info;
-                this.natTotal = res.bnAppsCount + res.evalRoundsCount;
+                this.natTotal = res.bnAppsCount + res.bnEvaluationsCount;
                 this.totalBnApps = res.bnAppsCount;
-                this.totalEvalRounds = res.evalRoundsCount;
+                this.totalBnEvaluations = res.bnEvaluationsCount;
             }
         },
     },

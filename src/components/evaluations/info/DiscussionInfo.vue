@@ -10,7 +10,7 @@
             <div id="consensusSettings" class="collapse container">
                 <consensus />
                 <cooldown
-                    v-if="selectedEvaluation && selectedEvaluation.consensus == 'fail'"
+                    v-if="selectedEvaluation && negativeConsensus"
                 />
                 <feedback-info
                     v-if="selectedEvaluation.consensus"
@@ -36,6 +36,7 @@ import Consensus from './common/Consensus.vue';
 import Cooldown from './common/Cooldown.vue';
 import ReviewsListing from './common/ReviewsListing.vue';
 import FeedbackInfo from './common/FeedbackInfo.vue';
+import evaluations from '../../../mixins/evaluations.js';
 
 export default {
     name: 'DiscussionInfo',
@@ -45,6 +46,7 @@ export default {
         ReviewsListing,
         FeedbackInfo,
     },
+    mixins: [ evaluations ],
     computed: {
         ...mapState([
             'loggedInUser',
@@ -52,6 +54,9 @@ export default {
         ...mapGetters('evaluations', [
             'selectedEvaluation',
         ]),
+        consensus () {
+            return this.selectedEvaluation.consensus;
+        },
     },
 };
 </script>

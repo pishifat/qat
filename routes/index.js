@@ -9,6 +9,7 @@ const Logger = require('../models/log');
 const ResignationEvaluation = require('../models/evaluations/resignationEvaluation');
 const { setSession } = require('../helpers/util');
 const { OsuResponseError } = require('../helpers/errors');
+const { ResignationConsensus } = require('../shared/enums');
 
 const router = express.Router();
 
@@ -47,7 +48,7 @@ router.get('/modsCount/:user/:mode', async (req, res) => {
             })
             .sort({ updatedAt: -1 });
 
-        if (lastEvaluation && lastEvaluation.consensus == 'resignedOnGoodTerms') months = 1;
+        if (lastEvaluation && lastEvaluation.consensus === ResignationConsensus.ResignedOnGoodTerms) months = 1;
         else if (wasBn) months = 2;
     }
 
