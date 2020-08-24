@@ -8,6 +8,7 @@ const Aiess = require('../../models/aiess');
 const middlewares = require('../../helpers/middlewares');
 const discord = require('../../helpers/discord');
 const getGeneralEvents = require('../evaluations/bnEval').getGeneralEvents;
+const getUserModsCount = require('../../helpers/scrap').getUserModsCount;
 
 const router = express.Router();
 
@@ -269,6 +270,11 @@ router.get('/activity', async (req, res) => {
     let maxDate = new Date(deadline);
 
     res.json(await getGeneralEvents(osuId, mongoId, modes, minDate, maxDate));
+});
+
+/* GET modding info */
+router.get('/findModsCount/:username', async (req, res) => {
+    res.json(await getUserModsCount(req.params.username));
 });
 
 module.exports = router;
