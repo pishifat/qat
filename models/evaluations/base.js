@@ -7,7 +7,7 @@ const baseSchema = {
     feedback: { type: String },
     cooldownDate: { type: Date },
     natEvaluators: [{ type: 'ObjectId', ref: 'User' }],
-    consensusSetAt: { type: Date },
+    archivedAt: { type: Date },
 };
 
 module.exports = baseSchema;

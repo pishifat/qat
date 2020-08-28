@@ -1,4 +1,4 @@
-const config = require('./config.json');
+const config = require('../config.json');
 const Mongoose = require('mongoose');
 
 Mongoose.connect(config.connection, { useNewUrlParser: true }, async function (error, db) {

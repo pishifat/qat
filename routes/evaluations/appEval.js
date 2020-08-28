@@ -210,7 +210,7 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
         }
 
         evaluation.active = false;
-        evaluation.consensusSetAt = new Date();
+        evaluation.archivedAt = new Date();
         await evaluation.save();
 
         discord.webhookPost(

@@ -12,7 +12,7 @@ interface IEvaluationBase {
     feedback?: string;
     cooldownDate?: Date;
     natEvaluators?: IUserDocument[];
-    consensusSetAt?: Date;
+    archivedAt?: Date;
     createdAt?: Date;
     updatedAt?: Date;
     isApplication?: boolean;
