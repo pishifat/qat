@@ -39,7 +39,7 @@ export default {
             const html = el.innerHTML.replace(/<br>/gi, '\r\n');
             const fakeEl = document.createElement('div');
             fakeEl.innerHTML = html;
-            navigator.clipboard.writeText(fakeEl.textContent);
+            navigator.clipboard.writeText(fakeEl.textContent.trim());
         },
     },
 };
