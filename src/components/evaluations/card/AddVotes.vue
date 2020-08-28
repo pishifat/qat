@@ -1,10 +1,10 @@
 <template>
-    <div>
+    <span>
         <span
-            v-if="pass"
+            v-if="positive"
             class="badge badge-pass mx-1"
         >
-            {{ pass }}
+            {{ positive }}
         </span>
 
         <span
@@ -15,19 +15,19 @@
         </span>
 
         <span
-            v-if="fail"
+            v-if="negative"
             class="badge badge-fail mx-1"
         >
-            {{ fail }}
+            {{ negative }}
         </span>
-    </div>
+    </span>
 </template>
 
 <script>
 export default {
     name: 'AddVotes',
     props: {
-        reviews: {
+        inputs: {
             type: Array,
             default() {
                 return [];
@@ -36,14 +36,13 @@ export default {
     },
     data() {
         return {
-            pass: 0,
+            positive: 0,
             neutral: 0,
-            fail: 0,
-            isSelected: false,
+            negative: 0,
         };
     },
     watch: {
-        reviews() {
+        inputs() {
             this.addVotes();
         },
     },
@@ -52,16 +51,16 @@ export default {
     },
     methods: {
         addVotes() {
-            this.pass = 0;
+            this.positive = 0;
             this.neutral = 0;
-            this.fail = 0;
-            this.reviews.forEach(review => {
-                if (review.vote == 1) {
-                    this.pass++;
-                } else if (review.vote == 2) {
+            this.negative = 0;
+            this.inputs.forEach(input => {
+                if (input.vote == 1) {
+                    this.positive++;
+                } else if (input.vote == 2) {
                     this.neutral++;
-                } else if (review.vote == 3) {
-                    this.fail++;
+                } else if (input.vote == 3) {
+                    this.negative++;
                 }
             });
         },

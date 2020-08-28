@@ -12,7 +12,7 @@
 
         <add-votes
             v-else-if="loggedInUser.isNat && isDiscussion"
-            :reviews="reviews"
+            :inputs="reviews"
         />
 
         <span class="mr-1 ml-auto small">

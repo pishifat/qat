@@ -2,7 +2,7 @@ export default {
     namespaced: true,
     state: () => ({
         page: 1,
-        limit: 20,
+        limit: 24,
         maxPages: 1,
     }),
     mutations: {

@@ -10,12 +10,14 @@
             {{ evaluation.isApplication ? 'APPLICATION' : evaluation.isBnEvaluation ? 'BN EVAL' : 'RESIGNATION' }}
         </router-link>
         -
-        <span :class="consensusColor">
-            {{ consensus.toUpperCase() }}
-        </span>
-        <span v-if="evaluation.addition" :class="consensusColor">
-            + {{ addition.toUpperCase() }}
-        </span>
+        <small>
+            <span :class="consensusColor">
+                {{ makeWordFromField(consensus).toUpperCase() }}
+            </span>
+            <span v-if="evaluation.addition" :class="consensusColor">
+                + {{ makeWordFromField(addition).toUpperCase() }}
+            </span>
+        </small>
 
         <div v-if="evaluation.feedback" v-html="$md.render(evaluation.feedback)" />
     </div>

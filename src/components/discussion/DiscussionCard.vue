@@ -18,10 +18,17 @@
                     <span v-else>{{ discussion.title }}</span>
                 </p>
                 <div class="card-status" :class="discussion.isActive ? 'status-bar-active' : 'status-bar-inactive'" />
-                <div class="card-icons">
+
+                <div>
                     <span class="small float-left">{{ discussion.createdAt | toStandardDate }}</span>
 
+                    <add-votes
+                        class="ml-2"
+                        :inputs="discussion.mediations"
+                    />
+
                     <mode-display
+                        class="float-right"
                         :modes="discussion.mode"
                         :show-all="true"
                     />
@@ -34,11 +41,13 @@
 <script>
 import { mapState } from 'vuex';
 import ModeDisplay from '../ModeDisplay.vue';
+import AddVotes from '../evaluations/card/AddVotes.vue';
 
 export default {
     name: 'DiscussionCard',
     components: {
         ModeDisplay,
+        AddVotes,
     },
     props: {
         discussion: {
