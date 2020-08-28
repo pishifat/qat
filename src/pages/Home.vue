@@ -4,7 +4,7 @@
 
         <section class="card card-body">
             <h4 class="mx-auto mb-3">
-                Current BNs
+                Current Beatmap Nominators
             </h4>
 
             <transition-group
