@@ -192,7 +192,7 @@ async function setFeedback (evaluation, feedback, session) {
         [{
             author: discord.defaultWebhookAuthor(session),
             color: discord.webhookColors.blue,
-            description: formatDescription(evaluation, '', `: ${util.shorten(feedback, 925, '... *(truncated)*')}`),
+            description: formatDescription(evaluation, '', `feedback: ${util.shorten(feedback, 925, '... *(truncated)*')}`),
         }],
         evaluation.mode
     );
