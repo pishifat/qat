@@ -12,10 +12,41 @@ const User = require('../models/user');
 const BeatmapReport = require('../models/beatmapReport');
 const Aiess = require('../models/aiess');
 
-const defaultPopulate = [{
-    path: 'user',
-    select: 'username osuId modesInfo',
-}];
+const defaultPopulate = [
+    { path: 'user', select: 'username osuId modesInfo' },
+    { path: 'natEvaluators', select: 'username osuId' },
+    {
+        path: 'reviews',
+        select: 'evaluator',
+        populate: {
+            path: 'evaluator',
+            select: 'username osuId',
+        },
+    },
+];
+
+/**
+ * @param {Array} reviews
+ * @param {Array} natEvaluators
+ * @returns {string} text for webhook
+ */
+function findNatEvaluatorStatuses (reviews, natEvaluators) {
+    let text = '';
+
+    const evaluatorIds = reviews.map(r => r.evaluator.id);
+
+    natEvaluators.forEach(user => {
+        if (evaluatorIds.includes(user.id)) {
+            text += `\n✅ `;
+        } else {
+            text += `\n❌ `;
+        }
+
+        text += `[${user.username}](https://osu.ppy.sh/users/${user.osuId})`;
+    });
+
+    return text;
+}
 
 const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
     // establish dates for reference
@@ -96,6 +127,8 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
             generateWebhook = true;
         }
 
+        description += findNatEvaluatorStatuses(app.reviews, app.natEvaluators);
+
         if (generateWebhook) {
             await discord.webhookPost(
                 [{
@@ -112,7 +145,7 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
     for (let i = 0; i < activeRounds.length; i++) {
         const round = activeRounds[i];
 
-        let description = `[**${round.user.username}**'s current BN eval](http://bn.mappersguild.com/bneval?id=${round.id}) `;
+        let description = `[**${round.user.username}**'s ${round.isResignation ? 'resignation' : 'current BN eval'}](http://bn.mappersguild.com/bneval?id=${round.id}) `;
         let natList = '';
         let generateWebhook;
 
@@ -126,9 +159,11 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
             if (!maniaHighlight && round.mode === 'mania') { maniaHighlight = true; }
 
             description += 'is overdue!';
+            description += findNatEvaluatorStatuses(round.reviews, round.natEvaluators);
             generateWebhook = true;
         } else if (round.deadline < nearDeadline) {
             description += 'is due in less than 24 hours!';
+            description += findNatEvaluatorStatuses(round.reviews, round.natEvaluators);
             generateWebhook = true;
         } else if (round.deadline > startRange && round.deadline < endRange) {
             description += 'is due in two weeks!';
