@@ -528,8 +528,8 @@ router.get('/findPreviousEvaluations/:userId', async (req, res) => {
 
     if (evaluations.length && applications.length) {
         previousEvaluations.sort((a, b) => {
-            const dateA = (a.isApplication ? a.createdAt : a.deadline);
-            const dateB = (b.isApplication ? b.createdAt : b.deadline);
+            const dateA = (a.deadline);
+            const dateB = (b.deadline);
             if (dateA > dateB) return 1;
             if (dateA < dateB) return -1;
 

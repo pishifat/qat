@@ -26,7 +26,7 @@
                                 <a :href="'https://osu.ppy.sh/users/' + app.user.osuId" target="_blank">
                                     {{ app.user.username }}
                                 </a>
-                                -- {{ app.createdAt | toStandardDate }}
+                                -- {{ app.deadline | toStandardDate }}
                             </div>
                         </div>
 

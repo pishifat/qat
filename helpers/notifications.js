@@ -75,12 +75,8 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
     // find and post webhook for BN applications
     for (let i = 0; i < activeApps.length; i++) {
         const app = activeApps[i];
+        const deadline = app.deadline;
 
-        let addition = 7;
-
-        if (app.discussion) { addition += 7; }
-
-        const deadline = new Date(app.createdAt.setDate(app.createdAt.getDate() + addition));
         let description = `[**${app.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${app.id}) `;
         let generateWebhook;
 
