@@ -56,8 +56,12 @@ header {
     background-repeat: repeat-x;
     background-position: bottom;
 
-    & .nav-link:hover, & .active {
+    & .nav-link {
         font-weight: bold;
+    }
+
+    & .nav-link:hover, & .active {
+        text-shadow: 0 0 1px white;
     }
 }
 
