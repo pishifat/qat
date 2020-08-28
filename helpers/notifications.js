@@ -48,6 +48,28 @@ function findNatEvaluatorStatuses (reviews, natEvaluators) {
     return text;
 }
 
+/**
+ * @param {Boolean} discussion
+ * @param {string} consensus
+ * @param {string} feedback
+ * @returns {string} text for webhook
+ */
+function findMissingContent (discussion, consensus, feedback) {
+    let text = '\n**Next step:** ';
+
+    if (!discussion) {
+        text += `get more NAT evaluations`;
+    } else if (!consensus) {
+        text += `decide consensus`;
+    } else if (!feedback) {
+        text += `write feedback`;
+    } else {
+        text += `send PM`;
+    }
+
+    return text;
+}
+
 const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
     // establish dates for reference
     const date = new Date();
@@ -128,6 +150,7 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
         }
 
         description += findNatEvaluatorStatuses(app.reviews, app.natEvaluators);
+        description += findMissingContent(app.discussion, app.consensus, app.feedback);
 
         if (generateWebhook) {
             await discord.webhookPost(
@@ -159,11 +182,9 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
             if (!maniaHighlight && round.mode === 'mania') { maniaHighlight = true; }
 
             description += 'is overdue!';
-            description += findNatEvaluatorStatuses(round.reviews, round.natEvaluators);
             generateWebhook = true;
         } else if (round.deadline < nearDeadline) {
             description += 'is due in less than 24 hours!';
-            description += findNatEvaluatorStatuses(round.reviews, round.natEvaluators);
             generateWebhook = true;
         } else if (round.deadline > startRange && round.deadline < endRange) {
             description += 'is due in two weeks!';
@@ -202,6 +223,8 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
         }
 
         if (generateWebhook && !natList.length) {
+            description += findNatEvaluatorStatuses(round.reviews, round.natEvaluators);
+            description += findMissingContent(round.discussion, round.consensus, round.feedback);
             await discord.webhookPost(
                 [{
                     description,

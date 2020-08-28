@@ -24,7 +24,7 @@
             />
         </div>
 
-        <div v-if="(!selectedEvaluation.bnEvaluators || !selectedEvaluation.bnEvaluators.length) && selectedEvaluation.isApplication" class="col-sm-12">
+        <div v-if="(!selectedEvaluation.bnEvaluators || !selectedEvaluation.bnEvaluators.length) && selectedEvaluation.isApplication && !selectedEvaluation.discussion" class="col-sm-12">
             <hr>
 
             <div class="row">
