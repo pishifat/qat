@@ -639,7 +639,6 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
             'nomination_reset'
         ),
         Aiess.find({
-            userId: { $ne: userOsuId },
             beatmapsetId: { $in: qaBeatmapsetIds },
             timestamp: { $gte: minDate, $lte: maxDate },
             type: 'disqualify',

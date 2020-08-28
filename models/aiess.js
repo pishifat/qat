@@ -100,7 +100,6 @@ class AiessService extends mongoose.Model
         const aggregation = this.aggregate([
             {
                 $match: {
-                    userId: { $ne: userId },
                     beatmapsetId: {
                         $in: beatmapsetIds,
                     },
