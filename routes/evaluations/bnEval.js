@@ -621,7 +621,7 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
 
     const beatmapsetIds = uniqueNominations.map(n => n.beatmapsetId);
     const qaBeatmapsetIds = qualityAssuranceChecks.map(qa => qa.beatmapsetId);
-    let [nominationsDisqualified, nominationsPopped, disqualifiedQualityAssuranceChecks, othersNominations] = await Promise.all([
+    let [nominationsDisqualified, nominationsPopped, disqualifiedQualityAssuranceChecks/*, othersNominations*/] = await Promise.all([
         Aiess.getRelatedBeatmapsetEvents(
             userOsuId,
             beatmapsetIds,
@@ -650,27 +650,67 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
                 select: 'username osuId',
             },
         }),
-        Aiess.find({
+        /*Aiess.find({
             userId: { $ne: userOsuId },
             beatmapsetId: { $in: beatmapsetIds },
             timestamp: { $gte: minDate, $lte: maxDate },
             type: { $in: ['nominate', 'qualify'] },
-        }),
+        }),*/
     ]);
 
     // Exclude pops/dqs that happened before this user nomination
     // And pops/dqs that happened after others bns nominated the set (and current bn wasn't involved in the end)
+
+    /* the "efficient" but broken way
     nominationsPopped = nominationsPopped.filter(pop => {
         const happenedBefore = uniqueNominations.some(n => n.beatmapsetId == pop.beatmapsetId && n.timestamp < pop.timestamp);
         const nominationsAfterwards = othersNominations.filter(n => n.beatmapsetId == pop.beatmapsetId && n.timestamp < pop.timestamp);
 
         return !nominationsAfterwards.length && happenedBefore;
+    }
+    */
+
+    // the inefficient but working (?) way
+    nominationsPopped = nominationsPopped.filter(async event => {
+        if (uniqueNominations.some(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
+            let a = await Aiess
+                .find({
+                    beatmapsetId: event.beatmapsetId,
+                    timestamp: { $lte: event.timestamp },
+                })
+                .sort({ timestamp: -1 })
+                .limit(2);
+
+            if (a[1] && a[1].userId == userOsuId) {
+                return;
+            }
+        }
     });
+
+    /* the "efficient" but broken way
     nominationsDisqualified = nominationsDisqualified.filter(dq => {
         const happenedBefore = uniqueNominations.some(n => n.beatmapsetId == dq.beatmapsetId && n.timestamp < dq.timestamp);
         const nominationsAfterwards = othersNominations.filter(n => n.beatmapsetId == dq.beatmapsetId && n.timestamp < dq.timestamp);
 
         return nominationsAfterwards.length < 2 && happenedBefore;
+    */
+
+    // the inefficient but working (?) way
+    nominationsDisqualified = nominationsDisqualified.filter(async event => {
+        if (uniqueNominations.some(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
+            let a = await Aiess
+                .find({
+                    beatmapsetId: event.beatmapsetId,
+                    timestamp: { $lte: event.timestamp },
+                })
+                .sort({ timestamp: -1 })
+                .limit(3);
+
+            // check if user was the nominator
+            if ((a[1] && a[1].userId == userOsuId) || (a[2] && a[2].userId == userOsuId)) {
+                return;
+            }
+        }
     });
     disqualifiedQualityAssuranceChecks = disqualifiedQualityAssuranceChecks.filter(dq =>
         qualityAssuranceChecks.some(qa => qa.beatmapsetId == dq.beatmapsetId && qa.timestamp < dq.timestamp)
