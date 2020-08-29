@@ -65,4 +65,9 @@ router.get('/qaEventsByUser/:osuId', async (req, res) => {
     );
 });
 
+/* GET dq info for discussionID */
+router.get('/dqInfoByDiscussionId/:discussionId', async (req, res) => {
+    res.json(await Aiess.findOne({ discussionId: req.params.discussionId }));
+});
+
 module.exports = router;
