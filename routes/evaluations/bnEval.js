@@ -621,7 +621,7 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
 
     const beatmapsetIds = uniqueNominations.map(n => n.beatmapsetId);
     const qaBeatmapsetIds = qualityAssuranceChecks.map(qa => qa.beatmapsetId);
-    let [nominationsDisqualified, nominationsPopped, disqualifiedQualityAssuranceChecks/*, othersNominations*/] = await Promise.all([
+    let [allNominationsDisqualified, allNominationsPopped, disqualifiedQualityAssuranceChecks/*, othersNominations*/] = await Promise.all([
         Aiess.getRelatedBeatmapsetEvents(
             userOsuId,
             beatmapsetIds,
@@ -671,7 +671,9 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
     */
 
     // the inefficient but working (?) way
-    nominationsPopped = nominationsPopped.filter(async event => {
+    let nominationsPopped = [];
+
+    for (const event of allNominationsPopped) {
         if (uniqueNominations.some(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
             let a = await Aiess
                 .find({
@@ -682,10 +684,10 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
                 .limit(2);
 
             if (a[1] && a[1].userId == userOsuId) {
-                return;
+                nominationsPopped.push(event);
             }
         }
-    });
+    }
 
     /* the "efficient" but broken way
     nominationsDisqualified = nominationsDisqualified.filter(dq => {
@@ -696,7 +698,9 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
     */
 
     // the inefficient but working (?) way
-    nominationsDisqualified = nominationsDisqualified.filter(async event => {
+    let nominationsDisqualified = [];
+
+    for (const event of allNominationsDisqualified) {
         if (uniqueNominations.some(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
             let a = await Aiess
                 .find({
@@ -704,14 +708,14 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
                     timestamp: { $lte: event.timestamp },
                 })
                 .sort({ timestamp: -1 })
-                .limit(3);
+                .limit(2);
 
-            // check if user was the nominator
-            if ((a[1] && a[1].userId == userOsuId) || (a[2] && a[2].userId == userOsuId)) {
-                return;
+            if ((a[0] && a[0].userId == userOsuId) || (a[1] && a[1].userId == userOsuId)) {
+                nominationsDisqualified.push(event);
             }
         }
-    });
+    }
+
     disqualifiedQualityAssuranceChecks = disqualifiedQualityAssuranceChecks.filter(dq =>
         qualityAssuranceChecks.some(qa => qa.beatmapsetId == dq.beatmapsetId && qa.timestamp < dq.timestamp)
     );
