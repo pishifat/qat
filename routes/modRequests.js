@@ -117,6 +117,10 @@ router.get('/relevantInfo', middlewares.isLoggedIn, async (req, res) => {
             .sort({ createdAt: -1 });
     }
 
+    for (const req of requests) {
+        if (!req.beatmapset) console.log(req);
+    }
+
     res.json({
         ownRequests,
         user,
@@ -130,7 +134,7 @@ router.post('/store', middlewares.isLoggedIn, async (req, res) => {
 
     util.isValidUrlOrThrow(link, 'https://osu.ppy.sh/beatmapsets/');
     const beatmapsetId = util.getBeatmapsetIdFromUrl(link);
-    const cooldown = moment().subtract(1, 'month');
+    const cooldown = moment().subtract(2, 'month');
     const [hasRequested, beatmapsetRequested] = await Promise.all([
         ModRequest.findOne({
             user: req.session.mongoId,
@@ -141,7 +145,7 @@ router.post('/store', middlewares.isLoggedIn, async (req, res) => {
 
     if (hasRequested || beatmapsetRequested) {
         return res.json({
-            error: 'Already requested within the month',
+            error: 'You can only request one beatmap every 2 months!',
         });
     }
 
