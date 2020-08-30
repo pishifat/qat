@@ -4,7 +4,7 @@ const modReviewsSchema = new mongoose.Schema({
     modRequest: { type: 'ObjectId', ref: 'ModRequest', required: true },
     user: { type: 'ObjectId', ref: 'User', required: true },
     action: { type: String, enum: ['denied', 'accepted'], required: true },
-    comment: { type: String, trim: true, maxlength: 300 },
+    comment: { type: String, trim: true, maxlength: 500 },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 /**
