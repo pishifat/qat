@@ -99,7 +99,7 @@
                                     type="text"
                                     class="form-control my-1"
                                     placeholder="comment... (optional)"
-                                    maxlength="300"
+                                    maxlength="500"
                                     :disabled="!user"
                                 >
 

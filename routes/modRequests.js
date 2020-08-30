@@ -134,6 +134,7 @@ router.post('/store', middlewares.isLoggedIn, async (req, res) => {
 
     util.isValidUrlOrThrow(link, 'https://osu.ppy.sh/beatmapsets/');
     const beatmapsetId = util.getBeatmapsetIdFromUrl(link);
+
     const cooldown = moment().subtract(2, 'month');
     const [hasRequested, beatmapsetRequested] = await Promise.all([
         ModRequest.findOne({
@@ -189,6 +190,11 @@ router.post('/store', middlewares.isLoggedIn, async (req, res) => {
     request.category = category;
     request.beatmapset = beatmapset;
     request.comment = comment;
+
+    await Promise.all([
+        beatmapset.validate(),
+        request.validate(),
+    ]);
 
     await Promise.all([
         beatmapset.save(),

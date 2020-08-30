@@ -107,20 +107,41 @@ app.use(function(req, res) {
 // error handler
 // eslint-disable-next-line no-unused-vars
 app.use(function(err, req, res, next) {
-    if (err.name == 'DocumentNotFoundError') err.message = 'Not found';
+    let customErrorMessage;
+    if (err.name == 'DocumentNotFoundError') customErrorMessage = 'Not found';
+
+    if (err instanceof mongoose.Error.ValidationError) {
+        // @ts-ignore
+        customErrorMessage = err._message + ':';
+
+        const keys = Object.keys(err.errors);
+
+        for (const key of keys) {
+            const error = err.errors[key];
+
+            if (error.kind === 'required') {
+                customErrorMessage += `\n"${error.path}" is missing.`;
+            } else if (error.kind === 'maxlength') {
+                // @ts-ignore
+                customErrorMessage += `\nMax length for input is ${error.properties.maxlength}.`;
+            } else {
+                customErrorMessage += '\n' + error.message;
+            }
+        }
+    }
 
     // set locals, only providing error in development
     res.locals.message = err.message;
     res.locals.error = {};
 
     if (req.app.get('env') === 'development') {
-        console.log(err);
+        //console.log(err);
         res.locals.error = err;
     }
 
     // render the error page or return json error obj
     if (req.accepts(['html', 'json']) === 'json') {
-        res.json({ error: err.message || 'Something went wrong!' });
+        res.json({ error: customErrorMessage || err.message || 'Something went wrong!' });
     } else {
         res.status(err.status || 500);
         res.render('error');
