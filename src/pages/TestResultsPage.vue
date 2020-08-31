@@ -37,7 +37,7 @@
                         <b>User:</b> {{ selectedTest.applicant.username }} -
                         <b>Mode:</b> {{ selectedTest.mode }} -
                         <b>Score:</b> {{ selectedTest.totalScore }} -
-                        <b><a :href="'https://bn.mappersguild.com/evaluationresults?id=' + relevantApplicationId" target="_blank">Evaluation results</a></b>
+                        <b><a :href="'https://bn.mappersguild.com/message?eval=' + relevantApplicationId" target="_blank">Evaluation results</a></b>
                     </div>
                 </section>
 

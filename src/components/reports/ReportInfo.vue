@@ -11,7 +11,7 @@
 
             <feedback v-if="loggedInUser.isNat" class="mb-3" />
 
-            <feedback-pm
+            <report-feedback-pm
                 v-if="!selectedReport.isActive"
             />
         </div>
@@ -23,7 +23,7 @@ import { mapGetters, mapState } from 'vuex';
 import ModalHeader from './info/ModalHeader.vue';
 import Context from './info/Context.vue';
 import Feedback from './info/Feedback.vue';
-import FeedbackPm from './info/FeedbackPm.vue';
+import ReportFeedbackPm from './info/ReportFeedbackPm.vue';
 import ModalDialog from '../ModalDialog.vue';
 
 export default {
@@ -32,7 +32,7 @@ export default {
         ModalHeader,
         Context,
         Feedback,
-        FeedbackPm,
+        ReportFeedbackPm,
         ModalDialog,
     },
     computed: {

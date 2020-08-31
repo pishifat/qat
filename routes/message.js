@@ -2,6 +2,7 @@ const express = require('express');
 const middlewares = require('../helpers/middlewares');
 const AppEvaluation = require('../models/evaluations/appEvaluation');
 const Evaluation = require('../models/evaluations/evaluation');
+const Report = require('../models/report');
 
 const router = express.Router();
 
@@ -36,6 +37,11 @@ const bnEvalPopulate = [
     },
 ];
 
+const reportPopulate = [
+    { path: 'culprit', select: 'username osuId' },
+    { path: 'reporter', select: 'username osuId' },
+];
+
 /* GET evaluation results by ID */
 router.get('/evaluation/:id', async (req, res) => {
     let evaluation;
@@ -44,6 +50,11 @@ router.get('/evaluation/:id', async (req, res) => {
     if (!evaluation) evaluation = await Evaluation.findById(req.params.id).populate(bnEvalPopulate);
 
     return res.json(evaluation);
+});
+
+/* GET report by ID */
+router.get('/report/:id', async (req, res) => {
+    return res.json(await Report.findById(req.params.id).populate(reportPopulate));
 });
 
 module.exports = router;

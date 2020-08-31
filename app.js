@@ -38,7 +38,7 @@ const qualityAssuranceRouter = require('./routes/qualityAssurance');
 const logsRouter = require('./routes/logs');
 const interOpRouter = require('./routes/interOp');
 const modRequestsRouter = require('./routes/modRequests');
-const evaluationResultsRouter = require('./routes/evaluationResults');
+const messageRouter = require('./routes/message');
 
 const app = express();
 
@@ -94,7 +94,7 @@ app.use('/qualityassurance', qualityAssuranceRouter);
 app.use('/logs', logsRouter);
 app.use('/interOp', interOpRouter);
 app.use('/modrequests', modRequestsRouter);
-app.use('/evaluationResults', evaluationResultsRouter);
+app.use('/message', messageRouter);
 
 // catch 404
 app.use(function(req, res) {

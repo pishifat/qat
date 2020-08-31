@@ -58,11 +58,11 @@ export default {
 
                 // pass
                 if (this.positiveConsensus) {
-                    message = `You are now a Probationary ${this.modeString} Beatmap Nominator! Please read all BN pages on the wiki (https://osu.ppy.sh/help/wiki/People/The_Team/Beatmap_Nominators), join the BN Discord server (${this.discordLink ? this.discordLink : 'expired link'}), and review your evaluation (https://bn.mappersguild.com/evaluationresults?id=${this.selectedEvaluation.id}). Have fun! `;
+                    message = `You are now a Probationary ${this.modeString} Beatmap Nominator! Please read all BN pages on the wiki (https://osu.ppy.sh/help/wiki/People/The_Team/Beatmap_Nominators), join the BN Discord server (${this.discordLink ? this.discordLink : 'expired link'}), and review your evaluation (https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id}). Have fun! `;
 
                 // fail
                 } else {
-                    message = `Hello! Your ${this.modeString} BN application has been unfortunately denied :( Review reasons for your rejection here: https://bn.mappersguild.com/evaluationresults?id=${this.selectedEvaluation.id} -- You can apply for BN in this game mode again on ${this.toStandardDate(this.selectedEvaluation.cooldownDate)}. Good luck! `;
+                    message = `Hello! Your ${this.modeString} BN application has been unfortunately denied :( Review reasons for your rejection here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id} -- You can apply for BN in this game mode again on ${this.toStandardDate(this.selectedEvaluation.cooldownDate)}. Good luck! `;
                 }
 
             // current BN evaluation
@@ -74,15 +74,15 @@ export default {
 
                     // probation to full
                     if (this.isProbation) {
-                        message += `you have been promoted from Probation to a Full Beatmap Nominator! Review your evaluation here: https://bn.mappersguild.com/evaluationresults?id=${this.selectedEvaluation.id} `;
+                        message += `you have been promoted from Probation to a Full Beatmap Nominator! Review your evaluation here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id} `;
 
                     // low activity warning
                     } else if (this.lowActivityWarning) {
-                        message += `the NAT have noticed that your nomination activity is too low to effectively form a conclusion. We will evaluate again 1 month from now! Review your evaluation here: https://bn.mappersguild.com/evaluationresults?id=${this.selectedEvaluation.id} `;
+                        message += `the NAT have noticed that your nomination activity is too low to effectively form a conclusion. We will evaluate again 1 month from now! Review your evaluation here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id} `;
 
                     // full to full
                     } else {
-                        message += `we'd like to remind you that you're doing well! Review your evaluation here: https://bn.mappersguild.com/evaluationresults?id=${this.selectedEvaluation.id} `;
+                        message += `we'd like to remind you that you're doing well! Review your evaluation here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id} `;
                     }
 
                 // probation
@@ -97,7 +97,7 @@ export default {
                         message += `you have been moved to the Probationary Beatmap Nominators :( The NAT `;
                     }
 
-                    message += `will evaluate your BN work again in 1 month. Review reasons for your Probation here: https://bn.mappersguild.com/evaluationresults?id=${this.selectedEvaluation.id} `;
+                    message += `will evaluate your BN work again in 1 month. Review reasons for your Probation here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id} `;
 
                 // remove from BN
                 } else {
@@ -132,7 +132,7 @@ export default {
 
                     // kick
                     } else {
-                        message += `shown improvement in the areas mentioned. Review reasons for your removal here: https://bn.mappersguild.com/evaluationresults?id=${this.selectedEvaluation.id} `;
+                        message += `shown improvement in the areas mentioned. Review reasons for your removal here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id} `;
                     }
 
                     // cheeky sign-off

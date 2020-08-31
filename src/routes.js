@@ -6,7 +6,7 @@ const Users = () => import(/* webpackChunkName: "public", webpackPrefetch: true 
 const Vetoes = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/VetoesPage.vue');
 const QualityAssurance = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/QualityAssurancePage.vue');
 const TestResults = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/TestResultsPage.vue');
-const EvaluationResults = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/EvaluationResultsPage.vue');
+const Message = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/MessagePage.vue');
 
 const DiscussionVote = () => import(/* webpackChunkName: "bn", webpackPrefetch: true */ './pages/DiscussionVotePage.vue');
 const AppEvalPage = () => import(/* webpackChunkName: "bn", webpackPrefetch: true */ './pages/AppEvalPage.vue');
@@ -28,7 +28,7 @@ const routes = [
     { path: '/vetoes', component: Vetoes, meta: { title: 'Vetoes' } },
     { path: '/qualityassurance', component: QualityAssurance, meta: { title: 'Quality Assurance' } },
     { path: '/testresults', component: TestResults, meta: { title: 'Ranking Criteria Test Results' } },
-    { path: '/evaluationresults', component: EvaluationResults, meta: { title: 'Evaluation Results' } },
+    { path: '/message', component: Message, meta: { title: 'Message from the NAT' } },
 
     // BN/NAT
     { path: '/discussionvote', component: DiscussionVote, meta: { title: 'Discussion Vote' } },
