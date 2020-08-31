@@ -39,7 +39,11 @@
 
         <div v-if="bnActivity">
             <div v-for="user in bnActivity" :key="user.username" class="small mb-1">
-                <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a> (joined {{ user.joinDate | toStandardDate }})
+                <user-link
+                    :osu-id="user.osuId"
+                    :username="user.username"
+                />
+                (joined {{ user.joinDate | toStandardDate }})
                 <ul>
                     <li
                         :class="user.uniqueNominations < bnDaysDisplay/10 ?
@@ -64,14 +68,18 @@
 
 <script>
 import postData from '../../mixins/postData.js';
+import UserLink from '../UserLink.vue';
 
 export default {
     name: 'BnActivity',
+    components: {
+        UserLink,
+    },
     mixins: [ postData ],
     data() {
         return {
             bnActivity: null,
-            bnDays: '',
+            bnDays: null,
             bnDaysDisplay: '',
             bnMode: 'osu',
         };

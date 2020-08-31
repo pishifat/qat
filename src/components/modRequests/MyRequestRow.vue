@@ -17,9 +17,10 @@
         </div>
         <div v-if="request.modReviews.length" class="col-sm-12">
             <div v-for="review in request.modReviews" :key="review._id" class="ml-2 text-secondary">
-                <a :href="'https://osu.ppy.sh/users/' + review.user.osuId" target="_blank">
-                    {{ review.user.username }}
-                </a>
+                <user-link
+                    :osu-id="review.user.osuId"
+                    :username="review.user.username"
+                />
                 <span :class="review.action == 'accepted' ? 'text-success' : 'text-danger'">
                     {{ review.action }}
                 </span>
@@ -30,8 +31,13 @@
 </template>
 
 <script>
+import UserLink from '../UserLink.vue';
+
 export default {
     name: 'MyRequestRow',
+    components: {
+        UserLink,
+    },
     props: {
         request: {
             type: Object,

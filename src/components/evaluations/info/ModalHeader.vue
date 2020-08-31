@@ -2,13 +2,11 @@
     <div class="modal-header" :class="isNatEvaluator() ? 'bg-info' : 'bg-primary'">
         <h5 class="modal-title">
             {{ isApplication ? 'Application Evaluation:' : isBnEvaluation ? 'BN Evaluation:' : 'Resignation Evaluation:' }}
-            <a
-                :href="'https://osu.ppy.sh/users/' + osuId"
-                target="_blank"
+            <user-link
+                :osu-id="osuId"
+                :username="username"
                 @click.stop
-            >
-                {{ username }}
-            </a>
+            />
 
             <mode-display :modes="mode" />
         </h5>
@@ -21,11 +19,13 @@
 <script>
 import { mapState } from 'vuex';
 import ModeDisplay from '../../ModeDisplay.vue';
+import UserLink from '../../UserLink.vue';
 
 export default {
     name: 'ModalHeader',
     components: {
         ModeDisplay,
+        UserLink,
     },
     props: {
         osuId: {

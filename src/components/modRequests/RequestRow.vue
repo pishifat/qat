@@ -7,9 +7,11 @@
                     {{ request.beatmapset.fullTitle }}
                 </a>
                 <div>
-                    by <a :href="`https://osu.ppy.sh/users/${request.user.osuId}`" target="_blank">
-                        {{ request.user.username }}
-                    </a>
+                    by
+                    <user-link
+                        :osu-id="request.user.osuId"
+                        :username="request.user.username"
+                    />
                 </div>
             </div>
         </div>
@@ -74,11 +76,13 @@
 
 <script>
 import RequestTag from './RequestTag.vue';
+import UserLink from '../UserLink.vue';
 
 export default {
     name: 'RequestRow',
     components: {
         RequestTag,
+        UserLink,
     },
     props: {
         request: {

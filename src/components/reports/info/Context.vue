@@ -26,18 +26,23 @@
         <p v-if="!selectedReport.isActive">
             <b>Reported by:</b>
 
-            <a :href="'https://osu.ppy.sh/users/' + selectedReport.reporter.osuId" target="_blank">
-                {{ selectedReport.reporter.username }}
-            </a>
+            <user-link
+                :osu-id="selectedReport.reporter.osuId"
+                :username="selectedReport.reporter.username"
+            />
         </p>
     </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
+import UserLink from '../../UserLink.vue';
 
 export default {
     name: 'Context',
+    components: {
+        UserLink,
+    },
     computed: mapGetters('manageReports', [
         'selectedReport',
     ]),

@@ -8,15 +8,12 @@
         >
             <img :src="'https://a.ppy.sh/' + user.osuId" class="card-avatar-img">
             <div class="card-body">
-                <a
-                    :href="'https://osu.ppy.sh/users/' + user.osuId"
+                <user-link
                     class="wrap-text"
-                    target="_blank"
+                    :osu-id="user.osuId"
+                    :username="user.username"
                     @click.stop
-                >
-                    {{ user.username }}
-                </a>
-
+                />
                 <small
                     v-if="firstBnDate"
                     class="ml-1"
@@ -45,12 +42,14 @@
 <script>
 import ModeDisplay from '../ModeDisplay.vue';
 import DateDisplay from '../DateDisplay.vue';
+import UserLink from '../UserLink.vue';
 
 export default {
     name: 'UserCard',
     components: {
         ModeDisplay,
         DateDisplay,
+        UserLink,
     },
     props: {
         user: {

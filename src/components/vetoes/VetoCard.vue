@@ -19,14 +19,12 @@
                 </div>
                 <div class="small">
                     Hosted by
-                    <a
+                    <user-link
                         class="font-weight-bold"
-                        :href="`https://osu.ppy.sh/users/${veto.beatmapMapperId}`"
-                        target="_blank"
+                        :osu-id="veto.beatmapMapperId"
+                        :username="veto.beatmapMapper"
                         @click.stop
-                    >
-                        {{ veto.beatmapMapper }}
-                    </a>
+                    />
                 </div>
 
                 <div class="card-status" :class="`status-bar-${veto.status}`" />
@@ -60,12 +58,14 @@
 <script>
 import ModeDisplay from '../ModeDisplay.vue';
 import DateDisplay from '../DateDisplay.vue';
+import UserLink from '../UserLink.vue';
 
 export default {
     name: 'VetoCard',
     components: {
         ModeDisplay,
         DateDisplay,
+        UserLink,
     },
     props: {
         veto: {

@@ -4,14 +4,16 @@
             Report
             <span v-if="report.culprit">
                 of
-                <a :href="'https://osu.ppy.sh/users/' + report.culprit.osuId" target="_blank">
-                    {{ report.culprit.username }}
-                </a>
+                <user-link
+                    :osu-id="report.culprit.osuId"
+                    :username="report.culprit.username"
+                />
             </span>
             by
-            <a :href="'https://osu.ppy.sh/users/' + report.reporter.osuId" target="_blank">
-                {{ report.reporter.username }}
-            </a>
+            <user-link
+                :osu-id="report.reporter.osuId"
+                :username="report.reporter.username"
+            />
         </h4>
         <h5 v-if="report.valid" class="text-center">
             Consensus:
@@ -35,9 +37,13 @@
 </template>
 
 <script>
+import UserLink from '../UserLink.vue';
 
 export default {
     name: 'ReportFeedback',
+    components: {
+        UserLink,
+    },
     props: {
         report: {
             type: Object,

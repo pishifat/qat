@@ -9,15 +9,12 @@
         >
             <div class="card-body">
                 <p class="text-truncate text-secondary">
-                    <a
+                    <user-link
                         v-if="report.culprit"
-                        :href="'https://osu.ppy.sh/users/' + report.culprit.osuId"
-                        target="_blank"
+                        :osu-id="report.culprit.osuId"
+                        :username="report.culprit.username"
                         @click.stop
-                    >
-                        {{ report.culprit.username }}
-                    </a>
-
+                    />
                     <a
                         v-else
                         :href="report.link"
@@ -46,11 +43,13 @@
 
 <script>
 import DateDisplay from '../DateDisplay.vue';
+import UserLink from '../UserLink.vue';
 
 export default {
     name: 'ReportCard',
     components: {
         DateDisplay,
+        UserLink,
     },
     props: {
         report: {

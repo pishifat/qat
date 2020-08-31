@@ -18,9 +18,10 @@
             >
                 <b>
                     {{ note.updatedAt | toStandardDate }} -
-                    <a :href="'https://osu.ppy.sh/users/' + note.author.osuId" target="_blank">
-                        {{ note.author.username }}
-                    </a>
+                    <user-link
+                        :osu-id="note.author.osuId"
+                        :username="note.author.username"
+                    />
                 </b>
                 <div v-html="$md.render(note.comment)" />
             </li>
@@ -30,9 +31,13 @@
 
 <script>
 import postData from '../../../../mixins/postData.js';
+import UserLink from '../../../UserLink.vue';
 
 export default {
     name: 'UserNotes',
+    components: {
+        UserLink,
+    },
     mixins: [ postData ],
     props: {
         userMongoId: {

@@ -13,7 +13,10 @@
 
         <div v-if="potentialNatInfo.length">
             <div v-for="user in potentialNatInfo" :key="user.osuId" class="small my-2">
-                <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a>
+                <user-link
+                    :osu-id="user.osuId"
+                    :username="user.username"
+                />
                 <p class="ml-2">
                     <a data-toggle="collapse" :href="'#evaluations' + user.osuId" @click.prevent>Show app evals ({{ user.evaluatedApps.length }}) <i class="fas fa-angle-down" /></a>
                 </p>
@@ -23,9 +26,10 @@
                         <div class="card card-body mb-2">
                             <div>
                                 <b>Applicant:</b>
-                                <a :href="'https://osu.ppy.sh/users/' + app.user.osuId" target="_blank">
-                                    {{ app.user.username }}
-                                </a>
+                                <user-link
+                                    :osu-id="app.user.osuId"
+                                    :username="app.user.username"
+                                />
                                 -- {{ app.deadline | toStandardDate }}
                             </div>
                         </div>
@@ -77,9 +81,13 @@
 <script>
 import postData from '../../mixins/postData.js';
 import { AppEvaluationConsensus } from '../../../shared/enums';
+import UserLink from '../UserLink.vue';
 
 export default {
     name: 'PotentialNatInfo',
+    components: {
+        UserLink,
+    },
     mixins: [ postData ],
     data() {
         return {

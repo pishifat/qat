@@ -4,9 +4,11 @@
         :class="headerColor"
     >
         <h5 class="modal-title">
-            <a :href="'https://osu.ppy.sh/users/' + selectedUser.osuId" class="text-white">
-                <b>{{ selectedUser.username }}</b>
-            </a>
+            <user-link
+                class="font-weight-bold text-white"
+                :osu-id="selectedUser.osuId"
+                :username="selectedUser.username"
+            />
 
             <mode-display
                 :modes="selectedUser.modes"
@@ -21,11 +23,13 @@
 <script>
 import { mapGetters } from 'vuex';
 import ModeDisplay from '../../ModeDisplay.vue';
+import UserLink from '../../UserLink.vue';
 
 export default {
     name: 'ModalHeader',
     components: {
         ModeDisplay,
+        UserLink,
     },
     computed: {
         ...mapGetters('users', [

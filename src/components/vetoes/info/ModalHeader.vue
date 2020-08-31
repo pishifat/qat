@@ -5,9 +5,11 @@
                 <b>{{ selectedVeto.beatmapTitle }}</b>
             </a>
             by
-            <a :href="`https://osu.ppy.sh/users/${selectedVeto.beatmapMapperId}`" target="_blank" class="text-white">
-                <b>{{ selectedVeto.beatmapMapper }}</b>
-            </a>
+            <user-link
+                class="text-white"
+                :osu-id="selectedVeto.beatmapMapperId"
+                :username="selectedVeto.beatmapMapper"
+            />
 
             <mode-display
                 :modes="selectedVeto.mode"
@@ -23,11 +25,13 @@
 <script>
 import { mapGetters } from 'vuex';
 import ModeDisplay from '../../ModeDisplay.vue';
+import UserLink from '../../UserLink.vue';
 
 export default {
     name: 'ModalHeader',
     components: {
         ModeDisplay,
+        UserLink,
     },
     computed: {
         ...mapGetters('vetoes', [

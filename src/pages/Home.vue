@@ -24,12 +24,10 @@
                             <td
                                 :style="getGroupColor(user)"
                             >
-                                <a
-                                    :href="`https://osu.ppy.sh/users/${user.osuId}`"
-                                    target="_blank"
-                                >
-                                    {{ user.username }}
-                                </a>
+                                <user-link
+                                    :osu-id="user.osuId"
+                                    :username="user.username"
+                                />
                             </td>
                         </tr>
                     </tbody>
@@ -59,12 +57,14 @@ import { mapState } from 'vuex';
 import postData from '../mixins/postData';
 import ToastMessages from '../components/ToastMessages.vue';
 import ModScoreCalculator from '../components/home/ModScoreCalculator.vue';
+import UserLink from '../components/UserLink.vue';
 
 export default {
     name: 'Index',
     components: {
         ToastMessages,
         ModScoreCalculator,
+        UserLink,
     },
     mixins: [ postData ],
     computed: mapState([

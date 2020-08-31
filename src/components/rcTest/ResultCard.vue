@@ -2,13 +2,11 @@
     <div class="col-md-6 col-lg-4 my-2" @click="selectTest()">
         <div class="card cursor-pointer">
             <div class="card-body">
-                <a
-                    :href="'https://osu.ppy.sh/users/' + selectedTest.applicant.osuId"
-                    target="_blank"
+                <user-link
+                    :osu-id="selectedTest.applicant.osuId"
+                    :username="selectedTest.applicant.username"
                     @click.stop
-                >
-                    {{ selectedTest.applicant.username }}
-                </a>
+                />
             </div>
 
             <div class="card-footer small d-flex align-items-center">
@@ -27,11 +25,13 @@
 
 <script>
 import ModeDisplay from '../ModeDisplay.vue';
+import UserLink from '../UserLink.vue';
 
 export default {
     name: 'ResultCard',
     components: {
         ModeDisplay,
+        UserLink,
     },
     props: {
         selectedTest: {

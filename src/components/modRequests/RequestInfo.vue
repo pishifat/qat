@@ -78,9 +78,10 @@
             <b>Reviews:</b>
             <div v-for="review in selectedRequest.modReviews" :key="review.id" class="row text-secondary">
                 <div class="col-sm-2">
-                    <a :href="'https://osu.ppy.sh/users/' + review.user.osuId" target="_blank">
-                        {{ review.user.username }}
-                    </a>
+                    <user-link
+                        :osu-id="review.user.osuId"
+                        :username="review.user.username"
+                    />
                 </div>
                 <div class="col-sm-2 text-capitalize" :class="review.action == 'accepted' ? 'text-success' : 'text-danger'">
                     {{ review.action }}
@@ -97,11 +98,13 @@
 import Axios from 'axios';
 import ModalDialog from '../ModalDialog.vue';
 import { mapState, mapGetters } from 'vuex';
+import UserLink from '../UserLink.vue';
 
 export default {
     name: 'RequestInfo',
     components: {
         ModalDialog,
+        UserLink,
     },
     data () {
         return {

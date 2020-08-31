@@ -16,7 +16,10 @@
             </small>
 
             <div v-for="user in badgeUsers" :key="user.id" class="small mb-1">
-                <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a>
+                <user-link
+                    :osu-id="user.osuId"
+                    :username="user.username"
+                />
                 <ul>
                     <li :class="compareBadgeDuration(user.bnProfileBadge, user.bnDuration) ? 'background-fail' : ''">
                         BN: {{ yearsDuration(user.bnDuration) }} -- badge: {{ user.bnProfileBadge }}
@@ -36,9 +39,13 @@
 
 <script>
 import postData from '../../mixins/postData.js';
+import UserLink from '../UserLink.vue';
 
 export default {
     name: 'Badges',
+    components: {
+        UserLink,
+    },
     mixins: [postData],
     data () {
         return {

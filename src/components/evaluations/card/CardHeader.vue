@@ -1,9 +1,11 @@
 <template>
     <div class="card-body">
         <p class="card-text">
-            <a :href="'https://osu.ppy.sh/users/' + osuId" target="_blank">
-                <b>{{ username }}</b>
-            </a>
+            <user-link
+                class="font-weight-bold"
+                :osu-id="osuId"
+                :username="username"
+            />
             <i v-if="mode == 'osu'" class="far fa-circle mx-1" />
             <i v-else-if="mode == 'taiko'" class="fas fa-drum mx-1" />
             <i v-else-if="mode == 'catch'" class="fas fa-apple-alt mx-1" />
@@ -29,9 +31,13 @@
 
 <script>
 import evaluations from '../../../mixins/evaluations';
+import UserLink from '../../../components/UserLink.vue';
 
 export default {
     name: 'CardHeader',
+    components: {
+        UserLink,
+    },
     mixins: [ evaluations ],
     props: {
         username: {

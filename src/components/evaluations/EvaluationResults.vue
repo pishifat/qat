@@ -1,9 +1,10 @@
 <template>
     <div class="card card-body">
         <h4 class="text-center">
-            <a :href="'https://osu.ppy.sh/users/' + evaluation.user.osuId" target="_blank">
-                {{ evaluation.user.username }}
-            </a>
+            <user-link
+                :osu-id="evaluation.user.osuId"
+                :username="evaluation.user.username"
+            />
         </h4>
         <h5 class="text-center">
             {{ evaluation.mode == 'osu' ? 'osu!' : 'osu!' + evaluation.mode }} {{ evaluation.isApplication ? 'BN application' : 'nomination assessment' }} results
@@ -47,9 +48,11 @@
             <div class="card card-body">
                 <ul>
                     <li v-for="review in natReviews" :key="review.id">
-                        <a :href="'https://osu.ppy.sh/users/' + review.evaluator.osuId" target="_blank" :class="review.evaluator.groups.includes('nat') ? 'text-nat' : review.evaluator.groups.includes('bn') ? 'text-probation' : ''">
-                            {{ review.evaluator.username }}
-                        </a>
+                        <user-link
+                            :class="review.evaluator.groups.includes('nat') ? 'text-nat' : review.evaluator.groups.includes('bn') ? 'text-probation' : ''"
+                            :osu-id="review.evaluator.osuId"
+                            :username="review.evaluator.username"
+                        />
                     </li>
                 </ul>
             </div>
@@ -60,9 +63,13 @@
 <script>
 import evaluations from '../../mixins/evaluations.js';
 import { BnEvaluationAddition } from '../../../shared/enums';
+import UserLink from '../../components/UserLink.vue';
 
 export default {
     name: 'EvaluationResults',
+    components: {
+        UserLink,
+    },
     mixins: [ evaluations ],
     props: {
         evaluation: {

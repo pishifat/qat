@@ -47,7 +47,11 @@
                 :key="user.username"
                 class="small mb-1"
             >
-                <a :href="'https://osu.ppy.sh/users/' + user.osuId" target="_blank">{{ user.username }}</a> (joined {{ user.joinDate | toStandardDate }})
+                <user-link
+                    :osu-id="user.osuId"
+                    :username="user.username"
+                />
+                (joined {{ user.joinDate | toStandardDate }})
                 <ul>
                     <li>{{ user.totalBnAppEvals }} application evaluations</li>
                     <li>{{ user.totalCurrentBnEvals }} current BN evaluations</li>
@@ -68,9 +72,13 @@
 
 <script>
 import postData from '../../mixins/postData.js';
+import UserLink from '../UserLink.vue';
 
 export default {
     name: 'NatActivity',
+    components: {
+        UserLink,
+    },
     mixins: [ postData ],
     data() {
         return {
