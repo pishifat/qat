@@ -146,7 +146,7 @@ router.post('/submitTest', async (req, res) => {
         currentBnApp._id
     );
 
-    const twoEvaluationModes = ['catch', 'mania'];
+    const twoEvaluationModes = ['catch'];
     const invalids = [8129817, 3178418, 2857314];
     const assignedNat = await User.aggregate([
         {
