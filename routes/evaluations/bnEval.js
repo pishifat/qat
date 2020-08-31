@@ -708,9 +708,11 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
                     timestamp: { $lte: event.timestamp },
                 })
                 .sort({ timestamp: -1 })
-                .limit(2);
+                .limit(3);
 
-            if ((a[0] && a[0].userId == userOsuId) || (a[1] && a[1].userId == userOsuId)) {
+            console.log(a);
+
+            if ((a[1] && a[1].userId == userOsuId) || (a[2] && a[2].userId == userOsuId)) {
                 nominationsDisqualified.push(event);
             }
         }

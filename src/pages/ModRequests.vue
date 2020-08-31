@@ -45,7 +45,7 @@
                                 <hr>
                                 <p>Submission info:</p>
                                 <ul>
-                                    <li>You can submit once per month</li>
+                                    <li>You can submit once every two months</li>
                                     <li>Only submit beatmaps that are ready for ranking</li>
                                     <li>Set your map's language/genre before submitting</li>
                                     <li>
