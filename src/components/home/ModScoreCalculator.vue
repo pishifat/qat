@@ -39,28 +39,12 @@
         </div>
 
         <div class="form-group">
-            <div class="input-group mb-3">
+            <div class="input-group mb-3" v-for="(index, n) in 3">
                 <input
-                    v-model="modsCount[0]"
+                    v-model="modsCount[index - 1]"
                     class="modCount form-control"
                     type="number"
-                    :placeholder="getPlaceholder(0)"
-                >
-            </div>
-            <div class="input-group mb-3">
-                <input
-                    v-model="modsCount[1]"
-                    class="modCount form-control"
-                    type="number"
-                    :placeholder="getPlaceholder(1)"
-                >
-            </div>
-            <div class="input-group">
-                <input
-                    v-model="modsCount[2]"
-                    class="modCount form-control"
-                    type="number"
-                    :placeholder="getPlaceholder(2)"
+                    :placeholder="getPlaceholder(index - 1)"
                 >
             </div>
         </div>

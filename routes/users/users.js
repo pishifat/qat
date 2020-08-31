@@ -274,7 +274,7 @@ router.get('/activity', async (req, res) => {
 
 /* GET modding info */
 router.get('/findModsCount/:username', async (req, res) => {
-    res.json(await getUserModsCount(req.params.username));
+    res.json(await getUserModsCount(req.session.accessToken, req.params.username));
 });
 
 module.exports = router;
