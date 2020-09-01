@@ -37,7 +37,7 @@ router.get('/relevantInfo', async (req, res) => {
 });
 
 
-/* GET search for test */
+/* GET search for a user's tests */
 router.get('/search/:user', middlewares.isNat, async (req, res) => {
     const userToSearch = decodeURI(req.params.user);
     const user = await User
@@ -58,9 +58,15 @@ router.get('/search/:user', middlewares.isNat, async (req, res) => {
     });
 });
 
-/* GET search for test */
+/* GET search for test from test _id */
+router.get('/findTest/:id', async (req, res) => {
+    res.json({ tests: await TestSubmission.find({ _id: req.params.id }).populate(defaultTestPopulate) });
+});
+
+/* GET search for application from test _id */
 router.get('/findApplication/:id', middlewares.isNat, async (req, res) => {
     res.json(await AppEvaluation.findOne({ test: req.params.id }));
 });
+
 
 module.exports = router;

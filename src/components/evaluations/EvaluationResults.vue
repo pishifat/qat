@@ -40,7 +40,7 @@
                         {{ evaluation.test.totalScore }}/20
                     </span>
                 </p>
-                <p><a href="/testresults" target="_blank">View your full test breakdown here</a></p>
+                <p><a :href="'/testresults?test=' + evaluation.test.id" target="_blank">View your full test breakdown here</a></p>
             </div>
 
             <h5>Evaluators</h5>

@@ -6,7 +6,7 @@
             <ul>
                 <li>At least 200 Kudosu earned for osu! modders</li>
                 <li>At least 150 Kudosu earned for osu!taiko/osu!catch/osu!mania modders</li>
-                <li>A positive mod score (calculated by your modding activity in the last 3 months, see calculator on the <a href="http://bn.mappersguild.com">front page</a>). Mod score for returning BNs is calculated based on 1 or 2 months of activity</li>
+                <li>A positive mod score (calculated by your modding activity in the last 3 months, see calculator on the <a href="/home">front page</a>). Mod score for returning BNs is calculated based on 1 or 2 months of activity</li>
                 <li>A passing score on a Ranking Criteria knowledge test</li>
                 <li>Competent modding abilities/behavior (evaluated by members of the NAT through your submitted mods, other modding history, and community interaction)</li>
             </ul>

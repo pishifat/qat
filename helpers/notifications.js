@@ -20,7 +20,7 @@ const defaultPopulate = [
         select: 'evaluator',
         populate: {
             path: 'evaluator',
-            select: 'username osuId',
+            select: 'username osuId isNat',
         },
     },
 ];
@@ -30,20 +30,30 @@ const defaultPopulate = [
  * @param {Array} natEvaluators
  * @returns {string} text for webhook
  */
-function findNatEvaluatorStatuses (reviews, natEvaluators) {
+function findNatEvaluatorStatuses (reviews, natEvaluators, discussion) {
     let text = '';
 
-    const evaluatorIds = reviews.map(r => r.evaluator.id);
+    if (discussion) {
+        for (const review of reviews) {
+            console.log(review.evaluator);
 
-    natEvaluators.forEach(user => {
-        if (evaluatorIds.includes(user.id)) {
-            text += `\n✅ `;
-        } else {
-            text += `\n❌ `;
+            if (review.evaluator.isNat) {
+                text += `\n✅ [${review.evaluator.username}](https://osu.ppy.sh/users/${review.evaluator.osuId})`;
+            }
         }
+    } else {
+        const evaluatorIds = reviews.map(r => r.evaluator.id);
 
-        text += `[${user.username}](https://osu.ppy.sh/users/${user.osuId})`;
-    });
+        for (const user of natEvaluators) {
+            if (evaluatorIds.includes(user.id)) {
+                text += `\n✅ `;
+            } else {
+                text += `\n❌ `;
+            }
+
+            text += `[${user.username}](https://osu.ppy.sh/users/${user.osuId})`;
+        }
+    }
 
     return text;
 }
@@ -149,7 +159,7 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
             generateWebhook = true;
         }
 
-        description += findNatEvaluatorStatuses(app.reviews, app.natEvaluators);
+        description += findNatEvaluatorStatuses(app.reviews, app.natEvaluators, app.discussion);
         description += findMissingContent(app.discussion, app.consensus, app.feedback);
 
         if (generateWebhook) {
@@ -223,7 +233,7 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
         }
 
         if (generateWebhook && !natList.length) {
-            description += findNatEvaluatorStatuses(round.reviews, round.natEvaluators);
+            description += findNatEvaluatorStatuses(round.reviews, round.natEvaluators, round.discussion);
             description += findMissingContent(round.discussion, round.consensus, round.feedback);
             await discord.webhookPost(
                 [{

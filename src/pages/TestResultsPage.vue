@@ -17,7 +17,7 @@
                 </button>
             </section>
 
-            <section v-if="tests" class="card card-body">
+            <section v-if="tests && tests.length > 1" class="card card-body">
                 <transition-group name="list" tag="div" class="row">
                     <result-card
                         v-for="test in tests"
@@ -34,10 +34,17 @@
             <template v-if="selectedTest">
                 <section class="card card-body text-center">
                     <div>
-                        <b>User:</b> {{ selectedTest.applicant.username }} -
-                        <b>Mode:</b> {{ selectedTest.mode }} -
-                        <b>Score:</b> {{ selectedTest.totalScore }} -
-                        <b><a :href="'https://bn.mappersguild.com/message?eval=' + relevantApplicationId" target="_blank">Evaluation results</a></b>
+                        <b>User:</b>
+                        <user-link
+                            :osu-id="selectedTest.applicant.osuId"
+                            :username="selectedTest.applicant.username"
+                        />
+                        -
+                        <b>Mode:</b> {{ selectedTest.mode === 'osu' ? 'osu!' : 'osu!' + selectedTest.mode }}
+                        -
+                        <b>Score:</b> {{ selectedTest.totalScore }}
+                        -
+                        <b><a :href="'/message?eval=' + relevantApplicationId" target="_blank">Evaluation results</a></b>
                     </div>
                 </section>
 
@@ -115,11 +122,13 @@ import { mapState, mapGetters } from 'vuex';
 import testResultsModule from '../store/testResults';
 import postData from '../mixins/postData.js';
 import ResultCard from '../components/rcTest/ResultCard.vue';
+import UserLink from '../components/UserLink.vue';
 
 export default {
     name: 'TestResultsPage',
     components: {
         ResultCard,
+        UserLink,
     },
     mixins: [postData],
     data() {
@@ -141,11 +150,17 @@ export default {
         ]),
     },
     watch: {
-        async selectedTest () {
-            const application = await this.initialRequest(`testResults/findApplication/${this.selectedTest.id}`);
+        async selectedTest (v) {
+            if (v) {
+                const application = await this.initialRequest(`testResults/findApplication/${this.selectedTest.id}`);
 
-            if (application) {
-                this.$store.commit('testResults/setRelevantApplicationId', application.id);
+                if (application) {
+                    this.$store.commit('testResults/setRelevantApplicationId', application.id);
+                }
+
+                if (this.$route.query.test !== this.selectedTest.id) {
+                    this.$router.replace(`/testresults?test=${this.selectedTest.id}`);
+                }
             }
         },
     },
@@ -156,10 +171,13 @@ export default {
     },
     async created() {
         const user = this.$route.query.user;
+        const test = this.$route.query.test;
         let res;
 
         if (user) {
             res = await this.initialRequest(`/testResults/search/${user}`);
+        } else if (test) {
+            res = await this.initialRequest(`/testResults/findTest/${test}`);
         } else {
             res = await this.initialRequest('/testResults/relevantInfo');
         }
