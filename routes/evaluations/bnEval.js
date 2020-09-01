@@ -771,6 +771,7 @@ router.get('/activity', async (req, res) => {
             bnEvaluators: mongoId,
             mode: modes,
             createdAt: { $gte: minDate },
+            discussion: true,
         })
         .populate(applicationPopulate)
         .sort({ createdAt: 1 });
