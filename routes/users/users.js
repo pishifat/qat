@@ -4,11 +4,13 @@ const Logger = require('../../models/log');
 const AppEvaluation = require('../../models/evaluations/appEvaluation');
 const BnEvaluation = require('../../models/evaluations/bnEvaluation');
 const Evaluation = require('../../models/evaluations/evaluation');
+const ResignationEvaluation = require('../../models/evaluations/resignationEvaluation');
 const Aiess = require('../../models/aiess');
 const middlewares = require('../../helpers/middlewares');
 const discord = require('../../helpers/discord');
 const getGeneralEvents = require('../evaluations/bnEval').getGeneralEvents;
 const getUserModsCount = require('../../helpers/scrap').getUserModsCount;
+const util = require('../../helpers/util');
 
 const router = express.Router();
 
@@ -275,6 +277,72 @@ router.get('/activity', async (req, res) => {
 /* GET modding info */
 router.get('/findModsCount/:username', async (req, res) => {
     res.json(await getUserModsCount(req.params.username));
+});
+
+/* GET user next evaluation isResignation field */
+router.post('/resignFromBn/:id', async (req, res) => {
+    const user = await User.findById(req.params.id).orFail();
+
+    if (req.session.mongoId != user.id) {
+        return res.json({ error: 'Unauthorized' });
+    }
+
+    const evaluation = await ResignationEvaluation.findOne({ user: req.params.id, active: true });
+
+    if (evaluation) {
+        return res.json({ error: 'Resignation is currently being handled by the NAT!' });
+    }
+
+    await Evaluation.deleteUserActiveEvaluations(user._id);
+
+    let resignations = [];
+
+    for (const mode of user.modes) {
+        resignations.push({ user: user._id, mode, deadline: new Date() });
+    }
+
+    const evaluations = await ResignationEvaluation.insertMany(resignations);
+
+    const twoEvaluationModes = ['catch'];
+    //const threeEvaluationModes = ['osu', 'taiko', 'mania'];
+
+    for (const evaluation of evaluations) {
+        const invalids = [8129817, 3178418, 2857314];
+        const assignedNat = await User.aggregate([
+            { $match: { groups: 'nat', 'modesInfo.mode': evaluation.mode, osuId: { $nin: invalids } } },
+            { $sample: { size: twoEvaluationModes.includes(evaluation.mode) ? 2 : 3 } },
+        ]);
+        let natList = '';
+
+        for (let i = 0; i < assignedNat.length; i++) {
+            const u = assignedNat[i];
+            evaluation.natEvaluators.push(u._id);
+            await evaluation.save();
+            natList += u.username;
+
+            if (i + 1 < assignedNat.length) {
+                natList += ', ';
+            }
+        }
+
+        await discord.webhookPost(
+            [{
+                author: discord.defaultWebhookAuthor(req.session),
+                color: discord.webhookColors.white,
+                description: `Created [**${user.username}**'s resignation eval](http://bn.mappersguild.com/bneval?id=${evaluation.id})`,
+                fields: [
+                    {
+                        name: 'Assigned NAT',
+                        value: natList,
+                    },
+                ],
+            }],
+            evaluation.mode
+        );
+        await util.sleep(500);
+    }
+
+    res.json({ success: 'ok' });
 });
 
 module.exports = router;

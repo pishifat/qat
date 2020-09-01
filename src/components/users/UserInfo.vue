@@ -33,6 +33,10 @@
                 <bn-evaluator-toggle
                     v-if="(selectedUser.id == loggedInUser.id || loggedInUser.isNat) && !selectedUser.isNat"
                 />
+
+                <resign
+                    v-if="selectedUser.id == loggedInUser.id && loggedInUser.isBn"
+                />
             </div>
 
             <notes
@@ -56,6 +60,7 @@ import BnEvaluatorToggle from './info/BnEvaluatorToggle.vue';
 import UserGroupToggle from './info/UserGroupToggle.vue';
 import ModdingActivity from '../evaluations/info/currentBns/ModdingActivity.vue';
 import UserActivity from '../evaluations/info/currentBns/userActivity/UserActivity.vue';
+import Resign from './info/Resign.vue';
 import ModalDialog from '../ModalDialog.vue';
 
 export default {
@@ -69,6 +74,7 @@ export default {
         UserGroupToggle,
         ModdingActivity,
         UserActivity,
+        Resign,
         ModalDialog,
     },
     computed: {
