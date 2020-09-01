@@ -60,11 +60,15 @@ router.get('/search/:user', middlewares.isNat, async (req, res) => {
 
 /* GET search for test from test _id */
 router.get('/findTest/:id', async (req, res) => {
-    res.json({ tests: await TestSubmission.find({ _id: req.params.id }).populate(defaultTestPopulate) });
+    const test = await TestSubmission.findOne({ _id: req.params.id }).populate(defaultTestPopulate);
+
+    res.json({
+        tests: [test], // setTests commit expects array
+    });
 });
 
 /* GET search for application from test _id */
-router.get('/findApplication/:id', middlewares.isNat, async (req, res) => {
+router.get('/findApplication/:id', async (req, res) => {
     res.json(await AppEvaluation.findOne({ test: req.params.id }));
 });
 
