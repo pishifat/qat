@@ -710,8 +710,6 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
                 .sort({ timestamp: -1 })
                 .limit(3);
 
-            console.log(a);
-
             if ((a[1] && a[1].userId == userOsuId) || (a[2] && a[2].userId == userOsuId)) {
                 nominationsDisqualified.push(event);
             }

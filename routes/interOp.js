@@ -2,6 +2,7 @@ const express = require('express');
 const config = require('../config.json');
 const Aiess = require('../models/aiess');
 const User = require('../models/user');
+const Evaluation = require('../models/evaluations/bnEvaluation');
 
 const router = express.Router();
 
@@ -68,6 +69,25 @@ router.get('/qaEventsByUser/:osuId', async (req, res) => {
 /* GET dq info for discussionID */
 router.get('/dqInfoByDiscussionId/:discussionId', async (req, res) => {
     res.json(await Aiess.findOne({ discussionId: req.params.discussionId }));
+});
+
+/* GET general reason for BN removal */
+router.get('/bnRemoval/:osuId', async (req, res) => {
+    const user = await User.findOne({ osuId: req.params.osuId });
+
+    if (!user) {
+        return res.status(404).send('User not found');
+    }
+
+    const latestEvalRound = await Evaluation
+        .findOne({ bn: user._id, consensus: 'fail', active: false })
+        .sort({ $natural: -1 });
+
+    if (!latestEvalRound) {
+        return res.status(404).send('User has no BN removal logged');
+    }
+
+    res.json(latestEvalRound.isResignation ? 'Resigned' : 'Kicked');
 });
 
 module.exports = router;
