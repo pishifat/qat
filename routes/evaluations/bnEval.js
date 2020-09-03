@@ -281,11 +281,16 @@ router.post('/setIndividualEval/', middlewares.isNat, async (req, res) => {
  * @returns {string}
  */
 function makeWordFromField (field) {
-    if (!field) return 'None';
+    if (!field) return 'none';
 
-    let word = field.replace(/([a-zA-Z])([A-Z])([a-z])/g, '$1 $2$3');
-
-    if (word.charAt(word.length-1) === 'n') word = word.replace(/.$/,'N'); // Bn --> BN
+    // Bn --> BN
+    let word = field.replace(/Bn/,'BN');
+    // aWordWithBNOnIt --> a Word With BNOn It
+    word = word.replace(/([a-z])([A-Z])/g, '$1 $2');
+    // a Word With BNOn It --> a Word With BN On It
+    word = word.replace(/([A-Z])([A-Z][a-z])/g, '$1 $2');
+    // capitalize
+    word = word.charAt(0).toUpperCase() + word.slice(1);
 
     return word;
 }
