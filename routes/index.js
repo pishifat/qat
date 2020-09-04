@@ -10,15 +10,8 @@ const ResignationEvaluation = require('../models/evaluations/resignationEvaluati
 const { setSession } = require('../helpers/util');
 const { OsuResponseError } = require('../helpers/errors');
 const { ResignationConsensus } = require('../shared/enums');
-const notifications = require('../helpers/notifications');
 
 const router = express.Router();
-
-/* GET index bn listing */
-router.get('/test', async (req, res) => {
-    await notifications.notify();
-    res.json('done');
-});
 
 /* GET index bn listing */
 router.get('/relevantInfo', async (req, res) => {
