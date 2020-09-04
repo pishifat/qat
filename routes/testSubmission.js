@@ -146,23 +146,7 @@ router.post('/submitTest', async (req, res) => {
         currentBnApp._id
     );
 
-    const twoEvaluationModes = ['catch'];
-    const invalids = [8129817, 3178418, 2857314];
-    const assignedNat = await User.aggregate([
-        {
-            $match: {
-                groups: 'nat',
-                'modesInfo.mode': test.mode,
-                osuId: { $nin: invalids },
-            },
-        },
-        {
-            $sample: {
-                size: twoEvaluationModes.includes(test.mode) ? 2 : 3,
-            },
-        },
-    ]);
-
+    const assignedNat = await User.getAssignedNat(test.mode);
     currentBnApp.natEvaluators = assignedNat;
     await currentBnApp.save();
     const natList = assignedNat.map(n => n.username).join(', ');

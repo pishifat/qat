@@ -28,3 +28,4 @@ config.json
 dist/
 public/js/
 public/css/
+.vscode/

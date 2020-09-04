@@ -201,28 +201,14 @@ async function setFeedback (evaluation, feedback, session) {
 }
 
 async function replaceUser (evaluation, currentUser, evaluatorId) {
-    const invalids = [
-        8129817,
-        3178418,
-        2857314,
-        ...evaluation.natEvaluators.map(u => u.osuId),
-    ];
+    const currentSelection = evaluation.natEvaluators.map(u => u.osuId);
     let newEvaluator;
 
     // assigns current user if possible. rng otherwise
-    if (!invalids.includes(currentUser.osuId) && currentUser.isBnFor(evaluation.mode)) {
+    if (currentUser.isBnEvaluator && currentUser.isBnFor(evaluation.mode) && !currentSelection.includes(currentUser.osuId)) {
         newEvaluator = currentUser;
     } else {
-        const evaluatorArray = await User.aggregate([
-            {
-                $match: {
-                    groups: 'nat',
-                    'modesInfo.mode': evaluation.mode,
-                    osuId: { $nin: invalids },
-                },
-            },
-            { $sample: { size: 1 } },
-        ]);
+        const evaluatorArray = await User.getAssignedNat(evaluation.mode, currentSelection, 1);
         newEvaluator = evaluatorArray[0];
     }
 

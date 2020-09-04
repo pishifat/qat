@@ -223,6 +223,38 @@ class UserService extends mongoose.Model {
         }
     }
 
+    /**
+     * Note that when doing evaluation.natEvaluators = assignedNats, natEvaluators will be an array of ObjectsIds, NOT an array users objects. Populate again to work with it.
+     * @param {string} mode
+     * @param {number[]} [excludeOsuIds]
+     * @param {number} [sampleSize]
+     * @returns {Promise<[]>}
+     */
+    static async getAssignedNat (mode, excludeOsuIds, sampleSize) {
+        const twoEvaluationModes = ['catch'];
+        sampleSize = sampleSize || (twoEvaluationModes.includes(mode) ? 2 : 3); // Settings.getModeEvaluationsSize(mode)
+
+        const query = User.aggregate([
+            {
+                $match: {
+                    groups: 'nat',
+                    'modesInfo.mode': mode,
+                    isBnEvaluator: true,
+                },
+            },
+        ]);
+
+        if (excludeOsuIds) {
+            query.match({
+                osuId: { $nin: excludeOsuIds },
+            });
+        }
+
+        return await query
+            .sample(sampleSize)
+            .exec();
+    }
+
 }
 
 userSchema.loadClass(UserService);

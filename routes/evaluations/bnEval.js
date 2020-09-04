@@ -61,7 +61,6 @@ function isValidMode(modeToCheck, isOsu, isTaiko, isCatch, isMania) {
 
 /* POST submit or edit eval */
 router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
-    // TODO missing asigned users in response??
     const includeFullBns = req.body.groups.includes('fullBn');
     const includeProbationBns = req.body.groups.includes('probationBn');
     const includeNat = req.body.groups.includes('nat');
@@ -159,30 +158,15 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
     let minDate = new Date();
     minDate.setDate(minDate.getDate() + 14);
 
-    const twoEvaluationModes = ['catch'];
-    //const threeEvaluationModes = ['osu', 'taiko', 'mania'];
-
     if (deadline < minDate) {
         for (let i = 0; i < result.length; i++) {
             const er = result[i];
             const u = await User.findById(er.user);
-            const invalids = [8129817, 3178418, 2857314, u.osuId];
-            const assignedNat = await User.aggregate([
-                { $match: { groups: 'nat', 'modesInfo.mode': er.mode, osuId: { $nin: invalids } } },
-                { $sample: { size: twoEvaluationModes.includes(er.mode) ? 2 : 3 } },
-            ]);
-            let natList = '';
-
-            for (let i = 0; i < assignedNat.length; i++) {
-                let user = assignedNat[i];
-                er.natEvaluators.push(user._id);
-                await er.save();
-                natList += user.username;
-
-                if (i + 1 < assignedNat.length) {
-                    natList += ', ';
-                }
-            }
+            const assignedNat = await User.getAssignedNat(er.mode, [u.osuId]);
+            er.natEvaluators = assignedNat;
+            await er.populate(defaultPopulate).execPopulate();
+            await er.save();
+            const natList = assignedNat.map(u => u.username).join(', ');
 
             await discord.webhookPost(
                 [{

@@ -61,12 +61,12 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
     const minEvalDate = new Date();
     minEvalDate.setDate(minEvalDate.getDate() - (parseInt(req.params.days)));
     const maxDate = new Date();
-    const invalids = [8129817, 3178418, 2857314];
     const [users, applicationEvaluations, bnEvaluations] = await Promise.all([
         User
             .find({
                 groups: 'nat',
                 'modesInfo.mode': req.params.mode,
+                isBnEvaluator: true,
             })
             .sort({ username: 1 }),
 
@@ -88,29 +88,27 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
     ]);
     let info = [];
     users.forEach(user => {
-        if (invalids.indexOf(user.osuId) == -1) {
-            let evalsOnBnApps = 0;
-            let evalsOnCurrentBnEvals = 0;
+        let evalsOnBnApps = 0;
+        let evalsOnCurrentBnEvals = 0;
 
-            applicationEvaluations.forEach(app => {
-                evalsOnBnApps += app.reviews.filter(r => r.evaluator == user.id).length;
-            });
+        applicationEvaluations.forEach(app => {
+            evalsOnBnApps += app.reviews.filter(r => r.evaluator == user.id).length;
+        });
 
-            bnEvaluations.forEach(round => {
-                evalsOnCurrentBnEvals += round.reviews.filter(r => r.evaluator == user.id).length;
-            });
+        bnEvaluations.forEach(round => {
+            evalsOnCurrentBnEvals += round.reviews.filter(r => r.evaluator == user.id).length;
+        });
 
-            const joinHistory = user.history.filter(h => h.kind === 'joined' &&  h.group === 'nat');
-            const lastJoin = joinHistory[joinHistory.length - 1];
+        const joinHistory = user.history.filter(h => h.kind === 'joined' &&  h.group === 'nat');
+        const lastJoin = joinHistory[joinHistory.length - 1];
 
-            info.push({
-                username: user.username,
-                osuId: user.osuId,
-                totalBnAppEvals: evalsOnBnApps,
-                totalCurrentBnEvals: evalsOnCurrentBnEvals,
-                joinDate: lastJoin && lastJoin.date,
-            });
-        }
+        info.push({
+            username: user.username,
+            osuId: user.osuId,
+            totalBnAppEvals: evalsOnBnApps,
+            totalCurrentBnEvals: evalsOnCurrentBnEvals,
+            joinDate: lastJoin && lastJoin.date,
+        });
     });
 
     res.json({
@@ -303,27 +301,11 @@ router.post('/resignFromBn/:id', async (req, res) => {
 
     const evaluations = await ResignationEvaluation.insertMany(resignations);
 
-    const twoEvaluationModes = ['catch'];
-    //const threeEvaluationModes = ['osu', 'taiko', 'mania'];
-
     for (const evaluation of evaluations) {
-        const invalids = [8129817, 3178418, 2857314];
-        const assignedNat = await User.aggregate([
-            { $match: { groups: 'nat', 'modesInfo.mode': evaluation.mode, osuId: { $nin: invalids } } },
-            { $sample: { size: twoEvaluationModes.includes(evaluation.mode) ? 2 : 3 } },
-        ]);
-        let natList = '';
-
-        for (let i = 0; i < assignedNat.length; i++) {
-            const u = assignedNat[i];
-            evaluation.natEvaluators.push(u._id);
-            await evaluation.save();
-            natList += u.username;
-
-            if (i + 1 < assignedNat.length) {
-                natList += ', ';
-            }
-        }
+        const assignedNat = await User.getAssignedNat(evaluation.mode);
+        evaluation.natEvaluators = assignedNat;
+        await evaluation.save();
+        const natList = assignedNat.map(e => e.username).join(', ');
 
         await discord.webhookPost(
             [{

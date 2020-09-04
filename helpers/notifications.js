@@ -35,8 +35,6 @@ function findNatEvaluatorStatuses (reviews, natEvaluators, discussion) {
 
     if (discussion) {
         for (const review of reviews) {
-            console.log(review.evaluator);
-
             if (review.evaluator.isNat) {
                 text += `\n✅ [${review.evaluator.username}](https://osu.ppy.sh/users/${review.evaluator.osuId})`;
             }
@@ -200,36 +198,13 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
             description += 'is due in two weeks!';
             generateWebhook = true;
 
-            const twoEvaluationModes = ['catch'];
-            //const threeEvaluationModes = ['osu', 'taiko', 'mania'];
-
             if (!round.natEvaluators || !round.natEvaluators.length) {
-                const invalids = [8129817, 3178418, 2857314];
-                const assignedNat = await User.aggregate([
-                    { $match: { groups: 'nat', 'modesInfo.mode': round.mode, osuId: { $nin: invalids } } },
-                    { $sample: { size: twoEvaluationModes.includes(round.mode) ? 2 : 3 } },
-                ]);
-
-                for (let i = 0; i < assignedNat.length; i++) {
-                    let user = assignedNat[i];
-                    await Evaluation.findByIdAndUpdate(round.id, { $push: { natEvaluators: user._id } });
-                    natList += user.username;
-
-                    if (i + 1 < assignedNat.length) {
-                        natList += ', ';
-                    }
-                }
-            } else {
-                for (let i = 0; i < round.natEvaluators.length; i++) {
-                    let userId = round.natEvaluators[i];
-                    let user = await User.findById(userId);
-                    natList += user.username;
-
-                    if (i + 1 < round.natEvaluators.length) {
-                        natList += ', ';
-                    }
-                }
+                round.natEvaluators = await User.getAssignedNat(round.mode);
+                await round.populate(defaultPopulate).execPopulate();
+                await round.save();
             }
+
+            natList = round.natEvaluators.map(u => u.username).join(', ');
         }
 
         if (generateWebhook && !natList.length) {
