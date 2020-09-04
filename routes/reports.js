@@ -104,7 +104,7 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
         });
 
         discord.webhookPost([{
-            description: `[Non-user report](http://bn.mappersguild.com/managereports?report=${report.id})`,
+            description: `[Non-user report](http://bn.mappersguild.com/managereports?id=${report.id})`,
             color: discord.webhookColors.lightRed,
             fields: notificationFields,
         }]);
