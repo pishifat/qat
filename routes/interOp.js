@@ -55,6 +55,10 @@ router.get('/events/:beatmapsetId', async (req, res) => {
 router.get('/qaEventsByUser/:osuId', async (req, res) => {
     let user = await User.findOne({ osuId: parseInt(req.params.osuId) });
 
+    if (!user) {
+        return res.status(404).send('User not found');
+    }
+
     res.json(
         await Aiess
             .find({ qualityAssuranceCheckers: user.id })
