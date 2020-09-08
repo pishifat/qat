@@ -101,7 +101,10 @@ router.get('/bnRemoval/:osuId', async (req, res) => {
         return res.status(404).send('User has no BN removal logged');
     }
 
-    res.json(latestEvaluation.isResignation ? 'Resigned' : 'Kicked');
+    res.json({
+        action: latestEvaluation.isResignation ? 'Resigned' : 'Kicked',
+        timestamp: latestEvaluation.archivedAt,
+    } );
 });
 
 module.exports = router;
