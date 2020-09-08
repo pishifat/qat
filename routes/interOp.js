@@ -2,7 +2,9 @@ const express = require('express');
 const config = require('../config.json');
 const Aiess = require('../models/aiess');
 const User = require('../models/user');
-const Evaluation = require('../models/evaluations/bnEvaluation');
+const Evaluation = require('../models/evaluations/evaluation');
+const { BnEvaluationConsensus, ResignationConsensus } = require('../shared/enums');
+
 
 const router = express.Router();
 
@@ -83,15 +85,23 @@ router.get('/bnRemoval/:osuId', async (req, res) => {
         return res.status(404).send('User not found');
     }
 
-    const latestEvalRound = await Evaluation
-        .findOne({ bn: user._id, consensus: 'fail', active: false })
+    const latestEvaluation = await Evaluation
+        .findOne({
+            user: user._id,
+            active: false,
+            $or: [
+                { consensus: BnEvaluationConsensus.RemoveFromBn },
+                { consensus: ResignationConsensus.ResignedOnGoodTerms },
+                { consensus: ResignationConsensus.ResignedOnStandardTerms },
+            ],
+        })
         .sort({ $natural: -1 });
 
-    if (!latestEvalRound) {
+    if (!latestEvaluation) {
         return res.status(404).send('User has no BN removal logged');
     }
 
-    res.json(latestEvalRound.isResignation ? 'Resigned' : 'Kicked');
+    res.json(latestEvaluation.isResignation ? 'Resigned' : 'Kicked');
 });
 
 module.exports = router;
