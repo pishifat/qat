@@ -14,7 +14,7 @@
             <span :class="consensusColor">
                 {{ makeWordFromField(consensus).toUpperCase() }}
             </span>
-            <span v-if="evaluation.addition" :class="consensusColor">
+            <span v-if="addition" :class="consensusColor">
                 + {{ makeWordFromField(addition).toUpperCase() }}
             </span>
         </small>
@@ -42,6 +42,9 @@ export default {
     computed: {
         consensus () {
             return this.evaluation.consensus;
+        },
+        addition () {
+            return this.evaluation.addition;
         },
     },
 };
