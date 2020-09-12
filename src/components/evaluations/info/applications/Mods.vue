@@ -14,7 +14,7 @@
                 />
             </li>
             <li class="small">
-                <a :href="'https://osu.ppy.sh/users/' + osuId + '/modding/events?types%5B%5D=kudosu_gain&types%5B%5D=kudosu_lost&min_date=&max_date='" target="_blank">All history</a>
+                <a :href="'https://osu.ppy.sh/beatmapsets/events?user=' + osuId + '&types%5B%5D=kudosu_gain&types%5B%5D=kudosu_lost&min_date=&max_date='" target="_blank">All history</a>
             </li>
         </ul>
     </div>
