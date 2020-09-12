@@ -5,7 +5,7 @@
             <b>{{ Math.round((mediations.length/totalMediations)*100) || 0 }}%</b>
         </p>
 
-        <ul v-if="loggedInUser.isNat">
+        <ul v-if="loggedInUser.hasFullReadAccess">
             <li v-for="mediation in mediations" :key="mediation.id" class="small ml-2">
                 {{ mediation.mediator.username }}
 
