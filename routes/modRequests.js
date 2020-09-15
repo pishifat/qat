@@ -101,30 +101,51 @@ router.get('/', (req, res) => {
     });
 });
 
-/* GET show index */
-router.get('/relevantInfo', middlewares.isLoggedIn, async (req, res) => {
+/* GET own created requests */
+router.get('/owned', middlewares.isLoggedIn, async (req, res) => {
     const user = res.locals.userRequest;
     const ownRequests = await ModRequest
         .find({ user: user._id })
         .populate(defaultPopulate)
         .sort({ createdAt: -1 });
-    let requests = [];
-
-    if (user.isFeatureTester) {
-        requests = await ModRequest
-            .find({})
-            .populate(defaultPopulate)
-            .sort({ createdAt: -1 });
-    }
-
-    for (const req of requests) {
-        if (!req.beatmapset) console.log(req);
-    }
 
     res.json({
         ownRequests,
         user,
+    });
+});
+
+/* GET all requests */
+router.get('/all', middlewares.isLoggedIn, middlewares.hasBasicAccess, async (req, res) => {
+    const user = res.locals.userRequest;
+    let requests = [];
+    let involvedRequests = [];
+
+    if (user.isFeatureTester) {
+        const months = req.query.limit || 2;
+        const maxDate = moment().subtract(months, 'month');
+        const reviews = await ModReview
+            .find({ user: user._id })
+            .sort({ createdAt: -1 });
+
+        const requestIds = reviews.map(r => r.modRequest);
+
+        [requests, involvedRequests] = await Promise.all([
+            ModRequest
+                .find({ createdAt: { $gte: maxDate.toDate() } })
+                .populate(defaultPopulate)
+                .sort({ createdAt: -1 }),
+
+            ModRequest
+                .find({ _id: { $in: requestIds } })
+                .populate(defaultPopulate)
+                .sort({ createdAt: -1 }),
+        ]);
+    }
+
+    res.json({
         requests,
+        involvedRequests,
     });
 });
 
@@ -167,7 +188,7 @@ router.post('/store', middlewares.isLoggedIn, async (req, res) => {
 
     if (beatmapsetInfo.user_id != res.locals.userRequest.osuId) {
         return res.json({
-            error: `Cannot submit others people's maps.. for now`,
+            error: `Cannot submit others people's maps`,
         });
     }
 

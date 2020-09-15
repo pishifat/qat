@@ -106,7 +106,7 @@
                                 <button
                                     :disabled="!user"
                                     class="btn btn-primary btn-block"
-                                    @click="submit"
+                                    @click="submit($event)"
                                 >
                                     Submit
                                 </button>
@@ -188,6 +188,10 @@
                                 @update:editing="editing = $event"
                             />
                         </requests-listing>
+
+                        <button type="button" class="btn btn-primary btn-block mb-2" @click="showMore($event)">
+                            Show more
+                        </button>
                     </template>
                 </div>
             </div>
@@ -229,9 +233,9 @@ export default {
             'user',
             'filters',
             'possibleFilters',
+            'involvedRequests',
         ]),
         ...mapGetters([
-            'involvedRequests',
             'filteredRequests',
         ]),
     },
@@ -240,12 +244,20 @@ export default {
         this.isLoading = !this.isLoading;
     },
     methods: {
-        async submit () {
+        async submit (e) {
             if (!this.category || !this.link) {
                 alert('Missing link or category');
 
                 return;
             }
+
+            if (this.comment && this.comment.length > 500) {
+                alert('Comment cannot be longer than 500 characters, consider modding it if you need more!');
+
+                return;
+            }
+
+            e.target.disabled = true;
 
             const { data } = await Axios.post('/modRequests/store', {
                 link: this.link,
@@ -254,6 +266,14 @@ export default {
             });
             alert(data.success || data.error);
             await this.$store.dispatch('getData');
+
+            e.target.disabled = false;
+        },
+        async showMore (e) {
+            e.target.disabled = true;
+            this.$store.commit('increaseLimit');
+            await this.$store.dispatch('getData');
+            e.target.disabled = false;
         },
     },
 };

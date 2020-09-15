@@ -20,7 +20,7 @@
                 hasRankedMaps ({{ request.user.rankedBeatmapsets }})
             </request-tag>
             <request-tag>
-                {{ request.beatmapset.totalLengthString }} ({{ (request.beatmapset.totalLength / 60).toFixed(1) }} min | {{ (request.beatmapset.totalLength / 60).toFixed(1) }} min)
+                {{ request.beatmapset.totalLengthString }} ({{ (request.beatmapset.length / 60).toFixed(1) }} min | {{ (request.beatmapset.totalLength / 60).toFixed(1) }} min)
             </request-tag>
             <request-tag>
                 {{ request.category }}

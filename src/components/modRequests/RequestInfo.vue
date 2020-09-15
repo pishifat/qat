@@ -9,12 +9,12 @@
             </span>
             <div class="row">
                 <div class="col-sm-7">
-                    <input
+                    <textarea
                         v-model.trim="reviewComment"
-                        type="text"
                         class="form-control"
                         placeholder="comment (optional)"
-                    >
+                        rows="3"
+                    />
                 </div>
                 <div class="col-sm-5 form-inline justify-content-around">
                     <div class="form-check">

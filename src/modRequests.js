@@ -24,6 +24,7 @@ const store = new Vuex.Store({
         user: null,
         ownRequests: [],
         requests: [],
+        involvedRequests: [],
         selectedRequestId: null,
         filters: [
             'ranked',
@@ -65,12 +66,16 @@ const store = new Vuex.Store({
                 'hasRankedMaps',
             ],
         },
+        monthsLimit: 2,
     },
     mutations: {
-        setInitialData (state, payload) {
+        setOwnRequests (state, payload) {
             state.user = payload.user;
-            state.requests = payload.requests;
             state.ownRequests = payload.ownRequests;
+        },
+        setAllRequests (state, payload) {
+            state.requests = payload.requests;
+            state.involvedRequests = payload.involvedRequests;
         },
         updateSelectRequestId (state, id) {
             state.selectedRequestId = id;
@@ -80,13 +85,11 @@ const store = new Vuex.Store({
             if (i !== -1) state.filters.splice(i, 1);
             else state.filters.push(filter);
         },
+        increaseLimit (state) {
+            state.monthsLimit++;
+        },
     },
     getters: {
-        involvedRequests (state) {
-            if (!state.user) return [];
-
-            return state.requests.filter(r => r.modReviews.some(r => r.user.id === state.user.id));
-        },
         filteredRequests (state) {
             return state.requests.filter(r => {
                 const lastEvent = r.beatmapset.events.length && r.beatmapset.events[0];
@@ -133,11 +136,16 @@ const store = new Vuex.Store({
         },
     },
     actions: {
-        async getData ({ commit }) {
-            const { data } = await Axios.get('/modRequests/relevantInfo');
+        async getData ({ commit, state }) {
+            const { data } = await Axios.get(`/modRequests/owned`);
 
             if (!data.error) {
-                commit('setInitialData', data);
+                commit('setOwnRequests', data);
+
+                if (state.user && state.user.isFeatureTester) {
+                    const { data } = await Axios.get(`/modRequests/all?limit=${state.monthsLimit}`);
+                    if (!data.error) commit('setAllRequests', data);
+                }
             }
         },
     },
