@@ -9,9 +9,11 @@
             <li v-for="mediation in mediations" :key="mediation.id" class="small ml-2">
                 {{ mediation.mediator.username }}
 
-                <span v-if="mediation.comment && mediation.comment.length" class="text-secondary pre-line ml-2" v-html="$md.render(mediation.comment)">
-                    {{ mediation.comment }}
-                </span>
+                <span
+                    v-if="mediation.comment && mediation.comment.length"
+                    class="text-secondary pre-line ml-2"
+                    v-html="$md.render(mediation.comment)"
+                />
             </li>
         </ul>
     </div>
