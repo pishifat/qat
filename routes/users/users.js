@@ -227,7 +227,7 @@ router.post('/:id/switchUserGroup', middlewares.isNat, async (req, res) => {
             date: new Date(),
             mode: mode.mode,
             kind: 'left',
-            group: user.isNat ? 'nat' : 'bn',
+            group: user.isNat ? 'bn' : 'nat',
             relatedEvaluation: null,
         });
 
@@ -235,7 +235,7 @@ router.post('/:id/switchUserGroup', middlewares.isNat, async (req, res) => {
             date: new Date(),
             mode: mode.mode,
             kind: 'joined',
-            group: user.isNat ? 'bn' : 'nat',
+            group: user.isNat ? 'nat' : 'bn',
             relatedEvaluation: null,
         });
     }
@@ -254,7 +254,7 @@ router.post('/:id/switchUserGroup', middlewares.isNat, async (req, res) => {
     res.json(user);
     Logger.generate(
         req.session.mongoId,
-        `Moved "${user.username}" from "${user.isNat ? 'NAT' : 'BN'}" to "${user.isNat ? 'BN' : 'NAT'}"`,
+        `Moved "${user.username}" from "${user.isNat ? 'BN' : 'NAT'}" to "${user.isNat ? 'NAT' : 'BN'}"`,
         'user',
         user._id
     );
