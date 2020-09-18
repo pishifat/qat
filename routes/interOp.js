@@ -3,7 +3,7 @@ const config = require('../config.json');
 const Aiess = require('../models/aiess');
 const User = require('../models/user');
 const Evaluation = require('../models/evaluations/evaluation');
-const { BnEvaluationConsensus, ResignationConsensus } = require('../shared/enums');
+const { BnEvaluationConsensus } = require('../shared/enums');
 
 
 const router = express.Router();
@@ -89,11 +89,7 @@ router.get('/bnRemoval/:osuId', async (req, res) => {
         .findOne({
             user: user._id,
             active: false,
-            $or: [
-                { consensus: BnEvaluationConsensus.RemoveFromBn },
-                { consensus: ResignationConsensus.ResignedOnGoodTerms },
-                { consensus: ResignationConsensus.ResignedOnStandardTerms },
-            ],
+            consensus: { $exists: true },
         })
         .sort({ $natural: -1 });
 
@@ -102,7 +98,7 @@ router.get('/bnRemoval/:osuId', async (req, res) => {
     }
 
     res.json({
-        action: latestEvaluation.isResignation ? 'Resigned' : 'Kicked',
+        action: latestEvaluation.isResignation ? 'Resigned' : latestEvaluation.consensus === BnEvaluationConsensus.FullBn ? 'Moved to Full BN' : latestEvaluation.consensus === BnEvaluationConsensus.ProbationBn ? 'Moved to Probation BN' : 'Kicked',
         timestamp: latestEvaluation.archivedAt,
     } );
 });
