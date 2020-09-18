@@ -122,6 +122,10 @@ router.post('/assignUser/:id', middlewares.isBnOrNat, async (req, res) => {
         return res.json({ error: 'You cannot check your nominations!' });
     }
 
+    if (event.creatorId == newChecker.osuId) {
+        return res.json({ error: 'You cannot check your maps!' });
+    }
+
     const newEvent = await Aiess
         .findByIdAndUpdate(req.params.id, { $push: { qualityAssuranceCheckers: newChecker._id } })
         .populate(defaultPopulate);
