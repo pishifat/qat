@@ -75,12 +75,6 @@ export default {
         ...mapGetters('qualityAssurance', [
             'filteredEvents',
         ]),
-        sevenDaysAgo() {
-            let date = new Date();
-            date.setDate(date.getDate() - 7);
-
-            return date;
-        },
     },
     beforeCreate () {
         if (!this.$store.hasModule('qualityAssurance')) {
@@ -110,24 +104,20 @@ export default {
         isOutdated (beatmapsetId, timestamp) {
             timestamp = new Date(timestamp);
 
-            if (timestamp < this.sevenDaysAgo) {
-                return true;
-            } else {
-                let beatmaps = this.filteredEvents.filter(b => b.beatmapsetId == beatmapsetId && b.timestamp != timestamp);
-                beatmaps = beatmaps.concat(this.overwriteEvents.filter(b => b.beatmapsetId == beatmapsetId));
-                let isOutdated = false;
+            let beatmaps = this.filteredEvents.filter(b => b.beatmapsetId == beatmapsetId && b.timestamp != timestamp);
+            beatmaps = beatmaps.concat(this.overwriteEvents.filter(b => b.beatmapsetId == beatmapsetId));
+            let isOutdated = false;
 
-                for (let i = 0; i < beatmaps.length; i++) {
-                    const b = beatmaps[i];
+            for (let i = 0; i < beatmaps.length; i++) {
+                const b = beatmaps[i];
 
-                    if (new Date(b.timestamp) > timestamp) {
-                        isOutdated = true;
-                        break;
-                    }
+                if (new Date(b.timestamp) > timestamp) {
+                    isOutdated = true;
+                    break;
                 }
-
-                return isOutdated;
             }
+
+            return isOutdated;
         },
         isMaxChecks (event) {
             for (const mode of event.modes) {
