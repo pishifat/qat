@@ -8,7 +8,7 @@
                 <li>Inappropriate behavior on a map discussion page/beatmap comment</li>
                 <li>A member of the BN/NAT violating the Code of Conduct/BN Rules</li>
             </ul>
-            <p>Authors of reports are anonymous until a consensus is met. The consensus will then be relayed to you via osu! forum PM.</p>
+            <p>Authors of reports are anonymous until a consensus is met. The consensus will then be relayed to you via osu! chat.</p>
         </section>
 
         <section class="card card-body">
@@ -119,7 +119,7 @@ export default {
                     type: 'success',
                 });
 
-                this.successInfo = 'Your report has been submitted! Its outcome will be sent to you via osu! forum PM';
+                this.successInfo = 'Your report has been submitted! Its outcome will be sent to you via osu! chat';
             }
         },
     },
