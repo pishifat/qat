@@ -46,8 +46,8 @@ const reportPopulate = [
 router.get('/evaluation/:id', async (req, res) => {
     let evaluation;
 
-    evaluation = await AppEvaluation.findById(req.params.id).populate(appPopulate);
-    if (!evaluation) evaluation = await Evaluation.findById(req.params.id).populate(bnEvalPopulate);
+    evaluation = await AppEvaluation.findOne({ _id: req.params.id, active: false }).populate(appPopulate);
+    if (!evaluation) evaluation = await Evaluation.findOne({ _id: req.params.id, active: false }).populate(bnEvalPopulate);
 
     return res.json(evaluation);
 });
