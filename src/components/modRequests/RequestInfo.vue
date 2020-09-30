@@ -78,6 +78,9 @@
             <b>Reviews:</b>
             <div v-for="review in selectedRequest.modReviews" :key="review.id" class="row text-secondary">
                 <div class="col-sm-2">
+                    {{ review.updatedAt | toStandardDate }}
+                </div>
+                <div class="col-sm-2">
                     <user-link
                         :osu-id="review.user.osuId"
                         :username="review.user.username"
@@ -86,7 +89,7 @@
                 <div class="col-sm-2 text-capitalize" :class="review.action == 'accepted' ? 'text-success' : 'text-danger'">
                     {{ review.action }}
                 </div>
-                <div class="col-sm-8">
+                <div class="col-sm-6">
                     {{ review.comment }}
                 </div>
             </div>

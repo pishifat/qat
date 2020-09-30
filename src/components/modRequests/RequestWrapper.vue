@@ -26,8 +26,6 @@
 <script>
 export default {
     name: 'RequestWrapper',
-    components: {
-    },
     props: {
         request: {
             type: Object,
