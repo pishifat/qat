@@ -125,7 +125,7 @@ const store = new Vuex.Store({
             });
         },
         selectedRequest (state) {
-            return state.requests.find(r => r.id == state.selectedRequestId);
+            return state.requests.find(r => r.id == state.selectedRequestId) || state.involvedRequests.find(r => r.id == state.selectedRequestId);
         },
         userReview (state, getters) {
             if (getters.selectedRequest) {

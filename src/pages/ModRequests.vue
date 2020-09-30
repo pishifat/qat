@@ -144,7 +144,6 @@
                     >
                         <request-row
                             :request="request"
-                            @update:editing="editing = $event"
                         />
                     </requests-listing>
 
@@ -185,7 +184,6 @@
                         >
                             <request-row
                                 :request="request"
-                                @update:editing="editing = $event"
                             />
                         </requests-listing>
 

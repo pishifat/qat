@@ -16,8 +16,8 @@
         </div>
 
         <div v-if="request.comment" class="row no-gutters py-1 px-2 bg-dark">
-            <div class="col-sm-12 small">
-                {{ request.comment | shorten(200) }}
+            <div class="col-sm-12 small text-truncate">
+                {{ request.comment }}
             </div>
         </div>
     </div>

@@ -86,10 +86,10 @@
                         :username="review.user.username"
                     />
                 </div>
-                <div class="col-sm-2 text-capitalize" :class="review.action == 'accepted' ? 'text-success' : 'text-danger'">
+                <div class="col-sm-2 text-capitalize" :class="review.action == 'accepted' ? 'text-success' : 'text-warning'">
                     {{ review.action }}
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-6 text-break">
                     {{ review.comment }}
                 </div>
             </div>
