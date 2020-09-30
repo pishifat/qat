@@ -21,7 +21,7 @@
                     :osu-id="review.user.osuId"
                     :username="review.user.username"
                 />
-                <span :class="review.action == 'accepted' ? 'text-success' : 'text-danger'">
+                <span :class="review.action == 'accepted' ? 'text-success' : 'text-warning'">
                     {{ review.action }}
                 </span>
                 - {{ review.comment }}
@@ -53,7 +53,7 @@ export default {
         },
         getStatusClass (reviews) {
             if (reviews.find(r => r.action === 'accepted')) return 'text-success';
-            if (reviews.find(r => r.action === 'denied')) return 'text-danger';
+            if (reviews.find(r => r.action === 'denied')) return 'text-warning';
 
             return '';
         },

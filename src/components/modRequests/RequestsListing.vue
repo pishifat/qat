@@ -12,17 +12,10 @@
                 <div
                     v-for="request in requests"
                     :key="request.id"
-                    class="row no-gutters rounded my-1"
-                    style="position: relative"
                 >
-                    <div
-                        :style="`background-image: url('https://assets.ppy.sh/beatmaps/${request.beatmapset.osuId}/covers/cover.jpg'; position: absolute; `"
-                        style="width: 100%; height: 100%; opacity: 0.2; background-size: cover;"
-                        class="rounded"
-                    />
-                    <div class="col-sm-12">
+                    <request-wrapper :request="request">
                         <slot :request="request" />
-                    </div>
+                    </request-wrapper>
                 </div>
             </transition-group>
         </div>
@@ -31,8 +24,13 @@
 </template>
 
 <script>
+import RequestWrapper from './RequestWrapper.vue';
+
 export default {
     name: 'RequestsListing',
+    components: {
+        RequestWrapper,
+    },
     props: {
         title: {
             type: String,
