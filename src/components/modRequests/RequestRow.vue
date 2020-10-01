@@ -66,7 +66,7 @@
                 href="#"
                 data-toggle="modal"
                 data-target="#modRequestDetail"
-                @click.prevent="$store.commit('updateSelectRequestId', request.id)"
+                @click.prevent="$store.commit('modRequests/updateSelectRequestId', request.id)"
             >
                 <i class="fas fa-ellipsis-v px-3" />
             </a>

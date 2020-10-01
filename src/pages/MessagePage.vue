@@ -42,8 +42,6 @@ export default {
         } else if (reportId) {
             const report = await this.initialRequest('/message/report/' + reportId);
 
-            console.log(report);
-
             if (report && !report.error) {
                 this.report = report;
             }

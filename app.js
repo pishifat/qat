@@ -37,7 +37,8 @@ const discussionVoteRouter = require('./routes/discussionVote');
 const qualityAssuranceRouter = require('./routes/qualityAssurance');
 const logsRouter = require('./routes/logs');
 const interOpRouter = require('./routes/interOp');
-const modRequestsRouter = require('./routes/modRequests');
+const modRequestsSubmissionsRouter = require('./routes/modRequests/submissions');
+const modRequestsReviewsRouter = require('./routes/modRequests/reviews');
 const messageRouter = require('./routes/message');
 
 const app = express();
@@ -93,7 +94,8 @@ app.use('/discussionVote', discussionVoteRouter);
 app.use('/qualityassurance', qualityAssuranceRouter);
 app.use('/logs', logsRouter);
 app.use('/interOp', interOpRouter);
-app.use('/modrequests', modRequestsRouter);
+app.use('/modrequests', modRequestsSubmissionsRouter);
+app.use('/modrequests/listing', modRequestsReviewsRouter);
 app.use('/message', messageRouter);
 
 // catch 404

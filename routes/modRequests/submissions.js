@@ -1,11 +1,10 @@
 const express = require('express');
 const moment = require('moment');
-const ModRequest = require('../models/modRequests/modRequest');
-const Beatmapset = require('../models/modRequests/beatmapset');
-const ModReview = require('../models/modRequests/modReview');
-const middlewares = require('../helpers/middlewares');
-const util = require('../helpers/util');
-const osu = require('../helpers/osu');
+const ModRequest = require('../../models/modRequests/modRequest');
+const Beatmapset = require('../../models/modRequests/beatmapset');
+const middlewares = require('../../helpers/middlewares');
+const util = require('../../helpers/util');
+const osu = require('../../helpers/osu');
 
 function getGenreName (id) {
     // note that there's no 8, 11, 12
@@ -90,17 +89,6 @@ const defaultPopulate = [
 
 const router = express.Router();
 
-/* GET show index */
-router.get('/', (req, res) => {
-    if (!req.session.mongoId) {
-        req.session.lastPage = req.originalUrl;
-    }
-
-    res.render('modrequests', {
-        layout: false,
-    });
-});
-
 /* GET own created requests */
 router.get('/owned', middlewares.isLoggedIn, async (req, res) => {
     const user = res.locals.userRequest;
@@ -112,40 +100,6 @@ router.get('/owned', middlewares.isLoggedIn, async (req, res) => {
     res.json({
         ownRequests,
         user,
-    });
-});
-
-/* GET all requests */
-router.get('/all', middlewares.isLoggedIn, middlewares.hasBasicAccess, async (req, res) => {
-    const user = res.locals.userRequest;
-    let requests = [];
-    let involvedRequests = [];
-
-    if (user.isFeatureTester) {
-        const months = req.query.limit || 2;
-        const maxDate = moment().subtract(months, 'month');
-        const reviews = await ModReview
-            .find({ user: user._id })
-            .sort({ createdAt: -1 });
-
-        const requestIds = reviews.map(r => r.modRequest);
-
-        [requests, involvedRequests] = await Promise.all([
-            ModRequest
-                .find({ createdAt: { $gte: maxDate.toDate() } })
-                .populate(defaultPopulate)
-                .sort({ createdAt: -1 }),
-
-            ModRequest
-                .find({ _id: { $in: requestIds } })
-                .populate(defaultPopulate)
-                .sort({ createdAt: -1 }),
-        ]);
-    }
-
-    res.json({
-        requests,
-        involvedRequests,
     });
 });
 
@@ -221,33 +175,6 @@ router.post('/store', middlewares.isLoggedIn, async (req, res) => {
         beatmapset.save(),
         request.save(),
     ]);
-
-    res.json({
-        success: 'Saved',
-    });
-});
-
-router.post('/:id/review', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
-    if (!res.locals.userRequest.isFeatureTester) {
-        return res.json({
-            error: 'Unauthorized',
-        });
-    }
-
-    let review = await ModReview.findOne({
-        modRequest: req.params.id,
-        user: req.session.mongoId,
-    });
-
-    if (!review) {
-        review = new ModReview();
-        review.modRequest = req.params.id;
-        review.user = req.session.mongoId;
-    }
-
-    review.action = req.body.action;
-    review.comment = req.body.comment;
-    await review.save();
 
     res.json({
         success: 'Saved',

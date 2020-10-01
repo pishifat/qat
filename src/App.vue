@@ -29,6 +29,26 @@
                                 BN Application
                             </router-link>
                         </li>
+
+                        <li v-if="loggedInUser.hasBasicAccess" class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                Mod Requests
+                            </a>
+                            <div class="dropdown-menu">
+                                <router-link class="dropdown-item" to="/modrequests">
+                                    Submission
+                                </router-link>
+                                <router-link class="dropdown-item" to="/modrequests/listing">
+                                    Listing
+                                </router-link>
+                            </div>
+                        </li>
+                        <li v-else class="nav-item">
+                            <router-link class="nav-link" to="/modrequests">
+                                Mod Requests
+                            </router-link>
+                        </li>
+
                         <li v-if="loggedInUser.hasFullReadAccess" class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
                                 Reports

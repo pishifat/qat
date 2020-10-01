@@ -24,7 +24,7 @@ async function isLoggedIn(req, res, next) {
     const u = await User.findById(req.session.mongoId);
 
     if (!u) {
-        return res.redirect('/');
+        return unauthorize(req, res);
     }
 
     // Refresh if less than 1 hours left for some possible edge cases

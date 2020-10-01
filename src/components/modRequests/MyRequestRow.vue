@@ -22,7 +22,7 @@
                     :username="review.user.username"
                 />
                 <span :class="review.action == 'accepted' ? 'text-success' : 'text-warning'">
-                    {{ review.action }}
+                    ({{ review.action }})
                 </span>
                 - {{ review.comment }}
             </div>

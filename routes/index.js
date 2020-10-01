@@ -72,6 +72,10 @@ router.get('/login', (req, res) => {
     res.cookie('_state', state, { httpOnly: true });
     const hashedState = Buffer.from(state).toString('base64');
 
+    if (!req.session.lastPage) {
+        req.session.lastPage = req.get('referer');
+    }
+
     res.redirect(
         `https://osu.ppy.sh/oauth/authorize?response_type=code&client_id=${
             config.id
@@ -183,7 +187,10 @@ router.get('/callback', async (req, res) => {
 
         req.session.osuId = osuId;
         req.session.username = username;
-        res.redirect(req.session.lastPage || '/');
+
+        const lastPage = req.session.lastPage;
+        req.session.lastPage = undefined;
+        res.redirect(lastPage || '/');
     }
 });
 

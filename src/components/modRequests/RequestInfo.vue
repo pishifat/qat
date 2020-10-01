@@ -98,9 +98,9 @@
 </template>
 
 <script>
-import Axios from 'axios';
-import ModalDialog from '../ModalDialog.vue';
 import { mapState, mapGetters } from 'vuex';
+import postData from '../../mixins/postData.js';
+import ModalDialog from '../ModalDialog.vue';
 import UserLink from '../UserLink.vue';
 
 export default {
@@ -109,6 +109,7 @@ export default {
         ModalDialog,
         UserLink,
     },
+    mixins: [ postData ],
     data () {
         return {
             reviewAction: '',
@@ -116,10 +117,10 @@ export default {
         };
     },
     computed: {
-        ...mapState([
+        ...mapState('modRequests', [
             'selectedRequestId',
         ]),
-        ...mapGetters([
+        ...mapGetters('modRequests', [
             'selectedRequest',
             'userReview',
         ]),
@@ -139,13 +140,27 @@ export default {
         },
     },
     methods: {
-        async submitReview () {
-            const { data } = await Axios.post(`/modRequests/${this.selectedRequestId}/review`, {
+        async submitReview (e) {
+            if (this.reviewComment && this.reviewComment.length > 500) {
+                this.$store.dispatch('updateToastMessages', {
+                    message: 'Comment cannot be longer than 500 characters, consider modding it if you need more',
+                    type: 'info',
+                });
+
+                return;
+            }
+
+            await this.executePost(`/modRequests/listing/${this.selectedRequestId}/review`, {
                 action: this.reviewAction,
                 comment: this.reviewComment,
-            });
-            alert(data.success || data.error);
-            await this.$store.dispatch('getData');
+            }, e);
+
+            const [all, involved] = await Promise.all([
+                this.executeGet('/modRequests/listing/all'),
+                this.executeGet('/modRequests/listing/involved'),
+            ]);
+            if (!all.error) this.$store.commit('modRequests/setAllRequests', all);
+            if (!involved.error) this.$store.commit('modRequests/setInvolvedRequests', involved);
         },
     },
 };

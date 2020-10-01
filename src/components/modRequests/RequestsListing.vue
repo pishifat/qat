@@ -1,9 +1,22 @@
 <template>
     <section class="card">
         <h5 class="card-header">
-            {{ title }} ({{ requests.length }})
+            <a v-if="collapseTarget" data-toggle="collapse" :href="`#${collapseTarget}`">
+                {{ title }} ({{ requests.length }})
+                <small class="ml-2">
+                    <i class="fas fa-chevron-down" />
+                </small>
+            </a>
+            <span v-else>
+                {{ title }} ({{ requests.length }})
+            </span>
         </h5>
-        <div class="card-body">
+
+        <div
+            :id="collapseTarget"
+            class="card-body"
+            :class="collapseTarget ? 'collapse' : ''"
+        >
             <transition-group
                 appear
                 name="list"
@@ -41,6 +54,10 @@ export default {
             default () {
                 return [];
             },
+        },
+        collapseTarget: {
+            type: String,
+            default: '',
         },
     },
 };

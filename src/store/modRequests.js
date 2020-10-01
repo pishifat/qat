@@ -1,11 +1,4 @@
-import './sass/app.scss';
-import './bootstrap';
-import Vue from 'vue';
-import Vuex from 'vuex';
-import Axios from 'axios';
-import ModRequests from './pages/ModRequests.vue';
-
-Vue.use(Vuex);
+import postData from '../mixins/postData';
 
 /**
  * Check if there's any mode remaning after applying the modes filters
@@ -19,9 +12,9 @@ function checkModes(filters, beatmapModes) {
     return filteredModes.length === beatmapModes.length;
 }
 
-const store = new Vuex.Store({
+export default {
+    namespaced: true,
     state: {
-        user: null,
         ownRequests: [],
         requests: [],
         involvedRequests: [],
@@ -66,15 +59,16 @@ const store = new Vuex.Store({
                 'hasRankedMaps',
             ],
         },
-        monthsLimit: 2,
+        monthsLimit: 1,
     },
     mutations: {
         setOwnRequests (state, payload) {
-            state.user = payload.user;
             state.ownRequests = payload.ownRequests;
         },
         setAllRequests (state, payload) {
             state.requests = payload.requests;
+        },
+        setInvolvedRequests (state, payload) {
             state.involvedRequests = payload.involvedRequests;
         },
         updateSelectRequestId (state, id) {
@@ -127,31 +121,12 @@ const store = new Vuex.Store({
         selectedRequest (state) {
             return state.requests.find(r => r.id == state.selectedRequestId) || state.involvedRequests.find(r => r.id == state.selectedRequestId);
         },
-        userReview (state, getters) {
+        userReview (state, getters, rootState) {
             if (getters.selectedRequest) {
-                return getters.selectedRequest.modReviews.find(r => r.user.id == state.user.id);
+                return getters.selectedRequest.modReviews.find(r => r.user.id == rootState.loggedInUser.id);
             }
 
             return null;
         },
     },
-    actions: {
-        async getData ({ commit, state }) {
-            const { data } = await Axios.get(`/modRequests/owned`);
-
-            if (!data.error) {
-                commit('setOwnRequests', data);
-
-                if (state.user && state.user.isFeatureTester) {
-                    const { data } = await Axios.get(`/modRequests/all?limit=${state.monthsLimit}`);
-                    if (!data.error) commit('setAllRequests', data);
-                }
-            }
-        },
-    },
-});
-
-new Vue({
-    render: h => h(ModRequests),
-    store,
-}).$mount('#app');
+};

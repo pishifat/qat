@@ -1,4 +1,5 @@
 import Home from './pages/Home.vue';
+import ModRequestsSubmission from './pages/ModRequestsSubmission.vue';
 const ApplicationSubmission = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/ApplicationSubmission.vue');
 const TestSubmission = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/TestSubmissionPage.vue');
 const ReportSubmission = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/ReportSubmission.vue');
@@ -8,6 +9,7 @@ const QualityAssurance = () => import(/* webpackChunkName: "public", webpackPref
 const TestResults = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/TestResultsPage.vue');
 const Message = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/MessagePage.vue');
 
+const ModRequests = () => import(/* webpackChunkName: "bn", webpackPrefetch: true */ './pages/ModRequests.vue');
 const DiscussionVote = () => import(/* webpackChunkName: "bn", webpackPrefetch: true */ './pages/DiscussionVotePage.vue');
 const AppEvalPage = () => import(/* webpackChunkName: "bn", webpackPrefetch: true */ './pages/AppEvalPage.vue');
 
@@ -29,10 +31,12 @@ const routes = [
     { path: '/qualityassurance', component: QualityAssurance, meta: { title: 'Quality Assurance' } },
     { path: '/testresults', component: TestResults, meta: { title: 'Ranking Criteria Test Results' } },
     { path: '/message', component: Message, meta: { title: 'Message from the NAT' } },
+    { path: '/modrequests', component: ModRequestsSubmission, meta: { title: 'Mod Requests' } },
 
     // BN/NAT
     { path: '/discussionvote', component: DiscussionVote, meta: { title: 'Discussion Vote' } },
     { path: '/appeval', component: AppEvalPage, meta: { title: 'BN Application Evaluations' } },
+    { path: '/modrequests/listing', component: ModRequests, meta: { title: 'Mod Requests Listing' } },
 
     // NAT
     { path: '/managereports', component: ManageReports, meta: { title: 'Manage Reports' } },

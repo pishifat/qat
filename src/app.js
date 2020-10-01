@@ -46,7 +46,8 @@ router.beforeEach(async (to, from, next) => {
             (
                 (
                     r.path.startsWith('/discussionvote') ||
-                    r.path.startsWith('/appeval')
+                    r.path.startsWith('/appeval') ||
+                    r.path.startsWith('/modrequests/listing')
                 ) &&
                 !store.state.loggedInUser.hasBasicAccess
             )
