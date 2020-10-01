@@ -109,7 +109,7 @@ export default {
     methods: {
         async showMore (e) {
             this.$store.commit('modRequests/increaseLimit');
-            const data = await this.executeGet(`/modRequests/all?limit=${this.monthsLimit}`, e);
+            const data = await this.executeGet(`/modRequests/listing/all?limit=${this.monthsLimit}`, e);
             if (!data.error) this.$store.commit('modRequests/setAllRequests', data);
         },
     },

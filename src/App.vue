@@ -6,7 +6,7 @@
         <header v-if="loggedInUser">
             <nav
                 id="top"
-                class="navbar navbar-expand-md navbar-dark navbar-nat"
+                class="navbar navbar-expand-lg navbar-dark navbar-nat"
             >
                 <button
                     class="navbar-toggler"
