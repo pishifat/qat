@@ -5,10 +5,11 @@
             style="position: relative"
         >
             <div
-                :style="`background-image: url('https://assets.ppy.sh/beatmaps/${request.beatmapset.osuId}/covers/cover.jpg'; position: absolute;`"
-                style="width: 100%; height: 100%; opacity: 0.2; background-size: cover;"
-                class="rounded"
+                :style="`background-image: url('https://assets.ppy.sh/beatmaps/${request.beatmapset.osuId}/covers/cover.jpg';`"
+                class="rounded-top request-row-bg"
             />
+
+            <div class=" request-row-bg-fade" />
 
             <div class="col-sm-12">
                 <slot />
@@ -34,3 +35,22 @@ export default {
     },
 };
 </script>
+
+<style>
+
+.request-row-bg {
+    width: 100%;
+    height: 100%;
+    opacity: 0.2;
+    background-size: cover;
+    position: absolute;
+}
+
+.request-row-bg-fade {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    background: linear-gradient(103deg, transparent 60%, #242424 100%);
+}
+
+</style>
