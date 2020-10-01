@@ -1,5 +1,3 @@
-import postData from '../mixins/postData';
-
 /**
  * Check if there's any mode remaning after applying the modes filters
  * @param {array} filters
@@ -56,7 +54,8 @@ export default {
                 'accepted',
             ],
             Others: [
-                'hasRankedMaps',
+                'has ranked maps',
+                'doesnt have ranked maps',
             ],
         },
         monthsLimit: 1,
@@ -110,7 +109,8 @@ export default {
                     (state.filters.includes('not reviewed') && r.modReviews.length === 0) ||
                     (state.filters.includes('denied') && r.modReviews.some(r => r.action === 'denied')) ||
                     (state.filters.includes('accepted') && r.modReviews.some(r => r.action === 'accepted')) ||
-                    (state.filters.includes('hasRankedMaps') && r.user.rankedBeatmapsets > 0)
+                    (state.filters.includes('has ranked maps') && r.user.rankedBeatmapsets > 0) ||
+                    (state.filters.includes('doesnt have ranked maps') && r.user.rankedBeatmapsets == 0)
                 ) {
                     return false;
                 }
