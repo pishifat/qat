@@ -10,6 +10,19 @@ function checkModes(filters, beatmapModes) {
     return filteredModes.length === beatmapModes.length;
 }
 
+/**
+ * Check if should filter out by genre or language
+ * @param {array} filters
+ * @param {array} values
+ * @param {string} beatmapValue
+ * @returns {boolean}
+ */
+function checkSetting(filters, values, beatmapValue) {
+    const genre = values.find(g => g === beatmapValue) || 'unspecified';
+
+    return filters.some(f => f.includes(genre));
+}
+
 const filters = localStorage.requestsFilters && JSON.parse(localStorage.requestsFilters);
 
 export default {
@@ -58,6 +71,23 @@ export default {
             Others: [
                 'has ranked maps',
                 'doesnt have ranked maps',
+            ],
+            Genre: [
+                'video game',
+                'anime',
+                'rock',
+                'pop',
+                'novelty',
+                'hip hop',
+                'electronic',
+                'folk',
+                'unspecified genre',
+            ],
+            Language: [
+                'english',
+                'japanese',
+                'instrumental',
+                'unspecified language',
             ],
         },
         monthsLimit: 1,
@@ -114,7 +144,9 @@ export default {
                     (state.filters.includes('denied') && r.modReviews.some(r => r.action === 'denied')) ||
                     (state.filters.includes('accepted') && r.modReviews.some(r => r.action === 'accepted')) ||
                     (state.filters.includes('has ranked maps') && r.user.rankedBeatmapsets > 0) ||
-                    (state.filters.includes('doesnt have ranked maps') && r.user.rankedBeatmapsets == 0)
+                    (state.filters.includes('doesnt have ranked maps') && r.user.rankedBeatmapsets == 0) ||
+                    checkSetting(state.filters, state.possibleFilters.Genre, r.beatmapset.genre) ||
+                    checkSetting(state.filters, state.possibleFilters.Language, r.beatmapset.language)
                 ) {
                     return false;
                 }
