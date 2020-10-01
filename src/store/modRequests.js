@@ -10,6 +10,8 @@ function checkModes(filters, beatmapModes) {
     return filteredModes.length === beatmapModes.length;
 }
 
+const filters = localStorage.requestsFilters && JSON.parse(localStorage.requestsFilters);
+
 export default {
     namespaced: true,
     state: {
@@ -17,7 +19,7 @@ export default {
         requests: [],
         involvedRequests: [],
         selectedRequestId: null,
-        filters: [
+        filters: filters || [
             'ranked',
             'qualified',
         ],
@@ -77,6 +79,8 @@ export default {
             const i = state.filters.findIndex(f => f === filter);
             if (i !== -1) state.filters.splice(i, 1);
             else state.filters.push(filter);
+
+            localStorage.requestsFilters = JSON.stringify(state.filters);
         },
         increaseLimit (state) {
             state.monthsLimit++;
