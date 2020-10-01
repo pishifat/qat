@@ -150,3 +150,7 @@ header {
         background-color: lighten($bright-blue-gray, 5%);
     }
 }
+
+.dropdown-item:hover {
+    background-color: #3b4e57 !important;
+}
