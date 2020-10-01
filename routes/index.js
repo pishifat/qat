@@ -83,6 +83,12 @@ router.get('/login', (req, res) => {
     );
 });
 
+/* GET destroy session */
+router.get('/logout', async (req, res) => {
+    await req.session.destroy();
+    res.redirect('/');
+});
+
 /* GET user's token and user's info to login */
 router.get('/callback', async (req, res) => {
     if (!req.query.code || req.query.error) {
