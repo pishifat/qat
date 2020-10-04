@@ -113,7 +113,7 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
     // find and post webhook for vetoes
     for (let i = 0; i < activeVetoes.length; i++) {
         const veto = activeVetoes[i];
-        let description = `Veto mediation for [**${veto.beatmapTitle}**](http://bn.mappersguild.com/vetoes?beatmaps=${veto.id}) `;
+        let description = `Veto mediation for [**${veto.beatmapTitle}**](http://bn.mappersguild.com/vetoes?id=${veto.id}) `;
 
         if (date > veto.deadline) {
             description += 'is overdue!';

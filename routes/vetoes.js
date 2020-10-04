@@ -116,7 +116,7 @@ router.post('/submit', async (req, res) => {
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),
         color: discord.webhookColors.darkPurple,
-        description: `Submitted [veto for **${v.beatmapTitle}** by **${v.beatmapMapper}**](https://bn.mappersguild.com/vetoes?beatmap=${v.id})`,
+        description: `Submitted [veto for **${v.beatmapTitle}** by **${v.beatmapMapper}**](https://bn.mappersguild.com/vetoes?id=${v.id})`,
     }],
     req.body.mode);
 });
@@ -159,7 +159,7 @@ router.post('/submitMediation/:id', middlewares.isBnOrNat, async (req, res) => {
         discord.webhookPost([{
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.lightPurple,
-            description: `Submitted opinion on [veto for **${v.beatmapTitle}** (${count}/${v.mediations.length})](https://bn.mappersguild.com/vetoes?beatmap=${v.id})`,
+            description: `Submitted opinion on [veto for **${v.beatmapTitle}** (${count}/${v.mediations.length})](https://bn.mappersguild.com/vetoes?id=${v.id})`,
         }],
         v.mode);
     }
@@ -225,7 +225,7 @@ router.post('/beginMediation/:id', middlewares.isNat, async (req, res) => {
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),
         color: discord.webhookColors.purple,
-        description: `Started mediation on [veto for **${v.beatmapTitle}**](https://bn.mappersguild.com/vetoes?beatmap=${v.id})`,
+        description: `Started mediation on [veto for **${v.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${v.id})`,
     }],
     v.mode);
 });
@@ -253,7 +253,7 @@ router.post('/concludeMediation/:id', middlewares.isNat, async (req, res) => {
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),
         color: discord.webhookColors.purple,
-        description: `Concluded mediation on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?beatmap=${veto.id})`,
+        description: `Concluded mediation on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`,
     }],
     veto.mode);
 });
@@ -330,7 +330,7 @@ router.post('/replaceMediator/:id', middlewares.isNat, async (req, res) => {
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),
         color: discord.webhookColors.darkOrange,
-        description: `Replaced **${oldMediation.mediator.username}** with **${newMediation.mediator.username}** as meditor on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?beatmap=${veto.id})`,
+        description: `Replaced **${oldMediation.mediator.username}** with **${newMediation.mediator.username}** as meditor on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`,
     }],
     veto.mode);
 });
