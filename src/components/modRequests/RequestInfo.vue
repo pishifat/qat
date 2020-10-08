@@ -119,6 +119,7 @@ export default {
     computed: {
         ...mapState('modRequests', [
             'selectedRequestId',
+            'monthsLimit',
         ]),
         ...mapGetters('modRequests', [
             'selectedRequest',
@@ -156,7 +157,7 @@ export default {
             }, e);
 
             const [all, involved] = await Promise.all([
-                this.executeGet('/modRequests/listing/all'),
+                this.executeGet(`/modRequests/listing/all?limit=${this.monthsLimit}`),
                 this.executeGet('/modRequests/listing/involved'),
             ]);
             if (!all.error) this.$store.commit('modRequests/setAllRequests', all);
