@@ -22,6 +22,8 @@ const ResignationConsensus = Object.freeze({
 
 const BnEvaluationAddition = Object.freeze({
     LowActivityWarning: 'lowActivityWarning',
+    BehaviorWarning: 'behaviorWarning',
+    MapQualityWarning: 'mapQualityWarning',
     None: 'none',
 });
 

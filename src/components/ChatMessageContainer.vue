@@ -8,9 +8,19 @@
             <div id="copyText" class="card card-body small mb-2" @click="copy">
                 <slot />
             </div>
-            <a :href="'https://osu.ppy.sh/community/chat?sendto=' + osuId" target="_blank" class="btn btn-sm btn-block btn-primary mb-2">
-                Open osu! chat
-            </a>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <a :href="`message?${messageType}=${mongoId}`" target="_blank" class="btn btn-sm btn-block btn-primary mb-2">
+                        Preview message
+                    </a>
+                </div>
+                <div class="col-sm-6">
+                    <a :href="'https://osu.ppy.sh/community/chat?sendto=' + osuId" target="_blank" class="btn btn-sm btn-block btn-primary mb-2">
+                        Open osu! chat
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -22,6 +32,14 @@ export default {
     props: {
         osuId: {
             type: Number,
+            required: true,
+        },
+        messageType: {
+            type: String,
+            required: true,
+        },
+        mongoId: {
+            type: String,
             required: true,
         },
     },

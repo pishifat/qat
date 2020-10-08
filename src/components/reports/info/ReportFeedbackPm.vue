@@ -2,6 +2,8 @@
     <div>
         <chat-message-container
             :osu-id="selectedReport.reporter.osuId"
+            :message-type="'report'"
+            :mongo-id="selectedReport.id"
         >
             {{ message }}
         </chat-message-container>

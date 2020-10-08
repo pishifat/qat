@@ -41,6 +41,12 @@ export default {
         lowActivityWarning () {
             return this.addition === BnEvaluationAddition.LowActivityWarning;
         },
+        behaviorWarning () {
+            return this.addition === BnEvaluationAddition.BehaviorWarning;
+        },
+        mapQualityWarning () {
+            return this.addition === BnEvaluationAddition.MapQualityWarning;
+        },
         noAddition () {
             return this.addition === BnEvaluationAddition.None;
         },

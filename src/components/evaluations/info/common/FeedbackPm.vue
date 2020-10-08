@@ -2,6 +2,8 @@
     <div>
         <chat-message-container
             :osu-id="selectedEvaluation.user.osuId"
+            :message-type="'eval'"
+            :mongo-id="selectedEvaluation.id"
         >
             {{ message }}
         </chat-message-container>
@@ -78,7 +80,7 @@ export default {
 
                     // low activity warning
                     } else if (this.lowActivityWarning) {
-                        message += `the NAT have noticed that your nomination activity is too low to effectively form a conclusion. We will evaluate again 1 month from now! Review your evaluation here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id} `;
+                        message += `the NAT have noticed that your nomination activity is too low to reach a conclusion. We will evaluate again 1 month from now! Review your evaluation here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id} `;
 
                     // full to full
                     } else {
@@ -90,7 +92,14 @@ export default {
 
                     // probation to probation
                     if (this.isProbation) {
-                        message += `the NAT have decided to extend your Probation period and `;
+                        message += `the NAT have decided to extend your Probation period `;
+
+                        // low activity warning
+                        if (this.lowActivityWarning) {
+                            message += `because your nomination activity is too low to reach a conclusion. We `;
+                        } else {
+                            message += `and `;
+                        }
 
                     // full to probation
                     } else {

@@ -33,11 +33,28 @@
             </span>
             <span v-if="selectedEvaluation.active" class="btn-group">
                 <button
+                    v-if="!isProbationForMode || selectedEvaluation.consensus == 'probationBn'"
                     class="btn btn-sm btn-primary"
                     :disabled="lowActivityWarning"
                     @click="setAddition('lowActivityWarning', $event);"
                 >
                     Low Activity Warning
+                </button>
+                <button
+                    v-if="!isProbationForMode || selectedEvaluation.consensus == 'probationBn'"
+                    class="btn btn-sm btn-primary"
+                    :disabled="behaviorWarning"
+                    @click="setAddition('behaviorWarning', $event);"
+                >
+                    Behavior Warning
+                </button>
+                <button
+                    v-if="consensus == 'probationBn'"
+                    class="btn btn-sm btn-primary"
+                    :disabled="mapQualityWarning"
+                    @click="setAddition('mapQualityWarning', $event);"
+                >
+                    Map Quality Warning
                 </button>
                 <button
                     class="btn btn-sm btn-primary"
@@ -70,6 +87,9 @@ export default {
         addition () {
             return this.selectedEvaluation.addition;
         },
+        isProbationForMode () {
+            return this.selectedEvaluation.user.probationModes.includes(this.selectedEvaluation.mode);
+        },
         buttons () {
             if (this.selectedEvaluation.isBnEvaluation) {
                 return [
@@ -97,7 +117,7 @@ export default {
         },
         canHaveAddition () {
             return this.selectedEvaluation.kind === EvaluationKind.BnEvaluation &&
-                this.selectedEvaluation.consensus === BnEvaluationConsensus.FullBn;
+                this.selectedEvaluation.consensus !== BnEvaluationConsensus.RemoveFromBn;
         },
     },
     methods: {
