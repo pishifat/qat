@@ -266,9 +266,33 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
         }
     });
 
-    // determine which posts haven't been sent to #report-feed
-    for (let i = 0; i < discussions.length; i++) {
-        const discussion = discussions[i];
+    for (const discussion of discussions) {
+        // get discussion url, parsing all discussions and fiding the discussion thread.
+        const discussionUrl = `https://osu.ppy.sh/beatmapsets/${discussion.beatmapset_id}/discussion`;
+        const discussionHtml = await axios.get(discussionUrl);
+        const $discussions = cheerio.load(discussionHtml.data);
+        const allDiscussions = JSON.parse($discussions('#json-beatmapset-discussion').html()).beatmapset.discussions;
+        const discussionPost = allDiscussions.find(d => d && d.id == discussion.id);
+
+        // variables for easier reading + editing
+        let messageType = discussion.message_type;
+        let discussionMessage = discussion.starting_post.message;
+        let userId = discussion.starting_post.user_id;
+
+        // find last reopen if it exists
+        let allPosts = discussionPost.posts;
+        allPosts.reverse();
+        const lastReopen = allPosts.find(p => p && p.system && !p.message.value);
+
+        // replace discussion details with reopen
+        if (lastReopen) {
+            let reopenPost = allPosts[allPosts.indexOf(lastReopen) + 1];
+            messageType = `reopen ${discussion.message_type}`;
+            discussionMessage = reopenPost.message;
+            userId = lastReopen.user_id;
+        }
+
+        // determine which posts haven't been sent to #report-feed
         let createWebhook;
 
         if (!beatmapsetIds.includes(discussion.beatmapset_id)) {
@@ -277,7 +301,7 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
             let alreadyReported = await BeatmapReport.findOne({
                 createdAt: { $gte: date },
                 beatmapsetId: discussion.beatmapset_id,
-                reporterUserId: discussion.starting_post.user_id,
+                reporterUserId: userId,
             });
 
             if (!alreadyReported) {
@@ -286,15 +310,17 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
         }
 
         if (createWebhook) {
-            // create event in db
+            // don't let the same map repeat in hourly cycle
             beatmapsetIds.push(discussion.beatmapset_id);
+
+            // create event in db
             await BeatmapReport.create({
                 beatmapsetId: discussion.beatmapset_id,
                 postId: discussion.id,
-                reporterUserId: discussion.starting_post.user_id,
+                reporterUserId: userId,
             });
 
-            let userInfo = await osuv1.getUserInfoV1(discussion.starting_post.user_id);
+            let userInfo = await osuv1.getUserInfoV1(userId);
             await util.sleep(500);
 
             // identify modes
@@ -329,18 +355,18 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
                 [{
                     author: {
                         name: userInfo.username,
-                        icon_url: `https://a.ppy.sh/${discussion.starting_post.user_id}`,
-                        url: `https://osu.ppy.sh/users/${discussion.starting_post.user_id}`,
+                        icon_url: `https://a.ppy.sh/${userId}`,
+                        url: `https://osu.ppy.sh/users/${userId}`,
                     },
                     description: `[**${discussion.beatmapset.artist} - ${discussion.beatmapset.title}**](https://osu.ppy.sh/beatmapsets/${discussion.beatmapset_id}/discussion/-/generalAll#/${discussion.id})\nMapped by [${discussion.beatmapset.creator}](https://osu.ppy.sh/users/${discussion.beatmapset.user_id}) [**${modes.join(', ')}**]`,
                     thumbnail: {
                         url: `https://b.ppy.sh/thumb/${discussion.beatmapset_id}.jpg`,
                     },
-                    color: discussion.message_type == 'suggestion' ? discord.webhookColors.lightOrange : discord.webhookColors.red,
+                    color: messageType.includes('suggestion') ? discord.webhookColors.lightOrange : discord.webhookColors.red,
                     fields: [
                         {
-                            name: discussion.message_type,
-                            value: discussion.starting_post.message.length > 500 ? discussion.starting_post.message.slice(0,500) + '... *(truncated)*' : discussion.starting_post.message,
+                            name: messageType,
+                            value: discussionMessage.length > 500 ? discussionMessage.slice(0,500) + '... *(truncated)*' : discussionMessage,
                         },
                     ],
                 }],
@@ -349,7 +375,7 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
             await util.sleep(500);
 
             // send highlights
-            if (discussion.message_type == 'problem') {
+            if (messageType.includes('problem')) {
                 modes.forEach(mode => {
                     discord.highlightWebhookPost('', `${mode}BeatmapReport`);
                 });
