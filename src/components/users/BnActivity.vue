@@ -8,10 +8,10 @@
                 autocomplete="off"
                 placeholder="days of activity..."
                 maxlength="3"
-                @keyup.enter="findBnActivity()"
+                @keyup.enter="findBnActivity($event)"
             >
 
-            <select v-model="bnMode" class="form-control ml-1" @change="findBnActivity()">
+            <select v-model="bnMode" class="form-control ml-1" @change="findBnActivity($event)">
                 <option class="ml-2" value="osu" selected>
                     osu!
                 </option>
@@ -31,7 +31,7 @@
                 data-toggle="tooltip"
                 data-placement="right"
                 title="Finds BN nomination, pop/dq, and report activity, defaults to 30 days"
-                @click="findBnActivity()"
+                @click="findBnActivity($event)"
             >
                 Load BN activity
             </button>
@@ -85,9 +85,10 @@ export default {
         };
     },
     methods: {
-        async findBnActivity() {
-            if (!this.bnDays.length) this.bnDays = 30;
-            const activity = await this.executeGet('/users/findBnActivity/' + this.bnDays + '/' + this.bnMode);
+        async findBnActivity(e) {
+            if (!this.bnDays || !this.bnDays.length) this.bnDays = 30;
+
+            const activity = await this.executeGet('/users/findBnActivity/' + this.bnDays + '/' + this.bnMode, e);
 
             if (activity) {
                 this.bnActivity = activity;

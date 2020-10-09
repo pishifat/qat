@@ -8,13 +8,13 @@
                 placeholder="days of activity..."
                 min="1"
                 max="100"
-                @keyup.enter="findNatActivity()"
+                @keyup.enter="findNatActivity($event)"
             >
 
             <select
                 v-model="natMode"
                 class="form-control ml-1"
-                @change="findNatActivity()"
+                @change="findNatActivity($event)"
             >
                 <option class="ml-2" value="osu" selected>
                     osu!
@@ -35,7 +35,7 @@
                 data-toggle="tooltip"
                 data-placement="right"
                 title="Finds NAT eval activity, defaults to 30 days"
-                @click="findNatActivity()"
+                @click="findNatActivity($event)"
             >
                 Load NAT activity
             </button>
@@ -91,10 +91,10 @@ export default {
         };
     },
     methods: {
-        async findNatActivity() {
-            if (!this.natDays.length) this.natDays = 30;
+        async findNatActivity(e) {
+            if (!this.natDays || !this.natDays.length) this.natDays = 30;
 
-            const res = await this.executeGet(`/users/findNatActivity/${this.natDays}/${this.natMode}`);
+            const res = await this.executeGet(`/users/findNatActivity/${this.natDays}/${this.natMode}`, e);
 
             if (res) {
                 this.natActivity = res.info;
