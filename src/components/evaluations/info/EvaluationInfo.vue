@@ -16,8 +16,13 @@
 
         <div v-if="selectedEvaluation" class="container">
             <main-application-info v-if="selectedEvaluation.isApplication" />
-            <main-current-bn-info v-else />
-
+            <user-activity
+                v-else
+                :osu-id="selectedEvaluation.user.osuId"
+                :modes="modes"
+                :deadline="selectedEvaluation.deadline"
+                :mongo-id="selectedEvaluation.user.id"
+            />
             <template v-if="loggedInUser.isNat">
                 <p>
                     <a href="#additionalInfo" data-toggle="collapse">
@@ -60,11 +65,11 @@ import PreviousEvaluations from './common/PreviousEvaluations.vue';
 import UserNotes from './common/UserNotes.vue';
 import UserReports from './currentBns/UserReports.vue';
 import ModdingActivity from './currentBns/ModdingActivity.vue';
+import UserActivity from './currentBns/userActivity/UserActivity.vue';
 import EvaluationInput from './common/EvaluationInput.vue';
 import EvaluatorAssignments from './common/EvaluatorAssignments.vue';
 import ModalDialog from '../../ModalDialog.vue';
 import MainApplicationInfo from './applications/MainApplicationInfo.vue';
-import MainCurrentBnInfo from './currentBns/MainCurrentBnInfo.vue';
 import DiscussionInfo from './DiscussionInfo.vue';
 
 export default {
@@ -75,11 +80,11 @@ export default {
         UserNotes,
         UserReports,
         ModdingActivity,
+        UserActivity,
         EvaluationInput,
         EvaluatorAssignments,
         ModalDialog,
         MainApplicationInfo,
-        MainCurrentBnInfo,
         DiscussionInfo,
     },
     computed: {
@@ -89,6 +94,12 @@ export default {
         ...mapGetters('evaluations', [
             'selectedEvaluation',
         ]),
+        modes () {
+            if (!this.selectedEvaluation) return [];
+            if (this.selectedEvaluation.user.modes.length) return this.selectedEvaluation.user.modes;
+
+            return this.selectedEvaluation.mode;
+        },
     },
 };
 </script>

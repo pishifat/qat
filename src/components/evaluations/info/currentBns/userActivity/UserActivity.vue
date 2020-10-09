@@ -1,67 +1,87 @@
 <template>
     <div>
-        <events-list
-            :events="nominations"
-            :events-id="'uniqueNominations'"
-            :header="'Unique nominations'"
-        />
-        <nomination-resets
-            :events="nominationsDisqualified"
-            :events-id="'nominationsDisqualified'"
-            :header="'Nominations disqualified'"
-        />
-        <nomination-resets
-            :events="nominationsPopped"
-            :events-id="'nominationsPopped'"
-            :header="'Nominations popped'"
-        />
-        <nomination-resets
-            :events="disqualifications"
-            :events-id="'disqualificationsByUser'"
-            :header="'Disqualifications done by user'"
-        />
-        <nomination-resets
-            :events="pops"
-            :events-id="'popsByUser'"
-            :header="'Pops done by user'"
-        />
-        <events-list
-            :events="qualityAssuranceChecks"
-            :events-id="'qualityAssuranceChecks'"
-            :header="'Quality Assurance Checks'"
-        />
-        <nomination-resets
-            :events="disqualifiedQualityAssuranceChecks"
-            :events-id="'disqualifiedQualityAssuranceChecks'"
-            :header="'Disqualified Quality Assurance Checks'"
-        />
+        <p class="font-weight-bold form-inline">
+            <span>BN activity:</span>
+            <input
+                v-if="editingDaysInput"
+                v-model="daysInput"
+                class="form-control form-control-sm w-days"
+                type="number"
+                min="1"
+                max="999"
+                @keyup.enter="editingDaysInput = false; findRelevantActivity();"
+            >
+            <span v-else class="mx-1">{{ daysInput }}</span>
+            days
+            <a href="#" @click.prevent="editingDaysInput ? findRelevantActivity() : ''; editingDaysInput = !editingDaysInput;">
+                <i class="fas fa-edit ml-1" />
+            </a>
+        </p>
 
-        <template v-if="loggedInUser.isNat">
-            <evaluation-list
-                v-if="assignedBnApplications && assignedBnApplications.length"
-                :events="assignedBnApplications"
-                :events-id="'assignedBnApplications'"
-                :header="'Application Evaluations (BN)'"
-                :is-application="true"
-                :mongo-id="mongoId"
+        <div class="container mb-3">
+            <events-list
+                :events="nominations"
+                :events-id="'uniqueNominations'"
+                :header="'Unique nominations'"
             />
-            <evaluation-list
-                v-if="natApplications && natApplications.length"
-                :events="natApplications"
-                :events-id="'natApplications'"
-                :header="'Application Evaluations (NAT)'"
-                :is-application="true"
-                :mongo-id="mongoId"
+            <nomination-resets
+                :events="nominationsDisqualified"
+                :events-id="'nominationsDisqualified'"
+                :header="'Nominations disqualified'"
             />
-            <evaluation-list
-                v-if="natBnEvaluations && natBnEvaluations.length"
-                :events="natBnEvaluations"
-                :events-id="'natBnEvaluations'"
-                :header="'Current BN Evaluations (NAT)'"
-                :is-application="false"
-                :mongo-id="mongoId"
+            <nomination-resets
+                :events="nominationsPopped"
+                :events-id="'nominationsPopped'"
+                :header="'Nominations popped'"
             />
-        </template>
+            <nomination-resets
+                :events="disqualifications"
+                :events-id="'disqualificationsByUser'"
+                :header="'Disqualifications done by user'"
+            />
+            <nomination-resets
+                :events="pops"
+                :events-id="'popsByUser'"
+                :header="'Pops done by user'"
+            />
+            <events-list
+                :events="qualityAssuranceChecks"
+                :events-id="'qualityAssuranceChecks'"
+                :header="'Quality Assurance Checks'"
+            />
+            <nomination-resets
+                :events="disqualifiedQualityAssuranceChecks"
+                :events-id="'disqualifiedQualityAssuranceChecks'"
+                :header="'Disqualified Quality Assurance Checks'"
+            />
+
+            <template v-if="loggedInUser.isNat">
+                <evaluation-list
+                    v-if="assignedBnApplications && assignedBnApplications.length"
+                    :events="assignedBnApplications"
+                    :events-id="'assignedBnApplications'"
+                    :header="'Application Evaluations (BN)'"
+                    :is-application="true"
+                    :mongo-id="mongoId"
+                />
+                <evaluation-list
+                    v-if="natApplications && natApplications.length"
+                    :events="natApplications"
+                    :events-id="'natApplications'"
+                    :header="'Application Evaluations (NAT)'"
+                    :is-application="true"
+                    :mongo-id="mongoId"
+                />
+                <evaluation-list
+                    v-if="natBnEvaluations && natBnEvaluations.length"
+                    :events="natBnEvaluations"
+                    :events-id="'natBnEvaluations'"
+                    :header="'Current BN Evaluations (NAT)'"
+                    :is-application="false"
+                    :mongo-id="mongoId"
+                />
+            </template>
+        </div>
     </div>
 </template>
 
@@ -98,6 +118,12 @@ export default {
             required: true,
         },
     },
+    data () {
+        return {
+            daysInput: 90,
+            editingDaysInput: false,
+        };
+    },
     computed: {
         ...mapState([
             'loggedInUser',
@@ -118,17 +144,25 @@ export default {
     watch: {
         mongoId() {
             this.findRelevantActivity();
+            this.daysInput = 90;
         },
     },
     created () {
         this.findRelevantActivity();
+        this.daysInput = 90;
     },
     methods: {
         async findRelevantActivity() {
             this.$store.commit('activity/setIsLoading', true);
 
+            let days = parseInt(this.daysInput);
+            if (isNaN(days)) days = 90;
+            else if (days > 1000) days = 999;
+            else if (days < 2) days = 2;
+            this.daysInput = days;
+
             if (this.loggedInUser.isNat) {
-                const res = await this.executeGet(`/bnEval/activity?osuId=${this.osuId}&modes=${this.modes}&deadline=${parseInt(new Date(this.deadline).getTime())}&mongoId=${this.mongoId}`);
+                const res = await this.executeGet(`/bnEval/activity?osuId=${this.osuId}&modes=${this.modes}&deadline=${new Date(this.deadline).getTime()}&mongoId=${this.mongoId}&days=${days}`);
 
                 if (res) {
                     this.$store.commit('activity/setNominations', res.uniqueNominations);
@@ -145,7 +179,7 @@ export default {
                     this.$store.commit('activity/setIsLoading', false);
                 }
             } else {
-                const res = await this.executeGet(`/users/activity?osuId=${this.osuId}&modes=${this.modes}&deadline=${parseInt(new Date(this.deadline).getTime())}&mongoId=${this.mongoId}`);
+                const res = await this.executeGet(`/users/activity?osuId=${this.osuId}&modes=${this.modes}&deadline=${new Date(this.deadline).getTime()}&mongoId=${this.mongoId}&days=${days}`);
 
                 if (res) {
                     this.$store.commit('activity/setNominations', res.uniqueNominations);
@@ -162,3 +196,11 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+
+.w-days {
+    max-width: 50px;
+}
+
+</style>

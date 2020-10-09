@@ -16,7 +16,13 @@
 
         <div v-if="selectedEvaluation" class="container">
             <main-application-info v-if="selectedEvaluation.isApplication" />
-            <main-current-bn-info v-else />
+            <user-activity
+                v-else
+                :osu-id="selectedEvaluation.user.osuId"
+                :modes="modes"
+                :deadline="selectedEvaluation.deadline"
+                :mongo-id="selectedEvaluation.user.id"
+            />
 
             <consensus />
 
@@ -46,9 +52,9 @@ import postData from '../../../mixins/postData.js';
 import ModalHeader from './ModalHeader.vue';
 import Consensus from './common/Consensus.vue';
 import ReviewsListing from './common/ReviewsListing.vue';
+import UserActivity from './currentBns/userActivity/UserActivity.vue';
 import ModalDialog from '../../ModalDialog.vue';
 import MainApplicationInfo from './applications/MainApplicationInfo.vue';
-import MainCurrentBnInfo from './currentBns/MainCurrentBnInfo.vue';
 import { AppEvaluationConsensus } from '../../../../shared/enums';
 
 export default {
@@ -57,9 +63,9 @@ export default {
         ModalHeader,
         Consensus,
         ReviewsListing,
+        UserActivity,
         ModalDialog,
         MainApplicationInfo,
-        MainCurrentBnInfo,
     },
     mixins: [ postData ],
     computed: {
@@ -69,6 +75,12 @@ export default {
         ...mapGetters('evaluations', [
             'selectedEvaluation',
         ]),
+        modes () {
+            if (!this.selectedEvaluation) return [];
+            if (this.selectedEvaluation.user.modes.length) return this.selectedEvaluation.user.modes;
+
+            return this.selectedEvaluation.mode;
+        },
     },
     methods: {
         async unarchive(e) {

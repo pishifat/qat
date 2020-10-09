@@ -262,11 +262,17 @@ router.post('/:id/switchUserGroup', middlewares.isNat, async (req, res) => {
 
 /* GET aiess info */
 router.get('/activity', async (req, res) => {
+    let days = parseInt(req.query.days);
+    if (isNaN(days)) days = 90;
+    else if (days > 1000) days = 999;
+    else if (days < 2) days = 2;
+
     const { osuId, mongoId } = req.query;
     const modes = req.query.modes.split(',');
+
     const deadline = parseInt(req.query.deadline);
     let minDate = new Date(deadline);
-    minDate.setDate(minDate.getDate() - 120);
+    minDate.setDate(minDate.getDate() - days);
     let maxDate = new Date(deadline);
 
     res.json(await getGeneralEvents(osuId, mongoId, modes, minDate, maxDate));

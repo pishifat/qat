@@ -10,18 +10,13 @@
             <div v-if="selectedUser.hasBasicAccess">
                 <next-evaluation />
                 <hr>
-                <p class="mb-1">
-                    <b>Recent BN activity</b>
-                </p>
 
-                <div class="container mb-3">
-                    <user-activity
-                        :modes="selectedUser.modes"
-                        :deadline="new Date().toString()"
-                        :osu-id="selectedUser.osuId"
-                        :mongo-id="selectedUser.id"
-                    />
-                </div>
+                <user-activity
+                    :modes="selectedUser.modes"
+                    :deadline="new Date().toString()"
+                    :osu-id="selectedUser.osuId"
+                    :mongo-id="selectedUser.id"
+                />
 
                 <modding-activity
                     v-if="loggedInUser.isNat"
