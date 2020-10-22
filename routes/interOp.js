@@ -5,7 +5,6 @@ const User = require('../models/user');
 const Evaluation = require('../models/evaluations/evaluation');
 const { BnEvaluationConsensus } = require('../shared/enums');
 
-
 const router = express.Router();
 
 /* AUTHENTICATION */
@@ -75,6 +74,35 @@ router.get('/qaEventsByUser/:osuId', async (req, res) => {
 /* GET dq info for discussionID */
 router.get('/dqInfoByDiscussionId/:discussionId', async (req, res) => {
     res.json(await Aiess.findOne({ discussionId: req.params.discussionId }));
+});
+
+/* GET latest evaluation */
+router.get('/latestEvaluation/:osuId', async (req, res) => {
+    const user = await User.findOne({ osuId: req.params.osuId });
+
+    if (!user) {
+        return res.status(404).send('User not found');
+    }
+
+    let week = new Date();
+    week.setDate(week.getDate() - 7);
+
+    const latestEvaluation = await Evaluation
+        .findOne({
+            user: user._id,
+            $or: [
+                { consensus: { $exists: true } },
+                { kind: 'resignation' },
+            ],
+            updatedAt: { $gte: week },
+        })
+        .sort({ $natural: -1 });
+
+    if (!latestEvaluation) {
+        return res.status(404).send('User has no recent BN evaluation logged');
+    }
+
+    res.json(latestEvaluation);
 });
 
 /* GET general reason for BN removal */
