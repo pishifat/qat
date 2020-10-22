@@ -84,9 +84,6 @@ router.get('/latestEvaluation/:osuId', async (req, res) => {
         return res.status(404).send('User not found');
     }
 
-    let week = new Date();
-    week.setDate(week.getDate() - 7);
-
     const latestEvaluation = await Evaluation
         .findOne({
             user: user._id,
@@ -94,7 +91,6 @@ router.get('/latestEvaluation/:osuId', async (req, res) => {
                 { consensus: { $exists: true } },
                 { kind: 'resignation' },
             ],
-            updatedAt: { $gte: week },
         })
         .sort({ $natural: -1 });
 
