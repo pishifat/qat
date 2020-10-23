@@ -29,3 +29,4 @@ dist/
 public/js/
 public/css/
 .vscode/
+*.csv

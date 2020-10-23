@@ -4,7 +4,7 @@
             class="card card-individual"
             data-toggle="modal"
             data-target="#extendedInfo"
-            :class="`card-bg-${user.probationModes.length && !user.isNat ? 'probation' : user.groups.includes('bn') ? 'bn' : user.groups.includes('nat') ? 'nat' : ''}`"
+            :class="`card-bg-${user.probationModes.length && !user.isNat ? 'probation' : user.groups.includes('bn') ? 'bn' : user.groups.includes('nat') ? 'nat' : 'user'}`"
         >
             <img :src="'https://a.ppy.sh/' + user.osuId" class="card-avatar-img">
             <div class="card-body">
@@ -118,6 +118,11 @@ export default {
 }
 .card-bg-probation {
     background-image: url('/images/probation.png');
+    background-repeat: no-repeat;
+    background-position: left;
+}
+.card-bg-user {
+    background-image: url('/images/user.png');
     background-repeat: no-repeat;
     background-position: left;
 }
