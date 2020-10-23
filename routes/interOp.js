@@ -92,7 +92,7 @@ router.get('/latestEvaluation/:osuId', async (req, res) => {
                 { kind: 'resignation' },
             ],
         })
-        .sort({ $natural: -1 });
+        .sort({ updatedAt: -1 });
 
     if (!latestEvaluation) {
         return res.status(404).send('User has no recent BN evaluation logged');
