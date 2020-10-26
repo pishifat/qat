@@ -22,6 +22,7 @@ interface IUser {
     bnProfileBadge: number;
     natProfileBadge: number;
     rankedBeatmapsets: number;
+    discordId: number;
 }
 
 export interface IUserDocument extends IUser, Document {

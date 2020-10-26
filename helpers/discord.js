@@ -53,22 +53,6 @@ async function highlightWebhookPost(message, webhook) {
     let role;
 
     switch (webhook) {
-        case 'osu':
-            url += `${config.standardWebhook.id}/${config.standardWebhook.token}`;
-            role = '<@&' + config.standardWebhook.role + '>';
-            break;
-        case 'taiko':
-            url += `${config.taikoWebhook.id}/${config.taikoWebhook.token}`;
-            role = '<@&' + config.taikoWebhook.role + '>';
-            break;
-        case 'catch':
-            url += `${config.catchWebhook.id}/${config.catchWebhook.token}`;
-            role = '<@&' + config.catchWebhook.role + '>';
-            break;
-        case 'mania':
-            url += `${config.maniaWebhook.id}/${config.maniaWebhook.token}`;
-            role = '<@&' + config.maniaWebhook.role + '>';
-            break;
         case 'osuBeatmapReport':
             url += `${config.beatmapReportWebhook.id}/${config.beatmapReportWebhook.token}`;
             role = '<@&' + config.beatmapReportWebhook.osuRole + '>';
@@ -85,14 +69,44 @@ async function highlightWebhookPost(message, webhook) {
             url += `${config.beatmapReportWebhook.id}/${config.beatmapReportWebhook.token}`;
             role = '<@&' + config.beatmapReportWebhook.maniaRole + '>';
             break;
-        default:
-            url += `${config.reportWebhook.id}/${config.reportWebhook.token}`;
-            break;
     }
 
     try {
         await axios.post(url, {
             content: role + ' ' + message,
+        });
+    } catch (error) {
+        //
+    }
+}
+
+async function userHighlightWebhookPost(webhook, discordIds) {
+    let url = 'https://discordapp.com/api/webhooks/';
+
+    switch (webhook) {
+        case 'osu':
+            url += `${config.standardWebhook.id}/${config.standardWebhook.token}`;
+            break;
+        case 'taiko':
+            url += `${config.taikoWebhook.id}/${config.taikoWebhook.token}`;
+            break;
+        case 'catch':
+            url += `${config.catchWebhook.id}/${config.catchWebhook.token}`;
+            break;
+        case 'mania':
+            url += `${config.maniaWebhook.id}/${config.maniaWebhook.token}`;
+            break;
+    }
+
+    let text = '';
+
+    for (const id of discordIds) {
+        text += `<@${id}> `;
+    }
+
+    try {
+        await axios.post(url, {
+            content: text,
         });
     } catch (error) {
         //
@@ -142,6 +156,7 @@ const webhookColors = {
 module.exports = {
     webhookPost,
     highlightWebhookPost,
+    userHighlightWebhookPost,
     defaultWebhookAuthor,
     webhookColors,
 };

@@ -14,13 +14,13 @@ const Aiess = require('../models/aiess');
 
 const defaultPopulate = [
     { path: 'user', select: 'username osuId modesInfo' },
-    { path: 'natEvaluators', select: 'username osuId' },
+    { path: 'natEvaluators', select: 'username osuId discordId' },
     {
         path: 'reviews',
         select: 'evaluator',
         populate: {
             path: 'evaluator',
-            select: 'username osuId isNat',
+            select: 'username osuId groups discordId',
         },
     },
 ];
@@ -28,18 +28,41 @@ const defaultPopulate = [
 /**
  * @param {Array} reviews
  * @param {Array} natEvaluators
+ * @param {Boolean} discussion
+ * @returns {Array} discord IDs for relevant NAT
+ */
+function findNatEvaluatorHighlights (reviews, natEvaluators, discussion) {
+    let discordIds = [];
+
+    if (discussion) {
+        for (const review of reviews) {
+            if (review.evaluator.groups.includes('nat')) {
+                discordIds.push(review.evaluator.discordId);
+            }
+        }
+    } else {
+        const evaluatorIds = reviews.map(r => r.evaluator.id);
+
+        for (const user of natEvaluators) {
+            if (!evaluatorIds.includes(user.id)) {
+                discordIds.push(user.discordId);
+            }
+        }
+    }
+
+    return discordIds;
+}
+
+/**
+ * @param {Array} reviews
+ * @param {Array} natEvaluators
+ * @param {Boolean} discussion
  * @returns {string} text for webhook
  */
 function findNatEvaluatorStatuses (reviews, natEvaluators, discussion) {
     let text = '';
 
-    if (discussion) {
-        for (const review of reviews) {
-            if (review.evaluator.isNat) {
-                text += `\n✅ [${review.evaluator.username}](https://osu.ppy.sh/users/${review.evaluator.osuId})`;
-            }
-        }
-    } else {
+    if (!discussion) {
         const evaluatorIds = reviews.map(r => r.evaluator.id);
 
         for (const user of natEvaluators) {
@@ -104,12 +127,6 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
         Veto.find({ status: 'wip' }),
     ]);
 
-    // determine if NAT receives highlight by mode
-    let osuHighlight;
-    let taikoHighlight;
-    let catchHighlight;
-    let maniaHighlight;
-
     // find and post webhook for vetoes
     for (let i = 0; i < activeVetoes.length; i++) {
         const veto = activeVetoes[i];
@@ -140,15 +157,10 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
 
         let description = `[**${app.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${app.id}) `;
         let generateWebhook;
+        let discordIds = [];
 
         if (date > deadline) {
-            if (!osuHighlight && app.mode === 'osu') { osuHighlight = true; }
-
-            if (!taikoHighlight && app.mode === 'taiko') { taikoHighlight = true; }
-
-            if (!catchHighlight && app.mode === 'catch') { catchHighlight = true; }
-
-            if (!maniaHighlight && app.mode === 'mania') { maniaHighlight = true; }
+            discordIds = findNatEvaluatorHighlights(app.reviews, app.natEvaluators, app.discussion);
 
             description += 'is overdue!';
             generateWebhook = true;
@@ -157,10 +169,10 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
             generateWebhook = true;
         }
 
-        description += findNatEvaluatorStatuses(app.reviews, app.natEvaluators, app.discussion);
-        description += findMissingContent(app.discussion, app.consensus, app.feedback);
-
         if (generateWebhook) {
+            description += findNatEvaluatorStatuses(app.reviews, app.natEvaluators, app.discussion);
+            description += findMissingContent(app.discussion, app.consensus, app.feedback);
+
             await discord.webhookPost(
                 [{
                     description,
@@ -168,6 +180,9 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
                 }],
                 app.mode
             );
+            await util.sleep(500);
+
+            await discord.userHighlightWebhookPost(app.mode, discordIds);
             await util.sleep(500);
         }
     }
@@ -179,15 +194,11 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
         let description = `[**${round.user.username}**'s ${round.isResignation ? 'resignation' : 'current BN eval'}](http://bn.mappersguild.com/bneval?id=${round.id}) `;
         let natList = '';
         let generateWebhook;
+        let discordIds = [];
 
         if (date > round.deadline) {
-            if (!osuHighlight && round.mode === 'osu') { osuHighlight = true; }
-
-            if (!taikoHighlight && round.mode === 'taiko') { taikoHighlight = true; }
-
-            if (!catchHighlight && round.mode === 'catch') { catchHighlight = true; }
-
-            if (!maniaHighlight && round.mode === 'mania') { maniaHighlight = true; }
+            discordIds = findNatEvaluatorHighlights(round.reviews, round.natEvaluators, round.discussion);
+            console.log(discordIds);
 
             description += 'is overdue!';
             generateWebhook = true;
@@ -218,8 +229,10 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
                 round.mode
             );
             await util.sleep(500);
-        } else if (generateWebhook && natList.length) {
 
+            await discord.userHighlightWebhookPost(round.mode, discordIds);
+            await util.sleep(500);
+        } else if (generateWebhook && natList.length) {
             await discord.webhookPost(
                 [{
                     description,
@@ -236,12 +249,6 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
             await util.sleep(500);
         }
     }
-
-    // send highlights if needed
-    if (osuHighlight) discord.highlightWebhookPost('time to find a new NAT member?', 'osu');
-    if (taikoHighlight) discord.highlightWebhookPost('i wonder who would make the best new NAT...', 'taiko');
-    if (catchHighlight) discord.highlightWebhookPost('oh no', 'catch');
-    if (maniaHighlight) discord.highlightWebhookPost('so who is the new NAT candidate?', 'mania');
 }, {
     scheduled: false,
 });
