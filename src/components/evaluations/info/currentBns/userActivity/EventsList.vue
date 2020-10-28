@@ -14,7 +14,7 @@
                         {{ event.timestamp | toMonthDay }}
                     </td>
                     <td>
-                        <a :href="'https://osu.ppy.sh/beatmapsets/' + event.beatmapsetId + '/discussion/-/events'" target="_blank">
+                        <a :href="'https://osu.ppy.sh/beatmapsets/' + event.beatmapsetId + '/discussion?user=' + osuId" target="_blank">
                             <mode-display
                                 :modes="event.modes"
                             />
@@ -55,6 +55,10 @@ export default {
         },
         eventsId: {
             type: String,
+            required: true,
+        },
+        osuId: {
+            type: Number,
             required: true,
         },
     },

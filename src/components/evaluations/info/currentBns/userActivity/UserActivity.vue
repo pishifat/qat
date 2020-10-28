@@ -23,6 +23,7 @@
                 :events="nominations"
                 :events-id="'uniqueNominations'"
                 :header="'Unique nominations'"
+                :osu-id="osuId"
             />
             <nomination-resets
                 :events="nominationsDisqualified"
@@ -48,6 +49,7 @@
                 :events="qualityAssuranceChecks"
                 :events-id="'qualityAssuranceChecks'"
                 :header="'Quality Assurance Checks'"
+                :osu-id="osuId"
             />
             <nomination-resets
                 :events="disqualifiedQualityAssuranceChecks"
