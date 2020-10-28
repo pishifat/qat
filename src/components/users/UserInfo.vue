@@ -8,23 +8,19 @@
             <duration />
 
             <div v-if="selectedUser.groups.includes('bn') || selectedUser.groups.includes('nat')">
+                <next-evaluation />
+                <hr>
+
+                <user-activity
+                    :modes="selectedUser.modes"
+                    :deadline="new Date().toString()"
+                    :osu-id="selectedUser.osuId"
+                    :mongo-id="selectedUser.id"
+                />
+
+
+
                 <div v-if="loggedInUser.hasBasicAccess">
-                    <next-evaluation />
-                    <hr>
-
-                    <user-activity
-                        :modes="selectedUser.modes"
-                        :deadline="new Date().toString()"
-                        :osu-id="selectedUser.osuId"
-                        :mongo-id="selectedUser.id"
-                    />
-
-                    <modding-activity
-                        v-if="loggedInUser.isNat"
-                        :username="selectedUser.username"
-                        class="mt-2"
-                    />
-
                     <!-- BN can only see this on their own cards. NAT can see on everyone's cards -->
                     <bn-evaluator-toggle
                         v-if="(selectedUser.id == loggedInUser.id || loggedInUser.isNat) && !selectedUser.isNat"
@@ -36,6 +32,11 @@
                 </div>
 
                 <div v-if="loggedInUser.isNat">
+                    <modding-activity
+                        :username="selectedUser.username"
+                        class="mt-2"
+                    />
+
                     <notes />
 
                     <user-group-toggle />
