@@ -198,7 +198,6 @@ const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
 
         if (date > round.deadline) {
             discordIds = findNatEvaluatorHighlights(round.reviews, round.natEvaluators, round.discussion);
-            console.log(discordIds);
 
             description += 'is overdue!';
             generateWebhook = true;
