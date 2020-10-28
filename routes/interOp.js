@@ -3,6 +3,7 @@ const config = require('../config.json');
 const Aiess = require('../models/aiess');
 const User = require('../models/user');
 const Evaluation = require('../models/evaluations/evaluation');
+const AppEvaluation = require('../models/evaluations/appEvaluation');
 const { BnEvaluationConsensus } = require('../shared/enums');
 
 const router = express.Router();
@@ -76,7 +77,7 @@ router.get('/dqInfoByDiscussionId/:discussionId', async (req, res) => {
     res.json(await Aiess.findOne({ discussionId: req.params.discussionId }));
 });
 
-/* GET latest evaluation */
+/* GET latest evaluation or appevaluation */
 router.get('/latestEvaluation/:osuId', async (req, res) => {
     const user = await User.findOne({ osuId: req.params.osuId });
 
@@ -85,20 +86,52 @@ router.get('/latestEvaluation/:osuId', async (req, res) => {
     }
 
     const latestEvaluation = await Evaluation
-        .findOne({
-            user: user._id,
-            $or: [
-                { consensus: { $exists: true } },
-                { kind: 'resignation' },
-            ],
-        })
+        .findOne(
+            {
+                user: user._id,
+                $or: [
+                    { consensus: { $exists: true } },
+                    { kind: 'resignation' },
+                ],
+            },
+            {
+                feedback: 0,
+            })
         .sort({ updatedAt: -1 });
 
-    if (!latestEvaluation) {
+    const latestAppEvaluation = await AppEvaluation
+        .findOne(
+            {
+                user: user._id,
+                consensus: { $exists: true },
+            },
+            {
+                feedback: 0,
+            })
+        .sort({ updatedAt: -1 });
+
+    if (!latestEvaluation && !latestAppEvaluation) {
         return res.status(404).send('User has no recent BN evaluation logged');
     }
 
-    res.json(latestEvaluation);
+    let evaluation;
+
+    if (latestEvaluation && latestAppEvaluation) {
+        console.log(latestEvaluation.updatedAt);
+        console.log(latestAppEvaluation.updatedAt);
+
+        if (latestEvaluation.updatedAt > latestAppEvaluation.updatedAt) {
+            evaluation = latestEvaluation;
+        } else {
+            evaluation = latestAppEvaluation;
+        }
+    } else if (latestEvaluation) {
+        evaluation = latestEvaluation;
+    } else if (latestAppEvaluation) {
+        evaluation = latestAppEvaluation;
+    }
+
+    res.json(evaluation);
 });
 
 /* GET general reason for BN removal */

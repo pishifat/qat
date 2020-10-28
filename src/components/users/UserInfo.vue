@@ -18,8 +18,6 @@
                     :mongo-id="selectedUser.id"
                 />
 
-
-
                 <div v-if="loggedInUser.hasBasicAccess">
                     <!-- BN can only see this on their own cards. NAT can see on everyone's cards -->
                     <bn-evaluator-toggle
