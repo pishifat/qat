@@ -101,7 +101,7 @@ function findMissingContent (discussion, consensus, feedback) {
     return text;
 }
 
-const notifyDeadlines = cron.schedule('0 16 * * *', async () => {
+const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
     // establish dates for reference
     const date = new Date();
     const nearDeadline = new Date();
