@@ -1,7 +1,7 @@
 <template>
     <div>
         <router-link :to="'/evalarchive?id=' + evaluation.id" class="small">
-            {{ evaluation.isApplication ? evaluation.updatedAt.slice(0,10) : evaluation.deadline.slice(0,10) }}
+            {{ evaluation.deadline.slice(0,10) }}
             -
             <mode-display
                 :modes="evaluation.mode"
