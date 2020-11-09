@@ -122,7 +122,7 @@ function defaultWebhookAuthor(session) {
 }
 
 const webhookColors = {
-    lightRed: 16742771,       // nonUserReport, active: moveToGroupDiscussion
+    lightRed: 16742771,       // nonUserReport, active: moveToGroupDiscussion, almostOverdueNotifications
     darkRed: 8787477,         // userReport
     red: 15607337,            // overdueNotifications, problemReport, lowActivity
 

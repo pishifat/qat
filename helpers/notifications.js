@@ -101,6 +101,18 @@ function findMissingContent (discussion, consensus, feedback) {
     return text;
 }
 
+/**
+ * @param {Date} deadline
+ * @returns {number} text for webhook
+ */
+function findDaysAgo (deadline) {
+    const today = new Date();
+    const contacted = new Date(deadline);
+    const days = Math.round((today.getTime() - contacted.getTime())/(1000*60*60*24));
+
+    return days;
+}
+
 const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
     // establish dates for reference
     const date = new Date();
@@ -156,17 +168,21 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
         const deadline = app.deadline;
 
         let description = `[**${app.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${app.id}) `;
-        let generateWebhook;
+        let generateWebhook = true;
         let discordIds = [];
+        let color;
 
         if (date > deadline) {
             discordIds = findNatEvaluatorHighlights(app.reviews, app.natEvaluators, app.discussion);
+            const days = findDaysAgo(app.createdAt);
 
-            description += 'is overdue!';
-            generateWebhook = true;
+            description += `was due ${days == 0 ? 'today!' : days == 1 ? days + ' day ago!' : days + ' days ago!'}`;
+            color = discord.webhookColors.red;
         } else if (deadline < nearDeadline) {
             description += 'is due in less than 24 hours!';
-            generateWebhook = true;
+            color = discord.webhookColors.lightRed;
+        } else {
+            generateWebhook = false;
         }
 
         if (generateWebhook) {
@@ -176,7 +192,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
             await discord.webhookPost(
                 [{
                     description,
-                    color: discord.webhookColors.red,
+                    color,
                 }],
                 app.mode
             );
@@ -193,20 +209,22 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
 
         let description = `[**${round.user.username}**'s ${round.isResignation ? 'resignation' : 'current BN eval'}](http://bn.mappersguild.com/bneval?id=${round.id}) `;
         let natList = '';
-        let generateWebhook;
+        let generateWebhook = true;
         let discordIds = [];
+        let color;
 
         if (date > round.deadline) {
             discordIds = findNatEvaluatorHighlights(round.reviews, round.natEvaluators, round.discussion);
+            const days = findDaysAgo(round.deadline);
 
-            description += 'is overdue!';
-            generateWebhook = true;
+            description += `was due ${days == 0 ? 'today!' : days == 1 ? days + ' day ago!' : days + ' days ago!'}`;
+            color = discord.webhookColors.red;
         } else if (round.deadline < nearDeadline) {
             description += 'is due in less than 24 hours!';
-            generateWebhook = true;
+            color = discord.webhookColors.lightRed;
         } else if (round.deadline > startRange && round.deadline < endRange) {
             description += 'is due in two weeks!';
-            generateWebhook = true;
+            color = discord.webhookColors.pink;
 
             if (!round.natEvaluators || !round.natEvaluators.length) {
                 round.natEvaluators = await User.getAssignedNat(round.mode);
@@ -215,6 +233,8 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
             }
 
             natList = round.natEvaluators.map(u => u.username).join(', ');
+        } else {
+            generateWebhook = false;
         }
 
         if (generateWebhook && !natList.length) {
@@ -223,7 +243,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
             await discord.webhookPost(
                 [{
                     description,
-                    color: discord.webhookColors.red,
+                    color,
                 }],
                 round.mode
             );
@@ -235,7 +255,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
             await discord.webhookPost(
                 [{
                     description,
-                    color: discord.webhookColors.pink,
+                    color,
                     fields: [
                         {
                             name: 'Assigned NAT',
