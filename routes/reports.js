@@ -33,6 +33,13 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
         value: req.body.reason.length > 975 ? req.body.reason.slice(0,975) + '... *(truncated)*' : req.body.reason,
     }];
 
+    if (validUrl) {
+        notificationFields.push({
+            name: 'Relevant link',
+            value: link,
+        });
+    }
+
     if (req.body.username) {
         let u = await User.findByUsername(req.body.username);
 
@@ -50,13 +57,6 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
         res.json({
             success: 'ok',
         });
-
-        if (validUrl) {
-            notificationFields.push({
-                name: 'Relevant link',
-                value: link,
-            });
-        }
 
         // for #user-reportfeed
         await discord.webhookPost(
@@ -103,11 +103,23 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
             success: 'ok',
         });
 
-        discord.webhookPost([{
+        console.log(notificationFields);
+
+        // for #user-reportfeed
+        await discord.webhookPost([{
             description: `[Non-user report](http://bn.mappersguild.com/managereports?id=${report.id})`,
             color: discord.webhookColors.lightRed,
             fields: notificationFields,
-        }]);
+        }],
+        'userReport');
+
+        // for #nat
+        await discord.webhookPost([{
+            description: `[Non-user report](http://bn.mappersguild.com/managereports?id=${report.id})`,
+            color: discord.webhookColors.lightRed,
+            fields: notificationFields,
+        }],
+        'natUserReport');
 
         Logger.generate(
             null,
