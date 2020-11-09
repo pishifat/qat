@@ -82,6 +82,10 @@ export default {
                     } else if (this.lowActivityWarning) {
                         message += `the NAT have noticed that your nomination activity is too low to reach a conclusion. We will evaluate again 1 month from now! Review your evaluation here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id} `;
 
+                    // behavior warning
+                    } else if (this.behaviorWarning) {
+                        message += `the NAT believe that your behavior is concerning. You are still a Full BN, but we will evaluate again 1 month from now! Review your evaluation here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id} `;
+
                     // full to full
                     } else {
                         message += `we'd like to remind you that you're doing well! Review your evaluation here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id} `;
