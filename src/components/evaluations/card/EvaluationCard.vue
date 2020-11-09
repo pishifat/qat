@@ -4,8 +4,8 @@
         @click="select()"
     >
         <div
-            class="card cursor-pointer"
-            :class="[isSelected ? 'bg-blue-gray' : '', 'border-' + relevantReviewVote, isNatEvaluator ? 'bg-info' : '']"
+            class="card border-dark cursor-pointer"
+            :class="[isSelected ? 'bg-blue-gray' : '', 'border-' + relevantReviewVote, isNatEvaluator ? 'bg-primary' : '', 'card-bg-' + imageClass]"
             data-toggle="modal"
             :data-target="target"
         >
@@ -82,6 +82,11 @@ export default {
         osuId () {
             return this.evaluation.user.osuId;
         },
+        imageClass () {
+            if (this.evaluation.isApplication) return 'user';
+            else if (this.evaluation.user.probationModes.includes(this.evaluation.mode)) return 'probation';
+            else return 'bn';
+        },
         isSelected () {
             if (!this.checkedEvaluations) return false;
 
@@ -109,3 +114,23 @@ export default {
     },
 };
 </script>
+
+<style>
+
+.card-bg-bn {
+    background-image: url('/images/bn-transparent.png');
+    background-repeat: repeat-y;
+    background-position: left top;
+}
+.card-bg-probation {
+    background-image: url('/images/probation-transparent.png');
+    background-repeat: repeat-y;
+    background-position: left top;
+}
+.card-bg-user {
+    background-image: url('/images/user-transparent.png');
+    background-repeat: repeat-y;
+    background-position: left top;
+}
+
+</style>
