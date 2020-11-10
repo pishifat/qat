@@ -2,6 +2,7 @@ const express = require('express');
 const config = require('../config.json');
 const Aiess = require('../models/aiess');
 const User = require('../models/user');
+const Log = require('../models/log');
 const Evaluation = require('../models/evaluations/evaluation');
 const AppEvaluation = require('../models/evaluations/appEvaluation');
 const { BnEvaluationConsensus } = require('../shared/enums');
@@ -158,6 +159,41 @@ router.get('/bnRemoval/:osuId', async (req, res) => {
         action: latestEvaluation.isResignation ? 'Resigned' : latestEvaluation.consensus === BnEvaluationConsensus.FullBn ? 'Moved to Full BN' : latestEvaluation.consensus === BnEvaluationConsensus.ProbationBn ? 'Moved to Probation BN' : 'Kicked',
         timestamp: latestEvaluation.archivedAt,
     } );
+});
+
+/* GET all of a user's logs */
+router.get('/qaLogs/:osuId/:category', async (req, res) => {
+    const user = await User.findOne({ osuId: req.params.osuId });
+
+    if (!user) {
+        return res.status(404).send('User not found');
+    }
+
+    const logs = await Log
+        .find({
+            user: user._id,
+            category: req.params.category,
+        })
+        .sort({ $natural: -1 });
+
+    if (!logs || !logs.length) {
+        return res.status(404).send(
+            `User has no ${req.params.category} logs. Be sure your category is one of the following: 
+            'account',
+            'user',
+            'application',
+            'appEvaluation',
+            'bnEvaluation',
+            'dataCollection',
+            'discussionVote',
+            'report',
+            'test',
+            'qualityAssurance',
+            'veto'`
+        );
+    }
+
+    res.json(logs);
 });
 
 module.exports = router;
