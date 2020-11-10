@@ -162,7 +162,7 @@ router.get('/bnRemoval/:osuId', async (req, res) => {
 });
 
 /* GET all of a user's logs */
-router.get('/qaLogs/:osuId/:category', async (req, res) => {
+router.get('/logs/:osuId/:category', async (req, res) => {
     const user = await User.findOne({ osuId: req.params.osuId });
 
     if (!user) {
