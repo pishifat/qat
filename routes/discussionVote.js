@@ -147,7 +147,7 @@ router.post('/submitMediation/:id', async (req, res) => {
         d._id
     );
 
-    if (isNewMediation && res.locals.userRequest.isNat) {
+    /*if (isNewMediation && res.locals.userRequest.isNat) {
         discord.webhookPost(
             [{
                 author: discord.defaultWebhookAuthor(req.session),
@@ -156,7 +156,7 @@ router.post('/submitMediation/:id', async (req, res) => {
             }],
             d.mode
         );
-    }
+    }*/
 });
 
 /* POST conclude mediation */
