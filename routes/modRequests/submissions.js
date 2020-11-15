@@ -119,9 +119,13 @@ router.post('/store', middlewares.isLoggedIn, async (req, res) => {
         Beatmapset.findOne({ osuId: parseInt(beatmapsetId, 10) }),
     ]);
 
-    if (hasRequested || beatmapsetRequested) {
+    if (hasRequested) {
         return res.json({
             error: 'You can only request one beatmap every 2 months!',
+        });
+    } else if (beatmapsetRequested) {
+        return res.json({
+            error: 'You cannot submit a beatmap that you submitted before!',
         });
     }
 
