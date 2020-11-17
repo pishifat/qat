@@ -111,8 +111,10 @@ async function submitEval (evaluation, session, isNat, behaviorComment, moddingC
 
             if (
                 isNat &&
-                (threeEvaluationModes.includes(evaluation.mode) && totalNat >= 2) ||
-                (twoEvaluationModes.includes(evaluation.mode) && totalNat >= 1)
+                (
+                    (threeEvaluationModes.includes(evaluation.mode) && totalNat >= 2) ||
+                    (twoEvaluationModes.includes(evaluation.mode) && totalNat >= 1)
+                )
             ) {
                 evaluation.discussion = true;
                 await evaluation.save();
