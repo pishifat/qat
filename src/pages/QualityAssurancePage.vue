@@ -105,6 +105,13 @@ export default {
         isOutdated (beatmapsetId, timestamp) {
             timestamp = new Date(timestamp);
 
+            let date = new Date();
+            date.setDate(date.getDate() - 10); // 10 is estimate of longest days count for qualified map queue
+
+            if (timestamp < date) {
+                return true;
+            }
+
             let beatmaps = this.filteredEvents.filter(b => b.beatmapsetId == beatmapsetId && b.timestamp != timestamp);
             beatmaps = beatmaps.concat(this.overwriteEvents.filter(b => b.beatmapsetId == beatmapsetId));
             let isOutdated = false;
