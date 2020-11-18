@@ -16,9 +16,9 @@
             </span>
             <span v-html="$md.renderInline(event.content)" />
 
-            <div v-if="event.qualityAssuranceComments && userQualityAssuranceComment && loggedInUser.isNat" class="mt-2">
+            <div v-if="event.qaComment" class="mt-2">
                 <b>QA comment:</b>
-                <span v-html="$md.render(userQualityAssuranceComment)" />
+                <span v-html="$md.render(event.qaComment)" />
             </div>
         </template>
 
@@ -99,14 +99,6 @@ export default {
             if (total >= 4 || this.event.obviousness == 2 || this.event.severity == 3) return 'text-success';
             else if (total >= 2) return 'text-neutral';
             else return 'text-danger';
-        },
-        /** @returns {string | null} */
-        userQualityAssuranceComment () {
-            if (this.event.qualityAssuranceComments && this.event.qualityAssuranceComments.length) {
-                return this.event.qualityAssuranceComments[0].comment;
-            } else {
-                return null;
-            }
         },
     },
     watch: {

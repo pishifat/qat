@@ -38,9 +38,9 @@ export interface IUserDocument extends IUser, Document {
     natDuration: number;
     isBnFor: (mode: string) => boolean;
     isFullBnFor: (mode: string) => boolean;
-    qualityAssuranceChecks?: IAiessDocument[];
     /** Used in notifications */
-    recentQualityAssuranceChecks?: number;
+    recentQaChecks?: number;
+    allQaChecks?: number;
 }
 
 interface IUsersByGroup {

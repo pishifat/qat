@@ -7,6 +7,7 @@ const Evaluation = require('../../models/evaluations/evaluation');
 const AppEvaluation = require('../../models/evaluations/appEvaluation');
 const User = require('../../models/user');
 const Aiess = require('../../models/aiess');
+const QualityAssuranceCheck = require('../../models/qualityAssuranceCheck');
 const Note = require('../../models/note');
 const { submitEval, setGroupEval, setFeedback, replaceUser } = require('./evaluations');
 const middlewares = require('../../helpers/middlewares');
@@ -595,21 +596,18 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
         Aiess.getUniqueUserEvents(userOsuId, minDate, maxDate, modes, ['nominate', 'qualify']),
         Aiess.getUserEvents(userOsuId, minDate, maxDate, modes, ['disqualify']),
         Aiess.getUserEvents(userOsuId, minDate, maxDate, modes, ['nomination_reset']),
-        Aiess.find({
-            qualityAssuranceCheckers: mongoId,
+        QualityAssuranceCheck.find({
+            user: mongoId,
             timestamp: { $gte: minDate, $lte: maxDate },
         }).populate({
-            path: 'qualityAssuranceComments',
-            match: { mediator: mongoId },
-            populate: {
-                path: 'mediator',
-                select: 'username osuId',
-            },
+            path: 'event',
+            select: 'beatmapsetId timestamp modes artistTitle',
         }),
     ]);
 
     const beatmapsetIds = uniqueNominations.map(n => n.beatmapsetId);
-    const qaBeatmapsetIds = qualityAssuranceChecks.map(qa => qa.beatmapsetId);
+    const qaBeatmapsetIds = qualityAssuranceChecks.map(qa => qa.event.beatmapsetId);
+
     let [allNominationsDisqualified, allNominationsPopped, disqualifiedQualityAssuranceChecks/*, othersNominations*/] = await Promise.all([
         Aiess.getRelatedBeatmapsetEvents(
             userOsuId,
@@ -631,13 +629,6 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
             beatmapsetId: { $in: qaBeatmapsetIds },
             timestamp: { $gte: minDate, $lte: maxDate },
             type: 'disqualify',
-        }).populate({
-            path: 'qualityAssuranceComments',
-            match: { mediator: mongoId },
-            populate: {
-                path: 'mediator',
-                select: 'username osuId',
-            },
         }),
         /*Aiess.find({
             userId: { $ne: userOsuId },
@@ -706,16 +697,19 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
     }
 
     disqualifiedQualityAssuranceChecks = disqualifiedQualityAssuranceChecks.filter(dq =>
-        qualityAssuranceChecks.some(qa => qa.beatmapsetId == dq.beatmapsetId && qa.timestamp < dq.timestamp)
+        qualityAssuranceChecks.some(qa => qa.event.beatmapsetId == dq.beatmapsetId && qa.event.timestamp < dq.timestamp)
     );
 
+    // set qa comments for dq'd qa checks
     for (let i = 0; i < disqualifiedQualityAssuranceChecks.length; i++) {
         const event = disqualifiedQualityAssuranceChecks[i];
 
-        const related = qualityAssuranceChecks.find(qa => qa.beatmapsetId == event.beatmapsetId && qa.timestamp < event.timestamp);
+        const relatedQaCheck = qualityAssuranceChecks.find(qa =>
+            qa.event.beatmapsetId == event.beatmapsetId && qa.event.timestamp < event.timestamp
+        );
 
-        if (related && related.qualityAssuranceComments.length) {
-            disqualifiedQualityAssuranceChecks[i].qualityAssuranceComments = related.qualityAssuranceComments.filter(c => c.mediator.id == mongoId);
+        if (relatedQaCheck && relatedQaCheck.comment && relatedQaCheck.comment.length) {
+            disqualifiedQualityAssuranceChecks[i].qaComment = relatedQaCheck.comment;
         }
     }
 

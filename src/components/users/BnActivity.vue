@@ -55,7 +55,6 @@
                         {{ user.uniqueNominations }} nominations
                     </li>
                     <li>{{ user.nominationResets }} nomination resets</li>
-                    <li>{{ user.qualityAssuranceChecks }} quality assurance checks</li>
                     <li>Next evaluation: {{ user.nextEvaluation ? (user.nextEvaluation.slice(0, 10)): 'Never' }}</li>
                 </ul>
             </div>

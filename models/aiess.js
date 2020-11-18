@@ -12,7 +12,6 @@ const aiessSchema = new mongoose.Schema({
     creatorId: { type: Number },
     creatorName: { type: String },
 
-    valid: { type: Number, enum: [1, 2, 3] }, // TODO check if not used anymore?
     obviousness: { type: Number, default: null },
     severity: { type: Number, default: null },
     mapperId: { type: Number },
@@ -21,8 +20,8 @@ const aiessSchema = new mongoose.Schema({
     isUnique: { type: Boolean, default: false },
     effortBonus: { type: Number }, //multiplier combining drain per diff, # diffs, and difficulty of each diff
     responsibleNominators: [{ type: Number }],
-    qualityAssuranceCheckers: [{ type: 'ObjectId', ref: 'User' }],
-    qualityAssuranceComments: [{ type: 'ObjectId', ref: 'Mediation' }],
+
+    qaComment: { type: String }, // temporary field added during user activity for disqualified qa checks
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 class AiessService extends mongoose.Model

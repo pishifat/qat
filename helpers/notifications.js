@@ -9,6 +9,7 @@ const AppEvaluation = require('../models/evaluations/appEvaluation');
 const Evaluation = require('../models/evaluations/evaluation');
 const Veto = require('../models/veto');
 const User = require('../models/user');
+const QualityAssuranceCheck = require('../models/qualityAssuranceCheck');
 const BeatmapReport = require('../models/beatmapReport');
 const Aiess = require('../models/aiess');
 
@@ -416,6 +417,9 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
  * Notify of quality assurance helper activity every saturday at 22 pm
  */
 const notifyQualityAssurance = cron.schedule('0 22 * * 6', async () => {
+    let sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
     const users = await User
         .find({
             $or: [
@@ -423,50 +427,48 @@ const notifyQualityAssurance = cron.schedule('0 22 * * 6', async () => {
                 { groups: 'bn' },
             ],
         })
-        .populate({
-            path: 'qualityAssuranceChecks',
-        })
         .sort({ username: 1 });
-
-    for (let i = 0; i < users.length; i++) {
-        const sevenDaysAgo = moment().subtract(7, 'days');
-
-        const recentCount = users[i].qualityAssuranceChecks.filter(event =>
-            moment(event.timestamp).isAfter(sevenDaysAgo)
-        ).length;
-
-        users[i].recentQualityAssuranceChecks = recentCount;
-    }
-
-    const overallUsers = [...users];
-    const recentUsers = [...users];
-
-    overallUsers.sort((a, b) => {
-        if (a.qualityAssuranceChecks.length > b.qualityAssuranceChecks.length) return -1;
-        if (a.qualityAssuranceChecks.length < b.qualityAssuranceChecks.length) return 1;
-
-        return 0;
-    });
-
-    recentUsers.sort((a, b) => {
-        if (a.recentQualityAssuranceChecks > b.recentQualityAssuranceChecks) return -1;
-        if (a.recentQualityAssuranceChecks < b.recentQualityAssuranceChecks) return 1;
-
-        return 0;
-    });
 
     const modes = ['osu', 'taiko', 'catch', 'mania'];
 
     for (const mode of modes) {
+        for (let i = 0; i < users.length; i++) {
+            const userId = users[i].id;
+
+            const recent = await QualityAssuranceCheck.find({ user: userId, timestamp: { $gte: sevenDaysAgo }, mode });
+            const all = await QualityAssuranceCheck.find({ user: userId, mode });
+
+            users[i].recentQaChecks = recent.length;
+            users[i].allQaChecks = all.length;
+        }
+
+        const overallUsers = [...users];
+        const recentUsers = [...users];
+
+        overallUsers.sort((a, b) => {
+            if (a.allQaChecks > b.allQaChecks) return -1;
+            if (a.allQaChecks < b.allQaChecks) return 1;
+
+            return 0;
+        });
+
+        recentUsers.sort((a, b) => {
+            if (a.recentQaChecks > b.recentQaChecks) return -1;
+            if (a.recentQaChecks < b.recentQaChecks) return 1;
+
+            return 0;
+        });
+
+
         let topTenText = '';
         let topTenCount = 0;
 
         for (let i = 0; topTenCount < 10 && i < users.length; i++) {
             const user = overallUsers[i];
 
-            if (user.isBnFor(mode) && user.qualityAssuranceChecks.length > 0) {
+            if (user.isBnFor(mode) && user.allQaChecks > 0) {
                 topTenCount++;
-                topTenText += `${topTenCount}. ${user.username}: **${user.qualityAssuranceChecks.length}**\n`;
+                topTenText += `${topTenCount}. ${user.username}: **${user.allQaChecks}**\n`;
             }
         }
 
@@ -476,9 +478,9 @@ const notifyQualityAssurance = cron.schedule('0 22 * * 6', async () => {
         for (let i = 0; recentCount < 3 && i < users.length; i++) {
             const user = recentUsers[i];
 
-            if (user.isBnFor(mode) && user.recentQualityAssuranceChecks > 0) {
+            if (user.isBnFor(mode) && user.recentQaChecks > 0) {
                 recentCount++;
-                recentText += `${recentCount}. ${user.username}: **${user.recentQualityAssuranceChecks}**\n`;
+                recentText += `${recentCount}. ${user.username}: **${user.recentQaChecks}**\n`;
             }
         }
 
@@ -607,9 +609,9 @@ async function findUniqueNominations (initialDate, bn) {
  * @returns {Promise<number>} number of qa checks
  */
 async function findQualityAssuranceChecks (initialDate, bn) {
-    const events = await Aiess.find({
-        qualityAssuranceCheckers: bn.id,
-        updatedAt: { $gt: initialDate },
+    const events = await QualityAssuranceCheck.find({
+        user: bn.id,
+        timestamp: { $gt: initialDate },
     });
 
     return events.length;

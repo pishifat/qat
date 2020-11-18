@@ -2,6 +2,7 @@ const express = require('express');
 const config = require('../config.json');
 const Aiess = require('../models/aiess');
 const User = require('../models/user');
+const QualityAssuranceCheck = require('../models/qualityAssuranceCheck');
 const Log = require('../models/log');
 const Evaluation = require('../models/evaluations/evaluation');
 const AppEvaluation = require('../models/evaluations/appEvaluation');
@@ -46,10 +47,6 @@ router.get('/events/:beatmapsetId', async (req, res) => {
     res.json(
         await Aiess
             .find({ beatmapsetId: req.params.beatmapsetId })
-            .populate([
-                { path: 'qualityAssuranceCheckers', select: 'osuId username' },
-                { path: 'qualityAssuranceComments', populate: { path: 'mediator', select: 'osuId username' } },
-            ])
             .sort({ timestamp: 1 })
     );
 });
@@ -63,12 +60,9 @@ router.get('/qaEventsByUser/:osuId', async (req, res) => {
     }
 
     res.json(
-        await Aiess
-            .find({ qualityAssuranceCheckers: user.id })
-            .populate([
-                { path: 'qualityAssuranceCheckers', select: 'osuId username' },
-                { path: 'qualityAssuranceComments', populate: { path: 'mediator', select: 'osuId username' } },
-            ])
+        await QualityAssuranceCheck
+            .find({ user: user.id })
+            .populate({ path: 'event ' })
             .sort({ timestamp: 1 })
     );
 });

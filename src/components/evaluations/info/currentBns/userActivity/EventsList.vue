@@ -14,12 +14,12 @@
                         {{ event.timestamp | toMonthDay }}
                     </td>
                     <td>
-                        <a :href="'https://osu.ppy.sh/beatmapsets/' + event.beatmapsetId + '/discussion?user=' + osuId" target="_blank">
+                        <a :href="'https://osu.ppy.sh/beatmapsets/' + beatmapsetId(event) + '/discussion?user=' + osuId" target="_blank">
                             <mode-display
-                                :modes="event.modes"
+                                :modes="modes(event)"
                             />
 
-                            {{ event.artistTitle }}
+                            {{ artistTitle(event) }}
                         </a>
                     </td>
                 </tr>
@@ -62,8 +62,33 @@ export default {
             required: true,
         },
     },
-    computed: mapState('activity', [
-        'isLoading',
-    ]),
+    computed: {
+        ...mapState('activity', [
+            'isLoading',
+        ]),
+    },
+    methods: {
+        beatmapsetId (event) {
+            if (this.eventsId == 'qualityAssuranceChecks') {
+                return event.event.beatmapsetId;
+            } else {
+                return event.beatmapsetId;
+            }
+        },
+        modes (event) {
+            if (this.eventsId == 'qualityAssuranceChecks') {
+                return event.event.modes;
+            } else {
+                return event.modes;
+            }
+        },
+        artistTitle (event) {
+            if (this.eventsId == 'qualityAssuranceChecks') {
+                return event.event.artistTitle;
+            } else {
+                return event.artistTitle;
+            }
+        },
+    },
 };
 </script>

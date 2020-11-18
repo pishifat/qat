@@ -25,13 +25,11 @@ const userSchema = new mongoose.Schema({
     natProfileBadge: { type: Number, default: 0 },
     rankedBeatmapsets: { type: Number, default: 0 },
     discordId: { type: String },
-}, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
-userSchema.virtual('qualityAssuranceChecks', {
-    ref: 'aiess',
-    localField: '_id',
-    foreignField: 'qualityAssuranceCheckers',
-});
+    /* temporary fields for qa leaderboard webhook */
+    recentQaChecks: { type: Number },
+    allQaChecks: { type: Number },
+}, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 class UserService extends mongoose.Model {
 

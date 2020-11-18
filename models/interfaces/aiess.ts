@@ -23,8 +23,7 @@ interface IAiess {
     isUnique: boolean;
     effortBonus: number;
     responsibleNominators: number[];
-    qualityAssuranceCheckers: IUserDocument[];
-    qualityAssuranceComments: IMediationDocument[];
+    qaComment: string; // temporary field added during user activity for disqualified qa checks
 }
 
 export interface IAiessDocument extends IAiess, Document { }
