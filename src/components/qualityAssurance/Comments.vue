@@ -1,10 +1,10 @@
 <template>
     <div>
-        <div v-if="loggedInUser.hasBasicAccess" class="col-sm-12 my-2" :class="otherUserComments.length ? 'mb-1' : ''">
+        <div v-if="isQualityAssuranceChecker" class="col-sm-12 my-2" :class="otherUserComments.length ? 'mb-1' : ''">
             <a
                 href="#"
                 class="ml-2"
-                :class="isMaxChecks || isOutdated ? 'disabled' : ''"
+                :class="disable ? 'disabled' : ''"
                 @click.prevent="showInput = !showInput"
             >
                 <i class="fas fa-edit" />
@@ -20,7 +20,7 @@
             <input
                 v-if="showInput"
                 v-model="userComment"
-                :disabled="isMaxChecks || isOutdated"
+                :disabled="disable"
                 class="form-control form-control-sm"
                 type="text"
                 maxlength="1000"
@@ -30,12 +30,12 @@
             >
         </div>
 
-        <div v-if="otherUserComments.length" class="col-sm-12 mb-2">
+        <div v-if="otherChecksWithComments.length" class="col-sm-12 mb-2">
             <ul class="small mb-0">
                 <!-- if not maxchecks/outdated/currentuser, show Anoynmous: comment, otherwise show username: comment -->
-                <li v-for="mediation in otherUserComments" :key="mediation.id">
-                    {{ loggedInUser.isNat || isMaxChecks || isOutdated ? mediation.mediator.username + ':' : 'anonymous:' }}
-                    <span v-html="$md.render(mediation.comment)" />
+                <li v-for="check in otherChecksWithComments" :key="check.id">
+                    {{ loggedInUser.isNat || disable ? check.user.username + ':' : 'anonymous:' }}
+                    <span v-html="$md.renderInline(check.comment)" />
                 </li>
             </ul>
         </div>
@@ -50,8 +50,8 @@ export default {
     name: 'Comments',
     mixins: [ postData ],
     props: {
-        qualityAssuranceComments: {
-            type: Array,
+        qualityAssuranceChecks: {
+            type: [Array, Object],
             default() {
                 return [];
             },
@@ -60,22 +60,25 @@ export default {
             type: String,
             required: true,
         },
-        isMaxChecks: Boolean,
-        isOutdated: Boolean,
+        isQualityAssuranceChecker: Boolean,
+        disable: Boolean,
     },
     data() {
         return {
             showInput: false,
             userComment: null,
-            mediationId: null,
+            qaCheckId: null,
         };
     },
     computed: {
         ...mapState([
             'loggedInUser',
         ]),
-        otherUserComments() {
-            return this.qualityAssuranceComments.filter(m => m.mediator.id != this.loggedInUser.id && m.comment.length);
+        ...mapState('qualityAssurance', [
+            'pageFilters',
+        ]),
+        otherChecksWithComments() {
+            return this.qualityAssuranceChecks.filter(q => q.user.id != this.loggedInUser.id && q.comment);
         },
     },
     watch: {
@@ -89,18 +92,18 @@ export default {
     methods: {
         findRelevantComment() {
             this.userComment = null;
-            this.mediationId = null;
+            this.qaCheckId = null;
 
-            const userMediation = this.qualityAssuranceComments.find(m => m.mediator.id == this.loggedInUser.id);
+            const userMediation = this.qualityAssuranceChecks.find(q => q.user.id == this.loggedInUser.id && q.mode == this.pageFilters.filters.mode);
 
             if (userMediation) {
                 this.userComment = userMediation.comment;
-                this.mediationId = userMediation.id;
+                this.qaCheckId = userMediation.id;
             }
         },
         async editComment (e) {
             this.showInput = false;
-            const event = await this.executePost('/qualityAssurance/editComment/' + this.eventId, { mediationId: this.mediationId, comment: this.userComment }, e);
+            const event = await this.executePost('/qualityAssurance/editComment/' + this.eventId, { qaCheckId: this.qaCheckId, comment: this.userComment }, e);
 
             if (event && !event.error) {
                 this.$store.commit('qualityAssurance/updateEvent', event);

@@ -24,6 +24,12 @@ const aiessSchema = new mongoose.Schema({
     qaComment: { type: String }, // temporary field added during user activity for disqualified qa checks
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
+aiessSchema.virtual('qualityAssuranceChecks', {
+    ref: 'QualityAssuranceCheck',
+    localField: '_id',
+    foreignField: 'event',
+});
+
 class AiessService extends mongoose.Model
 {
 

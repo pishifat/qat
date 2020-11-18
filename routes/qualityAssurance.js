@@ -9,12 +9,11 @@ const router = express.Router();
 router.use(middlewares.isLoggedIn);
 
 const defaultPopulate = [
-    { path: 'qualityAssuranceCheckers', select: 'username osuId modesInfo' },
     {
-        path: 'qualityAssuranceComments',
+        path: 'qualityAssuranceChecks',
         populate: {
-            path: 'mediator',
-            select: 'username osuId id',
+            path: 'user',
+            select: 'username osuId',
         },
     },
 ];
@@ -23,6 +22,7 @@ const defaultPopulate = [
 router.get('/relevantInfo', async (req, res) => {
     let date = new Date();
     date.setDate(date.getDate() - 7);
+
     const [events, overwrite] = await Promise.all([
         Aiess
             .find({
@@ -43,6 +43,7 @@ router.get('/relevantInfo', async (req, res) => {
             .populate(defaultPopulate)
             .sort({ timestamp: -1 }),
     ]);
+
 
     res.json({
         events,

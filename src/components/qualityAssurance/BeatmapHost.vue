@@ -1,6 +1,8 @@
 <template>
     <div class="small">
-        <div>Hosted by</div>
+        <div class="text-secondary">
+            Hosted by
+        </div>
 
         <div class="text-truncate">
             <user-link

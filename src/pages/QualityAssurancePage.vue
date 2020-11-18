@@ -71,6 +71,7 @@ export default {
         ...mapState('qualityAssurance', [
             'events',
             'overwriteEvents',
+            'pageFilters',
         ]),
         ...mapGetters('qualityAssurance', [
             'filteredEvents',
@@ -108,10 +109,8 @@ export default {
             beatmaps = beatmaps.concat(this.overwriteEvents.filter(b => b.beatmapsetId == beatmapsetId));
             let isOutdated = false;
 
-            for (let i = 0; i < beatmaps.length; i++) {
-                const b = beatmaps[i];
-
-                if (new Date(b.timestamp) > timestamp) {
+            for (const beatmap of beatmaps) {
+                if (new Date(beatmap.timestamp) > timestamp) {
                     isOutdated = true;
                     break;
                 }
@@ -120,15 +119,9 @@ export default {
             return isOutdated;
         },
         isMaxChecks (event) {
-            for (const mode of event.modes) {
-                const checkers = event.qualityAssuranceCheckers.filter(checker => checker.fullModes.includes(mode)).length;
+            const checks = event.qualityAssuranceChecks.filter(qa => qa.mode == this.pageFilters.filters.mode);
 
-                if (checkers < 2 && this.loggedInUser.fullModes.includes(mode)) {
-                    return false;
-                }
-            }
-
-            return true;
+            return checks.length >= 2;
         },
         async loadMore (e) {
             const res = await this.executeGet('/qualityAssurance/loadMore/' + this.limit + '/' + (this.limit - 200), e);

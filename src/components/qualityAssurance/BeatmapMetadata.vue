@@ -1,6 +1,6 @@
 <template>
     <div class="text-truncate">
-        <div class="text-truncate text-secondary">
+        <div class="text-truncate text-secondary small">
             {{ splitArtistTitle[0] }}
         </div>
         <a

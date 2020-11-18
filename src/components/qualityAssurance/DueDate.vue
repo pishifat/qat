@@ -1,6 +1,6 @@
 <template>
     <div class="small">
-        <div>
+        <div class="text-secondary">
             Due
         </div>
 

@@ -2,17 +2,17 @@
     <div>
         <span v-if="showAll">
             <a
-                v-for="user in qualityAssuranceCheckers"
-                :key="user.id"
-                :href="'https://osu.ppy.sh/users/' + user.osuId"
+                v-for="check in qualityAssuranceChecks"
+                :key="check.id"
+                :href="'https://osu.ppy.sh/users/' + check.user.osuId"
                 target="_blank"
                 class="mx-1"
             >
                 <img
                     class="avatar-img avatar-img--small"
-                    :src="'https://a.ppy.sh/' + user.osuId"
+                    :src="'https://a.ppy.sh/' + check.user.osuId"
                     data-toggle="tooltip"
-                    :title="user.username"
+                    :title="`${check.user.username} (${check.mode})`"
                 >
             </a>
         </span>
@@ -39,7 +39,7 @@ import { mapState } from 'vuex';
 export default {
     name: 'QualityAssuranceCheckers',
     props: {
-        qualityAssuranceCheckers: {
+        qualityAssuranceChecks: {
             type: Array,
             default() {
                 return [];

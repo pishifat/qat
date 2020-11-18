@@ -33,7 +33,7 @@
 
                             <quality-assurance-checkers
                                 class="col-sm-4 ml-2 ml-sm-0"
-                                :quality-assurance-checkers="event.qualityAssuranceCheckers"
+                                :quality-assurance-checks="event.qualityAssuranceChecks"
                                 :is-quality-assurance-checker="isQualityAssuranceChecker"
                                 :show-all="showAll"
                             />
@@ -50,13 +50,13 @@
                 </div>
 
                 <comments
-                    v-if="loggedInUser.hasBasicAccess || (!loggedInUser.hasBasicAccess && event.qualityAssuranceComments.length)"
+                    v-if="isQualityAssuranceChecker || hasComments"
                     class="row small"
                     :class="loggedInUser.hasBasicAccess ? 'mt-2' : ''"
-                    :quality-assurance-comments="event.qualityAssuranceComments"
+                    :quality-assurance-checks="event.qualityAssuranceChecks"
                     :event-id="event.id"
-                    :is-max-checks="isMaxChecks"
-                    :is-outdated="isOutdated"
+                    :is-quality-assurance-checker="isQualityAssuranceChecker"
+                    :disable="isMaxChecks || isOutdated"
                 />
             </div>
         </div>
@@ -98,17 +98,22 @@ export default {
         ]),
         isQualityAssuranceChecker() {
             let valid;
-            this.event.qualityAssuranceCheckers.forEach(user => {
-                if (user.id == this.loggedInUser.id) {
+
+            for (const check of this.event.qualityAssuranceChecks) {
+                if (check.user.id == this.loggedInUser.id) {
                     valid = true;
+                    break;
                 }
-            });
+            }
 
             return valid;
         },
         showAll() {
-            if (this.event.qualityAssuranceCheckers && (this.loggedInUser.isNat || this.isMaxChecks || this.isOutdated)) return true;
+            if (this.event.qualityAssuranceChecks && (this.loggedInUser.isNat || this.isMaxChecks || this.isOutdated)) return true;
             else return false;
+        },
+        hasComments() {
+            return this.event.qualityAssuranceChecks.some(q => q.comment && q.comment.length);
         },
     },
 };
