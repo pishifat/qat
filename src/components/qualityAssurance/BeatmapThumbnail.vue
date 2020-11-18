@@ -24,7 +24,8 @@ export default {
 .beatmap-thumbnail {
     min-width: 80px;
     min-height: 60px;
-    border-top-left-radius: 5px;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
     background-repeat: no-repeat;
     background-size: cover;
 }

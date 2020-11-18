@@ -27,6 +27,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import postData from '../../mixins/postData.js';
 
 export default {
@@ -45,10 +46,15 @@ export default {
             forceDisabled: false,
         };
     },
+    computed: {
+        ...mapState('qualityAssurance', [
+            'pageFilters',
+        ]),
+    },
     methods: {
         async assignUser () {
             this.forceDisabled = true;
-            const event = await this.executePost('/qualityAssurance/assignUser/' + this.eventId, {});
+            const event = await this.executePost('/qualityAssurance/assignUser/' + this.eventId + '/' + this.pageFilters.filters.mode, {});
 
             if (event) {
                 this.$store.commit('qualityAssurance/updateEvent', event);

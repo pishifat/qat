@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-if="isQualityAssuranceChecker" class="col-sm-12 my-2" :class="otherUserComments.length ? 'mb-1' : ''">
+        <div v-if="isQualityAssuranceChecker" class="col-sm-12 my-2" :class="otherChecksWithComments.length ? 'mb-1' : ''">
             <a
                 href="#"
                 class="ml-2"
@@ -10,18 +10,18 @@
                 <i class="fas fa-edit" />
             </a>
             <span v-if="!showInput && !userComment">
-                ...
+                ... <span class="small">(write any notes to the NAT about your QA check here!)</span>
             </span>
             <span
                 v-else-if="!showInput"
-                class="ml-1 small text-white"
-                v-html="$md.render(userComment)"
+                class="ml-1 text-white"
+                v-html="$md.renderInline(userComment)"
             />
             <input
                 v-if="showInput"
                 v-model="userComment"
                 :disabled="disable"
-                class="form-control form-control-sm"
+                class="form-control form-control-sm ml-2 w-75"
                 type="text"
                 maxlength="1000"
                 placeholder="enter to submit..."
@@ -31,7 +31,7 @@
         </div>
 
         <div v-if="otherChecksWithComments.length" class="col-sm-12 mb-2">
-            <ul class="small mb-0">
+            <ul class="mb-0">
                 <!-- if not maxchecks/outdated/currentuser, show Anoynmous: comment, otherwise show username: comment -->
                 <li v-for="check in otherChecksWithComments" :key="check.id">
                     {{ loggedInUser.isNat || disable ? check.user.username + ':' : 'anonymous:' }}
@@ -78,11 +78,11 @@ export default {
             'pageFilters',
         ]),
         otherChecksWithComments() {
-            return this.qualityAssuranceChecks.filter(q => q.user.id != this.loggedInUser.id && q.comment);
+            return this.qualityAssuranceChecks.filter(q => q.user.id != this.loggedInUser.id && q.comment && q.comment.length);
         },
     },
     watch: {
-        qualityAssuranceComments() {
+        event() {
             this.findRelevantComment();
         },
     },
@@ -103,10 +103,10 @@ export default {
         },
         async editComment (e) {
             this.showInput = false;
-            const event = await this.executePost('/qualityAssurance/editComment/' + this.eventId, { qaCheckId: this.qaCheckId, comment: this.userComment }, e);
+            const qaCheck = await this.executePost('/qualityAssurance/editComment/' + this.eventId, { qaCheckId: this.qaCheckId, comment: this.userComment }, e);
 
             if (event && !event.error) {
-                this.$store.commit('qualityAssurance/updateEvent', event);
+                this.$store.commit('qualityAssurance/updateQaCheck', this.eventId, qaCheck);
                 this.findRelevantComment();
             }
         },

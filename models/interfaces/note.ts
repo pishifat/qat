@@ -8,4 +8,4 @@ interface INoteDocument extends Document {
     isHidden?: boolean;
 }
 
-export default interface IDocumentModel extends Model<INoteDocument> { }
+export default interface INoteModel extends Model<INoteDocument> { }

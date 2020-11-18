@@ -1,8 +1,8 @@
 const express = require('express');
 const Aiess = require('../models/aiess');
 const Logger = require('../models/log');
-const Mediation = require('../models/mediation');
 const middlewares = require('../helpers/middlewares');
+const QualityAssuranceCheck = require('../models/qualityAssuranceCheck');
 
 const router = express.Router();
 
@@ -72,13 +72,15 @@ router.get('/loadMore/:limit/:skip', async (req, res) => {
 });
 
 /* POST assign user */
-router.post('/assignUser/:id', middlewares.isBnOrNat, async (req, res) => {
+router.post('/assignUser/:id/:mode', middlewares.isBnOrNat, async (req, res) => {
     const event = await Aiess
         .findById(req.params.id)
         .populate(defaultPopulate)
         .orFail();
 
-    const [outDated, bubble] = await Promise.all([
+    const newChecker = res.locals.userRequest;
+
+    const [outDated, bubble, qaChecks] = await Promise.all([
         Aiess
             .findOne({
                 beatmapsetId: event.beatmapsetId,
@@ -89,34 +91,22 @@ router.post('/assignUser/:id', middlewares.isBnOrNat, async (req, res) => {
                 timestamp: { $gte: event.timestamp },
             })
             .sort({ timestamp: -1 }),
-
         Aiess
             .findOne({
                 beatmapsetId: event.beatmapsetId,
                 type: 'nominate',
             })
             .sort({ timestamp: -1 }),
+        QualityAssuranceCheck
+            .find({
+                event: event._id,
+                mode: req.params.mode,
+            }),
+
     ]);
 
     if (outDated) {
         return res.json({ error: 'Outdated' });
-    }
-
-    const newChecker = res.locals.userRequest;
-    let isFull = true;
-
-    // TODO kinda breaks if checkers change their game modes within the week or so, real fix is to change the way QA is saved
-    for (const mode of event.modes) {
-        const checkers = event.qualityAssuranceCheckers.filter(checker => checker.fullModes.includes(mode)).length;
-
-        if (checkers < 2 && newChecker.isFullBnFor(mode)) {
-            isFull = false;
-            break;
-        }
-    }
-
-    if (isFull) {
-        return res.json({ error: 'You cannot check filled maps or not related to your game mode' });
     }
 
     if (event.userId == newChecker.osuId || bubble.userId == newChecker.osuId) {
@@ -127,8 +117,24 @@ router.post('/assignUser/:id', middlewares.isBnOrNat, async (req, res) => {
         return res.json({ error: 'You cannot check your maps!' });
     }
 
+    if (!newChecker.modes.includes(req.params.mode)) {
+        return res.json({ error: 'You are not qualified for this game mode!' });
+    }
+
+    if (qaChecks.length >= 2) {
+        return res.json({ error: 'Map has too many checks for this mode!' });
+    }
+
+    let newCheck = new QualityAssuranceCheck();
+    newCheck.user = newChecker._id;
+    newCheck.event = event._id;
+    newCheck.timestamp = new Date();
+    newCheck.mode = req.params.mode;
+
+    await newCheck.save();
+
     const newEvent = await Aiess
-        .findByIdAndUpdate(req.params.id, { $push: { qualityAssuranceCheckers: newChecker._id } })
+        .findById(req.params.id)
         .populate(defaultPopulate);
 
     res.json(newEvent);
@@ -144,10 +150,23 @@ router.post('/assignUser/:id', middlewares.isBnOrNat, async (req, res) => {
 /* POST unassign user */
 router.post('/unassignUser/:id', middlewares.isBnOrNat, async (req, res) => {
     const event = await Aiess
-        .findByIdAndUpdate(req.params.id, { $pull: { qualityAssuranceCheckers: req.session.mongoId } })
+        .findById(req.params.id)
+        .populate(defaultPopulate)
+        .orFail();
+
+    const qaCheck = event.qualityAssuranceChecks.find(q => q.user.id == req.session.mongoId);
+
+    if (!qaCheck) {
+        return res.json({ error: 'Not assigned' });
+    }
+
+    await QualityAssuranceCheck.deleteOne({ _id: qaCheck._id });
+
+    const newEvent = await Aiess
+        .findById(req.params.id)
         .populate(defaultPopulate);
 
-    res.json(event);
+    res.json(newEvent);
 
     Logger.generate(
         req.session.mongoId,
@@ -159,22 +178,20 @@ router.post('/unassignUser/:id', middlewares.isBnOrNat, async (req, res) => {
 
 /* POST unassign user */
 router.post('/editComment/:id', middlewares.isBnOrNat, async (req, res) => {
-    let mediation;
+    const qaCheck = await QualityAssuranceCheck
+        .findById(req.body.qaCheckId)
+        .populate(defaultPopulate)
+        .orFail();
 
-    if (req.body.mediationId) {
-        mediation = await Mediation.findById(req.body.mediationId);
-    } else {
-        mediation = await Mediation.create({ mediator: req.session.mongoId });
-        await Aiess.findByIdAndUpdate(req.params.id, { $push: { qualityAssuranceComments: mediation } });
-    }
+    qaCheck.comment = req.body.comment.trim();
 
-    await Mediation.findByIdAndUpdate(mediation._id, { comment: req.body.comment });
+    await qaCheck.save();
 
-    const event = await Aiess
+    const newEvent = await Aiess
         .findById(req.params.id)
         .populate(defaultPopulate);
 
-    res.json(event);
+    res.json(newEvent);
 });
 
 module.exports = router;

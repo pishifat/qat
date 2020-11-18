@@ -1,6 +1,5 @@
 import { Document, Model, Aggregate } from 'mongoose'
-import { IUserDocument } from './user';
-import { IMediationDocument } from './mediation';
+import { IQualityAssuranceCheckDocument } from './qualityAssuranceCheck';
 
 interface IAiess {
     _id: any;
@@ -24,6 +23,7 @@ interface IAiess {
     effortBonus: number;
     responsibleNominators: number[];
     qaComment: string; // temporary field added during user activity for disqualified qa checks
+    qualityAssuranceChecks: IQualityAssuranceCheckDocument[]; // virtual
 }
 
 export interface IAiessDocument extends IAiess, Document { }

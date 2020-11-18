@@ -2,7 +2,7 @@ import { Document, Model } from 'mongoose'
 import { IUserDocument } from './user';
 import { IAiessDocument } from './aiess';
 
-interface IQualityAssuranceCheckDocument extends Document {
+export interface IQualityAssuranceCheckDocument extends Document {
     user: IUserDocument;
     event: IAiessDocument;
     comment: string;
@@ -10,4 +10,4 @@ interface IQualityAssuranceCheckDocument extends Document {
     mode: string;
 }
 
-export default interface IDocumentModel extends Model<IQualityAssuranceCheckDocument> { }
+export default interface IQualityAssuranceCheckModel extends Model<IQualityAssuranceCheckDocument> { }
