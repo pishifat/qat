@@ -16,7 +16,6 @@
                         :key="event.id"
                         :event="event"
                         :is-outdated="isOutdated(event.beatmapsetId, event.timestamp)"
-                        :is-max-checks="isMaxChecks(event)"
                     />
                 </transition-group>
 
@@ -71,7 +70,6 @@ export default {
         ...mapState('qualityAssurance', [
             'events',
             'overwriteEvents',
-            'pageFilters',
         ]),
         ...mapGetters('qualityAssurance', [
             'filteredEvents',
@@ -124,11 +122,6 @@ export default {
             }
 
             return isOutdated;
-        },
-        isMaxChecks (event) {
-            const checks = event.qualityAssuranceChecks.filter(qa => qa.mode == this.pageFilters.filters.mode);
-
-            return checks.length >= 2;
         },
         async loadMore (e) {
             const res = await this.executeGet('/qualityAssurance/loadMore/' + this.limit + '/' + (this.limit - 200), e);

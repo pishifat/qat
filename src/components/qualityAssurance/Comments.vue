@@ -10,7 +10,7 @@
                 <i class="fas fa-edit" />
             </a>
             <span v-if="!showInput && !userComment">
-                ... <span class="small">(write any notes to the NAT about your QA check here!)</span>
+                ... <span class="small">(write any notes about your QA check here!)</span>
             </span>
             <span
                 v-else-if="!showInput"
