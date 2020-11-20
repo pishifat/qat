@@ -1,4 +1,3 @@
-const cheerio = require('cheerio');
 const moment = require('moment');
 const { default: Axios } = require('axios');
 
@@ -8,14 +7,14 @@ const { default: Axios } = require('axios');
  * @param {number} [months] number of months to look from
  * @returns {Promise<number[]>} array with values per month ex: [1,1,1]
  */
-async function getUserModsCount(username, months) {
+async function getUserModsCount(accessToken, username, months) {
     if (!username) return [];
 
-    const baseUrl = `https://osu.ppy.sh/beatmapsets/events?limit=50&types[]=kudosu_gain&types[]=kudosu_lost&user=${username}`;
+    const baseUrl = `https://osu.ppy.sh/api/v2/beatmapsets/events?limit=50&types[]=kudosu_gain&types[]=kudosu_lost&user=${username}`;
     let maxDate = moment();
     let minDate = moment().subtract(30, 'days');
     let modCount = [];
-    let allMods = [];
+    let allMods = new Map();
     if (!months) months = 3;
 
     // Loops for months
@@ -23,16 +22,16 @@ async function getUserModsCount(username, months) {
         const maxDateStr = maxDate.format('YYYY-MM-DD');
         const minDateStr = minDate.format('YYYY-MM-DD');
         const urlWithDate = baseUrl + `&min_date=${minDateStr}&max_date=${maxDateStr}`;
-        let monthMods = [];
+        let monthMods = new Map();
         let hasEvents = true;
         let pageNumber = 1;
 
         // Loops through pages of a month
         while (hasEvents) {
             const finalUrl = urlWithDate + `&page=${pageNumber}`;
-            const historyHtml = await Axios.get(finalUrl);
-            const $ = cheerio.load(historyHtml.data);
-            const events = JSON.parse($('#json-events').html());
+            const headers = { 'Authorization': `Bearer ${accessToken}` };
+            const response = await Axios.get(finalUrl, { headers });
+            const events = response.data.events;
 
             if (!events.length) {
                 hasEvents = false;
@@ -44,6 +43,7 @@ async function getUserModsCount(username, months) {
                             beatmapsetId: event.beatmapset.id,
                             discussionId: event.discussion.id,
                             isGain: event.type == 'kudosu_gain',
+                            date: new Date(event.created_at),
                         });
                     }
                 });
@@ -53,20 +53,22 @@ async function getUserModsCount(username, months) {
                     if (
                         mod.isGain &&
                         !pageMods.some(m => m.discussionId == mod.discussionId && !m.isGain) &&
-                        !monthMods.some(m => m.beatmapsetId == mod.beatmapsetId) &&
-                        !allMods.some(m => m.beatmapsetId == mod.beatmapsetId)
+                        !monthMods.has(mod.beatmapsetId) &&
+                        !allMods.has(mod.beatmapsetId)
                     ) {
-                        monthMods.push(mod);
+                        // monthMods.push(mod);
+                        monthMods.set(mod.beatmapsetId, mod);
                     }
                 });
 
-                allMods.push(...monthMods);
+                // allMods.push(...monthMods.values());
+                allMods = new Map([...allMods, ...monthMods]);
             }
 
             pageNumber ++;
         }
 
-        modCount.push(monthMods.length);
+        modCount.push(monthMods.size);
         minDate.subtract(30, 'days');
         maxDate.subtract(30, 'days');
     }
@@ -81,10 +83,10 @@ async function getUserModsCount(username, months) {
  * @param {string} mode
  * @returns {Promise<number|undefined>} mod score fixed to two decimals ex: 7,77
  */
-async function getUserModScore(username, months, mode) {
-    if (!username) return undefined;
+async function getUserModScore(accessToken, username, months, mode) {
+    if (!accessToken || !username) return undefined;
 
-    const modsCount = await getUserModsCount(username, months);
+    const modsCount = await getUserModsCount(accessToken, username, months);
     let modScore = 0;
     let expectedMods = (mode && mode == 'osu' ? 4 : 3);
 

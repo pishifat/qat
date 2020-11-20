@@ -52,7 +52,7 @@ router.get('/modsCount/:user/:mode', async (req, res) => {
         else if (wasBn) months = 2;
     }
 
-    const modCount = await getUserModsCount(userInput, months);
+    const modCount = await getUserModsCount(req.session.accessToken, userInput, months);
 
     if (!modCount.length) {
         return res.json({
