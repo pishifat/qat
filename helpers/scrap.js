@@ -1,4 +1,3 @@
-const cheerio = require('cheerio');
 const moment = require('moment');
 const { default: Axios } = require('axios');
 
@@ -30,7 +29,7 @@ async function getUserModsCount(accessToken, username, months) {
         // Loops through pages of a month
         while (hasEvents) {
             const finalUrl = urlWithDate + `&page=${pageNumber}`;
-            const headers = { "Authorization": `Bearer ${accessToken}` };
+            const headers = { 'Authorization': `Bearer ${accessToken}` };
             const response = await Axios.get(finalUrl, { headers });
             const events = response.data.events;
 
@@ -84,10 +83,10 @@ async function getUserModsCount(accessToken, username, months) {
  * @param {string} mode
  * @returns {Promise<number|undefined>} mod score fixed to two decimals ex: 7,77
  */
-async function getUserModScore(username, months, mode) {
-    if (!username) return undefined;
+async function getUserModScore(accessToken, username, months, mode) {
+    if (!accessToken || !username) return undefined;
 
-    const modsCount = await getUserModsCount(username, months);
+    const modsCount = await getUserModsCount(accessToken, username, months);
     let modScore = 0;
     let expectedMods = (mode && mode == 'osu' ? 4 : 3);
 

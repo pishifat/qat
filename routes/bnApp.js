@@ -96,7 +96,7 @@ router.post('/apply', async (req, res) => {
         // Check user kudosu total count & mod score
         const [userInfo, modScore] = await Promise.all([
             osu.getUserInfo(req.session.accessToken),
-            getUserModScore(req.session.username, months, mode),
+            getUserModScore(req.session.accessToken, req.session.username, months, mode),
         ]);
 
         if (!userInfo || userInfo.error || !modScore) {

@@ -26,10 +26,11 @@
                 >
                 <div class="input-group-append">
                     <button
+                        :disabled="!loggedInUser"
                         class="btn btn-sm btn-primary"
                         data-toggle="tooltip"
                         data-placement="top"
-                        title="Automatically detect your mod score based on your modding history"
+                        :title="loggedInUser ? 'Automatically detect your mod score based on your modding history' : 'Authorize above to auto-calculate mod score'"
                         @click="autoCalculate"
                     >
                         Auto-calculate
@@ -39,7 +40,7 @@
         </div>
 
         <div class="form-group">
-            <div class="input-group mb-3" v-for="(index, n) in 3">
+            <div v-for="index in 3" :key="index" class="input-group mb-3">
                 <input
                     v-model="modsCount[index - 1]"
                     class="modCount form-control"
@@ -59,6 +60,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import postData from '../../mixins/postData';
 import ModeRadioDisplay from '../ModeRadioDisplay.vue';
 
@@ -77,6 +79,9 @@ export default {
             months: 3,
         };
     },
+    computed: mapState([
+        'loggedInUser',
+    ]),
     watch: {
         modsCount () {
             this.calculateTotalScore();
