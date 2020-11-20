@@ -347,8 +347,11 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
                 reporterUserId: userId,
             });
 
-            let userInfo = await osuv1.getUserInfoV1(userId);
+            // get user data
+            const userInfo = await osuv1.getUserInfoV1(userId);
             await util.sleep(500);
+
+            const mongoUser = await User.findOne({ osuId: userId });
 
             // identify modes
             let modes = [];
@@ -389,7 +392,7 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
                     thumbnail: {
                         url: `https://b.ppy.sh/thumb/${discussion.beatmapset_id}.jpg`,
                     },
-                    color: messageType.includes('suggestion') ? discord.webhookColors.lightOrange : discord.webhookColors.red,
+                    color: messageType.includes('problem') ? discord.webhookColors.red : mongoUser && mongoUser.isBnOrNat ? discord.webhookColors.orange : discord.webhookColors.lightOrange,
                     fields: [
                         {
                             name: messageType,
@@ -402,7 +405,7 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
             await util.sleep(500);
 
             // send highlights
-            if (messageType.includes('problem')) {
+            if (messageType.includes('problem') || (mongoUser && mongoUser.isBnOrNat)) {
                 modes.forEach(mode => {
                     discord.highlightWebhookPost('', `${mode}BeatmapReport`);
                 });
