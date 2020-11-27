@@ -7,7 +7,7 @@
         <div v-if="events" :id="eventsId" class="collapse">
             <data-table
                 v-if="events.length"
-                :headers="['Date', 'Mapset']"
+                :headers="['Date', 'Mapset', 'Host']"
             >
                 <tr v-for="event in events" :key="event.id">
                     <td class="text-nowrap">
@@ -22,6 +22,12 @@
                             {{ artistTitle(event) }}
                         </a>
                     </td>
+                    <td>
+                        <user-link
+                            :username="creatorName(event)"
+                            :osu-id="creatorId(event)"
+                        />
+                    </td>
                 </tr>
             </data-table>
             <p v-else class="small ml-4">
@@ -35,12 +41,14 @@
 import { mapState } from 'vuex';
 import DataTable from '../../../../DataTable.vue';
 import ModeDisplay from '../../../../ModeDisplay.vue';
+import UserLink from '../../../../UserLink.vue';
 
 export default {
     name: 'EventsList',
     components: {
         DataTable,
         ModeDisplay,
+        UserLink,
     },
     props: {
         events: {
@@ -87,6 +95,20 @@ export default {
                 return event.event.artistTitle;
             } else {
                 return event.artistTitle;
+            }
+        },
+        creatorName (event) {
+            if (this.eventsId == 'qualityAssuranceChecks') {
+                return event.event.creatorName;
+            } else {
+                return event.creatorName;
+            }
+        },
+        creatorId (event) {
+            if (this.eventsId == 'qualityAssuranceChecks') {
+                return event.event.creatorId;
+            } else {
+                return event.creatorId;
             }
         },
     },

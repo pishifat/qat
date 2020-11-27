@@ -601,7 +601,7 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
             timestamp: { $gte: minDate, $lte: maxDate },
         }).populate({
             path: 'event',
-            select: 'beatmapsetId timestamp modes artistTitle',
+            select: 'beatmapsetId timestamp modes artistTitle creatorName creatorId',
         }),
     ]);
 
