@@ -207,12 +207,12 @@
             </div>
             <div class="row mb-2">
                 <small class="mb-1">Summarize the discussion's proposed change(s)</small>
-                <input
+                <textarea
                     v-model="shortReason"
-                    type="text"
                     class="form-control"
-                    placeholder="change..."
-                >
+                    placeholder="change(s)..."
+                    rows="3"
+                />
             </div>
             <hr>
             <button type="submit" class="btn btn-primary float-right" @click="submitDiscussion($event)">

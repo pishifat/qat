@@ -43,14 +43,13 @@
 
             <b>Proposal:</b>
 
-            <input
+            <textarea
                 v-if="isEditingProposal"
                 v-model="editProposalContent"
                 class="form-control form-control-sm w-75"
-                type="text"
                 placeholder="enter to submit new proposal..."
-                @keyup.enter="update()"
-            >
+                rows="3"
+            />
 
             <span v-else class="small" v-html="$md.render(selectedDiscussionVote.shortReason)" />
         </p>
