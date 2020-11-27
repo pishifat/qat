@@ -76,6 +76,7 @@ router.post('/submit', middlewares.isNat, async (req, res) => {
         creator: req.session.mongoId,
         isNatOnly: req.body.isNatOnly,
         neutralAllowed: req.body.neutralAllowed,
+        reasonAllowed: req.body.reasonAllowed,
     });
 
     res.json(d);
@@ -146,17 +147,6 @@ router.post('/submitMediation/:id', async (req, res) => {
         'discussionVote',
         d._id
     );
-
-    /*if (isNewMediation && res.locals.userRequest.isNat) {
-        discord.webhookPost(
-            [{
-                author: discord.defaultWebhookAuthor(req.session),
-                color: discord.webhookColors.lightYellow,
-                description: `Submitted vote for [discussion on **${d.title}**](http://bn.mappersguild.com/discussionvote?id=${d.id})`,
-            }],
-            d.mode
-        );
-    }*/
 });
 
 /* POST conclude mediation */

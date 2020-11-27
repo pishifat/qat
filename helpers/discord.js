@@ -130,7 +130,7 @@ const webhookColors = {
     darkOrange: 7092736,      // replaceMediator
     orange: 15169835,         // replaceEvaluator
 
-    lightYellow: 16777104,    // submitDiscussionVote
+    lightYellow: 16777104,
     darkYellow: 7105536,      // concludeDiscussionVote
     yellow: 16777022,         // submitMediationDiscussionVote
 

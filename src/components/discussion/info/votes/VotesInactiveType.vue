@@ -7,11 +7,14 @@
 
         <ul v-if="loggedInUser.hasFullReadAccess">
             <li v-for="mediation in mediations" :key="mediation.id" class="small ml-2">
-                {{ mediation.mediator.username }}
+                <user-link
+                    :username="mediation.mediator.username"
+                    :osu-id="mediation.mediator.osuId"
+                />
 
                 <span
                     v-if="mediation.comment && mediation.comment.length"
-                    class="text-secondary pre-line ml-2"
+                    class="text-secondary pre-wrap ml-2"
                     v-html="$md.render(mediation.comment)"
                 />
             </li>
@@ -21,9 +24,13 @@
 
 <script>
 import { mapState } from 'vuex';
+import UserLink from '../../../UserLink.vue';
 
 export default {
     name: 'VotesInactiveType',
+    components: {
+        UserLink,
+    },
     props: {
         mediations: {
             type: Array,

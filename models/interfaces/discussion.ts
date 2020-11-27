@@ -8,9 +8,10 @@ interface IDiscussionDocument extends Document {
     discussionLink: string;
     shortReason: string;
     isActive?: boolean;
-    mediations?: IMediationDocument[];
     isNatOnly: boolean;
     neutralAllowed: boolean;
+    reasonAllowed: boolean;
+    mediations?: IMediationDocument[];
     creator: IUserDocument;
 }
 

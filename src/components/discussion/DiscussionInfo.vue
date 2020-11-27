@@ -8,10 +8,7 @@
             <discussion-context />
 
             <votes-active
-                v-if="selectedDiscussionVote.isActive && !selectedDiscussionVote.isNatOnly"
-            />
-            <votes-active
-                v-else-if="selectedDiscussionVote.isActive && selectedDiscussionVote.isNatOnly"
+                v-if="selectedDiscussionVote.isActive"
             />
             <votes-inactive
                 v-else-if="!selectedDiscussionVote.isActive"

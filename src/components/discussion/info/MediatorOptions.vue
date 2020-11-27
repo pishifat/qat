@@ -2,7 +2,7 @@
     <div>
         <div class="mb-2">
             <textarea
-                v-if="selectedDiscussionVote.isNatOnly"
+                v-if="selectedDiscussionVote.reasonAllowed"
                 id="comment"
                 v-model="comment"
                 class="form-control"
@@ -45,10 +45,6 @@
                     <label class="form-check-label text-fail" for="3">Disagree</label>
                 </div>
             </div>
-
-            <p v-if="!selectedDiscussionVote.isNatOnly && selectedDiscussionVote.discussionLink" class="small ml-2">
-                If you have any feedback to improve the proposal, post on <a :href="selectedDiscussionVote.discussionLink" target="_blank">the thread</a>.
-            </p>
 
             <div class="d-flex justify-content-end">
                 <button class="btn btn-sm btn-primary" @click="submitMediation($event)">

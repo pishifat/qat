@@ -152,6 +152,41 @@
                     </label>
                 </div>
             </div>
+            <div class="row">
+                <p>Reason input allowed:</p>
+                <div class="row ml-4">
+                    <label
+                        class="mx-1"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="reason input not allowed"
+                    >
+                        <input
+                            v-model="reason"
+                            type="radio"
+                            class="cross-radio hide-default"
+                            name="reason"
+                            value="noReason"
+                        >
+                        <i class="fas fa-times fa-lg" />
+                    </label>
+                    <label
+                        class="mx-1"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="reason input allowed"
+                    >
+                        <input
+                            v-model="reason"
+                            type="radio"
+                            class="checkmark-radio hide-default"
+                            name="reason"
+                            value="reason"
+                        >
+                        <i class="fas fa-check fa-lg" />
+                    </label>
+                </div>
+            </div>
             <div class="row mb-3">
                 <small class="mb-1">Link to relevant discussion (optional)</small>
                 <input
@@ -205,6 +240,7 @@ export default {
             mode: null,
             group: 'bn',
             neutral: 'neutral',
+            reason: 'noReason',
         };
     },
     methods: {
@@ -225,6 +261,7 @@ export default {
                         mode: this.mode,
                         isNatOnly: this.group == 'nat',
                         neutralAllowed: this.neutral == 'neutral',
+                        reasonAllowed: this.reason == 'reason',
                     },
                     e
                 );
