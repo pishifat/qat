@@ -1,13 +1,16 @@
 import Vue from 'vue';
 import MarkdownIt from 'markdown-it';
 import moment from 'moment';
+import MarkdownItVideo from 'markdown-it-video';
 
 const md = new MarkdownIt('zero', {
     html: false,
     breaks: true,
     linkify: true,
     typographer: false,
-}).enable(['emphasis', 'linkify', 'newline', 'link', 'image']);
+})
+    .enable(['emphasis', 'linkify', 'newline', 'link', 'image'])
+    .use(MarkdownItVideo);
 
 // Remember old renderer, if overridden, or proxy to default renderer
 const defaultRender = md.renderer.rules.link_open || function (tokens, idx, options, env, self) {
