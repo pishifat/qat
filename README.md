@@ -22,6 +22,6 @@ Once config is set up, type `npm i` then `npm run dev` in console. You'll be abl
 
 Running the project sucks if you don't have data. One day I'll set up sample data, but enjoy the inconvenience until then!
 
-## Nomination data
+## Data
 
-Some people use this website's /interOp routes for nomination data. If you're one of these people, tell me what you'd be doing with the info and I'll probably give you an access key. Don't share your key with anyone else.
+Some people use this website's /interOp routes for various data. If you're one of these people, tell me what you'd be doing with the info and I'll probably give you an access key. Don't share your key with anyone else.

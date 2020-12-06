@@ -7,6 +7,7 @@ const QualityAssuranceCheck = require('../models/qualityAssuranceCheck');
 const Log = require('../models/log');
 const Evaluation = require('../models/evaluations/evaluation');
 const AppEvaluation = require('../models/evaluations/appEvaluation');
+const getGeneralEvents = require('./evaluations/bnEval').getGeneralEvents;
 const { BnEvaluationConsensus } = require('../shared/enums');
 
 const router = express.Router();
@@ -75,9 +76,72 @@ router.get('/qaEventsByUser/:osuId', async (req, res) => {
     );
 });
 
+
+/* GET all recent QA info */
+router.get('/qaInfo/', async (req, res) => {
+    const populate = [
+        {
+            path: 'qualityAssuranceChecks',
+            populate: {
+                path: 'user',
+                select: 'username osuId',
+            },
+        },
+    ];
+
+    let date = new Date();
+    date.setDate(date.getDate() - 7);
+
+    const [events, overwrite] = await Promise.all([
+        Aiess
+            .find({
+                type: 'qualify',
+                timestamp: { $gte: date },
+            })
+            .populate(populate)
+            .sort({ timestamp: -1 }),
+
+        Aiess
+            .find({
+                $or: [
+                    { type: 'disqualify' },
+                    { type: 'rank' },
+                ],
+                timestamp: { $gte: date },
+            })
+            .populate(populate)
+            .sort({ timestamp: -1 }),
+    ]);
+
+    res.json({
+        events,
+        overwrite,
+    });
+});
+
 /* GET dq info for discussionID */
 router.get('/dqInfoByDiscussionId/:discussionId', async (req, res) => {
     res.json(await Aiess.findOne({ discussionId: req.params.discussionId }));
+});
+
+/* GET activity by user and days */
+router.get('/nominationResets/:osuId/:days/', async (req, res) => {
+    const user = await User.findOne({ osuId: req.params.osuId });
+
+    if (!user) {
+        return res.status(404).send('User not found');
+    }
+
+    let days = parseInt(req.params.days);
+    if (isNaN(days)) days = 90;
+    else if (days > 1000) days = 999;
+    else if (days < 2) days = 2;
+
+    let minDate = new Date();
+    minDate.setDate(minDate.getDate() - days);
+    let maxDate = new Date();
+
+    res.json(await getGeneralEvents(user.osuId, user.id, user.modes, minDate, maxDate));
 });
 
 /* GET latest evaluation or appevaluation */
