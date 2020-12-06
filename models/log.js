@@ -17,6 +17,7 @@ const logSchema = new mongoose.Schema({
             'test',
             'qualityAssurance',
             'veto',
+            'interOp',
         ],
     },
     relatedId: { type: 'ObjectId' },

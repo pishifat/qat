@@ -5,7 +5,12 @@
     "secret": "",
     "redirect": "http://localhost:8080/callback",
     "connection": "",
-    "interOpSecret": "",
+    "interOpAccess": {
+        "UNIQUE_USER": {
+            "mongoId": "",
+            "secret": ""
+        }
+    },
     "standardWebhook": {
         "id": "",
         "token": "",

@@ -1,6 +1,7 @@
 const express = require('express');
 const config = require('../config.json');
 const Aiess = require('../models/aiess');
+const Logger = require('../models/log');
 const User = require('../models/user');
 const QualityAssuranceCheck = require('../models/qualityAssuranceCheck');
 const Log = require('../models/log');
@@ -12,14 +13,21 @@ const router = express.Router();
 
 /* AUTHENTICATION */
 router.use((req, res, next) => {
-    const secret = req.header('Qat-Key');
+    const secret = req.header('secret');
+    const username = req.header('username');
 
-    if (!secret || config.interOpSecret !== secret)
+    if (!secret || !username || config.interOpAccess[username].secret !== secret) {
         return res.status(401).send('Invalid key');
+    }
+
+    Logger.generate(
+        config.interOpAccess[username].mongoId,
+        `accessed /interOp${req.url}`,
+        'interOp'
+    );
 
     return next();
 });
-
 
 /* GET users in BN/NAT */
 router.get('/users', async (_, res) => {
