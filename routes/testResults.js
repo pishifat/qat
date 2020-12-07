@@ -69,7 +69,7 @@ router.get('/findTest/:id', async (req, res) => {
 
 /* GET search for application from test _id */
 router.get('/findApplication/:id', async (req, res) => {
-    res.json(await AppEvaluation.findOne({ test: req.params.id }));
+    res.json(await AppEvaluation.findOne({ test: req.params.id }, { id: 1, createdAt: 1 }));
 });
 
 module.exports = router;
