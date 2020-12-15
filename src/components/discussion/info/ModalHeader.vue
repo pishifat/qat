@@ -2,7 +2,7 @@
     <div class="modal-header bg-primary">
         <h5 class="modal-title">
             <a
-                v-if="selectedDiscussionVote.discussionLink.length"
+                v-if="selectedDiscussionVote.discussionLink"
                 :href="selectedDiscussionVote.discussionLink"
                 target="_blank"
             >

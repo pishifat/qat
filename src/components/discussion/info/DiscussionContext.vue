@@ -3,7 +3,7 @@
         <p v-if="selectedDiscussionVote.isContentReview">
             <img class="img-responsive fit-image" :src="selectedDiscussionVote.discussionLink">
         </p>
-        <p v-else-if="selectedDiscussionVote.discussionLink.length" class="mb-2">
+        <p v-else-if="selectedDiscussionVote.discussionLink" class="mb-2">
             <a :href="selectedDiscussionVote.discussionLink" target="_blank">Read and contribute to the full discussion here</a>
         </p>
 

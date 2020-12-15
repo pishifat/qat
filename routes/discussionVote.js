@@ -16,7 +16,7 @@ const defaultPopulate = [
         path: 'mediations',
         populate: {
             path: 'mediator',
-            select: 'username osuId',
+            select: 'username osuId groups',
         },
     },
 ];
@@ -26,7 +26,7 @@ function getBnDefaultPopulate (mongoId) {
         path: 'mediations',
         populate: {
             path: 'mediator',
-            select: 'username osuId',
+            select: 'username osuId groups',
             match: {
                 _id: mongoId,
             },
