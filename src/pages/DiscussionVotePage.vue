@@ -7,12 +7,12 @@
                 store-module="discussionVote"
             >
                 <button
-                    v-if="loggedInUser.isNat"
+                    v-if="loggedInUser.hasBasicAccess"
                     class="btn btn-block btn-primary my-1"
                     data-toggle="modal"
                     data-target="#addDiscussion"
                 >
-                    Submit topic for vote
+                    {{ loggedInUser.isNat ? 'Submit topic for vote' : 'Submit content for review' }}
                 </button>
             </filter-box>
 
@@ -35,7 +35,7 @@
 
             <section class="card card-body">
                 <h2>
-                    Inactive Votes <small v-if="paginatedInactiveDiscussionVotes">({{ inactiveDiscussionVotes.length }})</small>
+                    Inactive votes <small v-if="paginatedInactiveDiscussionVotes">({{ inactiveDiscussionVotes.length }})</small>
                 </h2>
 
                 <div v-if="!paginatedInactiveDiscussionVotes.length" class="ml-4 text-white-50">

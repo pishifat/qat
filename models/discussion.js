@@ -9,6 +9,7 @@ const discussionSchema = new mongoose.Schema({
     isNatOnly: { type: Boolean, default: false },
     neutralAllowed: { type: Boolean, default: true },
     reasonAllowed: { type: Boolean, default: false },
+    isContentReview: { type: Boolean },
     mediations: [{ type: 'ObjectId', ref: 'Mediation' }],
     creator: { type: 'ObjectId', ref: 'User' },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });

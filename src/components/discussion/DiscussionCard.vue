@@ -10,7 +10,7 @@
             <div class="card-body">
                 <p class="wrap-text">
                     <a
-                        v-if="discussion.discussionLink.length"
+                        v-if="discussion.discussionLink"
                         :href="discussion.discussionLink"
                         target="_blank"
                         @click.stop

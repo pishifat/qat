@@ -3,7 +3,7 @@
         <!-- agree -->
         <votes-inactive-type
             :mediations="agreeMediations"
-            type="Agree"
+            type="Yes/Agree"
             :total-mediations="totalMediations"
         />
 
@@ -18,7 +18,7 @@
         <!-- disagree -->
         <votes-inactive-type
             :mediations="disagreeMediations"
-            type="Disagree"
+            type="No/Disagree"
             :total-mediations="totalMediations"
         />
     </div>

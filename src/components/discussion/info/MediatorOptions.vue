@@ -6,7 +6,7 @@
                 id="comment"
                 v-model="comment"
                 class="form-control"
-                placeholder="Why you agree/disagree with the proposed change(s)..."
+                placeholder="your thoughts on the question/proposal above..."
                 rows="3"
             />
 
@@ -20,7 +20,7 @@
                         name="vote"
                         value="1"
                     >
-                    <label class="form-check-label text-pass" for="1">Agree</label>
+                    <label class="form-check-label text-pass" for="1">Yes/Agree</label>
                 </div>
                 <div v-if="selectedDiscussionVote.neutralAllowed" class="form-check form-check-inline">
                     <input
@@ -42,7 +42,7 @@
                         name="vote"
                         value="3"
                     >
-                    <label class="form-check-label text-fail" for="3">Disagree</label>
+                    <label class="form-check-label text-fail" for="3">No/Disagree</label>
                 </div>
             </div>
 

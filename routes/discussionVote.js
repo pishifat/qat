@@ -57,26 +57,40 @@ router.get('/relevantInfo', async (req, res) => {
 });
 
 /* POST create a new discussion vote. */
-router.post('/submit', middlewares.isNat, async (req, res) => {
+router.post('/submit', async (req, res) => {
     let url = req.body.discussionLink;
 
     if (url.length == 0) {
         url = undefined;
-    }
 
-    if (req.body.discussionLink.length) {
+        if (req.body.isContentReview) {
+            return res.json({
+                error: 'No link provided',
+            });
+        }
+    } else if (!req.body.isContentReview) {
         util.isValidUrlOrThrow(url, 'osu.ppy.sh');
     }
 
+    let title = req.body.title;
+    let shortReason = req.body.shortReason;
+
+    if (req.body.isContentReview) {
+        const contentReviews = await Discussion.find({ isContentReview: true });
+        title = `Content review #${contentReviews.length + 1}`;
+        shortReason = `Is this content appropriate for a beatmap? ${url}`;
+    }
+
     let d = await Discussion.create({
-        discussionLink: req.body.discussionLink,
-        title: req.body.title,
-        shortReason: req.body.shortReason,
+        discussionLink: url,
+        title,
+        shortReason,
         mode: req.body.mode,
         creator: req.session.mongoId,
         isNatOnly: req.body.isNatOnly,
         neutralAllowed: req.body.neutralAllowed,
         reasonAllowed: req.body.reasonAllowed,
+        isContentReview: req.body.isContentReview,
     });
 
     res.json(d);
@@ -91,11 +105,11 @@ router.post('/submit', middlewares.isNat, async (req, res) => {
         [{
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.yellow,
-            description: `**New discussion up for vote:** [${req.body.title}](http://bn.mappersguild.com/discussionvote?id=${d.id})`,
+            description: `**New discussion up for vote:** [${title}](http://bn.mappersguild.com/discussionvote?id=${d.id})`,
             fields: [
                 {
-                    name: `Proposal`,
-                    value: req.body.shortReason,
+                    name: `Question/Proposal`,
+                    value: shortReason,
                 },
             ],
         }],
@@ -150,7 +164,7 @@ router.post('/submitMediation/:id', async (req, res) => {
 });
 
 /* POST conclude mediation */
-router.post('/concludeMediation/:id', middlewares.isNat, async (req, res) => {
+router.post('/concludeMediation/:id', middlewares.hasFullReadAccess, async (req, res) => {
     const d = await Discussion
         .findByIdAndUpdate(req.params.id, { isActive: false })
         .populate(defaultPopulate);

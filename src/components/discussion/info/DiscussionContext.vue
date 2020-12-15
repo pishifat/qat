@@ -1,6 +1,9 @@
 <template>
     <div>
-        <p v-if="selectedDiscussionVote.discussionLink.length" class="mb-2">
+        <p v-if="selectedDiscussionVote.isContentReview">
+            <img class="img-responsive fit-image" :src="selectedDiscussionVote.discussionLink">
+        </p>
+        <p v-else-if="selectedDiscussionVote.discussionLink.length" class="mb-2">
             <a :href="selectedDiscussionVote.discussionLink" target="_blank">Read and contribute to the full discussion here</a>
         </p>
 
@@ -41,7 +44,7 @@
                 <i class="fas fa-edit" />
             </a>
 
-            <b>Proposal:</b>
+            <b>Question/Proposal:</b>
 
             <textarea
                 v-if="isEditingProposal"
@@ -79,7 +82,7 @@ export default {
             'selectedDiscussionVote',
         ]),
         isEditable() {
-            return this.loggedInUser.isNat &&
+            return !this.selectedDiscussionVote.isContentReview &&
                 this.selectedDiscussionVote.creator == this.loggedInUser.id &&
                 this.selectedDiscussionVote.isActive;
         },
@@ -120,3 +123,12 @@ export default {
     },
 };
 </script>
+
+<style>
+
+.fit-image{
+    width: 100%;
+    object-fit: cover;
+}
+
+</style>

@@ -1,10 +1,10 @@
 <template>
     <div>
         <p>
-            <b>Total votes</b> ({{ selectedDiscussionVote.mediations.length }}):
+            <b>Total votes</b> ({{ selectedDiscussionVote.mediations.length }})
         </p>
 
-        <ul v-if="loggedInUser.isNat">
+        <ul v-if="loggedInUser.hasFullReadAccess">
             <li v-for="mediation in selectedDiscussionVote.mediations" :key="mediation.id" class="small">
                 <user-link
                     :username="mediation.mediator.username"

@@ -14,7 +14,7 @@
                 v-else-if="!selectedDiscussionVote.isActive"
             />
 
-            <button v-if="selectedDiscussionVote.isActive && loggedInUser.isNat" class="btn btn-sm btn-primary mt-3" @click="concludeMediation($event)">
+            <button v-if="selectedDiscussionVote.isActive && loggedInUser.hasFullReadAccess" class="btn btn-sm btn-primary mt-3" @click="concludeMediation($event)">
                 Conclude Vote
             </button>
 
