@@ -234,7 +234,7 @@
             </div>
             <!-- link to content -->
             <div class="row mb-3">
-                <small class="mb-1">{{ isContentReview ? 'Direct link to image/content' : 'Link to relevant discussion (optional)' }}</small>
+                <small class="mb-1">{{ isContentReview ? 'Direct link to image/content (only ONE link)' : 'Link to relevant discussion (optional)' }}</small>
                 <input
                     v-model="discussionLink"
                     type="text"
