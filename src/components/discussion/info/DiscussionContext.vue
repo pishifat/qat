@@ -1,9 +1,9 @@
 <template>
     <div>
-        <p v-if="selectedDiscussionVote.isContentReview">
+        <p v-if="selectedDiscussionVote.isContentReview && isImage">
             <img class="img-responsive fit-image" :src="selectedDiscussionVote.discussionLink">
         </p>
-        <p v-else-if="selectedDiscussionVote.discussionLink" class="mb-2">
+        <p v-else-if="!selectedDiscussionVote.isContentReview && selectedDiscussionVote.discussionLink" class="mb-2">
             <a :href="selectedDiscussionVote.discussionLink" target="_blank">Read and contribute to the full discussion here</a>
         </p>
 
@@ -85,6 +85,9 @@ export default {
             return !this.selectedDiscussionVote.isContentReview &&
                 this.selectedDiscussionVote.creator == this.loggedInUser.id &&
                 this.selectedDiscussionVote.isActive;
+        },
+        isImage() {
+            return (this.selectedDiscussionVote.discussionLink.match(/\.(jpeg|jpg|gif|png)$/) != null);
         },
     },
     watch: {
