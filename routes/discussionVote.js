@@ -78,7 +78,7 @@ router.post('/submit', async (req, res) => {
     if (req.body.isContentReview) {
         const contentReviews = await Discussion.find({ isContentReview: true });
         title = `Content review #${contentReviews.length + 251}`;
-        shortReason = `Is this content appropriate for a beatmap? ${url}`;
+        shortReason = `Is this content appropriate for a beatmap? ${url}\n\n*${req.body.shortReason}*`;
     }
 
     let d = await Discussion.create({
@@ -101,7 +101,7 @@ router.post('/submit', async (req, res) => {
         d._id
     );
 
-    discord.webhookPost(
+    await discord.webhookPost(
         [{
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.yellow,
@@ -113,8 +113,12 @@ router.post('/submit', async (req, res) => {
                 },
             ],
         }],
-        d.mode
+        req.body.isContentReview ? 'contentCase' : d.mode
     );
+
+    if (req.body.isContentReview) {
+        await discord.roleHighlightWebhookPost('contentCases');
+    }
 });
 
 /* POST submit mediation */

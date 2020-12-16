@@ -35,6 +35,9 @@ async function webhookPost(message, webhook) {
         case 'natUserReport':
             url += `${config.natReportWebhook.id}/${config.natReportWebhook.token}`;
             break;
+        case 'contentCase':
+            url += `${config.contentCasesWebhook.id}/${config.contentCasesWebhook.token}`;
+            break;
         default:
             return { error: 'no webhook specified' };
     }
@@ -113,6 +116,26 @@ async function userHighlightWebhookPost(webhook, discordIds) {
     }
 }
 
+async function roleHighlightWebhookPost(webhook, id) {
+    let url = 'https://discordapp.com/api/webhooks/';
+    let text = '';
+
+    switch (webhook) { // more roles later maybe
+        case 'contentCases':
+            url += `${config.contentCasesWebhook.id}/${config.contentCasesWebhook.token}`;
+            text = `<@&${config.contentCasesWebhook.gmtRole}>`;
+            break;
+    }
+
+    try {
+        await axios.post(url, {
+            content: text,
+        });
+    } catch (error) {
+        //
+    }
+}
+
 function defaultWebhookAuthor(session) {
     return {
         name: session.username,
@@ -157,6 +180,7 @@ module.exports = {
     webhookPost,
     highlightWebhookPost,
     userHighlightWebhookPost,
+    roleHighlightWebhookPost,
     defaultWebhookAuthor,
     webhookColors,
 };

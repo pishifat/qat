@@ -14,7 +14,7 @@
                 v-else-if="!selectedDiscussionVote.isActive"
             />
 
-            <button v-if="selectedDiscussionVote.isActive && loggedInUser.hasFullReadAccess" class="btn btn-sm btn-primary mt-3" @click="concludeMediation($event)">
+            <button v-if="selectedDiscussionVote.isActive && loggedInUser.hasFullReadAccess" class="btn btn-sm btn-danger btn-block mt-3" @click="concludeMediation($event)">
                 Conclude Vote
             </button>
 
@@ -64,7 +64,7 @@ export default {
     },
     methods: {
         async concludeMediation (e) {
-            const result = confirm(`Are you sure?`);
+            const result = confirm(`Are you sure? This will end voting for everyone.`);
 
             if (result) {
                 const discussionVote = await this.executePost(

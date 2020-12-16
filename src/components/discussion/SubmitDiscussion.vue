@@ -242,26 +242,25 @@
                     placeholder="link..."
                 >
             </div>
-            <div v-if="!isContentReview">
-                <div class="row mb-3">
-                    <small class="mb-1">Title for discussion vote</small>
-                    <input
-                        v-model="title"
-                        type="text"
-                        class="form-control"
-                        placeholder="title..."
-                    >
-                </div>
-                <div class="row mb-2">
-                    <small class="mb-1">Summarize the discussion's proposed change(s)</small>
-                    <textarea
-                        v-model="shortReason"
-                        class="form-control"
-                        placeholder="change(s)..."
-                        rows="3"
-                    />
-                </div>
+            <div class="row mb-2">
+                <small class="mb-1">{{ isContentReview ? 'Additional information or links (optional)' : `Summarize the discussion's proposed change(s)` }}</small>
+                <textarea
+                    v-model="shortReason"
+                    class="form-control"
+                    :placeholder="isContentReview ? 'info...' : 'summary...'"
+                    rows="3"
+                />
             </div>
+            <div v-if="!isContentReview" class="row mb-3">
+                <small class="mb-1">Title for discussion vote</small>
+                <input
+                    v-model="title"
+                    type="text"
+                    class="form-control"
+                    placeholder="title..."
+                >
+            </div>
+
 
             <hr>
             <button type="submit" class="btn btn-primary float-right" @click="submitDiscussion($event)">

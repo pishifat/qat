@@ -6,7 +6,7 @@
                 id="comment"
                 v-model="comment"
                 class="form-control"
-                placeholder="your thoughts on the question/proposal above... (if none, write something like 'none')"
+                placeholder="your thoughts on the question/proposal above... (optional)"
                 rows="3"
             />
 
