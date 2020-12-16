@@ -77,7 +77,7 @@ router.post('/submit', async (req, res) => {
 
     if (req.body.isContentReview) {
         const contentReviews = await Discussion.find({ isContentReview: true });
-        title = `Content review #${contentReviews.length + 1}`;
+        title = `Content review #${contentReviews.length + 251}`;
         shortReason = `Is this content appropriate for a beatmap? ${url}`;
     }
 
