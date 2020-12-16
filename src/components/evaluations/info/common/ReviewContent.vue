@@ -9,7 +9,7 @@
             />
 
             <div v-else class="small text-center my-2" :class="voteColor(review.vote)">
-                User {{ index }}
+                User {{ index }} ({{ review.evaluator && review.evaluator.groups.includes('nat') ? 'NAT' : 'BN' }})
 
                 <div v-if="review.evaluator && review.evaluator.id == loggedInUser.id">
                     (this is you!)

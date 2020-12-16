@@ -29,22 +29,17 @@ const defaultPopulate = [
     },
 ];
 
-function getBnDefaultPopulate (mongoId) {
-    return [
-        { path: 'user', select: 'username osuId' },
-        {
-            path: 'reviews',
-            select: 'behaviorComment moddingComment vote',
-            populate: {
-                path: 'evaluator',
-                select: 'username osuId groups',
-                match: {
-                    _id: mongoId,
-                },
-            },
+const bnDefualtPopulate = [
+    { path: 'user', select: 'username osuId' },
+    {
+        path: 'reviews',
+        select: 'behaviorComment moddingComment vote',
+        populate: {
+            path: 'evaluator',
+            select: 'groups',
         },
-    ];
-}
+    },
+];
 
 /* GET applications listing. */
 router.get('/relevantInfo', async (req, res) => {
@@ -59,23 +54,23 @@ router.get('/relevantInfo', async (req, res) => {
             .populate(defaultPopulate)
             .sort({
                 createdAt: 1,
-                consensus: 1,
-                feedback: 1,
             });
     } else {
         applications = await AppEvaluation
             .find({
-                test: { $exists: true },
                 bnEvaluators: req.session.mongoId,
+                test: { $exists: true },
+                $or: [
+                    { active: true, discussion: false },
+                    { active: false, discussion: true },
+                ],
             })
             .select(['active', 'user', 'discussion', 'reviews', 'mode', 'mods', 'reasons', 'consensus', 'createdAt', 'updatedAt'])
             .populate(
-                getBnDefaultPopulate(req.session.mongoId)
+                bnDefualtPopulate
             )
             .sort({
-                createdAt: 1,
-                consensus: 1,
-                feedback: 1,
+                createdAt: -1,
             });
     }
 
@@ -115,7 +110,7 @@ router.post('/submitEval/:id', middlewares.isBnOrNat, async (req, res) => {
     evaluation = await AppEvaluation
         .findById(req.params.id)
         .populate(
-            res.locals.userRequest.isNat ? defaultPopulate : getBnDefaultPopulate(req.session.mongoId)
+            res.locals.userRequest.isNat ? defaultPopulate : bnDefualtPopulate
         );
 
     res.json(evaluation);
