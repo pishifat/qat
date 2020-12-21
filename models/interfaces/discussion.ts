@@ -14,6 +14,8 @@ interface IDiscussionDocument extends Document {
     isContentReview: boolean;
     mediations?: IMediationDocument[];
     creator: IUserDocument;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export default interface IDiscussionModel extends Model<IDiscussionDocument> { }

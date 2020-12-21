@@ -168,6 +168,7 @@ app.listen(port, () => {
     notifications.notifyBeatmapReports.start();
     notifications.lowActivityTask.start();
     notifications.notifyQualityAssurance.start();
+    notifications.closeContentReviews.start();
 });
 
 module.exports = app;

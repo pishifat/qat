@@ -12,6 +12,8 @@ const User = require('../models/user');
 const QualityAssuranceCheck = require('../models/qualityAssuranceCheck');
 const BeatmapReport = require('../models/beatmapReport');
 const Aiess = require('../models/aiess');
+const Discussion = require('../models/discussion');
+const Logger = require('../models/log');
 
 const defaultPopulate = [
     { path: 'user', select: 'username osuId modesInfo' },
@@ -267,6 +269,51 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
                 round.mode
             );
             await util.sleep(500);
+        }
+    }
+}, {
+    scheduled: false,
+});
+
+const closeContentReviews = cron.schedule('0 9 * * *', async () => {
+    const oneDayAgo = new Date();
+    const threeDaysAgo = new Date();
+    const sevenDaysAgo = new Date();
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 1);
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    const activeContentReviews = await Discussion
+        .find({ isContentReview: true, isActive: true })
+        .populate({ path: 'mediations' });
+
+    for (const discussion of activeContentReviews) {
+        const sevenDaysOld = discussion.createdAt < sevenDaysAgo;
+        const threeDaysOld = discussion.createdAt < threeDaysAgo;
+        const inactive = discussion.updatedAt < oneDayAgo;
+
+        console.log(sevenDaysOld || (threeDaysOld && inactive));
+
+        if (sevenDaysOld || (threeDaysOld && inactive)) {
+            await Discussion.findByIdAndUpdate(discussion.id, { isActive: false });
+
+            Logger.generate(
+                null,
+                'Concluded vote for a discussion',
+                'discussionVote',
+                discussion._id
+            );
+
+            const agree = discussion.mediations.filter(m => m.vote == 1);
+            const disagree = discussion.mediations.filter(m => m.vote == 3);
+
+            await discord.webhookPost(
+                [{
+                    color: discord.webhookColors.darkYellow,
+                    description: `Concluded vote for [discussion on **${discussion.title}**](http://bn.mappersguild.com/discussionvote?id=${discussion.id})\n\nIs this content appropriate for a beatmap? ${discussion.discussionLink}\n**Yes:** ${agree.length}\n**No:** ${disagree.length}`,
+                }],
+                'contentCase'
+            );
         }
     }
 }, {
@@ -642,4 +689,4 @@ async function hasLowActivity (initialDate, bn, mode) {
     return false;
 }
 
-module.exports = { notifyDeadlines, notifyBeatmapReports, lowActivityTask, notifyQualityAssurance };
+module.exports = { notifyDeadlines, notifyBeatmapReports, lowActivityTask, notifyQualityAssurance, closeContentReviews };
