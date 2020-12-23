@@ -322,7 +322,7 @@ const closeContentReviews = cron.schedule('0 9 * * *', async () => {
 
 const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
     // find pending discussion posts
-    let url = 'https://osu.ppy.sh/beatmapsets/beatmap-discussions?user=&beatmapset_status=qualified&limit=50&message_types%5B%5D=suggestion&message_types%5B%5D=problem&only_unresolved=on';
+    let url = 'https://osu.ppy.sh/beatmapsets/discussions?user=&beatmapset_status=qualified&limit=50&message_types%5B%5D=suggestion&message_types%5B%5D=problem&only_unresolved=on';
     const historyHtml = await axios.get(url);
     const $ = cheerio.load(historyHtml.data);
     let discussions = JSON.parse($('#json-discussions').html());
