@@ -67,16 +67,21 @@ export default {
             const result = confirm(`Are you sure? This will end voting for everyone.`);
 
             if (result) {
-                const discussionVote = await this.executePost(
-                    '/discussionVote/concludeMediation/' + this.selectedDiscussionVote.id, e);
+                const result2 = confirm(`ARE YOU REALLY SURE? THIS IS NOT THE VOTE BUTTON. DON'T BE STUPID.`);
 
-                if (discussionVote && !discussionVote.error) {
-                    this.$store.commit('discussionVote/updateDiscussionVote', discussionVote);
-                    this.$store.dispatch('updateToastMessages', {
-                        message: `Concluded vote`,
-                        type: 'success',
-                    });
+                if (result2) {
+                    const discussionVote = await this.executePost(
+                        '/discussionVote/concludeMediation/' + this.selectedDiscussionVote.id, e);
+
+                    if (discussionVote && !discussionVote.error) {
+                        this.$store.commit('discussionVote/updateDiscussionVote', discussionVote);
+                        this.$store.dispatch('updateToastMessages', {
+                            message: `Concluded vote`,
+                            type: 'success',
+                        });
+                    }
                 }
+
             }
         },
     },

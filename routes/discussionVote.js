@@ -117,7 +117,7 @@ router.post('/submit', async (req, res) => {
     );
 
     if (req.body.isContentReview) {
-        await discord.roleHighlightWebhookPost('contentCases');
+        await discord.roleHighlightWebhookPost('contentCase');
     }
 });
 
@@ -182,14 +182,19 @@ router.post('/concludeMediation/:id', middlewares.hasFullReadAccess, async (req,
         d._id
     );
 
-    discord.webhookPost(
-        [{
-            author: discord.defaultWebhookAuthor(req.session),
-            color: discord.webhookColors.darkYellow,
-            description: `Concluded vote for [discussion on **${d.title}**](http://bn.mappersguild.com/discussionvote?id=${d.id})`,
-        }],
-        d.mode
-    );
+    if (d.isContentReview) {
+        discord.contentCaseWebhookPost(d);
+    } else {
+        discord.webhookPost(
+            [{
+                author: discord.defaultWebhookAuthor(req.session),
+                color: discord.webhookColors.darkYellow,
+                description: `Concluded vote for [discussion on **${d.title}**](http://bn.mappersguild.com/discussionvote?id=${d.id})`,
+            }],
+            d.mode
+        );
+    }
+
 });
 
 /* POST update discussion */

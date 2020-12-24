@@ -304,16 +304,7 @@ const closeContentReviews = cron.schedule('0 9 * * *', async () => {
                 discussion._id
             );
 
-            const agree = discussion.mediations.filter(m => m.vote == 1);
-            const disagree = discussion.mediations.filter(m => m.vote == 3);
-
-            await discord.webhookPost(
-                [{
-                    color: discord.webhookColors.darkYellow,
-                    description: `Concluded vote for [discussion on **${discussion.title}**](http://bn.mappersguild.com/discussionvote?id=${discussion.id})\n\nIs this content appropriate for a beatmap? ${discussion.discussionLink}\n**Yes:** ${agree.length}\n**No:** ${disagree.length}`,
-                }],
-                'contentCase'
-            );
+            await discord.contentCaseWebhookPost(discussion); // test this
         }
     }
 }, {

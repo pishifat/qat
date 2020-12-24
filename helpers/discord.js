@@ -116,12 +116,12 @@ async function userHighlightWebhookPost(webhook, discordIds) {
     }
 }
 
-async function roleHighlightWebhookPost(webhook, id) {
+async function roleHighlightWebhookPost(webhook) {
     let url = 'https://discordapp.com/api/webhooks/';
     let text = '';
 
     switch (webhook) { // more roles later maybe
-        case 'contentCases':
+        case 'contentCase':
             url += `${config.contentCasesWebhook.id}/${config.contentCasesWebhook.token}`;
             text = `<@&${config.contentCasesWebhook.gmtRole}>`;
             break;
@@ -176,11 +176,49 @@ const webhookColors = {
     black: 2564903,       // archive
 };
 
+async function contentCaseWebhookPost(d) {
+    const agree = d.mediations.filter(m => m.vote == 1);
+    const disagree = d.mediations.filter(m => m.vote == 3);
+
+    const gmtNatAgree = agree.filter(m => (m.mediator.groups.includes('nat') || m.mediator.groups.includes('gmt')));
+    const gmtNatDisagree = disagree.filter(m => (m.mediator.groups.includes('nat') || m.mediator.groups.includes('gmt')));
+
+    const bnAgree = agree.filter(m => m.mediator.groups.includes('bn'));
+    const bnDisagree = disagree.filter(m => m.mediator.groups.includes('bn'));
+
+    const totalGmtNatVotes = gmtNatAgree.length + gmtNatDisagree.length;
+    const gmtNatAgreePercentage = Math.round((gmtNatAgree.length / totalGmtNatVotes) * 1000) / 10;
+    const gmtNatDisagreePercentage = Math.round((gmtNatDisagree.length / totalGmtNatVotes) * 1000) / 10;
+
+    const totalBnVotes = bnAgree.length + bnDisagree.length;
+    const bnAgreePercentage = Math.round((bnAgree.length / totalBnVotes) * 1000) / 10;
+    const bnDisagreePercentage = Math.round((bnDisagree.length / totalBnVotes) * 1000) / 10;
+
+    const totalVotes = totalGmtNatVotes + totalBnVotes;
+    const totalAgreePercentage = Math.round((agree.length / totalVotes) * 1000) / 10;
+    const totalDisagreePercentage = Math.round((disagree.length / totalVotes) * 1000) / 10;
+
+
+    await webhookPost(
+        [{
+            color: webhookColors.darkYellow,
+            description:
+                `Concluded vote for [**${d.title}**](http://bn.mappersguild.com/discussionvote?id=${d.id})\n
+                Is this content appropriate for a beatmap? ${d.discussionLink}\n
+                **GMT/NAT:**    ${gmtNatAgreePercentage}% yes | ${gmtNatDisagreePercentage}% no
+                **BN:** ${bnAgreePercentage}% yes | ${bnDisagreePercentage}% no
+                **Total:** ${totalAgreePercentage}% yes | ${totalDisagreePercentage}% no`,
+        }],
+        'contentCase'
+    );
+}
+
 module.exports = {
     webhookPost,
     highlightWebhookPost,
     userHighlightWebhookPost,
     roleHighlightWebhookPost,
     defaultWebhookAuthor,
+    contentCaseWebhookPost,
     webhookColors,
 };
