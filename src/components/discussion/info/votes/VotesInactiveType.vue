@@ -5,12 +5,17 @@
             <b>{{ Math.round((mediations.length/totalMediations)*100) || 0 }}%</b>
         </p>
 
-        <ul v-if="loggedInUser.hasFullReadAccess">
+        <ul>
             <li v-for="mediation in mediations" :key="mediation.id" class="small ml-2">
-                <user-link
-                    :username="mediation.mediator.username"
-                    :osu-id="mediation.mediator.osuId"
-                />
+                <span v-if="loggedInUser.hasFullReadAccess">
+                    <user-link
+                        :username="mediation.mediator.username"
+                        :osu-id="mediation.mediator.osuId"
+                    />
+                </span>
+                <span v-else>
+                    <span>{{ mediation.mediator.groups.includes('gmt') ? 'Anon GMT' : mediation.mediator.groups.includes('nat') ? 'Anon NAT' : mediation.mediator.groups.includes('bn') ? 'Anon BN' : 'Anon user (ex-GMT/NAT/BN)' }}</span>
+                </span>
 
                 <span
                     v-if="mediation.comment && mediation.comment.length"

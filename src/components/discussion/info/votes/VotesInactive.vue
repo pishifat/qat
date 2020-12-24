@@ -2,7 +2,7 @@
     <div>
         <hr>
         <button class="btn btn-sm btn-block btn-primary ml-2 mb-2" type="submit" @click="showAll = !showAll">
-            {{ showAll ? 'Show all votes' : 'Hide BN votes' }}
+            {{ showAll ? 'Hide BN votes' : 'Show all votes' }}
         </button>
         <!-- agree -->
         <votes-inactive-type
@@ -52,21 +52,21 @@ export default {
         agreeMediations() {
             let m = this.selectedDiscussionVote.mediations.filter(mediation => mediation.vote == 1);
 
-            if (this.showAll) m = this.filterAll(m);
+            if (!this.showAll) m = this.filterAll(m);
 
             return m;
         },
         neutralMediations() {
             let m = this.selectedDiscussionVote.mediations.filter(mediation => mediation.vote == 2);
 
-            if (this.showAll) m = this.filterAll(m);
+            if (!this.showAll) m = this.filterAll(m);
 
             return m;
         },
         disagreeMediations() {
             let m = this.selectedDiscussionVote.mediations.filter(mediation => mediation.vote == 3);
 
-            if (this.showAll) m = this.filterAll(m);
+            if (!this.showAll) m = this.filterAll(m);
 
             return m;
         },

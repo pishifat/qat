@@ -25,7 +25,7 @@ const routes = [
     { path: '/', component: Home, alias: '/home' },
     { path: '/bnapps', component: ApplicationSubmission, meta: { title: 'Beatmap Nominator Application' } },
     { path: '/testsubmission', component: TestSubmission, meta: { title: 'Test Submission' } },
-    { path: '/reports', component: ReportSubmission, meta: { title: 'Reports Submission' } },
+    { path: '/reports', component: ReportSubmission, meta: { title: 'Report Submission' } },
     { path: '/users', component: Users, meta: { title: 'BN/NAT Listing' } },
     { path: '/vetoes', component: Vetoes, meta: { title: 'Vetoes' } },
     { path: '/qualityassurance', component: QualityAssurance, meta: { title: 'Quality Assurance' } },

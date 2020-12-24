@@ -21,18 +21,15 @@ const defaultPopulate = [
     },
 ];
 
-function getBnDefaultPopulate (mongoId) {
-    return {
+const bnDefaultPopulate = [
+    {
         path: 'mediations',
         populate: {
             path: 'mediator',
-            select: 'username osuId groups',
-            match: {
-                _id: mongoId,
-            },
+            select: 'groups -_id',
         },
-    };
-}
+    },
+];
 
 /* GET discussions. */
 router.get('/relevantInfo', async (req, res) => {
@@ -47,7 +44,7 @@ router.get('/relevantInfo', async (req, res) => {
     } else {
         discussions = await Discussion
             .find({ isNatOnly: { $ne: true } })
-            .populate(getBnDefaultPopulate(req.session.mongoId))
+            .populate(bnDefaultPopulate)
             .sort({ createdAt: -1 });
     }
 
@@ -154,7 +151,7 @@ router.post('/submitMediation/:id', async (req, res) => {
     let d = await Discussion
         .findById(req.params.id)
         .populate(
-            res.locals.userRequest.isNat ? defaultPopulate : getBnDefaultPopulate(req.session.mongoId)
+            res.locals.userRequest.isNat ? defaultPopulate : bnDefaultPopulate
         );
 
     res.json(d);
