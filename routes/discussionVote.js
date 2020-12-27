@@ -19,6 +19,7 @@ const defaultPopulate = [
             select: 'username osuId groups',
         },
     },
+    { path: 'creator' },
 ];
 
 const inactiveBnDefaultPopulate = [
@@ -205,7 +206,8 @@ router.post('/concludeMediation/:id', middlewares.hasFullReadAccess, async (req,
     );
 
     if (d.isContentReview) {
-        discord.contentCaseWebhookPost(d);
+        await discord.contentCaseWebhookPost(d);
+        if (!d.creator.isBnOrNat) await discord.roleHighlightWebhookPost('contentCase', `relay consensus to **${d.creator.username}** (https://osu.ppy.sh/users/${d.creator.osuId})`);
     } else {
         discord.webhookPost(
             [{

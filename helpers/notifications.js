@@ -283,16 +283,25 @@ const closeContentReviews = cron.schedule('0 9 * * *', async () => {
     threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
+    const discussionPopulate = [
+        {
+            path: 'mediations',
+            populate: {
+                path: 'mediator',
+                select: 'username osuId groups',
+            },
+        },
+        { path: 'creator' },
+    ];
+
     const activeContentReviews = await Discussion
         .find({ isContentReview: true, isActive: true })
-        .populate({ path: 'mediations' });
+        .populate(discussionPopulate);
 
     for (const discussion of activeContentReviews) {
         const sevenDaysOld = discussion.createdAt < sevenDaysAgo;
         const threeDaysOld = discussion.createdAt < threeDaysAgo;
         const inactive = discussion.updatedAt < oneDayAgo;
-
-        console.log(sevenDaysOld || (threeDaysOld && inactive));
 
         if (sevenDaysOld || (threeDaysOld && inactive)) {
             await Discussion.findByIdAndUpdate(discussion.id, { isActive: false });
@@ -304,7 +313,8 @@ const closeContentReviews = cron.schedule('0 9 * * *', async () => {
                 discussion._id
             );
 
-            await discord.contentCaseWebhookPost(discussion); // test this
+            await discord.contentCaseWebhookPost(discussion);
+            if (!discussion.creator.isBnOrNat) await discord.roleHighlightWebhookPost('contentCase', `relay consensus to **${discussion.creator.username}** (https://osu.ppy.sh/users/${discussion.creator.osuId})`);
         }
     }
 }, {

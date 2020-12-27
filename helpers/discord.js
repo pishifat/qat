@@ -116,20 +116,22 @@ async function userHighlightWebhookPost(webhook, discordIds) {
     }
 }
 
-async function roleHighlightWebhookPost(webhook) {
+async function roleHighlightWebhookPost(webhook, text) {
     let url = 'https://discordapp.com/api/webhooks/';
-    let text = '';
+    let content = '';
 
     switch (webhook) { // more roles later maybe
         case 'contentCase':
             url += `${config.contentCasesWebhook.id}/${config.contentCasesWebhook.token}`;
-            text = `<@&${config.contentCasesWebhook.gmtRole}>`;
+            content = `<@&${config.contentCasesWebhook.gmtRole}>`;
             break;
     }
 
+    if (text) content+= ` ${text}`;
+
     try {
         await axios.post(url, {
-            content: text,
+            content,
         });
     } catch (error) {
         //
