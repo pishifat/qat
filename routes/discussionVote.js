@@ -21,7 +21,7 @@ const defaultPopulate = [
     },
 ];
 
-const bnDefaultPopulate = [
+const inactiveBnDefaultPopulate = [
     {
         path: 'mediations',
         populate: {
@@ -30,6 +30,19 @@ const bnDefaultPopulate = [
         },
     },
 ];
+
+function getActiveBnDefaultPopulate (mongoId) {
+    return {
+        path: 'mediations',
+        populate: {
+            path: 'mediator',
+            select: 'username osuId groups',
+            match: {
+                _id: mongoId,
+            },
+        },
+    };
+}
 
 /* GET discussions. */
 router.get('/relevantInfo', async (req, res) => {
@@ -42,10 +55,18 @@ router.get('/relevantInfo', async (req, res) => {
             .sort({ createdAt: -1 });
 
     } else {
-        discussions = await Discussion
-            .find({ isNatOnly: { $ne: true } })
-            .populate(bnDefaultPopulate)
-            .sort({ createdAt: -1 });
+        const [activeDiscussions, inactiveDiscussions] = await Promise.all([
+            Discussion
+                .find({ isNatOnly: { $ne: true }, isActive: true })
+                .populate(getActiveBnDefaultPopulate(req.session.mongoId))
+                .sort({ createdAt: -1 }),
+            Discussion
+                .find({ isNatOnly: { $ne: true }, isActive: false })
+                .populate(inactiveBnDefaultPopulate)
+                .sort({ createdAt: -1 }),
+        ]);
+
+        discussions = activeDiscussions.concat(inactiveDiscussions);
     }
 
     res.json({
@@ -151,7 +172,7 @@ router.post('/submitMediation/:id', async (req, res) => {
     let d = await Discussion
         .findById(req.params.id)
         .populate(
-            res.locals.userRequest.isNat ? defaultPopulate : bnDefaultPopulate
+            res.locals.userRequest.isNat ? defaultPopulate : getActiveBnDefaultPopulate(req.session.mongoId)
         );
 
     res.json(d);
