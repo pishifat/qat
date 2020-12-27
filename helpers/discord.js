@@ -203,11 +203,7 @@ async function contentCaseWebhookPost(d) {
         [{
             color: webhookColors.darkYellow,
             description:
-                `Concluded vote for [**${d.title}**](http://bn.mappersguild.com/discussionvote?id=${d.id})\n
-                Is this content appropriate for a beatmap? ${d.discussionLink}\n
-                **GMT/NAT:**    ${gmtNatAgreePercentage}% yes | ${gmtNatDisagreePercentage}% no
-                **BN:** ${bnAgreePercentage}% yes | ${bnDisagreePercentage}% no
-                **Total:** ${totalAgreePercentage}% yes | ${totalDisagreePercentage}% no`,
+                `Concluded vote for [**${d.title}**](http://bn.mappersguild.com/discussionvote?id=${d.id})\n\nIs this content appropriate for a beatmap? ${d.discussionLink}\n\n**GMT/NAT:**    ${gmtNatAgreePercentage}% yes | ${gmtNatDisagreePercentage}% no\n**BN:** ${bnAgreePercentage}% yes | ${bnDisagreePercentage}% no\n**Total:** ${totalAgreePercentage}% yes | ${totalDisagreePercentage}% no`,
         }],
         'contentCase'
     );

@@ -26,7 +26,7 @@ const inactiveBnDefaultPopulate = [
         path: 'mediations',
         populate: {
             path: 'mediator',
-            select: 'groups -_id',
+            select: 'groups',
         },
     },
 ];
@@ -96,7 +96,11 @@ router.post('/submit', async (req, res) => {
     if (req.body.isContentReview) {
         const contentReviews = await Discussion.find({ isContentReview: true });
         title = `Content review #${contentReviews.length + 251}`;
-        shortReason = `Is this content appropriate for a beatmap? ${url}\n\n*${req.body.shortReason}*`;
+        shortReason = `Is this content appropriate for a beatmap? ${url}`;
+
+        if (req.body.shortReason.length) {
+            shortReason += `\n\n*${req.body.shortReason}*`;
+        }
     }
 
     let d = await Discussion.create({
