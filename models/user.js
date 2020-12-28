@@ -229,7 +229,7 @@ class UserService extends mongoose.Model {
      * @returns {Promise<[]>}
      */
     static async getAssignedNat (mode, excludeOsuIds, sampleSize) {
-        const twoEvaluationModes = ['catch'];
+        const twoEvaluationModes = ['']; // ['osu', 'taiko', 'catch', 'mania']
         sampleSize = sampleSize || (twoEvaluationModes.includes(mode) ? 2 : 3); // Settings.getModeEvaluationsSize(mode)
 
         const query = User.aggregate([
