@@ -251,7 +251,7 @@ router.post('/:id/switchUserGroup', middlewares.isNat, async (req, res) => {
     res.json(user);
     Logger.generate(
         req.session.mongoId,
-        `Moved "${user.username}" from "${user.isNat ? 'BN' : 'NAT'}" to "${user.isNat ? 'NAT' : 'BN'}"`,
+        `Moved "${user.username}" from "${user.isNat ? 'NAT' : 'BN'}" to "${user.isNat ? 'BN' : 'NAT'}"`,
         'user',
         user._id
     );
