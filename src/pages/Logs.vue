@@ -2,7 +2,7 @@
     <div class="card card-body">
         <template v-if="loggedInUser.osuId == 1052994 || loggedInUser.osuId == 3178418">
             <a class="btn btn-primary mb-2" data-toggle="collapse" href="#collapseErrors">
-                Toggle error logs
+                Toggle error and interOp logs
             </a>
 
             <data-table

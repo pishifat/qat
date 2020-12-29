@@ -14,7 +14,7 @@ router.get('/search', async (req, res) => {
 
     if (req.session.osuId == 1052994 || req.session.osuId == 3178418) {
         errors = await Logger
-            .find({ isError: true })
+            .find({ $or: [{ isError: true }, { category: 'interOp' }] })
             .populate(defaultPopulate)
             .sort({ createdAt: -1 })
             .limit(100)
@@ -24,7 +24,7 @@ router.get('/search', async (req, res) => {
     res.json({
         errors,
         logs: await Logger
-            .find({ isError: false })
+            .find({ isError: false, category: { $ne: 'interOp' } })
             .select('user action category relatedId createdAt')
             .populate(defaultPopulate)
             .sort({ createdAt: -1 })
