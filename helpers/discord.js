@@ -196,7 +196,7 @@ async function contentCaseWebhookPost(d) {
     const bnAgreePercentage = Math.round((bnAgree.length / totalBnVotes) * 1000) / 10;
     const bnDisagreePercentage = Math.round((bnDisagree.length / totalBnVotes) * 1000) / 10;
 
-    const totalVotes = totalGmtNatVotes + totalBnVotes;
+    const totalVotes = agree.length + disagree.length;
     const totalAgreePercentage = Math.round((agree.length / totalVotes) * 1000) / 10;
     const totalDisagreePercentage = Math.round((disagree.length / totalVotes) * 1000) / 10;
 
@@ -205,7 +205,7 @@ async function contentCaseWebhookPost(d) {
         [{
             color: webhookColors.darkYellow,
             description:
-                `Concluded vote for [**${d.title}**](http://bn.mappersguild.com/discussionvote?id=${d.id})\n\nIs this content appropriate for a beatmap? ${d.discussionLink}\n\n**GMT/NAT:**    ${gmtNatAgreePercentage}% yes | ${gmtNatDisagreePercentage}% no\n**BN:** ${bnAgreePercentage}% yes | ${bnDisagreePercentage}% no\n**Total:** ${totalAgreePercentage}% yes | ${totalDisagreePercentage}% no`,
+                `Concluded vote for [**${d.title}**](http://bn.mappersguild.com/discussionvote?id=${d.id})\n\nIs this content appropriate for a beatmap? ${d.discussionLink}\n\n**GMT/NAT:** ${gmtNatAgreePercentage}% yes | ${gmtNatDisagreePercentage}% no\n**BN:** ${bnAgreePercentage}% yes | ${bnDisagreePercentage}% no\n**Total:** ${totalAgreePercentage}% yes | ${totalDisagreePercentage}% no`,
         }],
         'contentCase'
     );
