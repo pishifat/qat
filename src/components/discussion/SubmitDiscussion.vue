@@ -233,8 +233,11 @@
                 </div>
             </div>
             <!-- link to content -->
+            <div v-if="isContentReview" class="row mb-3">
+                Content in ranked maps will not be changed unless it is severely inappropriate. Please focus reports on inappropriate content from qualified/pending/WIP/graveyard maps.
+            </div>
             <div class="row mb-3">
-                <small class="mb-1">{{ isContentReview ? 'Direct link to image/content (only ONE link)' : 'Link to relevant discussion (optional)' }}</small>
+                <small class="mb-1">{{ isContentReview ? 'Direct link to content (if image, URL should end in .jpg or .png)' : 'Link to relevant discussion (optional)' }}</small>
                 <input
                     v-model="discussionLink"
                     type="text"

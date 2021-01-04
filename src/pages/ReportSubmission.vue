@@ -44,6 +44,14 @@
             </div>
 
             <div v-if="category && category.length">
+                <div v-if="category == 'contentCaseVisual' || category == 'contentCaseSong'" class="row mb-2">
+                    <div class="col-sm-12">
+                        <b>Note:</b> Content in ranked maps will not be changed unless it is severely inappropriate. Please focus reports on inappropriate content from qualified/pending/WIP/graveyard maps.
+                    </div>
+                </div>
+
+                <hr>
+
                 <div class="row mb-2">
                     <div class="col-sm-12">
                         <h4>{{ primaryLinkHeader }}</h4>
