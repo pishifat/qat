@@ -207,7 +207,7 @@ router.post('/concludeMediation/:id', middlewares.hasFullReadAccess, async (req,
 
     if (d.isContentReview) {
         await discord.contentCaseWebhookPost(d);
-        if (!d.creator.isBnOrNat) await discord.roleHighlightWebhookPost('contentCase', `relay consensus to **${d.creator.username}** (https://osu.ppy.sh/users/${d.creator.osuId})`);
+        if (!(d.creator.isBnOrNat || d.creator.groups.includes('gmt'))) await discord.roleHighlightWebhookPost('contentCase', `relay consensus to **${d.creator.username}** (https://osu.ppy.sh/users/${d.creator.osuId})`);
     } else {
         discord.webhookPost(
             [{
