@@ -34,7 +34,7 @@
                             Time as NAT
                         </a>
                     </div>
-                    <button v-if="!showOldUsers && loggedInUser.hasBasicAccess" class="btn btn-primary btn-sm ml-2 float-right" @click="loadPreviousBnAndNat($event)">
+                    <button v-if="!showOldUsers" class="btn btn-primary btn-sm ml-2 float-right" @click="loadPreviousBnAndNat($event)">
                         Show previous BN/NAT
                     </button>
                 </div>
