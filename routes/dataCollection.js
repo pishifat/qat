@@ -9,7 +9,7 @@ router.use(middlewares.isLoggedIn);
 router.use(middlewares.hasFullReadAccess);
 
 /* GET dq/pop listing */
-router.get('/relevantInfo', async (req, res) => {
+router.get('/loadRecentEvents', async (req, res) => {
     let date = new Date();
     date.setDate(date.getDate() - 90);
     let data = await Aiess
@@ -17,6 +17,35 @@ router.get('/relevantInfo', async (req, res) => {
             $or: [
                 { type: 'disqualify' },
                 { type: 'nomination_reset' },
+            ],
+            timestamp: { $gte: date },
+        })
+        .sort({ timestamp: -1 });
+
+    res.json({
+        events: data,
+    });
+});
+
+/* GET unset dq/pop listing */
+router.get('/loadUnsetEvents', async (req, res) => {
+    let date = new Date();
+    date.setDate(date.getDate() - 365);
+    let data = await Aiess
+        .find({
+            $and: [
+                {
+                    $or: [
+                        { obviousness: null },
+                        { severity: null },
+                    ],
+                },
+                {
+                    $or: [
+                        { type: 'disqualify' },
+                        { type: 'nomination_reset' },
+                    ],
+                },
             ],
             timestamp: { $gte: date },
         })

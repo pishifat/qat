@@ -5,7 +5,11 @@
                 :placeholder="'enter to search event...'"
                 :options="['', 'osu', 'taiko', 'catch', 'mania']"
                 store-module="dataCollection"
-            />
+            >
+                <button class="btn btn-sm btn-block btn-primary mt-2" @click="isUnsetEvents ? loadRecentEvents($event) : loadUnsetEvents($event)">
+                    {{ isUnsetEvents ? 'Load all events from the last 90 days' : 'Load events without obviousness or severity scores from the last year' }}
+                </button>
+            </filter-box>
 
             <events-table
                 :events="disqualifications"
@@ -44,6 +48,12 @@ export default {
         EventsTable,
     },
     mixins: [postData],
+    data () {
+        return {
+            isUnsetEvents: false,
+            isLoading: false,
+        };
+    },
     computed: {
         ...mapGetters([
             'userMainMode',
@@ -61,11 +71,37 @@ export default {
     async created() {
         this.$store.commit('dataCollection/pageFilters/setFilterMode', this.userMainMode);
 
-        const res = await this.executeGet('/dataCollection/relevantInfo');
+        const res = await this.executeGet('/dataCollection/loadRecentEvents');
 
         if (res) {
             this.$store.commit('dataCollection/setEvents', res.events);
         }
+    },
+    methods: {
+        async loadUnsetEvents(e) {
+            console.log('a');
+            this.isLoading = true;
+
+            const res = await this.executeGet('/dataCollection/loadUnsetEvents', e);
+
+            if (res) {
+                this.isLoading = false;
+                this.isUnsetEvents = true;
+                this.$store.commit('dataCollection/setEvents', res.events);
+            }
+        },
+        async loadRecentEvents(e) {
+            console.log('b');
+            this.isLoading = true;
+
+            const res = await this.executeGet('/dataCollection/loadRecentEvents', e);
+
+            if (res) {
+                this.isLoading = false;
+                this.isUnsetEvents = false;
+                this.$store.commit('dataCollection/setEvents', res.events);
+            }
+        },
     },
 };
 </script>
