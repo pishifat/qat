@@ -193,7 +193,7 @@ export default {
             if (this.vetoReasons.length) {
                 const firstUrl = this.vetoReasons[0].link;
                 let indexStart = firstUrl.indexOf('beatmapsets/') + 'beatmapsets/'.length;
-                let indexEnd = firstUrl.indexOf('/discussion#');
+                let indexEnd = firstUrl.indexOf('/discussion');
 
                 if (indexEnd !== -1) {
                     bmId = firstUrl.slice(indexStart, indexEnd);

@@ -55,6 +55,10 @@
                     The mapper and veto submitter are automatically excluded. Please manually exclude any guest difficulty creators and the nominating BNs.
                 </div>
             </div>
+            <button class="btn btn-sm btn-block btn-danger mb-2" @click="deleteVeto($event)">
+                Delete veto
+            </button>
+
             <button class="btn btn-sm btn-block btn-primary mb-2" @click="selectMediators($event)">
                 {{ mediators ? 'Re-select mediators' : 'Select mediators' }}
             </button>
@@ -174,6 +178,22 @@ export default {
             if (result && !result.error) {
                 this.mediators = result;
             }
+        },
+        async deleteVeto (e) {
+            if (confirm(`Are you sure?`)) {
+                const result = await this.executePost(`/vetoes/deleteVeto/${this.selectedVeto.id}`, e);
+
+                if (result && !result.error) {
+                    const res = await this.executeGet('/vetoes/relevantInfo/');
+
+                    if (res) {
+                        $('#extendedInfo').modal('hide');
+                        this.$store.commit('vetoes/setVetoes', res.vetoes);
+                    }
+                }
+            }
+
+
         },
     },
 };

@@ -335,4 +335,29 @@ router.post('/replaceMediator/:id', middlewares.isNat, async (req, res) => {
     veto.mode);
 });
 
+/* POST delete veto */
+router.post('/deleteVeto/:id', middlewares.isNat, async (req, res) => {
+    const veto = await Veto
+        .findByIdAndRemove(req.params.id)
+        .orFail();
+
+    res.json({ success: 'ok' });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Deleted veto for "${veto.beatmapTitle}"`,
+        'veto',
+        veto._id
+    );
+
+    console.log(veto.mode);
+
+    discord.webhookPost([{
+        author: discord.defaultWebhookAuthor(req.session),
+        color: discord.webhookColors.black,
+        description: `Deleted veto for **${veto.beatmapTitle}**`,
+    }],
+    veto.mode);
+});
+
 module.exports = router;
