@@ -62,10 +62,19 @@ router.get('/involved', async (req, res) => {
 });
 
 router.post('/:id/review', middlewares.isBnOrNat, async (req, res) => {
-    let review = await ModReview.findOne({
-        modRequest: req.params.id,
-        user: req.session.mongoId,
-    });
+    let [review, modRequest] = await Promise.all([
+        ModReview.findOne({
+            modRequest: req.params.id,
+            user: req.session.mongoId,
+        }),
+        ModRequest.findById(req.params.id),
+    ]);
+
+    if (modRequest.user.toString() == req.session.mongoId) {
+        return res.json({
+            error: 'Cannot review your own maps!',
+        });
+    }
 
     if (!review) {
         review = new ModReview();
