@@ -144,7 +144,7 @@ export default {
         ]),
     },
     watch: {
-        mongoId() {
+        deadline() {
             this.findRelevantActivity();
             this.daysInput = 90;
         },
