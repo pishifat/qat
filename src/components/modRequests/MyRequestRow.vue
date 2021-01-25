@@ -16,7 +16,9 @@
                 </request-tag>
             </div>
             <div>
-                {{ $moment(request.createdAt).fromNow() }}
+                <span :title="request.createdAt">
+                    {{ $moment(request.createdAt).fromNow() }}
+                </span>
             </div>
             <div :class="getStatusClass(request.modReviews)">
                 {{ getStatus(request.modReviews) }}
@@ -55,8 +57,11 @@ export default {
     },
     methods: {
         getStatus (reviews) {
+            console.dir(reviews);
             if (reviews.find(r => r.action === 'accepted')) return 'Accepted';
-            if (reviews.find(r => r.action === 'denied')) return 'Not Accepted';
+
+            let denys = reviews.filter(r => r.action === 'denied').length;
+            if (denys > 0) return `Denied by ${denys}`;
 
             return 'Pending';
         },

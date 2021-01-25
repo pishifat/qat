@@ -61,7 +61,7 @@
             </request-tag>
         </div>
         <div class="col-2 col-sm-4 col-lg-2 d-flex justify-content-end align-items-center order-1 order-lg-2 h-100">
-            <span class="d-none d-sm-block">
+            <span class="d-none d-sm-block" :title="request.createdAt">
                 {{ $moment(request.createdAt).fromNow() }}
             </span>
             <a
