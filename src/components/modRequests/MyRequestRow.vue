@@ -1,6 +1,6 @@
 <template>
     <div class="row align-items-center" style="min-height: 30px">
-        <div class="col-sm-9">
+        <div class="col-sm-8">
             <a
                 class="ml-2"
                 :href="`https://osu.ppy.sh/beatmapsets/${request.beatmapset.osuId}`"
@@ -9,8 +9,15 @@
                 {{ request.beatmapset.fullTitle }}
             </a>
         </div>
-        <div class="col-sm-3 d-flex justify-content-around">
-            <div>{{ request.createdAt | toMonthDay }}</div>
+        <div class="col-sm-4 d-flex justify-content-around">
+            <div>
+                <request-tag>
+                    {{ request.category }}
+                </request-tag>
+            </div>
+            <div>
+                {{ $moment(request.createdAt).fromNow() }}
+            </div>
             <div :class="getStatusClass(request.modReviews)">
                 {{ getStatus(request.modReviews) }}
             </div>
@@ -31,11 +38,13 @@
 </template>
 
 <script>
+import RequestTag from './RequestTag.vue';
 import UserLink from '../UserLink.vue';
 
 export default {
     name: 'MyRequestRow',
     components: {
+        RequestTag,
         UserLink,
     },
     props: {
