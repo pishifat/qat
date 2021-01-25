@@ -32,6 +32,7 @@ export default {
         requests: [],
         involvedRequests: [],
         selectedRequestId: null,
+        editingRequestId: null,
         filters: filters || [
             'ranked',
             'qualified',
@@ -92,6 +93,7 @@ export default {
         },
         monthsLimit: 1,
     },
+
     mutations: {
         setOwnRequests (state, payload) {
             state.ownRequests = payload.ownRequests;
@@ -105,6 +107,9 @@ export default {
         updateSelectRequestId (state, id) {
             state.selectedRequestId = id;
         },
+        updateEditingRequestId (state, id) {
+            state.editingRequestId = id;
+        },
         updateFilters (state, filter) {
             const i = state.filters.findIndex(f => f === filter);
             if (i !== -1) state.filters.splice(i, 1);
@@ -116,6 +121,7 @@ export default {
             state.monthsLimit++;
         },
     },
+
     getters: {
         filteredRequests (state) {
             return state.requests.filter(r => {
@@ -153,6 +159,9 @@ export default {
 
                 return true;
             });
+        },
+        selectedEditRequest (state) {
+            return state.ownRequests.find(r => r.id == state.editingRequestId);
         },
         selectedRequest (state) {
             return state.requests.find(r => r.id == state.selectedRequestId) || state.involvedRequests.find(r => r.id == state.selectedRequestId);

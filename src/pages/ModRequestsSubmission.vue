@@ -104,6 +104,7 @@
             </template>
         </div>
 
+        <edit-request-modal />
         <toast-messages />
     </div>
 </template>
@@ -113,6 +114,7 @@ import { mapState } from 'vuex';
 import postData from '../mixins/postData.js';
 import modRequestsModule from '../store/modRequests';
 import RequestsListing from '../components/modRequests/RequestsListing.vue';
+import EditRequestModal from '../components/modRequests/EditRequestModal.vue';
 import MyRequestRow from '../components/modRequests/MyRequestRow.vue';
 import ToastMessages from '../components/ToastMessages.vue';
 
@@ -120,6 +122,7 @@ export default {
     name: 'ModRequestsSubmission',
     components: {
         RequestsListing,
+        EditRequestModal,
         MyRequestRow,
         ToastMessages,
     },

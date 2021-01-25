@@ -23,6 +23,16 @@
             <div :class="getStatusClass(request.modReviews)">
                 {{ getStatus(request.modReviews) }}
             </div>
+            <div class="d-flex justify-content-end align-items-center">
+                <a
+                    href="#"
+                    data-toggle="modal"
+                    data-target="#editRequestModal"
+                    @click.prevent="$store.commit('modRequests/updateEditingRequestId', request.id)"
+                >
+                    <i class="fas fa-ellipsis-v px-3" />
+                </a>
+            </div>
         </div>
         <div v-if="request.modReviews.length" class="col-sm-12">
             <div v-for="review in request.modReviews" :key="review._id" class="ml-2 text-secondary">
@@ -57,11 +67,10 @@ export default {
     },
     methods: {
         getStatus (reviews) {
-            console.dir(reviews);
             if (reviews.find(r => r.action === 'accepted')) return 'Accepted';
 
-            let denys = reviews.filter(r => r.action === 'denied').length;
-            if (denys > 0) return `Denied by ${denys}`;
+            let n_denied = reviews.filter(r => r.action === 'denied').length;
+            if (n_denied > 0) return `Denied by ${n_denied}`;
 
             return 'Pending';
         },
