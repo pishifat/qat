@@ -36,6 +36,7 @@
                         :include-time="true"
                     />
                 </span>
+                <span class="small float-right">{{ category }}</span>
             </div>
         </div>
     </div>
@@ -55,6 +56,24 @@ export default {
         report: {
             type: Object,
             required: true,
+        },
+    },
+    computed: {
+        category() {
+            switch (this.report.category) {
+                case 'stolenBeatmap':
+                    return 'Stolen beatmap';
+                case 'contentCaseSong':
+                    return 'Inappropriate song';
+                case 'contentCaseVisual':
+                    return 'Inappropriate visual content';
+                case 'behavior':
+                    return 'User behavior';
+                case 'other':
+                    return 'Other';
+                default:
+                    return 'No category';
+            }
         },
     },
     methods: {

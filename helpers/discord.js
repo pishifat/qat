@@ -175,7 +175,7 @@ const webhookColors = {
     white: 15724527,      // unarchive, addEvaluation
     brown: 7554849,       // submitUserNote
     gray: 8815494,        // passive: moveToGroupDiscussion,
-    black: 2564903,       // archive
+    black: 2564903,       // archive, deleteVeto
 };
 
 async function contentCaseWebhookPost(d) {

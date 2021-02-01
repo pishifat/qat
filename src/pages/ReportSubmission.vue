@@ -9,8 +9,8 @@
                 <li>Inappropriate behavior on a beatmap discussion or comments</li>
                 <li>A member of the BN/NAT violating osu!'s <a href="https://osu.ppy.sh/wiki/Rules/Code_of_Conduct_for_Modding_and_Mapping" target="_blank">Code of Conduct</a>, <a href="https://osu.ppy.sh/wiki/People/The_Team/Beatmap_Nominators/Rules" target="_blank">BN Rules</a>, or <a href="https://osu.ppy.sh/wiki/People/The_Team/Beatmap_Nominators/Expectations" target="_blank">Expectations for the BN</a></li>
             </ul>
-            <p>Members of the BN/GMT/NAT evaluate inappropriate content through anonymous votes. Other reports are evaluated by the NAT on a case-by-case basis.</p>
-            <p>Excluding inappropriate content reviews, authors of reports are anonymous until a consensus is met. The consensus will be relayed to you via osu! chat.</p>
+            <p>Most reports are evaluated by the NAT on a case-by-case basis. In special cases, members of the BN/GMT/NAT evaluate inappropriate content through anonymous votes.</p>
+            <p>Excluding those special cases, authors of reports are anonymous until a consensus is met. The consensus will be relayed to you via osu! chat.</p>
         </section>
 
         <section class="card card-body">
@@ -198,10 +198,11 @@ export default {
     },
     methods: {
         async submit (e) {
-            const data = await this.executePost(this.category.includes('contentCase') ? `/reports/submitContentCase` : `/reports/submitReport`, {
+            const data = await this.executePost(`/reports/submitReport`, {
                 username: this.username,
                 reason: this.reason,
                 link: this.link,
+                category: this.category,
             }, e);
 
             if (!data.error) {

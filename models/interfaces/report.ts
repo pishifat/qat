@@ -9,6 +9,7 @@ interface IReportDocument extends Document {
     valid: number;
     feedback: string;
     isActive: boolean;
+    category: string;
 }
 
 export default interface IReportModel extends Model<IReportDocument> { }

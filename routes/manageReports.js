@@ -1,9 +1,11 @@
 const express = require('express');
 const Logger = require('../models/log');
 const Report = require('../models/report');
+const Discussion = require('../models/discussion');
 const User = require('../models/user');
 const middlewares = require('../helpers/middlewares');
 const util = require('../helpers/util');
+const discord = require('../helpers/discord');
 
 const router = express.Router();
 
@@ -108,6 +110,70 @@ router.post('/submitReportEval/:id', middlewares.isNat, async (req, res) => {
             r._id
         );
     }
+});
+
+/* POST send report to content review */
+router.post('/sendToContentReview/:id', middlewares.isNat, async (req, res) => {
+    let report = await Report
+        .findById(req.params.id)
+        .populate(defaultPopulate)
+        .orFail();
+
+    const url = report.link;
+
+    if (!url || url.length == 0) {
+        return res.json({
+            error: 'No link provided',
+        });
+    }
+
+    const contentReviews = await Discussion.find({ isContentReview: true });
+    const title = `Content review #${contentReviews.length + 251}`;
+    let shortReason = `Is this content appropriate for a beatmap? ${url}`;
+    shortReason += `\n\n*${report.reason}*`;
+
+    let d = await Discussion.create({
+        discussionLink: url,
+        title,
+        shortReason,
+        mode: 'all',
+        creator: report.reporter._id,
+        isNatOnly: false,
+        neutralAllowed: false,
+        reasonAllowed: true,
+        isContentReview: true,
+    });
+
+    await Report.findByIdAndUpdate(req.params.id, { isActive: false, feedback: `Report closed and replaced by discussion vote (${d.id})` });
+    report = await Report
+        .findById(req.params.id)
+        .populate(defaultPopulate);
+
+    res.json(report);
+
+    Logger.generate(
+        req.session.mongoId,
+        'Moved a report to content review',
+        'discussionVote',
+        d._id
+    );
+
+    await discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(report.reporter),
+            color: discord.webhookColors.yellow,
+            description: `**New discussion up for vote:** [${title}](http://bn.mappersguild.com/discussionvote?id=${d.id})`,
+            fields: [
+                {
+                    name: `Question/Proposal`,
+                    value: shortReason,
+                },
+            ],
+        }],
+        'contentCase'
+    );
+
+    await discord.roleHighlightWebhookPost('contentCase');
 });
 
 module.exports = router;

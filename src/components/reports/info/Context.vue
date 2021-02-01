@@ -1,6 +1,14 @@
 <template>
     <div>
         <p>
+            <b>Category:</b>
+        </p>
+
+        <div class="ml-4 mb-3 small text-secondary">
+            {{ category }}
+        </div>
+
+        <p>
             <b>Reason:</b>
         </p>
 
@@ -43,8 +51,26 @@ export default {
     components: {
         UserLink,
     },
-    computed: mapGetters('manageReports', [
-        'selectedReport',
-    ]),
+    computed: {
+        ...mapGetters('manageReports', [
+            'selectedReport',
+        ]),
+        category() {
+            switch (this.selectedReport.category) {
+                case 'stolenBeatmap':
+                    return 'Stolen beatmap';
+                case 'contentCaseSong':
+                    return 'Inappropriate song';
+                case 'contentCaseVisual':
+                    return 'Inappropriate visual content';
+                case 'behavior':
+                    return 'User behavior';
+                case 'other':
+                    return 'Other';
+                default:
+                    return 'No category';
+            }
+        },
+    },
 };
 </script>

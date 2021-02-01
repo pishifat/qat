@@ -54,6 +54,15 @@
 
             <div class="form-inline justify-content-end">
                 <button
+                    v-if="selectedReport.category.includes('contentCase')"
+                    class="btn btn-sm btn-primary mx-1"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="Deletes report and creates content review for relevant link"
+                    @click="sendToContentReview($event);"
+                >
+                    Send to content review
+                </button> <button
                     class="btn btn-sm btn-success mx-1"
                     data-toggle="tooltip"
                     data-placement="top"
@@ -62,6 +71,7 @@
                 >
                     Save Report Evaluation
                 </button>
+
                 <button
                     class="btn btn-sm btn-danger mx-1"
                     data-toggle="tooltip"
@@ -137,6 +147,21 @@ export default {
                     this.$store.dispatch('manageReports/updateReport', report);
                     this.$store.dispatch('updateToastMessages', {
                         message: `Saved evaluation`,
+                        type: 'success',
+                    });
+                }
+            }
+        },
+        async sendToContentReview (e) {
+            const result = confirm(`Are you sure? The report will be deleted and a content review will be opened.`);
+
+            if (result) {
+                const report = await this.executePost('/manageReports/sendToContentReview/' + this.selectedReport.id, {}, e);
+
+                if (report && !report.error) {
+                    this.$store.dispatch('manageReports/updateReport', report);
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `Created discussion vote and deleted report`,
                         type: 'success',
                     });
                 }
