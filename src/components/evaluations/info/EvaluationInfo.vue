@@ -22,6 +22,7 @@
                 :modes="modes"
                 :deadline="selectedEvaluation.deadline"
                 :mongo-id="selectedEvaluation.user.id"
+                :unique="selectedEvaluation.id"
             />
             <template v-if="loggedInUser.isNat">
                 <p>

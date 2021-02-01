@@ -119,6 +119,10 @@ export default {
             type: String,
             required: true,
         },
+        unique: {
+            type: String,
+            required: true,
+        },
     },
     data () {
         return {
@@ -144,7 +148,7 @@ export default {
         ]),
     },
     watch: {
-        deadline() {
+        unique() {
             this.findRelevantActivity();
             this.daysInput = 90;
         },

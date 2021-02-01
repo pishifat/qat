@@ -16,6 +16,7 @@
                     :deadline="new Date().toString()"
                     :osu-id="selectedUser.osuId"
                     :mongo-id="selectedUser.id"
+                    :unique="selectedUser.id"
                 />
 
                 <div v-if="loggedInUser.hasBasicAccess">
