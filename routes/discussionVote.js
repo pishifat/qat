@@ -124,6 +124,9 @@ router.post('/submit', async (req, res) => {
         d._id
     );
 
+    // webhooks
+
+    // #content-cases
     await discord.webhookPost(
         [{
             author: discord.defaultWebhookAuthor(req.session),
@@ -140,7 +143,24 @@ router.post('/submit', async (req, res) => {
     );
 
     if (req.body.isContentReview) {
+        // #content-cases
         await discord.roleHighlightWebhookPost('contentCase');
+
+        // #gmt
+        await discord.webhookPost(
+            [{
+                author: discord.defaultWebhookAuthor(req.session),
+                color: discord.webhookColors.yellow,
+                description: `**New discussion up for vote:** [${title}](http://bn.mappersguild.com/discussionvote?id=${d.id})`,
+                fields: [
+                    {
+                        name: `Question/Proposal`,
+                        value: shortReason,
+                    },
+                ],
+            }],
+            'internalContentCase'
+        );
     }
 });
 

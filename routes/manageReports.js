@@ -158,6 +158,9 @@ router.post('/sendToContentReview/:id', middlewares.isNat, async (req, res) => {
         d._id
     );
 
+    // webhooks
+
+    // #content-cases
     await discord.webhookPost(
         [{
             author: discord.defaultWebhookAuthor(report.reporter),
@@ -174,6 +177,22 @@ router.post('/sendToContentReview/:id', middlewares.isNat, async (req, res) => {
     );
 
     await discord.roleHighlightWebhookPost('contentCase');
+
+    // #gmt
+    await discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(report.reporter),
+            color: discord.webhookColors.yellow,
+            description: `**New discussion up for vote:** [${title}](http://bn.mappersguild.com/discussionvote?id=${d.id})`,
+            fields: [
+                {
+                    name: `Question/Proposal`,
+                    value: shortReason,
+                },
+            ],
+        }],
+        'internalContentCase'
+    );
 });
 
 module.exports = router;

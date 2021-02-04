@@ -64,5 +64,9 @@
         "id": "",
         "token": "",
         "gmtRole": ""
+    },
+    "internalContentCasesWebhook": {
+        "id": "",
+        "token": ""
     }
 }
