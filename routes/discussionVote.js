@@ -51,18 +51,18 @@ router.get('/relevantInfo', async (req, res) => {
 
     if (res.locals.userRequest.hasFullReadAccess) {
         discussions = await Discussion
-            .find({})
+            .find({ isHidden: { $ne: true } })
             .populate(defaultPopulate)
             .sort({ createdAt: -1 });
 
     } else {
         const [activeDiscussions, inactiveDiscussions] = await Promise.all([
             Discussion
-                .find({ isNatOnly: { $ne: true }, isActive: true })
+                .find({ isNatOnly: { $ne: true }, isActive: true, isHidden: { $ne: true } })
                 .populate(getActiveBnDefaultPopulate(req.session.mongoId))
                 .sort({ createdAt: -1 }),
             Discussion
-                .find({ isNatOnly: { $ne: true }, isActive: false })
+                .find({ isNatOnly: { $ne: true }, isActive: false, isHidden: { $ne: true } })
                 .populate(inactiveBnDefaultPopulate)
                 .sort({ createdAt: -1 }),
         ]);
