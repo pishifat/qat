@@ -1,9 +1,17 @@
 <template>
     <div>
-        <p>
+        <div>
             {{ mediations.length }} "{{ type }}" {{ mediations.length == 1 ? 'vote' : 'votes' }}
-            <b>{{ Math.round((mediations.length/totalMediations)*100) || 0 }}%</b>
-        </p>
+            <div class="font-weight-bold small">
+                GMT/NAT: {{ Math.round((natGmtMediations.length/totalNatGmtMediations)*1000) / 10 || 0 }}%
+            </div>
+            <div class="font-weight-bold small">
+                BN: {{ Math.round((bnMediations.length/totalBnMediations)*1000) / 10 || 0 }}%
+            </div>
+            <div class="font-weight-bold small">
+                Total: {{ Math.round(((bnMediations.length + natGmtMediations.length)/(totalBnMediations + totalNatGmtMediations))*1000) / 10 || 0 }}%
+            </div>
+        </div>
 
         <ul>
             <li v-for="mediation in mediations" :key="mediation.id" class="small ml-2">
@@ -37,7 +45,11 @@ export default {
         UserLink,
     },
     props: {
-        mediations: {
+        bnMediations: {
+            type: Array,
+            required: true,
+        },
+        natGmtMediations: {
             type: Array,
             required: true,
         },
@@ -45,13 +57,24 @@ export default {
             type: String,
             required: true,
         },
-        totalMediations: {
+        totalBnMediations: {
             type: Number,
             required: true,
         },
+        totalNatGmtMediations: {
+            type: Number,
+            required: true,
+        },
+        showAll: Boolean,
     },
-    computed: mapState([
-        'loggedInUser',
-    ]),
+    computed: {
+        ...mapState([
+            'loggedInUser',
+        ]),
+        mediations() {
+            if (this.showAll) return this.bnMediations.concat(this.natGmtMediations);
+            else return this.natGmtMediations;
+        },
+    },
 };
 </script>
