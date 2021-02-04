@@ -54,7 +54,7 @@
 
             <div class="form-inline justify-content-end">
                 <button
-                    v-if="selectedReport.category.includes('contentCase')"
+                    v-if="selectedReport.category && selectedReport.category.includes('contentCase')"
                     class="btn btn-sm btn-primary mx-1"
                     data-toggle="tooltip"
                     data-placement="top"
