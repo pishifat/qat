@@ -9,6 +9,8 @@
 
             <handbook />
 
+            <leaderboard />
+
             <section class="card card-body">
                 <transition-group name="list" tag="div">
                     <event-row
@@ -45,6 +47,7 @@ import postData from '../mixins/postData.js';
 import FilterBox from '../components/FilterBox.vue';
 import EventRow from '../components/qualityAssurance/EventRow.vue';
 import Handbook from '../components/qualityAssurance/Handbook.vue';
+import Leaderboard from '../components/qualityAssurance/Leaderboard.vue';
 
 export default {
     name: 'QualityAssurancePage',
@@ -53,6 +56,7 @@ export default {
         FilterBox,
         EventRow,
         Handbook,
+        Leaderboard,
     },
     mixins: [postData],
     data() {

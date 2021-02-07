@@ -465,97 +465,6 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
 });
 
 /**
- * Notify of quality assurance helper activity every saturday at 22 pm
- */
-const notifyQualityAssurance = cron.schedule('0 22 * * 6', async () => {
-    let sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-    const users = await User
-        .find({
-            $or: [
-                { groups: 'nat' },
-                { groups: 'bn' },
-            ],
-        })
-        .sort({ username: 1 });
-
-    const modes = ['osu', 'taiko', 'catch', 'mania'];
-
-    for (const mode of modes) {
-        for (let i = 0; i < users.length; i++) {
-            const userId = users[i].id;
-
-            const recent = await QualityAssuranceCheck.find({ user: userId, timestamp: { $gte: sevenDaysAgo }, mode });
-            const all = await QualityAssuranceCheck.find({ user: userId, mode });
-
-            users[i].recentQaChecks = recent.length;
-            users[i].allQaChecks = all.length;
-        }
-
-        const overallUsers = [...users];
-        const recentUsers = [...users];
-
-        overallUsers.sort((a, b) => {
-            if (a.allQaChecks > b.allQaChecks) return -1;
-            if (a.allQaChecks < b.allQaChecks) return 1;
-
-            return 0;
-        });
-
-        recentUsers.sort((a, b) => {
-            if (a.recentQaChecks > b.recentQaChecks) return -1;
-            if (a.recentQaChecks < b.recentQaChecks) return 1;
-
-            return 0;
-        });
-
-
-        let topTenText = '';
-        let topTenCount = 0;
-
-        for (let i = 0; topTenCount < 10 && i < users.length; i++) {
-            const user = overallUsers[i];
-
-            if (user.isBnFor(mode) && user.allQaChecks > 0) {
-                topTenCount++;
-                topTenText += `${topTenCount}. ${user.username}: **${user.allQaChecks}**\n`;
-            }
-        }
-
-        let recentText = '';
-        let recentCount = 0;
-
-        for (let i = 0; recentCount < 3 && i < users.length; i++) {
-            const user = recentUsers[i];
-
-            if (user.isBnFor(mode) && user.recentQaChecks > 0) {
-                recentCount++;
-                recentText += `${recentCount}. ${user.username}: **${user.recentQaChecks}**\n`;
-            }
-        }
-
-        await discord.webhookPost(
-            [{
-                title: `${mode == 'osu' ? 'osu!' : 'osu!' + mode} QA activity`,
-                color: discord.webhookColors.lightBlue,
-                fields: [{
-                    name: `all time`,
-                    value: topTenText,
-                },{
-                    name: `last 7 days`,
-                    value: recentText,
-                }],
-            }],
-            mode == 'osu' ? 'standardQualityAssurance' : 'taikoCatchManiaQualityAssurance'
-        );
-        await util.sleep(500);
-    }
-}, {
-    scheduled: false,
-});
-
-/**
  * Checks for bns with less than 6 mods (4 for mania) the first day of every month
  */
 const lowActivityTask = cron.schedule('0 23 1 * *', async () => {
@@ -690,4 +599,4 @@ async function hasLowActivity (initialDate, bn, mode) {
     return false;
 }
 
-module.exports = { notifyDeadlines, notifyBeatmapReports, lowActivityTask, notifyQualityAssurance, closeContentReviews };
+module.exports = { notifyDeadlines, notifyBeatmapReports, lowActivityTask, closeContentReviews };

@@ -167,7 +167,6 @@ app.listen(port, () => {
     notifications.notifyDeadlines.start();
     notifications.notifyBeatmapReports.start();
     notifications.lowActivityTask.start();
-    notifications.notifyQualityAssurance.start();
     notifications.closeContentReviews.start();
 });
 

@@ -1,5 +1,6 @@
 const express = require('express');
 const Aiess = require('../models/aiess');
+const User = require('../models/user');
 const Logger = require('../models/log');
 const middlewares = require('../helpers/middlewares');
 const QualityAssuranceCheck = require('../models/qualityAssuranceCheck');
@@ -192,6 +193,78 @@ router.post('/editComment/:id', middlewares.isBnOrNat, async (req, res) => {
         .populate(defaultPopulate);
 
     res.json(newEvent);
+});
+
+/* GET load more content */
+router.get('/loadLeaderboard', async (req, res) => {
+    let sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    const [users, recentQaChecks, allQaChecks] = await Promise.all([
+        User
+            .find({
+                $or: [
+                    { groups: 'nat' },
+                    { groups: 'bn' },
+                ],
+            })
+            .sort({ username: 1 }),
+        QualityAssuranceCheck.find({ timestamp: { $gte: sevenDaysAgo } }),
+        QualityAssuranceCheck.find({}),
+    ]);
+
+    const modes = ['osu', 'taiko', 'catch', 'mania'];
+    const data = [];
+
+    for (const mode of modes) {
+        const modeUsers = [];
+
+        for (let i = 0; i < users.length; i++) {
+            const user = users[i];
+
+            const recent = recentQaChecks.filter(q => q.user.toString() == user.id && q.mode == mode);
+            const all = allQaChecks.filter(q => q.user.toString() == user.id && q.mode == mode);
+
+            if (user.isBnFor(mode)) {
+                modeUsers.push({
+                    id: user.id,
+                    username: user.username,
+                    osuId: user.osuId,
+                    recentQaChecks: recent.length,
+                    allQaChecks: all.length,
+                });
+            }
+
+        }
+
+        const overallUsers = [...modeUsers];
+        const recentUsers = [...modeUsers];
+
+        overallUsers.sort((a, b) => {
+            if (a.allQaChecks > b.allQaChecks) return -1;
+            if (a.allQaChecks < b.allQaChecks) return 1;
+
+            return 0;
+        });
+
+        recentUsers.sort((a, b) => {
+            if (a.recentQaChecks > b.recentQaChecks) return -1;
+            if (a.recentQaChecks < b.recentQaChecks) return 1;
+
+            return 0;
+        });
+
+        const overallDisplayUsers = overallUsers.filter(u => u.allQaChecks > 0);
+        const recentDisplayUsers = recentUsers.filter(u => u.recentQaChecks > 0);
+
+        data.push({
+            mode,
+            overallDisplayUsers,
+            recentDisplayUsers,
+        });
+    }
+
+    res.json(data);
 });
 
 module.exports = router;
