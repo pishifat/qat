@@ -1,6 +1,6 @@
 <template>
     <section class="card card-body">
-        <a data-toggle="collapse" href="#leaderboard" @click="loadLeaderboard()">QA check logs <i class="fas fa-angle-down" /></a>
+        <a data-toggle="collapse" href="#leaderboard" @click="loadLeaderboard()">QA check stats <i class="fas fa-angle-down" /></a>
 
         <div id="leaderboard" class="collapse mt-4 mx-4">
             <div v-if="!leaderboard" class="small">
