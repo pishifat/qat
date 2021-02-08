@@ -9,7 +9,7 @@ class EvaluationService extends mongoose.Model {
 
     static findActiveEvaluations() {
         let minDate = new Date();
-        minDate.setDate(minDate.getDate() + 29);
+        minDate.setDate(minDate.getDate() + 14);
 
         return this
             .find({

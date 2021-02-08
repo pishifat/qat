@@ -246,6 +246,12 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
         let discordIds = [];
         let color;
 
+        if (round.discussion) { // current BN evals in groups have 7 extra days
+            const tempDate = new Date(round.deadline);
+            tempDate.setDate(tempDate.getDate() + 7);
+            round.deadline = tempDate;
+        }
+
         if (date > round.deadline) {
             discordIds = findNatEvaluatorHighlights(round.reviews, round.natEvaluators, round.discussion);
             const days = findDaysAgo(round.deadline);

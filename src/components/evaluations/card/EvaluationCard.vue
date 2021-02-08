@@ -21,7 +21,7 @@
             <card-footer
                 :evaluation-id="evaluation.id"
                 :reviews="evaluation.reviews"
-                :deadline="evaluation.deadline"
+                :deadline="deadline"
                 :is-discussion="evaluation.discussion"
                 :is-active="evaluation.active"
             />
@@ -91,6 +91,16 @@ export default {
             if (!this.checkedEvaluations) return false;
 
             return this.checkedEvaluations.includes(this.evaluation.id);
+        },
+        deadline () { // display +7 days for current BN evals in groups
+            if (this.evaluation.isApplication || !this.evaluation.discussion) {
+                return this.evaluation.deadline;
+            } else {
+                const tempDate = new Date(this.evaluation.deadline);
+                tempDate.setDate(tempDate.getDate() + 7);
+
+                return tempDate;
+            }
         },
     },
     methods: {
