@@ -15,7 +15,7 @@
                 <li>Identification of both isolated issues and general map-wide issues</li>
             </ul>
             <p class="small ml-4">
-                To effectively evaluate an applicant's mods, you will likely need to download the beatmap and examine it yourself. This can reveal if the applicant's suggestions fit appropraitely with the beatmap and if the applicant overlooks any of the beatmap's glaring problems! When criticizing a specific mod post, include a link to it alongside your explanation.
+                To effectively evaluate an applicant's mods, you will likely need to download the beatmap and examine it yourself. This can reveal if the applicant's suggestions fit appropriately with the beatmap and if the applicant overlooks any of the beatmap's glaring problems! When criticizing a specific mod post, include a link to it alongside your explanation.
             </p>
             <p class="small ml-4">
                 Mod posts with beneficial suggestions are valuable regardless of their writing style. Verbose writing may not be helpful despite explanations being detailed. Regardless of writing style, the content of the suggestions is what matters. A poor writing style can be fixed much more practically than poor modding knowledge, so don't consider it too vital to an applicant's capabiltiies.
