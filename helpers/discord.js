@@ -123,10 +123,14 @@ async function roleHighlightWebhookPost(webhook, text) {
     let url = 'https://discordapp.com/api/webhooks/';
     let content = '';
 
-    switch (webhook) { // more roles later maybe
+    switch (webhook) {
         case 'contentCase':
             url += `${config.contentCasesWebhook.id}/${config.contentCasesWebhook.token}`;
             content = `<@&${config.contentCasesWebhook.gmtRole}>`;
+            break;
+        case 'report':
+            url += `${config.reportWebhook.id}/${config.reportWebhook.token}`;
+            content = `<@&${config.reportWebhook.reportRole}>`;
             break;
     }
 

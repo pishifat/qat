@@ -13,6 +13,7 @@ const QualityAssuranceCheck = require('../models/qualityAssuranceCheck');
 const BeatmapReport = require('../models/beatmapReport');
 const Aiess = require('../models/aiess');
 const Discussion = require('../models/discussion');
+const Report = require('../models/report');
 const Logger = require('../models/log');
 
 const defaultPopulate = [
@@ -26,6 +27,10 @@ const defaultPopulate = [
             select: 'username osuId groups discordId',
         },
     },
+];
+
+const defaultReportPopulate = [
+    { path: 'culprit', select: 'username osuId modesInfo' },
 ];
 
 /**
@@ -125,9 +130,11 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
     startRange.setDate(startRange.getDate() + 13);
     const endRange = new Date();
     endRange.setDate(endRange.getDate() + 14);
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
     // find active events
-    let [activeApps, activeRounds, activeVetoes] = await Promise.all([
+    let [activeApps, activeRounds, activeVetoes, activeReports] = await Promise.all([
         AppEvaluation
             .find({
                 active: true,
@@ -140,7 +147,30 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
             .populate(defaultPopulate),
 
         Veto.find({ status: 'wip' }),
+        Report
+            .find({ isActive: true, createdAt: { $lte: sevenDaysAgo } })
+            .populate(defaultReportPopulate),
     ]);
+
+    // find and post webhook for reports
+    for (let i = 0; i < activeReports.length; i++) {
+        const report = activeReports[i];
+        const description = `[Report for **${report.culprit ? report.culprit.username : report.link}**](http://bn.mappersguild.com/managereports?id=${report.id}) is more than a week old!`;
+
+        await discord.webhookPost(
+            [{
+                description,
+                color: discord.webhookColors.red,
+            }],
+            'userReport'
+        );
+        await util.sleep(500);
+    }
+
+    if (activeReports.length) {
+        await discord.roleHighlightWebhookPost('report');
+        await util.sleep(500);
+    }
 
     // find and post webhook for vetoes
     for (let i = 0; i < activeVetoes.length; i++) {

@@ -72,6 +72,8 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
             'userReport'
         );
 
+        await discord.roleHighlightWebhookPost('report');
+
         // for #nat
         await discord.webhookPost(
             [{
@@ -111,6 +113,8 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
             fields: notificationFields,
         }],
         'userReport');
+
+        await discord.roleHighlightWebhookPost('report');
 
         // for #nat
         await discord.webhookPost([{
