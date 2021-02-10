@@ -1,7 +1,7 @@
 <template>
     <modal-dialog
         id="editRequestModal"
-        :title="'Editing request for ' + fullTitle"
+        :title="fullTitle"
     >
         <div v-if="selectedEditRequest" class="container">
             <div class="row">
@@ -67,12 +67,6 @@ export default {
             category: '',
         };
     },
-    watch: {
-        selectedEditRequest (req) {
-            this.comment = (req && req.comment) || '';
-            this.category = (req && req.category) || '';
-        },
-    },
     computed: {
         ...mapState('modRequests', [
             'editingRequestId',
@@ -88,6 +82,12 @@ export default {
             return '';
         },
     },
+    watch: {
+        selectedEditRequest (req) {
+            this.comment = (req && req.comment) || '';
+            this.category = (req && req.category) || '';
+        },
+    },
     methods: {
         async editRequest (e) {
             let updateData = {
@@ -95,7 +95,7 @@ export default {
                 category: this.category,
             };
 
-            await this.executePost(`/modRequests/${this.editingRequestId}/edit`, updateData);
+            await this.executePost(`/modRequests/${this.editingRequestId}/edit`, updateData, e);
 
             const data = await this.executeGet('/modRequests/owned');
             if (!data.error) this.$store.commit('modRequests/setOwnRequests', data);
@@ -106,5 +106,5 @@ export default {
             });
         },
     },
-}
+};
 </script>

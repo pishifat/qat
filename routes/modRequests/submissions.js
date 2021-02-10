@@ -6,16 +6,6 @@ const middlewares = require('../../helpers/middlewares');
 const util = require('../../helpers/util');
 const osu = require('../../helpers/osu');
 
-function validateCategory(category) {
-    return [
-        'simple',
-        'tech',
-        'doubleBpm',
-        'conceptual',
-        'other',
-    ].includes(category);
-}
-
 function getGenreName (id) {
     // note that there's no 8, 11, 12
     switch (id) {
@@ -160,10 +150,6 @@ router.post('/store', middlewares.isLoggedIn, async (req, res) => {
         });
     }
 
-    if (!validateCategory(request.category)) {
-        return res.json({ error: `Invalid category.`, });
-    }
-
     const modes = [...new Set(beatmapsetInfo.beatmaps.map(b => b.mode))];
 
     const beatmapset = new Beatmapset();
@@ -201,14 +187,11 @@ router.post('/store', middlewares.isLoggedIn, async (req, res) => {
 
 router.post('/:id/edit', middlewares.isLoggedIn, async (req, res) => {
     let modRequest = await ModRequest.findById(req.params.id);
+
     if (modRequest.user.toString() != req.session.mongoId) {
         return res.json({
-            error: "Cannot edit other people's requests!",
+            error: 'Cannot edit other people\'s requests!',
         });
-    }
-
-    if (!validateCategory(req.body.category)) {
-        return res.json({ error: `Invalid category.`, });
     }
 
     modRequest.comment = req.body.comment;
