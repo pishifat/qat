@@ -1,6 +1,6 @@
 <template>
     <div class="row align-items-center" style="min-height: 30px">
-        <div class="col-sm-9">
+        <div class="col-sm-8">
             <a
                 class="ml-2"
                 :href="`https://osu.ppy.sh/beatmapsets/${request.beatmapset.osuId}`"
@@ -9,10 +9,29 @@
                 {{ request.beatmapset.fullTitle }}
             </a>
         </div>
-        <div class="col-sm-3 d-flex justify-content-around">
-            <div>{{ request.createdAt | toMonthDay }}</div>
+        <div class="col-sm-4 d-flex justify-content-around">
+            <div>
+                <request-tag>
+                    {{ request.category }}
+                </request-tag>
+            </div>
+            <div>
+                <span :title="request.createdAt">
+                    {{ $moment(request.createdAt).fromNow() }}
+                </span>
+            </div>
             <div :class="getStatusClass(request.modReviews)">
                 {{ getStatus(request.modReviews) }}
+            </div>
+            <div class="d-flex justify-content-end align-items-center">
+                <a
+                    href="#"
+                    data-toggle="modal"
+                    data-target="#editRequestModal"
+                    @click.prevent="$store.commit('modRequests/updateEditingRequestId', request.id)"
+                >
+                    <i class="fas fa-ellipsis-v px-3" />
+                </a>
             </div>
         </div>
         <div v-if="request.modReviews.length" class="col-sm-12">
@@ -31,11 +50,13 @@
 </template>
 
 <script>
+import RequestTag from './RequestTag.vue';
 import UserLink from '../UserLink.vue';
 
 export default {
     name: 'MyRequestRow',
     components: {
+        RequestTag,
         UserLink,
     },
     props: {
@@ -47,7 +68,9 @@ export default {
     methods: {
         getStatus (reviews) {
             if (reviews.find(r => r.action === 'accepted')) return 'Accepted';
-            if (reviews.find(r => r.action === 'denied')) return 'Not Accepted';
+
+            let n_denied = reviews.filter(r => r.action === 'denied').length;
+            if (n_denied > 0) return `Denied by ${n_denied}`;
 
             return 'Pending';
         },

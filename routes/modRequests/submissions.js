@@ -185,4 +185,22 @@ router.post('/store', middlewares.isLoggedIn, async (req, res) => {
     });
 });
 
+router.post('/:id/edit', middlewares.isLoggedIn, async (req, res) => {
+    let modRequest = await ModRequest.findById(req.params.id);
+
+    if (modRequest.user.toString() != req.session.mongoId) {
+        return res.json({
+            error: 'Cannot edit other people\'s requests!',
+        });
+    }
+
+    modRequest.comment = req.body.comment;
+    modRequest.category = req.body.category;
+    await modRequest.save();
+
+    res.json({
+        success: 'Saved',
+    });
+});
+
 module.exports = router;

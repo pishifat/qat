@@ -20,7 +20,9 @@
                 hasRankedMaps ({{ request.user.rankedBeatmapsets }})
             </request-tag>
             <request-tag>
-                {{ request.beatmapset.totalLengthString }} ({{ (request.beatmapset.length / 60).toFixed(1) }} min | {{ (request.beatmapset.totalLength / 60).toFixed(1) }} min)
+                {{ request.beatmapset.totalLengthString }}
+                ({{ $moment($moment.duration(request.beatmapset.length, "seconds").asMilliseconds()).format("m:ss") }} |
+                {{ $moment($moment.duration(request.beatmapset.totalLength, "seconds").asMilliseconds()).format("m:ss") }} set)
             </request-tag>
             <request-tag>
                 {{ request.category }}
@@ -59,7 +61,7 @@
             </request-tag>
         </div>
         <div class="col-2 col-sm-4 col-lg-2 d-flex justify-content-end align-items-center order-1 order-lg-2 h-100">
-            <span class="d-none d-sm-block">
+            <span class="d-none d-sm-block" :title="request.createdAt">
                 {{ $moment(request.createdAt).fromNow() }}
             </span>
             <a
