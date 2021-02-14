@@ -312,10 +312,10 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
 });
 
 const closeContentReviews = cron.schedule('0 9 * * *', async () => {
-    const oneDayAgo = new Date();
+    const twoDaysAgo = new Date();
     const threeDaysAgo = new Date();
     const sevenDaysAgo = new Date();
-    threeDaysAgo.setDate(threeDaysAgo.getDate() - 1);
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 2);
     threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
@@ -337,7 +337,7 @@ const closeContentReviews = cron.schedule('0 9 * * *', async () => {
     for (const discussion of activeContentReviews) {
         const sevenDaysOld = discussion.createdAt < sevenDaysAgo;
         const threeDaysOld = discussion.createdAt < threeDaysAgo;
-        const inactive = discussion.updatedAt < oneDayAgo;
+        const inactive = discussion.updatedAt < twoDaysAgo;
 
         if (sevenDaysOld || (threeDaysOld && inactive)) {
             await Discussion.findByIdAndUpdate(discussion.id, { isActive: false });
