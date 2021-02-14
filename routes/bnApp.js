@@ -45,7 +45,7 @@ router.post('/apply', async (req, res) => {
         mods[i] = mods[i].trim();
         reasons[i] = reasons[i] && reasons[i].trim();
 
-        util.isValidUrlOrThrow(mods[i], 'https://osu.ppy.sh/beatmapsets', `One of your mods' link is not valid`);
+        util.isValidUrlOrThrow(mods[i], 'https://osu.ppy.sh/beatmapsets', `One of your mod links is not valid`);
 
         if (!reasons[i]) {
             return res.json({
