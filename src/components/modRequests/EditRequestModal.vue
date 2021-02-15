@@ -74,6 +74,7 @@ export default {
         ...mapGetters('modRequests', [
             'selectedEditRequest',
         ]),
+        /** @returns {string} */
         fullTitle () {
             if (this.selectedEditRequest) {
                 return this.selectedEditRequest.beatmapset.fullTitle;
