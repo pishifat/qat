@@ -68,18 +68,18 @@ router.get('/modsCount/:user/:mode', async (req, res) => {
 
 /* GET 'login' to get user's info */
 router.get('/login', (req, res) => {
-    const state = crypto.randomBytes(48).toString('hex');
-    res.cookie('_state', state, { httpOnly: true });
-    const hashedState = Buffer.from(state).toString('base64');
+    const state = crypto.randomBytes(48).toString('base64');
 
-    if (!req.session.lastPage) {
-        req.session.lastPage = req.get('referer');
-    }
+    req.session._state = {
+        state,
+        redirectUrl: req.get('referer'),
+    };
 
     res.redirect(
-        `https://osu.ppy.sh/oauth/authorize?response_type=code&client_id=${
-            config.id
-        }&redirect_uri=${encodeURIComponent(config.redirect)}&state=${hashedState}&scope=identify+public`
+        'https://osu.ppy.sh/oauth/authorize?response_type=code&client_id=' + config.id +
+        '&redirect_uri=' + encodeURIComponent(config.redirect) +
+        '&state=' + encodeURIComponent(state) +
+        '&scope=identify+public'
     );
 });
 
@@ -95,11 +95,11 @@ router.get('/callback', async (req, res) => {
         return res.status(500).render('error', { message: req.query.error || 'Something went wrong' });
     }
 
-    const decodedState = Buffer.from(req.query.state, 'base64').toString('ascii');
-    const savedState = req.cookies._state;
-    res.clearCookie('_state');
+    const decodedState = decodeURIComponent(req.query.state);
+    const savedState = req.session._state;
+    req.session._state = undefined;
 
-    if (decodedState !== savedState) {
+    if (decodedState !== savedState.state) {
         return res.status(403).render('error', { message: 'unauthorized' });
     }
 
@@ -194,9 +194,7 @@ router.get('/callback', async (req, res) => {
         req.session.osuId = osuId;
         req.session.username = username;
 
-        const lastPage = req.session.lastPage;
-        req.session.lastPage = undefined;
-        res.redirect(lastPage || '/');
+        res.redirect(savedState.redirectUrl || '/');
     }
 });
 

@@ -65,16 +65,25 @@ db.on('error', console.error.bind(console, 'db connection error:'));
 db.once('open', function() {
     console.log('natdb connected');
 });
-app.use(
-    session({
-        secret: config.session,
-        store: new MongoStore({ mongooseConnection: db }),
-        resave: false,
-        saveUninitialized: false,
-        secure: true,
+
+const sessionConfig = {
+    name: 'bnsite_session',
+    secret: config.session,
+    store: new MongoStore({ mongooseConnection: db }),
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
         sameSite: 'lax',
-    })
-);
+        httpOnly: true,
+    },
+};
+
+if (app.get('env') === 'production') {
+    app.set('trust proxy', 1);
+    sessionConfig.cookie.secure = true;
+}
+
+app.use(session(sessionConfig));
 
 app.use('/', indexRouter);
 app.use('/bnApps', bnAppRouter);

@@ -1,3 +1,4 @@
+import Axios from 'axios';
 import toastsModule from './modules/toasts';
 import userActivity from './modules/userActivity';
 
@@ -14,7 +15,7 @@ export default {
     },
     getters: {
         userMainMode (state) {
-            if (state.loggedInUser.modes && state.loggedInUser.modes.length) {
+            if (state.loggedInUser && state.loggedInUser.modes && state.loggedInUser.modes.length) {
                 return state.loggedInUser.modes[0];
             }
 
@@ -23,7 +24,10 @@ export default {
     },
     mutations: {
         setInitialData (state, payload) {
-            state.loggedInUser = payload.me;
+            if (!payload.error) {
+                state.loggedInUser = payload.me;
+            }
+
             state.initialized = true;
         },
         setHomeData (state, allUsersByMode) {
@@ -31,6 +35,12 @@ export default {
         },
         updateLoadingState (state) {
             state.isLoading = !state.isLoading;
+        },
+    },
+    actions: {
+        async setInitialData ({ commit }) {
+            const { data } = await Axios.get('/me');
+            commit('setInitialData', data);
         },
     },
     strict: process.env.NODE_ENV !== 'production',

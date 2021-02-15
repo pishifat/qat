@@ -4,10 +4,6 @@
             v-if="isLoading"
             class="loading-container"
         >
-            <!-- <img
-                src="/images/rip.svg"
-                style="max-height: 160px"
-            > -->
             <div
                 class="spinner-border"
                 role="status"

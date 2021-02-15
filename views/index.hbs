@@ -26,37 +26,7 @@
     {{/unless}}
 >
 
-    {{#if loggedIn}}
     <div id="app"></div>
-    {{else}}
-    <div class="container py-4">
-        <section class="card card-body">
-            <div class="row">
-                <div class="col-lg-5 text-center mb-3 mb-lg-0">
-                    <div class="my-3">
-                        <img src="/images/qatlogo.png" alt="NAT" class="mr-1" style="border-radius: 100%; box-shadow: 0px 1px 5px #41bba12e; width: 130px;">
-                    </div>
-                    <form class="" action="/login" method="GET">
-                        <button class="btn btn-lg btn-primary" type="submit">Authorize your osu! account</button>
-                    </form>
-                </div>
-
-                <div class="col-lg-7 d-flex flex-column justify-content-center">
-                    <p>"Authorizing" will identify you through your osu! account.</p>
-                    <p>You can do any of these after authorization:</p>
-                    <ul>
-                        <li>Apply to join the Beatmap Nominators</li>
-                        <li>Automatically calculate mod score</li>
-                        <li>Report members of the BN/NAT</li>
-                        <li>View detailed BN/NAT listings, beatmap vetoes, and beatmap quality assurance info</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <div id="app"></div>
-    </div>
-    {{/if}}
 
     <script src="/js/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" 

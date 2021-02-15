@@ -1,4 +1,5 @@
 import Home from './pages/Home.vue';
+import NotFound from './pages/NotFound.vue';
 import ModRequestsSubmission from './pages/ModRequestsSubmission.vue';
 const ApplicationSubmission = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/ApplicationSubmission.vue');
 const TestSubmission = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/TestSubmissionPage.vue');
@@ -22,7 +23,7 @@ const Logs = () => import(/* webpackChunkName: "nat", webpackPrefetch: true */ '
 
 const routes = [
     // Public
-    { path: '/', component: Home, alias: '/home' },
+    { path: '/', component: Home, alias: '/home', name: 'home', meta: { public: true } },
     { path: '/bnapps', component: ApplicationSubmission, meta: { title: 'Beatmap Nominator Application' } },
     { path: '/testsubmission', component: TestSubmission, meta: { title: 'Test Submission' } },
     { path: '/reports', component: ReportSubmission, meta: { title: 'Report Submission' } },
@@ -31,22 +32,22 @@ const routes = [
     { path: '/qualityassurance', component: QualityAssurance, meta: { title: 'Quality Assurance' } },
     { path: '/testresults', component: TestResults, meta: { title: 'Ranking Criteria Test Results' } },
     { path: '/message', component: Message, meta: { title: 'Message from the NAT' } },
-    { path: '/modrequests', component: ModRequestsSubmission, meta: { title: 'Mod Requests' } },
+    { path: '/modrequests', component: ModRequestsSubmission, meta: { title: 'Mod Requests', public: true } },
 
     // BN/NAT
-    { path: '/discussionvote', component: DiscussionVote, meta: { title: 'Discussion Vote' } },
-    { path: '/appeval', component: AppEvalPage, meta: { title: 'BN Application Evaluations' } },
-    { path: '/modrequests/listing', component: ModRequests, meta: { title: 'Mod Requests Listing' } },
+    { path: '/discussionvote', component: DiscussionVote, meta: { title: 'Discussion Vote', requiresBasicAccess: true } },
+    { path: '/appeval', component: AppEvalPage, meta: { title: 'BN Application Evaluations', requiresBasicAccess: true } },
+    { path: '/modrequests/listing', component: ModRequests, meta: { title: 'Mod Requests Listing', requiresBasicAccess: true } },
 
     // NAT
-    { path: '/managereports', component: ManageReports, meta: { title: 'Manage Reports' } },
-    { path: '/bneval', component: BnEvalPage, meta: { title: 'Current BN Evaluations' } },
-    { path: '/evalarchive', component: EvalArchive, meta: { title: 'Evaluation Archives' } },
-    { path: '/datacollection', component: DataCollection, meta: { title: 'Data Collection' } },
-    { path: '/managetest', component: ManageTest, meta: { title: 'Manage RC Test' } },
-    { path: '/logs', component: Logs, meta: { title: 'Logs' } },
+    { path: '/managereports', component: ManageReports, meta: { title: 'Manage Reports', requiresFullReadAccess: true } },
+    { path: '/bneval', component: BnEvalPage, meta: { title: 'Current BN Evaluations', requiresFullReadAccess: true } },
+    { path: '/evalarchive', component: EvalArchive, meta: { title: 'Evaluation Archives', requiresFullReadAccess: true } },
+    { path: '/datacollection', component: DataCollection, meta: { title: 'Data Collection', requiresFullReadAccess: true } },
+    { path: '/managetest', component: ManageTest, meta: { title: 'Manage RC Test', requiresFullReadAccess: true } },
+    { path: '/logs', component: Logs, meta: { title: 'Logs', requiresFullReadAccess: true } },
 
-    { path: '*', redirect: '/' },
+    { path: '*', component: NotFound, meta: { title: 'Oops', public: true } },
 ];
 
 export default routes;

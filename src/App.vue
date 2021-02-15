@@ -150,7 +150,8 @@
         </header>
 
         <div
-            :class="{ 'container pb-4 body-content-padding': loggedInUser }"
+            class="container py-4"
+            :class="{ 'body-content-padding': loggedInUser }"
         >
             <div v-if="loggedInUser" class="card">
                 <div class="card-header d-flex align-items-center">
@@ -162,9 +163,40 @@
             </div>
 
             <loading-page>
-                <transition name="route-transition" mode="out-in">
-                    <router-view />
-                </transition>
+                <transition-group name="route-transition" mode="out-in">
+                    <section v-if="initialized && !loggedInUser" key="login" class="card card-body">
+                        <div class="row">
+                            <div class="col-lg-5 text-center mb-3 mb-lg-0">
+                                <div class="my-3">
+                                    <img
+                                        src="/images/qatlogo.png"
+                                        alt="NAT"
+                                        class="mr-1"
+                                        style="border-radius: 100%; box-shadow: 0px 1px 5px #41bba12e; width: 130px;"
+                                    >
+                                </div>
+                                <div v-if="!isPublicPage" class="text-danger font-weight-bold my-3 text-center">
+                                    Login first to visit this page!
+                                </div>
+                                <a href="/login" class="btn btn-lg btn-primary" type="submit">
+                                    Authorize your osu! account
+                                </a>
+                            </div>
+
+                            <div class="col-lg-7 d-flex flex-column justify-content-center">
+                                <p>"Authorizing" will identify you through your osu! account.</p>
+                                <p>You can do any of these after authorization:</p>
+                                <ul>
+                                    <li>Apply to join the Beatmap Nominators</li>
+                                    <li>Automatically calculate mod score</li>
+                                    <li>Report members of the BN/NAT</li>
+                                    <li>View detailed BN/NAT listings, beatmap vetoes, and beatmap quality assurance info</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+                    <router-view v-if="loggedInUser || isPublicPage" key="page" />
+                </transition-group>
             </loading-page>
         </div>
     </div>
@@ -180,10 +212,16 @@ export default {
     },
     computed: {
         ...mapState([
+            'initialized',
             'loggedInUser',
         ]),
+        /** @returns {string} */
         title () {
             return this.$route.meta.title;
+        },
+        /** @returns {boolean} */
+        isPublicPage () {
+            return this.$route.meta.public;
         },
     },
 };

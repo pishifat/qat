@@ -8,19 +8,14 @@ function unauthorize(req, res) {
     if (req.accepts(['html', 'json']) === 'json') {
         res.json({ error: 'Unauthorized - Login first' });
     } else {
-        res.redirect('/');
+        res.render('index',{
+            layout: false,
+            loggedIn: req.session.mongoId,
+        });
     }
 }
 
 async function isLoggedIn(req, res, next) {
-    if (!req.session.mongoId) {
-        if (req.accepts(['html', 'json']) !== 'json') {
-            req.session.lastPage = req.originalUrl;
-        }
-
-        return unauthorize(req, res);
-    }
-
     const u = await User.findById(req.session.mongoId);
 
     if (!u) {
