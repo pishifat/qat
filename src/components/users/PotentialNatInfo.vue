@@ -11,10 +11,14 @@
         <div v-if="potentialNatInfo.length">
             osu
             <div v-for="user in osuUsers" :key="user.osuId + 'osu'" class="small my-2 ml-2 row">
-                <user-link
-                    :osu-id="user.osuId"
-                    :username="user.username"
-                />
+                <a
+                    href="#"
+                    data-toggle="modal"
+                    data-target="#extendedInfo"
+                    @click="selectUser(user)"
+                >
+                    {{ user.username }}
+                </a>
                 <div>: {{ user.evaluatedApps }}</div>
             </div>
             taiko
@@ -88,6 +92,14 @@ export default {
                         this.potentialNatInfo.push(user);
                     }
                 });
+            }
+        },
+        selectUser(user) {
+            console.log(user);
+            this.$store.commit('users/setSelectedUserId', user.id);
+
+            if (this.$route.query.id !== user.id) {
+                this.$router.replace(`/users?id=${user.id}`);
             }
         },
     },

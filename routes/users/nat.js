@@ -161,6 +161,7 @@ router.get('/findPotentialNatInfo', async (req, res) => {
         });
 
         info.push({
+            id: user.id,
             username: user.username,
             osuId: user.osuId,
             modes: user.modes,
