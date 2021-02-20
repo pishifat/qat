@@ -3,76 +3,43 @@
         <button
             v-if="!potentialNatInfo.length"
             class="btn btn-sm btn-primary my-1"
-            data-toggle="tooltip"
-            data-placement="right"
-            title="Finds info on prospective NAT members"
-            @click="findPotentialNatInfo()"
+            @click="findPotentialNatInfo($event)"
         >
-            Load potential NAT info
+            Load BN evaluation stats
         </button>
 
         <div v-if="potentialNatInfo.length">
-            <div v-for="user in potentialNatInfo" :key="user.osuId" class="small my-2">
+            osu
+            <div v-for="user in osuUsers" :key="user.osuId + 'osu'" class="small my-2 ml-2 row">
                 <user-link
                     :osu-id="user.osuId"
                     :username="user.username"
                 />
-                <p class="ml-2">
-                    <a data-toggle="collapse" :href="'#evaluations' + user.osuId" @click.prevent>Show app evals ({{ user.evaluatedApps.length }}) <i class="fas fa-angle-down" /></a>
-                </p>
-
-                <div :id="'evaluations' + user.osuId" class="collapse ml-4">
-                    <div v-for="app in user.evaluatedApps" :key="app.id" class="my-2">
-                        <div class="card card-body mb-2">
-                            <div>
-                                <b>Applicant:</b>
-                                <user-link
-                                    :osu-id="app.user.osuId"
-                                    :username="app.user.username"
-                                />
-                                -- {{ app.deadline | toStandardDate }}
-                            </div>
-                        </div>
-
-                        <div class="card card-body mb-2">
-                            <div class="mb-2">
-                                <b>NAT Consensus:</b>
-                                <span :class="isPass(app.consensus) ? 'text-success' : 'text-danger'">{{ app.consensus }}</span>
-                            </div>
-
-                            <b>Feedback:</b>
-                            <div class="pre-line text-secondary ml-2">
-                                {{ app.feedback }}
-                            </div>
-                        </div>
-
-                        <div class="card card-body">
-                            <div class="mb-2">
-                                <b>BN's opinion:</b>
-                                <span :class="findVote(app.reviews, user.osuId) == 'pass' ? 'text-success' : findVote(app.reviews, user.osuId) == 'neutral' ? 'text-neutral' : 'text-danger'">
-                                    {{ findVote(app.reviews, user.osuId) }}
-                                </span>
-                            </div>
-
-                            <div class="mb-2">
-                                <b>Behavior comment:</b>
-                                <div class="pre-line text-secondary ml-2">
-                                    {{ findBehaviorComment(app.reviews, user.osuId) }}
-                                </div>
-                            </div>
-
-                            <div>
-                                <b>Modding comment:</b>
-
-                                <div class="pre-line text-secondary ml-2">
-                                    {{ findModdingComment(app.reviews, user.osuId) }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <hr>
-                    </div>
-                </div>
+                <div>: {{ user.evaluatedApps }}</div>
+            </div>
+            taiko
+            <div v-for="user in taikoUsers" :key="user.osuId + 'taiko'" class="small my-2 ml-2 row">
+                <user-link
+                    :osu-id="user.osuId"
+                    :username="user.username"
+                />
+                <div>: {{ user.evaluatedApps }}</div>
+            </div>
+            catch
+            <div v-for="user in catchUsers" :key="user.osuId + 'catch'" class="small my-2 ml-2 row">
+                <user-link
+                    :osu-id="user.osuId"
+                    :username="user.username"
+                />
+                <div>: {{ user.evaluatedApps }}</div>
+            </div>
+            mania
+            <div v-for="user in maniaUsers" :key="user.osuId + 'mania'" class="small my-2 ml-2 row">
+                <user-link
+                    :osu-id="user.osuId"
+                    :username="user.username"
+                />
+                <div>: {{ user.evaluatedApps }}</div>
             </div>
         </div>
     </div>
@@ -80,7 +47,6 @@
 
 <script>
 import postData from '../../mixins/postData.js';
-import { AppEvaluationConsensus } from '../../../shared/enums';
 import UserLink from '../UserLink.vue';
 
 export default {
@@ -95,54 +61,34 @@ export default {
         };
     },
     computed: {
-        /** @returns {Boolean} */
-        isPass (consensus) {
-            return consensus === AppEvaluationConsensus.Pass;
+        /** @returns {Array} */
+        osuUsers () {
+            return this.potentialNatInfo.filter(u => u.modes.includes('osu'));
+        },
+        /** @returns {Array} */
+        taikoUsers () {
+            return this.potentialNatInfo.filter(u => u.modes.includes('taiko'));
+        },
+        /** @returns {Array} */
+        catchUsers () {
+            return this.potentialNatInfo.filter(u => u.modes.includes('catch'));
+        },
+        /** @returns {Array} */
+        maniaUsers () {
+            return this.potentialNatInfo.filter(u => u.modes.includes('mania'));
         },
     },
     methods: {
-        async findPotentialNatInfo() {
-            const users = await this.executeGet('/users/nat/findPotentialNatInfo/');
+        async findPotentialNatInfo(e) {
+            const users = await this.executeGet('/users/nat/findPotentialNatInfo/', e);
 
             if (users) {
                 users.forEach(user => {
-                    if (user.evaluatedApps.length) {
+                    if (user.evaluatedApps) {
                         this.potentialNatInfo.push(user);
                     }
                 });
             }
-        },
-        findVote(reviews, osuId) {
-            let vote = 'none';
-            reviews.forEach(review => {
-                if (review.evaluator.osuId == osuId) {
-                    if (review.vote == 1) vote = 'pass';
-                    else if (review.vote == 2) vote = 'neutral';
-                    else if (review.vote == 3) vote = 'fail';
-                }
-            });
-
-            return vote;
-        },
-        findBehaviorComment(reviews, osuId) {
-            let behaviorComment = 'none';
-            reviews.forEach(review => {
-                if (review.evaluator.osuId == osuId) {
-                    behaviorComment = review.behaviorComment;
-                }
-            });
-
-            return behaviorComment;
-        },
-        findModdingComment(reviews, osuId) {
-            let moddingComment = 'none';
-            reviews.forEach(review => {
-                if (review.evaluator.osuId == osuId) {
-                    moddingComment = review.moddingComment;
-                }
-            });
-
-            return moddingComment;
         },
     },
 };

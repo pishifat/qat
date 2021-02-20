@@ -142,12 +142,10 @@ router.get('/findPotentialNatInfo', async (req, res) => {
             },
             active: false,
         }).populate([
-            { path: 'user', select: 'username osuId' },
-            { path: 'bnEvaluators', select: 'username osuId' },
-            { path: 'test', select: 'totalScore' },
+            { path: 'bnEvaluators', select: 'username osuId groups' },
             {
                 path: 'reviews',
-                select: 'evaluator behaviorComment moddingComment vote',
+                select: 'evaluator',
                 populate: {
                     path: 'evaluator',
                     select: 'username osuId groups',
@@ -166,7 +164,7 @@ router.get('/findPotentialNatInfo', async (req, res) => {
             username: user.username,
             osuId: user.osuId,
             modes: user.modes,
-            evaluatedApps,
+            evaluatedApps: evaluatedApps.length,
         });
     });
 
