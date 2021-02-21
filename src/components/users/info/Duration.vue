@@ -27,32 +27,15 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import duration from '../../../mixins/duration.js';
 
 export default {
     name: 'Duration',
+    mixins: [ duration ],
     computed: {
         ...mapGetters('users', [
             'selectedUser',
         ]),
-        bnHistory () {
-            return this.selectedUser.history.filter(h => h.group === 'bn');
-        },
-        natHistory () {
-            return this.selectedUser.history.filter(h => h.group === 'nat');
-        },
-    },
-    methods: {
-        calculateDuration (group) {
-            let days = group == 'bn' ? this.selectedUser.bnDuration : this.selectedUser.natDuration;
-            let years = Math.floor(days / 365);
-            let remainingDays = Math.round(days % 365);
-
-            if (years > 0) {
-                return `${years} ${years == 1 ? 'year' : 'years'}, ${remainingDays} days`;
-            } else {
-                return `${remainingDays} days`;
-            }
-        },
     },
 };
 </script>

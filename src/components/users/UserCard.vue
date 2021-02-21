@@ -15,19 +15,18 @@
                     @click.stop
                 />
                 <small
-                    v-if="firstBnDate"
+                    v-if="bnHistory.length"
                     class="ml-1"
                 >
-                    Joined BN:
-                    <date-display :date="firstBnDate" />
+                    BN for {{ calculateDuration('bn') }}
                 </small>
 
                 <small
-                    v-if="firstNatDate"
+                    v-if="natHistory.length"
                     class="ml-1"
                 >
-                    Joined NAT:
-                    <date-display :date="firstNatDate" />
+                    NAT for {{ calculateDuration('nat') }}
+
                 </small>
 
                 <mode-display
@@ -40,17 +39,17 @@
 </template>
 
 <script>
+import duration from '../../mixins/duration.js';
 import ModeDisplay from '../ModeDisplay.vue';
-import DateDisplay from '../DateDisplay.vue';
 import UserLink from '../UserLink.vue';
 
 export default {
     name: 'UserCard',
     components: {
         ModeDisplay,
-        DateDisplay,
         UserLink,
     },
+    mixins: [ duration ],
     props: {
         user: {
             type: Object,
@@ -58,15 +57,8 @@ export default {
         },
     },
     computed: {
-        firstBnDate () {
-            const bnHistory = this.user.history.filter(h => h.group === 'bn');
-
-            return bnHistory.length && bnHistory[0].date;
-        },
-        firstNatDate () {
-            const natHistory = this.user.history.filter(h => h.group === 'nat');
-
-            return natHistory.length && natHistory[0].date;
+        selectedUser () {
+            return this.user;
         },
     },
     methods: {
