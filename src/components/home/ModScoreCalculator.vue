@@ -51,10 +51,12 @@
         </div>
 
         <ul class="small">
-            <li>You can either write your username and auto-calculate your score, or manually write your mods count in the boxes above</li>
-            <li>A "mod" is counted for each beatmapset through which you have received at least one Kudosu ("thumbs up" on discussion page)</li>
-            <li>Scores 0 or higher are passing</li>
+            <li>"Auto-calculate" will fetch modding activity from a user.</li>
+            <li>Manually inputting numbers will let you see mod score for any combination</li>
+            <li>A "mod" is counted for each beatmapset through which you receive <a href="https://osu.ppy.sh/wiki/en/Modding/Kudosu" target="_blank">kudosu</a> ("thumbs up" on discussion page).</li>
+            <li>Date for a mod is determined by the latest kudosu received</li>
             <li>Selecting a different game mode above may impact your mod score (osu! has stricter requirements than taiko/catch/mania)</li>
+            <li>Scores 0 or higher are passing</li>
         </ul>
     </section>
 </template>
