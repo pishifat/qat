@@ -262,4 +262,21 @@ router.get('/logs/:osuId/:category', async (req, res) => {
     res.json(logs);
 });
 
+/* GET events created/updated after date */
+router.get('/eventsByDate/:date', async (req, res) => {
+    const date = new Date(req.params.date);
+
+    if (isNaN(date.getTime())) {
+        return res.status(404).send('Invalid date');
+    }
+
+    const events = await Aiess
+        .find({
+            updatedAt: { $gt: date },
+        })
+        .sort({ $natural: -1 });
+
+    res.json(events);
+});
+
 module.exports = router;
