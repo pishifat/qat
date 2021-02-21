@@ -371,12 +371,11 @@ router.post('/selectBnEvaluators', middlewares.isNat, async (req, res) => {
     ]);
     let users = [];
     let excludeUserIds = [];
-    const requiredUsers = req.body.mode == 'osu' ? 6 : 3;
 
     if (req.body.includeUsers) {
         const includeUsers = req.body.includeUsers.split(',');
 
-        for (let i = 0; i < includeUsers.length && users.length < requiredUsers; i++) {
+        for (let i = 0; i < includeUsers.length; i++) {
             const userToSearch = includeUsers[i].trim();
             const user = await User.findByUsername(userToSearch);
 
@@ -400,6 +399,10 @@ router.post('/selectBnEvaluators', middlewares.isNat, async (req, res) => {
             }
         }
     }
+
+    const modeUsers = req.body.mode == 'osu' ? 6 : 3;
+
+    const requiredUsers = users.length > modeUsers ? users.length : modeUsers;
 
     for (let i = 0; users.length < requiredUsers && i < allUsers.length; i++) {
         const user = allUsers[i];
