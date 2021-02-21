@@ -25,7 +25,7 @@ export default {
         ]),
         /** @returns {string} */
         message () {
-            let message = `Hello! You recently reported ${this.selectedReport.culprit ? this.selectedReport.culprit.username : this.selectedReport.link}. The NAT reviewed your report and believe it is ${this.selectedReport.valid === 1 ? 'valid' : this.selectedReport === 2 ? 'partially valid' : 'invalid'}. View your full report and feedback here: https://bn.mappersguild.com/message?report=${this.selectedReport.id} —NAT`;
+            let message = `Hello! You recently reported ${this.selectedReport.culprit ? this.selectedReport.culprit.username : this.selectedReport.link}. The NAT reviewed your report and believe it is ${this.selectedReport.valid === 1 ? 'valid' : this.selectedReport.valid === 2 ? 'partially valid' : 'invalid'}. View your full report and feedback here: https://bn.mappersguild.com/message?report=${this.selectedReport.id} —NAT`;
 
             return message;
         },

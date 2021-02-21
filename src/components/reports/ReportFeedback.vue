@@ -15,10 +15,13 @@
                 :username="report.reporter.username"
             />
         </h4>
+        <h5 v-if="report.category" class="text-center">
+            Category:
+            <span class="text-secondary">{{ categoryText }}</span>
+        </h5>
         <h5 v-if="report.valid" class="text-center">
             Consensus:
             <span :class="consensusColor" class="text-capitalize">{{ consensusText }}</span>
-            <span v-if="addition" :class="consensusColor" class="text-capitalize"> + {{ additionText }}</span>
         </h5>
 
         <div>
@@ -62,6 +65,7 @@ export default {
                     return 'text-fail';
             }
         },
+        /** @returns {string} */
         consensusText() {
             switch (this.report.valid) {
                 case 1:
@@ -71,6 +75,15 @@ export default {
                 default: // case 3:
                     return 'Invalid';
             }
+        },
+        /** @returns {string} */
+        categoryText() {
+            let word = this.report.category;
+
+            word = word.replace(/([a-z])([A-Z])/g, '$1 $2');
+            word = word.charAt(0).toUpperCase() + word.slice(1);
+
+            return word;
         },
     },
 };
