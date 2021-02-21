@@ -5,7 +5,7 @@
     >
         <div
             class="card border-dark cursor-pointer"
-            :class="[isSelected ? 'bg-blue-gray' : '', 'border-' + relevantReviewVote, isNatEvaluator ? 'bg-primary' : '', 'card-bg-' + imageClass]"
+            :class="[isSelected ? 'bg-blue-gray' : '', 'border-' + relevantReviewVote, isNatEvaluator ? 'bg-danger' : '', 'card-bg-' + imageClass]"
             data-toggle="modal"
             :data-target="target"
         >
