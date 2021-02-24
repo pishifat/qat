@@ -5,7 +5,7 @@
     >
         <div
             class="card border-dark cursor-pointer"
-            :class="[isSelected ? 'bg-blue-gray' : '', 'border-' + relevantReviewVote, isNatEvaluator ? 'bg-danger' : '', 'card-bg-' + imageClass]"
+            :class="[isSelected ? 'bg-blue-gray' : '', 'border-' + relevantReviewVote, isNatEvaluator ? 'assigned' : '', 'card-bg-' + imageClass]"
             data-toggle="modal"
             :data-target="target"
         >
@@ -141,6 +141,10 @@ export default {
     background-image: url('/images/user-transparent.png');
     background-repeat: repeat-y;
     background-position: left top;
+}
+
+.assigned {
+    background-color: rgb(95, 60, 60) !important
 }
 
 </style>
