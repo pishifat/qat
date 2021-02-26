@@ -20,7 +20,7 @@ const logSchema = new mongoose.Schema({
             'interOp',
         ],
     },
-    relatedId: { type: 'ObjectId' },
+    relatedId: { type: 'ObjectId', ref: 'aiess' }, // if this needs to be populated for more than aiess, create dynamic refPath with category (requires some renaming)
 
     // For errors
     isError: { type: Boolean, default: false },

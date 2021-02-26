@@ -29,7 +29,7 @@ const defaultPopulate = [
     },
 ];
 
-const bnDefualtPopulate = [
+const bnDefaultPopulate = [
     { path: 'user', select: 'username osuId' },
     {
         path: 'reviews',
@@ -67,7 +67,7 @@ router.get('/relevantInfo', async (req, res) => {
             })
             .select(['active', 'user', 'discussion', 'reviews', 'mode', 'mods', 'reasons', 'consensus', 'createdAt', 'updatedAt'])
             .populate(
-                bnDefualtPopulate
+                bnDefaultPopulate
             )
             .sort({
                 createdAt: -1,
@@ -110,7 +110,7 @@ router.post('/submitEval/:id', middlewares.isBnOrNat, async (req, res) => {
     evaluation = await AppEvaluation
         .findById(req.params.id)
         .populate(
-            res.locals.userRequest.isNat ? defaultPopulate : bnDefualtPopulate
+            res.locals.userRequest.isNat ? defaultPopulate : bnDefaultPopulate
         );
 
     res.json(evaluation);

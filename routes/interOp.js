@@ -184,9 +184,6 @@ router.get('/latestEvaluation/:osuId', async (req, res) => {
     let evaluation;
 
     if (latestEvaluation && latestAppEvaluation) {
-        console.log(latestEvaluation.updatedAt);
-        console.log(latestAppEvaluation.updatedAt);
-
         if (latestEvaluation.updatedAt > latestAppEvaluation.updatedAt) {
             evaluation = latestEvaluation;
         } else {
@@ -270,13 +267,18 @@ router.get('/eventsByDate/:date', async (req, res) => {
         return res.status(404).send('Invalid date');
     }
 
-    const events = await Aiess
+    const logs = await Log
         .find({
-            updatedAt: { $gt: date },
+            createdAt: { $gt: date },
+            category: 'dataCollection',
         })
+        .populate([
+            { path: 'user', select: 'username osuId' },
+            { path: 'relatedId', select: 'obviousness severity discussionId' },
+        ])
         .sort({ $natural: -1 });
 
-    res.json(events);
+    res.json(logs);
 });
 
 module.exports = router;
