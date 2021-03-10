@@ -52,7 +52,10 @@ router.get('/loadNextEvaluation/:id', async (req, res) => {
         return res.json('Never');
     }
 
-    res.json(er.deadline);
+    const deadline = new Date(er.deadline);
+    deadline.setDate(deadline.getDate() + 7);
+
+    res.json(deadline);
 });
 
 router.get('/findNatActivity/:days/:mode', async (req, res) => {
@@ -164,8 +167,13 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
         }
 
         let activeEval = allActiveBnEvaluations.find(e => e.user == user.id);
+
         let deadline;
-        if (activeEval) deadline = activeEval.deadline;
+
+        if (activeEval) {
+            deadline = new Date(activeEval.deadline);
+            deadline.setDate(deadline.getDate() + 7);
+        }
 
         const joinHistory = user.history.filter(h => h.kind === 'joined' &&  h.group === 'bn');
         const lastJoin = joinHistory[joinHistory.length - 1];
@@ -243,7 +251,7 @@ router.post('/:id/switchUserGroup', middlewares.isNat, async (req, res) => {
         [{
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.darkGreen,
-            description: `Moved [**${user.username}**](http://osu.ppy.sh/users/${user.osuId}) from **${user.isNat ? 'NAT' : 'BN'}** to **${user.isNat ? 'BN' : 'NAT'}**.`,
+            description: `Moved [**${user.username}**](http://osu.ppy.sh/users/${user.osuId}) from **${user.isNat ? 'BN' : 'NAT'}** to **${user.isNat ? 'NAT' : 'BN'}**.`,
         }],
         'all'
     );
@@ -251,7 +259,7 @@ router.post('/:id/switchUserGroup', middlewares.isNat, async (req, res) => {
     res.json(user);
     Logger.generate(
         req.session.mongoId,
-        `Moved "${user.username}" from "${user.isNat ? 'NAT' : 'BN'}" to "${user.isNat ? 'BN' : 'NAT'}"`,
+        `Moved "${user.username}" from "${user.isNat ? 'BN' : 'NAT'}" to "${user.isNat ? 'NAT' : 'BN'}"`,
         'user',
         user._id
     );

@@ -2,7 +2,7 @@
     <div class="col-md-6 col-lg-4 my-2" @click="selectDiscussion()">
         <div
             class="card card-individual"
-            :class="['border-' + findRelevantMediation(), discussion.isNatOnly ? 'bg-danger' : '']"
+            :class="['border-' + findRelevantMediation(), discussion.isNatOnly ? 'nat-vote' : '']"
             data-toggle="modal"
             data-target="#extendedInfo"
             :data-discussion="discussion.id"
@@ -97,6 +97,10 @@ export default {
 
 .status-bar-inactive {
     background: radial-gradient(var(--gray), transparent 70%);
+}
+
+.nat-vote {
+    background-color: rgb(95, 60, 60) !important
 }
 
 </style>

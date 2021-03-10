@@ -1,13 +1,39 @@
 <template>
     <div>
-        <p v-if="selectedDiscussionVote.isContentReview && isImage">
-            <img class="img-responsive fit-image" :src="selectedDiscussionVote.discussionLink">
-        </p>
+        <div v-if="selectedDiscussionVote.isContentReview">
+            <div
+                v-if="isEditable"
+            >
+                <a
+                    href="#"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="edit link"
+                    @click.prevent="isEditingLink ? update() : isEditingLink = true"
+                >
+                    <i class="fas fa-edit" />
+                </a>
+
+                <b>Direct link:</b>
+
+                <input
+                    v-if="isEditingLink"
+                    v-model="editLinkContent"
+                    class="form-control form-control-sm w-50 mb-2"
+                    type="text"
+                    placeholder="enter to submit new link..."
+                    @keyup.enter="update()"
+                >
+
+                <span v-else class="small" v-html="$md.render(selectedDiscussionVote.discussionLink)" />
+            </div>
+            <img v-if="isImage" class="img-responsive fit-image mb-2" :src="selectedDiscussionVote.discussionLink">
+        </div>
         <p v-else-if="!selectedDiscussionVote.isContentReview && selectedDiscussionVote.discussionLink" class="mb-2">
             <a :href="selectedDiscussionVote.discussionLink" target="_blank">Read and contribute to the full discussion here</a>
         </p>
 
-        <p v-if="isEditable">
+        <p v-if="isEditable && !selectedDiscussionVote.isContentReview">
             <a
                 href="#"
                 data-toggle="tooltip"
@@ -84,6 +110,8 @@ export default {
             editTitleContent: '',
             isEditingProposal: false,
             editProposalContent: '',
+            isEditingLink: false,
+            editLinkContent: '',
         };
     },
     computed: {
@@ -94,9 +122,9 @@ export default {
             'selectedDiscussionVote',
         ]),
         isEditable() {
-            return !this.selectedDiscussionVote.isContentReview &&
-                this.selectedDiscussionVote.creator == this.loggedInUser.id &&
-                this.selectedDiscussionVote.isActive;
+            return this.selectedDiscussionVote.isActive &&
+                ((!this.selectedDiscussionVote.isContentReview && this.selectedDiscussionVote.creator == this.loggedInUser.id && this.selectedDiscussionVote.isActive) ||
+                (this.selectedDiscussionVote.isContentReview && (this.loggedInUser.groups.includes('nat') || this.loggedInUser.groups.includes('gmt'))));
         },
         isImage() {
             return (this.selectedDiscussionVote.discussionLink.match(/\.(jpeg|jpg|gif|png)$/) != null);
@@ -108,12 +136,15 @@ export default {
             this.editTitleContent = this.selectedDiscussionVote.title;
             this.isEditingProposal = false;
             this.editProposalContent = this.selectedDiscussionVote.shortReason;
+            this.isEditingLink = false;
+            this.editLinkContent = this.selectedDiscussionVote.discussionLink;
         },
     },
     created () {
         if (this.selectedDiscussionVote) {
             this.editTitleContent = this.selectedDiscussionVote.title;
             this.editProposalContent = this.selectedDiscussionVote.shortReason;
+            this.editLinkContent = this.selectedDiscussionVote.discussionLink;
         }
     },
     methods: {
@@ -122,6 +153,7 @@ export default {
                 `/discussionVote/${this.selectedDiscussionVote.id}/update`, {
                     title: this.editTitleContent,
                     shortReason: this.editProposalContent,
+                    discussionLink: this.editLinkContent,
                 });
 
             if (discussionVote && !discussionVote.error) {
@@ -133,6 +165,7 @@ export default {
 
                 this.isEditingTitle = false;
                 this.isEditingProposal = false;
+                this.isEditingLink = false;
             }
         },
     },

@@ -244,9 +244,10 @@ router.post('/concludeMediation/:id', middlewares.hasFullReadAccess, async (req,
 /* POST update discussion */
 router.post('/:id/update', middlewares.isNat, async (req, res) => {
     const title = req.body.title;
-    const shortReason= req.body.shortReason;
+    const shortReason = req.body.shortReason;
+    const discussionLink = req.body.discussionLink;
 
-    if (!title || !shortReason) {
+    if (!title || !shortReason || !discussionLink) {
         return res.json({
             error: 'Missing data',
         });
@@ -255,7 +256,6 @@ router.post('/:id/update', middlewares.isNat, async (req, res) => {
     const discussion = await Discussion
         .findOne({
             _id: req.params.id,
-            creator: req.session.mongoId,
             isActive: true,
         })
         .populate(defaultPopulate)
@@ -263,9 +263,11 @@ router.post('/:id/update', middlewares.isNat, async (req, res) => {
 
     discussion.title = title;
     discussion.shortReason = shortReason;
+    discussion.discussionLink = discussionLink;
     await discussion.save();
 
     res.json(discussion);
+
     Logger.generate(
         req.session.mongoId,
         `Changed discussion title to "${title}" and proposal to "${shortReason}"`,

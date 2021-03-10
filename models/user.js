@@ -84,10 +84,31 @@ class UserService extends mongoose.Model {
         if (!this.history) return null;
 
         const bnHistory = this.history.filter(h => h.group === group);
+
+        let historyKind;
+
+        for (let i = 0; i < bnHistory.length; i++) {
+            const history = bnHistory[i];
+
+            if (historyKind !== history.kind) {
+                historyKind = history.kind;
+            } else {
+                if (history.kind == 'joined') bnHistory.splice(i, 1);
+                else if (history.kind == 'left') bnHistory.splice(i+1, 1);
+            }
+
+        }
+
+
         const joinedHistory = bnHistory.filter(h => h.kind === 'joined');
         const leftHistory = bnHistory.filter(h => h.kind === 'left');
         let bnDuration = 0;
         let unendingDate;
+
+        if (this.username == 'Nao Tomori') {
+            console.log(bnHistory);
+
+        }
 
         for (const history of joinedHistory) {
             const i = leftHistory.findIndex(d => d.date > history.date && d.mode === history.mode);
