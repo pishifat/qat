@@ -4,7 +4,7 @@
             class="btn btn-block btn-danger"
             data-toggle="tooltip"
             data-placement="top"
-            title="You will be removed from the BN. The NAT will evaluate your recent activity and give you re-application info"
+            title="The NAT will evaluate your recent activity and remove you from the BN (usually within 24 hours)."
             @click="resignFromBn($event)"
         >
             Resign from the Beatmap Nominators
