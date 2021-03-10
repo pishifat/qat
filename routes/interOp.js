@@ -276,7 +276,7 @@ router.get('/eventsByDate/:date', async (req, res) => {
             { path: 'user', select: 'username osuId' },
             { path: 'relatedId', select: 'obviousness severity discussionId' },
         ])
-        .sort({ $natural: -1 });
+        .sort({ createdAt: -1 });
 
     res.json(logs);
 });
