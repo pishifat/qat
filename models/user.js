@@ -99,16 +99,10 @@ class UserService extends mongoose.Model {
 
         }
 
-
         const joinedHistory = bnHistory.filter(h => h.kind === 'joined');
         const leftHistory = bnHistory.filter(h => h.kind === 'left');
         let bnDuration = 0;
         let unendingDate;
-
-        if (this.username == 'Nao Tomori') {
-            console.log(bnHistory);
-
-        }
 
         for (const history of joinedHistory) {
             const i = leftHistory.findIndex(d => d.date > history.date && d.mode === history.mode);
