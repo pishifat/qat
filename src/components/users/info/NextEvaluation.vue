@@ -1,6 +1,6 @@
 <template>
     <p>
-        <b>{{ displayMode ? `Next ${mode == 'osu' ? 'osu!' : 'osu!' + mode} evaluation` : 'Next evaluation:' }}</b> {{ nextEvaluationDate }}
+        <b>{{ displayMode ? `Next ${mode == 'osu' ? 'osu!' : 'osu!' + mode} evaluation:` : 'Next evaluation:' }}</b> {{ nextEvaluationDate }}
     </p>
 </template>
 
