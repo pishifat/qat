@@ -1,6 +1,6 @@
 <template>
     <p>
-        <b>Next evaluation:</b> {{ nextEvaluationDate }}
+        <b>{{ displayMode ? `Next ${mode == 'osu' ? 'osu!' : 'osu!' + mode} evaluation` : 'Next evaluation:' }}</b> {{ nextEvaluationDate }}
     </p>
 </template>
 
@@ -26,6 +26,9 @@ export default {
         ...mapGetters('users', [
             'selectedUser',
         ]),
+        displayMode() {
+            return this.selectedUser.modes.length > 1;
+        },
     },
     watch: {
         selectedUser() {
