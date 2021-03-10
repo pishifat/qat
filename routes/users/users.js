@@ -45,8 +45,8 @@ router.get('/loadPreviousBnAndNat', async (req, res) => {
 });
 
 /* GET user next evaluation */
-router.get('/loadNextEvaluation/:id', async (req, res) => {
-    let er = await BnEvaluation.findOne({ user: req.params.id, active: true });
+router.get('/loadNextEvaluation/:id/:mode', async (req, res) => {
+    let er = await BnEvaluation.findOne({ user: req.params.id, mode: req.params.mode, active: true });
 
     if (!er) {
         return res.json('Never');

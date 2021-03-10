@@ -11,6 +11,12 @@ import postData from '../../../mixins/postData.js';
 export default {
     name: 'NextEvaluation',
     mixins: [ postData ],
+    props: {
+        mode: {
+            type: String,
+            required: true,
+        },
+    },
     data() {
         return {
             nextEvaluationDate: '...',
@@ -32,7 +38,7 @@ export default {
     },
     methods: {
         async loadNextEvaluation() {
-            const nextEvaluationDate = await this.executeGet('/users/loadNextEvaluation/' + this.selectedUser.id);
+            const nextEvaluationDate = await this.executeGet(`/users/loadNextEvaluation/${this.selectedUser.id}/${this.mode}`);
 
             if (nextEvaluationDate) {
                 this.nextEvaluationDate = nextEvaluationDate.slice(0,10);

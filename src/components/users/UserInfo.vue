@@ -8,7 +8,11 @@
             <duration />
 
             <div v-if="selectedUser.groups.includes('bn') || selectedUser.groups.includes('nat')">
-                <next-evaluation />
+                <next-evaluation
+                    v-for="mode in selectedUser.modes"
+                    :key="mode"
+                    :mode="mode"
+                />
                 <hr>
 
                 <user-activity
