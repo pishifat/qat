@@ -173,10 +173,13 @@ app.set('port', port);
 
 app.listen(port, () => {
     console.log('Listening on ' + port);
-    notifications.notifyDeadlines.start();
-    notifications.notifyBeatmapReports.start();
-    notifications.lowActivityTask.start();
-    notifications.closeContentReviews.start();
+
+    if (config.enableNotifications) {
+        notifications.notifyDeadlines.start();
+        notifications.notifyBeatmapReports.start();
+        notifications.lowActivityTask.start();
+        notifications.closeContentReviews.start();
+    }
 });
 
 module.exports = app;
