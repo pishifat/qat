@@ -16,8 +16,14 @@
             </div>
         </div>
         <div class="col-12 col-lg-6 order-2 order-lg-1 my-2 my-lg-0">
+            <request-tag
+                v-if="wasPreviouslyAccepted"
+                class-list="badge-bn"
+            >
+                Previously Accepted By You
+            </request-tag>
             <request-tag v-if="request.user.rankedBeatmapsets">
-                hasRankedMaps ({{ request.user.rankedBeatmapsets }})
+                Has Ranked Maps ({{ request.user.rankedBeatmapsets }})
             </request-tag>
             <request-tag>
                 {{ request.beatmapset.totalLengthString }}
@@ -77,6 +83,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import RequestTag from './RequestTag.vue';
 import UserLink from '../UserLink.vue';
 
@@ -93,6 +100,9 @@ export default {
         },
     },
     computed: {
+        ...mapState('modRequests', [
+            'involvedRequests',
+        ]),
         /** @returns {array} */
         acceptedReviews () {
             return this.request.modReviews.filter(r => r.action === 'accepted');
@@ -107,6 +117,14 @@ export default {
             if (bpm < 160) return 'slow';
             else if (bpm >= 190) return 'fast';
             else return 'average';
+        },
+        /** @returns {boolean} */
+        wasPreviouslyAccepted () {
+            return this.involvedRequests.some(r =>
+                r.id !== this.request.id &&
+                r.user.osuId === this.request.user.osuId &&
+                r.modReviews.some(review => review.action === 'accepted')
+            );
         },
     },
 };
