@@ -153,14 +153,15 @@ router.get('/callback', async (req, res) => {
             );
         } else {
             if (user.username != username) {
-                user.username = username;
-                await user.save();
                 Logger.generate(
                     user._id,
                     `Username changed from "${user.username}" to "${response.username}"`,
                     'account',
                     user._id
                 );
+
+                user.username = username;
+                await user.save();
             }
 
             if (user.rankedBeatmapsets != rankedBeatmapsets) {

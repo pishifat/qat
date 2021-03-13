@@ -9,28 +9,28 @@ router.use(middlewares.hasFullReadAccess);
 
 const defaultPopulate = [{ path: 'user', select: 'username' }];
 
-router.get('/search', async (req, res) => {
-    let errors = [];
+router.get('/search/:category/:skip', async (req, res) => {
+    const category = req.params.category;
 
-    if (req.session.osuId == 1052994 || req.session.osuId == 3178418) {
-        errors = await Logger
-            .find({ $or: [{ isError: true }, { category: 'interOp' }] })
-            .populate(defaultPopulate)
-            .sort({ createdAt: -1 })
-            .limit(100)
-            .skip(parseInt(req.params.skip));
+    let find;
+
+    if (category == 'error') {
+        find = { isError: true };
+    } else if (category !== 'all') {
+        find = { category };
+    } else {
+        find = { isError: false, category: { $ne: 'interOp' } };
     }
 
-    res.json({
-        errors,
-        logs: await Logger
-            .find({ isError: false, category: { $ne: 'interOp' } })
-            .select('user action category relatedId createdAt')
+    res.json(
+        await Logger
+            .find(find)
+            .select('user action category relatedId createdAt stack extraInfo')
             .populate(defaultPopulate)
             .sort({ createdAt: -1 })
-            .limit(100)
-            .skip(parseInt(req.query.skip) || 0),
-    });
+            .limit(300)
+            .skip(parseInt(req.params.skip) || 0)
+    );
 });
 
 module.exports = router;

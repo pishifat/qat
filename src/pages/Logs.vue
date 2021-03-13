@@ -1,39 +1,27 @@
 <template>
     <div class="card card-body">
-        <template v-if="loggedInUser.osuId == 1052994 || loggedInUser.osuId == 3178418">
-            <a class="btn btn-primary mb-2" data-toggle="collapse" href="#collapseErrors">
-                Toggle error and interOp logs
-            </a>
-
-            <data-table
-                id="collapseErrors"
-                class="collapse"
-                :headers="['date', 'user', 'action', 'stack', 'extra']"
-            >
-                <tr v-for="log in errors" :key="log.id">
-                    <td>
-                        {{ log.createdAt }} GMT
-                    </td>
-                    <td>
-                        {{ (log.user && log.user.username) || 'Anonymous' }}
-                    </td>
-                    <td>
-                        {{ log.action | shorten }}
-                    </td>
-                    <td>
-                        {{ log.stack | shorten }}
-                    </td>
-                    <td>
-                        {{ log.extraInfo | shorten }}
-                    </td>
-                </tr>
-            </data-table>
-
-            <hr>
-        </template>
+        <select
+            id="mode"
+            v-model="category"
+            class="form-control mb-4"
+            @change="loadCategory($event)"
+        >
+            <option value="all">
+                All
+            </option>
+            <option disabled>
+                ---
+            </option>
+            <option v-for="log in logCategories" :key="log" :value="log">
+                {{ log }}
+            </option>
+            <option value="error">
+                error
+            </option>
+        </select>
 
         <data-table
-            :headers="['date', 'user', 'action']"
+            :headers="category == 'error' ? ['date', 'user', 'action', 'stack', 'extra'] : ['date', 'user', 'action']"
         >
             <tr v-for="log in logs" :key="log.id">
                 <td>
@@ -44,6 +32,12 @@
                 </td>
                 <td>
                     {{ log.action | shorten }}
+                </td>
+                <td v-if="category == 'error'">
+                    {{ log.stack | shorten }}
+                </td>
+                <td v-if="category == 'error'">
+                    {{ log.extraInfo | shorten }}
                 </td>
             </tr>
         </data-table>
@@ -79,28 +73,52 @@ export default {
     data () {
         return {
             logs: [],
-            errors: [],
-            skip: 100,
+            skip: 300,
+            logCategories: [
+                'account',
+                'user',
+                'application',
+                'appEvaluation',
+                'bnEvaluation',
+                'dataCollection',
+                'discussionVote',
+                'report',
+                'test',
+                'qualityAssurance',
+                'veto',
+                'interOp',
+            ],
+            category: 'all',
         };
     },
-    computed: mapState([
-        'loggedInUser',
-    ]),
+    computed: {
+        ...mapState([
+            'loggedInUser',
+        ]),
+    },
     async created () {
-        const data = await this.initialRequest(`/logs/search`);
+        const logs = await this.initialRequest(`/logs/search/${this.category}/${this.skip}`);
 
-        if (!data.error) {
-            this.logs = data.logs;
-            this.errors = data.errors;
+        if (!logs.error) {
+            this.logs = logs;
         }
     },
     methods: {
-        async showMore (e) {
-            const data = await this.executeGet(`/logs/search?skip=${this.skip}`, e);
+        async loadCategory (e) {
+            this.skip = 0;
+            const logs = await this.executeGet(`/logs/search/${this.category}/${this.skip}`, e);
 
-            if (!data.error) {
-                this.skip += 100;
-                this.logs = [...this.logs, ...data.logs];
+            if (!logs.error) {
+                this.skip += 300;
+                this.logs = logs;
+            }
+        },
+        async showMore (e) {
+            const logs = await this.executeGet(`/logs/search/${this.category}/${this.skip}`, e);
+
+            if (!logs.error) {
+                this.skip += 300;
+                this.logs = [...this.logs, ...logs];
             }
         },
     },
