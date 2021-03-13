@@ -96,9 +96,9 @@ export default {
         /** @returns {string} */
         calculateColor () {
             let total = this.event.obviousness + this.event.severity;
-            if (total >= 4 || this.event.obviousness == 2 || this.event.severity == 3) return 'text-success';
+            if (total >= 4 || this.event.obviousness == 2 || this.event.severity == 3) return 'text-danger';
             else if (total >= 2) return 'text-neutral';
-            else return 'text-danger';
+            else return 'text-success';
         },
     },
     watch: {
