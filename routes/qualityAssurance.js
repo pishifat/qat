@@ -118,7 +118,7 @@ router.post('/assignUser/:id/:mode', middlewares.isBnOrNat, async (req, res) => 
         return res.json({ error: 'You cannot check your maps!' });
     }
 
-    if (!newChecker.modes.includes(req.params.mode)) {
+    if (!newChecker.fullModes.includes(req.params.mode)) {
         return res.json({ error: 'You are not qualified for this game mode!' });
     }
 
