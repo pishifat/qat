@@ -242,7 +242,7 @@ router.post('/concludeMediation/:id', middlewares.hasFullReadAccess, async (req,
 });
 
 /* POST update discussion */
-router.post('/:id/update', middlewares.isNat, async (req, res) => {
+router.post('/:id/update', middlewares.hasFullReadAccess, async (req, res) => {
     const title = req.body.title;
     const shortReason = req.body.shortReason;
     const discussionLink = req.body.discussionLink;
