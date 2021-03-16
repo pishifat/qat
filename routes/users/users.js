@@ -201,7 +201,7 @@ router.post('/:id/switchBnEvaluator', middlewares.isBnOrNat, async (req, res) =>
         });
     }
 
-    user.isBnEvaluator = !user.isBnEvaluator,
+    user.isBnEvaluator = !user.isBnEvaluator;
     await user.save();
 
     res.json(user);
