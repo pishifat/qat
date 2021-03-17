@@ -96,7 +96,9 @@ router.get('/callback', async (req, res) => {
     }
 
     const decodedState = decodeURIComponent(req.query.state);
-    const savedState = req.session._state;
+    const savedState = {
+        ...req.session._state,
+    };
     req.session._state = undefined;
 
     if (decodedState !== savedState.state) {
