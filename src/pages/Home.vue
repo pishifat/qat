@@ -28,6 +28,13 @@
                                     :osu-id="user.osuId"
                                     :username="user.username"
                                 />
+                                <span
+                                    v-for="status in user.requestStatus"
+                                    :key="status"
+                                    class="badge badge-pill mx-1 text-capitalize"
+                                    :class="status === 'closed' ? 'badge-danger' : 'badge-primary'"
+                                    v-html="$md.renderInline(formatLink(status, user.requestLink))"
+                                />
                             </td>
                         </tr>
                     </tbody>
@@ -92,6 +99,17 @@ export default {
             if (user.level === 'full') {
                 return 'border-left: 3px solid var(--bn);';
             }
+        },
+        formatLink (status, requestLink) {
+            if (status === 'personalQueue' && requestLink) {
+                return `[${status}](${requestLink})`;
+            }
+
+            if (status === 'globalQueue') {
+                return `[${status}](/modrequests)`;
+            }
+
+            return status;
         },
     },
 };

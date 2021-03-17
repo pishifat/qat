@@ -191,6 +191,24 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
     res.json(info);
 });
 
+/* POST switch/update request status */
+router.post('/updateDiscordId', middlewares.isNat, async (req, res) => {
+    const user = res.locals.userRequest;
+    user.discordId = req.body.discordId;
+    await user.save();
+
+    res.json({
+        success: 'Updated',
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Updated "${user.username}" discord ID to ${user.discordId})`,
+        'user',
+        user._id
+    );
+});
+
 /* POST switch bn evaluator */
 router.post('/:id/switchBnEvaluator', middlewares.isBnOrNat, async (req, res) => {
     const user = await User.findById(req.params.id).orFail();
@@ -208,6 +226,37 @@ router.post('/:id/switchBnEvaluator', middlewares.isBnOrNat, async (req, res) =>
     Logger.generate(
         req.session.mongoId,
         `Opted "${user.username}" ${user.isBnEvaluator ? 'in to' : 'out of'} optional BN app evaluation input`,
+        'user',
+        user._id
+    );
+});
+
+/* POST switch/update request status */
+router.post('/:id/updateRequestStatus', middlewares.isBnOrNat, async (req, res) => {
+    if (req.body.requestLink) {
+        util.isValidUrlOrThrow(req.body.requestLink);
+    }
+
+    const user = await User.findById(req.params.id).orFail();
+
+    if (req.session.mongoId != user.id && !res.locals.userRequest.isNat) {
+        return res.json({
+            error: 'Unauthorized',
+        });
+    }
+
+    user.requestStatus = req.body.requestStatus;
+    user.requestLink = req.body.requestLink;
+    await user.save();
+
+    res.json({
+        success: 'Updated',
+        user,
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Updated "${user.username}" status to ${user.requestStatus} (${user.requestLink || 'No link'})`,
         'user',
         user._id
     );

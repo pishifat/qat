@@ -1,6 +1,7 @@
 const Review = require('../../models/evaluations/review');
 const Logger = require('../../models/log');
 const User = require('../../models/user');
+const Settings = require('../../models/settings');
 const discord = require('../../helpers/discord');
 const util = require('../../helpers/util');
 const { EvaluationKind } = require('../../shared/enums');
@@ -88,19 +89,13 @@ async function submitEval (evaluation, session, isNat, behaviorComment, moddingC
             evaluation.mode
         );
 
-        const twoEvaluationModes = [''];
-        const threeEvaluationModes = ['osu', 'taiko', 'catch', 'mania'];
+        const evaluationsRequired = await Settings.getModeEvaluationsRequired(evaluation.mode);
 
-        if (!evaluation.discussion &&
-            (
-                (threeEvaluationModes.includes(evaluation.mode) && evaluation.reviews.length > 2) ||
-                (twoEvaluationModes.includes(evaluation.mode) && evaluation.reviews.length > 1)
-            )
-        ) {
+        if (isNat && !evaluation.discussion && evaluation.reviews.length >= evaluationsRequired) {
             let totalPass = 0;
             let totalNeutral = 0;
             let totalFail = 0;
-            let totalNat = 0;
+            let totalNat = 1; // +1 because r.evaluator isn't an user object just the ID so won't be counted in
 
             evaluation.reviews.forEach(r => {
                 if (r.evaluator.isNat) totalNat++;
@@ -109,13 +104,7 @@ async function submitEval (evaluation, session, isNat, behaviorComment, moddingC
                 else if (r.vote == 3) totalFail++;
             });
 
-            if (
-                isNat &&
-                (
-                    (threeEvaluationModes.includes(evaluation.mode) && totalNat >= 2) ||
-                    (twoEvaluationModes.includes(evaluation.mode) && totalNat >= 1)
-                )
-            ) {
+            if (totalNat >= evaluationsRequired) {
                 evaluation.discussion = true;
                 await evaluation.save();
 

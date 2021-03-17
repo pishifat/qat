@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const util = require('../helpers/util');
 const moment = require('moment');
+const Settings = require('./settings');
 
 const userSchema = new mongoose.Schema({
     osuId: { type: Number, required: true },
@@ -25,6 +26,8 @@ const userSchema = new mongoose.Schema({
     natProfileBadge: { type: Number, default: 0 },
     rankedBeatmapsets: { type: Number, default: 0 },
     discordId: { type: String },
+    requestStatus: [{ type: String, enum: ['ingame', 'personalQueue', 'globalQueue', 'closed'] }],
+    requestLink: { type: String },
 
     /* temporary fields for qa leaderboard webhook */
     recentQaChecks: { type: Number },
@@ -211,6 +214,8 @@ class UserService extends mongoose.Model {
                         osuId: '$osuId',
                         group: '$groups',
                         level: '$modesInfo.level',
+                        requestStatus: '$requestStatus',
+                        requestLink: '$requestLink',
                     },
                 },
             });
@@ -244,8 +249,7 @@ class UserService extends mongoose.Model {
      * @returns {Promise<[]>}
      */
     static async getAssignedNat (mode, excludeOsuIds, sampleSize) {
-        const twoEvaluationModes = ['']; // ['osu', 'taiko', 'catch', 'mania']
-        sampleSize = sampleSize || (twoEvaluationModes.includes(mode) ? 2 : 3); // Settings.getModeEvaluationsSize(mode)
+        sampleSize = sampleSize || await Settings.getModeEvaluationsRequired(mode);
 
         const query = User.aggregate([
             {

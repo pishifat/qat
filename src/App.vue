@@ -140,8 +140,19 @@
                         </template>
 
                         <li class="nav-item">
+                            <a
+                                class="nav-link"
+                                href="#"
+                                data-toggle="modal"
+                                data-target="#globalSettings"
+                            >
+                                <i class="fas fa-cog text-info" />
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
                             <a class="nav-link" href="/logout">
-                                Log Out
+                                <i class="fas fa-sign-out-alt text-danger" />
                             </a>
                         </li>
                     </ul>
@@ -199,16 +210,20 @@
                 </transition-group>
             </loading-page>
         </div>
+
+        <settings-modal v-if="loggedInUser" />
     </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
 import LoadingPage from './components/LoadingPage.vue';
+import SettingsModal from './components/settingsModal/SettingsModal.vue';
 
 export default {
     components: {
         LoadingPage,
+        SettingsModal,
     },
     computed: {
         ...mapState([

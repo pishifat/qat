@@ -1,0 +1,136 @@
+<template>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6">
+                <div>Where do you take requests from?</div>
+                <small class="text-secondary">
+                    It'll show in the homepage for people's knowledge (Optional)
+                </small>
+            </div>
+
+            <div class="col-sm-6">
+                <div class="form-check">
+                    <input
+                        id="settings-requests-ingame"
+                        v-model="requestStatus"
+                        value="ingame"
+                        type="checkbox"
+                        class="form-check-input"
+                        @change="updateRequestStatus"
+                    >
+                    <label
+                        class="form-check-label text-secondary"
+                        for="settings-requests-ingame"
+                    >
+                        Osu's chat
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input
+                        id="settings-requests-personal"
+                        v-model="requestStatus"
+                        value="personalQueue"
+                        type="checkbox"
+                        class="form-check-input"
+                        @change="updateRequestStatus"
+                    >
+                    <label
+                        class="form-check-label text-secondary"
+                        for="settings-requests-personal"
+                    >
+                        Personal Queue
+                    </label>
+                    <template v-if="hasPersonalQueue">
+                        <div class="input-group">
+                            <input
+                                v-model="requestLink"
+                                type="text"
+                                class="form-control"
+                                placeholder="Link your queue if you want to..."
+                            >
+                            <div class="input-group-append">
+                                <button
+                                    class="btn btn-sm btn-outline-success"
+                                    type="button"
+                                    @click="updateRequestStatus"
+                                >
+                                    <i class="fas fa-save" />
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <div class="form-check">
+                    <input
+                        id="settings-requests-global"
+                        v-model="requestStatus"
+                        value="globalQueue"
+                        type="checkbox"
+                        class="form-check-input"
+                        @change="updateRequestStatus"
+                    >
+                    <label
+                        class="form-check-label text-secondary"
+                        for="settings-requests-global"
+                    >
+                        <a href="/modrequests/listing" target="_blank">
+                            Global Queue
+                        </a>
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input
+                        id="settings-requests-closed"
+                        v-model="requestStatus"
+                        value="closed"
+                        type="checkbox"
+                        class="form-check-input"
+                        @change="updateRequestStatus"
+                    >
+                    <label
+                        class="form-check-label text-secondary"
+                        for="settings-requests-closed"
+                    >
+                        Closed
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+import { mapState } from 'vuex';
+import postData from '../../mixins/postData';
+
+export default {
+    mixins: [ postData ],
+    data () {
+        return {
+            requestStatus: [],
+            requestLink: '',
+        };
+    },
+    computed: {
+        ...mapState([
+            'loggedInUser',
+        ]),
+        /** @returns {boolean} */
+        hasPersonalQueue () {
+            return this.requestStatus.includes('personalQueue');
+        },
+    },
+    created () {
+        this.requestStatus = this.loggedInUser.requestStatus;
+        this.requestLink = this.loggedInUser.requestLink;
+    },
+    methods: {
+        async updateRequestStatus (e) {
+            await this.executePost(`/users/${this.loggedInUser.id}/updateRequestStatus`, {
+                requestStatus: this.requestStatus,
+                requestLink: this.requestLink,
+            }, e);
+        },
+    },
+};
+</script>

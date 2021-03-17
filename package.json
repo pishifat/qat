@@ -45,6 +45,7 @@
   "devDependencies": {
     "@types/bootstrap": "^4.5.0",
     "@types/jquery": "^3.5.1",
+    "@types/markdown-it": "^12.0.1",
     "@types/mongoose": "^5.7.36",
     "babel-eslint": "^10.1.0",
     "eslint": "^6.8.0",
