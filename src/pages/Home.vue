@@ -31,10 +31,13 @@
                                 <span
                                     v-for="status in user.requestStatus"
                                     :key="status"
-                                    class="badge badge-pill mx-1 text-capitalize"
+                                    class="badge badge-pill mx-1 text-lowercase"
                                     :class="status === 'closed' ? 'badge-danger' : 'badge-primary'"
                                     v-html="$md.renderInline(formatLink(status, user.requestLink))"
                                 />
+                                <span v-if="user.requestStatus && user.requestStatus.length && !user.requestStatus.includes('closed')" class="badge badge-pill badge-success">
+                                    open
+                                </span>
                             </td>
                         </tr>
                     </tbody>
@@ -62,6 +65,7 @@
 <script>
 import { mapState } from 'vuex';
 import postData from '../mixins/postData';
+import evaluations from '../mixins/evaluations';
 import ToastMessages from '../components/ToastMessages.vue';
 import ModScoreCalculator from '../components/home/ModScoreCalculator.vue';
 import UserLink from '../components/UserLink.vue';
@@ -73,7 +77,7 @@ export default {
         ModScoreCalculator,
         UserLink,
     },
-    mixins: [ postData ],
+    mixins: [ postData, evaluations ],
     computed: mapState([
         'allUsersByMode',
     ]),
@@ -101,11 +105,13 @@ export default {
             }
         },
         formatLink (status, requestLink) {
-            if (status === 'personalQueue' && requestLink) {
+            status = this.makeWordFromField(status);
+
+            if (status === 'Personal Queue' && requestLink) {
                 return `[${status}](${requestLink})`;
             }
 
-            if (status === 'globalQueue') {
+            if (status === 'Global Queue') {
                 return `[${status}](/modrequests)`;
             }
 

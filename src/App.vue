@@ -139,7 +139,7 @@
                             </li>
                         </template>
 
-                        <li class="nav-item">
+                        <li v-if="loggedInUser.hasBasicAccess" class="nav-item">
                             <a
                                 class="nav-link"
                                 href="#"

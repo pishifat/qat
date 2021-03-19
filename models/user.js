@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema({
     natProfileBadge: { type: Number, default: 0 },
     rankedBeatmapsets: { type: Number, default: 0 },
     discordId: { type: String },
-    requestStatus: [{ type: String, enum: ['ingame', 'personalQueue', 'globalQueue', 'closed'] }],
+    requestStatus: [{ type: String, enum: ['gameChat', 'personalQueue', 'globalQueue', 'closed'] }],
     requestLink: { type: String },
 
     /* temporary fields for qa leaderboard webhook */

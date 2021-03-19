@@ -4,23 +4,23 @@
             <div class="col-sm-6">
                 <div>Where do you take requests from?</div>
                 <small class="text-secondary">
-                    Displayed on the home page
+                    Displayed on the home page. Changes are only visible after refreshing
                 </small>
             </div>
 
             <div class="col-sm-6">
                 <div class="form-check">
                     <input
-                        id="settings-requests-ingame"
+                        id="settings-requests-game-chat"
                         v-model="requestStatus"
-                        value="ingame"
+                        value="gameChat"
                         type="checkbox"
                         class="form-check-input"
                         @change="updateRequestStatus"
                     >
                     <label
                         class="form-check-label text-secondary"
-                        for="settings-requests-ingame"
+                        for="settings-requests-game-chat"
                     >
                         In-game chat
                     </label>
@@ -38,7 +38,7 @@
                         class="form-check-label text-secondary"
                         for="settings-requests-personal"
                     >
-                        External queue
+                        Personal queue
                     </label>
                     <template v-if="hasPersonalQueue">
                         <div class="input-group">
