@@ -2,8 +2,12 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-6">
-                <p>Do you want to evaluate new BN applications?</p>
+                <div>Do you want to evaluate new BN applications?</div>
+                <small class="text-secondary">
+                    You can give input on occasional new BN applicants and may be considered for joining the NAT in the future
+                </small>
             </div>
+
             <div class="col-sm-6">
                 <div class="form-check">
                     <input
@@ -17,7 +21,7 @@
                         class="form-check-label text-secondary"
                         for="settings-evaluator"
                     >
-                        BN Evaluator
+                        BN application evaluator
                     </label>
                 </div>
             </div>

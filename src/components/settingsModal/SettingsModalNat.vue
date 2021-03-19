@@ -4,7 +4,7 @@
             <div class="col-sm-4">
                 <div>Your Discord ID</div>
                 <small class="text-secondary">
-                    Used just for highlights
+                    Used for deadline-related highlights
                 </small>
             </div>
             <div class="col-sm-8">
@@ -29,7 +29,10 @@
         </div>
         <hr>
 
-        <p>Evaluations Required</p>
+        <div>Evaluations required</div>
+        <small class="text-secondary">
+            Number of evaluations required before an application/BN eval is moved to group discussion
+        </small>
 
         <button v-if="!modeSettings.length" @click="create">
             init

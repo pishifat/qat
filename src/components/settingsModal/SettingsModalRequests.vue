@@ -4,7 +4,7 @@
             <div class="col-sm-6">
                 <div>Where do you take requests from?</div>
                 <small class="text-secondary">
-                    It'll show in the homepage for people's knowledge (Optional)
+                    Displayed on the home page
                 </small>
             </div>
 
@@ -22,7 +22,7 @@
                         class="form-check-label text-secondary"
                         for="settings-requests-ingame"
                     >
-                        Osu's chat
+                        In-game chat
                     </label>
                 </div>
                 <div class="form-check">
@@ -38,7 +38,7 @@
                         class="form-check-label text-secondary"
                         for="settings-requests-personal"
                     >
-                        Personal Queue
+                        External queue
                     </label>
                     <template v-if="hasPersonalQueue">
                         <div class="input-group">
@@ -46,7 +46,7 @@
                                 v-model="requestLink"
                                 type="text"
                                 class="form-control"
-                                placeholder="Link your queue if you want to..."
+                                placeholder="Link your modding queue/form..."
                             >
                             <div class="input-group-append">
                                 <button
@@ -74,7 +74,7 @@
                         for="settings-requests-global"
                     >
                         <a href="/modrequests/listing" target="_blank">
-                            Global Queue
+                            Global queue
                         </a>
                     </label>
                 </div>
