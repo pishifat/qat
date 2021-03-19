@@ -28,15 +28,14 @@
                                     :osu-id="user.osuId"
                                     :username="user.username"
                                 />
-                                <span
-                                    v-for="status in user.requestStatus"
-                                    :key="status"
-                                    class="badge badge-pill mx-1 text-lowercase"
-                                    :class="status === 'closed' ? 'badge-danger' : 'badge-primary'"
-                                    v-html="$md.renderInline(formatLink(status, user.requestLink))"
-                                />
-                                <span v-if="user.requestStatus && user.requestStatus.length && !user.requestStatus.includes('closed')" class="badge badge-pill badge-success">
-                                    open
+                                <span v-if="user.requestStatus">
+                                    <span
+                                        v-for="status in requestMethods(user.requestStatus)"
+                                        :key="status"
+                                        class="badge badge-pill mx-1 text-lowercase"
+                                        :class="status === 'closed' ? 'badge-danger' : status === 'open' ? 'badge-success' : 'badge-primary'"
+                                        v-html="$md.renderInline(formatLink(status, user.requestLink))"
+                                    />
                                 </span>
                             </td>
                         </tr>
@@ -91,6 +90,16 @@ export default {
         }
     },
     methods: {
+        requestMethods(requestStatus) {
+            let statusList = [...requestStatus];
+            statusList = statusList.sort();
+
+            if (statusList.length && !statusList.includes('closed')) {
+                statusList.unshift('open');
+            }
+
+            return statusList;
+        },
         getGroupColor (user) {
             if (user.group === 'nat') {
                 return 'border-left: 3px solid var(--danger);';
