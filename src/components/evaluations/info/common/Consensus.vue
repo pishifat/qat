@@ -33,7 +33,6 @@
             </span>
             <span v-if="selectedEvaluation.active" class="btn-group">
                 <button
-                    v-if="!isProbationForMode || selectedEvaluation.consensus == 'probationBn'"
                     class="btn btn-sm btn-primary"
                     :disabled="lowActivityWarning"
                     @click="setAddition('lowActivityWarning', $event);"
@@ -41,7 +40,6 @@
                     Low Activity Warning
                 </button>
                 <button
-                    v-if="!isProbationForMode || selectedEvaluation.consensus == 'probationBn'"
                     class="btn btn-sm btn-primary"
                     :disabled="behaviorWarning"
                     @click="setAddition('behaviorWarning', $event);"
@@ -49,7 +47,6 @@
                     Behavior Warning
                 </button>
                 <button
-                    v-if="consensus == 'probationBn'"
                     class="btn btn-sm btn-primary"
                     :disabled="mapQualityWarning"
                     @click="setAddition('mapQualityWarning', $event);"
@@ -72,7 +69,7 @@
 import { mapGetters } from 'vuex';
 import postData from '../../../../mixins/postData.js';
 import evaluations from '../../../../mixins/evaluations.js';
-import { EvaluationKind, BnEvaluationConsensus } from '../../../../../shared/enums.js';
+import { EvaluationKind } from '../../../../../shared/enums.js';
 
 export default {
     name: 'Consensus',
@@ -116,8 +113,7 @@ export default {
             return [];
         },
         canHaveAddition () {
-            return this.selectedEvaluation.kind === EvaluationKind.BnEvaluation &&
-                this.selectedEvaluation.consensus !== BnEvaluationConsensus.RemoveFromBn;
+            return this.selectedEvaluation.kind === EvaluationKind.BnEvaluation;
         },
     },
     methods: {

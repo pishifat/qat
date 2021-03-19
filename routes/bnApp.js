@@ -1,14 +1,14 @@
 const express = require('express');
 const middlewares = require('../helpers/middlewares');
 const util = require('../helpers/util');
-const { getUserModScore } = require('../helpers/scrap');
+const { getUserModScore, getUserModsCount } = require('../helpers/scrap');
 const osu = require('../helpers/osu');
 const AppEvaluation = require('../models/evaluations/appEvaluation.js');
 const BnEvaluation = require('../models/evaluations/bnEvaluation');
 const Logger = require('../models/log.js');
 const TestSubmission = require('../models/bnTest/testSubmission');
 const ResignationEvaluation = require('../models/evaluations/resignationEvaluation');
-const { ResignationConsensus } = require('../shared/enums');
+const { ResignationConsensus, BnEvaluationAddition } = require('../shared/enums');
 
 const router = express.Router();
 
@@ -61,7 +61,7 @@ router.post('/apply', async (req, res) => {
     }
 
     let cooldownDate = new Date();
-    const [currentBnApp, currentBnEval, lastResignation] = await Promise.all([
+    const [currentBnApp, currentBnEval, lastResignation, lastCurrentBnEval] = await Promise.all([
         AppEvaluation.findOne({
             user: req.session.mongoId,
             mode,
@@ -73,25 +73,30 @@ router.post('/apply', async (req, res) => {
         BnEvaluation.findOne({
             user: req.session.mongoId,
             mode,
-            consensus: 'fail',
+            consensus: 'removeFromBn',
             cooldownDate: { $gte: cooldownDate },
         }),
-        ResignationEvaluation
-            .findOne({
-                user: req.session.mongoId,
-                mode,
-            })
+        ResignationEvaluation.findOne({
+            user: req.session.mongoId,
+            mode,
+        })
             .sort({ updatedAt: -1 }),
+        BnEvaluation.findOne({
+            user: req.session.mongoId,
+            mode,
+            consensus: 'removeFromBn',
+        }),
     ]);
 
     const wasBn = res.locals.userRequest.history && res.locals.userRequest.history.length;
     const resignedOnGoodTerms = lastResignation && lastResignation.consensus === ResignationConsensus.ResignedOnGoodTerms;
+    const kickedForActivity = lastCurrentBnEval && lastCurrentBnEval.addition === BnEvaluationAddition.LowActivityWarning;
 
     if (!currentBnApp && !currentBnEval) {
         let months = 3;
 
         if (resignedOnGoodTerms) months = 1;
-        else if (wasBn) months = 2;
+        else if (wasBn || kickedForActivity) months = 2;
 
         // Check user kudosu total count & mod score
         const [userInfo, modScore] = await Promise.all([
@@ -109,7 +114,17 @@ router.post('/apply', async (req, res) => {
             return res.json({ error: `You do not meet the required ${requiredKudosu} kudosu to apply. You currently have ${userInfo.kudosu.total} kudosu.` });
         }
 
-        if (modScore < 0) {
+        if (kickedForActivity) {
+            const modsCount = await getUserModsCount(req.session.accessToken, req.session.username, months);
+            const reducer = (accumulator, currentValue) => accumulator + currentValue;
+            const modsThreshold = 8;
+
+            const totalMods = modsCount.reduce(reducer);
+
+            if (totalMods < modsThreshold) {
+                return res.json({ error: `You need at least ${modsThreshold} mods within the last 60 days to apply because you were recently removed for low activity!` } );
+            }
+        } else if (modScore < 0) {
             let additionalInfo = `Your mod score was calculated based on ${months} month${months == 1 ? '' : 's'} of activity because `;
             if (resignedOnGoodTerms) additionalInfo += 'you resigned from the BN on good terms.';
             else if (wasBn) additionalInfo += 'you were BN for this game mode in the past.';

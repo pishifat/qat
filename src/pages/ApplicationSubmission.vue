@@ -4,14 +4,12 @@
             <div>The <a href="https://osu.ppy.sh/help/wiki/People/Beatmap_Nominators" target="_blank">Beatmap Nominators</a> (BN) are a group of users in charge of promoting Ranked beatmaps.</div>
             <div>Requirements for joining the BN:</div>
             <ul>
-                <li>At least 200 Kudosu earned for osu! modders</li>
-                <li>At least 150 Kudosu earned for osu!taiko/osu!catch/osu!mania modders</li>
-                <li>A positive mod score (calculated by your modding activity in the last 3 months, see calculator on the <a href="/home">front page</a>). Mod score for returning BNs is calculated based on 1 or 2 months of activity</li>
-                <li>A passing score on a Ranking Criteria knowledge test</li>
-                <li>Competent modding abilities/behavior (evaluated by members of the NAT through your submitted mods, other modding history, and community interaction)</li>
+                <li>At least 200 <a href="https://osu.ppy.sh/wiki/en/Modding/Kudosu" target="_blank">kudosu</a> for osu! modders or 150 kudosu for osu!taiko/osu!catch/osu!mania modders</li>
+                <li>A positive <a href="/home" target="_blank">mod score</a>. Returning BNs have different mod score requirements as explained on the <a href="https://osu.ppy.sh/wiki/en/People/The_Team/Beatmap_Nominators/Becoming_a_Beatmap_Nominator#rejoining-after-being-removed-from-the-beatmap-nominators" target="_blank">osu! wiki</a></li>
+                <li>A score of 12.5 or higher on the <a href="https://osu.ppy.sh/wiki/en/People/The_Team/Beatmap_Nominators/Beatmap_Nominator_Test" target="_blank">Beatmap Nominator Test</a> (this begins after clicking "Apply" below).</li>
+                <li>Competent modding abilities/behavior. This is evaluated by the NAT through your submitted mods, other modding history, and community interaction</li>
             </ul>
-            <div>If you meet the mod score/kudosu thresholds, you will have the option to begin a Ranking Criteria knowledge test after clicking "apply". This test has no time limit and can be completed at any time after your application is submitted. You cannot apply to other game modes while the test is incomplete.</div>
-            <div>When your application is evaluated, you will receive an osu! forum PM with the results. If your application is denied or you are removed from the BN, you cannot apply to the same game mode again for 90 days.</div>
+            <div>After your application is evaluated, you will receive an osu! forum PM with the results. If your application is denied, you cannot apply to the same game mode again for 90 days.</div>
         </div>
 
         <div class="card card-body">

@@ -13,7 +13,7 @@ const { submitEval, setGroupEval, setFeedback, replaceUser } = require('./evalua
 const middlewares = require('../../helpers/middlewares');
 const discord = require('../../helpers/discord');
 const util = require('../../helpers/util');
-const { BnEvaluationConsensus, BnEvaluationAddition } = require('../../shared/enums');
+const { BnEvaluationConsensus, BnEvaluationAddition, ResignationConsensus } = require('../../shared/enums');
 
 const router = express.Router();
 
@@ -407,7 +407,13 @@ router.post('/setConsensus/:id', middlewares.isNat, async (req, res) => {
 
     if (req.body.consensus === BnEvaluationConsensus.RemoveFromBn || evaluation.isResignation) {
         const date = new Date();
-        date.setDate(date.getDate() + 90);
+
+        if (req.body.consensus == ResignationConsensus.ResignedOnGoodTerms) {
+            date.setDate(date.getDate() + 30);
+        } else {
+            date.setDate(date.getDate() + 60);
+        }
+
         evaluation.cooldownDate = date;
     }
 
