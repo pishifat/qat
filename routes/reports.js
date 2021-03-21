@@ -41,6 +41,26 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
         });
     }
 
+    let reportCategory;
+
+    switch (req.body.category) {
+        case 'stolenBeatmap':
+            reportCategory = 'Stolen beatmap report';
+            break;
+        case 'contentCaseSong':
+            reportCategory = 'Song content report';
+            break;
+        case 'contentCaseVisual':
+            reportCategory = 'Visual content report';
+            break;
+        case 'behavior':
+            reportCategory = 'User behavior report';
+            break;
+        default:
+            reportCategory = 'Other report';
+            break;
+    }
+
     if (req.body.username) {
         let u = await User.findByUsername(req.body.username);
 
@@ -66,7 +86,7 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
                     url: `https://a.ppy.sh/${u.osuId}`,
                 },
                 color: discord.webhookColors.darkRed,
-                description: `[User report](http://bn.mappersguild.com/managereports?id=${report.id}) for **${u.username}**`,
+                description: `[${reportCategory}](http://bn.mappersguild.com/managereports?id=${report.id}) for **${u.username}**`,
                 fields: notificationFields,
             }],
             'userReport'
@@ -81,7 +101,7 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
                     url: `https://a.ppy.sh/${u.osuId}`,
                 },
                 color: discord.webhookColors.darkRed,
-                description: `[User report](http://bn.mappersguild.com/managereports?id=${report.id}) for **${u.username}**`,
+                description: `[${reportCategory}](http://bn.mappersguild.com/managereports?id=${report.id}) for **${u.username}**`,
                 fields: notificationFields,
             }],
             'natUserReport'
@@ -108,8 +128,8 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
 
         // for #user-reportfeed
         await discord.webhookPost([{
-            description: `[Non-user report](http://bn.mappersguild.com/managereports?id=${report.id})`,
-            color: discord.webhookColors.lightRed,
+            description: `[${reportCategory}](http://bn.mappersguild.com/managereports?id=${report.id})`,
+            color: discord.webhookColors.darkRed,
             fields: notificationFields,
         }],
         'userReport');
@@ -118,8 +138,8 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
 
         // for #nat
         await discord.webhookPost([{
-            description: `[Non-user report](http://bn.mappersguild.com/managereports?id=${report.id})`,
-            color: discord.webhookColors.lightRed,
+            description: `[${reportCategory}](http://bn.mappersguild.com/managereports?id=${report.id})`,
+            color: discord.webhookColors.darkRed,
             fields: notificationFields,
         }],
         'natUserReport');
