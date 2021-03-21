@@ -510,7 +510,6 @@ router.get('/findPreviousEvaluations/:userId', async (req, res) => {
         user: req.params.userId,
         active: false,
         consensus: { $exists: true },
-        feedback: { $exists: true },
     });
 
     const applications = await AppEvaluation.find({

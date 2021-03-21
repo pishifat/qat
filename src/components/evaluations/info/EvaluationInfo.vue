@@ -32,6 +32,7 @@
                 </p>
 
                 <div id="additionalInfo" class="collapse container">
+                    <evaluator-assignments />
                     <previous-evaluations
                         :user-mongo-id="selectedEvaluation.user.id"
                     />
@@ -44,7 +45,6 @@
                     <modding-activity
                         :username="selectedEvaluation.user.username"
                     />
-                    <evaluator-assignments />
                 </div>
             </template>
 
