@@ -350,7 +350,8 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
             if (evaluation.addition === BnEvaluationAddition.LowActivityWarning) {
                 deadline.setDate(deadline.getDate() + 40);
             } else {
-                deadline.setDate(deadline.getDate() + 100);
+                const randomDelay = Math.floor(Math.random() * (115 - 85) + 85); // between 85 and 115 days
+                deadline.setDate(deadline.getDate() + randomDelay);
             }
 
             await user.save();
