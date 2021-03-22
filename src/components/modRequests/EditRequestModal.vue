@@ -52,7 +52,6 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex';
-import postData from '../../mixins/postData.js';
 import ModalDialog from '../ModalDialog.vue';
 
 export default {
@@ -60,7 +59,6 @@ export default {
     components: {
         ModalDialog,
     },
-    mixins: [ postData ],
     data () {
         return {
             comment: '',
@@ -96,9 +94,9 @@ export default {
                 category: this.category,
             };
 
-            await this.executePost(`/modRequests/${this.editingRequestId}/edit`, updateData, e);
+            await this.$http.executePost(`/modRequests/${this.editingRequestId}/edit`, updateData, e);
 
-            const data = await this.executeGet('/modRequests/owned');
+            const data = await this.$http.executeGet('/modRequests/owned');
             if (!data.error) this.$store.commit('modRequests/setOwnRequests', data);
         },
     },

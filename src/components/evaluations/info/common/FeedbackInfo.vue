@@ -31,7 +31,6 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import postData from '../../../../mixins/postData.js';
 import evaluations from '../../../../mixins/evaluations.js';
 import FeedbackPm from './FeedbackPm.vue';
 
@@ -40,7 +39,7 @@ export default {
     components: {
         FeedbackPm,
     },
-    mixins: [ postData, evaluations ],
+    mixins: [ evaluations ],
     data() {
         return {
             feedback: '',
@@ -51,6 +50,7 @@ export default {
         ...mapGetters('evaluations', [
             'selectedEvaluation',
         ]),
+        /** @returns {string} */
         consensus () {
             return this.selectedEvaluation.consensus;
         },
@@ -65,7 +65,7 @@ export default {
     },
     methods: {
         async setFeedback (e) {
-            const result = await this.executePost(
+            const result = await this.$http.executePost(
                 `/${this.selectedEvaluation.isApplication ? 'appEval' : 'bnEval'}/setFeedback/` + this.selectedEvaluation.id, { feedback: this.feedback }, e);
 
             if (result && !result.error) {

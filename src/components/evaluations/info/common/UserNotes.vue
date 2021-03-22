@@ -30,7 +30,6 @@
 </template>
 
 <script>
-import postData from '../../../../mixins/postData.js';
 import UserLink from '../../../UserLink.vue';
 
 export default {
@@ -38,7 +37,6 @@ export default {
     components: {
         UserLink,
     },
-    mixins: [ postData ],
     props: {
         userMongoId: {
             type: String,
@@ -62,7 +60,7 @@ export default {
     methods: {
         async findUserNotes() {
             this.userNotes = null;
-            const res = await this.executeGet('/bnEval/findUserNotes/' + this.userMongoId);
+            const res = await this.$http.executeGet('/bnEval/findUserNotes/' + this.userMongoId);
 
             if (res) {
                 this.userNotes = res.userNotes;

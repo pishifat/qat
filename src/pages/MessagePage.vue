@@ -12,7 +12,6 @@
 </template>
 
 <script>
-import postData from '../mixins/postData.js';
 import EvaluationResults from '../components/evaluations/EvaluationResults.vue';
 import ReportFeedback from '../components/reports/ReportFeedback.vue';
 
@@ -22,7 +21,6 @@ export default {
         EvaluationResults,
         ReportFeedback,
     },
-    mixins: [ postData ],
     data() {
         return {
             evaluation: null,
@@ -34,13 +32,13 @@ export default {
         const reportId = this.$route.query.report;
 
         if (evalId) {
-            const evaluation = await this.initialRequest('/message/evaluation/' + evalId);
+            const evaluation = await this.$http.initialRequest('/message/evaluation/' + evalId);
 
             if (evaluation && !evaluation.error) {
                 this.evaluation = evaluation;
             }
         } else if (reportId) {
-            const report = await this.initialRequest('/message/report/' + reportId);
+            const report = await this.$http.initialRequest('/message/report/' + reportId);
 
             if (report && !report.error) {
                 this.report = report;

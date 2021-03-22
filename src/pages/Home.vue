@@ -65,7 +65,6 @@
 
 <script>
 import { mapState } from 'vuex';
-import postData from '../mixins/postData';
 import evaluations from '../mixins/evaluations';
 import ToastMessages from '../components/ToastMessages.vue';
 import ModScoreCalculator from '../components/home/ModScoreCalculator.vue';
@@ -80,14 +79,14 @@ export default {
         Minecraft,
         UserLink,
     },
-    mixins: [ postData, evaluations ],
+    mixins: [ evaluations ],
     computed: mapState([
         'allUsersByMode',
     ]),
     async created () {
         if (this.allUsersByMode.length) return;
 
-        const data = await this.executeGet('/relevantInfo');
+        const data = await this.$http.executeGet('/relevantInfo');
 
         if (data.allUsersByMode) {
             this.$store.commit('setHomeData', data.allUsersByMode);

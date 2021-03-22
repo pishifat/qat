@@ -101,10 +101,8 @@
 
 <script>
 import { mapState } from 'vuex';
-import postData from '../../mixins/postData';
 
 export default {
-    mixins: [ postData ],
     data () {
         return {
             requestStatus: [],
@@ -126,7 +124,7 @@ export default {
     },
     methods: {
         async updateRequestStatus (e) {
-            await this.executePost(`/users/${this.loggedInUser.id}/updateRequestStatus`, {
+            await this.$http.executePost(`/users/${this.loggedInUser.id}/updateRequestStatus`, {
                 requestStatus: this.requestStatus,
                 requestLink: this.requestLink,
             }, e);

@@ -129,7 +129,6 @@
 </template>
 
 <script>
-import postData from '../mixins/postData';
 import ToastMessages from '../components/ToastMessages.vue';
 
 export default {
@@ -137,7 +136,6 @@ export default {
     components: {
         ToastMessages,
     },
-    mixins: [ postData ],
     data () {
         return {
             username: '',
@@ -198,14 +196,14 @@ export default {
     },
     methods: {
         async submit (e) {
-            const data = await this.executePost(`/reports/submitReport`, {
+            const data = await this.$http.executePost(`/reports/submitReport`, {
                 username: this.username,
                 reason: this.reason,
                 link: this.link,
                 category: this.category,
             }, e);
 
-            if (data && !data.error) {
+            if (this.$http.isValid(data)) {
                 this.successInfo = 'Your report has been submitted! Its outcome will be sent to you via osu! chat';
             }
         },

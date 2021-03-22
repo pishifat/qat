@@ -22,7 +22,6 @@
 <script>
 import AddEvaluations from '../components/evaluations/AddEvaluations.vue';
 import EvalPage from '../components/evaluations/EvalPage.vue';
-import postData from '../mixins/postData.js';
 
 export default {
     name: 'BnEvalPage',
@@ -30,7 +29,6 @@ export default {
         AddEvaluations,
         EvalPage,
     },
-    mixins: [ postData ],
     methods: {
         openAddEvaluations() {
             this.$store.commit('evaluations/updateCheckedEvaluations', []);

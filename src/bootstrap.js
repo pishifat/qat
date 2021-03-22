@@ -2,6 +2,7 @@ import Vue from 'vue';
 import MarkdownIt from 'markdown-it';
 import moment from 'moment';
 import MarkdownItVideo from 'markdown-it-video';
+import http from './store/http';
 
 const md = new MarkdownIt('zero', {
     html: false,
@@ -31,6 +32,7 @@ md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
 
 Vue.prototype.$md = md;
 Vue.prototype.$moment = moment;
+Vue.prototype.$http = http;
 
 Vue.filter('toStandardDate', (date) => {
     if (!date) return '';

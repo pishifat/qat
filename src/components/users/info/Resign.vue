@@ -14,11 +14,9 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import postData from '../../../mixins/postData.js';
 
 export default {
     name: 'BnEvaluatorToggle',
-    mixins: [postData],
     computed: {
         ...mapGetters('users', [
             'selectedUser',
@@ -29,7 +27,7 @@ export default {
             const result = confirm(`Are you sure? You will no longer be a Beatmap Nominator.`);
 
             if (result) {
-                await this.executePost(`/users/resignFromBn/${this.selectedUser.id}`, {}, e);
+                await this.$http.executePost(`/users/resignFromBn/${this.selectedUser.id}`, {}, e);
             }
         },
     },

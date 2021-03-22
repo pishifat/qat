@@ -43,7 +43,6 @@
 import { mapState, mapGetters } from 'vuex';
 import qualityAssuranceModule from '../store/qualityAssurance';
 import ToastMessages from '../components/ToastMessages.vue';
-import postData from '../mixins/postData.js';
 import FilterBox from '../components/FilterBox.vue';
 import EventRow from '../components/qualityAssurance/EventRow.vue';
 import Handbook from '../components/qualityAssurance/Handbook.vue';
@@ -58,7 +57,6 @@ export default {
         Handbook,
         Leaderboard,
     },
-    mixins: [postData],
     data() {
         return {
             limit: 200,
@@ -86,18 +84,18 @@ export default {
     },
     async created() {
         this.$store.commit('qualityAssurance/pageFilters/setFilterMode', this.userMainMode);
-        const data = await this.initialRequest('/qualityAssurance/relevantInfo');
+        const data = await this.$http.initialRequest('/qualityAssurance/relevantInfo');
 
-        if (data) {
+        if (this.$http.isValid(data)) {
             this.$store.commit('qualityAssurance/setEvents', data.events);
             this.$store.commit('qualityAssurance/setOverwriteEvents', data.overwrite);
         }
     },
     mounted() {
         setInterval(async () => {
-            const data = await this.executeGet('/qualityAssurance/relevantInfo');
+            const data = await this.$http.executeGet('/qualityAssurance/relevantInfo');
 
-            if (data) {
+            if (this.$http.isValid(data)) {
                 this.$store.commit('qualityAssurance/setEvents', data.events);
                 this.$store.commit('qualityAssurance/setOverwriteEvents', data.overwrite);
             }
@@ -128,7 +126,7 @@ export default {
             return isOutdated;
         },
         async loadMore (e) {
-            const res = await this.executeGet('/qualityAssurance/loadMore/' + this.limit + '/' + (this.limit - 200), e);
+            const res = await this.$http.executeGet('/qualityAssurance/loadMore/' + this.limit + '/' + (this.limit - 200), e);
 
             if (res) {
                 this.$store.commit('qualityAssurance/addEvents', res.events);

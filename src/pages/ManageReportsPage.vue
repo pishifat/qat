@@ -79,7 +79,6 @@ import manageReportsModule from '../store/manageReports';
 import ToastMessages from '../components/ToastMessages.vue';
 import ReportCard from '../components/reports/ReportCard.vue';
 import ReportInfo from '../components/reports/ReportInfo.vue';
-import postData from '../mixins/postData.js';
 
 export default {
     name: 'ManageReportsPage',
@@ -88,7 +87,6 @@ export default {
         ReportCard,
         ReportInfo,
     },
-    mixins: [postData],
     data() {
         return {
             searchValue: null,
@@ -108,7 +106,7 @@ export default {
         }
     },
     async created() {
-        const res = await this.initialRequest('/manageReports/relevantInfo');
+        const res = await this.$http.initialRequest('/manageReports/relevantInfo');
 
         if (res) {
             this.$store.commit('manageReports/setOpenReports', res.openReports);
@@ -122,7 +120,7 @@ export default {
                     this.$store.commit('manageReports/setSelectedReportId', id);
                     $('#reportInfo').modal('show');
                 } else {
-                    const report = await this.executeGet(`/manageReports/searchById/${id}`);
+                    const report = await this.$http.executeGet(`/manageReports/searchById/${id}`);
 
                     if (report && !report.error) {
                         this.$store.commit('manageReports/setClosedReports', [report]);
@@ -141,7 +139,7 @@ export default {
     },
     methods: {
         updateReports (data) {
-            if (data && !data.error) {
+            if (this.$http.isValid(data)) {
                 this.$store.commit('manageReports/setIsQueried', true);
                 this.$store.commit('manageReports/setClosedReports', data);
                 this.$store.dispatch('updateToastMessages', {
@@ -161,7 +159,7 @@ export default {
                     this.$router.replace(`/managereports?user=${this.searchValue}`);
                 }
 
-                const data = await this.executeGet('/manageReports/search/' + this.searchValue, e);
+                const data = await this.$http.executeGet('/manageReports/search/' + this.searchValue, e);
                 this.updateReports(data);
             }
         },
@@ -172,7 +170,7 @@ export default {
                     type: 'danger',
                 });
             } else {
-                const data = await this.executeGet('/manageReports/searchRecent/' + this.limit, e);
+                const data = await this.$http.executeGet('/manageReports/searchRecent/' + this.limit, e);
                 this.updateReports(data);
             }
         },

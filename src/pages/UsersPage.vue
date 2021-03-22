@@ -84,7 +84,6 @@ import Badges from '../components/users/Badges.vue';
 import PotentialNatInfo from '../components/users/PotentialNatInfo.vue';
 import FilterBox from '../components/FilterBox.vue';
 import PaginationNav from '../components/PaginationNav.vue';
-import postData from '../mixins/postData.js';
 
 export default {
     name: 'UsersPage',
@@ -99,7 +98,6 @@ export default {
         FilterBox,
         PaginationNav,
     },
-    mixins: [postData],
     computed: {
         ...mapState([
             'loggedInUser',
@@ -127,7 +125,7 @@ export default {
     async created() {
         if (this.users.length) return;
 
-        const data = await this.initialRequest('/users/relevantInfo');
+        const data = await this.$http.initialRequest('/users/relevantInfo');
 
         if (!data.error) {
             this.$store.commit('users/setUsers', data.users);
@@ -154,7 +152,7 @@ export default {
             this.$store.dispatch('users/updateSorting', sortBy);
         },
         async loadPreviousBnAndNat(e) {
-            const res = await this.executeGet('/users/loadPreviousBnAndNat', e);
+            const res = await this.$http.executeGet('/users/loadPreviousBnAndNat', e);
 
             if (res) {
                 this.$store.commit('users/setShowOldUsers', true);

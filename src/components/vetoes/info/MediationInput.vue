@@ -62,11 +62,9 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex';
-import postData from '../../../mixins/postData';
 
 export default {
     name: 'MediationInput',
-    mixins: [ postData ],
     data() {
         return {
             comment: null,
@@ -115,7 +113,7 @@ export default {
                     type: 'danger',
                 });
             } else {
-                const data = await this.executePost(
+                const data = await this.$http.executePost(
                     `vetoes/submitMediation/${this.selectedVeto.id}`,
                     {
                         mediationId: this.mediationId,
@@ -125,7 +123,7 @@ export default {
                     e
                 );
 
-                if (data && !data.error) {
+                if (this.$http.isValid(data)) {
                     this.$store.commit('vetoes/updateVeto', data.veto);
                 }
             }

@@ -94,7 +94,6 @@
 import { mapGetters } from 'vuex';
 import ConclusionPost from './ConclusionPost.vue';
 import ForumPm from './ForumPm.vue';
-import postData from '../../../mixins/postData';
 
 export default {
     name: 'AdminButtons',
@@ -102,7 +101,6 @@ export default {
         ConclusionPost,
         ForumPm,
     },
-    mixins: [ postData ],
     data() {
         return {
             mediators: null,
@@ -134,7 +132,7 @@ export default {
             const result = confirm(`Are you sure?`);
 
             if (result) {
-                const veto = await this.executePost(`/vetoes/beginMediation/${this.selectedVeto.id}`, { mediators: this.mediators }, e);
+                const veto = await this.$http.executePost(`/vetoes/beginMediation/${this.selectedVeto.id}`, { mediators: this.mediators }, e);
 
                 this.commitVeto(veto, 'Started veto mediation');
             }
@@ -143,7 +141,7 @@ export default {
             const result = confirm(`Are you sure?`);
 
             if (result) {
-                const veto = await this.executePost(
+                const veto = await this.$http.executePost(
                     `/vetoes/concludeMediation/${this.selectedVeto.id}`,
                     {
                         majorityUphold: this.majorityUphold,
@@ -160,7 +158,7 @@ export default {
             const result = confirm(`Are you sure? This should only be done if a mistake was made.`);
 
             if (result) {
-                const veto = await this.executePost(`/vetoes/continueMediation/${this.selectedVeto.id}`, {}, e);
+                const veto = await this.$http.executePost(`/vetoes/continueMediation/${this.selectedVeto.id}`, {}, e);
 
                 this.commitVeto(veto, 'Re-opened mediation');
             }
@@ -174,7 +172,7 @@ export default {
 
             excludeUsers.push(this.selectedVeto.beatmapMapper.toLowerCase(), this.selectedVeto.vetoer.username.toLowerCase());
 
-            const result = await this.executePost('/vetoes/selectMediators', { mode: this.selectedVeto.mode, excludeUsers }, e);
+            const result = await this.$http.executePost('/vetoes/selectMediators', { mode: this.selectedVeto.mode, excludeUsers }, e);
 
             if (result && !result.error) {
                 this.mediators = result;
@@ -182,10 +180,10 @@ export default {
         },
         async deleteVeto (e) {
             if (confirm(`Are you sure?`)) {
-                const result = await this.executePost(`/vetoes/deleteVeto/${this.selectedVeto.id}`, e);
+                const result = await this.$http.executePost(`/vetoes/deleteVeto/${this.selectedVeto.id}`, e);
 
                 if (result && !result.error) {
-                    const res = await this.executeGet('/vetoes/relevantInfo/');
+                    const res = await this.$http.executeGet('/vetoes/relevantInfo/');
 
                     if (res) {
                         $('#extendedInfo').modal('hide');

@@ -146,7 +146,6 @@
 </template>
 
 <script>
-import postData from '../../mixins/postData.js';
 import ModalDialog from '../ModalDialog.vue';
 
 export default {
@@ -154,7 +153,6 @@ export default {
     components: {
         ModalDialog,
     },
-    mixins: [postData],
     data() {
         return {
             vetoReasons: [],
@@ -225,7 +223,7 @@ export default {
                     type: 'danger',
                 });
             } else {
-                const data = await this.executePost(
+                const data = await this.$http.executePost(
                     '/vetoes/submit',
                     {
                         reasons: this.vetoReasons,
@@ -234,7 +232,7 @@ export default {
                     e
                 );
 
-                if (data && !data.error) {
+                if (this.$http.isValid(data)) {
                     $('#addVeto').modal('hide');
                     this.$store.commit('vetoes/addVeto', data.veto);
                 }

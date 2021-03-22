@@ -31,16 +31,14 @@
 
 <script>
 import { mapState } from 'vuex';
-import postData from '../../mixins/postData.js';
 
 export default {
-    mixins: [ postData ],
     computed: mapState([
         'loggedInUser',
     ]),
     methods: {
         async updateBnEvaluator (e) {
-            await this.executePost(`/users/${this.loggedInUser.id}/switchBnEvaluator`, {}, e);
+            await this.$http.executePost(`/users/${this.loggedInUser.id}/switchBnEvaluator`, {}, e);
         },
     },
 };

@@ -52,6 +52,7 @@ export default {
         },
     },
     computed: {
+        /** @returns {string[]} */
         filters () {
             return this.$store.state[this.storeModule].pageFilters.filters;
         },

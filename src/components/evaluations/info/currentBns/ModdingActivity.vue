@@ -19,11 +19,9 @@
 </template>
 
 <script>
-import postData from '../../../../mixins/postData.js';
 
 export default {
     name: 'ModdingActivity',
-    mixins: [postData],
     props: {
         username: {
             type: String,
@@ -46,7 +44,7 @@ export default {
                 message: `Loading modding activity (this may take a while)`,
                 type: 'info',
             });
-            const res = await this.executeGet(`/users/findModsCount/${this.username}`);
+            const res = await this.$http.executeGet(`/users/findModsCount/${this.username}`);
 
             if (res) {
                 this.modCount = res;

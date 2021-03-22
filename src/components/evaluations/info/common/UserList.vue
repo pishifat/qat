@@ -24,11 +24,9 @@
 </template>
 
 <script>
-import postData from '../../../../mixins/postData.js';
 
 export default {
     name: 'UserList',
-    mixins: [postData],
     props: {
         header: {
             type: String,
@@ -52,7 +50,7 @@ export default {
             const result = confirm(`Are you sure?`);
 
             if (result) {
-                const r = await this.executePost(`/${this.isApplication ? 'appEval' : 'bnEval'}/replaceUser/${this.nominatorAssessmentMongoId}`, {
+                const r = await this.$http.executePost(`/${this.isApplication ? 'appEval' : 'bnEval'}/replaceUser/${this.nominatorAssessmentMongoId}`, {
                     evaluatorId,
                     replaceNat: this.replaceNat,
                 }, e);

@@ -105,7 +105,6 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import evaluationsModule from '../../store/evaluations';
-import postData from '../../mixins/postData.js';
 import ToastMessages from '../ToastMessages.vue';
 import FilterBox from '../FilterBox.vue';
 import EvaluationCard from './card/EvaluationCard.vue';
@@ -119,7 +118,6 @@ export default {
         EvaluationCard,
         EvaluationInfo,
     },
-    mixins: [ postData ],
     props: {
         discussionEvaluationsTitle: {
             type: String,
@@ -162,9 +160,9 @@ export default {
             this.$store.commit(`evaluations/pageFilters/setFilterMode`, this.userMainMode);
         }
 
-        const data = await this.initialRequest(`/${this.kind === 'applications' ? 'appEval' : 'bnEval'}/relevantInfo`);
+        const data = await this.$http.initialRequest(`/${this.kind === 'applications' ? 'appEval' : 'bnEval'}/relevantInfo`);
 
-        if (data) {
+        if (this.$http.isValid(data)) {
             this.$store.commit(`evaluations/setEvaluations`, data.evaluations);
             const id = this.$route.query.id;
 
@@ -182,9 +180,9 @@ export default {
     },
     mounted () {
         setInterval(async () => {
-            const data = await this.executeGet(`/${this.kind === 'applications' ? 'appEval' : 'bnEval'}/relevantInfo`);
+            const data = await this.$http.executeGet(`/${this.kind === 'applications' ? 'appEval' : 'bnEval'}/relevantInfo`);
 
-            if (data) {
+            if (this.$http.isValid(data)) {
                 this.$store.commit(`evaluations/setEvaluations`, data.evaluations);
             }
         }, 21600000);
@@ -214,9 +212,9 @@ export default {
                     let evaluations = [];
 
                     if (this.kind === 'applications') {
-                        evaluations = await this.executePost('/appEval/setGroupEval/', { checkedApps: this.checkedEvaluations }, e);
+                        evaluations = await this.$http.executePost('/appEval/setGroupEval/', { checkedApps: this.checkedEvaluations }, e);
                     } else {
-                        evaluations = await this.executePost('/bnEval/setGroupEval/', { checkedRounds: this.checkedEvaluations }, e);
+                        evaluations = await this.$http.executePost('/bnEval/setGroupEval/', { checkedRounds: this.checkedEvaluations }, e);
                     }
 
                     this.commitEvaluations(evaluations, 'Set as group eval');
@@ -231,9 +229,9 @@ export default {
                     let evaluations = [];
 
                     if (this.kind === 'applications') {
-                        evaluations = await this.executePost('/appEval/setIndividualEval/', { checkedApps: this.checkedEvaluations }, e);
+                        evaluations = await this.$http.executePost('/appEval/setIndividualEval/', { checkedApps: this.checkedEvaluations }, e);
                     } else {
-                        evaluations = await this.executePost('/bnEval/setIndividualEval/', { checkedRounds: this.checkedEvaluations }, e);
+                        evaluations = await this.$http.executePost('/bnEval/setIndividualEval/', { checkedRounds: this.checkedEvaluations }, e);
                     }
 
                     this.commitEvaluations(evaluations, 'Set as individual eval');
@@ -248,9 +246,9 @@ export default {
                     let evaluations = [];
 
                     if (this.kind === 'applications') {
-                        evaluations = await this.executePost('/appEval/setComplete/', { checkedApps: this.checkedEvaluations }, e);
+                        evaluations = await this.$http.executePost('/appEval/setComplete/', { checkedApps: this.checkedEvaluations }, e);
                     } else {
-                        evaluations = await this.executePost('/bnEval/setComplete/', { checkedRounds: this.checkedEvaluations }, e);
+                        evaluations = await this.$http.executePost('/bnEval/setComplete/', { checkedRounds: this.checkedEvaluations }, e);
                     }
 
                     this.commitEvaluations(evaluations, 'Archived');

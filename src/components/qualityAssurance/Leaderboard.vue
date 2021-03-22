@@ -49,7 +49,6 @@
 
 <script>
 import { mapState } from 'vuex';
-import postData from '../../mixins/postData.js';
 import UserLink from '../UserLink.vue';
 
 export default {
@@ -57,7 +56,6 @@ export default {
     components: {
         UserLink,
     },
-    mixins: [ postData ],
     data () {
         return {
             leaderboard: null,
@@ -73,9 +71,9 @@ export default {
         async loadLeaderboard () {
             if (!this.leaderboard && !this.loading) {
                 this.loading = true;
-                const data = await this.executeGet('/qualityAssurance/loadLeaderboard');
+                const data = await this.$http.executeGet('/qualityAssurance/loadLeaderboard');
 
-                if (data) {
+                if (this.$http.isValid(data)) {
                     this.loading = false;
                     this.leaderboard = data;
                     console.log(data);

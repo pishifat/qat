@@ -66,7 +66,6 @@
 </template>
 
 <script>
-import postData from '../../mixins/postData.js';
 import UserLink from '../UserLink.vue';
 
 export default {
@@ -74,7 +73,6 @@ export default {
     components: {
         UserLink,
     },
-    mixins: [ postData ],
     data() {
         return {
             bnActivity: null,
@@ -87,7 +85,7 @@ export default {
         async findBnActivity(e) {
             if (!this.bnDays || !this.bnDays.length) this.bnDays = 30;
 
-            const activity = await this.executeGet('/users/findBnActivity/' + this.bnDays + '/' + this.bnMode, e);
+            const activity = await this.$http.executeGet('/users/findBnActivity/' + this.bnDays + '/' + this.bnMode, e);
 
             if (activity) {
                 this.bnActivity = activity;

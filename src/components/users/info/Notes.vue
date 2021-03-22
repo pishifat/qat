@@ -72,7 +72,6 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import postData from '../../../mixins/postData.js';
 import UserLink from '../../UserLink.vue';
 
 export default {
@@ -80,7 +79,6 @@ export default {
     components: {
         UserLink,
     },
-    mixins: [ postData ],
     data() {
         return {
             notes: null,
@@ -110,7 +108,7 @@ export default {
     },
     methods: {
         async loadUserNotes() {
-            const notes = await this.executeGet('/users/nat/loadUserNotes/' + this.selectedUser.id);
+            const notes = await this.$http.executeGet('/users/nat/loadUserNotes/' + this.selectedUser.id);
 
             if (notes) {
                 this.notes = notes;
@@ -118,9 +116,9 @@ export default {
         },
         async saveNote(e) {
             if (this.comment.length) {
-                const data = await this.executePost('/users/nat/saveNote/' + this.selectedUser.id, { comment: this.comment }, e);
+                const data = await this.$http.executePost('/users/nat/saveNote/' + this.selectedUser.id, { comment: this.comment }, e);
 
-                if (data && !data.error) {
+                if (this.$http.isValid(data)) {
                     if (this.notes) {
                         this.notes.unshift(data.note);
                     }
@@ -129,9 +127,9 @@ export default {
         },
         async editNote(e) {
             if (this.editNoteComment.length) {
-                const data = await this.executePost('/users/nat/editNote/' + this.editNoteId, { comment: this.editNoteComment }, e);
+                const data = await this.$http.executePost('/users/nat/editNote/' + this.editNoteId, { comment: this.editNoteComment }, e);
 
-                if (data && !data.error) {
+                if (this.$http.isValid(data)) {
                     if (this.notes) {
                         const i = this.notes.findIndex(n => n.id == this.editNoteId);
                         this.notes[i] = data.note;
@@ -144,7 +142,7 @@ export default {
             const result = confirm(`Are you sure?`);
 
             if (result) {
-                await this.executePost('/users/nat/hideNote/' + noteId, { userId: this.selectedUser.id });
+                await this.$http.executePost('/users/nat/hideNote/' + noteId, { userId: this.selectedUser.id });
 
                 if (this.notes) {
                     const i = this.notes.findIndex(note => note.id == noteId);

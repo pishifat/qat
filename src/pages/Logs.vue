@@ -59,7 +59,6 @@
 
 <script>
 import { mapState } from 'vuex';
-import postData from '../mixins/postData';
 import ToastMessages from '../components/ToastMessages.vue';
 import DataTable from '../components/DataTable.vue';
 
@@ -69,7 +68,6 @@ export default {
         ToastMessages,
         DataTable,
     },
-    mixins: [ postData ],
     data () {
         return {
             logs: [],
@@ -97,7 +95,7 @@ export default {
         ]),
     },
     async created () {
-        const logs = await this.initialRequest(`/logs/search/${this.category}/${this.skip}`);
+        const logs = await this.$http.initialRequest(`/logs/search/${this.category}/${this.skip}`);
 
         if (!logs.error) {
             this.logs = logs;
@@ -106,7 +104,7 @@ export default {
     methods: {
         async loadCategory (e) {
             this.skip = 0;
-            const logs = await this.executeGet(`/logs/search/${this.category}/${this.skip}`, e);
+            const logs = await this.$http.executeGet(`/logs/search/${this.category}/${this.skip}`, e);
 
             if (!logs.error) {
                 this.skip += 300;
@@ -114,7 +112,7 @@ export default {
             }
         },
         async showMore (e) {
-            const logs = await this.executeGet(`/logs/search/${this.category}/${this.skip}`, e);
+            const logs = await this.$http.executeGet(`/logs/search/${this.category}/${this.skip}`, e);
 
             if (!logs.error) {
                 this.skip += 300;

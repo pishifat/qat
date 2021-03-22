@@ -50,11 +50,8 @@
 </template>
 
 <script>
-import postData from '../../../../mixins/postData.js';
-
 export default {
     name: 'ObviousnessSeverity',
-    mixins: [ postData ],
     props: {
         obviousness: {
             type: Number || null,
@@ -75,9 +72,9 @@ export default {
     },
     methods: {
         async updateObviousness(obviousness) {
-            let data = await this.executePost('/dataCollection/updateObviousness/' + this.eventId, { obviousness });
+            let data = await this.$http.executePost('/dataCollection/updateObviousness/' + this.eventId, { obviousness });
 
-            if (data && !data.error) {
+            if (this.$http.isValid(data)) {
                 this.$store.commit('dataCollection/updateEvent', {
                     id: this.eventId,
                     type: this.type,
@@ -87,9 +84,9 @@ export default {
             }
         },
         async updateSeverity(severity) {
-            let data = await this.executePost('/dataCollection/updateSeverity/' + this.eventId, { severity });
+            let data = await this.$http.executePost('/dataCollection/updateSeverity/' + this.eventId, { severity });
 
-            if (data && !data.error) {
+            if (this.$http.isValid(data)) {
                 this.$store.commit('dataCollection/updateEvent', {
                     id: this.eventId,
                     type: this.type,

@@ -57,7 +57,6 @@ import VetoInfo from '../components/vetoes/VetoInfo.vue';
 import SubmitVeto from '../components/vetoes/SubmitVeto.vue';
 import FilterBox from '../components/FilterBox.vue';
 import PaginationNav from '../components/PaginationNav.vue';
-import postData from '../mixins/postData.js';
 
 export default {
     name: 'VetoesPage',
@@ -69,7 +68,6 @@ export default {
         FilterBox,
         PaginationNav,
     },
-    mixins: [postData],
     computed: {
         ...mapState('vetoes', [
             'vetoes',
@@ -93,7 +91,7 @@ export default {
     async created () {
         if (this.vetoes.length) return;
 
-        const data = await this.initialRequest('/vetoes/relevantInfo');
+        const data = await this.$http.initialRequest('/vetoes/relevantInfo');
 
         if (data.vetoes) {
             this.$store.commit('vetoes/setVetoes', data.vetoes);
@@ -112,7 +110,7 @@ export default {
     },
     mounted () {
         setInterval(async () => {
-            const res = await this.executeGet('/vetoes/relevantInfo/');
+            const res = await this.$http.executeGet('/vetoes/relevantInfo/');
 
             if (res) {
                 this.$store.commit('vetoes/setVetoes', res.vetoes);

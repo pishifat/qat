@@ -71,10 +71,8 @@
 
 <script>
 import { mapState } from 'vuex';
-import postData from '../../mixins/postData.js';
 
 export default {
-    mixins: [ postData ],
     data () {
         return {
             modeSettings: [],
@@ -90,23 +88,23 @@ export default {
     },
     methods: {
         async fetchSettings () {
-            const settings = await this.executeGet(`/settings`);
+            const settings = await this.$http.executeGet(`/settings`);
 
             if (!settings.error) {
                 this.modeSettings = settings.modeSettings;
             }
         },
         async create (e) {
-            await this.executePost(`/settings/create`, {}, e);
+            await this.$http.executePost(`/settings/create`, {}, e);
             await this.fetchSettings();
         },
         async update (e) {
-            await this.executePost(`/settings/update`, {
+            await this.$http.executePost(`/settings/update`, {
                 modeSettings: this.modeSettings,
             }, e);
         },
         async updateDiscordId (e) {
-            await this.executePost(`/users/updateDiscordId`, {
+            await this.$http.executePost(`/users/updateDiscordId`, {
                 discordId: this.discordId,
             }, e);
         },

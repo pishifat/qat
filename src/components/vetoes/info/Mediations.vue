@@ -38,7 +38,6 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex';
-import postData from '../../../mixins/postData';
 import UserAvatar from '../../UserAvatar.vue';
 
 export default {
@@ -46,7 +45,6 @@ export default {
     components: {
         UserAvatar,
     },
-    mixins: [ postData ],
     computed: {
         ...mapState([
             'loggedInUser',
@@ -70,9 +68,9 @@ export default {
             const result = confirm(`Are you sure? This should only be done if a mistake was made.`);
 
             if (result) {
-                const data = await this.executePost(`/vetoes/replaceMediator/${this.selectedVeto.id}`, { mediationId });
+                const data = await this.$http.executePost(`/vetoes/replaceMediator/${this.selectedVeto.id}`, { mediationId });
 
-                if (data && !data.error) {
+                if (this.$http.isValid(data)) {
                     this.$store.commit('vetoes/updateVeto', data.veto);
                 }
             }

@@ -26,7 +26,6 @@
 </template>
 
 <script>
-import postData from '../../../../mixins/postData.js';
 import PreviousEvaluationEntry from './PreviousEvaluationEntry.vue';
 
 export default {
@@ -34,7 +33,6 @@ export default {
     components: {
         PreviousEvaluationEntry,
     },
-    mixins: [ postData ],
     props: {
         userMongoId: {
             type: String,
@@ -59,9 +57,9 @@ export default {
         async findPreviousEvaluations() {
             this.previousEvaluations = [];
             this.isLoading = true;
-            const data = await this.executeGet('/bnEval/findPreviousEvaluations/' + this.userMongoId);
+            const data = await this.$http.executeGet('/bnEval/findPreviousEvaluations/' + this.userMongoId);
 
-            if (data) {
+            if (this.$http.isValid(data)) {
                 this.previousEvaluations = data.previousEvaluations;
                 this.isLoading = false;
             }

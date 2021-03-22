@@ -60,7 +60,6 @@
 
 <script>
 import { mapState } from 'vuex';
-import postData from '../../../../../mixins/postData.js';
 import ObviousnessSeverity from '../ObviousnessSeverity.vue';
 
 export default {
@@ -68,7 +67,6 @@ export default {
     components: {
         ObviousnessSeverity,
     },
-    mixins: [ postData ],
     props: {
         event: {
             type: Object,
@@ -108,7 +106,7 @@ export default {
     },
     methods: {
         async updateContent (e) {
-            const data = await this.executePost('/dataCollection/updateContent/' + this.event._id, { reason: this.newEventContent }, e);
+            const data = await this.$http.executePost('/dataCollection/updateContent/' + this.event._id, { reason: this.newEventContent }, e);
             this.$store.commit('dataCollection/updateEvent', {
                 id: this.event._id,
                 type: this.event.type,

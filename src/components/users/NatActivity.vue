@@ -71,7 +71,6 @@
 </template>
 
 <script>
-import postData from '../../mixins/postData.js';
 import UserLink from '../UserLink.vue';
 
 export default {
@@ -79,7 +78,6 @@ export default {
     components: {
         UserLink,
     },
-    mixins: [ postData ],
     data() {
         return {
             natActivity: null,
@@ -94,7 +92,7 @@ export default {
         async findNatActivity(e) {
             if (!this.natDays || !this.natDays.length) this.natDays = 30;
 
-            const res = await this.executeGet(`/users/findNatActivity/${this.natDays}/${this.natMode}`, e);
+            const res = await this.$http.executeGet(`/users/findNatActivity/${this.natDays}/${this.natMode}`, e);
 
             if (res) {
                 this.natActivity = res.info;

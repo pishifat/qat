@@ -21,11 +21,9 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import postData from '../../../mixins/postData.js';
 
 export default {
     name: 'BnEvaluatorToggle',
-    mixins: [postData],
     computed: {
         ...mapGetters('users', [
             'selectedUser',
@@ -33,9 +31,9 @@ export default {
     },
     methods: {
         async switchBnEvaluator(e) {
-            const data = await this.executePost(`/users/${this.selectedUser.id}/switchBnEvaluator`, {}, e);
+            const data = await this.$http.executePost(`/users/${this.selectedUser.id}/switchBnEvaluator`, {}, e);
 
-            if (data && !data.error) {
+            if (this.$http.isValid(data)) {
                 this.$store.commit('users/updateUser', data.user);
             }
         },

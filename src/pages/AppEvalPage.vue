@@ -24,7 +24,6 @@
 import { mapState } from 'vuex';
 import EvalPage from '../components/evaluations/EvalPage.vue';
 import EvaluationInstructions from '../components/evaluations/EvaluationInstructions.vue';
-import postData from '../mixins/postData.js';
 
 export default {
     name: 'AppEvalPage',
@@ -32,7 +31,6 @@ export default {
         EvalPage,
         EvaluationInstructions,
     },
-    mixins: [ postData ],
     computed: {
         ...mapState([
             'loggedInUser',

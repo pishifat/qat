@@ -1,4 +1,5 @@
 import Axios from 'axios';
+import store from './main';
 
 async function executeRequest (requestType, url, data, e, updateLoadingState, store) {
     if (updateLoadingState) store.commit('updateLoadingState');
@@ -37,18 +38,22 @@ async function executeRequest (requestType, url, data, e, updateLoadingState, st
     }
 }
 
-export default {
-    methods: {
-        async executePost(url, data, e) {
-            return await executeRequest('post', url, data, e, false, this.$store);
-        },
+const http = {
+    async executePost (url, data, e) {
+        return await executeRequest('post', url, data, e, false, store);
+    },
 
-        async executeGet(url, e, updateLoadingState) {
-            return await executeRequest('get', url, null, e, updateLoadingState, this.$store);
-        },
+    async executeGet (url, e, updateLoadingState) {
+        return await executeRequest('get', url, null, e, updateLoadingState, store);
+    },
 
-        async initialRequest(url) {
-            return await executeRequest('get', url, null, null, true, this.$store);
-        },
+    async initialRequest (url) {
+        return await executeRequest('get', url, null, null, true, store);
+    },
+
+    isValid (data) {
+        return data && data.error === undefined;
     },
 };
+
+export default http;

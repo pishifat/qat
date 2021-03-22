@@ -134,7 +134,6 @@
 <script>
 import ModalDialog from '../ModalDialog.vue';
 import ModeRadioDisplay from '../ModeRadioDisplay.vue';
-import postData from '../../mixins/postData.js';
 
 export default {
     name: 'AddEvaluations',
@@ -142,7 +141,6 @@ export default {
         ModalDialog,
         ModeRadioDisplay,
     },
-    mixins: [postData],
     data() {
         return {
             includeUsers: null,
@@ -176,7 +174,7 @@ export default {
                     return;
                 }
 
-                const data = await this.executePost(
+                const data = await this.$http.executePost(
                     '/bnEval/addEvaluations/',
                     {
                         modes: this.selectedModes,
@@ -189,7 +187,7 @@ export default {
                     e
                 );
 
-                if (data && !data.error) {
+                if (this.$http.isValid(data)) {
                     this.$store.commit('evaluations/setEvaluations', data.evaluations);
 
                     if (data.evaluations.length) {

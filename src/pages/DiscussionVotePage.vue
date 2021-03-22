@@ -74,7 +74,6 @@ import DiscussionInfo from '../components/discussion/DiscussionInfo.vue';
 import SubmitDiscussion from '../components/discussion/SubmitDiscussion.vue';
 import FilterBox from '../components/FilterBox.vue';
 import PaginationNav from '../components/PaginationNav.vue';
-import postData from '../mixins/postData.js';
 
 export default {
     name: 'DiscussionVotePage',
@@ -86,7 +85,6 @@ export default {
         FilterBox,
         PaginationNav,
     },
-    mixins: [postData],
     computed: {
         ...mapState([
             'loggedInUser',
@@ -111,7 +109,7 @@ export default {
         }
     },
     async created() {
-        const res = await this.initialRequest('/discussionVote/relevantInfo');
+        const res = await this.$http.initialRequest('/discussionVote/relevantInfo');
 
         if (res) {
             this.$store.commit('discussionVote/setDiscussionVotes', res.discussions);
@@ -130,7 +128,7 @@ export default {
     },
     mounted() {
         setInterval(async () => {
-            const res = await this.executeGet('/discussionVote/relevantInfo');
+            const res = await this.$http.executeGet('/discussionVote/relevantInfo');
 
             if (res) {
                 this.$store.commit('discussionVote/setDiscussionVotes', res.discussions);

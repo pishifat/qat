@@ -111,7 +111,6 @@
 
 <script>
 import { mapState } from 'vuex';
-import postData from '../mixins/postData.js';
 import modRequestsModule from '../store/modRequests';
 import RequestsListing from '../components/modRequests/RequestsListing.vue';
 import EditRequestModal from '../components/modRequests/EditRequestModal.vue';
@@ -126,7 +125,6 @@ export default {
         MyRequestRow,
         ToastMessages,
     },
-    mixins: [ postData ],
     data () {
         return {
             link: '',
@@ -149,7 +147,7 @@ export default {
     },
     async created () {
         if (this.loggedInUser) {
-            const data = await this.initialRequest('/modRequests/owned');
+            const data = await this.$http.initialRequest('/modRequests/owned');
             if (!data.error) this.$store.commit('modRequests/setOwnRequests', data);
         }
     },
@@ -173,13 +171,13 @@ export default {
                 return;
             }
 
-            await this.executePost('/modRequests/store', {
+            await this.$http.executePost('/modRequests/store', {
                 link: this.link,
                 category: this.category,
                 comment: this.comment,
             }, e);
 
-            const data = await this.executeGet('/modRequests/owned');
+            const data = await this.$http.executeGet('/modRequests/owned');
             if (!data.error) this.$store.commit('modRequests/setOwnRequests', data);
         },
     },

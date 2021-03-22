@@ -76,11 +76,9 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import postData from '../../../../mixins/postData.js';
 
 export default {
     name: 'EvaluationInput',
-    mixins: [ postData ],
     data() {
         return {
             moddingComment: '',
@@ -127,7 +125,7 @@ export default {
                     type: 'danger',
                 });
             } else {
-                const result = await this.executePost(
+                const result = await this.$http.executePost(
                     `/${this.selectedEvaluation.isApplication ? 'appEval' : 'bnEval'}/submitEval/${this.selectedEvaluation.id}`, {
                         vote: this.vote,
                         moddingComment: this.moddingComment,

@@ -50,7 +50,6 @@
 </template>
 
 <script>
-import postData from '../../mixins/postData.js';
 import UserLink from '../UserLink.vue';
 
 export default {
@@ -58,7 +57,6 @@ export default {
     components: {
         UserLink,
     },
-    mixins: [ postData ],
     data() {
         return {
             potentialNatInfo: [],
@@ -84,7 +82,7 @@ export default {
     },
     methods: {
         async findPotentialNatInfo(e) {
-            const users = await this.executeGet('/users/nat/findPotentialNatInfo/', e);
+            const users = await this.$http.executeGet('/users/nat/findPotentialNatInfo/', e);
 
             if (users) {
                 users.forEach(user => {

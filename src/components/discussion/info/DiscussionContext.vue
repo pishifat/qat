@@ -99,11 +99,9 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import postData from '../../../mixins/postData.js';
 
 export default {
     name: 'DiscussionContext',
-    mixins: [ postData ],
     data() {
         return {
             isEditingTitle: false,
@@ -172,14 +170,14 @@ export default {
             }
         },
         async update () {
-            const data = await this.executePost(
+            const data = await this.$http.executePost(
                 `/discussionVote/${this.selectedDiscussionVote.id}/update`, {
                     title: this.editTitleContent,
                     shortReason: this.editProposalContent,
                     discussionLink: this.editLinkContent,
                 });
 
-            if (data && !data.error) {
+            if (this.$http.isValid(data)) {
                 this.$store.commit('discussionVote/updateDiscussionVote', data.discussion);
 
                 this.isEditingTitle = false;

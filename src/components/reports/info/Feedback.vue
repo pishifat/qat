@@ -88,11 +88,9 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import postData from '../../../mixins/postData.js';
 
 export default {
     name: 'Feedback',
-    mixins: [postData],
     data() {
         return {
             feedback: '',
@@ -131,13 +129,13 @@ export default {
                     return;
                 }
 
-                const data = await this.executePost(
+                const data = await this.$http.executePost(
                     '/manageReports/submitReportEval/' + this.selectedReport.id,
                     { vote: this.vote, feedback: this.feedback, close },
                     e
                 );
 
-                if (data && !data.error) {
+                if (this.$http.isValid(data)) {
                     this.$store.dispatch('manageReports/updateReport', data.report);
                 }
             }
@@ -146,9 +144,9 @@ export default {
             const result = confirm(`Are you sure? The report will be deleted and a content review will be opened.`);
 
             if (result) {
-                const data = await this.executePost('/manageReports/sendToContentReview/' + this.selectedReport.id, {}, e);
+                const data = await this.$http.executePost('/manageReports/sendToContentReview/' + this.selectedReport.id, {}, e);
 
-                if (data && !data.error) {
+                if (this.$http.isValid(data)) {
                     this.$store.dispatch('manageReports/updateReport', data.report);
                 }
             }

@@ -40,7 +40,6 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import postData from '../../mixins/postData.js';
 import ObviousnessSeverity from '../evaluations/info/currentBns/ObviousnessSeverity.vue';
 import ModalDialog from '../ModalDialog.vue';
 
@@ -50,7 +49,6 @@ export default {
         ObviousnessSeverity,
         ModalDialog,
     },
-    mixins: [postData],
     data() {
         return {
             newEventContent: null,
@@ -74,9 +72,9 @@ export default {
     },
     methods: {
         async updateContent(e) {
-            const data = await this.executePost('/dataCollection/updateContent/' + this.selectedEvent.id, { reason: this.newEventContent }, e);
+            const data = await this.$http.executePost('/dataCollection/updateContent/' + this.selectedEvent.id, { reason: this.newEventContent }, e);
 
-            if (data && !data.error) {
+            if (this.$http.isValid(data)) {
                 this.$store.commit('dataCollection/updateEvent', {
                     id: this.selectedEvent.id,
                     type: this.selectedEvent.type,

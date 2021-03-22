@@ -35,7 +35,6 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import postData from '../../mixins/postData.js';
 import ModalHeader from './info/ModalHeader.vue';
 import DiscussionContext from './info/DiscussionContext.vue';
 import VotesActive from './info/votes/VotesActive.vue';
@@ -53,7 +52,6 @@ export default {
         MediatorOptions,
         ModalDialog,
     },
-    mixins: [ postData ],
     computed: {
         ...mapState([
             'loggedInUser',
@@ -70,10 +68,10 @@ export default {
                 const result2 = confirm(`ARE YOU REALLY SURE? THIS IS NOT THE VOTE BUTTON. DON'T BE STUPID.`);
 
                 if (result2) {
-                    const data = await this.executePost(
+                    const data = await this.$http.executePost(
                         '/discussionVote/concludeMediation/' + this.selectedDiscussionVote.id, e);
 
-                    if (data && !data.error) {
+                    if (this.$http.isValid(data)) {
                         this.$store.commit('discussionVote/updateDiscussionVote', data.discussion);
                     }
                 }

@@ -49,7 +49,6 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import postData from '../../../mixins/postData.js';
 import ModalHeader from './ModalHeader.vue';
 import Consensus from './common/Consensus.vue';
 import ReviewsListing from './common/ReviewsListing.vue';
@@ -68,7 +67,6 @@ export default {
         ModalDialog,
         MainApplicationInfo,
     },
-    mixins: [ postData ],
     computed: {
         ...mapState([
             'loggedInUser',
@@ -76,6 +74,7 @@ export default {
         ...mapGetters('evaluations', [
             'selectedEvaluation',
         ]),
+        /** @returns {string | string[]} */
         modes () {
             if (!this.selectedEvaluation) return [];
             if (this.selectedEvaluation.user.modes.length) return this.selectedEvaluation.user.modes;
@@ -89,7 +88,7 @@ export default {
                 const result = confirm(`Are you sure? ${this.selectedEvaluation.consensus === AppEvaluationConsensus.Pass ? 'This will remove the user from the BN' : ''}`);
 
                 if (result) {
-                    const data = await this.executePost(`/evalArchive/${this.selectedEvaluation.id}/unarchiveApp`, e);
+                    const data = await this.$http.executePost(`/evalArchive/${this.selectedEvaluation.id}/unarchiveApp`, e);
 
                     if (!data.error) {
                         $('#evaluationArchiveInfo').modal('hide');
@@ -100,7 +99,7 @@ export default {
                 const result = confirm(`Are you sure? This will place the user on probation`);
 
                 if (result) {
-                    const data = await this.executePost(`/evalArchive/${this.selectedEvaluation.id}/unarchiveBn`, e);
+                    const data = await this.$http.executePost(`/evalArchive/${this.selectedEvaluation.id}/unarchiveBn`, e);
 
                     if (!data.error) {
                         $('#evaluationArchiveInfo').modal('hide');

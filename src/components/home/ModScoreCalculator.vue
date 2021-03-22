@@ -63,7 +63,6 @@
 
 <script>
 import { mapState } from 'vuex';
-import postData from '../../mixins/postData';
 import ModeRadioDisplay from '../ModeRadioDisplay.vue';
 
 export default {
@@ -71,7 +70,6 @@ export default {
     components: {
         ModeRadioDisplay,
     },
-    mixins: [ postData ],
     data () {
         return {
             selectedMode: 'osu',
@@ -127,7 +125,7 @@ export default {
             }
 
             this.info = 'Retrieving info... (this will take a few seconds)';
-            const data = await this.executeGet(`/modsCount/${this.user}/${this.selectedMode}`, e);
+            const data = await this.$http.executeGet(`/modsCount/${this.user}/${this.selectedMode}`, e);
 
             if (!data.error) {
                 this.$set(this.modsCount, 0, data.modCount[0]);

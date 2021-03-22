@@ -44,11 +44,9 @@
 
 <script>
 import { mapState } from 'vuex';
-import postData from '../../mixins/postData.js';
 
 export default {
     name: 'Comments',
-    mixins: [ postData ],
     props: {
         qualityAssuranceChecks: {
             type: [Array, Object],
@@ -103,7 +101,7 @@ export default {
         },
         async editComment (e) {
             this.showInput = false;
-            const qaCheck = await this.executePost('/qualityAssurance/editComment/' + this.eventId, { qaCheckId: this.qaCheckId, comment: this.userComment }, e);
+            const qaCheck = await this.$http.executePost('/qualityAssurance/editComment/' + this.eventId, { qaCheckId: this.qaCheckId, comment: this.userComment }, e);
 
             if (event && !event.error) {
                 this.$store.commit('qualityAssurance/updateQaCheck', this.eventId, qaCheck);

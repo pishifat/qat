@@ -65,7 +65,6 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import modRequestsModule from '../store/modRequests';
-import postData from '../mixins/postData.js';
 import RequestsListing from '../components/modRequests/RequestsListing.vue';
 import RequestRow from '../components/modRequests/RequestRow.vue';
 import RequestInfo from '../components/modRequests/RequestInfo.vue';
@@ -81,7 +80,6 @@ export default {
         RequestTag,
         ToastMessages,
     },
-    mixins: [ postData ],
     computed: {
         ...mapState('modRequests', [
             'filters',
@@ -100,8 +98,8 @@ export default {
     },
     async created () {
         const [all, involved] = await Promise.all([
-            this.initialRequest('/modRequests/listing/all'),
-            this.executeGet('/modRequests/listing/involved'),
+            this.$http.initialRequest('/modRequests/listing/all'),
+            this.$http.executeGet('/modRequests/listing/involved'),
         ]);
         if (!all.error) this.$store.commit('modRequests/setAllRequests', all);
         if (!involved.error) this.$store.commit('modRequests/setInvolvedRequests', involved);
@@ -109,7 +107,7 @@ export default {
     methods: {
         async showMore (e) {
             this.$store.commit('modRequests/increaseLimit');
-            const data = await this.executeGet(`/modRequests/listing/all?limit=${this.monthsLimit}`, e);
+            const data = await this.$http.executeGet(`/modRequests/listing/all?limit=${this.monthsLimit}`, e);
             if (!data.error) this.$store.commit('modRequests/setAllRequests', data);
         },
     },

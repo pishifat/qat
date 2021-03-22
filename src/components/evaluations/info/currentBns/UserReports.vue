@@ -29,11 +29,8 @@
 </template>
 
 <script>
-import postData from '../../../../mixins/postData.js';
-
 export default {
     name: 'UserReports',
-    mixins: [postData],
     props: {
         userMongoId: {
             type: String,
@@ -56,7 +53,7 @@ export default {
     methods: {
         async findUserReports() {
             this.userReports = null;
-            const res = await this.executeGet('/bnEval/findUserReports/' + this.userMongoId);
+            const res = await this.$http.executeGet('/bnEval/findUserReports/' + this.userMongoId);
 
             if (res) {
                 this.userReports = res.userReports;

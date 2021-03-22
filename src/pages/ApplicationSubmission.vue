@@ -96,7 +96,6 @@
 </template>
 
 <script>
-import postData from '../mixins/postData';
 import ToastMessages from '../components/ToastMessages.vue';
 import ModeRadioDisplay from '../components/ModeRadioDisplay.vue';
 
@@ -106,7 +105,6 @@ export default {
         ToastMessages,
         ModeRadioDisplay,
     },
-    mixins: [ postData ],
     data () {
         return {
             hasPendingTest: false,
@@ -117,7 +115,7 @@ export default {
         };
     },
     async created () {
-        const data = await this.initialRequest('/bnapps/relevantInfo');
+        const data = await this.$http.initialRequest('/bnapps/relevantInfo');
 
         if (!data.error) {
             this.hasPendingTest = data.hasPendingTest;
@@ -127,7 +125,7 @@ export default {
         async apply (e) {
             this.successInfo = `Submitting & calculating mod score... (this will take a few seconds)`;
 
-            const data = await this.executePost(`/bnapps/apply`, {
+            const data = await this.$http.executePost(`/bnapps/apply`, {
                 mode: this.selectedMode,
                 mods: this.mods,
                 reasons: this.reasons,

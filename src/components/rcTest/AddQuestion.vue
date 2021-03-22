@@ -23,7 +23,6 @@
 </template>
 
 <script>
-import postData from '../../mixins/postData.js';
 import ModalDialog from '../../components/ModalDialog.vue';
 import QuestionType from './QuestionType.vue';
 import QuestionContent from './QuestionContent.vue';
@@ -35,7 +34,6 @@ export default {
         QuestionType,
         QuestionContent,
     },
-    mixins: [ postData ],
     props: {
         category: {
             type: String,
@@ -56,13 +54,13 @@ export default {
                     type: 'danger',
                 });
             } else {
-                const data = await this.executePost('/manageTest/store', {
+                const data = await this.$http.executePost('/manageTest/store', {
                     questionType: this.questionType,
                     newQuestion: this.questionContent,
                     category: this.category,
                 }, e);
 
-                if (data && !data.error) {
+                if (this.$http.isValid(data)) {
                     this.$store.commit('manageTest/addQuestion', data.question);
                 }
             }

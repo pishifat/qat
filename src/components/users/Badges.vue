@@ -38,7 +38,6 @@
 </template>
 
 <script>
-import postData from '../../mixins/postData.js';
 import UserLink from '../UserLink.vue';
 
 export default {
@@ -46,7 +45,6 @@ export default {
     components: {
         UserLink,
     },
-    mixins: [postData],
     data () {
         return {
             badgeUsers: [],
@@ -54,7 +52,7 @@ export default {
     },
     methods: {
         async findUserBadgeInfo() {
-            const users = await this.executeGet('/users/nat/findUserBadgeInfo');
+            const users = await this.$http.executeGet('/users/nat/findUserBadgeInfo');
 
             if (users) {
                 this.badgeUsers = users.filter(user =>
@@ -69,7 +67,7 @@ export default {
             return Math.floor(days / 365);
         },
         async editBadgeValue(id, group, add) {
-            const u = await this.executePost(
+            const u = await this.$http.executePost(
                 '/users/nat/editBadgeValue/' + id,
                 { group, add }
             );

@@ -120,7 +120,6 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import testResultsModule from '../store/testResults';
-import postData from '../mixins/postData.js';
 import ResultCard from '../components/rcTest/ResultCard.vue';
 import UserLink from '../components/UserLink.vue';
 
@@ -130,7 +129,6 @@ export default {
         ResultCard,
         UserLink,
     },
-    mixins: [postData],
     data() {
         return {
             selectedOptionIds: [],
@@ -152,7 +150,7 @@ export default {
     watch: {
         async selectedTest (v) {
             if (v) {
-                const application = await this.initialRequest(`testResults/findApplication/${this.selectedTest.id}`);
+                const application = await this.$http.initialRequest(`testResults/findApplication/${this.selectedTest.id}`);
 
                 if (application) {
                     this.$store.commit('testResults/setRelevantApplicationId', application.id);
@@ -175,11 +173,11 @@ export default {
         let res;
 
         if (user) {
-            res = await this.initialRequest(`/testResults/search/${user}`);
+            res = await this.$http.initialRequest(`/testResults/search/${user}`);
         } else if (test) {
-            res = await this.initialRequest(`/testResults/findTest/${test}`);
+            res = await this.$http.initialRequest(`/testResults/findTest/${test}`);
         } else {
-            res = await this.initialRequest('/testResults/relevantInfo');
+            res = await this.$http.initialRequest('/testResults/relevantInfo');
         }
 
         if (res) {
@@ -228,7 +226,7 @@ export default {
                     this.$router.replace(`/testresults?user=${user}`);
                 }
 
-                const result = await this.executeGet(`/testResults/search/${user}`, e);
+                const result = await this.$http.executeGet(`/testResults/search/${user}`, e);
 
                 if (result && !result.error) {
                     this.$store.commit('testResults/setTests', result.tests);

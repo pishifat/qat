@@ -91,7 +91,6 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import postData from '../../../../mixins/postData.js';
 import UserList from './UserList.vue';
 
 export default {
@@ -99,7 +98,6 @@ export default {
     components: {
         UserList,
     },
-    mixins: [ postData ],
     data() {
         return {
             includeUsers: null,
@@ -123,7 +121,7 @@ export default {
     },
     methods: {
         async selectBnEvaluators(e) {
-            const r = await this.executePost('/appeval/selectBnEvaluators', {
+            const r = await this.$http.executePost('/appeval/selectBnEvaluators', {
                 mode: this.selectedEvaluation.mode,
                 id: this.selectedEvaluation.id,
                 includeUsers: this.includeUsers,
@@ -140,9 +138,9 @@ export default {
             );
 
             if (result) {
-                const data = await this.executePost('/appEval/enableBnEvaluators/' + this.selectedEvaluation.id, { bnEvaluators: this.potentialBnEvaluators }, e);
+                const data = await this.$http.executePost('/appEval/enableBnEvaluators/' + this.selectedEvaluation.id, { bnEvaluators: this.potentialBnEvaluators }, e);
 
-                if (data && !data.error) {
+                if (this.$http.isValid(data)) {
                     this.$store.dispatch('appEval/updateAssessment', data.application);
                 }
             }

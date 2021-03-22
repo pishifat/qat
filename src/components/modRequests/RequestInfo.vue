@@ -99,7 +99,6 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import postData from '../../mixins/postData.js';
 import ModalDialog from '../ModalDialog.vue';
 import UserLink from '../UserLink.vue';
 
@@ -109,7 +108,6 @@ export default {
         ModalDialog,
         UserLink,
     },
-    mixins: [ postData ],
     data () {
         return {
             reviewAction: '',
@@ -151,14 +149,14 @@ export default {
                 return;
             }
 
-            await this.executePost(`/modRequests/listing/${this.selectedRequestId}/review`, {
+            await this.$http.executePost(`/modRequests/listing/${this.selectedRequestId}/review`, {
                 action: this.reviewAction,
                 comment: this.reviewComment,
             }, e);
 
             const [all, involved] = await Promise.all([
-                this.executeGet(`/modRequests/listing/all?limit=${this.monthsLimit}`),
-                this.executeGet('/modRequests/listing/involved'),
+                this.$http.executeGet(`/modRequests/listing/all?limit=${this.monthsLimit}`),
+                this.$http.executeGet('/modRequests/listing/involved'),
             ]);
             if (!all.error) this.$store.commit('modRequests/setAllRequests', all);
             if (!involved.error) this.$store.commit('modRequests/setInvolvedRequests', involved);

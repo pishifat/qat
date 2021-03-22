@@ -67,13 +67,12 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import postData from '../../../../mixins/postData.js';
 import evaluations from '../../../../mixins/evaluations.js';
 import { EvaluationKind } from '../../../../../shared/enums.js';
 
 export default {
     name: 'Consensus',
-    mixins: [ postData, evaluations ],
+    mixins: [ evaluations ],
     computed: {
         ...mapGetters('evaluations', [
             'selectedEvaluation',
@@ -124,7 +123,7 @@ export default {
     methods: {
         async setConsensus(consensus, e) {
 
-            const result = await this.executePost(
+            const result = await this.$http.executePost(
                 `/${this.selectedEvaluation.isApplication ? 'appEval' : 'bnEval'}/setConsensus/` + this.selectedEvaluation.id, { consensus }, e);
 
             if (result && !result.error) {
@@ -136,7 +135,7 @@ export default {
             }
         },
         async setAddition(addition, e) {
-            const result = await this.executePost(
+            const result = await this.$http.executePost(
                 `/${this.selectedEvaluation.isApplication ? 'appEval' : 'bnEval'}/setAddition/` + this.selectedEvaluation.id, { addition }, e);
 
             if (result && !result.error) {

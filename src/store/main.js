@@ -1,8 +1,12 @@
+import Vue from 'vue';
+import Vuex from 'vuex';
 import Axios from 'axios';
 import toastsModule from './modules/toasts';
 import userActivity from './modules/userActivity';
 
-export default {
+Vue.use(Vuex);
+
+const store = new Vuex.Store({
     modules: {
         toasts: toastsModule,
         activity: userActivity,
@@ -44,4 +48,6 @@ export default {
         },
     },
     strict: process.env.NODE_ENV !== 'production',
-};
+});
+
+export default store;

@@ -100,7 +100,6 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import postData from '../../mixins/postData.js';
 import DataTable from '../../components/DataTable.vue';
 
 export default {
@@ -108,7 +107,6 @@ export default {
     components: {
         DataTable,
     },
-    mixins: [ postData ],
     data () {
         return {
             optionEditingId: null,
@@ -143,7 +141,7 @@ export default {
             }
         },
         async addOption(e) {
-            const question = await this.executePost(`/manageTest/${this.selectedQuestion.id}/options/store`, {
+            const question = await this.$http.executePost(`/manageTest/${this.selectedQuestion.id}/options/store`, {
                 content: this.newContent,
                 score: this.newScore,
             }, e);
@@ -151,7 +149,7 @@ export default {
             this.updateQuestion(question, 'Option added');
         },
         async updateOption(e) {
-            const question = await this.executePost(`/manageTest/${this.selectedQuestion.id}/options/${this.optionEditingId}/update`, {
+            const question = await this.$http.executePost(`/manageTest/${this.selectedQuestion.id}/options/${this.optionEditingId}/update`, {
                 content: this.content,
                 score: this.score,
             }, e);
@@ -163,7 +161,7 @@ export default {
             this.updateQuestion(question, 'Option updated');
         },
         async toggleActivity(id, e) {
-            const question = await this.executePost(`/manageTest/${this.selectedQuestion.id}/options/${id}/toggleActivity`, {}, e);
+            const question = await this.$http.executePost(`/manageTest/${this.selectedQuestion.id}/options/${id}/toggleActivity`, {}, e);
             this.updateQuestion(question, 'Option updated');
         },
     },

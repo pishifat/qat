@@ -9,11 +9,11 @@
                 type="number"
                 min="1"
                 max="999"
-                @keyup.enter="editingDaysInput = false; findRelevantActivity();"
+                @keyup.enter="search"
             >
             <span v-else class="mx-1">{{ daysInput }}</span>
             days
-            <a href="#" @click.prevent="editingDaysInput ? findRelevantActivity() : ''; editingDaysInput = !editingDaysInput;">
+            <a href="#" @click.prevent="search">
                 <i class="fas fa-edit ml-1" />
             </a>
         </p>
@@ -89,7 +89,6 @@
 
 <script>
 import { mapState } from 'vuex';
-import postData from '../../../../../mixins/postData.js';
 import EventsList from './EventsList.vue';
 import NominationResets from './NominationResets.vue';
 import EvaluationList from './EvaluationList.vue';
@@ -101,7 +100,6 @@ export default {
         NominationResets,
         EvaluationList,
     },
-    mixins: [ postData ],
     props: {
         modes: {
             type: [Array, String],
@@ -158,17 +156,24 @@ export default {
         this.daysInput = 90;
     },
     methods: {
+        async search () {
+            if (this.editingDaysInput) {
+                await this.findRelevantActivity();
+            }
+
+            this.editingDaysInput = !this.editingDaysInput;
+        },
         async findRelevantActivity() {
             this.$store.commit('activity/setIsLoading', true);
 
-            let days = parseInt(this.daysInput);
+            let days = parseInt(this.daysInput.toString());
             if (isNaN(days)) days = 90;
             else if (days > 1000) days = 999;
             else if (days < 2) days = 2;
             this.daysInput = days;
 
             if (this.loggedInUser.isNat) {
-                const res = await this.executeGet(`/bnEval/activity?osuId=${this.osuId}&modes=${this.modes}&deadline=${new Date(this.deadline).getTime()}&mongoId=${this.mongoId}&days=${days}`);
+                const res = await this.$http.executeGet(`/bnEval/activity?osuId=${this.osuId}&modes=${this.modes}&deadline=${new Date(this.deadline).getTime()}&mongoId=${this.mongoId}&days=${days}`);
 
                 if (res) {
                     this.$store.commit('activity/setNominations', res.uniqueNominations);
@@ -185,7 +190,7 @@ export default {
                     this.$store.commit('activity/setIsLoading', false);
                 }
             } else {
-                const res = await this.executeGet(`/users/activity?osuId=${this.osuId}&modes=${this.modes}&deadline=${new Date(this.deadline).getTime()}&mongoId=${this.mongoId}&days=${days}`);
+                const res = await this.$http.executeGet(`/users/activity?osuId=${this.osuId}&modes=${this.modes}&deadline=${new Date(this.deadline).getTime()}&mongoId=${this.mongoId}&days=${days}`);
 
                 if (res) {
                     this.$store.commit('activity/setNominations', res.uniqueNominations);

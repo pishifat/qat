@@ -122,14 +122,12 @@
 
 <script>
 import ToastMessages from '../components/ToastMessages.vue';
-import postData from '../mixins/postData.js';
 
 export default {
     name: 'TestSubmissionPage',
     components: {
         ToastMessages,
     },
-    mixins: [ postData ],
     data() {
         return {
             testList: null,
@@ -143,7 +141,7 @@ export default {
         };
     },
     async created() {
-        const data = await this.initialRequest('/testSubmission/tests');
+        const data = await this.$http.initialRequest('/testSubmission/tests');
 
         if (data && data.testList && data.testList.length) {
             this.testList = data.testList;
@@ -171,7 +169,7 @@ export default {
         },
         async loadTest (e) {
             if (this.selectedTest) {
-                const data = await this.executeGet(`/testSubmission/tests/${this.selectedTest}`, e);
+                const data = await this.$http.executeGet(`/testSubmission/tests/${this.selectedTest}`, e);
 
                 if (data.test && !data.error) {
                     data.test.answers.forEach(a => {
@@ -194,7 +192,7 @@ export default {
                 type: 'info',
             });
             this.isSubmitting = true;
-            const data = await this.executePost('/testSubmission/submitTest', {
+            const data = await this.$http.executePost('/testSubmission/submitTest', {
                 testId: this.selectedTest,
                 comment: this.comment,
             }, e);
@@ -209,14 +207,14 @@ export default {
             }
         },
         async submitAnswer (answerId, e) {
-            const data = await this.executePost('/testSubmission/submitAnswer', {
+            const data = await this.$http.executePost('/testSubmission/submitAnswer', {
                 testId: this.selectedTest,
                 answerId,
                 checkedOptions: this.checkedOptions[answerId],
             }, e);
 
-            // Reload just in case
-            if (data && data.error) {
+            // Reload just in case of error
+            if (!this.$http.isValid(data)) {
                 this.loadTest();
             }
         },

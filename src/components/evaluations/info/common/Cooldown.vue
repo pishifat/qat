@@ -27,11 +27,9 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import postData from '../../../../mixins/postData.js';
 
 export default {
     name: 'Cooldown',
-    mixins: [ postData ],
     data() {
         return {
             newCooldownDays: 0,
@@ -71,7 +69,7 @@ export default {
     },
     methods: {
         async setCooldownDate(e) {
-            const result = await this.executePost(
+            const result = await this.$http.executePost(
                 `/${this.selectedEvaluation.isApplication ? 'appEval' : 'bnEval'}/setCooldownDate/` + this.selectedEvaluation.id,
                 { cooldownDate: this.newCooldownDate },
                 e

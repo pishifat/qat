@@ -276,14 +276,12 @@
 <script>
 import { mapState } from 'vuex';
 import ModalDialog from '../ModalDialog.vue';
-import postData from '../../mixins/postData.js';
 
 export default {
     name: 'SubmitDiscussion',
     components: {
         ModalDialog,
     },
-    mixins: [postData],
     data() {
         return {
             discussionLink: '',
@@ -319,7 +317,7 @@ export default {
     },
     methods: {
         async submitDiscussion(e) {
-            const data = await this.executePost(
+            const data = await this.$http.executePost(
                 '/discussionVote/submit',
                 {
                     discussionLink: this.discussionLink,
@@ -334,7 +332,7 @@ export default {
                 e
             );
 
-            if (data && !data.error) {
+            if (this.$http.isValid(data)) {
                 $('#addDiscussion').modal('hide');
                 this.$store.commit('discussionVote/addDiscussionVote', data.discussion);
             }

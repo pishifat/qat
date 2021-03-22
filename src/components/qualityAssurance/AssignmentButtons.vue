@@ -28,11 +28,9 @@
 
 <script>
 import { mapState } from 'vuex';
-import postData from '../../mixins/postData.js';
 
 export default {
     name: 'AssignmentButtons',
-    mixins: [postData],
     props: {
         eventId: {
             type: String,
@@ -54,7 +52,7 @@ export default {
     methods: {
         async assignUser () {
             this.forceDisabled = true;
-            const event = await this.executePost('/qualityAssurance/assignUser/' + this.eventId + '/' + this.pageFilters.filters.mode, {});
+            const event = await this.$http.executePost('/qualityAssurance/assignUser/' + this.eventId + '/' + this.pageFilters.filters.mode, {});
 
             if (event) {
                 this.$store.commit('qualityAssurance/updateEvent', event);
@@ -63,7 +61,7 @@ export default {
         },
         async unassignUser () {
             this.forceDisabled = true;
-            const event = await this.executePost('/qualityAssurance/unassignUser/' + this.eventId, {});
+            const event = await this.$http.executePost('/qualityAssurance/unassignUser/' + this.eventId, {});
 
             if (event && !event.error) {
                 this.$store.commit('qualityAssurance/updateEvent', event);

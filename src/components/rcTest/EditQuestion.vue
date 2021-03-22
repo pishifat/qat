@@ -39,7 +39,6 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import postData from '../../mixins/postData.js';
 import ModalDialog from '../../components/ModalDialog.vue';
 import EditOptions from './EditOptions.vue';
 import QuestionType from './QuestionType.vue';
@@ -53,7 +52,6 @@ export default {
         QuestionContent,
         EditOptions,
     },
-    mixins: [ postData ],
     data() {
         return {
             questionContent: '',
@@ -79,20 +77,20 @@ export default {
                     type: 'danger',
                 });
             } else {
-                const data = await this.executePost(`/manageTest/${this.selectedQuestion.id}/update`, {
+                const data = await this.$http.executePost(`/manageTest/${this.selectedQuestion.id}/update`, {
                     questionType: this.questionType,
                     newQuestion: this.questionContent,
                 }, e);
 
-                if (data && !data.error) {
+                if (this.$http.isValid(data)) {
                     this.$store.commit('manageTest/updateQuestion', data.question);
                 }
             }
         },
         async toggleActivity(e) {
-            const data = await this.executePost(`/manageTest/${this.selectedQuestion.id}/toggleActivity`, {}, e);
+            const data = await this.$http.executePost(`/manageTest/${this.selectedQuestion.id}/toggleActivity`, {}, e);
 
-            if (data && !data.error) {
+            if (this.$http.isValid(data)) {
                 this.$store.commit('manageTest/updateQuestion', data.question);
             }
         },

@@ -88,7 +88,6 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import postData from '../mixins/postData.js';
 import evaluationsModule from '../store/evaluations';
 import ToastMessages from '../components/ToastMessages.vue';
 import EvaluationCard from '../components/evaluations/card/EvaluationCard.vue';
@@ -101,7 +100,6 @@ export default {
         EvaluationCard,
         ArchiveInfo,
     },
-    mixins: [postData],
     data() {
         return {
             searchValue: null,
@@ -139,7 +137,7 @@ export default {
         query += id ? `id=${id}` : '';
         query += user ? `user=${user}` : '';
 
-        const data = await this.initialRequest(`/evalArchive/search?${query}`);
+        const data = await this.$http.initialRequest(`/evalArchive/search?${query}`);
 
         if (data.bnApplications || data.evaluations) {
             this.$store.commit('evaluations/setEvaluations', [...data.evaluations, ...data.bnApplications]);
@@ -171,7 +169,7 @@ export default {
                     this.$router.replace(`/evalarchive?user=${this.searchValue}`);
                 }
 
-                const res = await this.executeGet(`/evalArchive/search?user=${this.searchValue}`, e);
+                const res = await this.$http.executeGet(`/evalArchive/search?user=${this.searchValue}`, e);
 
                 if (res && !res.error) {
                     this.$store.commit('evaluations/setEvaluations', [...res.bnApplications, ...res.evaluations]);
@@ -185,7 +183,7 @@ export default {
                     type: 'danger',
                 });
             } else {
-                const res = await this.executeGet(`/evalarchive/search?limit=${this.limit}`, e);
+                const res = await this.$http.executeGet(`/evalarchive/search?limit=${this.limit}`, e);
 
                 if (res && !res.error) {
                     this.$store.commit('evaluations/setEvaluations', [...res.bnApplications, ...res.evaluations]);

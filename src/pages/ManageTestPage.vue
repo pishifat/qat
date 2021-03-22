@@ -71,7 +71,6 @@ import ToastMessages from '../components/ToastMessages.vue';
 import AddQuestion from '../components/rcTest/AddQuestion.vue';
 import EditQuestion from '../components/rcTest/EditQuestion.vue';
 import DataTable from '../components/DataTable.vue';
-import postData from '../mixins/postData.js';
 import { mapState } from 'vuex';
 
 export default {
@@ -82,7 +81,6 @@ export default {
         EditQuestion,
         DataTable,
     },
-    mixins: [ postData ],
     data() {
         return {
             categories: [
@@ -122,7 +120,7 @@ export default {
     },
     methods: {
         async loadContent (e) {
-            const data = await this.executeGet('/manageTest/load/' + this.selectedCategory, e);
+            const data = await this.$http.executeGet('/manageTest/load/' + this.selectedCategory, e);
 
             if (data.questions && data.questions.length) {
                 this.$store.commit('manageTest/setQuestions', data.questions);

@@ -6,11 +6,9 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import postData from '../../../mixins/postData.js';
 
 export default {
     name: 'NextEvaluation',
-    mixins: [ postData ],
     props: {
         mode: {
             type: String,
@@ -26,6 +24,7 @@ export default {
         ...mapGetters('users', [
             'selectedUser',
         ]),
+        /** @returns {boolean} */
         displayMode() {
             return this.selectedUser.modes.length > 1;
         },
@@ -41,7 +40,7 @@ export default {
     },
     methods: {
         async loadNextEvaluation() {
-            const nextEvaluationDate = await this.executeGet(`/users/loadNextEvaluation/${this.selectedUser.id}/${this.mode}`);
+            const nextEvaluationDate = await this.$http.executeGet(`/users/loadNextEvaluation/${this.selectedUser.id}/${this.mode}`);
 
             if (nextEvaluationDate) {
                 this.nextEvaluationDate = nextEvaluationDate.slice(0,10);

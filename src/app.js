@@ -1,16 +1,12 @@
 import './sass/app.scss';
 import './bootstrap';
 import Vue from 'vue';
-import Vuex from 'vuex';
 import VueRouter from 'vue-router';
-import main from './store/main';
+import store from './store/main';
 import App from './App.vue';
 import routes from './routes';
 
-Vue.use(Vuex);
 Vue.use(VueRouter);
-
-const store = new Vuex.Store(main);
 
 const router = new VueRouter({
     mode: 'history',

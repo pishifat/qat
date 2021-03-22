@@ -14,18 +14,15 @@
 </template>
 
 <script>
-import postData from '../../mixins/postData';
-
 export default {
     name: 'Minecraft',
-    mixins: [postData],
     data () {
         return {
             minecraft: null,
         };
     },
     async created() {
-        this.minecraft = await this.initialRequest('/minecraft');
+        this.minecraft = await this.$http.initialRequest('/minecraft');
     },
 };
 </script>

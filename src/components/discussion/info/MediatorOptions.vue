@@ -57,11 +57,9 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import postData from '../../../mixins/postData.js';
 
 export default {
     name: 'MediatorOptions',
-    mixins: [ postData ],
     data() {
         return {
             vote: null,
@@ -103,13 +101,13 @@ export default {
             }
         },
         async submitMediation (e) {
-            const data = await this.executePost(
+            const data = await this.$http.executePost(
                 '/discussionVote/submitMediation/' + this.selectedDiscussionVote.id, {
                     vote: this.vote,
                     comment: this.comment,
                 }, e);
 
-            if (data && !data.error) {
+            if (this.$http.isValid(data)) {
                 this.$store.commit('discussionVote/updateDiscussionVote', data.discussion);
             }
         },
