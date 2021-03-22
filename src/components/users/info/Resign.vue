@@ -29,14 +29,7 @@ export default {
             const result = confirm(`Are you sure? You will no longer be a Beatmap Nominator.`);
 
             if (result) {
-                const success = await this.executePost(`/users/resignFromBn/${this.selectedUser.id}`, {}, e);
-
-                if (success && !success.error) {
-                    this.$store.dispatch('updateToastMessages', {
-                        message: `Your removal will be processed soon`,
-                        type: 'success',
-                    });
-                }
+                await this.executePost(`/users/resignFromBn/${this.selectedUser.id}`, {}, e);
             }
         },
     },

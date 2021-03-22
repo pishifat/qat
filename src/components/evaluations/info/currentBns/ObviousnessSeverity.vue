@@ -75,22 +75,28 @@ export default {
     },
     methods: {
         async updateObviousness(obviousness) {
-            let result = await this.executePost('/dataCollection/updateObviousness/' + this.eventId, { obviousness });
-            if (result == this.obviousness) result = null;
-            this.$store.commit('dataCollection/updateEvent', { id: this.eventId, type: this.type, modifiedField: 'obviousness', value: result });
-            this.$store.dispatch('updateToastMessages', {
-                message: `Updated obviousness`,
-                type: 'success',
-            });
+            let data = await this.executePost('/dataCollection/updateObviousness/' + this.eventId, { obviousness });
+
+            if (data && !data.error) {
+                this.$store.commit('dataCollection/updateEvent', {
+                    id: this.eventId,
+                    type: this.type,
+                    modifiedField: 'obviousness',
+                    value: data.obviousness,
+                });
+            }
         },
         async updateSeverity(severity) {
-            let result = await this.executePost('/dataCollection/updateSeverity/' + this.eventId, { severity });
-            if (result == this.severity) result = null;
-            this.$store.commit('dataCollection/updateEvent', { id: this.eventId, type: this.type, modifiedField: 'severity', value: result });
-            this.$store.dispatch('updateToastMessages', {
-                message: `Updated severity`,
-                type: 'success',
-            });
+            let data = await this.executePost('/dataCollection/updateSeverity/' + this.eventId, { severity });
+
+            if (data && !data.error) {
+                this.$store.commit('dataCollection/updateEvent', {
+                    id: this.eventId,
+                    type: this.type,
+                    modifiedField: 'severity',
+                    value: data.severity,
+                });
+            }
         },
     },
 };

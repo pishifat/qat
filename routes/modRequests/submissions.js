@@ -199,7 +199,7 @@ router.post('/:id/edit', middlewares.isLoggedIn, async (req, res) => {
     await modRequest.save();
 
     res.json({
-        success: 'Saved',
+        success: 'Saved comment.',
     });
 });
 

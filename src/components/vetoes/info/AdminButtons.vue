@@ -20,7 +20,7 @@
             <button
                 v-else
                 class="btn btn-sm btn-danger btn-block mb-2"
-                @click="continueMediation($event, true)"
+                @click="continueMediation($event)"
             >
                 Re-initiate veto mediation
             </button>
@@ -46,7 +46,7 @@
             <div class="mb-2">
                 <span>Exclude specific user(s):</span>
                 <input
-                    id="excludeUsers"
+                    v-model="excludeUsers"
                     class="form-control ml-1 w-75 small"
                     type="text"
                     placeholder="username1, username2, username3..."
@@ -106,6 +106,7 @@ export default {
     data() {
         return {
             mediators: null,
+            excludeUsers: '',
         };
     },
     computed: {
@@ -165,7 +166,7 @@ export default {
             }
         },
         async selectMediators (e) {
-            let excludeUsers = $('#excludeUsers').val().split(',');
+            let excludeUsers = this.excludeUsers.split(',');
 
             for (let i = 0; i < excludeUsers.length; i++) {
                 excludeUsers[i] = excludeUsers[i].trim().toLowerCase();

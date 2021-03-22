@@ -91,7 +91,7 @@ router.post('/submit', async (req, res) => {
         return res.json({ error: 'You can only submit vetoes for mediation on your own beatmaps!' });
     }
 
-    let v = await Veto.create({
+    let veto = await Veto.create({
         vetoer: req.session.mongoId,
         reasons: req.body.reasons,
         beatmapId: bmInfo.beatmapset_id,
@@ -100,23 +100,27 @@ router.post('/submit', async (req, res) => {
         beatmapMapperId: bmInfo.creator_id,
         mode: req.body.mode,
     });
-    v = await Veto
-        .findById(v._id)
+    veto = await Veto
+        .findById(veto._id)
         .populate(
             getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
         );
 
-    res.json(v);
+    res.json({
+        veto,
+        success: 'Submitted veto',
+    });
+
     Logger.generate(
         req.session.mongoId,
-        `Submitted a veto for mediation on "${v.beatmapTitle}"`,
+        `Submitted a veto for mediation on "${veto.beatmapTitle}"`,
         'veto',
-        v._id
+        veto._id
     );
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),
         color: discord.webhookColors.darkPurple,
-        description: `Submitted [veto for **${v.beatmapTitle}** by **${v.beatmapMapper}**](https://bn.mappersguild.com/vetoes?id=${v.id})`,
+        description: `Submitted [veto for **${veto.beatmapTitle}** by **${veto.beatmapMapper}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`,
     }],
     req.body.mode);
 });
@@ -135,23 +139,26 @@ router.post('/submitMediation/:id', middlewares.isBnOrNat, async (req, res) => {
     mediation.vote = req.body.vote;
     await mediation.save();
 
-    const v = await Veto
+    const veto = await Veto
         .findById(req.params.id)
         .populate(
             getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
         );
 
-    res.json(v);
+    res.json({
+        veto,
+        success: 'Submitted mediation',
+    });
 
     Logger.generate(
         req.session.mongoId,
         `${isFirstComment ? 'Submitted' : 'Updated'} vote for a veto`,
         'veto',
-        v._id
+        veto._id
     );
 
     let count = 0;
-    v.mediations.forEach(mediation => {
+    veto.mediations.forEach(mediation => {
         if (mediation.comment) count++;
     });
 
@@ -159,9 +166,9 @@ router.post('/submitMediation/:id', middlewares.isBnOrNat, async (req, res) => {
         discord.webhookPost([{
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.lightPurple,
-            description: `Submitted opinion on [veto for **${v.beatmapTitle}** (${count}/${v.mediations.length})](https://bn.mappersguild.com/vetoes?id=${v.id})`,
+            description: `Submitted opinion on [veto for **${veto.beatmapTitle}** (${count}/${veto.mediations.length})](https://bn.mappersguild.com/vetoes?id=${veto.id})`,
         }],
-        v.mode);
+        veto.mode);
     }
 });
 
@@ -318,7 +325,10 @@ router.post('/replaceMediator/:id', middlewares.isNat, async (req, res) => {
         .findById(req.params.id)
         .populate(defaultPopulate);
 
-    res.json(veto);
+    res.json({
+        veto,
+        success: 'Replaced mediator',
+    });
 
     Logger.generate(
         req.session.mongoId,
@@ -341,7 +351,7 @@ router.post('/deleteVeto/:id', middlewares.isNat, async (req, res) => {
         .findByIdAndRemove(req.params.id)
         .orFail();
 
-    res.json({ success: 'ok' });
+    res.json({ success: 'Deleted' });
 
     Logger.generate(
         req.session.mongoId,

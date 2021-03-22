@@ -33,14 +33,10 @@ export default {
     },
     methods: {
         async switchBnEvaluator(e) {
-            const user = await this.executePost(`/users/${this.selectedUser.id}/switchBnEvaluator`, {}, e);
+            const data = await this.executePost(`/users/${this.selectedUser.id}/switchBnEvaluator`, {}, e);
 
-            if (user && !user.error) {
-                this.$store.commit('users/updateUser', user);
-                this.$store.dispatch('updateToastMessages', {
-                    message: `Toggled BN evaluator`,
-                    type: 'success',
-                });
+            if (data && !data.error) {
+                this.$store.commit('users/updateUser', data.user);
             }
         },
     },

@@ -176,7 +176,7 @@ export default {
                     return;
                 }
 
-                const result = await this.executePost(
+                const data = await this.executePost(
                     '/bnEval/addEvaluations/',
                     {
                         modes: this.selectedModes,
@@ -189,25 +189,14 @@ export default {
                     e
                 );
 
-                if (result && !result.error) {
-                    this.$store.commit('evaluations/setEvaluations', result.ers);
-                    this.$store.dispatch('updateToastMessages', {
-                        message: `Generated evaluations`,
-                        type: 'success',
-                    });
+                if (data && !data.error) {
+                    this.$store.commit('evaluations/setEvaluations', data.evaluations);
 
-                    if (result.ers.length) {
+                    if (data.evaluations.length) {
 
-                        if (result.failed.length) {
-                            let errorMessage = 'The following usernames could not be processed: ';
-
-                            for (let i = 0; i < result.failed.length; i++) {
-                                errorMessage += result.failed[i];
-
-                                if (i + 1 != result.failed.length) {
-                                    errorMessage += ', ';
-                                }
-                            }
+                        if (data.failed.length) {
+                            const usernames = data.failed.join(', ');
+                            let errorMessage = `The following usernames could not be processed: ${usernames}`;
 
                             this.$store.dispatch('updateToastMessages', {
                                 message: errorMessage,

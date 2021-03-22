@@ -103,18 +103,14 @@ export default {
             }
         },
         async submitMediation (e) {
-            const discussionVote = await this.executePost(
+            const data = await this.executePost(
                 '/discussionVote/submitMediation/' + this.selectedDiscussionVote.id, {
                     vote: this.vote,
                     comment: this.comment,
                 }, e);
 
-            if (discussionVote && !discussionVote.error) {
-                this.$store.commit('discussionVote/updateDiscussionVote', discussionVote);
-                this.$store.dispatch('updateToastMessages', {
-                    message: `Submitted vote`,
-                    type: 'success',
-                });
+            if (data && !data.error) {
+                this.$store.commit('discussionVote/updateDiscussionVote', data.discussion);
             }
         },
     },

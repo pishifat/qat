@@ -205,12 +205,7 @@ export default {
                 category: this.category,
             }, e);
 
-            if (!data.error) {
-                this.$store.dispatch('updateToastMessages', {
-                    message: 'Sent!',
-                    type: 'success',
-                });
-
+            if (data && !data.error) {
                 this.successInfo = 'Your report has been submitted! Its outcome will be sent to you via osu! chat';
             }
         },

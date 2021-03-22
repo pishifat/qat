@@ -138,7 +138,7 @@ router.post('/:id/unarchiveApp', async (req, res) => {
         app.mode
     );
 
-    res.json({ success: 'ok' });
+    res.json({ success: 'Unarchived' });
 });
 
 /* POST unarchive bn evaluation */
@@ -192,7 +192,7 @@ router.post('/:id/unarchiveBn', async (req, res) => {
         evaluation.mode
     );
 
-    res.json({ success: 'ok' });
+    res.json({ success: 'Unarchived' });
 });
 
 module.exports = router;

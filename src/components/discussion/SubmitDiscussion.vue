@@ -300,22 +300,26 @@ export default {
         ...mapState([
             'loggedInUser',
         ]),
+        /** @returns {boolean} */
         isNatOnly () {
             return this.group == 'nat';
         },
+        /** @returns {boolean} */
         neutralAllowed () {
             return this.neutral == 'neutral';
         },
+        /** @returns {boolean} */
         reasonAllowed () {
             return this.reason == 'reason';
         },
+        /** @returns {boolean} */
         isContentReview () {
             return this.contentReview == 'contentReview';
         },
     },
     methods: {
         async submitDiscussion(e) {
-            const discussionVote = await this.executePost(
+            const data = await this.executePost(
                 '/discussionVote/submit',
                 {
                     discussionLink: this.discussionLink,
@@ -330,18 +334,11 @@ export default {
                 e
             );
 
-            if (discussionVote && !discussionVote.error) {
+            if (data && !data.error) {
                 $('#addDiscussion').modal('hide');
-                this.$store.commit('discussionVote/addDiscussionVote', discussionVote);
-                this.$store.dispatch('updateToastMessages', {
-                    message: `Submitted discussion`,
-                    type: 'success',
-                });
+                this.$store.commit('discussionVote/addDiscussionVote', data.discussion);
             }
         },
     },
 };
 </script>
-
-<style>
-</style>

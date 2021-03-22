@@ -70,14 +70,10 @@ export default {
             const result = confirm(`Are you sure? This should only be done if a mistake was made.`);
 
             if (result) {
-                const veto = await this.executePost(`/vetoes/replaceMediator/${this.selectedVeto.id}`, { mediationId });
+                const data = await this.executePost(`/vetoes/replaceMediator/${this.selectedVeto.id}`, { mediationId });
 
-                if (veto && !veto.error) {
-                    this.$store.commit('vetoes/updateVeto', veto);
-                    this.$store.dispatch('updateToastMessages', {
-                        message: `Replaced mediator`,
-                        type: 'success',
-                    });
+                if (data && !data.error) {
+                    this.$store.commit('vetoes/updateVeto', data.veto);
                 }
             }
         },

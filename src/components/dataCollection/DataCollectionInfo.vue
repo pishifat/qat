@@ -74,17 +74,16 @@ export default {
     },
     methods: {
         async updateContent(e) {
-            const result = await this.executePost('/dataCollection/updateContent/' + this.selectedEvent.id, { reason: this.newEventContent }, e);
-            this.$store.commit('dataCollection/updateEvent', {
-                id: this.selectedEvent.id,
-                type: this.selectedEvent.type,
-                modifiedField: 'content',
-                value: result,
-            });
-            this.$store.dispatch('updateToastMessages', {
-                message: `Updated content`,
-                type: 'success',
-            });
+            const data = await this.executePost('/dataCollection/updateContent/' + this.selectedEvent.id, { reason: this.newEventContent }, e);
+
+            if (data && !data.error) {
+                this.$store.commit('dataCollection/updateEvent', {
+                    id: this.selectedEvent.id,
+                    type: this.selectedEvent.type,
+                    modifiedField: 'content',
+                    value: data.reason,
+                });
+            }
         },
     },
 };

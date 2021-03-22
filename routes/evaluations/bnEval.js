@@ -154,7 +154,11 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
 
     const evaluations = await Evaluation.findActiveEvaluations();
 
-    res.json({ ers: evaluations, failed });
+    res.json({
+        evaluations,
+        failed,
+        success: 'Generated evaluations',
+    });
 
     let minDate = new Date();
     minDate.setDate(minDate.getDate() + 14);

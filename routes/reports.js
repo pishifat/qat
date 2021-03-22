@@ -76,7 +76,7 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
         await report.save();
 
         res.json({
-            success: 'ok',
+            success: 'Sent!',
         });
 
         // for #user-reportfeed
@@ -123,7 +123,7 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
         await report.save();
 
         res.json({
-            success: 'ok',
+            success: 'Sent!',
         });
 
         // for #user-reportfeed

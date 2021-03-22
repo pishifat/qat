@@ -9,7 +9,7 @@
                     data-toggle="tooltip"
                     data-placement="top"
                     title="edit link"
-                    @click.prevent="isEditingLink ? update() : isEditingLink = true"
+                    @click.prevent="editLink"
                 >
                     <i class="fas fa-edit" />
                 </a>
@@ -39,7 +39,7 @@
                 data-toggle="tooltip"
                 data-placement="top"
                 title="edit title"
-                @click.prevent="isEditingTitle ? update() : isEditingTitle = true"
+                @click.prevent="editTitle"
             >
                 <i class="fas fa-edit" />
             </a>
@@ -65,7 +65,7 @@
                 data-toggle="tooltip"
                 data-placement="top"
                 title="edit title"
-                @click.prevent="isEditingProposal ? update() : isEditingProposal = true"
+                @click.prevent="editProposal"
             >
                 <i class="fas fa-edit" />
             </a>
@@ -121,11 +121,13 @@ export default {
         ...mapGetters('discussionVote', [
             'selectedDiscussionVote',
         ]),
+        /** @returns {boolean} */
         isEditable() {
             return this.selectedDiscussionVote.isActive &&
                 ((!this.selectedDiscussionVote.isContentReview && this.selectedDiscussionVote.creator == this.loggedInUser.id && this.selectedDiscussionVote.isActive) ||
                 (this.selectedDiscussionVote.isContentReview && (this.loggedInUser.groups.includes('nat') || this.loggedInUser.groups.includes('gmt'))));
         },
+        /** @returns {boolean} */
         isImage() {
             return (this.selectedDiscussionVote.discussionLink.match(/\.(jpeg|jpg|gif|png)$/) != null);
         },
@@ -148,20 +150,37 @@ export default {
         }
     },
     methods: {
+        editLink () {
+            if (this.isEditingLink) {
+                this.update();
+            } else {
+                this.isEditingLink = true;
+            }
+        },
+        editTitle () {
+            if (this.isEditingTitle) {
+                this.update();
+            } else {
+                this.isEditingTitle = true;
+            }
+        },
+        editProposal () {
+            if (this.isEditingProposal) {
+                this.update();
+            } else {
+                this.isEditingProposal = true;
+            }
+        },
         async update () {
-            const discussionVote = await this.executePost(
+            const data = await this.executePost(
                 `/discussionVote/${this.selectedDiscussionVote.id}/update`, {
                     title: this.editTitleContent,
                     shortReason: this.editProposalContent,
                     discussionLink: this.editLinkContent,
                 });
 
-            if (discussionVote && !discussionVote.error) {
-                this.$store.commit('discussionVote/updateDiscussionVote', discussionVote);
-                this.$store.dispatch('updateToastMessages', {
-                    message: `Updated`,
-                    type: 'info',
-                });
+            if (data && !data.error) {
+                this.$store.commit('discussionVote/updateDiscussionVote', data.discussion);
 
                 this.isEditingTitle = false;
                 this.isEditingProposal = false;

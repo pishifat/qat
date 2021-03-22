@@ -40,7 +40,10 @@ router.post('/saveNote/:id', async (req, res) => {
         .findById(note._id)
         .populate(defaultNotePopulate);
 
-    res.json(note);
+    res.json({
+        note,
+        success: 'Added note',
+    });
 
     let u = await User.findById(req.params.id);
 
@@ -71,7 +74,10 @@ router.post('/saveNote/:id', async (req, res) => {
 router.post('/hideNote/:id', async (req, res) => {
     await Note.findByIdAndUpdate(req.params.id, { isHidden: true });
 
-    res.json({});
+    res.json({
+        success: 'Removed note',
+    });
+
     let u = await User.findById(req.body.userId);
     Logger.generate(
         req.session.mongoId,
@@ -83,12 +89,16 @@ router.post('/hideNote/:id', async (req, res) => {
 
 /* POST edit note */
 router.post('/editNote/:id', async (req, res) => {
-    const n = await Note
+    const note = await Note
         .findByIdAndUpdate(req.params.id, { comment: req.body.comment })
         .populate(defaultNotePopulate);
 
-    res.json(n);
-    let u = await User.findById(n.user);
+    res.json({
+        note,
+        success: 'Edited note',
+    });
+
+    let u = await User.findById(note.user);
     Logger.generate(
         req.session.mongoId,
         `edited user note for "${u.username}"`,

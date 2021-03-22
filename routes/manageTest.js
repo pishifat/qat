@@ -41,7 +41,11 @@ router.post('/store', middlewares.isNat, async (req, res) => {
         questionType: req.body.questionType,
     });
 
-    res.json(question);
+    res.json({
+        question,
+        success: 'Question added',
+    });
+
     Logger.generate(
         req.session.mongoId,
         `Added new "${question.category}" question to RC test: "${util.shorten(question.content)}"`,
@@ -61,7 +65,11 @@ router.post('/:id/update', middlewares.isNat, async (req, res) => {
     question.questionType = req.body.questionType;
     await question.save();
 
-    res.json(question);
+    res.json({
+        question,
+        success: 'Question content updated',
+    });
+
     Logger.generate(
         req.session.mongoId,
         `Updated question on RC test: "${
@@ -84,7 +92,11 @@ router.post('/:id/toggleActivity', middlewares.isNat, async (req, res) => {
     question.active = !question.active;
     await question.save();
 
-    res.json(question);
+    res.json({
+        question,
+        success: 'Question activity updated',
+    });
+
     Logger.generate(
         req.session.mongoId,
         `Marked RC test question as "${req.body.status ? 'active' : 'inactive'}"`,

@@ -108,16 +108,12 @@ export default {
     },
     methods: {
         async updateContent (e) {
-            const result = await this.executePost('/dataCollection/updateContent/' + this.event._id, { reason: this.newEventContent }, e);
+            const data = await this.executePost('/dataCollection/updateContent/' + this.event._id, { reason: this.newEventContent }, e);
             this.$store.commit('dataCollection/updateEvent', {
                 id: this.event._id,
                 type: this.event.type,
                 modifiedField: 'content',
-                value: result,
-            });
-            this.$store.dispatch('updateToastMessages', {
-                message: `Updated content`,
-                type: 'success',
+                value: data.reason,
             });
         },
         getSeverityTooltip (obviousness, severity) {

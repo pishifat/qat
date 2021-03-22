@@ -115,7 +115,7 @@ export default {
                     type: 'danger',
                 });
             } else {
-                const veto = await this.executePost(
+                const data = await this.executePost(
                     `vetoes/submitMediation/${this.selectedVeto.id}`,
                     {
                         mediationId: this.mediationId,
@@ -125,12 +125,8 @@ export default {
                     e
                 );
 
-                if (veto && !veto.error) {
-                    this.$store.commit('vetoes/updateVeto', veto);
-                    this.$store.dispatch('updateToastMessages', {
-                        message: `Submitted mediation`,
-                        type: 'success',
-                    });
+                if (data && !data.error) {
+                    this.$store.commit('vetoes/updateVeto', data.veto);
                 }
             }
         },

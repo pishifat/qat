@@ -127,28 +127,18 @@ export default {
                     type: 'danger',
                 });
             } else {
-                let report;
-
-                if (close) {
-                    const result = confirm(`Are you sure? Report feedback cannot be edited after closing. Doing this will reveal the reporter.`);
-
-                    if (result) {
-                        report = await this.executePost(
-                            '/manageReports/submitReportEval/' + this.selectedReport.id,
-                            { vote: this.vote, feedback: this.feedback, close }, e);
-                    }
-                } else {
-                    report = await this.executePost(
-                        '/manageReports/submitReportEval/' + this.selectedReport.id,
-                        { vote: this.vote, feedback: this.feedback, close }, e);
+                if (close && !confirm(`Are you sure? Report feedback cannot be edited after closing. Doing this will reveal the reporter.`)) {
+                    return;
                 }
 
-                if (report && !report.error) {
-                    this.$store.dispatch('manageReports/updateReport', report);
-                    this.$store.dispatch('updateToastMessages', {
-                        message: `Saved evaluation`,
-                        type: 'success',
-                    });
+                const data = await this.executePost(
+                    '/manageReports/submitReportEval/' + this.selectedReport.id,
+                    { vote: this.vote, feedback: this.feedback, close },
+                    e
+                );
+
+                if (data && !data.error) {
+                    this.$store.dispatch('manageReports/updateReport', data.report);
                 }
             }
         },
@@ -156,14 +146,10 @@ export default {
             const result = confirm(`Are you sure? The report will be deleted and a content review will be opened.`);
 
             if (result) {
-                const report = await this.executePost('/manageReports/sendToContentReview/' + this.selectedReport.id, {}, e);
+                const data = await this.executePost('/manageReports/sendToContentReview/' + this.selectedReport.id, {}, e);
 
-                if (report && !report.error) {
-                    this.$store.dispatch('manageReports/updateReport', report);
-                    this.$store.dispatch('updateToastMessages', {
-                        message: `Created discussion vote and deleted report`,
-                        type: 'success',
-                    });
+                if (data && !data.error) {
+                    this.$store.dispatch('manageReports/updateReport', data.report);
                 }
             }
         },

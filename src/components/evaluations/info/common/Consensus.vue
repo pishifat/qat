@@ -78,15 +78,19 @@ export default {
         ...mapGetters('evaluations', [
             'selectedEvaluation',
         ]),
+        /** @returns {string} */
         consensus () {
             return this.selectedEvaluation.consensus;
         },
+        /** @returns {string} */
         addition () {
             return this.selectedEvaluation.addition;
         },
+        /** @returns {boolean} */
         isProbationForMode () {
             return this.selectedEvaluation.user.probationModes.includes(this.selectedEvaluation.mode);
         },
+        /** @returns {{ consensus: string, color: string }[]} */
         buttons () {
             if (this.selectedEvaluation.isBnEvaluation) {
                 return [
@@ -112,6 +116,7 @@ export default {
 
             return [];
         },
+        /** @returns {boolean} */
         canHaveAddition () {
             return this.selectedEvaluation.kind === EvaluationKind.BnEvaluation;
         },

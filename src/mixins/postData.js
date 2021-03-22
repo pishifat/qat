@@ -19,6 +19,13 @@ async function executeRequest (requestType, url, data, e, updateLoadingState, st
             store.dispatch('updateToastMessages', { message: res.data.error });
         }
 
+        if (res.data.success) {
+            store.dispatch('updateToastMessages', {
+                type: 'success',
+                message: res.data.success,
+            });
+        }
+
         return res.data;
     } catch (error) {
         store.dispatch('updateToastMessages', { message: 'Something went wrong!' });

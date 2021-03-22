@@ -424,21 +424,25 @@ router.post('/enableBnEvaluators/:id', middlewares.isNat, async (req, res) => {
         await AppEvaluation.findByIdAndUpdate(req.params.id, { $push: { bnEvaluators: bn._id } });
     }
 
-    let a = await AppEvaluation.findById(req.params.id).populate(defaultPopulate);
-    res.json(a);
+    let application = await AppEvaluation.findById(req.params.id).populate(defaultPopulate);
+    res.json({
+        application,
+        success: 'Enabled BN evaluators',
+    });
+
     Logger.generate(
         req.session.mongoId,
         `Opened a BN app to evaluation from ${req.body.bnEvaluators.length} current BNs.`,
         'appEvaluation',
-        a._id
+        application._id
     );
     discord.webhookPost(
         [{
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.lightOrange,
-            description: `Enabled BN evaluators for [**${a.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${a.id})`,
+            description: `Enabled BN evaluators for [**${application.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${application.id})`,
         }],
-        a.mode
+        application.mode
     );
 });
 

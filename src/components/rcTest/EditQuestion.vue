@@ -79,29 +79,21 @@ export default {
                     type: 'danger',
                 });
             } else {
-                const question = await this.executePost(`/manageTest/${this.selectedQuestion.id}/update`, {
+                const data = await this.executePost(`/manageTest/${this.selectedQuestion.id}/update`, {
                     questionType: this.questionType,
                     newQuestion: this.questionContent,
                 }, e);
 
-                if (question && !question.error) {
-                    this.$store.commit('manageTest/updateQuestion', question);
-                    this.$store.dispatch('updateToastMessages', {
-                        message: `Question content updated`,
-                        type: 'success',
-                    });
+                if (data && !data.error) {
+                    this.$store.commit('manageTest/updateQuestion', data.question);
                 }
             }
         },
         async toggleActivity(e) {
-            const question = await this.executePost(`/manageTest/${this.selectedQuestion.id}/toggleActivity`, {}, e);
+            const data = await this.executePost(`/manageTest/${this.selectedQuestion.id}/toggleActivity`, {}, e);
 
-            if (question && !question.error) {
-                this.$store.commit('manageTest/updateQuestion', question);
-                this.$store.dispatch('updateToastMessages', {
-                    message: `Question activity updated`,
-                    type: 'success',
-                });
+            if (data && !data.error) {
+                this.$store.commit('manageTest/updateQuestion', data.question);
             }
         },
     },

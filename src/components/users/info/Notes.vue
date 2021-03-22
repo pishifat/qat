@@ -118,32 +118,24 @@ export default {
         },
         async saveNote(e) {
             if (this.comment.length) {
-                const note = await this.executePost('/users/nat/saveNote/' + this.selectedUser.id, { comment: this.comment }, e);
+                const data = await this.executePost('/users/nat/saveNote/' + this.selectedUser.id, { comment: this.comment }, e);
 
-                if (note && !note.error) {
+                if (data && !data.error) {
                     if (this.notes) {
-                        this.notes.unshift(note);
-                        this.$store.dispatch('updateToastMessages', {
-                            message: `Added note`,
-                            type: 'success',
-                        });
+                        this.notes.unshift(data.note);
                     }
                 }
             }
         },
         async editNote(e) {
             if (this.editNoteComment.length) {
-                const note = await this.executePost('/users/nat/editNote/' + this.editNoteId, { comment: this.editNoteComment }, e);
+                const data = await this.executePost('/users/nat/editNote/' + this.editNoteId, { comment: this.editNoteComment }, e);
 
-                if (note && !note.error) {
+                if (data && !data.error) {
                     if (this.notes) {
                         const i = this.notes.findIndex(n => n.id == this.editNoteId);
-                        this.notes[i] = note;
+                        this.notes[i] = data.note;
                         this.editNoteId = '';
-                        this.$store.dispatch('updateToastMessages', {
-                            message: `Edited note`,
-                            type: 'success',
-                        });
                     }
                 }
             }
@@ -157,10 +149,6 @@ export default {
                 if (this.notes) {
                     const i = this.notes.findIndex(note => note.id == noteId);
                     this.notes.splice(i, 1);
-                    this.$store.dispatch('updateToastMessages', {
-                        message: `Removed note`,
-                        type: 'success',
-                    });
                 }
             }
         },

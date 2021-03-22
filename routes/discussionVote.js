@@ -104,7 +104,7 @@ router.post('/submit', async (req, res) => {
         }
     }
 
-    let d = await Discussion.create({
+    let discussion = await Discussion.create({
         discussionLink: url,
         title,
         shortReason,
@@ -116,12 +116,15 @@ router.post('/submit', async (req, res) => {
         isContentReview: req.body.isContentReview,
     });
 
-    res.json(d);
+    res.json({
+        discussion,
+        success: 'Submitted discussion',
+    });
     Logger.generate(
         req.session.mongoId,
         'Submitted a discussion for voting',
         'discussionVote',
-        d._id
+        discussion._id
     );
 
     // webhooks
@@ -131,7 +134,7 @@ router.post('/submit', async (req, res) => {
         [{
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.yellow,
-            description: `**New discussion up for vote:** [${title}](http://bn.mappersguild.com/discussionvote?id=${d.id})`,
+            description: `**New discussion up for vote:** [${title}](http://bn.mappersguild.com/discussionvote?id=${discussion.id})`,
             fields: [
                 {
                     name: `Question/Proposal`,
@@ -139,7 +142,7 @@ router.post('/submit', async (req, res) => {
                 },
             ],
         }],
-        req.body.isContentReview ? 'contentCase' : d.mode
+        req.body.isContentReview ? 'contentCase' : discussion.mode
     );
 
     if (req.body.isContentReview) {
@@ -151,7 +154,7 @@ router.post('/submit', async (req, res) => {
             [{
                 author: discord.defaultWebhookAuthor(req.session),
                 color: discord.webhookColors.yellow,
-                description: `**New discussion up for vote:** [${title}](http://bn.mappersguild.com/discussionvote?id=${d.id})`,
+                description: `**New discussion up for vote:** [${title}](http://bn.mappersguild.com/discussionvote?id=${discussion.id})`,
                 fields: [
                     {
                         name: `Question/Proposal`,
@@ -200,7 +203,10 @@ router.post('/submitMediation/:id', async (req, res) => {
             res.locals.userRequest.isNat ? defaultPopulate : getActiveBnDefaultPopulate(req.session.mongoId)
         );
 
-    res.json(d);
+    res.json({
+        discussion: d,
+        success: 'Submitted vote',
+    });
 
     Logger.generate(
         req.session.mongoId,
@@ -212,30 +218,36 @@ router.post('/submitMediation/:id', async (req, res) => {
 
 /* POST conclude mediation */
 router.post('/concludeMediation/:id', middlewares.hasFullReadAccess, async (req, res) => {
-    const d = await Discussion
+    const discussion = await Discussion
         .findByIdAndUpdate(req.params.id, { isActive: false })
         .populate(defaultPopulate);
 
-    res.json(d);
+    res.json({
+        discussion,
+        success: 'Concluded vote',
+    });
 
     Logger.generate(
         req.session.mongoId,
         'Concluded vote for a discussion',
         'discussionVote',
-        d._id
+        discussion._id
     );
 
-    if (d.isContentReview) {
-        await discord.contentCaseWebhookPost(d);
-        if (!(d.creator.isBnOrNat || d.creator.groups.includes('gmt'))) await discord.roleHighlightWebhookPost('contentCase', `relay consensus to **${d.creator.username}** (https://osu.ppy.sh/users/${d.creator.osuId})`);
+    if (discussion.isContentReview) {
+        await discord.contentCaseWebhookPost(discussion);
+
+        if (!(discussion.creator.isBnOrNat || discussion.creator.groups.includes('gmt'))) {
+            await discord.roleHighlightWebhookPost('contentCase', `relay consensus to **${discussion.creator.username}** (https://osu.ppy.sh/users/${discussion.creator.osuId})`);
+        }
     } else {
         discord.webhookPost(
             [{
                 author: discord.defaultWebhookAuthor(req.session),
                 color: discord.webhookColors.darkYellow,
-                description: `Concluded vote for [discussion on **${d.title}**](http://bn.mappersguild.com/discussionvote?id=${d.id})`,
+                description: `Concluded vote for [discussion on **${discussion.title}**](http://bn.mappersguild.com/discussionvote?id=${discussion.id})`,
             }],
-            d.mode
+            discussion.mode
         );
     }
 
@@ -266,7 +278,10 @@ router.post('/:id/update', middlewares.hasFullReadAccess, async (req, res) => {
     discussion.discussionLink = discussionLink;
     await discussion.save();
 
-    res.json(discussion);
+    res.json({
+        discussion,
+        success: 'Updated',
+    });
 
     Logger.generate(
         req.session.mongoId,

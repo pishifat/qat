@@ -222,7 +222,11 @@ router.post('/:id/switchBnEvaluator', middlewares.isBnOrNat, async (req, res) =>
     user.isBnEvaluator = !user.isBnEvaluator;
     await user.save();
 
-    res.json(user);
+    res.json({
+        user,
+        success: 'Toggled BN evaluator',
+    });
+
     Logger.generate(
         req.session.mongoId,
         `Opted "${user.username}" ${user.isBnEvaluator ? 'in to' : 'out of'} optional BN app evaluation input`,
@@ -305,7 +309,11 @@ router.post('/:id/switchUserGroup', middlewares.isNat, async (req, res) => {
         'all'
     );
 
-    res.json(user);
+    res.json({
+        user,
+        success: 'Changed user group',
+    });
+
     Logger.generate(
         req.session.mongoId,
         `Moved "${user.username}" from "${user.isNat ? 'BN' : 'NAT'}" to "${user.isNat ? 'NAT' : 'BN'}"`,
@@ -384,7 +392,9 @@ router.post('/resignFromBn/:id', async (req, res) => {
         await util.sleep(500);
     }
 
-    res.json({ success: 'ok' });
+    res.json({
+        success: 'Your removal will be processed soon',
+    });
 });
 
 module.exports = router;

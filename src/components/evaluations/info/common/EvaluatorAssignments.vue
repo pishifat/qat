@@ -111,6 +111,7 @@ export default {
         ...mapGetters('evaluations', [
             'selectedEvaluation',
         ]),
+        /** @returns {Object[]} */
         submittedEvaluators() {
             return this.selectedEvaluation.reviews.map(review => review.evaluator);
         },
@@ -139,14 +140,10 @@ export default {
             );
 
             if (result) {
-                const a = await this.executePost('/appEval/enableBnEvaluators/' + this.selectedEvaluation.id, { bnEvaluators: this.potentialBnEvaluators }, e);
+                const data = await this.executePost('/appEval/enableBnEvaluators/' + this.selectedEvaluation.id, { bnEvaluators: this.potentialBnEvaluators }, e);
 
-                if (a && !a.error) {
-                    this.$store.dispatch('appEval/updateAssessment', a);
-                    this.$store.dispatch('updateToastMessages', {
-                        message: `Enabled BN evaluators`,
-                        type: 'success',
-                    });
+                if (data && !data.error) {
+                    this.$store.dispatch('appEval/updateAssessment', data.application);
                 }
             }
         },

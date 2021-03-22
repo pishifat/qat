@@ -32,14 +32,10 @@ export default {
             const result = confirm(`Are you sure?`);
 
             if (result) {
-                const user = await this.executePost(`/users/${this.selectedUser.id}/switchUserGroup`, {}, e);
+                const data = await this.executePost(`/users/${this.selectedUser.id}/switchUserGroup`, {}, e);
 
-                if (user && !user.error) {
-                    this.$store.commit('users/updateUser', user);
-                    this.$store.dispatch('updateToastMessages', {
-                        message: `Changed user group`,
-                        type: 'success',
-                    });
+                if (data && !data.error) {
+                    this.$store.commit('users/updateUser', data.user);
                 }
             }
         },

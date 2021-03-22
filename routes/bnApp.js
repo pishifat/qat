@@ -150,7 +150,7 @@ router.post('/apply', async (req, res) => {
             await AppEvaluation.findByIdAndUpdate(newBnApp.id, { test: test._id });
 
             res.json({
-                success: 'ok',
+                success: 'Applied',
             });
 
             Logger.generate(req.session.mongoId, `Applied for ${mode} BN`, 'application', newBnApp._id);

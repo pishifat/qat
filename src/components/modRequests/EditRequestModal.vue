@@ -100,11 +100,6 @@ export default {
 
             const data = await this.executeGet('/modRequests/owned');
             if (!data.error) this.$store.commit('modRequests/setOwnRequests', data);
-
-            this.$store.dispatch('updateToastMessages', {
-                message: 'Saved comment.',
-                type: 'info',
-            });
         },
     },
 };

@@ -75,7 +75,7 @@ router.post('/submitAnswer', async (req, res) => {
         .orFail();
 
     return res.json({
-        success: 'ok',
+        success: 'Answer saved',
     });
 });
 
@@ -137,6 +137,7 @@ router.post('/submitTest', async (req, res) => {
 
     res.json({
         totalScore,
+        success: 'Test submitted!',
     });
 
     Logger.generate(

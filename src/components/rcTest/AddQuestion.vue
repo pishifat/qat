@@ -56,18 +56,14 @@ export default {
                     type: 'danger',
                 });
             } else {
-                const question = await this.executePost('/manageTest/store', {
+                const data = await this.executePost('/manageTest/store', {
                     questionType: this.questionType,
                     newQuestion: this.questionContent,
                     category: this.category,
                 }, e);
 
-                if (question && !question.error) {
-                    this.$store.commit('manageTest/addQuestion', question);
-                    this.$store.dispatch('updateToastMessages', {
-                        message: `Question added`,
-                        type: 'success',
-                    });
+                if (data && !data.error) {
+                    this.$store.commit('manageTest/addQuestion', data.question);
                 }
             }
         },

@@ -85,18 +85,21 @@ router.post('/submitReportEval/:id', middlewares.isNat, async (req, res) => {
         await Report.findByIdAndUpdate(req.params.id, { isActive: false });
     }
 
-    const r = await Report
+    const report = await Report
         .findById(req.params.id)
         .populate(defaultPopulate);
 
-    res.json(r);
+    res.json({
+        report,
+        success: 'Saved evaluation',
+    });
 
     if (req.body.feedback && req.body.feedback.length) {
         Logger.generate(
             req.session.mongoId,
             `Set feedback on report to "${util.shorten(req.body.feedback)}"`,
             'report',
-            r._id
+            report._id
         );
     }
 
@@ -107,7 +110,7 @@ router.post('/submitReportEval/:id', middlewares.isNat, async (req, res) => {
             req.session.mongoId,
             `Set validity of report to "${validity}"`,
             'report',
-            r._id
+            report._id
         );
     }
 });
@@ -149,7 +152,10 @@ router.post('/sendToContentReview/:id', middlewares.isNat, async (req, res) => {
         .findById(req.params.id)
         .populate(defaultPopulate);
 
-    res.json(report);
+    res.json({
+        report,
+        success: 'Created discussion vote and deleted report',
+    });
 
     Logger.generate(
         req.session.mongoId,

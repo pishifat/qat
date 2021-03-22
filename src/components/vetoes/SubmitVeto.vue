@@ -225,7 +225,7 @@ export default {
                     type: 'danger',
                 });
             } else {
-                const veto = await this.executePost(
+                const data = await this.executePost(
                     '/vetoes/submit',
                     {
                         reasons: this.vetoReasons,
@@ -234,13 +234,9 @@ export default {
                     e
                 );
 
-                if (veto && !veto.error) {
+                if (data && !data.error) {
                     $('#addVeto').modal('hide');
-                    this.$store.commit('vetoes/addVeto', veto);
-                    this.$store.dispatch('updateToastMessages', {
-                        message: `Submitted veto`,
-                        type: 'success',
-                    });
+                    this.$store.commit('vetoes/addVeto', data.veto);
                 }
             }
         },

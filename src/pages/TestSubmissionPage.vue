@@ -203,35 +203,21 @@ export default {
                 this.selectedTest = null;
                 this.testList = null;
                 this.displayScore = data.totalScore;
-                this.$store.dispatch('updateToastMessages', {
-                    message: `Test submitted!`,
-                    type: 'success',
-                });
             } else {
                 this.loadTest();
                 this.isSubmitting = false;
             }
         },
         async submitAnswer (answerId, e) {
-            const res = await this.executePost('/testSubmission/submitAnswer', {
+            const data = await this.executePost('/testSubmission/submitAnswer', {
                 testId: this.selectedTest,
                 answerId,
                 checkedOptions: this.checkedOptions[answerId],
             }, e);
 
-            if (res) {
-                if (res.error) {
-                    this.loadTest();
-                    this.$store.dispatch('updateToastMessages', {
-                        message: res.error,
-                        type: 'danger',
-                    });
-                } else {
-                    this.$store.dispatch('updateToastMessages', {
-                        message: `Answer saved`,
-                        type: 'success',
-                    });
-                }
+            // Reload just in case
+            if (data && data.error) {
+                this.loadTest();
             }
         },
     },
