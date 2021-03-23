@@ -26,7 +26,9 @@ interface IAiess {
     qualityAssuranceChecks: IQualityAssuranceCheckDocument[]; // virtual
 }
 
-export interface IAiessDocument extends IAiess, Document { }
+export interface IAiessDocument extends IAiess, Document {
+    _id: any;
+}
 
 interface IAiessByType {
     _id: string;

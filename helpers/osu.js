@@ -11,6 +11,7 @@ async function getToken(code) {
         client_secret: config.secret,
     });
 
+    /** @type {import('axios').AxiosRequestConfig} */
     const options = {
         method: 'post',
         url: 'https://osu.ppy.sh/oauth/token',
@@ -37,6 +38,7 @@ async function refreshToken(refreshToken) {
         refresh_token: refreshToken,
     });
 
+    /** @type {import('axios').AxiosRequestConfig} */
     const options = {
         method: 'POST',
         url: 'https://osu.ppy.sh/oauth/token',
@@ -56,6 +58,7 @@ async function refreshToken(refreshToken) {
 }
 
 async function getUserInfo(token) {
+    /** @type {import('axios').AxiosRequestConfig} */
     const options = {
         method: 'GET',
         url: 'https://osu.ppy.sh/api/v2/me',
@@ -74,6 +77,7 @@ async function getUserInfo(token) {
 }
 
 async function getBeatmapsetInfo(token, setId) {
+    /** @type {import('axios').AxiosRequestConfig} */
     const options = {
         method: 'GET',
         url: `https://osu.ppy.sh/api/v2/beatmapsets/${setId}`,
