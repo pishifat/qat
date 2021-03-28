@@ -8,6 +8,7 @@ export interface IModRequestDocument extends Document {
     category: 'simple' | 'tech' | 'doubleBpm' | 'conceptual' | 'other';
     beatmapset: IBeatmapsetDocument;
     comment: string;
+    createdAt?: Date;
     /** virtually populated */
     modReviews: IModReviewDocument[],
 }

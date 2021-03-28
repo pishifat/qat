@@ -121,7 +121,7 @@ router.post('/store', middlewares.isLoggedIn, async (req, res) => {
 
     if (hasRequested) {
         return res.json({
-            error: 'You can only request one beatmap every 2 months!',
+            error: `You can only request one beatmap every 2 months! You can submit again on ${moment(hasRequested.createdAt).add(2, 'month')}.`,
         });
     } else if (beatmapsetRequested) {
         return res.json({
