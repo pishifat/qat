@@ -24,6 +24,7 @@
                 :deadline="deadline"
                 :is-discussion="evaluation.discussion"
                 :is-active="evaluation.active"
+                :archived-at="evaluation.archivedAt"
             />
         </div>
     </div>

@@ -61,6 +61,10 @@ export default {
             type: String,
             required: true,
         },
+        archivedAt: {
+            type: String,
+            default: '',
+        },
         isDiscussion: Boolean,
         isActive: Boolean,
     },
@@ -79,6 +83,8 @@ export default {
         transformedDeadline () {
             if (this.isActive) {
                 return this.$moment(this.deadline).fromNow();
+            } else if (this.archivedAt && this.archivedAt.length) {
+                return this.$options.filters.toStandardDate(this.archivedAt);
             } else {
                 return this.$options.filters.toStandardDate(this.deadline);
             }
