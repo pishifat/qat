@@ -40,17 +40,28 @@
                         <input
                             v-model="mods[i - 1]"
                             type="text"
-                            class="form-control"
+                            class="form-control ml-2 mb-2"
                             placeholder="link to beatmap discussion"
                             maxlength="1000"
                         >
-                        <input
+
+                        <div class="ml-2 small">
+                            Additional mod info
+                            <ul>
+                                <li>Would you nominate this beatmap? If not, why?</li>
+                                <li>Is there anything else you'd like the NAT to know about this mod?</li>
+                                <li>Please provide a copy of the map before your mod was applied (optional)</li>
+                            </ul>
+                        </div>
+
+                        <textarea
                             v-model="reasons[i - 1]"
                             type="text"
-                            class="form-control"
-                            placeholder="would you nominate this beatmap? if not, why?"
+                            class="form-control ml-2"
+                            placeholder="responses to the bullet points above"
                             maxlength="1000"
-                        >
+                            rows="2"
+                        />
                     </div>
                 </div>
             </div>
