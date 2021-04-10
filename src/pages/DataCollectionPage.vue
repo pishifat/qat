@@ -77,7 +77,6 @@ export default {
     },
     methods: {
         async loadUnsetEvents(e) {
-            console.log('a');
             this.isLoading = true;
 
             const res = await this.$http.executeGet('/dataCollection/loadUnsetEvents', e);
@@ -89,7 +88,6 @@ export default {
             }
         },
         async loadRecentEvents(e) {
-            console.log('b');
             this.isLoading = true;
 
             const res = await this.$http.executeGet('/dataCollection/loadRecentEvents', e);

@@ -6,6 +6,24 @@
                 :options="['', 'osu', 'taiko', 'catch', 'mania']"
                 store-module="users"
             >
+                <div v-if="loggedInUser.isNat" class="row">
+                    <div class="col-sm-4 input-group">
+                        <input
+                            id="search"
+                            v-model="userInput"
+                            class="form-control"
+                            type="text"
+                            autocomplete="off"
+                            placeholder="open card for username or osu ID..."
+                            @keyup.enter="openUserModal($event)"
+                        >
+                        <div class="input-group-append">
+                            <button class="btn btn-sm btn-primary px-3" @click="openUserModal($event)">
+                                <i class="fas fa-external-link-alt" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
                 <div class="sort-filter sort-filter--small">
                     <span class="sort-filter__title">Sort by</span>
                     <div class="sort-filter__items">
@@ -34,6 +52,7 @@
                             Time as NAT
                         </a>
                     </div>
+
                     <button v-if="!showOldUsers" class="btn btn-primary btn-sm ml-2 float-right" @click="loadPreviousBnAndNat($event)">
                         Show previous BN/NAT
                     </button>
@@ -98,6 +117,11 @@ export default {
         FilterBox,
         PaginationNav,
     },
+    data () {
+        return {
+            userInput: '',
+        };
+    },
     computed: {
         ...mapState([
             'loggedInUser',
@@ -136,7 +160,8 @@ export default {
                 let i = this.users.findIndex(u => u.id == id);
 
                 if (i == -1) {
-                    await this.loadPreviousBnAndNat();
+                    this.userInput = id.toString();
+                    await this.loadUser();
                     i = this.users.findIndex(u => u.id == id);
                 }
 
@@ -159,6 +184,49 @@ export default {
                 this.$store.commit('users/setUsers', res.users);
                 this.$store.dispatch('users/pageFilters/setFilterMode', '');
             }
+        },
+        async openUserModal(e) {
+            if (this.userInput.length) {
+                let i = this.users.findIndex(u =>
+                    u.username.toLowerCase() == this.userInput.toLowerCase().trim() ||
+                u.osuId.toString() == this.userInput.trim()
+                );
+
+                if (i >= 0) {
+                    const id = this.users[i].id;
+                    this.$store.commit('users/setSelectedUserId', id);
+
+                    if (this.$route.query.id !== id) {
+                        this.$router.replace(`/users?id=${id}`);
+                    }
+
+                    $('#extendedInfo').modal('show');
+                } else {
+                    const user = await this.loadUser(e);
+
+                    if (user && !user.error) {
+                        const id = user.id;
+                        this.$store.commit('users/setSelectedUserId', id);
+
+                        if (this.$route.query.id !== id) {
+                            this.$router.replace(`/users?id=${id}`);
+                        }
+
+                        $('#extendedInfo').modal('show');
+                    }
+                }
+            }
+        },
+        async loadUser(e) {
+            const user = await this.$http.executeGet('/users/loadUser/' + this.userInput, e);
+
+            if (user && !user.error) {
+                const users = [...this.users];
+                users.push(user);
+                this.$store.commit('users/setUsers', users);
+            }
+
+            return user;
         },
     },
 };

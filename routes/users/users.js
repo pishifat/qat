@@ -23,7 +23,7 @@ const evaluationsPopulate = [
     },
 ];
 
-/* GET applicant listing. */
+/* GET user list */
 router.get('/relevantInfo', async (req, res) => {
     const users = await User
         .find({
@@ -35,13 +35,22 @@ router.get('/relevantInfo', async (req, res) => {
     });
 });
 
-/* GET applicant listing. */
+/* GET extended user list */
 router.get('/loadPreviousBnAndNat', async (req, res) => {
     const users = await User.find({
         history: { $exists: true, $ne: [] },
     }).sort({ username: 1 });
 
     res.json({ users });
+});
+
+/* GET user */
+router.get('/loadUser/:userInput', async (req, res) => {
+    if (!req.params.userInput.length) {
+        return res.json({ error: 'No input' });
+    }
+
+    res.json(await User.findByUsernameOrOsuId(req.params.userInput) || await User.findById(req.params.userInput));
 });
 
 /* GET user next evaluation */

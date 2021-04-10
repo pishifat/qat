@@ -93,7 +93,6 @@ export default {
             }
         },
         selectUser(user) {
-            console.log(user);
             this.$store.commit('users/setSelectedUserId', user.id);
 
             if (this.$route.query.id !== user.id) {

@@ -76,7 +76,6 @@ export default {
                 if (this.$http.isValid(data)) {
                     this.loading = false;
                     this.leaderboard = data;
-                    console.log(data);
                 }
             }
         },

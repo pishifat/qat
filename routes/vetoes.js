@@ -360,8 +360,6 @@ router.post('/deleteVeto/:id', middlewares.isNat, async (req, res) => {
         veto._id
     );
 
-    console.log(veto.mode);
-
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),
         color: discord.webhookColors.black,
