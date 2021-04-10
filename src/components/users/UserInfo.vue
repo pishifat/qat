@@ -7,7 +7,7 @@
         <div v-if="selectedUser" class="container">
             <duration />
 
-            <div v-if="selectedUser.groups.includes('bn') || selectedUser.groups.includes('nat')">
+            <div v-if="selectedUser.isBn || selectedUser.isNat">
                 <next-evaluation
                     v-for="mode in selectedUser.modes"
                     :key="mode"
@@ -34,16 +34,16 @@
                     />
                 </div>
 
-                <div v-if="loggedInUser.isNat">
-                    <modding-activity
-                        :username="selectedUser.username"
-                        class="mt-2"
-                    />
+                <modding-activity
+                    v-if="loggedInUser.isNat"
+                    :username="selectedUser.username"
+                    class="mt-2"
+                />
+            </div>
+            <div v-if="loggedInUser.isNat">
+                <notes />
 
-                    <notes />
-
-                    <user-group-toggle />
-                </div>
+                <user-group-toggle v-if="selectedUser.isBn || selectedUser.isNat" />
             </div>
         </div>
     </modal-dialog>

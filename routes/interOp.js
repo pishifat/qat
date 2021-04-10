@@ -9,7 +9,6 @@ const Evaluation = require('../models/evaluations/evaluation');
 const AppEvaluation = require('../models/evaluations/appEvaluation');
 const getGeneralEvents = require('./evaluations/bnEval').getGeneralEvents;
 const { BnEvaluationConsensus } = require('../shared/enums');
-const moment = require('moment');
 
 const router = express.Router();
 

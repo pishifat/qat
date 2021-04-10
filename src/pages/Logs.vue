@@ -95,7 +95,7 @@ export default {
         ]),
     },
     async created () {
-        const logs = await this.$http.initialRequest(`/logs/search/${this.category}/${this.skip}`);
+        const logs = await this.$http.initialRequest(`/logs/search/${this.category}/0`);
 
         if (!logs.error) {
             this.logs = logs;

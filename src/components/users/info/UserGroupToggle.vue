@@ -2,7 +2,7 @@
     <div>
         <p>
             <button
-                class="btn btn-sm btn-block ml-2"
+                class="btn btn-sm btn-block"
                 :class="{ 'btn-danger': selectedUser.isBn, 'btn-bn': selectedUser.isNat }"
                 data-toggle="tooltip"
                 data-placement="top"
