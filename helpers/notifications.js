@@ -350,7 +350,7 @@ const closeContentReviews = cron.schedule('0 9 * * *', async () => {
             );
 
             await discord.contentCaseWebhookPost(discussion);
-            if (!(discussion.creator.isBnOrNat || discussion.creator.groups.includes('gmt'))) await discord.roleHighlightWebhookPost('contentCase', `relay consensus to **${discussion.creator.username}** (https://osu.ppy.sh/users/${discussion.creator.osuId})`);
+            if (!(discussion.creator.isBnOrNat || discussion.creator.groups.includes('gmt'))) await discord.roleHighlightWebhookPost('contentCase', `relay consensus to **${discussion.creator.username}** (https://osu.ppy.sh/users/${discussion.creator.osuId}). React with :mark_check: when relayed.`);
         }
     }
 }, {
