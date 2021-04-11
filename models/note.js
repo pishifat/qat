@@ -5,6 +5,8 @@ const noteSchema = new mongoose.Schema({
     user: { type: 'ObjectId', ref: 'User', required: true },
     comment: { type: String },
     isHidden: { type: Boolean },
+    isWarning: { type: Boolean },
+    isSummary: { type: Boolean },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 /**

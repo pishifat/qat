@@ -41,9 +41,11 @@
                 />
             </div>
             <div v-if="loggedInUser.isNat">
-                <notes />
-
                 <user-group-toggle v-if="selectedUser.isBn || selectedUser.isNat" />
+
+                <hr>
+
+                <notes />
             </div>
         </div>
     </modal-dialog>

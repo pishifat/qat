@@ -31,11 +31,48 @@ router.get('/loadUserNotes/:id', async (req, res) => {
 
 /* POST save note */
 router.post('/saveNote/:id', async (req, res) => {
-    let note = await Note.create({
-        author: req.session.mongoId,
-        user: req.params.id,
-        comment: req.body.comment,
-    });
+    const isWarning = req.body.isWarning;
+    const isSummary = req.body.isSummary;
+    let warning;
+    let summary;
+    let note;
+
+    // edit warning note if one exists
+    if (isWarning) {
+        warning = await Note.findOne({ user: req.params.id, isWarning: true });
+
+        if (warning) {
+            note = await Note.findByIdAndUpdate(warning.id, {
+                author: req.session.mongoId,
+                comment: req.body.comment,
+            });
+        }
+    }
+
+    // edit summary note if one exists
+    if (isSummary) {
+        summary = await Note.findOne({ user: req.params.id, isSummary: true });
+
+        if (summary) {
+            note = await Note.findByIdAndUpdate(summary.id, {
+                author: req.session.mongoId,
+                comment: req.body.comment,
+            });
+        }
+    }
+
+    // create new note (or new summary/warning if none exists)
+    if (!warning && !summary) {
+        note = await Note.create({
+            author: req.session.mongoId,
+            user: req.params.id,
+            comment: req.body.comment,
+            isWarning,
+            isSummary,
+        });
+    }
+
+    // populate for return
     note = await Note
         .findById(note._id)
         .populate(defaultNotePopulate);
@@ -49,7 +86,7 @@ router.post('/saveNote/:id', async (req, res) => {
 
     Logger.generate(
         req.session.mongoId,
-        `Added user note to "${u.username}"`,
+        `Added ${isWarning ? 'warning note' : isSummary ? 'summary note' : 'note'} to "${u.username}"'s profile`,
         'user',
         u._id
     );
@@ -58,7 +95,7 @@ router.post('/saveNote/:id', async (req, res) => {
         [{
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.brown,
-            description: `Added note to [**${note.user.username}**'s profile](http://bn.mappersguild.com/users?id=${note.user.id})`,
+            description: `Added ${isWarning ? '**warning** note' : isSummary ? '**summary** note' : 'note'} to [**${note.user.username}**'s profile](http://bn.mappersguild.com/users?id=${note.user.id})`,
             fields: [
                 {
                     name: 'Note',

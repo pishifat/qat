@@ -4,15 +4,29 @@
             <b>NAT user notes:</b>
         </p>
 
+
+
         <ul class="text-secondary small">
-            <li v-if="!userNotes">
+            <li v-if="summaryNote">
+                <b>USER SUMMARY</b>
+                <div v-html="$md.render(summaryNote.comment)" />
+            </li>
+
+            <li v-if="warningNote">
+                <b>LATEST WARNING/ACTION</b>
+                <div v-html="$md.render(warningNote.comment)" />
+            </li>
+
+            <li v-if="!otherNotes">
                 ...
             </li>
-            <li v-else-if="!userNotes.length">
+
+            <li v-else-if="!otherNotes.length">
                 User has no notes
             </li>
+
             <li
-                v-for="note in userNotes"
+                v-for="note in otherNotes"
                 v-else
                 :key="note.id"
             >
@@ -47,6 +61,32 @@ export default {
         return {
             userNotes: null,
         };
+    },
+    computed: {
+        /** @returns {Array} */
+        otherNotes() {
+            if (this.userNotes) {
+                return this.userNotes.filter(n => !n.isWarning && !n.isSummary);
+            }
+
+            return [];
+        },
+        /** @returns {Object} */
+        warningNote() {
+            if (this.userNotes) {
+                return this.userNotes.find(n => n.isWarning);
+            }
+
+            return null;
+        },
+        /** @returns {Object} */
+        summaryNote() {
+            if (this.userNotes) {
+                return this.userNotes.find(n => n.isSummary);
+            }
+
+            return null;
+        },
     },
     watch: {
         userMongoId() {

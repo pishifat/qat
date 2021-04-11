@@ -2,8 +2,7 @@
     <div>
         <p>
             <button
-                class="btn btn-sm btn-block"
-                :class="{ 'btn-danger': selectedUser.isBn, 'btn-bn': selectedUser.isNat }"
+                class="btn btn-sm btn-block btn-primary"
                 data-toggle="tooltip"
                 data-placement="top"
                 title="Toggle user group"

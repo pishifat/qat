@@ -1,16 +1,43 @@
 <template>
     <div>
+        <div v-if="summaryNote" class="my-2">
+            <b>User summary</b>
+            <div class="ml-4 small text-secondary" v-html="$md.render(summaryNote.comment)" />
+        </div>
+
+        <div v-if="warningNote" class="my-2">
+            <b>Latest warning/action</b>
+            <div class="ml-4 small text-secondary" v-html="$md.render(warningNote.comment)" />
+        </div>
+
         <textarea
             v-model="comment"
-            placeholder="new user note..."
+            placeholder="user note..."
             class="form-control"
             rows="2"
         />
 
-        <button class="btn btn-primary btn-block btn-sm" @click="saveNote($event)">
-            Save
-        </button>
+        <div class="row mt-1">
+            <div class="col-sm-6">
+                <button class="btn btn-primary btn-block btn-sm" @click="saveNote($event)">
+                    Save new note
+                </button>
+            </div>
+            <div class="col-sm-3">
+                <button class="btn btn-danger btn-block btn-sm" @click="saveNote($event, 'warning')">
+                    {{ warningNote ? 'Overwrite' : 'Save' }} warning
+                </button>
+            </div>
+            <div class="col-sm-3">
+                <button class="btn btn-danger btn-block btn-sm" @click="saveNote($event, 'summary')">
+                    {{ summaryNote ? 'Overwrite' : 'Save' }} summary
+                </button>
+            </div>
+        </div>
 
+        <p class="mt-2">
+            <b>Other notes</b>
+        </p>
         <ul class="mt-2">
             <li v-if="!notes" class="small">
                 ...
@@ -19,7 +46,7 @@
                 User has no notes
             </li>
             <li
-                v-for="note in notes"
+                v-for="note in otherNotes"
                 v-else
                 :key="note.id"
                 class="small"
@@ -61,8 +88,8 @@
                         rows="2"
                     />
 
-                    <button class="btn btn-primary btn-sm btn-block" @click="editNote($event)">
-                        Edit
+                    <button class="btn btn-primary btn-sm btn-block mt-1" @click="editNote($event)">
+                        Edit note
                     </button>
                 </div>
             </li>
@@ -94,13 +121,42 @@ export default {
         ...mapGetters('users', [
             'selectedUser',
         ]),
+        /** @returns {Array} */
+        otherNotes() {
+            if (this.notes) {
+                return this.notes.filter(n => !n.isWarning && !n.isSummary);
+            }
+
+            return null;
+        },
+        /** @returns {Object} */
+        warningNote() {
+            if (this.notes) {
+                return this.notes.find(n => n.isWarning);
+            }
+
+            return null;
+        },
+        /** @returns {Object} */
+        summaryNote() {
+            if (this.notes) {
+                return this.notes.find(n => n.isSummary);
+            }
+
+            return null;
+        },
     },
     watch: {
-        selectedUser() {
+        async selectedUser() {
             this.notes = null;
             this.comment = '';
             this.editNoteId = '';
-            this.loadUserNotes();
+            await this.loadUserNotes();
+        },
+        async notes() {
+            if (this.notes && this.notes.length && this.notes[0].user.id !== this.selectedUser.id) { // without this, wrong notes show if you visit /users -> click a user -> search an unlisted user. can't figure out why
+                await this.loadUserNotes();
+            }
         },
     },
     mounted() {
@@ -114,9 +170,12 @@ export default {
                 this.notes = notes;
             }
         },
-        async saveNote(e) {
+        async saveNote(e, type) {
             if (this.comment.length) {
-                const data = await this.$http.executePost('/users/nat/saveNote/' + this.selectedUser.id, { comment: this.comment }, e);
+                const isWarning = (type == 'warning');
+                const isSummary = (type == 'summary');
+
+                const data = await this.$http.executePost('/users/nat/saveNote/' + this.selectedUser.id, { comment: this.comment, isWarning, isSummary }, e);
 
                 if (this.$http.isValid(data)) {
                     if (this.notes) {
