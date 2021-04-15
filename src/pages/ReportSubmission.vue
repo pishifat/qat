@@ -53,7 +53,7 @@
                 <hr>
 
                 <div v-if="category == 'stolenBeatmap'">
-                    If a beatmap you created is stolen and you want it removed from the beatmap listing, send notice to <code>copyright@ppy.sh</code> as per osu!'s <a href="https://osu.ppy.sh/legal/en/Copyright" target="_blank">copyright policy</a>.
+                    If a beatmap you created is stolen and you want it removed from the beatmap listing, send notice to <code>copyright@ppy.sh</code> from as per osu!'s <a href="https://osu.ppy.sh/legal/en/Copyright" target="_blank">copyright policy</a>. Your notice should come from the email address linked to your osu! account.
                 </div>
 
                 <div v-else>
