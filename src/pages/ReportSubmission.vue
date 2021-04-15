@@ -24,9 +24,6 @@
                         <option value="" disabled>
                             Select a category
                         </option>
-                        <option value="stolenBeatmap">
-                            Stolen beatmap
-                        </option>
                         <option value="contentCaseSong">
                             Song Content Rules violation
                         </option>
@@ -35,6 +32,9 @@
                         </option>
                         <option value="behavior">
                             Inappropriate behavior in beatmap discussion or comments
+                        </option>
+                        <option value="stolenBeatmap">
+                            Stolen beatmap
                         </option>
                         <option value="other">
                             Other
@@ -52,72 +52,78 @@
 
                 <hr>
 
-                <div class="row mb-2">
-                    <div class="col-sm-12">
-                        <h4>{{ primaryLinkHeader }}</h4>
-                        <p class="small text-secondary">
-                            {{ primaryLinkSubheader }}
-                        </p>
-                        <input
-                            v-model="link"
-                            type="text"
-                            class="form-control"
-                            placeholder="link..."
-                            maxlength="150"
-                            autocomplete="off"
-                        >
-                    </div>
+                <div v-if="category == 'stolenBeatmap'">
+                    If a beatmap you created is stolen and you want it removed from the beatmap listing, send notice to <code>copyright@ppy.sh</code> as per osu!'s <a href="https://osu.ppy.sh/legal/en/Copyright" target="_blank">copyright policy</a>.
                 </div>
 
-                <div v-if="category == 'behavior' || category == 'other'" class="row mb-2">
-                    <div class="col-sm-12">
-                        <h4>Username:</h4>
-                        <p class="small text-secondary">
-                            If your report pertains to a member of the BN/NAT, include their name. Otherwise leave empty.
-                        </p>
-
-                        <input
-                            v-model="username"
-                            type="text"
-                            class="form-control"
-                            placeholder="username..."
-                            maxlength="18"
-                            autocomplete="off"
-                        >
+                <div v-else>
+                    <div class="row mb-2">
+                        <div class="col-sm-12">
+                            <h4>{{ primaryLinkHeader }}</h4>
+                            <p class="small text-secondary">
+                                {{ primaryLinkSubheader }}
+                            </p>
+                            <input
+                                v-model="link"
+                                type="text"
+                                class="form-control"
+                                placeholder="link..."
+                                maxlength="150"
+                                autocomplete="off"
+                            >
+                        </div>
                     </div>
-                </div>
 
-                <div class="row mb-2">
-                    <div class="col-sm-12">
-                        <h4>{{ reasonHeader }}</h4>
-                        <p class="small text-secondary">
-                            {{ reasonSubheader }}
-                        </p>
+                    <div v-if="category == 'behavior' || category == 'other'" class="row mb-2">
+                        <div class="col-sm-12">
+                            <h4>Username:</h4>
+                            <p class="small text-secondary">
+                                If your report pertains to a member of the BN/NAT, include their name. Otherwise leave empty.
+                            </p>
 
-                        <textarea
-                            v-model="reason"
-                            class="form-control"
-                            rows="4"
-                            maxlength="5000"
-                        />
+                            <input
+                                v-model="username"
+                                type="text"
+                                class="form-control"
+                                placeholder="username..."
+                                maxlength="18"
+                                autocomplete="off"
+                            >
+                        </div>
                     </div>
-                </div>
 
-                <div class="row">
-                    <div class="col-sm-12 text-center">
-                        <button
-                            class="btn btn-primary btn-block"
-                            type="button"
-                            @click="submit($event)"
-                        >
-                            Submit Report
-                        </button>
+                    <div class="row mb-2">
+                        <div class="col-sm-12">
+                            <h4>{{ reasonHeader }}</h4>
+                            <p class="small text-secondary">
+                                {{ reasonSubheader }}
+                            </p>
 
-                        <div
-                            v-if="successInfo"
-                            class="pt-2 text-success small"
-                        >
-                            {{ successInfo }}
+                            <textarea
+                                v-model="reason"
+                                class="form-control"
+                                rows="4"
+                                maxlength="5000"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-12 text-center">
+                            <button
+                                class="btn btn-primary btn-block"
+                                type="button"
+                                @click="submit($event)"
+                            >
+                                Submit Report
+                            </button>
+
+                            <div
+                                v-if="successInfo"
+                                class="pt-2 text-success small"
+                            >
+                                {{ successInfo }}
+                            </div>
                         </div>
                     </div>
                 </div>
