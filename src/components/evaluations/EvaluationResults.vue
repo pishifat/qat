@@ -44,7 +44,7 @@
             </div>
 
             <h5>Evaluators</h5>
-            <p>The consenus of your evaluation is final and appeals will not be taken. If you have questions about your evaluation though, please contact any member of the NAT below!</p>
+            <p>The consensus of your evaluation is final and appeals will not be taken. If you have questions about your evaluation though, please contact any member of the NAT below!</p>
             <div class="card card-body">
                 <ul>
                     <li v-for="review in natReviews" :key="review.id">

@@ -34,11 +34,14 @@
 
                 <data-table
                     v-if="questions.length"
-                    :headers="['Question', '']"
+                    :headers="['Question', 'Updated', '']"
                 >
                     <tr v-for="question in questions" :key="question.id" :class="question.active ? 'border-active' : 'border-inactive'">
                         <td>
                             {{ question.content }}
+                        </td>
+                        <td>
+                            {{ questionUpdated(question) }}
                         </td>
                         <td class="text-right">
                             <a
@@ -131,6 +134,19 @@ export default {
         },
         getCategoryContent () {
             return this.categories.find(c => c.value === this.selectedCategory).content || this.selectedCategory;
+        },
+        questionUpdated (question) {
+            let updated = new Date(question.updatedAt);
+
+            for (const option of question.options) {
+                let newUpdated = new Date(option.updatedAt);
+
+                if (newUpdated > updated) {
+                    updated = newUpdated;
+                }
+            }
+
+            return updated.toString().slice(4,15);
         },
     },
 };

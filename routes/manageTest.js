@@ -14,7 +14,7 @@ router.use(middlewares.hasFullReadAccess);
 const defaultPopulate = [
     {
         path: 'options',
-        select: 'content score active',
+        select: 'content score active updatedAt',
         sort: {
             active: 1,
         },
