@@ -57,6 +57,33 @@ async function refreshToken(refreshToken) {
     }
 }
 
+async function getClientCredentialsGrant() {
+    const postData = querystring.stringify({
+        grant_type: 'client_credentials',
+        client_id: config.id,
+        client_secret: config.secret,
+        scope: 'public',
+    });
+
+    /** @type {import('axios').AxiosRequestConfig} */
+    const options = {
+        method: 'post',
+        url: 'https://osu.ppy.sh/oauth/token',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        data: postData,
+    };
+
+    try {
+        const res = await axios(options);
+
+        return res.data;
+    } catch (error) {
+        return { error };
+    }
+}
+
 async function getUserInfo(token) {
     /** @type {import('axios').AxiosRequestConfig} */
     const options = {
@@ -89,9 +116,26 @@ async function getBeatmapsetInfo(token, setId) {
     return (await axios(options)).data;
 }
 
+async function getDiscussions(token, params) {
+    let url = `https://osu.ppy.sh/api/v2/beatmapsets/discussions${params}`;
+
+    /** @type {import('axios').AxiosRequestConfig} */
+    const options = {
+        method: 'GET',
+        url,
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    };
+
+    return (await axios(options)).data;
+}
+
 module.exports = {
     getToken,
     refreshToken,
+    getClientCredentialsGrant,
     getUserInfo,
     getBeatmapsetInfo,
+    getDiscussions,
 };

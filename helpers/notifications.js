@@ -1,9 +1,8 @@
-const { default: axios } = require('axios');
-const cheerio = require('cheerio');
 const cron = require('node-cron');
 const moment = require('moment');
 const discord = require('./discord');
 const osuv1 = require('./osuv1');
+const osu = require('./osu');
 const util = require('./util');
 const AppEvaluation = require('../models/evaluations/appEvaluation');
 const Evaluation = require('../models/evaluations/evaluation');
@@ -358,50 +357,46 @@ const closeContentReviews = cron.schedule('0 9 * * *', async () => {
 });
 
 const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
+    const response = await osu.getClientCredentialsGrant();
+    const token = response.access_token;
+
     // find pending discussion posts
-    let url = 'https://osu.ppy.sh/beatmapsets/discussions?user=&beatmapset_status=qualified&limit=50&message_types%5B%5D=suggestion&message_types%5B%5D=problem&only_unresolved=on';
-    const historyHtml = await axios.get(url);
-    const $ = cheerio.load(historyHtml.data);
-    let discussions = JSON.parse($('#json-discussions').html());
+    const parentDiscussions = await osu.getDiscussions(token, '?beatmapset_status=qualified&limit=50&message_types%5B%5D=suggestion&message_types%5B%5D=problem&only_unresolved=on');
+    const discussions = parentDiscussions.discussions;
 
     // find database's discussion posts
     const date = new Date();
     date.setDate(date.getDate() - 10); // used to be 7, but backlog in qualified maps feed caused duplicate reports
     let beatmapReports = await BeatmapReport.find({ createdAt: { $gte: date } });
+    await util.sleep(500);
 
     // create array of reported beatmapsetIds
-    let beatmapsetIds = [];
-    beatmapReports.forEach(beatmapReport => {
-        if (!beatmapsetIds.includes(beatmapReport.beatmapsetId)) {
-            beatmapsetIds.push(beatmapReport.beatmapsetId);
-        }
-    });
+    const beatmapsetIds = beatmapReports.map(r => r.beatmapsetId);
 
     for (const discussion of discussions) {
-        // get discussion url, parsing all discussions and fiding the discussion thread.
-        const discussionUrl = `https://osu.ppy.sh/beatmapsets/${discussion.beatmapset_id}/discussion`;
-        const discussionHtml = await axios.get(discussionUrl);
-        const $discussions = cheerio.load(discussionHtml.data);
-        const allDiscussions = JSON.parse($discussions('#json-beatmapset-discussion').html()).beatmapset.discussions;
-        const discussionPost = allDiscussions.find(d => d && d.id == discussion.id);
-
-        // variables for easier reading + editing
         let messageType = discussion.message_type;
         let discussionMessage = discussion.starting_post.message;
-        let userId = discussion.starting_post.user_id;
+        let userId = discussion.user_id;
+
+        /* NO RE-OPENED POSTS FOR NOW
 
         // find last reopen if it exists
-        let allPosts = discussionPost.posts;
-        allPosts.reverse();
-        const lastReopen = allPosts.find(p => p && p.system && !p.message.value);
+        const parentPosts = await osu.getDiscussions(token, `/posts?beatmapset_discussion_id=${discussion.id}`);
+        const posts = parentPosts.posts;
+        await util.sleep(500);
+
+        const postReported = await BeatmapReport.findOne({
+            postId: discussion.id,
+        });
 
         // replace discussion details with reopen
-        if (lastReopen) {
-            let reopenPost = allPosts[allPosts.indexOf(lastReopen) + 1];
-            messageType = `reopen ${discussion.message_type}`;
-            discussionMessage = reopenPost.message;
-            userId = lastReopen.user_id;
+        if (postReported && posts[0] && posts[0].id !== discussion.starting_post.id) {
+            messageType = `reopen ${messageType}`;
+            discussionMessage = posts[0].message;
+            userId = posts[0].user_id;
         }
+
+        NO RE-OPENED POSTS FOR NOW */
 
         // determine which posts haven't been sent to #report-feed
         let createWebhook;
