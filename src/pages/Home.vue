@@ -16,7 +16,7 @@
                 tag="div"
                 class="row"
             >
-                <table v-for="usersByMode in allUsersByMode" :key="usersByMode._id" class="table table-sm table-dark table-hover col-6 col-md-3">
+                <table v-for="usersByMode in sorted" :key="usersByMode._id" class="table table-sm table-dark table-hover col-6 col-md-3">
                     <thead>
                         <td>{{ usersByMode._id }}</td>
                     </thead>
@@ -24,21 +24,33 @@
                     <tbody>
                         <tr v-for="user in usersByMode.users" :key="user.id">
                             <td
+                                style="height: 10px;"
                                 :style="getGroupColor(user)"
                             >
-                                <user-link
-                                    :osu-id="user.osuId"
-                                    :username="user.username"
-                                />
-                                <span v-if="user.requestStatus">
-                                    <span
-                                        v-for="status in requestMethods(user.requestStatus)"
-                                        :key="status"
-                                        class="badge badge-pill mx-1 text-lowercase"
-                                        :class="status === 'closed' ? 'badge-danger' : status === 'open' ? 'badge-success' : 'badge-primary'"
-                                        v-html="$md.renderInline(formatLink(status, user.requestLink))"
+                                <div>
+                                    <user-link
+                                        :osu-id="user.osuId"
+                                        :username="user.username"
                                     />
-                                </span>
+                                    <span v-if="user.requestStatus">
+                                        <span
+                                            v-for="status in requestMethods(user.requestStatus)"
+                                            :key="status"
+                                            class="badge badge-pill mx-1 text-lowercase"
+                                            :class="status === 'closed' ? 'badge-danger' : status === 'open' ? 'badge-success' : 'badge-primary'"
+                                            v-html="$md.renderInline(formatLink(status, user.requestLink))"
+                                        />
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr v-for="i in modeEmptyCells(usersByMode._id)" :key="i">
+                            <td
+                                style="height: 10px; opacity: 0;"
+                            >
+                                <div>
+                                    .
+                                </div>
                             </td>
                         </tr>
                     </tbody>
@@ -80,9 +92,19 @@ export default {
         UserLink,
     },
     mixins: [ evaluations ],
-    computed: mapState([
-        'allUsersByMode',
-    ]),
+    computed: {
+        ...mapState([
+            'allUsersByMode',
+        ]),
+        sorted () {
+            const sortOrder = ['osu', 'taiko', 'catch', 'mania'];
+            const sorted = [...this.allUsersByMode];
+
+            return sorted.sort(function(a, b) {
+                return sortOrder.indexOf(a._id) - sortOrder.indexOf(b._id);
+            });
+        },
+    },
     async created () {
         if (this.allUsersByMode.length) return;
 
@@ -93,6 +115,7 @@ export default {
         }
     },
     methods: {
+        /** @returns {array} */
         requestMethods(requestStatus) {
             let statusList = [...requestStatus];
             statusList = statusList.sort();
@@ -103,6 +126,7 @@ export default {
 
             return statusList;
         },
+        /** @returns {string} */
         getGroupColor (user) {
             if (user.group === 'nat') {
                 return 'border-left: 3px solid var(--danger);';
@@ -116,6 +140,7 @@ export default {
                 return 'border-left: 3px solid var(--bn);';
             }
         },
+        /** @returns {string} */
         formatLink (status, requestLink) {
             status = this.makeWordFromField(status);
 
@@ -128,6 +153,15 @@ export default {
             }
 
             return status;
+        },
+        /** @returns {number} */
+        modeEmptyCells (mode) {
+            const osu = this.allUsersByMode.find(i => i._id == 'osu');
+            const osuCount = osu.users.length;
+            const newMode = this.allUsersByMode.find(i => i._id == mode);
+            const modeCount = newMode.users.length;
+
+            return osuCount - modeCount;
         },
     },
 };
