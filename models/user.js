@@ -22,6 +22,7 @@ const userSchema = new mongoose.Schema({
     }],
     isVetoMediator: { type: Boolean, default: true },
     isBnEvaluator: { type: Boolean, default: true },
+    isTrialNat: { type: Boolean, default: false }, // used to give BNs some NAT permissions during trial run
     bnProfileBadge: { type: Number, default: 0 },
     natProfileBadge: { type: Number, default: 0 },
     rankedBeatmapsets: { type: Number, default: 0 },

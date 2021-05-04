@@ -26,7 +26,11 @@
                 <div v-if="loggedInUser.hasBasicAccess">
                     <!-- BN can only see this on their own cards. NAT can see on everyone's cards -->
                     <bn-evaluator-toggle
-                        v-if="(selectedUser.id == loggedInUser.id || loggedInUser.isNat) && !selectedUser.isNat"
+                        v-if="loggedInUser.isNat"
+                    />
+
+                    <trial-nat-toggle
+                        v-if="loggedInUser.isNat"
                     />
 
                     <resign
@@ -58,6 +62,7 @@ import Duration from './info/Duration.vue';
 import Notes from './info/Notes.vue';
 import NextEvaluation from './info/NextEvaluation.vue';
 import BnEvaluatorToggle from './info/BnEvaluatorToggle.vue';
+import TrialNatToggle from './info/TrialNatToggle.vue';
 import UserGroupToggle from './info/UserGroupToggle.vue';
 import ModdingActivity from '../evaluations/info/currentBns/ModdingActivity.vue';
 import UserActivity from '../evaluations/info/currentBns/userActivity/UserActivity.vue';
@@ -72,6 +77,7 @@ export default {
         Notes,
         NextEvaluation,
         BnEvaluatorToggle,
+        TrialNatToggle,
         UserGroupToggle,
         ModdingActivity,
         UserActivity,

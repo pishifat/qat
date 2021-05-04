@@ -8,7 +8,11 @@
 
         <hr>
 
-        <settings-modal-nat v-if="loggedInUser.isNat" />
+        <settings-modal-discord />
+
+        <hr>
+
+        <settings-modal-mode-evaluations v-if="loggedInUser.isNat" />
     </modal-dialog>
 </template>
 
@@ -16,13 +20,15 @@
 import { mapState } from 'vuex';
 import ModalDialog from '../ModalDialog.vue';
 import SettingsModalEvaluator from './SettingsModalEvaluator.vue';
-import SettingsModalNat from './SettingsModalNat.vue';
+import SettingsModalDiscord from './SettingsModalDiscord.vue';
+import SettingsModalModeEvaluations from './SettingsModalModeEvaluations.vue';
 import SettingsModalRequests from './SettingsModalRequests.vue';
 
 export default {
     components: {
         ModalDialog,
-        SettingsModalNat,
+        SettingsModalModeEvaluations,
+        SettingsModalDiscord,
         SettingsModalRequests,
         SettingsModalEvaluator,
     },

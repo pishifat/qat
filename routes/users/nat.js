@@ -144,6 +144,27 @@ router.post('/editNote/:id', async (req, res) => {
     );
 });
 
+/* POST toggle isTrialNat */
+router.post('/:id/toggleIsTrialNat', middlewares.isNat, async (req, res) => {
+    const user = await User.findById(req.params.id).orFail();
+
+    user.isTrialNat = !user.isTrialNat;
+    await user.save();
+
+    res.json({
+        user,
+        success: 'Toggled isTrialNat',
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Opted "${user.username}" ${user.isTrialNat ? 'in to' : 'out of'} trial NAT`,
+        'user',
+        user._id
+    );
+});
+
+
 /* GET all users with badge info */
 router.get('/findUserBadgeInfo', async (req, res) => {
     const u = await User.find({

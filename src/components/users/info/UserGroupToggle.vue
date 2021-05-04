@@ -1,15 +1,19 @@
 <template>
     <div>
         <p>
-            <button
-                class="btn btn-sm btn-block btn-primary"
+            <b>
+                User group:
+            </b>
+            <a
+                class="ml-1"
                 data-toggle="tooltip"
                 data-placement="top"
                 title="Toggle user group"
-                @click="switchUserGroup($event)"
+                href="#"
+                @click.prevent="switchUserGroup()"
             >
                 {{ selectedUser.isBn ? 'Move to NAT' : 'Move to BN' }}
-            </button>
+            </a>
         </p>
     </div>
 </template>
@@ -25,11 +29,11 @@ export default {
         ]),
     },
     methods: {
-        async switchUserGroup(e) {
+        async switchUserGroup() {
             const result = confirm(`Are you sure?`);
 
             if (result) {
-                const data = await this.$http.executePost(`/users/${this.selectedUser.id}/switchUserGroup`, {}, e);
+                const data = await this.$http.executePost(`/users/${this.selectedUser.id}/switchUserGroup`, {});
 
                 if (this.$http.isValid(data)) {
                     this.$store.commit('users/updateUser', data.user);

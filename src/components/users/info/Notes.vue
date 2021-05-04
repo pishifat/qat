@@ -1,5 +1,10 @@
 <template>
     <div>
+        <p>
+            <b>
+                Notes
+            </b>
+        </p>
         <div v-if="summaryNote" class="my-2">
             <b>User summary</b>
             <div class="ml-4 small text-secondary" v-html="$md.render(summaryNote.comment)" />

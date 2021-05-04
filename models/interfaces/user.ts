@@ -19,6 +19,7 @@ interface IUser {
     }[]
     isVetoMediator: boolean;
     isBnEvaluator: boolean;
+    isTrialNat: boolean;
     bnProfileBadge: number;
     natProfileBadge: number;
     rankedBeatmapsets: number;

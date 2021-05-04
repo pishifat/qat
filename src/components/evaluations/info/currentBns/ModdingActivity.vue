@@ -1,15 +1,20 @@
 <template>
     <div>
-        <b>Modding:</b>
-        <button
-            class="btn btn-sm btn-primary mx-2 mb-2"
-            data-toggle="tooltip"
-            data-placement="right"
-            title="Finds unique mod count in the last 90 days. Only use on BNs with low activity"
-            @click="findModCount()"
-        >
-            Load modding activity
-        </button>
+        <p>
+            <b>
+                Modding:
+            </b>
+            <a
+                class="ml-1"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Finds unique mod count in the last 90 days"
+                href="#"
+                @click.prevent="findModCount()"
+            >
+                <i class="fas fa-search" />
+            </a>
+        </p>
         <ul v-if="modCount" class="small">
             <li v-for="(count, i) in modCount" :key="i">
                 Month {{ i+1 }}: {{ count }}

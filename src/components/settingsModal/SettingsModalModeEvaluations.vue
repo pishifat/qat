@@ -1,34 +1,5 @@
 <template>
     <div class="container">
-        <div class="row">
-            <div class="col-sm-4">
-                <div>Your Discord ID</div>
-                <small class="text-secondary">
-                    Used for deadline-related highlights
-                </small>
-            </div>
-            <div class="col-sm-8">
-                <div class="input-group">
-                    <input
-                        v-model="discordId"
-                        type="number"
-                        class="form-control"
-                        placeholder="ID..."
-                    >
-                    <div class="input-group-append">
-                        <button
-                            class="btn btn-sm btn-outline-success"
-                            type="button"
-                            @click="updateDiscordId"
-                        >
-                            <i class="fas fa-save" />
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <hr>
-
         <div>Evaluations required</div>
         <small class="text-secondary">
             Number of evaluations required before an application/BN eval is moved to group discussion
@@ -76,14 +47,12 @@ export default {
     data () {
         return {
             modeSettings: [],
-            discordId: 0,
         };
     },
     computed: mapState([
         'loggedInUser',
     ]),
     async created () {
-        this.discordId = this.loggedInUser.discordId;
         await this.fetchSettings();
     },
     methods: {
@@ -101,11 +70,6 @@ export default {
         async update (e) {
             await this.$http.executePost(`/settings/update`, {
                 modeSettings: this.modeSettings,
-            }, e);
-        },
-        async updateDiscordId (e) {
-            await this.$http.executePost(`/users/updateDiscordId`, {
-                discordId: this.discordId,
             }, e);
         },
     },
