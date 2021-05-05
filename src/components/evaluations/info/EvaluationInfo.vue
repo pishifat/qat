@@ -24,7 +24,7 @@
                 :mongo-id="selectedEvaluation.user.id"
                 :unique="selectedEvaluation.id"
             />
-            <template v-if="loggedInUser.isNat">
+            <template v-if="loggedInUser.isNat || loggedInUser.isTrialNat">
                 <p>
                     <a href="#additionalInfo" data-toggle="collapse">
                         Additional info <i class="fas fa-angle-down" />
@@ -51,7 +51,7 @@
             <discussion-info v-if="selectedEvaluation.discussion" />
 
             <!-- Only NAT can edit their review while in discussion -->
-            <template v-if="!selectedEvaluation.discussion || (selectedEvaluation.discussion && loggedInUser.isNat)">
+            <template v-if="!selectedEvaluation.discussion || (selectedEvaluation.discussion && (loggedInUser.isNat || loggedInUser.isTrialNat))">
                 <hr>
                 <evaluation-input />
             </template>

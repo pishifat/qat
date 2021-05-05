@@ -38,7 +38,7 @@ router.get('/relevantInfo', async (req, res) => {
 
 
 /* GET search for a user's tests */
-router.get('/search/:user', middlewares.isNat, async (req, res) => {
+router.get('/search/:user', middlewares.hasFullReadAccessOrTrialNat, async (req, res) => {
     const userToSearch = decodeURI(req.params.user);
     const user = await User
         .findByUsernameOrOsuId(userToSearch)

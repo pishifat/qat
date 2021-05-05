@@ -9,7 +9,7 @@
             >
                 {{ consensusText }}
             </span>
-            <span v-if="selectedEvaluation.active" class="btn-group">
+            <span v-if="selectedEvaluation.active && loggedInUser.isNat" class="btn-group">
                 <button
                     v-for="button in buttons"
                     :key="button.consensus"
@@ -31,7 +31,7 @@
             >
                 {{ additionText }}
             </span>
-            <span v-if="selectedEvaluation.active" class="btn-group">
+            <span v-if="selectedEvaluation.active && loggedInUser.isNat" class="btn-group">
                 <button
                     class="btn btn-sm btn-primary"
                     :disabled="lowActivityWarning"
@@ -66,7 +66,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import evaluations from '../../../../mixins/evaluations.js';
 import { EvaluationKind } from '../../../../../shared/enums.js';
 
@@ -74,6 +74,9 @@ export default {
     name: 'Consensus',
     mixins: [ evaluations ],
     computed: {
+        ...mapState([
+            'loggedInUser',
+        ]),
         ...mapGetters('evaluations', [
             'selectedEvaluation',
         ]),

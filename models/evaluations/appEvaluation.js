@@ -4,7 +4,6 @@ const baseSchema = require('./base');
 const appEvaluationSchema = new mongoose.Schema({
     ...baseSchema,
     consensus: { type: String, enum: ['pass', 'fail'] },
-    bnEvaluators: [{ type: 'ObjectId', ref: 'User' }],
     mods: [{ type: String, required: true }],
     reasons: [{ type: String, required: true }],
     test: { type: 'ObjectId', ref: 'TestSubmission' },

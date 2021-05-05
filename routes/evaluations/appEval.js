@@ -31,6 +31,7 @@ const defaultPopulate = [
 
 const bnDefaultPopulate = [
     { path: 'user', select: 'username osuId' },
+    { path: 'test', select: 'comment totalScore' },
     {
         path: 'reviews',
         select: 'behaviorComment moddingComment vote',
@@ -45,7 +46,7 @@ const bnDefaultPopulate = [
 router.get('/relevantInfo', async (req, res) => {
     let applications = [];
 
-    if (res.locals.userRequest.hasFullReadAccess) {
+    if (res.locals.userRequest.hasFullReadAccess || res.locals.userRequest.isTrialNat) {
         applications = await AppEvaluation
             .find({
                 active: true,
@@ -91,6 +92,7 @@ router.post('/submitEval/:id', middlewares.isBnOrNat, async (req, res) => {
 
     if (
         !res.locals.userRequest.isNat &&
+        !res.locals.userRequest.isTrialNat &&
         !evaluation.bnEvaluators.some(bn => bn.id == req.session.mongoId)
     ) {
         return res.json({
@@ -101,7 +103,7 @@ router.post('/submitEval/:id', middlewares.isBnOrNat, async (req, res) => {
     const isNewEvaluation = await submitEval(
         evaluation,
         req.session,
-        res.locals.userRequest.isNat,
+        res.locals.userRequest.isNat || res.locals.userRequest.isTrialNat,
         req.body.behaviorComment,
         req.body.moddingComment,
         req.body.vote
@@ -110,7 +112,7 @@ router.post('/submitEval/:id', middlewares.isBnOrNat, async (req, res) => {
     evaluation = await AppEvaluation
         .findById(req.params.id)
         .populate(
-            res.locals.userRequest.isNat ? defaultPopulate : bnDefaultPopulate
+            res.locals.userRequest.isNat || res.locals.userRequest.isTrialNat ? defaultPopulate : bnDefaultPopulate
         );
 
     res.json(evaluation);
@@ -291,7 +293,7 @@ router.post('/setCooldownDate/:id', middlewares.isNat, async (req, res) => {
 });
 
 /* POST set feedback of eval */
-router.post('/setFeedback/:id', middlewares.isNat, async (req, res) => {
+router.post('/setFeedback/:id', middlewares.isNatOrTrialNat, async (req, res) => {
     let evaluation = await AppEvaluation
         .findById(req.params.id)
         .populate(defaultPopulate)

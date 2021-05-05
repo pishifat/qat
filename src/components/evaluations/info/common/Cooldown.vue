@@ -3,11 +3,14 @@
         <b>Cooldown:</b>
 
         <input
+            v-if="loggedInUser.isNat"
             v-model.number="newCooldownDays"
             type="number"
             class="form-control mx-2"
             @change="setCooldownDate($event)"
         >
+
+        <span v-else class="mx-1 text-danger">{{ originalCooldownDays }}</span>
 
         <span class="small text-secondary">
             User can reapply on
@@ -26,7 +29,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 
 export default {
     name: 'Cooldown',
@@ -36,6 +39,9 @@ export default {
         };
     },
     computed: {
+        ...mapState([
+            'loggedInUser',
+        ]),
         ...mapGetters('evaluations', [
             'selectedEvaluation',
         ]),

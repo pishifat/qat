@@ -6,11 +6,11 @@
             :osu-id="selectedEvaluation.user.osuId"
         />
 
-        <template v-if="loggedInUser.isNat">
-            <applicant-comment
-                :comment="selectedEvaluation.test.comment"
-            />
+        <applicant-comment
+            :comment="selectedEvaluation.test.comment"
+        />
 
+        <template v-if="loggedInUser.isNat || loggedInUser.isTrialNat">
             <test-results
                 :test-score="selectedEvaluation.test.totalScore"
                 :osu-id="selectedEvaluation.user.osuId"

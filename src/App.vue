@@ -88,10 +88,25 @@
                                     Discussion Vote
                                 </router-link>
                             </li>
-                            <li class="nav-item">
+                            <li v-if="!loggedInUser.isTrialNat" class="nav-item">
                                 <router-link class="nav-link" to="/appeval">
                                     BN Application Evaluations
                                 </router-link>
+                            </li>
+                        </template>
+                        <template v-if="loggedInUser.isBn && !loggedInUser.isNat && loggedInUser.isTrialNat">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                    Evaluations
+                                </a>
+                                <div class="dropdown-menu">
+                                    <router-link class="dropdown-item" to="/appeval">
+                                        Applications
+                                    </router-link>
+                                    <router-link class="dropdown-item" to="/bneval">
+                                        Current BNs
+                                    </router-link>
+                                </div>
                             </li>
                         </template>
                         <template v-else-if="loggedInUser.hasFullReadAccess">

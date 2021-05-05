@@ -24,6 +24,8 @@
             />
         </div>
 
+        <!-- hide BN evaluator selection while trial NAT exists
+
         <div v-if="(!selectedEvaluation.bnEvaluators || !selectedEvaluation.bnEvaluators.length) && selectedEvaluation.isApplication && !selectedEvaluation.discussion" class="col-sm-12">
             <hr>
 
@@ -86,6 +88,8 @@
                 </div>
             </div>
         </div>
+
+        -->
     </div>
 </template>
 

@@ -18,6 +18,7 @@ const Logger = require('../models/log');
 const defaultPopulate = [
     { path: 'user', select: 'username osuId modesInfo' },
     { path: 'natEvaluators', select: 'username osuId discordId' },
+    { path: 'bnEvaluators', select: 'username osuId discordId' },
     {
         path: 'reviews',
         select: 'evaluator',
@@ -62,17 +63,17 @@ function findNatEvaluatorHighlights (reviews, natEvaluators, discussion) {
 
 /**
  * @param {Array} reviews
- * @param {Array} natEvaluators
+ * @param {Array} evaluators
  * @param {Boolean} discussion
  * @returns {string} text for webhook
  */
-function findNatEvaluatorStatuses (reviews, natEvaluators, discussion) {
+function findNatEvaluatorStatuses (reviews, evaluators, discussion) {
     let text = '';
 
     if (!discussion) {
         const evaluatorIds = reviews.map(r => r.evaluator.id);
 
-        for (const user of natEvaluators) {
+        for (const user of evaluators) {
             if (evaluatorIds.includes(user.id)) {
                 text += `\n✅ `;
             } else {
@@ -96,7 +97,7 @@ function findMissingContent (discussion, consensus, feedback) {
     let text = '\n**Next step:** ';
 
     if (!discussion) {
-        text += `get more NAT evaluations`;
+        text += `get more evaluations`;
     } else if (!consensus) {
         text += `decide consensus`;
     } else if (!feedback) {
@@ -203,9 +204,10 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
         let generateWebhook = true;
         let discordIds = [];
         let color;
+        let trialEvaluators = app.mode == 'osu' ? app.natEvaluators.concat(app.bnEvaluators) : app.natEvaluators;
 
         if (date > deadline) {
-            discordIds = findNatEvaluatorHighlights(app.reviews, app.natEvaluators, app.discussion);
+            discordIds = findNatEvaluatorHighlights(app.reviews, trialEvaluators, app.discussion);
             const days = findDaysAgo(app.createdAt);
 
             description += `was due ${days == 0 ? 'today!' : days == 1 ? days + ' day ago!' : days + ' days ago!'}`;
@@ -218,7 +220,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
         }
 
         if (generateWebhook) {
-            description += findNatEvaluatorStatuses(app.reviews, app.natEvaluators, app.discussion);
+            description += findNatEvaluatorStatuses(app.reviews, trialEvaluators, app.discussion);
             description += findMissingContent(app.discussion, app.consensus, app.feedback);
 
             await discord.webhookPost(
@@ -241,9 +243,11 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
 
         let description = `[**${round.user.username}**'s ${round.isResignation ? 'resignation' : 'current BN eval'}](http://bn.mappersguild.com/bneval?id=${round.id}) `;
         let natList = '';
+        let trialNatList = '';
         let generateWebhook = true;
         let discordIds = [];
         let color;
+        let trialEvaluators = round.mode == 'osu' ? round.natEvaluators.concat(round.bnEvaluators) : round.natEvaluators;
 
         if (round.discussion) { // current BN evals in groups have 7 extra days
             const tempDate = new Date(round.deadline);
@@ -252,7 +256,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
         }
 
         if (date > round.deadline) {
-            discordIds = findNatEvaluatorHighlights(round.reviews, round.natEvaluators, round.discussion);
+            discordIds = findNatEvaluatorHighlights(round.reviews, trialEvaluators, round.discussion);
             const days = findDaysAgo(round.deadline);
 
             description += `was due ${days == 0 ? 'today!' : days == 1 ? days + ' day ago!' : days + ' days ago!'}`;
@@ -265,18 +269,30 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
             color = discord.webhookColors.pink;
 
             if (!round.natEvaluators || !round.natEvaluators.length) {
-                round.natEvaluators = await User.getAssignedNat(round.mode);
+                round.natEvaluators = round.mode == 'osu' ? await User.getAssignedNat(round.mode, [], 2) : await User.getAssignedNat(round.mode);
                 await round.populate(defaultPopulate).execPopulate();
                 await round.save();
             }
 
             natList = round.natEvaluators.map(u => u.username).join(', ');
+
+            if (round.mode == 'osu') {
+                if (!round.bnEvaluators || !round.bnEvaluators.length) {
+                    round.bnEvaluators = await User.getAssignedTrialNat(round.mode, [], 2);
+                    await round.populate(defaultPopulate).execPopulate();
+                    await round.save();
+                }
+
+                trialNatList = round.bnEvaluators.map(u => u.username).join(', ');
+            }
         } else {
             generateWebhook = false;
         }
 
         if (generateWebhook && !natList.length) {
-            description += findNatEvaluatorStatuses(round.reviews, round.natEvaluators, round.discussion);
+            trialEvaluators = round.natEvaluators.concat(round.bnEvaluators);
+
+            description += findNatEvaluatorStatuses(round.reviews, trialEvaluators, round.discussion);
             description += findMissingContent(round.discussion, round.consensus, round.feedback);
             await discord.webhookPost(
                 [{
@@ -290,16 +306,25 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
             await discord.userHighlightWebhookPost(round.mode, discordIds);
             await util.sleep(500);
         } else if (generateWebhook && natList.length) {
+            let fields = [
+                {
+                    name: 'Assigned NAT',
+                    value: natList,
+                },
+            ];
+
+            if (trialNatList.length) {
+                fields.push({
+                    name: 'Assigned BN',
+                    value: trialNatList,
+                });
+            }
+
             await discord.webhookPost(
                 [{
                     description,
                     color,
-                    fields: [
-                        {
-                            name: 'Assigned NAT',
-                            value: natList,
-                        },
-                    ],
+                    fields,
                 }],
                 round.mode
             );

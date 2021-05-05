@@ -32,6 +32,7 @@ export interface IUserDocument extends IUser, Document {
     isNat: boolean;
     isBn: boolean;
     isBnOrNat: boolean;
+    isNatOrTrialNat: boolean;
     hasBasicAccess: boolean;
     hasFullReadAccess: boolean;
     modes: string[];
@@ -63,4 +64,5 @@ export interface IUserModel extends Model<IUserDocument> {
     getAllByMode?: (includeFullBns: boolean, includeProbation: boolean, includeNat: boolean) => Promise<IUsersByGroup[] & { error?: string }>;
     getAllMediators?: () => Promise<IUser[] & { error?: string }>;
     getAssignedNat?: (mode: string, excludeOsuIds?: number[], sampleSize?: number) => Promise<IUserDocument[]>;
+    getAssignedTrialNat?: (mode: string, excludeOsuIds?: number[], sampleSize?: number) => Promise<IUserDocument[]>;
 }

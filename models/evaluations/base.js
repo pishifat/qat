@@ -7,6 +7,7 @@ const baseSchema = {
     feedback: { type: String },
     cooldownDate: { type: Date },
     natEvaluators: [{ type: 'ObjectId', ref: 'User' }],
+    bnEvaluators: [{ type: 'ObjectId', ref: 'User' }],
     archivedAt: { type: Date },
 };
 

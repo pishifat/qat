@@ -200,9 +200,18 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
     res.json(info);
 });
 
-/* POST switch/update request status */
-router.post('/updateDiscordId', middlewares.isNat, async (req, res) => {
-    const user = res.locals.userRequest;
+/* POST update discord ID */
+router.post('/updateDiscordId', middlewares.isNatOrTrialNat, async (req, res) => {
+    let user;
+
+    if (req.body.userId) {
+        user = await User.findById(req.body.userId);
+    } else {
+        user = res.locals.userRequest;
+    }
+
+    console.log(user.username);
+
     user.discordId = req.body.discordId;
     await user.save();
 
@@ -283,6 +292,7 @@ router.post('/:id/switchUserGroup', middlewares.isNat, async (req, res) => {
         const i = user.groups.findIndex(g => g === 'nat');
         if (i !== -1) user.groups.splice(i, 1, 'bn');
     } else {
+        user.isTrialNat = false;
         const i = user.groups.findIndex(g => g === 'bn');
         if (i !== -1) user.groups.splice(i, 1, 'nat');
     }

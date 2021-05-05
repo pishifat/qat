@@ -8,11 +8,13 @@
 
         <hr>
 
-        <settings-modal-discord />
+        <template v-if="loggedInUser.isNat">
+            <settings-modal-discord />
 
-        <hr>
+            <hr>
 
-        <settings-modal-mode-evaluations v-if="loggedInUser.isNat" />
+            <settings-modal-mode-evaluations />
+        </template>
     </modal-dialog>
 </template>
 

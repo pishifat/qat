@@ -25,7 +25,8 @@ router.beforeEach(async (to, from, next) => {
         store.state.loggedInUser &&
         to.matched.some(r =>
             (r.meta.requiresBasicAccess && !store.state.loggedInUser.hasBasicAccess) ||
-            (r.meta.requiresFullReadAccess && !store.state.loggedInUser.hasFullReadAccess)
+            (r.meta.requiresFullReadAccess && !store.state.loggedInUser.hasFullReadAccess) ||
+            (r.meta.requiresFullReadAccessOrTrialNat && !(store.state.loggedInUser.hasFullReadAccess || store.state.loggedInUser.isTrialNat))
         )
     ) {
         next({ name: 'home' });

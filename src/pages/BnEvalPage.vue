@@ -5,6 +5,7 @@
         >
             <template #individual-evaluations-title>
                 <button
+                    v-if="loggedInUser.isNat"
                     class="btn btn-primary"
                     data-toggle="modal"
                     data-target="#addEvaluations"
@@ -20,6 +21,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import AddEvaluations from '../components/evaluations/AddEvaluations.vue';
 import EvalPage from '../components/evaluations/EvalPage.vue';
 
@@ -28,6 +30,11 @@ export default {
     components: {
         AddEvaluations,
         EvalPage,
+    },
+    computed: {
+        ...mapState([
+            'loggedInUser',
+        ]),
     },
     methods: {
         openAddEvaluations() {

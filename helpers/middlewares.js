@@ -67,10 +67,26 @@ function hasFullReadAccess(req, res, next) {
     next();
 }
 
+function hasFullReadAccessOrTrialNat(req, res, next) {
+    const u = res.locals.userRequest;
+    if (!u.hasFullReadAccess && !u.isTrialNat) return unauthorize(req, res);
+
+    next();
+}
+
+function isNatOrTrialNat(req, res, next) {
+    const u = res.locals.userRequest;
+    if (!u.isNat && !u.isTrialNat) return unauthorize(req, res);
+
+    next();
+}
+
 module.exports = {
     isLoggedIn,
     isBnOrNat,
     isNat,
+    hasFullReadAccessOrTrialNat,
+    isNatOrTrialNat,
     hasBasicAccess,
     hasFullReadAccess,
 };

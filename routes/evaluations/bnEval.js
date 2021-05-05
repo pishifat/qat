@@ -18,7 +18,7 @@ const { BnEvaluationConsensus, BnEvaluationAddition, ResignationConsensus } = re
 const router = express.Router();
 
 router.use(middlewares.isLoggedIn);
-router.use(middlewares.hasFullReadAccess);
+router.use(middlewares.hasFullReadAccessOrTrialNat);
 
 //population
 const defaultPopulate = [
@@ -28,6 +28,10 @@ const defaultPopulate = [
     },
     {
         path: 'natEvaluators',
+        select: 'username osuId',
+    },
+    {
+        path: 'bnEvaluators',
         select: 'username osuId',
     },
     {
@@ -199,7 +203,7 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
 });
 
 /* POST submit or edit eval */
-router.post('/submitEval/:id', middlewares.isNat, async (req, res) => {
+router.post('/submitEval/:id', middlewares.isNatOrTrialNat, async (req, res) => {
     let evaluation = await Evaluation
         .findOne({
             _id: req.params.id,
@@ -211,7 +215,7 @@ router.post('/submitEval/:id', middlewares.isNat, async (req, res) => {
     const isNewEvaluation = await submitEval(
         evaluation,
         req.session,
-        res.locals.userRequest.isNat,
+        res.locals.userRequest.isNat || res.locals.userRequest.isTrialNat,
         req.body.behaviorComment,
         req.body.moddingComment,
         req.body.vote
@@ -320,6 +324,8 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
                 relatedEvaluation: evaluation._id,
             });
 
+            user.isTrialNat = false;
+
             await user.save();
         }
 
@@ -329,6 +335,9 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
                     mode: evaluation.mode,
                     level: 'probation',
                 });
+
+                user.isTrialNat = false;
+
                 await user.save();
             }
 
@@ -499,7 +508,7 @@ router.post('/setCooldownDate/:id', middlewares.isNat, async (req, res) => {
 });
 
 /* POST set feedback of eval */
-router.post('/setFeedback/:id', middlewares.isNat, async (req, res) => {
+router.post('/setFeedback/:id', middlewares.isNatOrTrialNat, async (req, res) => {
     let evaluation = await Evaluation
         .findById(req.params.id)
         .populate(defaultPopulate)

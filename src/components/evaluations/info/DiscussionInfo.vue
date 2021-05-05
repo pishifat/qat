@@ -1,6 +1,6 @@
 <template>
     <div>
-        <template v-if="loggedInUser.isNat">
+        <template v-if="loggedInUser.isNat || loggedInUser.isTrialNat">
             <p>
                 <a href="#consensusSettings" data-toggle="collapse">
                     Consensus settings <i class="fas fa-angle-down" />

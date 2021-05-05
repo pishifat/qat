@@ -58,6 +58,10 @@ class UserService extends mongoose.Model {
         return this.groups && (this.groups.includes('nat') || this.groups.includes('gmt'));
     }
 
+    get isNatOrTrialNat () {
+        return this.groups && (this.groups.includes('nat') || (this.groups.includes('bn') && this.isTrialNat));
+    }
+
     // Modes
     get modes () {
         return this.modesInfo && this.modesInfo.map(m => m.mode);
@@ -258,6 +262,38 @@ class UserService extends mongoose.Model {
                     groups: 'nat',
                     'modesInfo.mode': mode,
                     isBnEvaluator: true,
+                },
+            },
+        ]);
+
+        if (excludeOsuIds) {
+            query.match({
+                osuId: { $nin: excludeOsuIds },
+            });
+        }
+
+        return await query
+            .sample(sampleSize)
+            .exec();
+    }
+
+    /**
+     * Note that when doing evaluation.natEvaluators = assignedNats, natEvaluators will be an array of ObjectsIds, NOT an array users objects. Populate again to work with it.
+     * @param {string} mode
+     * @param {number[]} [excludeOsuIds]
+     * @param {number} [sampleSize]
+     * @returns {Promise<[]>}
+     */
+    static async getAssignedTrialNat (mode, excludeOsuIds, sampleSize) {
+        sampleSize = sampleSize || await Settings.getModeEvaluationsRequired(mode);
+
+        const query = User.aggregate([
+            {
+                $match: {
+                    groups: 'bn',
+                    'modesInfo.mode': mode,
+                    isBnEvaluator: true,
+                    isTrialNat: true,
                 },
             },
         ]);

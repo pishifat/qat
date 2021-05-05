@@ -25,7 +25,7 @@
                 <div class="col-sm-10" v-html="$md.render(short)" />
                 <div class="col-sm-2">
                     <button class="btn btn-sm btn-primary" @click="showFull = true">
-                        Show full evaluation
+                        Show full feedback
                     </button>
                 </div>
             </div>
@@ -68,8 +68,6 @@ export default {
             if (i == -1 || (i > j && j !== -1)) i = j;
 
             if (i == -1 || i > 250) i = 250;
-
-            console.log(j);
 
             return this.evaluation.feedback.slice(0,i).trim() + '... (*truncated*)';
         },

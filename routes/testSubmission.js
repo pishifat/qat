@@ -147,22 +147,37 @@ router.post('/submitTest', async (req, res) => {
         currentBnApp._id
     );
 
-    const assignedNat = await User.getAssignedNat(test.mode);
+    const assignedNat = test.mode == 'osu' ? await User.getAssignedNat(test.mode, [], 2) : await User.getAssignedNat(test.mode);
     currentBnApp.natEvaluators = assignedNat;
     await currentBnApp.save();
     const natList = assignedNat.map(n => n.username).join(', ');
+
+    let fields = [
+        {
+            name: 'Assigned NAT',
+            value: natList,
+        },
+    ];
+
+    let trialNatList = '';
+
+    if (test.mode == 'osu') {
+        const assignedTrialNat = await User.getAssignedTrialNat(test.mode, [], 2);
+        currentBnApp.bnEvaluators = assignedTrialNat;
+        await currentBnApp.save();
+        trialNatList = assignedTrialNat.map(n => n.username).join(', ');
+        fields.push({
+            name: 'Assigned BN',
+            value: trialNatList,
+        });
+    }
 
     discord.webhookPost(
         [{
             author: discord.defaultWebhookAuthor(req.session),
             description: `Submitted [BN application](http://bn.mappersguild.com/appeval?id=${currentBnApp.id}) with test score of **${totalScore}**`,
             color: discord.webhookColors.green,
-            fields: [
-                {
-                    name: 'Assigned NAT',
-                    value: natList,
-                },
-            ],
+            fields,
         }],
         test.mode
     );

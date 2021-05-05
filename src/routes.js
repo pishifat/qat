@@ -14,8 +14,9 @@ const ModRequests = () => import(/* webpackChunkName: "bn", webpackPrefetch: tru
 const DiscussionVote = () => import(/* webpackChunkName: "bn", webpackPrefetch: true */ './pages/DiscussionVotePage.vue');
 const AppEvalPage = () => import(/* webpackChunkName: "bn", webpackPrefetch: true */ './pages/AppEvalPage.vue');
 
+const BnEvalPage = () => import(/* webpackChunkName: "bn", webpackPrefetch: true */ './pages/BnEvalPage.vue'); // trial NAT only
+
 const ManageReports = () => import(/* webpackChunkName: "nat", webpackPrefetch: true */ './pages/ManageReportsPage.vue');
-const BnEvalPage = () => import(/* webpackChunkName: "nat", webpackPrefetch: true */ './pages/BnEvalPage.vue');
 const EvalArchive = () => import(/* webpackChunkName: "nat", webpackPrefetch: true */ './pages/EvalArchivePage.vue');
 const DataCollection = () => import(/* webpackChunkName: "nat", webpackPrefetch: true */ './pages/DataCollectionPage.vue');
 const ManageTest = () => import(/* webpackChunkName: "nat", webpackPrefetch: true */ './pages/ManageTestPage.vue');
@@ -39,9 +40,11 @@ const routes = [
     { path: '/appeval', component: AppEvalPage, meta: { title: 'BN Application Evaluations', requiresBasicAccess: true } },
     { path: '/modrequests/listing', component: ModRequests, meta: { title: 'Mod Requests Listing', requiresBasicAccess: true } },
 
+    // NAT and Trial NAT
+    { path: '/bneval', component: BnEvalPage, meta: { title: 'Current BN Evaluations', requiresFullReadAccessOrTrialNat: true } },
+
     // NAT
     { path: '/managereports', component: ManageReports, meta: { title: 'Manage Reports', requiresFullReadAccess: true } },
-    { path: '/bneval', component: BnEvalPage, meta: { title: 'Current BN Evaluations', requiresFullReadAccess: true } },
     { path: '/evalarchive', component: EvalArchive, meta: { title: 'Evaluation Archives', requiresFullReadAccess: true } },
     { path: '/datacollection', component: DataCollection, meta: { title: 'Data Collection', requiresFullReadAccess: true } },
     { path: '/managetest', component: ManageTest, meta: { title: 'Manage RC Test', requiresFullReadAccess: true } },

@@ -12,6 +12,7 @@ interface IEvaluationBase {
     feedback?: string;
     cooldownDate?: Date;
     natEvaluators?: IUserDocument[];
+    bnEvaluators?: IUserDocument[];
     archivedAt?: Date;
     createdAt?: Date;
     updatedAt?: Date;
@@ -22,7 +23,6 @@ interface IEvaluationBase {
 
 export interface IAppEvaluationDocument extends IEvaluationBase, Document {
     consensus?: string;
-    bnEvaluators?: IUserDocument[];
     mods: string[];
     reasons: string[];
     test?: ITestSubmissionDocument;

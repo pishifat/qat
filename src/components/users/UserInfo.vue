@@ -23,34 +23,30 @@
                     :unique="selectedUser.id"
                 />
 
-                <div v-if="loggedInUser.hasBasicAccess">
-                    <!-- BN can only see this on their own cards. NAT can see on everyone's cards -->
-                    <bn-evaluator-toggle
-                        v-if="loggedInUser.isNat"
-                    />
-
-                    <trial-nat-toggle
-                        v-if="loggedInUser.isNat"
-                    />
-
-                    <resign
-                        v-if="selectedUser.id == loggedInUser.id && loggedInUser.isBn"
-                    />
-                </div>
-
-                <modding-activity
-                    v-if="loggedInUser.isNat"
-                    :username="selectedUser.username"
-                    class="mt-2"
+                <resign
+                    v-if="selectedUser.id == loggedInUser.id && loggedInUser.isBn"
                 />
-            </div>
-            <div v-if="loggedInUser.isNat">
-                <user-group-toggle v-if="selectedUser.isBn || selectedUser.isNat" />
 
-                <hr>
+                <div v-if="loggedInUser.isNat">
+                    <bn-evaluator-toggle />
 
-                <notes />
+                    <trial-nat-toggle />
+
+                    <discord-id />
+
+                    <user-group-toggle v-if="selectedUser.isBn || selectedUser.isNat" />
+
+                    <modding-activity
+                        :username="selectedUser.username"
+                        class="mt-2"
+                    />
+
+                    <hr>
+
+                    <notes />
+                </div>
             </div>
+            <div v-if="loggedInUser.isNat" />
         </div>
     </modal-dialog>
 </template>
@@ -60,6 +56,7 @@ import { mapGetters, mapState } from 'vuex';
 import ModalHeader from './info/ModalHeader.vue';
 import Duration from './info/Duration.vue';
 import Notes from './info/Notes.vue';
+import DiscordId from './info/DiscordId.vue';
 import NextEvaluation from './info/NextEvaluation.vue';
 import BnEvaluatorToggle from './info/BnEvaluatorToggle.vue';
 import TrialNatToggle from './info/TrialNatToggle.vue';
@@ -75,6 +72,7 @@ export default {
         ModalHeader,
         Duration,
         Notes,
+        DiscordId,
         NextEvaluation,
         BnEvaluatorToggle,
         TrialNatToggle,

@@ -26,6 +26,10 @@ class EvaluationService extends mongoose.Model {
                     select: 'username osuId',
                 },
                 {
+                    path: 'bnEvaluators',
+                    select: 'username osuId',
+                },
+                {
                     path: 'reviews',
                     select: 'evaluator behaviorComment moddingComment vote',
                     populate: {

@@ -2,7 +2,7 @@
     <div class="row my-3">
         <div class="col-sm-2">
             <user-avatar
-                v-if="loggedInUser.isNat"
+                v-if="loggedInUser.isNat || loggedInUser.isTrialNat"
                 :user="review.evaluator"
                 :text-color="voteColor(review.vote)"
                 :align-start="true"

@@ -6,7 +6,7 @@
         <ul>
             <li v-for="user in userList" :key="user.id" class="small">
                 <a
-                    v-if="nominatorAssessmentMongoId"
+                    v-if="nominatorAssessmentMongoId && loggedInUser.isNat"
                     href="#"
                     data-toggle="tooltip"
                     data-placement="top"
@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 
 export default {
     name: 'UserList',
@@ -44,6 +45,11 @@ export default {
             default: null,
         },
         replaceNat: Boolean,
+    },
+    computed: {
+        ...mapState([
+            'loggedInUser',
+        ]),
     },
     methods: {
         async replaceUser (evaluatorId, e) {

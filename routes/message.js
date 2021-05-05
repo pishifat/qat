@@ -46,7 +46,7 @@ const reportPopulate = [
 router.get('/evaluation/:id', async (req, res) => {
     let query;
 
-    if (res.locals.userRequest.isNat) query = { _id: req.params.id };
+    if (res.locals.userRequest.isNat || res.locals.userRequest.isTrialNat) query = { _id: req.params.id };
     else query = { _id: req.params.id, active: false };
 
     let evaluation;
