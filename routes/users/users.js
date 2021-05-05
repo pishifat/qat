@@ -221,7 +221,7 @@ router.post('/updateDiscordId', middlewares.isNatOrTrialNat, async (req, res) =>
 
     Logger.generate(
         req.session.mongoId,
-        `Updated "${user.username}" discord ID to ${user.discordId})`,
+        `Updated "${user.username}" discord ID to ${user.discordId}`,
         'user',
         user._id
     );
