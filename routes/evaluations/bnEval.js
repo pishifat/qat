@@ -314,6 +314,12 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
                 if (bnIndex !== -1) {
                     user.groups.splice(bnIndex, 1);
                 }
+
+                const natIndex = user.groups.findIndex(g => g === 'nat');
+
+                if (natIndex !== -1 && bnIndex == -1) {
+                    user.groups.splice(natIndex, 1);
+                }
             }
 
             user.history.push({
