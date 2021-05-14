@@ -39,7 +39,7 @@ const defaultPopulate = [
         select: 'evaluator behaviorComment moddingComment vote',
         populate: {
             path: 'evaluator',
-            select: 'username osuId groups',
+            select: 'username osuId groups isTrialNat',
         },
     },
 ];
@@ -568,7 +568,7 @@ router.get('/findUserNotes/:id', async (req, res) => {
 });
 
 /* GET find user reports */
-router.get('/findUserReports/:id', async (req, res) => {
+router.get('/findUserReports/:id', middlewares.isNat, async (req, res) => {
     const userReports = await Report.find({
         culprit: req.params.id,
         isActive: { $ne: true },

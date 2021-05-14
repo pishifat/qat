@@ -40,6 +40,7 @@
                         :user-mongo-id="selectedEvaluation.user.id"
                     />
                     <user-reports
+                        v-if="loggedInUser.isNat"
                         :user-mongo-id="selectedEvaluation.user.id"
                     />
                     <modding-activity

@@ -19,7 +19,7 @@
         </template>
 
         <!-- Only NAT can see the reviews if there isn't a consensus -->
-        <template v-if="selectedEvaluation.consensus || loggedInUser.isNat">
+        <template v-if="selectedEvaluation.consensus || loggedInUser.isNat || loggedInUser.isTrialNat">
             <hr>
             <reviews-listing />
         </template>

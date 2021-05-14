@@ -97,12 +97,13 @@ async function submitEval (evaluation, session, isNat, behaviorComment, moddingC
             let totalFail = 0;
             let totalNat = 1; // +1 because r.evaluator isn't an user object just the ID so won't be counted in
 
-            evaluation.reviews.forEach(r => {
-                if (r.evaluator.isNat) totalNat++;
-                if (r.vote == 1) totalPass++;
-                else if (r.vote == 2) totalNeutral++;
-                else if (r.vote == 3) totalFail++;
-            });
+            for (const review of evaluation.reviews) {
+                console.log(review.evaluator.isNat || review.evaluator.isTrialNat);
+                if (review.evaluator.isNat || review.evaluator.isTrialNat) totalNat++;
+                if (review.vote == 1) totalPass++;
+                else if (review.vote == 2) totalNeutral++;
+                else if (review.vote == 3) totalFail++;
+            }
 
             if (totalNat >= evaluationsRequired) {
                 evaluation.discussion = true;
