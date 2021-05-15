@@ -9,7 +9,7 @@
             >
                 {{ consensusText }}
             </span>
-            <span v-if="selectedEvaluation.active && loggedInUser.isNat" class="btn-group">
+            <span v-if="selectedEvaluation.active && (loggedInUser.isNat || loggedInUser.isTrialNat)" class="btn-group">
                 <button
                     v-for="button in buttons"
                     :key="button.consensus"
@@ -31,7 +31,7 @@
             >
                 {{ additionText }}
             </span>
-            <span v-if="selectedEvaluation.active && loggedInUser.isNat" class="btn-group">
+            <span v-if="selectedEvaluation.active && (loggedInUser.isNat || loggedInUser.isTrialNat)" class="btn-group">
                 <button
                     class="btn btn-sm btn-primary"
                     :disabled="lowActivityWarning"

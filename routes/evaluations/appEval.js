@@ -237,7 +237,7 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
 });
 
 /* POST set consensus of eval */
-router.post('/setConsensus/:id', middlewares.isNat, async (req, res) => {
+router.post('/setConsensus/:id', middlewares.isNatOrTrialNat, async (req, res) => {
     let evaluation = await AppEvaluation
         .findByIdAndUpdate(req.params.id, { consensus: req.body.consensus })
         .populate(defaultPopulate)
