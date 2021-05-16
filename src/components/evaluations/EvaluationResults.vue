@@ -44,7 +44,7 @@
             </div>
 
             <h5>Evaluators</h5>
-            <p>The consensus of your evaluation is final and appeals will not be taken. If you have questions about your evaluation though, please contact any member of the NAT or BN below!</p>
+            <p>The consensus of your evaluation is final and appeals will not be taken. If you have questions about your evaluation though, please contact any member of the {{ evaluation.mode == 'osu' ? 'NAT or BN' : 'NAT' }} below!</p>
             <div class="card card-body">
                 <ul>
                     <li v-for="review in natReviews" :key="review.id">
@@ -80,8 +80,8 @@ export default {
     computed: {
         /** @returns {array} */
         natReviews () {
-            return this.evaluation.reviews; // temporary while trialNAT exists
-            // return this.evaluation.reviews.filter(r => r.evaluator.isNat);
+            if (this.evaluation.mode == 'osu') return this.evaluation.reviews; // temporary while trialNAT exists
+            else return this.evaluation.reviews.filter(r => r.evaluator.isNat);
         },
         /** @returns {string} */
         scoreColor() {
