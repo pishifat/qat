@@ -24,7 +24,7 @@ const defaultPopulate = [
         select: 'evaluator behaviorComment moddingComment vote',
         populate: {
             path: 'evaluator',
-            select: 'username osuId groups',
+            select: 'username osuId groups isTrialNat',
         },
     },
 ];
