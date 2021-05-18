@@ -154,7 +154,7 @@ export default {
             }
 
             // professional sign-off
-            message += `—NAT`;
+            message += `—BN+NAT`;
 
             return message;
         },
