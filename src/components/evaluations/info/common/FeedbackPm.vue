@@ -60,7 +60,7 @@ export default {
 
                 // pass
                 if (this.positiveConsensus) {
-                    message = `You are now a Probationary ${this.modeString} Beatmap Nominator! Please read all BN pages on the wiki (https://osu.ppy.sh/help/wiki/People/The_Team/Beatmap_Nominators), join the BN Discord server (${this.discordLink ? this.discordLink : 'LINK DOES NOT EXIST'}), and review your evaluation here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id} -- Have fun! `;
+                    message = `You are now a Probationary ${this.modeString} Beatmap Nominator! Please read all BN pages on the wiki https://osu.ppy.sh/help/wiki/People/The_Team/Beatmap_Nominators + join the BN Discord server ${this.discordLink ? this.discordLink : 'LINK DOES NOT EXIST'} + review your evaluation here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id} -- Have fun! `;
 
                 // fail
                 } else {
