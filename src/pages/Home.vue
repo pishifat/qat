@@ -1,7 +1,5 @@
 <template>
     <div>
-        <minecraft />
-
         <mod-score-calculator />
 
         <section class="card card-body">
@@ -80,7 +78,6 @@ import { mapState } from 'vuex';
 import evaluations from '../mixins/evaluations';
 import ToastMessages from '../components/ToastMessages.vue';
 import ModScoreCalculator from '../components/home/ModScoreCalculator.vue';
-import Minecraft from '../components/home/Minecraft.vue';
 import UserLink from '../components/UserLink.vue';
 
 export default {
@@ -88,7 +85,6 @@ export default {
     components: {
         ToastMessages,
         ModScoreCalculator,
-        Minecraft,
         UserLink,
     },
     mixins: [ evaluations ],

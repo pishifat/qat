@@ -20,19 +20,6 @@ router.get('/relevantInfo', async (req, res) => {
     });
 });
 
-/* GET minecraft */
-router.get('/minecraft', async (req, res) => {
-    let minecraft;
-
-    if (req.session && req.session.mongoId) {
-        const u = await User.findById(req.session.mongoId);
-
-        if (u.hasBasicAccess) minecraft = config.minecraft;
-    }
-
-    res.json(minecraft);
-});
-
 /* GET my info */
 router.get('/me', middlewares.isLoggedIn, (req, res) => {
     res.json({
