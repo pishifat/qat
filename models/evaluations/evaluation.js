@@ -7,7 +7,7 @@ const evaluationSchema = new mongoose.Schema({
 
 class EvaluationService extends mongoose.Model {
 
-    static findActiveEvaluations() {
+    static findActiveEvaluations(mongoId) {
         let minDate = new Date();
         minDate.setDate(minDate.getDate() + 14);
 
@@ -15,6 +15,7 @@ class EvaluationService extends mongoose.Model {
             .find({
                 active: true,
                 deadline: { $lte: minDate },
+                user: { $ne: mongoId },
             })
             .populate([
                 {

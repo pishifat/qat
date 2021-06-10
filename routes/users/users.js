@@ -389,7 +389,7 @@ router.post('/resignFromBn/:id', async (req, res) => {
     const evaluations = await ResignationEvaluation.insertMany(resignations);
 
     for (const evaluation of evaluations) {
-        const assignedNat = await User.getAssignedNat(evaluation.mode);
+        const assignedNat = await User.getAssignedNat(evaluation.mode, [user.osuId]);
         evaluation.natEvaluators = assignedNat;
         await evaluation.save();
         const natList = assignedNat.map(e => e.username).join(', ');

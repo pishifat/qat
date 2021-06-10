@@ -50,7 +50,7 @@ const notesPopulate = [
 
 /* GET current BN eval listing. */
 router.get('/relevantInfo', async (req, res) => {
-    const evaluations = await Evaluation.findActiveEvaluations();
+    const evaluations = await Evaluation.findActiveEvaluations(req.session.mongoId);
 
     res.json({
         evaluations,
@@ -156,7 +156,7 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
         error: `Didn't create any`,
     });
 
-    const evaluations = await Evaluation.findActiveEvaluations();
+    const evaluations = await Evaluation.findActiveEvaluations(req.session.mongoId);
 
     res.json({
         evaluations,
@@ -242,7 +242,7 @@ router.post('/setGroupEval/', middlewares.isNat, async (req, res) => {
         .populate(defaultPopulate);
 
     await setGroupEval(evaluations, req.session);
-    evaluations = await Evaluation.findActiveEvaluations();
+    evaluations = await Evaluation.findActiveEvaluations(req.session.mongoId);
     res.json(evaluations);
     Logger.generate(
         req.session.mongoId,
@@ -259,7 +259,7 @@ router.post('/setIndividualEval/', middlewares.isNat, async (req, res) => {
         discussion: false,
     });
 
-    const evaluations = await Evaluation.findActiveEvaluations();
+    const evaluations = await Evaluation.findActiveEvaluations(req.session.mongoId);
 
     res.json(evaluations);
     Logger.generate(
@@ -405,7 +405,7 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
         );
     }
 
-    evaluations = await Evaluation.findActiveEvaluations();
+    evaluations = await Evaluation.findActiveEvaluations(req.session.mongoId);
 
     res.json(evaluations);
     Logger.generate(

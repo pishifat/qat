@@ -268,8 +268,10 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
             description += 'is due in two weeks!';
             color = discord.webhookColors.pink;
 
+
+
             if (!round.natEvaluators || !round.natEvaluators.length) {
-                round.natEvaluators = round.mode == 'osu' ? await User.getAssignedNat(round.mode, [], 2) : await User.getAssignedNat(round.mode);
+                round.natEvaluators = round.mode == 'osu' ? await User.getAssignedNat(round.mode, [round.user.osuId], 2) : await User.getAssignedNat(round.mode);
                 await round.populate(defaultPopulate).execPopulate();
                 await round.save();
             }
@@ -278,7 +280,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
 
             if (round.mode == 'osu') {
                 if (!round.bnEvaluators || !round.bnEvaluators.length) {
-                    round.bnEvaluators = await User.getAssignedTrialNat(round.mode, [], 2);
+                    round.bnEvaluators = await User.getAssignedTrialNat(round.mode, [round.user.osuId], 2);
                     await round.populate(defaultPopulate).execPopulate();
                     await round.save();
                 }
