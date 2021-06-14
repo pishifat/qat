@@ -98,8 +98,7 @@ async function submitEval (evaluation, session, isNat, behaviorComment, moddingC
             let totalNat = 1; // +1 because r.evaluator isn't an user object just the ID so won't be counted in
 
             for (const review of evaluation.reviews) {
-                console.log(review.evaluator.isNat || review.evaluator.isTrialNat);
-                if (review.evaluator.isNat || review.evaluator.isTrialNat) totalNat++;
+                if (review.evaluator.isNat) totalNat++;
                 if (review.vote == 1) totalPass++;
                 else if (review.vote == 2) totalNeutral++;
                 else if (review.vote == 3) totalFail++;
