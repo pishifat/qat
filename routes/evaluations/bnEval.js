@@ -212,6 +212,18 @@ router.post('/submitEval/:id', middlewares.isNatOrTrialNat, async (req, res) => 
         .populate(defaultPopulate)
         .orFail();
 
+    if (res.locals.userRequest.isTrialNat) {
+        const bnEvaluatorIds = evaluation.bnEvaluators.map(u => u.id);
+
+        let minDate = new Date(evaluation.deadline);
+        minDate.setDate(minDate.getDate() - 3);
+
+        if (!bnEvaluatorIds.includes(res.locals.userRequest.id) && new Date() < minDate) {
+            return res.json({ error: `Let one of the assigned BNs evaluate first. You can submit your evaluation after ${minDate}` });
+        }
+    }
+
+
     const isNewEvaluation = await submitEval(
         evaluation,
         req.session,
