@@ -579,12 +579,13 @@ router.get('/findUserReports/:id', middlewares.isNat, async (req, res) => {
 
 /* POST replace evaluator */
 router.post('/replaceUser/:id', middlewares.isNat, async (req, res) => {
+    const replaceNat = Boolean(req.body.replaceNat);
     let evaluation = await Evaluation
         .findById(req.params.id)
         .populate(defaultPopulate)
         .orFail();
 
-    let newEvaluator = await replaceUser(evaluation, res.locals.userRequest, req.body.evaluatorId);
+    let newEvaluator = await replaceUser(evaluation, res.locals.userRequest, req.body.evaluatorId, !replaceNat);
     evaluation = await Evaluation
         .findById(req.params.id)
         .populate(defaultPopulate);

@@ -192,20 +192,26 @@ async function setFeedback (evaluation, feedback, session) {
     return evaluation;
 }
 
-async function replaceUser (evaluation, currentUser, evaluatorId) {
-    const currentSelection = evaluation.natEvaluators.map(u => u.osuId);
+async function replaceUser (evaluation, currentUser, evaluatorId, isBn) {
+    const currentSelection = isBn ? evaluation.bnEvaluators.map(u => u.osuId) : evaluation.natEvaluators.map(u => u.osuId);
     let newEvaluator;
 
     // assigns current user if possible. rng otherwise
-    if (currentUser.isBnEvaluator && currentUser.isBnFor(evaluation.mode) && !currentSelection.includes(currentUser.osuId)) {
+    if (!currentUser.isNat && currentUser.isBnEvaluator && currentUser.isBnFor(evaluation.mode) && !currentSelection.includes(currentUser.osuId)) {
         newEvaluator = currentUser;
     } else {
-        const evaluatorArray = await User.getAssignedNat(evaluation.mode, currentSelection, 1);
+        const evaluatorArray = isBn ? await User.getAssignedTrialNat(evaluation.mode, currentSelection, 1) : await User.getAssignedNat(evaluation.mode, currentSelection, 1);
         newEvaluator = evaluatorArray[0];
     }
 
-    const i = evaluation.natEvaluators.findIndex(e => e.id == evaluatorId);
-    evaluation.natEvaluators.splice(i, 1, newEvaluator._id);
+    const i = isBn ? evaluation.bnEvaluators.findIndex(e => e.id == evaluatorId) : evaluation.natEvaluators.findIndex(e => e.id == evaluatorId);
+
+    if (isBn) {
+        evaluation.bnEvaluators.splice(i, 1, newEvaluator._id);
+    } else {
+        evaluation.natEvaluators.splice(i, 1, newEvaluator._id);
+    }
+
     await evaluation.save();
 
     return newEvaluator;
