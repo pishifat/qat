@@ -7,6 +7,7 @@
             <modal-header
                 :mode="selectedEvaluation.mode"
                 :nat-evaluators="selectedEvaluation.natEvaluators || []"
+                :bn-evaluators="selectedEvaluation.bnEvaluators || []"
                 :osu-id="selectedEvaluation.user.osuId"
                 :username="selectedEvaluation.user.username"
                 :is-application="selectedEvaluation.isApplication"

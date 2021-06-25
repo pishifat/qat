@@ -1,5 +1,5 @@
 <template>
-    <div class="modal-header" :class="isNatEvaluator() ? 'bg-danger' : 'bg-primary'">
+    <div class="modal-header" :class="isAssigned() ? 'bg-danger' : 'bg-primary'">
         <h5 class="modal-title">
             {{ isApplication ? 'Application Evaluation:' : isBnEvaluation ? 'BN Evaluation:' : 'Resignation Evaluation:' }}
             <user-link
@@ -46,6 +46,12 @@ export default {
                 return [];
             },
         },
+        bnEvaluators: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
         isApplication: Boolean,
         isBnEvaluation: Boolean,
     },
@@ -55,16 +61,9 @@ export default {
         ]),
     },
     methods: {
-        isNatEvaluator() {
-            for (let i = 0; i < this.natEvaluators.length; i++) {
-                let user = this.natEvaluators[i];
-
-                if (user.id == this.loggedInUser.id) {
-                    return true;
-                }
-            }
-
-            return false;
+        isAssigned () {
+            return (this.natEvaluators && this.natEvaluators.some(e => e.id == this.loggedInUser.id) ||
+            this.bnEvaluators && this.bnEvaluators.some(e => e.id == this.loggedInUser.id));
         },
     },
 };
