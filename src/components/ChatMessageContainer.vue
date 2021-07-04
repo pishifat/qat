@@ -10,15 +10,28 @@
             </div>
 
             <div class="row">
-                <div class="col-sm-6">
+                <div :class="osuId ? 'col-sm-6' : 'col-sm-12'">
                     <a :href="`message?${messageType}=${mongoId}`" target="_blank" class="btn btn-sm btn-block btn-primary mb-2">
                         Preview message
                     </a>
                 </div>
-                <div class="col-sm-6">
-                    <a :href="'https://osu.ppy.sh/community/chat?sendto=' + osuId" target="_blank" class="btn btn-sm btn-block btn-primary mb-2">
-                        Open osu! chat
-                    </a>
+                <div v-if="osuId" class="col-sm-6">
+                    <div>
+                        <a :href="'https://osu.ppy.sh/community/chat?sendto=' + osuId" target="_blank" class="btn btn-sm btn-block btn-primary mb-2">
+                            Open osu! chat
+                        </a>
+                    </div>
+                </div>
+                <div v-else-if="users" class="col-sm-3">
+                    <div v-for="user in users" :key="user.osuId">
+                        <user-link
+                            :username="user.username"
+                            :osu-id="user.osuId"
+                        />
+                        <a :href="'https://osu.ppy.sh/community/chat?sendto=' + user.osuId" target="_blank" class="btn btn-sm btn-block btn-primary mb-2">
+                            Open osu! chat
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -26,13 +39,17 @@
 </template>
 
 <script>
+import UserLink from './UserLink.vue';
 
 export default {
     name: 'ChatMessageContainer',
+    components: {
+        UserLink,
+    },
     props: {
         osuId: {
             type: Number,
-            required: true,
+            default: 0,
         },
         messageType: {
             type: String,
@@ -41,6 +58,12 @@ export default {
         mongoId: {
             type: String,
             required: true,
+        },
+        users: {
+            type: Array,
+            default() {
+                return [];
+            },
         },
     },
     methods: {

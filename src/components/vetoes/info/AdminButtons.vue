@@ -31,11 +31,10 @@
             </button>
             <conclusion-post />
 
-            <!-- view mediator forum PM -->
-            <button class="btn btn-sm btn-block btn-primary mb-2" data-toggle="collapse" data-target="#forumMessage">
-                See full forum PM <i class="fas fa-angle-down" />
-            </button>
-            <forum-pm />
+            <!-- view mediator chat message -->
+            <veto-chat-message
+                :users="[]"
+            />
         </div>
 
         <!-- set up veto for mediation -->
@@ -82,8 +81,10 @@
                 </div>
 
                 <div class="col-sm-9">
-                    <b>Forum PM:</b>
-                    <forum-pm class="show" />
+                    <b>Chat message:</b>
+                    <veto-chat-message
+                        :users="mediators"
+                    />
                 </div>
             </div>
         </div>
@@ -93,13 +94,13 @@
 <script>
 import { mapGetters } from 'vuex';
 import ConclusionPost from './ConclusionPost.vue';
-import ForumPm from './ForumPm.vue';
+import VetoChatMessage from '../VetoChatMessage.vue';
 
 export default {
     name: 'AdminButtons',
     components: {
         ConclusionPost,
-        ForumPm,
+        VetoChatMessage,
     },
     data() {
         return {

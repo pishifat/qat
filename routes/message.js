@@ -3,6 +3,7 @@ const middlewares = require('../helpers/middlewares');
 const AppEvaluation = require('../models/evaluations/appEvaluation');
 const Evaluation = require('../models/evaluations/evaluation');
 const Report = require('../models/report');
+const Veto = require('../models/veto');
 
 const router = express.Router();
 
@@ -60,6 +61,13 @@ router.get('/evaluation/:id', async (req, res) => {
 /* GET report by ID */
 router.get('/report/:id', async (req, res) => {
     return res.json(await Report.findById(req.params.id).populate(reportPopulate));
+});
+
+/* GET veto by ID */
+router.get('/veto/:id', async (req, res) => {
+    const veto = await Veto.findById(req.params.id);
+
+    return res.json(veto);
 });
 
 module.exports = router;
