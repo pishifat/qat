@@ -472,7 +472,7 @@ router.post('/setConsensus/:id', middlewares.isNatOrTrialNat, async (req, res) =
 });
 
 /* POST set addition of eval */
-router.post('/setAddition/:id', middlewares.isNat, async (req, res) => {
+router.post('/setAddition/:id', middlewares.isNatOrTrialNat, async (req, res) => {
     const evaluation = await BnEvaluation
         .findById(req.params.id)
         .populate(defaultPopulate)
