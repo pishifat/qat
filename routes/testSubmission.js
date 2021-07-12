@@ -6,6 +6,7 @@ const AppEvaluation = require('../models/evaluations/appEvaluation');
 const User = require('../models/user');
 const middlewares = require('../helpers/middlewares');
 const discord = require('../helpers/discord');
+const { AppEvaluationConsensus } = require('../shared/enums');
 
 const router = express.Router();
 
@@ -138,6 +139,7 @@ router.post('/submitTest', async (req, res) => {
     res.json({
         totalScore,
         success: 'Test submitted!',
+        isOsu: test.mode == 'osu',
     });
 
     Logger.generate(
@@ -147,32 +149,34 @@ router.post('/submitTest', async (req, res) => {
         currentBnApp._id
     );
 
-    const assignedNat = test.mode == 'osu' ? await User.getAssignedNat(test.mode, [], 2) : await User.getAssignedNat(test.mode);
-    currentBnApp.natEvaluators = assignedNat;
-    await currentBnApp.save();
-    const natList = assignedNat.map(n => n.username).join(', ');
+    let fields = [];
 
-    let fields = [
-        {
+    if (totalScore >= 12.5 || test.mode != 'osu') {
+        const assignedNat = test.mode == 'osu' ? await User.getAssignedNat(test.mode, [], 2) : await User.getAssignedNat(test.mode);
+        currentBnApp.natEvaluators = assignedNat;
+        await currentBnApp.save();
+        const natList = assignedNat.map(n => n.username).join(', ');
+
+        fields.push({
             name: 'Assigned NAT',
             value: natList,
-        },
-    ];
-
-    let trialNatList = '';
-
-    if (test.mode == 'osu') {
-        const assignedTrialNat = await User.getAssignedTrialNat(test.mode, [], 2);
-        currentBnApp.bnEvaluators = assignedTrialNat;
-        await currentBnApp.save();
-        trialNatList = assignedTrialNat.map(n => n.username).join(', ');
-        fields.push({
-            name: 'Assigned BN',
-            value: trialNatList,
         });
+
+        let trialNatList = '';
+
+        if (test.mode == 'osu') {
+            const assignedTrialNat = await User.getAssignedTrialNat(test.mode, [], 2);
+            currentBnApp.bnEvaluators = assignedTrialNat;
+            await currentBnApp.save();
+            trialNatList = assignedTrialNat.map(n => n.username).join(', ');
+            fields.push({
+                name: 'Assigned BN',
+                value: trialNatList,
+            });
+        }
     }
 
-    discord.webhookPost(
+    await discord.webhookPost(
         [{
             author: discord.defaultWebhookAuthor(req.session),
             description: `Submitted [BN application](http://bn.mappersguild.com/appeval?id=${currentBnApp.id}) with test score of **${totalScore}**`,
@@ -181,6 +185,32 @@ router.post('/submitTest', async (req, res) => {
         }],
         test.mode
     );
+
+    if (totalScore < 12.5 && test.mode == 'osu') {
+        let cooldown = new Date();
+        cooldown.setDate(cooldown.getDate() - 30);
+
+        currentBnApp.cooldownDate = cooldown;
+        currentBnApp.active = false;
+        currentBnApp.archivedAt = new Date();
+        currentBnApp.consensus = AppEvaluationConsensus.Fail;
+        await currentBnApp.save();
+
+        discord.webhookPost(
+            [{
+                color: discord.webhookColors.black,
+                description: `Archived [**${req.session.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${currentBnApp.id}) with **Fail** consensus because of below minimum test score (12.5).`,
+            }],
+            currentBnApp.mode
+        );
+        Logger.generate(
+            req.session.mongoId,
+            `Set ${req.session.username}'s ${currentBnApp.mode} application eval as "${currentBnApp.consensus}"`,
+            'appEvaluation',
+            currentBnApp._id
+        );
+        await currentBnApp.save();
+    }
 });
 
 module.exports = router;

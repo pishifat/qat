@@ -109,7 +109,10 @@
                     and re-submit your test. Sorry!
                 </p>
 
-                <p>Your test has been submitted! Your score is {{ displayScore }}/20.</p>
+                <p>Your test has been submitted! Your score is <b>{{ displayScore }}/20.</b></p>
+                <p v-if="displayScore < 12.5 && isOsu">
+                    Due to poor test results, we feel you need to brush up on your general knowledge before being able to apply for the BNG. Since you failed due to your test results and not your modding itself, you may apply again 1 month from now.
+                </p>
             </div>
             <div v-else class="text-center">
                 You have no pending test...
@@ -135,6 +138,7 @@ export default {
             test: null,
             timeRemaining: null,
             displayScore: null,
+            isOsu: false,
             checkedOptions: {},
             comment: '',
             isSubmitting: false,
@@ -201,6 +205,7 @@ export default {
                 this.selectedTest = null;
                 this.testList = null;
                 this.displayScore = data.totalScore;
+                this.isOsu = data.isOsu;
             } else {
                 this.loadTest();
                 this.isSubmitting = false;
