@@ -2,10 +2,16 @@
     "enableNotifications": false,
     "session": "",
     "v1token": "",
-    "id": 0,
-    "secret": "",
-    "redirect": "http://localhost:8080/callback",
     "connection": "",
+    "oauth": {
+        "id": 0,
+        "secret": "",
+        "redirect": "http://localhost:8080/callback"
+    },
+    "bot": {
+        "id": 0,
+        "secret": ""
+    },
     "interOpAccess": {
         "UNIQUE_USER": {
             "mongoId": "",

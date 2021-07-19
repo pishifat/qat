@@ -6,9 +6,9 @@ async function getToken(code) {
     const postData = querystring.stringify({
         grant_type: 'authorization_code',
         code,
-        redirect_uri: config.redirect,
-        client_id: config.id,
-        client_secret: config.secret,
+        redirect_uri: config.oauth.redirect,
+        client_id: config.oauth.id,
+        client_secret: config.oauth.secret,
     });
 
     /** @type {import('axios').AxiosRequestConfig} */
@@ -33,8 +33,8 @@ async function getToken(code) {
 async function refreshToken(refreshToken) {
     const postData = querystring.stringify({
         grant_type: 'refresh_token',
-        client_id: config.id,
-        client_secret: config.secret,
+        client_id: config.oauth.id,
+        client_secret: config.oauth.secret,
         refresh_token: refreshToken,
     });
 
@@ -60,8 +60,8 @@ async function refreshToken(refreshToken) {
 async function getClientCredentialsGrant() {
     const postData = querystring.stringify({
         grant_type: 'client_credentials',
-        client_id: config.id,
-        client_secret: config.secret,
+        client_id: config.oauth.id,
+        client_secret: config.oauth.secret,
         scope: 'public',
     });
 
