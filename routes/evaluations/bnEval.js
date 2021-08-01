@@ -853,6 +853,8 @@ router.post('/sendMessages/:id', middlewares.isNatOrTrialNat, async (req, res) =
 
     let messages;
 
+    req.body.users.push({ osuId: req.session.osuId });
+
     for (const user of req.body.users) {
         messages = await osuBot.sendMessages(user.osuId, req.body.messages);
     }
@@ -861,7 +863,7 @@ router.post('/sendMessages/:id', middlewares.isNatOrTrialNat, async (req, res) =
         return res.json({ error: `Messages were not sent. Please let pishifat know!` });
     }
 
-    res.json({ success: 'Messages sent!' });
+    res.json({ success: 'Messages sent! A copy was sent to you for confirmation' });
 
     Logger.generate(
         req.session.mongoId,
