@@ -1,23 +1,22 @@
 <template>
     <div>
-        <chat-message-container
-            :users="users"
+        <bot-chat-message
+            :messages="messages"
             :message-type="'veto'"
             :mongo-id="selectedVeto.id"
-        >
-            {{ message }}
-        </chat-message-container>
+            :users="users"
+        />
     </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
-import ChatMessageContainer from '../ChatMessageContainer.vue';
+import BotChatMessage from '../BotChatMessage.vue';
 
 export default {
     name: 'VetoChatMessage',
     components: {
-        ChatMessageContainer,
+        BotChatMessage,
     },
     props: {
         users: {
@@ -31,11 +30,16 @@ export default {
         ...mapGetters('vetoes', [
             'selectedVeto',
         ]),
-        /** @returns {string} */
-        message () {
-            let message = `You've been selected to help mediate a veto for https://osu.ppy.sh/beatmapsets/${this.selectedVeto.beatmapId} -- Read details here: https://bn.mappersguild.com/message?veto=${this.selectedVeto.id} -- Thank you! —NAT`;
+        /** @returns {Array} */
+        messages () {
+            let messages = [];
 
-            return message;
+            messages.push(`hello! you've been selected to help mediate a veto for https://osu.ppy.sh/beatmapsets/${this.selectedVeto.beatmapId}`);
+            messages.push(`read details here: https://bn.mappersguild.com/message?veto=${this.selectedVeto.id}`);
+            messages.push(`thank you!`);
+            messages.push(`—NAT`);
+
+            return messages;
         },
     },
 };

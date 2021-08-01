@@ -6,6 +6,7 @@ const Logger = require('../models/log');
 const middlewares = require('../helpers/middlewares');
 const util = require('../helpers/util');
 const osuv1 = require('../helpers/osuv1');
+const osuBot = require('../helpers/osuBot');
 const discord = require('../helpers/discord');
 
 const router = express.Router();
@@ -364,6 +365,39 @@ router.post('/deleteVeto/:id', middlewares.isNat, async (req, res) => {
         author: discord.defaultWebhookAuthor(req.session),
         color: discord.webhookColors.black,
         description: `Deleted veto for **${veto.beatmapTitle}**`,
+    }],
+    veto.mode);
+});
+
+/* POST send messages */
+router.post('/sendMessages/:id', middlewares.isNat, async (req, res) => {
+    const veto = await Veto
+        .findById(req.params.id)
+        .orFail();
+
+    let messages;
+
+    for (const user of req.body.users) {
+        messages = await osuBot.sendMessages(user.osuId, req.body.messages);
+    }
+
+    if (messages !== true) {
+        return res.json({ error: `Messages were not sent. Please let pishifat know!` });
+    }
+
+    res.json({ success: 'Messages sent!' });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Sent chat messages to mediators of "${veto.beatmapTitle}"`,
+        'veto',
+        veto._id
+    );
+
+    discord.webhookPost([{
+        author: discord.defaultWebhookAuthor(req.session),
+        color: discord.webhookColors.white,
+        description: `Sent chat messages to mediators of [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`,
     }],
     veto.mode);
 });

@@ -32,7 +32,12 @@
             <conclusion-post />
 
             <!-- view mediator chat message -->
+            <button class="btn btn-sm btn-block btn-primary mb-2" data-toggle="collapse" data-target="#messages">
+                See veto chat messages <i class="fas fa-angle-down" />
+            </button>
             <veto-chat-message
+                id="messages"
+                class="collapse"
                 :users="[]"
             />
         </div>
@@ -81,7 +86,7 @@
                 </div>
 
                 <div class="col-sm-9">
-                    <b>Chat message:</b>
+                    <b>Chat messages:</b>
                     <veto-chat-message
                         :users="mediators"
                     />
