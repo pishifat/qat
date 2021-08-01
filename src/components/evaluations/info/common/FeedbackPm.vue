@@ -1,24 +1,24 @@
 <template>
     <div>
-        <chat-message-container
-            :osu-id="selectedEvaluation.user.osuId"
+        <bot-chat-message
+            :messages="messages"
             :message-type="'eval'"
             :mongo-id="selectedEvaluation.id"
-        >
-            {{ message }}
-        </chat-message-container>
+            :users="[{ username: selectedEvaluation.user.username, osuId: selectedEvaluation.user.osuId }]"
+            :eval-type="selectedEvaluation.kind"
+        />
     </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
-import ChatMessageContainer from '../../../ChatMessageContainer.vue';
+import BotChatMessage from '../../../BotChatMessage.vue';
 import evaluations from '../../../../mixins/evaluations.js';
 
 export default {
     name: 'FeedbackPm',
     components: {
-        ChatMessageContainer,
+        BotChatMessage,
     },
     mixins: [ evaluations ],
     props: {
@@ -51,44 +51,65 @@ export default {
         addition () {
             return this.selectedEvaluation.addition;
         },
-        /** @returns {string} */
-        message () {
-            let message = '';
+        /** @returns {Array} */
+        messages () {
+            let messages = [];
 
             // application
             if (this.selectedEvaluation.isApplication) {
 
                 // pass
                 if (this.positiveConsensus) {
-                    message = `You are now a Probationary ${this.modeString} Beatmap Nominator! Please read all BN pages on the wiki https://osu.ppy.sh/help/wiki/People/The_Team/Beatmap_Nominators + join the BN Discord server ${this.discordLink ? this.discordLink : 'LINK DOES NOT EXIST'} + review your evaluation here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id} -- Have fun! `;
+                    messages.push(`hello! you are now a Probationary ${this.modeString} Beatmap Nominator! here's a few things to get you started:`);
+                    messages.push(`1. read all BN pages on the wiki: https://osu.ppy.sh/help/wiki/People/The_Team/Beatmap_Nominators`);
+                    messages.push(`2. join the BN Discord server: ${this.discordLink ? this.discordLink : 'LINK DOES NOT EXIST'}`);
+                    messages.push(`3. review your evaluation here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id}`);
+                    messages.push(`have fun!`);
 
                 // fail
                 } else {
-                    message = `Hello! Your ${this.modeString} BN application has been unfortunately denied :( Review reasons for your rejection here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id} -- You can apply for BN in this game mode again on ${this.toStandardDate(this.selectedEvaluation.cooldownDate)}. Good luck! `;
+                    messages.push(`hello! your ${this.modeString} BN application has been unfortunately denied :(`);
+                    messages.push(`review reasons for your rejection here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id}`);
+                    messages.push(`you can apply for BN in this game mode again on ${this.toStandardDate(this.selectedEvaluation.cooldownDate)}`);
+                    messages.push(`good luck!`);
                 }
 
             // current BN evaluation
             } else {
-                message = `Following an evaluation of your recent ${this.modeString} BN work, `;
+                let line = `hello! following an evaluation of your recent ${this.modeString} BN work, `;
 
                 // pass
                 if (!this.selectedEvaluation.isResignation && this.positiveConsensus) {
 
                     // probation to full
                     if (this.isProbation) {
-                        message += `you have been promoted from Probation to a Full Beatmap Nominator! Review your evaluation here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id} `;
+                        line += `you have been promoted from Probation to a Full Beatmap Nominator!`;
+
+                        messages.push(line);
+                        messages.push(`review your evaluation here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id}`);
 
                     // low activity warning
                     } else if (this.lowActivityWarning) {
-                        message += `the NAT have noticed that your nomination activity is too low to reach a conclusion. We will evaluate again 1 month from now! Review your evaluation here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id} `;
+                        line += `the NAT have noticed that your nomination activity is too low to reach a conclusion`;
+
+                        messages.push(line);
+                        messages.push(`your BN activity will be evaluated again 1 month from now!`);
+                        messages.push(`review your evaluation here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id}`);
 
                     // behavior warning
                     } else if (this.behaviorWarning) {
-                        message += `the NAT believe that your behavior is concerning. You are still a Full BN, but we will evaluate again 1 month from now! Review your evaluation here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id} `;
+                        line += `the NAT believe that your behavior is concerning`;
+
+                        messages.push(line);
+                        messages.push(`you are still a Full BN, but we will evaluate again 1 month from now!`);
+                        messages.push(`review your evaluation here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id}`);
 
                     // full to full
                     } else {
-                        message += `we'd like to remind you that you're doing well! Review your evaluation here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id} `;
+                        line += `we'd like to remind you that you're doing well!`;
+
+                        messages.push(line);
+                        messages.push(`review your evaluation here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id}`);
                     }
 
                 // probation
@@ -96,67 +117,78 @@ export default {
 
                     // probation to probation
                     if (this.isProbation) {
-                        message += `the NAT have decided to extend your Probation period `;
+                        line += `the NAT have decided to extend your Probation period`;
 
                         // low activity warning
                         if (this.lowActivityWarning) {
-                            message += `because your nomination activity is too low to reach a conclusion. We `;
-                        } else {
-                            message += `and `;
+                            line += ` because your nomination activity is too low to reach a conclusion`;
                         }
+
+                        messages.push(line);
 
                     // full to probation
                     } else {
-                        message += `you have been moved to the Probationary Beatmap Nominators :( The NAT `;
+                        line += `you have been moved to the Probationary Beatmap Nominators :(`;
+
+                        messages.push(line);
                     }
 
-                    message += `will evaluate your BN work again in 1 month. Review reasons for your Probation here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id} `;
+                    messages.push(`the NAT will evaluate your BN work again in 1 month!`);
+                    messages.push(`review reasons for your Probation here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id}`);
 
                 // remove from BN
                 } else {
 
                     // resign
                     if (this.selectedEvaluation.isResignation) {
-                        message = `Following your ${this.modeString} BN resignation, the NAT evaluated your recent BN work and concluded that `;
+                        line = `following your ${this.modeString} BN resignation, the NAT evaluated your recent BN work and concluded that `;
 
                         // resigned on good terms
                         if (this.positiveConsensus) {
-                            message += `you are still a capable Beatmap Nominator! `;
+                            line += `you are still a capable Beatmap Nominator!`;
 
                         // resigned on standard terms
                         } else {
-                            message += `your resignation will be on standard terms. `;
+                            line += `your resignation will be on standard terms`;
                         }
 
                     // kick
                     } else {
-                        message += `you have been removed from the Beatmap Nominators :( `;
+                        line += `you have been removed from the Beatmap Nominators :(`;
                     }
 
-                    message += `If you want to apply for BN again, you may do so on ${this.toStandardDate(this.selectedEvaluation.cooldownDate)}, provided you have `;
+                    messages.push(line);
+
+                    let line2 = `If you want to apply for BN again, you may do so on ${this.toStandardDate(this.selectedEvaluation.cooldownDate)}, provided you have `;
 
                     // resigned on good terms
                     if (this.positiveConsensus) {
-                        message += `one month of modding activity (~4 mods). `;
+                        line2 += `one month of modding activity (~4 mods)`;
+                        messages.push(line2);
 
                     // resigned on standard terms
                     } else if (this.neutralConsensus) {
-                        message += `two months of modding activity (~4 mods each month). `;
+                        line2 += `two months of modding activity (~4 mods each month)`;
+                        messages.push(line2);
 
                     // kick
                     } else {
-                        message += `shown improvement in the areas mentioned. Review reasons for your removal here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id} `;
+                        line2 += `shown improvement in the areas mentioned`;
+                        messages.push(line2);
+
+                        messages.push(`review reasons for your removal here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id}`);
                     }
 
                     // cheeky sign-off
-                    message += `Good Luck! `;
+                    messages.push(`good luck!`);
                 }
             }
 
             // professional sign-off
-            message += `—BN+NAT`;
+            let signature = this.selectedEvaluation.mode == 'osu' ? `—BN+NAT` : `—NAT`;
+            messages.push(signature);
 
-            return message;
+            return messages;
         },
     },
     methods: {

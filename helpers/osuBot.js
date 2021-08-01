@@ -1,5 +1,6 @@
 const config = require('../config.json');
 const { default: axios } = require('axios');
+const util = require('./util');
 
 let tokenInfo = {
     expiresAt: null,
@@ -40,6 +41,8 @@ async function getBotToken () {
  */
 async function sendMessage(userId, message) {
     const token = await getBotToken();
+
+    await util.sleep(500); // prevent rate limiting
 
     if (typeof token !== 'string') {
         return { error: token.error };

@@ -7,6 +7,7 @@ const { submitEval, setGroupEval, setFeedback, replaceUser } = require('./evalua
 const middlewares = require('../../helpers/middlewares');
 const discord = require('../../helpers/discord');
 const { AppEvaluationConsensus } = require('../../shared/enums');
+const osuBot = require('../../helpers/osuBot');
 
 const router = express.Router();
 
@@ -446,6 +447,40 @@ router.post('/enableBnEvaluators/:id', middlewares.isNat, async (req, res) => {
         }],
         application.mode
     );
+});
+
+/* POST send messages */
+router.post('/sendMessages/:id', middlewares.isNatOrTrialNat, async (req, res) => {
+    const application = await AppEvaluation
+        .findById(req.params.id)
+        .populate(defaultPopulate)
+        .orFail();
+
+    let messages;
+
+    for (const user of req.body.users) {
+        messages = await osuBot.sendMessages(user.osuId, req.body.messages);
+    }
+
+    if (messages !== true) {
+        return res.json({ error: `Messages were not sent. Please let pishifat know!` });
+    }
+
+    res.json({ success: 'Messages sent!' });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Sent chat messages for BN app for "${application.user.username}"`,
+        'appEvaluation',
+        application._id
+    );
+
+    discord.webhookPost([{
+        author: discord.defaultWebhookAuthor(req.session),
+        color: discord.webhookColors.white,
+        description: `Sent chat messages for [**${application.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${application.id})`,
+    }],
+    application.mode);
 });
 
 module.exports = router;

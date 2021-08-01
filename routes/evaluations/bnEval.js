@@ -14,6 +14,7 @@ const middlewares = require('../../helpers/middlewares');
 const discord = require('../../helpers/discord');
 const util = require('../../helpers/util');
 const { BnEvaluationConsensus, BnEvaluationAddition, ResignationConsensus } = require('../../shared/enums');
+const osuBot = require('../../helpers/osuBot');
 
 const router = express.Router();
 
@@ -841,6 +842,40 @@ router.get('/activity', async (req, res) => {
         appEvaluations,
         bnEvaluations,
     });
+});
+
+/* POST send messages */
+router.post('/sendMessages/:id', middlewares.isNatOrTrialNat, async (req, res) => {
+    const evaluation = await Evaluation
+        .findById(req.params.id)
+        .populate(defaultPopulate)
+        .orFail();
+
+    let messages;
+
+    for (const user of req.body.users) {
+        messages = await osuBot.sendMessages(user.osuId, req.body.messages);
+    }
+
+    if (messages !== true) {
+        return res.json({ error: `Messages were not sent. Please let pishifat know!` });
+    }
+
+    res.json({ success: 'Messages sent!' });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Sent chat messages for current BN eval for "${evaluation.user.username}"`,
+        'bnEvaluation',
+        evaluation._id
+    );
+
+    discord.webhookPost([{
+        author: discord.defaultWebhookAuthor(req.session),
+        color: discord.webhookColors.white,
+        description: `Sent chat messages for [**${evaluation.user.username}**'s current BN eval](http://bn.mappersguild.com/appeval?id=${evaluation.id})`,
+    }],
+    evaluation.mode);
 });
 
 module.exports = { router, getGeneralEvents };

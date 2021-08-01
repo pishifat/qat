@@ -204,7 +204,7 @@ router.post('/sendToContentReview/:id', middlewares.isNat, async (req, res) => {
 
 /* POST send messages */
 router.post('/sendMessages/:id', middlewares.isNat, async (req, res) => {
-    const veto = await Report
+    const report = await Report
         .findById(req.params.id)
         .orFail();
 
@@ -223,8 +223,8 @@ router.post('/sendMessages/:id', middlewares.isNat, async (req, res) => {
     Logger.generate(
         req.session.mongoId,
         `Sent chat messages about a closed report`,
-        'veto',
-        veto._id
+        'report',
+        report._id
     );
 });
 

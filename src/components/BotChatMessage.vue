@@ -5,7 +5,7 @@
         </div>
 
         <a v-if="users.length" class="btn btn-sm btn-block btn-success mb-2" @click="sendMessages($event)">
-            Send messages to all users
+            Send messages
         </a>
     </div>
 </template>
@@ -36,6 +36,10 @@ export default {
                 return [];
             },
         },
+        evalType: {
+            type: String,
+            default: '',
+        },
     },
     methods: {
         async sendMessages (e) {
@@ -50,6 +54,14 @@ export default {
                         break;
                     case 'report':
                         route = 'manageReports';
+                        break;
+                    case 'eval':
+                        if (this.evalType == 'application') {
+                            route = 'appEval';
+                        } else if (this.evalType == 'currentBn' || this.evalType == 'resignation') {
+                            route = 'bnEval';
+                        }
+
                         break;
                     default:
                         return '';
