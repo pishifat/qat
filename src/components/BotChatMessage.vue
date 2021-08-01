@@ -48,6 +48,9 @@ export default {
                     case 'veto':
                         route = 'vetoes';
                         break;
+                    case 'report':
+                        route = 'manageReports';
+                        break;
                     default:
                         return '';
                 }

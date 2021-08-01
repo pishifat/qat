@@ -6,6 +6,7 @@ const User = require('../models/user');
 const middlewares = require('../helpers/middlewares');
 const util = require('../helpers/util');
 const discord = require('../helpers/discord');
+const osuBot = require('../helpers/osuBot');
 
 const router = express.Router();
 
@@ -198,6 +199,32 @@ router.post('/sendToContentReview/:id', middlewares.isNat, async (req, res) => {
             ],
         }],
         'internalContentCase'
+    );
+});
+
+/* POST send messages */
+router.post('/sendMessages/:id', middlewares.isNat, async (req, res) => {
+    const veto = await Report
+        .findById(req.params.id)
+        .orFail();
+
+    let messages;
+
+    for (const user of req.body.users) {
+        messages = await osuBot.sendMessages(user.osuId, req.body.messages);
+    }
+
+    if (messages !== true) {
+        return res.json({ error: `Messages were not sent. Please let pishifat know!` });
+    }
+
+    res.json({ success: 'Messages sent!' });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Sent chat messages about a closed report`,
+        'veto',
+        veto._id
     );
 });
 
