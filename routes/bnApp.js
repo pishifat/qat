@@ -104,7 +104,7 @@ router.post('/apply', async (req, res) => {
             getUserModScore(req.session.accessToken, req.session.username, months, mode),
         ]);
 
-        if (!userInfo || userInfo.error || !modScore) {
+        if (!userInfo || userInfo.error || (!modScore && modScore !== 0)) {
             return res.json({ error: 'Something went wrong! Please retry again.' });
         }
 
