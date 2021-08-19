@@ -152,7 +152,7 @@ router.post('/submitTest', async (req, res) => {
     let fields = [];
 
     if (totalScore >= 12.5 || test.mode != 'osu') {
-        const assignedNat = test.mode == 'osu' ? await User.getAssignedNat(test.mode, [], 2) : await User.getAssignedNat(test.mode);
+        const assignedNat = test.mode == 'taiko' ? await User.getAssignedNat(test.mode, [], 2) : await User.getAssignedNat(test.mode);
         currentBnApp.natEvaluators = assignedNat;
         await currentBnApp.save();
         const natList = assignedNat.map(n => n.username).join(', ');
@@ -164,7 +164,7 @@ router.post('/submitTest', async (req, res) => {
 
         let trialNatList = '';
 
-        if (test.mode == 'osu') {
+        if (test.mode == 'taiko') {
             const assignedTrialNat = await User.getAssignedTrialNat(test.mode, [], 2);
             currentBnApp.bnEvaluators = assignedTrialNat;
             await currentBnApp.save();
