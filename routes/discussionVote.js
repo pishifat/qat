@@ -1,6 +1,7 @@
 const express = require('express');
 const middlewares = require('../helpers/middlewares');
 const discord = require('../helpers/discord');
+const osuBot = require('../helpers/osuBot');
 const util = require('../helpers/util');
 const Discussion = require('../models/discussion');
 const Mediation = require('../models/mediation');
@@ -235,11 +236,8 @@ router.post('/concludeMediation/:id', middlewares.hasFullReadAccess, async (req,
     );
 
     if (discussion.isContentReview) {
-        await discord.contentCaseWebhookPost(discussion);
-
-        if (!(discussion.creator.isBnOrNat || discussion.creator.groups.includes('gmt'))) {
-            await discord.roleHighlightWebhookPost('contentCase', `relay consensus to **${discussion.creator.username}** (https://osu.ppy.sh/users/${discussion.creator.osuId}). React with :white_check_mark: when relayed.`);
-        }
+        const messages = await discord.contentCaseWebhookPost(discussion);
+        await osuBot.sendMessages(discussion.creator.osuId, messages);
     } else {
         discord.webhookPost(
             [{

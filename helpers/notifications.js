@@ -3,6 +3,7 @@ const moment = require('moment');
 const discord = require('./discord');
 const osuv1 = require('./osuv1');
 const osu = require('./osu');
+const osuBot = require('./osuBot');
 const util = require('./util');
 const AppEvaluation = require('../models/evaluations/appEvaluation');
 const Evaluation = require('../models/evaluations/evaluation');
@@ -375,8 +376,8 @@ const closeContentReviews = cron.schedule('0 9 * * *', async () => {
                 discussion._id
             );
 
-            await discord.contentCaseWebhookPost(discussion);
-            if (!(discussion.creator.isBnOrNat || discussion.creator.groups.includes('gmt'))) await discord.roleHighlightWebhookPost('contentCase', `relay consensus to **${discussion.creator.username}** (https://osu.ppy.sh/users/${discussion.creator.osuId}). React with :white_check_mark: when relayed.`);
+            const messages = await discord.contentCaseWebhookPost(discussion);
+            await osuBot.sendMessages(discussion.creator.osuId, messages);
         }
     }
 }, {
