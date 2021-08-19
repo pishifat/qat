@@ -20,7 +20,7 @@ async function getBotToken () {
             grant_type: 'client_credentials',
             client_id: config.bot.id,
             client_secret: config.bot.secret,
-            scope: 'bot chat.write',
+            scope: 'delegate chat.write',
         });
 
         tokenInfo = {
