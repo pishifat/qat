@@ -89,7 +89,7 @@ router.post('/submit', async (req, res) => {
             });
         }
     } else if (!req.body.isContentReview) {
-        util.isValidUrlOrThrow(url, 'osu.ppy.sh');
+        util.isValidUrlOrThrow(url);
     }
 
     let title = req.body.title;
