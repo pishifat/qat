@@ -257,7 +257,7 @@ router.post('/:id/update', middlewares.hasFullReadAccess, async (req, res) => {
     const shortReason = req.body.shortReason;
     const discussionLink = req.body.discussionLink;
 
-    if (!title || !shortReason || !discussionLink) {
+    if (!title || !shortReason) {
         return res.json({
             error: 'Missing data',
         });
