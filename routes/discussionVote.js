@@ -117,6 +117,10 @@ router.post('/submit', async (req, res) => {
         isContentReview: req.body.isContentReview,
     });
 
+    discussion = await Discussion
+        .findById(discussion.id)
+        .populate(defaultPopulate);
+
     res.json({
         discussion,
         success: 'Submitted discussion',
@@ -255,7 +259,7 @@ router.post('/concludeMediation/:id', middlewares.hasFullReadAccess, async (req,
 router.post('/:id/update', middlewares.hasFullReadAccess, async (req, res) => {
     const title = req.body.title;
     const shortReason = req.body.shortReason;
-    const discussionLink = req.body.discussionLink;
+    const discussionLink = req.body.discussionLink || '';
 
     if (!title || !shortReason) {
         return res.json({

@@ -122,7 +122,7 @@ export default {
         /** @returns {boolean} */
         isEditable() {
             return this.selectedDiscussionVote.isActive &&
-                ((!this.selectedDiscussionVote.isContentReview && this.selectedDiscussionVote.creator == this.loggedInUser.id && this.selectedDiscussionVote.isActive) ||
+                ((!this.selectedDiscussionVote.isContentReview && this.selectedDiscussionVote.creator.id == this.loggedInUser.id && this.selectedDiscussionVote.isActive) ||
                 (this.selectedDiscussionVote.isContentReview && (this.loggedInUser.groups.includes('nat') || this.loggedInUser.groups.includes('gmt'))));
         },
         /** @returns {boolean} */
