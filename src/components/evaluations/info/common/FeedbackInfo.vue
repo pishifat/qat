@@ -24,6 +24,7 @@
         </div>
 
         <feedback-pm
+            v-if="selectedEvaluation.feedback && selectedEvaluation.feedback.length"
             :discord-link="discordLink"
         />
     </div>

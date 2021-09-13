@@ -5,7 +5,7 @@
         </div>
 
         <a v-if="users.length" class="btn btn-sm btn-block btn-success mb-2" @click="sendMessages($event)">
-            Send messages
+            Send messages & archive
         </a>
     </div>
 </template>
@@ -67,7 +67,12 @@ export default {
                         return '';
                 }
 
-                await this.$http.executePost(`/${route}/sendMessages/${this.mongoId}`, { users: this.users, messages: this.messages }, e);
+                const res = await this.$http.executePost(`/${route}/sendMessages/${this.mongoId}`, { users: this.users, messages: this.messages }, e);
+
+                if (this.messageType == 'eval' && res.success) {
+                    await this.$http.executePost(`/${route}/setComplete/`, { checkedApps: [this.mongoId] });
+                    this.$router.push(`evalarchive?id=${this.mongoId}`);
+                }
             }
         },
     },
