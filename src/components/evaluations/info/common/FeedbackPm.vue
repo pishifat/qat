@@ -4,7 +4,7 @@
             :messages="messages"
             :message-type="'eval'"
             :mongo-id="selectedEvaluation.id"
-            :users="[{ username: 'pishifat', osuId: 3178418 }]"
+            :users="[{ username: selectedEvaluation.user.username, osuId: selectedEvaluation.user.osuId }]"
             :eval-type="selectedEvaluation.kind"
         />
     </div>
