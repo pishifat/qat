@@ -303,6 +303,7 @@ function makeWordFromField (field) {
 
 /* POST set evals as complete */
 router.post('/setComplete/', middlewares.isNat, async (req, res) => {
+    console.log('in');
     let evaluations = await Evaluation
         .find({
             _id: {
@@ -311,6 +312,8 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
             active: true,
         })
         .populate(defaultPopulate);
+
+    console.log(evaluations);
 
     for (const evaluation of evaluations) {
         let user = await User.findById(evaluation.user);
