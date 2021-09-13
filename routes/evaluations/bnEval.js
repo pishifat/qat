@@ -249,7 +249,7 @@ router.post('/setGroupEval/', middlewares.isNat, async (req, res) => {
     let evaluations = await Evaluation
         .find({
             _id: {
-                $in: req.body.checkedRounds,
+                $in: req.body.evalIds,
             },
         })
         .populate(defaultPopulate);
@@ -259,7 +259,7 @@ router.post('/setGroupEval/', middlewares.isNat, async (req, res) => {
     res.json(evaluations);
     Logger.generate(
         req.session.mongoId,
-        `Set ${req.body.checkedRounds.length} BN eval${req.body.checkedRounds.length == 1 ? '' : 's'} as group evaluation`,
+        `Set ${req.body.evalIds.length} BN eval${req.body.evalIds.length == 1 ? '' : 's'} as group evaluation`,
         'bnEvaluation'
     );
 });
@@ -267,7 +267,7 @@ router.post('/setGroupEval/', middlewares.isNat, async (req, res) => {
 /* POST set invidivual eval */
 router.post('/setIndividualEval/', middlewares.isNat, async (req, res) => {
     await Evaluation.updateMany({
-        _id: { $in: req.body.checkedRounds },
+        _id: { $in: req.body.evalIds },
     }, {
         discussion: false,
     });
@@ -277,7 +277,7 @@ router.post('/setIndividualEval/', middlewares.isNat, async (req, res) => {
     res.json(evaluations);
     Logger.generate(
         req.session.mongoId,
-        `Set ${req.body.checkedRounds.length} BN eval${req.body.checkedRounds.length == 1 ? '' : 's'} as individual evaluation`,
+        `Set ${req.body.evalIds.length} BN eval${req.body.evalIds.length == 1 ? '' : 's'} as individual evaluation`,
         'bnEvaluation'
     );
 });
@@ -306,7 +306,7 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
     let evaluations = await Evaluation
         .find({
             _id: {
-                $in: req.body.checkedRounds,
+                $in: req.body.evalIds,
             },
             active: true,
         })
@@ -423,7 +423,7 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
     res.json(evaluations);
     Logger.generate(
         req.session.mongoId,
-        `Set ${req.body.checkedRounds.length} BN eval${req.body.checkedRounds.length == 1 ? '' : 's'} as completed`,
+        `Set ${req.body.evalIds.length} BN eval${req.body.evalIds.length == 1 ? '' : 's'} as completed`,
         'bnEvaluation'
     );
 });

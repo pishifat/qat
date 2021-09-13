@@ -130,7 +130,7 @@ router.post('/setGroupEval/', middlewares.isNat, async (req, res) => {
     const evaluations = await AppEvaluation
         .find({
             _id: {
-                $in: req.body.checkedApps,
+                $in: req.body.evalIds,
             },
         })
         .populate(defaultPopulate);
@@ -141,7 +141,7 @@ router.post('/setGroupEval/', middlewares.isNat, async (req, res) => {
     res.json(a);
     Logger.generate(
         req.session.mongoId,
-        `Set ${req.body.checkedApps.length} BN app${req.body.checkedApps.length == 1 ? '' : 's'} as group evaluation`,
+        `Set ${req.body.evalIds.length} BN app${req.body.evalIds.length == 1 ? '' : 's'} as group evaluation`,
         'appEvaluation'
     );
 });
@@ -149,7 +149,7 @@ router.post('/setGroupEval/', middlewares.isNat, async (req, res) => {
 /* POST set invidivual eval */
 router.post('/setIndividualEval/', middlewares.isNat, async (req, res) => {
     await AppEvaluation.updateMany({
-        _id: { $in: req.body.checkedApps },
+        _id: { $in: req.body.evalIds },
     }, {
         discussion: false,
     });
@@ -159,7 +159,7 @@ router.post('/setIndividualEval/', middlewares.isNat, async (req, res) => {
     res.json(a);
     Logger.generate(
         req.session.mongoId,
-        `Set ${req.body.checkedApps.length} BN app${req.body.checkedApps.length == 1 ? '' : 's'} as individual evaluation`,
+        `Set ${req.body.evalIds.length} BN app${req.body.evalIds.length == 1 ? '' : 's'} as individual evaluation`,
         'appEvaluation'
     );
 });
@@ -169,7 +169,7 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
     const evaluations = await AppEvaluation
         .find({
             _id: {
-                $in: req.body.checkedApps,
+                $in: req.body.evalIds,
             },
             active: true,
         })
@@ -232,7 +232,7 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
     res.json(activeApps);
     Logger.generate(
         req.session.mongoId,
-        `Set ${req.body.checkedApps.length} BN app${req.body.checkedApps.length == 1 ? '' : 's'} as completed`,
+        `Set ${req.body.evalIds.length} BN app${req.body.evalIds.length == 1 ? '' : 's'} as completed`,
         'appEvaluation'
     );
 });

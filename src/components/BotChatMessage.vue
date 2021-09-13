@@ -43,7 +43,7 @@ export default {
     },
     methods: {
         async sendMessages (e) {
-            const result = confirm(`Are you sure?`);
+            const result = confirm(`Are you sure? This will take a few seconds to complete.`);
 
             if (result) {
                 let route = '';
@@ -70,7 +70,7 @@ export default {
                 const res = await this.$http.executePost(`/${route}/sendMessages/${this.mongoId}`, { users: this.users, messages: this.messages }, e);
 
                 if (this.messageType == 'eval' && res.success) {
-                    await this.$http.executePost(`/${route}/setComplete/`, { checkedApps: [this.mongoId] });
+                    await this.$http.executePost(`/${route}/setComplete/`, { evalIds: [this.mongoId] });
                     this.$router.push(`evalarchive?id=${this.mongoId}`);
                 }
             }

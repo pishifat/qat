@@ -212,9 +212,9 @@ export default {
                     let evaluations = [];
 
                     if (this.kind === 'applications') {
-                        evaluations = await this.$http.executePost('/appEval/setGroupEval/', { checkedApps: this.checkedEvaluations }, e);
+                        evaluations = await this.$http.executePost('/appEval/setGroupEval/', { evalIds: this.checkedEvaluations }, e);
                     } else {
-                        evaluations = await this.$http.executePost('/bnEval/setGroupEval/', { checkedRounds: this.checkedEvaluations }, e);
+                        evaluations = await this.$http.executePost('/bnEval/setGroupEval/', { evalIds: this.checkedEvaluations }, e);
                     }
 
                     this.commitEvaluations(evaluations, 'Set as group eval');
@@ -229,9 +229,9 @@ export default {
                     let evaluations = [];
 
                     if (this.kind === 'applications') {
-                        evaluations = await this.$http.executePost('/appEval/setIndividualEval/', { checkedApps: this.checkedEvaluations }, e);
+                        evaluations = await this.$http.executePost('/appEval/setIndividualEval/', { evalIds: this.checkedEvaluations }, e);
                     } else {
-                        evaluations = await this.$http.executePost('/bnEval/setIndividualEval/', { checkedRounds: this.checkedEvaluations }, e);
+                        evaluations = await this.$http.executePost('/bnEval/setIndividualEval/', { evalIds: this.checkedEvaluations }, e);
                     }
 
                     this.commitEvaluations(evaluations, 'Set as individual eval');
@@ -246,9 +246,9 @@ export default {
                     let evaluations = [];
 
                     if (this.kind === 'applications') {
-                        evaluations = await this.$http.executePost('/appEval/setComplete/', { checkedApps: this.checkedEvaluations }, e);
+                        evaluations = await this.$http.executePost('/appEval/setComplete/', { evalIds: this.checkedEvaluations }, e);
                     } else {
-                        evaluations = await this.$http.executePost('/bnEval/setComplete/', { checkedRounds: this.checkedEvaluations }, e);
+                        evaluations = await this.$http.executePost('/bnEval/setComplete/', { evalIds: this.checkedEvaluations }, e);
                     }
 
                     this.commitEvaluations(evaluations, 'Archived');
