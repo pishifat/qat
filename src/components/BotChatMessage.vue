@@ -44,6 +44,7 @@ export default {
     methods: {
         async sendMessages (e) {
             const result = confirm(`Are you sure? This will take a few seconds to complete.`);
+            const mongoId = this.mongoId;
 
             if (result) {
                 let route = '';
@@ -67,11 +68,11 @@ export default {
                         return '';
                 }
 
-                const res = await this.$http.executePost(`/${route}/sendMessages/${this.mongoId}`, { users: this.users, messages: this.messages }, e);
+                const res = await this.$http.executePost(`/${route}/sendMessages/${mongoId}`, { users: this.users, messages: this.messages }, e);
 
                 if (this.messageType == 'eval' && res.success) {
-                    await this.$http.executePost(`/${route}/setComplete/`, { evalIds: [this.mongoId] });
-                    this.$router.push(`evalarchive?id=${this.mongoId}`);
+                    await this.$http.executePost(`/${route}/setComplete/`, { evalIds: [mongoId] });
+                    this.$router.push(`evalarchive?id=${mongoId}`);
                 }
             }
         },
