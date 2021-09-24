@@ -77,6 +77,7 @@
             <section class="card card-body">
                 <nat-activity class="my-2" />
                 <bn-activity classs="my-2" />
+                <gmt-activity class="my-2" />
 
                 <template v-if="loggedInUser.isNat">
                     <badges />
@@ -99,6 +100,7 @@ import UserCard from '../components/users/UserCard.vue';
 import UserInfo from '../components/users/UserInfo.vue';
 import NatActivity from '../components/users/NatActivity.vue';
 import BnActivity from '../components/users/BnActivity.vue';
+import GmtActivity from '../components/users/GmtActivity.vue';
 import Badges from '../components/users/Badges.vue';
 import PotentialNatInfo from '../components/users/PotentialNatInfo.vue';
 import FilterBox from '../components/FilterBox.vue';
@@ -112,6 +114,7 @@ export default {
         UserInfo,
         NatActivity,
         BnActivity,
+        GmtActivity,
         Badges,
         PotentialNatInfo,
         FilterBox,

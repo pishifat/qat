@@ -4,6 +4,7 @@ const Logger = require('../../models/log');
 const AppEvaluation = require('../../models/evaluations/appEvaluation');
 const BnEvaluation = require('../../models/evaluations/bnEvaluation');
 const Evaluation = require('../../models/evaluations/evaluation');
+const Discussion = require('../../models/discussion');
 const ResignationEvaluation = require('../../models/evaluations/resignationEvaluation');
 const Aiess = require('../../models/aiess');
 const middlewares = require('../../helpers/middlewares');
@@ -198,6 +199,47 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
     });
 
     res.json(info);
+});
+
+router.get('/findGmtActivity/:days', async (req, res) => {
+    let minDate = new Date();
+    minDate.setDate(minDate.getDate() - parseInt(req.params.days));
+
+    const [users, discussions] = await Promise.all([
+        User
+            .find({
+                groups: 'gmt',
+            })
+            .sort({ username: 1 }),
+
+        await Discussion
+            .find({
+                isContentReview: true,
+                updatedAt: { $gte: minDate },
+            })
+            .populate('mediations'),
+    ]);
+
+    let info = [];
+
+    for (const user of users) {
+        let totalVotes = 0;
+
+        for (const discussion of discussions) {
+            const userMediations = discussion.mediations.filter(m => m.mediator.toString() == user.id);
+            totalVotes += userMediations.length;
+        }
+
+        info.push({
+            username: user.username,
+            osuId: user.osuId,
+            totalVotes,
+        });
+    }
+
+    res.json({
+        info,
+    });
 });
 
 /* POST update discord ID */
