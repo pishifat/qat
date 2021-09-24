@@ -24,7 +24,7 @@
         </div>
 
         <feedback-pm
-            v-if="selectedEvaluation.feedback && selectedEvaluation.feedback.length"
+            v-if="(selectedEvaluation.feedback && selectedEvaluation.feedback.length) || selectedEvaluation.isResignation"
             :discord-link="discordLink"
         />
     </div>
