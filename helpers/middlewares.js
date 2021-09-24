@@ -4,9 +4,9 @@ const { refreshToken } = require('./osu');
 const { setSession } = require('./util');
 const { OsuResponseError } = require('./errors');
 
-function unauthorize(req, res) {
+function unauthorize(req, res, customError) {
     if (req.accepts(['html', 'json']) === 'json') {
-        res.json({ error: 'Unauthorized - Login first' });
+        res.json({ error: customError ? customError : 'Unauthorized - Login first' });
     } else {
         res.render('index',{
             layout: false,
@@ -81,12 +81,22 @@ function isNatOrTrialNat(req, res, next) {
     next();
 }
 
+function isResponsibleWithButtons(req, res, next) {
+    const u = res.locals.userRequest;
+    const valid = [3178418, 1541323];
+
+    if (!valid.includes(u.osuId)) return unauthorize(req, res, `You can't use this`);
+
+    next();
+}
+
 module.exports = {
     isLoggedIn,
     isBnOrNat,
     isNat,
     hasFullReadAccessOrTrialNat,
     isNatOrTrialNat,
+    isResponsibleWithButtons,
     hasBasicAccess,
     hasFullReadAccess,
 };

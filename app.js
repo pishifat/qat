@@ -41,6 +41,7 @@ const modRequestsSubmissionsRouter = require('./routes/modRequests/submissions')
 const modRequestsReviewsRouter = require('./routes/modRequests/reviews');
 const messageRouter = require('./routes/message');
 const settingsRouter = require('./routes/settings');
+const spamRouter = require('./routes/spam');
 
 const app = express();
 
@@ -108,6 +109,7 @@ app.use('/modrequests', modRequestsSubmissionsRouter);
 app.use('/modrequests/listing', modRequestsReviewsRouter);
 app.use('/message', messageRouter);
 app.use('/settings', settingsRouter);
+app.use('/spam', spamRouter);
 
 // catch 404
 app.use(function(req, res) {

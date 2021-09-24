@@ -85,6 +85,7 @@ export default {
                 'qualityAssurance',
                 'veto',
                 'interOp',
+                'spam',
             ],
             category: 'all',
         };

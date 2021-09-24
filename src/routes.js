@@ -21,6 +21,7 @@ const EvalArchive = () => import(/* webpackChunkName: "nat", webpackPrefetch: tr
 const DataCollection = () => import(/* webpackChunkName: "nat", webpackPrefetch: true */ './pages/DataCollectionPage.vue');
 const ManageTest = () => import(/* webpackChunkName: "nat", webpackPrefetch: true */ './pages/ManageTestPage.vue');
 const Logs = () => import(/* webpackChunkName: "nat", webpackPrefetch: true */ './pages/Logs.vue');
+const Spam = () => import(/* webpackChunkName: "nat", webpackPrefetch: true */ './pages/Spam.vue');
 
 const routes = [
     // Public
@@ -49,6 +50,7 @@ const routes = [
     { path: '/datacollection', component: DataCollection, meta: { title: 'Data Collection', requiresFullReadAccess: true } },
     { path: '/managetest', component: ManageTest, meta: { title: 'Manage RC Test', requiresFullReadAccess: true } },
     { path: '/logs', component: Logs, meta: { title: 'Logs', requiresFullReadAccess: true } },
+    { path: '/spam', component: Spam, meta: { title: 'Spam', requiresFullReadAccess: true } },
 
     { path: '*', component: NotFound, meta: { title: 'Oops', public: true } },
 ];
