@@ -1,12 +1,13 @@
 const express = require('express');
 const AppEvaluation = require('../../models/evaluations/appEvaluation');
 const BnEvaluation = require('../../models/evaluations/bnEvaluation');
+const ResignationEvaluation = require('../../models/evaluations/resignationEvaluation');
 const User = require('../../models/user');
 const Logger = require('../../models/log');
 const { submitEval, setGroupEval, setFeedback, replaceUser } = require('./evaluations');
 const middlewares = require('../../helpers/middlewares');
 const discord = require('../../helpers/discord');
-const { AppEvaluationConsensus } = require('../../shared/enums');
+const { AppEvaluationConsensus, ResignationConsensus } = require('../../shared/enums');
 const osuBot = require('../../helpers/osuBot');
 
 const router = express.Router();
@@ -179,13 +180,30 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
         let user = await User.findById(evaluation.user);
 
         if (evaluation.consensus === AppEvaluationConsensus.Pass) {
+            let level = 'probation';
+            let daysToNextEval = 40;
+
+            const lastResignation = await ResignationEvaluation
+                .findOne({
+                    user: user._id,
+                    mode: evaluation.mode,
+                })
+                .sort({
+                    updatedAt: -1,
+                });
+
+            if (lastResignation && lastResignation.consensus === ResignationConsensus.ResignedOnGoodTerms) {
+                level = 'full';
+                daysToNextEval = Math.floor(Math.random() * (115 - 85) + 85); // between 85 and 115 days;
+            }
+
             user.modesInfo.push({
                 mode: evaluation.mode,
-                level: 'probation',
+                level,
             });
 
             let deadline = new Date();
-            deadline.setDate(deadline.getDate() + 40);
+            deadline.setDate(deadline.getDate() + daysToNextEval);
             await BnEvaluation.create({
                 user: evaluation.user,
                 mode: evaluation.mode,
