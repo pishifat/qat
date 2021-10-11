@@ -60,7 +60,7 @@ export default {
 
                 // pass
                 if (this.positiveConsensus) {
-                    messages.push(`hello! you are now a Probationary ${this.modeString} Beatmap Nominator! here's a few things to get you started:`);
+                    messages.push(`hello! you are now an ${this.modeString} Beatmap Nominator! here's a few things to get you started:`);
                     messages.push(`1. read all BN pages on the wiki: https://osu.ppy.sh/help/wiki/People/The_Team/Beatmap_Nominators`);
                     messages.push(`2. join the BN Discord server: ${this.discordLink ? this.discordLink : 'LINK DOES NOT EXIST'}`);
                     messages.push(`3. review your evaluation here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id}`);
