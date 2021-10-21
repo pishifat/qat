@@ -163,14 +163,14 @@ router.post('/apply', async (req, res) => {
                 return res.json({
                     error: `Your previous application was rejected (check your osu! forum PMs for details). 
                             You may apply for this game mode again on 
-                            ${new Date(currentBnApp.cooldownDate).toString().slice(4, 15)}.`,
+                            ${new Date(currentBnApp.cooldownDate).toString().slice(4, 24)}.`,
                 });
             }
         } else if (currentBnEval) {
             return res.json({
                 error: `You were recently removed from the Beatmap Nominators in this game mode. 
                         You may apply for this game mode again on 
-                        ${new Date(currentBnEval.cooldownDate).toString().slice(4, 15)}.`,
+                        ${new Date(currentBnEval.cooldownDate).toString().slice(4, 24)}.`,
             });
         }
     }
