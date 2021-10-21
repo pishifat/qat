@@ -625,32 +625,15 @@ async function findUniqueNominations (initialDate, bn) {
 /**
  * @param {Date} initialDate
  * @param {object} bn
- * @returns {Promise<number>} number of qa checks
- */
-async function findQualityAssuranceChecks (initialDate, bn) {
-    const events = await QualityAssuranceCheck.find({
-        user: bn.id,
-        timestamp: { $gt: initialDate },
-    });
-
-    return events.length;
-}
-
-/**
- * @param {Date} initialDate
- * @param {object} bn
  * @param {string} mode
  * @returns {Promise<boolean>} whether or not the user has 'low activity'
  */
 async function hasLowActivity (initialDate, bn, mode) {
-    const [uniqueNominations, qualityAssuranceChecks] = await Promise.all([
-        findUniqueNominations(initialDate, bn),
-        findQualityAssuranceChecks(initialDate, bn),
-    ]);
+    const uniqueNominations = await findUniqueNominations(initialDate, bn);
 
     if (
-        (uniqueNominations + (qualityAssuranceChecks / 4) < 4 && mode == 'mania') ||
-        (uniqueNominations + (qualityAssuranceChecks / 4) < 6 && mode != 'mania')
+        (uniqueNominations < 4 && mode == 'mania') ||
+        (uniqueNominations < 6 && mode != 'mania')
     ) {
         return true;
     }
