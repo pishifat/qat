@@ -18,25 +18,24 @@ router.post('/sendMessages', middlewares.isResponsibleWithButtons, async (req, r
 
     let users = [];
 
-    if (req.body.group == 'list') {
-        const splitIds = req.body.users.split('\n');
-        const osuIds = splitIds.filter(id => id.length);
+    const splitIds = req.body.users.split('\n');
+    const unfilteredOsuIds = splitIds.filter(id => id.length);
+    const osuIds = [...new Set(unfilteredOsuIds)];
 
-        if (!osuIds.length) {
-            return res.json({ error: 'No users' });
+    console.log(osuIds);
+
+    if (!osuIds.length) {
+        return res.json({ error: 'No users' });
+    }
+
+    for (const osuId of osuIds) {
+        const id = parseInt(osuId);
+
+        if (isNaN(id)) {
+            return res.json({ error: `User "${osuId}" wasn't found. Make sure it's an osu ID, not a username` });
         }
 
-        for (const osuId of osuIds) {
-            const id = parseInt(osuId);
-
-            if (isNaN(id)) {
-                return res.json({ error: `User "${osuId}" wasn't found. Make sure it's an osu ID, not a username` });
-            }
-
-            users.push({ osuId: id });
-        }
-    } else {
-        users = await User.find({ groups: { $in: req.body.group } });
+        users.push({ osuId: id });
     }
 
     let newMessages;
@@ -61,6 +60,40 @@ router.post('/sendMessages', middlewares.isResponsibleWithButtons, async (req, r
         'spam',
         null
     );
+});
+
+/* GET user osu! IDs */
+router.get('/findUserOsuIds/:group/:mode', async (req, res) => {
+    let users;
+    const group = req.params.group;
+    const mode = req.params.mode;
+
+    if (group !== 'all' && mode !== 'all') {
+        users = await User
+            .find({
+                modesInfo: { $elemMatch: { mode } },
+                groups: { $in: [group] },
+            });
+    } else if (group !== 'all' && mode == 'all') {
+        users = await User
+            .find({
+                groups: { $in: [group] },
+            });
+    } else if (group == 'all' && mode !== 'all') {
+        users = await User
+            .find({
+                modesInfo: { $elemMatch: { mode } },
+            });
+    } else if (group == 'all' && mode == 'all') {
+        users = await User
+            .find({
+                groups: { $in: ['bn', 'nat'] },
+            });
+    }
+
+    const userOsuIds = users.map(u => u.osuId);
+
+    res.json(userOsuIds);
 });
 
 module.exports = router;

@@ -33,22 +33,61 @@
             rows="4"
         />
 
+        <div class="row mx-2 my-2">
+            <button class="btn btn-primary my-1 col-sm-5 mx-2" @click="findUserOsuIds($event)">
+                Find user IDs
+            </button>
+
+            <select
+                v-model="group"
+                class="form-control my-1 mx-1 col-sm-3"
+            >
+                <option value="" disabled>
+                    Select a group
+                </option>
+                <option value="bn">
+                    BN
+                </option>
+                <option value="nat">
+                    NAT
+                </option>
+                <option value="all">
+                    all
+                </option>
+            </select>
+
+            <select
+                v-model="mode"
+                class="form-control my-1 mx-1 col-sm-3"
+            >
+                <option value="" disabled>
+                    Select a mode
+                </option>
+                <option value="osu">
+                    osu
+                </option>
+                <option value="taiko">
+                    taiko
+                </option>
+                <option value="catch">
+                    catch
+                </option>
+                <option value="mania">
+                    mania
+                </option>
+                <option value="all">
+                    all
+                </option>
+            </select>
+        </div>
+
+
+
         <hr>
 
-        <button class="btn btn-primary my-1" @click="sendMessages($event, 'list')">
+
+        <button class="btn btn-danger my-1" @click="sendMessages($event)">
             Send to users listed above
-        </button>
-
-        <button class="btn btn-primary my-1" @click="sendMessages($event, ['bn'])">
-            Send to BN
-        </button>
-
-        <button class="btn btn-primary my-1" @click="sendMessages($event, ['nat'])">
-            Send to NAT
-        </button>
-
-        <button class="btn btn-primary my-1" @click="sendMessages($event, ['bn', 'nat'])">
-            Send to BN & NAT
         </button>
 
         <toast-messages />
@@ -68,6 +107,8 @@ export default {
         return {
             message: '',
             users: '',
+            group: '',
+            mode: '',
         };
     },
     computed: {
@@ -82,15 +123,38 @@ export default {
         },
     },
     methods: {
-        async sendMessages (e, group) {
-            const result = confirm(`Are you sure? This message will be sent to everyone in the ${group}.`);
+        async sendMessages (e) {
+            const result = confirm(`Are you sure? This message will be sent to everyone listed.`);
 
             if (result) {
                 const result2 = confirm(`Are you really sure? Just double-checking in case you don't read.`);
 
                 if (result2) {
-                    await this.$http.executePost(`/spam/sendMessages/`, { users: this.users, lines: this.lines, group }, e);
+                    await this.$http.executePost(`/spam/sendMessages/`, { users: this.users, lines: this.lines }, e);
                 }
+            }
+        },
+        async findUserOsuIds (e) {
+            if (!this.group || !this.mode) {
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Cannot leave fields blank!`,
+                    type: 'danger',
+                });
+            } else {
+                const res = await this.$http.executeGet(`/spam/findUserOsuIds/${this.group}/${this.mode}`, e);
+
+                for (const id of res) {
+                    if (!this.users.length) {
+                        this.users += id;
+                    } else {
+                        this.users += '\n' + id;
+                    }
+                }
+
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Added ${res.length} users`,
+                    type: 'success',
+                });
             }
         },
     },
