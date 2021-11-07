@@ -21,11 +21,11 @@ router.use((req, res, next) => {
         return res.status(401).send('Invalid key');
     }
 
-    Logger.generate(
+    /*Logger.generate(
         config.interOpAccess[username].mongoId,
         `accessed /interOp${req.url}`,
         'interOp'
-    );
+    );*/
 
     return next();
 });
