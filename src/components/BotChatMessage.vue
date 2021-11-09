@@ -5,7 +5,7 @@
         </div>
 
         <a v-if="users.length" class="btn btn-sm btn-block btn-success mb-2" @click="sendMessages($event)">
-            Send messages & archive
+            {{ customText }}
         </a>
     </div>
 </template>
@@ -40,6 +40,10 @@ export default {
             type: String,
             default: '',
         },
+        customText: {
+            type: String,
+            default: 'Send messages',
+        },
     },
     methods: {
         async sendMessages (e) {
@@ -48,6 +52,7 @@ export default {
 
             if (result) {
                 let route = '';
+                let type = '';
 
                 switch (this.messageType) {
                     case 'veto':
@@ -56,6 +61,10 @@ export default {
                     case 'report':
                         route = 'manageReports';
                         break;
+                    case 'enableBnEvaluators':
+                        route = 'appEval';
+                        type = 'enable BN evaluators';
+                        break;
                     case 'eval':
                         if (this.evalType == 'application') {
                             route = 'appEval';
@@ -63,16 +72,23 @@ export default {
                             route = 'bnEval';
                         }
 
+                        type = 'archive';
+
                         break;
                     default:
                         return '';
                 }
 
-                const res = await this.$http.executePost(`/${route}/sendMessages/${mongoId}`, { users: this.users, messages: this.messages }, e);
+                const res = await this.$http.executePost(`/${route}/sendMessages/${mongoId}`, { users: this.users, messages: this.messages, type }, e);
 
                 if (this.messageType == 'eval' && res.success) {
                     await this.$http.executePost(`/${route}/setComplete/`, { evalIds: [mongoId] });
                     this.$router.push(`evalarchive?id=${mongoId}`);
+                }
+
+                if (this.messageType == 'enableBnEvaluators') {
+                    await this.$http.executePost(`/${route}/enableBnEvaluators/${mongoId}`, { bnEvaluators: this.users });
+                    window.location.reload();
                 }
             }
         },

@@ -5,6 +5,7 @@
             :message-type="'veto'"
             :mongo-id="selectedVeto.id"
             :users="users"
+            :custom-text="'Send messages'"
         />
     </div>
 </template>

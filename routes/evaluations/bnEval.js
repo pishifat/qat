@@ -867,7 +867,7 @@ router.post('/sendMessages/:id', middlewares.isNatOrTrialNat, async (req, res) =
 
     Logger.generate(
         req.session.mongoId,
-        `Sent chat messages for current BN eval for "${evaluation.user.username}"`,
+        `Sent ${req.body.type} chat messages for current BN eval for "${evaluation.user.username}"`,
         'bnEvaluation',
         evaluation._id
     );
@@ -875,7 +875,7 @@ router.post('/sendMessages/:id', middlewares.isNatOrTrialNat, async (req, res) =
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),
         color: discord.webhookColors.white,
-        description: `Sent chat messages for [**${evaluation.user.username}**'s current BN eval](http://bn.mappersguild.com/appeval?id=${evaluation.id})`,
+        description: `Sent **${req.body.type}** chat messages for [**${evaluation.user.username}**'s current BN eval](http://bn.mappersguild.com/appeval?id=${evaluation.id})`,
     }],
     evaluation.mode);
 });

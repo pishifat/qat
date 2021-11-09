@@ -81,8 +81,8 @@ export default {
     computed: {
         /** @returns {array} */
         natReviews () {
-            if (this.evaluation.mode == 'osu') return this.evaluation.reviews; // temporary while trialNAT exists
-            else return this.evaluation.reviews.filter(r => r.evaluator.isNat);
+            //if (this.evaluation.mode == 'taiko') return this.evaluation.reviews; // temporary while trialNAT exists. there was an "else" after this line (useful to know if returning to trial nat system ever)
+            return this.evaluation.reviews.filter(r => r.evaluator.isNat);
         },
         /** @returns {string} */
         scoreColor() {

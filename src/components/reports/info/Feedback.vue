@@ -6,7 +6,7 @@
             </p>
 
             <p class="small ml-2">
-                This will be sent to the reporter in a forum PM. Include the consensus and any actions being taken.
+                This will be sent to the reporter in an osu! message. Include the consensus and any actions being taken.
             </p>
 
             <textarea

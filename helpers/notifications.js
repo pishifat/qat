@@ -9,7 +9,6 @@ const AppEvaluation = require('../models/evaluations/appEvaluation');
 const Evaluation = require('../models/evaluations/evaluation');
 const Veto = require('../models/veto');
 const User = require('../models/user');
-const QualityAssuranceCheck = require('../models/qualityAssuranceCheck');
 const BeatmapReport = require('../models/beatmapReport');
 const Aiess = require('../models/aiess');
 const Discussion = require('../models/discussion');
@@ -205,10 +204,11 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
         let generateWebhook = true;
         let discordIds = [];
         let color;
-        let trialEvaluators = app.mode == 'taiko' ? app.natEvaluators.concat(app.bnEvaluators) : app.natEvaluators;
+        let evaluators = app.natEvaluators;
+        //let trialEvaluators = app.mode == 'taiko' ? app.natEvaluators.concat(app.bnEvaluators) : app.natEvaluators;
 
         if (date > deadline) {
-            discordIds = findNatEvaluatorHighlights(app.reviews, trialEvaluators, app.discussion);
+            discordIds = findNatEvaluatorHighlights(app.reviews, evaluators, app.discussion);
             const days = findDaysAgo(app.createdAt);
 
             description += `was due ${days == 0 ? 'today!' : days == 1 ? days + ' day ago!' : days + ' days ago!'}`;
@@ -221,7 +221,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
         }
 
         if (generateWebhook) {
-            description += findNatEvaluatorStatuses(app.reviews, trialEvaluators, app.discussion);
+            description += findNatEvaluatorStatuses(app.reviews, evaluators, app.discussion);
             description += findMissingContent(app.discussion, app.consensus, app.feedback);
 
             await discord.webhookPost(
@@ -244,11 +244,12 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
 
         let description = `[**${round.user.username}**'s ${round.isResignation ? 'resignation' : 'current BN eval'}](http://bn.mappersguild.com/bneval?id=${round.id}) `;
         let natList = '';
-        let trialNatList = '';
+        //let trialNatList = '';
         let generateWebhook = true;
         let discordIds = [];
         let color;
-        let trialEvaluators = round.mode == 'taiko' ? round.natEvaluators.concat(round.bnEvaluators) : round.natEvaluators;
+        let evaluators = round.natEvaluators;
+        //let trialEvaluators = round.mode == 'taiko' ? round.natEvaluators.concat(round.bnEvaluators) : round.natEvaluators;
 
         if (round.discussion) { // current BN evals in groups have 7 extra days
             const tempDate = new Date(round.deadline);
@@ -257,7 +258,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
         }
 
         if (date > round.deadline) {
-            discordIds = findNatEvaluatorHighlights(round.reviews, trialEvaluators, round.discussion);
+            discordIds = findNatEvaluatorHighlights(round.reviews, evaluators, round.discussion);
             const days = findDaysAgo(round.deadline);
 
             description += `was due ${days == 0 ? 'today!' : days == 1 ? days + ' day ago!' : days + ' days ago!'}`;
@@ -279,7 +280,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
 
             natList = round.natEvaluators.map(u => u.username).join(', ');
 
-            if (round.mode == 'taiko') {
+            /*if (round.mode == 'taiko') {
                 if (!round.bnEvaluators || !round.bnEvaluators.length) {
                     round.bnEvaluators = await User.getAssignedTrialNat(round.mode, [round.user.osuId], 2);
                     await round.populate(defaultPopulate).execPopulate();
@@ -287,15 +288,15 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
                 }
 
                 trialNatList = round.bnEvaluators.map(u => u.username).join(', ');
-            }
+            }*/
         } else {
             generateWebhook = false;
         }
 
         if (generateWebhook && !natList.length) {
-            trialEvaluators = round.natEvaluators.concat(round.bnEvaluators);
+            evaluators = round.natEvaluators.concat(round.bnEvaluators);
 
-            description += findNatEvaluatorStatuses(round.reviews, trialEvaluators, round.discussion);
+            description += findNatEvaluatorStatuses(round.reviews, evaluators, round.discussion);
             description += findMissingContent(round.discussion, round.consensus, round.feedback);
             await discord.webhookPost(
                 [{
@@ -316,12 +317,12 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
                 },
             ];
 
-            if (trialNatList.length) {
+            /*if (trialNatList.length) {
                 fields.push({
                     name: 'Assigned BN',
                     value: trialNatList,
                 });
-            }
+            }*/
 
             await discord.webhookPost(
                 [{

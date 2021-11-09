@@ -9,7 +9,7 @@
                 <li>A score of 12.5 or higher on the <a href="https://osu.ppy.sh/wiki/en/People/The_Team/Beatmap_Nominators/Beatmap_Nominator_Test" target="_blank">Beatmap Nominator Test</a> (this begins after clicking "Apply" below).</li>
                 <li>Competent modding abilities/behavior. This is evaluated by the NAT through your submitted mods, other modding history, and community interaction</li>
             </ul>
-            <div>After your application is evaluated, you will receive an osu! forum PM with the results. If your application is denied, you cannot apply to the same game mode again for 90 days.</div>
+            <div>After your application is evaluated, you will receive an osu! message from the <a href="https://osu.ppy.sh/users/23648635" target="_blank">mappersguild bot</a> with the results. If your application is denied, you cannot apply to the same game mode again for 90 days (unless otherwise specified).</div>
         </div>
 
         <div class="card card-body">

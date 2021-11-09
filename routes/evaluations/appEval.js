@@ -405,6 +405,12 @@ router.post('/replaceUser/:id', middlewares.isNat, async (req, res) => {
 
 /* POST select BN evaluators */
 router.post('/selectBnEvaluators', middlewares.isNat, async (req, res) => {
+    const totalUsers = parseInt(req.body.totalUsers);
+
+    if (isNaN(totalUsers) || totalUsers < 1 || totalUsers > 10) {
+        return res.json({ error: 'Pick a number between 1 and 10' });
+    }
+
     const allUsers = await User.aggregate([
         {
             $match: {
@@ -446,9 +452,7 @@ router.post('/selectBnEvaluators', middlewares.isNat, async (req, res) => {
         }
     }
 
-    const modeUsers = req.body.mode == 'osu' ? 6 : 3;
-
-    const requiredUsers = users.length > modeUsers ? users.length : modeUsers;
+    const requiredUsers = users.length > totalUsers ? users.length : totalUsers;
 
     for (let i = 0; users.length < requiredUsers && i < allUsers.length; i++) {
         const user = allUsers[i];
@@ -466,11 +470,13 @@ router.post('/selectBnEvaluators', middlewares.isNat, async (req, res) => {
 /* POST begin BN evaluations */
 router.post('/enableBnEvaluators/:id', middlewares.isNat, async (req, res) => {
     for (let i = 0; i < req.body.bnEvaluators.length; i++) {
-        let bn = req.body.bnEvaluators[i];
-        await AppEvaluation.findByIdAndUpdate(req.params.id, { $push: { bnEvaluators: bn._id } });
+        const bn = req.body.bnEvaluators[i];
+        const user = await User.findOne({ osuId: bn.osuId });
+        await AppEvaluation.findByIdAndUpdate(req.params.id, { $push: { bnEvaluators: user._id } });
     }
 
     let application = await AppEvaluation.findById(req.params.id).populate(defaultPopulate);
+
     res.json({
         application,
         success: 'Enabled BN evaluators',
@@ -515,7 +521,7 @@ router.post('/sendMessages/:id', middlewares.isNatOrTrialNat, async (req, res) =
 
     Logger.generate(
         req.session.mongoId,
-        `Sent chat messages for BN app for "${application.user.username}"`,
+        `Sent **${req.body.type}** chat messages for BN app for "${application.user.username}"`,
         'appEvaluation',
         application._id
     );
@@ -523,7 +529,7 @@ router.post('/sendMessages/:id', middlewares.isNatOrTrialNat, async (req, res) =
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),
         color: discord.webhookColors.white,
-        description: `Sent chat messages for [**${application.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${application.id})`,
+        description: `Sent **${req.body.type}** chat messages for [**${application.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${application.id})`,
     }],
     application.mode);
 });

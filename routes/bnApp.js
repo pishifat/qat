@@ -161,7 +161,7 @@ router.post('/apply', async (req, res) => {
                 return res.json({ error: 'Your application is still being evaluated!' });
             } else {
                 return res.json({
-                    error: `Your previous application was rejected (check your osu! forum PMs for details). 
+                    error: `Your previous application was rejected (check your osu! messages for details). 
                             You may apply for this game mode again on 
                             ${new Date(currentBnApp.cooldownDate).toString().slice(4, 24)}.`,
                 });

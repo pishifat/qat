@@ -6,6 +6,7 @@
             :mongo-id="selectedEvaluation.id"
             :users="[{ username: selectedEvaluation.user.username, osuId: selectedEvaluation.user.osuId }]"
             :eval-type="selectedEvaluation.kind"
+            :custom-text="'Send messages & archive'"
         />
     </div>
 </template>
