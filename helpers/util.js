@@ -84,6 +84,19 @@ function sleep(ms) {
 }
 
 /**
+ * Find days between two dates
+ * @param {Date} date1
+ * @param {Date} date2
+ */
+function findDaysBetweenDates (date1, date2) {
+    const d1 = new Date(date1);
+    const d2 = new Date(date2);
+    const days = Math.round((d1.getTime() - d2.getTime())/(1000*60*60*24));
+
+    return days;
+}
+
+/**
  * Set tokens and session age
  * @param {object} session
  * @param {object} response
@@ -96,4 +109,4 @@ function setSession(session, response) {
     session.refreshToken = response.refresh_token;
 }
 
-module.exports = { escapeUsername, getBeatmapsetIdFromUrl, isValidUrl, isValidUrlOrThrow, shorten, sleep, setSession };
+module.exports = { escapeUsername, getBeatmapsetIdFromUrl, isValidUrl, isValidUrlOrThrow, shorten, sleep, findDaysBetweenDates, setSession };

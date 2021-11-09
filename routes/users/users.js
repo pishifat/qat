@@ -20,7 +20,11 @@ router.use(middlewares.isLoggedIn);
 const evaluationsPopulate = [
     {
         path: 'reviews',
-        select: 'evaluator',
+        select: 'evaluator createdAt',
+    },
+    {
+        path: 'user',
+        select: 'username',
     },
 ];
 
@@ -68,6 +72,7 @@ router.get('/loadNextEvaluation/:id/:mode', async (req, res) => {
     res.json(deadline);
 });
 
+/* GET find NAT activity */
 router.get('/findNatActivity/:days/:mode', async (req, res) => {
     const minAppDate = new Date();
     minAppDate.setDate(minAppDate.getDate() - (parseInt(req.params.days) + 14));
@@ -131,6 +136,149 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
     });
 });
 
+/* GET find NAT activity but cooler */
+router.get('/findNatActivity2/:number/:mode', async (req, res) => {
+    const limit = parseInt(req.params.number);
+    const mode = req.params.mode;
+
+    if (isNaN(limit)) {
+        return res.json({ error: 'Invalid number' });
+    }
+
+    const [users, appEvals, currentBnEvals] = await Promise.all([
+        User
+            .find({
+                groups: 'nat',
+                'modesInfo.mode': mode,
+                isBnEvaluator: true,
+            })
+            .sort({ username: 1 }),
+
+        AppEvaluation
+            .find({
+                mode,
+                active: false,
+                feedback: { $exists: true },
+                reviews: { $ne: [] },
+            })
+            .populate(evaluationsPopulate)
+            .sort({ updatedAt: -1 })
+            .limit(limit),
+
+        Evaluation
+            .find({
+                mode,
+                active: false,
+                feedback: { $exists: true },
+                reviews: { $ne: [] },
+            })
+            .populate(evaluationsPopulate)
+            .sort({ updatedAt: -1 })
+            .limit(limit),
+    ]);
+
+
+    let info = [];
+    let total = 0;
+
+    for (const user of users) {
+        let participatedAppEvals = 0;
+        let participatedCurrentBnEvals = 0;
+        let totalFeedbackWritten = 0;
+        let recentlyJoinedNat = false;
+        let totalDaysOverdue = 0;
+
+        for (const app of appEvals) {
+            const relevantEval = app.reviews.filter(r => r.evaluator == user.id);
+
+            if (relevantEval && relevantEval.length) {
+                participatedAppEvals ++;
+                let manualDeadline = new Date(app.createdAt);
+                manualDeadline.setDate(manualDeadline.getDate() + 14);
+
+                totalDaysOverdue += util.findDaysBetweenDates(new Date(relevantEval[0].createdAt), new Date(manualDeadline));
+            }
+        }
+
+        for (const round of currentBnEvals) {
+            const relevantEval = round.reviews.filter(r => r.evaluator == user.id);
+
+            if (relevantEval && relevantEval.length) {
+                participatedCurrentBnEvals ++;
+                totalDaysOverdue += util.findDaysBetweenDates(new Date(relevantEval[0].createdAt), new Date(round.deadline));
+            }
+        }
+
+        const totalParticipated = participatedAppEvals + participatedCurrentBnEvals;
+        total += totalParticipated;
+
+        const joinHistory = user.history.filter(h => h.kind === 'joined' &&  h.group === 'nat');
+        const lastJoin = joinHistory[joinHistory.length - 1];
+
+        if (lastJoin.date > appEvals[limit-1].archivedAt || lastJoin.date > currentBnEvals[limit-1].archivedAt) {
+            recentlyJoinedNat = true;
+        }
+
+        info.push({
+            username: user.username,
+            osuId: user.osuId,
+            participatedAppEvals,
+            participatedCurrentBnEvals,
+            totalParticipated,
+            totalDaysOverdue,
+            totalFeedbackWritten,
+            recentlyJoinedNat,
+            limit,
+        });
+    }
+
+    for (const app of appEvals) {
+        const log = await Logger
+            .findOne({
+                relatedId: app._id,
+                action: `Created feedback of ${app.user.username}'s ${app.mode} evaluation`,
+            })
+            .populate({ path: 'user', select: 'username osuId' })
+            .sort({ createdAt: -1 });
+
+
+        const userIndex = info.findIndex(u => u.osuId == log.user.osuId);
+
+        if (userIndex > -1) {
+            info[userIndex].totalFeedbackWritten++;
+        }
+    }
+
+    for (const round of currentBnEvals) {
+        const log = await Logger
+            .findOne({
+                relatedId: round._id,
+                action: `Created feedback of ${round.user.username}'s ${round.mode} evaluation`,
+            })
+            .populate({ path: 'user', select: 'username osuId' })
+            .sort({ createdAt: -1 });
+
+        const userIndex = info.findIndex(u => u.osuId == log.user.osuId);
+
+        if (userIndex > -1) {
+            info[userIndex].totalFeedbackWritten++;
+        }
+    }
+
+    info.sort((a, b) => {
+        if (a.totalParticipated > b.totalParticipated) return -1;
+        if (a.totalParticipated < b.totalParticipated) return 1;
+
+        return 0;
+    });
+
+    res.json({
+        info,
+        total,
+    });
+});
+
+/* GET find BN activity */
 router.get('/findBnActivity/:days/:mode', async (req, res) => {
     let minDate = new Date();
     minDate.setDate(minDate.getDate() - parseInt(req.params.days));
@@ -251,8 +399,6 @@ router.post('/updateDiscordId', middlewares.isNatOrTrialNat, async (req, res) =>
     } else {
         user = res.locals.userRequest;
     }
-
-    console.log(user.username);
 
     user.discordId = req.body.discordId;
     await user.save();

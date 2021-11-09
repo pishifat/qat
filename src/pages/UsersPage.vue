@@ -75,7 +75,7 @@
 
             <!-- other tools -->
             <section class="card card-body">
-                <nat-activity class="my-2" />
+                <nat-activity-2 class="my-2" />
                 <bn-activity classs="my-2" />
                 <gmt-activity class="my-2" />
 
@@ -98,7 +98,7 @@ import usersModule from '../store/users';
 import ToastMessages from '../components/ToastMessages.vue';
 import UserCard from '../components/users/UserCard.vue';
 import UserInfo from '../components/users/UserInfo.vue';
-import NatActivity from '../components/users/NatActivity.vue';
+import NatActivity2 from '../components/users/NatActivity2.vue';
 import BnActivity from '../components/users/BnActivity.vue';
 import GmtActivity from '../components/users/GmtActivity.vue';
 import Badges from '../components/users/Badges.vue';
@@ -112,7 +112,7 @@ export default {
         ToastMessages,
         UserCard,
         UserInfo,
-        NatActivity,
+        NatActivity2,
         BnActivity,
         GmtActivity,
         Badges,

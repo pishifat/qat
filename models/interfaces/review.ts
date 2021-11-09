@@ -6,6 +6,7 @@ export interface IReviewDocument extends Document {
     behaviorComment: string;
     moddingComment: string;
     vote: number;
+    createdAt?: Date;
 }
 
 export interface IReviewModel extends Model<IReviewDocument> { }
