@@ -7,7 +7,7 @@ const Logger = require('../../models/log');
 const { submitEval, setGroupEval, setFeedback, replaceUser } = require('./evaluations');
 const middlewares = require('../../helpers/middlewares');
 const discord = require('../../helpers/discord');
-const { AppEvaluationConsensus, ResignationConsensus } = require('../../shared/enums');
+const { AppEvaluationConsensus, ResignationConsensus, BnEvaluationConsensus } = require('../../shared/enums');
 const osuBot = require('../../helpers/osuBot');
 
 const router = express.Router();
@@ -192,9 +192,34 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
                     updatedAt: -1,
                 });
 
+            const lastCurrentBnEval = await BnEvaluation
+                .findOne({
+                    user: user._id,
+                    mode: evaluation.mode,
+                    consensus: BnEvaluationConsensus.RemoveFromBn,
+                })
+                .sort({
+                    updatedAt: -1,
+                });
+
+            let skipProbation = false;
+
             if (lastResignation && lastResignation.consensus === ResignationConsensus.ResignedOnGoodTerms) {
-                level = 'full';
-                daysToNextEval = Math.floor(Math.random() * (115 - 85) + 85); // between 85 and 115 days;
+                if (lastCurrentBnEval && lastResignation.archivedAt && lastCurrentBnEval.archivedAt) {
+                    const resignationArchiveDate = new Date(lastResignation.archivedAt);
+                    const currentBnEvalArchiveDate = new Date(lastCurrentBnEval.archivedAt);
+
+                    if (resignationArchiveDate > currentBnEvalArchiveDate) {
+                        skipProbation = true;
+                    }
+                } else {
+                    skipProbation = true;
+                }
+
+                if (skipProbation) {
+                    level = 'full';
+                    daysToNextEval = Math.floor(Math.random() * (115 - 85) + 85); // between 85 and 115 days;
+                }
             }
 
             user.modesInfo.push({
