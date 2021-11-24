@@ -6,6 +6,7 @@ const AppEvaluation = require('../models/evaluations/appEvaluation');
 const User = require('../models/user');
 const middlewares = require('../helpers/middlewares');
 const discord = require('../helpers/discord');
+const util = require('../helpers/util');
 const { AppEvaluationConsensus } = require('../shared/enums');
 
 const router = express.Router();
@@ -155,7 +156,23 @@ router.post('/submitTest', async (req, res) => {
         //const assignedNat = test.mode == 'taiko' ? await User.getAssignedNat(test.mode, [], 2) : await User.getAssignedNat(test.mode);
         const assignedNat = await User.getAssignedNat(test.mode);
         currentBnApp.natEvaluators = assignedNat;
+
+        const assignments = [];
+
+        const days = util.findDaysBetweenDates(new Date(), new Date(currentBnApp.deadline));
+
+        for (const user of assignedNat) {
+            assignments.push({
+                date: new Date(),
+                user: user._id,
+                daysOverdue: days,
+            });
+        }
+
+        currentBnApp.natEvaluatorHistory = assignments;
+
         await currentBnApp.save();
+
         const natList = assignedNat.map(n => n.username).join(', ');
 
         fields.push({
@@ -205,6 +222,7 @@ router.post('/submitTest', async (req, res) => {
             }],
             currentBnApp.mode
         );
+
         Logger.generate(
             req.session.mongoId,
             `Set ${req.session.username}'s ${currentBnApp.mode} application eval as "${currentBnApp.consensus}"`,

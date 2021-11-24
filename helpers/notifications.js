@@ -127,9 +127,9 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
     const nearDeadline = new Date();
     nearDeadline.setDate(nearDeadline.getDate() + 1);
     const startRange = new Date();
-    startRange.setDate(startRange.getDate() + 13);
+    startRange.setDate(startRange.getDate() + 3);
     const endRange = new Date();
-    endRange.setDate(endRange.getDate() + 14);
+    endRange.setDate(endRange.getDate() + 366);
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
@@ -273,8 +273,22 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
 
 
             if (!round.natEvaluators || !round.natEvaluators.length) {
-                round.natEvaluators = round.mode == 'taiko' ? await User.getAssignedNat(round.mode, [round.user.osuId], 2) : await User.getAssignedNat(round.mode);
+                round.natEvaluators = await User.getAssignedNat(round.mode);
                 await round.populate(defaultPopulate).execPopulate();
+                const days = util.findDaysBetweenDates(new Date(), new Date(round.deadline));
+
+                const assignments = [];
+
+                for (const user of round.natEvaluators) {
+                    assignments.push({
+                        date: new Date(),
+                        user: user._id,
+                        daysOverdue: days,
+                    });
+                }
+
+                round.natEvaluatorHistory = assignments;
+
                 await round.save();
             }
 

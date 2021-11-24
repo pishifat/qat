@@ -6,6 +6,7 @@ const User = require('../../models/user');
 const Logger = require('../../models/log');
 const { submitEval, setGroupEval, setFeedback, replaceUser } = require('./evaluations');
 const middlewares = require('../../helpers/middlewares');
+const util = require('../../helpers/util');
 const discord = require('../../helpers/discord');
 const { AppEvaluationConsensus, ResignationConsensus, BnEvaluationConsensus } = require('../../shared/enums');
 const osuBot = require('../../helpers/osuBot');
@@ -358,6 +359,16 @@ router.post('/replaceUser/:id', middlewares.isNat, async (req, res) => {
 
     if (replaceNat) {
         replacement = await replaceUser(evaluation, res.locals.userRequest, req.body.evaluatorId);
+        const days = util.findDaysBetweenDates(new Date(), new Date(evaluation.deadline));
+
+        evaluation.natEvaluatorHistory.push({
+            date: new Date(),
+            user: replacement._id,
+            previousUser: req.body.evaluatorId,
+            daysOverdue: days,
+        });
+
+        await evaluation.save();
     } else {
         let invalids = evaluation.bnEvaluators.map(bn => bn.osuId);
         const evaluatorArray = await User.aggregate([

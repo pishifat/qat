@@ -9,6 +9,13 @@ const baseSchema = {
     natEvaluators: [{ type: 'ObjectId', ref: 'User' }],
     bnEvaluators: [{ type: 'ObjectId', ref: 'User' }],
     archivedAt: { type: Date },
+    natEvaluatorHistory: [{
+        _id: false,
+        date: { type: Date, required: true },
+        user: { type: 'ObjectId', ref: 'User', required: true },
+        previousUser: { type: 'ObjectId', ref: 'User' },
+        daysOverdue: { type: Number, required: true },
+    }],
 };
 
 module.exports = baseSchema;

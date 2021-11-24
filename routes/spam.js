@@ -22,8 +22,6 @@ router.post('/sendMessages', middlewares.isResponsibleWithButtons, async (req, r
     const unfilteredOsuIds = splitIds.filter(id => id.length);
     const osuIds = [...new Set(unfilteredOsuIds)];
 
-    console.log(osuIds);
-
     if (!osuIds.length) {
         return res.json({ error: 'No users' });
     }

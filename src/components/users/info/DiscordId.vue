@@ -38,7 +38,6 @@ export default {
         ]),
     },
     created () {
-        console.log(this.selectedUser.discordId);
         this.idInput = this.selectedUser.discordId;
     },
     methods: {

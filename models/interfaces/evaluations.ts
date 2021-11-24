@@ -19,6 +19,12 @@ interface IEvaluationBase {
     isApplication?: boolean;
     isBnEvaluation?: boolean;
     isResignation?: boolean;
+    natEvaluatorHistory: { 
+        date: Date;
+        user: IUserDocument;
+        previousUser?: IUserDocument;
+        daysOverdue: number;
+    }[]
 }
 
 export interface IAppEvaluationDocument extends IEvaluationBase, Document {
