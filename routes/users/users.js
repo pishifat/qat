@@ -480,6 +480,7 @@ router.post('/:id/switchUserGroup', middlewares.isNat, async (req, res) => {
         const i = user.groups.findIndex(g => g === 'nat');
         if (i !== -1) user.groups.splice(i, 1, 'bn');
     } else {
+        await Evaluation.deleteUserActiveEvaluations(user._id);
         user.isTrialNat = false;
         const i = user.groups.findIndex(g => g === 'bn');
         if (i !== -1) user.groups.splice(i, 1, 'nat');
