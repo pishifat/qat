@@ -195,6 +195,7 @@ router.post('/submitTest', async (req, res) => {
         currentBnApp.active = false;
         currentBnApp.archivedAt = new Date();
         currentBnApp.consensus = AppEvaluationConsensus.Fail;
+        currentBnApp.feedback = 'Below minimum test score (12.5)';
         await currentBnApp.save();
 
         discord.webhookPost(
