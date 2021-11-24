@@ -57,7 +57,7 @@
                         <user-link
                             :osu-id="user.osuId"
                             :username="user.username"
-                        />{{ user.recentlyJoinedNat ? '*' : '' }}
+                        />{{ user.recentlyJoinedNat ? '*' : '' }}{{ user.inBag ? '^' : '' }}
                     </td>
                     <!-- stats -->
                     <td class="text-center">
@@ -80,6 +80,9 @@
 
             <div v-if="recentlyJoinedNatExists" class="text-danger">
                 *user joined NAT after some evaluations were completed
+            </div>
+            <div class="text-danger">
+                ^user could be assigned to the next evaluation (in the 'bag')
             </div>
         </div>
     </div>

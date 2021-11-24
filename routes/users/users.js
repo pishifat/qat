@@ -222,6 +222,7 @@ router.get('/findNatActivity2/:number/:mode', async (req, res) => {
         info.push({
             username: user.username,
             osuId: user.osuId,
+            inBag: user.inBag,
             participatedAppEvals,
             participatedCurrentBnEvals,
             totalParticipated,

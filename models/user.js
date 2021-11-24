@@ -22,6 +22,7 @@ const userSchema = new mongoose.Schema({
     }],
     isVetoMediator: { type: Boolean, default: true },
     isBnEvaluator: { type: Boolean, default: true },
+    inBag: { type: Boolean, default: true },
     isTrialNat: { type: Boolean, default: false }, // used to give BNs some NAT permissions during trial run
     bnProfileBadge: { type: Number, default: 0 },
     natProfileBadge: { type: Number, default: 0 },
@@ -262,6 +263,7 @@ class UserService extends mongoose.Model {
                     groups: 'nat',
                     'modesInfo.mode': mode,
                     isBnEvaluator: true,
+                    inBag: true,
                 },
             },
         ]);
@@ -272,9 +274,44 @@ class UserService extends mongoose.Model {
             });
         }
 
-        return await query
+        let assignedNat = await query
             .sample(sampleSize)
             .exec();
+
+        console.log(assignedNat);
+
+        let finalAssignedNat = [];
+
+        if (assignedNat.length < sampleSize) {
+            const relevantNat = await User.find({
+                groups: 'nat',
+                'modesInfo.mode': mode,
+                isBnEvaluator: true,
+                inBag: { $ne: true },
+            });
+
+            const assignedNatIds = assignedNat.map(u => u.id);
+
+            for (const user of relevantNat) {
+                if (!assignedNatIds.includes(user.id)) {
+                    await User.findByIdAndUpdate(user._id, { inBag: true });
+                }
+            }
+
+            let additionalAssignedNat = await query
+                .sample(sampleSize - assignedNat.length)
+                .exec();
+
+            finalAssignedNat = assignedNat.concat(additionalAssignedNat);
+        } else {
+            finalAssignedNat = assignedNat;
+        }
+
+        for (const user of finalAssignedNat) {
+            await User.findByIdAndUpdate(user._id, { inBag: false });
+        }
+
+        return finalAssignedNat;
     }
 
     /**
