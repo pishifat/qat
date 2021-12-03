@@ -278,11 +278,19 @@ class UserService extends mongoose.Model {
             .sample(sampleSize)
             .exec();
 
-        console.log(assignedNat);
+        let uniqueAssignedNatIds = [];
+        let uniqueAssignedNat = [];
+
+        for (const user of assignedNat) {
+            if (!uniqueAssignedNatIds.includes(user.id)) {
+                uniqueAssignedNatIds.push(user.id);
+                uniqueAssignedNat.push(user);
+            }
+        }
 
         let finalAssignedNat = [];
 
-        if (assignedNat.length < sampleSize) {
+        if (uniqueAssignedNatIds.length < sampleSize) {
             const relevantNat = await User.find({
                 groups: 'nat',
                 'modesInfo.mode': mode,
@@ -290,21 +298,19 @@ class UserService extends mongoose.Model {
                 inBag: { $ne: true },
             });
 
-            const assignedNatIds = assignedNat.map(u => u.id);
-
             for (const user of relevantNat) {
-                if (!assignedNatIds.includes(user.id)) {
+                if (!uniqueAssignedNatIds.includes(user.id)) {
                     await User.findByIdAndUpdate(user._id, { inBag: true });
                 }
             }
 
             let additionalAssignedNat = await query
-                .sample(sampleSize - assignedNat.length)
+                .sample(sampleSize - uniqueAssignedNatIds.length)
                 .exec();
 
-            finalAssignedNat = assignedNat.concat(additionalAssignedNat);
+            finalAssignedNat = uniqueAssignedNat.concat(additionalAssignedNat);
         } else {
-            finalAssignedNat = assignedNat;
+            finalAssignedNat = uniqueAssignedNat;
         }
 
         for (const user of finalAssignedNat) {

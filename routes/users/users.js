@@ -233,7 +233,7 @@ router.get('/findNatActivity2/:number/:mode', async (req, res) => {
         });
     }
 
-    for (const app of appEvals) {
+    /*for (const app of appEvals) {
         const log = await Logger
             .findOne({
                 relatedId: app._id,
@@ -264,7 +264,7 @@ router.get('/findNatActivity2/:number/:mode', async (req, res) => {
         if (userIndex > -1) {
             info[userIndex].totalFeedbackWritten++;
         }
-    }
+    }*/
 
     info.sort((a, b) => {
         if (a.totalParticipated > b.totalParticipated) return -1;

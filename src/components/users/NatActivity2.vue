@@ -42,7 +42,7 @@
         </div>
 
         <div v-if="userInfo.length">
-            <data-table :headers="['#', 'user', 'BN app evals', 'current BN evals', 'total', 'feedback written', 'total days overdue']" class="w-75 my-2">
+            <data-table :headers="['#', 'user', 'BN app evals', 'current BN evals', 'total', 'total days overdue']" class="w-75 my-2">
                 <tr
                     v-for="(user, i) in userInfo"
                     :key="user.username"
@@ -69,9 +69,9 @@
                     <td class="text-center">
                         <b>{{ user.totalParticipated }} ({{ Math.round((user.totalParticipated/total)*100) }}%)</b>
                     </td>
-                    <td class="text-center">
+                    <!--<td class="text-center" disabled="true">
                         {{ user.totalFeedbackWritten }}
-                    </td>
+                    </td>-->
                     <td class="text-center">
                         {{ user.totalDaysOverdue }}
                     </td>
