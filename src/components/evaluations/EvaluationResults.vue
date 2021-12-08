@@ -19,6 +19,33 @@
         </div>
 
         <div>
+            <div v-if="evaluation.isApplication">
+                <a href="#applicationInfo" data-toggle="collapse">
+                    <h5>Application details <i class="fas fa-angle-down" /></h5>
+                </a>
+                <div id="applicationInfo" class="collapse container">
+                    <h5>Submitted mods</h5>
+                    <div v-for="(mod, i) in evaluation.mods" :key="mod" class="row">
+                        <div class="col-sm-3">
+                            Mod {{ i+1 }}:
+                            <span v-html="$md.render(mod)" />
+                        </div>
+                        <div class="col-sm-9">
+                            Additional info:
+                            <span class="small" v-html="$md.render(evaluation.reasons[i])" />
+                        </div>
+                    </div>
+                    <h5>Test results</h5>
+                    <p>
+                        Final score:
+                        <span :class="scoreColor">
+                            {{ evaluation.test.totalScore }}/20
+                        </span>
+                    </p>
+                    <p><a :href="'/testresults?test=' + evaluation.test.id" target="_blank">View your full test breakdown here</a></p>
+                </div>
+            </div>
+
             <div v-if="evaluation.isApplication && positiveConsensus">
                 <h5>New BN Information</h5>
                 <p>You will be a Probationary Beatmap Nominator for about one month (exact date of your next evaluation can be seen from your <a :href="'/users?id=' + evaluation.user.id" target="_blank">user card</a>). This means you can only nominate beatmaps that have been nominated by Full Beatmap Nominators and you cannot disqualify maps.</p>
@@ -31,17 +58,6 @@
             <div v-if="evaluation.feedback">
                 <h5>Feedback</h5>
                 <div class="card card-body small mb-4" v-html="$md.render(evaluation.feedback)" />
-            </div>
-
-            <div v-if="evaluation.isApplication">
-                <h5>Test results</h5>
-                <p>
-                    Final score:
-                    <span :class="scoreColor">
-                        {{ evaluation.test.totalScore }}/20
-                    </span>
-                </p>
-                <p><a :href="'/testresults?test=' + evaluation.test.id" target="_blank">View your full test breakdown here</a></p>
             </div>
 
             <h5>Evaluators</h5>
