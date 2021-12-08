@@ -61,7 +61,7 @@ export default {
             }
         },
         compareBadgeDuration (currentBadge, days) {
-            return (currentBadge || 0) < this.yearsDuration(days);
+            return (currentBadge || 0) != this.yearsDuration(days);
         },
         yearsDuration (days) {
             return Math.floor(days / 365);

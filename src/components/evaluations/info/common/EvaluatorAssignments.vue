@@ -7,6 +7,7 @@
                 :is-application="selectedEvaluation.isApplication"
                 :nominator-assessment-mongo-id="selectedEvaluation.id"
                 :replace-nat="true"
+                :mode="selectedEvaluation.mode"
             />
         </div>
         <div v-if="selectedEvaluation.bnEvaluators && selectedEvaluation.bnEvaluators.length" class="col-lg-4">

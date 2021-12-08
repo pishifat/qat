@@ -191,13 +191,15 @@ async function setFeedback (evaluation, feedback, session) {
     return evaluation;
 }
 
-async function replaceUser (evaluation, currentUser, evaluatorId, isBn) {
+async function replaceUser (evaluation, currentUser, evaluatorId, isBn, selectedUserId) {
     const currentSelection = isBn ? evaluation.bnEvaluators.map(u => u.osuId) : evaluation.natEvaluators.map(u => u.osuId);
     let newEvaluator;
 
-    // assigns current user if possible. rng otherwise
-    if (!currentUser.isNat && currentUser.isBnEvaluator && currentUser.isBnFor(evaluation.mode) && !currentSelection.includes(currentUser.osuId)) {
-        newEvaluator = currentUser;
+    // assigns selected user if available, otherwise assigns based on bag for NAT or random for BN
+    if (selectedUserId) {
+        newEvaluator = await User.findById(selectedUserId);
+        newEvaluator.inBag = false;
+        await newEvaluator.save();
     } else {
         const evaluatorArray = isBn ? await User.getAssignedTrialNat(evaluation.mode, currentSelection, 1) : await User.getAssignedNat(evaluation.mode, currentSelection, 1);
         newEvaluator = evaluatorArray[0];

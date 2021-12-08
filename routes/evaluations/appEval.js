@@ -358,7 +358,8 @@ router.post('/replaceUser/:id', middlewares.isNat, async (req, res) => {
     let replacement;
 
     if (replaceNat) {
-        replacement = await replaceUser(evaluation, res.locals.userRequest, req.body.evaluatorId);
+        replacement = await replaceUser(evaluation, res.locals.userRequest, req.body.evaluatorId, false, req.body.selectedUserId);
+
         const days = util.findDaysBetweenDates(new Date(), new Date(evaluation.deadline));
 
         evaluation.natEvaluatorHistory.push({

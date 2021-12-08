@@ -174,6 +174,18 @@ router.get('/findUserBadgeInfo', async (req, res) => {
     res.json(u);
 });
 
+/* GET all NAT users in evaluation bag for relevant mode */
+router.get('/findBagUsers/:mode', async (req, res) => {
+    const u = await User.find({
+        groups: 'nat',
+        'modesInfo.mode': req.params.mode,
+        isBnEvaluator: true,
+        inBag: true,
+    }).sort({ username: 1 });
+
+    res.json(u);
+});
+
 /* POST edit badge value */
 router.post('/editBadgeValue/:id', async (req, res) => {
     let u = await User.findById(req.params.id);
