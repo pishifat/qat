@@ -29,6 +29,11 @@ const userSchema = new mongoose.Schema({
     rankedBeatmapsets: { type: Number, default: 0 },
     discordId: { type: String },
     requestStatus: [{ type: String, enum: ['gameChat', 'personalQueue', 'globalQueue', 'closed'] }],
+    genrePreferences: [{ type: String, enum: ['rock', 'pop', 'novelty', 'hip hop', 'electronic', 'metal', 'classical', 'folk', 'jazz', 'other'] }],
+    languagePreferences: [{ type: String, enum: ['instrumental', 'english', 'japanese', 'korean', 'chinese', 'other'] }],
+    stylePreferences: [{ type: String, enum: ['simple', 'tech', 'alternating', 'conceptual', 'other'] }],
+    detailPreferences: [{ type: String, enum: ['anime', 'game', 'movie', 'tv', 'doujin', 'featured artist', 'cover', 'remix'] }],
+    mapperPreferences: [{ type: String, enum: ['new mapper', 'experienced mapper'] }],
     requestLink: { type: String },
 
     /* temporary fields for qa leaderboard webhook */

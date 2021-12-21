@@ -1,6 +1,7 @@
 const cron = require('node-cron');
 const moment = require('moment');
 const discord = require('./discord');
+const Aiess = require('../models/aiess');
 const osuv1 = require('./osuv1');
 const osu = require('./osu');
 const osuBot = require('./osuBot');
@@ -10,7 +11,6 @@ const Evaluation = require('../models/evaluations/evaluation');
 const Veto = require('../models/veto');
 const User = require('../models/user');
 const BeatmapReport = require('../models/beatmapReport');
-const Aiess = require('../models/aiess');
 const Discussion = require('../models/discussion');
 const Report = require('../models/report');
 const Logger = require('../models/log');
@@ -556,7 +556,7 @@ const lowActivityTask = cron.schedule('0 23 1 * *', async () => {
                 if (await hasLowActivity(initialDate, bn, mode)) {
                     lowActivityFields.push({
                         name: bn.username,
-                        value: `${await findUniqueNominations(initialDate, bn)}`,
+                        value: `${await findUniqueNominationsCount(initialDate, bn)}`,
                         inline: true,
                         mode,
                     });
@@ -623,7 +623,7 @@ const lowActivityTask = cron.schedule('0 23 1 * *', async () => {
  * @param {object} bn
  * @returns {Promise<number>} number of unique bubbled/qualified
  */
-async function findUniqueNominations (initialDate, bn) {
+async function findUniqueNominationsCount (initialDate, bn) {
     const events = await Aiess.distinct('beatmapsetId', {
         userId: bn.osuId,
         type: {
@@ -644,7 +644,7 @@ async function findUniqueNominations (initialDate, bn) {
  * @returns {Promise<boolean>} whether or not the user has 'low activity'
  */
 async function hasLowActivity (initialDate, bn, mode) {
-    const uniqueNominations = await findUniqueNominations(initialDate, bn);
+    const uniqueNominations = await findUniqueNominationsCount(initialDate, bn);
 
     if (
         (uniqueNominations < 4 && mode == 'mania') ||

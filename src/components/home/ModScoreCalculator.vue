@@ -27,7 +27,7 @@
                 <div class="input-group-append">
                     <button
                         :disabled="!loggedInUser"
-                        class="btn btn-sm btn-primary"
+                        class="btn btn-sm btn-secondary"
                         data-toggle="tooltip"
                         data-placement="top"
                         :title="loggedInUser ? 'Automatically detect your mod score based on your modding history' : 'Authorize above to auto-calculate mod score'"

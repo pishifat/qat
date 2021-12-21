@@ -1,5 +1,6 @@
 const moment = require('moment');
 const { default: Axios } = require('axios');
+const Aiess = require('../models/aiess');
 
 /**
  * Calculate mods count for each month
@@ -97,7 +98,27 @@ async function getUserModScore(accessToken, username, months, mode) {
     return Math.round(modScore * 100) / 100;
 }
 
+/**
+ * @param {Date} initialDate
+ * @param {object} bn
+ * @returns {Promise<number>} number of unique bubbled/qualified
+ */
+async function findUniqueNominations (initialDate, bn) {
+    const events = await Aiess.distinct('beatmapsetId', {
+        userId: bn.osuId,
+        type: {
+            $in: ['nominate', 'qualify'],
+        },
+        timestamp: {
+            $gt: initialDate,
+        },
+    });
+
+    return events.length;
+}
+
 module.exports = {
     getUserModsCount,
     getUserModScore,
+    findUniqueNominations,
 };

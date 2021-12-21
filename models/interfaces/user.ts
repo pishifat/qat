@@ -1,5 +1,4 @@
 import { Document, Model, DocumentQuery } from 'mongoose';
-import { IAiessDocument } from './aiess';
 import { IAppEvaluationDocument, IBnEvaluationDocument } from './evaluations';
 
 interface IUser {
@@ -25,7 +24,12 @@ interface IUser {
     natProfileBadge: number;
     rankedBeatmapsets: number;
     discordId: string;
-    requestStatus: string;
+    requestStatus: string[];
+    genrePreferences: string[];
+    languagePreferences: string[];
+    stylePreferences: string[];
+    detailPreferences: string[];
+    mapperPreferences: string[];
     requestLink: string;
 }
 

@@ -4,12 +4,15 @@ const crypto = require('crypto');
 const { getUserModsCount } = require('../helpers/scrap');
 const middlewares = require('../helpers/middlewares');
 const osu = require('../helpers/osu');
+const util = require('../helpers/util');
+const scrap = require('../helpers/scrap');
 const User = require('../models/user');
 const Logger = require('../models/log');
 const ResignationEvaluation = require('../models/evaluations/resignationEvaluation');
 const { setSession } = require('../helpers/util');
 const { OsuResponseError } = require('../helpers/errors');
 const { ResignationConsensus } = require('../shared/enums');
+const moment = require('moment');
 
 const router = express.Router();
 
@@ -64,6 +67,20 @@ router.get('/modsCount/:user/:mode', async (req, res) => {
         modCount,
         months,
     });
+});
+
+/* POST find BNs for BN finder */
+router.post('/findBns/', async (req, res) => {
+    const url = req.body.url;
+    const genres = req.body.genres;
+    const styles = req.body.styles;
+    const details = req.body.styles;
+
+    util.isValidUrlOrThrow(url, 'https://osu.ppy.sh/beatmapsets', `Invalid map link`);
+    const initialDate = moment().subtract(3, 'months').toDate();
+    const num = await scrap.findUniqueNominations(initialDate, { osuId: 4879380 });
+
+    return res.json({ error: num });
 });
 
 /* GET 'login' to get user's info */

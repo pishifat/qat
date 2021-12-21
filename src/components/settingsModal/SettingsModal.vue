@@ -8,6 +8,10 @@
 
         <hr>
 
+        <settings-modal-preferences />
+
+        <hr>
+
         <template v-if="loggedInUser.isNat">
             <settings-modal-discord />
 
@@ -25,6 +29,7 @@ import SettingsModalEvaluator from './SettingsModalEvaluator.vue';
 import SettingsModalDiscord from './SettingsModalDiscord.vue';
 import SettingsModalModeEvaluations from './SettingsModalModeEvaluations.vue';
 import SettingsModalRequests from './SettingsModalRequests.vue';
+import SettingsModalPreferences from './SettingsModalPreferences.vue';
 
 export default {
     components: {
@@ -33,6 +38,7 @@ export default {
         SettingsModalDiscord,
         SettingsModalRequests,
         SettingsModalEvaluator,
+        SettingsModalPreferences,
     },
     computed: mapState([
         'loggedInUser',

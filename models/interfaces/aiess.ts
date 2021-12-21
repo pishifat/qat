@@ -7,6 +7,8 @@ interface IAiess {
     userId: number;
     discussionId: number;
     artistTitle: string;
+    genre: string;
+    language: string;
     modes: string[];
     type: string;
     content: string;

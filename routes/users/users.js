@@ -473,6 +473,211 @@ router.post('/:id/updateRequestStatus', middlewares.isBnOrNat, async (req, res) 
     );
 });
 
+/* POST update genre preferences */
+router.post('/:id/updateGenrePreferences', middlewares.isBnOrNat, async (req, res) => {
+    const user = await User.findById(req.params.id).orFail();
+
+    if (req.session.mongoId != user.id) {
+        return res.json({
+            error: 'Unauthorized',
+        });
+    }
+
+    const genre = req.body.genre;
+
+    if (user.genrePreferences.length >= 3 && !user.genrePreferences.includes(genre)) {
+        return res.json({
+            error: 'Cannot save more than 3 preferences',
+            user,
+        });
+    }
+
+    if (genre.length && !user.genrePreferences.includes(genre)) {
+        user.genrePreferences.push(genre);
+    } else if (user.genrePreferences.includes(genre)) {
+        const i = user.genrePreferences.indexOf(genre);
+        user.genrePreferences.splice(i,1);
+    }
+
+    await user.save();
+
+    res.json({
+        success: 'Updated',
+        user,
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Updated "${user.username}" genre preferences to ${user.genrePreferences}`,
+        'user',
+        user._id
+    );
+});
+
+/* POST update language preferences */
+router.post('/:id/updateLanguagePreferences', middlewares.isBnOrNat, async (req, res) => {
+    const user = await User.findById(req.params.id).orFail();
+
+    if (req.session.mongoId != user.id) {
+        return res.json({
+            error: 'Unauthorized',
+        });
+    }
+
+    const language = req.body.language;
+
+    if (user.languagePreferences.length >= 3 && !user.languagePreferences.includes(language)) {
+        return res.json({
+            error: 'Cannot save more than 3 preferences',
+            user,
+        });
+    }
+
+    if (language.length && !user.languagePreferences.includes(language)) {
+        user.languagePreferences.push(language);
+    } else if (user.languagePreferences.includes(language)) {
+        const i = user.languagePreferences.indexOf(language);
+        user.languagePreferences.splice(i,1);
+    }
+
+    await user.save();
+
+    res.json({
+        success: 'Updated',
+        user,
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Updated "${user.username}" language preferences to ${user.languagePreferences}`,
+        'user',
+        user._id
+    );
+});
+
+/* POST update map style preferences */
+router.post('/:id/updateStylePreferences', middlewares.isBnOrNat, async (req, res) => {
+    const user = await User.findById(req.params.id).orFail();
+
+    if (req.session.mongoId != user.id) {
+        return res.json({
+            error: 'Unauthorized',
+        });
+    }
+
+    const style = req.body.style;
+
+    if (user.stylePreferences.length >= 3 && !user.stylePreferences.includes(style)) {
+        return res.json({
+            error: 'Cannot save more than 3 preferences',
+            user,
+        });
+    }
+
+    if (style.length && !user.stylePreferences.includes(style)) {
+        user.stylePreferences.push(style);
+    } else if (user.stylePreferences.includes(style)) {
+        const i = user.stylePreferences.indexOf(style);
+        user.stylePreferences.splice(i,1);
+    }
+
+    await user.save();
+
+    res.json({
+        success: 'Updated',
+        user,
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Updated "${user.username}" style preferences to ${user.stylePreferences}`,
+        'user',
+        user._id
+    );
+});
+
+/* POST update song detail preferences */
+router.post('/:id/updateDetailPreferences', middlewares.isBnOrNat, async (req, res) => {
+    const user = await User.findById(req.params.id).orFail();
+
+    if (req.session.mongoId != user.id) {
+        return res.json({
+            error: 'Unauthorized',
+        });
+    }
+
+    const detail = req.body.detail;
+
+    if (user.detailPreferences.length >= 3 && !user.detailPreferences.includes(detail)) {
+        return res.json({
+            error: 'Cannot save more than 3 preferences',
+            user,
+        });
+    }
+
+    if (detail.length && !user.detailPreferences.includes(detail)) {
+        user.detailPreferences.push(detail);
+    } else if (user.detailPreferences.includes(detail)) {
+        const i = user.detailPreferences.indexOf(detail);
+        user.detailPreferences.splice(i,1);
+    }
+
+    await user.save();
+
+    res.json({
+        success: 'Updated',
+        user,
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Updated "${user.username}" detail preferences to ${user.detailPreferences}`,
+        'user',
+        user._id
+    );
+});
+
+/* POST update mapper preferences */
+router.post('/:id/updateMapperPreferences', middlewares.isBnOrNat, async (req, res) => {
+    const user = await User.findById(req.params.id).orFail();
+
+    if (req.session.mongoId != user.id) {
+        return res.json({
+            error: 'Unauthorized',
+        });
+    }
+
+    const mapper = req.body.mapper;
+
+    if (user.mapperPreferences.length >= 3 && !user.mapperPreferences.includes(mapper)) {
+        return res.json({
+            error: 'Cannot save more than 3 preferences',
+            user,
+        });
+    }
+
+    if (mapper.length && !user.mapperPreferences.includes(mapper)) {
+        user.mapperPreferences.push(mapper);
+    } else if (user.mapperPreferences.includes(mapper)) {
+        const i = user.mapperPreferences.indexOf(mapper);
+        user.mapperPreferences.splice(i,1);
+    }
+
+    await user.save();
+
+    res.json({
+        success: 'Updated',
+        user,
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Updated "${user.username}" mapper preferences to ${user.mapperPreferences}`,
+        'user',
+        user._id
+    );
+});
+
 /* POST switch user group */
 router.post('/:id/switchUserGroup', middlewares.isNat, async (req, res) => {
     const user = await User.findById(req.params.id).orFail();

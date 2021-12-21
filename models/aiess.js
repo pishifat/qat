@@ -5,6 +5,8 @@ const aiessSchema = new mongoose.Schema({
     userId: { type: Number },
     discussionId: { type: Number },
     artistTitle: { type: String },
+    genre: { type: String },
+    language: { type: String },
     modes: [{ type: String, enum: ['osu', 'taiko', 'catch', 'mania'] }],
     type: { type: String, enum: ['nominate', 'qualify', 'disqualify', 'nomination_reset', 'rank'] },
     content: { type: String },
