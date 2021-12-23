@@ -24,6 +24,7 @@ const BnEvaluationAddition = Object.freeze({
     LowActivityWarning: 'lowActivityWarning',
     BehaviorWarning: 'behaviorWarning',
     MapQualityWarning: 'mapQualityWarning',
+    ModdingQualityWarning: 'moddingQualityWarning',
     None: 'none',
 });
 

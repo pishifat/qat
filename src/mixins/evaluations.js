@@ -47,6 +47,9 @@ export default {
         mapQualityWarning () {
             return this.addition === BnEvaluationAddition.MapQualityWarning;
         },
+        moddingQualityWarning () {
+            return this.addition === BnEvaluationAddition.ModdingQualityWarning;
+        },
         noAddition () {
             return this.addition === BnEvaluationAddition.None;
         },

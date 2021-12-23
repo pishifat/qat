@@ -55,6 +55,13 @@
                 </button>
                 <button
                     class="btn btn-sm btn-primary"
+                    :disabled="moddingQualityWarning"
+                    @click="setAddition('moddingQualityWarning', $event);"
+                >
+                    Modding Quality Warning
+                </button>
+                <button
+                    class="btn btn-sm btn-primary"
                     :disabled="!selectedEvaluation.addition || noAddition"
                     @click="setAddition('none', $event);"
                 >
