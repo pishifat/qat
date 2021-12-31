@@ -9,7 +9,7 @@ class EvaluationService extends mongoose.Model {
 
     static findActiveEvaluations(mongoId) {
         let minDate = new Date();
-        minDate.setDate(minDate.getDate() + 14);
+        minDate.setDate(minDate.getDate() + 7);
 
         return this
             .find({
@@ -44,7 +44,7 @@ class EvaluationService extends mongoose.Model {
 
     static deleteUserActiveEvaluations(userId) {
         let minDate = new Date();
-        minDate.setDate(minDate.getDate() + 14);
+        minDate.setDate(minDate.getDate() + 7);
 
         return this.deleteMany({
             user: userId,

@@ -127,9 +127,9 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
     const nearDeadline = new Date();
     nearDeadline.setDate(nearDeadline.getDate() + 1);
     const startRange = new Date();
-    startRange.setDate(startRange.getDate() + 13);
+    startRange.setDate(startRange.getDate() + 6);
     const endRange = new Date();
-    endRange.setDate(endRange.getDate() + 14);
+    endRange.setDate(endRange.getDate() + 7);
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 

@@ -166,7 +166,7 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
     });
 
     let minDate = new Date();
-    minDate.setDate(minDate.getDate() + 14);
+    minDate.setDate(minDate.getDate() + 7);
 
     if (deadline < minDate) {
         for (let i = 0; i < result.length; i++) {
