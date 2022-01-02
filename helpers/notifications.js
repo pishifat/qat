@@ -267,7 +267,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
             description += 'is due in less than 24 hours!';
             color = discord.webhookColors.lightRed;
         } else if (round.deadline > startRange && round.deadline < endRange) {
-            description += 'is due in two weeks!';
+            description += 'is due in 1 week!';
             color = discord.webhookColors.pink;
 
 
