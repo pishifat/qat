@@ -1,6 +1,7 @@
 <template>
     <p>
-        <b>{{ displayMode ? `Next ${mode == 'osu' ? 'osu!' : 'osu!' + mode} evaluation:` : 'Next evaluation:' }}</b> {{ nextEvaluationDate }}
+        <b>{{ displayMode ? `Next ${mode == 'osu' ? 'osu!' : 'osu!' + mode} evaluation:` : 'Next evaluation:' }}</b>
+        {{ nextEvaluationDate }}
     </p>
 </template>
 
@@ -43,7 +44,7 @@ export default {
             const nextEvaluationDate = await this.$http.executeGet(`/users/loadNextEvaluation/${this.selectedUser.id}/${this.mode}`);
 
             if (nextEvaluationDate) {
-                this.nextEvaluationDate = nextEvaluationDate.slice(0,10);
+                this.nextEvaluationDate = nextEvaluationDate;
             }
         },
     },

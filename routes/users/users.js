@@ -66,10 +66,13 @@ router.get('/loadNextEvaluation/:id/:mode', async (req, res) => {
         return res.json('Never');
     }
 
-    const deadline = new Date(er.deadline);
-    deadline.setDate(deadline.getDate() + 7);
+    const firstDate = new Date(er.deadline);
+    const secondDate = new Date(er.deadline);
+    firstDate.setDate(firstDate.getDate() - 7);
+    secondDate.setDate(secondDate.getDate() + 7);
+    const nextEvaluationText = `Between ${firstDate.toISOString().slice(0,10)} and ${secondDate.toISOString().slice(0,10)}`;
 
-    res.json(deadline);
+    res.json(nextEvaluationText);
 });
 
 /* GET find NAT activity */
@@ -330,8 +333,11 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
         let deadline;
 
         if (activeEval) {
-            deadline = new Date(activeEval.deadline);
-            deadline.setDate(deadline.getDate() + 7);
+            const firstDate = new Date(activeEval.deadline);
+            const secondDate = new Date(activeEval.deadline);
+            firstDate.setDate(firstDate.getDate() - 7);
+            secondDate.setDate(secondDate.getDate() + 7);
+            deadline = `Between ${firstDate.toISOString().slice(0,10)} and ${secondDate.toISOString().slice(0,10)}`;
         }
 
         const joinHistory = user.history.filter(h => h.kind === 'joined' &&  h.group === 'bn');

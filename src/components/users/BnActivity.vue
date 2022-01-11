@@ -55,7 +55,7 @@
                         {{ user.uniqueNominations }} nominations
                     </li>
                     <li>{{ user.nominationResets }} nomination resets</li>
-                    <li>Next evaluation: {{ user.nextEvaluation ? (user.nextEvaluation.slice(0, 10)): 'Never' }}</li>
+                    <li>Next evaluation: {{ user.nextEvaluation ? user.nextEvaluation : 'Never' }}</li>
                 </ul>
             </div>
             <p class="small ml-2">
