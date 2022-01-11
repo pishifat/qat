@@ -287,7 +287,7 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
     const [users, allEvents, allActiveBnEvaluations] = await Promise.all([
         User
             .find({
-                groups: 'bn',
+                groups: { $in: ['nat','bn'] },
                 'modesInfo.mode': req.params.mode,
             })
             .sort({ username: 1 }),
