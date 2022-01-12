@@ -9,6 +9,7 @@ const util = require('./util');
 const AppEvaluation = require('../models/evaluations/appEvaluation');
 const Evaluation = require('../models/evaluations/evaluation');
 const Veto = require('../models/veto');
+const BnFinderMatch = require('../models/bnFinderMatch');
 const User = require('../models/user');
 const BeatmapReport = require('../models/beatmapReport');
 const Discussion = require('../models/discussion');
@@ -619,6 +620,34 @@ const lowActivityTask = cron.schedule('0 23 1 * *', async () => {
 });
 
 /**
+ * Marks BN Finder Matches as Expired if not pending/WIP/graveyard
+ */
+const checkMatchBeatmapStatuses = cron.schedule('2 22 * * *', async () => {
+    const response = await osu.getClientCredentialsGrant();
+    const token = response.access_token;
+
+    const matches = await BnFinderMatch
+        .find({
+            isMatch: { $exists: false },
+            isExpired: { $ne: true },
+        })
+        .populate('beatmapset');
+
+    for (const match of matches) {
+        const beatmapsetInfo = await osu.getBeatmapsetInfo(token, match.beatmapset.osuId);
+
+        // 4 = loved, 3 = qualified, 2 = approved, 1 = ranked, 0 = pending, -1 = WIP, -2 = graveyard
+        if (beatmapsetInfo.ranked > 0) {
+            await BnFinderMatch.findByIdAndUpdate(match.id, { isExpired: true });
+        }
+    }
+
+    console.log(matches);
+}, {
+    scheduled: false,
+});
+
+/**
  * @param {Date} initialDate
  * @param {object} bn
  * @returns {Promise<number>} number of unique bubbled/qualified
@@ -656,4 +685,4 @@ async function hasLowActivity (initialDate, bn, mode) {
     return false;
 }
 
-module.exports = { notifyDeadlines, notifyBeatmapReports, lowActivityTask, closeContentReviews };
+module.exports = { notifyDeadlines, notifyBeatmapReports, lowActivityTask, closeContentReviews, checkMatchBeatmapStatuses };

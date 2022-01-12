@@ -11,6 +11,8 @@ const beatmapsetsSchema = new mongoose.Schema({
     genre: { type: String, required: true },
     language: { type: String, required: true },
     numberDiffs: { type: Number, required: true },
+    mapperUsername: { type: String },
+    mapperOsuId: { type: Number },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 beatmapsetsSchema.virtual('events', {

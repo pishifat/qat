@@ -152,21 +152,31 @@
             </div>
         </div>
 
-        <div v-if="users.length" class="justify-content-between">
+        <div v-if="users.length" class="justify-content-between mt-4">
             The following users might be interested in your map:
-            <ul class="small">
-                <li>dafdsfsf</li>
+            <ul>
+                <li v-for="user in users" :key="user.id">
+                    <user-link
+                        :username="user.username"
+                        :osu-id="user.osuId"
+                    />
+                </li>
             </ul>
+            <p>Your map will be shown to each of these BNs (if they use the match finding system & this is your first time submitting the map). If your map is accepted or rejected, you'll be notified by <a href="https://osu.ppy.sh/users/23648635" target="_blank">the mappersguild chat bot</a>.</p>
+            <p>For a faster response, try reaching out to these users directly.</p>
         </div>
     </section>
 </template>
 
 <script>
 import { mapState } from 'vuex';
+import UserLink from '../../components/UserLink.vue';
 
 export default {
     name: 'BnFinder',
-    components: {},
+    components: {
+        UserLink,
+    },
     data () {
         return {
             url: '',
@@ -248,7 +258,7 @@ export default {
             );
 
             if (!data.error) {
-                this.users = data.users;
+                this.users = data;
             }
         },
     },

@@ -350,6 +350,11 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
             nominationResets,
             joinDate: lastJoin && lastJoin.date,
             nextEvaluation: deadline,
+            genrePreferences: user.genrePreferences,
+            languagePreferences: user.languagePreferences,
+            detailPreferences: user.detailPreferences,
+            stylePreferences: user.stylePreferences,
+            mapperPreferences: user.mapperPreferences,
         });
     });
 

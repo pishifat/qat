@@ -1,6 +1,9 @@
 <template>
     <div>
-        <!--<bn-finder />-->
+        <bn-finder />
+        <bn-finder-matches
+            v-if="loggedInUser && loggedInUser.isBnOrNat"
+        />
         <mod-score-calculator />
 
         <section class="card card-body">
@@ -79,7 +82,8 @@ import { mapState } from 'vuex';
 import evaluations from '../mixins/evaluations';
 import ToastMessages from '../components/ToastMessages.vue';
 import ModScoreCalculator from '../components/home/ModScoreCalculator.vue';
-//import BnFinder from '../components/home/BnFinder.vue';
+import BnFinder from '../components/home/BnFinder.vue';
+import BnFinderMatches from '../components/home/BnFinderMatches.vue';
 import UserLink from '../components/UserLink.vue';
 
 export default {
@@ -87,13 +91,15 @@ export default {
     components: {
         ToastMessages,
         ModScoreCalculator,
-        //BnFinder,
+        BnFinder,
+        BnFinderMatches,
         UserLink,
     },
     mixins: [ evaluations ],
     computed: {
         ...mapState([
             'allUsersByMode',
+            'loggedInUser',
         ]),
         sorted () {
             const sortOrder = ['osu', 'taiko', 'catch', 'mania'];

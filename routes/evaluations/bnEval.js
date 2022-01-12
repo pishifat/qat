@@ -436,7 +436,6 @@ router.post('/setConsensus/:id', middlewares.isNatOrTrialNat, async (req, res) =
         .orFail();
 
     evaluation.consensus = req.body.consensus;
-    evaluation.addition = req.body.consensus;
 
     if (req.body.consensus === BnEvaluationConsensus.RemoveFromBn || evaluation.isResignation) {
         const date = new Date();

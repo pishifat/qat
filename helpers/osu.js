@@ -103,6 +103,25 @@ async function getUserInfo(token) {
     }
 }
 
+async function getOtherUserInfo(token, osuId) {
+    /** @type {import('axios').AxiosRequestConfig} */
+    const options = {
+        method: 'GET',
+        url: `https://osu.ppy.sh/api/v2/users/${osuId}`,
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    };
+
+    try {
+        const res = await axios(options);
+
+        return res.data;
+    } catch (error) {
+        return { error };
+    }
+}
+
 async function getBeatmapsetInfo(token, setId) {
     /** @type {import('axios').AxiosRequestConfig} */
     const options = {
@@ -136,6 +155,7 @@ module.exports = {
     refreshToken,
     getClientCredentialsGrant,
     getUserInfo,
+    getOtherUserInfo,
     getBeatmapsetInfo,
     getDiscussions,
 };

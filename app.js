@@ -183,6 +183,7 @@ app.listen(port, () => {
         notifications.notifyBeatmapReports.start();
         notifications.lowActivityTask.start();
         notifications.closeContentReviews.start();
+        notifications.checkMatchBeatmapStatuses.start();
     }
 });
 

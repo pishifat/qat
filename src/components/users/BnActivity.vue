@@ -56,6 +56,11 @@
                     </li>
                     <li>{{ user.nominationResets }} nomination resets</li>
                     <li>Next evaluation: {{ user.nextEvaluation ? user.nextEvaluation : 'Never' }}</li>
+                    <li>genre: {{ user.genrePreferences }}</li>
+                    <li>language: {{ user.languagePreferences }}</li>
+                    <li>style: {{ user.stylePreferences }}</li>
+                    <li>detail: {{ user.detailPreferences }}</li>
+                    <li>mapper: {{ user.mapperPreferences }}</li>
                 </ul>
             </div>
             <p class="small ml-2">

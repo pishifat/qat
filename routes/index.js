@@ -4,15 +4,16 @@ const crypto = require('crypto');
 const { getUserModsCount } = require('../helpers/scrap');
 const middlewares = require('../helpers/middlewares');
 const osu = require('../helpers/osu');
+const osuBot = require('../helpers/osuBot');
 const util = require('../helpers/util');
-const scrap = require('../helpers/scrap');
 const User = require('../models/user');
 const Logger = require('../models/log');
 const ResignationEvaluation = require('../models/evaluations/resignationEvaluation');
 const { setSession } = require('../helpers/util');
 const { OsuResponseError } = require('../helpers/errors');
 const { ResignationConsensus } = require('../shared/enums');
-const moment = require('moment');
+const Beatmapset = require('../models/modRequests/beatmapset');
+const BnFinderMatch = require('../models/bnFinderMatch');
 
 const router = express.Router();
 
@@ -71,16 +72,267 @@ router.get('/modsCount/:user/:mode', async (req, res) => {
 
 /* POST find BNs for BN finder */
 router.post('/findBns/', async (req, res) => {
+    // set variables
     const url = req.body.url;
-    const genres = req.body.genres;
-    const styles = req.body.styles;
-    const details = req.body.styles;
+    let genres = req.body.genres;
+    let languages = req.body.languages;
+    let styles = req.body.styles;
+    let details = req.body.details;
 
+    // find beatmap and mapper info
     util.isValidUrlOrThrow(url, 'https://osu.ppy.sh/beatmapsets', `Invalid map link`);
-    const initialDate = moment().subtract(3, 'months').toDate();
-    const num = await scrap.findUniqueNominations(initialDate, { osuId: 4879380 });
+    const beatmapsetId = util.getBeatmapsetIdFromUrl(url);
 
-    return res.json({ error: num });
+    const beatmapsetInfo = await osu.getBeatmapsetInfo(req.session.accessToken, beatmapsetId);
+
+    if (!beatmapsetInfo || beatmapsetInfo.error || !beatmapsetInfo.id) {
+        return res.json({
+            error: `Couldn't retrieve beatmap info`,
+        });
+    }
+
+    // 4 = loved, 3 = qualified, 2 = approved, 1 = ranked, 0 = pending, -1 = WIP, -2 = graveyard
+    if (beatmapsetInfo.ranked > 0) {
+        return res.json({
+            error: `Can't submit ranked maps`,
+        });
+    }
+
+    const mapperInfo = await osu.getOtherUserInfo(req.session.accessToken, beatmapsetInfo.user.id);
+
+    if (!mapperInfo || mapperInfo.error) {
+        return res.json({
+            error: `Couldn't retrieve mapper info`,
+        });
+    }
+
+    if (mapperInfo.id !== req.session.osuId) {
+        return res.json({ error: 'You can only submit your own beatmaps' });
+    }
+
+    // set beatmap and mapper variables
+    const osuGenre = beatmapsetInfo.genre.name.toLowerCase();
+    const osuLanguage = beatmapsetInfo.language.name.toLowerCase();
+    const beatmapModes = beatmapsetInfo.beatmaps.map(b => b.mode);
+
+    if (beatmapModes.indexOf('fruits') >= 0) {
+        const i = beatmapModes.indexOf('fruits');
+        beatmapModes.splice(i, 1, 'catch');
+    }
+
+    let mapperExperience = mapperInfo.ranked_and_approved_beatmapset_count >= 3 ? ['experienced mapper'] : ['new mapper'];
+
+    if (!genres.includes(osuGenre)) {
+        genres.push(osuGenre);
+    }
+
+    if (!languages.includes(osuLanguage)) {
+        languages.push(osuLanguage);
+    }
+
+    // find matching users
+
+    const finalUsers = [];
+
+    for (let step = 0; step <= 5 && finalUsers.length < 5; step++) {
+        const users = await User.find({
+            groups: { $in: ['nat', 'bn'] },
+            'modesInfo.mode': { $in: beatmapModes },
+            $and: [
+                { $or:
+                    [
+                        { genrePreferences: { $in: genres } },
+                        { genrePreferences: { $size: 0 } },
+                    ],
+                },
+                { $or:
+                    [
+                        { languagePreferences: { $in: languages } },
+                        { languagePreferences: { $size: 0 } },
+                    ],
+                },
+                { $or:
+                    [
+                        { mapperPreferences: { $in: mapperExperience } },
+                        { mapperPreferences: { $size: 0 } },
+                    ],
+                },
+            ],
+        });
+
+        users.sort( () => .5 - Math.random() );
+
+        const filteredUsers = users.filter(u => {
+            return (
+                (u.genrePreferences && u.genrePreferences.length) ||
+                (u.languagePreferences && u.languagePreferences.length) ||
+                (u.stylePreferences && u.stylePreferences.length) ||
+                (u.detailPreferences && u.detailPreferences.length) ||
+                (u.mapperPreferences && u.mapperPreferences.length)
+            );
+        });
+
+        for (let i = 0; i < filteredUsers.length; i++) {
+            const user = filteredUsers[i];
+            filteredUsers[i].genreCount = 0;
+            filteredUsers[i].languageCount = 0;
+            filteredUsers[i].styleCount = 0;
+            filteredUsers[i].detailCount = 0;
+            filteredUsers[i].mapperExperienceCount = 0;
+
+            for (const genre of genres) {
+                if (user.genrePreferences.includes(genre)) filteredUsers[i].genreCount += 5;
+            }
+
+            for (const language of languages) {
+                if (user.languagePreferences.includes(language)) filteredUsers[i].languageCount += 3;
+            }
+
+            for (const style of styles) {
+                if (user.stylePreferences.includes(style)) filteredUsers[i].styleCount += 2;
+            }
+
+            for (const detail of details) {
+                if (user.detailPreferences.includes(detail)) filteredUsers[i].detailCount += 1;
+            }
+
+            for (const experience of mapperExperience) {
+                if (user.mapperPreferences.includes(experience)) filteredUsers[i].mapperExperienceCount += 3;
+            }
+
+            filteredUsers[i].totalPreferenceCount = filteredUsers[i].genreCount + filteredUsers[i].languageCount + filteredUsers[i].styleCount + filteredUsers[i].detailCount + filteredUsers[i].mapperExperienceCount;
+        }
+
+        filteredUsers.sort((a, b) => {
+            if (a.totalPreferenceCount > b.totalPreferenceCount) return -1;
+            if (a.totalPreferenceCount < b.totalPreferenceCount) return 1;
+
+            return 0;
+        });
+
+        const finalUserIds = finalUsers.map(u => u.id);
+
+        for (let i = 0; i < filteredUsers.length && finalUsers.length < 5; i++) {
+            const user = filteredUsers[i];
+
+            if (!finalUserIds.includes(user.id)) {
+                finalUsers.push(user);
+            }
+        }
+
+        switch (step) {
+            case 0:
+                details = ['anime', 'game', 'movie', 'tv', 'doujin', 'featured artist', 'cover', 'remix'];
+                break;
+            case 1:
+                styles = ['simple', 'tech', 'alternating', 'conceptual', 'other'];
+                break;
+            case 2:
+                mapperExperience = ['new mapper', 'experienced mapper'];
+                break;
+            case 3:
+                languages = ['instrumental', 'english', 'japanese', 'korean', 'chinese', 'other'];
+                break;
+            default:
+                genres = ['rock', 'pop', 'novelty', 'hip hop', 'electronic', 'metal', 'classical', 'folk', 'jazz', 'other'];
+                break;
+        }
+    }
+
+    let beatmapset;
+    let alreadySubmitted = false;
+
+    let existingBeatmapset = await Beatmapset.findOne({ osuId: parseInt(beatmapsetId) });
+
+    if (existingBeatmapset) {
+        beatmapset = existingBeatmapset;
+
+        const existingMatch = await BnFinderMatch.findOne({ beatmapset: beatmapset._id });
+
+        if (existingMatch) {
+            alreadySubmitted = true;
+        }
+    } else {
+        beatmapset = new Beatmapset();
+        beatmapset.osuId = beatmapsetInfo.id;
+        beatmapset.artist = beatmapsetInfo.artist;
+        beatmapset.title = beatmapsetInfo.title;
+        beatmapset.modes = beatmapModes;
+        beatmapset.genre = beatmapsetInfo.genre.name.toLowerCase();
+        beatmapset.language = beatmapsetInfo.language.name.toLowerCase();
+        beatmapset.numberDiffs = beatmapsetInfo.beatmaps.length;
+        beatmapset.length = beatmapsetInfo.beatmaps[0].total_length;
+        beatmapset.bpm = beatmapsetInfo.bpm;
+        beatmapset.submittedAt = beatmapsetInfo.submitted_date;
+        beatmapset.mapperUsername = mapperInfo.username;
+        beatmapset.mapperOsuId = mapperInfo.id;
+
+        await beatmapset.validate();
+        await beatmapset.save();
+    }
+
+    if (!alreadySubmitted) {
+        for (const user of finalUsers) {
+            const match = new BnFinderMatch();
+            match.user = user._id;
+            match.beatmapset = beatmapset._id;
+            match.genres = req.body.genres;
+            match.languages = req.body.languages;
+            match.styles = req.body.styles;
+            match.details = req.body.details;
+            match.mapperExperience = mapperInfo.ranked_and_approved_beatmapset_count >= 3 ? 'experienced mapper' : 'new mapper';
+
+            await match.validate();
+            await match.save();
+        }
+    }
+
+    if (!finalUsers.length) {
+        return res.json({ error: 'No BNs matching your criteria could be found :( Try again later.' });
+    }
+
+    return res.json(finalUsers);
+});
+
+/* GET next match from BN Finder */
+router.get('/findNextMatch', async (req, res) => {
+    const match = await BnFinderMatch
+        .findOne({
+            user: req.session.mongoId,
+            isMatch: { $exists: false },
+            isExpired: { $ne: true },
+        })
+        .populate('beatmapset')
+        .sort({ createdAt: 1 });
+
+    if (!match) {
+        return res.json('no match');
+    }
+
+    return res.json(match);
+});
+
+/* POST set match status */
+router.post('/setMatchStatus/:id', async (req, res) => {
+    const match = await BnFinderMatch.findByIdAndUpdate(req.params.id, { isMatch: req.body.status }).populate('beatmapset user');
+
+    let messages = [];
+
+    if (req.body.status == true) {
+        messages.push(`hello! ${req.session.username} ( https://osu.ppy.sh/users/${req.session.osuId} ) expressed interest your beatmap "${match.beatmapset.fullTitle}"!`, `send them a message if they haven't modded your map already! :)`);
+    } else {
+        messages.push(`hello! ${req.session.username} ( https://osu.ppy.sh/users/${req.session.osuId} ) wasn't interested in your beatmap "${match.beatmapset.fullTitle}".`, `send them a message if you'd like more feedback. :)`);
+    }
+
+    messages.push(`—BN Finder`);
+
+    const sentMessages = await osuBot.sendMessages(match.user.osuId, messages);
+
+    if (sentMessages !== true) {
+        return res.json({ error: `Messages were not sent. Please let pishifat know!` });
+    }
+
+    return res.json({ success: 'Mapper has been notified!' });
 });
 
 /* GET 'login' to get user's info */

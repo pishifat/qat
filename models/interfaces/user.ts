@@ -31,6 +31,14 @@ interface IUser {
     detailPreferences: string[];
     mapperPreferences: string[];
     requestLink: string;
+
+    // not used in model
+    genreCount: number;
+    languageCount: number;
+    styleCount: number;
+    detailCount: number;
+    mapperExperienceCount: number;
+    totalPreferenceCount: number;
 }
 
 export interface IUserDocument extends IUser, Document {

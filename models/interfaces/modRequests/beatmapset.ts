@@ -1,4 +1,5 @@
 import { Document, Model } from 'mongoose'
+import { IUserDocument } from '../user';
 
 export interface IBeatmapsetDocument extends Document {
     osuId: number;
@@ -11,6 +12,8 @@ export interface IBeatmapsetDocument extends Document {
     length: number;
     bpm: number;
     submittedAt: Date;
+    mapperUsername: string;
+    mapperOsuId: number;
 
     fullTitle: string;
     totalLength: number;

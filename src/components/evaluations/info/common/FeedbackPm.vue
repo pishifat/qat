@@ -186,7 +186,7 @@ export default {
             }
 
             // professional sign-off
-            let signature = this.selectedEvaluation.mode == 'osu' ? `—BN+NAT` : `—NAT`;
+            let signature = `—NAT`;
             messages.push(signature);
 
             return messages;
