@@ -436,12 +436,12 @@ router.post('/setConsensus/:id', middlewares.isNatOrTrialNat, async (req, res) =
         .orFail();
 
     evaluation.consensus = req.body.consensus;
-    evaluation.addition = 'none';
+    evaluation.addition = req.body.consensus;
 
     if (req.body.consensus === BnEvaluationConsensus.RemoveFromBn || evaluation.isResignation) {
         const date = new Date();
 
-        if (req.body.consensus == ResignationConsensus.ResignedOnGoodTerms) {
+        if (req.body.consensus == ResignationConsensus.ResignedOnGoodTerms || (req.body.consensus == BnEvaluationConsensus.RemoveFromBn && evaluation.addition == BnEvaluationAddition.LowActivityWarning)) {
             date.setDate(date.getDate() + 30);
         } else {
             date.setDate(date.getDate() + 60);
@@ -480,6 +480,13 @@ router.post('/setAddition/:id', middlewares.isNatOrTrialNat, async (req, res) =>
         .orFail();
 
     evaluation.addition = req.body.addition;
+
+    if (req.body.addition == BnEvaluationAddition.LowActivityWarning) {
+        const date = new Date();
+        date.setDate(date.getDate() + 30);
+
+        evaluation.cooldownDate = date;
+    }
 
     await evaluation.save();
     res.json(evaluation);
