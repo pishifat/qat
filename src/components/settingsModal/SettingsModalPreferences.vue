@@ -134,7 +134,7 @@
             </div>
         </div>
         <hr>
-        <div v-if="!loggedInUser.modes.includes('mania')" class="row">
+        <div v-if="loggedInUser.modes.includes('mania')" class="row">
             <div class="col-sm-6">
                 <div>What are your preferred keymodes?</div>
                 <small class="text-secondary">
