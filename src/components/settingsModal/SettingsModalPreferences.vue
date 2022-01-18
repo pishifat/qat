@@ -63,19 +63,99 @@
             </div>
 
             <div class="col-sm-6">
-                <div v-for="style in styleOptions" :key="style" class="form-check">
+                <div v-if="loggedInUser.modes.includes('osu')">
+                    <div v-for="style in osuStyleOptions" :key="style" class="form-check">
+                        <input
+                            :checked="osuStylePreferences.includes(style)"
+                            :value="style"
+                            type="checkbox"
+                            class="form-check-input"
+                            :disabled="(osuStylePreferences.length >= 3 && !osuStylePreferences.includes(style)) || processing"
+                            @change="updateStylePreferences(style, 'osu', $event)"
+                        >
+                        <label
+                            class="form-check-label text-secondary"
+                        >
+                            {{ style }} <span class="small">(osu!)</span>
+                        </label>
+                    </div>
+                </div>
+                <div v-if="loggedInUser.modes.includes('taiko')">
+                    <div v-for="style in taikoStyleOptions" :key="style" class="form-check">
+                        <input
+                            :checked="taikoStylePreferences.includes(style)"
+                            :value="style"
+                            type="checkbox"
+                            class="form-check-input"
+                            :disabled="(taikoStylePreferences.length >= 3 && !taikoStylePreferences.includes(style)) || processing"
+                            @change="updateStylePreferences(style, 'taiko', $event)"
+                        >
+                        <label
+                            class="form-check-label text-secondary"
+                        >
+                            {{ style }} <span class="small">(osu!taiko)</span>
+                        </label>
+                    </div>
+                </div>
+                <div v-if="loggedInUser.modes.includes('catch')">
+                    <div v-for="style in catchStyleOptions" :key="style" class="form-check">
+                        <input
+                            :checked="catchStylePreferences.includes(style)"
+                            :value="style"
+                            type="checkbox"
+                            class="form-check-input"
+                            :disabled="(catchStylePreferences.length >= 3 && !catchStylePreferences.includes(style)) || processing"
+                            @change="updateStylePreferences(style, 'catch', $event)"
+                        >
+                        <label
+                            class="form-check-label text-secondary"
+                        >
+                            {{ style }} <span class="small">(osu!catch)</span>
+                        </label>
+                    </div>
+                </div>
+                <div v-if="loggedInUser.modes.includes('mania')">
+                    <div v-for="style in maniaStyleOptions" :key="style" class="form-check">
+                        <input
+                            :checked="maniaStylePreferences.includes(style)"
+                            :value="style"
+                            type="checkbox"
+                            class="form-check-input"
+                            :disabled="(maniaStylePreferences.length >= 3 && !maniaStylePreferences.includes(style)) || processing"
+                            @change="updateStylePreferences(style, 'mania', $event)"
+                        >
+                        <label
+                            class="form-check-label text-secondary"
+                        >
+                            {{ style }} <span class="small">(osu!mania)</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div v-if="!loggedInUser.modes.includes('mania')" class="row">
+            <div class="col-sm-6">
+                <div>What are your preferred keymodes?</div>
+                <small class="text-secondary">
+                    Select up to 3
+                </small>
+            </div>
+
+            <div class="col-sm-6">
+                <div v-for="keymode in maniaKeymodeOptions" :key="keymode" class="form-check">
                     <input
-                        :checked="stylePreferences.includes(style)"
-                        :value="style"
+                        :checked="maniaKeymodePreferences.includes(keymode)"
+                        :value="keymode"
                         type="checkbox"
                         class="form-check-input"
-                        :disabled="(stylePreferences.length >= 3 && !stylePreferences.includes(style)) || processing"
-                        @change="updateStylePreferences(style, $event)"
+                        :disabled="(maniaKeymodePreferences.length >= 3 && !maniaKeymodePreferences.includes(keymode)) || processing"
+                        @change="updateKeymodePreferences(keymode, $event)"
                     >
                     <label
                         class="form-check-label text-secondary"
                     >
-                        {{ style }}
+                        {{ keymode }}
                     </label>
                 </div>
             </div>
@@ -135,24 +215,34 @@
             </div>
         </div>
     </div>
+    </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
+import { GenrePreferences, LanguagePreferences, DetailPreferences, MapperPreferences, OsuStylePreferences, TaikoStylePreferences, CatchStylePreferences, ManiaStylePreferences, ManiaKeymodePreferences } from '../../../shared/enums';
 
 export default {
     data () {
         return {
             genrePreferences: [],
             languagePreferences: [],
-            stylePreferences: [],
+            osuStylePreferences: [],
+            taikoStylePreferences: [],
+            catchStylePreferences: [],
+            maniaStylePreferences: [],
+            maniaKeymodePreferences: [],
             detailPreferences: [],
             mapperPreferences: [],
-            genreOptions: ['rock', 'pop', 'novelty', 'hip hop', 'electronic', 'metal', 'classical', 'folk', 'jazz', 'other'],
-            languageOptions: ['instrumental', 'english', 'japanese', 'korean', 'chinese', 'other'],
-            styleOptions: ['simple', 'tech', 'alternating', 'conceptual', 'other'],
-            detailOptions: ['anime', 'game', 'movie', 'tv', 'doujin', 'featured artist', 'cover', 'remix'],
-            mapperOptions: ['new mapper', 'experienced mapper'],
+            genreOptions: GenrePreferences,
+            languageOptions: LanguagePreferences,
+            osuStyleOptions: OsuStylePreferences,
+            taikoStyleOptions: TaikoStylePreferences,
+            catchStyleOptions: CatchStylePreferences,
+            maniaStyleOptions: ManiaStylePreferences,
+            maniaKeymodeOptions: ManiaKeymodePreferences,
+            detailOptions: DetailPreferences,
+            mapperOptions: MapperPreferences,
             processing: false,
         };
     },
@@ -164,7 +254,11 @@ export default {
     created () {
         this.genrePreferences = this.loggedInUser.genrePreferences;
         this.languagePreferences = this.loggedInUser.languagePreferences;
-        this.stylePreferences = this.loggedInUser.stylePreferences;
+        this.osuStylePreferences = this.loggedInUser.osuStylePreferences;
+        this.taikoStylePreferences = this.loggedInUser.taikoStylePreferences;
+        this.catchStylePreferences = this.loggedInUser.catchStylePreferences;
+        this.maniaStylePreferences = this.loggedInUser.maniaStylePreferences;
+        this.maniaKeymodePreferences = this.loggedInUser.maniaKeymodePreferences;
         this.detailPreferences = this.loggedInUser.detailPreferences;
         this.mapperPreferences = this.loggedInUser.mapperPreferences;
     },
@@ -187,13 +281,25 @@ export default {
             this.languagePreferences = data.user.languagePreferences;
             this.processing = false;
         },
-        async updateStylePreferences (style, e) {
+        async updateStylePreferences (style, mode, e) {
             this.processing = true;
-            const data = await this.$http.executePost(`/users/${this.loggedInUser.id}/updateStylePreferences`, {
+            const data = await this.$http.executePost(`/users/${this.loggedInUser.id}/updateStylePreferences/${mode}`, {
                 style,
             }, e);
 
-            this.stylePreferences = data.user.stylePreferences;
+            this.osuStylePreferences = data.user.osuStylePreferences;
+            this.taikoStylePreferences = data.user.taikoStylePreferences;
+            this.catchStylePreferences = data.user.catchStylePreferences;
+            this.maniaStylePreferences = data.user.maniaStylePreferences;
+            this.processing = false;
+        },
+        async updateKeymodePreferences (keymode, e) {
+            this.processing = true;
+            const data = await this.$http.executePost(`/users/${this.loggedInUser.id}/updateKeymodePreferences`, {
+                keymode,
+            }, e);
+
+            this.maniaKeymodePreferences = data.user.maniaKeymodePreferences;
             this.processing = false;
         },
         async updateDetailPreferences (detail, e) {

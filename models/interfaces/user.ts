@@ -27,7 +27,11 @@ interface IUser {
     requestStatus: string[];
     genrePreferences: string[];
     languagePreferences: string[];
-    stylePreferences: string[];
+    osuStylePreferences: string[];
+    taikoStylePreferences: string[];
+    catchStylePreferences: string[];
+    maniaStylePreferences: string[];
+    maniaKeymodePreferences: string[];
     detailPreferences: string[];
     mapperPreferences: string[];
     requestLink: string;

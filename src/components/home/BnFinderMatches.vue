@@ -93,10 +93,12 @@
             </div>
 
             <div class="container">
-                <p>When users submit beatmaps above that match your beatmap preferences, they'll appear here!</p>
-                <p>Your beatmap preferences can be edited from the <b><span class="text-info"><i class="fas fa-cog text-info" /> cog icon</span></b> in the top right. You can select up to 3 preferences per category. For the best results, try to select 3 preferences (even if you prefer more than 3).</p>
+                <p>When users submit beatmaps above that match your preferences, they'll appear here!</p>
+                <p>Your beatmap preferences can be edited from the <b><span class="text-info"><i class="fas fa-cog text-info" /> cog icon</span></b> in the top right. You can select up to 3 preferences per category. For the best results, try to select 3 preferences in every section.</p>
                 <p><b><span class="text-success"><i class="fas fa-check-circle" /> Accepting</span></b> or <b><span class="text-danger"><i class="fas fa-times-circle" /> rejecting</span></b> any matches will automatically notify the beatmap's creator.</p>
                 <p>Only you can see this section.</p>
+                <hr>
+                <p>NOBODY CAN SUBMIT MAPS YET. SET YOUR PREFERENCES BEFORE <b>NOVEMBER 19</b> PLEASE THANKS :heart:</p>
             </div>
         </section>
     </div>

@@ -58,7 +58,10 @@
                     <li>Next evaluation: {{ user.nextEvaluation ? user.nextEvaluation : 'Never' }}</li>
                     <li>genre: {{ user.genrePreferences }}</li>
                     <li>language: {{ user.languagePreferences }}</li>
-                    <li>style: {{ user.stylePreferences }}</li>
+                    <li>style: {{ bnMode == 'osu' ? user.osuStylePreferences : bnMode == 'taiko' ? user.taikoStylePreferences : bnMode == 'catch' ? user.catchStylePreferences : user.ManiaStylePreferences }}</li>
+                    <li v-if="bnMode == 'mania'">
+                        keymode: {{ user.maniaKeymodePreferences }}
+                    </li>
                     <li>detail: {{ user.detailPreferences }}</li>
                     <li>mapper: {{ user.mapperPreferences }}</li>
                 </ul>

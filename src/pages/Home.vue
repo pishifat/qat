@@ -1,6 +1,6 @@
 <template>
     <div>
-        <bn-finder />
+        <!-- <bn-finder /> -->
         <bn-finder-matches
             v-if="loggedInUser && loggedInUser.isBnOrNat"
         />

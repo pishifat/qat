@@ -353,7 +353,11 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
             genrePreferences: user.genrePreferences,
             languagePreferences: user.languagePreferences,
             detailPreferences: user.detailPreferences,
-            stylePreferences: user.stylePreferences,
+            osuStylePreferences: user.osuStylePreferences,
+            taikoStylePreferences: user.taikoStylePreferences,
+            catchStylePreferences: user.catchStylePreferences,
+            maniaStylePreferences: user.maniaStylePreferences,
+            maniaKeymodePreferences: user.maniaKeymodePreferences,
             mapperPreferences: user.mapperPreferences,
         });
     });
@@ -567,7 +571,7 @@ router.post('/:id/updateLanguagePreferences', middlewares.isBnOrNat, async (req,
 });
 
 /* POST update map style preferences */
-router.post('/:id/updateStylePreferences', middlewares.isBnOrNat, async (req, res) => {
+router.post('/:id/updateStylePreferences/:mode', middlewares.isBnOrNat, async (req, res) => {
     const user = await User.findById(req.params.id).orFail();
 
     if (req.session.mongoId != user.id) {
@@ -577,19 +581,68 @@ router.post('/:id/updateStylePreferences', middlewares.isBnOrNat, async (req, re
     }
 
     const style = req.body.style;
+    const mode = req.params.mode;
 
-    if (user.stylePreferences.length >= 3 && !user.stylePreferences.includes(style)) {
+    let relevantStylePreferences = mode == 'osu' ? user.osuStylePreferences : mode == 'taiko' ? user.taikoStylePreferences : mode == 'catch' ? user.catchStylePreferences : user.maniaStylePreferences;
+
+    if (relevantStylePreferences.length >= 3 && !relevantStylePreferences.includes(style)) {
         return res.json({
             error: 'Cannot save more than 3 preferences',
             user,
         });
     }
 
-    if (style.length && !user.stylePreferences.includes(style)) {
-        user.stylePreferences.push(style);
-    } else if (user.stylePreferences.includes(style)) {
-        const i = user.stylePreferences.indexOf(style);
-        user.stylePreferences.splice(i,1);
+    if (style.length && !relevantStylePreferences.includes(style)) {
+        relevantStylePreferences.push(style);
+    } else if (relevantStylePreferences.includes(style)) {
+        const i = relevantStylePreferences.indexOf(style);
+        relevantStylePreferences.splice(i,1);
+    }
+
+    if (mode == 'osu') user.osuStylePreferences = relevantStylePreferences;
+    else if (mode == 'taiko') user.taikoStylePreferences = relevantStylePreferences;
+    else if (mode == 'catch') user.catchStylePreferences = relevantStylePreferences;
+    else if (mode == 'mania') user.maniaStylePreferences = relevantStylePreferences;
+
+    await user.save();
+
+    res.json({
+        success: 'Updated',
+        user,
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Updated "${user.username}" ${mode} style preferences to ${relevantStylePreferences}`,
+        'user',
+        user._id
+    );
+});
+
+/* POST update mania keymode preferences */
+router.post('/:id/updateKeymodePreferences', middlewares.isBnOrNat, async (req, res) => {
+    const user = await User.findById(req.params.id).orFail();
+
+    if (req.session.mongoId != user.id) {
+        return res.json({
+            error: 'Unauthorized',
+        });
+    }
+
+    const keymode = req.body.keymode;
+
+    if (user.maniaKeymodePreferences.length >= 3 && !user.maniaKeymodePreferences.includes(keymode)) {
+        return res.json({
+            error: 'Cannot save more than 3 preferences',
+            user,
+        });
+    }
+
+    if (keymode.length && !user.maniaKeymodePreferences.includes(keymode)) {
+        user.maniaKeymodePreferences.push(keymode);
+    } else if (user.maniaKeymodePreferences.includes(keymode)) {
+        const i = user.maniaKeymodePreferences.indexOf(keymode);
+        user.maniaKeymodePreferences.splice(i,1);
     }
 
     await user.save();
@@ -601,7 +654,7 @@ router.post('/:id/updateStylePreferences', middlewares.isBnOrNat, async (req, re
 
     Logger.generate(
         req.session.mongoId,
-        `Updated "${user.username}" style preferences to ${user.stylePreferences}`,
+        `Updated "${user.username}" keymode preferences to ${user.maniaKeymodePreferences}`,
         'user',
         user._id
     );

@@ -16,7 +16,7 @@
                                 class="form-control my-1"
                             >
                                 <option value="" disabled>
-                                    select a song genre
+                                    select genre
                                 </option>
                                 <option v-for="option in genreOptions" :key="option" :value="option">
                                     {{ option }}
@@ -43,7 +43,7 @@
                                 class="form-control my-1"
                             >
                                 <option value="" disabled>
-                                    select a song language
+                                    select language
                                 </option>
                                 <option v-for="option in languageOptions" :key="option" :value="option">
                                     {{ option }}
@@ -64,15 +64,27 @@
 
                 <div class="row">
                     <div class="input-group">
-                        <div class="w-50">
+                        <div class="w-25">
                             <select
                                 v-model="styleSelected"
                                 class="form-control my-1"
                             >
                                 <option value="" disabled>
-                                    select a map style
+                                    select style
                                 </option>
-                                <option v-for="option in styleOptions" :key="option" :value="option">
+                                <option v-for="option in filteredStyles" :key="option" :value="option">
+                                    {{ option }}
+                                </option>
+
+                                <option v-if="selectedMode == 'mania'" disabled>
+                                    ---
+                                </option>
+                                <option
+                                    v-for="option in maniaKeymodeOptions"
+                                    v-if="selectedMode == 'mania'"
+                                    :key="option"
+                                    :value="option"
+                                >
                                     {{ option }}
                                 </option>
                             </select>
@@ -86,6 +98,10 @@
                                 {{ styles.includes(styleSelected) ? 'Remove style' : 'Add style' }}
                             </button>
                         </div>
+                        <mode-radio-display
+                            v-model="selectedMode"
+                            class="small mt-2 d-flex justify-content-between"
+                        />
                     </div>
                 </div>
 
@@ -97,7 +113,7 @@
                                 class="form-control my-1"
                             >
                                 <option value="" disabled>
-                                    select a song detail
+                                    select detail
                                 </option>
                                 <option v-for="option in detailOptions" :key="option" :value="option">
                                     {{ option }}
@@ -160,44 +176,80 @@
                         :username="user.username"
                         :osu-id="user.osuId"
                     />
+                    <span v-if="user.requestStatus && !user.requestStatus.includes('closed')">
+                        <span
+                            class="badge badge-pill mx-1 text-lowercase badge-success"
+                        >open
+                        </span>
+                    </span>
                 </li>
             </ul>
             <p>Your map will be shown to each of these BNs (if they use the match finding system & this is your first time submitting the map). If your map is accepted or rejected, you'll be notified by <a href="https://osu.ppy.sh/users/23648635" target="_blank">the mappersguild chat bot</a>.</p>
-            <p>For a faster response, try reaching out to these users directly.</p>
+            <p>For a faster response, try reaching out to some of these users directly.</p>
+            <p>
+                Note: This is a work-in-progress! The way recommendations are selected will likely change.
+            </p>
         </div>
     </section>
 </template>
 
 <script>
 import { mapState } from 'vuex';
+import evaluations from '../../mixins/evaluations';
 import UserLink from '../../components/UserLink.vue';
+import ModeRadioDisplay from '../ModeRadioDisplay.vue';
+import { GenrePreferences, LanguagePreferences, DetailPreferences, OsuStylePreferences, TaikoStylePreferences, CatchStylePreferences, ManiaStylePreferences, ManiaKeymodePreferences } from '../../../shared/enums';
 
 export default {
     name: 'BnFinder',
     components: {
         UserLink,
+        ModeRadioDisplay,
     },
+    mixins: [evaluations],
     data () {
         return {
             url: '',
             genres: [],
-            genreOptions: ['rock', 'pop', 'novelty', 'hip hop', 'electronic', 'metal', 'classical', 'folk', 'jazz', 'other'],
+            genreOptions: GenrePreferences,
             genreSelected: '',
             languages: [],
-            languageOptions: ['instrumental', 'english', 'japanese', 'korean', 'chinese', 'other'],
+            languageOptions: LanguagePreferences,
             languageSelected: '',
             styles: [],
-            styleOptions: ['simple', 'tech', 'alternating', 'conceptual', 'other'],
+            osuStyleOptions: OsuStylePreferences,
+            taikoStyleOptions: TaikoStylePreferences,
+            catchStyleOptions: CatchStylePreferences,
+            maniaStyleOptions: ManiaStylePreferences,
+            maniaKeymodeOptions: ManiaKeymodePreferences,
             styleSelected: '',
             details: [],
-            detailOptions: ['anime', 'game', 'movie', 'tv', 'doujin', 'featured artist', 'cover', 'remix'],
+            detailOptions: DetailPreferences,
             detailSelected: '',
             users: [],
+            selectedMode: 'osu',
         };
     },
-    computed: mapState([
-        'loggedInUser',
-    ]),
+    computed: {
+        ...mapState([
+            'loggedInUser',
+        ]),
+        /** @returns {Array} */
+        filteredStyles() {
+            switch (this.selectedMode) {
+                case 'osu':
+                    return this.osuStyleOptions;
+                case 'taiko':
+                    return this.taikoStyleOptions;
+                case 'catch':
+                    return this.catchStyleOptions;
+                case 'mania':
+                    return this.maniaStyleOptions;
+                default:
+                    return this.osuStyleOptions;
+            }
+        },
+    },
     methods: {
         addGenre () {
             if (this.genreSelected.length && !this.genres.includes(this.genreSelected)) {

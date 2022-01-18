@@ -11,7 +11,7 @@ const Logger = require('../models/log');
 const ResignationEvaluation = require('../models/evaluations/resignationEvaluation');
 const { setSession } = require('../helpers/util');
 const { OsuResponseError } = require('../helpers/errors');
-const { ResignationConsensus } = require('../shared/enums');
+const { ResignationConsensus, GenrePreferences, LanguagePreferences, DetailPreferences, OsuStylePreferences, TaikoStylePreferences, CatchStylePreferences, ManiaStylePreferences, ManiaKeymodePreferences, MapperPreferences } = require('../shared/enums');
 const Beatmapset = require('../models/modRequests/beatmapset');
 const BnFinderMatch = require('../models/bnFinderMatch');
 
@@ -120,6 +120,12 @@ router.post('/findBns/', async (req, res) => {
         beatmapModes.splice(i, 1, 'catch');
     }
 
+    const tempStyles = [];
+    if (beatmapModes.includes('osu')) tempStyles.push(OsuStylePreferences);
+    if (beatmapModes.includes('taiko')) tempStyles.push(TaikoStylePreferences);
+    if (beatmapModes.includes('catch')) tempStyles.push(CatchStylePreferences);
+    if (beatmapModes.includes('mania')) tempStyles.push(ManiaStylePreferences);
+
     let mapperExperience = mapperInfo.ranked_and_approved_beatmapset_count >= 3 ? ['experienced mapper'] : ['new mapper'];
 
     if (!genres.includes(osuGenre)) {
@@ -134,39 +140,23 @@ router.post('/findBns/', async (req, res) => {
 
     const finalUsers = [];
 
-    for (let step = 0; step <= 5 && finalUsers.length < 5; step++) {
-        const users = await User.find({
-            groups: { $in: ['nat', 'bn'] },
-            'modesInfo.mode': { $in: beatmapModes },
-            $and: [
-                { $or:
-                    [
-                        { genrePreferences: { $in: genres } },
-                        { genrePreferences: { $size: 0 } },
-                    ],
-                },
-                { $or:
-                    [
-                        { languagePreferences: { $in: languages } },
-                        { languagePreferences: { $size: 0 } },
-                    ],
-                },
-                { $or:
-                    [
-                        { mapperPreferences: { $in: mapperExperience } },
-                        { mapperPreferences: { $size: 0 } },
-                    ],
-                },
-            ],
-        });
+    const users = await User.find({
+        groups: { $in: ['nat', 'bn'] },
+        'modesInfo.mode': { $in: beatmapModes },
+    });
 
+    for (let step = 0; step <= 5 && finalUsers.length < 5; step++) {
         users.sort( () => .5 - Math.random() );
 
         const filteredUsers = users.filter(u => {
             return (
                 (u.genrePreferences && u.genrePreferences.length) ||
                 (u.languagePreferences && u.languagePreferences.length) ||
-                (u.stylePreferences && u.stylePreferences.length) ||
+                (u.osuStylePreferences && u.osuStylePreferences.length) ||
+                (u.taikoStylePreferences && u.taikoStylePreferences.length) ||
+                (u.catchStylePreferences && u.catchStylePreferences.length) ||
+                (u.maniaStylePreferences && u.maniaStylePreferences.length) ||
+                (u.maniaKeymodePreferences && u.maniaKeymodePreferences.length) ||
                 (u.detailPreferences && u.detailPreferences.length) ||
                 (u.mapperPreferences && u.mapperPreferences.length)
             );
@@ -189,7 +179,16 @@ router.post('/findBns/', async (req, res) => {
             }
 
             for (const style of styles) {
-                if (user.stylePreferences.includes(style)) filteredUsers[i].styleCount += 2;
+                if (user.modes.includes('osu') && beatmapModes.includes('osu') && user.osuStylePreferences.includes(style)) filteredUsers[i].styleCount += 2;
+                if (user.modes.includes('taiko') && beatmapModes.includes('taiko') && user.taikoStylePreferences.includes(style)) filteredUsers[i].styleCount += 2;
+                if (user.modes.includes('catch') && beatmapModes.includes('catch') && user.catchStylePreferences.includes(style)) filteredUsers[i].styleCount += 2;
+                if (user.modes.includes('mania') && beatmapModes.includes('mania') && user.maniaStylePreferences.includes(style)) filteredUsers[i].styleCount += 2;
+
+                if (user.modes.includes('mania') && beatmapModes.includes('mania') && user.maniaKeymodePreferences.includes(style)) {
+                    filteredUsers[i].styleCount += 2;
+                } else {
+                    filteredUsers[i].styleCount -= 10;
+                }
             }
 
             for (const detail of details) {
@@ -220,21 +219,23 @@ router.post('/findBns/', async (req, res) => {
             }
         }
 
+        let tempStyles = [];
+
         switch (step) {
             case 0:
-                details = ['anime', 'game', 'movie', 'tv', 'doujin', 'featured artist', 'cover', 'remix'];
+                details = DetailPreferences;
                 break;
             case 1:
-                styles = ['simple', 'tech', 'alternating', 'conceptual', 'other'];
+                styles = [...new Set(tempStyles)];
                 break;
             case 2:
-                mapperExperience = ['new mapper', 'experienced mapper'];
+                mapperExperience = MapperPreferences;
                 break;
             case 3:
-                languages = ['instrumental', 'english', 'japanese', 'korean', 'chinese', 'other'];
+                languages = LanguagePreferences;
                 break;
             default:
-                genres = ['rock', 'pop', 'novelty', 'hip hop', 'electronic', 'metal', 'classical', 'folk', 'jazz', 'other'];
+                genres = GenrePreferences;
                 break;
         }
     }
