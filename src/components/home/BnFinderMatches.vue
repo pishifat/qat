@@ -98,7 +98,7 @@
                 <p><b><span class="text-success"><i class="fas fa-check-circle" /> Accepting</span></b> or <b><span class="text-danger"><i class="fas fa-times-circle" /> rejecting</span></b> any matches will automatically notify the beatmap's creator.</p>
                 <p>Only you can see this section.</p>
                 <hr>
-                <p>NOBODY CAN SUBMIT MAPS YET. SET YOUR PREFERENCES BEFORE <b>NOVEMBER 19</b> PLEASE THANKS :heart:</p>
+                <p>NOBODY CAN SUBMIT MAPS YET. SET YOUR PREFERENCES BEFORE <b><del>NOVEMBER</del> JANUARY 19</b> PLEASE THANKS :heart:</p>
             </div>
         </section>
     </div>
