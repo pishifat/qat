@@ -37,7 +37,7 @@ const MapperPreferences = ['new mapper', 'experienced mapper'];
 const OsuStylePreferences = ['simple', 'tech', 'alternating', 'conceptual', 'other'];
 const TaikoStylePreferences = ['simple', 'tech', 'SV heavy', 'other'];
 const CatchStylePreferences = ['simple', 'tech', 'hyperdashless', 'low AR', 'high CS', 'other'];
-const ManiaStylePreferences = ['rice', 'long notes', 'SV heavy', 'dump', 'other'];
+const ManiaStylePreferences = ['rice', 'long notes', 'hybrid', 'SV heavy', 'dump', 'other'];
 const ManiaKeymodePreferences = ['4K', '7K', 'other keymode'];
 
 module.exports = {

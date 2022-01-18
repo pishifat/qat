@@ -34,7 +34,7 @@ const userSchema = new mongoose.Schema({
     osuStylePreferences: [{ type: String, enum: ['simple', 'tech', 'alternating', 'conceptual', 'other'] }],
     taikoStylePreferences: [{ type: String, enum: ['simple', 'tech', 'SV heavy', 'other'] }],
     catchStylePreferences: [{ type: String, enum: ['simple', 'tech', 'hyperdashless', 'low AR', 'high CS', 'other'] }],
-    maniaStylePreferences: [{ type: String, enum: ['rice', 'long notes', 'SV heavy', 'dump', 'other'] }],
+    maniaStylePreferences: [{ type: String, enum: ['rice', 'long notes', 'hybrid', 'SV heavy', 'dump', 'other'] }],
     maniaKeymodePreferences: [{ type: String, enum: ['4K', '7K', 'other keymode'] }],
     detailPreferences: [{ type: String, enum: ['anime', 'game', 'movie', 'tv', 'doujin', 'featured artist', 'cover', 'remix'] }],
     mapperPreferences: [{ type: String, enum: ['new mapper', 'experienced mapper'] }],
