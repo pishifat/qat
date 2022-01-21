@@ -104,7 +104,7 @@
 
             <div class="container">
                 <p>When users submit beatmaps above that match your preferences, they'll appear here!</p>
-                <p>Your beatmap preferences can be edited from the <b><span class="text-info"><i class="fas fa-cog text-info" /> cog icon</span></b> in the top right. You can select up to 3 preferences per category.</p>
+                <p>Your beatmap preferences can be edited from the <b><span class="text-info"><i class="fas fa-cog text-info" /> cog icon</span></b> in the top right. You can select up to 3 preferences per category. If you have any ideas for the preferences list, talk to pishifat.</p>
                 <p><b><span class="text-success"><i class="fas fa-check-circle" /> Accepting</span></b> or <b><span class="text-danger"><i class="fas fa-times-circle" /> rejecting</span></b> any matches will automatically notify the beatmap's creator.</p>
                 <p>Only you can see this section.</p>
             </div>
