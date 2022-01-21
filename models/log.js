@@ -19,6 +19,7 @@ const logSchema = new mongoose.Schema({
             'veto',
             'interOp',
             'spam',
+            'bnFinder',
         ],
     },
     relatedId: { type: 'ObjectId', ref: 'aiess' }, // if this needs to be populated for more than aiess, create dynamic refPath with category (requires some renaming)

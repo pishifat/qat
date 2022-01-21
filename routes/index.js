@@ -323,6 +323,13 @@ router.post('/findBns/', async (req, res) => {
 
             await match.validate();
             await match.save();
+
+            Logger.generate(
+                req.session.mongoId,
+                `Created BN finder match for "${user.username}" on s/${beatmapset.osuId}`,
+                'bnFinder',
+                beatmapset._id
+            );
         }
     }
 
