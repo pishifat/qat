@@ -5,7 +5,7 @@
                 BN Finder
             </h4>
         </div>
-
+        <p>Having trouble finding a Beatmap Nominator to mod your map? Submit your map info below.</p>
         <div class="row container">
             <div class="col-sm-6">
                 <div class="row">
