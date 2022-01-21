@@ -225,7 +225,11 @@ router.post('/findBns/', async (req, res) => {
 
             // mapper experience
             for (const experience of mapperExperience) {
-                if (user.mapperPreferences.includes(experience)) filteredUsers[i].mapperExperienceCount += mapperVar;
+                if (user.mapperPreferences.includes(experience)) {
+                    filteredUsers[i].mapperExperienceCount += mapperVar;
+                } else {
+                    filteredUsers[i].mapperExperienceCount -= mapperVar*2;
+                }
             }
 
             // total
