@@ -252,8 +252,9 @@ router.get('/logs/:osuId/:category', async (req, res) => {
             'report',
             'test',
             'qualityAssurance',
-            'veto'
-            'spam'`
+            'veto',
+            'spam',
+            'bnFinder'`
         );
     }
 

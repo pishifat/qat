@@ -86,6 +86,7 @@ export default {
                 'veto',
                 'interOp',
                 'spam',
+                'bnFinder',
             ],
             category: 'all',
         };
