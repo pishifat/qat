@@ -250,10 +250,8 @@ router.post('/findBns/', async (req, res) => {
         for (let i = 0; i < filteredUsers.length && finalUsers.length < 5; i++) {
             const user = filteredUsers[i];
 
-            if (!finalUserIds.includes(user.id)) {
+            if (!finalUserIds.includes(user.id) && user.id !== req.session.mongoId) {
                 finalUsers.push(user);
-                console.log(user.username);
-                console.log(user.totalPreferenceCount);
             }
         }
 
@@ -367,12 +365,13 @@ router.post('/setMatchStatus/:id', async (req, res) => {
     if (req.body.status == true) {
         messages.push(`hello! ${req.session.username} https://osu.ppy.sh/users/${req.session.osuId} expressed interest in your beatmap "${match.beatmapset.fullTitle}"! https://osu.ppy.sh/beatmapsets/${match.beatmapset.osuId}`, `send them a message if they haven't modded your map already! :)`);
     } else {
-        messages.push(`hello! ${req.session.username} https://osu.ppy.sh/users/${req.session.osuId} wasn't interested in your beatmap "${match.beatmapset.fullTitle}". https://osu.ppy.sh/beatmapsets/${match.beatmapset.osuId}`, `send them a message if you'd like more feedback. :)`);
+        messages.push(`hello! one of the BNs who was recommended your beatmap "${match.beatmapset.fullTitle}" https://osu.ppy.sh/beatmapsets/${match.beatmapset.osuId} wasn't interested :(`);
+        messages.push(`their name isn't revealed in case they'd rather be anonymous.`);
     }
 
     messages.push(`—BN Finder`);
 
-    const sentMessages = await osuBot.sendMessages(match.user.osuId, messages);
+    const sentMessages = await osuBot.sendMessages(match.beatmapset.mapperOsuId, messages);
 
     if (sentMessages !== true) {
         return res.json({ error: `Messages were not sent. Please let pishifat know!` });
