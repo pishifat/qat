@@ -46,7 +46,7 @@
                         </span>
                         <span v-if="match.styles && match.styles.length && match.details && match.details.length">/</span>
                         <span v-if="match.details && match.details.length">
-                            Other detail(s): <b>{{ match.styles.join(', ') }}</b>
+                            Other detail(s): <b>{{ match.details.join(', ') }}</b>
                         </span>
                     </div>
                 </div>
@@ -54,29 +54,39 @@
             <div class="row col-sm-12">
                 <div class="col-sm-3" />
                 <h1 class="col-sm-1">
-                    <a href="#" @click.prevent="setMatchStatus(match.id, false)">
+                    <a
+                        href="#"
+                        :class="processing ? 'processing' : ''"
+                        @click.prevent="setMatchStatus(match.id, false)"
+                    >
                         <i
                             class="fas fa-times-circle d-flex flex-row-reverse text-danger"
                             data-toggle="tooltip"
                             data-placement="left"
                             title="notify mapper that you're NOT interested in this map"
+
                             @mouseover="rejectHover = true"
                             @mouseleave="rejectHover = false"
                         />
                     </a>
                 </h1>
 
-                <h3 class="col-sm-4 justify-content-center d-flex" :class="rejectHover ? 'text-danger' : 'text-success'">
-                    <b>{{ rejectHover ? 'NEXT MAP' : acceptHover ? 'MATCH' : '' }}</b>
+                <h3 class="col-sm-4 justify-content-center d-flex" :class="processing ? 'text-secondary' : rejectHover ? 'text-danger' : 'text-success'">
+                    <b>{{ processing ? 'processing...' : rejectHover ? 'NEXT MAP' : acceptHover ? 'MATCH' : '' }}</b>
                 </h3>
 
                 <h1 class="col-sm-1">
-                    <a href="#" @click.prevent="setMatchStatus(match.id, true)">
+                    <a
+                        href="#"
+                        :class="processing ? 'processing' : ''"
+                        @click.prevent="setMatchStatus(match.id, true)"
+                    >
                         <i
                             class="fas fa-check-circle d-flex flex-row text-success"
                             data-toggle="tooltip"
                             data-placement="right"
                             title="notify mapper that you're interested in this map!"
+
                             @mouseover="acceptHover = true"
                             @mouseleave="acceptHover = false"
                         />
@@ -94,11 +104,9 @@
 
             <div class="container">
                 <p>When users submit beatmaps above that match your preferences, they'll appear here!</p>
-                <p>Your beatmap preferences can be edited from the <b><span class="text-info"><i class="fas fa-cog text-info" /> cog icon</span></b> in the top right. You can select up to 3 preferences per category. For the best results, try to select 3 preferences in every section.</p>
+                <p>Your beatmap preferences can be edited from the <b><span class="text-info"><i class="fas fa-cog text-info" /> cog icon</span></b> in the top right. You can select up to 3 preferences per category.</p>
                 <p><b><span class="text-success"><i class="fas fa-check-circle" /> Accepting</span></b> or <b><span class="text-danger"><i class="fas fa-times-circle" /> rejecting</span></b> any matches will automatically notify the beatmap's creator.</p>
                 <p>Only you can see this section.</p>
-                <hr>
-                <p>NOBODY CAN SUBMIT MAPS YET. SET YOUR PREFERENCES BEFORE <b><del>NOVEMBER</del> JANUARY 19</b> PLEASE THANKS :heart:</p>
             </div>
         </section>
     </div>
@@ -117,6 +125,7 @@ export default {
             match: null,
             rejectHover: false,
             acceptHover: false,
+            processing: false,
         };
     },
     async created () {
@@ -126,24 +135,25 @@ export default {
         async findNextMatch () {
             const match = await this.$http.executeGet('/findNextMatch');
 
-            if (match) {
-                this.match = match;
-            } else {
+            if (match.none) {
                 this.match = null;
+            } else {
+                this.match = match;
             }
         },
         async setMatchStatus (id, status) {
-            const match = await this.$http.executePost(
-                '/setMatchStatus/' + id,
-                {
-                    status,
-                }
-            );
+            if (!this.processing) {
+                this.processing = true;
+                await this.$http.executePost(
+                    '/setMatchStatus/' + id,
+                    {
+                        status,
+                    }
+                );
 
-            this.match = null;
+                await this.findNextMatch();
 
-            if (match) {
-                this.findNextMatch();
+                this.processing = false;
             }
         },
     },
@@ -173,6 +183,10 @@ export default {
 
 .accept-color {
     color: rgb(75, 128, 75);
+}
+
+.processing {
+    pointer-events: none;
 }
 
 </style>

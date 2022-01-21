@@ -162,6 +162,14 @@ router.post('/findBns/', async (req, res) => {
             );
         });
 
+        // figure out matching characteristics
+        const genreVar = 5;
+        const languageVar = 3;
+        const styleVar = 2;
+        const detailVar = 1;
+        const mapperVar = 3;
+        const keymodeVar = 10;
+
         for (let i = 0; i < filteredUsers.length; i++) {
             const user = filteredUsers[i];
             filteredUsers[i].genreCount = 0;
@@ -170,38 +178,61 @@ router.post('/findBns/', async (req, res) => {
             filteredUsers[i].detailCount = 0;
             filteredUsers[i].mapperExperienceCount = 0;
 
+            // genre
             for (const genre of genres) {
-                if (user.genrePreferences.includes(genre)) filteredUsers[i].genreCount += 5;
+                if (user.genrePreferences.includes(genre)) filteredUsers[i].genreCount += genreVar;
             }
 
+            if (!filteredUsers[i].genreCount) {
+                filteredUsers[i].genreCount -= genreVar*2;
+            }
+
+            if (user.genrePreferences.length && user.genrePreferences.length == genres.length && filteredUsers[i].genreCount/genreVar == genres.length) {
+                filteredUsers[i].genreCount += genreVar;
+            }
+
+            // language
             for (const language of languages) {
-                if (user.languagePreferences.includes(language)) filteredUsers[i].languageCount += 3;
+                if (user.languagePreferences.includes(language)) filteredUsers[i].languageCount += languageVar;
             }
 
+            if (!filteredUsers[i].languageCount) {
+                filteredUsers[i].languageCount -= languageVar*2;
+            }
+
+            if (user.languagePreferences.length && user.languagePreferences.length == languages.length && filteredUsers[i].languageCount/languageVar == languages.length) {
+                filteredUsers[i].languageCount += languageVar;
+            }
+
+            // style + keycount
             for (const style of styles) {
-                if (user.modes.includes('osu') && beatmapModes.includes('osu') && user.osuStylePreferences.includes(style)) filteredUsers[i].styleCount += 2;
-                if (user.modes.includes('taiko') && beatmapModes.includes('taiko') && user.taikoStylePreferences.includes(style)) filteredUsers[i].styleCount += 2;
-                if (user.modes.includes('catch') && beatmapModes.includes('catch') && user.catchStylePreferences.includes(style)) filteredUsers[i].styleCount += 2;
-                if (user.modes.includes('mania') && beatmapModes.includes('mania') && user.maniaStylePreferences.includes(style)) filteredUsers[i].styleCount += 2;
+                if (user.modes.includes('osu') && beatmapModes.includes('osu') && user.osuStylePreferences.includes(style)) filteredUsers[i].styleCount += styleVar;
+                if (user.modes.includes('taiko') && beatmapModes.includes('taiko') && user.taikoStylePreferences.includes(style)) filteredUsers[i].styleCount += styleVar;
+                if (user.modes.includes('catch') && beatmapModes.includes('catch') && user.catchStylePreferences.includes(style)) filteredUsers[i].styleCount += styleVar;
+                if (user.modes.includes('mania') && beatmapModes.includes('mania') && user.maniaStylePreferences.includes(style)) filteredUsers[i].styleCount += styleVar;
 
                 if (user.modes.includes('mania') && beatmapModes.includes('mania') && user.maniaKeymodePreferences.includes(style)) {
-                    filteredUsers[i].styleCount += 2;
-                } else {
-                    filteredUsers[i].styleCount -= 10;
+                    filteredUsers[i].styleCount += keymodeVar;
+                } else if (user.modes.includes('mania') && beatmapModes.includes('mania') && !user.maniaKeymodePreferences.includes(style)) {
+                    filteredUsers[i].styleCount -= keymodeVar;
                 }
             }
 
+            // details
             for (const detail of details) {
-                if (user.detailPreferences.includes(detail)) filteredUsers[i].detailCount += 1;
+                if (user.detailPreferences.includes(detail)) filteredUsers[i].detailCount += detailVar;
             }
 
+            // mapper experience
             for (const experience of mapperExperience) {
-                if (user.mapperPreferences.includes(experience)) filteredUsers[i].mapperExperienceCount += 3;
+                if (user.mapperPreferences.includes(experience)) filteredUsers[i].mapperExperienceCount += mapperVar;
             }
 
+            // total
             filteredUsers[i].totalPreferenceCount = filteredUsers[i].genreCount + filteredUsers[i].languageCount + filteredUsers[i].styleCount + filteredUsers[i].detailCount + filteredUsers[i].mapperExperienceCount;
         }
 
+        // sort by matchingness
         filteredUsers.sort((a, b) => {
             if (a.totalPreferenceCount > b.totalPreferenceCount) return -1;
             if (a.totalPreferenceCount < b.totalPreferenceCount) return 1;
@@ -211,11 +242,14 @@ router.post('/findBns/', async (req, res) => {
 
         const finalUserIds = finalUsers.map(u => u.id);
 
+        // add relevant users to final users list
         for (let i = 0; i < filteredUsers.length && finalUsers.length < 5; i++) {
             const user = filteredUsers[i];
 
             if (!finalUserIds.includes(user.id)) {
                 finalUsers.push(user);
+                console.log(user.username);
+                console.log(user.totalPreferenceCount);
             }
         }
 
@@ -307,7 +341,7 @@ router.get('/findNextMatch', async (req, res) => {
         .sort({ createdAt: 1 });
 
     if (!match) {
-        return res.json('no match');
+        return res.json({ none: 'no match' });
     }
 
     return res.json(match);
@@ -320,9 +354,9 @@ router.post('/setMatchStatus/:id', async (req, res) => {
     let messages = [];
 
     if (req.body.status == true) {
-        messages.push(`hello! ${req.session.username} ( https://osu.ppy.sh/users/${req.session.osuId} ) expressed interest your beatmap "${match.beatmapset.fullTitle}"!`, `send them a message if they haven't modded your map already! :)`);
+        messages.push(`hello! ${req.session.username} https://osu.ppy.sh/users/${req.session.osuId} expressed interest in your beatmap "${match.beatmapset.fullTitle}"! https://osu.ppy.sh/beatmapsets/${match.beatmapset.osuId}`, `send them a message if they haven't modded your map already! :)`);
     } else {
-        messages.push(`hello! ${req.session.username} ( https://osu.ppy.sh/users/${req.session.osuId} ) wasn't interested in your beatmap "${match.beatmapset.fullTitle}".`, `send them a message if you'd like more feedback. :)`);
+        messages.push(`hello! ${req.session.username} https://osu.ppy.sh/users/${req.session.osuId} wasn't interested in your beatmap "${match.beatmapset.fullTitle}". https://osu.ppy.sh/beatmapsets/${match.beatmapset.osuId}`, `send them a message if you'd like more feedback. :)`);
     }
 
     messages.push(`—BN Finder`);

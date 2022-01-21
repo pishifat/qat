@@ -186,8 +186,8 @@
             </ul>
             <p>Your map will be shown to each of these BNs (if they use the match finding system & this is your first time submitting the map). If your map is accepted or rejected, you'll be notified by <a href="https://osu.ppy.sh/users/23648635" target="_blank">the mappersguild chat bot</a>.</p>
             <p>For a faster response, try reaching out to some of these users directly.</p>
-            <p>
-                Note: This is a work-in-progress! The way recommendations are selected will likely change.
+            <p class="small text-secondary">
+                Note: This is a work-in-progress! The matching formula will change with time. :)
             </p>
         </div>
     </section>
