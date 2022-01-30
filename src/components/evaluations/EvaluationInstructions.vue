@@ -13,6 +13,7 @@
                 <li>Comparisons of parts of a map to support issues/suggestions</li>
                 <li>A wide variety of map elements, such as rhythm, spacing, movement, intensity, contrast, and consistency.</li>
                 <li>Identification of both isolated issues and general map-wide issues</li>
+                <li>Consideration of mappers' intentions when identifying issues and giving suggestions</li>
             </ul>
             <p class="small ml-4">
                 To effectively evaluate an applicant's mods, you will likely need to download the beatmap and examine it yourself. This can reveal if the applicant's suggestions fit appropriately with the beatmap and if the applicant overlooks any of the beatmap's glaring problems! When criticizing a specific mod post, include a link to it alongside your explanation.
