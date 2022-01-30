@@ -28,6 +28,7 @@
                         <li>Comparisons of parts of a map to support issues/suggestions</li>
                         <li>A wide variety of map elements, such as rhythm, spacing, movement, intensity, contrast, and consistency.</li>
                         <li>Identification of both isolated issues and general map-wide issues</li>
+                        <li>Consideration of mappers' intentions when identifying issues and giving suggestions</li>
                     </ul>
                 </div>
             </div>
