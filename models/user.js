@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const util = require('../helpers/util');
 const moment = require('moment');
 const Settings = require('./settings');
+const enums = require('../shared/enums');
+
 
 const userSchema = new mongoose.Schema({
     osuId: { type: Number, required: true },
@@ -29,15 +31,24 @@ const userSchema = new mongoose.Schema({
     rankedBeatmapsets: { type: Number, default: 0 },
     discordId: { type: String },
     requestStatus: [{ type: String, enum: ['gameChat', 'personalQueue', 'globalQueue', 'closed'] }],
-    genrePreferences: [{ type: String, enum: ['rock', 'pop', 'novelty', 'hip hop', 'electronic', 'metal', 'classical', 'folk', 'jazz', 'vocaloid', 'other'] }],
-    languagePreferences: [{ type: String, enum: ['instrumental', 'english', 'japanese', 'korean', 'chinese', 'other'] }],
-    osuStylePreferences: [{ type: String, enum: ['simple', 'tech', 'alternating', 'conceptual', 'other'] }],
-    taikoStylePreferences: [{ type: String, enum: ['simple', 'tech', 'SV heavy', 'other'] }],
-    catchStylePreferences: [{ type: String, enum: ['simple', 'tech', 'hyperdashless', 'low AR', 'high CS', 'other'] }],
-    maniaStylePreferences: [{ type: String, enum: ['rice', 'long notes', 'hybrid', 'SV heavy', 'dump', 'other'] }],
-    maniaKeymodePreferences: [{ type: String, enum: ['4K', '7K', 'other keymode'] }],
-    detailPreferences: [{ type: String, enum: ['anime', 'game', 'movie', 'tv', 'doujin', 'featured artist', 'cover', 'remix'] }],
-    mapperPreferences: [{ type: String, enum: ['new mapper', 'experienced mapper'] }],
+    genrePreferences: [{ type: String, enum: enums.GenrePreferences }],
+    genreNegativePreferences: [{ type: String, enum: enums.GenrePreferences }],
+    languagePreferences: [{ type: String, enum: enums.LanguagePreferences }],
+    languageNegativePreferences: [{ type: String, enum: enums.LanguagePreferences }],
+    osuStylePreferences: [{ type: String, enum: enums.OsuStylePreferences }],
+    osuStyleNegativePreferences: [{ type: String, enum: enums.OsuStylePreferences }],
+    taikoStylePreferences: [{ type: String, enum: enums.TaikoStylePreferences }],
+    taikoStyleNegativePreferences: [{ type: String, enum: enums.TaikoStylePreferences }],
+    catchStylePreferences: [{ type: String, enum: enums.CatchStylePreferences }],
+    catchStyleNegativePreferences: [{ type: String, enum: enums.CatchStylePreferences }],
+    maniaStylePreferences: [{ type: String, enum: enums.ManiaStylePreferences }],
+    maniaStyleNegativePreferences: [{ type: String, enum: enums.ManiaStylePreferences }],
+    maniaKeymodePreferences: [{ type: String, enum: enums.ManiaKeymodePreferences }],
+    maniaKeymodeNegativePreferences: [{ type: String, enum: enums.ManiaKeymodePreferences }],
+    detailPreferences: [{ type: String, enum: enums.DetailPreferences }],
+    detailNegativePreferences: [{ type: String, enum: enums.DetailPreferences }],
+    mapperPreferences: [{ type: String, enum: enums.MapperPreferences }],
+    mapperNegativePreferences: [{ type: String, enum: enums.MapperPreferences }],
     requestLink: { type: String },
 
     /* temporary fields for qa leaderboard webhook */

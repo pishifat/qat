@@ -499,19 +499,35 @@ router.post('/:id/updateGenrePreferences', middlewares.isBnOrNat, async (req, re
     }
 
     const genre = req.body.genre;
+    const isPreference = req.body.isPreference;
 
-    if (user.genrePreferences.length >= 3 && !user.genrePreferences.includes(genre)) {
+    if (user.genrePreferences.length >= 3 && !user.genrePreferences.includes(genre) && isPreference) {
         return res.json({
             error: 'Cannot save more than 3 preferences',
             user,
         });
     }
 
-    if (genre.length && !user.genrePreferences.includes(genre)) {
+    if (genre.length && !user.genrePreferences.includes(genre) && isPreference) {
         user.genrePreferences.push(genre);
-    } else if (user.genrePreferences.includes(genre)) {
+
+        if (user.genreNegativePreferences.indexOf(genre) >= 0) {
+            const i = user.genreNegativePreferences.indexOf(genre);
+            user.genreNegativePreferences.splice(i,1);
+        }
+    } else if (user.genrePreferences.includes(genre) && isPreference) {
         const i = user.genrePreferences.indexOf(genre);
         user.genrePreferences.splice(i,1);
+    } else if (genre.length && !user.genreNegativePreferences.includes(genre) && !isPreference) {
+        user.genreNegativePreferences.push(genre);
+
+        if (user.genrePreferences.indexOf(genre) >= 0) {
+            const i = user.genrePreferences.indexOf(genre);
+            user.genrePreferences.splice(i,1);
+        }
+    } else if (user.genreNegativePreferences.includes(genre) && !isPreference) {
+        const i = user.genreNegativePreferences.indexOf(genre);
+        user.genreNegativePreferences.splice(i,1);
     }
 
     await user.save();
@@ -520,13 +536,6 @@ router.post('/:id/updateGenrePreferences', middlewares.isBnOrNat, async (req, re
         success: 'Updated',
         user,
     });
-
-    Logger.generate(
-        req.session.mongoId,
-        `Updated "${user.username}" genre preferences to ${user.genrePreferences}`,
-        'user',
-        user._id
-    );
 });
 
 /* POST update language preferences */
@@ -540,19 +549,35 @@ router.post('/:id/updateLanguagePreferences', middlewares.isBnOrNat, async (req,
     }
 
     const language = req.body.language;
+    const isPreference = req.body.isPreference;
 
-    if (user.languagePreferences.length >= 3 && !user.languagePreferences.includes(language)) {
+    if (user.languagePreferences.length >= 3 && !user.languagePreferences.includes(language) && isPreference) {
         return res.json({
             error: 'Cannot save more than 3 preferences',
             user,
         });
     }
 
-    if (language.length && !user.languagePreferences.includes(language)) {
+    if (language.length && !user.languagePreferences.includes(language) && isPreference) {
         user.languagePreferences.push(language);
-    } else if (user.languagePreferences.includes(language)) {
+
+        if (user.languageNegativePreferences.indexOf(language) >= 0) {
+            const i = user.languageNegativePreferences.indexOf(language);
+            user.languageNegativePreferences.splice(i,1);
+        }
+    } else if (user.languagePreferences.includes(language) && isPreference) {
         const i = user.languagePreferences.indexOf(language);
         user.languagePreferences.splice(i,1);
+    } else if (language.length && !user.languageNegativePreferences.includes(language) && !isPreference) {
+        user.languageNegativePreferences.push(language);
+
+        if (user.languagePreferences.indexOf(language) >= 0) {
+            const i = user.languagePreferences.indexOf(language);
+            user.languagePreferences.splice(i,1);
+        }
+    } else if (user.languageNegativePreferences.includes(language) && !isPreference) {
+        const i = user.languageNegativePreferences.indexOf(language);
+        user.languageNegativePreferences.splice(i,1);
     }
 
     await user.save();
@@ -582,27 +607,53 @@ router.post('/:id/updateStylePreferences/:mode', middlewares.isBnOrNat, async (r
 
     const style = req.body.style;
     const mode = req.params.mode;
+    const isPreference = req.body.isPreference;
 
     let relevantStylePreferences = mode == 'osu' ? user.osuStylePreferences : mode == 'taiko' ? user.taikoStylePreferences : mode == 'catch' ? user.catchStylePreferences : user.maniaStylePreferences;
+    let relevantStyleNegativePreferences = mode == 'osu' ? user.osuStyleNegativePreferences : mode == 'taiko' ? user.taikoStyleNegativePreferences : mode == 'catch' ? user.catchStyleNegativePreferences : user.maniaStyleNegativePreferences;
 
-    if (relevantStylePreferences.length >= 3 && !relevantStylePreferences.includes(style)) {
+    if (relevantStylePreferences.length >= 3 && !relevantStylePreferences.includes(style) && isPreference) {
         return res.json({
             error: 'Cannot save more than 3 preferences',
             user,
         });
     }
 
-    if (style.length && !relevantStylePreferences.includes(style)) {
+    if (style.length && !relevantStylePreferences.includes(style) && isPreference) {
         relevantStylePreferences.push(style);
-    } else if (relevantStylePreferences.includes(style)) {
+
+        if (relevantStyleNegativePreferences.indexOf(style) >= 0) {
+            const i = relevantStyleNegativePreferences.indexOf(style);
+            relevantStyleNegativePreferences.splice(i,1);
+        }
+    } else if (relevantStylePreferences.includes(style) && isPreference) {
         const i = relevantStylePreferences.indexOf(style);
         relevantStylePreferences.splice(i,1);
+    } else if (style.length && !relevantStyleNegativePreferences.includes(style) && !isPreference) {
+        relevantStyleNegativePreferences.push(style);
+
+        if (relevantStylePreferences.indexOf(style) >= 0) {
+            const i = relevantStylePreferences.indexOf(style);
+            relevantStylePreferences.splice(i,1);
+        }
+    } else if (relevantStyleNegativePreferences.includes(style) && !isPreference) {
+        const i = relevantStyleNegativePreferences.indexOf(style);
+        relevantStyleNegativePreferences.splice(i,1);
     }
 
-    if (mode == 'osu') user.osuStylePreferences = relevantStylePreferences;
-    else if (mode == 'taiko') user.taikoStylePreferences = relevantStylePreferences;
-    else if (mode == 'catch') user.catchStylePreferences = relevantStylePreferences;
-    else if (mode == 'mania') user.maniaStylePreferences = relevantStylePreferences;
+    if (mode == 'osu') {
+        user.osuStylePreferences = relevantStylePreferences;
+        user.osuStyleNegativePreferences = relevantStyleNegativePreferences;
+    } else if (mode == 'taiko') {
+        user.taikoStylePreferences = relevantStylePreferences;
+        user.taikoStyleNegativePreferences = relevantStyleNegativePreferences;
+    } else if (mode == 'catch') {
+        user.catchStylePreferences = relevantStylePreferences;
+        user.catchStyleNegativePreferences = relevantStyleNegativePreferences;
+    } else if (mode == 'mania') {
+        user.maniaStylePreferences = relevantStylePreferences;
+        user.maniaStyleNegativePreferences = relevantStyleNegativePreferences;
+    }
 
     await user.save();
 
@@ -630,19 +681,35 @@ router.post('/:id/updateKeymodePreferences', middlewares.isBnOrNat, async (req, 
     }
 
     const keymode = req.body.keymode;
+    const isPreference = req.body.isPreference;
 
-    if (user.maniaKeymodePreferences.length >= 3 && !user.maniaKeymodePreferences.includes(keymode)) {
+    if (user.maniaKeymodePreferences.length >= 3 && !user.maniaKeymodePreferences.includes(keymode) && isPreference) {
         return res.json({
             error: 'Cannot save more than 3 preferences',
             user,
         });
     }
 
-    if (keymode.length && !user.maniaKeymodePreferences.includes(keymode)) {
+    if (keymode.length && !user.maniaKeymodePreferences.includes(keymode) && isPreference) {
         user.maniaKeymodePreferences.push(keymode);
-    } else if (user.maniaKeymodePreferences.includes(keymode)) {
+
+        if (user.maniaKeymodeNegativePreferences.indexOf(keymode) >= 0) {
+            const i = user.maniaKeymodeNegativePreferences.indexOf(keymode);
+            user.maniaKeymodeNegativePreferences.splice(i,1);
+        }
+    } else if (user.maniaKeymodePreferences.includes(keymode) && isPreference) {
         const i = user.maniaKeymodePreferences.indexOf(keymode);
         user.maniaKeymodePreferences.splice(i,1);
+    } else if (keymode.length && !user.maniaKeymodeNegativePreferences.includes(keymode) && !isPreference) {
+        user.maniaKeymodeNegativePreferences.push(keymode);
+
+        if (user.maniaKeymodePreferences.indexOf(keymode) >= 0) {
+            const i = user.maniaKeymodePreferences.indexOf(keymode);
+            user.maniaKeymodePreferences.splice(i,1);
+        }
+    } else if (user.maniaKeymodeNegativePreferences.includes(keymode) && !isPreference) {
+        const i = user.maniaKeymodeNegativePreferences.indexOf(keymode);
+        user.maniaKeymodeNegativePreferences.splice(i,1);
     }
 
     await user.save();
@@ -671,19 +738,35 @@ router.post('/:id/updateDetailPreferences', middlewares.isBnOrNat, async (req, r
     }
 
     const detail = req.body.detail;
+    const isPreference = req.body.isPreference;
 
-    if (user.detailPreferences.length >= 3 && !user.detailPreferences.includes(detail)) {
+    if (user.detailPreferences.length >= 3 && !user.detailPreferences.includes(detail) && isPreference) {
         return res.json({
             error: 'Cannot save more than 3 preferences',
             user,
         });
     }
 
-    if (detail.length && !user.detailPreferences.includes(detail)) {
+    if (detail.length && !user.detailPreferences.includes(detail) && isPreference) {
         user.detailPreferences.push(detail);
-    } else if (user.detailPreferences.includes(detail)) {
+
+        if (user.detailNegativePreferences.indexOf(detail) >= 0) {
+            const i = user.detailNegativePreferences.indexOf(detail);
+            user.detailNegativePreferences.splice(i,1);
+        }
+    } else if (user.detailPreferences.includes(detail) && isPreference) {
         const i = user.detailPreferences.indexOf(detail);
         user.detailPreferences.splice(i,1);
+    } else if (detail.length && !user.detailNegativePreferences.includes(detail) && !isPreference) {
+        user.detailNegativePreferences.push(detail);
+
+        if (user.detailPreferences.indexOf(detail) >= 0) {
+            const i = user.detailPreferences.indexOf(detail);
+            user.detailPreferences.splice(i,1);
+        }
+    } else if (user.detailNegativePreferences.includes(detail) && !isPreference) {
+        const i = user.detailNegativePreferences.indexOf(detail);
+        user.detailNegativePreferences.splice(i,1);
     }
 
     await user.save();
@@ -712,6 +795,7 @@ router.post('/:id/updateMapperPreferences', middlewares.isBnOrNat, async (req, r
     }
 
     const mapper = req.body.mapper;
+    const isPreference = req.body.isPreference;
 
     if (user.mapperPreferences.length >= 3 && !user.mapperPreferences.includes(mapper)) {
         return res.json({
@@ -720,11 +804,26 @@ router.post('/:id/updateMapperPreferences', middlewares.isBnOrNat, async (req, r
         });
     }
 
-    if (mapper.length && !user.mapperPreferences.includes(mapper)) {
+    if (mapper.length && !user.mapperPreferences.includes(mapper) && isPreference) {
         user.mapperPreferences.push(mapper);
-    } else if (user.mapperPreferences.includes(mapper)) {
+
+        if (user.mapperNegativePreferences.indexOf(mapper) >= 0) {
+            const i = user.mapperNegativePreferences.indexOf(mapper);
+            user.mapperNegativePreferences.splice(i,1);
+        }
+    } else if (user.mapperPreferences.includes(mapper) && isPreference) {
         const i = user.mapperPreferences.indexOf(mapper);
         user.mapperPreferences.splice(i,1);
+    } else if (mapper.length && !user.mapperNegativePreferences.includes(mapper) && !isPreference) {
+        user.mapperNegativePreferences.push(mapper);
+
+        if (user.mapperPreferences.indexOf(mapper) >= 0) {
+            const i = user.mapperPreferences.indexOf(mapper);
+            user.mapperPreferences.splice(i,1);
+        }
+    } else if (user.mapperNegativePreferences.includes(mapper) && !isPreference) {
+        const i = user.mapperNegativePreferences.indexOf(mapper);
+        user.mapperNegativePreferences.splice(i,1);
     }
 
     await user.save();

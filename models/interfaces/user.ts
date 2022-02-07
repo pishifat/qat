@@ -26,14 +26,23 @@ interface IUser {
     discordId: string;
     requestStatus: string[];
     genrePreferences: string[];
+    genreNegativePreferences: string[];
     languagePreferences: string[];
+    languageNegativePreferences: string[];
     osuStylePreferences: string[];
+    osuStyleNegativePreferences: string[];
     taikoStylePreferences: string[];
+    taikoStyleNegativePreferences: string[];
     catchStylePreferences: string[];
+    catchStyleNegativePreferences: string[];
     maniaStylePreferences: string[];
+    maniaStyleNegativePreferences: string[];
     maniaKeymodePreferences: string[];
+    maniaKeymodeNegativePreferences: string[];
     detailPreferences: string[];
+    detailNegativePreferences: string[];
     mapperPreferences: string[];
+    mapperNegativePreferences: string[];
     requestLink: string;
 
     // not used in model

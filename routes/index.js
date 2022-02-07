@@ -184,6 +184,7 @@ router.post('/findBns/', async (req, res) => {
             // genre
             for (const genre of genres) {
                 if (user.genrePreferences.includes(genre)) filteredUsers[i].genreCount += genreVar;
+                if (user.genreNegativePreferences.includes(genre)) filteredUsers[i].genreCount -= genreVar*10;
             }
 
             if (!filteredUsers[i].genreCount) {
@@ -196,7 +197,8 @@ router.post('/findBns/', async (req, res) => {
 
             // language
             for (const language of languages) {
-                if (user.languagePreferences.includes(language)) filteredUsers[i].languageCount += languageVar;
+                if (user.languagePreferences && user.languagePreferences.includes(language)) filteredUsers[i].languageCount += languageVar;
+                if (user.languageNegativePreferences && user.languageNegativePreferences.includes(language)) filteredUsers[i].languageCount -= languageVar*10;
             }
 
             if (!filteredUsers[i].languageCount) {
@@ -209,29 +211,43 @@ router.post('/findBns/', async (req, res) => {
 
             // style + keycount
             for (const style of styles) {
-                if (user.modes.includes('osu') && beatmapModes.includes('osu') && user.osuStylePreferences.includes(style)) filteredUsers[i].styleCount += styleVar;
-                if (user.modes.includes('taiko') && beatmapModes.includes('taiko') && user.taikoStylePreferences.includes(style)) filteredUsers[i].styleCount += styleVar;
-                if (user.modes.includes('fruits') && beatmapModes.includes('fruits') && user.catchStylePreferences.includes(style)) filteredUsers[i].styleCount += styleVar;
-                if (user.modes.includes('mania') && beatmapModes.includes('mania') && user.maniaStylePreferences.includes(style)) filteredUsers[i].styleCount += styleVar;
+                if (user.modes.includes('osu') && beatmapModes.includes('osu') && user.osuStylePreferences && user.osuStylePreferences.includes(style)) filteredUsers[i].styleCount += styleVar;
+                if (user.modes.includes('osu') && beatmapModes.includes('osu') && user.osuStyleNegativePreferences && user.osuStyleNegativePreferences.includes(style)) filteredUsers[i].styleCount -= styleVar*10;
+                if (user.modes.includes('taiko') && beatmapModes.includes('taiko') && user.taikoStylePreferences && user.taikoStylePreferences.includes(style)) filteredUsers[i].styleCount += styleVar;
+                if (user.modes.includes('taiko') && beatmapModes.includes('taiko') && user.taikoStyleNegativePreferences && user.taikoStyleNegativePreferences.includes(style)) filteredUsers[i].styleCount -= styleVar*10;
+                if (user.modes.includes('fruits') && beatmapModes.includes('fruits') && user.catchStylePreferences && user.catchStylePreferences.includes(style)) filteredUsers[i].styleCount += styleVar;
+                if (user.modes.includes('fruits') && beatmapModes.includes('fruits') && user.catchStyleNegativePreferences && user.catchStyleNegativePreferences.includes(style)) filteredUsers[i].styleCount -= styleVar*10;
+                if (user.modes.includes('mania') && beatmapModes.includes('mania') && user.maniaStylePreferences && user.maniaStylePreferences.includes(style)) filteredUsers[i].styleCount += styleVar;
+                if (user.modes.includes('mania') && beatmapModes.includes('mania') && user.maniaStyleNegativePreferences && user.maniaStyleNegativePreferences.includes(style)) filteredUsers[i].styleCount -= styleVar*10;
 
-                if (user.modes.includes('mania') && beatmapModes.includes('mania') && user.maniaKeymodePreferences.includes(style)) {
+                if (user.modes.includes('mania') && beatmapModes.includes('mania') && user.maniaKeymodePreferences && user.maniaKeymodePreferences.includes(style)) {
                     filteredUsers[i].styleCount += keymodeVar;
-                } else if (user.modes.includes('mania') && beatmapModes.includes('mania') && !user.maniaKeymodePreferences.includes(style)) {
+                } else if (user.modes.includes('mania') && beatmapModes.includes('mania') && user.maniaKeymodePreferences && !user.maniaKeymodePreferences.includes(style)) {
                     filteredUsers[i].styleCount -= keymodeVar;
                 }
+
+                if (user.modes.includes('mania') && beatmapModes.includes('mania') && user.maniaKeymodeNegativePreferences && user.maniaKeymodeNegativePreferences.includes(style)) {
+                    filteredUsers[i].styleCount -= keymodeVar*10;
+                }
+
             }
 
             // details
             for (const detail of details) {
-                if (user.detailPreferences.includes(detail)) filteredUsers[i].detailCount += detailVar;
+                if (user.detailPreferences && user.detailPreferences.includes(detail)) filteredUsers[i].detailCount += detailVar;
+                if (user.detailNegativePreferences && user.detailNegativePreferences.includes(detail)) filteredUsers[i].detailCount -= detailVar*10;
             }
 
             // mapper experience
             for (const experience of mapperExperience) {
-                if (user.mapperPreferences.includes(experience)) {
+                if (user.mapperPreferences && user.mapperPreferences.includes(experience)) {
                     filteredUsers[i].mapperExperienceCount += mapperVar;
-                } else {
+                } else if (user.mapperPreferences) {
                     filteredUsers[i].mapperExperienceCount -= mapperVar*2;
+                }
+
+                if (user.mapperNegativePreferences && user.mapperNegativePreferences.includes(experience)) {
+                    filteredUsers[i].mapperExperienceCount -= mapperVar*10;
                 }
             }
 
@@ -385,8 +401,7 @@ router.post('/setMatchStatus/:id', async (req, res) => {
 
     messages.push(`—BN Finder`);
 
-    //const sentMessages = await osuBot.sendMessages(match.beatmapset.mapperOsuId, messages);
-    const sentMessages = await osuBot.sendMessages(3178418, messages);
+    const sentMessages = await osuBot.sendMessages(match.beatmapset.mapperOsuId, messages);
 
     if (sentMessages !== true) {
         await osuBot.sendMessages(3178418, [`send message on match status error for ${match.beatmapset.osuId} pls fix`]);

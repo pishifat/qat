@@ -32,7 +32,7 @@ const BnEvaluationAddition = Object.freeze({
 // BN Finder
 const GenrePreferences = ['rock', 'pop', 'novelty', 'hip hop', 'electronic', 'metal', 'classical', 'folk', 'jazz', 'vocaloid', 'other'];
 const LanguagePreferences = ['instrumental', 'english', 'japanese', 'korean', 'chinese', 'other'];
-const DetailPreferences = ['anime', 'game', 'movie', 'tv', 'doujin', 'featured artist', 'cover', 'remix'];
+const DetailPreferences = ['anime', 'featured artist', 'game', 'movie', 'tv', 'doujin', 'cover', 'remix'];
 const MapperPreferences = ['new mapper', 'experienced mapper'];
 const OsuStylePreferences = ['simple', 'tech', 'alternating', 'conceptual', 'other'];
 const TaikoStylePreferences = ['simple', 'tech', 'SV heavy', 'other'];
