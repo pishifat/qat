@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
     rankedBeatmapsets: { type: Number, default: 0 },
     discordId: { type: String },
     requestStatus: [{ type: String, enum: ['gameChat', 'personalQueue', 'globalQueue', 'closed'] }],
-    genrePreferences: [{ type: String, enum: ['rock', 'pop', 'novelty', 'hip hop', 'electronic', 'metal', 'classical', 'folk', 'jazz', 'other'] }],
+    genrePreferences: [{ type: String, enum: ['rock', 'pop', 'novelty', 'hip hop', 'electronic', 'metal', 'classical', 'folk', 'jazz', 'vocaloid', 'other'] }],
     languagePreferences: [{ type: String, enum: ['instrumental', 'english', 'japanese', 'korean', 'chinese', 'other'] }],
     osuStylePreferences: [{ type: String, enum: ['simple', 'tech', 'alternating', 'conceptual', 'other'] }],
     taikoStylePreferences: [{ type: String, enum: ['simple', 'tech', 'SV heavy', 'other'] }],
