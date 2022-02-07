@@ -86,8 +86,10 @@ router.post('/findBns/', async (req, res) => {
     const beatmapsetInfo = await osu.getBeatmapsetInfo(req.session.accessToken, beatmapsetId);
 
     if (!beatmapsetInfo || beatmapsetInfo.error || !beatmapsetInfo.id) {
+        await osuBot.sendMessages(3178418, [`beatmapsetInfo error for ${url} pls fix`]);
+
         return res.json({
-            error: `Couldn't retrieve beatmap info`,
+            error: `Couldn't retrieve beatmap info. Dev has been notified.`,
         });
     }
 
@@ -100,9 +102,11 @@ router.post('/findBns/', async (req, res) => {
 
     const mapperInfo = await osu.getOtherUserInfo(req.session.accessToken, beatmapsetInfo.user.id);
 
-    if (!mapperInfo || mapperInfo.error) {
+    if (!mapperInfo || mapperInfo.error || !mapperInfo.id) {
+        await osuBot.sendMessages(3178418, [`mapperInfo error for ${url} pls fix`]);
+
         return res.json({
-            error: `Couldn't retrieve mapper info`,
+            error: `Couldn't retrieve mapper info. Dev has been notified.`,
         });
     }
 
