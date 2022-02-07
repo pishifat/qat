@@ -119,15 +119,10 @@ router.post('/findBns/', async (req, res) => {
     const osuLanguage = beatmapsetInfo.language.name.toLowerCase();
     const beatmapModes = beatmapsetInfo.beatmaps.map(b => b.mode);
 
-    if (beatmapModes.indexOf('fruits') >= 0) {
-        const i = beatmapModes.indexOf('fruits');
-        beatmapModes.splice(i, 1, 'catch');
-    }
-
     const tempStyles = [];
     if (beatmapModes.includes('osu')) tempStyles.push(OsuStylePreferences);
     if (beatmapModes.includes('taiko')) tempStyles.push(TaikoStylePreferences);
-    if (beatmapModes.includes('catch')) tempStyles.push(CatchStylePreferences);
+    if (beatmapModes.includes('fruits')) tempStyles.push(CatchStylePreferences);
     if (beatmapModes.includes('mania')) tempStyles.push(ManiaStylePreferences);
 
     let mapperExperience = mapperInfo.ranked_and_approved_beatmapset_count >= 3 ? ['experienced mapper'] : ['new mapper'];
@@ -216,7 +211,7 @@ router.post('/findBns/', async (req, res) => {
             for (const style of styles) {
                 if (user.modes.includes('osu') && beatmapModes.includes('osu') && user.osuStylePreferences.includes(style)) filteredUsers[i].styleCount += styleVar;
                 if (user.modes.includes('taiko') && beatmapModes.includes('taiko') && user.taikoStylePreferences.includes(style)) filteredUsers[i].styleCount += styleVar;
-                if (user.modes.includes('catch') && beatmapModes.includes('catch') && user.catchStylePreferences.includes(style)) filteredUsers[i].styleCount += styleVar;
+                if (user.modes.includes('fruits') && beatmapModes.includes('fruits') && user.catchStylePreferences.includes(style)) filteredUsers[i].styleCount += styleVar;
                 if (user.modes.includes('mania') && beatmapModes.includes('mania') && user.maniaStylePreferences.includes(style)) filteredUsers[i].styleCount += styleVar;
 
                 if (user.modes.includes('mania') && beatmapModes.includes('mania') && user.maniaKeymodePreferences.includes(style)) {
