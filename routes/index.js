@@ -372,6 +372,7 @@ router.post('/setMatchStatus/:id', async (req, res) => {
     messages.push(`—BN Finder`);
 
     const sentMessages = await osuBot.sendMessages(match.beatmapset.mapperOsuId, messages);
+    //const sentMessages = await osuBot.sendMessages(3178418, messages);
 
     if (sentMessages !== true) {
         return res.json({ error: `Messages were not sent. Please let pishifat know!` });

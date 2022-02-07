@@ -26,6 +26,8 @@
                 <div>
                     <audio
                         controls
+                        preload="none"
+                        :src="`https://b.ppy.sh/preview/${match.beatmapset.osuId}.mp3`"
                     >
                         <source
                             :src="`https://b.ppy.sh/preview/${match.beatmapset.osuId}.mp3`"
