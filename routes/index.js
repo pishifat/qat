@@ -386,7 +386,16 @@ router.post('/setMatchStatus/:id', async (req, res) => {
     //const sentMessages = await osuBot.sendMessages(3178418, messages);
 
     if (sentMessages !== true) {
-        return res.json({ error: `Messages were not sent. Please let pishifat know!` });
+        await osuBot.sendMessages(3178418, [`send message on match status error for ${match.beatmapset.osuId} pls fix`]);
+
+        return res.json({ error: `Messages were not sent. Dev has been notified.` });
+    } else {
+        Logger.generate(
+            req.session.mongoId,
+            `Set match status for s/${match.beatmapset.osuId} as ${req.body.status}`,
+            'bnFinder',
+            match.beatmapset._id
+        );
     }
 
     return res.json({ success: 'Mapper has been notified!' });
