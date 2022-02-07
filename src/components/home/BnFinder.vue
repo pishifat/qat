@@ -176,7 +176,7 @@
                         :username="user.username"
                         :osu-id="user.osuId"
                     />
-                    <span v-if="user.requestStatus && !user.requestStatus.includes('closed')">
+                    <span v-if="user.requestStatus && user.requestStatus.length && !user.requestStatus.includes('closed')">
                         <span
                             class="badge badge-pill mx-1 text-lowercase badge-success"
                         >open

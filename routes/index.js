@@ -86,7 +86,7 @@ router.post('/findBns/', async (req, res) => {
     const beatmapsetInfo = await osu.getBeatmapsetInfo(req.session.accessToken, beatmapsetId);
 
     if (!beatmapsetInfo || beatmapsetInfo.error || !beatmapsetInfo.id) {
-        await osuBot.sendMessages(3178418, [`beatmapsetInfo error for ${url} pls fix`]);
+        await osuBot.sendMessages(3178418, [`beatmapsetInfo 1st stop error for ${url} pls fix`]);
 
         return res.json({
             error: `Couldn't retrieve beatmap info. Dev has been notified.`,
@@ -100,17 +100,7 @@ router.post('/findBns/', async (req, res) => {
         });
     }
 
-    const mapperInfo = await osu.getOtherUserInfo(req.session.accessToken, beatmapsetInfo.user.id);
-
-    if (!mapperInfo || mapperInfo.error || !mapperInfo.id) {
-        await osuBot.sendMessages(3178418, [`mapperInfo error for ${url} pls fix`]);
-
-        return res.json({
-            error: `Couldn't retrieve mapper info. Dev has been notified.`,
-        });
-    }
-
-    if (mapperInfo.id !== req.session.osuId) {
+    if (beatmapsetInfo.user.id !== req.session.osuId) {
         return res.json({ error: 'You can only submit your own beatmaps' });
     }
 
@@ -124,6 +114,16 @@ router.post('/findBns/', async (req, res) => {
     if (beatmapModes.includes('taiko')) tempStyles.push(TaikoStylePreferences);
     if (beatmapModes.includes('fruits')) tempStyles.push(CatchStylePreferences);
     if (beatmapModes.includes('mania')) tempStyles.push(ManiaStylePreferences);
+
+    const mapperInfo = await osu.getOtherUserInfo(req.session.accessToken, beatmapsetInfo.user.id);
+
+    if (!mapperInfo || mapperInfo.error || !mapperInfo.id) {
+        await osuBot.sendMessages(3178418, [`mapperInfo 2nd stop error for ${url} pls fix`]);
+
+        return res.json({
+            error: `Couldn't retrieve mapper info. Dev has been notified.`,
+        });
+    }
 
     let mapperExperience = mapperInfo.ranked_and_approved_beatmapset_count >= 3 ? ['experienced mapper'] : ['new mapper'];
 
@@ -304,15 +304,18 @@ router.post('/findBns/', async (req, res) => {
         beatmapset.length = beatmapsetInfo.beatmaps[0].total_length;
         beatmapset.bpm = beatmapsetInfo.bpm;
         beatmapset.submittedAt = beatmapsetInfo.submitted_date;
-        beatmapset.mapperUsername = mapperInfo.username;
-        beatmapset.mapperOsuId = mapperInfo.id;
+        beatmapset.mapperUsername = beatmapsetInfo.user.username;
+        beatmapset.mapperOsuId = beatmapsetInfo.user.id;
 
-        if (!beatmapset.mapperOsuId) {
-            await osuBot.sendMessages(3178418, [`mapperInfo error for ${url} pls fix (2nd instance)`]);
+        if (!beatmapset.mapperOsuId || !beatmapset.mapperUsername) {
+            const response = await osu.getClientCredentialsGrant();
+            const token = response.access_token;
 
-            return res.json({
-                error: `Couldn't retrieve mapper info. Dev has been notified.`,
-            });
+            const beatmapsetInfo = await osu.getBeatmapsetInfo(token, beatmapset.osuId);
+            beatmapset.mapperOsuId = beatmapsetInfo.user.id;
+            beatmapset.mapperUsername = beatmapsetInfo.user.username;
+
+            await osuBot.sendMessages(3178418, [`mapperInfo 3rd stop for ${url} pls fix`]);
         }
 
         await beatmapset.validate();
@@ -382,8 +385,8 @@ router.post('/setMatchStatus/:id', async (req, res) => {
 
     messages.push(`—BN Finder`);
 
-    const sentMessages = await osuBot.sendMessages(match.beatmapset.mapperOsuId, messages);
-    //const sentMessages = await osuBot.sendMessages(3178418, messages);
+    //const sentMessages = await osuBot.sendMessages(match.beatmapset.mapperOsuId, messages);
+    const sentMessages = await osuBot.sendMessages(3178418, messages);
 
     if (sentMessages !== true) {
         await osuBot.sendMessages(3178418, [`send message on match status error for ${match.beatmapset.osuId} pls fix`]);
