@@ -132,12 +132,16 @@ router.post('/findBns/', async (req, res) => {
 
     let mapperExperience = mapperInfo.ranked_and_approved_beatmapset_count >= 3 ? ['experienced mapper'] : ['new mapper'];
 
-    if (!genres.includes(osuGenre)) {
+    if (!genres.includes(osuGenre) && GenrePreferences.includes(osuGenre)) {
         genres.push(osuGenre);
     }
 
-    if (!languages.includes(osuLanguage)) {
+    if (!languages.includes(osuLanguage) && LanguagePreferences.includes(osuLanguage)) {
         languages.push(osuLanguage);
+    }
+
+    if (!genres.length || !languages.length) {
+        return res.json({ error: 'Must select at least one genre and language.' });
     }
 
     // find matching users
@@ -307,6 +311,14 @@ router.post('/findBns/', async (req, res) => {
         beatmapset.submittedAt = beatmapsetInfo.submitted_date;
         beatmapset.mapperUsername = mapperInfo.username;
         beatmapset.mapperOsuId = mapperInfo.id;
+
+        if (!beatmapset.mapperOsuId) {
+            await osuBot.sendMessages(3178418, [`mapperInfo error for ${url} pls fix (2nd instance)`]);
+
+            return res.json({
+                error: `Couldn't retrieve mapper info. Dev has been notified.`,
+            });
+        }
 
         await beatmapset.validate();
         await beatmapset.save();
