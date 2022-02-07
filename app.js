@@ -184,7 +184,6 @@ app.listen(port, () => {
         notifications.lowActivityTask.start();
         notifications.closeContentReviews.start();
         notifications.checkMatchBeatmapStatuses.start();
-        notifications.temp.start();
     }
 });
 

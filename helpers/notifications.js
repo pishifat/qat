@@ -649,30 +649,6 @@ const checkMatchBeatmapStatuses = cron.schedule('2 22 * * *', async () => {
 });
 
 /**
- * Temporarily fixes maps submitted without name info
- */
-const temp = cron.schedule('2 23 * * *', async () => {
-    const response = await osu.getClientCredentialsGrant();
-    const token = response.access_token;
-
-    const matches = await BnFinderMatch
-        .find({
-            isMatch: { $exists: false },
-            isExpired: { $ne: true },
-        })
-        .populate('beatmapset');
-
-    for (const match of matches) {
-        if (!match.beatmapset.mapperOsuId) {
-            const beatmapsetInfo = await osu.getBeatmapsetInfo(token, match.beatmapset.osuId);
-            await Beatmapset.findByIdAndUpdate(match.beatmapset.id, { mapperOsuId: beatmapsetInfo.user.id, mapperUsername: beatmapsetInfo.user.username });
-        }
-    }
-}, {
-    scheduled: false,
-});
-
-/**
  * @param {Date} initialDate
  * @param {object} bn
  * @returns {Promise<number>} number of unique bubbled/qualified
@@ -710,4 +686,4 @@ async function hasLowActivity (initialDate, bn, mode) {
     return false;
 }
 
-module.exports = { notifyDeadlines, notifyBeatmapReports, lowActivityTask, closeContentReviews, checkMatchBeatmapStatuses, temp };
+module.exports = { notifyDeadlines, notifyBeatmapReports, lowActivityTask, closeContentReviews, checkMatchBeatmapStatuses };
