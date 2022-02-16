@@ -180,9 +180,9 @@ router.post('/submitTest', async (req, res) => {
             value: natList,
         });
 
-        /*let trialNatList = '';
+        let trialNatList = '';
 
-        if (test.mode == 'taiko') {
+        if (test.mode == 'mania') {
             const assignedTrialNat = await User.getAssignedTrialNat(test.mode, [], 2);
             currentBnApp.bnEvaluators = assignedTrialNat;
             await currentBnApp.save();
@@ -191,7 +191,7 @@ router.post('/submitTest', async (req, res) => {
                 name: 'Assigned BN',
                 value: trialNatList,
             });
-        }*/
+        }
     }
 
     await discord.webhookPost(
