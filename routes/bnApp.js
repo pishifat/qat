@@ -124,7 +124,7 @@ router.post('/apply', async (req, res) => {
             if (totalMods < modsThreshold) {
                 return res.json({ error: `You need at least ${modsThreshold} mods within the last 60 days to apply because you were recently removed for low activity!` } );
             }
-        } else if (modScore < 0) {
+        } else if (modScore < 0 && mode == 'osu') {
             let additionalInfo = `Your mod score was calculated based on ${months} month${months == 1 ? '' : 's'} of activity because `;
             if (resignedOnGoodTerms) additionalInfo += 'you resigned from the BN on good terms.';
             else if (wasBn) additionalInfo += 'you were BN for this game mode in the past.';
