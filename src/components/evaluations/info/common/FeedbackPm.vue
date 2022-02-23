@@ -91,7 +91,7 @@ export default {
 
                     // low activity warning
                     } else if (this.lowActivityWarning) {
-                        line += `the NAT have noticed that your nomination activity is too low to reach a conclusion`;
+                        line += `the NAT have noticed that your nomination activity is currently too low`;
 
                         messages.push(line);
                         messages.push(`your BN activity will be evaluated again 1 month from now!`);
