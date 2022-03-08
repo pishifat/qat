@@ -75,8 +75,9 @@
                         :class="processing ? 'processing' : ''"
                         @click.prevent="setMatchStatus(match.id, false)"
                     >
-                        <i
-                            class="fas fa-times-circle d-flex text-danger"
+                        <font-awesome-icon
+                            icon="fa-solid fa-circle-xmark"
+                            class="d-flex text-danger"
                             :class="windowWidth < 576 ? 'justify-content-center' : 'flex-row-reverse'"
                             :data-toggle="windowWidth < 768 ? '' : 'tooltip'"
                             data-placement="left"
@@ -98,8 +99,9 @@
                         :class="processing ? 'processing' : ''"
                         @click.prevent="setMatchStatus(match.id, true)"
                     >
-                        <i
-                            class="fas fa-check-circle d-flex flex-row text-success"
+                        <font-awesome-icon
+                            icon="fa-solid fa-circle-check"
+                            class="d-flex flex-row text-success"
                             :class="windowWidth < 576 ? 'justify-content-center' : ''"
                             :data-toggle="windowWidth < 768 ? '' : 'tooltip'"
                             data-placement="right"
