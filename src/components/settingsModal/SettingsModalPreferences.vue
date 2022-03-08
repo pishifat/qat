@@ -11,7 +11,7 @@
             <div class="col-sm-6">
                 <div class="form-check">
                     <input
-                        id="settings-evaluator"
+                        id="settings-anonymous"
                         :checked="loggedInUser.isBnFinderAnonymous"
                         type="checkbox"
                         class="form-check-input"
@@ -19,7 +19,7 @@
                     >
                     <label
                         class="form-check-label text-secondary"
-                        for="settings-evaluator"
+                        for="settings-anonymous"
                     >
                         Anonymous on BN Finder messages
                     </label>
