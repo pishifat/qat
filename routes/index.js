@@ -412,7 +412,7 @@ router.post('/setMatchStatus/:id', async (req, res) => {
     const sentMessages = await osuBot.sendMessages(match.beatmapset.mapperOsuId, messages);
 
     if (sentMessages !== true) {
-        await osuBot.sendMessages(3178418, [`send message on match status error for ${match.beatmapset.osuId} pls fix`]);
+        await osuBot.sendMessages(3178418, [`send message on match status error for ${match.beatmapset.osuId} pls fix. user: ${req.session.username} / match id: ${match.id}`]);
 
         return res.json({ error: `Messages were not sent. Dev has been notified.` });
     } else {
