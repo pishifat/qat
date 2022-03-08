@@ -2,6 +2,33 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-6">
+                <div>Do you want to be anonymous when accepting/denying matches?</div>
+                <small class="text-secondary">
+                    Only relevant to osu! messages
+                </small>
+            </div>
+
+            <div class="col-sm-6">
+                <div class="form-check">
+                    <input
+                        id="settings-evaluator"
+                        :checked="loggedInUser.isBnFinderAnonymous"
+                        type="checkbox"
+                        class="form-check-input"
+                        @change="updateIsBnFinderAnonymous"
+                    >
+                    <label
+                        class="form-check-label text-secondary"
+                        for="settings-evaluator"
+                    >
+                        Anonymous on BN Finder messages
+                    </label>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-sm-6">
                 <div>What are your preferred song genres?</div>
                 <small class="text-secondary">
                     {{ defaultText }}
@@ -299,6 +326,9 @@ export default {
         this.mapperNegativePreferences = this.loggedInUser.mapperNegativePreferences;
     },
     methods: {
+        async updateIsBnFinderAnonymous (e) {
+            await this.$http.executePost(`/users/${this.loggedInUser.id}/switchIsBnFinderAnonymous`, {}, e);
+        },
         async updateGenrePreferences (genre, isPreference, e) {
             this.processing = true;
             const data = await this.$http.executePost(`/users/${this.loggedInUser.id}/updateGenrePreferences`, {

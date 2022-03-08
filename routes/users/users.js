@@ -457,6 +457,32 @@ router.post('/:id/switchBnEvaluator', middlewares.isBnOrNat, async (req, res) =>
     );
 });
 
+/* POST switch isBnFinderAnonymous */
+router.post('/:id/switchIsBnFinderAnonymous', middlewares.isBnOrNat, async (req, res) => {
+    const user = await User.findById(req.params.id).orFail();
+
+    if (req.session.mongoId != user.id && !res.locals.userRequest.isNat) {
+        return res.json({
+            error: 'Unauthorized',
+        });
+    }
+
+    user.isBnFinderAnonymous = !user.isBnFinderAnonymous;
+    await user.save();
+
+    res.json({
+        user,
+        success: 'Toggled anonymous setting',
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Toggled "${user.username}" ${user.isBnFinderAnonymous ? 'on' : 'off'} for anonymous BN Finder setting`,
+        'user',
+        user._id
+    );
+});
+
 /* POST switch/update request status */
 router.post('/:id/updateRequestStatus', middlewares.isBnOrNat, async (req, res) => {
     if (req.body.requestLink) {

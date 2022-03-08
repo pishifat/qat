@@ -44,6 +44,7 @@ interface IUser {
     mapperPreferences: string[];
     mapperNegativePreferences: string[];
     requestLink: string;
+    isBnFinderAnonymous: boolean;
 
     // not used in model
     genreCount: number;

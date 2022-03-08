@@ -388,15 +388,23 @@ router.get('/findNextMatch', async (req, res) => {
 
 /* POST set match status */
 router.post('/setMatchStatus/:id', async (req, res) => {
-    const match = await BnFinderMatch.findByIdAndUpdate(req.params.id, { isMatch: req.body.status }).populate('beatmapset user');
+    const [match, user] = await Promise.all([
+        BnFinderMatch.findByIdAndUpdate(req.params.id, { isMatch: req.body.status }).populate('beatmapset user'),
+        User.findById(req.session.mongoId),
+    ]);
 
     let messages = [];
 
     if (req.body.status == true) {
         messages.push(`hello! ${req.session.username} https://osu.ppy.sh/users/${req.session.osuId} expressed interest in your beatmap "${match.beatmapset.fullTitle}"! https://osu.ppy.sh/beatmapsets/${match.beatmapset.osuId}`, `send them a message if they haven't modded your map already! :)`);
     } else {
-        messages.push(`hello! one of the BNs who was recommended your beatmap "${match.beatmapset.fullTitle}" https://osu.ppy.sh/beatmapsets/${match.beatmapset.osuId} wasn't interested :(`);
-        messages.push(`their name isn't revealed in case they'd rather be anonymous.`);
+        messages.push(`hello! ${user.isBnFinderAnonymous ? 'one of the BNs' : `the BN "${user.username}"`} who was recommended your beatmap "${match.beatmapset.fullTitle}" https://osu.ppy.sh/beatmapsets/${match.beatmapset.osuId} wasn't interested :(`);
+
+        if (user.isBnFinderAnonymous) {
+            messages.push(`their name isn't revealed in case they'd rather be anonymous.`);
+        } else {
+            messages.push(`contact the user if you'd like to know why!`);
+        }
     }
 
     messages.push(`—BN Finder`);
