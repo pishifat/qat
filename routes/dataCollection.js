@@ -56,6 +56,21 @@ router.get('/loadUnsetEvents', async (req, res) => {
     });
 });
 
+/* POST toggle isReviewed */
+router.post('/toggleIsReviewed/:id', middlewares.isNat, async (req, res) => {
+    let a = await Aiess.findById(req.params.id).orFail();
+
+    a.isReviewed = !a.isReviewed;
+    await a.save();
+
+    res.json({
+        isReviewed: a.isReviewed,
+        success: 'Toggled reviewed status. Refresh to see changes',
+    });
+
+    Logger.generate(req.session.mongoId, `Toggled review status of s/${a.beatmapsetId} to ${a.isReviewed}`, 'dataCollection', a._id);
+});
+
 /* POST edit reason for dq/pop */
 router.post('/updateContent/:id', middlewares.isNat, async (req, res) => {
     let a = await Aiess.findByIdAndUpdate(req.params.id, { content: req.body.reason });

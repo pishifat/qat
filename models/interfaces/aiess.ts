@@ -24,6 +24,7 @@ interface IAiess {
     isUnique: boolean;
     effortBonus: number;
     responsibleNominators: number[];
+    isReviewed: boolean;
     qaComment: string; // temporary field added during user activity for disqualified qa checks
     qualityAssuranceChecks: IQualityAssuranceCheckDocument[]; // virtual
 }

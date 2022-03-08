@@ -22,6 +22,7 @@ const aiessSchema = new mongoose.Schema({
     isUnique: { type: Boolean, default: false },
     effortBonus: { type: Number }, //multiplier combining drain per diff, # diffs, and difficulty of each diff
     responsibleNominators: [{ type: Number }],
+    isReviewed: { type: Boolean, default: false },
 
     qaComment: { type: String }, // temporary field added during user activity for disqualified qa checks
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });

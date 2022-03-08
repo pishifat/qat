@@ -21,6 +21,20 @@
 
                             {{ artistTitle(event) }}
                         </a>
+                        <a
+                            v-if="loggedInUser.isNat && eventsId == 'uniqueNominations'"
+                            href="#"
+                            :class="processing ? 'processing' : ''"
+                            data-toggle="tooltip"
+                            data-placement="right"
+                            title="mark map as reviewed"
+                            @click.prevent="toggleIsReviewed(event)"
+                        >
+                            <font-awesome-icon
+                                icon="fa-solid fa-circle-check"
+                                :class="event.isReviewed ? 'text-success' : 'text-secondary'"
+                            />
+                        </a>
                     </td>
                     <td>
                         <user-link
@@ -70,12 +84,34 @@ export default {
             required: true,
         },
     },
+    data() {
+        return {
+            processing: false,
+        };
+    },
     computed: {
         ...mapState('activity', [
             'isLoading',
         ]),
+        ...mapState([
+            'loggedInUser',
+        ]),
     },
     methods: {
+        async toggleIsReviewed (event) {
+            if (!this.processing) {
+                this.processing = true;
+                const data = await this.$http.executePost('/dataCollection/toggleIsReviewed/' + event._id, {});
+                this.$store.commit('dataCollection/updateEvent', {
+                    id: event._id,
+                    type: event.type,
+                    modifiedField: 'isReviewed',
+                    value: data.isReviewed,
+                });
+                this.processing = false;
+            }
+
+        },
         beatmapsetId (event) {
             if (this.eventsId == 'qualityAssuranceChecks') {
                 return event.event.beatmapsetId;
@@ -114,3 +150,9 @@ export default {
     },
 };
 </script>
+
+<style>
+.processing {
+    pointer-events: none;
+}
+</style>
