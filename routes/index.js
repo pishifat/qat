@@ -11,7 +11,7 @@ const Logger = require('../models/log');
 const ResignationEvaluation = require('../models/evaluations/resignationEvaluation');
 const { setSession } = require('../helpers/util');
 const { OsuResponseError } = require('../helpers/errors');
-const { ResignationConsensus, GenrePreferences, LanguagePreferences, DetailPreferences, OsuStylePreferences, TaikoStylePreferences, CatchStylePreferences, ManiaStylePreferences, ManiaKeymodePreferences, MapperPreferences } = require('../shared/enums');
+const { ResignationConsensus, GenrePreferences, LanguagePreferences, DetailPreferences, OsuStylePreferences, TaikoStylePreferences, CatchStylePreferences, ManiaStylePreferences, MapperPreferences } = require('../shared/enums');
 const Beatmapset = require('../models/modRequests/beatmapset');
 const BnFinderMatch = require('../models/bnFinderMatch');
 
@@ -377,7 +377,9 @@ router.get('/findNextMatch', async (req, res) => {
             isExpired: { $ne: true },
         })
         .populate('beatmapset')
-        .sort({ createdAt: 1 });
+        .sort({ isPostponed: 1, createdAt: 1  });
+
+    console.log(match.isPostponed);
 
     if (!match) {
         return res.json({ none: 'no match' });
@@ -425,6 +427,21 @@ router.post('/setMatchStatus/:id', async (req, res) => {
     }
 
     return res.json({ success: 'Mapper has been notified!' });
+});
+
+/* POST postpone match */
+router.post('/postponeMatch/:id', async (req, res) => {
+    const match = await BnFinderMatch.findByIdAndUpdate(req.params.id, { isPostponed: true }).populate('beatmapset user');
+
+    Logger.generate(
+        req.session.mongoId,
+        `Postponed match for s/${match.beatmapset.osuId}`,
+        'bnFinder',
+        match.beatmapset._id
+    );
+
+
+    return res.json({ success: 'Match moved to end of queue' });
 });
 
 /* GET 'login' to get user's info */

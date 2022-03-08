@@ -15,6 +15,20 @@
             <div class="col-sm-12 text-center">
                 <h4 class="mt-3">
                     <a :href="`https://osu.ppy.sh/beatmapsets/${match.beatmapset.osuId}`" target="_blank"><b>{{ match.beatmapset.fullTitle }}</b></a>
+                    <a
+                        v-if="!match.isPostponed"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="postpone match (move to end of queue)"
+                        href="#"
+                        :class="processing ? 'processing' : ''"
+                        @click.prevent="postponeMatch(match.id)"
+                    >
+                        <font-awesome-icon
+                            icon="fa-solid fa-circle-arrow-right"
+                            class="text-warning small"
+                        />
+                    </a>
                 </h4>
                 <h5>
                     mapped by
@@ -54,7 +68,8 @@
                 </div>
             </div>
             <div class="row col-sm-12">
-                <h1 :class="windowWidth < 576 ? 'col-sm-12' : 'col-sm-4'">
+                <div class="col-sm-3" />
+                <h1 :class="windowWidth < 576 ? 'col-sm-12' : 'col-sm-1'">
                     <a
                         href="#"
                         :class="processing ? 'processing' : ''"
@@ -63,7 +78,7 @@
                         <i
                             class="fas fa-times-circle d-flex text-danger"
                             :class="windowWidth < 576 ? 'justify-content-center' : 'flex-row-reverse'"
-                            :data-toggle="windowWidth < 576 ? '' : 'tooltip'"
+                            :data-toggle="windowWidth < 768 ? '' : 'tooltip'"
                             data-placement="left"
                             title="notify mapper that you're NOT interested in this map"
 
@@ -77,7 +92,7 @@
                     <b>{{ processing ? 'processing...' : rejectHover ? 'NEXT MAP' : acceptHover ? 'MATCH' : '' }}</b>
                 </h3>
 
-                <h1 :class="windowWidth < 576 ? 'col-sm-12' : 'col-sm-4'">
+                <h1 :class="windowWidth < 576 ? 'col-sm-12' : 'col-sm-1'">
                     <a
                         href="#"
                         :class="processing ? 'processing' : ''"
@@ -86,7 +101,7 @@
                         <i
                             class="fas fa-check-circle d-flex flex-row text-success"
                             :class="windowWidth < 576 ? 'justify-content-center' : ''"
-                            :data-toggle="windowWidth < 576 ? '' : 'tooltip'"
+                            :data-toggle="windowWidth < 768 ? '' : 'tooltip'"
                             data-placement="right"
                             title="notify mapper that you're interested in this map!"
 
@@ -165,6 +180,16 @@ export default {
                         status,
                     }
                 );
+
+                await this.findNextMatch();
+
+                this.processing = false;
+            }
+        },
+        async postponeMatch (id) {
+            if (!this.processing) {
+                this.processing = true;
+                await this.$http.executePost('/postponeMatch/' + id);
 
                 await this.findNextMatch();
 

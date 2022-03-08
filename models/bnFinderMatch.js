@@ -10,6 +10,7 @@ const bnFinderMatchSchema = new mongoose.Schema({
     styles: [{ type: String }],
     details: [{ type: String }],
     mapperExperience: { type: String },
+    isPostponed: { type: Boolean },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 /**

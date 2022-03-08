@@ -12,6 +12,7 @@ export interface IBnFinderMatchDocument extends Document {
     styles: string[];
     details: string[];
     mapperExperience: string;
+    isPostponed: boolean;
 }
 
 export default interface IBnFinderMatchModel extends Model<IBnFinderMatchDocument> { }

@@ -5,6 +5,9 @@ import VueRouter from 'vue-router';
 import store from './store/main';
 import App from './App.vue';
 import routes from './routes';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faCircleArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 Vue.use(VueRouter);
 
@@ -34,6 +37,9 @@ router.beforeEach(async (to, from, next) => {
         next();
     }
 });
+
+library.add(faCircleArrowRight);
+Vue.component('font-awesome-icon', FontAwesomeIcon);
 
 new Vue({
     store,
