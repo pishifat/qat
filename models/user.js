@@ -322,17 +322,16 @@ class UserService extends mongoose.Model {
             for (const user of relevantNat) {
                 if (!uniqueAssignedNatIds.includes(user.id)) {
                     await User.findByIdAndUpdate(user._id, { inBag: true });
+
+                    if (uniqueAssignedNatIds.length < sampleSize) {
+                        uniqueAssignedNatIds.push(user.id);
+                        uniqueAssignedNat.push(user);
+                    }
                 }
             }
-
-            let additionalAssignedNat = await query
-                .sample(sampleSize - uniqueAssignedNatIds.length)
-                .exec();
-
-            finalAssignedNat = uniqueAssignedNat.concat(additionalAssignedNat);
-        } else {
-            finalAssignedNat = uniqueAssignedNat;
         }
+
+        finalAssignedNat = uniqueAssignedNat;
 
         for (const user of finalAssignedNat) {
             await User.findByIdAndUpdate(user._id, { inBag: false });
