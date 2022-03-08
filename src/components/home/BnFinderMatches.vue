@@ -2,7 +2,7 @@
     <div>
         <div
             v-if="match"
-            class="my-2 row no-gutters"
+            class="my-2 row no-gutters mobile"
             style="position: relative; height: 250px;"
         >
             <div
@@ -54,16 +54,16 @@
                 </div>
             </div>
             <div class="row col-sm-12">
-                <div class="col-sm-3" />
-                <h1 class="col-sm-1">
+                <h1 :class="windowWidth < 576 ? 'col-sm-12' : 'col-sm-4'">
                     <a
                         href="#"
                         :class="processing ? 'processing' : ''"
                         @click.prevent="setMatchStatus(match.id, false)"
                     >
                         <i
-                            class="fas fa-times-circle d-flex flex-row-reverse text-danger"
-                            data-toggle="tooltip"
+                            class="fas fa-times-circle d-flex text-danger"
+                            :class="windowWidth < 576 ? 'justify-content-center' : 'flex-row-reverse'"
+                            :data-toggle="windowWidth < 576 ? '' : 'tooltip'"
                             data-placement="left"
                             title="notify mapper that you're NOT interested in this map"
 
@@ -73,11 +73,11 @@
                     </a>
                 </h1>
 
-                <h3 class="col-sm-4 justify-content-center d-flex" :class="processing ? 'text-secondary' : rejectHover ? 'text-danger' : 'text-success'">
+                <h3 v-if="windowWidth > 576" class="col-sm-4 justify-content-center d-flex" :class="processing ? 'text-secondary' : rejectHover ? 'text-danger' : 'text-success'">
                     <b>{{ processing ? 'processing...' : rejectHover ? 'NEXT MAP' : acceptHover ? 'MATCH' : '' }}</b>
                 </h3>
 
-                <h1 class="col-sm-1">
+                <h1 :class="windowWidth < 576 ? 'col-sm-12' : 'col-sm-4'">
                     <a
                         href="#"
                         :class="processing ? 'processing' : ''"
@@ -85,7 +85,8 @@
                     >
                         <i
                             class="fas fa-check-circle d-flex flex-row text-success"
-                            data-toggle="tooltip"
+                            :class="windowWidth < 576 ? 'justify-content-center' : ''"
+                            :data-toggle="windowWidth < 576 ? '' : 'tooltip'"
                             data-placement="right"
                             title="notify mapper that you're interested in this map!"
 
@@ -128,12 +129,24 @@ export default {
             rejectHover: false,
             acceptHover: false,
             processing: false,
+            windowWidth: window.innerWidth,
         };
     },
     async created () {
         await this.findNextMatch();
     },
+    mounted() {
+        this.$nextTick(() => {
+            window.addEventListener('resize', this.onResize);
+        });
+    },
+    beforeDestroy() {
+        window.removeEventListener('resize', this.onResize);
+    },
     methods: {
+        onResize() {
+            this.windowWidth = window.innerWidth;
+        },
         async findNextMatch () {
             const match = await this.$http.executeGet('/findNextMatch');
 
@@ -189,6 +202,12 @@ export default {
 
 .processing {
     pointer-events: none;
+}
+
+@media screen and (max-width: 576px) {
+    .mobile {
+        height: 350px !important
+    }
 }
 
 </style>
