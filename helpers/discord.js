@@ -86,7 +86,7 @@ async function highlightWebhookPost(message, webhook) {
     }
 }
 
-async function userHighlightWebhookPost(webhook, discordIds) {
+async function userHighlightWebhookPost(webhook, discordIds, text) {
     let url = 'https://discordapp.com/api/webhooks/';
 
     switch (webhook) {
@@ -104,7 +104,7 @@ async function userHighlightWebhookPost(webhook, discordIds) {
             break;
     }
 
-    let text = '';
+    if (!text) text = '';
 
     for (const id of discordIds) {
         text += `<@${id}> `;

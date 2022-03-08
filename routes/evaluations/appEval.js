@@ -8,6 +8,7 @@ const { submitEval, setGroupEval, setFeedback, replaceUser } = require('./evalua
 const middlewares = require('../../helpers/middlewares');
 const util = require('../../helpers/util');
 const discord = require('../../helpers/discord');
+const osu = require('../../helpers/osu');
 const { AppEvaluationConsensus, ResignationConsensus, BnEvaluationConsensus } = require('../../shared/enums');
 const osuBot = require('../../helpers/osuBot');
 
@@ -249,6 +250,14 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
             });
 
             await user.save();
+
+            const userOsuInfo = await osu.getOtherUserInfo(req.session.accessToken, user.osuId);
+            const pishifat = await User.findOne({ osuId: 3178418 });
+
+            if (!userOsuInfo.is_supporter) {
+                await discord.userHighlightWebhookPost(evaluation.mode, [pishifat.discordId], 'give new BN supporter pls ');
+                await util.sleep(500);
+            }
         }
 
         evaluation.active = false;
