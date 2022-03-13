@@ -16,7 +16,7 @@
                 <h4 class="mt-3">
                     <a :href="`https://osu.ppy.sh/beatmapsets/${match.beatmapset.osuId}`" target="_blank"><b>{{ match.beatmapset.fullTitle }}</b></a>
                     <a
-                        v-if="!match.isPostponed"
+                        v-if="match && !match.isPostponed"
                         data-toggle="tooltip"
                         data-placement="top"
                         title="postpone match (move to end of queue)"

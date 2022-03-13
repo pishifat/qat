@@ -379,8 +379,6 @@ router.get('/findNextMatch', async (req, res) => {
         .populate('beatmapset')
         .sort({ isPostponed: 1, createdAt: 1  });
 
-    console.log(match.isPostponed);
-
     if (!match) {
         return res.json({ none: 'no match' });
     }
