@@ -110,23 +110,31 @@ router.post('/store', middlewares.isLoggedIn, async (req, res) => {
     util.isValidUrlOrThrow(link, 'https://osu.ppy.sh/beatmapsets/');
     const beatmapsetId = util.getBeatmapsetIdFromUrl(link);
 
-    const cooldown = moment().subtract(2, 'month');
-    const [hasRequested, beatmapsetRequested] = await Promise.all([
+    const cooldown = moment().subtract(1, 'month');
+    const [hasRequested, relevantBeatmaps] = await Promise.all([
         ModRequest.findOne({
             user: req.session.mongoId,
             createdAt: { $gte: cooldown.toDate() },
         }),
-        Beatmapset.findOne({ osuId: parseInt(beatmapsetId, 10) }),
+        Beatmapset.find({ osuId: parseInt(beatmapsetId, 10) }),
     ]);
 
     if (hasRequested) {
         return res.json({
-            error: `You can only request one beatmap every 2 months! You can submit again on ${moment(hasRequested.createdAt).add(2, 'month')}.`,
+            error: `You can only request one beatmap every month! You can submit again on ${moment(hasRequested.createdAt).add(1, 'month')}.`,
         });
-    } else if (beatmapsetRequested) {
-        return res.json({
-            error: 'You cannot submit a beatmap that you submitted before!',
-        });
+    } else if (relevantBeatmaps && relevantBeatmaps.length) {
+        for (const map of relevantBeatmaps) {
+            const relevantModReq = await ModRequest.findOne({ beatmapset: map._id });
+
+            console.log(relevantModReq);
+
+            if (relevantModReq) {
+                return res.json({
+                    error: 'You cannot submit a beatmap that you submitted before!',
+                });
+            }
+        }
     }
 
     const beatmapsetInfo = await osu.getBeatmapsetInfo(req.session.accessToken, beatmapsetId);
