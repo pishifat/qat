@@ -13,7 +13,7 @@ async function getUserModsCount(accessToken, username, months) {
 
     const baseUrl = `https://osu.ppy.sh/api/v2/beatmapsets/events?limit=50&types[]=kudosu_gain&types[]=kudosu_lost&user=${username}`;
     let maxDate = moment();
-    let minDate = moment().subtract(30, 'days');
+    let minDate = moment().subtract(1, 'month');
     let modCount = [];
     let allMods = new Map();
     if (!months) months = 3;
@@ -70,8 +70,8 @@ async function getUserModsCount(accessToken, username, months) {
         }
 
         modCount.push(monthMods.size);
-        minDate.subtract(30, 'days');
-        maxDate.subtract(30, 'days');
+        minDate.subtract(1, 'month');
+        maxDate.subtract(1, 'month');
     }
 
     return modCount;
