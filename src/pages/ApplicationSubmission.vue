@@ -12,6 +12,12 @@
             <div>After your application is evaluated, you will receive an osu! message from the <a href="https://osu.ppy.sh/users/23648635" target="_blank">mappersguild bot</a> with the results. If your application is denied, you cannot apply to the same game mode again for 90 days (unless otherwise specified).</div>
         </div>
 
+        <div class="card card-body mb-3 bg-danger">
+            <div class="text-center">
+                <h5>Notice: BN applications for the osu! game mode are paused until May 1st (or earlier) while we integrate new NAT members.</h5>
+            </div>
+        </div>
+
         <div class="card card-body">
             <div class="row mb-2">
                 <div class="col-sm-12">
