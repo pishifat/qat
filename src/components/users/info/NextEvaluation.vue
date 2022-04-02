@@ -1,7 +1,32 @@
 <template>
-    <p>
-        <b>{{ displayMode ? `Next ${mode == 'osu' ? 'osu!' : 'osu!' + mode} evaluation:` : 'Next evaluation:' }}</b>
-        {{ nextEvaluationDate }}
+    <p class="form-inline">
+        <b class="mr-1">
+            {{ displayMode ? `Next ${mode == 'osu' ? 'osu!' : 'osu!' + mode} evaluation:` : 'Next evaluation:' }}
+            <span v-if="isEditing">(deadline)</span>
+        </b>
+
+        <input
+            v-if="isEditing"
+            v-model="newDeadlineInput"
+            class="form-control form-control-sm w-50 mb-2"
+            type="text"
+            placeholder="new date (yyyy-mm-dd)"
+            @keyup.enter="adjustEvaluationDeadline($event)"
+        >
+
+        <span v-else>{{ nextEvaluationText }}</span>
+
+        <a
+            v-if="isEditable"
+            href="#"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="edit next evaluation date"
+            class="ml-1"
+            @click.prevent="isEditing = !isEditing"
+        >
+            <i class="fas fa-edit" />
+        </a>
     </p>
 </template>
 
@@ -15,10 +40,17 @@ export default {
             type: String,
             required: true,
         },
+        mongoId: {
+            type: String,
+            required: true,
+        },
     },
     data() {
         return {
-            nextEvaluationDate: '...',
+            nextEvaluationText: '...',
+            newDeadlineInput: '',
+            isEditable: false,
+            isEditing: false,
         };
     },
     computed: {
@@ -32,7 +64,8 @@ export default {
     },
     watch: {
         selectedUser() {
-            this.nextEvaluationDate = '...';
+            this.nextEvaluationText = '...';
+            this.newDeadlineInput = ''; // figure this out
             this.loadNextEvaluation();
         },
     },
@@ -40,11 +73,38 @@ export default {
         this.loadNextEvaluation();
     },
     methods: {
-        async loadNextEvaluation() {
-            const nextEvaluationDate = await this.$http.executeGet(`/users/loadNextEvaluation/${this.selectedUser.id}/${this.mode}`);
+        processDeadline (deadline) {
+            const deadlineDate = new Date(deadline);
+            this.newDeadlineInput = deadlineDate.toISOString().slice(0,10);
 
-            if (nextEvaluationDate) {
-                this.nextEvaluationDate = nextEvaluationDate;
+            const firstDate = new Date(deadline);
+            const secondDate = new Date(deadline);
+            const today = new Date();
+            firstDate.setDate(firstDate.getDate() - 7);
+            secondDate.setDate(secondDate.getDate() + 7);
+
+            if (deadlineDate > today) {
+                this.isEditable = true;
+            } else {
+                this.isEditable = false;
+            }
+
+            const nextEvaluationText = `Between ${firstDate.toISOString().slice(0,10)} and ${secondDate.toISOString().slice(0,10)}`;
+            this.nextEvaluationText = nextEvaluationText;
+        },
+        async loadNextEvaluation() {
+            const deadline = await this.$http.executeGet(`/users/loadNextEvaluation/${this.selectedUser.id}/${this.mode}`);
+
+            if (deadline) {
+                this.processDeadline(deadline);
+            }
+        },
+        async adjustEvaluationDeadline() {
+            const res = await this.$http.executePost(`/users/adjustEvaluationDeadline/${this.selectedUser.id}/${this.mode}`, { newDeadline: this.newDeadlineInput });
+
+            if (res.deadline) {
+                this.processDeadline(res.deadline);
+                this.isEditing = false;
             }
         },
     },

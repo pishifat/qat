@@ -12,6 +12,7 @@
                     v-for="mode in selectedUser.modes"
                     :key="mode"
                     :mode="mode"
+                    :mongo-id="selectedUser.id"
                 />
                 <hr>
 

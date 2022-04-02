@@ -252,6 +252,38 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
         //let evaluators = round.natEvaluators;
         let trialEvaluators = round.mode == 'mania' ? round.natEvaluators.concat(round.bnEvaluators) : round.natEvaluators;
 
+        if (!round.natEvaluators || !round.natEvaluators.length) {
+            round.natEvaluators = await User.getAssignedNat(round.mode);
+            await round.populate(defaultPopulate).execPopulate();
+            const days = util.findDaysBetweenDates(new Date(), new Date(round.deadline));
+
+            const assignments = [];
+
+            for (const user of round.natEvaluators) {
+                assignments.push({
+                    date: new Date(),
+                    user: user._id,
+                    daysOverdue: days,
+                });
+            }
+
+            round.natEvaluatorHistory = assignments;
+
+            await round.save();
+
+            natList = round.natEvaluators.map(u => u.username).join(', ');
+
+            if (round.mode == 'mania') {
+                if (!round.bnEvaluators || !round.bnEvaluators.length) {
+                    round.bnEvaluators = await User.getAssignedTrialNat(round.mode, [round.user.osuId], 2);
+                    await round.populate(defaultPopulate).execPopulate();
+                    await round.save();
+                }
+
+                trialNatList = round.bnEvaluators.map(u => u.username).join(', ');
+            }
+        }
+
         if (round.discussion) { // current BN evals in groups have 7 extra days
             const tempDate = new Date(round.deadline);
             tempDate.setDate(tempDate.getDate() + 7);
@@ -270,40 +302,6 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
         } else if (round.deadline > startRange && round.deadline < endRange) {
             description += 'is due in 1 week!';
             color = discord.webhookColors.pink;
-
-
-
-            if (!round.natEvaluators || !round.natEvaluators.length) {
-                round.natEvaluators = await User.getAssignedNat(round.mode);
-                await round.populate(defaultPopulate).execPopulate();
-                const days = util.findDaysBetweenDates(new Date(), new Date(round.deadline));
-
-                const assignments = [];
-
-                for (const user of round.natEvaluators) {
-                    assignments.push({
-                        date: new Date(),
-                        user: user._id,
-                        daysOverdue: days,
-                    });
-                }
-
-                round.natEvaluatorHistory = assignments;
-
-                await round.save();
-            }
-
-            natList = round.natEvaluators.map(u => u.username).join(', ');
-
-            if (round.mode == 'mania') {
-                if (!round.bnEvaluators || !round.bnEvaluators.length) {
-                    round.bnEvaluators = await User.getAssignedTrialNat(round.mode, [round.user.osuId], 2);
-                    await round.populate(defaultPopulate).execPopulate();
-                    await round.save();
-                }
-
-                trialNatList = round.bnEvaluators.map(u => u.username).join(', ');
-            }
         } else {
             generateWebhook = false;
         }

@@ -60,19 +60,37 @@ router.get('/loadUser/:userInput', async (req, res) => {
 
 /* GET user next evaluation */
 router.get('/loadNextEvaluation/:id/:mode', async (req, res) => {
-    let er = await BnEvaluation.findOne({ user: req.params.id, mode: req.params.mode, active: true });
+    const er = await BnEvaluation.findOne({ user: req.params.id, mode: req.params.mode, active: true });
 
     if (!er) {
         return res.json('Never');
     }
 
-    const firstDate = new Date(er.deadline);
-    const secondDate = new Date(er.deadline);
-    firstDate.setDate(firstDate.getDate() - 7);
-    secondDate.setDate(secondDate.getDate() + 7);
-    const nextEvaluationText = `Between ${firstDate.toISOString().slice(0,10)} and ${secondDate.toISOString().slice(0,10)}`;
+    res.json(er.deadline);
+});
 
-    res.json(nextEvaluationText);
+/* POST adjust next evaluation deadline */
+router.post('/adjustEvaluationDeadline/:id/:mode', middlewares.isNat, async (req, res) => {
+    const er = await BnEvaluation
+        .findOne({ user: req.params.id, mode: req.params.mode, active: true })
+        .populate({ path: 'user', select: 'username' });
+
+    const newDeadline = new Date(req.body.newDeadline);
+
+    er.deadline = newDeadline;
+    await er.save();
+
+    res.json({
+        success: 'Updated',
+        deadline: newDeadline,
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Adjusted "${er.user.username}" current BN evaluation deadline to ${newDeadline.toISOString().slice(0,10)}`,
+        'bnEvaluation',
+        er._id
+    );
 });
 
 /* GET find NAT activity */
