@@ -211,7 +211,10 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
                     const resignationArchiveDate = new Date(lastResignation.archivedAt);
                     const currentBnEvalArchiveDate = new Date(lastCurrentBnEval.archivedAt);
 
-                    if (resignationArchiveDate > currentBnEvalArchiveDate) {
+                    const oneYearAgo = new Date();
+                    oneYearAgo.setDate(oneYearAgo.getDate() - 365);
+
+                    if (resignationArchiveDate > currentBnEvalArchiveDate && resignationArchiveDate < oneYearAgo) {
                         skipProbation = true;
                     }
                 } else {
