@@ -17,7 +17,7 @@
         <span v-else>{{ nextEvaluationText }}</span>
 
         <a
-            v-if="isEditable"
+            v-if="isEditable && loggedInUser.isNat"
             href="#"
             data-toggle="tooltip"
             data-placement="top"
@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 
 export default {
     name: 'NextEvaluation',
@@ -54,6 +54,10 @@ export default {
         };
     },
     computed: {
+        ...mapState([
+            'initialized',
+            'loggedInUser',
+        ]),
         ...mapGetters('users', [
             'selectedUser',
         ]),
