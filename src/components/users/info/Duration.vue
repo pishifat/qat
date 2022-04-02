@@ -6,7 +6,7 @@
             </p>
 
             <ul class="text-secondary">
-                <li v-for="history in bnHistory" :key="history.date" class="small">
+                <li v-for="history in sortedBnHistory" :key="history.date" class="small">
                     {{ history.date | toStandardDate }}: {{ history.kind }} ({{ history.mode }})
                 </li>
             </ul>
@@ -17,7 +17,7 @@
             </p>
 
             <ul class="text-secondary">
-                <li v-for="history in natHistory" :key="history.date" class="small">
+                <li v-for="history in sortedNatHistory" :key="history.date" class="small">
                     {{ history.date | toStandardDate }}: {{ history.kind }} ({{ history.mode }})
                 </li>
             </ul>
@@ -36,6 +36,22 @@ export default {
         ...mapGetters('users', [
             'selectedUser',
         ]),
+        sortedBnHistory () {
+            return [...this.bnHistory].sort((a, b) => {
+                if (a.date > b.date) return 1;
+                if (a.date < b.date) return -1;
+
+                return 0;
+            });
+        },
+        sortedNatHistory () {
+            return [...this.natHistory].sort((a, b) => {
+                if (a.date > b.date) return 1;
+                if (a.date < b.date) return -1;
+
+                return 0;
+            });
+        },
     },
 };
 </script>
