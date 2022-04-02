@@ -80,11 +80,12 @@ router.get('/search', async (req, res) => {
 
         bnApplicationsQuery.where('user', user.id);
         bnEvaluationsQuery.where('user', user.id);
-    }
-
-    if (idToSearch) {
+    } else if (idToSearch) {
         bnApplicationsQuery.where('_id', idToSearch);
         bnEvaluationsQuery.where('_id', idToSearch);
+    } else {
+        bnApplicationsQuery.where('mode', req.query.mode);
+        bnEvaluationsQuery.where('mode', req.query.mode);
     }
 
     const [bnApplications, evaluations] = await Promise.all([

@@ -27,6 +27,26 @@
                         class="form-control"
                         @keyup.enter="queryRecent($event)"
                     >
+
+                    <select
+                        v-model="mode"
+                        class="form-control ml-1"
+                        @change="findNatActivity($event)"
+                    >
+                        <option class="ml-2" value="osu" selected>
+                            osu!
+                        </option>
+                        <option class="ml-2" value="taiko">
+                            osu!taiko
+                        </option>
+                        <option class="ml-2" value="catch">
+                            osu!catch
+                        </option>
+                        <option class="ml-2" value="mania">
+                            osu!mania
+                        </option>
+                    </select>
+
                     <button class="btn btn-sm btn-primary ml-2" type="submit" @click="queryRecent($event)">
                         Show recent
                     </button>
@@ -105,6 +125,7 @@ export default {
             searchValue: null,
             limit: null,
             wasLoaded: false,
+            mode: 'osu',
         };
     },
     computed: {
@@ -183,7 +204,7 @@ export default {
                     type: 'danger',
                 });
             } else {
-                const res = await this.$http.executeGet(`/evalarchive/search?limit=${this.limit}`, e);
+                const res = await this.$http.executeGet(`/evalarchive/search?limit=${this.limit}&mode=${this.mode}`, e);
 
                 if (res && !res.error) {
                     this.$store.commit('evaluations/setEvaluations', [...res.bnApplications, ...res.evaluations]);
