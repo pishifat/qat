@@ -76,17 +76,5 @@ export default {
                 m.mediator && m.mediator.id == rootState.loggedInUser.id
             );
         },
-        majorityUphold: (state, getters) => {
-            if (!getters.selectedVeto) return false;
-
-            let total = 0;
-
-            getters.selectedVeto.mediations.forEach(mediation => {
-                if (mediation.vote === 1) total++;
-                if (mediation.vote === 3) total--;
-            });
-
-            return total > 0;
-        },
     },
 };

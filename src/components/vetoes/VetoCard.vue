@@ -97,19 +97,19 @@ export default {
 }
 
 .status-bar-available {
-    background: radial-gradient(var(--success), transparent 70%);
-}
-
-.status-bar-upheld {
-    background: radial-gradient(var(--warning), transparent 70%);
+    background: radial-gradient(var(--danger), transparent 70%);
 }
 
 .status-bar-wip {
-    background: radial-gradient(var(--purple), transparent 70%);
+    background: radial-gradient(var(--warning), transparent 70%);
+}
+
+.status-bar-upheld {
+    background: radial-gradient(var(--success), transparent 70%);
 }
 
 .status-bar-withdrawn {
-    background: radial-gradient(var(--danger), transparent 70%);
+    background: radial-gradient(var(--success), transparent 70%);
 }
 
 </style>

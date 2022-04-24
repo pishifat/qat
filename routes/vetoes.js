@@ -100,6 +100,7 @@ router.post('/submit', async (req, res) => {
         beatmapMapper: bmInfo.creator,
         beatmapMapperId: bmInfo.creator_id,
         mode: req.body.mode,
+        vetoFormat: 2,
     });
     veto = await Veto
         .findById(veto._id)
@@ -128,17 +129,23 @@ router.post('/submit', async (req, res) => {
 
 /* POST submit mediation */
 router.post('/submitMediation/:id', middlewares.isBnOrNat, async (req, res) => {
-    const mediation = await Mediation
-        .findOne({
-            _id: req.body.mediationId,
-            mediator: req.session.mongoId,
-        })
-        .orFail();
-    const isFirstComment = mediation.comment === undefined;
+    const mediationData = req.body.mediation;
+    const voteData = req.body.vote;
+    const inputData = req.body.input;
 
-    mediation.comment = req.body.comment;
-    mediation.vote = req.body.vote;
-    await mediation.save();
+    for (let i = 0; i < mediationData.mediationIds.length; i++) {
+        const mediationId = mediationData.mediationIds[i];
+        const mediation = await Mediation
+            .findOne({
+                _id: mediationId,
+                mediator: req.session.mongoId,
+            })
+            .orFail();
+
+        mediation.comment = inputData.comments[i];
+        mediation.vote = voteData.votes[i];
+        await mediation.save();
+    }
 
     const veto = await Veto
         .findById(req.params.id)
@@ -153,12 +160,12 @@ router.post('/submitMediation/:id', middlewares.isBnOrNat, async (req, res) => {
 
     Logger.generate(
         req.session.mongoId,
-        `${isFirstComment ? 'Submitted' : 'Updated'} vote for a veto`,
+        `Submitted vote for a veto`,
         'veto',
         veto._id
     );
 
-    let count = 0;
+    /*let count = 0;
     veto.mediations.forEach(mediation => {
         if (mediation.comment) count++;
     });
@@ -170,12 +177,13 @@ router.post('/submitMediation/:id', middlewares.isBnOrNat, async (req, res) => {
             description: `Submitted opinion on [veto for **${veto.beatmapTitle}** (${count}/${veto.mediations.length})](https://bn.mappersguild.com/vetoes?id=${veto.id})`,
         }],
         veto.mode);
-    }
+    }*/
 });
 
 /* POST set status upheld or withdrawn. */
 router.post('/selectMediators', middlewares.isNat, async (req, res) => {
     let allUsers = await User.getAllMediators();
+    //let allUsers = await User.find({ osuId: 3178418 });
 
     if (allUsers.error) {
         return res.json({
@@ -183,7 +191,7 @@ router.post('/selectMediators', middlewares.isNat, async (req, res) => {
         });
     }
 
-    let usernames = [];
+    let users = [];
 
     for (let i = 0; i < allUsers.length; i++) {
         let user = allUsers[i];
@@ -195,26 +203,33 @@ router.post('/selectMediators', middlewares.isNat, async (req, res) => {
                 (!user.modesInfo.some(m => m.level === 'probation') && req.body.mode == 'all')
             )
         ) {
-            usernames.push(user);
+            users.push(user);
 
-            if (usernames.length >= (req.body.mode == 'osu' || req.body.mode == 'all' ? 11 : 7)) {
+            if (users.length >= (req.body.mode == 'osu' || req.body.mode == 'all' ? 11 : 7)) {
                 break;
             }
         }
     }
 
-    res.json(usernames);
+
+    res.json(users);
 });
 
 /* POST begin mediation */
 router.post('/beginMediation/:id', middlewares.isNat, async (req, res) => {
-    for (let i = 0; i < req.body.mediators.length; i++) {
-        let mediator = req.body.mediators[i];
-        let m = await Mediation.create({ mediator: mediator._id });
-        await Veto.findByIdAndUpdate(req.params.id, {
-            $push: { mediations: m },
-            status: 'wip',
-        });
+    const vetoReasons = req.body.reasons;
+    const vetoMediators = req.body.mediators;
+
+    for (let i = 0; i < vetoMediators.length; i++) {
+        let mediator = vetoMediators[i];
+
+        for (let j = 0; j < vetoReasons.length; j++) {
+            let m = await Mediation.create({ mediator: mediator._id, reasonIndex: j });
+            await Veto.findByIdAndUpdate(req.params.id, {
+                $push: { mediations: m },
+                status: 'wip',
+            });
+        }
     }
 
     let date = new Date();
@@ -244,17 +259,17 @@ router.post('/concludeMediation/:id', middlewares.isNat, async (req, res) => {
         .findById(req.params.id)
         .populate(defaultPopulate);
 
-    if (req.body.dismiss || !req.body.majorityUphold) {
+    if (req.body.dismiss) {
         veto.status = 'withdrawn';
     } else {
-        veto.status = 'upheld';
+        veto.status = 'upheld'; // no longer accurately tracking this after implementing multi-part vetoes. it's too complicated to display at a glance
     }
 
     await veto.save();
     res.json(veto);
     Logger.generate(
         req.session.mongoId,
-        `Veto ${veto.status.charAt(0).toUpperCase() + veto.status.slice(1)} for "${veto.beatmapTitle}" ${req.body.dismiss ? 'without mediation' : ''}`,
+        `Veto concluded for "${veto.beatmapTitle}" ${req.body.dismiss ? 'without mediation' : ''}`,
         'veto',
         veto._id
     );
@@ -287,6 +302,18 @@ router.post('/replaceMediator/:id', middlewares.isNat, async (req, res) => {
         .findById(req.params.id)
         .populate(defaultPopulate);
 
+    const mediationIds = [];
+
+    let oldMediationUsername;
+    let newMediationUsername;
+
+    for (const mediation of veto.mediations) {
+        if (mediation.mediator.id == req.body.userId) {
+            mediationIds.push(mediation.id);
+            oldMediationUsername = mediation.mediator.username;
+        }
+    }
+
     let currentMediators = veto.mediations.map(m => m.mediator.osuId);
     let newMediator;
 
@@ -308,19 +335,17 @@ router.post('/replaceMediator/:id', middlewares.isNat, async (req, res) => {
         ]);
     }
 
-    const oldMediation = await Mediation
-        .findById(req.body.mediationId)
-        .populate({
-            path: 'mediator',
-            select: 'username',
-        });
+    for (let i = 0; i < mediationIds.length; i++) {
+        const mediationId = mediationIds[i];
+        const newMediation = await Mediation
+            .findByIdAndUpdate(mediationId, { mediator: newMediator[0]._id })
+            .populate({
+                path: 'mediator',
+                select: 'username',
+            });
 
-    const newMediation = await Mediation
-        .findByIdAndUpdate(req.body.mediationId, { mediator: newMediator[0]._id })
-        .populate({
-            path: 'mediator',
-            select: 'username',
-        });
+        newMediationUsername = newMediation.mediator.username;
+    }
 
     veto = await Veto
         .findById(req.params.id)
@@ -341,7 +366,7 @@ router.post('/replaceMediator/:id', middlewares.isNat, async (req, res) => {
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),
         color: discord.webhookColors.darkOrange,
-        description: `Replaced **${oldMediation.mediator.username}** with **${newMediation.mediator.username}** as mediator on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`,
+        description: `Replaced **${oldMediationUsername}** with **${newMediationUsername}** as mediator on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`,
     }],
     veto.mode);
 });

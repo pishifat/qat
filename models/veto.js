@@ -15,6 +15,7 @@ const vetoesSchema = new mongoose.Schema({
     status: { type: String, enum: ['available', 'wip', 'upheld', 'withdrawn'], default: 'available' },
     mediations: [{ type: 'ObjectId', ref: 'Mediation' }],
     deadline: { type: Date },
+    vetoFormat: { type: Number },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 /**

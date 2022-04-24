@@ -2,18 +2,22 @@
     <div>
         <div v-if="selectedVeto.mediations.length">
             <!-- conclude mediation... -->
-            <div v-if="selectedVeto.status !== 'upheld' && selectedVeto.status !== 'withdrawn'">
+            <div v-if="selectedVeto.status !== 'upheld' && selectedVeto.status !== 'withdrawn'" class="row">
                 <!-- ...based on voting results -->
-                <button
-                    class="btn btn-sm btn-block btn-danger mb-2"
-                    @click="concludeMediation($event)"
-                >
-                    {{ majorityUphold ? 'Uphold veto' : 'Withdraw veto' }}
-                </button>
+                <div class="col-sm-6">
+                    <button
+                        class="btn btn-sm btn-block btn-danger mb-2"
+                        @click="concludeMediation($event)"
+                    >
+                        Conclude mediation
+                    </button>
+                </div>
                 <!-- ...regardless of voting results -->
-                <button class="btn btn-sm btn-block btn-danger mb-2" @click="concludeMediation($event, true)">
-                    Dismiss without mediation
-                </button>
+                <div class="col-sm-6">
+                    <button class="btn btn-sm btn-block btn-danger mb-2" @click="concludeMediation($event, true)">
+                        Dismiss without mediation
+                    </button>
+                </div>
             </div>
 
             <!-- restart mediation if concluded -->
@@ -27,13 +31,22 @@
 
             <!-- view conclusion discussion post -->
             <button class="btn btn-sm btn-block btn-primary mb-2" data-toggle="collapse" data-target="#conclusion">
-                See full conclusion post <i class="fas fa-angle-down" />
+                {{ selectedVeto.vetoFormat == 2 ? 'Show full conclusion posts' : 'Show full conclusion post' }} <i class="fas fa-angle-down" />
             </button>
-            <conclusion-post />
+            <div v-if="selectedVeto.vetoFormat == 2">
+                <div v-for="(reason, i) in selectedVeto.reasons" :key="i">
+                    <multi-part-veto-conclusion-post
+                        :reason-index="i"
+                    />
+                </div>
+            </div>
+            <div v-else>
+                <conclusion-post />
+            </div>
 
             <!-- view mediator chat message -->
             <button class="btn btn-sm btn-block btn-primary mb-2" data-toggle="collapse" data-target="#messages">
-                See veto chat messages <i class="fas fa-angle-down" />
+                Show veto chat messages <i class="fas fa-angle-down" />
             </button>
             <veto-chat-message
                 id="messages"
@@ -99,12 +112,14 @@
 <script>
 import { mapGetters } from 'vuex';
 import ConclusionPost from './ConclusionPost.vue';
+import MultiPartVetoConclusionPost from './MultiPartVetoConclusionPost.vue';
 import VetoChatMessage from '../VetoChatMessage.vue';
 
 export default {
     name: 'AdminButtons',
     components: {
         ConclusionPost,
+        MultiPartVetoConclusionPost,
         VetoChatMessage,
     },
     data() {
@@ -116,7 +131,6 @@ export default {
     computed: {
         ...mapGetters('vetoes', [
             'selectedVeto',
-            'majorityUphold',
         ]),
     },
     watch: {
@@ -138,7 +152,7 @@ export default {
             const result = confirm(`Are you sure?`);
 
             if (result) {
-                const veto = await this.$http.executePost(`/vetoes/beginMediation/${this.selectedVeto.id}`, { mediators: this.mediators }, e);
+                const veto = await this.$http.executePost(`/vetoes/beginMediation/${this.selectedVeto.id}`, { mediators: this.mediators, reasons: this.selectedVeto.reasons }, e);
 
                 this.commitVeto(veto, 'Started veto mediation');
             }
@@ -150,7 +164,6 @@ export default {
                 const veto = await this.$http.executePost(
                     `/vetoes/concludeMediation/${this.selectedVeto.id}`,
                     {
-                        majorityUphold: this.majorityUphold,
                         dismiss,
                     },
                     e

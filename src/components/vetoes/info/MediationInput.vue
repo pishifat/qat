@@ -1,56 +1,61 @@
 <template>
     <div>
         <hr>
-        Reason for vote:
-        <div class="small px-4 mb-2">
-            This comment will be displayed anonymously alongside the verdict post. If you partially agree with the veto, clearly say which points you agree/disagree with. Inappropriate responses will be discarded.
+        Mediation response:
+        <div class="small px-4 mb-2 text-secondary">
+            Your comments will be shown anonymously on the map thread. Clearly explain why you agree or disagree with each reason. Inappropriate responses will be discarded.
         </div>
 
-        <textarea
-            id="comment"
-            v-model="comment"
-            class="form-control mb-2"
-            placeholder="Why you agree/disagree with the veto..."
-            rows="3"
-        />
+        <div v-for="(reason, i) in selectedVeto.reasons" :key="i">
+            <a :href="reason.link" target="_blank">{{ i+1 }}. {{ reason.summary }}</a>
+            <textarea
+                id="comment"
+                v-model="input.comments[i]"
+                class="form-control mb-2"
+                placeholder="Why you agree/disagree with the above veto reason..."
+                rows="3"
+            />
 
-        <div class="d-flex justify-content-end mb-2">
-            <div class="form-check form-check-inline">
-                <input
-                    id="1"
-                    v-model="vote"
-                    class="form-check-input"
-                    type="radio"
-                    name="vote"
-                    value="1"
-                >
-                <label class="form-check-label text-success" for="1">Agree</label>
-            </div>
+            <div class="d-flex justify-content-end mb-2">
+                <div class="form-check form-check-inline">
+                    <input
+                        :id="'1' + i"
+                        v-model="vote.votes[i]"
+                        class="form-check-input"
+                        type="radio"
+                        :name="'vote' + i"
+                        value="1"
+                    >
+                    <label class="form-check-label text-success" for="1">Agree</label>
+                </div>
 
-            <div class="form-check form-check-inline">
-                <input
-                    id="2"
-                    v-model="vote"
-                    class="form-check-input"
-                    type="radio"
-                    name="vote"
-                    value="2"
-                >
-                <label class="form-check-label text-neutral" for="2">Partially agree</label>
-            </div>
+                <div class="form-check form-check-inline">
+                    <input
+                        :id="'2' + i"
+                        v-model="vote.votes[i]"
+                        class="form-check-input"
+                        type="radio"
+                        :name="'vote' + i"
+                        value="2"
+                    >
+                    <label class="form-check-label text-neutral" for="2">Partially agree</label>
+                </div>
 
-            <div class="form-check form-check-inline">
-                <input
-                    id="3"
-                    v-model="vote"
-                    class="form-check-input"
-                    type="radio"
-                    name="vote"
-                    value="3"
-                >
-                <label class="form-check-label text-danger" for="3">Disagree</label>
+                <div class="form-check form-check-inline">
+                    <input
+                        :id="'3' + i"
+                        v-model="vote.votes[i]"
+                        class="form-check-input"
+                        type="radio"
+                        :name="'vote' + i"
+                        value="3"
+                    >
+                    <label class="form-check-label text-danger" for="3">Disagree</label>
+                </div>
             </div>
         </div>
+
+
 
         <div class="d-flex justify-content-end">
             <button class="btn btn-sm btn-primary" @click="submitMediation($event)">
@@ -67,9 +72,15 @@ export default {
     name: 'MediationInput',
     data() {
         return {
-            comment: null,
-            vote: null,
-            mediationId: null,
+            input: {
+                comments: [],
+            },
+            vote: {
+                votes: [],
+            },
+            mediation: {
+                mediationIds: [],
+            },
         };
     },
     computed: {
@@ -91,41 +102,34 @@ export default {
     methods: {
         findUserMediation() {
             if (this.loggedInUser.hasBasicAccess) { // mediator info is hidden from normal users, so this function wouldn't work
-                this.mediationId = null;
-                this.comment = null;
-                this.vote = null;
+                this.mediation.mediationIds = [];
+                this.input.comment = [];
+                this.vote.votes = [];
 
-                for (const mediation of this.selectedVeto.mediations) {
-                    if (mediation.mediator && mediation.mediator.id === this.loggedInUser.id) {
-                        if (mediation.comment) this.comment = mediation.comment;
-                        if (mediation.vote) this.vote = mediation.vote;
-
-                        this.mediationId = mediation.id;
-                        break;
+                for (let i = 0; i < this.selectedVeto.reasons.length; i++) {
+                    for (const mediation of this.selectedVeto.mediations) {
+                        if (mediation.mediator && mediation.mediator.id === this.loggedInUser.id && mediation.reasonIndex == i) {
+                            this.input.comments[i] = mediation.comment;
+                            this.vote.votes[i] = mediation.vote;
+                            this.mediation.mediationIds[i] = mediation.id;
+                        }
                     }
                 }
             }
         },
         async submitMediation (e) {
-            if (!this.vote || !this.comment.length) {
-                this.$store.dispatch('updateToastMessages', {
-                    message: `Cannot leave fields blank!`,
-                    type: 'danger',
-                });
-            } else {
-                const data = await this.$http.executePost(
-                    `vetoes/submitMediation/${this.selectedVeto.id}`,
-                    {
-                        mediationId: this.mediationId,
-                        vote: this.vote,
-                        comment: this.comment,
-                    },
-                    e
-                );
+            const data = await this.$http.executePost(
+                `vetoes/submitMediation/${this.selectedVeto.id}`,
+                {
+                    mediation: this.mediation,
+                    vote: this.vote,
+                    input: this.input,
+                },
+                e
+            );
 
-                if (this.$http.isValid(data)) {
-                    this.$store.commit('vetoes/updateVeto', data.veto);
-                }
+            if (this.$http.isValid(data)) {
+                this.$store.commit('vetoes/updateVeto', data.veto);
             }
         },
     },

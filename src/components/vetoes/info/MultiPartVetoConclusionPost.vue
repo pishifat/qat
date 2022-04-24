@@ -1,8 +1,13 @@
 <template>
     <div id="conclusion" class="collapse card card-body my-2 small pre-line">
-        <span>Hello! This beatmap has undergone veto mediation by the Beatmap Nominators. The veto post can be found here: {{ selectedVeto.discussionLink }}</span>
+        <span>This beatmap has undergone veto mediation by the Beatmap Nominators.</span>
         <br>
-        <span>After an anonymous vote, it has been decided that the veto will be {{ upholdMediations.length > withdrawMediations.length ? 'upheld' : 'dismissed' }}. The following are reasons why Beatmap Nominators {{ upholdMediations.length > withdrawMediations.length ? 'agree' : 'disagree' }} with the veto:</span>
+        <span>Issue summary: "{{ selectedVeto.reasons[reasonIndex].summary }}"</span>
+        <br>
+        <span>Original post: {{ selectedVeto.reasons[reasonIndex].link }}</span>
+        <br>
+
+        <span>After an anonymous vote, this {{ selectedVeto.reasons.length > 1 ? 'portion of the veto' : 'veto' }} will be {{ upholdMediations.length > withdrawMediations.length ? 'upheld' : 'dismissed' }}. Reasons why Beatmap Nominators {{ upholdMediations.length > withdrawMediations.length ? 'agree' : 'disagree' }} with it:</span>
         <br>
         <br>
 
@@ -23,7 +28,7 @@
                 </div>
                 <br>
             </div>
-            <span>Due to the veto being withdrawn, this beatmap may now be re-nominated.</span>
+            <span>If all portions of the veto have been dismissed, this beatmap may now be re-nominated.</span>
         </div>
 
         <br>
@@ -43,12 +48,18 @@ import { mapGetters } from 'vuex';
 
 export default {
     name: 'ConclusionPost',
+    props: {
+        reasonIndex: {
+            type: Number,
+            required: true,
+        },
+    },
     computed: {
         ...mapGetters('vetoes', [
             'selectedVeto',
         ]),
         shuffledMediations () {
-            let shuffled = this.selectedVeto.mediations.filter(m => m.vote);
+            let shuffled = this.selectedVeto.mediations.filter(m => m.vote && m.reasonIndex == this.reasonIndex);
 
             for (let i = shuffled.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -58,10 +69,10 @@ export default {
             return shuffled;
         },
         upholdMediations () {
-            return this.selectedVeto.mediations.filter(mediation => mediation.vote && mediation.vote !== 3);
+            return this.selectedVeto.mediations.filter(mediation => mediation.vote && mediation.reasonIndex == this.reasonIndex && mediation.vote !== 3);
         },
         withdrawMediations () {
-            return this.selectedVeto.mediations.filter(mediation => mediation.vote && mediation.vote !== 1);
+            return this.selectedVeto.mediations.filter(mediation => mediation.vote && mediation.reasonIndex == this.reasonIndex && mediation.vote !== 1);
         },
     },
 };

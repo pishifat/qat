@@ -13,6 +13,7 @@ interface IVetoDocument extends Document {
     status?: string;
     mediations?: IMediationDocument[];
     deadline?: Date;
+    vetoFormat?: number;
 }
 
 export default interface IVetoModel extends Model<IVetoDocument> { }
