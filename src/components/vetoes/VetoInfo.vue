@@ -60,7 +60,7 @@ export default {
         showMediations() {
             if (this.selectedVeto.mediations.length) {
                 // NAT can see only if they're not mediators
-                if (this.loggedInUser.isNat && this.isMediator) {
+                if (this.loggedInUser.isNat && !this.isMediator) {
                     return true;
                 // everyone can see when upheld/withdrawn
                 } else if (this.selectedVeto.status == 'upheld' || this.selectedVeto.status == 'withdrawn') {
