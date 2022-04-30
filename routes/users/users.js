@@ -1018,4 +1018,16 @@ router.post('/resignFromBn/:id', async (req, res) => {
     });
 });
 
+/* POST cycle bag 
+router.post('/cycleBag/:mode', middlewares.isResponsibleWithButtons, async (req, res) => {
+    const users = await User.getAssignedNat(req.params.mode);
+
+    console.log('---\nfinalusers\n---');
+    for (const user of users) {
+        console.log(user.username);
+    }
+
+    res.json({ success: 'ok' });
+});*/
+
 module.exports = router;

@@ -84,6 +84,12 @@
             <div class="text-danger">
                 ^user could be assigned to the next evaluation (in the 'bag')
             </div>
+            <!--<button
+                class="btn btn-sm btn-danger ml-1"
+                @click="cycleBag($event)"
+            >
+                Cycle bag
+            </button>-->
         </div>
     </div>
 </template>
@@ -125,6 +131,13 @@ export default {
             if (res) {
                 this.userInfo = res.info;
                 this.total = res.total;
+            }
+        },
+        async cycleBag(e) {
+            const res = await this.$http.executePost(`/users/cycleBag/${this.mode}`, e);
+
+            if (res) {
+                await this.findNatActivity();
             }
         },
     },

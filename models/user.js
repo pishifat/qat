@@ -303,8 +303,8 @@ class UserService extends mongoose.Model {
         let uniqueAssignedNat = [];
 
         for (const user of assignedNat) {
-            if (!uniqueAssignedNatIds.includes(user.id)) {
-                uniqueAssignedNatIds.push(user.id);
+            if (!uniqueAssignedNatIds.includes(user._id.toString())) {
+                uniqueAssignedNatIds.push(user._id.toString());
                 uniqueAssignedNat.push(user);
             }
         }
@@ -312,21 +312,34 @@ class UserService extends mongoose.Model {
         let finalAssignedNat = [];
 
         if (uniqueAssignedNatIds.length < sampleSize) {
-            const relevantNat = await User.find({
-                groups: 'nat',
-                'modesInfo.mode': mode,
-                isBnEvaluator: true,
-                inBag: { $ne: true },
-            });
+            const newQuery = User.aggregate([
+                {
+                    $match: {
+                        groups: 'nat',
+                        'modesInfo.mode': mode,
+                        isBnEvaluator: true,
+                        inBag: false,
+                    },
+                },
+            ]);
 
-            for (const user of relevantNat) {
-                if (!uniqueAssignedNatIds.includes(user.id)) {
-                    await User.findByIdAndUpdate(user._id, { inBag: true });
+            if (excludeOsuIds) {
+                newQuery.match({
+                    osuId: { $nin: excludeOsuIds },
+                });
+            }
 
-                    if (uniqueAssignedNatIds.length < sampleSize) {
-                        uniqueAssignedNatIds.push(user.id);
-                        uniqueAssignedNat.push(user);
-                    }
+            let additionalAssignedNat = await newQuery
+                .sample(100) // random sort all options
+                .exec();
+
+            for (const user of additionalAssignedNat) {
+                await User.findByIdAndUpdate(user._id, { inBag: true });
+
+                if (uniqueAssignedNatIds.length < sampleSize) {
+                    uniqueAssignedNatIds.push(user._id.toString());
+                    uniqueAssignedNat.push(user);
+                    await User.findByIdAndUpdate(user._id, { inBag: false });
                 }
             }
         }
