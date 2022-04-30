@@ -319,7 +319,7 @@ router.post('/replaceMediator/:id', middlewares.isNat, async (req, res) => {
 
     if (veto.mode === 'all') {
         newMediator = await User.aggregate([
-            { $match: { osuId: { $nin: currentMediators }, isVetoMediator: true } },
+            { $match: { osuId: { $nin: currentMediators }, isVetoMediator: true, groups: { $in: [ 'bn', 'nat' ]} } },
             { $sample: { size: 1 } },
         ]);
     } else {
