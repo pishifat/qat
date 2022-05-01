@@ -30,12 +30,6 @@ router.get('/relevantInfo', async (req, res) => {
 router.post('/apply', async (req, res) => {
     const { mods, reasons, mode } = req.body;
 
-    if (mode == 'osu') {
-        return res.json({
-            error: `Applications for this game mode are currently on hold. Please try again later!`,
-        });
-    }
-
     if (!mods || !mods.length || !Array.isArray(mods) ||
         !reasons || !reasons.length || !Array.isArray(reasons) ||
         !mode
