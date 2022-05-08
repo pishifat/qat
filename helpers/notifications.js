@@ -15,17 +15,18 @@ const BeatmapReport = require('../models/beatmapReport');
 const Discussion = require('../models/discussion');
 const Report = require('../models/report');
 const Logger = require('../models/log');
+const { user } = require('../models/evaluations/base');
 
 const defaultPopulate = [
     { path: 'user', select: 'username osuId modesInfo' },
-    { path: 'natEvaluators', select: 'username osuId discordId' },
-    { path: 'bnEvaluators', select: 'username osuId discordId' },
+    { path: 'natEvaluators', select: 'username osuId discordId isBnEvaluator' },
+    { path: 'bnEvaluators', select: 'username osuId discordId isBnEvaluator' },
     {
         path: 'reviews',
         select: 'evaluator',
         populate: {
             path: 'evaluator',
-            select: 'username osuId groups discordId',
+            select: 'username osuId groups discordId isBnEvaluator',
         },
     },
 ];
@@ -122,7 +123,7 @@ function findDaysAgo (deadline) {
     return days;
 }
 
-const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
+const notifyDeadlines = cron.schedule('7 11 * * *', async () => {
     // establish dates for reference
     const date = new Date();
     const nearDeadline = new Date();
@@ -205,8 +206,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
         let generateWebhook = true;
         let discordIds = [];
         let color;
-        //let evaluators = app.natEvaluators;
-        let trialEvaluators = app.mode == 'mania' ? app.natEvaluators.concat(app.bnEvaluators) : app.natEvaluators;
+        let trialEvaluators = app.mode == '' ? app.natEvaluators.concat(app.bnEvaluators) : app.natEvaluators;
 
         if (date > deadline) {
             discordIds = findNatEvaluatorHighlights(app.reviews, trialEvaluators, app.discussion);
@@ -249,8 +249,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
         let generateWebhook = true;
         let discordIds = [];
         let color;
-        //let evaluators = round.natEvaluators;
-        let trialEvaluators = round.mode == 'mania' ? round.natEvaluators.concat(round.bnEvaluators) : round.natEvaluators;
+        let trialEvaluators = round.mode == '' ? round.natEvaluators.concat(round.bnEvaluators) : round.natEvaluators;
 
         if (!round.natEvaluators || !round.natEvaluators.length) {
             round.natEvaluators = await User.getAssignedNat(round.mode);
@@ -273,7 +272,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
 
             natList = round.natEvaluators.map(u => u.username).join(', ');
 
-            if (round.mode == 'mania') {
+            if (round.mode == '') {
                 if (!round.bnEvaluators || !round.bnEvaluators.length) {
                     round.bnEvaluators = await User.getAssignedTrialNat(round.mode, [round.user.osuId], 2);
                     await round.populate(defaultPopulate).execPopulate();

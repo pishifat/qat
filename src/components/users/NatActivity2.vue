@@ -84,12 +84,12 @@
             <div class="text-danger">
                 ^user could be assigned to the next evaluation (in the 'bag')
             </div>
-            <!--<button
+            <button
                 class="btn btn-sm btn-danger ml-1"
                 @click="cycleBag($event)"
             >
                 Cycle bag
-            </button>-->
+            </button>
         </div>
     </div>
 </template>

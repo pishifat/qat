@@ -53,6 +53,13 @@ const notesPopulate = [
 router.get('/relevantInfo', async (req, res) => {
     const evaluations = await Evaluation.findActiveEvaluations(req.session.mongoId);
 
+    /*for (const evaluation of evaluations) {
+        if (evaluation.mode == 'osu' && evaluation.active) {
+            evaluation.natEvaluators = [];
+            await evaluation.save();
+        }
+    }*/
+
     res.json({
         evaluations,
     });
