@@ -35,7 +35,7 @@
 
             <div class="row mb-2">
                 <div class="col-sm-12">
-                    <div v-for="i in 4" :key="i" class="form-group">
+                    <div v-for="i in 3" :key="i" class="form-group">
                         <p>Mod {{ i }}:</p>
 
                         <input
