@@ -45,7 +45,7 @@ function findNatEvaluatorHighlights (reviews, natEvaluators, discussion) {
 
     if (discussion) {
         for (const review of reviews) {
-            if (review.evaluator.groups.includes('nat')) {
+            if (review.evaluator.groups.includes('nat') && review.evaluator.isBnEvaluator) {
                 discordIds.push(review.evaluator.discordId);
             }
         }
@@ -53,7 +53,7 @@ function findNatEvaluatorHighlights (reviews, natEvaluators, discussion) {
         const evaluatorIds = reviews.map(r => r.evaluator.id);
 
         for (const user of natEvaluators) {
-            if (!evaluatorIds.includes(user.id)) {
+            if (!evaluatorIds.includes(user.id) && user.isBnEvaluator) {
                 discordIds.push(user.discordId);
             }
         }
