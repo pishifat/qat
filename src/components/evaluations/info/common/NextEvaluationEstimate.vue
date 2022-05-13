@@ -2,7 +2,7 @@
     <p>
         <b>Next evaluation:</b>
         <span :class="consensusColor">
-            {{ `~${consensus == 'probationBn' ? '1' : evaluationsWithoutIncident > 1 ? '6' : '3'} month${consensus == 'probationBn' ? '' : 's'}` }}
+            {{ `~${consensus == 'probationBn' || consensus == 'pass' ? '1' : evaluationsWithoutIncident > 1 ? '6' : '3'} month${consensus == 'probationBn' || consensus == 'pass' ? '' : 's'}` }}
         </span>
     </p>
 </template>
