@@ -20,7 +20,6 @@ export default {
 
         // modify data
         updateEvent (state, event) {
-            console.log('in');
             const i = state.events.findIndex(e => e.id == event.id);
             if (i >= 0) Vue.set(state.events[i], event.modifiedField, event.value);
         },

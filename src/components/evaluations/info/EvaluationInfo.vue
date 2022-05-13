@@ -15,8 +15,9 @@
             />
         </template>
 
-        <div v-if="selectedEvaluation" class="container">
+        <div v-if="selectedEvaluation" class="container">{{ selectedEvaluation.deadline }}
             <main-application-info v-if="selectedEvaluation.isApplication" />
+            
             <user-activity
                 v-else
                 :osu-id="selectedEvaluation.user.osuId"
@@ -24,6 +25,7 @@
                 :deadline="selectedEvaluation.deadline"
                 :mongo-id="selectedEvaluation.user.id"
                 :unique="selectedEvaluation.id"
+                :overwrite-days="selectedEvaluation.activityToCheck ? selectedEvaluation.activityToCheck + 7 : 90 + 7"
             />
             <template v-if="loggedInUser.isNat || loggedInUser.isTrialNat">
                 <p>

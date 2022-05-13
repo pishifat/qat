@@ -22,6 +22,7 @@
                     :osu-id="selectedUser.osuId"
                     :mongo-id="selectedUser.id"
                     :unique="selectedUser.id"
+                    :overwrite-days="90"
                 />
 
                 <resign

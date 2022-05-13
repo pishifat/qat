@@ -122,7 +122,7 @@ function findDaysAgo (deadline) {
     return days;
 }
 
-const notifyDeadlines = cron.schedule('7 11 * * *', async () => {
+const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
     // establish dates for reference
     const date = new Date();
     const nearDeadline = new Date();
@@ -638,7 +638,6 @@ const checkMatchBeatmapStatuses = cron.schedule('2 22 * * *', async () => {
         }
     }
 
-    console.log(matches);
 }, {
     scheduled: false,
 });

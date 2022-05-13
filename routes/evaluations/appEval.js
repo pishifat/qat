@@ -223,7 +223,7 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
 
                 if (skipProbation) {
                     level = 'full';
-                    daysToNextEval = Math.floor(Math.random() * (115 - 85) + 85); // between 85 and 115 days;
+                    daysToNextEval = Math.floor(Math.random() * (95 - 85) + 85); // between 85 and 95 days;
                 }
             }
 
@@ -238,6 +238,7 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
                 user: evaluation.user,
                 mode: evaluation.mode,
                 deadline,
+                activityToCheck: 40,
             });
 
             if (!user.isBn) {

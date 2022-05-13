@@ -44,11 +44,13 @@ export interface IBnEvaluationDocument extends IEvaluationBase, Document {
     consensus?: string;
     deadline?: Date;
     addition?: string;
+    activityToCheck?: number;
     kind?: string;
 }
 
 export interface IBnEvaluationModel extends Model<IBnEvaluationDocument> {
     findActiveEvaluations?: (mongoId: string) => Promise<IBnEvaluationDocument[]>;
+    findInactiveEvaluations?: () => Promise<IEvaluationDocument[]>;
     deleteUserActiveEvaluations?: (userId: number) => Promise<{ ok: number, deletedCount: number, n: number }>;
 }
 
@@ -67,5 +69,6 @@ export interface IEvaluationDocument extends IEvaluationBase, IBnEvaluationDocum
 
 export interface IEvaluationModel extends Model<IEvaluationDocument> {
     findActiveEvaluations?: (mongoId: string) => Promise<IEvaluationDocument[]>;
+    findInactiveEvaluations?: () => Promise<IEvaluationDocument[]>;
     deleteUserActiveEvaluations?: (userId: number) => Promise<{ ok: number, deletedCount: number, n: number }>;
 }

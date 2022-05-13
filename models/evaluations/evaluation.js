@@ -42,6 +42,40 @@ class EvaluationService extends mongoose.Model {
             .sort({ deadline: 1, consensus: 1, feedback: 1 });
     }
 
+    static findInactiveEvaluations() {
+        let minDate = new Date();
+        minDate.setDate(minDate.getDate() + 7);
+
+        return this
+            .find({
+                active: true,
+                deadline: { $gte: minDate },
+            })
+            .populate([
+                {
+                    path: 'user',
+                    select: 'username osuId modesInfo groups',
+                },
+                {
+                    path: 'natEvaluators',
+                    select: 'username osuId',
+                },
+                {
+                    path: 'bnEvaluators',
+                    select: 'username osuId',
+                },
+                {
+                    path: 'reviews',
+                    select: 'evaluator behaviorComment moddingComment vote',
+                    populate: {
+                        path: 'evaluator',
+                        select: 'username osuId groups',
+                    },
+                },
+            ])
+            .sort({ deadline: 1, consensus: 1, feedback: 1 });
+    }
+
     static deleteUserActiveEvaluations(userId) {
         let minDate = new Date();
         minDate.setDate(minDate.getDate() + 7);

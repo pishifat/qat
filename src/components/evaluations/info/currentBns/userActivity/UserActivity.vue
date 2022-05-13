@@ -121,10 +121,14 @@ export default {
             type: String,
             required: true,
         },
+        overwriteDays: {
+            type: Number,
+            required: true,
+        },
     },
     data () {
         return {
-            daysInput: 90,
+            daysInput: this.overwriteDays,
             editingDaysInput: false,
         };
     },
@@ -148,12 +152,12 @@ export default {
     watch: {
         unique() {
             this.findRelevantActivity();
-            this.daysInput = 90;
+            this.daysInput = this.overwriteDays;
         },
     },
     created () {
         this.findRelevantActivity();
-        this.daysInput = 90;
+        this.daysInput = this.overwriteDays;
     },
     methods: {
         async search () {
@@ -167,7 +171,7 @@ export default {
             this.$store.commit('activity/setIsLoading', true);
 
             let days = parseInt(this.daysInput.toString());
-            if (isNaN(days)) days = 90;
+            if (isNaN(days)) days = 90 + 7;
             else if (days > 1000) days = 999;
             else if (days < 2) days = 2;
             this.daysInput = days;

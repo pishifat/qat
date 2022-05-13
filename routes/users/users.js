@@ -1023,6 +1023,7 @@ router.post('/cycleBag/:mode', middlewares.isResponsibleWithButtons, async (req,
     const users = await User.getAssignedNat(req.params.mode);
 
     console.log('---\nfinalusers\n---');
+
     for (const user of users) {
         console.log(user.username);
     }

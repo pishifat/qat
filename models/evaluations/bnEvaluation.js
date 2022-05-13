@@ -5,6 +5,7 @@ const bnEvaluationSchema = new mongoose.Schema({
     consensus: { type: String, enum: ['fullBn', 'probationBn', 'removeFromBn'] },
     deadline: { type: Date , required: true },
     addition: { type: String, enum: ['lowActivityWarning', 'behaviorWarning', 'mapQualityWarning', 'moddingQualityWarning', 'none'] },
+    activityToCheck: { type: Number },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true }, discriminatorKey: 'kind' });
 
 bnEvaluationSchema.virtual('isBnEvaluation').get(function () {

@@ -127,8 +127,6 @@ router.post('/store', middlewares.isLoggedIn, async (req, res) => {
         for (const map of relevantBeatmaps) {
             const relevantModReq = await ModRequest.findOne({ beatmapset: map._id });
 
-            console.log(relevantModReq);
-
             if (relevantModReq) {
                 return res.json({
                     error: 'You cannot submit a beatmap that you submitted before!',

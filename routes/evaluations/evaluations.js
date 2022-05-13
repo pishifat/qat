@@ -1,6 +1,8 @@
 const Review = require('../../models/evaluations/review');
 const Logger = require('../../models/log');
 const User = require('../../models/user');
+const Evaluation = require('../../models/evaluations/evaluation');
+const AppEvaluation = require('../../models/evaluations/appEvaluation');
 const Settings = require('../../models/settings');
 const discord = require('../../helpers/discord');
 const util = require('../../helpers/util');
@@ -218,9 +220,54 @@ async function replaceUser (evaluation, currentUser, evaluatorId, isBn, selected
     return newEvaluator;
 }
 
+async function findEvaluationsWithoutIncident (selectedUserId) {
+    const evaluations = await Evaluation.find({
+        user: selectedUserId,
+        active: false,
+        consensus: { $exists: true },
+    });
+
+    const applications = await AppEvaluation.find({
+        user: selectedUserId,
+        active: false,
+        consensus: { $exists: true },
+        feedback: { $exists: true },
+    });
+
+    let previousEvaluations = evaluations.concat(applications);
+
+    if (evaluations.length && applications.length) {
+        previousEvaluations.sort((a, b) => {
+            const dateA = (a.archivedAt ? a.archivedAt : a.deadline);
+            const dateB = (b.archivedAt ? b.archivedAt : b.deadline);
+            if (dateA > dateB) return 1;
+            if (dateA < dateB) return -1;
+
+            return 0;
+        });
+    }
+
+    const reversed = previousEvaluations.reverse();
+
+    let count = 0;
+
+    for (let i = 0; i < reversed.length; i++) {
+        const evaluation = reversed[i];
+
+        if (evaluation.kind == 'currentBn' && evaluation.consensus == 'fullBn' && (evaluation.addition == 'none' || !evaluation.addition) && count < 3) {
+            count++;
+        } else {
+            break;
+        }
+    }
+
+    return count;
+}
+
 module.exports = {
     submitEval,
     setGroupEval,
     setFeedback,
     replaceUser,
+    findEvaluationsWithoutIncident,
 };

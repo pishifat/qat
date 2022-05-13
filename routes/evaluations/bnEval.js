@@ -9,7 +9,7 @@ const User = require('../../models/user');
 const Aiess = require('../../models/aiess');
 const QualityAssuranceCheck = require('../../models/qualityAssuranceCheck');
 const Note = require('../../models/note');
-const { submitEval, setGroupEval, setFeedback, replaceUser } = require('./evaluations');
+const { submitEval, setGroupEval, setFeedback, replaceUser, findEvaluationsWithoutIncident } = require('./evaluations');
 const middlewares = require('../../helpers/middlewares');
 const discord = require('../../helpers/discord');
 const util = require('../../helpers/util');
@@ -52,13 +52,6 @@ const notesPopulate = [
 /* GET current BN eval listing. */
 router.get('/relevantInfo', async (req, res) => {
     const evaluations = await Evaluation.findActiveEvaluations(req.session.mongoId);
-
-    /*for (const evaluation of evaluations) {
-        if (evaluation.mode == 'osu' && evaluation.active) {
-            evaluation.natEvaluators = [];
-            await evaluation.save();
-        }
-    }*/
 
     res.json({
         evaluations,
@@ -373,6 +366,7 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
                 user: evaluation.user,
                 mode: evaluation.mode,
                 deadline,
+                activityToCheck: 40,
             });
         }
 
@@ -385,12 +379,23 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
             }
 
             let deadline = new Date();
+            let activityToCheck = 90;
 
             if (evaluation.addition === BnEvaluationAddition.LowActivityWarning) {
-                deadline.setDate(deadline.getDate() + 40);
+                deadline.setDate(deadline.getDate() + 40); // +40 days
             } else {
-                const randomDelay = Math.floor(Math.random() * (115 - 85) + 85); // between 85 and 115 days
-                deadline.setDate(deadline.getDate() + randomDelay);
+                const random90 = Math.round(Math.random() * (95 - 85) + 85); // between 85 and 95 days
+                const random180 = Math.round(Math.random() * (185 - 175) + 175); // between 185 and 175 days
+
+                const evaluationsWithoutIncident = await findEvaluationsWithoutIncident(user._id);
+
+                if (evaluationsWithoutIncident > 1) {
+                    deadline.setDate(deadline.getDate() + random180);
+                    activityToCheck = random180;
+                } else {
+                    deadline.setDate(deadline.getDate() + random90);
+                    activityToCheck = random90;
+                }
             }
 
             await user.save();
@@ -398,6 +403,7 @@ router.post('/setComplete/', middlewares.isNat, async (req, res) => {
                 user: evaluation.user,
                 mode: evaluation.mode,
                 deadline,
+                activityToCheck,
             });
         }
 
@@ -579,6 +585,13 @@ router.get('/findPreviousEvaluations/:userId', async (req, res) => {
     }
 
     res.json({ previousEvaluations });
+});
+
+/* GET estimated next evaluation date */
+router.get('/findEvaluationsWithoutIncident/:userId', async (req, res) => {
+    const evaluationsWithoutIncident = await findEvaluationsWithoutIncident(req.params.userId);
+
+    res.json(evaluationsWithoutIncident);
 });
 
 /* GET find user notes */

@@ -12,6 +12,9 @@
                 <cooldown
                     v-if="selectedEvaluation && negativeConsensus"
                 />
+                <next-evaluation-estimate
+                    v-else-if="selectedEvaluation.consensus"
+                />
                 <feedback-info
                     v-if="selectedEvaluation.consensus"
                 />
@@ -37,6 +40,7 @@ import Cooldown from './common/Cooldown.vue';
 import ReviewsListing from './common/ReviewsListing.vue';
 import FeedbackInfo from './common/FeedbackInfo.vue';
 import evaluations from '../../../mixins/evaluations.js';
+import NextEvaluationEstimate from './common/NextEvaluationEstimate.vue';
 
 export default {
     name: 'DiscussionInfo',
@@ -45,6 +49,7 @@ export default {
         Cooldown,
         ReviewsListing,
         FeedbackInfo,
+        NextEvaluationEstimate,
     },
     mixins: [ evaluations ],
     computed: {

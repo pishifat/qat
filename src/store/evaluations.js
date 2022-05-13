@@ -26,7 +26,6 @@ export default {
 
         // modify data
         updateEvaluation (state, evaluation) {
-            console.log('in');
             const i = state.evaluations.findIndex(a => a.id == evaluation.id);
             if (i !== -1) Vue.set(state.evaluations, i, evaluation);
         },
