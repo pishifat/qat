@@ -15,7 +15,6 @@ const BeatmapReport = require('../models/beatmapReport');
 const Discussion = require('../models/discussion');
 const Report = require('../models/report');
 const Logger = require('../models/log');
-const { user } = require('../models/evaluations/base');
 
 const defaultPopulate = [
     { path: 'user', select: 'username osuId modesInfo' },
