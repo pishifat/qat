@@ -125,10 +125,6 @@ async function roleHighlightWebhookPost(webhook, text) {
             url += `${config.contentCasesWebhook.id}/${config.contentCasesWebhook.token}`;
             content = `<@&${config.contentCasesWebhook.gmtRole}>`;
             break;
-        case 'report':
-            url += `${config.reportWebhook.id}/${config.reportWebhook.token}`;
-            content = `<@&${config.reportWebhook.reportRole}>`;
-            break;
     }
 
     if (text) content+= ` ${text}`;
