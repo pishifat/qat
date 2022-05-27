@@ -151,7 +151,7 @@ router.post('/submitReportEval/:id', async (req, res) => {
             author: discord.defaultWebhookAuthor(req.session),
             thumbnail,
             color,
-            description: `[Report for **${report.culprit ? report.culprit.username : report.link}**](http://bn.mappersguild.com/managereports?id=${report.id})`,
+            description: `Adjusted ${req.body.close ? 'status' : 'feedback'} on [report for **${report.culprit ? report.culprit.username : report.link}**](http://bn.mappersguild.com/managereports?id=${report.id})`,
             fields,
         }],
         'natUserReport'
