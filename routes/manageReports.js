@@ -148,6 +148,7 @@ router.post('/submitReportEval/:id', async (req, res) => {
 
     await discord.webhookPost(
         [{
+            author: discord.defaultWebhookAuthor(req.session),
             thumbnail,
             color,
             description: `[Report for **${report.culprit ? report.culprit.username : report.link}**](http://bn.mappersguild.com/managereports?id=${report.id})`,
@@ -273,6 +274,7 @@ router.post('/sendMessages/:id', async (req, res) => {
 
     await discord.webhookPost(
         [{
+            author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.white,
             description: `Sent chat messages for [report for **${report.culprit ? report.culprit.username : report.link}**](http://bn.mappersguild.com/managereports?id=${report.id})`,
         }],
