@@ -96,7 +96,7 @@ router.post('/submitReportEval/:id', async (req, res) => {
     });
 
     let fields = [];
-
+    let color = discord.webhookColors.pink;
     let thumbnail = {
         url: `https://bn.mappersguild.com/images/qatlogo.png`,
     };
@@ -138,16 +138,18 @@ router.post('/submitReportEval/:id', async (req, res) => {
     }
 
     if (req.body.close) {
-        fields.push({
+        fields = [{
             name: 'Report status',
             value: 'CLOSED',
-        });
+        }];
+
+        color = discord.webhookColors.red;
     }
 
     await discord.webhookPost(
         [{
             thumbnail,
-            color: discord.webhookColors.pink,
+            color,
             description: `[Report for **${report.culprit ? report.culprit.username : report.link}**](http://bn.mappersguild.com/managereports?id=${report.id})`,
             fields,
         }],
@@ -245,6 +247,7 @@ router.post('/sendToContentReview/:id', async (req, res) => {
 router.post('/sendMessages/:id', async (req, res) => {
     const report = await Report
         .findById(req.params.id)
+        .populate(defaultPopulate)
         .orFail();
 
     let messages;
