@@ -171,7 +171,7 @@ const webhookColors = {
     darkPurple: 4263999,      // submitVeto
     purple: 8536232,          // startVetoMediation, concludeVetoMediation
 
-    pink: 16728232,       // revealedCurrentBnEvalNotification
+    pink: 16728232,       // revealedCurrentBnEvalNotification, modified report
     white: 15724527,      // unarchive, addEvaluation, sendMessages
     brown: 7554849,       // submitUserNote
     gray: 8815494,        // passive: moveToGroupDiscussion,

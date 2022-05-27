@@ -95,6 +95,18 @@ router.post('/submitReportEval/:id', async (req, res) => {
         success: 'Saved evaluation',
     });
 
+    let fields = [];
+
+    let thumbnail = {
+        url: `https://bn.mappersguild.com/images/qatlogo.png`,
+    };
+
+    if (report.culprit && report.culprit.osuId) {
+        thumbnail = {
+            url: `https://a.ppy.sh/${report.culprit.osuId}`,
+        };
+    }
+
     if (req.body.feedback && req.body.feedback.length) {
         Logger.generate(
             req.session.mongoId,
@@ -102,6 +114,11 @@ router.post('/submitReportEval/:id', async (req, res) => {
             'report',
             report._id
         );
+
+        fields.push({
+            name: 'Report feedback',
+            value: req.body.feedback.length > 900 ? req.body.feedback.slice(0,900) + '... *(truncated)*' : req.body.feedback,
+        });
     }
 
     if (req.body.vote) {
@@ -113,7 +130,29 @@ router.post('/submitReportEval/:id', async (req, res) => {
             'report',
             report._id
         );
+
+        fields.push({
+            name: 'Report vote',
+            value: validity,
+        });
     }
+
+    if (req.body.close) {
+        fields.push({
+            name: 'Report status',
+            value: 'CLOSED',
+        });
+    }
+
+    await discord.webhookPost(
+        [{
+            thumbnail,
+            color: discord.webhookColors.pink,
+            description: `[Report for **${report.culprit ? report.culprit.username : report.link}**](http://bn.mappersguild.com/managereports?id=${report.id})`,
+            fields,
+        }],
+        'natUserReport'
+    );
 });
 
 /* POST send report to content review */
@@ -227,6 +266,14 @@ router.post('/sendMessages/:id', async (req, res) => {
         `Sent chat messages about a closed report`,
         'report',
         report._id
+    );
+
+    await discord.webhookPost(
+        [{
+            color: discord.webhookColors.white,
+            description: `Sent chat messages for [report for **${report.culprit ? report.culprit.username : report.link}**](http://bn.mappersguild.com/managereports?id=${report.id})`,
+        }],
+        'natUserReport'
     );
 });
 
