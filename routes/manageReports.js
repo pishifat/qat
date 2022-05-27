@@ -73,7 +73,7 @@ router.get('/searchById/:id', async (req, res) => {
 });
 
 /* POST submit or edit eval */
-router.post('/submitReportEval/:id', middlewares.isNat, async (req, res) => {
+router.post('/submitReportEval/:id', async (req, res) => {
     if (req.body.feedback && req.body.feedback.length) {
         await Report.findByIdAndUpdate(req.params.id, { feedback: req.body.feedback });
     }
@@ -117,7 +117,7 @@ router.post('/submitReportEval/:id', middlewares.isNat, async (req, res) => {
 });
 
 /* POST send report to content review */
-router.post('/sendToContentReview/:id', middlewares.isNat, async (req, res) => {
+router.post('/sendToContentReview/:id', async (req, res) => {
     let report = await Report
         .findById(req.params.id)
         .populate(defaultPopulate)
@@ -203,7 +203,7 @@ router.post('/sendToContentReview/:id', middlewares.isNat, async (req, res) => {
 });
 
 /* POST send messages */
-router.post('/sendMessages/:id', middlewares.isNat, async (req, res) => {
+router.post('/sendMessages/:id', async (req, res) => {
     const report = await Report
         .findById(req.params.id)
         .orFail();

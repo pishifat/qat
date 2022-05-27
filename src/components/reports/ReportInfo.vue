@@ -9,7 +9,7 @@
 
             <hr>
 
-            <feedback v-if="loggedInUser.isNat" class="mb-3" />
+            <feedback class="mb-3" />
 
             <report-feedback-pm
                 v-if="!selectedReport.isActive"
