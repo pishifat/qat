@@ -29,9 +29,6 @@ async function webhookPost(message, webhook) {
         case 'beatmapReport':
             url += `${config.beatmapReportWebhook.id}/${config.beatmapReportWebhook.token}`;
             break;
-        case 'userReport':
-            url += `${config.reportWebhook.id}/${config.reportWebhook.token}`;
-            break;
         case 'natUserReport':
             url += `${config.natReportWebhook.id}/${config.natReportWebhook.token}`;
             break;

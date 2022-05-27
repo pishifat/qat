@@ -59,11 +59,6 @@
         "catchRole": "",
         "maniaRole": ""
     },
-    "reportWebhook": {
-        "id": "",
-        "token": "",
-        "reportRole": ""
-    },
     "natReportWebhook": {
         "id": "",
         "token": ""

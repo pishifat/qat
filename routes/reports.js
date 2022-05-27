@@ -79,22 +79,6 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
             success: 'Sent!',
         });
 
-        // for #user-reportfeed
-        await discord.webhookPost(
-            [{
-                thumbnail: {
-                    url: `https://a.ppy.sh/${u.osuId}`,
-                },
-                color: discord.webhookColors.darkRed,
-                description: `[${reportCategory}](http://bn.mappersguild.com/managereports?id=${report.id}) for **${u.username}**`,
-                fields: notificationFields,
-            }],
-            'userReport'
-        );
-
-        await discord.roleHighlightWebhookPost('report');
-
-        // for #nat
         await discord.webhookPost(
             [{
                 thumbnail: {
@@ -126,17 +110,6 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
             success: 'Sent!',
         });
 
-        // for #user-reportfeed
-        await discord.webhookPost([{
-            description: `[${reportCategory}](http://bn.mappersguild.com/managereports?id=${report.id})`,
-            color: discord.webhookColors.darkRed,
-            fields: notificationFields,
-        }],
-        'userReport');
-
-        await discord.roleHighlightWebhookPost('report');
-
-        // for #nat
         await discord.webhookPost([{
             description: `[${reportCategory}](http://bn.mappersguild.com/managereports?id=${report.id})`,
             color: discord.webhookColors.darkRed,
