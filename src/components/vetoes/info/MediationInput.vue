@@ -103,7 +103,7 @@ export default {
         findUserMediation() {
             if (this.loggedInUser.hasBasicAccess) { // mediator info is hidden from normal users, so this function wouldn't work
                 this.mediation.mediationIds = [];
-                this.input.comment = [];
+                this.input.comments = [];
                 this.vote.votes = [];
 
                 for (let i = 0; i < this.selectedVeto.reasons.length; i++) {

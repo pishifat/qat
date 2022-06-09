@@ -6,6 +6,9 @@
         "jquery": true,
         "commonjs": true
     },
+    "editor.codeActionsOnsSave": {
+        "source.fixAll.eslint": true
+    },
     "extends": [
         "eslint:recommended",
         "plugin:vue/recommended"
@@ -26,12 +29,16 @@
         "indent": [
             "error",
             4,
-            { "SwitchCase": 1 }
+            {
+                "SwitchCase": 1
+            }
         ],
         "quotes": [
             "error",
             "single",
-            { "allowTemplateLiterals": true }
+            {
+                "allowTemplateLiterals": true
+            }
         ],
         "semi": [
             "error",
@@ -39,11 +46,15 @@
         ],
         "semi-spacing": [
             "error",
-            { "before": false, "after": true }
+            {
+                "before": false,
+                "after": true
+            }
         ],
         "no-var": "error",
         "comma-dangle": [
-            "error", {
+            "error",
+            {
                 "arrays": "always-multiline",
                 "objects": "always-multiline",
                 "imports": "always-multiline",
@@ -59,13 +70,16 @@
         "object-shorthand": "error",
         "require-await": "error",
         "vue/html-indent": [
-            "error", 
+            "error",
             4
         ],
-        "vue/max-attributes-per-line": ["error", {
-            "singleline": 3,
-            "multiline": 1
-        }],
+        "vue/max-attributes-per-line": [
+            "error",
+            {
+                "singleline": 3,
+                "multiline": 1
+            }
+        ],
         "vue/no-v-html": "off",
         "no-trailing-spaces": "error",
         "key-spacing": "error",
@@ -73,13 +87,31 @@
         "space-before-blocks": "error",
         "padding-line-between-statements": [
             "error",
-            { "blankLine": "always", "prev": "*", "next": "return" },
-
-            { "blankLine": "always", "prev": "directive", "next": "*" },
-            { "blankLine": "any", "prev": "directive", "next": "directive" },
-
-            { "blankLine": "always", "prev": "*", "next": "block-like" },
-            { "blankLine": "always", "prev": "block-like", "next": "*" }
+            {
+                "blankLine": "always",
+                "prev": "*",
+                "next": "return"
+            },
+            {
+                "blankLine": "always",
+                "prev": "directive",
+                "next": "*"
+            },
+            {
+                "blankLine": "any",
+                "prev": "directive",
+                "next": "directive"
+            },
+            {
+                "blankLine": "always",
+                "prev": "*",
+                "next": "block-like"
+            },
+            {
+                "blankLine": "always",
+                "prev": "block-like",
+                "next": "*"
+            }
         ]
     }
 }
