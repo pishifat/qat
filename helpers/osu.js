@@ -132,7 +132,13 @@ async function getBeatmapsetInfo(token, setId) {
         },
     };
 
-    return (await axios(options)).data;
+    try {
+        const res = await axios(options);
+
+        return res.data;
+    } catch (error) {
+        return { error };
+    }
 }
 
 async function getDiscussions(token, params) {

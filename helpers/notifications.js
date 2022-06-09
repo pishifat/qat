@@ -40,7 +40,7 @@ const defaultReportPopulate = [
  * @param {Boolean} discussion
  * @returns {Array} discord IDs for relevant NAT
  */
-function findNatEvaluatorHighlights (reviews, natEvaluators, discussion) {
+function findNatEvaluatorHighlights(reviews, natEvaluators, discussion) {
     let discordIds = [];
 
     if (discussion) {
@@ -68,7 +68,7 @@ function findNatEvaluatorHighlights (reviews, natEvaluators, discussion) {
  * @param {Boolean} discussion
  * @returns {string} text for webhook
  */
-function findNatEvaluatorStatuses (reviews, evaluators, discussion) {
+function findNatEvaluatorStatuses(reviews, evaluators, discussion) {
     let text = '';
 
     if (!discussion) {
@@ -94,7 +94,7 @@ function findNatEvaluatorStatuses (reviews, evaluators, discussion) {
  * @param {string} feedback
  * @returns {string} text for webhook
  */
-function findMissingContent (discussion, consensus, feedback) {
+function findMissingContent(discussion, consensus, feedback) {
     let text = '\n**Next step:** ';
 
     if (!discussion) {
@@ -114,10 +114,10 @@ function findMissingContent (discussion, consensus, feedback) {
  * @param {Date} deadline
  * @returns {number} text for webhook
  */
-function findDaysAgo (deadline) {
+function findDaysAgo(deadline) {
     const today = new Date();
     const contacted = new Date(deadline);
-    const days = Math.round((today.getTime() - contacted.getTime())/(1000*60*60*24));
+    const days = Math.round((today.getTime() - contacted.getTime()) / (1000 * 60 * 60 * 24));
 
     return days;
 }
@@ -495,7 +495,7 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
                     fields: [
                         {
                             name: messageType,
-                            value: discussionMessage.length > 500 ? discussionMessage.slice(0,500) + '... *(truncated)*' : discussionMessage,
+                            value: discussionMessage.length > 500 ? discussionMessage.slice(0, 500) + '... *(truncated)*' : discussionMessage,
                         },
                     ],
                 }],
@@ -581,7 +581,7 @@ const lowActivityTask = cron.schedule('0 23 1 * *', async () => {
             await discord.webhookPost(
                 [{
                     title: 'Low Activity',
-                    description: `The following users have low activity from ${initialDate.toISOString().slice(0,10)} to today`,
+                    description: `The following users have low activity from ${initialDate.toISOString().slice(0, 10)} to today`,
                     color: discord.webhookColors.red,
                     fields: modeField,
                 }],
@@ -611,9 +611,10 @@ const checkMatchBeatmapStatuses = cron.schedule('2 22 * * *', async () => {
 
     for (const match of matches) {
         const beatmapsetInfo = await osu.getBeatmapsetInfo(token, match.beatmapset.osuId);
+        await util.sleep(500);
 
         // 4 = loved, 3 = qualified, 2 = approved, 1 = ranked, 0 = pending, -1 = WIP, -2 = graveyard
-        if (beatmapsetInfo.ranked > 0) {
+        if (beatmapsetInfo.error || beatmapsetInfo.ranked > 0) {
             await BnFinderMatch.findByIdAndUpdate(match.id, { isExpired: true });
         }
     }
@@ -627,7 +628,7 @@ const checkMatchBeatmapStatuses = cron.schedule('2 22 * * *', async () => {
  * @param {object} bn
  * @returns {Promise<number>} number of unique bubbled/qualified
  */
-async function findUniqueNominationsCount (initialDate, bn) {
+async function findUniqueNominationsCount(initialDate, bn) {
     const events = await Aiess.distinct('beatmapsetId', {
         userId: bn.osuId,
         type: {
@@ -647,7 +648,7 @@ async function findUniqueNominationsCount (initialDate, bn) {
  * @param {string} mode
  * @returns {Promise<boolean>} whether or not the user has 'low activity'
  */
-async function hasLowActivity (initialDate, bn, mode) {
+async function hasLowActivity(initialDate, bn, mode) {
     const uniqueNominations = await findUniqueNominationsCount(initialDate, bn);
 
     if (
