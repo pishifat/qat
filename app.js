@@ -134,8 +134,11 @@ app.use(function (err, req, res, next) {
         for (const key of keys) {
             const error = err.errors[key];
 
+            // @ts-ignore
             if (error.kind === 'required') {
+                // @ts-ignore
                 customErrorMessage += `\n"${error.path}" is missing.`;
+                // @ts-ignore
             } else if (error.kind === 'maxlength') {
                 // @ts-ignore
                 customErrorMessage += `\nMax length for input is ${error.properties.maxlength}.`;
