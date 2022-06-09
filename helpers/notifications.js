@@ -516,11 +516,13 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
 });
 
 /**
- * Checks for bns with less than 6 mods (4 for mania) the first day of every month
+ * Checks for bns with less than 6 mods (4 for mania) over the course of 90 days the first day of every month
  */
 const lowActivityTask = cron.schedule('0 23 1 * *', async () => {
-    const lowActivityFields = [];
-    const initialDate = moment().subtract(3, 'months').toDate();
+    const lowActivityFields90 = [];
+    const lowActivityFields30 = [];
+    const initialDate90 = moment().subtract(3, 'months').toDate();
+    const initialDate30 = moment().subtract(1, 'months').toDate();
 
     const bns = await User.find({ groups: 'bn' });
 
@@ -528,12 +530,20 @@ const lowActivityTask = cron.schedule('0 23 1 * *', async () => {
         const joinedHistory = bn.history.filter(h => h.kind === 'joined');
         const date = joinedHistory[joinedHistory.length - 1].date;
 
-        if (new Date(date) < initialDate) {
+        if (new Date(date) < initialDate90) {
             for (const mode of bn.modes) {
-                if (await hasLowActivity(initialDate, bn, mode)) {
-                    lowActivityFields.push({
+                if (await hasLowActivity(initialDate90, bn, mode, 3)) {
+                    lowActivityFields90.push({
                         name: bn.username,
-                        value: `${await findUniqueNominationsCount(initialDate, bn)}`,
+                        value: `${await findUniqueNominationsCount(initialDate90, bn)}`,
+                        inline: true,
+                        mode,
+                    });
+                }
+                if (await hasLowActivity(initialDate30, bn, mode, 1)) {
+                    lowActivityFields30.push({
+                        name: bn.username,
+                        value: `${await findUniqueNominationsCount(initialDate30, bn)}`,
                         inline: true,
                         mode,
                     });
@@ -542,37 +552,64 @@ const lowActivityTask = cron.schedule('0 23 1 * *', async () => {
         }
     }
 
-    if (!lowActivityFields.length) return;
+    if (!lowActivityFields90.length) return;
 
-    let formatField = { name: 'username', value: 'nominations within 3 months' };
-    let osuFields = [];
-    let taikoFields = [];
-    let catchFields = [];
-    let maniaFields = [];
-    osuFields.push(formatField);
-    taikoFields.push(formatField);
-    catchFields.push(formatField);
-    maniaFields.push(formatField);
+    // i don't care how stupid this is. this is how it's being done.
+    let formatField90 = { name: 'username', value: 'nominations within 3 months' };
+    let formatField30 = { name: 'username', value: 'nominations within 1 month' };
+    let osuFields90 = [];
+    let taikoFields90 = [];
+    let catchFields90 = [];
+    let maniaFields90 = [];
+    let osuFields30 = [];
+    let taikoFields30 = [];
+    let catchFields30 = [];
+    let maniaFields30 = [];
+    osuFields90.push(formatField90);
+    taikoFields90.push(formatField90);
+    catchFields90.push(formatField90);
+    maniaFields90.push(formatField90);
+    osuFields30.push(formatField30);
+    taikoFields30.push(formatField30);
+    catchFields30.push(formatField30);
+    maniaFields30.push(formatField30);
 
-    lowActivityFields.forEach(field => {
+    for (const field of lowActivityFields90) {
         switch (field.mode) {
             case 'osu':
-                osuFields.push(field);
+                osuFields90.push(field);
                 break;
             case 'taiko':
-                taikoFields.push(field);
+                taikoFields90.push(field);
                 break;
             case 'catch':
-                catchFields.push(field);
+                catchFields90.push(field);
                 break;
             case 'mania':
-                maniaFields.push(field);
+                maniaFields90.push(field);
                 break;
         }
-    });
+    }
 
-    const modeFields = [osuFields, taikoFields, catchFields, maniaFields];
-    const modes = ['osu', 'taiko', 'catch', 'mania'];
+    for (const field of lowActivityFields30) {
+        switch (field.mode) {
+            case 'osu':
+                osuFields30.push(field);
+                break;
+            case 'taiko':
+                taikoFields30.push(field);
+                break;
+            case 'catch':
+                catchFields30.push(field);
+                break;
+            case 'mania':
+                maniaFields30.push(field);
+                break;
+        }
+    }
+
+    const modeFields = [osuFields90, taikoFields90, catchFields90, maniaFields90, osuFields30, taikoFields30, catchFields30, maniaFields30];
+    const modes = ['osu', 'taiko', 'catch', 'mania', 'osu', 'taiko', 'catch', 'mania']; // this is where it gets really stupid and i am embarrassed
 
     for (let i = 0; i < modeFields.length; i++) {
         const modeField = modeFields[i];
@@ -580,8 +617,8 @@ const lowActivityTask = cron.schedule('0 23 1 * *', async () => {
         if (modeField.length > 1) { // only create webhook if there are users with low activity in mode
             await discord.webhookPost(
                 [{
-                    title: 'Low Activity',
-                    description: `The following users have low activity from ${initialDate.toISOString().slice(0, 10)} to today`,
+                    title: `Low Activity ${i >= 4 ? '(30 days)' : '(90 days)'}`,
+                    description: `The following users have low activity from ${i >= 4 ? initialDate30.toISOString().slice(0, 10) : initialDate90.toISOString().slice(0, 10)} to today`,
                     color: discord.webhookColors.red,
                     fields: modeField,
                 }],
@@ -648,12 +685,12 @@ async function findUniqueNominationsCount(initialDate, bn) {
  * @param {string} mode
  * @returns {Promise<boolean>} whether or not the user has 'low activity'
  */
-async function hasLowActivity(initialDate, bn, mode) {
+async function hasLowActivity(initialDate, bn, mode, months) {
     const uniqueNominations = await findUniqueNominationsCount(initialDate, bn);
 
     if (
-        (uniqueNominations < 4 && mode == 'mania') ||
-        (uniqueNominations < 6 && mode != 'mania')
+        (uniqueNominations < (2 * months) && mode == 'mania') ||
+        (uniqueNominations < (3 * months) && mode != 'mania')
     ) {
         return true;
     }

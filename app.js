@@ -10,7 +10,7 @@ require('express-async-errors');
 
 // Return the 'new' updated object by default when doing findByIdAndUpdate
 mongoose.plugin(schema => {
-    schema.pre('findOneAndUpdate', function() {
+    schema.pre('findOneAndUpdate', function () {
         if (!('new' in this.options)) {
             this.setOptions({ new: true });
         }
@@ -64,7 +64,7 @@ mongoose.connect(config.connection, {
 });
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'db connection error:'));
-db.once('open', function() {
+db.once('open', function () {
     console.log('natdb connected');
 });
 
@@ -112,8 +112,8 @@ app.use('/settings', settingsRouter);
 app.use('/spam', spamRouter);
 
 // catch 404
-app.use(function(req, res) {
-    res.render('index',{
+app.use(function (req, res) {
+    res.render('index', {
         layout: false,
         loggedIn: req.session.mongoId,
     });
@@ -121,7 +121,7 @@ app.use(function(req, res) {
 
 // error handler
 // eslint-disable-next-line no-unused-vars
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
     let customErrorMessage;
     if (err.name == 'DocumentNotFoundError') customErrorMessage = 'Not found';
 
