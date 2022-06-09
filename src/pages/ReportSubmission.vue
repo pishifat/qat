@@ -3,13 +3,11 @@
         <section class="card card-body mb-3">
             <p>Reports can be made about anything mapping/modding related, including but not limited to:</p>
             <ul>
-                <li>Stolen beatmaps</li>
                 <li>Beatmap songs violating osu!'s <a href="https://osu.ppy.sh/wiki/en/Rules/Song_Content_Rules" target="_blank">Song Content Rules</a></li>
                 <li>Beatmap backgrounds (or other visual assets) violating osu!'s <a href="https://osu.ppy.sh/wiki/Rules/Visual_Content_Considerations" target="_blank">Visual Content Considerations</a></li>
-                <li>Inappropriate behavior on a beatmap discussion or comments</li>
-                <li>A member of the BN/NAT violating osu!'s <a href="https://osu.ppy.sh/wiki/Rules/Code_of_Conduct_for_Modding_and_Mapping" target="_blank">Code of Conduct</a>, <a href="https://osu.ppy.sh/wiki/People/The_Team/Beatmap_Nominators/Rules" target="_blank">BN Rules</a>, or <a href="https://osu.ppy.sh/wiki/People/The_Team/Beatmap_Nominators/Expectations" target="_blank">Expectations for the BN</a></li>
+                <li>A member of the BN violating osu!'s <a href="https://osu.ppy.sh/wiki/Rules/Code_of_Conduct_for_Modding_and_Mapping" target="_blank">Code of Conduct</a>, <a href="https://osu.ppy.sh/wiki/People/The_Team/Beatmap_Nominators/Rules" target="_blank">BN Rules</a>, or <a href="https://osu.ppy.sh/wiki/People/The_Team/Beatmap_Nominators/Expectations" target="_blank">Expectations for the BN</a></li>
             </ul>
-            <p>Most reports are evaluated by the NAT on a case-by-case basis. In special cases, members of the BN/GMT/NAT evaluate inappropriate content through anonymous votes.</p>
+            <p>Most reports are evaluated by the GMT/NAT on a case-by-case basis. In special cases, members of the BN/GMT/NAT evaluate inappropriate content through anonymous votes.</p>
             <p>Excluding those special cases, authors of reports are anonymous until a consensus is met. The consensus will be relayed to you via osu! chat.</p>
         </section>
 
@@ -31,7 +29,7 @@
                             Visual Content Considerations violation
                         </option>
                         <option value="behavior">
-                            Inappropriate behavior in beatmap discussion or comments
+                            Inappropriate behavior from a BN
                         </option>
                         <option value="stolenBeatmap">
                             Stolen beatmap
@@ -50,10 +48,14 @@
                     </div>
                 </div>
 
+                <div v-if="category == 'behavior'">
+                    Before submitting a behavior report, check the <a href="https://osu.ppy.sh/wiki/Reporting_bad_behaviour" target="_blank">reporting policy on the osu! wiki</a>.
+                </div>
+
                 <hr>
 
                 <div v-if="category == 'stolenBeatmap'">
-                    If a beatmap you created is stolen and you want it removed from the beatmap listing, send notice to <code>copyright@ppy.sh</code> from as per osu!'s <a href="https://osu.ppy.sh/legal/en/Copyright" target="_blank">copyright policy</a>. Your notice should come from the email address linked to your osu! account.
+                    If a beatmap you created is stolen and you want it removed from the beatmap listing, send notice to <code>copyright@ppy.sh</code> from as per osu!'s <a href="https://osu.ppy.sh/legal/Copyright" target="_blank">copyright policy</a>. Your notice should come from the email address linked to your osu! account.
                 </div>
 
                 <div v-else>
@@ -78,7 +80,7 @@
                         <div class="col-sm-12">
                             <h4>Username:</h4>
                             <p class="small text-secondary">
-                                If your report pertains to a member of the BN/NAT, include their name. Otherwise leave empty.
+                                If your report pertains to a member of the BN, include their name. Otherwise leave empty.
                             </p>
 
                             <input
