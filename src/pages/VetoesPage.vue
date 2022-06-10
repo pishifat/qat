@@ -6,13 +6,22 @@
                 :options="['', 'osu', 'taiko', 'catch', 'mania']"
                 store-module="vetoes"
             >
-                <button class="btn btn-block btn-primary my-1" data-toggle="modal" data-target="#addVeto">
+                <button
+                    class="btn btn-block btn-primary my-1"
+                    data-toggle="modal"
+                    data-target="#addVeto"
+                >
                     Submit veto
                 </button>
             </filter-box>
 
             <section class="card card-body">
-                <h2>Active Vetoes <small v-if="activeVetoes">({{ activeVetoes.length }})</small></h2>
+                <h2>
+                    Active Vetoes
+                    <small v-if="activeVetoes"
+                        >({{ activeVetoes.length }})</small
+                    >
+                </h2>
 
                 <transition-group name="list" tag="div" class="row">
                     <veto-card
@@ -24,7 +33,28 @@
             </section>
 
             <section class="card card-body">
-                <h2>Resolved Vetoes <small v-if="paginatedResolvedVetoes">({{ resolvedVetoes.length }})</small></h2>
+                <h2>
+                    Resolved Vetoes
+                    <small v-if="paginatedResolvedVetoes"
+                        >({{ resolvedVetoes.length }})</small
+                    >
+                    <button
+                        v-if="!reachedMax"
+                        type="button"
+                        class="btn btn-primary ml-2"
+                        @click="showMore($event)"
+                    >
+                        Show more vetoes
+                    </button>
+                    <button
+                        v-if="!reachedMax"
+                        type="button"
+                        class="btn btn-secondary ml-2"
+                        @click="showAll($event)"
+                    >
+                        Show all vetoes
+                    </button>
+                </h2>
 
                 <transition-group name="list" tag="div" class="row">
                     <veto-card
@@ -34,9 +64,7 @@
                     />
                 </transition-group>
 
-                <pagination-nav
-                    store-module="vetoes"
-                />
+                <pagination-nav store-module="vetoes" />
             </section>
         </div>
 
@@ -68,10 +96,15 @@ export default {
         FilterBox,
         PaginationNav,
     },
+    data() {
+        return {
+            skip: 20,
+            limit: 20,
+            reachedMax: false,
+        };
+    },
     computed: {
-        ...mapState('vetoes', [
-            'vetoes',
-        ]),
+        ...mapState('vetoes', ['vetoes']),
         ...mapGetters('vetoes', [
             'activeVetoes',
             'resolvedVetoes',
@@ -79,43 +112,73 @@ export default {
         ]),
     },
     watch: {
-        resolvedVetoes (v) {
+        resolvedVetoes(v) {
             this.$store.dispatch('vetoes/pagination/updateMaxPages', v.length);
         },
     },
-    beforeCreate () {
+    beforeCreate() {
         if (!this.$store.hasModule('vetoes')) {
             this.$store.registerModule('vetoes', vetoesModule);
         }
     },
-    async created () {
+    async created() {
         if (this.vetoes.length) return;
 
-        const data = await this.$http.initialRequest('/vetoes/relevantInfo');
+        const id = this.$route.query.id;
 
-        if (data.vetoes) {
-            this.$store.commit('vetoes/setVetoes', data.vetoes);
+        if (id) {
+            const veto = await this.$http.initialRequest(
+                `/vetoes/searchVeto/${id}`
+            );
 
-            const id = this.$route.query.id;
+            if (veto && !veto.error) {
+                this.$store.commit('vetoes/setVetoes', [veto]);
+                this.$store.commit('vetoes/setSelectedVetoId', id);
+                $('#extendedInfo').modal('show');
+            }
+        } else {
+            const data = await this.$http.initialRequest(
+                `/vetoes/relevantInfo/${this.limit}`
+            );
 
-            if (id) {
-                const i = this.vetoes.findIndex(v => v.id == id);
-
-                if (i >= 0) {
-                    this.$store.commit('vetoes/setSelectedVetoId', id);
-                    $('#extendedInfo').modal('show');
-                }
+            if (data.vetoes) {
+                this.$store.commit('vetoes/setVetoes', data.vetoes);
             }
         }
     },
-    mounted () {
+    mounted() {
         setInterval(async () => {
-            const res = await this.$http.executeGet('/vetoes/relevantInfo/');
-
-            if (res) {
-                this.$store.commit('vetoes/setVetoes', res.vetoes);
-            }
+            this.limit -= this.skip;
+            await this.showMore(null);
         }, 21600000);
+    },
+    methods: {
+        async showMore(e) {
+            this.limit += this.skip;
+
+            const startVetoesCount = this.vetoes.length;
+
+            const data = await this.$http.executeGet(
+                `/vetoes/relevantInfo/${this.limit}`,
+                e
+            );
+
+            if (data.vetoes) {
+                this.$store.commit('vetoes/setVetoes', data.vetoes);
+
+                if (data.vetoes.length == startVetoesCount) {
+                    this.reachedMax = true;
+                }
+            }
+        },
+        async showAll(e) {
+            const result = confirm(`Are you sure? This will take a while.`);
+            if (result) {
+                this.limit = 10000;
+                this.reachedMax = true;
+                await this.showMore(e);
+            }
+        },
     },
 };
 </script>

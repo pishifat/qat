@@ -47,14 +47,16 @@ function getActiveBnDefaultPopulate (mongoId) {
 }
 
 /* GET discussions. */
-router.get('/relevantInfo', async (req, res) => {
+router.get('/relevantInfo/:limit', async (req, res) => {
+    const limit = parseInt(req.params.limit);
     let discussions;
 
     if (res.locals.userRequest.hasFullReadAccess) {
         discussions = await Discussion
             .find({ isHidden: { $ne: true } })
             .populate(defaultPopulate)
-            .sort({ createdAt: -1 });
+            .sort({ createdAt: -1 })
+            .limit(limit);
 
     } else {
         const [activeDiscussions, inactiveDiscussions] = await Promise.all([
@@ -65,7 +67,8 @@ router.get('/relevantInfo', async (req, res) => {
             Discussion
                 .find({ isNatOnly: { $ne: true }, isActive: false, isHidden: { $ne: true } })
                 .populate(inactiveBnDefaultPopulate)
-                .sort({ createdAt: -1 }),
+                .sort({ createdAt: -1 })
+                .limit(limit),
         ]);
 
         discussions = activeDiscussions.concat(inactiveDiscussions);
@@ -74,6 +77,30 @@ router.get('/relevantInfo', async (req, res) => {
     res.json({
         discussions,
     });
+});
+
+/* GET specific discussion */
+router.get('/searchDiscussionVote/:id', async (req, res) => {
+    let discussion;
+    if (res.locals.userRequest.hasFullReadAccess) {
+        discussion = await Discussion
+            .findOne({ _id: req.params.id, isHidden: { $ne: true }})
+            .populate(defaultPopulate);
+    } else {
+        const tempDiscussion = await Discussion.findById(req.params.id);
+
+        if (tempDiscussion.isActive) {
+            discussion = await Discussion
+                .findOne({ _id: req.params.id, isNatOnly: { $ne: true }, isActive: true, isHidden: { $ne: true } })
+                .populate(getActiveBnDefaultPopulate(req.session.mongoId));
+        } else {
+            discussion = await Discussion
+                .findOne({ isNatOnly: { $ne: true }, isActive: false, isHidden: { $ne: true } })
+                .populate(inactiveBnDefaultPopulate);
+        }
+    }
+
+    res.json(discussion);
 });
 
 /* POST create a new discussion vote. */

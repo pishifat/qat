@@ -48,19 +48,29 @@ function getPopulate(isNat, mongoId) {
 }
 
 /* GET vetoes list. */
-router.get('/relevantInfo', async (req, res) => {
+router.get('/relevantInfo/:limit', async (req, res) => {
     let vetoes = await Veto
-        .find({ status: 'wip' })
+        .find({})
         .populate(
             getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
         )
-        .sort({ createdAt: -1 });
-
-    console.log(vetoes[0].mediations)
+        .sort({ createdAt: -1 })
+        .limit(parseInt(req.params.limit));
 
     res.json({
         vetoes,
     });
+});
+
+/* GET specific veto */
+router.get('/searchVeto/:id', async (req, res) => {
+    let veto = await Veto
+        .findById(req.params.id)
+        .populate(
+            getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
+        );
+
+    res.json(veto);
 });
 
 /* POST create a new veto. */
