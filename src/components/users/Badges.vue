@@ -6,7 +6,7 @@
             data-toggle="tooltip"
             data-placement="right"
             title="Finds relevant yearly profile badge info"
-            @click="findUserBadgeInfo()"
+            @click="findUserBadgeInfo($event)"
         >
             Load badge info
         </button>
@@ -51,8 +51,8 @@ export default {
         };
     },
     methods: {
-        async findUserBadgeInfo() {
-            const users = await this.$http.executeGet('/users/nat/findUserBadgeInfo');
+        async findUserBadgeInfo(e) {
+            const users = await this.$http.executeGet('/users/nat/findUserBadgeInfo', e);
 
             if (users) {
                 this.badgeUsers = users.filter(user =>

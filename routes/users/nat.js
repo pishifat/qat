@@ -5,6 +5,8 @@ const Note = require('../../models/note');
 const AppEvaluation = require('../../models/evaluations/appEvaluation');
 const middlewares = require('../../helpers/middlewares');
 const discord = require('../../helpers/discord');
+const scrap = require('../../helpers/scrap');
+const moment = require('moment');
 
 const router = express.Router();
 
@@ -99,7 +101,7 @@ router.post('/saveNote/:id', async (req, res) => {
             fields: [
                 {
                     name: 'Note',
-                    value: req.body.comment.length > 950 ? req.body.comment.slice(0,950) + '... *(truncated)*' : req.body.comment,
+                    value: req.body.comment.length > 950 ? req.body.comment.slice(0, 950) + '... *(truncated)*' : req.body.comment,
                 },
             ],
         }],
@@ -167,11 +169,70 @@ router.post('/:id/toggleIsTrialNat', middlewares.isNat, async (req, res) => {
 
 /* GET all users with badge info */
 router.get('/findUserBadgeInfo', async (req, res) => {
-    const u = await User.find({
+    const badgeUsers = await User.find({
         history: { $exists: true, $ne: [] },
     }).sort({ username: 1 });
 
-    res.json(u);
+    const bnSiteLeftTheWomb = new Date('2019-05-01');
+
+    const newUsers = [];
+
+    for (let i = 0; i < badgeUsers.length; i++) {
+        const user = badgeUsers[i];
+
+        let bnMonths = 0;
+
+        if (user.natDuration) {
+            const natHistory = user.history.filter(h => h.group == 'nat');
+
+            let startDate;
+            let nextDate;
+            let endDate;
+
+            for (let j = 0; j < natHistory.length; j++) {
+                if (!(j % 2)) {
+                    const historyElement = natHistory[j];
+
+                    startDate = new Date(historyElement.date);
+                    nextDate = moment(startDate).add(1, 'months').toDate();
+                    endDate = natHistory[j + 1] ? natHistory[j + 1].date : new Date();
+
+                    while (nextDate < endDate) {
+                        if (startDate < bnSiteLeftTheWomb) {
+                            startDate = moment(bnSiteLeftTheWomb).toDate();
+                            nextDate = moment(bnSiteLeftTheWomb).add(1, 'months').toDate();
+                        }
+
+                        const count = await scrap.findUniqueNominationsCount(startDate, nextDate, user);
+                        startDate = moment(startDate).add(1, 'months').toDate();
+                        nextDate = moment(nextDate).add(1, 'months').toDate();
+
+                        const requirement = historyElement.mode == 'mania' ? 2 : 3;
+
+                        if (count >= requirement) bnMonths++;
+                    }
+                }
+            }
+        }
+
+        let newBnDuration = user.bnDuration;
+
+        if (bnMonths) {
+            newBnDuration += (30 * bnMonths);
+        }
+
+        newUsers.push({
+            id: user.id,
+            osuId: user.osuId,
+            username: user.username,
+            bnProfileBadge: user.bnProfileBadge,
+            natProfileBadge: user.natProfileBadge,
+            bnDuration: newBnDuration,
+            natDuration: user.natDuration,
+        });
+    }
+
+    res.json(newUsers);
 });
 
 /* GET all NAT users in evaluation bag for relevant mode */

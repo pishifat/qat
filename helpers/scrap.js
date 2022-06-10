@@ -66,7 +66,7 @@ async function getUserModsCount(accessToken, username, months) {
                 allMods = new Map([...allMods, ...monthMods]);
             }
 
-            pageNumber ++;
+            pageNumber++;
         }
 
         modCount.push(monthMods.size);
@@ -100,17 +100,19 @@ async function getUserModScore(accessToken, username, months, mode) {
 
 /**
  * @param {Date} initialDate
- * @param {object} bn
+ * @param {Date} endDate
+ * @param {object} user
  * @returns {Promise<number>} number of unique bubbled/qualified
  */
-async function findUniqueNominations (initialDate, bn) {
+async function findUniqueNominationsCount(initialDate, endDate, user) {
     const events = await Aiess.distinct('beatmapsetId', {
-        userId: bn.osuId,
+        userId: user.osuId,
         type: {
             $in: ['nominate', 'qualify'],
         },
         timestamp: {
             $gt: initialDate,
+            $lt: endDate
         },
     });
 
@@ -120,5 +122,5 @@ async function findUniqueNominations (initialDate, bn) {
 module.exports = {
     getUserModsCount,
     getUserModScore,
-    findUniqueNominations,
+    findUniqueNominationsCount,
 };

@@ -1,9 +1,9 @@
 const cron = require('node-cron');
 const moment = require('moment');
 const discord = require('./discord');
-const Aiess = require('../models/aiess');
 const osuv1 = require('./osuv1');
 const osu = require('./osu');
+const scrap = require('./scrap');
 const osuBot = require('./osuBot');
 const util = require('./util');
 const AppEvaluation = require('../models/evaluations/appEvaluation');
@@ -535,7 +535,7 @@ const lowActivityTask = cron.schedule('0 23 1 * *', async () => {
                 if (await hasLowActivity(initialDate90, bn, mode, 3)) {
                     lowActivityFields90.push({
                         name: bn.username,
-                        value: `${await findUniqueNominationsCount(initialDate90, bn)}`,
+                        value: `${await scrap.findUniqueNominationsCount(initialDate90, new Date(), bn)}`,
                         inline: true,
                         mode,
                     });
@@ -543,7 +543,7 @@ const lowActivityTask = cron.schedule('0 23 1 * *', async () => {
                 if (await hasLowActivity(initialDate30, bn, mode, 1)) {
                     lowActivityFields30.push({
                         name: bn.username,
-                        value: `${await findUniqueNominationsCount(initialDate30, bn)}`,
+                        value: `${await scrap.findUniqueNominationsCount(initialDate30, new Date(), bn)}`,
                         inline: true,
                         mode,
                     });
@@ -663,34 +663,16 @@ const checkMatchBeatmapStatuses = cron.schedule('2 22 * * *', async () => {
 /**
  * @param {Date} initialDate
  * @param {object} bn
- * @returns {Promise<number>} number of unique bubbled/qualified
- */
-async function findUniqueNominationsCount(initialDate, bn) {
-    const events = await Aiess.distinct('beatmapsetId', {
-        userId: bn.osuId,
-        type: {
-            $in: ['nominate', 'qualify'],
-        },
-        timestamp: {
-            $gt: initialDate,
-        },
-    });
-
-    return events.length;
-}
-
-/**
- * @param {Date} initialDate
- * @param {object} bn
  * @param {string} mode
+ * @param {number} months
  * @returns {Promise<boolean>} whether or not the user has 'low activity'
  */
 async function hasLowActivity(initialDate, bn, mode, months) {
-    const uniqueNominations = await findUniqueNominationsCount(initialDate, bn);
+    const uniqueNominationsCount = await scrap.findUniqueNominationsCount(initialDate, new Date(), bn);
 
     if (
-        (uniqueNominations < (2 * months) && mode == 'mania') ||
-        (uniqueNominations < (3 * months) && mode != 'mania')
+        (uniqueNominationsCount < (2 * months) && mode == 'mania') ||
+        (uniqueNominationsCount < (3 * months) && mode != 'mania')
     ) {
         return true;
     }
