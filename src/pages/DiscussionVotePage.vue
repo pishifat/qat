@@ -150,19 +150,25 @@ export default {
     async created() {
         const id = this.$route.query.id;
 
+        await this.showMore(null, true);
+
         if (id) {
             const discussionVote = await this.$http.initialRequest(
                 `/discussionVote/searchDiscussionVote/${id}`
             );
 
-            if (discussionVote && !discussionVote.error) {
-                this.$store.commit('discussionVote/setDiscussionVotes', [
-                    discussionVote,
-                ]);
+            const i = this.discussionVotes.findIndex((d) => d.id == id);
+
+            if (i >= 0) {
                 this.$store.commit(
                     'discussionVote/setSelectedDiscussionVoteId',
                     id
                 );
+                $('#extendedInfo').modal('show');
+            } else {
+                this.$store.commit('discussionVote/setDiscussionVotes', [
+                    discussionVote,
+                ]);
                 $('#extendedInfo').modal('show');
             }
         } else {
@@ -194,15 +200,23 @@ export default {
         }, 21600000);
     },
     methods: {
-        async showMore(e) {
+        async showMore(e, firstLoad) {
             this.limit += this.skip;
 
             const startDiscussionVotesCount = this.discussionVotes.length;
 
-            const data = await this.$http.executeGet(
-                `/discussionVote/relevantInfo/${this.limit}`,
-                e
-            );
+            let data;
+
+            if (firstLoad) {
+                data = await this.$http.initialRequest(
+                    `/discussionVote/relevantInfo/${this.limit}`
+                );
+            } else {
+                data = await this.$http.executeGet(
+                    `/discussionVote/relevantInfo/${this.limit}`,
+                    e
+                );
+            }
 
             if (data.discussions) {
                 this.$store.commit(

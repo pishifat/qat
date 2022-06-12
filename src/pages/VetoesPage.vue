@@ -126,14 +126,20 @@ export default {
 
         const id = this.$route.query.id;
 
+        await this.showMore(null, true);
+
         if (id) {
             const veto = await this.$http.initialRequest(
                 `/vetoes/searchVeto/${id}`
             );
 
-            if (veto && !veto.error) {
-                this.$store.commit('vetoes/setVetoes', [veto]);
+            const i = this.vetoes.findIndex((d) => d.id == id);
+
+            if (i >= 0) {
                 this.$store.commit('vetoes/setSelectedVetoId', id);
+                $('#extendedInfo').modal('show');
+            } else {
+                this.$store.commit('vetoes/setVetoes', [veto]);
                 $('#extendedInfo').modal('show');
             }
         } else {
@@ -153,15 +159,23 @@ export default {
         }, 21600000);
     },
     methods: {
-        async showMore(e) {
+        async showMore(e, firstLoad) {
             this.limit += this.skip;
 
             const startVetoesCount = this.vetoes.length;
 
-            const data = await this.$http.executeGet(
-                `/vetoes/relevantInfo/${this.limit}`,
-                e
-            );
+            let data;
+
+            if (firstLoad) {
+                data = await this.$http.initialRequest(
+                    `/vetoes/relevantInfo/${this.limit}`
+                );
+            } else {
+                data = await this.$http.executeGet(
+                    `/vetoes/relevantInfo/${this.limit}`,
+                    e
+                );
+            }
 
             if (data.vetoes) {
                 this.$store.commit('vetoes/setVetoes', data.vetoes);
