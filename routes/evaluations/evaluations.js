@@ -93,7 +93,7 @@ async function submitEval (evaluation, session, isNat, behaviorComment, moddingC
 
         const evaluationsRequired = await Settings.getModeEvaluationsRequired(evaluation.mode);
 
-        if (isNat && !evaluation.discussion && evaluation.reviews.length >= evaluationsRequired) {
+        if (isNat && !evaluation.discussion) {
             let totalPass = 0;
             let totalNeutral = 0;
             let totalFail = 0;
@@ -106,7 +106,7 @@ async function submitEval (evaluation, session, isNat, behaviorComment, moddingC
                 else if (review.vote == 3) totalFail++;
             }
 
-            if (totalNat >= evaluationsRequired) {
+            if (totalNat >= evaluationsRequired || (totalNat == (evaluationsRequired - 1) && totalNat == totalFail)) {
                 evaluation.discussion = true;
                 await evaluation.save();
 

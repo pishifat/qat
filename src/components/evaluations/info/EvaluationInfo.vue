@@ -1,8 +1,5 @@
 <template>
-    <modal-dialog
-        id="evaluationInfo"
-        modal-size="xl"
-    >
+    <modal-dialog id="evaluationInfo" modal-size="xl">
         <template v-if="selectedEvaluation" #header>
             <modal-header
                 :mode="selectedEvaluation.mode"
@@ -15,9 +12,9 @@
             />
         </template>
 
-        <div v-if="selectedEvaluation" class="container">{{ selectedEvaluation.deadline }}
+        <div v-if="selectedEvaluation" class="container">
             <main-application-info v-if="selectedEvaluation.isApplication" />
-            
+
             <user-activity
                 v-else
                 :osu-id="selectedEvaluation.user.osuId"
@@ -25,7 +22,11 @@
                 :deadline="selectedEvaluation.deadline"
                 :mongo-id="selectedEvaluation.user.id"
                 :unique="selectedEvaluation.id"
-                :overwrite-days="selectedEvaluation.activityToCheck ? selectedEvaluation.activityToCheck + 7 : 90 + 7"
+                :overwrite-days="
+                    selectedEvaluation.activityToCheck
+                        ? selectedEvaluation.activityToCheck + 7
+                        : 90 + 7
+                "
             />
             <template v-if="loggedInUser.isNat || loggedInUser.isTrialNat">
                 <p>
@@ -39,9 +40,7 @@
                     <previous-evaluations
                         :user-mongo-id="selectedEvaluation.user.id"
                     />
-                    <user-notes
-                        :user-mongo-id="selectedEvaluation.user.id"
-                    />
+                    <user-notes :user-mongo-id="selectedEvaluation.user.id" />
                     <user-reports
                         v-if="loggedInUser.isNat"
                         :user-mongo-id="selectedEvaluation.user.id"
@@ -55,8 +54,14 @@
             <discussion-info v-if="selectedEvaluation.discussion" />
 
             <!-- Only NAT can edit their review while in discussion -->
-            <template v-if="!selectedEvaluation.discussion || (selectedEvaluation.discussion && (loggedInUser.isNat || loggedInUser.isTrialNat))">
-                <hr>
+            <template
+                v-if="
+                    !selectedEvaluation.discussion ||
+                    (selectedEvaluation.discussion &&
+                        (loggedInUser.isNat || loggedInUser.isTrialNat))
+                "
+            >
+                <hr />
                 <evaluation-input />
             </template>
         </div>
@@ -93,15 +98,12 @@ export default {
         DiscussionInfo,
     },
     computed: {
-        ...mapState([
-            'loggedInUser',
-        ]),
-        ...mapGetters('evaluations', [
-            'selectedEvaluation',
-        ]),
-        modes () {
+        ...mapState(['loggedInUser']),
+        ...mapGetters('evaluations', ['selectedEvaluation']),
+        modes() {
             if (!this.selectedEvaluation) return [];
-            if (this.selectedEvaluation.user.modes.length) return this.selectedEvaluation.user.modes;
+            if (this.selectedEvaluation.user.modes.length)
+                return this.selectedEvaluation.user.modes;
 
             return this.selectedEvaluation.mode;
         },
