@@ -34,19 +34,37 @@ class TestSubmissionService extends mongoose.Model
                 mode,
             });
 
+            let bnTotal = 5;
+            let codeOfConductTotal = 1;
+            let generalTotal = 1;
+            let spreadTotal = 1;
+            let metadataTotal = 1;
+            let timingTotal = 1;
+            let audioTotal = 1;
+            let videoBackgroundTotal = 1;
+            let skinningTotal = 1;
+            let storyboardingTotal = 1;
+            let modeTotal = mode == 'mania' ? 7 : 6;
+
             let categoriesObject = [
-                { name: 'bn', total: 5 },
-                { name: 'codeOfConduct', total: 1 },
-                { name: 'general', total: 1 },
-                { name: 'spread', total: 1 },
-                { name: 'metadata', total: 1 },
-                { name: 'timing', total: 1 },
-                { name: 'audio', total: 1 },
-                { name: 'videoBackground', total: 1 },
-                { name: 'skinning', total: 1 },
-                { name: 'storyboarding', total: 1 },
+                { name: 'bn', total: bnTotal },
+                { name: 'codeOfConduct', total: codeOfConductTotal },
+                { name: 'general', total: generalTotal },
+                { name: 'spread', total: spreadTotal },
+                { name: 'metadata', total: metadataTotal },
+                { name: 'timing', total: timingTotal },
+                { name: 'audio', total: audioTotal },
+                { name: 'videoBackground', total: videoBackgroundTotal },
+                { name: 'storyboarding', total: storyboardingTotal },
             ];
-            categoriesObject.push({ name: mode, total: 6 });
+
+            // because mania doesn't have skinning questions
+            if (mode != 'mania') {
+                categoriesObject.push({ name: 'skinning', total: skinningTotal });
+            }
+
+            // not included in object declaration so skinning comes first
+            categoriesObject.push({ name: mode, total: modeTotal });
 
             let qs = [];
 
