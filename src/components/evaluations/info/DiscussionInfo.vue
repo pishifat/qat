@@ -9,26 +9,32 @@
 
             <div id="consensusSettings" class="collapse container">
                 <consensus />
-                <cooldown
-                    v-if="selectedEvaluation && negativeConsensus"
-                />
+                <cooldown v-if="selectedEvaluation && negativeConsensus" />
                 <next-evaluation-estimate
-                    v-else-if="selectedEvaluation.consensus"
+                    v-else-if="
+                        selectedEvaluation.consensus &&
+                        selectedEvaluation.kind != 'resignation'
+                    "
                 />
-                <feedback-info
-                    v-if="selectedEvaluation.consensus"
-                />
+                <feedback-info v-if="selectedEvaluation.consensus" />
             </div>
         </template>
 
         <!-- Only NAT can see the reviews if there isn't a consensus -->
-        <template v-if="selectedEvaluation.consensus || loggedInUser.isNat || loggedInUser.isTrialNat">
-            <hr>
+        <template
+            v-if="
+                selectedEvaluation.consensus ||
+                loggedInUser.isNat ||
+                loggedInUser.isTrialNat
+            "
+        >
+            <hr />
             <reviews-listing />
         </template>
 
         <p v-else class="small">
-            No consensus has been set, so evaluations are not visible. Check back later!
+            No consensus has been set, so evaluations are not visible. Check
+            back later!
         </p>
     </div>
 </template>
@@ -51,15 +57,11 @@ export default {
         FeedbackInfo,
         NextEvaluationEstimate,
     },
-    mixins: [ evaluations ],
+    mixins: [evaluations],
     computed: {
-        ...mapState([
-            'loggedInUser',
-        ]),
-        ...mapGetters('evaluations', [
-            'selectedEvaluation',
-        ]),
-        consensus () {
+        ...mapState(['loggedInUser']),
+        ...mapGetters('evaluations', ['selectedEvaluation']),
+        consensus() {
             return this.selectedEvaluation.consensus;
         },
     },

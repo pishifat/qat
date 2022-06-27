@@ -1,11 +1,12 @@
 <template>
     <section class="card card-body">
         <div class="d-flex align-items-center mb-1">
-            <h4 class="mb-0">
-                BN Finder
-            </h4>
+            <h4 class="mb-0">BN Finder</h4>
         </div>
-        <p>Having trouble finding a Beatmap Nominator to mod your map? Submit your map info below.</p>
+        <p>
+            Having trouble finding a Beatmap Nominator to mod your map? Submit
+            your map info below.
+        </p>
         <div class="row container">
             <div class="col-sm-6">
                 <div class="row">
@@ -15,10 +16,12 @@
                                 v-model="genreSelected"
                                 class="form-control my-1"
                             >
-                                <option value="" disabled>
-                                    select genre
-                                </option>
-                                <option v-for="option in genreOptions" :key="option" :value="option">
+                                <option value="" disabled>select genre</option>
+                                <option
+                                    v-for="option in genreOptions"
+                                    :key="option"
+                                    :value="option"
+                                >
                                     {{ option }}
                                 </option>
                             </select>
@@ -26,10 +29,18 @@
                         <div class="input-group-append">
                             <button
                                 class="btn btn-sm"
-                                :class="genres.includes(genreSelected) ? 'btn-danger' : 'btn-primary'"
+                                :class="
+                                    genres.includes(genreSelected)
+                                        ? 'btn-danger'
+                                        : 'btn-primary'
+                                "
                                 @click="addGenre()"
                             >
-                                {{ genres.includes(genreSelected) ? 'Remove genre' : 'Add genre' }}
+                                {{
+                                    genres.includes(genreSelected)
+                                        ? 'Remove genre'
+                                        : 'Add genre'
+                                }}
                             </button>
                         </div>
                     </div>
@@ -45,7 +56,11 @@
                                 <option value="" disabled>
                                     select language
                                 </option>
-                                <option v-for="option in languageOptions" :key="option" :value="option">
+                                <option
+                                    v-for="option in languageOptions"
+                                    :key="option"
+                                    :value="option"
+                                >
                                     {{ option }}
                                 </option>
                             </select>
@@ -53,10 +68,18 @@
                         <div class="input-group-append">
                             <button
                                 class="btn btn-sm"
-                                :class="languages.includes(languageSelected) ? 'btn-danger' : 'btn-primary'"
+                                :class="
+                                    languages.includes(languageSelected)
+                                        ? 'btn-danger'
+                                        : 'btn-primary'
+                                "
                                 @click="addLanguage()"
                             >
-                                {{ languages.includes(languageSelected) ? 'Remove language' : 'Add language' }}
+                                {{
+                                    languages.includes(languageSelected)
+                                        ? 'Remove language'
+                                        : 'Add language'
+                                }}
                             </button>
                         </div>
                     </div>
@@ -69,10 +92,12 @@
                                 v-model="styleSelected"
                                 class="form-control my-1"
                             >
-                                <option value="" disabled>
-                                    select style
-                                </option>
-                                <option v-for="option in filteredStyles" :key="option" :value="option">
+                                <option value="" disabled>select style</option>
+                                <option
+                                    v-for="option in filteredStyles"
+                                    :key="option"
+                                    :value="option"
+                                >
                                     {{ option }}
                                 </option>
 
@@ -92,10 +117,18 @@
                         <div class="input-group-append">
                             <button
                                 class="btn btn-sm btn-primary"
-                                :class="styles.includes(styleSelected) ? 'btn-danger' : 'btn-primary'"
+                                :class="
+                                    styles.includes(styleSelected)
+                                        ? 'btn-danger'
+                                        : 'btn-primary'
+                                "
                                 @click="addStyle()"
                             >
-                                {{ styles.includes(styleSelected) ? 'Remove style' : 'Add style' }}
+                                {{
+                                    styles.includes(styleSelected)
+                                        ? 'Remove style'
+                                        : 'Add style'
+                                }}
                             </button>
                         </div>
                         <mode-radio-display
@@ -112,10 +145,12 @@
                                 v-model="detailSelected"
                                 class="form-control my-1"
                             >
-                                <option value="" disabled>
-                                    select detail
-                                </option>
-                                <option v-for="option in detailOptions" :key="option" :value="option">
+                                <option value="" disabled>select detail</option>
+                                <option
+                                    v-for="option in detailOptions"
+                                    :key="option"
+                                    :value="option"
+                                >
                                     {{ option }}
                                 </option>
                             </select>
@@ -123,10 +158,18 @@
                         <div class="input-group-append">
                             <button
                                 class="btn btn-sm"
-                                :class="details.includes(detailSelected) ? 'btn-danger' : 'btn-primary'"
+                                :class="
+                                    details.includes(detailSelected)
+                                        ? 'btn-danger'
+                                        : 'btn-primary'
+                                "
                                 @click="addDetail()"
                             >
-                                {{ details.includes(detailSelected) ? 'Remove detail' : 'Add detail' }}
+                                {{
+                                    details.includes(detailSelected)
+                                        ? 'Remove detail'
+                                        : 'Add detail'
+                                }}
                             </button>
                         </div>
                     </div>
@@ -136,11 +179,59 @@
                 <div class="justify-content-between">
                     Your map details:
                     <ul class="small">
-                        <li>Song genre(s): <span class="text-secondary"><span v-if="!genres.length"><i>add some!</i></span><span v-else><b>{{ genres.join(', ') }}</b></span></span></li>
-                        <li>Song language(s): <span class="text-secondary"><span v-if="!languages.length"><i>add some!</i></span><span v-else><b>{{ languages.join(', ') }}</b></span></span></li>
-                        <li>Map style(s): <span class="text-secondary"><span v-if="!styles.length"><i>add some!</i></span><span v-else><b>{{ styles.join(', ') }}</b></span></span></li>
-                        <li>Other detail(s): <span class="text-secondary"><span v-if="!details.length"><i>add some!</i></span><span v-else><b>{{ details.join(', ') }}</b></span></span></li>
+                        <li>
+                            Song genre(s):
+                            <span class="text-secondary"
+                                ><span v-if="!genres.length"
+                                    ><i>add some!</i></span
+                                ><span v-else
+                                    ><b>{{ genres.join(', ') }}</b></span
+                                ></span
+                            >
+                        </li>
+                        <li>
+                            Song language(s):
+                            <span class="text-secondary"
+                                ><span v-if="!languages.length"
+                                    ><i>add some!</i></span
+                                ><span v-else
+                                    ><b>{{ languages.join(', ') }}</b></span
+                                ></span
+                            >
+                        </li>
+                        <li>
+                            Map style(s):
+                            <span class="text-secondary"
+                                ><span v-if="!styles.length"
+                                    ><i>add some!</i></span
+                                ><span v-else
+                                    ><b>{{ styles.join(', ') }}</b></span
+                                ></span
+                            >
+                        </li>
+                        <li>
+                            Other detail(s):
+                            <span class="text-secondary"
+                                ><span v-if="!details.length"
+                                    ><i>add some!</i></span
+                                ><span v-else
+                                    ><b>{{ details.join(', ') }}</b></span
+                                ></span
+                            >
+                        </li>
                     </ul>
+                </div>
+                <div class="form-check small">
+                    <input
+                        checked
+                        v-model="messaging"
+                        value=""
+                        type="checkbox"
+                        class="form-check-input"
+                    />
+                    <label class="form-check-label text-secondary">
+                        Receive osu! messages from BNs about your beatmap
+                    </label>
                 </div>
                 <div class="form-inline mb-3 justify-content-between">
                     <div class="input-group">
@@ -150,14 +241,18 @@
                             type="text"
                             placeholder="map link"
                             @keyup.enter="submit($event)"
-                        >
+                        />
                         <div class="input-group-append">
                             <button
                                 :disabled="!loggedInUser"
                                 class="btn btn-sm btn-secondary"
                                 data-toggle="tooltip"
                                 data-placement="top"
-                                :title="loggedInUser ? 'Submit details to find BNs' : 'Authorize above to find BNs'"
+                                :title="
+                                    loggedInUser
+                                        ? 'Submit details to find BNs'
+                                        : 'Authorize above to find BNs'
+                                "
                                 @click="submit($event)"
                             >
                                 Find Beatmap Nominators
@@ -172,22 +267,41 @@
             The following users might be interested in your map:
             <ul>
                 <li v-for="user in users" :key="user.id">
-                    <user-link
-                        :username="user.username"
-                        :osu-id="user.osuId"
-                    />
-                    <span v-if="user.requestStatus && user.requestStatus.length && !user.requestStatus.includes('closed')">
+                    <user-link :username="user.username" :osu-id="user.osuId" />
+                    <span
+                        v-if="
+                            user.requestStatus &&
+                            user.requestStatus.length &&
+                            !user.requestStatus.includes('closed')
+                        "
+                    >
                         <span
-                            class="badge badge-pill mx-1 text-lowercase badge-success"
-                        >open
+                            class="
+                                badge badge-pill
+                                mx-1
+                                text-lowercase
+                                badge-success
+                            "
+                            >open
                         </span>
                     </span>
                 </li>
             </ul>
-            <p>Your map will be shown to each of these BNs (if they use the match finding system & this is your first time submitting the map). If your map is accepted or rejected, you'll be notified by <a href="https://osu.ppy.sh/users/23648635" target="_blank">the mappersguild chat bot</a>.</p>
-            <p>For a faster response, try reaching out to some of these users directly.</p>
+            <p>
+                Your map will be shown to each of these BNs (if they use the
+                match finding system & this is your first time submitting the
+                map). If your map is accepted or rejected, you'll be notified by
+                <a href="https://osu.ppy.sh/users/23648635" target="_blank"
+                    >the mappersguild chat bot</a
+                >.
+            </p>
+            <p>
+                For a faster response, try reaching out to some of these users
+                directly.
+            </p>
             <p class="small text-secondary">
-                Note: This is a work-in-progress! The matching formula will change with time. :)
+                Note: This is a work-in-progress! The matching formula will
+                change with time. :)
             </p>
         </div>
     </section>
@@ -198,7 +312,16 @@ import { mapState } from 'vuex';
 import evaluations from '../../mixins/evaluations';
 import UserLink from '../../components/UserLink.vue';
 import ModeRadioDisplay from '../ModeRadioDisplay.vue';
-import { GenrePreferences, LanguagePreferences, DetailPreferences, OsuStylePreferences, TaikoStylePreferences, CatchStylePreferences, ManiaStylePreferences, ManiaKeymodePreferences } from '../../../shared/enums';
+import {
+    GenrePreferences,
+    LanguagePreferences,
+    DetailPreferences,
+    OsuStylePreferences,
+    TaikoStylePreferences,
+    CatchStylePreferences,
+    ManiaStylePreferences,
+    ManiaKeymodePreferences,
+} from '../../../shared/enums';
 
 export default {
     name: 'BnFinder',
@@ -207,7 +330,7 @@ export default {
         ModeRadioDisplay,
     },
     mixins: [evaluations],
-    data () {
+    data() {
         return {
             url: '',
             genres: [],
@@ -228,12 +351,11 @@ export default {
             detailSelected: '',
             users: [],
             selectedMode: 'osu',
+            messaging: true,
         };
     },
     computed: {
-        ...mapState([
-            'loggedInUser',
-        ]),
+        ...mapState(['loggedInUser']),
         /** @returns {Array} */
         filteredStyles() {
             switch (this.selectedMode) {
@@ -251,43 +373,55 @@ export default {
         },
     },
     methods: {
-        addGenre () {
-            if (this.genreSelected.length && !this.genres.includes(this.genreSelected)) {
+        addGenre() {
+            if (
+                this.genreSelected.length &&
+                !this.genres.includes(this.genreSelected)
+            ) {
                 this.genres.push(this.genreSelected);
                 this.genreSelected = '';
             } else if (this.genres.includes(this.genreSelected)) {
                 const i = this.genres.indexOf(this.genreSelected);
-                this.genres.splice(i,1);
+                this.genres.splice(i, 1);
             }
         },
-        addLanguage () {
-            if (this.languageSelected.length && !this.languages.includes(this.languageSelected)) {
+        addLanguage() {
+            if (
+                this.languageSelected.length &&
+                !this.languages.includes(this.languageSelected)
+            ) {
                 this.languages.push(this.languageSelected);
                 this.languageSelected = '';
             } else if (this.languages.includes(this.languageSelected)) {
                 const i = this.languages.indexOf(this.languageSelected);
-                this.languages.splice(i,1);
+                this.languages.splice(i, 1);
             }
         },
-        addStyle () {
-            if (this.styleSelected.length && !this.styles.includes(this.styleSelected)) {
+        addStyle() {
+            if (
+                this.styleSelected.length &&
+                !this.styles.includes(this.styleSelected)
+            ) {
                 this.styles.push(this.styleSelected);
                 this.styleSelected = '';
             } else if (this.styles.includes(this.styleSelected)) {
                 const i = this.styles.indexOf(this.styleSelected);
-                this.styles.splice(i,1);
+                this.styles.splice(i, 1);
             }
         },
-        addDetail () {
-            if (this.detailSelected.length && !this.details.includes(this.detailSelected)) {
+        addDetail() {
+            if (
+                this.detailSelected.length &&
+                !this.details.includes(this.detailSelected)
+            ) {
                 this.details.push(this.detailSelected);
                 this.detailSelected = '';
             } else if (this.details.includes(this.detailSelected)) {
                 const i = this.details.indexOf(this.detailSelected);
-                this.details.splice(i,1);
+                this.details.splice(i, 1);
             }
         },
-        async submit (e) {
+        async submit(e) {
             if (!this.url) {
                 this.$store.dispatch('updateToastMessages', {
                     message: `Must enter beatmap link`,
@@ -305,6 +439,7 @@ export default {
                     languages: this.languages,
                     styles: this.styles,
                     details: this.details,
+                    messaging: this.messaging,
                 },
                 e
             );

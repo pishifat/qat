@@ -78,6 +78,7 @@ router.post('/findBns/', async (req, res) => {
     let languages = req.body.languages;
     let styles = req.body.styles;
     let details = req.body.details;
+    const messagingEnabled = req.body.messaging;
 
     // find beatmap and mapper info
     util.isValidUrlOrThrow(url, 'https://osu.ppy.sh/beatmapsets', `Invalid map link`);
@@ -323,17 +324,6 @@ router.post('/findBns/', async (req, res) => {
         beatmapset.mapperUsername = beatmapsetInfo.user.username;
         beatmapset.mapperOsuId = beatmapsetInfo.user.id;
 
-        if (!beatmapset.mapperOsuId || !beatmapset.mapperUsername) {
-            const response = await osu.getClientCredentialsGrant();
-            const token = response.access_token;
-
-            const beatmapsetInfo = await osu.getBeatmapsetInfo(token, beatmapset.osuId);
-            beatmapset.mapperOsuId = beatmapsetInfo.user.id;
-            beatmapset.mapperUsername = beatmapsetInfo.user.username;
-
-            await osuBot.sendMessages(3178418, [`mapperInfo 3rd stop for ${url} pls fix`]);
-        }
-
         await beatmapset.validate();
         await beatmapset.save();
     }
@@ -348,6 +338,7 @@ router.post('/findBns/', async (req, res) => {
             match.styles = req.body.styles;
             match.details = req.body.details;
             match.mapperExperience = mapperInfo.ranked_and_approved_beatmapset_count >= 3 ? 'experienced mapper' : 'new mapper';
+            match.messagingEnabled = messagingEnabled;
 
             await match.validate();
             await match.save();
@@ -370,7 +361,20 @@ router.post('/findBns/', async (req, res) => {
 
 /* GET next match from BN Finder */
 router.get('/findNextMatch', async (req, res) => {
-    const match = await BnFinderMatch
+    const matches = await BnFinderMatch.find({
+        isMatch: { $exists: false },
+        isExpired: { $ne: true },
+        messagingEnabled: { $ne: true },
+    });
+
+    console.log(matches.length);
+
+    for(const match of matches) {
+        match.messagingEnabled = true;
+        console.log(match.beatmapset);
+        await match.save();
+    }
+    let match = await BnFinderMatch
         .findOne({
             user: req.session.mongoId,
             isMatch: { $exists: false },
@@ -378,6 +382,28 @@ router.get('/findNextMatch', async (req, res) => {
         })
         .populate('beatmapset')
         .sort({ isPostponed: 1, createdAt: 1  });
+
+    if (!match.beatmapset.mapperOsuId || !match.beatmapset.mapperUsername) {
+        const response = await osu.getClientCredentialsGrant();
+        const token = response.access_token;
+
+        let existingBeatmapset = await Beatmapset.findOne({ osuId: match.beatmapset.osuId });
+
+        const beatmapsetInfo = await osu.getBeatmapsetInfo(token, match.beatmapset.osuId);
+
+        existingBeatmapset.mapperOsuId = beatmapsetInfo.user.id;
+        existingBeatmapset.mapperUsername = beatmapsetInfo.user.username;
+        await existingBeatmapset.save();
+
+        match = await BnFinderMatch
+            .findOne({
+                user: req.session.mongoId,
+                isMatch: { $exists: false },
+                isExpired: { $ne: true },
+            })
+            .populate('beatmapset')
+            .sort({ isPostponed: 1, createdAt: 1  });
+    }
 
     if (!match) {
         return res.json({ none: 'no match' });
@@ -409,22 +435,24 @@ router.post('/setMatchStatus/:id', async (req, res) => {
 
     messages.push(`—BN Finder`);
 
-    const sentMessages = await osuBot.sendMessages(match.beatmapset.mapperOsuId, messages);
+    if (match.messagingEnabled) {
+        const sentMessages = await osuBot.sendMessages(match.beatmapset.mapperOsuId, messages);
 
-    if (sentMessages !== true) {
-        await osuBot.sendMessages(3178418, [`send message on match status error for ${match.beatmapset.osuId} pls fix. user: ${req.session.username} / match id: ${match.id}`]);
-
-        return res.json({ error: `Messages were not sent. Dev has been notified.` });
-    } else {
-        Logger.generate(
-            req.session.mongoId,
-            `Set match status for s/${match.beatmapset.osuId} as ${req.body.status}`,
-            'bnFinder',
-            match.beatmapset._id
-        );
+        if (sentMessages !== true) {
+            await osuBot.sendMessages(3178418, [`message sending fucked up. user: ${req.session.username} / match id: ${match.id}`]);
+    
+            return res.json({ error: `Messages were not sent. Dev has been notified.` });
+        }
     }
+    
+    Logger.generate(
+        req.session.mongoId,
+        `Set match status for s/${match.beatmapset.osuId} as ${req.body.status}`,
+        'bnFinder',
+        match.beatmapset._id
+    );
 
-    return res.json({ success: 'Mapper has been notified!' });
+    return res.json({ success: 'Match finalized!' });
 });
 
 /* POST postpone match */
