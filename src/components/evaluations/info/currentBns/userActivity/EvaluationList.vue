@@ -1,9 +1,11 @@
 <template>
     <div>
-        <p class="ml-2">
-            <a :href="events && `#${eventsId}`" data-toggle="collapse">{{ header }} <i class="fas fa-angle-down" /></a>
+        <div class="ml-2">
+            <a :href="events && `#${eventsId}`" data-toggle="collapse"
+                >{{ header }} <i class="fas fa-angle-down"
+            /></a>
             ({{ isLoading ? '...' : events ? events.length : '0' }})
-        </p>
+        </div>
 
         <div v-if="events" :id="eventsId" class="collapse">
             <data-table
@@ -15,7 +17,15 @@
                         {{ findDate(event) }}
                     </td>
                     <td>
-                        <a :href="'/' + (isApplication ? 'appeval' : 'bneval') + '?id=' + event.id" target="_blank">
+                        <a
+                            :href="
+                                '/' +
+                                (isApplication ? 'appeval' : 'bneval') +
+                                '?id=' +
+                                event.id
+                            "
+                            target="_blank"
+                        >
                             {{ findUsername(event) }}
                         </a>
                     </td>
@@ -26,14 +36,16 @@
                     </td>
                     <td>
                         <span :class="'text-' + event.consensus">
-                            {{ event.consensus ? event.consensus.toUpperCase() : 'NONE' }}
+                            {{
+                                event.consensus
+                                    ? event.consensus.toUpperCase()
+                                    : 'NONE'
+                            }}
                         </span>
                     </td>
                 </tr>
             </data-table>
-            <p v-else class="small ml-4">
-                None...
-            </p>
+            <p v-else class="small ml-4">None...</p>
         </div>
     </div>
 </template>
@@ -68,21 +80,19 @@ export default {
         },
         isApplication: Boolean,
     },
-    computed: mapState('activity', [
-        'isLoading',
-    ]),
+    computed: mapState('activity', ['isLoading']),
     methods: {
-        findDate (event) {
+        findDate(event) {
             let date;
             if (this.isApplication) date = event.createdAt;
             else date = event.deadline;
 
-            return new Date(date).toString().slice(4,10);
+            return new Date(date).toString().slice(4, 10);
         },
-        findUsername (event) {
+        findUsername(event) {
             return event.user.username;
         },
-        findVote (reviews) {
+        findVote(reviews) {
             let vote;
 
             for (let i = 0; i < reviews.length; i++) {

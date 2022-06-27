@@ -1,9 +1,11 @@
 <template>
     <div>
-        <p class="ml-2">
-            <a :href="events && `#${eventsId}`" data-toggle="collapse">{{ header }} <i class="fas fa-angle-down" /></a>
+        <div class="ml-2">
+            <a :href="events && `#${eventsId}`" data-toggle="collapse"
+                >{{ header }} <i class="fas fa-angle-down"
+            /></a>
             ({{ isLoading ? '...' : events ? events.length : '0' }})
-        </p>
+        </div>
         <div v-if="events" :id="eventsId" class="collapse">
             <data-table
                 v-if="events.length"
@@ -14,22 +16,28 @@
                         {{ event.timestamp | toMonthDay }}
                     </td>
                     <td class="w-25">
-                        <a :href="event.discussionId ? 'https://osu.ppy.sh/beatmapsets/' + event.beatmapsetId + '/discussion/-/generalAll#/' + event.discussionId : 'https://osu.ppy.sh/beatmapsets/' + event.beatmapsetId + '/discussion/-/events'" target="_blank">
-                            <mode-display
-                                :modes="event.modes"
-                            />
+                        <a
+                            :href="
+                                event.discussionId
+                                    ? 'https://osu.ppy.sh/beatmapsets/' +
+                                      event.beatmapsetId +
+                                      '/discussion/-/generalAll#/' +
+                                      event.discussionId
+                                    : 'https://osu.ppy.sh/beatmapsets/' +
+                                      event.beatmapsetId +
+                                      '/discussion/-/events'
+                            "
+                            target="_blank"
+                        >
+                            <mode-display :modes="event.modes" />
 
                             {{ event.artistTitle }}
                         </a>
                     </td>
-                    <nomination-reset-editing
-                        :event="event"
-                    />
+                    <nomination-reset-editing :event="event" />
                 </tr>
             </data-table>
-            <p v-else class="small ml-4">
-                None...
-            </p>
+            <p v-else class="small ml-4">None...</p>
         </div>
     </div>
 </template>
@@ -63,8 +71,6 @@ export default {
             required: true,
         },
     },
-    computed: mapState('activity', [
-        'isLoading',
-    ]),
+    computed: mapState('activity', ['isLoading']),
 };
 </script>

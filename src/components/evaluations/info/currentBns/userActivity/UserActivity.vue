@@ -1,7 +1,7 @@
 <template>
     <div>
         <p class="font-weight-bold form-inline">
-            <span>BN activity:</span>
+            <span>User activity:</span>
             <input
                 v-if="editingDaysInput"
                 v-model="daysInput"
@@ -10,7 +10,7 @@
                 min="1"
                 max="999"
                 @keyup.enter="search"
-            >
+            />
             <span v-else class="mx-1">{{ daysInput }}</span>
             days
             <a href="#" @click.prevent="search">
@@ -19,6 +19,7 @@
         </p>
 
         <div class="container mb-3">
+            <div>Nominations</div>
             <events-list
                 :events="nominations"
                 :events-id="'uniqueNominations'"
@@ -45,6 +46,7 @@
                 :events-id="'popsByUser'"
                 :header="'Pops done by user'"
             />
+            <div class="mt-2">Quality Assurance</div>
             <events-list
                 :events="qualityAssuranceChecks"
                 :events-id="'qualityAssuranceChecks'"
@@ -57,9 +59,16 @@
                 :header="'Disqualified Quality Assurance Checks'"
             />
 
-            <template v-if="loggedInUser.isNat">
+            <template
+                v-if="
+                    loggedInUser.isNat && (natApplicaions || natBnEvaluations)
+                "
+            >
+                <div class="mt-2">Evaluations</div>
                 <evaluation-list
-                    v-if="assignedBnApplications && assignedBnApplications.length"
+                    v-if="
+                        assignedBnApplications && assignedBnApplications.length
+                    "
                     :events="assignedBnApplications"
                     :events-id="'assignedBnApplications'"
                     :header="'Application Evaluations (BN)'"
@@ -67,7 +76,6 @@
                     :mongo-id="mongoId"
                 />
                 <evaluation-list
-                    v-if="natApplications && natApplications.length"
                     :events="natApplications"
                     :events-id="'natApplications'"
                     :header="'Application Evaluations (NAT)'"
@@ -75,12 +83,21 @@
                     :mongo-id="mongoId"
                 />
                 <evaluation-list
-                    v-if="natBnEvaluations && natBnEvaluations.length"
                     :events="natBnEvaluations"
                     :events-id="'natBnEvaluations'"
                     :header="'Current BN Evaluations (NAT)'"
                     :is-application="false"
                     :mongo-id="mongoId"
+                />
+            </template>
+
+            <template>
+                <div class="mt-2">Modding</div>
+                <events-list
+                    :events="bnFinderMatches"
+                    :events-id="'bnFinderMatches'"
+                    :header="'BN Finder matches'"
+                    :osu-id="osuId"
                 />
             </template>
         </div>
@@ -126,16 +143,14 @@ export default {
             required: true,
         },
     },
-    data () {
+    data() {
         return {
             daysInput: this.overwriteDays,
             editingDaysInput: false,
         };
     },
     computed: {
-        ...mapState([
-            'loggedInUser',
-        ]),
+        ...mapState(['loggedInUser']),
         ...mapState('activity', [
             'nominations',
             'nominationsDisqualified',
@@ -147,6 +162,7 @@ export default {
             'assignedBnApplications',
             'natApplications',
             'natBnEvaluations',
+            'bnFinderMatches',
         ]),
     },
     watch: {
@@ -155,12 +171,12 @@ export default {
             this.daysInput = this.overwriteDays;
         },
     },
-    created () {
+    created() {
         this.findRelevantActivity();
         this.daysInput = this.overwriteDays;
     },
     methods: {
-        async search () {
+        async search() {
             if (this.editingDaysInput) {
                 await this.findRelevantActivity();
             }
@@ -176,36 +192,64 @@ export default {
             else if (days < 2) days = 2;
             this.daysInput = days;
 
-            if (this.loggedInUser.isNat) {
-                const res = await this.$http.executeGet(`/bnEval/activity?osuId=${this.osuId}&modes=${this.modes}&deadline=${new Date(this.deadline).getTime()}&mongoId=${this.mongoId}&days=${days}`);
+            const route = this.loggedInUser.isNat ? 'bnEval' : 'users';
 
-                if (res) {
-                    this.$store.commit('activity/setNominations', res.uniqueNominations);
-                    this.$store.commit('activity/setNominationsDisqualified', res.nominationsDisqualified);
-                    this.$store.commit('activity/setNominationsPopped', res.nominationsPopped);
-                    this.$store.commit('activity/setDisqualifications', res.disqualifications);
-                    this.$store.commit('activity/setPops', res.pops);
-                    this.$store.commit('activity/setQualityAssuranceChecks', res.qualityAssuranceChecks);
-                    this.$store.commit('activity/setDisqualifiedQualityAssuranceChecks', res.disqualifiedQualityAssuranceChecks);
+            const res = await this.$http.executeGet(
+                `/${route}/activity?osuId=${this.osuId}&modes=${
+                    this.modes
+                }&deadline=${new Date(this.deadline).getTime()}&mongoId=${
+                    this.mongoId
+                }&days=${days}`
+            );
 
-                    this.$store.commit('activity/setBnApplications', res.assignedBnApplications);
-                    this.$store.commit('activity/setNatApplications', res.appEvaluations);
-                    this.$store.commit('activity/setNatBnEvaluations', res.bnEvaluations);
-                    this.$store.commit('activity/setIsLoading', false);
+            if (res) {
+                this.$store.commit(
+                    'activity/setNominations',
+                    res.uniqueNominations
+                );
+                this.$store.commit(
+                    'activity/setNominationsDisqualified',
+                    res.nominationsDisqualified
+                );
+                this.$store.commit(
+                    'activity/setNominationsPopped',
+                    res.nominationsPopped
+                );
+                this.$store.commit(
+                    'activity/setDisqualifications',
+                    res.disqualifications
+                );
+                this.$store.commit('activity/setPops', res.pops);
+                this.$store.commit(
+                    'activity/setQualityAssuranceChecks',
+                    res.qualityAssuranceChecks
+                );
+                this.$store.commit(
+                    'activity/setDisqualifiedQualityAssuranceChecks',
+                    res.disqualifiedQualityAssuranceChecks
+                );
+
+                if (this.loggedInUser.isNat) {
+                    this.$store.commit(
+                        'activity/setBnApplications',
+                        res.assignedBnApplications
+                    );
+                    this.$store.commit(
+                        'activity/setNatApplications',
+                        res.appEvaluations
+                    );
+                    this.$store.commit(
+                        'activity/setNatBnEvaluations',
+                        res.bnEvaluations
+                    );
                 }
-            } else {
-                const res = await this.$http.executeGet(`/users/activity?osuId=${this.osuId}&modes=${this.modes}&deadline=${new Date(this.deadline).getTime()}&mongoId=${this.mongoId}&days=${days}`);
 
-                if (res) {
-                    this.$store.commit('activity/setNominations', res.uniqueNominations);
-                    this.$store.commit('activity/setNominationsDisqualified', res.nominationsDisqualified);
-                    this.$store.commit('activity/setNominationsPopped', res.nominationsPopped);
-                    this.$store.commit('activity/setDisqualifications', res.disqualifications);
-                    this.$store.commit('activity/setPops', res.pops);
-                    this.$store.commit('activity/setQualityAssuranceChecks', res.qualityAssuranceChecks);
-                    this.$store.commit('activity/setDisqualifiedQualityAssuranceChecks', res.disqualifiedQualityAssuranceChecks);
-                    this.$store.commit('activity/setIsLoading', false);
-                }
+                this.$store.commit(
+                    'activity/setBnFinderMatches',
+                    res.bnFinderMatches
+                );
+
+                this.$store.commit('activity/setIsLoading', false);
             }
         },
     },
@@ -213,9 +257,7 @@ export default {
 </script>
 
 <style scoped>
-
 .w-days {
     max-width: 50px;
 }
-
 </style>

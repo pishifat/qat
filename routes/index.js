@@ -361,19 +361,6 @@ router.post('/findBns/', async (req, res) => {
 
 /* GET next match from BN Finder */
 router.get('/findNextMatch', async (req, res) => {
-    const matches = await BnFinderMatch.find({
-        isMatch: { $exists: false },
-        isExpired: { $ne: true },
-        messagingEnabled: { $ne: true },
-    });
-
-    console.log(matches.length);
-
-    for(const match of matches) {
-        match.messagingEnabled = true;
-        console.log(match.beatmapset);
-        await match.save();
-    }
     let match = await BnFinderMatch
         .findOne({
             user: req.session.mongoId,

@@ -13,6 +13,7 @@ export default {
         assignedBnApplications: [],
         natApplications: [],
         natBnEvaluations: [],
+        bnFinderMatches: [],
         isLoading: true,
     }),
     mutations: {
@@ -48,6 +49,9 @@ export default {
         },
         setNatBnEvaluations (state, evaluations) {
             state.natBnEvaluations = evaluations;
+        },
+        setBnFinderMatches (state, bnFinderMatches) {
+            state.bnFinderMatches = bnFinderMatches;
         },
         updateEvent (state, event) {
             let i;
