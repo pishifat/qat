@@ -150,7 +150,7 @@ router.post('/findBns/', async (req, res) => {
     });
 
     for (let step = 0; step <= 5 && finalUsers.length < 5; step++) {
-        users.sort( () => .5 - Math.random() );
+        users.sort(() => .5 - Math.random());
 
         const filteredUsers = users.filter(u => {
             return (
@@ -185,41 +185,41 @@ router.post('/findBns/', async (req, res) => {
             // genre
             for (const genre of genres) {
                 if (user.genrePreferences.includes(genre)) filteredUsers[i].genreCount += genreVar;
-                if (user.genreNegativePreferences.includes(genre)) filteredUsers[i].genreCount -= genreVar*10;
+                if (user.genreNegativePreferences.includes(genre)) filteredUsers[i].genreCount -= genreVar * 10;
             }
 
             if (!filteredUsers[i].genreCount) {
-                filteredUsers[i].genreCount -= genreVar*2;
+                filteredUsers[i].genreCount -= genreVar * 2;
             }
 
-            if (user.genrePreferences.length && user.genrePreferences.length == genres.length && filteredUsers[i].genreCount/genreVar == genres.length) {
+            if (user.genrePreferences.length && user.genrePreferences.length == genres.length && filteredUsers[i].genreCount / genreVar == genres.length) {
                 filteredUsers[i].genreCount += genreVar;
             }
 
             // language
             for (const language of languages) {
                 if (user.languagePreferences && user.languagePreferences.includes(language)) filteredUsers[i].languageCount += languageVar;
-                if (user.languageNegativePreferences && user.languageNegativePreferences.includes(language)) filteredUsers[i].languageCount -= languageVar*10;
+                if (user.languageNegativePreferences && user.languageNegativePreferences.includes(language)) filteredUsers[i].languageCount -= languageVar * 10;
             }
 
             if (!filteredUsers[i].languageCount) {
-                filteredUsers[i].languageCount -= languageVar*2;
+                filteredUsers[i].languageCount -= languageVar * 2;
             }
 
-            if (user.languagePreferences.length && user.languagePreferences.length == languages.length && filteredUsers[i].languageCount/languageVar == languages.length) {
+            if (user.languagePreferences.length && user.languagePreferences.length == languages.length && filteredUsers[i].languageCount / languageVar == languages.length) {
                 filteredUsers[i].languageCount += languageVar;
             }
 
             // style + keycount
             for (const style of styles) {
                 if (user.modes.includes('osu') && beatmapModes.includes('osu') && user.osuStylePreferences && user.osuStylePreferences.includes(style)) filteredUsers[i].styleCount += styleVar;
-                if (user.modes.includes('osu') && beatmapModes.includes('osu') && user.osuStyleNegativePreferences && user.osuStyleNegativePreferences.includes(style)) filteredUsers[i].styleCount -= styleVar*10;
+                if (user.modes.includes('osu') && beatmapModes.includes('osu') && user.osuStyleNegativePreferences && user.osuStyleNegativePreferences.includes(style)) filteredUsers[i].styleCount -= styleVar * 10;
                 if (user.modes.includes('taiko') && beatmapModes.includes('taiko') && user.taikoStylePreferences && user.taikoStylePreferences.includes(style)) filteredUsers[i].styleCount += styleVar;
-                if (user.modes.includes('taiko') && beatmapModes.includes('taiko') && user.taikoStyleNegativePreferences && user.taikoStyleNegativePreferences.includes(style)) filteredUsers[i].styleCount -= styleVar*10;
+                if (user.modes.includes('taiko') && beatmapModes.includes('taiko') && user.taikoStyleNegativePreferences && user.taikoStyleNegativePreferences.includes(style)) filteredUsers[i].styleCount -= styleVar * 10;
                 if (user.modes.includes('fruits') && beatmapModes.includes('fruits') && user.catchStylePreferences && user.catchStylePreferences.includes(style)) filteredUsers[i].styleCount += styleVar;
-                if (user.modes.includes('fruits') && beatmapModes.includes('fruits') && user.catchStyleNegativePreferences && user.catchStyleNegativePreferences.includes(style)) filteredUsers[i].styleCount -= styleVar*10;
+                if (user.modes.includes('fruits') && beatmapModes.includes('fruits') && user.catchStyleNegativePreferences && user.catchStyleNegativePreferences.includes(style)) filteredUsers[i].styleCount -= styleVar * 10;
                 if (user.modes.includes('mania') && beatmapModes.includes('mania') && user.maniaStylePreferences && user.maniaStylePreferences.includes(style)) filteredUsers[i].styleCount += styleVar;
-                if (user.modes.includes('mania') && beatmapModes.includes('mania') && user.maniaStyleNegativePreferences && user.maniaStyleNegativePreferences.includes(style)) filteredUsers[i].styleCount -= styleVar*10;
+                if (user.modes.includes('mania') && beatmapModes.includes('mania') && user.maniaStyleNegativePreferences && user.maniaStyleNegativePreferences.includes(style)) filteredUsers[i].styleCount -= styleVar * 10;
 
                 if (user.modes.includes('mania') && beatmapModes.includes('mania') && user.maniaKeymodePreferences && user.maniaKeymodePreferences.includes(style)) {
                     filteredUsers[i].styleCount += keymodeVar;
@@ -228,7 +228,7 @@ router.post('/findBns/', async (req, res) => {
                 }
 
                 if (user.modes.includes('mania') && beatmapModes.includes('mania') && user.maniaKeymodeNegativePreferences && user.maniaKeymodeNegativePreferences.includes(style)) {
-                    filteredUsers[i].styleCount -= keymodeVar*10;
+                    filteredUsers[i].styleCount -= keymodeVar * 10;
                 }
 
             }
@@ -236,7 +236,7 @@ router.post('/findBns/', async (req, res) => {
             // details
             for (const detail of details) {
                 if (user.detailPreferences && user.detailPreferences.includes(detail)) filteredUsers[i].detailCount += detailVar;
-                if (user.detailNegativePreferences && user.detailNegativePreferences.includes(detail)) filteredUsers[i].detailCount -= detailVar*10;
+                if (user.detailNegativePreferences && user.detailNegativePreferences.includes(detail)) filteredUsers[i].detailCount -= detailVar * 10;
             }
 
             // mapper experience
@@ -244,11 +244,11 @@ router.post('/findBns/', async (req, res) => {
                 if (user.mapperPreferences && user.mapperPreferences.includes(experience)) {
                     filteredUsers[i].mapperExperienceCount += mapperVar;
                 } else if (user.mapperPreferences) {
-                    filteredUsers[i].mapperExperienceCount -= mapperVar*2;
+                    filteredUsers[i].mapperExperienceCount -= mapperVar * 2;
                 }
 
                 if (user.mapperNegativePreferences && user.mapperNegativePreferences.includes(experience)) {
-                    filteredUsers[i].mapperExperienceCount -= mapperVar*10;
+                    filteredUsers[i].mapperExperienceCount -= mapperVar * 10;
                 }
             }
 
@@ -368,7 +368,11 @@ router.get('/findNextMatch', async (req, res) => {
             isExpired: { $ne: true },
         })
         .populate('beatmapset')
-        .sort({ isPostponed: 1, createdAt: 1  });
+        .sort({ isPostponed: 1, createdAt: 1 });
+
+    if (!match) {
+        return res.json({ none: 'no match' });
+    }
 
     if (!match.beatmapset.mapperOsuId || !match.beatmapset.mapperUsername) {
         const response = await osu.getClientCredentialsGrant();
@@ -389,11 +393,7 @@ router.get('/findNextMatch', async (req, res) => {
                 isExpired: { $ne: true },
             })
             .populate('beatmapset')
-            .sort({ isPostponed: 1, createdAt: 1  });
-    }
-
-    if (!match) {
-        return res.json({ none: 'no match' });
+            .sort({ isPostponed: 1, createdAt: 1 });
     }
 
     return res.json(match);
@@ -427,11 +427,11 @@ router.post('/setMatchStatus/:id', async (req, res) => {
 
         if (sentMessages !== true) {
             await osuBot.sendMessages(3178418, [`message sending fucked up. user: ${req.session.username} / match id: ${match.id}`]);
-    
+
             return res.json({ error: `Messages were not sent. Dev has been notified.` });
         }
     }
-    
+
     Logger.generate(
         req.session.mongoId,
         `Set match status for s/${match.beatmapset.osuId} as ${req.body.status}`,
