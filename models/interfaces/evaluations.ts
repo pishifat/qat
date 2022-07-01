@@ -19,7 +19,7 @@ interface IEvaluationBase {
     isApplication?: boolean;
     isBnEvaluation?: boolean;
     isResignation?: boolean;
-    natEvaluatorHistory: { 
+    natEvaluatorHistory: {
         date: Date;
         user: IUserDocument;
         previousUser?: IUserDocument;
@@ -46,6 +46,7 @@ export interface IBnEvaluationDocument extends IEvaluationBase, Document {
     addition?: string;
     activityToCheck?: number;
     kind?: string;
+    length?: number;
 }
 
 export interface IBnEvaluationModel extends Model<IBnEvaluationDocument> {
@@ -58,6 +59,7 @@ export interface IResignationEvaluationDocument extends IEvaluationBase, Documen
     consensus?: string;
     deadline?: Date;
     kind?: string;
+    length?: number;
 }
 
 export interface IResignationEvaluationModel extends Model<IResignationEvaluationDocument> {

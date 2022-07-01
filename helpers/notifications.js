@@ -185,7 +185,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
         let generateWebhook = true;
         let discordIds = [];
         let color;
-        let trialEvaluators = app.mode == '' ? app.natEvaluators.concat(app.bnEvaluators) : app.natEvaluators;
+        let trialEvaluators = app.mode == 'osu' ? app.natEvaluators.concat(app.bnEvaluators) : app.natEvaluators;
 
         if (date > deadline) {
             discordIds = findNatEvaluatorHighlights(app.reviews, trialEvaluators, app.discussion);
@@ -228,10 +228,10 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
         let generateWebhook = true;
         let discordIds = [];
         let color;
-        let trialEvaluators = round.mode == '' ? round.natEvaluators.concat(round.bnEvaluators) : round.natEvaluators;
+        let trialEvaluators = round.mode == 'osu' ? round.natEvaluators.concat(round.bnEvaluators) : round.natEvaluators;
 
         if (!round.natEvaluators || !round.natEvaluators.length) {
-            round.natEvaluators = await User.getAssignedNat(round.mode);
+            round.natEvaluators = round.mode == 'osu' ? await User.getAssignedNat(round.mode, [], 2) : await User.getAssignedNat(round.mode);
             await round.populate(defaultPopulate).execPopulate();
             const days = util.findDaysBetweenDates(new Date(), new Date(round.deadline));
 
@@ -251,7 +251,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
 
             natList = round.natEvaluators.map(u => u.username).join(', ');
 
-            if (round.mode == '') {
+            if (round.mode == 'osu') {
                 if (!round.bnEvaluators || !round.bnEvaluators.length) {
                     round.bnEvaluators = await User.getAssignedTrialNat(round.mode, [round.user.osuId], 2);
                     await round.populate(defaultPopulate).execPopulate();
