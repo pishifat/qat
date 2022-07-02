@@ -168,7 +168,7 @@ router.post('/setIndividualEval/', middlewares.isNat, async (req, res) => {
 });
 
 /* POST set evals as complete */
-router.post('/setComplete/', middlewares.isNat, async (req, res) => {
+router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
     const evaluations = await AppEvaluation
         .find({
             _id: {
@@ -328,7 +328,7 @@ router.post('/setConsensus/:id', middlewares.isNatOrTrialNat, async (req, res) =
 });
 
 /* POST set cooldown */
-router.post('/setCooldownDate/:id', middlewares.isNat, async (req, res) => {
+router.post('/setCooldownDate/:id', middlewares.isNatOrTrialNat, async (req, res) => {
     const evaluation = await AppEvaluation
         .findByIdAndUpdate(req.params.id, { cooldownDate: req.body.cooldownDate })
         .populate(defaultPopulate);

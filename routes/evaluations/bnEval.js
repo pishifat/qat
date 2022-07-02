@@ -303,7 +303,7 @@ function makeWordFromField (field) {
 }
 
 /* POST set evals as complete */
-router.post('/setComplete/', middlewares.isNat, async (req, res) => {
+router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
     let evaluations = await Evaluation
         .find({
             _id: {
@@ -524,7 +524,7 @@ router.post('/setAddition/:id', middlewares.isNatOrTrialNat, async (req, res) =>
 });
 
 /* POST set cooldown */
-router.post('/setCooldownDate/:id', middlewares.isNat, async (req, res) => {
+router.post('/setCooldownDate/:id', middlewares.isNatOrTrialNat, async (req, res) => {
     let evaluation = await BnEvaluation
         .findByIdAndUpdate(req.params.id, { cooldownDate: req.body.cooldownDate })
         .populate(defaultPopulate);
