@@ -30,18 +30,6 @@
                         </li>
                     </ul>
                 </div>
-                <div v-if="veto.reasons.length > 1">
-                    <p>Explain your reasoning for each issue separately.</p>
-
-                    <div>For example:</div>
-                    <ul>
-                        <li>Agree with concern (1) because...</li>
-                        <li>Disagree with concern (2) because...</li>
-                        <li>Neutral with concern (3) because...</li>
-                    </ul>
-
-                    <p>We will count your votes for each topic separately so the veto can be upheld for an one topic and dismissed for others. Your overall vote should be based on the sum of individual votes. For example if you agree with 1 and 2 but not 3, you'd vote "Agree". This leaves your overall vote as a general impression while focus remains on the specific issues.</p>
-                </div>
                 <hr>
                 <p><b>Please post your opinion on the veto <a :href="'/vetoes?id=' + veto.id">here</a> within one week.</b></p>
                 <div>Your decision will be anonymous to everyone but members of the NAT.</div>
