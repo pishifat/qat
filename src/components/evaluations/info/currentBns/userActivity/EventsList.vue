@@ -38,10 +38,7 @@
                             {{ artistTitle(event) }}
                         </a>
                         <a
-                            v-if="
-                                loggedInUser.isNat &&
-                                eventsId == 'uniqueNominations'
-                            "
+                            v-if="(loggedInUser.isNat || loggedInUser.isTrialNat) && isEvaluation"
                             href="#"
                             :class="processing ? 'processing' : ''"
                             data-toggle="tooltip"
@@ -103,6 +100,10 @@ export default {
         osuId: {
             type: Number,
             required: true,
+        },
+        isEvaluation: {
+            type: Boolean,
+            default: false,
         },
     },
     data() {

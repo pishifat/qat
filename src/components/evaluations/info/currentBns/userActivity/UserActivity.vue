@@ -25,6 +25,7 @@
                 :events-id="'uniqueNominations'"
                 :header="'Unique nominations'"
                 :osu-id="osuId"
+                :is-evaluation="isEvaluation"
             />
             <nomination-resets
                 :events="nominationsDisqualified"
@@ -141,6 +142,10 @@ export default {
         overwriteDays: {
             type: Number,
             required: true,
+        },
+        isEvaluation: {
+            type: Boolean,
+            default: false,
         },
     },
     data() {

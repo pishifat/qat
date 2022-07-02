@@ -27,6 +27,7 @@
                         ? selectedEvaluation.activityToCheck + 7
                         : 90 + 7
                 "
+                :is-evaluation="true"
             />
             <template v-if="loggedInUser.isNat || loggedInUser.isTrialNat">
                 <p>

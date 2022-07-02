@@ -57,7 +57,7 @@ router.get('/loadUnsetEvents', async (req, res) => {
 });
 
 /* POST toggle isReviewed */
-router.post('/toggleIsReviewed/:id', middlewares.isNat, async (req, res) => {
+router.post('/toggleIsReviewed/:id', middlewares.isNatOrTrialNat, async (req, res) => {
     let a = await Aiess.findById(req.params.id).orFail();
 
     a.isReviewed = !a.isReviewed;
