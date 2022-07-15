@@ -1,7 +1,6 @@
 const express = require('express');
 const config = require('../config.json');
 const Aiess = require('../models/aiess');
-//const Logger = require('../models/log');
 const User = require('../models/user');
 const QualityAssuranceCheck = require('../models/qualityAssuranceCheck');
 const Log = require('../models/log');
@@ -9,6 +8,7 @@ const Evaluation = require('../models/evaluations/evaluation');
 const AppEvaluation = require('../models/evaluations/appEvaluation');
 const getGeneralEvents = require('./evaluations/bnEval').getGeneralEvents;
 const { BnEvaluationConsensus } = require('../shared/enums');
+const middlewares = require('../helpers/middlewares');
 
 const router = express.Router();
 
@@ -20,12 +20,6 @@ router.use((req, res, next) => {
     if (!secret || !username || config.interOpAccess[username].secret !== secret) {
         return res.status(401).send('Invalid key');
     }
-
-    /*Logger.generate(
-        config.interOpAccess[username].mongoId,
-        `accessed /interOp${req.url}`,
-        'interOp'
-    );*/
 
     return next();
 });
@@ -144,8 +138,33 @@ router.get('/nominationResets/:osuId/:days/', async (req, res) => {
     res.json(await getGeneralEvents(user.osuId, user.id, user.modes, minDate, maxDate));
 });
 
+/* GET events created/updated after date */
+router.get('/eventsByDate/:date', async (req, res) => {
+    const date = new Date(req.params.date);
+
+    if (isNaN(date.getTime())) {
+        return res.status(404).send('Invalid date');
+    }
+
+    const logs = await Log
+        .find({
+            createdAt: { $gt: date },
+            category: 'dataCollection',
+        })
+        .populate([
+            { path: 'user', select: 'username osuId' },
+            { path: 'relatedId', select: 'obviousness severity discussionId' },
+        ])
+        .sort({ createdAt: -1 });
+
+    res.json(logs);
+});
+
+
+/* sensitive data */
+
 /* GET latest evaluation or appevaluation */
-router.get('/latestEvaluation/:osuId', async (req, res) => {
+router.get('/latestEvaluation/:osuId', middlewares.hasPrivateInterOpsAccess, async (req, res) => {
     const user = await User.findOne({ osuId: req.params.osuId });
 
     if (!user) {
@@ -199,7 +218,7 @@ router.get('/latestEvaluation/:osuId', async (req, res) => {
 });
 
 /* GET general reason for BN removal */
-router.get('/bnRemoval/:osuId', async (req, res) => {
+router.get('/bnRemoval/:osuId', middlewares.hasPrivateInterOpsAccess, async (req, res) => {
     const user = await User.findOne({ osuId: req.params.osuId });
 
     if (!user) {
@@ -225,7 +244,7 @@ router.get('/bnRemoval/:osuId', async (req, res) => {
 });
 
 /* GET all of a user's logs */
-router.get('/logs/:osuId/:category', async (req, res) => {
+router.get('/logs/:osuId/:category', middlewares.hasPrivateInterOpsAccess, async (req, res) => {
     const user = await User.findOne({ osuId: req.params.osuId });
 
     if (!user) {
@@ -257,28 +276,6 @@ router.get('/logs/:osuId/:category', async (req, res) => {
             'bnFinder'`
         );
     }
-
-    res.json(logs);
-});
-
-/* GET events created/updated after date */
-router.get('/eventsByDate/:date', async (req, res) => {
-    const date = new Date(req.params.date);
-
-    if (isNaN(date.getTime())) {
-        return res.status(404).send('Invalid date');
-    }
-
-    const logs = await Log
-        .find({
-            createdAt: { $gt: date },
-            category: 'dataCollection',
-        })
-        .populate([
-            { path: 'user', select: 'username osuId' },
-            { path: 'relatedId', select: 'obviousness severity discussionId' },
-        ])
-        .sort({ createdAt: -1 });
 
     res.json(logs);
 });

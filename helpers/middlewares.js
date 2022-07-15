@@ -90,6 +90,14 @@ function isResponsibleWithButtons(req, res, next) {
     next();
 }
 
+async function hasPrivateInterOpsAccess(req, res, next) {
+    const u = await User.findOne({ username: req.headers.username });
+
+    if (!u.hasFullReadAccess) return unauthorize(req, res, `You can't use this`);
+
+    next();
+}
+
 module.exports = {
     isLoggedIn,
     isBnOrNat,
@@ -99,4 +107,5 @@ module.exports = {
     isResponsibleWithButtons,
     hasBasicAccess,
     hasFullReadAccess,
+    hasPrivateInterOpsAccess,
 };
