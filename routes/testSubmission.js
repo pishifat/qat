@@ -4,6 +4,7 @@ const TestAnswer = require('../models/bnTest/testAnswer');
 const Logger = require('../models/log');
 const AppEvaluation = require('../models/evaluations/appEvaluation');
 const User = require('../models/user');
+const Settings = require('../models/settings');
 const middlewares = require('../helpers/middlewares');
 const discord = require('../helpers/discord');
 const util = require('../helpers/util');
@@ -151,10 +152,9 @@ router.post('/submitTest', async (req, res) => {
     );
 
     let fields = [];
-    const trialModes = ['osu', 'taiko'];
 
     if (totalScore >= 12.5 || test.mode != 'osu') {
-        const assignedNat = trialModes.includes(test.mode) ? await User.getAssignedNat(test.mode, [], 2) : await User.getAssignedNat(test.mode);
+        const assignedNat = await User.getAssignedNat(test.mode);
         currentBnApp.natEvaluators = assignedNat;
 
         const assignments = [];
@@ -180,13 +180,11 @@ router.post('/submitTest', async (req, res) => {
             value: natList,
         });
 
-        let trialNatList = '';
-
-        if (trialModes.includes(test.mode)) {
-            const assignedTrialNat = await User.getAssignedTrialNat(test.mode, [], 2);
+        if (await Settings.getModeHasTrialNat(test.mode)) {
+            const assignedTrialNat = await User.getAssignedTrialNat(test.mode);
             currentBnApp.bnEvaluators = assignedTrialNat;
             await currentBnApp.save();
-            trialNatList = assignedTrialNat.map(n => n.username).join(', ');
+            const trialNatList = assignedTrialNat.map(n => n.username).join(', ');
             fields.push({
                 name: 'Assigned BN',
                 value: trialNatList,

@@ -7,6 +7,7 @@ const Evaluation = require('../../models/evaluations/evaluation');
 const Discussion = require('../../models/discussion');
 const ResignationEvaluation = require('../../models/evaluations/resignationEvaluation');
 const Aiess = require('../../models/aiess');
+const Settings = require('../../models/settings');
 const middlewares = require('../../helpers/middlewares');
 const discord = require('../../helpers/discord');
 const getGeneralEvents = require('../evaluations/bnEval').getGeneralEvents;
@@ -991,22 +992,36 @@ router.post('/resignFromBn/:id', async (req, res) => {
     const evaluations = await ResignationEvaluation.insertMany(resignations);
 
     for (const evaluation of evaluations) {
+        const fields = [];
+
         const assignedNat = await User.getAssignedNat(evaluation.mode, [user.osuId]);
         evaluation.natEvaluators = assignedNat;
-        await evaluation.save();
         const natList = assignedNat.map(e => e.username).join(', ');
+
+        fields.push({
+            name: 'Assigned NAT',
+            value: natList,
+        });
+
+        if (await Settings.getModeHasTrialNat(evaluation.mode)) {
+            const assignedTrialNat = await User.getAssignedTrialNat(evaluation.mode, [user.osuId]);
+            evaluation.bnEvaluators = assignedTrialNat;
+            const trialNatList = assignedTrialNat.map(e => e.username).join(', ');
+
+            fields.push({
+                name: 'Assigned BN',
+                value: trialNatList,
+            });
+        }
+
+        await evaluation.save();
 
         await discord.webhookPost(
             [{
                 author: discord.defaultWebhookAuthor(req.session),
                 color: discord.webhookColors.white,
                 description: `Created [**${user.username}**'s resignation eval](http://bn.mappersguild.com/bneval?id=${evaluation.id})`,
-                fields: [
-                    {
-                        name: 'Assigned NAT',
-                        value: natList,
-                    },
-                ],
+                fields,
             }],
             evaluation.mode
         );

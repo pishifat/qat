@@ -5,6 +5,7 @@ const settingsSchema = new mongoose.Schema({
         _id: false,
         mode: { type: String, enum: ['osu', 'taiko', 'catch', 'mania'], required: true },
         evalsRequired: { type: Number, required: true },
+        hasTrialNat: { type: Boolean },
     }],
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
@@ -19,6 +20,17 @@ class SettingsService extends mongoose.Model {
         const modeSetting = settings.modeSettings.find(s => s.mode === mode);
 
         return modeSetting.evalsRequired || 3;
+    }
+
+    /**
+     * @param {string} mode
+     * @returns {Promise<boolean>} Whether or not mode has trial NAT enabled
+     */
+    static async getModeHasTrialNat (mode) {
+        const settings = await this.findOne();
+        const modeSetting = settings.modeSettings.find(s => s.mode === mode);
+
+        return modeSetting.hasTrialNat || false;
     }
 
 }

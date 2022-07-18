@@ -97,8 +97,7 @@ export default {
     computed: {
         /** @returns {array} */
         natReviews () {
-            if (this.evaluation.mode == 'osu') return this.evaluation.reviews;
-            else return this.evaluation.reviews.filter(r => r.evaluator.isNat);
+            return this.evaluation.reviews.filter(r => r.evaluator.isNat || r.evaluator.isTrialNat);
         },
         /** @returns {string} */
         scoreColor() {

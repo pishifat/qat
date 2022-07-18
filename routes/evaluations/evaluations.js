@@ -91,7 +91,8 @@ async function submitEval (evaluation, session, isNat, behaviorComment, moddingC
             evaluation.mode
         );
 
-        const evaluationsRequired = await Settings.getModeEvaluationsRequired(evaluation.mode);
+        // +1 evaluation required when a mode has trial NAT (because there's more assigned users)
+        const evaluationsRequired = await Settings.getModeHasTrialNat(evaluation.mode) ? await Settings.getModeEvaluationsRequired(evaluation.mode) + 1 : await Settings.getModeEvaluationsRequired(evaluation.mode);
 
         if (isNat && !evaluation.discussion) {
             let totalPass = 0;

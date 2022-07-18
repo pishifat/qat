@@ -14,23 +14,10 @@ router.get('/', async (req, res) => {
     res.json(settings);
 });
 
-/* POST create initial global settings - delete later */
-router.post('/create', async (req, res) => {
-    const existingSettings = await Settings.findOne();
-
-    if (existingSettings) {
-        return res.json({
-            error: 'Already created',
-        });
-    }
-
-    const modes = ['osu', 'catch', 'taiko', 'mania'];
-    const modeSettings = modes.map(mode => ({
-        mode,
-        evalsRequired: 3,
-    }));
-
-    const settings = new Settings();
+/* POST update global settings */
+router.post('/update', async (req, res) => {
+    const modeSettings = req.body.modeSettings;
+    const settings = await Settings.findOne();
     settings.modeSettings = modeSettings;
     await settings.save();
 
@@ -39,11 +26,13 @@ router.post('/create', async (req, res) => {
     });
 });
 
-/* POST update global settings */
-router.post('/update', async (req, res) => {
-    const modeSettings = req.body.modeSettings;
+/* POST toggle hasTrialNat */
+router.post('/toggleHasTrialNat', async (req, res) => {
+    const mode = req.body.mode;
     const settings = await Settings.findOne();
-    settings.modeSettings = modeSettings;
+    const settingIndex = settings.modeSettings.findIndex(s => s.mode === mode);
+
+    settings.modeSettings[settingIndex].hasTrialNat = !settings.modeSettings[settingIndex].hasTrialNat;
     await settings.save();
 
     res.json({

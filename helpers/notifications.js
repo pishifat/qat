@@ -15,6 +15,7 @@ const BeatmapReport = require('../models/beatmapReport');
 const Discussion = require('../models/discussion');
 const Report = require('../models/report');
 const Logger = require('../models/log');
+const Settings = require('../models/settings');
 
 const defaultPopulate = [
     { path: 'user', select: 'username osuId modesInfo' },
@@ -134,9 +135,6 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-    // trial NAT modes
-    const trialModes = ['osu', 'taiko'];
-
     // find active events
     let [activeApps, activeRounds, activeVetoes] = await Promise.all([
         AppEvaluation
@@ -188,10 +186,10 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
         let generateWebhook = true;
         let discordIds = [];
         let color;
-        let trialEvaluators = trialModes.includes(app.mode) ? app.natEvaluators.concat(app.bnEvaluators) : app.natEvaluators;
+        let evaluators = await Settings.getModeHasTrialNat(app.mode) ? app.natEvaluators.concat(app.bnEvaluators) : app.natEvaluators;
 
         if (date > deadline) {
-            discordIds = findNatEvaluatorHighlights(app.reviews, trialEvaluators, app.discussion);
+            discordIds = findNatEvaluatorHighlights(app.reviews, evaluators, app.discussion);
             const days = findDaysAgo(app.createdAt);
 
             description += `was due ${days == 0 ? 'today!' : days == 1 ? days + ' day ago!' : days + ' days ago!'}`;
@@ -204,7 +202,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
         }
 
         if (generateWebhook) {
-            description += findNatEvaluatorStatuses(app.reviews, trialEvaluators, app.discussion);
+            description += findNatEvaluatorStatuses(app.reviews, evaluators, app.discussion);
             description += findMissingContent(app.discussion, app.consensus, app.feedback);
 
             await discord.webhookPost(
@@ -231,10 +229,10 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
         let generateWebhook = true;
         let discordIds = [];
         let color;
-        let trialEvaluators = trialModes.includes(round.mode) ? round.natEvaluators.concat(round.bnEvaluators) : round.natEvaluators;
+        let evaluators = await Settings.getModeHasTrialNat(round.mode) ? round.natEvaluators.concat(round.bnEvaluators) : round.natEvaluators;
 
         if (!round.natEvaluators || !round.natEvaluators.length) {
-            round.natEvaluators = trialModes.includes(round.mode) ? await User.getAssignedNat(round.mode, [], 2) : await User.getAssignedNat(round.mode);
+            round.natEvaluators = await User.getAssignedNat(round.mode);
             await round.populate(defaultPopulate).execPopulate();
             const days = util.findDaysBetweenDates(new Date(), new Date(round.deadline));
 
@@ -254,9 +252,9 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
 
             natList = round.natEvaluators.map(u => u.username).join(', ');
 
-            if (trialModes.includes(round.mode)) {
+            if (await Settings.getModeHasTrialNat(round.mode)) {
                 if (!round.bnEvaluators || !round.bnEvaluators.length) {
-                    round.bnEvaluators = await User.getAssignedTrialNat(round.mode, [round.user.osuId], 2);
+                    round.bnEvaluators = await User.getAssignedTrialNat(round.mode, [round.user.osuId], (await Settings.getModeEvaluationsRequired(round.mode) - 1));
                     await round.populate(defaultPopulate).execPopulate();
                     await round.save();
                 }
@@ -272,7 +270,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
         }
 
         if (date > round.deadline) {
-            discordIds = findNatEvaluatorHighlights(round.reviews, trialEvaluators, round.discussion);
+            discordIds = findNatEvaluatorHighlights(round.reviews, evaluators, round.discussion);
             const days = findDaysAgo(round.deadline);
 
             description += `was due ${days == 0 ? 'today!' : days == 1 ? days + ' day ago!' : days + ' days ago!'}`;
@@ -290,7 +288,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
         if (generateWebhook && !natList.length) {
             //evaluators = round.natEvaluators.concat(round.bnEvaluators);
 
-            description += findNatEvaluatorStatuses(round.reviews, trialEvaluators, round.discussion);
+            description += findNatEvaluatorStatuses(round.reviews, evaluators, round.discussion);
             description += findMissingContent(round.discussion, round.consensus, round.feedback);
             await discord.webhookPost(
                 [{

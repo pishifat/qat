@@ -20,7 +20,7 @@ const appPopulate = [
         select: 'evaluator',
         populate: {
             path: 'evaluator',
-            select: 'username osuId groups',
+            select: 'username osuId groups isTrialNat',
         },
     },
 ];
@@ -33,7 +33,7 @@ const bnEvalPopulate = [
         select: 'evaluator',
         populate: {
             path: 'evaluator',
-            select: 'username osuId groups',
+            select: 'username osuId groups isTrialNat',
         },
     },
 ];

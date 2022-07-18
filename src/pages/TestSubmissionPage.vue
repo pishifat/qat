@@ -101,14 +101,6 @@
 
         <div v-else class="card card-body">
             <div v-if="displayScore || displayScore == 0">
-                <p class="small">
-                    If you see nonsense below this line, you'll need to visit the
-                    <router-link to="/bnapps">
-                        BN Application page
-                    </router-link>
-                    and re-submit your test. Sorry!
-                </p>
-
                 <p>Your test has been submitted! Your score is <b>{{ displayScore }}/20.</b></p>
                 <p v-if="displayScore < 12.5 && isOsu">
                     Due to poor test results, we feel you need to brush up on your general knowledge before being able to apply for the BNG. Since you failed due to your test results and not your modding itself, you may apply again 1 month from now.

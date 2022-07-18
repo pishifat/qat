@@ -2,7 +2,7 @@
     <div class="container">
         <div>Evaluations required</div>
         <small class="text-secondary">
-            Number of evaluations required before an application/BN eval is moved to group discussion
+            Number of evaluations required before an application/BN eval is moved to group discussion. If a mode has Trial NAT enabled, this number will be subtracted by 1 and applied to both NAT and BN assignments (e.g. setting is 3 --> 2 NAT and 2 BN will be assigned per evaluation)
         </small>
 
         <button v-if="!modeSettings.length" @click="create">
@@ -18,7 +18,24 @@
                 :for="`mode-settings-${setting.mode}`"
                 class="col-sm-4 col-form-label"
             >
-                {{ setting.mode }}
+                {{ setting.mode == 'osu' ? 'osu!' : 'osu!' + setting.mode }}
+                <a
+                    href="#"
+                    :class="processing ? 'processing' : ''"
+                    data-toggle="tooltip"
+                    data-placement="right"
+                    title="toggle Trial NAT for mode"
+                    @click.prevent="toggleHasTrialNat(setting.mode, $event)"
+                >
+                    <font-awesome-icon
+                        icon="fa-solid fa-circle-check"
+                        :class="
+                            setting.hasTrialNat
+                                ? 'text-success'
+                                : 'text-secondary'
+                        "
+                    />
+                </a>
             </label>
             <div class="col-sm-8">
                 <input
@@ -32,7 +49,7 @@
 
         <div class="row">
             <div class="col text-right">
-                <button class="btn btn-success" @click="update">
+                <button class="btn btn-success" @click="update($event)">
                     Save
                 </button>
             </div>
@@ -71,6 +88,13 @@ export default {
             await this.$http.executePost(`/settings/update`, {
                 modeSettings: this.modeSettings,
             }, e);
+        },
+        async toggleHasTrialNat (mode, e) {
+            await this.$http.executePost(`/settings/toggleHasTrialNat`, {
+                mode,
+            }, e);
+
+            await this.fetchSettings();
         },
     },
 };
