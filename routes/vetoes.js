@@ -230,7 +230,7 @@ router.post('/selectMediators', middlewares.isNat, async (req, res) => {
         ) {
             users.push(user);
 
-            if (users.length >= (req.body.mode == 'osu' || req.body.mode == 'all' ? 11 : 7)) {
+            if (users.length >= (req.body.mode == 'osu' || req.body.mode == 'taiko' || req.body.mode == 'all' ? 11 : 7)) {
                 break;
             }
         }
