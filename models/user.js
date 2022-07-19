@@ -276,7 +276,7 @@ class UserService extends mongoose.Model {
      * @returns {Promise<[]>}
      */
     static async getAssignedNat (mode, excludeOsuIds, sampleSize) {
-        sampleSize = sampleSize || await Settings.getModeHasTrialNat ? await Settings.getModeEvaluationsRequired(mode) - 1 : await Settings.getModeEvaluationsRequired(mode);
+        sampleSize = sampleSize || await Settings.getModeHasTrialNat(mode) ? await Settings.getModeEvaluationsRequired(mode) - 1 : await Settings.getModeEvaluationsRequired(mode);
 
         const query = User.aggregate([
             {
@@ -361,7 +361,7 @@ class UserService extends mongoose.Model {
      * @returns {Promise<[]>}
      */
     static async getAssignedTrialNat (mode, excludeOsuIds, sampleSize) {
-        sampleSize = sampleSize || await Settings.getModeHasTrialNat ? await Settings.getModeEvaluationsRequired(mode) - 1 : await Settings.getModeEvaluationsRequired(mode);
+        sampleSize = sampleSize || await Settings.getModeHasTrialNat(mode) ? await Settings.getModeEvaluationsRequired(mode) - 1 : await Settings.getModeEvaluationsRequired(mode);
 
         const query = User.aggregate([
             {
