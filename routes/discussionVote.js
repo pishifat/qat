@@ -174,7 +174,8 @@ router.post('/submit', async (req, res) => {
                 },
             ],
         }],
-        req.body.isContentReview ? 'contentCase' : discussion.mode
+        //req.body.isContentReview ? 'contentCase' : discussion.mode -- disabling this because of trial nat
+        req.body.isContentReview ? 'contentCase' : 'all'
     );
 
     if (req.body.isContentReview) {
@@ -276,7 +277,8 @@ router.post('/concludeMediation/:id', middlewares.hasFullReadAccess, async (req,
                 color: discord.webhookColors.darkYellow,
                 description: `Concluded vote for [discussion on **${discussion.title}**](http://bn.mappersguild.com/discussionvote?id=${discussion.id})`,
             }],
-            discussion.mode
+            //discussion.mode -- disabling this because of trial nat
+            'all'
         );
     }
 
