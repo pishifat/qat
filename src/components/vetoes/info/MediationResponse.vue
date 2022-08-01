@@ -65,9 +65,8 @@ export default {
         voteColor (vote) {
             switch (vote) {
                 case 1:
-                    return 'text-success'; // agree
                 case 2:
-                    return 'text-neutral'; // neutral
+                    return 'text-success'; // agree/partially agree
                 case 3:
                     return 'text-danger'; // disagree
             }
