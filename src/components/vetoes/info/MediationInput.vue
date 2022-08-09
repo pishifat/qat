@@ -38,7 +38,7 @@
                         :name="'vote' + i"
                         value="2"
                     >
-                    <label class="form-check-label text-neutral" for="2">Partially agree</label>
+                    <label class="form-check-label text-success" for="2">Partially agree</label>
                 </div>
 
                 <div class="form-check form-check-inline">
