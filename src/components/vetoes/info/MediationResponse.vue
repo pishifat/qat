@@ -6,6 +6,7 @@
                 :user="mediation.mediator"
                 :text-color="voteColor(mediation.vote)"
             >
+                <span v-if="mediation.vote == 2" class="text-secondary small">(partially agree)</span>
                 <a
                     v-if="!mediation.comment && selectedVeto.status === 'wip'"
                     href="#"
