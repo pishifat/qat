@@ -38,6 +38,9 @@ async function webhookPost(message, webhook) {
         case 'internalContentCase':
             url += `${config.internalContentCasesWebhook.id}/${config.internalContentCasesWebhook.token}`;
             break;
+        case 'dev':
+            url += `${config.devWebhook.id}/${config.devWebhook.token}`;
+            break;
         default:
             return { error: 'no webhook specified' };
     }
@@ -174,7 +177,7 @@ const webhookColors = {
     pink: 16728232,       // revealedCurrentBnEvalNotification, modified report
     white: 15724527,      // unarchive, addEvaluation, sendMessages
     brown: 7554849,       // submitUserNote
-    gray: 8815494,        // passive: moveToGroupDiscussion,
+    gray: 8815494,        // passive: moveToGroupDiscussion, dev
     black: 2564903,       // archive, deleteVeto
 };
 

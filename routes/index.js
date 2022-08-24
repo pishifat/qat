@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const { getUserModsCount } = require('../helpers/scrap');
 const middlewares = require('../helpers/middlewares');
 const osu = require('../helpers/osu');
+const discord = require('../helpers/discord');
 const osuBot = require('../helpers/osuBot');
 const util = require('../helpers/util');
 const User = require('../models/user');
@@ -87,7 +88,14 @@ router.post('/findBns/', async (req, res) => {
     const beatmapsetInfo = await osu.getBeatmapsetInfo(req.session.accessToken, beatmapsetId);
 
     if (!beatmapsetInfo || beatmapsetInfo.error || !beatmapsetInfo.id) {
-        await osuBot.sendMessages(3178418, [`beatmapsetInfo 1st stop error for ${url} pls fix`]);
+        await discord.webhookPost(
+            [{
+                title: 'qat message failed',
+                color: discord.webhookColors.gray,
+                description: `beatmapsetInfo 1st stop error for ${url} pls fix`,
+            }],
+            'dev'
+        );
 
         return res.json({
             error: `Couldn't retrieve beatmap info. Dev has been notified.`,
