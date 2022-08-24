@@ -7,6 +7,7 @@
             data-target="#extendedInfo"
             :data-discussion="discussion.id"
         >
+            <img v-if="isImage ":src="discussion.discussionLink" class="card-thumb"></img>
             <div class="card-body">
                 <p class="wrap-text">
                     <a
@@ -60,6 +61,9 @@ export default {
         ...mapState([
             'loggedInUser',
         ]),
+        isImage() {
+            return (this.discussion.discussionLink.match(/\.(jpeg|jpg|gif|png)$/) != null);
+        },
     },
     methods: {
         selectDiscussion() {
@@ -90,6 +94,18 @@ export default {
 </script>
 
 <style scoped>
+
+.card-thumb {
+    position: absolute;
+    top: 8px;
+    left: calc(100% - 67px);
+    max-width: 60px;
+    max-height: 40px;
+    object-fit: cover;
+    border-radius: 10%;
+    box-shadow: 0 1px 1rem rgba(10, 10, 25, .9);
+    background-color: var(--gray-dark);
+}
 
 .status-bar-active {
     background: radial-gradient(#fff, transparent 70%);
