@@ -11,7 +11,13 @@
         </div>
 
         <div v-if="warningNote" class="my-2">
-            <b>Latest warning/action</b>
+            <b>Latest warning/action - 
+                {{ warningNote.updatedAt | toStandardDate }} -
+                <user-link
+                    :osu-id="warningNote.author.osuId"
+                    :username="warningNote.author.username"
+                />
+            </b>
             <div class="ml-4 small text-secondary" v-html="$md.render(warningNote.comment)" />
         </div>
 
@@ -44,10 +50,10 @@
             <b>Other notes</b>
         </p>
         <ul class="mt-2">
-            <li v-if="!notes" class="small">
+            <li v-if="!otherNotes" class="small">
                 ...
             </li>
-            <li v-else-if="!notes.length" class="small">
+            <li v-else-if="!otherNotes.length" class="small">
                 User has no notes
             </li>
             <li

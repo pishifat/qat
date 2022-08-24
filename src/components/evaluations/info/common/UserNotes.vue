@@ -13,7 +13,13 @@
             </li>
 
             <li v-if="warningNote">
-                <b>LATEST WARNING/ACTION</b>
+                <b>LATEST WARNING/ACTION - 
+                    {{ warningNote.updatedAt | toStandardDate }} -
+                    <user-link
+                        :osu-id="warningNote.author.osuId"
+                        :username="warningNote.author.username"
+                    />
+                </b>
                 <div v-html="$md.render(warningNote.comment)" />
             </li>
 
