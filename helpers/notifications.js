@@ -231,7 +231,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
         let color;
         let evaluators = await Settings.getModeHasTrialNat(round.mode) ? round.natEvaluators.concat(round.bnEvaluators) : round.natEvaluators;
 
-        if (!round.natEvaluators || !round.natEvaluators.length) {
+        if (round.deadline < endRange && (!round.natEvaluators || !round.natEvaluators.length)) {
             round.natEvaluators = await User.getAssignedNat(round.mode);
             await round.populate(defaultPopulate).execPopulate();
             const days = util.findDaysBetweenDates(new Date(), new Date(round.deadline));
