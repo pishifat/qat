@@ -15,11 +15,37 @@
                 only pishifat can edit this section
             </small>
 
+            <ul class="small">
+                <li>BN1y.png</li>
+                <li>BN2y.jpg</li>
+                <li>BN3y.jpg</li>
+                <li>BN4y.jpg</li>
+                <li>BN5y.jpg</li>
+                <li>Longstanding contribution to the Beatmap Nominators - 1 Year</li>
+                <li>Longstanding contribution to the Beatmap Nominators - 2 Years</li>
+                <li>Longstanding contribution to the Beatmap Nominators - 3 Years</li>
+                <li>Longstanding contribution to the Beatmap Nominators - 4 Years</li>
+                <li>Longstanding contribution to the Beatmap Nominators - 5 Years</li>
+                <li>QAT1y.png</li>
+                <li>QAT2y.jpg</li>
+                <li>QAT3y.jpg</li>
+                <li>QAT4y.jpg</li>
+                <li>QAT5y.jpg</li>
+                <li>Longstanding contribution to the Nomination Assessment Team - 1 Year</li>
+                <li>Longstanding contribution to the Nomination Assessment Team - 2 Years</li>
+                <li>Longstanding contribution to the Nomination Assessment Team - 3 Years</li>
+                <li>Longstanding contribution to the Nomination Assessment Team - 4 Years</li>
+                <li>Longstanding contribution to the Nomination Assessment Team - 5 Years</li>
+                <li>Longstanding contribution to the Quality Assurance Team / Nomination Assessment Team - 4 Years</li>
+                <li>Longstanding contribution to the Quality Assurance Team / Nomination Assessment Team - 5 Years</li>
+                <li>https://osu.ppy.sh/wiki/en/People/The_Team/Beatmap_Nominators</li>
+            </ul>
+
             <div v-for="user in badgeUsers" :key="user.id" class="small mb-1">
                 <user-link
                     :osu-id="user.osuId"
                     :username="user.username"
-                />
+                /> {{ user.osuId }}
                 <ul>
                     <li :class="compareBadgeDuration(user.bnProfileBadge, user.bnDuration) ? 'background-fail' : ''">
                         BN: {{ yearsDuration(user.bnDuration) }} -- badge: {{ user.bnProfileBadge }}
