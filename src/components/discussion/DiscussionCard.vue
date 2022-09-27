@@ -62,7 +62,11 @@ export default {
             'loggedInUser',
         ]),
         isImage() {
-            return (this.discussion.discussionLink.match(/\.(jpeg|jpg|gif|png)$/) != null);
+            if (this.discussion && this.discussion.discussionLink) {
+                return (this.discussion.discussionLink.match(/\.(jpeg|jpg|gif|png)$/) != null);
+            } else {
+                return null;
+            }
         },
     },
     methods: {

@@ -21,7 +21,6 @@
                 {{ setting.mode == 'osu' ? 'osu!' : 'osu!' + setting.mode }}
                 <a
                     href="#"
-                    :class="processing ? 'processing' : ''"
                     data-toggle="tooltip"
                     data-placement="right"
                     title="toggle Trial NAT for mode"
