@@ -166,6 +166,53 @@ router.post('/:id/toggleIsTrialNat', middlewares.isNat, async (req, res) => {
     );
 });
 
+/* find months of sufficient BN activity for members of NAT */
+async function findAdditionalBnMonths (user) {
+    const bnSiteLeftTheWomb = new Date('2019-05-01');
+    let bnMonths = 0;
+
+    if (user.natDuration) {
+        const natHistory = user.history.filter(h => h.group == 'nat');
+
+        let startDate;
+        let nextDate;
+        let endDate;
+
+        for (let j = 0; j < natHistory.length; j++) {
+            if (!(j % 2)) {
+                const historyElement = natHistory[j];
+
+                startDate = new Date(historyElement.date);
+                nextDate = moment(startDate).add(1, 'months').toDate();
+                endDate = natHistory[j + 1] ? natHistory[j + 1].date : new Date();
+
+                while (nextDate < endDate) {
+                    if (startDate < bnSiteLeftTheWomb) {
+                        startDate = moment(bnSiteLeftTheWomb).toDate();
+                        nextDate = moment(bnSiteLeftTheWomb).add(1, 'months').toDate();
+                    }
+
+                    const count = await scrap.findUniqueNominationsCount(startDate, nextDate, user);
+                    startDate = moment(startDate).add(1, 'months').toDate();
+                    nextDate = moment(nextDate).add(1, 'months').toDate();
+
+                    const requirement = historyElement.mode == 'mania' ? 2 : 3;
+
+                    if (count >= requirement) bnMonths++;
+                }
+            }
+        }
+    }
+
+    let newBnDuration = user.bnDuration;
+
+    if (bnMonths) {
+        newBnDuration += (30 * bnMonths);
+    }
+
+    return bnMonths;
+}
+
 
 /* GET all users with badge info */
 router.get('/findUserBadgeInfo', async (req, res) => {
@@ -173,53 +220,10 @@ router.get('/findUserBadgeInfo', async (req, res) => {
         history: { $exists: true, $ne: [] },
     }).sort({ username: 1 });
 
-    const bnSiteLeftTheWomb = new Date('2019-05-01');
-
     const newUsers = [];
 
     for (let i = 0; i < badgeUsers.length; i++) {
         const user = badgeUsers[i];
-
-        let bnMonths = 0;
-
-        if (user.natDuration) {
-            const natHistory = user.history.filter(h => h.group == 'nat');
-
-            let startDate;
-            let nextDate;
-            let endDate;
-
-            for (let j = 0; j < natHistory.length; j++) {
-                if (!(j % 2)) {
-                    const historyElement = natHistory[j];
-
-                    startDate = new Date(historyElement.date);
-                    nextDate = moment(startDate).add(1, 'months').toDate();
-                    endDate = natHistory[j + 1] ? natHistory[j + 1].date : new Date();
-
-                    while (nextDate < endDate) {
-                        if (startDate < bnSiteLeftTheWomb) {
-                            startDate = moment(bnSiteLeftTheWomb).toDate();
-                            nextDate = moment(bnSiteLeftTheWomb).add(1, 'months').toDate();
-                        }
-
-                        const count = await scrap.findUniqueNominationsCount(startDate, nextDate, user);
-                        startDate = moment(startDate).add(1, 'months').toDate();
-                        nextDate = moment(nextDate).add(1, 'months').toDate();
-
-                        const requirement = historyElement.mode == 'mania' ? 2 : 3;
-
-                        if (count >= requirement) bnMonths++;
-                    }
-                }
-            }
-        }
-
-        let newBnDuration = user.bnDuration;
-
-        if (bnMonths) {
-            newBnDuration += (30 * bnMonths);
-        }
 
         newUsers.push({
             id: user.id,
@@ -227,12 +231,19 @@ router.get('/findUserBadgeInfo', async (req, res) => {
             username: user.username,
             bnProfileBadge: user.bnProfileBadge,
             natProfileBadge: user.natProfileBadge,
-            bnDuration: newBnDuration,
+            bnDuration: user.bnDuration += (30 * await findAdditionalBnMonths(user)),
             natDuration: user.natDuration,
         });
     }
 
     res.json(newUsers);
+});
+
+/* GET additional user BN months (for people who were in NAT but still nominated maps) */
+router.post('/:id/findAdditionalBnMonths', async (req, res) => {
+    let user = await User.findById(req.params.id);
+
+    res.json(await findAdditionalBnMonths(user));
 });
 
 /* GET all NAT users in evaluation bag for relevant mode */

@@ -9,6 +9,15 @@
                 <li v-for="history in sortedBnHistory" :key="history.date" class="small">
                     {{ history.date | toStandardDate }}: {{ history.kind }} ({{ history.mode }})
                 </li>
+                <li 
+                    v-if="this.additional"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="time is added for the user's BN badge, but not included in tenure above"
+                    class="small"
+                >
+                    {{ additional }} as NAT while meeting BN activity requirements
+                </li>
             </ul>
         </div>
         <div v-if="natHistory.length" class="col-sm-6">
@@ -32,6 +41,11 @@ import duration from '../../../mixins/duration.js';
 export default {
     name: 'Duration',
     mixins: [ duration ],
+    data () {
+        return {
+            additional: null,
+        };
+    },
     computed: {
         ...mapGetters('users', [
             'selectedUser',
@@ -51,6 +65,41 @@ export default {
 
                 return 0;
             });
+        },
+    },
+    created () {
+        this.findAdditionalBnMonths();
+    },
+    watch: {
+        selectedUser() {
+            this.additional = null;
+            this.findAdditionalBnMonths();
+        },
+    },
+    methods: {
+        async findAdditionalBnMonths() {
+            const months = await this.$http.executePost(`/users/nat/${this.selectedUser.id}/findAdditionalBnMonths`, {});
+
+            if (this.$http.isValid(months)) {
+                if (months == 0 || !months) {
+                    this.additional = null;
+                } else {
+                    let years = Math.floor(months / 12);
+                    let remainingMonths = Math.round(months % 12);
+
+                    let additional = '';
+
+                    if (years) {
+                        additional += `${years} year${years > 1 ? 's' : ''} and `;
+                    }
+
+                    if (remainingMonths) {
+                        additional += `${remainingMonths} month${remainingMonths > 1 ? 's' : ''}`;
+                    }
+
+                    this.additional = additional;
+                }
+            }
         },
     },
 };

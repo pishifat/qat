@@ -79,22 +79,27 @@ export default {
     methods: {
         processDeadline (deadline) {
             const deadlineDate = new Date(deadline);
-            this.newDeadlineInput = deadlineDate.toISOString().slice(0,10);
+            if (!isNaN(deadlineDate)) {
 
-            const firstDate = new Date(deadline);
-            const secondDate = new Date(deadline);
-            const today = new Date();
-            firstDate.setDate(firstDate.getDate() - 7);
-            secondDate.setDate(secondDate.getDate() + 7);
+                this.newDeadlineInput = deadlineDate.toISOString().slice(0,10);
 
-            if (deadlineDate > today) {
-                this.isEditable = true;
+                const firstDate = new Date(deadline);
+                const secondDate = new Date(deadline);
+                const today = new Date();
+                firstDate.setDate(firstDate.getDate() - 7);
+                secondDate.setDate(secondDate.getDate() + 7);
+
+                if (deadlineDate > today) {
+                    this.isEditable = true;
+                } else {
+                    this.isEditable = false;
+                }
+
+                const nextEvaluationText = `Between ${firstDate.toISOString().slice(0,10)} and ${secondDate.toISOString().slice(0,10)}`;
+                this.nextEvaluationText = nextEvaluationText;
             } else {
-                this.isEditable = false;
+                this.nextEvaluationText = deadline;
             }
-
-            const nextEvaluationText = `Between ${firstDate.toISOString().slice(0,10)} and ${secondDate.toISOString().slice(0,10)}`;
-            this.nextEvaluationText = nextEvaluationText;
         },
         async loadNextEvaluation() {
             const deadline = await this.$http.executeGet(`/users/loadNextEvaluation/${this.selectedUser.id}/${this.mode}`);

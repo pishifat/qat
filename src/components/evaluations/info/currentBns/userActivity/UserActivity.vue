@@ -62,7 +62,7 @@
 
             <template
                 v-if="
-                    loggedInUser.isNat && (natApplicaions || natBnEvaluations)
+                    loggedInUser.isNat && (natApplications || natBnEvaluations)
                 "
             >
                 <div class="mt-2">Evaluations</div>
