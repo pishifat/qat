@@ -100,15 +100,6 @@ router.post('/adjustEvaluationDeadline/:id/:mode', middlewares.isNat, async (req
 router.post('/resetEvaluationDeadline/:id/:mode', middlewares.isNat, async (req, res) => {
     const userId = req.params.id;
     const mode = req.params.mode;
-    
-    /* find which users don't have any upcoming bn eval
-    const bns = await User.find({ groups: 'bn'} );
-    for (const bn of bns) {
-        for (const mode of bn.modesInfo) {
-            const er = await BnEvaluation.findOne({ user: bn.id, mode: mode.mode, active: true });
-            if (!er) console.log(`${bn.username} ${mode}`)
-        }
-    }*/
 
     const [evaluation, pendingEvaluation] = await Promise.all([
         BnEvaluation

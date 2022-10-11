@@ -8,6 +8,7 @@ const osuBot = require('./osuBot');
 const util = require('./util');
 const AppEvaluation = require('../models/evaluations/appEvaluation');
 const Evaluation = require('../models/evaluations/evaluation');
+const BnEvaluation = require('../models/evaluations/bnEvaluation');
 const Veto = require('../models/veto');
 const BnFinderMatch = require('../models/bnFinderMatch');
 const User = require('../models/user');
@@ -636,7 +637,7 @@ const lowActivityTask = cron.schedule('0 23 1 * *', async () => {
 /**
  * Marks BN Finder Matches as Expired if not pending/WIP/graveyard
  */
-const checkMatchBeatmapStatuses = cron.schedule('2 22 * * *', async () => {
+ const checkMatchBeatmapStatuses = cron.schedule('2 22 * * *', async () => {
     const response = await osu.getClientCredentialsGrant();
     const token = response.access_token;
 
@@ -654,6 +655,30 @@ const checkMatchBeatmapStatuses = cron.schedule('2 22 * * *', async () => {
         // 4 = loved, 3 = qualified, 2 = approved, 1 = ranked, 0 = pending, -1 = WIP, -2 = graveyard
         if (beatmapsetInfo.error || beatmapsetInfo.ranked > 0) {
             await BnFinderMatch.findByIdAndUpdate(match.id, { isExpired: true });
+        }
+    }
+}, {
+    scheduled: false,
+});
+
+/**
+ * Check if any current BNs have no upcoming evaluations (basically ensuring the NAT don't make a mistake and forget about it)
+ */
+const checkBnEvaluationDeadlines = cron.schedule('3 22 * * *', async () => {
+    const bns = await User.find({ groups: 'bn'} );
+    for (const bn of bns) {
+        for (const mode of bn.modesInfo) {
+            const er = await BnEvaluation.findOne({ user: bn.id, mode: mode.mode, active: true });
+            if (!er) {
+                await discord.webhookPost(
+                    [{
+                        title: `missing BN evaluation for ${bn.username}`,
+                        color: discord.webhookColors.red,
+                        description: `https://bn.mappersguild.com/users?id=${bn.id}`,
+                    }],
+                    'dev'
+                );
+            }
         }
     }
 
@@ -681,4 +706,4 @@ async function hasLowActivity(initialDate, bn, mode, months) {
     return false;
 }
 
-module.exports = { notifyDeadlines, notifyBeatmapReports, lowActivityTask, closeContentReviews, checkMatchBeatmapStatuses };
+module.exports = { notifyDeadlines, notifyBeatmapReports, lowActivityTask, closeContentReviews, checkMatchBeatmapStatuses, checkBnEvaluationDeadlines };
