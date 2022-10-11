@@ -12,6 +12,7 @@ const middlewares = require('../../helpers/middlewares');
 const discord = require('../../helpers/discord');
 const getGeneralEvents = require('../evaluations/bnEval').getGeneralEvents;
 const getUserModsCount = require('../../helpers/scrap').getUserModsCount;
+const findAdditionalBnMonths = require('../../helpers/scrap').findAdditionalBnMonths;
 const util = require('../../helpers/util');
 const { BnEvaluationConsensus, BnEvaluationAddition } = require('../../shared/enums');
 const { findEvaluationsWithoutIncident } = require('../evaluations/evaluations');
@@ -1136,6 +1137,13 @@ router.post('/cycleBag/:mode', middlewares.isResponsibleWithButtons, async (req,
     }
 
     res.json({ success: 'ok' });
+});
+
+/* GET additional user BN months (for people who were in NAT but still nominated maps) */
+router.post('/:id/findAdditionalBnMonths', async (req, res) => {
+    let user = await User.findById(req.params.id);
+
+    res.json(await findAdditionalBnMonths(user));
 });
 
 module.exports = router;

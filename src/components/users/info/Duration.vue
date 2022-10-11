@@ -78,7 +78,7 @@ export default {
     },
     methods: {
         async findAdditionalBnMonths() {
-            const months = await this.$http.executePost(`/users/nat/${this.selectedUser.id}/findAdditionalBnMonths`, {});
+            const months = await this.$http.executePost(`/users/${this.selectedUser.id}/findAdditionalBnMonths`, {});
 
             if (this.$http.isValid(months)) {
                 if (months == 0 || !months) {
