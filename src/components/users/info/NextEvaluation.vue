@@ -27,6 +27,15 @@
         >
             <i class="fas fa-edit" />
         </a>
+
+        <button 
+            v-if="loggedInUser.isNat" 
+            data-toggle="tooltip"
+            data-placement="top"
+            title="reset next evaluation date to default based on previous evaluations"
+            class="btn btn-sm btn-primary ml-2" type="submit" @click="reset($event)">
+            Reset
+        </button>
     </p>
 </template>
 
@@ -110,6 +119,14 @@ export default {
         },
         async adjustEvaluationDeadline() {
             const res = await this.$http.executePost(`/users/adjustEvaluationDeadline/${this.selectedUser.id}/${this.mode}`, { newDeadline: this.newDeadlineInput });
+
+            if (res.deadline) {
+                this.processDeadline(res.deadline);
+                this.isEditing = false;
+            }
+        },
+        async reset(e) {
+            const res = await this.$http.executePost(`/users/resetEvaluationDeadline/${this.selectedUser.id}/${this.mode}`, {}, e);
 
             if (res.deadline) {
                 this.processDeadline(res.deadline);

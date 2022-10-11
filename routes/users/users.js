@@ -13,6 +13,8 @@ const discord = require('../../helpers/discord');
 const getGeneralEvents = require('../evaluations/bnEval').getGeneralEvents;
 const getUserModsCount = require('../../helpers/scrap').getUserModsCount;
 const util = require('../../helpers/util');
+const { BnEvaluationConsensus, BnEvaluationAddition } = require('../../shared/enums');
+const { findEvaluationsWithoutIncident } = require('../evaluations/evaluations');
 
 const router = express.Router();
 
@@ -88,9 +90,108 @@ router.post('/adjustEvaluationDeadline/:id/:mode', middlewares.isNat, async (req
 
     Logger.generate(
         req.session.mongoId,
-        `Adjusted "${er.user.username}" current BN evaluation deadline to ${newDeadline.toISOString().slice(0,10)}`,
+        `Adjusted "${er.user.username}" ${mode} current BN evaluation deadline to ${newDeadline.toISOString().slice(0,10)}`,
         'bnEvaluation',
         er._id
+    );
+});
+
+/* POST reset next evaluation deadline based on previous evaluations */
+router.post('/resetEvaluationDeadline/:id/:mode', middlewares.isNat, async (req, res) => {
+    const userId = req.params.id;
+    const mode = req.params.mode;
+    
+    /* find which users don't have any upcoming bn eval
+    const bns = await User.find({ groups: 'bn'} );
+    for (const bn of bns) {
+        for (const mode of bn.modesInfo) {
+            const er = await BnEvaluation.findOne({ user: bn.id, mode: mode.mode, active: true });
+            if (!er) console.log(`${bn.username} ${mode}`)
+        }
+    }*/
+
+    const [evaluation, pendingEvaluation] = await Promise.all([
+        BnEvaluation
+            .findOne({
+                user: userId,
+                mode,
+                consensus: { $exists: true },
+                active: false,
+            })
+            .sort({ updatedAt: -1 }),
+        BnEvaluation
+            .findOne({
+                user: userId,
+                mode,
+                active: true,
+            })
+            .populate({
+                path: 'user',
+                select: 'username',
+            }),
+    ]);
+
+    let deadline = new Date(evaluation.archivedAt);
+
+    if (evaluation.consensus === BnEvaluationConsensus.ProbationBn) {
+        deadline.setDate(deadline.getDate() + 40);
+        
+        if (pendingEvaluation) {
+            pendingEvaluation.deadline = deadline;
+            await pendingEvaluation.save();
+        } else {
+            await BnEvaluation.create({
+                user: evaluation.user,
+                mode: evaluation.mode,
+                deadline,
+                activityToCheck: 40,
+            });
+        }
+    }
+
+    else if (evaluation.consensus === BnEvaluationConsensus.FullBn) {
+        let activityToCheck = 90;
+
+        if (evaluation.addition === BnEvaluationAddition.LowActivityWarning) {
+            deadline.setDate(deadline.getDate() + 40); // +40 days
+        } else {
+            const random90 = Math.round(Math.random() * (95 - 85) + 85); // between 85 and 95 days
+            const random180 = Math.round(Math.random() * (185 - 175) + 175); // between 185 and 175 days
+
+            const evaluationsWithoutIncident = await findEvaluationsWithoutIncident(userId);
+
+            if (evaluationsWithoutIncident > 1) {
+                deadline.setDate(deadline.getDate() + random180);
+                activityToCheck = random180;
+            } else {
+                deadline.setDate(deadline.getDate() + random90);
+                activityToCheck = random90;
+            }
+        }
+
+        if (pendingEvaluation) {
+            pendingEvaluation.deadline = deadline;
+            pendingEvaluation.activityToCheck = activityToCheck;
+            await pendingEvaluation.save();
+        } else {
+            await BnEvaluation.create({
+                user: evaluation.user,
+                mode: evaluation.mode,
+                deadline,
+                activityToCheck,
+            });
+        }
+    }
+
+    res.json({
+        deadline
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Reset "${pendingEvaluation.user.username}" ${mode} current BN evaluation deadline to ${deadline.toISOString().slice(0,10)}`,
+        'bnEvaluation',
+        pendingEvaluation._id
     );
 });
 
