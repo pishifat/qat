@@ -208,12 +208,33 @@ router.post('/submitMediation/:id', middlewares.isBnOrNat, async (req, res) => {
 /* POST set status upheld or withdrawn. */
 router.post('/selectMediators', middlewares.isNat, async (req, res) => {
     let allUsers = await User.getAllMediators();
-    //let pishi = await User.find({ osuId: 3178418 });
+    const mode = req.body.mode;
 
     if (allUsers.error) {
         return res.json({
             error: allUsers.error,
         });
+    }
+
+    let totalMediators;
+
+    if (mode === 'all') {
+        const validMediators = await User.find({
+            groups: { $in: ['nat', 'bn'] },
+            isVetoMediator: true,
+        });
+    
+        totalMediators = Math.round(validMediators.length * 0.2);
+    } else {
+        const validMediators = await User.find({
+            groups: { $in: ['nat', 'bn'] },
+            'modesInfo.mode': { $in: mode },
+            isVetoMediator: true,
+        });
+
+        totalMediators = Math.round(validMediators.length * 0.2);
+
+        if (totalMediators < 7) totalMediators = 7;
     }
 
     let users = [];
@@ -224,13 +245,13 @@ router.post('/selectMediators', middlewares.isNat, async (req, res) => {
         if (
             !req.body.excludeUsers.includes(user.username.toLowerCase()) &&
             (
-                (user.modesInfo.some(m => m.mode === req.body.mode && m.level === 'full') && req.body.mode != 'all') ||
-                (!user.modesInfo.some(m => m.level === 'probation') && req.body.mode == 'all')
+                (user.modesInfo.some(m => m.mode === mode && m.level === 'full') && mode != 'all') ||
+                (!user.modesInfo.some(m => m.level === 'probation') && mode == 'all')
             )
         ) {
             users.push(user);
 
-            if (users.length >= (req.body.mode == 'catch' ? 7 : 11)) {
+            if (users.length >= totalMediators) {
                 break;
             }
         }
