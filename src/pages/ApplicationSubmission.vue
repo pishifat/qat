@@ -66,7 +66,7 @@
                     <h4>Example mods:</h4>
                     <p class="small ml-4">
                         Link the discussion pages of at least two mapsets you
-                        have modded in the last six months. Try to include at
+                        have modded in the last six months. Include at
                         least one map you would nominate and one you wouldn't,
                         so the NAT can understand your nomination quality
                         standards. These (and potentially more) will be
