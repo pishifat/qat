@@ -37,7 +37,7 @@ const routes = [
     { path: '/modrequests', component: ModRequestsSubmission, meta: { title: 'Mod Requests', public: true } },
 
     // BN/NAT
-    { path: '/discussionvote', component: DiscussionVote, meta: { title: 'Discussion Vote', requiresBasicAccess: true } },
+    { path: '/discussionvote', component: DiscussionVote, meta: { title: 'Content Review', requiresBasicAccess: true } },
     { path: '/appeval', component: AppEvalPage, meta: { title: 'BN Application Evaluations', requiresBasicAccess: true } },
     { path: '/modrequests/listing', component: ModRequests, meta: { title: 'Mod Requests Listing', requiresBasicAccess: true } },
 

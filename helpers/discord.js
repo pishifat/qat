@@ -41,6 +41,9 @@ async function webhookPost(message, webhook) {
         case 'dev':
             url += `${config.devWebhook.id}/${config.devWebhook.token}`;
             break;
+        case 'announcement':
+            url += `${config.announcementWebhook.id}/${config.announcementWebhook.token}`;
+            break;
         default:
             return { error: 'no webhook specified' };
     }
@@ -119,18 +122,37 @@ async function userHighlightWebhookPost(webhook, discordIds, text) {
     }
 }
 
-async function roleHighlightWebhookPost(webhook, text) {
+async function roleHighlightWebhookPost(webhook, roles, text) {
     let url = 'https://discordapp.com/api/webhooks/';
     let content = '';
 
     switch (webhook) {
         case 'contentCase':
             url += `${config.contentCasesWebhook.id}/${config.contentCasesWebhook.token}`;
-            content = `<@&${config.contentCasesWebhook.gmtRole}>`;
+            break;
+        case 'announcement':
+            url += `${config.announcementWebhook.id}/${config.announcementWebhook.token}`;
             break;
     }
 
-    if (text) content+= ` ${text}`;
+    for (const role of roles) {
+        switch (role) {
+            case 'gmt':
+                content += `<@&${config.contentCasesWebhook.gmtRole}>`;
+                break;
+            case 'nat':
+                content += `<@&${config.announcementWebhook.natRole}>`;
+                break;
+            case 'bn':
+                content += `<@&${config.announcementWebhook.bnRole}>`;
+                break;
+            case 'probation':
+                content += `<@&${config.announcementWebhook.probationRole}>`;
+                break;
+        }
+    }
+
+    if (text) content += ` ${text}`;
 
     try {
         await axios.post(url, {
@@ -166,7 +188,7 @@ const webhookColors = {
     darkGreen: 1921053,       // switchUserGroup
     green: 4380222,           // newBnApplication
 
-    lightBlue: 8643583,       // setConsensus
+    lightBlue: 8643583,       // setConsensus, announcement
     darkBlue: 1911891,        // setCooldown
     blue: 6786559,            // setFeedback
 
@@ -235,6 +257,20 @@ async function contentCaseWebhookPost(d) {
     return messages;
 }
 
+async function announcementWebhookPost(session, title, description) {
+    await webhookPost(
+        [{
+            color: webhookColors.lightBlue,
+            title,
+            description,
+            author: defaultWebhookAuthor(session),
+        }],
+        'announcement'
+    );
+
+    return { success: 'ok' };
+}
+
 module.exports = {
     webhookPost,
     highlightWebhookPost,
@@ -242,5 +278,6 @@ module.exports = {
     roleHighlightWebhookPost,
     defaultWebhookAuthor,
     contentCaseWebhookPost,
+    announcementWebhookPost,
     webhookColors,
 };

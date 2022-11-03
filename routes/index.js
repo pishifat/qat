@@ -15,6 +15,7 @@ const { OsuResponseError } = require('../helpers/errors');
 const { ResignationConsensus, GenrePreferences, LanguagePreferences, DetailPreferences, OsuStylePreferences, TaikoStylePreferences, CatchStylePreferences, ManiaStylePreferences, MapperPreferences } = require('../shared/enums');
 const Beatmapset = require('../models/modRequests/beatmapset');
 const BnFinderMatch = require('../models/bnFinderMatch');
+const Announcement = require('../models/announcement');
 
 const router = express.Router();
 
@@ -463,6 +464,22 @@ router.post('/postponeMatch/:id', async (req, res) => {
 
 
     return res.json({ success: 'Match moved to end of queue' });
+});
+
+/* GET announcements */
+router.get('/findAnnouncements', async (req, res) => {
+    const limit = parseInt(req.query.limit);
+
+    let announcements = await Announcement
+        .find({})
+        .populate('beatmapset')
+        .limit(limit);
+
+    if (!announcements) {
+        return res.json({ none: 'no announcement' });
+    }
+
+    return res.json(announcements);
 });
 
 /* GET 'login' to get user's info */

@@ -21,7 +21,7 @@
 
             <!-- view conclusion discussion post -->
             <button class="btn btn-sm btn-block btn-primary mb-2" data-toggle="collapse" data-target="#conclusion">
-                'Show full conclusion post(s) <i class="fas fa-angle-down" />
+                Show full conclusion post(s) <i class="fas fa-angle-down" />
             </button>
             <div v-if="selectedVeto.vetoFormat == 2">
                 <div v-for="(reason, i) in selectedVeto.reasons" :key="i">

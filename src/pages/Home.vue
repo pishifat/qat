@@ -1,5 +1,6 @@
 <template>
     <div>
+        <announcements />
         <bn-finder />
         <bn-finder-matches
             v-if="loggedInUser && loggedInUser.isBnOrNat"
@@ -83,6 +84,7 @@ import evaluations from '../mixins/evaluations';
 import ToastMessages from '../components/ToastMessages.vue';
 import ModScoreCalculator from '../components/home/ModScoreCalculator.vue';
 import BnFinder from '../components/home/BnFinder.vue';
+import Announcements from '../components/home/Announcements.vue';
 import BnFinderMatches from '../components/home/BnFinderMatches.vue';
 import UserLink from '../components/UserLink.vue';
 
@@ -92,6 +94,7 @@ export default {
         ToastMessages,
         ModScoreCalculator,
         BnFinder,
+        Announcements,
         BnFinderMatches,
         UserLink,
     },

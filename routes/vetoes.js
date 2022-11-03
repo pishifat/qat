@@ -57,13 +57,6 @@ router.get('/relevantInfo/:limit', async (req, res) => {
         .sort({ createdAt: -1 })
         .limit(parseInt(req.params.limit));
 
-    /*for (const veto of vetoes) {
-        if (veto.status == 'upheld' || veto.status == 'withdrawn') {
-            veto.status = 'archive';
-            veto.save();
-        }
-    }*/
-
     res.json({
         vetoes,
     });

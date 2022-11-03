@@ -75,5 +75,12 @@
     "devWebhook": {
         "id": "",
         "token": ""
+    },
+    "announcementWebhook": {
+        "id": "",
+        "token": "",
+        "natRole": "",
+        "bnRole": "",
+        "probationRole": ""
     }
 }

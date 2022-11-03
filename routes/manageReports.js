@@ -225,7 +225,7 @@ router.post('/sendToContentReview/:id', async (req, res) => {
         'contentCase'
     );
 
-    await discord.roleHighlightWebhookPost('contentCase');
+    await discord.roleHighlightWebhookPost('contentCase', ['gmt']);
 
     // #gmt
     await discord.webhookPost(

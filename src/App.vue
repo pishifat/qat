@@ -19,100 +19,113 @@
 
                 <div id="navbar" class="collapse navbar-collapse justify-content-center">
                     <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <router-link class="nav-link" to="/home">
-                                Home
-                            </router-link>
-                        </li>
-                        <li class="nav-item">
-                            <router-link class="nav-link" to="/bnapps">
-                                BN Application
-                            </router-link>
-                        </li>
+                        <!-- this is going to be very repetitive and i don't care. optimizing makes organization a pain -->
 
-                        <li v-if="loggedInUser.hasBasicAccess" class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
-                                Mod Requests
-                            </a>
-                            <div class="dropdown-menu">
-                                <router-link class="dropdown-item" to="/modrequests">
-                                    Submission
-                                </router-link>
-                                <router-link class="dropdown-item" to="/modrequests/listing">
-                                    Listing
-                                </router-link>
-                            </div>
-                        </li>
-                        <li v-else class="nav-item">
-                            <router-link class="nav-link" to="/modrequests">
-                                Mod Requests
-                            </router-link>
-                        </li>
-
-                        <li v-if="loggedInUser.hasFullReadAccess" class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
-                                Reports
-                            </a>
-                            <div class="dropdown-menu">
-                                <router-link class="dropdown-item" to="/reports">
-                                    Reports
-                                </router-link>
-                                <router-link class="dropdown-item" to="/managereports">
-                                    Manage Reports
-                                </router-link>
-                            </div>
-                        </li>
-                        <li v-else class="nav-item">
-                            <router-link class="nav-link" to="/reports">
-                                Reports
-                            </router-link>
-                        </li>
+                        <!-- everyone -->
                         <li class="nav-item">
-                            <router-link class="nav-link" to="/users">
-                                Users
-                            </router-link>
-                        </li>
-                        <li class="nav-item">
-                            <router-link class="nav-link" to="/vetoes">
-                                Vetoes
-                            </router-link>
-                        </li>
-                        <li class="nav-item">
-                            <router-link class="nav-link" to="/qualityassurance">
-                                Quality Assurance
-                            </router-link>
-                        </li>
-                        <template v-if="loggedInUser.isBn && !loggedInUser.isNat && !loggedInUser.hasFullReadAccess">
+                                <router-link class="nav-link" to="/home">
+                                    Home
+                                </router-link>
+                            </li>
                             <li class="nav-item">
-                                <router-link class="nav-link" to="/discussionvote">
-                                    Discussion Vote
+                                <router-link class="nav-link" to="/bnapps">
+                                    BN Application
                                 </router-link>
                             </li>
-                            <li v-if="!loggedInUser.isTrialNat" class="nav-item">
-                                <router-link class="nav-link" to="/appeval">
-                                    BN Application Evaluations
+                            <li class="nav-item">
+                                <router-link class="nav-link" to="/users">
+                                    BN/NAT listing
                                 </router-link>
                             </li>
-                        </template>
-                        <template v-if="loggedInUser.isBn && !loggedInUser.isNat && loggedInUser.isTrialNat">
+                        
+                        <!-- normal user -->
+                        <template v-if="!loggedInUser.hasBasicAccess && !loggedInUser.hasFullReadAccess">
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
-                                    Evaluations
+                                    Other
                                 </a>
                                 <div class="dropdown-menu">
-                                    <router-link class="dropdown-item" to="/appeval">
-                                        Applications
+                                    <router-link class="dropdown-item" to="/reports">
+                                        Reports
                                     </router-link>
-                                    <router-link class="dropdown-item" to="/bneval">
-                                        Current BNs
+                                    <router-link class="dropdown-item" to="/modrequests">
+                                        Mod Requests
+                                    </router-link>
+                                    <router-link class="dropdown-item" to="/vetoes">
+                                        Vetoes (read-only)
+                                    </router-link>
+                                    <router-link class="dropdown-item" to="/qualityassurance">
+                                        Quality Assurance (read-only)
                                     </router-link>
                                 </div>
                             </li>
                         </template>
+
+                        <!-- BN -->
+
+                        <template v-else-if="loggedInUser.hasBasicAccess && !loggedInUser.hasFullReadAccess">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                    Other
+                                </a>
+                                <div class="dropdown-menu">
+                                    <router-link class="dropdown-item" to="/reports">
+                                        Reports
+                                    </router-link>
+                                    <router-link class="dropdown-item" to="/modrequests">
+                                        Mod Request Submission
+                                    </router-link>
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                    BN pages
+                                </a>
+                                <div class="dropdown-menu">
+                                    <router-link v-if="!loggedInUser.isTrialNat" class="dropdown-item" to="/appeval">
+                                        BN Application Evaluations
+                                    </router-link>
+                                    <router-link class="dropdown-item" to="/discussionvote">
+                                        Content Review
+                                    </router-link>
+                                    <router-link class="dropdown-item" to="/vetoes">
+                                        Vetoes
+                                    </router-link>
+                                    <router-link class="dropdown-item" to="/qualityassurance">
+                                        Quality Assurance
+                                    </router-link>
+                                    <router-link class="dropdown-item" to="/modrequests/listing">
+                                        Mod Request Listing
+                                    </router-link>
+                                </div>
+                            </li>
+                        </template>
+
+                        <!-- NAT -->
+
                         <template v-else-if="loggedInUser.hasFullReadAccess">
+                            <li v-if="loggedInUser.hasFullReadAccess" class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                    Reports
+                                </a>
+                                <div class="dropdown-menu">
+                                    <router-link class="dropdown-item" to="/reports">
+                                        Reports
+                                    </router-link>
+                                    <router-link class="dropdown-item" to="/managereports">
+                                        Manage Reports
+                                    </router-link>
+                                </div>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <router-link class="nav-link" to="/vetoes">
+                                    Vetoes
+                                </router-link>
+                            </li>
                             <li class="nav-item">
                                 <router-link class="nav-link" to="/discussionvote">
-                                    Discussion Vote
+                                    Content Review
                                 </router-link>
                             </li>
                             <li class="nav-item dropdown">
@@ -148,11 +161,17 @@
                                 </div>
                             </li>
                             <li class="nav-item">
+                                <router-link class="nav-link" to="/spam">
+                                    Spam
+                                </router-link>
+                            </li>
+                            <li class="nav-item">
                                 <router-link class="nav-link" to="/logs">
                                     Logs
                                 </router-link>
                             </li>
                         </template>
+                        
 
                         <li v-if="loggedInUser.hasBasicAccess" class="nav-item">
                             <a
