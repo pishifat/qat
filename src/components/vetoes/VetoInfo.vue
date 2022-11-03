@@ -62,8 +62,8 @@ export default {
                 // NAT can see only if they're not mediators
                 if (this.loggedInUser.isNat && !this.isMediator) {
                     return true;
-                // everyone can see when upheld/withdrawn
-                } else if (this.selectedVeto.status == 'upheld' || this.selectedVeto.status == 'withdrawn') {
+                // everyone can see when archived
+                } else if (this.selectedVeto.status == 'archive') {
                     return true;
                 }
             }

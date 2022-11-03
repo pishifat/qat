@@ -1,37 +1,27 @@
 <template>
     <div>
         <div v-if="selectedVeto.mediations.length">
-            <!-- conclude mediation... -->
-            <div v-if="selectedVeto.status !== 'upheld' && selectedVeto.status !== 'withdrawn'" class="row">
-                <!-- ...based on voting results -->
-                <div class="col-sm-6">
-                    <button
-                        class="btn btn-sm btn-block btn-danger mb-2"
-                        @click="concludeMediation($event)"
-                    >
-                        Conclude mediation
-                    </button>
-                </div>
-                <!-- ...regardless of voting results -->
-                <div class="col-sm-6">
-                    <button class="btn btn-sm btn-block btn-danger mb-2" @click="concludeMediation($event, true)">
-                        Dismiss without mediation
-                    </button>
-                </div>
-            </div>
-
             <!-- restart mediation if concluded -->
             <button
-                v-else
+                v-if="selectedVeto.status == 'archive'"
                 class="btn btn-sm btn-danger btn-block mb-2"
                 @click="continueMediation($event)"
             >
                 Re-initiate veto mediation
             </button>
 
+            <!-- conclude mediation -->
+            <button
+                v-else
+                class="btn btn-sm btn-block btn-danger mb-2"
+                @click="concludeMediation($event)"
+            >
+                Conclude mediation
+            </button>
+
             <!-- view conclusion discussion post -->
             <button class="btn btn-sm btn-block btn-primary mb-2" data-toggle="collapse" data-target="#conclusion">
-                {{ selectedVeto.vetoFormat == 2 ? 'Show full conclusion posts' : 'Show full conclusion post' }} <i class="fas fa-angle-down" />
+                'Show full conclusion post(s) <i class="fas fa-angle-down" />
             </button>
             <div v-if="selectedVeto.vetoFormat == 2">
                 <div v-for="(reason, i) in selectedVeto.reasons" :key="i">
@@ -39,9 +29,6 @@
                         :reason-index="i"
                     />
                 </div>
-            </div>
-            <div v-else>
-                <conclusion-post />
             </div>
 
             <!-- view mediator chat message -->
@@ -56,7 +43,7 @@
         </div>
 
         <!-- set up veto for mediation -->
-        <div v-else-if="selectedVeto.status !== 'upheld' && selectedVeto.status !== 'withdrawn'">
+        <div v-else-if="selectedVeto.status !== 'archive'">
             <hr>
 
             <!-- specify mediators -->
@@ -111,14 +98,12 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import ConclusionPost from './ConclusionPost.vue';
 import MultiPartVetoConclusionPost from './MultiPartVetoConclusionPost.vue';
 import VetoChatMessage from '../VetoChatMessage.vue';
 
 export default {
     name: 'AdminButtons',
     components: {
-        ConclusionPost,
         MultiPartVetoConclusionPost,
         VetoChatMessage,
     },

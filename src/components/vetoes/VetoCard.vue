@@ -104,11 +104,7 @@ export default {
     background: radial-gradient(var(--warning), transparent 70%);
 }
 
-.status-bar-upheld {
-    background: radial-gradient(var(--success), transparent 70%);
-}
-
-.status-bar-withdrawn {
+.status-bar-archive {
     background: radial-gradient(var(--success), transparent 70%);
 }
 

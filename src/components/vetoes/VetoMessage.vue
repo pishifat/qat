@@ -14,11 +14,11 @@
             />
         </h5>
 
-        <h5 class="text-center">
+        <h5 v-if="veto.status !== 'archive'" class="text-center">
             <a :href="'/vetoes?id=' + veto.id">View mediation here</a>
         </h5>
 
-        <div>
+        <div v-if="veto.status !== 'archive'">
             <h5>Mediation info</h5>
             <div class="card card-body small mb-4">
                 <p>Hello! You've been selected to mediate the veto above.</p>
@@ -37,16 +37,45 @@
                 <div>Thank you!</div>
             </div>
         </div>
+
+        <div v-else>
+            <div v-for="(reason, i) in veto.reasons" :key="i">
+                <veto-part-summary
+                    :veto="veto"
+                    :reason-index="i"
+                />
+            </div>
+            <div class="card card-body small mb-4">
+                <span>Users involved in this veto's mediation: </span>
+
+                <ul>
+                    <li v-for="user in users" :key="user.osuId">
+                        <user-link
+                            :class="user.groups.includes('nat') ? 'text-nat' : user.groups.includes('bn') ? 'text-probation' : ''"
+                            :osu-id="user.osuId"
+                            :username="user.username"
+                        />
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
 import UserLink from '../UserLink.vue';
+import VetoPartSummary from './VetoPartSummary.vue';
 
 export default {
     name: 'VetoMessage',
     components: {
         UserLink,
+        VetoPartSummary
+    },
+    data () {
+        return {
+            users: null,
+        };
     },
     props: {
         veto: {
@@ -54,8 +83,12 @@ export default {
             required: true,
         },
     },
-    computed: {
-
+    async created() {
+        if (this.veto.status == 'archive') {
+            this.users = await this.$http.executeGet(
+                `/message/vetoMediators/${this.veto.id}`
+            );
+        }
     },
 };
 </script>

@@ -45,11 +45,9 @@ export default {
             switch (this.selectedVeto.status) {
                 case 'available':
                     return style + 'var(--danger)';
-                case 'upheld':
-                    return style + 'var(--success)';
                 case 'wip':
                     return style + 'var(--warning)';
-                case 'withdrawn':
+                case 'archive':
                     return style + 'var(--success)';
                 default:
                     return style + 'var(--bright-blue-gray)';

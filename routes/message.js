@@ -43,6 +43,23 @@ const reportPopulate = [
     { path: 'reporter', select: 'username osuId' },
 ];
 
+const vetoPopulate = [
+    { 
+        path: 'mediations',
+        select: 'comment vote reasonIndex',
+    },
+];
+
+const vetoPrivatePopulate = [
+    { 
+        path: 'mediations',
+        populate: {
+            path: 'mediator',
+            select: 'username osuId groups',
+        },
+    },
+];
+
 /* GET evaluation results by ID */
 router.get('/evaluation/:id', async (req, res) => {
     let query;
@@ -65,9 +82,30 @@ router.get('/report/:id', async (req, res) => {
 
 /* GET veto by ID */
 router.get('/veto/:id', async (req, res) => {
-    const veto = await Veto.findById(req.params.id);
+    const veto = await Veto.findById(req.params.id).populate(vetoPopulate);
 
     return res.json(veto);
+});
+
+/* GET veto mediators */
+router.get('/vetoMediators/:id', async (req, res) => {
+    const veto = await Veto.findById(req.params.id).populate(vetoPrivatePopulate);
+
+    const users = [];
+    const userOsuIds = [];
+
+    for (const mediation of veto.mediations) {
+        if (!userOsuIds.includes(mediation.mediator.osuId)) {
+            userOsuIds.push(mediation.mediator.osuId);
+            users.push({
+                osuId: mediation.mediator.osuId,
+                username: mediation.mediator.username,
+                groups: mediation.mediator.groups,
+            });
+        }
+    }
+
+    return res.json(users);
 });
 
 module.exports = router;

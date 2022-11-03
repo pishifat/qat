@@ -57,6 +57,13 @@ router.get('/relevantInfo/:limit', async (req, res) => {
         .sort({ createdAt: -1 })
         .limit(parseInt(req.params.limit));
 
+    /*for (const veto of vetoes) {
+        if (veto.status == 'upheld' || veto.status == 'withdrawn') {
+            veto.status = 'archive';
+            veto.save();
+        }
+    }*/
+
     res.json({
         vetoes,
     });
@@ -205,7 +212,7 @@ router.post('/submitMediation/:id', middlewares.isBnOrNat, async (req, res) => {
 
 });
 
-/* POST set status upheld or withdrawn. */
+/* POST select mediators */
 router.post('/selectMediators', middlewares.isNat, async (req, res) => {
     let allUsers = await User.getAllMediators();
     const mode = req.body.mode;
@@ -304,17 +311,13 @@ router.post('/concludeMediation/:id', middlewares.isNat, async (req, res) => {
         .findById(req.params.id)
         .populate(defaultPopulate);
 
-    if (req.body.dismiss) {
-        veto.status = 'withdrawn';
-    } else {
-        veto.status = 'upheld'; // no longer accurately tracking this after implementing multi-part vetoes. it's too complicated to display at a glance
-    }
+    veto.status = 'archive';
 
     await veto.save();
     res.json(veto);
     Logger.generate(
         req.session.mongoId,
-        `Veto concluded for "${veto.beatmapTitle}" ${req.body.dismiss ? 'without mediation' : ''}`,
+        `Veto concluded for "${veto.beatmapTitle}"`,
         'veto',
         veto._id
     );

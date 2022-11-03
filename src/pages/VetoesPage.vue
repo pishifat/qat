@@ -17,7 +17,7 @@
 
             <section class="card card-body">
                 <h2>
-                    Active Vetoes
+                    Active vetoes
                     <small v-if="activeVetoes"
                         >({{ activeVetoes.length }})</small
                     >
@@ -34,7 +34,7 @@
 
             <section class="card card-body">
                 <h2>
-                    Resolved Vetoes
+                    Archived vetoes
                     <small v-if="paginatedResolvedVetoes"
                         >({{ resolvedVetoes.length }})</small
                     >
