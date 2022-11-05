@@ -482,6 +482,26 @@ router.get('/findAnnouncements', async (req, res) => {
     return res.json(announcements);
 });
 
+/* POST update announcement */
+router.post('/updateAnnouncement/:id', async (req, res) => {
+    const user = await User.findById(req.session.mongoId); // can't use middleware for reasons that i don't care to figure out, so this is the alternative
+
+    if (!user.isNat) {
+        return res.json({ error: `You can't use this` });
+    }
+
+    const announcement = await Announcement.findByIdAndUpdate(req.params.id, { title: req.body.newTitle, content: req.body.newContent });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Updated an announcement`,
+        'spam',
+        announcement._id
+    );
+
+    return res.json(announcement);
+});
+
 /* GET 'login' to get user's info */
 router.get('/login', (req, res) => {
     const state = crypto.randomBytes(48).toString('base64');

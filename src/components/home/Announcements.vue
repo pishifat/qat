@@ -8,8 +8,9 @@
 
         <div>
             <div v-for="announcement in announcements" :key="announcement.id" class="card card-body small mb-4">
-                <h5>{{ announcement.title }} <span class="small text-secondary">({{ announcement.createdAt.slice(0,10) }})</span></h5> 
-                <span v-html="$md.render(announcement.content)" />
+                <announcement
+                    :announcement="announcement"
+                />
             </div>
             <div>
                 <button
@@ -28,21 +29,36 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+import Announcement from './Announcement.vue';
+import announcementsModule from '../../store/announcements';
 
 export default {
     name: 'Announcements',
+    components: {
+        Announcement
+    },
     data () {
         return {
-            announcements: [],
             limit: 1,
             max: false,
         };
+    },
+    computed: {
+        ...mapState('announcements', [
+            'announcements',
+        ]),
+    },
+    beforeCreate () {
+        if (!this.$store.hasModule('announcements')) {
+            this.$store.registerModule('announcements', announcementsModule);
+        }
     },
     async created () {
         const announcements = await this.$http.initialRequest(`/findAnnouncements?limit=${this.limit}`);
 
             if (announcements) {
-                this.announcements = announcements;
+                this.$store.commit('announcements/setAnnouncements', announcements);
             }
     },
     methods: {
@@ -50,7 +66,7 @@ export default {
             const announcements = await this.$http.executeGet(`/findAnnouncements?limit=${this.limit}`, e);
 
             if (announcements) {
-                this.announcements = announcements;
+                this.$store.commit('announcements/setAnnouncements', announcements);
             }
         },
         async showMore (e) {

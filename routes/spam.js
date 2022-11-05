@@ -123,7 +123,7 @@ router.post('/sendAnnouncement', middlewares.isNat, async (req, res) => {
         req.session.mongoId,
         `Published an announcement`,
         'spam',
-        null
+        announcement._id
     );
 });
 
