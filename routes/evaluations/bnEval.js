@@ -361,13 +361,22 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
                 await user.save();
             }
 
+            let activityToCheck = 40;
             let deadline = new Date();
-            deadline.setDate(deadline.getDate() + 40);
+            deadline.setDate(deadline.getDate() + activityToCheck);
+
+            if (evaluation.overwriteNextEvaluationDate) {
+                deadline = new Date(evaluation.overwriteNextEvaluationDate); // manually set deadline
+                const today = new Date();
+                const difference = deadline.getTime() - today.getTime();
+                activityToCheck = Math.ceil(difference / (1000*3600*24)); // days between deadline and now
+            }
+            
             await BnEvaluation.create({
                 user: evaluation.user,
                 mode: evaluation.mode,
                 deadline,
-                activityToCheck: 40,
+                activityToCheck,
             });
         }
 
@@ -382,7 +391,12 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
             let deadline = new Date();
             let activityToCheck = 90;
 
-            if (evaluation.addition === BnEvaluationAddition.LowActivityWarning) {
+            if (evaluation.overwriteNextEvaluationDate) {
+                deadline = new Date(evaluation.overwriteNextEvaluationDate); // manually set deadline
+                const today = new Date();
+                const difference = deadline.getTime() - today.getTime();
+                activityToCheck = Math.ceil(difference / (1000*3600*24)); // days between deadline and now
+            } else if (evaluation.addition === BnEvaluationAddition.LowActivityWarning) {
                 deadline.setDate(deadline.getDate() + 40); // +40 days
             } else {
                 const random90 = Math.round(Math.random() * (95 - 85) + 85); // between 85 and 95 days
@@ -390,7 +404,7 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
 
                 const evaluationsWithoutIncident = await findEvaluationsWithoutIncident(user._id);
 
-                if (evaluationsWithoutIncident > 1) {
+                if (evaluationsWithoutIncident > 1 && (!evaluation.addition || evaluation.addition !== BnEvaluationAddition.None)) {
                     deadline.setDate(deadline.getDate() + random180);
                     activityToCheck = random180;
                 } else {
@@ -450,6 +464,7 @@ router.post('/setConsensus/:id', middlewares.isNatOrTrialNat, async (req, res) =
         .orFail();
 
     evaluation.consensus = req.body.consensus;
+    evaluation.overwriteNextEvaluationDate = null;
 
     if (req.body.consensus === BnEvaluationConsensus.RemoveFromBn || evaluation.isResignation) {
         const date = new Date();
@@ -493,6 +508,7 @@ router.post('/setAddition/:id', middlewares.isNatOrTrialNat, async (req, res) =>
         .orFail();
 
     evaluation.addition = req.body.addition;
+    evaluation.overwriteNextEvaluationDate = null;
 
     if (req.body.addition == BnEvaluationAddition.LowActivityWarning) {
         const date = new Date();
@@ -932,6 +948,35 @@ router.post('/sendMessages/:id', middlewares.isNatOrTrialNat, async (req, res) =
         description: `Sent **${req.body.type}** chat messages for [**${evaluation.user.username}**'s current BN eval](http://bn.mappersguild.com/appeval?id=${evaluation.id})`,
     }],
     evaluation.mode);
+});
+
+/* POST overwrite next evaluation deadline */
+router.post('/overwriteEvaluationDate/:id/', middlewares.isNatOrTrialNat, async (req, res) => {
+    const er = await BnEvaluation
+        .findById(req.params.id)
+        .populate(defaultPopulate);
+
+    const newDeadline = new Date(req.body.newDeadline);
+    const twoWeeks = new Date();
+    twoWeeks.setDate(twoWeeks.getDate() + 14);
+
+    if (newDeadline < twoWeeks) {
+        return res.json({
+            error: 'New deadline is too soon.'
+        });
+    }
+
+    er.overwriteNextEvaluationDate = newDeadline;
+    await er.save();
+
+    res.json(er);
+
+    Logger.generate(
+        req.session.mongoId,
+        `Overwrote "${er.user.username}" ${er.mode} next current BN evaluation deadline to ${newDeadline.toISOString().slice(0,10)}`,
+        'bnEvaluation',
+        er._id
+    );
 });
 
 module.exports = { router, getGeneralEvents };

@@ -16,6 +16,7 @@ const baseSchema = {
         previousUser: { type: 'ObjectId', ref: 'User' },
         daysOverdue: { type: Number, required: true },
     }],
+    overwriteNextEvaluationDate: { type: Date },
 };
 
 module.exports = baseSchema;

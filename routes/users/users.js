@@ -91,7 +91,7 @@ router.post('/adjustEvaluationDeadline/:id/:mode', middlewares.isNat, async (req
 
     Logger.generate(
         req.session.mongoId,
-        `Adjusted "${er.user.username}" ${mode} current BN evaluation deadline to ${newDeadline.toISOString().slice(0,10)}`,
+        `Adjusted "${er.user.username}" ${req.params.mode} current BN evaluation deadline to ${newDeadline.toISOString().slice(0,10)}`,
         'bnEvaluation',
         er._id
     );

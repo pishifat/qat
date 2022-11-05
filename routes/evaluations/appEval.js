@@ -183,7 +183,7 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
 
         if (evaluation.consensus === AppEvaluationConsensus.Pass) {
             let level = 'probation';
-            let daysToNextEval = 40;
+            let activityToCheck = 40;
 
             const lastResignation = await ResignationEvaluation
                 .findOne({
@@ -223,7 +223,7 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
 
                 if (skipProbation) {
                     level = 'full';
-                    daysToNextEval = Math.floor(Math.random() * (95 - 85) + 85); // between 85 and 95 days;
+                    activityToCheck = Math.floor(Math.random() * (95 - 85) + 85); // between 85 and 95 days;
                 }
             }
 
@@ -233,12 +233,20 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
             });
 
             let deadline = new Date();
-            deadline.setDate(deadline.getDate() + daysToNextEval);
+            deadline.setDate(deadline.getDate() + activityToCheck);
+
+            if (evaluation.overwriteNextEvaluationDate) {
+                deadline = new Date(evaluation.overwriteNextEvaluationDate); // manually set deadline
+                const today = new Date();
+                const difference = deadline.getTime() - today.getTime();
+                activityToCheck = Math.ceil(difference / (1000*3600*24)); // days between deadline and now
+            }
+
             await BnEvaluation.create({
                 user: evaluation.user,
                 mode: evaluation.mode,
                 deadline,
-                activityToCheck: 40,
+                activityToCheck,
             });
 
             if (!user.isBn) {
@@ -305,8 +313,10 @@ router.post('/setConsensus/:id', middlewares.isNatOrTrialNat, async (req, res) =
         let date = new Date(evaluation.createdAt);
         date.setDate(date.getDate() + 90);
         evaluation.cooldownDate = date;
-        await evaluation.save();
     }
+
+    evaluation.overwriteNextEvaluationDate = null;
+    await evaluation.save();
 
     res.json(evaluation);
 
@@ -557,6 +567,36 @@ router.post('/sendMessages/:id', middlewares.isNatOrTrialNat, async (req, res) =
         description: `Sent **${req.body.type}** chat messages for [**${application.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${application.id})`,
     }],
     application.mode);
+});
+
+/* POST overwrite next evaluation deadline */
+router.post('/overwriteEvaluationDate/:id/', middlewares.isNatOrTrialNat, async (req, res) => {
+    const app = await AppEvaluation
+        .findById(req.params.id)
+        .populate(defaultPopulate);
+
+    const newDeadline = new Date(req.body.newDeadline);
+    
+    const twoWeeks = new Date();
+    twoWeeks.setDate(twoWeeks.getDate() + 14);
+
+    if (newDeadline < twoWeeks) {
+        return res.json({
+            error: 'New deadline is too soon.'
+        });
+    }
+
+    app.overwriteNextEvaluationDate = newDeadline;
+    await app.save();
+
+    res.json(app);
+
+    Logger.generate(
+        req.session.mongoId,
+        `Overwrote "${app.user.username}" ${app.mode} next current BN evaluation deadline to ${newDeadline.toISOString().slice(0,10)}`,
+        'appEvaluation',
+        app._id
+    );
 });
 
 module.exports = router;

@@ -24,7 +24,8 @@ interface IEvaluationBase {
         user: IUserDocument;
         previousUser?: IUserDocument;
         daysOverdue: number;
-    }[]
+    }[];
+    overwriteNextEvaluationDate?: Date;
 }
 
 export interface IAppEvaluationDocument extends IEvaluationBase, Document {
