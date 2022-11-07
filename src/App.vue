@@ -99,6 +99,22 @@
                                     </router-link>
                                 </div>
                             </li>
+
+                            <!-- Trial NAT -->
+
+                            <li v-if="loggedInUser.isTrialNat" class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                    Evaluations
+                                </a>
+                                <div class="dropdown-menu">
+                                    <router-link class="dropdown-item" to="/appeval">
+                                        Applications
+                                    </router-link>
+                                    <router-link class="dropdown-item" to="/bneval">
+                                        Current BNs
+                                    </router-link>
+                                </div>
+                            </li>
                         </template>
 
                         <!-- NAT -->
