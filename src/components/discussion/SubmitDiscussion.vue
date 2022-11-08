@@ -246,7 +246,7 @@
                 >
             </div>
             <div class="row mb-2">
-                <small class="mb-1">{{ isContentReview ? 'Additional information or links (optional)' : `Summarize the discussion's proposed change(s)` }}</small>
+                <small class="mb-1">{{ isContentReview ? 'Beatmap link and/or additional information (optional)' : `Summarize the discussion's proposed change(s)` }}</small>
                 <textarea
                     v-model="shortReason"
                     class="form-control"
