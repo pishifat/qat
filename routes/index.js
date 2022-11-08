@@ -473,7 +473,8 @@ router.get('/findAnnouncements', async (req, res) => {
     let announcements = await Announcement
         .find({})
         .populate('beatmapset')
-        .limit(limit);
+        .limit(limit)
+        .sort({ createdAt: -1 });
 
     if (!announcements) {
         return res.json({ none: 'no announcement' });
