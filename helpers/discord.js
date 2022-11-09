@@ -167,6 +167,18 @@ async function roleHighlightWebhookPost(webhook, roles, text) {
             case 'natMania':
                 content += `<@&${config.announcementWebhook.natMania}>`;
                 break;
+            case 'natEvaluatorOsu':
+                content += `<@&${config.announcementWebhook.natEvaluatorOsu}>`;
+                break;
+            case 'natEvaluatorTaiko':
+                content += `<@&${config.announcementWebhook.natEvaluatorTaiko}>`;
+                break;
+            case 'natEvaluatorCatch':
+                content += `<@&${config.announcementWebhook.natEvaluatorCatch}>`;
+                break;
+            case 'natEvaluatorMania':
+                content += `<@&${config.announcementWebhook.natEvaluatorMania}>`;
+                break;
             case 'bn':
                 content += `<@&${config.announcementWebhook.bnRole}>`;
                 break;
