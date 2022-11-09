@@ -17,6 +17,7 @@ const Discussion = require('../models/discussion');
 const Report = require('../models/report');
 const Logger = require('../models/log');
 const Settings = require('../models/settings');
+const { user } = require('../models/evaluations/base');
 
 const defaultPopulate = [
     { path: 'user', select: 'username osuId modesInfo' },
@@ -706,4 +707,51 @@ async function hasLowActivity(initialDate, bn, mode, months) {
     return false;
 }
 
-module.exports = { notifyDeadlines, notifyBeatmapReports, lowActivityTask, closeContentReviews, checkMatchBeatmapStatuses, checkBnEvaluationDeadlines };
+/**
+ * Checks for bns with less than 6 mods (4 for mania) over the course of 90 days the first day of every month
+ */
+const lowActivityPerUserTask = cron.schedule('* * * * *', async () => {
+    const initialDate90 = moment().subtract(3, 'months').toDate();
+    const initialDate30 = moment().subtract(1, 'months').toDate();
+
+    const bns = await User.find({ groups: 'bn' });
+
+    for (const bn of bns) {
+        const joinedHistory = bn.history.filter(h => h.kind === 'joined');
+        const date = joinedHistory[joinedHistory.length - 1].date;
+
+        if (new Date(date) < initialDate90) {
+            for (const mode of bn.modes) {
+                if (await hasLowActivity(initialDate90, bn, mode, 3) && (!bn.lastMarkedAsLowActivity || new Date(bn.lastMarkedAsLowActivity) < initialDate30)) {
+                    bn.lastMarkedAsLowActivity = new Date();
+                    await bn.save();
+
+                    let role;
+
+                    switch (mode) {
+                        case 'osu':
+                            role = 'natOsu';
+                            break;
+                        case 'taiko':
+                            role = 'natTaiko';
+                            break;
+                        case 'catch':
+                            role = 'natCatch';
+                            break;
+                        case 'mania':
+                            role = 'natMania';
+                            break;
+                    }
+
+                    const text = `**${bn.username}** (<https://osu.ppy.sh/users/${bn.osuId}>) - ${await scrap.findUniqueNominationsCount(initialDate90, new Date(), bn)} nominations in 90 days!`;
+
+                    await discord.roleHighlightWebhookPost(mode, [role], text);
+                }
+            }
+        }
+    }
+}, {
+    scheduled: false,
+});
+
+module.exports = { notifyDeadlines, notifyBeatmapReports, lowActivityTask, closeContentReviews, checkMatchBeatmapStatuses, checkBnEvaluationDeadlines, lowActivityPerUserTask };

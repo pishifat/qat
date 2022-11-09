@@ -45,6 +45,7 @@ interface IUser {
     mapperNegativePreferences: string[];
     requestLink: string;
     isBnFinderAnonymous: boolean;
+    lastMarkedAsLowActivity: Date;
 
     // not used in model
     genreCount: number;

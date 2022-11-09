@@ -133,21 +133,69 @@ async function roleHighlightWebhookPost(webhook, roles, text) {
         case 'announcement':
             url += `${config.announcementWebhook.id}/${config.announcementWebhook.token}`;
             break;
+        case 'osu':
+            url += `${config.standardWebhook.id}/${config.standardWebhook.token}`;
+            break;
+        case 'taiko':
+            url += `${config.taikoWebhook.id}/${config.taikoWebhook.token}`;
+            break;
+        case 'catch':
+            url += `${config.catchWebhook.id}/${config.catchWebhook.token}`;
+            break;
+        case 'mania':
+            url += `${config.maniaWebhook.id}/${config.maniaWebhook.token}`;
+            break;
     }
 
     for (const role of roles) {
         switch (role) {
             case 'gmt':
-                content += `<@&${config.contentCasesWebhook.gmtRole}>`;
+                content += `<@&${config.announcementWebhook.gmtRole}>`;
                 break;
             case 'nat':
                 content += `<@&${config.announcementWebhook.natRole}>`;
                 break;
+            case 'natOsu':
+                content += `<@&${config.announcementWebhook.natOsu}>`;
+                break;
+            case 'natTaiko':
+                content += `<@&${config.announcementWebhook.natTaiko}>`;
+                break;
+            case 'natCatch':
+                content += `<@&${config.announcementWebhook.natCatch}>`;
+                break;
+            case 'natMania':
+                content += `<@&${config.announcementWebhook.natMania}>`;
+                break;
             case 'bn':
                 content += `<@&${config.announcementWebhook.bnRole}>`;
                 break;
+            case 'bnOsu':
+                content += `<@&${config.announcementWebhook.bnOsu}>`;
+                break;
+            case 'bnTaiko':
+                content += `<@&${config.announcementWebhook.bnTaiko}>`;
+                break;
+            case 'bnCatch':
+                content += `<@&${config.announcementWebhook.bnCatch}>`;
+                break;
+            case 'bnMania':
+                content += `<@&${config.announcementWebhook.bnMania}>`;
+                break;
             case 'probation':
                 content += `<@&${config.announcementWebhook.probationRole}>`;
+                break;
+            case 'probationOsu':
+                content += `<@&${config.announcementWebhook.probationOsu}>`;
+                break;
+            case 'probationTaiko':
+                content += `<@&${config.announcementWebhook.probationTaiko}>`;
+                break;
+            case 'probationCatch':
+                content += `<@&${config.announcementWebhook.probationCatch}>`;
+                break;
+            case 'probationMania':
+                content += `<@&${config.announcementWebhook.probationMania}>`;
                 break;
         }
     }

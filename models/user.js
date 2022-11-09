@@ -51,6 +51,7 @@ const userSchema = new mongoose.Schema({
     mapperNegativePreferences: [{ type: String, enum: enums.MapperPreferences }],
     requestLink: { type: String },
     isBnFinderAnonymous: { type: Boolean, default: true },
+    lastMarkedAsLowActivity: { type: Date },
 
     /* temporary fields for qa leaderboard webhook */
     recentQaChecks: { type: Number },

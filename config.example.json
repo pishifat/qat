@@ -20,28 +20,23 @@
     },
     "standardWebhook": {
         "id": "",
-        "token": "",
-        "role": ""
+        "token": ""
     },
     "catchWebhook": {
         "id": "",
-        "token": "",
-        "role": ""
+        "token": ""
     },
     "taikoWebhook": {
         "id": "",
-        "token": "",
-        "role": ""
+        "token": ""
     },
     "maniaWebhook": {
         "id": "",
-        "token": "",
-        "role": ""
+        "token": ""
     },
     "allWebhook": {
         "id": "",
-        "token": "",
-        "role": ""
+        "token": ""
     },
     "standardQualityAssuranceWebhook": {
         "id": "",
@@ -65,8 +60,7 @@
     },
     "contentCasesWebhook": {
         "id": "",
-        "token": "",
-        "gmtRole": ""
+        "token": ""
     },
     "internalContentCasesWebhook": {
         "id": "",
@@ -79,8 +73,21 @@
     "announcementWebhook": {
         "id": "",
         "token": "",
+        "gmtRole": "",
         "natRole": "",
+        "natOsu": "",
+        "natTaiko": "",
+        "natCatch": "",
+        "natMania": "",
         "bnRole": "",
-        "probationRole": ""
+        "bnOsu": "",
+        "bnTaiko": "",
+        "bnCatch": "",
+        "bnMania": "",
+        "probationRole": "",
+        "probationOsu": "",
+        "probationTaiko": "",
+        "probationCatch": "",
+        "probationMania": ""
     }
 }
