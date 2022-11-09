@@ -33,7 +33,25 @@ const defaultPopulate = [
     },
 ];
 
-const bnDefaultPopulate = [
+// hides all reviews other than current user
+function getActiveBnDefaultPopulate(mongoId) {
+    return [
+        { path: 'user', select: 'username osuId' },
+        { path: 'test', select: 'comment totalScore' },
+        {
+            path: 'reviews',
+            select: 'behaviorComment moddingComment vote',
+            match: {
+                evaluator: mongoId,
+            },
+            populate: {
+                path: 'evaluator',
+            },
+        },
+    ];
+}
+
+const inactiveBnDefaultPopulate = [
     { path: 'user', select: 'username osuId' },
     { path: 'test', select: 'comment totalScore' },
     {
@@ -61,22 +79,33 @@ router.get('/relevantInfo', async (req, res) => {
                 createdAt: 1,
             });
     } else {
-        applications = await AppEvaluation
-            .find({
-                bnEvaluators: req.session.mongoId,
-                test: { $exists: true },
-                $or: [
-                    { active: true, discussion: false },
-                    { active: false, discussion: true },
-                ],
-            })
-            .select(['active', 'user', 'discussion', 'reviews', 'mode', 'mods', 'reasons', 'consensus', 'createdAt', 'updatedAt'])
-            .populate(
-                bnDefaultPopulate
-            )
-            .sort({
-                createdAt: -1,
-            });
+        const [activeApplications, inactiveApplications] = await Promise.all([
+            AppEvaluation
+                .find({
+                    bnEvaluators: req.session.mongoId,
+                    test: { $exists: true },
+                    active: true,
+                })
+                .select(['active', 'user', 'discussion', 'reviews', 'mode', 'mods', 'reasons', 'createdAt', 'updatedAt'])
+                .populate(getActiveBnDefaultPopulate(req.session.mongoId))
+                .sort({
+                    createdAt: -1,
+                }),
+                AppEvaluation
+                    .find({
+                        bnEvaluators: req.session.mongoId,
+                        test: { $exists: true },
+                        active: false,
+                        discussion: true,
+                    })
+                    .select(['active', 'user', 'discussion', 'reviews', 'mode', 'mods', 'reasons', 'consensus', 'createdAt', 'updatedAt']) // "consensus" is the only difference
+                    .populate(inactiveBnDefaultPopulate)
+                    .sort({
+                        createdAt: -1,
+                    })
+        ]);
+
+        applications = activeApplications.concat(inactiveApplications);
     }
 
     res.json({
@@ -116,7 +145,7 @@ router.post('/submitEval/:id', middlewares.isBnOrNat, async (req, res) => {
     evaluation = await AppEvaluation
         .findById(req.params.id)
         .populate(
-            res.locals.userRequest.isNat || res.locals.userRequest.isTrialNat ? defaultPopulate : bnDefaultPopulate
+            res.locals.userRequest.isNat || res.locals.userRequest.isTrialNat ? defaultPopulate : getActiveBnDefaultPopulate(req.session.mongoId)
         );
 
     res.json(evaluation);

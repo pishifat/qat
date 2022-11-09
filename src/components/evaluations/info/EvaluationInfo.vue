@@ -55,13 +55,7 @@
             <discussion-info v-if="selectedEvaluation.discussion" />
 
             <!-- Only NAT can edit their review while in discussion -->
-            <template
-                v-if="
-                    !selectedEvaluation.discussion ||
-                    (selectedEvaluation.discussion &&
-                        (loggedInUser.isNat || loggedInUser.isTrialNat))
-                "
-            >
+            <template v-if="selectedEvaluation.active">
                 <hr />
                 <evaluation-input />
             </template>

@@ -20,10 +20,10 @@
             </div>
         </template>
 
-        <!-- Only NAT can see the reviews if there isn't a consensus -->
+        <!-- Only NAT can see the reviews if the application is active -->
         <template
             v-if="
-                selectedEvaluation.consensus ||
+                !selectedEvaluation.active ||
                 loggedInUser.isNat ||
                 loggedInUser.isTrialNat
             "
@@ -31,11 +31,6 @@
             <hr />
             <reviews-listing />
         </template>
-
-        <p v-else class="small">
-            No consensus has been set, so evaluations are not visible. Check
-            back later!
-        </p>
     </div>
 </template>
 
