@@ -708,9 +708,9 @@ async function hasLowActivity(initialDate, bn, mode, months) {
 }
 
 /**
- * Checks for bns with less than 6 mods (4 for mania) over the course of 90 days the first day of every month
+ * Checks for bns with less than required nomination count daily
  */
-const lowActivityPerUserTask = cron.schedule('* * * * *', async () => {
+const lowActivityPerUserTask = cron.schedule('22 22 * * *', async () => {
     const initialDate90 = moment().subtract(3, 'months').toDate();
     const initialDate30 = moment().subtract(1, 'months').toDate();
 
