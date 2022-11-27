@@ -49,29 +49,6 @@ const defaultBnPopulate = [
 
 /* GET search for user */
 router.get('/search', async (req, res) => {
-    let dateStart = moment('2019-04-27');
-    let dateEnd = moment('2019-04-27').add(1, 'month');
-    const today = moment(new Date);
-
-    while (dateStart < today) {
-        const apps = await AppEvaluation.find({
-            mode: 'osu',
-            $and: [
-                { createdAt: { $gt: dateStart } },
-                { createdAt: { $lt: dateEnd } }
-            ]
-        });
-
-        console.log(dateStart);
-        console.log(apps.length);
-
-        dateStart = moment(dateStart).add(1, 'month');
-        dateEnd = moment(dateEnd).add(1, 'month');
-    }
-    
-
-
-
     const userToSearch = req.query.user && decodeURI(req.query.user);
     const idToSearch = req.query.id;
 
