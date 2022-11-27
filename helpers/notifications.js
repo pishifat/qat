@@ -730,16 +730,16 @@ const lowActivityPerUserTask = cron.schedule('22 22 * * *', async () => {
 
                     switch (mode) {
                         case 'osu':
-                            role = 'natOsu';
+                            role = 'natEvaluatorOsu';
                             break;
                         case 'taiko':
-                            role = 'natTaiko';
+                            role = 'natEvaluatorTaiko';
                             break;
                         case 'catch':
-                            role = 'natCatch';
+                            role = 'natEvaluatorCatch';
                             break;
                         case 'mania':
-                            role = 'natMania';
+                            role = 'natEvaluatorMania';
                             break;
                     }
 
