@@ -2,7 +2,7 @@
     <div class="container">
         <div>Evaluations required</div>
         <small class="text-secondary">
-            Number of evaluations required before an application/BN eval is moved to group discussion. If a mode has Trial NAT enabled, this number will be subtracted by 1 and applied to both NAT and BN assignments (e.g. setting is 3 --> 2 NAT and 2 BN will be assigned per evaluation)
+            Number of evaluations required before an application/BN eval is moved to group discussion. If a mode has BN Evaluators enabled, this number will be subtracted by 1 and applied to both NAT and BN assignments (e.g. setting is 3 --> 2 NAT and 2 BN will be assigned per evaluation)
         </small>
 
         <button v-if="!modeSettings.length" @click="create">
@@ -23,7 +23,7 @@
                     href="#"
                     data-toggle="tooltip"
                     data-placement="right"
-                    title="toggle Trial NAT for mode"
+                    title="toggle BN Evaluators for mode"
                     @click.prevent="toggleHasTrialNat(setting.mode, $event)"
                 >
                     <font-awesome-icon

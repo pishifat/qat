@@ -2,9 +2,9 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-6">
-                <div>Do you want to do BN evaluations?</div>
+                <div>Do you want to do {{loggedInUser.isNatOrTrialNat ? "BN" : "mock" }} evaluations?</div>
                 <small class="text-secondary">
-                    You can give input on new BN applicants and current BNs
+                    You can give input on new BN applicants {{loggedInUser.isNatOrTrialNat ? "and current BNs" : null }}
                 </small>
             </div>
 
@@ -21,7 +21,7 @@
                         class="form-check-label text-secondary"
                         for="settings-evaluator"
                     >
-                        BN application evaluator
+                    {{loggedInUser.isNatOrTrialNat ? "BN" : "Mock" }} evaluations
                     </label>
                 </div>
             </div>

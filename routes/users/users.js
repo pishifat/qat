@@ -558,7 +558,7 @@ router.post('/:id/switchBnEvaluator', middlewares.isBnOrNat, async (req, res) =>
 
     res.json({
         user,
-        success: 'Toggled BN evaluator',
+        success: 'Toggled mock evaluations',
     });
 
     Logger.generate(
