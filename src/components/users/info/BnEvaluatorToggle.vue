@@ -2,13 +2,13 @@
     <div>
         <p>
             <b>
-                Mock evaluations:
+                {{selectedUser.isNatOrTrialNat ? "E" : "Mock e" }}valuations:
             </b>
             <a
                 class="ml-1"
                 data-toggle="tooltip"
                 data-placement="top"
-                title="Toggle mock evaluations"
+                title="Toggle evaluations"
                 href="#"
                 @click.prevent="switchBnEvaluator($event)"
             >
