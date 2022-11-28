@@ -133,16 +133,27 @@
                                     </router-link>
                                 </div>
                             </li>
-                            
-                            <li class="nav-item">
-                                <router-link class="nav-link" to="/vetoes">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                    Other
+                                </a>
+                                <div class="dropdown-menu">
+                                    <router-link class="dropdown-item" to="/vetoes">
                                     Vetoes
-                                </router-link>
-                            </li>
-                            <li class="nav-item">
-                                <router-link class="nav-link" to="/discussionvote">
+                                    </router-link>
+                                    <router-link class="dropdown-item" to="/discussionvote">
                                     Content Review
-                                </router-link>
+                                    </router-link>
+                                    <router-link class="dropdown-item" to="/qualityassurance">
+                                        Quality Assurance
+                                    </router-link>
+                                    <router-link class="dropdown-item" to="/modrequests">
+                                        Mod Request Submission
+                                    </router-link>
+                                    <router-link class="dropdown-item" to="/modrequests/listing">
+                                        Mod Request Listing
+                                    </router-link>
+                                </div>
                             </li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
