@@ -2,13 +2,13 @@
     <div>
         <p>
             <b>
-                Trial NAT:
+                BN Evaluator:
             </b>
             <a
                 class="ml-1"
                 data-toggle="tooltip"
                 data-placement="top"
-                title="Toggle trial NAT"
+                title="Toggle BN Evaluator"
                 href="#"
                 @click.prevent="toggleIsTrialNat()"
             >

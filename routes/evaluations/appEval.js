@@ -543,7 +543,7 @@ router.post('/enableBnEvaluators/:id', middlewares.isNat, async (req, res) => {
 
     res.json({
         application,
-        success: 'Enabled BN evaluators',
+        success: 'Enabled mock evaluations',
     });
 
     Logger.generate(
@@ -556,7 +556,7 @@ router.post('/enableBnEvaluators/:id', middlewares.isNat, async (req, res) => {
         [{
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.lightOrange,
-            description: `Enabled BN evaluators for [**${application.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${application.id})`,
+            description: `Enabled mock evaluations for [**${application.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${application.id})`,
         }],
         application.mode
     );

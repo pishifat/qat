@@ -29,8 +29,8 @@
             <hr>
 
             <div class="row">
-                <div class="col-sm-2">
-                    <b>Total BN evaluators</b>
+                <div class="col-sm-3">
+                    <b>Total mock evaluators</b>
                     <input
                         v-model="totalUsers"
                         class="form-control"
@@ -61,7 +61,7 @@
             </div>
 
             <button class="btn btn-sm btn-primary my-2 btn-block" @click="selectBnEvaluators($event)">
-                {{ potentialBnEvaluators ? 'Re-select BN Evaluators' : 'Select BN Evaluators' }}
+                {{ potentialBnEvaluators ? 'Re-select mock evaluators' : 'Select mock evaluators' }}
             </button>
 
             <div v-if="potentialBnEvaluators && potentialBnEvaluators.length">

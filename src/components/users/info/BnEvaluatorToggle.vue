@@ -2,13 +2,13 @@
     <div>
         <p>
             <b>
-                BN evaluator:
+                {{selectedUser.isNatOrTrialNat ? "Evaluations" : "Mock evaluations" }}:
             </b>
             <a
                 class="ml-1"
                 data-toggle="tooltip"
                 data-placement="top"
-                title="Toggle BN evaluator"
+                title="Toggle evaluations"
                 href="#"
                 @click.prevent="switchBnEvaluator($event)"
             >

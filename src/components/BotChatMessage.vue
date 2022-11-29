@@ -63,7 +63,7 @@ export default {
                         break;
                     case 'enableBnEvaluators':
                         route = 'appEval';
-                        type = 'enable BN evaluators';
+                        type = 'enable mock evaluations';
                         break;
                     case 'eval':
                         if (this.evalType == 'application') {
