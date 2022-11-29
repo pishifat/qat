@@ -2,7 +2,7 @@
     <div>
         <p>
             <b>
-                {{selectedUser.isNatOrTrialNat ? "E" : "Mock e" }}valuations:
+                {{selectedUser.isNatOrTrialNat ? "Evaluations" : "Mock evaluations" }}:
             </b>
             <a
                 class="ml-1"
