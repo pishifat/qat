@@ -1041,7 +1041,7 @@ router.post('/:id/switchUserGroup', middlewares.isNat, async (req, res) => {
 router.get('/activity', async (req, res) => {
     let days = parseInt(req.query.days);
     if (isNaN(days)) days = 90;
-    else if (days > 1000) days = 999;
+    else if (days > 10000) days = 9999;
     else if (days < 2) days = 2;
 
     const { osuId, mongoId } = req.query;

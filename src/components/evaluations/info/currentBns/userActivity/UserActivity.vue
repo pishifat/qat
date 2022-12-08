@@ -8,7 +8,7 @@
                 class="form-control form-control-sm w-days"
                 type="number"
                 min="1"
-                max="999"
+                max="9999"
                 @keyup.enter="search"
             />
             <span v-else class="mx-1">{{ daysInput }}</span>
@@ -193,7 +193,7 @@ export default {
 
             let days = parseInt(this.daysInput.toString());
             if (isNaN(days)) days = 90 + 7;
-            else if (days > 1000) days = 999;
+            else if (days > 10000) days = 9999;
             else if (days < 2) days = 2;
             this.daysInput = days;
 

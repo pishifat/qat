@@ -128,7 +128,7 @@ router.get('/nominationResets/:osuId/:days/', async (req, res) => {
 
     let days = parseInt(req.params.days);
     if (isNaN(days)) days = 90;
-    else if (days > 1000) days = 999;
+    else if (days > 10000) days = 9999;
     else if (days < 2) days = 2;
 
     let minDate = new Date();
