@@ -5,7 +5,6 @@
         <bn-finder-matches
             v-if="loggedInUser && loggedInUser.isBnOrNat"
         />
-        <mod-score-calculator />
 
         <section class="card card-body">
             <h4 class="mx-auto mb-3">
@@ -82,7 +81,6 @@
 import { mapState } from 'vuex';
 import evaluations from '../mixins/evaluations';
 import ToastMessages from '../components/ToastMessages.vue';
-import ModScoreCalculator from '../components/home/ModScoreCalculator.vue';
 import BnFinder from '../components/home/BnFinder.vue';
 import Announcements from '../components/home/Announcements.vue';
 import BnFinderMatches from '../components/home/BnFinderMatches.vue';
@@ -92,7 +90,6 @@ export default {
     name: 'Index',
     components: {
         ToastMessages,
-        ModScoreCalculator,
         BnFinder,
         Announcements,
         BnFinderMatches,

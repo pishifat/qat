@@ -124,14 +124,17 @@ router.post('/apply', async (req, res) => {
             if (totalMods < modsThreshold) {
                 return res.json({ error: `You need at least ${modsThreshold} mods within the last 60 days to apply because you were recently removed for low activity!` } );
             }
-        } else if (modScore < 0 && mode == 'osu') {
+        }
+        
+        // mod score requirements (removed 12/7/2022)
+        /* else if (modScore < 0 && mode == 'osu') {
             let additionalInfo = `Your mod score was calculated based on ${months} month${months == 1 ? '' : 's'} of activity because `;
             if (resignedOnGoodTerms) additionalInfo += 'you resigned from the BN on good terms.';
             else if (wasBn) additionalInfo += 'you were BN for this game mode in the past.';
 
             return res.json({ error: `Your mod score needs to be higher or equal than 0. Currently it is ${modScore}.
                 ${resignedOnGoodTerms || wasBn ? additionalInfo : ''}` });
-        }
+        }*/
 
         // Create app & test
         const [newBnApp, test] = await Promise.all([
