@@ -234,7 +234,7 @@ router.post('/selectMediators', middlewares.isNat, async (req, res) => {
 
         totalMediators = Math.round(validMediators.length * 0.2);
 
-        if (totalMediators < 7) totalMediators = 7;
+        if (totalMediators < 11) totalMediators = 11;
     }
 
     let users = [];
