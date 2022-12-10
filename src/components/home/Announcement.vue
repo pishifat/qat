@@ -14,7 +14,7 @@
             <h5 v-else>{{ announcement.title }} <span class="small text-secondary">({{ announcement.createdAt.slice(0,10) }})</span></h5>
 
             <a
-                v-if="loggedInUser.isNat"
+                v-if="loggedInUser && loggedInUser.isNat"
                 href="#"
                 class="ml-1"
                 @click.prevent="isEditingTitle = !isEditingTitle"
@@ -44,7 +44,7 @@
 
             <div v-else>
                 <span v-html="$md.render(announcement.content)" />
-                <button v-if="loggedInUser.isNat" type="submit" class="btn btn-primary float-right" @click="isEditingContent = !isEditingContent">
+                <button v-if="loggedInUser && loggedInUser.isNat" type="submit" class="btn btn-primary float-right" @click="isEditingContent = !isEditingContent">
                     Edit
                 </button>
             </div>
