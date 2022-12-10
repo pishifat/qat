@@ -5,7 +5,7 @@
             :message-type="'enableBnEvaluators'"
             :mongo-id="selectedEvaluation.id"
             :users="users"
-            :custom-text="'Send messages & enable BN evaluators'"
+            :custom-text="'Send messages & enable mock evaluations'"
         />
     </div>
 </template>
