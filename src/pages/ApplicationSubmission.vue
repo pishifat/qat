@@ -24,16 +24,6 @@
                     osu!taiko/osu!catch/osu!mania modders
                 </li>
                 <li>
-                    A positive <a href="/home" target="_blank">mod score</a>.
-                    Returning BNs have different mod score requirements as
-                    explained on the
-                    <a
-                        href="https://osu.ppy.sh/wiki/en/People/The_Team/Beatmap_Nominators/Becoming_a_Beatmap_Nominator#rejoining-after-being-removed-from-the-beatmap-nominators"
-                        target="_blank"
-                        >osu! wiki</a
-                    >
-                </li>
-                <li>
                     A score of 12.5 or higher on the
                     <a
                         href="https://osu.ppy.sh/wiki/en/People/The_Team/Beatmap_Nominators/Beatmap_Nominator_Test"
