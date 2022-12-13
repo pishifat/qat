@@ -105,7 +105,7 @@ router.get('/vetoMediators/:id', async (req, res) => {
         }
     }
 
-    return res.json(users);
+    return res.json(users.sort(() => .5 - Math.random()));
 });
 
 module.exports = router;
