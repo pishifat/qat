@@ -18,6 +18,7 @@ const Report = require('../models/report');
 const Logger = require('../models/log');
 const Settings = require('../models/settings');
 const { user } = require('../models/evaluations/base');
+const ResignationEvaluation = require('../models/evaluations/resignationEvaluation');
 
 const defaultPopulate = [
     { path: 'user', select: 'username osuId modesInfo' },
@@ -670,7 +671,8 @@ const checkBnEvaluationDeadlines = cron.schedule('3 22 * * *', async () => {
     for (const bn of bns) {
         for (const mode of bn.modesInfo) {
             const er = await BnEvaluation.findOne({ user: bn.id, mode: mode.mode, active: true });
-            if (!er) {
+            const resignation = await ResignationEvaluation.findOne({ user: bn.id, mode: mode.mode, active: true });
+            if (!er && !resignation) {
                 await discord.webhookPost(
                     [{
                         title: `missing BN evaluation for ${bn.username}`,
