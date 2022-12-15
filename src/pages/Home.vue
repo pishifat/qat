@@ -43,12 +43,19 @@
                                             v-html="$md.renderInline(formatLink(status, user.requestLink))"
                                         />
                                     </span>
+                                    
+                                    <span 
+                                        v-if="user.languages && user.languages.length"
+                                        class="badge badge-pill mx-1 text-lowercase badge-secondary"
+                                    >
+                                        {{ user.languages.join(', ') }}
+                                    </span>
                                 </div>
                             </td>
                         </tr>
                         <tr v-for="i in modeEmptyCells(usersByMode._id)" :key="i">
                             <td
-                                style="height: 10px; opacity: 0;"
+                                style="opacity: 0;"
                             >
                                 <div>
                                     .

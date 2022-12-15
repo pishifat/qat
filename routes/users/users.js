@@ -593,6 +593,41 @@ router.post('/:id/updateRequestStatus', middlewares.isBnOrNat, async (req, res) 
     );
 });
 
+/* POST update languages */
+router.post('/:id/updateLanguages', middlewares.isBnOrNat, async (req, res) => {
+    const user = await User.findById(req.params.id).orFail();
+
+    if (req.session.mongoId != user.id && !res.locals.userRequest.isNat) {
+        return res.json({
+            error: 'Unauthorized',
+        });
+    }
+    
+    const language = req.body.language;
+
+    const i = user.languages.indexOf(language);
+
+    if (i == -1) {
+        user.languages.push(language);
+    } else {
+        user.languages.splice(i, 1);
+    }
+
+    await user.save();
+
+    res.json({
+        success: 'Updated',
+        user,
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `${i == -1 ? 'Added ' + language + ' to' : 'Removed ' + language + ' from'} "${user.username}"'s language list`,
+        'user',
+        user._id
+    );
+});
+
 /* POST update genre preferences */
 router.post('/:id/updateGenrePreferences', middlewares.isBnOrNat, async (req, res) => {
     const user = await User.findById(req.params.id).orFail();

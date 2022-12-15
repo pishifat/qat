@@ -45,6 +45,7 @@ interface IUser {
     mapperNegativePreferences: string[];
     requestLink: string;
     isBnFinderAnonymous: boolean;
+    languages: string[];
     lastMarkedAsLowActivity: Date;
 
     // not used in model

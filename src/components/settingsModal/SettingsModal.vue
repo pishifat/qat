@@ -8,6 +8,10 @@
 
         <hr>
 
+        <settings-modal-languages />
+
+        <hr>
+
         <settings-modal-preferences />
 
         <hr>
@@ -30,6 +34,7 @@ import SettingsModalDiscord from './SettingsModalDiscord.vue';
 import SettingsModalModeEvaluations from './SettingsModalModeEvaluations.vue';
 import SettingsModalRequests from './SettingsModalRequests.vue';
 import SettingsModalPreferences from './SettingsModalPreferences.vue';
+import SettingsModalLanguages from './SettingsModalLanguages.vue';
 
 export default {
     components: {
@@ -39,6 +44,7 @@ export default {
         SettingsModalRequests,
         SettingsModalEvaluator,
         SettingsModalPreferences,
+        SettingsModalLanguages,
     },
     computed: mapState([
         'loggedInUser',

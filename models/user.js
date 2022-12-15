@@ -51,6 +51,7 @@ const userSchema = new mongoose.Schema({
     mapperNegativePreferences: [{ type: String, enum: enums.MapperPreferences }],
     requestLink: { type: String },
     isBnFinderAnonymous: { type: Boolean, default: true },
+    languages: [{ type: String, enum: enums.Languages, default: [] }],
     lastMarkedAsLowActivity: { type: Date },
 
     /* temporary fields for qa leaderboard webhook */
@@ -244,6 +245,7 @@ class UserService extends mongoose.Model {
                         level: '$modesInfo.level',
                         requestStatus: '$requestStatus',
                         requestLink: '$requestLink',
+                        languages: '$languages',
                     },
                 },
             });
