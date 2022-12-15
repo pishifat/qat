@@ -348,39 +348,6 @@ router.get('/findNatActivity2/:number/:mode', async (req, res) => {
         });
     }
 
-    /*for (const app of appEvals) {
-        const log = await Logger
-            .findOne({
-                relatedId: app._id,
-                action: `Created feedback of ${app.user.username}'s ${app.mode} evaluation`,
-            })
-            .populate({ path: 'user', select: 'username osuId' })
-            .sort({ createdAt: -1 });
-
-
-        const userIndex = info.findIndex(u => u.osuId == log.user.osuId);
-
-        if (userIndex > -1) {
-            info[userIndex].totalFeedbackWritten++;
-        }
-    }
-
-    for (const round of currentBnEvals) {
-        const log = await Logger
-            .findOne({
-                relatedId: round._id,
-                action: `Created feedback of ${round.user.username}'s ${round.mode} evaluation`,
-            })
-            .populate({ path: 'user', select: 'username osuId' })
-            .sort({ createdAt: -1 });
-
-        const userIndex = info.findIndex(u => u.osuId == log.user.osuId);
-
-        if (userIndex > -1) {
-            info[userIndex].totalFeedbackWritten++;
-        }
-    }*/
-
     info.sort((a, b) => {
         if (a.totalParticipated > b.totalParticipated) return -1;
         if (a.totalParticipated < b.totalParticipated) return 1;

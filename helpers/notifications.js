@@ -690,6 +690,132 @@ const checkBnEvaluationDeadlines = cron.schedule('3 22 * * *', async () => {
 });
 
 /**
+ * Check if any ex-BNs or ex-NAT have incorrectly accruing tenures
+ */
+const checkTenureValidity = cron.schedule('40 4 4 * *', async () => {
+    const response = await osu.getClientCredentialsGrant();
+    const token = response.access_token;
+
+    const users = await User.find({
+        'history.0': { $exists: true },
+    });
+
+    for (const user of users) {
+        const mapperInfo = await osu.getOtherUserInfo(token, user.osuId);
+
+        if (mapperInfo && mapperInfo.groups) {
+            const isBn = mapperInfo.groups.some(g => g.id == 28 || g.id == 32);
+            const isNat = mapperInfo.groups.some(g => g.id == 7);
+            
+            const bnHistory = user.history.filter(h => h.group == 'bn');
+            bnHistory.sort((a, b) => {
+                if (new Date(a.date) > new Date(b.date)) return 1;
+                if (new Date(a.date) < new Date(b.date)) return -1;
+    
+                return 0;
+            });
+
+            const natHistory = user.history.filter(h => h.group == 'nat');
+            natHistory.sort((a, b) => {
+                if (new Date(a.date) > new Date(b.date)) return 1;
+                if (new Date(a.date) < new Date(b.date)) return -1;
+    
+                return 0;
+            });
+
+            const bnModes = [];
+            const natModes = [];
+
+            if (isBn) {
+                for (const group of mapperInfo.groups) {
+                    if (group.id == 28 || group.id == 32) {
+                        for (const playmode of group.playmodes) {
+                            if (playmode == 'fruits') {
+                                bnModes.push('catch');
+                            } else {
+                                bnModes.push(playmode);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (isNat) {
+                for (const group of mapperInfo.groups) {
+                    if (group.id == 7) {
+                        for (const playmode of group.playmodes) {
+                            if (playmode == 'fruits') {
+                                natModes.push('catch');
+                            } else {
+                                natModes.push(playmode);
+                            }
+                        }
+                    }
+                }
+            }
+
+            const modes = ['osu', 'taiko', 'catch', 'mania'];
+
+            for (const mode of modes) {
+                const modeBnHistory = bnHistory.filter(h => h.mode == mode);
+                const modeNatHistory = natHistory.filter(h => h.mode == mode);
+
+                const lastModeBnHistory = modeBnHistory.length ? modeBnHistory[modeBnHistory.length - 1] : null;
+                const lastModeNatHistory = modeNatHistory.length ? modeNatHistory[modeNatHistory.length - 1] : null;
+
+                let notify = false;
+
+                if (lastModeBnHistory) {
+                    if (lastModeBnHistory.kind == 'joined') {
+                        if (!bnModes.includes(mode)) {
+                            notify = true;
+                        }
+                    } else {
+                        if (bnModes.includes(mode)) {
+                            notify = true;
+                        }
+                    }
+                }
+                
+                if (lastModeNatHistory) {
+                    if (lastModeNatHistory.kind == 'joined') {
+                        if (!natModes.includes(mode)) {
+                            notify = true;
+                        }
+                    } else {
+                        if (natModes.includes(mode)) {
+                            notify = true;
+                        }
+                    }
+                }
+
+                if (!isBn && !isNat) {
+                    if ((lastModeBnHistory && lastModeBnHistory.kind == 'joined') || lastModeNatHistory && lastModeNatHistory.kind == 'joined') {
+                        notify = true;
+                    }
+                }
+
+                if (notify) {
+                    await discord.webhookPost(
+                        [{
+                            title: `${user.username} ${mode} history is sus`,
+                            color: discord.webhookColors.red,
+                            description: `https://bn.mappersguild.com/users?id=${user.id}`,
+                        }],
+                        'dev'
+                    );
+                }
+                
+            }
+        }
+
+        await util.sleep(500);
+    }
+}, {
+    scheduled: false,
+});
+
+/**
  * @param {Date} initialDate
  * @param {object} bn
  * @param {string} mode
@@ -756,4 +882,4 @@ const lowActivityPerUserTask = cron.schedule('22 22 * * *', async () => {
     scheduled: false,
 });
 
-module.exports = { notifyDeadlines, notifyBeatmapReports, lowActivityTask, closeContentReviews, checkMatchBeatmapStatuses, checkBnEvaluationDeadlines, lowActivityPerUserTask };
+module.exports = { notifyDeadlines, notifyBeatmapReports, lowActivityTask, closeContentReviews, checkMatchBeatmapStatuses, checkBnEvaluationDeadlines, lowActivityPerUserTask, checkTenureValidity };

@@ -189,6 +189,7 @@ app.listen(port, () => {
         notifications.checkMatchBeatmapStatuses.start();
         notifications.checkBnEvaluationDeadlines.start();
         notifications.lowActivityPerUserTask.start();
+        notifications.checkTenureValidity.start();
     }
 });
 

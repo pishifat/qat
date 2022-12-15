@@ -738,27 +738,8 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
             timestamp: { $gte: minDate, $lte: maxDate },
             type: 'disqualify',
         }),
-        /*Aiess.find({
-            userId: { $ne: userOsuId },
-            beatmapsetId: { $in: beatmapsetIds },
-            timestamp: { $gte: minDate, $lte: maxDate },
-            type: { $in: ['nominate', 'qualify'] },
-        }),*/
     ]);
 
-    // Exclude pops/dqs that happened before this user nomination
-    // And pops/dqs that happened after others bns nominated the set (and current bn wasn't involved in the end)
-
-    /* the "efficient" but broken way
-    nominationsPopped = nominationsPopped.filter(pop => {
-        const happenedBefore = uniqueNominations.some(n => n.beatmapsetId == pop.beatmapsetId && n.timestamp < pop.timestamp);
-        const nominationsAfterwards = othersNominations.filter(n => n.beatmapsetId == pop.beatmapsetId && n.timestamp < pop.timestamp);
-
-        return !nominationsAfterwards.length && happenedBefore;
-    }
-    */
-
-    // the inefficient but working (?) way
     let nominationsPopped = [];
 
     for (const event of allNominationsPopped) {
@@ -777,15 +758,6 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
         }
     }
 
-    /* the "efficient" but broken way
-    nominationsDisqualified = nominationsDisqualified.filter(dq => {
-        const happenedBefore = uniqueNominations.some(n => n.beatmapsetId == dq.beatmapsetId && n.timestamp < dq.timestamp);
-        const nominationsAfterwards = othersNominations.filter(n => n.beatmapsetId == dq.beatmapsetId && n.timestamp < dq.timestamp);
-
-        return nominationsAfterwards.length < 2 && happenedBefore;
-    */
-
-    // the inefficient but working (?) way
     let nominationsDisqualified = [];
 
     for (const event of allNominationsDisqualified) {
