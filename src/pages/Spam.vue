@@ -21,6 +21,30 @@
                     <option value="probation">
                         Probation
                     </option>
+                    <option value="bnOsu">
+                        BN (osu!)
+                    </option>
+                    <option value="bnTaiko">
+                        BN (osu!taiko)
+                    </option>
+                    <option value="bnCatch">
+                        BN (osu!catch)
+                    </option>
+                    <option value="bnMania">
+                        BN (osu!mania)
+                    </option>
+                    <option value="probationOsu">
+                        Probation (osu!)
+                    </option>
+                    <option value="probationTaiko">
+                        Probation (osu!taiko)
+                    </option>
+                    <option value="probationCatch">
+                        Probation (osu!catch)
+                    </option>
+                    <option value="probationMania">
+                        Probation (osu!mania)
+                    </option>
                 </select>
                 <button class="btn btn-secondary btn-sm my-1 col-sm-3 mx-2" @click="toggleRole()">
                     {{ roles.includes(selectedRole) ? 'Remove selected role' : 'Add selected role' }}
