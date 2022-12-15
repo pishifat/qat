@@ -145,7 +145,7 @@ export default {
         return {
             includeUsers: null,
             excludeUsers: null,
-            deadline: this.$moment().add(12, 'days').format('YYYY-MM-DD'),
+            deadline: this.$moment().add(6, 'days').format('YYYY-MM-DD'),
             selectedModes: [],
             isResignation: false,
             groups: [],
