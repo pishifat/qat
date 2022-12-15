@@ -1,7 +1,7 @@
 <template>
     <div>
-        <h5 v-if="veto.reasons.length == 1">Veto consensus: {{ upholdMediations.length > withdrawMediations.length ? 'upheld' : 'dismissed' }}</h5>
-        <h5 v-else>Veto reason #{{ reasonIndex+1 }} of {{ veto.reasons.length }} - {{ upholdMediations.length > withdrawMediations.length ? 'upheld' : 'dismissed' }}</h5>
+        <h5 v-if="veto.reasons.length == 1">Veto consensus: <span :class="upholdMediations.length > withdrawMediations.length ? 'text-success' : 'text-danger'">{{ upholdMediations.length > withdrawMediations.length ? 'upheld' : 'dismissed' }}</span></h5>
+        <h5 v-else>Veto reason #{{ reasonIndex+1 }} of {{ veto.reasons.length }} - <span :class="upholdMediations.length > withdrawMediations.length ? 'text-success' : 'text-danger'"></span>{{ upholdMediations.length > withdrawMediations.length ? 'upheld' : 'dismissed' }}</h5>
         <div class="card card-body small mb-4">
             <a :href="reason.link" target="_blank" class="mb-2">{{ reason.summary }}</a>
             <div v-if="upholdMediations.length > withdrawMediations.length">
