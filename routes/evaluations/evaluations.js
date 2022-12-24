@@ -179,7 +179,7 @@ async function setFeedback (evaluation, feedback, session) {
         evaluation._id
     );
 
-    evaluation.feedback = feedback;
+    evaluation.feedback = util.parseTimestamps(feedback);
     await evaluation.save();
 
     discord.webhookPost(
