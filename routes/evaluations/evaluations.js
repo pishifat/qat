@@ -70,8 +70,8 @@ async function submitEval (evaluation, session, isNat, behaviorComment, moddingC
         review.evaluator = session.mongoId;
     }
 
-    review.behaviorComment = behaviorComment;
-    review.moddingComment = moddingComment;
+    review.behaviorComment = util.parseTimestamps(behaviorComment);
+    review.moddingComment = util.parseTimestamps(moddingComment);
     review.vote = vote;
     await review.save();
 
