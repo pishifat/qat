@@ -13,7 +13,8 @@
                 <next-evaluation-estimate
                     v-else-if="
                         selectedEvaluation.consensus &&
-                        selectedEvaluation.kind != 'resignation'
+                        selectedEvaluation.kind != 'resignation' &&
+                        loggedInUser.isNat
                     "
                 />
                 <feedback-info v-if="selectedEvaluation.consensus" />

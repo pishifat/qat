@@ -923,7 +923,7 @@ router.post('/sendMessages/:id', middlewares.isNatOrTrialNat, async (req, res) =
 });
 
 /* POST overwrite next evaluation deadline */
-router.post('/overwriteEvaluationDate/:id/', middlewares.isNatOrTrialNat, async (req, res) => {
+router.post('/overwriteEvaluationDate/:id/', middlewares.isNat, async (req, res) => {
     const er = await BnEvaluation
         .findById(req.params.id)
         .populate(defaultPopulate);

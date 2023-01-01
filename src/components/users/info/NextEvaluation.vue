@@ -6,7 +6,7 @@
         </b>
 
         <input
-            v-if="isEditing"
+            v-if="isEditing && loggedInUser.isNat"
             v-model="newDeadlineInput"
             class="form-control form-control-sm w-50 mb-2"
             type="text"
