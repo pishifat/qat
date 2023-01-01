@@ -160,25 +160,8 @@ export default {
 
                     messages.push(line);
 
-                    let line2 = `If you want to apply for BN again, you may do so on ${this.toStandardDate(this.selectedEvaluation.cooldownDate)}, provided you have `;
-
-                    // resigned on good terms
-                    if (this.positiveConsensus) {
-                        line2 += `one month of modding activity (~4 mods)`;
-                        messages.push(line2);
-
-                    // resigned on standard terms
-                    } else if (this.neutralConsensus) {
-                        line2 += `two months of modding activity (~4 mods each month)`;
-                        messages.push(line2);
-
-                    // kick
-                    } else {
-                        line2 += `shown improvement in the areas mentioned`;
-                        messages.push(line2);
-
-                        messages.push(`review reasons for your removal here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id}`);
-                    }
+                    // reapply date
+                    messages.push(`If you want to apply for BN again, you may do so on ${this.toStandardDate(this.selectedEvaluation.cooldownDate)}`);
 
                     // cheeky sign-off
                     messages.push(`good luck!`);
