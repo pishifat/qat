@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="row">
-            <div v-if="loggedInUser.isBn && selectedEvaluation.active == true && selectedEvaluation.discussion == true" class="col-sm-12 mb-2">
+            <div v-if="loggedInUser.isBn && !loggedInUser.isTrialNat && selectedEvaluation.active == true && selectedEvaluation.discussion == true" class="col-sm-12 mb-2">
                 The NAT have already decided the consensus for this application, but you can still submit your thoughts!
             </div>
             <div class="col-sm-12">
