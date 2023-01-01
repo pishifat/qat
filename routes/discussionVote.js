@@ -170,7 +170,7 @@ router.post('/submit', async (req, res) => {
             fields: [
                 {
                     name: `Question/Proposal`,
-                    value: shortReason,
+                    value: shortReason.length > 900 ? shortReason.slice(0, 900) + '... *(truncated)*' : shortReason,
                 },
             ],
         }],
@@ -191,7 +191,7 @@ router.post('/submit', async (req, res) => {
                 fields: [
                     {
                         name: `Question/Proposal`,
-                        value: shortReason,
+                        value: shortReason.length > 900 ? shortReason.slice(0, 900) + '... *(truncated)*' : shortReason,
                     },
                 ],
             }],
