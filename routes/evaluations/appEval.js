@@ -233,24 +233,15 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
                     updatedAt: -1,
                 });
 
-            let skipProbation = false;
+            if (lastResignation && lastCurrentBnEval && lastResignation.archivedAt && lastCurrentBnEval.archivedAt && lastResignation.consensus === ResignationConsensus.ResignedOnGoodTerms) {
+                const resignationArchiveDate = new Date(lastResignation.archivedAt);
+                const currentBnEvalArchiveDate = new Date(lastCurrentBnEval.archivedAt);
 
-            if (lastResignation && lastResignation.consensus === ResignationConsensus.ResignedOnGoodTerms) {
-                if (lastCurrentBnEval && lastResignation.archivedAt && lastCurrentBnEval.archivedAt) {
-                    const resignationArchiveDate = new Date(lastResignation.archivedAt);
-                    const currentBnEvalArchiveDate = new Date(lastCurrentBnEval.archivedAt);
+                const oneYearAgo = new Date();
+                oneYearAgo.setDate(oneYearAgo.getDate() - 365);
 
-                    const oneYearAgo = new Date();
-                    oneYearAgo.setDate(oneYearAgo.getDate() - 365);
-
-                    if (resignationArchiveDate > currentBnEvalArchiveDate && resignationArchiveDate > oneYearAgo) {
-                        skipProbation = true;
-                    }
-                } else {
-                    skipProbation = true;
-                }
-
-                if (skipProbation) {
+                // skip probation on condition
+                if (resignationArchiveDate > currentBnEvalArchiveDate && resignationArchiveDate > oneYearAgo) {
                     level = 'full';
                     activityToCheck = Math.floor(Math.random() * (95 - 85) + 85); // between 85 and 95 days;
                 }
