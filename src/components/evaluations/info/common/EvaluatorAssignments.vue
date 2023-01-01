@@ -25,7 +25,7 @@
             />
         </div>
 
-        <div v-if="(!selectedEvaluation.bnEvaluators || !selectedEvaluation.bnEvaluators.length) && selectedEvaluation.isApplication && !selectedEvaluation.discussion" class="col-sm-12">
+        <div v-if="loggedInUser.isNat && (!selectedEvaluation.bnEvaluators || !selectedEvaluation.bnEvaluators.length) && selectedEvaluation.isApplication && !selectedEvaluation.discussion" class="col-sm-12">
             <hr>
 
             <div class="row">
@@ -85,7 +85,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import UserList from './UserList.vue';
 import EnableBnEvaluatorsChatMessage from '../applications/EnableBnEvaluatorsChatMessage.vue';
 
@@ -104,6 +104,9 @@ export default {
         };
     },
     computed: {
+        ...mapState([
+            'loggedInUser',
+        ]),
         ...mapGetters('evaluations', [
             'selectedEvaluation',
         ]),
