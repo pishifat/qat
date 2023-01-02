@@ -55,7 +55,7 @@
                 <div class="col-sm-12">
                     <h4>Example mods:</h4>
                     <p class="small ml-4">
-                        Link the discussion pages of at least two mapsets you
+                        Link the discussion pages of {{ wasBn ? "at least two" : "three" }} mapsets you
                         have modded in the last six months. Include at
                         least one map you would nominate and one you wouldn't,
                         so the NAT can understand your nomination quality
@@ -183,6 +183,7 @@
 <script>
 import ToastMessages from '../components/ToastMessages.vue';
 import ModeRadioDisplay from '../components/ModeRadioDisplay.vue';
+import { mapState } from 'vuex';
 
 export default {
     name: 'ApplicationSubmission',
@@ -206,7 +207,13 @@ export default {
             this.hasPendingTest = data.hasPendingTest;
         }
     },
+    computed: mapState([
+        'loggedInUser',
+    ]),
     methods: {
+        wasBn() {
+            return this.loggedInUser.history && this.loggedInUser.history.length;
+        },
         async apply(e) {
             this.successInfo = `Submitting & calculating mod score... (this will take a few seconds)`;
 

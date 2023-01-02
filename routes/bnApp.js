@@ -37,7 +37,11 @@ router.post('/apply', async (req, res) => {
         return res.json({ error: 'Missing mode or mods' });
     }
 
-    if (mods.length < 2) {
+    const wasBn = res.locals.userRequest.history && res.locals.userRequest.history.length;
+
+    if (mods.length !== 3 && !wasBn) {
+        return res.json({ error: `You must enter three mods!` });
+    } else if (mods.length < 2) {
         return res.json({ error: `You must enter at least two mods!` });
     }
 
@@ -88,7 +92,6 @@ router.post('/apply', async (req, res) => {
         }),
     ]);
 
-    const wasBn = res.locals.userRequest.history && res.locals.userRequest.history.length;
     const resignedOnGoodTerms = lastResignation && lastResignation.consensus === ResignationConsensus.ResignedOnGoodTerms;
     const kickedForActivity = lastCurrentBnEval && lastCurrentBnEval.addition === BnEvaluationAddition.LowActivityWarning;
 
