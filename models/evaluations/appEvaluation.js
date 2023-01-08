@@ -7,6 +7,7 @@ const appEvaluationSchema = new mongoose.Schema({
     mods: [{ type: String, required: true }],
     reasons: [{ type: String, required: true }],
     test: { type: 'ObjectId', ref: 'TestSubmission' },
+    isRejoinRequest: { type: Boolean },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 class AppEvaluationService extends mongoose.Model {
@@ -16,7 +17,7 @@ class AppEvaluationService extends mongoose.Model {
     }
 
     get deadline () {
-        let delay = this.discussion ? 14 : 7;
+        let delay = this.isRejoinRequest ? 1 : this.discussion ? 14 : 7;
         let createdAt = this.createdAt;
 
         return new Date(createdAt.setDate(createdAt.getDate() + delay));

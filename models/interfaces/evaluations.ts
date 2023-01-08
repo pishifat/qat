@@ -33,6 +33,7 @@ export interface IAppEvaluationDocument extends IEvaluationBase, Document {
     mods: string[];
     reasons: string[];
     test?: ITestSubmissionDocument;
+    isRejoinRequest?: Boolean;
     deadline?: Date;
     kind?: string;
 }

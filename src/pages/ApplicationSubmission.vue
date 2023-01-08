@@ -50,113 +50,139 @@
             </div>
         </div>
 
+        <hr />
+
         <div class="card card-body">
-            <div class="row mb-2">
-                <div class="col-sm-12">
-                    <h4>Example mods:</h4>
-                    <p class="small ml-4">
-                        Link the discussion pages of {{ wasBn ? "at least two" : "three" }} mapsets you
-                        have modded in the last six months. Include at
-                        least one map you would nominate and one you wouldn't,
-                        so the NAT can understand your nomination quality
-                        standards. These (and potentially more) will be
-                        evaluated by the NAT.
-                    </p>
-                    <p class="small ml-4">
-                        The following are modding traits expected of Beatmap
-                        Nominators
-                    </p>
-                    <ul class="small ml-1">
-                        <li>Coverage of all difficulty levels</li>
-                        <li>
-                            Identification of unrankable issues, including ones
-                            tools can't detect like timing/metadata
-                        </li>
-                        <li>
-                            Comparisons of parts of a map to support
-                            issues/suggestions
-                        </li>
-                        <li>
-                            A wide variety of map elements, such as rhythm,
-                            spacing, movement, intensity, contrast, and
-                            consistency.
-                        </li>
-                        <li>
-                            Identification of both isolated issues and general
-                            map-wide issues
-                        </li>
-                        <li>
-                            Consideration of mappers' intentions when
-                            identifying issues and giving suggestions
-                        </li>
-                    </ul>
+            <div v-if="!hasPendingTest">
+                <h4>Game-mode:</h4>
+
+                <div class="row">
+                    <div class="col-sm-12 pl-4">
+                        <mode-radio-display v-model="selectedMode" />
+                    </div>
                 </div>
-            </div>
+                
+                <hr />
 
-            <div class="row mb-2">
-                <div class="col-sm-12">
-                    <div v-for="i in 3" :key="i" class="form-group">
-                        <p>Mod {{ i }}:</p>
-
-                        <input
-                            v-model="mods[i - 1]"
-                            type="text"
-                            class="form-control ml-2 mb-2"
-                            placeholder="link to beatmap discussion"
-                            maxlength="1000"
-                        />
-
-                        <div class="ml-2 small">
-                            Additional mod info
-                            <ul>
+                <div v-if="!relevantResignation">
+                    <div class="row mb-2">
+                        <div class="col-sm-12">
+                            <h4>Example mods:</h4>
+                            <p class="small ml-4">
+                                Link the discussion pages of {{ wasBn ? "at least two" : "three" }} mapsets you
+                                have modded in the last six months. Include at
+                                least one map you would nominate and one you wouldn't,
+                                so the NAT can understand your nomination quality
+                                standards. These (and potentially more) will be
+                                evaluated by the NAT.
+                            </p>
+                            <p class="small ml-4">
+                                The following are modding traits expected of Beatmap
+                                Nominators
+                            </p>
+                            <ul class="small ml-1">
+                                <li>Coverage of all difficulty levels</li>
                                 <li>
-                                    Would you nominate this beatmap? If not,
-                                    why?
+                                    Identification of unrankable issues, including ones
+                                    tools can't detect like timing/metadata
                                 </li>
                                 <li>
-                                    Is there anything else you'd like the NAT to
-                                    know about this mod?
+                                    Comparisons of parts of a map to support
+                                    issues/suggestions
                                 </li>
                                 <li>
-                                    Please provide a copy of the map before your
-                                    mod was applied (optional)
+                                    A wide variety of map elements, such as rhythm,
+                                    spacing, movement, intensity, contrast, and
+                                    consistency.
+                                </li>
+                                <li>
+                                    Identification of both isolated issues and general
+                                    map-wide issues
+                                </li>
+                                <li>
+                                    Consideration of mappers' intentions when
+                                    identifying issues and giving suggestions
                                 </li>
                             </ul>
                         </div>
-
-                        <textarea
-                            v-model="reasons[i - 1]"
-                            type="text"
-                            class="form-control ml-2"
-                            placeholder="responses to the bullet points above"
-                            maxlength="1000"
-                            rows="2"
-                        />
                     </div>
-                </div>
-            </div>
 
-            <h4>Game-mode:</h4>
+                    <div class="row mb-2">
+                        <div class="col-sm-12">
+                            <div v-for="i in 3" :key="i" class="form-group">
+                                <p>Mod {{ i }}:</p>
 
-            <div class="row mb-2">
-                <div class="col-sm-12 pl-4">
-                    <mode-radio-display v-model="selectedMode" />
+                                <input
+                                    v-model="mods[i - 1]"
+                                    type="text"
+                                    class="form-control ml-2 mb-2"
+                                    placeholder="link to beatmap discussion"
+                                    maxlength="1000"
+                                />
+
+                                <div class="ml-2 small">
+                                    Additional mod info
+                                    <ul>
+                                        <li>
+                                            Would you nominate this beatmap? If not,
+                                            why?
+                                        </li>
+                                        <li>
+                                            Is there anything else you'd like the NAT to
+                                            know about this mod?
+                                        </li>
+                                        <li>
+                                            Please provide a copy of the map before your
+                                            mod was applied (optional)
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <textarea
+                                    v-model="reasons[i - 1]"
+                                    type="text"
+                                    class="form-control ml-2"
+                                    placeholder="responses to the bullet points above"
+                                    maxlength="1000"
+                                    rows="2"
+                                />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-sm-12 text-center">
-                    <template v-if="hasPendingTest">
+                    <template v-if="relevantResignation">
+                        <button
+                            v-if="!successInfo"
+                            class="btn btn-block btn-success"
+                            type="button"
+                            @click="rejoinApply($event)"
+                        >
+                            Request to re-join the Beatmap Nominators
+                        </button>
+                        <p v-if="successInfo" class="mt-2">
+                            {{ successInfo }}    
+                        </p>
+                        <p class="small mt-2">
+                            This option is available until {{ this.$moment(relevantResignation.archivedAt).add(6, 'months').format('YYYY-MM-DD') }} because you recently resigned from the {{ relevantResignation.mode == 'osu' ? 'osu!' : 'osu!' + relevantResignation.mode }} Beatmap Nominators.
+                        </p>
+                        <p class="small mt-2">
+                            You will not need to take the Ranking Criteria test. The NAT will review for any potential concerns and re-admit you to the Beatmap Nominators if everything is okay!
+                        </p>
+                    </template>
+                    <template v-else-if="hasPendingTest">
                         <a
                             href="/testsubmission"
                             class="btn btn-success btn-block"
                         >
-                            Begin Ranking Criteria Test
+                            Begin Ranking Criteria test
                         </a>
 
                         <p class="small mt-2">
-                            Before your application can be reviewed, you must
-                            take a short test.
+                            Before your application can be reviewed, you must take a short test.
                         </p>
                     </template>
 
@@ -194,6 +220,11 @@ export default {
     data() {
         return {
             hasPendingTest: false,
+            resignations: [],
+            cooldownApps: [],
+            cooldownEvals: [],
+            relevantResignation: null,
+            cooldown: false,
             selectedMode: '',
             mods: [],
             reasons: [],
@@ -205,11 +236,36 @@ export default {
 
         if (!data.error) {
             this.hasPendingTest = data.hasPendingTest;
+            this.resignations = data.resignations;
+            this.cooldownApps = data.cooldownApps;
+            this.cooldownEvals = data.cooldownEvals;
         }
     },
-    computed: mapState([
-        'loggedInUser',
-    ]),
+    computed: {
+        ...mapState([
+            'loggedInUser',
+        ]),
+    },
+    watch: {
+        selectedMode() {
+            this.successInfo = '';
+            this.relevantResignation = [...this.resignations].find(r => r.mode == this.selectedMode);
+
+            let cooldownApp;
+    
+            if (this.cooldownApps && this.cooldownApps.length) {
+                cooldownApp = Boolean([...this.cooldownApps].find(a => a.mode == this.selectedMode));
+            }
+
+            let cooldownEval;
+
+            if (this.cooldownEvals && this.cooldownEvals.length) {
+                cooldownEval = Boolean([...this.cooldownEvals].find(e => e.mode == this.selectedMode))
+            } 
+            
+            this.cooldown = Boolean(cooldownApp) || Boolean(cooldownEval);
+        },
+    },
     methods: {
         wasBn() {
             return this.loggedInUser.history && this.loggedInUser.history.length;
@@ -232,6 +288,17 @@ export default {
             }
 
             this.successInfo = '';
+        },
+        async rejoinApply(e) {
+            const data = await this.$http.executePost(
+                `/bnapps/rejoinApply`,
+                {
+                    mode: this.selectedMode,
+                },
+                e
+            );
+
+            this.successInfo = 'The NAT will review your re-join request!';
         },
     },
 };

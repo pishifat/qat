@@ -240,7 +240,7 @@ const webhookColors = {
     darkOrange: 7092736,      // replaceMediator
     orange: 15169835,         // replaceEvaluator
 
-    lightYellow: 16777104,
+    lightYellow: 16777104,    // rejoinBnRequest
     darkYellow: 7105536,      // concludeDiscussionVote
     yellow: 16777022,         // submitMediationDiscussionVote
 

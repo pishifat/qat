@@ -10,7 +10,7 @@
             :comment="selectedEvaluation.test.comment"
         />
 
-        <template v-if="loggedInUser.isNat || loggedInUser.isTrialNat">
+        <template v-if="(loggedInUser.isNat || loggedInUser.isTrialNat) && selectedEvaluation.test.totalScore > 0">
             <test-results
                 :test-score="selectedEvaluation.test.totalScore"
                 :osu-id="selectedEvaluation.user.osuId"
