@@ -204,7 +204,7 @@ router.post('/submitTest', async (req, res) => {
 
     if (totalScore < 12.5 && test.mode == 'osu') {
         let cooldown = new Date();
-        cooldown.setDate(cooldown.getDate() - 30);
+        cooldown.setDate(cooldown.getDate() + 30);
 
         currentBnApp.cooldownDate = cooldown;
         currentBnApp.active = false;
