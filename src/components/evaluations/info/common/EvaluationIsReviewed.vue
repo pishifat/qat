@@ -4,7 +4,6 @@
             <b>Reviewed: </b>
             <a
                 href="#"
-
                 data-toggle="tooltip"
                 data-placement="right"
                 title="mark evaluation as reviewed"
