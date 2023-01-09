@@ -3,10 +3,13 @@ const Logger = require('../../models/log');
 const User = require('../../models/user');
 const Evaluation = require('../../models/evaluations/evaluation');
 const AppEvaluation = require('../../models/evaluations/appEvaluation');
+const BnEvaluation = require('../../models/evaluations/bnEvaluation');
+const ResignationEvaluation = require('../../models/evaluations/resignationEvaluation');
 const Settings = require('../../models/settings');
 const discord = require('../../helpers/discord');
 const util = require('../../helpers/util');
-const { EvaluationKind } = require('../../shared/enums');
+const { EvaluationKind, BnEvaluationConsensus, ResignationConsensus } = require('../../shared/enums');
+const moment = require('moment');
 
 /**
  * @param {import('../../models/interfaces/evaluations').IEvaluationDocument} evaluation
@@ -265,10 +268,49 @@ async function findEvaluationsWithoutIncident (selectedUserId) {
     return count;
 }
 
+async function findSkipProbationEligibility (userId, mode) {
+    const oneYearAgo = moment().subtract(1, 'years').toDate();
+
+    const lastResignation = await ResignationEvaluation
+        .findOne({
+            user: userId,
+            mode,
+            archivedAt: { $gt: oneYearAgo },
+        })
+        .sort({
+            updatedAt: -1,
+        });
+
+    const lastCurrentBnEval = await BnEvaluation
+        .findOne({
+            user: userId,
+            mode,
+            archivedAt: { $gt: oneYearAgo },
+        })
+        .sort({
+            updatedAt: -1,
+        });
+
+    let skipProbation = false;
+
+    if (lastResignation && lastCurrentBnEval && lastResignation.archivedAt && lastCurrentBnEval.archivedAt && lastResignation.consensus === ResignationConsensus.ResignedOnGoodTerms) {
+        const resignationArchiveDate = new Date(lastResignation.archivedAt);
+        const currentBnEvalArchiveDate = new Date(lastCurrentBnEval.archivedAt);
+
+        // skip probation on condition
+        if (resignationArchiveDate > currentBnEvalArchiveDate && resignationArchiveDate > oneYearAgo) {
+            skipProbation = true;
+        }
+    }
+
+    return skipProbation;
+}
+
 module.exports = {
     submitEval,
     setGroupEval,
     setFeedback,
     replaceUser,
     findEvaluationsWithoutIncident,
+    findSkipProbationEligibility,
 };

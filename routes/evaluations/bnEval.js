@@ -10,7 +10,7 @@ const User = require('../../models/user');
 const Aiess = require('../../models/aiess');
 const QualityAssuranceCheck = require('../../models/qualityAssuranceCheck');
 const Note = require('../../models/note');
-const { submitEval, setGroupEval, setFeedback, replaceUser, findEvaluationsWithoutIncident } = require('./evaluations');
+const { submitEval, setGroupEval, setFeedback, replaceUser, findEvaluationsWithoutIncident, findSkipProbationEligibility } = require('./evaluations');
 const middlewares = require('../../helpers/middlewares');
 const discord = require('../../helpers/discord');
 const util = require('../../helpers/util');
@@ -609,6 +609,13 @@ router.get('/findEvaluationsWithoutIncident/:userId', async (req, res) => {
     const evaluationsWithoutIncident = await findEvaluationsWithoutIncident(req.params.userId);
 
     res.json(evaluationsWithoutIncident);
+});
+
+/* GET skip probation eligibility */
+router.get('/findSkipProbationEligibility/:userId/:mode', async (req, res) => {
+    const skipProbation = await findSkipProbationEligibility(req.params.userId, req.params.mode);
+
+    res.json(skipProbation);
 });
 
 /* GET find user notes */

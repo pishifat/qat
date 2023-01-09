@@ -4,7 +4,7 @@ const BnEvaluation = require('../../models/evaluations/bnEvaluation');
 const ResignationEvaluation = require('../../models/evaluations/resignationEvaluation');
 const User = require('../../models/user');
 const Logger = require('../../models/log');
-const { submitEval, setGroupEval, setFeedback, replaceUser } = require('./evaluations');
+const { submitEval, setGroupEval, setFeedback, replaceUser, findSkipProbationEligibility } = require('./evaluations');
 const middlewares = require('../../helpers/middlewares');
 const util = require('../../helpers/util');
 const discord = require('../../helpers/discord');
@@ -214,37 +214,11 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
             let level = 'probation';
             let activityToCheck = 40;
 
-            const lastResignation = await ResignationEvaluation
-                .findOne({
-                    user: user._id,
-                    mode: evaluation.mode,
-                })
-                .sort({
-                    updatedAt: -1,
-                });
+            const skipProbation = await findSkipProbationEligibility(user.id, evaluation.mode);
 
-            const lastCurrentBnEval = await BnEvaluation
-                .findOne({
-                    user: user._id,
-                    mode: evaluation.mode,
-                    consensus: BnEvaluationConsensus.RemoveFromBn,
-                })
-                .sort({
-                    updatedAt: -1,
-                });
-
-            if (lastResignation && lastCurrentBnEval && lastResignation.archivedAt && lastCurrentBnEval.archivedAt && lastResignation.consensus === ResignationConsensus.ResignedOnGoodTerms) {
-                const resignationArchiveDate = new Date(lastResignation.archivedAt);
-                const currentBnEvalArchiveDate = new Date(lastCurrentBnEval.archivedAt);
-
-                const oneYearAgo = new Date();
-                oneYearAgo.setDate(oneYearAgo.getDate() - 365);
-
-                // skip probation on condition
-                if (resignationArchiveDate > currentBnEvalArchiveDate && resignationArchiveDate > oneYearAgo) {
-                    level = 'full';
-                    activityToCheck = Math.floor(Math.random() * (95 - 85) + 85); // between 85 and 95 days;
-                }
+            if (skipProbation) {
+                level = 'full';
+                activityToCheck = Math.floor(Math.random() * (95 - 85) + 85); // between 85 and 95 days;
             }
 
             user.modesInfo.push({

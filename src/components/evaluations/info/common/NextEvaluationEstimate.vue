@@ -41,6 +41,7 @@ export default {
     data() {
         return {
             evaluationsWithoutIncident: null,
+            skipProbation: false,
             isEditing: false,
             newDeadlineInput: '',
         };
@@ -59,7 +60,7 @@ export default {
         estimateText () {
             let num;
 
-            if (this.consensus == 'probationBn' || this.consensus == 'pass' || this.selectedEvaluation.addition == 'lowActivityWarning') {
+            if (!this.skipProbation && (this.consensus == 'probationBn' || this.consensus == 'pass' || this.selectedEvaluation.addition == 'lowActivityWarning')) {
                 num = 1;
             } else if (this.evaluationsWithoutIncident > 1 && (!this.selectedEvaluation.addition || this.selectedEvaluation.addition == 'none')) {
                 num = 6;
@@ -77,17 +78,21 @@ export default {
     },
     watch: {
         async selectedEvaluation () {
-            await this.findEvaluationsWithoutIncident();
+            await this.findEstimateInfo();
         },
     },
     async mounted () {
-        await this.findEvaluationsWithoutIncident();
+        await this.findEstimateInfo();
     },
     methods: {
-        async findEvaluationsWithoutIncident() {
+        async findEstimateInfo() {
             this.evaluationsWithoutIncident = await this.$http.executeGet(
                 `/bnEval/findEvaluationsWithoutIncident/${this.selectedEvaluation.user.id}`
             );
+
+            this.skipProbation = Boolean(await this.$http.executeGet(
+                `/bnEval/findSkipProbationEligibility/${this.selectedEvaluation.user.id}/${this.selectedEvaluation.mode}`
+            ));
         },
         async overwriteEvaluationDate(e) {
             const result = await this.$http.executePost(
