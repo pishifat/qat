@@ -958,4 +958,30 @@ router.post('/overwriteEvaluationDate/:id/', middlewares.isNat, async (req, res)
     );
 });
 
+/* POST toggle isReviewed for evaluations */
+router.post('/toggleIsReviewed/:id', middlewares.isNat, async (req, res) => {
+    const er = await BnEvaluation
+        .findById(req.params.id)
+        .populate(defaultPopulate);
+
+    er.isReviewed = !er.isReviewed;
+    await er.save();
+
+    res.json(er);
+
+    discord.webhookPost([{
+        author: discord.defaultWebhookAuthor(req.session),
+        color: discord.webhookColors.lightPurple,
+        description: `${er.isReviewed ? 'Reviewed feedback for ' : 'Unmarked feedback as reviewed for '} [**${er.user.username}**'s current BN eval](http://bn.mappersguild.com/appeval?id=${er.id})`,
+    }],
+    er.mode);
+
+    Logger.generate(
+        req.session.mongoId,
+        `Toggled "${er.user.username}" ${er.mode} current BN evaluation isReviewed to ${er.isReviewed}`,
+        'bnEvaluation',
+        er._id
+    );
+});
+
 module.exports = { router, getGeneralEvents };

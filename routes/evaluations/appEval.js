@@ -593,4 +593,30 @@ router.post('/overwriteEvaluationDate/:id/', middlewares.isNat, async (req, res)
     );
 });
 
+/* POST toggle isReviewed for evaluations */
+router.post('/toggleIsReviewed/:id', middlewares.isNat, async (req, res) => {
+    const app = await AppEvaluation
+        .findById(req.params.id)
+        .populate(defaultPopulate);
+        
+    app.isReviewed = !app.isReviewed;
+    await app.save();
+
+    res.json(app);
+
+    discord.webhookPost([{
+        author: discord.defaultWebhookAuthor(req.session),
+        color: discord.webhookColors.lightPurple,
+        description: `${app.isReviewed ? 'Reviewed feedback for ' : 'Unmarked feedback as reviewed for '} [**${app.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${app.id})`,
+    }],
+    app.mode);
+
+    Logger.generate(
+        req.session.mongoId,
+        `Toggled "${app.user.username}" ${app.mode} BN app isReviewed to ${app.isReviewed}`,
+        'appEvaluation',
+        app._id
+    );
+});
+
 module.exports = router;

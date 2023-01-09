@@ -4,6 +4,7 @@ const baseSchema = {
     reviews: [{ type: 'ObjectId', ref: 'Review' }],
     active: { type: Boolean, default: true },
     discussion: { type: Boolean, default: false },
+    isReviewed: { type: Boolean, default: false },
     feedback: { type: String },
     cooldownDate: { type: Date },
     natEvaluators: [{ type: 'ObjectId', ref: 'User' }],
