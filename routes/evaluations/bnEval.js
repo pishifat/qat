@@ -958,4 +958,26 @@ router.post('/overwriteEvaluationDate/:id/', middlewares.isNat, async (req, res)
     );
 });
 
+/* POST toggle isReviewed for evaluations */
+router.post('/toggleIsReviewed/:id', middlewares.isNat, async (req, res) => {
+    const er = await BnEvaluation
+        .findById(req.params.id)
+        .populate(defaultPopulate);
+
+    er.isReviewed = !er.isReviewed;
+    await er.save();
+
+    res.json({
+        isReviewed: er.isReviewed,
+        success: `Toggled evaluation review status. Refresh to see changes`,
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Toggled "${er.user.username}" ${er.mode} current BN evaluation isReviewed to ${er.isReviewed}`,
+        'bnEvaluation',
+        er._id
+    );
+});
+
 module.exports = { router, getGeneralEvents };

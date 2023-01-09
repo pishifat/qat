@@ -593,4 +593,26 @@ router.post('/overwriteEvaluationDate/:id/', middlewares.isNat, async (req, res)
     );
 });
 
+/* POST toggle isReviewed for evaluations */
+router.post('/toggleIsReviewed/:id', middlewares.isNat, async (req, res) => {
+    const app = await AppEvaluation
+        .findById(req.params.id)
+        .populate(defaultPopulate);
+        
+    app.isReviewed = !app.isReviewed;
+    await app.save();
+
+    res.json({
+        isReviewed: app.isReviewed,
+        success: `Toggled evaluation review status. Refresh to see changes`,
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Toggled "${app.user.username}" ${app.mode} BN app isReviewed to ${app.isReviewed}`,
+        'appEvaluation',
+        app._id
+    );
+});
+
 module.exports = router;
