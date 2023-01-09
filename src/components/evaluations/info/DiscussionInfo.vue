@@ -17,6 +17,7 @@
                         loggedInUser.isNat
                     "
                 />
+                <evaluation-is-reviewed/>
                 <feedback-info v-if="selectedEvaluation.consensus" />
             </div>
         </template>
@@ -43,6 +44,7 @@ import ReviewsListing from './common/ReviewsListing.vue';
 import FeedbackInfo from './common/FeedbackInfo.vue';
 import evaluations from '../../../mixins/evaluations.js';
 import NextEvaluationEstimate from './common/NextEvaluationEstimate.vue';
+import EvaluationIsReviewed from './common/EvaluationIsReviewed.vue';
 
 export default {
     name: 'DiscussionInfo',
@@ -52,6 +54,7 @@ export default {
         ReviewsListing,
         FeedbackInfo,
         NextEvaluationEstimate,
+        EvaluationIsReviewed,
     },
     mixins: [evaluations],
     computed: {
