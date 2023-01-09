@@ -252,7 +252,7 @@ const webhookColors = {
     darkBlue: 1911891,        // setCooldown
     blue: 6786559,            // setFeedback
 
-    lightPurple: 11173873,    // submitVetoMediation
+    lightPurple: 11173873,    // submitVetoMediation, toggleIsReviewed
     darkPurple: 4263999,      // submitVeto
     purple: 8536232,          // startVetoMediation, concludeVetoMediation
 

@@ -30,7 +30,15 @@ export default {
     },
     methods: {
         async toggleEvaluationIsReviewed(e) {
-            await this.$http.executePost(`/${this.selectedEvaluation.isApplication ? 'appEval' : 'bnEval'}/toggleIsReviewed/${this.selectedEvaluation.id}`, e);   
+            const result = await this.$http.executePost(`/${this.selectedEvaluation.isApplication ? 'appEval' : 'bnEval'}/toggleIsReviewed/${this.selectedEvaluation.id}`, e); 
+            
+            if (result && !result.error) {
+                this.$store.commit('evaluations/updateEvaluation', result);
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Toggled feedback sanity check`,
+                    type: 'success',
+                });
+            }  
         },
     },
 }

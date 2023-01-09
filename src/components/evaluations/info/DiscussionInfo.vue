@@ -17,7 +17,7 @@
                         loggedInUser.isNat
                     "
                 />
-                <evaluation-is-reviewed/>
+                <evaluation-is-reviewed v-if="selectedEvaluation.feedback"/>
                 <feedback-info v-if="selectedEvaluation.consensus" />
             </div>
         </template>

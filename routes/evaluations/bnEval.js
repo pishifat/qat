@@ -967,10 +967,14 @@ router.post('/toggleIsReviewed/:id', middlewares.isNat, async (req, res) => {
     er.isReviewed = !er.isReviewed;
     await er.save();
 
-    res.json({
-        isReviewed: er.isReviewed,
-        success: `Toggled evaluation review status. Refresh to see changes`,
-    });
+    res.json(er);
+
+    discord.webhookPost([{
+        author: discord.defaultWebhookAuthor(req.session),
+        color: discord.webhookColors.lightPurple,
+        description: `${er.isReviewed ? 'Reviewed feedback for ' : 'Unmarked feedback as reviewed for '} [**${er.user.username}**'s current BN eval](http://bn.mappersguild.com/appeval?id=${er.id})`,
+    }],
+    er.mode);
 
     Logger.generate(
         req.session.mongoId,
