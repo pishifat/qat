@@ -59,7 +59,7 @@ router.post("/removeFromGmt", async (req, res) => {
 
     res.json({
         user,
-        success: "moved to GMT",
+        success: "removed from GMT",
     });
 });
 
@@ -136,7 +136,7 @@ router.post("/removeFromBn/:mode", async (req, res) => {
 
     res.json({
         user,
-        success: `removed osu!${mode == 'osu' ? '' : mode } probation/full BN`,
+        success: `removed from osu!${mode == 'osu' ? '' : mode } probation/full BN`,
     });
         
 });
