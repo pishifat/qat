@@ -6,6 +6,7 @@ const AppEvaluation = require('../../models/evaluations/appEvaluation');
 const middlewares = require('../../helpers/middlewares');
 const discord = require('../../helpers/discord');
 const scrap = require('../../helpers/scrap');
+const config = require('../../config.json');
 
 const router = express.Router();
 
@@ -206,7 +207,7 @@ router.get('/findBagUsers/:mode', async (req, res) => {
 router.post('/editBadgeValue/:id', async (req, res) => {
     let u = await User.findById(req.params.id);
 
-    if (res.locals.userRequest.osuId == '3178418') { //i dont want anyone else messing with this
+    if (res.locals.userRequest.osuId == config.admin.pishifat.toString()) { //i dont want anyone else messing with this
         let years;
         let num = req.body.add ? 1 : -1;
 

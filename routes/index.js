@@ -128,7 +128,7 @@ router.post('/findBns/', async (req, res) => {
     const mapperInfo = await osu.getOtherUserInfo(req.session.accessToken, beatmapsetInfo.user.id);
 
     if (!mapperInfo || mapperInfo.error || !mapperInfo.id) {
-        await osuBot.sendMessages(3178418, [`mapperInfo 2nd stop error for ${url} pls fix`]);
+        await osuBot.sendMessages(config.admin.pishifat, [`mapperInfo 2nd stop error for ${url} pls fix`]);
 
         return res.json({
             error: `Couldn't retrieve mapper info. Dev has been notified.`,
@@ -435,7 +435,7 @@ router.post('/setMatchStatus/:id', async (req, res) => {
         const sentMessages = await osuBot.sendMessages(match.beatmapset.mapperOsuId, messages);
 
         if (sentMessages !== true) {
-            await osuBot.sendMessages(3178418, [`message sending fucked up. user: ${req.session.username} / match id: ${match.id}`]);
+            await osuBot.sendMessages(config.admin.pishifat, [`message sending fucked up. user: ${req.session.username} / match id: ${match.id}`]);
 
             return res.json({ error: `Messages were not sent. Dev has been notified.` });
         }

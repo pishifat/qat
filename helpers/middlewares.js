@@ -1,8 +1,8 @@
-
 const User = require('../models/user');
 const { refreshToken } = require('./osu');
 const { setSession } = require('./util');
 const { OsuResponseError } = require('./errors');
+const config = require('../config.json');
 
 function unauthorize(req, res, customError) {
     if (req.accepts(['html', 'json']) === 'json') {
@@ -83,7 +83,7 @@ function isNatOrTrialNat(req, res, next) {
 
 function isResponsibleWithButtons(req, res, next) {
     const u = res.locals.userRequest;
-    const valid = [3178418, 1541323];
+    const valid = config.admin.users;
 
     if (!valid.includes(u.osuId)) return unauthorize(req, res, `You can't use this`);
 
