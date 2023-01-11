@@ -199,6 +199,16 @@
                             </li>
                         </template>
                         
+                        <li v-if="loggedInUser.isPishifat" class="nav-item">
+                            <a
+                                class="nav-link"
+                                href="#"
+                                data-toggle="modal"
+                                data-target="#DebugMenu"
+                            >
+                                <i class="fas fa-bug text-warning" />
+                            </a>
+                        </li>
 
                         <li v-if="loggedInUser.hasBasicAccess" class="nav-item">
                             <a
@@ -272,6 +282,7 @@
             </loading-page>
         </div>
 
+        <debug-modal v-if="loggedInUser.isPishifat" />
         <settings-modal v-if="loggedInUser" />
     </div>
 </template>
@@ -280,11 +291,13 @@
 import { mapState } from 'vuex';
 import LoadingPage from './components/LoadingPage.vue';
 import SettingsModal from './components/settingsModal/SettingsModal.vue';
+import DebugModal from './components/debugModal/DebugModal.vue';
 
 export default {
     components: {
         LoadingPage,
         SettingsModal,
+        DebugModal,
     },
     computed: {
         ...mapState([
