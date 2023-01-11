@@ -3,6 +3,7 @@ const util = require('../helpers/util');
 const moment = require('moment');
 const Settings = require('./settings');
 const enums = require('../shared/enums');
+const config = require('../config.json');
 
 
 const userSchema = new mongoose.Schema({
@@ -84,6 +85,14 @@ class UserService extends mongoose.Model {
 
     get isNatOrTrialNat () {
         return this.groups && (this.groups.includes('nat') || (this.groups.includes('bn') && this.isTrialNat));
+    }
+
+    get isPishifat () {
+        return this.osuId === config.admin.pishifat;
+    }
+
+    get isResponsibleWithButtons () {
+        return config.admin.users.includes(this.osuId);
     }
 
     // Modes
