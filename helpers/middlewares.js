@@ -98,6 +98,13 @@ async function hasPrivateInterOpsAccess(req, res, next) {
     next();
 }
 
+async function isPishifat(req, res, next) {
+    const u = res.locals.userRequest;
+    if (u.osuId !== config.admin.pishifat) return unauthorize(req, res);
+
+    next();
+}
+
 module.exports = {
     isLoggedIn,
     isBnOrNat,
@@ -108,4 +115,5 @@ module.exports = {
     hasBasicAccess,
     hasFullReadAccess,
     hasPrivateInterOpsAccess,
+    isPishifat,
 };
