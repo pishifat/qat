@@ -997,7 +997,19 @@ router.post('/:id/switchUserGroup', middlewares.isNat, async (req, res) => {
 
     for (const mode of user.modesInfo) {
         mode.level = 'full';
+        const activityToCheck = Math.floor(Math.random() * (95 - 85) + 85); // between 85 and 95 days;
+        let deadline = new Date();
+        deadline.setDate(deadline.getDate() + activityToCheck);
 
+        if (user.isNat) {
+            await BnEvaluation.create({
+                user: user._id,
+                mode: mode.mode,
+                deadline,
+                activityToCheck,
+            });
+        }
+        
         user.history.push({
             date: new Date(),
             mode: mode.mode,
