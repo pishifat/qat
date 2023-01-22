@@ -25,9 +25,13 @@
                     :overwrite-days="90"
                 />
 
-                <resign
-                    v-if="selectedUser.id == loggedInUser.id && loggedInUser.isBn"
-                />
+                <div v-for="mode in selectedUser.modes" :key="mode">
+                    <resign
+                        v-if="selectedUser.id == loggedInUser.id && loggedInUser.isBn"
+                        :mode="mode"
+                        class="mb-2"
+                    />
+                </div>
 
                 <div v-if="loggedInUser.isNat">
                     <bn-evaluator-toggle />

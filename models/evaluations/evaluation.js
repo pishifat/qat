@@ -76,7 +76,7 @@ class EvaluationService extends mongoose.Model {
             .sort({ deadline: 1, consensus: 1, feedback: 1 });
     }
 
-    static deleteUserActiveEvaluations(userId) {
+    static deleteUserActiveEvaluations(userId, mode) {
         let minDate = new Date();
         minDate.setDate(minDate.getDate() + 7);
 
@@ -84,6 +84,7 @@ class EvaluationService extends mongoose.Model {
             user: userId,
             active: true,
             deadline: { $gte: minDate },
+            mode,
         });
     }
 

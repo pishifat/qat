@@ -125,7 +125,7 @@ router.post('/:id/unarchiveApp', async (req, res) => {
 
         await Promise.all([
             user.save(),
-            Evaluation.deleteUserActiveEvaluations(user.id),
+            Evaluation.deleteUserActiveEvaluations(user.id, app.mode),
         ]);
     }
 
@@ -166,7 +166,7 @@ router.post('/:id/unarchiveBn', async (req, res) => {
 
     // Change mode to probation and restore mode if needed
     } else if (evaluation.consensus === BnEvaluationConsensus.ProbationBn || evaluation.consensus === BnEvaluationConsensus.FullBn) {
-        await Evaluation.deleteUserActiveEvaluations(user.id);
+        await Evaluation.deleteUserActiveEvaluations(user.id, evaluation.mode);
 
         const i = user.modesInfo.findIndex(m => m.mode == evaluation.mode);
 

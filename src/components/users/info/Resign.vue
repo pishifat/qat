@@ -7,7 +7,7 @@
             title="The NAT will evaluate your recent activity and remove you from the BN (usually within 24 hours)."
             @click="resignFromBn($event)"
         >
-            Resign from the Beatmap Nominators
+            Resign from the {{ mode == 'osu' ? 'osu!' : 'osu!' + mode }} Beatmap Nominators
         </button>
     </div>
 </template>
@@ -17,6 +17,12 @@ import { mapGetters } from 'vuex';
 
 export default {
     name: 'BnEvaluatorToggle',
+    props: {
+        mode: {
+            type: String,
+            required: true,
+        },
+    },
     computed: {
         ...mapGetters('users', [
             'selectedUser',
@@ -24,10 +30,10 @@ export default {
     },
     methods: {
         async resignFromBn(e) {
-            const result = confirm(`Are you sure? You will no longer be a Beatmap Nominator.`);
+            const result = confirm(`Are you sure? You will no longer be a Beatmap Nominator for ${this.mode == 'osu' ? 'osu!' : 'osu!' + this.mode}.`);
 
             if (result) {
-                await this.$http.executePost(`/users/resignFromBn/${this.selectedUser.id}`, {}, e);
+                await this.$http.executePost(`/users/resignFromBn/${this.selectedUser.id}`, { mode: this.mode }, e);
             }
         },
     },

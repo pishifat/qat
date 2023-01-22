@@ -989,7 +989,7 @@ router.post('/:id/switchUserGroup', middlewares.isNat, async (req, res) => {
         const i = user.groups.findIndex(g => g === 'nat');
         if (i !== -1) user.groups.splice(i, 1, 'bn');
     } else {
-        await Evaluation.deleteUserActiveEvaluations(user._id);
+        await Evaluation.deleteUserActiveEvaluations(user._id, user.modesInfo[0].mode);
         user.isTrialNat = false;
         const i = user.groups.findIndex(g => g === 'bn');
         if (i !== -1) user.groups.splice(i, 1, 'nat');
@@ -1077,63 +1077,59 @@ router.get('/findModsCount/:username', async (req, res) => {
 /* GET user next evaluation isResignation field */
 router.post('/resignFromBn/:id', async (req, res) => {
     const user = await User.findById(req.params.id).orFail();
+    const mode = req.body.mode;
 
     if (req.session.mongoId != user.id) {
         return res.json({ error: 'Unauthorized' });
     }
 
-    const evaluation = await ResignationEvaluation.findOne({ user: req.params.id, active: true });
+    const evaluation = await ResignationEvaluation.findOne({ user: user._id, mode, active: true });
 
     if (evaluation) {
         return res.json({ error: 'Resignation is currently being handled by the NAT!' });
     }
 
-    await Evaluation.deleteUserActiveEvaluations(user._id);
+    await Evaluation.deleteUserActiveEvaluations(user._id, mode);
 
-    let resignations = [];
+    let resignation = new ResignationEvaluation();
+    resignation.user = user._id;
+    resignation.mode = mode;
+    resignation.deadline = new Date();
 
-    for (const mode of user.modes) {
-        resignations.push({ user: user._id, mode, deadline: new Date() });
-    }
+    const fields = [];
 
-    const evaluations = await ResignationEvaluation.insertMany(resignations);
+    const assignedNat = await User.getAssignedNat(mode, [user.osuId]);
+    resignation.natEvaluators = assignedNat;
+    const natList = assignedNat.map(e => e.username).join(', ');
 
-    for (const evaluation of evaluations) {
-        const fields = [];
+    fields.push({
+        name: 'Assigned NAT',
+        value: natList,
+    });
 
-        const assignedNat = await User.getAssignedNat(evaluation.mode, [user.osuId]);
-        evaluation.natEvaluators = assignedNat;
-        const natList = assignedNat.map(e => e.username).join(', ');
+    if (await Settings.getModeHasTrialNat(mode)) {
+        const assignedTrialNat = await User.getAssignedTrialNat(mode, [user.osuId]);
+        resignation.bnEvaluators = assignedTrialNat;
+        const trialNatList = assignedTrialNat.map(e => e.username).join(', ');
 
         fields.push({
-            name: 'Assigned NAT',
-            value: natList,
+            name: 'Assigned BN',
+            value: trialNatList,
         });
-
-        if (await Settings.getModeHasTrialNat(evaluation.mode)) {
-            const assignedTrialNat = await User.getAssignedTrialNat(evaluation.mode, [user.osuId]);
-            evaluation.bnEvaluators = assignedTrialNat;
-            const trialNatList = assignedTrialNat.map(e => e.username).join(', ');
-
-            fields.push({
-                name: 'Assigned BN',
-                value: trialNatList,
-            });
-        }
-
-        await evaluation.save();
-
-        await discord.webhookPost(
-            [{
-                author: discord.defaultWebhookAuthor(req.session),
-                color: discord.webhookColors.white,
-                description: `Created [**${user.username}**'s resignation eval](http://bn.mappersguild.com/bneval?id=${evaluation.id})`,
-                fields,
-            }],
-            evaluation.mode
-        );
-        await util.sleep(500);
     }
+
+    await resignation.save();
+
+    await discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            color: discord.webhookColors.white,
+            description: `Created [**${user.username}**'s resignation eval](http://bn.mappersguild.com/bneval?id=${resignation.id})`,
+            fields,
+        }],
+        mode
+    );
+    await util.sleep(500);
 
     res.json({
         success: 'Your removal will be processed soon',

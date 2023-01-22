@@ -148,7 +148,7 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
     // delete scheduled BnEvaluations/ResignationEvaluations
     for (let i = 0; i < allEvalsToCreate.length; i++) {
         const round = allEvalsToCreate[i];
-        await Evaluation.deleteUserActiveEvaluations(round.user);
+        await Evaluation.deleteUserActiveEvaluations(round.user, round.mode);
     }
 
     // create BnEvaluations or Resignations
