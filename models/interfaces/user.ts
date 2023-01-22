@@ -74,6 +74,7 @@ export interface IUserDocument extends IUser, Document {
     /** Used in notifications */
     recentQaChecks?: number;
     allQaChecks?: number;
+    isPishifat?: boolean;
 }
 
 interface IUsersByGroup {

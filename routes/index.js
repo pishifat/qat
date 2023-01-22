@@ -628,6 +628,23 @@ router.get('/callback', async (req, res) => {
                 );
             }
 
+            // ensure correct groups for debugging users after re-log
+            if (user.isPishifat && !user.modesInfo.length) {
+                const modesInfo = [];
+
+                for (const group of response.groups) {
+                    if (group.id == 7 || group.id == 28 || group.id == 32) {
+                        modesInfo.push({
+                            mode: group.playmodes[0] == 'fruits' ? 'catch' : group.playmodes[0],
+                            level: 'full'
+                        });
+                    }
+                }
+
+                user.modesInfo = modesInfo;
+                await user.save();
+            }
+
             req.session.mongoId = user._id;
         }
 
