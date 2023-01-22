@@ -282,7 +282,7 @@
             </loading-page>
         </div>
 
-        <debug-modal v-if="loggedInUser.isPishifat" />
+        <debug-modal v-if="loggedInUser && loggedInUser.isPishifat" />
         <settings-modal v-if="loggedInUser" />
     </div>
 </template>
