@@ -972,7 +972,7 @@ router.post('/toggleIsReviewed/:id', middlewares.isNat, async (req, res) => {
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),
         color: discord.webhookColors.lightPurple,
-        description: `${er.isReviewed ? 'Reviewed feedback for ' : 'Unmarked feedback as reviewed for '} [**${er.user.username}**'s current BN eval](http://bn.mappersguild.com/appeval?id=${er.id})`,
+        description: `${er.isReviewed ? 'Reviewed feedback for ' : 'Unmarked feedback as reviewed for '} [**${er.user.username}**'s current BN eval](http://bn.mappersguild.com/bneval?id=${er.id})`,
     }],
     er.mode);
 
