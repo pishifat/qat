@@ -95,7 +95,7 @@
         "probationMania": ""
     },
     "admin": {
-        "pishifat": "",
-        "users": []
+        "pishifat": 0,
+        "users": [0, 1, 2]
     }
 }
