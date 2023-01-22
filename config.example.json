@@ -93,5 +93,9 @@
         "probationTaiko": "",
         "probationCatch": "",
         "probationMania": ""
+    },
+    "admin": {
+        "pishifat": "",
+        "users": []
     }
 }

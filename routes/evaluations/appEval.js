@@ -11,6 +11,7 @@ const discord = require('../../helpers/discord');
 const osu = require('../../helpers/osu');
 const { AppEvaluationConsensus, ResignationConsensus, BnEvaluationConsensus } = require('../../shared/enums');
 const osuBot = require('../../helpers/osuBot');
+const config = require('../../config.json');
 
 const router = express.Router();
 
@@ -258,7 +259,7 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
             await user.save();
 
             const userOsuInfo = await osu.getOtherUserInfo(req.session.accessToken, user.osuId);
-            const pishifat = await User.findOne({ osuId: 3178418 });
+            const pishifat = await User.findOne({ osuId: config.admin.pishifat });
 
             if (!userOsuInfo.is_supporter) {
                 await discord.userHighlightWebhookPost(evaluation.mode, [pishifat.discordId], 'give new BN supporter pls ');

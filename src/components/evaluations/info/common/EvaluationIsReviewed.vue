@@ -6,7 +6,7 @@
                 href="#"
                 data-toggle="tooltip"
                 data-placement="right"
-                title="mark evaluation as reviewed"
+                title="toggle review status"
                 @click.prevent="toggleEvaluationIsReviewed($event)"
             >
                 <font-awesome-icon
