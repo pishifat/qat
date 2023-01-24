@@ -60,9 +60,10 @@
                 :header="'Disqualified Quality Assurance Checks'"
             />
 
-            <template
+                <template
                 v-if="
-                    loggedInUser.isNat && (natApplications || natBnEvaluations)
+                    (loggedInUser.isNat || selectedUser.isNat) &&
+                    (natApplications || natBnEvaluations)
                 "
             >
                 <div class="mt-2">Evaluations</div>
@@ -106,7 +107,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import EventsList from './EventsList.vue';
 import NominationResets from './NominationResets.vue';
 import EvaluationList from './EvaluationList.vue';
@@ -156,6 +157,7 @@ export default {
     },
     computed: {
         ...mapState(['loggedInUser']),
+        ...mapGetters('users', ['selectedUser']),
         ...mapState('activity', [
             'nominations',
             'nominationsDisqualified',
