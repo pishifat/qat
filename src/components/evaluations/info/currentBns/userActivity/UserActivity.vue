@@ -60,7 +60,7 @@
                 :header="'Disqualified Quality Assurance Checks'"
             />
 
-                <template
+            <template
                 v-if="
                     (loggedInUser.isNat || selectedUser.isNat) &&
                     (natApplications || natBnEvaluations)
