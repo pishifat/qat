@@ -12,16 +12,6 @@ router.use(middlewares.isLoggedIn);
 const defaultAppPopulate = [
     { path: 'user', select: 'username osuId' },
     { path: 'test', select: 'totalScore comment' },
-    { path: 'bnEvaluators', select: 'username osuId' },
-    { path: 'natEvaluators', select: 'username osuId' },
-    {
-        path: 'reviews',
-        select: 'evaluator behaviorComment moddingComment vote',
-        populate: {
-            path: 'evaluator',
-            select: 'username osuId groups',
-        },
-    },
 ];
 
 const defaultBnPopulate = [
@@ -29,26 +19,27 @@ const defaultBnPopulate = [
         path: 'user',
         select: 'username osuId modesInfo',
     },
-    {
-        path: 'natEvaluators',
-        select: 'username osuId',
-    },
-    {
-        path: 'reviews',
-        select: 'evaluator behaviorComment moddingComment vote',
-        populate: {
-            path: 'evaluator',
-            select: 'username osuId groups',
-        },
-    },
+    
 ];
 
 /* GET search for your evals */
 router.get('/search', async (req, res) => {
     const userToSearch = req.session.osuId;
     const idToSearch = req.query.id;
+    
+    if (res.locals.userRequest.isNat) {
+        const reviewsPopulate = {
+            path: 'reviews',
+            select: 'evaluator behaviorComment moddingComment vote',
+            populate: {
+                path: 'evaluator',
+                select: 'username osuId groups',
+            },
+        };
 
-    let limit = parseInt(req.query.limit) || 12;
+        defaultAppPopulate.push(reviewsPopulate);
+        defaultBnPopulate.push(reviewsPopulate);
+    }
 
     let bnApplicationsQuery = AppEvaluation
         .find({
@@ -56,8 +47,7 @@ router.get('/search', async (req, res) => {
             consensus: { $exists: true },
         })
         .populate(defaultAppPopulate)
-        .sort({ createdAt: -1 })
-        .limit(limit);
+        .sort({ createdAt: -1 });
 
     let bnEvaluationsQuery = Evaluation
         .find({
@@ -65,8 +55,7 @@ router.get('/search', async (req, res) => {
             consensus: { $exists: true },
         })
         .populate(defaultBnPopulate)
-        .sort({ createdAt: -1 })
-        .limit(limit);
+        .sort({ createdAt: -1 });
 
         if (idToSearch) {
             bnApplicationsQuery.where('_id', idToSearch);
