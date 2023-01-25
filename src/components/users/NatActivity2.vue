@@ -85,6 +85,7 @@
                 ^user could be assigned to the next evaluation (in the 'bag')
             </div>
             <button
+                v-if="loggedInUser.isResponsibleWithButtons"
                 class="btn btn-sm btn-danger ml-1"
                 @click="cycleBag($event)"
             >
@@ -95,6 +96,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import UserLink from '../UserLink.vue';
 import DataTable from '../DataTable.vue';
 
@@ -113,6 +115,10 @@ export default {
         };
     },
     computed: {
+        ...mapState([
+            'loggedInUser',
+        ]),
+
         /** @returns {boolean} */
         recentlyJoinedNatExists () {
             let recentlyJoinedNatExists;

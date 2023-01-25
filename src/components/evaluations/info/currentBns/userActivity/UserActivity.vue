@@ -62,7 +62,8 @@
 
             <template
                 v-if="
-                    loggedInUser.isNat && (natApplications || natBnEvaluations)
+                    loggedInUser.isNat &&
+                    (assignedBnApplications || natApplications || natBnEvaluations)
                 "
             >
                 <div class="mt-2">Evaluations</div>
@@ -92,6 +93,29 @@
                 />
             </template>
 
+            <template
+                v-else-if="
+                    !loggedInUser.isNat && selectedUser.isNat &&
+                    (assignedBnApplications || natApplications || natBnEvaluations)
+                "
+            >
+                <div class="mt-2">Evaluations</div>
+                <public-evaluation-list
+                    :events="natApplications"
+                    :events-id="'natApplications'"
+                    :header="'Application Evaluations'"
+                    :is-application="true"
+                    :mongo-id="mongoId"
+                />
+                <public-evaluation-list
+                    :events="natBnEvaluations"
+                    :events-id="'natBnEvaluations'"
+                    :header="'Current BN Evaluations'"
+                    :is-application="false"
+                    :mongo-id="mongoId"
+                />
+            </template>
+
             <template>
                 <div class="mt-2">Modding</div>
                 <events-list
@@ -106,10 +130,11 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import EventsList from './EventsList.vue';
 import NominationResets from './NominationResets.vue';
 import EvaluationList from './EvaluationList.vue';
+import PublicEvaluationList from './PublicEvaluationList.vue';
 
 export default {
     name: 'UserActivity',
@@ -117,6 +142,7 @@ export default {
         EventsList,
         NominationResets,
         EvaluationList,
+        PublicEvaluationList,
     },
     props: {
         modes: {
@@ -156,6 +182,7 @@ export default {
     },
     computed: {
         ...mapState(['loggedInUser']),
+        ...mapGetters('users', ['selectedUser']),
         ...mapState('activity', [
             'nominations',
             'nominationsDisqualified',
@@ -234,7 +261,7 @@ export default {
                     res.disqualifiedQualityAssuranceChecks
                 );
 
-                if (this.loggedInUser.isNat) {
+                if (this.loggedInUser.isNat || this.selectedUser.isNat) {
                     this.$store.commit(
                         'activity/setBnApplications',
                         res.assignedBnApplications

@@ -863,7 +863,7 @@ router.get('/activity', async (req, res) => {
                 bnEvaluators: { $ne: mongoId },
             })
             .populate(applicationPopulate)
-            .sort({ createdAt: 1 }),
+            .sort({ deadline: 1 }),
 
         Evaluation
             .find({
@@ -872,7 +872,7 @@ router.get('/activity', async (req, res) => {
                 active: false,
             })
             .populate(defaultPopulate)
-            .sort({ createdAt: 1 }),
+            .sort({ deadline: 1 }),
     ]);
 
     // extract apps that user evaluated or was assigned to
