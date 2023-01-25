@@ -8,6 +8,7 @@ const Users = () => import(/* webpackChunkName: "public", webpackPrefetch: true 
 const Vetoes = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/VetoesPage.vue');
 const QualityAssurance = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/QualityAssurancePage.vue');
 const TestResults = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/TestResultsPage.vue');
+const YourEvals = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/YourEvalsPage.vue');
 const Message = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/MessagePage.vue');
 
 const ModRequests = () => import(/* webpackChunkName: "bn", webpackPrefetch: true */ './pages/ModRequests.vue');
@@ -33,6 +34,7 @@ const routes = [
     { path: '/vetoes', component: Vetoes, meta: { title: 'Vetoes' } },
     { path: '/qualityassurance', component: QualityAssurance, meta: { title: 'Quality Assurance' } },
     { path: '/testresults', component: TestResults, meta: { title: 'Ranking Criteria Test Results' } },
+    { path: '/yourevals', component: YourEvals, meta: { title: 'Your Evaluations' } },
     { path: '/message', component: Message, meta: { title: 'Message from the NAT' } },
     { path: '/modrequests', component: ModRequestsSubmission, meta: { title: 'Mod Requests', public: true } },
 

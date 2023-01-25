@@ -110,7 +110,7 @@ export default {
             this.$store.commit('evaluations/setSelectedEvaluationId', this.evaluation.id);
 
             if (this.$route.query.id !== this.evaluation.id && !this.loggedInUser.isBn) {
-                let url = '/evalarchive';
+                let url = this.$route.path;
 
                 if (this.evaluation.active) {
                     if (this.evaluation.isApplication) {

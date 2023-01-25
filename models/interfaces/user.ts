@@ -90,7 +90,7 @@ interface IUsersByGroup {
 
 export interface IUserModel extends Model<IUserDocument> {
     findByUsername?: (username: string) => DocumentQuery<IUserDocument, IUserDocument>;
-    findByUsernameOrOsuId?: (user: string) => DocumentQuery<IUserDocument, IUserDocument>;
+    findByUsernameOrOsuId?: (user: string | number) => DocumentQuery<IUserDocument, IUserDocument>;
     getAllByMode?: (includeFullBns: boolean, includeProbation: boolean, includeNat: boolean) => Promise<IUsersByGroup[] & { error?: string }>;
     getAllMediators?: () => Promise<IUser[] & { error?: string }>;
     getAssignedNat?: (mode: string, excludeOsuIds?: number[], sampleSize?: number) => Promise<IUserDocument[]>;
