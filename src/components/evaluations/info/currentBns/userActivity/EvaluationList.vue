@@ -15,7 +15,7 @@
                 >
                     <tr v-for="event in events" :key="event.id">
                         <td class="text-nowrap">
-                            {{ findDate(event) }}
+                            {{ new Date(event.deadline).toString().slice(4, 10) }}
                         </td>
                         <td>
                             <a
@@ -27,7 +27,7 @@
                                 "
                                 target="_blank"
                             >
-                                {{ findUsername(event) }}
+                                {{ event.user.username }}
                             </a>
                         </td>
                         <td>
@@ -87,16 +87,6 @@ export default {
         ...mapState(['loggedInUser']),
     },
     methods: {
-        findDate(event) {
-            let date;
-            if (this.isApplication) date = event.createdAt;
-            else date = event.deadline;
-
-            return new Date(date).toString().slice(4, 10);
-        },
-        findUsername(event) {
-            return event.user.username;
-        },
         findVote(reviews) {
             let vote;
 

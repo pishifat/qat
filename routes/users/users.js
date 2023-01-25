@@ -25,10 +25,14 @@ const evaluationsPopulate = [
     {
         path: 'reviews',
         select: 'evaluator createdAt',
+        populate: {
+            path: 'evaluator',
+            select: 'username osuId',
+        },
     },
     {
         path: 'user',
-        select: 'username',
+        select: 'username osuId',
     },
 ];
 
@@ -1066,7 +1070,45 @@ router.get('/activity', async (req, res) => {
     minDate.setDate(minDate.getDate() - days);
     let maxDate = new Date(deadline);
 
-    res.json(await getGeneralEvents(osuId, mongoId, modes, minDate, maxDate));
+    // find all AppEvaluations & BnEvaluations/Resignations for NAT
+    let [appEvaluations, bnEvaluations] = await Promise.all([
+        AppEvaluation
+            .find({
+                createdAt: { $gte: minDate },
+                mode: { $in: modes },
+                active: false,
+                bnEvaluators: { $ne: mongoId },
+            })
+            .populate(evaluationsPopulate)
+            .select('-feedback -id -_id -natEvaluatorHistory -mods -reasons -bnEvaluators -test')
+            .sort({ deadline: 1 }),
+
+        Evaluation
+            .find({
+                deadline: { $gte: minDate },
+                mode: { $in: modes },
+                active: false,
+            })
+            .populate(evaluationsPopulate)
+            .select('-feedback -id -_id -natEvaluatorHistory')
+            .sort({ deadline: 1 }),
+    ]);
+
+    // extract apps that user evaluated
+    appEvaluations = appEvaluations.filter(a => 
+        a.reviews.some(r => r.evaluator.id == mongoId)
+    );
+
+    // extract BnEvaluations/Resignations that user evaluated
+    bnEvaluations = bnEvaluations.filter(e =>
+        e.reviews.some(r => r.evaluator.id == mongoId)
+    );
+
+    res.json({
+        ...await getGeneralEvents(osuId, mongoId, modes, minDate, maxDate),
+        appEvaluations,
+        bnEvaluations,
+    });
 });
 
 /* GET modding info */
