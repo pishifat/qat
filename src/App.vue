@@ -119,6 +119,9 @@
                                     <router-link class="dropdown-item" to="/bneval">
                                         Current BNs
                                     </router-link>
+                                    <router-link class="dropdown-item" to="/yourevals">
+                                        Your Evaluations
+                                    </router-link>
                                 </div>
                             </li>
                         </template>
@@ -144,14 +147,11 @@
                                     Other
                                 </a>
                                 <div class="dropdown-menu">
-                                    <router-link class="dropdown-item" to="/yourevals">
-                                        Your Evaluations
-                                    </router-link>
                                     <router-link class="dropdown-item" to="/vetoes">
-                                    Vetoes
+                                        Vetoes
                                     </router-link>
                                     <router-link class="dropdown-item" to="/discussionvote">
-                                    Content Review
+                                        Content Review
                                     </router-link>
                                     <router-link class="dropdown-item" to="/qualityassurance">
                                         Quality Assurance
@@ -180,6 +180,9 @@
                                     </router-link>
                                     <router-link class="dropdown-item" to="/datacollection">
                                         Data collection
+                                    </router-link>
+                                    <router-link class="dropdown-item" to="/yourevals">
+                                        Your Evaluations
                                     </router-link>
                                 </div>
                             </li>
