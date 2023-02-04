@@ -180,7 +180,7 @@ router.post('/submit', async (req, res) => {
 
     if (req.body.isContentReview) {
         // #content-cases
-        await discord.roleHighlightWebhookPost('contentCase', ['gmt']);
+        await discord.roleHighlightWebhookPost('contentCase', ['contentReview']);
 
         // #gmt
         await discord.webhookPost(

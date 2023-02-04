@@ -152,6 +152,9 @@ async function roleHighlightWebhookPost(webhook, roles, text) {
             case 'gmt':
                 content += `<@&${config.announcementWebhook.gmtRole}>`;
                 break;
+            case 'contentReview':
+                content += `<@&${config.announcementWebhook.contentReviewRole}>`;
+                break;
             case 'nat':
                 content += `<@&${config.announcementWebhook.natRole}>`;
                 break;

@@ -74,6 +74,7 @@
         "id": "",
         "token": "",
         "gmtRole": "",
+        "contentReviewRole": "",
         "natRole": "",
         "natOsu": "",
         "natTaiko": "",
