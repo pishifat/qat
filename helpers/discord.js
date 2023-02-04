@@ -130,6 +130,9 @@ async function roleHighlightWebhookPost(webhook, roles, text) {
         case 'contentCase':
             url += `${config.contentCasesWebhook.id}/${config.contentCasesWebhook.token}`;
             break;
+        case 'internalContentCase':
+            url += `${config.internalContentCasesWebhook.id}/${config.internalContentCasesWebhook.token}`;
+            break;
         case 'announcement':
             url += `${config.announcementWebhook.id}/${config.announcementWebhook.token}`;
             break;
@@ -290,7 +293,7 @@ async function contentCaseWebhookPost(d) {
 
     const description = `Concluded vote for [**${d.title}**](http://bn.mappersguild.com/discussionvote?id=${d.id})\n\nIs this content appropriate for a beatmap? ${d.discussionLink}\n\n**GMT/NAT:** ${gmtNatAgreePercentage}% yes | ${gmtNatDisagreePercentage}% no\n**BN:** ${bnAgreePercentage}% yes | ${bnDisagreePercentage}% no\n**Total:** ${totalAgreePercentage}% yes | ${totalDisagreePercentage}% no`;
 
-    // #content-cases
+    // #content-cases (BN server)
     await webhookPost(
         [{
             color: webhookColors.darkYellow,
@@ -299,7 +302,7 @@ async function contentCaseWebhookPost(d) {
         'contentCase'
     );
 
-    // #gmt
+    // #content-review (internal)
     await webhookPost(
         [{
             color: webhookColors.darkYellow,

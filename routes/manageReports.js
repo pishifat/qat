@@ -209,7 +209,7 @@ router.post('/sendToContentReview/:id', async (req, res) => {
 
     // webhooks
 
-    // #content-cases
+    // #content-cases (BN server)
     await discord.webhookPost(
         [{
             author: discord.defaultWebhookAuthor(report.reporter),
@@ -225,9 +225,10 @@ router.post('/sendToContentReview/:id', async (req, res) => {
         'contentCase'
     );
 
-    await discord.roleHighlightWebhookPost('contentCase', ['contentReview']);
+    // #content-cases (BN server)
+    await discord.roleHighlightWebhookPost('contentCase', ['gmt']);
 
-    // #gmt
+    // #content-review (internal)
     await discord.webhookPost(
         [{
             author: discord.defaultWebhookAuthor(report.reporter),
@@ -242,6 +243,9 @@ router.post('/sendToContentReview/:id', async (req, res) => {
         }],
         'internalContentCase'
     );
+
+    // #content-review (internal)
+    await discord.roleHighlightWebhookPost('internalContentCase', ['contentReview']);
 });
 
 /* POST send messages */

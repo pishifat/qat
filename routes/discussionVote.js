@@ -161,7 +161,7 @@ router.post('/submit', async (req, res) => {
 
     // webhooks
 
-    // #content-cases
+    // #content-cases (BN server)
     await discord.webhookPost(
         [{
             author: discord.defaultWebhookAuthor(req.session),
@@ -174,15 +174,14 @@ router.post('/submit', async (req, res) => {
                 },
             ],
         }],
-        //req.body.isContentReview ? 'contentCase' : discussion.mode -- disabling this because of trial nat
         req.body.isContentReview ? 'contentCase' : 'all'
     );
 
     if (req.body.isContentReview) {
-        // #content-cases
-        await discord.roleHighlightWebhookPost('contentCase', ['contentReview']);
+        // #content-cases (BN server)
+        await discord.roleHighlightWebhookPost('contentCase', ['gmt']);
 
-        // #gmt
+        // #content-review (internal)
         await discord.webhookPost(
             [{
                 author: discord.defaultWebhookAuthor(req.session),
@@ -197,6 +196,9 @@ router.post('/submit', async (req, res) => {
             }],
             'internalContentCase'
         );
+
+        // #content-review (internal)
+        await discord.roleHighlightWebhookPost('internalContentCase', ['contentReview']);
     }
 });
 
