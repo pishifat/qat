@@ -258,7 +258,7 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
 /* GET find NAT activity but cooler */
 router.get('/findNatActivity2/:number/:mode', async (req, res) => {
     const limit = parseInt(req.params.number);
-    const mode = req.params.mode;
+    const mode = req.params.mode; 
 
     if (isNaN(limit)) {
         return res.json({ error: 'Invalid number' });
@@ -296,7 +296,6 @@ router.get('/findNatActivity2/:number/:mode', async (req, res) => {
             .limit(limit),
     ]);
 
-
     let info = [];
     let total = 0;
 
@@ -308,7 +307,7 @@ router.get('/findNatActivity2/:number/:mode', async (req, res) => {
         let totalDaysOverdue = 0;
 
         for (const app of appEvals) {
-            const relevantEval = app.reviews.filter(r => r.evaluator == user.id);
+            const relevantEval = app.reviews.filter(r => r.evaluator.id == user.id);
 
             if (relevantEval && relevantEval.length) {
                 participatedAppEvals ++;
@@ -320,7 +319,7 @@ router.get('/findNatActivity2/:number/:mode', async (req, res) => {
         }
 
         for (const round of currentBnEvals) {
-            const relevantEval = round.reviews.filter(r => r.evaluator == user.id);
+            const relevantEval = round.reviews.filter(r => r.evaluator.id == user.id);
 
             if (relevantEval && relevantEval.length) {
                 participatedCurrentBnEvals ++;
