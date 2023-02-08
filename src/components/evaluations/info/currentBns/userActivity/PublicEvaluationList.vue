@@ -10,17 +10,16 @@
         <div v-if="events" :id="eventsId" class="collapse">
             <data-table
                 v-if="events.length"
-                :headers="['Date', 'Evaluated User']"
+                :headers="['Date', 'Evaluation Consensus']"
             >
                 <tr v-for="event in events" :key="event.id">
                     <td class="text-nowrap">
                         {{ new Date(event.deadline).toString().slice(4, 10) }}
                     </td>
                     <td>
-                        <user-link
-                            :username="event.user.username"
-                            :osu-id="event.user.osuId"
-                        />
+                        <span :class="findConsensusColor(event.consensus)" class="text-capitalize" >
+                            {{ makeWordFromField(event.consensus).toUpperCase() }}
+                        </span>
                     </td>
                 </tr>
             </data-table>
@@ -31,11 +30,13 @@
 
 <script>
 import { mapState } from 'vuex';
+import evaluations from '../../../../../mixins/evaluations.js';
 import DataTable from '../../../../DataTable.vue';
 import UserLink from '../../../../UserLink.vue';
 
 export default {
     name: 'EvaluationList',
+    mixins: [ evaluations ],
     components: {
         DataTable,
         UserLink,
@@ -64,6 +65,29 @@ export default {
     computed: {
         ...mapState('activity', ['isLoading']), 
         ...mapState(['loggedInUser']),
+    },
+    methods: {
+        findConsensusColor (consensus) {
+            switch (consensus) {
+                case 'pass':
+                case 'fullBn':
+                case 'resignedOnGoodTerms':
+                    return 'text-pass';
+
+                case 'fail':
+                case 'removeFromBn':
+                    return 'text-fail';
+
+                case 'probationBn':
+                    return 'text-probation';
+
+                case 'resignedOnStandardTerms':
+                    return 'text-neutral';
+
+                default:
+                    return '';
+            }
+        },
     },
 };
 </script>
