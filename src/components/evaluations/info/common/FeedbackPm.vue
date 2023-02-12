@@ -161,8 +161,10 @@ export default {
                     messages.push(line);
 
                     // reasons
-                    messages.push(`review reasons for your removal here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id}`);
-
+                    if (!this.selectedEvaluation.isResignation) {
+                        messages.push(`review reasons for your removal here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id}`);
+                    }
+                    
                     // reapply date
                     messages.push(`If you want to apply for BN again, you may do so on ${this.toStandardDate(this.selectedEvaluation.cooldownDate)}`);
 
