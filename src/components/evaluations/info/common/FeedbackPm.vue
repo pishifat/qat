@@ -168,6 +168,10 @@ export default {
                     // reapply date
                     messages.push(`If you want to apply for BN again, you may do so on ${this.toStandardDate(this.selectedEvaluation.cooldownDate)}`);
 
+                    if (this.selectedEvaluation.isResignation && this.positiveConsensus) {
+                        messages.push(`You may also instantly re-join the BN any time within the next 6 months (no test or application required!) :)`);
+                    }
+
                     // cheeky sign-off
                     messages.push(`good luck!`);
                 }
