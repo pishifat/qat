@@ -14,8 +14,9 @@
                 v-if="feedback"
                 data-toggle="tooltip"
                 data-placement="top"
-                title="feedback written"
+                :title="'feedback written' + (isReviewed ? ' (reviewed)' : ' (needs review)')"
                 class="fas fa-comment mx-1"
+                :class="isReviewed ? 'text-success' : 'text-danger'"
             />
         </p>
         <div v-if="consensus">
@@ -63,6 +64,10 @@ export default {
         feedback: {
             type: String,
             default: '',
+        },
+        isReviewed: {
+            type: Boolean,
+            default: false,
         },
     },
 };

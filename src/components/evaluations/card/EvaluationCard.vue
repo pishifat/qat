@@ -16,6 +16,7 @@
                 :consensus="evaluation.consensus"
                 :addition="evaluation.addition"
                 :feedback="evaluation.feedback"
+                :is-reviewed="evaluation.isReviewed"
             />
 
             <card-footer
