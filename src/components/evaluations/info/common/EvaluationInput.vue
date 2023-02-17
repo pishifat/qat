@@ -14,7 +14,7 @@
                         v-model="moddingComment"
                         class="form-control"
                         rows="4"
-                        maxlength="3000"
+                        maxlength="5000"
                     />
                 </div>
             </div>
@@ -29,7 +29,7 @@
                         v-model="behaviorComment"
                         class="form-control"
                         rows="4"
-                        maxlength="3000"
+                        maxlength="5000"
                     />
                 </div>
             </div>
