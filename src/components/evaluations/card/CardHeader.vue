@@ -16,7 +16,7 @@
                 data-placement="top"
                 :title="'feedback written' + (isReviewed ? ' (reviewed)' : ' (needs review)')"
                 class="fas fa-comment mx-1"
-                :class="isReviewed ? 'text-success' : 'text-danger'"
+                :class="isReviewed ? '' : 'text-warning'"
             />
         </p>
         <div v-if="consensus">
