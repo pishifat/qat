@@ -63,7 +63,7 @@ router.get('/relevantInfo', async (req, res) => {
 
 /* POST apply for BN */
 router.post('/apply', async (req, res) => {
-    const { mods, reasons, mode } = req.body;
+    const { mods, reasons, oszs, mode } = req.body;
 
     if (res.locals.userRequest.modes.includes(mode)) {
         return res.json({
@@ -74,9 +74,10 @@ router.post('/apply', async (req, res) => {
     // validate user input
     if (!mods || !mods.length || !Array.isArray(mods) ||
         !reasons || !reasons.length || !Array.isArray(reasons) ||
+        !oszs || !oszs.length || !Array.isArray(oszs) ||
         !mode
     ) {
-        return res.json({ error: 'Missing mode or mods' });
+        return res.json({ error: 'All fields must be completed!' });
     }
 
     const wasBn = res.locals.userRequest.history && res.locals.userRequest.history.length;
@@ -90,12 +91,19 @@ router.post('/apply', async (req, res) => {
     for (let i = 0; i < mods.length; i++) {
         mods[i] = mods[i].trim();
         reasons[i] = reasons[i] && reasons[i].trim();
+        oszs[i] = oszs[i] && oszs[i].trim();
 
         util.isValidUrlOrThrow(mods[i], 'https://osu.ppy.sh/beatmapsets', `One of your mod links is not valid`);
 
         if (!reasons[i]) {
             return res.json({
-                error: `You need to write their reasoning`,
+                error: `Must to write something in the "reason" field for each mod`,
+            });
+        }
+
+        if (!oszs[i]) {
+            return res.json({
+                error: `Must to write something in the ".osz" field for each mod`,
             });
         }
     }
@@ -183,6 +191,7 @@ router.post('/apply', async (req, res) => {
             mode,
             mods,
             reasons,
+            oszs,
         }),
         TestSubmission.generateTest(req.session.mongoId, mode),
     ]);
@@ -254,6 +263,7 @@ router.post('/rejoinApply', async (req, res) => {
             mode,
             mods: [],
             reasons: [],
+            oszs: [],
         }),
         TestSubmission.generateTest(req.session.mongoId, mode),
     ]);

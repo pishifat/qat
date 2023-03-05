@@ -6,11 +6,16 @@
 
         <ul>
             <li v-for="(mod, i) in mods" :key="i" class="small">
-                <a :href="modUrl(mod)" target="_blank">{{ modUrl(mod) }}</a><br>
-                <span
+                Mod: <a :href="modUrl(mod)" target="_blank">{{ modUrl(mod) }}</a><br>
+                Additional info: <span
                     v-if="reasons && reasons.length"
                     class="text-secondary"
                     v-html="$md.render(reasons[i])"
+                />
+                .osz: <span
+                    v-if="oszs && oszs.length"
+                    class="text-secondary"
+                    v-html="$md.render(oszs[i])"
                 />
             </li>
             <li class="small">
@@ -31,6 +36,12 @@ export default {
             },
         },
         reasons: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
+        oszs: {
             type: Array,
             default() {
                 return [];

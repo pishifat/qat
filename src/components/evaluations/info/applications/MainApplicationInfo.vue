@@ -3,6 +3,7 @@
         <mods
             :mods="selectedEvaluation.mods"
             :reasons="selectedEvaluation.reasons"
+            :oszs="selectedEvaluation.oszs"
             :osu-id="selectedEvaluation.user.osuId"
         />
 

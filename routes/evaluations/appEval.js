@@ -9,7 +9,7 @@ const middlewares = require('../../helpers/middlewares');
 const util = require('../../helpers/util');
 const discord = require('../../helpers/discord');
 const osu = require('../../helpers/osu');
-const { AppEvaluationConsensus, ResignationConsensus, BnEvaluationConsensus } = require('../../shared/enums');
+const { AppEvaluationConsensus } = require('../../shared/enums');
 const osuBot = require('../../helpers/osuBot');
 const config = require('../../config.json');
 
@@ -87,7 +87,7 @@ router.get('/relevantInfo', async (req, res) => {
                     test: { $exists: true },
                     active: true,
                 })
-                .select(['active', 'user', 'discussion', 'reviews', 'mode', 'mods', 'reasons', 'createdAt', 'updatedAt'])
+                .select(['active', 'user', 'discussion', 'reviews', 'mode', 'mods', 'reasons', 'oszs', 'createdAt', 'updatedAt'])
                 .populate(getActiveBnDefaultPopulate(req.session.mongoId))
                 .sort({
                     createdAt: -1,
@@ -99,7 +99,7 @@ router.get('/relevantInfo', async (req, res) => {
                         active: false,
                         discussion: true,
                     })
-                    .select(['active', 'user', 'discussion', 'reviews', 'mode', 'mods', 'reasons', 'consensus', 'createdAt', 'updatedAt']) // "consensus" is the only difference
+                    .select(['active', 'user', 'discussion', 'reviews', 'mode', 'mods', 'reasons', 'oszs', 'consensus', 'createdAt', 'updatedAt']) // "consensus" is the only difference
                     .populate(inactiveBnDefaultPopulate)
                     .sort({
                         createdAt: -1,
@@ -275,7 +275,7 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
             [{
                 author: discord.defaultWebhookAuthor(req.session),
                 color: discord.webhookColors.black,
-                description: `Archived [**${user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${evaluation.id}) with **${evaluation.consensus === AppEvaluationConsensus.Pass ? 'Pass' : 'Fail'}** consensus`,
+                description: `Archived [**${user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${evaluation.id}) with **${evaluation.consensus === AppEvaluationConsensus.Pass ? 'Pass' : evaluation.consensus === AppEvaluationConsensus.Fail ? 'Fail' : 'no'}** consensus`,
             }],
             evaluation.mode
         );

@@ -131,10 +131,6 @@
                                             Is there anything else you'd like the NAT to
                                             know about this mod?
                                         </li>
-                                        <li>
-                                            Please provide a copy of the map before your
-                                            mod was applied (optional)
-                                        </li>
                                     </ul>
                                 </div>
 
@@ -145,6 +141,18 @@
                                     placeholder="responses to the bullet points above"
                                     maxlength="1000"
                                     rows="2"
+                                />
+
+                                <div class="ml-2 small">
+                                        Please provide a copy of the map before your mod was applied. If you do not have a copy of the map, write "none":
+                                </div>
+
+                                <input
+                                    v-model="oszs[i - 1]"
+                                    type="text"
+                                    class="form-control ml-2 mb-2"
+                                    placeholder="link to .osz of map before mod was applied"
+                                    maxlength="1000"
                                 />
                             </div>
                         </div>
@@ -228,6 +236,7 @@ export default {
             selectedMode: '',
             mods: [],
             reasons: [],
+            oszs: [],
             successInfo: '',
         };
     },
@@ -271,23 +280,40 @@ export default {
             return this.loggedInUser.history && this.loggedInUser.history.length;
         },
         async apply(e) {
-            this.successInfo = `Submitting & calculating mod score... (this will take a few seconds)`;
+            let missingLinkCount = 0;
 
-            const data = await this.$http.executePost(
-                `/bnapps/apply`,
-                {
-                    mode: this.selectedMode,
-                    mods: this.mods,
-                    reasons: this.reasons,
-                },
-                e
-            );
-
-            if (!data.error) {
-                this.hasPendingTest = true;
+            for (const osz of this.oszs) {
+                if (osz && osz.length && osz.indexOf('https://') < 0 && osz.trim() !== 'none') {
+                    missingLinkCount++;
+                }
             }
 
-            this.successInfo = '';
+            let result = true;
+
+            if (missingLinkCount > 0) {
+                result = confirm(`${missingLinkCount} of your submissions ${missingLinkCount == 1 ? 'is' : 'are'} missing the .osz link${missingLinkCount == 1 ? '' : 's'}. If you have a copy of the map, press "Cancel" and add it!`);
+            }
+
+            if (result) {
+                this.successInfo = `Submitting & calculating mod score... (this will take a few seconds)`;
+
+                const data = await this.$http.executePost(
+                    `/bnapps/apply`,
+                    {
+                        mode: this.selectedMode,
+                        mods: this.mods,
+                        reasons: this.reasons,
+                        oszs: this.oszs,
+                    },
+                    e
+                );
+
+                if (!data.error) {
+                    this.hasPendingTest = true;
+                }
+
+                this.successInfo = '';
+            }
         },
         async rejoinApply(e) {
             const data = await this.$http.executePost(

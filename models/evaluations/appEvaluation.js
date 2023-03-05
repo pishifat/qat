@@ -6,6 +6,7 @@ const appEvaluationSchema = new mongoose.Schema({
     consensus: { type: String, enum: ['pass', 'fail'] },
     mods: [{ type: String, required: true }],
     reasons: [{ type: String, required: true }],
+    oszs: [{ type: String, required: true }],
     test: { type: 'ObjectId', ref: 'TestSubmission' },
     isRejoinRequest: { type: Boolean },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });

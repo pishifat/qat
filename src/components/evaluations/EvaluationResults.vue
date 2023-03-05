@@ -30,9 +30,13 @@
                             Mod {{ i+1 }}:
                             <span v-html="$md.render(mod)" />
                         </div>
-                        <div class="col-sm-9">
+                        <div class="col-sm-6">
                             Additional info:
                             <span class="small" v-html="$md.render(evaluation.reasons[i])" />
+                        </div>
+                        <div class="col-sm-3" v-if="evaluation.oszs && evaluation.oszs.length">
+                            .osz:
+                            <span class="small" v-html="$md.render(evaluation.oszs[i])" />
                         </div>
                     </div>
                     <h5>Test results</h5>
