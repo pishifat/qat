@@ -214,6 +214,10 @@ router.post('/submitMediation/:id', async (req, res) => {
         .findById(req.params.id)
         .populate('mediations');
 
+    if (discussion.isNatOnly && !res.locals.userRequest.isNatOrTrialNat) {
+        return res.json({ error: 'Only NAT members can vote on this' });
+    }
+
     let mediation = discussion.mediations.find(m => m.mediator == req.session.mongoId);
     let isNewMediation = false;
 
