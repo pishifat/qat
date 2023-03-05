@@ -178,8 +178,8 @@ router.post('/submit', async (req, res) => {
     );
 
     if (req.body.isContentReview) {
-        // #content-cases (BN server)
-        await discord.roleHighlightWebhookPost('contentCase', ['gmt']);
+        // #content-cases (BN server) (not doing this anymore i guess)
+        // await discord.roleHighlightWebhookPost('contentCase', ['gmt']);
 
         // #content-review (internal)
         await discord.webhookPost(
