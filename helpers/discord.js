@@ -311,6 +311,10 @@ async function contentCaseWebhookPost(d) {
         'internalContentCase'
     );
 
+    // save consensus
+    d.isAcceptable = gmtNatAgreePercentage >= 70 || totalAgreePercentage >= 70;
+    await d.save();
+
     const messages = [
         `The content you submitted has been reviewed by the BN/NAT! - ${d.discussionLink}`,
         `Based on vote results below, the content ${gmtNatAgreePercentage >= 70 || totalAgreePercentage >= 70 ? `*CAN*` : `*CANNOT*`} be used. See https://osu.ppy.sh/wiki/en/Rules/Content_Voting_Process for details.`,

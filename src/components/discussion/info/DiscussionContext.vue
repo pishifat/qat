@@ -83,6 +83,27 @@
             <span v-else class="small" v-html="$md.render(selectedDiscussionVote.shortReason)" />
         </p>
 
+        <div v-if="selectedDiscussionVote.isContentReview && !selectedDiscussionVote.isActive">
+            <b>Consensus:</b> 
+            <span :class="selectedDiscussionVote.isAcceptable == true ? 'text-success' : selectedDiscussionVote.isAcceptable == false ? 'text-danger' : 'text-secondary'">
+                {{ selectedDiscussionVote.isAcceptable == true ? 'Pass' : selectedDiscussionVote.isAcceptable == false ? 'Fail' : 'Unknown' }}
+            </span>
+            <span v-if="!selectedDiscussionVote.isAcceptable && selectedDiscussionVote.isAcceptable != false" class="btn-group">
+                <button
+                    class="btn btn-sm btn-success"
+                    @click="setIsAcceptable(true, $event);"
+                >
+                    Pass
+                </button>
+                <button
+                    class="btn btn-sm btn-danger"
+                    @click="setIsAcceptable(false, $event);"
+                >
+                    Fail
+                </button>
+            </span>
+        </div>
+
         <div v-if="selectedDiscussionVote.isContentReview">
             <b>Content review notes:</b>
             <div class="small">
@@ -183,6 +204,16 @@ export default {
                 this.isEditingTitle = false;
                 this.isEditingProposal = false;
                 this.isEditingLink = false;
+            }
+        },
+        async setIsAcceptable (isAcceptable, e) {
+            const data = await this.$http.executePost(
+                `/discussionVote/${this.selectedDiscussionVote.id}/setIsAcceptable`, {
+                    isAcceptable,
+                }, e);
+
+            if (this.$http.isValid(data)) {
+                this.$store.commit('discussionVote/updateDiscussionVote', data.discussion);
             }
         },
     },

@@ -13,6 +13,7 @@ const discussionSchema = new mongoose.Schema({
     mediations: [{ type: 'ObjectId', ref: 'Mediation' }],
     creator: { type: 'ObjectId', ref: 'User' },
     isHidden: { type: Boolean, default: false },
+    isAcceptable: { type: Boolean },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 /**

@@ -12,6 +12,7 @@ interface IDiscussionDocument extends Document {
     neutralAllowed: boolean;
     reasonAllowed: boolean;
     isContentReview: boolean;
+    isAcceptable: boolean;
     mediations?: IMediationDocument[];
     creator: IUserDocument;
     createdAt?: Date;

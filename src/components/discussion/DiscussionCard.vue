@@ -7,17 +7,23 @@
             data-target="#extendedInfo"
             :data-discussion="discussion.id"
         >
-            <img v-if="isImage ":src="discussion.discussionLink" class="card-thumb"></img>
+            <img v-if="isImage" :src="discussion.discussionLink" class="card-thumb" />
             <div class="card-body">
-                <p class="wrap-text">
+                <div class="wrap-text">
                     <a
                         v-if="discussion.discussionLink"
                         :href="discussion.discussionLink"
                         target="_blank"
                         @click.stop
-                    >{{ discussion.title }}</a>
-                    <span v-else>{{ discussion.title }}</span>
-                </p>
+                    ><b>{{ discussion.title }}</b></a>
+                    <span v-else><b>{{ discussion.title }}</b></span>
+                </div>
+                <div v-if="discussion.isContentReview && !discussion.isActive" class="small">
+                    Consensus:
+                    <span :class="discussion.isAcceptable == true ? 'text-success' : discussion.isAcceptable == false ? 'text-danger' : 'text-secondary'">
+                        {{ discussion.isAcceptable == true ? 'Pass' : discussion.isAcceptable == false ? 'Fail' : 'Unknown'}}
+                    </span>
+                </div>
                 <div class="card-status" :class="discussion.isActive ? 'status-bar-active' : 'status-bar-inactive'" />
 
                 <div>
@@ -61,6 +67,7 @@ export default {
         ...mapState([
             'loggedInUser',
         ]),
+        /** @returns {boolean} */
         isImage() {
             if (this.discussion && this.discussion.discussionLink) {
                 return (this.discussion.discussionLink.match(/\.(jpeg|jpg|gif|png)$/) != null);

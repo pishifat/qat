@@ -328,4 +328,32 @@ router.post('/:id/update', middlewares.hasFullReadAccess, async (req, res) => {
     );
 });
 
+/* POST set isAcceptable for content review */
+router.post('/:id/setIsAcceptable', middlewares.hasFullReadAccess, async (req, res) => {
+    const isAcceptable = req.body.isAcceptable;
+
+    const discussion = await Discussion
+        .findOne({
+            _id: req.params.id,
+            isActive: false,
+        })
+        .populate(defaultPopulate)
+        .orFail();
+
+    discussion.isAcceptable = isAcceptable;
+    await discussion.save();
+
+    res.json({
+        discussion,
+        success: 'Updated',
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Changed consensus to ${isAcceptable ? 'pass' : 'fail'}`,
+        'discussionVote',
+        discussion._id
+    );
+});
+
 module.exports = router;
