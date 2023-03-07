@@ -92,7 +92,7 @@
                     :mongo-id="mongoId"
                 />
             </template>
-
+                
             <template
                 v-else-if="
                     !loggedInUser.isNat && selectedUser.isNat &&
@@ -125,6 +125,21 @@
                     :osu-id="osuId"
                 />
             </template>
+
+            <template v-if="loggedInUser.hasFullReadAccess && showArchive">
+                <hr />
+                <div>Archives</div>
+                <previous-evaluations
+                    :header="'Previous Evaluations'"
+                    :event-id="'previousEvaluations'"
+                    :mongo-id="mongoId"
+                />
+                <reports
+                    :header="'Reports'"
+                    :event-id="'reports'"
+                    :mongo-id="mongoId"
+                />
+            </template>
         </div>
     </div>
 </template>
@@ -135,6 +150,8 @@ import EventsList from './EventsList.vue';
 import NominationResets from './NominationResets.vue';
 import EvaluationList from './EvaluationList.vue';
 import PublicEvaluationList from './PublicEvaluationList.vue';
+import PreviousEvaluations from './PreviousEvaluations.vue';
+import Reports from './Reports.vue';
 
 export default {
     name: 'UserActivity',
@@ -143,6 +160,8 @@ export default {
         NominationResets,
         EvaluationList,
         PublicEvaluationList,
+        PreviousEvaluations,
+        Reports,
     },
     props: {
         modes: {
@@ -173,6 +192,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        showArchive: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
@@ -193,7 +216,6 @@ export default {
             'disqualifiedQualityAssuranceChecks',
             'assignedBnApplications',
             'natApplications',
-            'natBnEvaluations',
             'bnFinderMatches',
         ]),
     },

@@ -23,6 +23,7 @@
                     :mongo-id="selectedUser.id"
                     :unique="selectedUser.id"
                     :overwrite-days="90"
+                    :show-archive="true"
                 />
 
                 <div v-for="mode in selectedUser.modes" :key="mode">
