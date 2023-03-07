@@ -96,7 +96,6 @@
             <template v-if="loggedInUser.hasFullReadAccess">
                 <div class="mt-2">Archives</div>
                 <previous-evaluations
-                    v-if="loggedInUser.isNat"
                     :header="'Previous Evaluations'"
                     :event-id="'previousEvaluations'"
                     :mongo-id="mongoId"
