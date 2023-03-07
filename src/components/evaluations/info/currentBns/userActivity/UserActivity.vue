@@ -92,20 +92,6 @@
                     :mongo-id="mongoId"
                 />
             </template>
-
-            <template v-if="loggedInUser.hasFullReadAccess">
-                <div class="mt-2">Archives</div>
-                <previous-evaluations
-                    :header="'Previous Evaluations'"
-                    :event-id="'previousEvaluations'"
-                    :mongo-id="mongoId"
-                />
-                <reports
-                    :header="'Reports'"
-                    :event-id="'reports'"
-                    :mongo-id="mongoId"
-                />
-            </template>
                 
             <template
                 v-else-if="
@@ -137,6 +123,21 @@
                     :events-id="'bnFinderMatches'"
                     :header="'BN Finder matches'"
                     :osu-id="osuId"
+                />
+            </template>
+
+            <template v-if="loggedInUser.hasFullReadAccess && showArchive">
+                <hr />
+                <div>Archives</div>
+                <previous-evaluations
+                    :header="'Previous Evaluations'"
+                    :event-id="'previousEvaluations'"
+                    :mongo-id="mongoId"
+                />
+                <reports
+                    :header="'Reports'"
+                    :event-id="'reports'"
+                    :mongo-id="mongoId"
                 />
             </template>
         </div>
@@ -188,6 +189,10 @@ export default {
             required: true,
         },
         isEvaluation: {
+            type: Boolean,
+            default: false,
+        },
+        showArchive: {
             type: Boolean,
             default: false,
         },
