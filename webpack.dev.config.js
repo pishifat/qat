@@ -17,21 +17,15 @@ const config =  {
         },
     },
     devServer: {
+        devMiddleware: {
+            stats: 'minimal',
+        },
+        static: './public',
+        port: 8080,
         hot: true,
         proxy: {
             '/': 'http://localhost:3001',
         },
-        client: {
-            webSocketURL: {
-              hostname: "0.0.0.0",
-              pathname: "/http",
-              port: 8080,
-            },
-          },
-        devMiddleware: {
-            publicPath: './public',
-            stats: 'minimal',
-        }
     },
 };
 
