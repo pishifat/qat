@@ -93,6 +93,21 @@
                 />
             </template>
 
+            <template v-if="loggedInUser.hasFullReadAccess">
+                <div class="mt-2">Archives</div>
+                <previous-evaluations
+                    v-if="loggedInUser.isNat"
+                    :header="'Previous Evaluations'"
+                    :event-id="'previousEvaluations'"
+                    :mongo-id="mongoId"
+                />
+                <reports
+                    :header="'Reports'"
+                    :event-id="'reports'"
+                    :mongo-id="mongoId"
+                />
+            </template>
+                
             <template
                 v-else-if="
                     !loggedInUser.isNat && selectedUser.isNat &&
@@ -135,6 +150,8 @@ import EventsList from './EventsList.vue';
 import NominationResets from './NominationResets.vue';
 import EvaluationList from './EvaluationList.vue';
 import PublicEvaluationList from './PublicEvaluationList.vue';
+import PreviousEvaluations from './PreviousEvaluations.vue';
+import Reports from './Reports.vue';
 
 export default {
     name: 'UserActivity',
@@ -143,6 +160,8 @@ export default {
         NominationResets,
         EvaluationList,
         PublicEvaluationList,
+        PreviousEvaluations,
+        Reports,
     },
     props: {
         modes: {
@@ -193,7 +212,6 @@ export default {
             'disqualifiedQualityAssuranceChecks',
             'assignedBnApplications',
             'natApplications',
-            'natBnEvaluations',
             'bnFinderMatches',
         ]),
     },
