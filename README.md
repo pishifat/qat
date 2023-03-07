@@ -4,7 +4,7 @@
 
 ## Requirements
 
-- node
+- node (18)
 - mongodb
 
 If you want to contribute, make a copy of `config.example.json` titled `config.json` and fill out the fields below
