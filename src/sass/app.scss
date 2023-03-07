@@ -30,7 +30,7 @@
 // =========================================================================
 
 .body-triangles::before {
-    background-image: url('/images/triangles.png');
+    background-image: url('~/public/images/triangles.png');
     opacity: .25;
     position: fixed;
     width: 100%;

@@ -99,22 +99,22 @@ export default {
 }
 
 .card-bg-nat {
-    background-image: url('/images/nat.png');
+    background-image: url('~/public/images/nat.png');
     background-repeat: no-repeat;
     background-position: left;
 }
 .card-bg-bn {
-    background-image: url('/images/bn.png');
+    background-image: url('~/public/images/bn.png');
     background-repeat: no-repeat;
     background-position: left;
 }
 .card-bg-probation {
-    background-image: url('/images/probation.png');
+    background-image: url('~/public/images/probation.png');
     background-repeat: no-repeat;
     background-position: left;
 }
 .card-bg-user {
-    background-image: url('/images/user.png');
+    background-image: url('~/public/images/user.png');
     background-repeat: no-repeat;
     background-position: left;
 }

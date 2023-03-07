@@ -17,8 +17,10 @@ const config =  {
         },
     },
     devServer: {
-        contentBase: './public',
-        stats: 'minimal',
+        devMiddleware: {
+            stats: 'minimal',
+        },
+        static: './public',
         port: 8080,
         hot: true,
         proxy: {
