@@ -131,17 +131,17 @@ export default {
 <style>
 
 .card-bg-bn {
-    background-image: url('/images/bn-transparent.png');
+    background-image: url('../../../../public/images/bn-transparent.png');
     background-repeat: repeat-y;
     background-position: left top;
 }
 .card-bg-probation {
-    background-image: url('/images/probation-transparent.png');
+    background-image: url('../../../../public/images/probation-transparent.png');
     background-repeat: repeat-y;
     background-position: left top;
 }
 .card-bg-user {
-    background-image: url('/images/user-transparent.png');
+    background-image: url('../../../../public/images/user-transparent.png');
     background-repeat: repeat-y;
     background-position: left top;
 }

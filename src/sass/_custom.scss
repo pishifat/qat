@@ -52,7 +52,7 @@ header {
 
 .navbar-nat {
     z-index: 1000;
-    background-image: url('/images/partial.png');
+    background-image: url('../../public/images/partial.png');
     background-repeat: repeat-x;
     background-position: bottom;
 
@@ -107,7 +107,7 @@ header {
 // Cards
 
 .card-header-img {
-    background-image: url('/images/cat.png');
+    background-image: url('../../public/images/cat.png');
     background-repeat: no-repeat;
     background-size: contain;
     width: 40px;
