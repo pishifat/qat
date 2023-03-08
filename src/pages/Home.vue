@@ -16,7 +16,7 @@
                 name="route-transition"
                 mode="out-in"
                 tag="div"
-                class="row"
+                class="row align-items-start"
             >
                 <table v-for="usersByMode in sorted" :key="usersByMode._id" class="table table-sm table-dark table-hover col-6 col-md-3">
                     <thead>
