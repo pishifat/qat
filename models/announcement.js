@@ -10,6 +10,6 @@ const announcementSchema = new mongoose.Schema({
 /**
  * @type {import('./interfaces/announcement').default}
  */
-const Note = mongoose.model('Announcement', announcementSchema);
+const Announcement = mongoose.model('Announcement', announcementSchema);
 
-module.exports = Note;
+module.exports = Announcement;

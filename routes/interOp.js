@@ -6,9 +6,12 @@ const QualityAssuranceCheck = require('../models/qualityAssuranceCheck');
 const Log = require('../models/log');
 const Evaluation = require('../models/evaluations/evaluation');
 const AppEvaluation = require('../models/evaluations/appEvaluation');
+const Review = require('../models/evaluations/review');
 const getGeneralEvents = require('./evaluations/bnEval').getGeneralEvents;
 const { BnEvaluationConsensus } = require('../shared/enums');
 const middlewares = require('../helpers/middlewares');
+const BnEvaluation = require('../models/evaluations/bnEvaluation');
+const ResignationEvaluation = require('../models/evaluations/resignationEvaluation');
 
 const router = express.Router();
 
@@ -23,6 +26,30 @@ router.use((req, res, next) => {
 
     return next();
 });
+
+// establish evaluation population
+const evaluationPopulate = [
+    { path: 'user', select: 'username osuId' },
+    { path: 'bnEvaluators', select: 'username osuId' },
+    { path: 'natEvaluators', select: 'username osuId' },
+    { 
+        path: 'natEvaluatorHistory', 
+        select: 'user previousUser',
+        populate: {
+            path: 'user previousUser',
+            select: 'username osuId groups isTrialNat',
+        }
+    
+    },
+    {
+        path: 'reviews',
+        select: 'evaluator behaviorComment moddingComment vote',
+        populate: {
+            path: 'evaluator',
+            select: 'username osuId groups isTrialNat',
+        },
+    },
+];
 
 /* GET users in BN/NAT */
 router.get('/users', async (_, res) => {
@@ -278,6 +305,151 @@ router.get('/logs/:osuId/:category', middlewares.hasPrivateInterOpsAccess, async
     }
 
     res.json(logs);
+});
+
+/* GET a user's submitted evaluations */
+router.get('/submittedEvaluations/:osuId/:days', middlewares.hasPrivateInterOpsAccess, async (req, res) => {
+    const user = await User.findOne({ osuId: parseInt(req.params.osuId) });
+    const days = parseInt(req.params.days);
+
+    if (!user) {
+        return res.status(404).send('User not found');
+    }
+
+    if (isNaN(days)) {
+        return res.status(404).send('Invalid days count');
+    }
+    
+    let date = new Date();
+    date.setDate(date.getDate() - days);
+
+    // find submitted evaluations
+    const submittedEvaluations = [];
+
+    const reviews = await Review
+        .find({
+            evaluator: user._id,
+            createdAt: { $gt: date },
+        });
+
+    for (const review of reviews) {
+        let evaluation;
+        
+        // check for app
+        evaluation = await AppEvaluation
+            .findOne({
+                reviews: review._id,
+            })
+            .populate(evaluationPopulate);
+
+        if (!evaluation) {
+            evaluation = await BnEvaluation
+            .findOne({
+                reviews: review._id,
+            })
+            .populate(evaluationPopulate);
+        }
+
+        submittedEvaluations.push(evaluation);
+    }
+
+    res.json(submittedEvaluations);
+});
+
+/* GET a user's assigned evaluations */
+router.get('/assignedEvaluations/:osuId/:days', middlewares.hasPrivateInterOpsAccess, async (req, res) => {
+    const user = await User.findOne({ osuId: parseInt(req.params.osuId) });
+    const days = parseInt(req.params.days);
+
+    if (!user) {
+        return res.status(404).send('User not found');
+    }
+
+    if (isNaN(days)) {
+        return res.status(404).send('Invalid days count');
+    }
+
+    let date = new Date();
+    date.setDate(date.getDate() - days);
+
+    // find assigned evaluations (regardless of whether or not they were acted upon)
+    const assignedApplications = await AppEvaluation
+        .find({
+            natEvaluators: user._id,
+            $or: [
+                { active: true },
+                { 
+                    active: false,
+                    consensus: {$exists: true }
+                }
+            ],
+            createdAt: { $gt: date },
+        })
+        .populate(evaluationPopulate);
+    
+    const assignedEvaluations = await Evaluation
+        .find({
+            natEvaluators: user._id,
+            $or: [
+                { active: true },
+                { 
+                    active: false,
+                    consensus: {$exists: true }
+                }
+            ],
+            createdAt: { $gt: date },
+        })
+        .populate(evaluationPopulate);
+
+    res.json(assignedEvaluations.concat(assignedApplications));
+});
+
+/* GET a user's previously assigned evaluations */
+router.get('/previouslyAssignedEvaluations/:osuId/:days', middlewares.hasPrivateInterOpsAccess, async (req, res) => {
+    const user = await User.findOne({ osuId: parseInt(req.params.osuId) });
+    const days = parseInt(req.params.days);
+
+    if (!user) {
+        return res.status(404).send('User not found');
+    }
+
+    if (isNaN(days)) {
+        return res.status(404).send('Invalid days count');
+    }
+
+    let date = new Date();
+    date.setDate(date.getDate() - days);
+
+    // find assigned evaluations (including those that were re-rolled)
+    const previouslyAssignedApps = await AppEvaluation
+        .find({
+            'natEvaluatorHistory.previousUser': user._id,
+            $or: [
+                { active: true },
+                { 
+                    active: false,
+                    consensus: {$exists: true }
+                }
+            ],
+            createdAt: { $gt: date },
+        })
+        .populate(evaluationPopulate);
+
+    const previouslyAssignedEvaluations = await Evaluation
+        .find({
+            'natEvaluatorHistory.previousUser': user._id,
+            $or: [
+                { active: true },
+                { 
+                    active: false,
+                    consensus: {$exists: true }
+                }
+            ],
+            createdAt: { $gt: date },
+        })
+        .populate(evaluationPopulate);
+
+    res.json(previouslyAssignedEvaluations.concat(previouslyAssignedApps));
 });
 
 module.exports = router;
