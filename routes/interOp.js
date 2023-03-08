@@ -42,14 +42,14 @@ router.get('/users/all', async (_, res) => {
 
 /* GET specific user info */
 router.get('/users/:osuId', async (req, res) => {
-    res.json(await User.findOne({ osuId: req.params.osuId }));
+    res.json(await User.findOne({ osuId: parseInt(req.params.osuId) }));
 });
 
 /* GET events for beatmapsetID */
 router.get('/events/:beatmapsetId', async (req, res) => {
     res.json(
         await Aiess
-            .find({ beatmapsetId: req.params.beatmapsetId })
+            .find({ beatmapsetId: parseInt(req.params.beatmapsetId) })
             .sort({ timestamp: 1 })
     );
 });
@@ -115,12 +115,12 @@ router.get('/qaInfo/', async (req, res) => {
 
 /* GET dq info for discussionID */
 router.get('/dqInfoByDiscussionId/:discussionId', async (req, res) => {
-    res.json(await Aiess.findOne({ discussionId: req.params.discussionId }));
+    res.json(await Aiess.findOne({ discussionId: parseInt(req.params.discussionId) }));
 });
 
 /* GET activity by user and days */
 router.get('/nominationResets/:osuId/:days/', async (req, res) => {
-    const user = await User.findOne({ osuId: req.params.osuId });
+    const user = await User.findOne({ osuId: parseInt(req.params.osuId) });
 
     if (!user) {
         return res.status(404).send('User not found');
@@ -165,7 +165,7 @@ router.get('/eventsByDate/:date', async (req, res) => {
 
 /* GET latest evaluation or appevaluation */
 router.get('/latestEvaluation/:osuId', middlewares.hasPrivateInterOpsAccess, async (req, res) => {
-    const user = await User.findOne({ osuId: req.params.osuId });
+    const user = await User.findOne({ osuId: parseInt(req.params.osuId) });
 
     if (!user) {
         return res.status(404).send('User not found');
@@ -219,7 +219,7 @@ router.get('/latestEvaluation/:osuId', middlewares.hasPrivateInterOpsAccess, asy
 
 /* GET general reason for BN removal */
 router.get('/bnRemoval/:osuId', middlewares.hasPrivateInterOpsAccess, async (req, res) => {
-    const user = await User.findOne({ osuId: req.params.osuId });
+    const user = await User.findOne({ osuId: parseInt(req.params.osuId) });
 
     if (!user) {
         return res.status(404).send('User not found');
@@ -245,7 +245,7 @@ router.get('/bnRemoval/:osuId', middlewares.hasPrivateInterOpsAccess, async (req
 
 /* GET all of a user's logs */
 router.get('/logs/:osuId/:category', middlewares.hasPrivateInterOpsAccess, async (req, res) => {
-    const user = await User.findOne({ osuId: req.params.osuId });
+    const user = await User.findOne({ osuId: parseInt(req.params.osuId) });
 
     if (!user) {
         return res.status(404).send('User not found');
