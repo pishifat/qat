@@ -207,7 +207,7 @@ router.get('/findBagUsers/:mode', async (req, res) => {
 router.post('/editBadgeValue/:id', async (req, res) => {
     let u = await User.findById(req.params.id);
 
-    if (res.locals.userRequest.osuId == config.admin.pishifat) { //i dont want anyone else messing with this
+    if (res.locals.userRequest.isResponsibleWithButtons) {
         let years;
         let num = req.body.add ? 1 : -1;
 

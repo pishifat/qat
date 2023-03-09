@@ -11,10 +11,6 @@
             Load badge info
         </button>
         <div v-if="badgeUsers.length">
-            <small class="my-2">
-                only pishifat can edit this section
-            </small>
-
             <ul class="small">
                 <li>BN1y.png</li>
                 <li>BN2y.jpg</li>
