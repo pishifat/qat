@@ -82,7 +82,47 @@ async function sendMessages(userId, messages) {
     return true;
 }
 
+/**
+ * @param {number[]} userIds
+ * @param {object} channel
+ * @param {string} channel.name
+ * @param {string} channel.description
+ * @param {string} message
+ */
+async function sendAnnouncement(userIds, channel, message) {
+    const token = await getBotToken();
+
+    await util.sleep(500); // prevent rate limiting
+
+    if (typeof token !== 'string') {
+        return { error: token.error };
+    }
+
+    try {
+        await axios.post('https://osu.ppy.sh/api/v2/chat/channels/', {
+            channel: {
+                name: channel.name,
+                description: channel.description,
+            },
+            message,
+            target_ids: userIds,
+            type: "ANNOUNCE",
+        },
+        {
+            headers: {
+                Accept: "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        return true;
+    } catch (error) {
+        return { error };
+    }
+}
+
 module.exports = {
     sendMessage,
     sendMessages,
+    sendAnnouncement,
 };

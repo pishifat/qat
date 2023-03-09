@@ -1,10 +1,10 @@
 <template>
     <div>
         <div class="card card-body small mb-2">
-            <span v-for="(message, i) in messages" :key="i" v-html="$md.render(message)" />
+            <span v-html="$md.render(message)" />
         </div>
 
-        <a v-if="users.length" class="btn btn-sm btn-block btn-success mb-2" @click="sendMessages($event)">
+        <a v-if="users.length" class="btn btn-sm btn-block btn-success mb-2" @click="sendMessage($event)">
             {{ customText }}
         </a>
     </div>
@@ -15,10 +15,10 @@
 export default {
     name: 'BotChatMessage',
     props: {
-        messages: {
-            type: Array,
+        message: {
+            type: String,
             default() {
-                return [];
+                return "you shouldn't be seeing this, contact pishifat ASAP";
             },
             required: true,
         },
@@ -46,7 +46,7 @@ export default {
         },
     },
     methods: {
-        async sendMessages (e) {
+        async sendMessage (e) {
             const result = confirm(`Are you sure? This will take a few seconds to complete.`);
             const mongoId = this.mongoId;
 
@@ -79,7 +79,7 @@ export default {
                         return '';
                 }
 
-                const res = await this.$http.executePost(`/${route}/sendMessages/${mongoId}`, { users: this.users, messages: this.messages, type }, e);
+                const res = await this.$http.executePost(`/${route}/sendMessages/${mongoId}`, { users: this.users, message: this.message, type }, e);
 
                 if (this.messageType == 'eval' && res.success) {
                     await this.$http.executePost(`/${route}/setComplete/`, { evalIds: [mongoId] });
