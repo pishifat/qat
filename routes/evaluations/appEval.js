@@ -1,4 +1,5 @@
 const express = require('express');
+const moment = require('moment');
 const AppEvaluation = require('../../models/evaluations/appEvaluation');
 const BnEvaluation = require('../../models/evaluations/bnEvaluation');
 const ResignationEvaluation = require('../../models/evaluations/resignationEvaluation');
@@ -535,15 +536,29 @@ router.post('/sendMessages/:id', middlewares.isNatOrTrialNat, async (req, res) =
         .populate(defaultPopulate)
         .orFail();
 
-    let messages;
 
     req.body.users.push({ osuId: req.session.osuId });
 
-    for (const user of req.body.users) {
-        messages = await osuBot.sendMessages(user.osuId, req.body.messages);
+    const osuIds = req.body.users.map(user => user.osuId);
+
+    let channel;
+
+    if (req.body.type == 'enable mock evaluations') {
+        channel = {
+            name: `BN App Mock Eval (${application.mode == 'osu' ? 'osu!' : `osu!${application.mode}`})`,
+            description: `Invite to participate in a mock evaluation of a BN application`,
+        }
+    } else {
+        channel = {
+            name: `BN App Results (${application.mode == 'osu' ? 'osu!' : `osu!${application.mode}`})`,
+            description: `Results for your recent BN application (${moment(application.createdAt).format('YYYY-MM-DD')})`,
+        }
     }
 
-    if (messages !== true) {
+    const message = await osuBot.sendAnnouncement(osuIds, channel, req.body.message);
+
+    if (message !== true) {
+        console.log(message);
         return res.json({ error: `Messages were not sent. Please let pishifat know!` });
     }
 

@@ -1,4 +1,5 @@
 const express = require('express');
+const moment = require('moment');
 const Logger = require('../../models/log');
 const Report = require('../../models/report');
 const BnEvaluation = require('../../models/evaluations/bnEvaluation');
@@ -900,15 +901,18 @@ router.post('/sendMessages/:id', middlewares.isNatOrTrialNat, async (req, res) =
         .populate(defaultPopulate)
         .orFail();
 
-    let messages;
-
     req.body.users.push({ osuId: req.session.osuId });
 
-    for (const user of req.body.users) {
-        messages = await osuBot.sendMessages(user.osuId, req.body.messages);
+    const osuIds = req.body.users.map(user => user.osuId);
+
+    const channel = {
+        name: `BN Eval Results (${evaluation.mode == 'osu' ? 'osu!' : `osu!${evaluation.mode}`})`,
+        description: `Results for your recent BN evaluation (${moment(evaluation.createdAt).format('YYYY-MM-DD')})`,
     }
 
-    if (messages !== true) {
+    const message = await osuBot.sendAnnouncement(osuIds, channel, req.body.message);
+
+    if (message !== true) {
         return res.json({ error: `Messages were not sent. Please let pishifat know!` });
     }
 
