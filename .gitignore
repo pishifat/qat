@@ -29,3 +29,4 @@ dist/
 public/css/
 .vscode/
 *.csv
+yarn.lock
