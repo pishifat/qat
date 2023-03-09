@@ -5,7 +5,7 @@
             :message-type="'report'"
             :mongo-id="selectedReport.id"
             :users="[{ username: selectedReport.reporter.username, osuId: selectedReport.reporter.osuId }]"
-            :custom-text="'Send message & close report'"
+            :custom-text="'Send message'"
         />
     </div>
 </template>

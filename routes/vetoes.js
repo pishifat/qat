@@ -446,7 +446,7 @@ router.post('/sendMessages/:id', middlewares.isNat, async (req, res) => {
     const osuIds = req.body.users.map(user => user.osuId);
 
     const channel = {
-        name: `Veto Mediation Request (${veto.mode == 'all' ? 'All game modes' : veto.mode == 'osu' ? 'osu!' : `osu!${veto.mode}`})`,
+        name: `Veto Mediation (${veto.mode == 'all' ? 'All game modes' : veto.mode == 'osu' ? 'osu!' : `osu!${veto.mode}`})`,
         description: 'Request to participate in a veto mediation',
     }
 

@@ -545,12 +545,12 @@ router.post('/sendMessages/:id', middlewares.isNatOrTrialNat, async (req, res) =
 
     if (req.body.type == 'enable mock evaluations') {
         channel = {
-            name: `BN Application Mock Evaluation (${application.mode == 'osu' ? 'osu!' : `osu!${application.mode}`})`,
+            name: `BN App Mock Eval (${application.mode == 'osu' ? 'osu!' : `osu!${application.mode}`})`,
             description: `Invite to participate in a mock evaluation of a BN application`,
         }
     } else {
         channel = {
-            name: `BN Application Results (${application.mode == 'osu' ? 'osu!' : `osu!${application.mode}`})`,
+            name: `BN App Results (${application.mode == 'osu' ? 'osu!' : `osu!${application.mode}`})`,
             description: `Results for your recent BN application (${moment(application.createdAt).format('YYYY-MM-DD')})`,
         }
     }

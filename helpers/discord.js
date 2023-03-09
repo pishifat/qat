@@ -316,7 +316,7 @@ async function contentCaseWebhookPost(d) {
     await d.save();
 
     const channel = {
-        name: 'Content Review Consensus',
+        name: 'Content Review Results',
         description: 'Results for your recent content review submission',
     }
 
