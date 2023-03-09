@@ -1,11 +1,11 @@
 <template>
     <div>
         <bot-chat-message
-            :messages="messages"
+            :message="message"
             :message-type="'report'"
             :mongo-id="selectedReport.id"
             :users="[{ username: selectedReport.reporter.username, osuId: selectedReport.reporter.osuId }]"
-            :custom-text="'Send messages & close report'"
+            :custom-text="'Send message & close report'"
         />
     </div>
 </template>
@@ -23,17 +23,19 @@ export default {
         ...mapGetters('manageReports', [
             'selectedReport',
         ]),
-        /** @returns {Array} */
-        messages () {
-            let messages = [];
+        /** @returns {string} */
+        message () {
+            let message = `hello! you recently reported a concern about ${this.selectedReport.culprit ? `[${this.selectedReport.culprit.username}](https://osu.ppy.sh/users/${this.selectedReport.culprit.osuId})` : this.selectedReport.link} to the NAT`;
+            message += `\n\n`;
+            message += `the NAT reviewed your report and believe it is **${this.selectedReport.valid === 1 ? 'valid' : this.selectedReport.valid === 2 ? 'partially valid' : 'invalid'}**`;
+            message += `\n\n`;
+            message += `view your full report and feedback here: https://bn.mappersguild.com/message?report=${this.selectedReport.id}`;
+            message += `\n\n`;
+            message += `thank you!`
+            message += `\n\n`;
+            message += `—NAT`;
 
-            messages.push(`hello! you recently reported a concern about ${this.selectedReport.culprit ? this.selectedReport.culprit.username : this.selectedReport.link} to the NAT`);
-            messages.push(`the NAT reviewed your report and believe it is ${this.selectedReport.valid === 1 ? 'valid' : this.selectedReport.valid === 2 ? 'partially valid' : 'invalid'}`);
-            messages.push(`view your full report and feedback here: https://bn.mappersguild.com/message?report=${this.selectedReport.id}`);
-            messages.push(`thank you!`);
-            messages.push(`—NAT`);
-
-            return messages;
+            return message;
         },
     },
 };

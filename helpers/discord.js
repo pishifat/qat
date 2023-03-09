@@ -291,7 +291,7 @@ async function contentCaseWebhookPost(d) {
     const totalAgreePercentage = Math.round((agree.length / totalVotes) * 1000) / 10;
     const totalDisagreePercentage = Math.round((disagree.length / totalVotes) * 1000) / 10;
 
-    const description = `Concluded vote for [**${d.title}**](http://bn.mappersguild.com/discussionvote?id=${d.id})\n\nIs this content appropriate for a beatmap? ${d.discussionLink}\n\n**GMT/NAT:** ${gmtNatAgreePercentage}% yes | ${gmtNatDisagreePercentage}% no\n**BN:** ${bnAgreePercentage}% yes | ${bnDisagreePercentage}% no\n**Total:** ${totalAgreePercentage}% yes | ${totalDisagreePercentage}% no`;
+    const description = `Concluded vote for [**${d.title}**](http://bn.mappersguild.com/discussionvote?id=${d.id})\n\nIs this content appropriate for a beatmap? ${d.discussionLink}\n\n**GMT/NAT:** ${gmtNatAgreePercentage}% yes | ${gmtNatDisagreePercentage}% no\n**BN:** ${bnAgreePercentage}% yes | ${bnDisagreePercentage}% no\n**Total:** ${totalAgreePercentage}% yes | ${totalDisagreePercentage}% no\n\nThe content ${gmtNatAgreePercentage >= 70 || totalAgreePercentage >= 70 ? `*CAN*` : `*CANNOT*`} be used.`;
 
     // #content-cases (BN server)
     await webhookPost(
@@ -315,16 +315,22 @@ async function contentCaseWebhookPost(d) {
     d.isAcceptable = gmtNatAgreePercentage >= 70 || totalAgreePercentage >= 70;
     await d.save();
 
-    const messages = [
-        `The content you submitted has been reviewed by the BN/NAT! - ${d.discussionLink}`,
-        `Based on vote results below, the content ${gmtNatAgreePercentage >= 70 || totalAgreePercentage >= 70 ? `*CAN*` : `*CANNOT*`} be used. See https://osu.ppy.sh/wiki/en/Rules/Content_Voting_Process for details.`,
-        `The vote details are listed below:`,
-        `- GMT/NAT: ${gmtNatAgreePercentage}% yes | ${gmtNatDisagreePercentage}% no`,
-        `- BN: ${bnAgreePercentage}% yes | ${bnDisagreePercentage}% no`,
-        `- Total: ${totalAgreePercentage}% yes | ${totalDisagreePercentage}% no`,
-    ];
+    const channel = {
+        name: 'Content Review Consensus',
+        description: 'Results for your recent content review submission',
+    }
 
-    return messages;
+    let message = `The content you submitted has been reviewed by the BN/NAT! - ${d.discussionLink}`;
+    message += `\n\n`;
+    message += `Based on vote results below, the content ${gmtNatAgreePercentage >= 70 || totalAgreePercentage >= 70 ? `*CAN*` : `*CANNOT*`} be used. See [this page](https://osu.ppy.sh/wiki/en/Rules/Content_Voting_Process) for details.`;
+    message += `\n\n`;
+    message += `The vote details are listed below:`;
+    message += `\n\n`;
+    message += `- GMT/NAT: ${gmtNatAgreePercentage}% yes | ${gmtNatDisagreePercentage}% no\n`;
+    message += `- BN: ${bnAgreePercentage}% yes | ${bnDisagreePercentage}% no\n`;
+    message += `- Total: ${totalAgreePercentage}% yes | ${totalDisagreePercentage}% no`;
+
+    return { message, channel };
 }
 
 async function announcementWebhookPost(session, title, description) {

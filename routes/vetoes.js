@@ -441,15 +441,18 @@ router.post('/sendMessages/:id', middlewares.isNat, async (req, res) => {
         .findById(req.params.id)
         .orFail();
 
-    let messages;
-
     req.body.users.push({ osuId: req.session.osuId });
 
-    for (const user of req.body.users) {
-        messages = await osuBot.sendMessages(user.osuId, req.body.messages);
+    const osuIds = req.body.users.map(user => user.osuId);
+
+    const channel = {
+        name: `Veto Mediation Request (${veto.mode == 'all' ? 'All game modes' : veto.mode == 'osu' ? 'osu!' : `osu!${veto.mode}`})`,
+        description: 'Request to participate in a veto mediation',
     }
 
-    if (messages !== true) {
+    const message = await osuBot.sendAnnouncement(osuIds, channel, req.body.message);
+
+    if (message !== true) {
         return res.json({ error: `Messages were not sent. Please let pishifat know!` });
     }
 

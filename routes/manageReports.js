@@ -255,15 +255,18 @@ router.post('/sendMessages/:id', async (req, res) => {
         .populate(defaultPopulate)
         .orFail();
 
-    let messages;
-
     req.body.users.push({ osuId: req.session.osuId });
 
-    for (const user of req.body.users) {
-        messages = await osuBot.sendMessages(user.osuId, req.body.messages);
+    const osuIds = req.body.users.map(user => user.osuId);
+
+    const channel = {
+        name: `${report.culprit ? `User Report Results (${report.culprit.username})` : 'Report Results'}`,
+        description: `Results for your recent report`,
     }
 
-    if (messages !== true) {
+    const message = await osuBot.sendAnnouncement(osuIds, channel, req.body.message);
+
+    if (message !== true) {
         return res.json({ error: `Messages were not sent. Please let pishifat know!` });
     }
 

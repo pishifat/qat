@@ -274,8 +274,8 @@ router.post('/concludeMediation/:id', middlewares.hasFullReadAccess, async (req,
     );
 
     if (discussion.isContentReview) {
-        const messages = await discord.contentCaseWebhookPost(discussion);
-        await osuBot.sendMessages(discussion.creator.osuId, messages);
+        const { message, channel } = await discord.contentCaseWebhookPost(discussion);
+        await osuBot.sendAnnouncement([discussion.creator.osuId], channel, message);
     } else {
         discord.webhookPost(
             [{

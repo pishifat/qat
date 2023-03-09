@@ -372,8 +372,9 @@ const closeContentReviews = cron.schedule('0 9 * * *', async () => {
                 discussion._id
             );
 
-            const messages = await discord.contentCaseWebhookPost(discussion);
-            await osuBot.sendMessages(discussion.creator.osuId, messages);
+            const { message, channel } = await discord.contentCaseWebhookPost(discussion);
+            
+            await osuBot.sendAnnouncement([discussion.creator.osuId], channel, message);
         }
     }
 }, {
