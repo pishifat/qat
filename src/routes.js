@@ -49,7 +49,7 @@ const routes = [
     // NAT
     { path: '/managereports', component: ManageReports, meta: { title: 'Manage Reports', requiresFullReadAccess: true } },
     { path: '/evalarchive', component: EvalArchive, meta: { title: 'Evaluation Archives', requiresFullReadAccess: true } },
-    { path: '/sevs', component: DataCollection, meta: { title: 'Manage SEVs', requiresFullReadAccess: true } },
+    { path: '/datacollection', component: DataCollection, meta: { title: 'Manage SEVs', requiresFullReadAccess: true } },
     { path: '/managetest', component: ManageTest, meta: { title: 'Manage RC Test', requiresFullReadAccess: true } },
     { path: '/logs', component: Logs, meta: { title: 'Logs', requiresFullReadAccess: true } },
     { path: '/spam', component: Spam, meta: { title: 'Spam', requiresFullReadAccess: true } },

@@ -187,7 +187,7 @@
                                     <router-link class="dropdown-item" to="/evalarchive">
                                         Archive
                                     </router-link>
-                                    <router-link class="dropdown-item" to="/sevs">
+                                    <router-link class="dropdown-item" to="/datacollection">
                                         Manage SEVs
                                     </router-link>
                                     <router-link class="dropdown-item" to="/yourevals">
