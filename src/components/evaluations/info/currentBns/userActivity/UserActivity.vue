@@ -216,6 +216,7 @@ export default {
             'disqualifiedQualityAssuranceChecks',
             'assignedBnApplications',
             'natApplications',
+            'natBnEvaluations',
             'bnFinderMatches',
         ]),
     },
