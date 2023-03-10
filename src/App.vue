@@ -48,6 +48,9 @@
                                     <router-link class="dropdown-item" to="/yourevals">
                                         Your Evaluations
                                     </router-link>
+                                    <router-link class="dropdown-item" to="/testresults">
+                                        RC Test Results
+                                    </router-link>
                                     <router-link class="dropdown-item" to="/reports">
                                         Reports
                                     </router-link>
@@ -74,6 +77,9 @@
                                 <div class="dropdown-menu">
                                     <router-link class="dropdown-item" to="/yourevals">
                                         Your Evaluations
+                                    </router-link>
+                                    <router-link class="dropdown-item" to="/testresults">
+                                        RC Test Results
                                     </router-link>
                                     <router-link class="dropdown-item" to="/reports">
                                         Reports
@@ -121,6 +127,9 @@
                                     </router-link>
                                     <router-link class="dropdown-item" to="/yourevals">
                                         Your Evaluations
+                                    </router-link>
+                                    <router-link class="dropdown-item" to="/testresults">
+                                        RC Test Results
                                     </router-link>
                                 </div>
                             </li>
@@ -178,8 +187,8 @@
                                     <router-link class="dropdown-item" to="/evalarchive">
                                         Archive
                                     </router-link>
-                                    <router-link class="dropdown-item" to="/datacollection">
-                                        Data collection
+                                    <router-link class="dropdown-item" to="/sevs">
+                                        Manage SEVs
                                     </router-link>
                                     <router-link class="dropdown-item" to="/yourevals">
                                         Your Evaluations
