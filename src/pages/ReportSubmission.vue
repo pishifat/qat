@@ -44,7 +44,7 @@
             <div v-if="category && category.length">
                 <div v-if="category == 'contentCaseVisual' || category == 'contentCaseSong'" class="row mb-2">
                     <div class="col-sm-12">
-                        <b>Note:</b> Content in ranked maps will not be changed unless it is severely inappropriate. Please focus reports on inappropriate songs or visuals from qualified/pending/WIP/graveyard maps.
+                        <b>Note:</b> Content in ranked maps will not be changed unless it is severely inappropriate. Please focus reports on inappropriate songs or visuals from qualified or soon-to-be-qualified maps. For other maps, please use the beatmap report system on osu-web.
                     </div>
                 </div>
 

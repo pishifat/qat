@@ -234,7 +234,7 @@
             </div>
             <!-- link to content -->
             <div v-if="isContentReview" class="row mb-3">
-                Content in ranked maps will not be changed unless it is severely inappropriate. Please focus reports on inappropriate songs or visuals from qualified/pending/WIP/graveyard maps.
+                Content in ranked maps will not be changed unless it is severely inappropriate. Please focus reports on inappropriate songs or visuals from qualified or soon-to-be-qualified maps. For other maps, please use the beatmap report system on osu-web.
             </div>
             <div class="row mb-3">
                 <small class="mb-1">{{ isContentReview ? 'Direct link to content (if image, URL should end in .jpg or .png)' : 'Link to relevant discussion (optional)' }}</small>
