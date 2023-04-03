@@ -14,6 +14,9 @@ const discussionSchema = new mongoose.Schema({
     creator: { type: 'ObjectId', ref: 'User' },
     isHidden: { type: Boolean, default: false },
     isAcceptable: { type: Boolean },
+    agreeOverwriteText: { type: String },
+    neutralOverwriteText: { type: String },
+    disagreeOverwriteText: { type: String },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 /**

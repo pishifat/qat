@@ -105,43 +105,54 @@ router.get('/searchDiscussionVote/:id', async (req, res) => {
 
 /* POST create a new discussion vote. */
 router.post('/submit', async (req, res) => {
-    let url = req.body.discussionLink;
+    const { discussionLink, title, shortReason, mode, isNatOnly, neutralAllowed, reasonAllowed, isContentReview, customText, agreeOverwriteText, neutralOverwriteText, disagreeOverwriteText } = req.body;
 
-    if (url.length == 0) {
-        url = undefined;
-
-        if (req.body.isContentReview) {
-            return res.json({
-                error: 'No link provided',
-            });
-        }
-    } else if (!req.body.isContentReview) {
-        util.isValidUrlOrThrow(url);
+    if (discussionLink.length == 0 && isContentReview) {
+        return res.json({
+            error: 'No link provided',
+        });
+    }
+    
+    if (discussionLink.length > 0 && !isContentReview) {
+        util.isValidUrlOrThrow(discussionLink);
     }
 
-    let title = req.body.title;
-    let shortReason = req.body.shortReason;
+    let overwriteTitle = title;
+    let overwriteShortReason = shortReason;
 
     if (req.body.isContentReview) {
         const contentReviews = await Discussion.find({ isContentReview: true });
-        title = `Content review #${contentReviews.length + 251}`;
-        shortReason = `Is this content appropriate for a beatmap? ${url}`;
+        overwriteTitle = `Content review #${contentReviews.length + 251}`;
+        overwriteShortReason = `Is this content appropriate for a beatmap? ${discussionLink}`;
 
         if (req.body.shortReason.length) {
-            shortReason += `\n\n*${req.body.shortReason}*`;
+            overwriteShortReason += `\n\n*${req.body.shortReason}*`;
         }
     }
 
+    let finalAgreeText;
+    let finalNeutralText;
+    let finalDisagreeText;
+
+    if (customText) {
+        if (agreeOverwriteText.length) finalAgreeText = agreeOverwriteText;
+        if (neutralAllowed && neutralOverwriteText.length) finalNeutralText = neutralOverwriteText;
+        if (disagreeOverwriteText.length) finalDisagreeText = disagreeOverwriteText;
+    }
+
     let discussion = await Discussion.create({
-        discussionLink: url,
-        title,
-        shortReason,
-        mode: req.body.mode,
+        discussionLink: discussionLink.length > 0 ? discussionLink : null,
+        title: overwriteTitle,
+        shortReason: overwriteShortReason,
+        mode,
         creator: req.session.mongoId,
-        isNatOnly: req.body.isNatOnly,
-        neutralAllowed: req.body.neutralAllowed,
-        reasonAllowed: req.body.reasonAllowed,
-        isContentReview: req.body.isContentReview,
+        isNatOnly,
+        neutralAllowed,
+        reasonAllowed,
+        isContentReview,
+        agreeOverwriteText: finalAgreeText,
+        neutralOverwriteText: finalNeutralText,
+        disagreeOverwriteText: finalDisagreeText,
     });
 
     discussion = await Discussion
@@ -161,7 +172,7 @@ router.post('/submit', async (req, res) => {
 
     // webhooks
 
-    // #content-cases (BN server)
+    // #content-cases or #evaluations (BN server)
     await discord.webhookPost(
         [{
             author: discord.defaultWebhookAuthor(req.session),
@@ -178,9 +189,6 @@ router.post('/submit', async (req, res) => {
     );
 
     if (req.body.isContentReview) {
-        // #content-cases (BN server) (not doing this anymore i guess)
-        // await discord.roleHighlightWebhookPost('contentCase', ['gmt']);
-
         // #content-review (internal)
         await discord.webhookPost(
             [{

@@ -20,7 +20,7 @@
                         name="vote"
                         value="1"
                     >
-                    <label class="form-check-label text-pass" for="1">Yes/Agree</label>
+                    <label class="form-check-label text-pass" for="1">{{ selectedDiscussionVote.agreeOverwriteText ? selectedDiscussionVote.agreeOverwriteText : 'Yes/Agree' }}</label>
                 </div>
                 <div v-if="selectedDiscussionVote.neutralAllowed" class="form-check form-check-inline">
                     <input
@@ -31,7 +31,7 @@
                         name="vote"
                         value="2"
                     >
-                    <label class="form-check-label text-neutral" for="2">Neutral</label>
+                    <label class="form-check-label text-neutral" for="2">{{ selectedDiscussionVote.neutralOverwriteText ? selectedDiscussionVote.neutralOverwriteText : 'Neutral' }}</label>
                 </div>
                 <div class="form-check form-check-inline">
                     <input
@@ -42,7 +42,7 @@
                         name="vote"
                         value="3"
                     >
-                    <label class="form-check-label text-fail" for="3">No/Disagree</label>
+                    <label class="form-check-label text-fail" for="3">{{ selectedDiscussionVote.disagreeOverwriteText ? selectedDiscussionVote.disagreeOverwriteText : 'No/Disagree' }}</label>
                 </div>
             </div>
 

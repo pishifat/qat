@@ -13,6 +13,9 @@ interface IDiscussionDocument extends Document {
     reasonAllowed: boolean;
     isContentReview: boolean;
     isAcceptable: boolean;
+    agreeOverwriteText: string;
+    neutralOverwriteText: string;
+    disagreeOverwriteText: string;
     mediations?: IMediationDocument[];
     creator: IUserDocument;
     createdAt?: Date;

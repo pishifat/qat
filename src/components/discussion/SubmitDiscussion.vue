@@ -230,6 +230,72 @@
                             </label>
                         </div>
                     </div>
+
+                    <!-- custom response text input toggle -->
+                    <div class="row">
+                        <p>Customize vote responses:</p>
+                        <div class="row ml-4">
+                            <label
+                                class="mx-1"
+                                data-toggle="tooltip"
+                                data-placement="top"
+                                title="use defaults (Yes/Agree, Neutral, No/Disagree)"
+                            >
+                                <input
+                                    v-model="customText"
+                                    type="radio"
+                                    class="cross-radio hide-default"
+                                    name="customText"
+                                    value="noCustomText"
+                                >
+                                <i class="fas fa-times fa-lg" />
+                            </label>
+                            <label
+                                class="mx-1"
+                                data-toggle="tooltip"
+                                data-placement="top"
+                                title="use custom vote text"
+                            >
+                                <input
+                                    v-model="customText"
+                                    type="radio"
+                                    class="checkmark-radio hide-default"
+                                    name="customText"
+                                    value="customText"
+                                >
+                                <i class="fas fa-check fa-lg" />
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- custom vote text -->
+                    <template v-if="customText == 'customText'">
+                        <div class="row">
+                            <small>Default vote options will replace any empty inputs.</small>
+                            <input
+                                v-model="agreeOverwriteText"
+                                type="text"
+                                class="form-control"
+                                placeholder="Yes/Agree"
+                            >
+                        </div>
+                        <div v-if="neutral == 'neutral'" class="row">
+                            <input
+                                v-model="neutralOverwriteText"
+                                type="text"
+                                class="form-control"
+                                placeholder="Neutral"
+                            >
+                        </div>
+                        <div class="row mb-3">
+                            <input
+                                v-model="disagreeOverwriteText"
+                                type="text"
+                                class="form-control"
+                                placeholder="No/Disagree"
+                            >
+                        </div>
+                    </template>
                 </div>
             </div>
             <!-- link to content -->
@@ -292,6 +358,10 @@ export default {
             neutral: 'noNeutral',
             reason: 'reason',
             contentReview: 'contentReview',
+            customText: 'noCustomText',
+            agreeOverwriteText: '',
+            neutralOverwriteText: '',
+            disagreeOverwriteText: '',
         };
     },
     computed: {
@@ -314,6 +384,10 @@ export default {
         isContentReview () {
             return this.contentReview == 'contentReview';
         },
+        /** @returns {boolean} */
+        customTextAllowed () {
+            return this.customText == 'customText';
+        },
     },
     methods: {
         async submitDiscussion(e) {
@@ -328,6 +402,10 @@ export default {
                     neutralAllowed: this.neutralAllowed,
                     reasonAllowed: this.reasonAllowed,
                     isContentReview: this.isContentReview,
+                    customText: this.customTextAllowed,
+                    agreeOverwriteText: this.agreeOverwriteText,
+                    neutralOverwriteText: this.neutralOverwriteText,
+                    disagreeOverwriteText: this.disagreeOverwriteText,
                 },
                 e
             );
