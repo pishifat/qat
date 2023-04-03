@@ -95,22 +95,28 @@ async function submitEval (evaluation, session, isNat, behaviorComment, moddingC
         );
 
         // +1 evaluation required when a mode has trial NAT (because there's more assigned users)
-        const evaluationsRequired = await Settings.getModeHasTrialNat(evaluation.mode) ? await Settings.getModeEvaluationsRequired(evaluation.mode) + 1 : await Settings.getModeEvaluationsRequired(evaluation.mode);
+        const baseEvalsRequired = await Settings.getModeEvaluationsRequired(evaluation.mode);
+        const evaluationsRequired = await Settings.getModeHasTrialNat(evaluation.mode) ? baseEvalsRequired + 1 : baseEvalsRequired;
 
         if (isNat && !evaluation.discussion) {
             let totalPass = 0;
             let totalNeutral = 0;
             let totalFail = 0;
+            let totalNatFail = 0;
             let totalNat = 1; // +1 because r.evaluator isn't an user object just the ID so won't be counted in
 
             for (const review of evaluation.reviews) {
-                if (review.evaluator.isNat || review.evaluator.isTrialNat) totalNat++;
+                if (review.evaluator.isNat || review.evaluator.isTrialNat) {
+                    totalNat++;
+                    
+                    if (review.vote == 3) totalNatFail++;
+                }
                 if (review.vote == 1) totalPass++;
                 else if (review.vote == 2) totalNeutral++;
                 else if (review.vote == 3) totalFail++;
             }
 
-            if (totalNat >= evaluationsRequired || (totalNat == (evaluationsRequired - 1) && totalNat == totalFail)) {
+            if (totalNat >= evaluationsRequired || (totalNat == (evaluationsRequired - 1) && totalNat == totalNatFail)) {
                 evaluation.discussion = true;
                 await evaluation.save();
 
