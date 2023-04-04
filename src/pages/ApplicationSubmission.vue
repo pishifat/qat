@@ -52,22 +52,35 @@
 
         <hr />
 
+        <template v-if="outstandingCooldowns.length">
+            <div class="card card-body">
+                <h4>Notice</h4>
+                You have one or more outstanding cooldowns that prevents you from joining the Beatmap Nominators for the following modes:
+                <ul class="text-danger">
+                    <li v-for="evaluation in outstandingCooldowns" :key="evaluation.id">{{ evaluation.mode == 'osu' ? 'osu!' : 'osu!' + evaluation.mode }}: {{ evaluation.active ? 'Evaluation in progress' : evaluation.date }}</li>
+                </ul>
+            </div>
+            <hr />
+        </template>
+
         <div class="card card-body">
             <div v-if="!hasPendingTest">
-                <h4>Game-mode:</h4>
+                <h4>Game-mode</h4>
 
                 <div class="row">
                     <div class="col-sm-12 pl-4">
                         <mode-radio-display v-model="selectedMode" />
                     </div>
                 </div>
+
                 
+
                 <hr />
 
                 <div v-if="!relevantResignation">
                     <div class="row mb-2">
                         <div class="col-sm-12">
-                            <h4>Example mods:</h4>
+                            <h4>Example mods</h4>
                             <p class="small ml-4">
                                 Link the discussion pages of {{ wasBn ? "at least two" : "three" }} mapsets you
                                 have modded in the last six months. Include at
@@ -254,6 +267,29 @@ export default {
         ...mapState([
             'loggedInUser',
         ]),
+        outstandingCooldowns() {
+            const cooldowns = [];
+
+            for (const app of this.cooldownApps) {
+                cooldowns.push({
+                    id: app.id,
+                    mode: app.mode,
+                    date: new Date(app.cooldownDate),
+                    active: app.active,
+                });
+            };
+
+            for (const evaluation of this.cooldownEvals) {
+                cooldowns.push({
+                    id: evaluation.id,
+                    mode: evaluation.mode,
+                    date: new Date(evaluation.cooldownDate),
+                    active: evaluation.active,
+                });
+            }
+
+            return cooldowns;
+        },
     },
     watch: {
         selectedMode() {

@@ -39,14 +39,14 @@ router.get('/relevantInfo', async (req, res) => {
             .sort({
                 createdAt: -1
             }),
-        AppEvaluation.findOne({
+        AppEvaluation.find({
             user: req.session.mongoId,
             $or: [
                 { cooldownDate: { $gt: new Date() } },
                 { active: true },
             ],
         }),
-        BnEvaluation.findOne({
+        BnEvaluation.find({
             user: req.session.mongoId,
             consensus: 'removeFromBn',
             cooldownDate: { $gt: new Date() },
