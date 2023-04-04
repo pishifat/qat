@@ -39,7 +39,7 @@ const defaultPopulate = [
     },
     {
         path: 'reviews',
-        select: 'evaluator behaviorComment moddingComment vote',
+        select: 'evaluator behaviorComment moddingComment vote createdAt',
         populate: {
             path: 'evaluator',
             select: 'username osuId groups isTrialNat',
@@ -53,7 +53,7 @@ const notesPopulate = [
 
 /* GET current BN eval listing. */
 router.get('/relevantInfo', async (req, res) => {
-    const evaluations = await Evaluation.findActiveEvaluations(req.session.mongoId);
+    const evaluations = await Evaluation.findActiveEvaluations(req.session.mongoId, res.locals.userRequest.isNat);
 
     res.json({
         evaluations,
@@ -159,7 +159,7 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
         error: `Didn't create any`,
     });
 
-    const evaluations = await Evaluation.findActiveEvaluations(req.session.mongoId);
+    const evaluations = await Evaluation.findActiveEvaluations(req.session.mongoId, res.locals.userRequest.isNat);
 
     res.json({
         evaluations,
@@ -174,7 +174,7 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
         for (let i = 0; i < result.length; i++) {
             const er = result[i];
             const u = await User.findById(er.user);
-            const assignedNat = await User.getAssignedNat(er.mode, [u.osuId]);
+            const assignedNat = u.isNat ? [u] : await User.getAssignedNat(er.mode, [u.osuId]);
             er.natEvaluators = assignedNat;
             await er.populate(defaultPopulate).execPopulate();
             await er.save();
@@ -184,7 +184,7 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
                 [{
                     author: discord.defaultWebhookAuthor(req.session),
                     color: discord.webhookColors.white,
-                    description: `Created [**${u.username}**'s ${isResignation ? 'resignation' : 'current BN'} eval](http://bn.mappersguild.com/bneval?id=${er.id})`,
+                    description: `Created [**${u.username}**'s ${u.isNat ? 'NAT' : isResignation ? 'resignation' : 'current BN'} eval](http://bn.mappersguild.com/bneval?id=${er.id})`,
                     fields: [
                         {
                             name: 'Assigned NAT',
@@ -257,7 +257,7 @@ router.post('/setGroupEval/', middlewares.isNat, async (req, res) => {
         .populate(defaultPopulate);
 
     await setGroupEval(evaluations, req.session);
-    evaluations = await Evaluation.findActiveEvaluations(req.session.mongoId);
+    evaluations = await Evaluation.findActiveEvaluations(req.session.mongoId, res.locals.userRequest.isNat);
     res.json(evaluations);
     Logger.generate(
         req.session.mongoId,
@@ -274,7 +274,7 @@ router.post('/setIndividualEval/', middlewares.isNat, async (req, res) => {
         discussion: false,
     });
 
-    const evaluations = await Evaluation.findActiveEvaluations(req.session.mongoId);
+    const evaluations = await Evaluation.findActiveEvaluations(req.session.mongoId, res.locals.userRequest.isNat);
 
     res.json(evaluations);
     Logger.generate(
@@ -318,7 +318,90 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
         let user = await User.findById(evaluation.user);
         const i = user.modesInfo.findIndex(m => m.mode === evaluation.mode);
 
-        if (evaluation.consensus === BnEvaluationConsensus.RemoveFromBn || (evaluation.isResignation && evaluation.consensus)) {
+        // nat evaluation processing
+        if (user.isNat) {
+            const userGroup = req.body.userGroup;
+
+            if (userGroup == 'nat') {
+                const random45 = Math.round(Math.random() * (50 - 40) + 40); // between 40 and 50 days
+                let deadline = new Date();
+                deadline.setDate(deadline.getDate() + random45);
+
+                await BnEvaluation.create({
+                    user: evaluation.user,
+                    mode: evaluation.mode,
+                    deadline,
+                    activityToCheck: random45,
+                    natEvaluators: [evaluation.user],
+                });
+            } else if (userGroup == 'bn') {
+                user.history.push({
+                    date: new Date(),
+                    mode: evaluation.mode,
+                    kind: 'left',
+                    group: 'nat',
+                    relatedEvaluation: evaluation._id,
+                });
+
+                user.history.push({
+                    date: new Date(),
+                    mode: evaluation.mode,
+                    kind: 'joined',
+                    group: 'bn',
+                    relatedEvaluation: evaluation._id,
+                });
+
+                const natIndex = user.groups.findIndex(g => g === 'nat');
+
+                if (natIndex !== -1) {
+                    user.groups.splice(natIndex, 1);
+                }
+
+                const bnIndex = user.groups.findIndex(g => g === 'bn');
+
+                if (bnIndex == -1) {
+                    user.groups.push('bn');
+                }
+    
+                user.isTrialNat = false;
+
+                await user.save();
+
+                let deadline = new Date();
+                let activityToCheck = 90;
+                deadline.setDate(deadline.getDate() + activityToCheck);
+                
+
+                await BnEvaluation.create({
+                    user: evaluation.user,
+                    mode: evaluation.mode,
+                    deadline,
+                    activityToCheck,
+                });
+            } else if (userGroup == 'user') {
+                user.history.push({
+                    date: new Date(),
+                    mode: evaluation.mode,
+                    kind: 'left',
+                    group: 'nat',
+                    relatedEvaluation: evaluation._id,
+                });
+
+                user.isTrialNat = false;
+
+                const natIndex = user.groups.findIndex(g => g === 'nat');
+
+                if (natIndex !== -1) {
+                    user.groups.splice(natIndex, 1);
+                }
+
+                await user.save();
+            }
+            
+        }
+
+        // bn evaluation processing
+        else if (evaluation.consensus === BnEvaluationConsensus.RemoveFromBn || (evaluation.isResignation && evaluation.consensus)) {
             if (i !== -1) {
                 user.modesInfo.splice(i, 1);
             }
@@ -427,27 +510,51 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
         evaluation.archivedAt = new Date();
         await evaluation.save();
 
-        const consensusText = makeWordFromField(evaluation.consensus);
-        const additionText = makeWordFromField(evaluation.addition);
+        // nat eval logs
+        if (req.body.userGroup) {
+            Logger.generate(
+                req.session.mongoId,
+                `Archived ${user.username}'s ${evaluation.mode} NAT eval (Usergroup: ${req.body.userGroup.toUpperCase()})"`,
+                'bnEvaluation',
+                evaluation._id
+            );
 
-        Logger.generate(
-            req.session.mongoId,
-            `Set ${user.username}'s ${evaluation.mode} ${evaluation.isResignation ? 'resignation' : 'BN eval'} as "${consensusText}"`,
-            'bnEvaluation',
-            evaluation._id
-        );
+            discord.webhookPost(
+                [{
+                    author: discord.defaultWebhookAuthor(req.session),
+                    color: discord.webhookColors.black,
+                    description: `Archived [**${user.username}**'s NAT eval](http://bn.mappersguild.com/bneval?id=${evaluation.id}). Usergroup: **${req.body.userGroup.toUpperCase()}**`,
+                }],
+                evaluation.mode
+            );
+        }
 
-        discord.webhookPost(
-            [{
-                author: discord.defaultWebhookAuthor(req.session),
-                color: discord.webhookColors.black,
-                description: `Archived [**${user.username}**'s ${evaluation.isResignation ? 'resignation' : 'current BN'} eval](http://bn.mappersguild.com/bneval?id=${evaluation.id}) with **${consensusText}** consensus and **${additionText}** addition.`,
-            }],
-            evaluation.mode
-        );
+        // bn eval logs
+        else {
+            const consensusText = makeWordFromField(evaluation.consensus);
+            const additionText = makeWordFromField(evaluation.addition);
+
+            Logger.generate(
+                req.session.mongoId,
+                `Archived  ${user.username}'s ${evaluation.mode} ${evaluation.isResignation ? 'resignation' : 'BN eval'} as "${consensusText}"`,
+                'bnEvaluation',
+                evaluation._id
+            );
+
+            discord.webhookPost(
+                [{
+                    author: discord.defaultWebhookAuthor(req.session),
+                    color: discord.webhookColors.black,
+                    description: `Archived [**${user.username}**'s ${evaluation.isResignation ? 'resignation' : 'current BN'} eval](http://bn.mappersguild.com/bneval?id=${evaluation.id}) with **${consensusText}** consensus and **${additionText}** addition.`,
+                }],
+                evaluation.mode
+            );
+        }
+
+        
     }
 
-    evaluations = await Evaluation.findActiveEvaluations(req.session.mongoId);
+    evaluations = await Evaluation.findActiveEvaluations(req.session.mongoId, res.locals.userRequest.isNat);
 
     res.json(evaluations);
     Logger.generate(
@@ -820,7 +927,7 @@ const applicationPopulate = [
     },
     {
         path: 'reviews',
-        select: 'evaluator behaviorComment moddingComment vote',
+        select: 'evaluator behaviorComment moddingComment vote createdAt',
         populate: {
             path: 'evaluator',
             select: 'username osuId groups',

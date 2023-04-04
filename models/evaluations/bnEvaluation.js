@@ -6,6 +6,7 @@ const bnEvaluationSchema = new mongoose.Schema({
     deadline: { type: Date , required: true },
     addition: { type: String, enum: ['lowActivityWarning', 'behaviorWarning', 'mapQualityWarning', 'moddingQualityWarning', 'none'] },
     activityToCheck: { type: Number },
+    selfSummary: { type: 'ObjectId', ref: 'Note' }, // only used for NAT evals
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true }, discriminatorKey: 'kind' });
 
 bnEvaluationSchema.virtual('isBnEvaluation').get(function () {

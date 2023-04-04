@@ -126,6 +126,12 @@
                 >
                 move to user
                 </button>
+                <button
+                    class="btn btn-sm mb-3 mt-1 ml-1 btn-primary"
+                    @click="toggleIsNatLeader($event)"
+                >
+                toggle isNatLeader
+                </button>
             </div>
         </div>
     </div>
@@ -171,6 +177,10 @@ export default {
 
         async moveToUser (e) {
             await this.$http.executePost(`/debug/moveToUser`, {}, e);
+        },
+        
+        async toggleIsNatLeader (e) {
+            await this.$http.executePost(`/debug/toggleIsNatLeader`, {}, e);
         },
     },
 };

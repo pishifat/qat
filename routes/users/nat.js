@@ -3,6 +3,7 @@ const User = require('../../models/user');
 const Logger = require('../../models/log');
 const Note = require('../../models/note');
 const AppEvaluation = require('../../models/evaluations/appEvaluation');
+const BnEvaluation = require('../../models/evaluations/bnEvaluation');
 const middlewares = require('../../helpers/middlewares');
 const discord = require('../../helpers/discord');
 const scrap = require('../../helpers/scrap');
@@ -33,10 +34,8 @@ router.get('/loadUserNotes/:id', async (req, res) => {
 
 /* POST save note */
 router.post('/saveNote/:id', async (req, res) => {
-    const isWarning = req.body.isWarning;
-    const isSummary = req.body.isSummary;
+    const { isWarning, isSummary, comment, noteId, evaluationId } = req.body;
     let warning;
-    let summary;
     let note;
 
     // edit warning note if one exists
@@ -46,32 +45,35 @@ router.post('/saveNote/:id', async (req, res) => {
         if (warning) {
             note = await Note.findByIdAndUpdate(warning.id, {
                 author: req.session.mongoId,
-                comment: req.body.comment,
+                comment,
             });
         }
     }
 
-    // edit summary note if one exists
-    if (isSummary) {
-        summary = await Note.findOne({ user: req.params.id, isSummary: true });
-
-        if (summary) {
-            note = await Note.findByIdAndUpdate(summary.id, {
-                author: req.session.mongoId,
-                comment: req.body.comment,
-            });
-        }
+    // NAT evaluation self-summary notes
+    if (isSummary && noteId) {
+        note = await Note.findByIdAndUpdate(noteId, {
+            comment,
+        });
     }
 
-    // create new note (or new summary/warning if none exists)
-    if (!warning && !summary) {
+    // create new note (or new warning if none exists)
+    if (!warning && !noteId) {
         note = await Note.create({
             author: req.session.mongoId,
             user: req.params.id,
-            comment: req.body.comment,
+            comment,
             isWarning,
             isSummary,
         });
+    }
+
+    // save note to NAT self-summary eval thing
+    if (evaluationId) {
+        await BnEvaluation.findByIdAndUpdate(evaluationId, {
+            selfSummary: note._id,
+            discussion: true,
+        })
     }
 
     // populate for return
@@ -101,7 +103,7 @@ router.post('/saveNote/:id', async (req, res) => {
             fields: [
                 {
                     name: 'Note',
-                    value: req.body.comment.length > 950 ? req.body.comment.slice(0, 950) + '... *(truncated)*' : req.body.comment,
+                    value: comment.length > 950 ? comment.slice(0, 950) + '... *(truncated)*' : comment,
                 },
             ],
         }],

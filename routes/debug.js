@@ -170,4 +170,16 @@ router.post("/moveToProbation/:mode", async (req, res) => {
     });
 });
 
+/* POST move user to NAT leader */
+router.post("/toggleIsNatLeader", async (req, res) => {
+    const user = await User.findOne({ osuId: config.admin.pishifat });
+    user.isNatLeader = !user.isNatLeader;
+    await user.save();
+
+    res.json({
+        user,
+        success: `toggled isNatLeader`,
+    });
+});
+
 module.exports = router;

@@ -7,16 +7,27 @@ const evaluationSchema = new mongoose.Schema({
 
 class EvaluationService extends mongoose.Model {
 
-    static findActiveEvaluations(mongoId) {
+    static findActiveEvaluations(mongoId, isNat) {
         let minDate = new Date();
         minDate.setDate(minDate.getDate() + 7);
 
-        return this
-            .find({
+        let query;
+
+        if (isNat) {
+            query = {
+                active: true,
+                deadline: { $lte: minDate },
+            }
+        } else {
+            query = {
                 active: true,
                 deadline: { $lte: minDate },
                 user: { $ne: mongoId },
-            })
+            }
+        }
+
+        return this
+            .find(query)
             .populate([
                 {
                     path: 'user',
@@ -37,6 +48,9 @@ class EvaluationService extends mongoose.Model {
                         path: 'evaluator',
                         select: 'username osuId groups',
                     },
+                },
+                {
+                    path: 'selfSummary',
                 },
             ])
             .sort({ deadline: 1, consensus: 1, feedback: 1 });

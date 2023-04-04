@@ -7,11 +7,6 @@
 
 
         <ul class="text-secondary small">
-            <li v-if="summaryNote">
-                <b>USER SUMMARY</b>
-                <div v-html="$md.render(summaryNote.comment)" />
-            </li>
-
             <li v-if="warningNote">
                 <b>LATEST WARNING/ACTION - 
                     {{ warningNote.updatedAt | toStandardDate }} -
@@ -81,14 +76,6 @@ export default {
         warningNote() {
             if (this.userNotes) {
                 return this.userNotes.find(n => n.isWarning);
-            }
-
-            return null;
-        },
-        /** @returns {Object} */
-        summaryNote() {
-            if (this.userNotes) {
-                return this.userNotes.find(n => n.isSummary);
             }
 
             return null;

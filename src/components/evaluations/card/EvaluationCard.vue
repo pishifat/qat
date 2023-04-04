@@ -88,6 +88,7 @@ export default {
         imageClass () {
             if (this.evaluation.isApplication) return 'user';
             else if (this.evaluation.user.probationModes.includes(this.evaluation.mode)) return 'probation';
+            else if (this.evaluation.user.isNat) return 'nat';
             else return 'bn';
         },
         isSelected () {
@@ -142,6 +143,12 @@ export default {
 }
 .card-bg-user {
     background-image: url('~/public/images/user-transparent.png');
+    background-repeat: repeat-y;
+    background-position: left top;
+}
+
+.card-bg-nat {
+    background-image: url('~/public/images/nat.png');
     background-repeat: repeat-y;
     background-position: left top;
 }

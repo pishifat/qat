@@ -117,7 +117,7 @@
                     </div>
 
                     <small class="text-secondary ml-2 mt-1">
-                        Only deadlines within the next 2 weeks will be displayed.
+                        Only deadlines within the next week will be displayed.
                     </small>
                 </div>
             </div>

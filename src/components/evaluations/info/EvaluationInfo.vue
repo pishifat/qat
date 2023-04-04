@@ -52,12 +52,16 @@
                 </div>
             </template>
 
-            <discussion-info v-if="selectedEvaluation.discussion" />
+            <discussion-info v-if="selectedEvaluation.discussion && !selectedEvaluation.user.isNat" />
 
-            <!-- Only NAT can edit their review while in discussion -->
             <template v-if="selectedEvaluation.active">
                 <hr />
-                <evaluation-input />
+                <evaluation-input v-if="!selectedEvaluation.user.isNat" />
+                <nat-self-evaluation v-else-if="selectedEvaluation.user.isNat && selectedEvaluation.user.id == loggedInUser.id && !selectedEvaluation.discussion" />
+                <nat-leader-evaluation v-else-if="selectedEvaluation.user.isNat && selectedEvaluation.discussion && loggedInUser.isNatLeader" />
+                <div v-else>
+                    There's nothing for you to do here. :)
+                </div>
             </template>
         </div>
     </modal-dialog>
@@ -70,6 +74,8 @@ import PreviousEvaluations from './common/PreviousEvaluations.vue';
 import UserNotes from './common/UserNotes.vue';
 import UserReports from './currentBns/UserReports.vue';
 import ModdingActivity from './currentBns/ModdingActivity.vue';
+import NatSelfEvaluation from './currentBns/NatSelfEvaluation.vue';
+import NatLeaderEvaluation from './currentBns/NatLeaderEvaluation.vue';
 import UserActivity from './currentBns/userActivity/UserActivity.vue';
 import EvaluationInput from './common/EvaluationInput.vue';
 import EvaluatorAssignments from './common/EvaluatorAssignments.vue';
@@ -85,6 +91,8 @@ export default {
         UserNotes,
         UserReports,
         ModdingActivity,
+        NatSelfEvaluation,
+        NatLeaderEvaluation,
         UserActivity,
         EvaluationInput,
         EvaluatorAssignments,

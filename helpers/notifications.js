@@ -21,7 +21,7 @@ const { user } = require('../models/evaluations/base');
 const ResignationEvaluation = require('../models/evaluations/resignationEvaluation');
 
 const defaultPopulate = [
-    { path: 'user', select: 'username osuId modesInfo' },
+    { path: 'user', select: 'username osuId modesInfo groups' },
     { path: 'natEvaluators', select: 'username osuId discordId isBnEvaluator' },
     { path: 'bnEvaluators', select: 'username osuId discordId isBnEvaluator' },
     {
@@ -47,7 +47,9 @@ const defaultReportPopulate = [
 function findNatEvaluatorHighlights(reviews, natEvaluators, discussion) {
     let discordIds = [];
 
-    if (discussion) {
+    if (natEvaluators.length == 1) {
+        discordIds.push(natEvaluators[0].discordId);
+    } else if (discussion) {
         for (const review of reviews) {
             if (review.evaluator.groups.includes('nat') && review.evaluator.isBnEvaluator) {
                 discordIds.push(review.evaluator.discordId);
@@ -134,7 +136,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
     const startRange = new Date();
     startRange.setDate(startRange.getDate() + 6);
     const endRange = new Date();
-    endRange.setDate(endRange.getDate() + 7);
+    endRange.setDate(endRange.getDate() + 555);
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
@@ -226,7 +228,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
     for (let i = 0; i < activeRounds.length; i++) {
         const round = activeRounds[i];
 
-        let description = `[**${round.user.username}**'s ${round.isResignation ? 'resignation' : 'current BN eval'}](http://bn.mappersguild.com/bneval?id=${round.id}) `;
+        let description = `[**${round.user.username}**'s ${round.user.groups.includes('nat') ? 'NAT eval' : round.isResignation ? 'resignation' : 'current BN eval'}](http://bn.mappersguild.com/bneval?id=${round.id}) `;
         let natList = '';
         let trialNatList = '';
         let generateWebhook = true;
@@ -273,7 +275,6 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
         }
 
         if (date > round.deadline) {
-            discordIds = findNatEvaluatorHighlights(round.reviews, evaluators, round.discussion);
             const days = findDaysAgo(round.deadline);
 
             description += `was due ${days == 0 ? 'today!' : days == 1 ? days + ' day ago!' : days + ' days ago!'}`;
@@ -300,6 +301,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
             );
             await util.sleep(500);
 
+            discordIds = findNatEvaluatorHighlights(round.reviews, evaluators, round.discussion);
             await discord.userHighlightWebhookPost(round.mode, discordIds);
             await util.sleep(500);
         } else if (generateWebhook && natList.length) {

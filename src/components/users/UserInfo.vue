@@ -41,7 +41,7 @@
 
                     <discord-id />
 
-                    <user-group-toggle v-if="selectedUser.isBn || selectedUser.isNat" />
+                    <user-group-toggle v-if="selectedUser.isBn" />
 
                     <modding-activity
                         :username="selectedUser.username"

@@ -20,6 +20,7 @@ interface IUser {
     isBnEvaluator: boolean;
     inBag: boolean;
     isTrialNat: boolean;
+    isNatLeader: boolean;
     bnProfileBadge: number;
     natProfileBadge: number;
     rankedBeatmapsets: number;

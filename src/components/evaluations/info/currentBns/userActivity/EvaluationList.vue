@@ -11,11 +11,14 @@
             <div v-if="events" :id="eventsId" class="collapse">
                 <data-table
                     v-if="events.length"
-                    :headers="['Date', 'Evaluation', 'Vote', 'Consensus']"
+                    :headers="['Deadline', 'Eval submitted', 'Evaluation', 'Vote', 'Consensus']"
                 >
                     <tr v-for="event in events" :key="event.id">
                         <td class="text-nowrap">
                             {{ new Date(event.deadline).toString().slice(4, 10) }}
+                        </td>
+                        <td class="text-nowrap" :class="evaluatedAfterDeadline(event.deadline, event.reviews) ? 'text-danger' : ''">
+                            {{ findReviewDate(event.reviews) }}
                         </td>
                         <td>
                             <a
@@ -106,6 +109,44 @@ export default {
             else if (vote == 3) vote = 'fail';
 
             return vote;
+        },
+        findReviewDate(reviews) {
+            let date;
+
+            for (let i = 0; i < reviews.length; i++) {
+                const review = reviews[i];
+
+                if (review.evaluator.id == this.mongoId) {
+                    date = new Date(review.createdAt);
+                    break;
+                }
+            }
+
+            if (!date) {
+                return 'N/A';
+            }
+
+            return new Date(date).toString().slice(4, 10);
+        },
+        evaluatedAfterDeadline(deadline, reviews) {
+            const dateDeadline = new Date(deadline);
+            dateDeadline.setDate(dateDeadline.getDate() + 1);
+            let reviewDate;
+
+            for (let i = 0; i < reviews.length; i++) {
+                const review = reviews[i];
+
+                if (review.evaluator.id == this.mongoId) {
+                    reviewDate = new Date(review.createdAt);
+                    break;
+                }
+            }
+
+            if (!reviewDate) {
+                return true;
+            }
+
+            return dateDeadline < reviewDate;
         },
     },
 };

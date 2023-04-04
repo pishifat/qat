@@ -5,10 +5,6 @@
                 Notes
             </b>
         </p>
-        <div v-if="summaryNote" class="my-2">
-            <b>User summary</b>
-            <div class="ml-4 small text-secondary" v-html="$md.render(summaryNote.comment)" />
-        </div>
 
         <div v-if="warningNote" class="my-2">
             <b>Latest warning/action - 
@@ -34,14 +30,9 @@
                     Save new note
                 </button>
             </div>
-            <div class="col-sm-3">
+            <div class="col-sm-6">
                 <button class="btn btn-danger btn-block btn-sm" @click="saveNote($event, 'warning')">
                     {{ warningNote ? 'Overwrite' : 'Save' }} warning
-                </button>
-            </div>
-            <div class="col-sm-3">
-                <button class="btn btn-danger btn-block btn-sm" @click="saveNote($event, 'summary')">
-                    {{ summaryNote ? 'Overwrite' : 'Save' }} summary
                 </button>
             </div>
         </div>
@@ -135,7 +126,7 @@ export default {
         /** @returns {Array} */
         otherNotes() {
             if (this.notes) {
-                return this.notes.filter(n => !n.isWarning && !n.isSummary);
+                return this.notes.filter(n => !n.isWarning);
             }
 
             return null;
@@ -144,14 +135,6 @@ export default {
         warningNote() {
             if (this.notes) {
                 return this.notes.find(n => n.isWarning);
-            }
-
-            return null;
-        },
-        /** @returns {Object} */
-        summaryNote() {
-            if (this.notes) {
-                return this.notes.find(n => n.isSummary);
             }
 
             return null;
@@ -184,9 +167,8 @@ export default {
         async saveNote(e, type) {
             if (this.comment.length) {
                 const isWarning = (type == 'warning');
-                const isSummary = (type == 'summary');
 
-                const data = await this.$http.executePost('/users/nat/saveNote/' + this.selectedUser.id, { comment: this.comment, isWarning, isSummary }, e);
+                const data = await this.$http.executePost('/users/nat/saveNote/' + this.selectedUser.id, { comment: this.comment, isWarning }, e);
 
                 if (this.$http.isValid(data)) {
                     if (this.notes) {
