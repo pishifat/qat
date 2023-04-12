@@ -1,6 +1,6 @@
 /**
  * tags:
- * "users:request_status_update" = user request status updates
+ * * users:request_status_update
  */
 
 class WebsocketManager {

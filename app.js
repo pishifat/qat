@@ -129,7 +129,6 @@ app.use('/debug', debugRouter);
 app.use(function (req, res) {
     res.render('index', {
         layout: false,
-        // @ts-ignore
         loggedIn: req.session.mongoId,
     });
 });

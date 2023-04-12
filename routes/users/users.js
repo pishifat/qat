@@ -594,7 +594,7 @@ router.post('/:id/updateRequestStatus', middlewares.isBnOrNat, async (req, res) 
     res.json({
         success: 'Updated',
         user,
-    })
+    });
 
     Logger.generate(
         req.session.mongoId,
