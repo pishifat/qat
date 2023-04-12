@@ -1,3 +1,4 @@
+// @ts-nocheck
 const express = require('express');
 const config = require('../config.json');
 const Aiess = require('../models/aiess');
@@ -19,9 +20,10 @@ const router = express.Router();
 router.use((req, res, next) => {
     const secret = req.header('secret');
     const username = req.header('username');
+    const isWs = req.header('Upgrade');
 
-    if (!secret || !username || config.interOpAccess[username].secret !== secret) {
-        return res.status(401).send('Invalid key');
+    if (!secret || !username || config.interOpAccess[username]?.secret !== secret) {
+        if (isWs != "websocket") return res.status(401).send('Invalid key');
     }
 
     return next();
