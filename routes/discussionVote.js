@@ -177,11 +177,11 @@ router.post('/submit', async (req, res) => {
         [{
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.yellow,
-            description: `**New discussion up for vote:** [${title}](http://bn.mappersguild.com/discussionvote?id=${discussion.id})`,
+            description: `**New discussion up for vote:** [${overwriteTitle}](http://bn.mappersguild.com/discussionvote?id=${discussion.id})`,
             fields: [
                 {
                     name: `Question/Proposal`,
-                    value: shortReason.length > 900 ? shortReason.slice(0, 900) + '... *(truncated)*' : shortReason,
+                    value: overwriteShortReason.length > 900 ? overwriteShortReason.slice(0, 900) + '... *(truncated)*' : overwriteShortReason,
                 },
             ],
         }],
@@ -189,16 +189,17 @@ router.post('/submit', async (req, res) => {
     );
 
     if (req.body.isContentReview) {
+        console.log(overwriteTitle);
         // #content-review (internal)
         await discord.webhookPost(
             [{
                 author: discord.defaultWebhookAuthor(req.session),
                 color: discord.webhookColors.yellow,
-                description: `**New discussion up for vote:** [${title}](http://bn.mappersguild.com/discussionvote?id=${discussion.id})`,
+                description: `**New discussion up for vote:** [${overwriteTitle}](http://bn.mappersguild.com/discussionvote?id=${discussion.id})`,
                 fields: [
                     {
                         name: `Question/Proposal`,
-                        value: shortReason.length > 900 ? shortReason.slice(0, 900) + '... *(truncated)*' : shortReason,
+                        value: overwriteShortReason.length > 900 ? overwriteShortReason.slice(0, 900) + '... *(truncated)*' : overwriteShortReason,
                     },
                 ],
             }],
