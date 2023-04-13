@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const config = require('./config.json');
-const ws = require("ws")
+const ws = require("ws");
 require('express-async-errors');
 
 // Return the 'new' updated object by default when doing findByIdAndUpdate

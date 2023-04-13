@@ -21,7 +21,7 @@ router.use((req, res, next) => {
     const username = req.header('username');
     const isWs = req.header('Upgrade');
 
-    if (!secret || !username || config.interOpAccess[username]?.secret !== secret) {
+    if (!secret || !username || config.interOpAccess[username].secret !== secret) {
         if (isWs != "websocket") return res.status(401).send('Invalid key');
     }
 
