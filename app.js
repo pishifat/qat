@@ -1,11 +1,13 @@
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
+const middlewares = require("./helpers/middlewares")
 const logger = require('morgan');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const config = require('./config.json');
+const ws = require("ws");
 require('express-async-errors');
 
 // Return the 'new' updated object by default when doing findByIdAndUpdate
@@ -44,8 +46,16 @@ const messageRouter = require('./routes/message');
 const settingsRouter = require('./routes/settings');
 const spamRouter = require('./routes/spam');
 const debugRouter = require('./routes/debug');
+const { websocketManager } = require('./helpers/websocket');
 
 const app = express();
+
+global.ws = [] // array to access websocket clients
+const wsServer = new ws.Server({ noServer: true, path: "/websocket/interOp" });
+
+wsServer.on('connection', (socket, request) => {
+    console.log(`${request.headers['x-forwarded-for'] || request.socket.remoteAddress} is connected via websocket`);
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -177,12 +187,11 @@ app.use(function (err, req, res, next) {
     );
 });
 
-
 // server start
 const port = process.env.PORT || '3001';
 app.set('port', port);
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
     console.log('Listening on ' + port);
 
     if (config.enableNotifications) {
@@ -194,6 +203,43 @@ app.listen(port, () => {
         notifications.checkBnEvaluationDeadlines.start();
         notifications.lowActivityPerUserTask.start();
         notifications.checkTenureValidity.start();
+    }
+});
+
+// setup websocket
+server.on('upgrade', (request, socket, head) => {
+        wsServer.handleUpgrade(request, socket, head, (socket, request) => {
+        const secret = request.headers?.secret;
+        const username = request.headers?.username
+        const tags = request.headers?.tags
+
+        if (!config.interOpAccess[username?.toString()]) return sendError(401, "User not found!");
+
+        if (!tags || tags.toString().split("+").length == 0) return sendError(400, "Provide valid tags to listen to!");
+
+        if (!secret || !username || config.interOpAccess[username?.toString()].secret !== secret) return sendError(401, "Invalid key!")
+
+        function sendError(code, text) {
+            socket.send(JSON.stringify({
+                status: code,
+                statusText:text
+            }));
+
+            socket.close();
+        }
+
+        (global.ws || []).push({ tags: sanitizeTags(tags), ws: socket })
+
+        
+        wsServer.emit('connection', socket, request);
+    });
+
+    function sanitizeTags(requestTags) {
+        const tags = requestTags.toString().split("+")
+        const availableTags = websocketManager.availableTags;
+        const sanitizedTags = tags.map((t) => (t || "").toLowerCase().trim()).filter((t) => t.trim().toLowerCase() != "").filter((t) => availableTags.includes(t));
+
+        return sanitizedTags;
     }
 });
 

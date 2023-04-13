@@ -16,6 +16,7 @@ const findAdditionalBnMonths = require('../../helpers/scrap').findAdditionalBnMo
 const util = require('../../helpers/util');
 const { BnEvaluationConsensus, BnEvaluationAddition } = require('../../shared/enums');
 const { findEvaluationsWithoutIncident } = require('../evaluations/evaluations');
+const { websocketManager } = require("../../helpers/websocket");
 
 const router = express.Router();
 
@@ -579,6 +580,13 @@ router.post('/:id/updateRequestStatus', middlewares.isBnOrNat, async (req, res) 
         });
     }
 
+    // Send websocket notification if request status has changed
+    if (user.requestStatus.filter((s) => s == "closed").length != req.body.requestStatus.filter((s) => s == "closed").length) 
+        websocketManager.sendNotification("users:request_status_update", {
+            isOpen: !req.body.requestStatus.includes("closed"),
+            user: user
+        });
+    
     user.requestStatus = req.body.requestStatus;
     user.requestLink = req.body.requestLink;
     await user.save();
