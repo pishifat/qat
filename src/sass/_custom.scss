@@ -151,11 +151,13 @@ header {
     flex-direction: row;
     align-items: center;
     padding: 0.3rem;
-    transition: all 0.2s ease-in-out;
+    transition: all 120ms linear;
+    box-shadow: 0 0 0px transparent !important;
 
     &:hover {
-        transform: scale(1.05);
-    }
+        box-shadow: 0 0 10px #92b2bdb8 !important;
+        z-index: 1;
+    } 
 }
 
 .modal-content .card, .card .card {
