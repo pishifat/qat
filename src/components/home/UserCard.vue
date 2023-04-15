@@ -77,7 +77,6 @@ export default {
 
             return status;
         },
-
         /** @returns {string} */
         cardDecoration(user) {
             let css = this.getUserCover(user);
