@@ -196,7 +196,6 @@ const server = app.listen(port, () => {
 
     if (config.enableNotifications) {
         notifications.notifyDeadlines.start();
-        notifications.notifyBeatmapReports.start();
         notifications.lowActivityTask.start();
         notifications.closeContentReviews.start();
         notifications.checkMatchBeatmapStatuses.start();
