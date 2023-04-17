@@ -152,6 +152,7 @@ router.post('/submitTest', async (req, res) => {
     );
 
     let fields = [];
+    let discordIds = [];
 
     if (totalScore >= 12.5 || test.mode != 'osu') {
         const assignedNat = await User.getAssignedNat(test.mode);
@@ -174,6 +175,8 @@ router.post('/submitTest', async (req, res) => {
         await currentBnApp.save();
 
         const natList = assignedNat.map(n => n.username).join(', ');
+        const natDiscordIds = assignedNat.map(n => n.discordId);
+        discordIds = discordIds.concat(natDiscordIds);
 
         fields.push({
             name: 'Assigned NAT',
@@ -185,10 +188,12 @@ router.post('/submitTest', async (req, res) => {
             currentBnApp.bnEvaluators = assignedTrialNat;
             await currentBnApp.save();
             const trialNatList = assignedTrialNat.map(n => n.username).join(', ');
+            const trialNatDiscordIds = assignedTrialNat.map(n => n.discordId);
             fields.push({
                 name: 'Assigned BN',
                 value: trialNatList,
             });
+            discordIds = discordIds.concat(trialNatDiscordIds);
         }
     }
 
@@ -201,6 +206,8 @@ router.post('/submitTest', async (req, res) => {
         }],
         test.mode
     );
+
+    await discord.userHighlightWebhookPost(test.mode, discordIds);
 
     if (totalScore < 12.5 && test.mode == 'osu') {
         let cooldown = new Date();
