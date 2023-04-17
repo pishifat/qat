@@ -31,7 +31,7 @@ const defaultAppPopulate = [
 const defaultBnPopulate = [
     {
         path: 'user',
-        select: 'username osuId modesInfo',
+        select: 'username osuId modesInfo groups',
     },
     {
         path: 'natEvaluators',

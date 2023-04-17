@@ -14,6 +14,9 @@ const BnEvaluationConsensus = Object.freeze({
     FullBn: 'fullBn',
     ProbationBn: 'probationBn',
     RemoveFromBn: 'removeFromBn',
+    RemainInNat: 'remainInNat',
+    MoveToBn: 'moveToBn',
+    RemoveFromNat: 'removeFromNat',
 });
 
 const ResignationConsensus = Object.freeze({

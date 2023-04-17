@@ -5,14 +5,16 @@
                 <b>Self-reported summary:</b>
                 <span class="small" v-html="$md.render(selectedEvaluation.selfSummary.comment)" />
             </div>
-            <div class="col-sm-12 mb-4">
-                Consider the info above and communicate with the NAT member if you think there's a problem.
-            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <reviews-listing class="col-sm-12 mb-4" />
+            <evaluation-input class="col-sm-12 mb-4" />
         </div>
         <div class="row">
             <div class="col-sm-4">
                 <button
-                    class=" btn btn-sm btn-danger btn-block "
+                    class=" btn btn-sm btn-success btn-block "
                     @click="archiveNatEvaluation($event, 'nat')"
                 >
                     Archive
@@ -20,7 +22,7 @@
             </div>
             <div class="col-sm-4">
                 <button
-                    class="btn btn-sm btn-bn btn-block"
+                    class="btn btn-sm btn-secondary btn-block"
                     @click="archiveNatEvaluation($event, 'bn')"
                 >
                     Archive & move from NAT to BN
@@ -28,10 +30,10 @@
             </div>
             <div class="col-sm-4">
                 <button
-                    class="btn btn-sm btn-primary btn-block"
+                    class="btn btn-sm btn-danger btn-block"
                     @click="archiveNatEvaluation($event, 'user')"
                 >
-                    Archive & move from NAT to Alumni
+                    Archive & remove from NAT
                 </button>
             </div>
         </div>
@@ -40,9 +42,15 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import ReviewsListing from '../common/ReviewsListing.vue';
+import EvaluationInput from '../common/EvaluationInput.vue';
 
 export default {
     name: 'NatLeaderEvaluation',
+    components: {
+        EvaluationInput,
+        ReviewsListing,
+    },
     computed: {
         ...mapState([
             'loggedInUser',
@@ -55,7 +63,7 @@ export default {
         async archiveNatEvaluation(e, userGroup) {
             await this.$http.executePost(`/bnEval/setComplete/`, { evalIds: [this.selectedEvaluation.id], userGroup }, e);
             $('#evaluationInfo').modal('hide');
-            this.$router.push(`users?id=${this.selectedEvaluation.user.id}`);
+            this.$router.push(`/evalarchive?id=${this.selectedEvaluation.id}`);
         },
     },
 };

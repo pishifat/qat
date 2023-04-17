@@ -20,7 +20,7 @@
         <div class="col-sm-10">
             <div class="row">
                 <div class="col-sm-12">
-                    <b>Modding:</b>
+                    <b>{{ selectedEvaluation.user.isNat ? 'NAT activity:' : 'Modding:' }}</b>
                     <div class="small ml-2 card card-body" v-html="$md.render(review.moddingComment)" />
                 </div>
                 <div class="col-sm-12">
@@ -33,14 +33,16 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import UserAvatar from '../../../UserAvatar.vue';
+import evaluations from '../../../../mixins/evaluations.js';
 
 export default {
     name: 'ReviewContent',
     components: {
         UserAvatar,
     },
+    mixins: [evaluations],
     props: {
         review: {
             type: Object,
@@ -55,6 +57,9 @@ export default {
         ...mapState([
             'loggedInUser',
         ]),
+        ...mapGetters('evaluations', [
+            'selectedEvaluation']
+        ),
     },
     methods: {
         voteColor(vote) {

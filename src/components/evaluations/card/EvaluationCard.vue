@@ -88,7 +88,7 @@ export default {
         imageClass () {
             if (this.evaluation.isApplication) return 'user';
             else if (this.evaluation.user.probationModes.includes(this.evaluation.mode)) return 'probation';
-            else if (this.evaluation.user.isNat) return 'nat';
+            else if ((this.evaluation.user.isNat && !this.evaluation.consensus) || this.evaluation.selfSummary) return 'nat';
             else return 'bn';
         },
         isSelected () {

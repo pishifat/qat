@@ -141,7 +141,7 @@ router.post('/submitEval/:id', middlewares.isBnOrNat, async (req, res) => {
         res.locals.userRequest.isNat || res.locals.userRequest.isTrialNat,
         req.body.behaviorComment,
         req.body.moddingComment,
-        req.body.vote
+        req.body.vote,
     );
 
     evaluation = await AppEvaluation

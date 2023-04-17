@@ -12,11 +12,14 @@ export default {
             switch (this.consensus) {
                 case 'pass':
                 case 'fullBn':
+                case 'remainInNat':
                 case 'resignedOnGoodTerms':
                     return 'text-pass';
 
                 case 'fail':
+                case 'removeFromNat':
                 case 'removeFromBn':
+                case 'moveToBn':
                     return 'text-fail';
 
                 case 'probationBn':
@@ -60,6 +63,8 @@ export default {
 
             // Bn --> BN
             let word = field.replace(/Bn/,'BN');
+            // Nat --> NAT
+            word = word.replace(/Nat/, 'NAT');
             // aWordWithBNOnIt --> a Word With BNOn It
             word = word.replace(/([a-z])([A-Z])/g, '$1 $2');
             // a Word With BNOn It --> a Word With BN On It

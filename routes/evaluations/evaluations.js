@@ -85,14 +85,16 @@ async function submitEval (evaluation, session, isNat, behaviorComment, moddingC
         // Send new review notification
         let description = formatDescription(evaluation, 'Submitted eval for', '');
 
-        discord.webhookPost(
-            [{
-                author: discord.defaultWebhookAuthor(session),
-                color: discord.webhookColors.lightGreen,
-                description,
-            }],
-            evaluation.mode
-        );
+        if (!evaluation.user.isNat) {
+            discord.webhookPost(
+                [{
+                    author: discord.defaultWebhookAuthor(session),
+                    color: discord.webhookColors.lightGreen,
+                    description,
+                }],
+                evaluation.mode
+            );
+        }
 
         // +1 evaluation required when a mode has trial NAT (because there's more assigned users)
         const baseEvalsRequired = await Settings.getModeEvaluationsRequired(evaluation.mode);

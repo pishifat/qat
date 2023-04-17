@@ -77,7 +77,7 @@
             </section>
 
             <section v-if="wasLoaded" class="card card-body">
-                <h2>BN Evaluations</h2>
+                <h2>BN/NAT Evaluations</h2>
 
                 <transition-group
                     v-if="currentBnEvaluations.length"

@@ -226,14 +226,13 @@ router.post('/submitEval/:id', middlewares.isNatOrTrialNat, async (req, res) => 
         }
     }
 
-
     const isNewEvaluation = await submitEval(
         evaluation,
         req.session,
         res.locals.userRequest.isNat || res.locals.userRequest.isTrialNat,
         req.body.behaviorComment,
         req.body.moddingComment,
-        req.body.vote
+        req.body.vote,
     );
 
     evaluation = await Evaluation.findById(req.params.id).populate(defaultPopulate);
@@ -293,6 +292,8 @@ function makeWordFromField (field) {
 
     // Bn --> BN
     let word = field.replace(/Bn/,'BN');
+    // Nat --> NAT
+    word = word.replace(/Nat/,'NAT');
     // aWordWithBNOnIt --> a Word With BNOn It
     word = word.replace(/([a-z])([A-Z])/g, '$1 $2');
     // a Word With BNOn It --> a Word With BN On It
@@ -334,6 +335,10 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
                     activityToCheck: random45,
                     natEvaluators: [evaluation.user],
                 });
+
+                evaluation.consensus = BnEvaluationConsensus.RemainInNat;
+                evaluation.feedback = 'None';
+                evaluation.isReviewed = true;
             } else if (userGroup == 'bn') {
                 user.history.push({
                     date: new Date(),
@@ -378,6 +383,10 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
                     deadline,
                     activityToCheck,
                 });
+
+                evaluation.consensus = BnEvaluationConsensus.MoveToBn;
+                evaluation.feedback = 'None';
+                evaluation.isReviewed = true;
             } else if (userGroup == 'user') {
                 user.history.push({
                     date: new Date(),
@@ -396,6 +405,10 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
                 }
 
                 await user.save();
+
+                evaluation.consensus = BnEvaluationConsensus.RemoveFromNat;
+                evaluation.feedback = 'None';
+                evaluation.isReviewed = true;
             }
             
         }
