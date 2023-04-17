@@ -320,7 +320,7 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
 
         // nat evaluation processing
         if (user.isNat) {
-            const userGroup = req.body.userGroup;
+            const userGroup = req.body.userGroup || 'nat';
 
             if (userGroup == 'nat') {
                 const random45 = Math.round(Math.random() * (50 - 40) + 40); // between 40 and 50 days
@@ -511,10 +511,12 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
         await evaluation.save();
 
         // nat eval logs
-        if (req.body.userGroup) {
+        if (user.isNat) {
+            const userGroup = req.body.userGroup || 'nat';
+
             Logger.generate(
                 req.session.mongoId,
-                `Archived ${user.username}'s ${evaluation.mode} NAT eval (Usergroup: ${req.body.userGroup.toUpperCase()})"`,
+                `Archived ${user.username}'s ${evaluation.mode} NAT eval (Usergroup: ${userGroup.toUpperCase()})"`,
                 'bnEvaluation',
                 evaluation._id
             );
@@ -523,7 +525,7 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
                 [{
                     author: discord.defaultWebhookAuthor(req.session),
                     color: discord.webhookColors.black,
-                    description: `Archived [**${user.username}**'s NAT eval](http://bn.mappersguild.com/bneval?id=${evaluation.id}). Usergroup: **${req.body.userGroup.toUpperCase()}**`,
+                    description: `Archived [**${user.username}**'s NAT eval](http://bn.mappersguild.com/bneval?id=${evaluation.id}). Usergroup: **${userGroup.toUpperCase()}**`,
                 }],
                 evaluation.mode
             );

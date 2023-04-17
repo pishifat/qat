@@ -240,7 +240,15 @@ export default {
         },
         async setComplete(e) {
             if (this.checkedEvaluations.length) {
-                const result = confirm(`Are you sure? The consensus of any evaluation will affect its respective user.\n\nOnly do this after feedback PMs have been sent.`);
+                let text = `Are you sure? The consensus of any BN evaluation will affect its respective user.\n\n`;
+
+                if (this.loggedInUser.isNatLeader) {
+                    text += `If you're archiving a NAT eval however, it will default their usergroup to NAT.`
+                } else {
+                    text += `Only do this after feedback PMs have been sent.`;
+                }
+                console.log(this.loggedInUser);
+                const result = confirm(text);
 
                 if (result) {
                     let evaluations = [];
@@ -258,3 +266,4 @@ export default {
     },
 };
 </script>
+t
