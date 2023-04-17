@@ -50,13 +50,6 @@ router.post('/saveNote/:id', async (req, res) => {
         }
     }
 
-    // NAT evaluation self-summary notes
-    if (isSummary && noteId) {
-        note = await Note.findByIdAndUpdate(noteId, {
-            comment,
-        });
-    }
-
     // create new note (or new warning if none exists)
     if (!warning && !noteId) {
         note = await Note.create({
@@ -68,12 +61,28 @@ router.post('/saveNote/:id', async (req, res) => {
         });
     }
 
+    // NAT evaluation self-summary notes
+    if (isSummary && noteId) {
+        note = await Note.findByIdAndUpdate(noteId, {
+            comment,
+        });
+    }
+
     // save note to NAT self-summary eval thing
     if (evaluationId) {
+        const natLeaders = await User.find({ isNatLeader: true });
+        const discordIds = natLeaders.map(u => u.discordId);
+        
         await BnEvaluation.findByIdAndUpdate(evaluationId, {
             selfSummary: note._id,
             discussion: true,
-        })
+            natEvaluators: natLeaders.map(u => u._id),
+        });
+
+        const user = await User.findById(req.params.id);
+        const mode = user.modes && user.modes.length ? user.modes[0] : 'osu' //priority: current mode > default to osu
+
+        await discord.userHighlightWebhookPost(mode, discordIds);
     }
 
     // populate for return
