@@ -71,18 +71,12 @@ router.post('/saveNote/:id', async (req, res) => {
     // save note to NAT self-summary eval thing
     if (evaluationId) {
         const natLeaders = await User.find({ isNatLeader: true });
-        const discordIds = natLeaders.map(u => u.discordId);
         
         await BnEvaluation.findByIdAndUpdate(evaluationId, {
             selfSummary: note._id,
             discussion: true,
             natEvaluators: natLeaders.map(u => u._id),
         });
-
-        const user = await User.findById(req.params.id);
-        const mode = user.modes && user.modes.length ? user.modes[0] : 'osu' //priority: current mode > default to osu
-
-        await discord.userHighlightWebhookPost(mode, discordIds);
     }
 
     // populate for return
@@ -116,8 +110,17 @@ router.post('/saveNote/:id', async (req, res) => {
                 },
             ],
         }],
-        u.modes && u.modes.length ? u.modes[0] : u.history && u.history.length ? u.history[0].mode : 'osu' //priority: current mode > past mode > default to osu
+        u.modes && u.modes.length ? u.modes[0] : u.history && u.history.length ? u.history[0].mode : 'osu' // priority: current mode > past mode > default to osu
     );
+
+    if (evaluationId) {
+        const natLeaders = await User.find({ isNatLeader: true });
+        const discordIds = natLeaders.map(u => u.discordId);
+        const user = await User.findById(req.params.id);
+        const mode = user.modes && user.modes.length ? user.modes[0] : 'osu' // priority: current mode > default to osu
+
+        await discord.userHighlightWebhookPost(mode, discordIds, `https://mappersguild.com/bneval?id=${evaluationId} you're assigned to this now :) `);
+    }
 });
 
 /* POST hide note */
