@@ -4,6 +4,7 @@ export default {
         filters: {
             mode: '',
             value: '',
+            group: '',
         },
     }),
     mutations: {
@@ -12,6 +13,9 @@ export default {
         },
         setFilterValue (state, value) {
             state.filters.value = value;
+        },
+        setFilterGroup (state, group) {
+            state.filters.group = group;
         },
     },
 };

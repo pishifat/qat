@@ -3,7 +3,7 @@
         <div class="col-sm-12">
             <filter-box
                 :placeholder="'enter to search beatmap...'"
-                :options="['osu', 'taiko', 'catch', 'mania']"
+                :modes="['osu', 'taiko', 'catch', 'mania']"
                 store-module="qualityAssurance"
             />
 

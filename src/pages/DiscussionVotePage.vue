@@ -3,7 +3,7 @@
         <div class="col-md-12">
             <filter-box
                 :placeholder="'enter to search discussion...'"
-                :options="['', 'osu', 'taiko', 'catch', 'mania']"
+                :modes="['', 'osu', 'taiko', 'catch', 'mania']"
                 store-module="discussionVote"
             >
                 <button

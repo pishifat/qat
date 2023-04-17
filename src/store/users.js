@@ -49,10 +49,17 @@ export default {
         filteredUsers: (state, getters, rootState) => {
             let users = [...state.users];
             const mode = rootState.users.pageFilters.filters.mode;
+            const group = rootState.users.pageFilters.filters.group;
             const value = rootState.users.pageFilters.filters.value;
 
             if (mode) {
                 users = users.filter(u => u.modes.includes(mode));
+            }
+
+            if (group) {
+                users = users.filter(u =>
+                    u.groups.includes(group)
+                );
             }
 
             if (value) {

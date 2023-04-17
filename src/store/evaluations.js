@@ -41,10 +41,17 @@ export default {
         filteredEvaluations: (state, getters, rootState) => {
             let evaluations = [...state.evaluations];
             const mode = rootState.evaluations.pageFilters.filters.mode;
+            const group = rootState.evaluations.pageFilters.filters.group;
             const value = rootState.evaluations.pageFilters.filters.value;
 
             if (mode) {
                 evaluations = evaluations.filter(a => a.mode == mode);
+            }
+
+            if (group) {
+                evaluations = evaluations.filter(a =>
+                    a.user.groups.includes(group)
+                );
             }
 
             if (value) {

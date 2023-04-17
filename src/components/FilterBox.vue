@@ -17,17 +17,34 @@
         </div>
 
         <select
+            v-if="modes && modes.length"
             id="mode"
             class="form-control"
-            @change="updateFilterMode(options[$event.target.selectedIndex])"
+            @change="updateFilterMode(modes[$event.target.selectedIndex])"
         >
             <option
-                v-for="option in options"
-                :key="option"
-                :value="option"
-                :selected="option === filters.mode"
+                v-for="mode in modes"
+                :key="mode"
+                :value="mode"
+                :selected="mode === filters.mode"
             >
-                {{ option === '' ? 'All modes' : option }}
+                {{ mode === '' ? 'All modes' : mode }}
+            </option>
+        </select>
+
+        <select
+            v-if="groups && groups.length"
+            id="mode"
+            class="form-control"
+            @change="updateFilterGroup(groups[$event.target.selectedIndex])"
+        >
+            <option
+                v-for="group in groups"
+                :key="group"
+                :value="group"
+                :selected="group === filters.group"
+            >
+                {{ group === '' ? 'All groups' : group }}
             </option>
         </select>
 
@@ -42,9 +59,17 @@ export default {
             type: String,
             required: true,
         },
-        options: {
+        modes: {
             type: Array,
-            required: true,
+            default() {
+                return [];
+            },
+        },
+        groups: {
+            type: Array,
+            default() {
+                return [];
+            },
         },
         storeModule: {
             type: String,
@@ -63,6 +88,9 @@ export default {
         },
         updateFilterMode (mode) {
             this.$store.commit(this.storeModule + '/pageFilters/setFilterMode', mode);
+        },
+        updateFilterGroup (group) {
+            this.$store.commit(this.storeModule + '/pageFilters/setFilterGroup', group);
         },
     },
 };

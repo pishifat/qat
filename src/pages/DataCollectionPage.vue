@@ -3,7 +3,7 @@
         <div class="col-md-12">
             <filter-box
                 :placeholder="'enter to search event...'"
-                :options="['', 'osu', 'taiko', 'catch', 'mania']"
+                :modes="['', 'osu', 'taiko', 'catch', 'mania']"
                 store-module="dataCollection"
             >
                 <button class="btn btn-sm btn-block btn-primary mt-2" @click="isUnsetEvents ? loadRecentEvents($event) : loadUnsetEvents($event)">

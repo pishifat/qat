@@ -3,7 +3,8 @@
         <div class="col-md-12">
             <filter-box
                 :placeholder="'enter to search username...'"
-                :options="['', 'osu', 'taiko', 'catch', 'mania']"
+                :modes="['', 'osu', 'taiko', 'catch', 'mania']"
+                :groups="['', 'bn', 'nat']"
                 store-module="evaluations"
             >
                 <template v-if="loggedInUser.isNat">
