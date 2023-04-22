@@ -172,7 +172,7 @@ router.post('/apply', async (req, res) => {
     // check if user has sufficient modding activity (only relevant if removed for activity in the past)
     const kickedForActivity = lastCurrentBnEval && lastCurrentBnEval.addition === BnEvaluationAddition.LowActivityWarning;
 
-    if (kickedForActivity) {
+    if (kickedForActivity && mode !== 'catch') {
         const modsCount = await getUserModsCount(req.session.accessToken, req.session.username, 2); // 2 months of mods
         const reducer = (accumulator, currentValue) => accumulator + currentValue;
         const modsThreshold = 8;
