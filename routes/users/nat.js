@@ -6,6 +6,7 @@ const AppEvaluation = require('../../models/evaluations/appEvaluation');
 const BnEvaluation = require('../../models/evaluations/bnEvaluation');
 const middlewares = require('../../helpers/middlewares');
 const discord = require('../../helpers/discord');
+const util = require('../../helpers/util');
 const scrap = require('../../helpers/scrap');
 const config = require('../../config.json');
 
@@ -166,6 +167,18 @@ router.post('/:id/toggleIsTrialNat', middlewares.isNat, async (req, res) => {
 
     user.isTrialNat = !user.isTrialNat;
     await user.save();
+
+    user.modes.forEach(async mode => {
+        await discord.webhookPost(
+            [{
+                author: discord.defaultWebhookAuthor(req.session),
+                color: discord.webhookColors.lightPink,
+                description: `**${user.isTrialNat ? "Added" : "Removed"}** user **${user.username}** ${user.isTrialNat ? "to" : "from"} BN Evaluators`,
+            }],
+            mode
+        );
+        await util.sleep(500);
+    });
 
     res.json({
         user,

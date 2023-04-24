@@ -244,7 +244,7 @@ const webhookColors = {
 
     lightOrange: 15639928,    // enableBnEvaluators, suggestionReport
     darkOrange: 7092736,      // replaceMediator
-    orange: 15169835,         // replaceEvaluator
+    orange: 15169835,         // replaceEvaluator, switchBnEvaluator
 
     lightYellow: 16777104,    // rejoinBnRequest
     darkYellow: 7105536,      // concludeDiscussionVote
@@ -262,7 +262,8 @@ const webhookColors = {
     darkPurple: 4263999,      // submitVeto
     purple: 8536232,          // startVetoMediation, concludeVetoMediation
 
-    pink: 16728232,       // revealedCurrentBnEvalNotification, modified report
+    pink: 16728232,       // revealedCurrentBnEvalNotification, modified report, toggleHasTrialNat
+    lightPink: 16748236,  // isTrialNat
     white: 15724527,      // unarchive, addEvaluation, sendMessages
     brown: 7554849,       // submitUserNote
     gray: 8815494,        // passive: moveToGroupDiscussion, dev
