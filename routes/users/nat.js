@@ -173,7 +173,7 @@ router.post('/:id/toggleIsTrialNat', middlewares.isNat, async (req, res) => {
             [{
                 author: discord.defaultWebhookAuthor(req.session),
                 color: discord.webhookColors.lightPink,
-                description: `**${user.isTrialNat ? "Added" : "Removed"}** user **${user.username}** ${user.isTrialNat ? "to" : "from"} BN Evaluators`,
+                description: `**${user.isTrialNat ? "Added" : "Removed"}** user [**${user.username}**](https://osu.ppy.sh/users/${user.osuId}) ${user.isTrialNat ? "to" : "from"} BN Evaluators`,
             }],
             mode
         );

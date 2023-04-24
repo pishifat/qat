@@ -533,7 +533,7 @@ router.post('/:id/switchBnEvaluator', middlewares.isBnOrNat, async (req, res) =>
                 [{
                     author: discord.defaultWebhookAuthor(req.session),
                     color: discord.webhookColors.orange,
-                    description: `Toggled **${user.isBnEvaluator ? "on" : "off"}** ${user.isBn ? "mock evaluations" : "evaluations"} for **${user.username}**`,
+                    description: `Toggled **${user.isBnEvaluator ? "on" : "off"}** ${user.isBn ? "mock evaluations" : "evaluations"} for [**${user.username}**](https://osu.ppy.sh/users/${user.osuId})`,
                 }],
                 mode
             );
