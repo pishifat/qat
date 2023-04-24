@@ -527,6 +527,20 @@ router.post('/:id/switchBnEvaluator', middlewares.isBnOrNat, async (req, res) =>
     user.isBnEvaluator = !user.isBnEvaluator;
     await user.save();
 
+    if(res.locals.userRequest.isNat) {
+        user.modes.forEach(async mode => {
+            await discord.webhookPost(
+                [{
+                    author: discord.defaultWebhookAuthor(req.session),
+                    color: discord.webhookColors.orange,
+                    description: `Toggled **${user.isBnEvaluator ? "on" : "off"}** ${user.isBn ? "mock evaluations" : "evaluations"} for [**${user.username}**](https://osu.ppy.sh/users/${user.osuId})`,
+                }],
+                mode
+            );
+            await util.sleep(500);
+        });
+    }
+
     res.json({
         user,
         success: 'Toggled mock evaluations',
@@ -534,7 +548,7 @@ router.post('/:id/switchBnEvaluator', middlewares.isBnOrNat, async (req, res) =>
 
     Logger.generate(
         req.session.mongoId,
-        `Opted "${user.username}" ${user.isBnEvaluator ? 'in to' : 'out of'} optional BN app evaluation input`,
+        `Opted "${user.username}" ${user.isBnEvaluator ? 'in to' : 'out of'} mock evaluations`,
         'user',
         user._id
     );

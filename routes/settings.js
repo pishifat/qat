@@ -1,6 +1,8 @@
 const express = require('express');
 const middlewares = require('../helpers/middlewares');
 const Settings = require('../models/settings');
+const util = require('../helpers/util');
+const discord = require('../helpers/discord');
 
 const router = express.Router();
 
@@ -29,14 +31,25 @@ router.post('/update', async (req, res) => {
 /* POST toggle hasTrialNat */
 router.post('/toggleHasTrialNat', async (req, res) => {
     const mode = req.body.mode;
+    const parsedMode = `osu!${mode !== "osu" ? mode : ""}`;
     const settings = await Settings.findOne();
     const settingIndex = settings.modeSettings.findIndex(s => s.mode === mode);
 
     settings.modeSettings[settingIndex].hasTrialNat = !settings.modeSettings[settingIndex].hasTrialNat;
     await settings.save();
 
+    await discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            color: discord.webhookColors.pink,
+            description: `**${settings.modeSettings[settingIndex].hasTrialNat ? "Enabled" : "Disabled"}** BN evaluators for **${parsedMode}**`,
+        }],
+        mode
+    );
+    await util.sleep(500);
+
     res.json({
-        success: 'updated',
+        success: 'toggled hasTrialNat',
     });
 });
 

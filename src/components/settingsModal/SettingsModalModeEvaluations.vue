@@ -18,7 +18,6 @@
                 :for="`mode-settings-${setting.mode}`"
                 class="col-sm-4 col-form-label"
             >
-                {{ setting.mode == 'osu' ? 'osu!' : 'osu!' + setting.mode }}
                 <a
                     href="#"
                     data-toggle="tooltip"
@@ -35,6 +34,7 @@
                         "
                     />
                 </a>
+                {{ setting.mode == 'osu' ? 'osu!' : 'osu!' + setting.mode }}
             </label>
             <div class="col-sm-8">
                 <input
