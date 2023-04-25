@@ -260,10 +260,9 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
             await user.save();
 
             const userOsuInfo = await osu.getOtherUserInfo(req.session.accessToken, user.osuId);
-            const pishifat = await User.findOne({ osuId: config.admin.pishifat });
 
             if (!userOsuInfo.is_supporter) {
-                await discord.userHighlightWebhookPost(evaluation.mode, [pishifat.discordId], 'give new BN supporter pls ');
+                await discord.userHighlightWebhookPost(evaluation.mode, ['1049780400303644792'], 'give new BN supporter pls ');
                 await util.sleep(500);
             }
         }
