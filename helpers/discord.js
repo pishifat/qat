@@ -153,72 +153,72 @@ async function roleHighlightWebhookPost(webhook, roles, text) {
     for (const role of roles) {
         switch (role) {
             case 'gmt':
-                content += `<@&${config.announcementWebhook.gmtRole}>`;
+                content += `<@&${config.announcementWebhook.gmtRole}> `;
                 break;
             case 'contentReview':
-                content += `<@&${config.announcementWebhook.contentReviewRole}>`;
+                content += `<@&${config.announcementWebhook.contentReviewRole}> `;
                 break;
             case 'nat':
-                content += `<@&${config.announcementWebhook.natRole}>`;
+                content += `<@&${config.announcementWebhook.natRole}> `;
                 break;
             case 'natOsu':
-                content += `<@&${config.announcementWebhook.natOsu}>`;
+                content += `<@&${config.announcementWebhook.natOsu}> `;
                 break;
             case 'natTaiko':
-                content += `<@&${config.announcementWebhook.natTaiko}>`;
+                content += `<@&${config.announcementWebhook.natTaiko}> `;
                 break;
             case 'natCatch':
-                content += `<@&${config.announcementWebhook.natCatch}>`;
+                content += `<@&${config.announcementWebhook.natCatch}> `;
                 break;
             case 'natMania':
-                content += `<@&${config.announcementWebhook.natMania}>`;
+                content += `<@&${config.announcementWebhook.natMania}> `;
                 break;
             case 'natEvaluatorOsu':
-                content += `<@&${config.announcementWebhook.natEvaluatorOsu}>`;
+                content += `<@&${config.announcementWebhook.natEvaluatorOsu}> `;
                 break;
             case 'natEvaluatorTaiko':
-                content += `<@&${config.announcementWebhook.natEvaluatorTaiko}>`;
+                content += `<@&${config.announcementWebhook.natEvaluatorTaiko}> `;
                 break;
             case 'natEvaluatorCatch':
-                content += `<@&${config.announcementWebhook.natEvaluatorCatch}>`;
+                content += `<@&${config.announcementWebhook.natEvaluatorCatch}> `;
                 break;
             case 'natEvaluatorMania':
-                content += `<@&${config.announcementWebhook.natEvaluatorMania}>`;
+                content += `<@&${config.announcementWebhook.natEvaluatorMania}> `;
                 break;
             case 'bn':
-                content += `<@&${config.announcementWebhook.bnRole}>`;
+                content += `<@&${config.announcementWebhook.bnRole}> `;
                 break;
             case 'bnOsu':
-                content += `<@&${config.announcementWebhook.bnOsu}>`;
+                content += `<@&${config.announcementWebhook.bnOsu}> `;
                 break;
             case 'bnTaiko':
-                content += `<@&${config.announcementWebhook.bnTaiko}>`;
+                content += `<@&${config.announcementWebhook.bnTaiko}> `;
                 break;
             case 'bnCatch':
-                content += `<@&${config.announcementWebhook.bnCatch}>`;
+                content += `<@&${config.announcementWebhook.bnCatch}> `;
                 break;
             case 'bnMania':
-                content += `<@&${config.announcementWebhook.bnMania}>`;
+                content += `<@&${config.announcementWebhook.bnMania}> `;
                 break;
             case 'probation':
-                content += `<@&${config.announcementWebhook.probationRole}>`;
+                content += `<@&${config.announcementWebhook.probationRole}> `;
                 break;
             case 'probationOsu':
-                content += `<@&${config.announcementWebhook.probationOsu}>`;
+                content += `<@&${config.announcementWebhook.probationOsu}> `;
                 break;
             case 'probationTaiko':
-                content += `<@&${config.announcementWebhook.probationTaiko}>`;
+                content += `<@&${config.announcementWebhook.probationTaiko}> `;
                 break;
             case 'probationCatch':
-                content += `<@&${config.announcementWebhook.probationCatch}>`;
+                content += `<@&${config.announcementWebhook.probationCatch}> `;
                 break;
             case 'probationMania':
-                content += `<@&${config.announcementWebhook.probationMania}>`;
+                content += `<@&${config.announcementWebhook.probationMania}> `;
                 break;
         }
     }
 
-    if (text) content += ` ${text}`;
+    if (text) content = `${content.trim()} ${text}`;
 
     try {
         await axios.post(url, {
@@ -335,12 +335,19 @@ async function contentCaseWebhookPost(d) {
 }
 
 async function announcementWebhookPost(session, title, description) {
+    title = '📢 ' + title
+    const firstImage = description.match(/https?:\/\/.*\.(?:png|jpg|jpeg|gif|png)/i);
+
+    // replace all image links ![](LINK) with [image](LINK)
+    description = description.replace(/!\[.*\]\((https?:\/\/.*\.(?:png|jpg|jpeg|gif|png))\)/gi, '[image]($1)');
+    
     await webhookPost(
         [{
             color: webhookColors.lightBlue,
             title,
             description,
             author: defaultWebhookAuthor(session),
+            image: firstImage ? { url: firstImage[0] } : undefined,
         }],
         'announcement'
     );
