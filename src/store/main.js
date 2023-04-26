@@ -40,6 +40,9 @@ const store = new Vuex.Store({
         setOpenUsersData (state, allUsersByMode) {
             state.allUsersByMode = allUsersByMode;
         },
+        updateLoadingState (state) {
+            state.isLoading = !state.isLoading;
+        },
     },
     actions: {
         async setInitialData ({ commit }) {
