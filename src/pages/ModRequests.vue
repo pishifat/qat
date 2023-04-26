@@ -1,6 +1,7 @@
 <template>
     <div class="row">
         <div class="col-sm">
+            <bn-finder-matches />
             <requests-listing
                 v-if="involvedRequests.length"
                 v-slot="{ request }"
@@ -70,6 +71,7 @@ import RequestRow from '../components/modRequests/RequestRow.vue';
 import RequestInfo from '../components/modRequests/RequestInfo.vue';
 import RequestTag from '../components/modRequests/RequestTag.vue';
 import ToastMessages from '../components/ToastMessages.vue';
+import BnFinderMatches from '../components/modRequests/BnFinderMatches.vue';
 
 export default {
     name: 'ModRequests',
@@ -79,6 +81,7 @@ export default {
         RequestInfo,
         RequestTag,
         ToastMessages,
+        BnFinderMatches,
     },
     computed: {
         ...mapState('modRequests', [

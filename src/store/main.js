@@ -37,8 +37,8 @@ const store = new Vuex.Store({
         setHomeData (state, allUsersByMode) {
             state.allUsersByMode = allUsersByMode;
         },
-        updateLoadingState (state) {
-            state.isLoading = !state.isLoading;
+        setOpenUsersData (state, allUsersByMode) {
+            state.allUsersByMode = allUsersByMode;
         },
     },
     actions: {

@@ -36,12 +36,12 @@ const routes = [
     { path: '/testresults', component: TestResults, meta: { title: 'Ranking Criteria Test Results' } },
     { path: '/yourevals', component: YourEvals, meta: { title: 'Your Evaluations' } },
     { path: '/message', component: Message, meta: { title: 'Message from the NAT' } },
-    { path: '/modrequests', component: ModRequestsSubmission, meta: { title: 'Mod Requests', public: true } },
+    { path: '/modrequests', component: ModRequestsSubmission, meta: { title: 'Request a BN', public: true } },
 
     // BN/NAT
     { path: '/discussionvote', component: DiscussionVote, meta: { title: 'Content Review', requiresBasicAccess: true } },
     { path: '/appeval', component: AppEvalPage, meta: { title: 'BN Application Evaluations', requiresBasicAccess: true } },
-    { path: '/modrequests/listing', component: ModRequests, meta: { title: 'Mod Requests Listing', requiresBasicAccess: true } },
+    { path: '/modrequests/listing', component: ModRequests, meta: { title: 'BN Finder / Global Queue', requiresBasicAccess: true } },
 
     // NAT and Trial NAT
     { path: '/bneval', component: BnEvalPage, meta: { title: 'Current BN Evaluations', requiresFullReadAccessOrTrialNat: true } },

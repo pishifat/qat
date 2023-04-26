@@ -310,7 +310,7 @@
 <script>
 import { mapState } from 'vuex';
 import evaluations from '../../mixins/evaluations';
-import UserLink from '../../components/UserLink.vue';
+import UserLink from '../UserLink.vue';
 import ModeRadioDisplay from '../ModeRadioDisplay.vue';
 import {
     GenrePreferences,
