@@ -262,7 +262,7 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
             const userOsuInfo = await osu.getOtherUserInfo(req.session.accessToken, user.osuId);
 
             if (!userOsuInfo.is_supporter) {
-                await discord.userHighlightWebhookPost(evaluation.mode, ['1049780400303644792'], 'give new BN supporter pls ');
+                await discord.roleHighlightWebhookPost(evaluation.mode, ['groupMovers'], 'give new BN supporter pls ');
                 await util.sleep(500);
             }
         }
