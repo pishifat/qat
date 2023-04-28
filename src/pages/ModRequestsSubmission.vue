@@ -13,7 +13,7 @@
                     tag="div"
                     class="row align-items-start"
                 >
-                    <table v-for="usersByMode in sortedList" :key="usersByMode._id" class="table table-sm table-dark table-hover col-6 col-md-3">
+                    <table v-for="usersByMode in openUsers" :key="usersByMode._id" class="table table-sm table-dark table-hover col-6 col-md-3">
                         <thead>
                             <td>{{ usersByMode._id == 'osu' ? 'osu!' : 'osu!' + usersByMode._id }}</td>
                         </thead>
@@ -166,31 +166,16 @@ export default {
             link: '',
             category: '',
             comment: '',
+            openUsers: [],
         };
     },
     computed: {
         ...mapState([
             'loggedInUser',
-            'allUsersByMode',
         ]),
         ...mapState('modRequests', [
             'ownRequests',
         ]),
-        sortedList() {
-            const sortOrder = ['osu', 'taiko', 'catch', 'mania'];
-            const sorted = [...this.allUsersByMode];
-
-            // filter out users who have "closed" in their requestStatus array
-            sorted.forEach((mode) => {
-                mode.users = mode.users.filter((user) => {
-                    return (!user.requestStatus?.includes('closed') && user.requestStatus?.length);
-                });
-            });
-
-            return sorted.sort(function(a, b) {
-                return sortOrder.indexOf(a._id) - sortOrder.indexOf(b._id);
-            });
-        },
     },
     beforeCreate () {
         if (!this.$store.hasModule('modRequests')) {
@@ -202,16 +187,29 @@ export default {
             const data = await this.$http.initialRequest('/modRequests/owned');
             if (!data.error) this.$store.commit('modRequests/setOwnRequests', data);
         }
-        if (this.allUsersByMode.length) return;
 
-        const userData = await this.$http.executeGet('/relevantInfo');
+        const userData = await this.$http.initialRequest('/relevantInfo');
 
-        //! FIXME fix the bug where if you go from /modRequests to /home, the bn table will continue to show open users only, instead of all users
         if (userData.allUsersByMode) {
-            this.$store.commit('setOpenUsersData', userData.allUsersByMode);
+            this.openUsers = this.filterOpenUsers(userData.allUsersByMode);
         }
     },
     methods: {
+        filterOpenUsers(allUsersByMode) {
+            const sortOrder = ['osu', 'taiko', 'catch', 'mania'];
+            const filtered = allUsersByMode;
+
+            // filter out users who have "closed" in their requestStatus array
+            filtered.forEach((mode) => {
+                mode.users = mode.users.filter((user) => {
+                    return (!user.requestStatus?.includes('closed') && user.requestStatus?.length);
+                });
+            });
+
+            return filtered.sort(function(a, b) {
+                return sortOrder.indexOf(a._id) - sortOrder.indexOf(b._id);
+            });
+        },
         async submit (e) {
             if (!this.category || !this.link) {
                 this.$store.dispatch('updateToastMessages', {
