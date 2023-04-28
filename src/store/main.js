@@ -16,7 +16,6 @@ const store = new Vuex.Store({
         isLoading: false,
         loggedInUser: null,
         allUsersByMode: [],
-        allOpenUsersByMode: [],
     },
     getters: {
         userMainMode (state) {
@@ -37,9 +36,6 @@ const store = new Vuex.Store({
         },
         setHomeData (state, allUsersByMode) {
             state.allUsersByMode = allUsersByMode;
-        },
-        setOpenUsersData (state, allOpenUsersByMode) {
-            state.allOpenUsersByMode = allOpenUsersByMode;
         },
         updateLoadingState (state) {
             state.isLoading = !state.isLoading;
