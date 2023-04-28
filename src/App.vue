@@ -40,6 +40,11 @@
                         
                         <!-- normal user -->
                         <template v-if="!loggedInUser.hasBasicAccess && !loggedInUser.hasFullReadAccess">
+                            <li class="nav-item">
+                                <router-link class="nav-link" to="/modrequests">
+                                    Request a BN
+                                </router-link>
+                            </li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
                                     Other
@@ -53,9 +58,6 @@
                                     </router-link>
                                     <router-link class="dropdown-item" to="/reports">
                                         Reports
-                                    </router-link>
-                                    <router-link class="dropdown-item" to="/modrequests">
-                                        Mod Requests
                                     </router-link>
                                     <router-link class="dropdown-item" to="/vetoes">
                                         Vetoes (read-only)
@@ -70,6 +72,11 @@
                         <!-- BN -->
 
                         <template v-else-if="loggedInUser.hasBasicAccess && !loggedInUser.hasFullReadAccess">
+                            <li class="nav-item">
+                                <router-link class="nav-link" to="/modrequests">
+                                    Request a BN
+                                </router-link>
+                            </li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
                                     Other
@@ -83,9 +90,6 @@
                                     </router-link>
                                     <router-link class="dropdown-item" to="/reports">
                                         Reports
-                                    </router-link>
-                                    <router-link class="dropdown-item" to="/modrequests">
-                                        Mod Request Submission
                                     </router-link>
                                 </div>
                             </li>
@@ -107,7 +111,7 @@
                                         Quality Assurance
                                     </router-link>
                                     <router-link class="dropdown-item" to="/modrequests/listing">
-                                        Mod Request Listing
+                                        BN Finder / Global Queue
                                     </router-link>
                                 </div>
                             </li>
@@ -166,10 +170,10 @@
                                         Quality Assurance
                                     </router-link>
                                     <router-link class="dropdown-item" to="/modrequests">
-                                        Mod Request Submission
+                                        Request a BN
                                     </router-link>
                                     <router-link class="dropdown-item" to="/modrequests/listing">
-                                        Mod Request Listing
+                                        BN Finder / Global Queue
                                     </router-link>
                                 </div>
                             </li>

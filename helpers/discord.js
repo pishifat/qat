@@ -215,6 +215,8 @@ async function roleHighlightWebhookPost(webhook, roles, text) {
             case 'probationMania':
                 content += `<@&${config.announcementWebhook.probationMania}> `;
                 break;
+            case 'groupMovers':
+                content += `<@&${config.announcementWebhook.groupMoversRole}> `;
         }
     }
 

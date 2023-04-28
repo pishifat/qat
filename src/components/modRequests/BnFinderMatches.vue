@@ -133,7 +133,7 @@
 </template>
 
 <script>
-import UserLink from '../../components/UserLink.vue';
+import UserLink from '../UserLink.vue';
 
 export default {
     name: 'BnFinderMatches',

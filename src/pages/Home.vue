@@ -1,10 +1,6 @@
 <template>
     <div>
         <announcements />
-        <bn-finder />
-        <bn-finder-matches
-            v-if="loggedInUser && loggedInUser.isBnOrNat"
-        />
         <section class="card card-body">
             <h4 class="mx-auto mb-3">
                 Current Beatmap Nominators
@@ -50,9 +46,7 @@
 import { mapState } from 'vuex';
 import evaluations from '../mixins/evaluations';
 import ToastMessages from '../components/ToastMessages.vue';
-import BnFinder from '../components/home/BnFinder.vue';
 import Announcements from '../components/home/Announcements.vue';
-import BnFinderMatches from '../components/home/BnFinderMatches.vue';
 import UserLink from '../components/UserLink.vue';
 import UserCard from '../components/home/UserCard.vue';
 
@@ -60,9 +54,7 @@ export default {
     name: 'Index',
     components: {
         ToastMessages,
-        BnFinder,
         Announcements,
-        BnFinderMatches,
         UserLink,
         UserCard,
     },

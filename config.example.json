@@ -93,7 +93,8 @@
         "probationOsu": "",
         "probationTaiko": "",
         "probationCatch": "",
-        "probationMania": ""
+        "probationMania": "",
+        "groupMoversRole": ""
     },
     "admin": {
         "pishifat": 0,

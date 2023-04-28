@@ -1,9 +1,41 @@
 <template>
     <div class="row">
         <div class="col-sm">
+            <section class="card card-body">
+                <h4 class="mx-auto mb-3">
+                    Open Beatmap Nominators
+                </h4>
+                <p class="mx-auto mb-3 text-center">This is a list of Beatmap Nominators who are currently open for requests. Make sure to pay attention to their request methods and guidelines listed in their userpages!</p>
+                <transition-group
+                    appear
+                    name="route-transition"
+                    mode="out-in"
+                    tag="div"
+                    class="row align-items-start"
+                >
+                    <table v-for="usersByMode in openUsers" :key="usersByMode._id" class="table table-sm table-dark table-hover col-6 col-md-3">
+                        <thead>
+                            <td>{{ usersByMode._id == 'osu' ? 'osu!' : 'osu!' + usersByMode._id }}</td>
+                        </thead>
+                        <tbody>
+                            <tr v-for="user in usersByMode.users" :key="user.id"> 
+                                <user-card :user="user" />
+                            </tr>
+                        </tbody>
+                    </table>
+                </transition-group>
+            </section>
+            <div class="alert alert-danger mb-2">
+                <i class="fas fa-exclamation-triangle"></i>
+                The request methods below are rarely used and do not guarantee that your request will receive a response. Please use the table above instead.
+            </div>
+            <bn-finder />
             <section class="card">
                 <div class="card-body">
                     <div class="row">
+                        <div class="col-sm-12">
+                            <h4 class="mb-2">Global Queue</h4>
+                        </div>
                         <div class="col-sm-12">
                             <p>If you're a mapper, this page lets you submit requests to Beatmap Nominators without asking people individually.</p>
                             <p>If you're a Beatmap Nominator, this page lets you view maps from a variety of creators and select any that you're interested in modding.</p>
@@ -83,7 +115,7 @@
 
             <template v-if="ownRequests.length">
                 <requests-listing
-                    title="My Requests"
+                    title="Global Queue Requests"
                     :requests="ownRequests"
                 >
                     <template v-slot="{ request }">
@@ -116,6 +148,8 @@ import RequestsListing from '../components/modRequests/RequestsListing.vue';
 import EditRequestModal from '../components/modRequests/EditRequestModal.vue';
 import MyRequestRow from '../components/modRequests/MyRequestRow.vue';
 import ToastMessages from '../components/ToastMessages.vue';
+import BnFinder from '../components/modRequests/BnFinder.vue';
+import UserCard from '../components/home/UserCard.vue';
 
 export default {
     name: 'ModRequestsSubmission',
@@ -124,12 +158,15 @@ export default {
         EditRequestModal,
         MyRequestRow,
         ToastMessages,
+        BnFinder,
+        UserCard,
     },
     data () {
         return {
             link: '',
             category: '',
             comment: '',
+            openUsers: [],
         };
     },
     computed: {
@@ -150,8 +187,29 @@ export default {
             const data = await this.$http.initialRequest('/modRequests/owned');
             if (!data.error) this.$store.commit('modRequests/setOwnRequests', data);
         }
+
+        const userData = await this.$http.initialRequest('/relevantInfo');
+
+        if (userData.allUsersByMode) {
+            this.openUsers = this.filterOpenUsers(userData.allUsersByMode);
+        }
     },
     methods: {
+        filterOpenUsers(allUsersByMode) {
+            const sortOrder = ['osu', 'taiko', 'catch', 'mania'];
+            const filtered = allUsersByMode;
+
+            // filter out users who have "closed" in their requestStatus array
+            filtered.forEach((mode) => {
+                mode.users = mode.users.filter((user) => {
+                    return (!user.requestStatus?.includes('closed') && user.requestStatus?.length);
+                });
+            });
+
+            return filtered.sort(function(a, b) {
+                return sortOrder.indexOf(a._id) - sortOrder.indexOf(b._id);
+            });
+        },
         async submit (e) {
             if (!this.category || !this.link) {
                 this.$store.dispatch('updateToastMessages', {
