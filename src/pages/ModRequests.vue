@@ -1,6 +1,10 @@
 <template>
     <div class="row">
         <div class="col-sm">
+            <div class="alert alert-danger mb-2">
+                <i class="fas fa-exclamation-triangle"></i>
+                This page is no longer used. See <a href="/modrequests">this page</a> for mod requests instead.
+            </div>
             <bn-finder-matches />
             <requests-listing
                 v-if="involvedRequests.length"

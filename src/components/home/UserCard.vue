@@ -62,13 +62,9 @@ export default {
             status = this.makeWordFromField(status);
 
             if (status === 'Personal Queue' && requestLink) {
-                return `[personal](${requestLink})`;
+                return `[mod queue](${requestLink})`;
             } else if (status === 'Personal Queue') {
-                return `personal`;
-            }
-
-            if (status === 'Global Queue') {
-                return `[global](/modrequests)`;
+                return `mod queue`;
             }
             
             if (status === 'Game Chat') {

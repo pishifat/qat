@@ -110,9 +110,6 @@
                                     <router-link class="dropdown-item" to="/qualityassurance">
                                         Quality Assurance
                                     </router-link>
-                                    <router-link class="dropdown-item" to="/modrequests/listing">
-                                        BN Finder / Global Queue
-                                    </router-link>
                                 </div>
                             </li>
 
@@ -171,9 +168,6 @@
                                     </router-link>
                                     <router-link class="dropdown-item" to="/modrequests">
                                         Request a BN
-                                    </router-link>
-                                    <router-link class="dropdown-item" to="/modrequests/listing">
-                                        BN Finder / Global Queue
                                     </router-link>
                                 </div>
                             </li>

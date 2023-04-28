@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <div class="row">
+        <!--<div class="row">
             <div class="col-sm-6">
                 <div>Do you want to be anonymous when accepting/denying matches?</div>
                 <small class="text-secondary">
@@ -26,7 +26,7 @@
                 </div>
             </div>
         </div>
-        <hr>
+        <hr>-->
         <div class="row">
             <div class="col-sm-6">
                 <div>What are your preferred song genres?</div>

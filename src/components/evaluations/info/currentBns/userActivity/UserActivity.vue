@@ -118,12 +118,12 @@
 
             <template>
                 <div class="mt-2">Modding</div>
-                <events-list
+                <!--<events-list
                     :events="bnFinderMatches"
                     :events-id="'bnFinderMatches'"
                     :header="'BN Finder matches'"
                     :osu-id="osuId"
-                />
+                />-->
             </template>
 
             <template v-if="loggedInUser.hasFullReadAccess && showArchive">

@@ -60,7 +60,7 @@
                         </div>
                     </template>
                 </div>
-                <div class="form-check">
+                <!--<div class="form-check">
                     <input
                         id="settings-requests-global"
                         v-model="requestStatus"
@@ -77,7 +77,7 @@
                             Global queue
                         </a>
                     </label>
-                </div>
+                </div>-->
                 <div class="form-check">
                     <input
                         id="settings-requests-closed"

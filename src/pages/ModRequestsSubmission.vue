@@ -25,11 +25,7 @@
                     </table>
                 </transition-group>
             </section>
-            <div class="alert alert-danger mb-2">
-                <i class="fas fa-exclamation-triangle"></i>
-                The request methods below are rarely used and do not guarantee that your request will receive a response. Please use the table above instead.
-            </div>
-            <bn-finder />
+            <!--<bn-finder />
             <section class="card">
                 <div class="card-body">
                     <div class="row">
@@ -133,7 +129,7 @@
                         </div>
                     </template>
                 </requests-listing>
-            </template>
+            </template>-->
         </div>
 
         <edit-request-modal />
