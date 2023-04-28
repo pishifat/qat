@@ -37,7 +37,9 @@
 
             <hr>
 
-            <reviews-listing />
+            <reviews-listing 
+                v-if="loggedInUser.isNatLeader || !selectedEvaluation.selfSummary"
+            />
 
             <button
                 class="btn btn-sm btn-danger float-right"
