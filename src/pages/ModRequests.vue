@@ -1,7 +1,7 @@
 <template>
     <div class="row">
         <div class="col-sm">
-            <div class="alert alert-danger mb-2">
+            <div class="alert alert-danger mb-2 mt-2">
                 <i class="fas fa-exclamation-triangle"></i>
                 This page is no longer used. See <a href="/modrequests">this page</a> for mod requests instead.
             </div>
