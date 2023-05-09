@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Evaluation = require('./evaluation');
 
 const bnEvaluationSchema = new mongoose.Schema({
-    consensus: { type: String, enum: ['fullBn', 'probationBn', 'removeFromBn', 'remainInNat', 'movedToBn', 'removedFromNat'] }, // last 3 are only for NAT evals. which are mechanically BN evals. it's bad i know.
+    consensus: { type: String, enum: ['fullBn', 'probationBn', 'removeFromBn', 'remainInNat', 'moveToBn', 'removedFromNat'] }, // last 3 are only for NAT evals. which are mechanically BN evals. it's bad i know.
     deadline: { type: Date , required: true },
     addition: { type: String, enum: ['lowActivityWarning', 'behaviorWarning', 'mapQualityWarning', 'moddingQualityWarning', 'none'] },
     activityToCheck: { type: Number },
