@@ -120,7 +120,7 @@ router.post('/saveNote/:id', async (req, res) => {
         const user = await User.findById(req.params.id);
         const mode = user.modes && user.modes.length ? user.modes[0] : 'osu' // priority: current mode > default to osu
 
-        await discord.userHighlightWebhookPost(mode, discordIds, `https://mappersguild.com/bneval?id=${evaluationId} you're assigned to this now :) `);
+        await discord.userHighlightWebhookPost(mode, discordIds, `https://bn.mappersguild.com/bneval?id=${evaluationId} you're assigned to this now :) `);
     }
 });
 
