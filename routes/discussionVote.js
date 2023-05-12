@@ -112,6 +112,12 @@ router.post('/submit', async (req, res) => {
             error: 'No link provided',
         });
     }
+
+    if (discussionLink.length > 0 && discussionLink.includes('assets.ppy.sh')) {
+        return res.json({
+            error: 'assets.ppy.sh links are not allowed, please use a proper image hosting service instead',
+        });
+    }
     
     if (discussionLink.length > 0 && !isContentReview) {
         util.isValidUrlOrThrow(discussionLink);

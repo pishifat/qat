@@ -20,6 +20,12 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
         return res.json({ error: 'You must include a username or a link' });
     }
 
+    if (link.includes('assets.ppy.sh')) {
+        return res.json({
+            error: 'assets.ppy.sh links are not allowed, please use a proper image hosting service instead',
+        });
+    }
+
     const report = new Report();
     report.reporter = req.session.mongoId;
     report.reason = req.body.reason && req.body.reason.length ? req.body.reason : 'No additional information';

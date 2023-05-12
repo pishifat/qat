@@ -294,7 +294,7 @@ async function contentCaseWebhookPost(d) {
     const totalAgreePercentage = Math.round((agree.length / totalVotes) * 1000) / 10;
     const totalDisagreePercentage = Math.round((disagree.length / totalVotes) * 1000) / 10;
 
-    const description = `Concluded vote for [**${d.title}**](http://bn.mappersguild.com/discussionvote?id=${d.id})\n\nIs this content appropriate for a beatmap? ${d.discussionLink}\n\n**GMT/NAT:** ${gmtNatAgreePercentage}% yes | ${gmtNatDisagreePercentage}% no\n**BN:** ${bnAgreePercentage}% yes | ${bnDisagreePercentage}% no\n**Total:** ${totalAgreePercentage}% yes | ${totalDisagreePercentage}% no\n\nThe content ${gmtNatAgreePercentage >= 70 || totalAgreePercentage >= 70 ? `*CAN*` : `*CANNOT*`} be used.`;
+    const description = `Concluded vote for [**${d.title}**](http://bn.mappersguild.com/discussionvote?id=${d.id})\n\nIs this content appropriate for a beatmap? ${d.discussionLink}\n\n- **GMT/NAT:** ${gmtNatAgreePercentage}% yes | ${gmtNatDisagreePercentage}% no\n- **BN:** ${bnAgreePercentage}% yes | ${bnDisagreePercentage}% no\n- **Total:** ${totalAgreePercentage}% yes | ${totalDisagreePercentage}% no\n\nConsensus: ${gmtNatAgreePercentage >= 70 || totalAgreePercentage >= 70 ? `**Pass**` : `**Fail**`}`;
 
     // #content-cases (BN server)
     await webhookPost(
@@ -325,7 +325,7 @@ async function contentCaseWebhookPost(d) {
 
     let message = `The content you submitted has been reviewed by the BN/NAT! - ${d.discussionLink}`;
     message += `\n\n`;
-    message += `Based on vote results below, the content ${gmtNatAgreePercentage >= 70 || totalAgreePercentage >= 70 ? `*CAN*` : `*CANNOT*`} be used. See [this page](https://osu.ppy.sh/wiki/en/Rules/Content_Voting_Process) for details.`;
+    message += `Based on vote results below, the content ${gmtNatAgreePercentage >= 70 || totalAgreePercentage >= 70 ? `**CAN**` : `**CANNOT**`} be used. See [this page](https://osu.ppy.sh/wiki/en/Rules/Content_Voting_Process) for details.`;
     message += `\n\n`;
     message += `The vote details are listed below:`;
     message += `\n\n`;
