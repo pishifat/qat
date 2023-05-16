@@ -55,6 +55,7 @@ const userSchema = new mongoose.Schema({
     isBnFinderAnonymous: { type: Boolean, default: true },
     languages: [{ type: String, enum: enums.Languages, default: [] }],
     lastMarkedAsLowActivity: { type: Date },
+    showExplicitContent: { type: Boolean, default: false },
 
     /* temporary fields for qa leaderboard webhook */
     recentQaChecks: { type: Number },

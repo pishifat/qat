@@ -37,9 +37,9 @@ const routes = [
     { path: '/yourevals', component: YourEvals, meta: { title: 'Your Evaluations' } },
     { path: '/message', component: Message, meta: { title: 'Message from the NAT' } },
     { path: '/modrequests', component: ModRequestsSubmission, meta: { title: 'Request a BN', public: true } },
+    { path: '/discussionvote', component: DiscussionVote, meta: { title: 'Content Review' } },
 
     // BN/NAT
-    { path: '/discussionvote', component: DiscussionVote, meta: { title: 'Content Review', requiresBasicAccess: true } },
     { path: '/appeval', component: AppEvalPage, meta: { title: 'BN Application Evaluations', requiresBasicAccess: true } },
     { path: '/modrequests/listing', component: ModRequests, meta: { title: 'BN Finder / Global Queue', requiresBasicAccess: true } },
 

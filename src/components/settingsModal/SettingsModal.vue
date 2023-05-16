@@ -1,20 +1,26 @@
 <template>
     <modal-dialog id="globalSettings" title="Settings">
-        <settings-modal-evaluator />
+        <settings-modal-explicit />
 
-        <hr>
+        <template v-if="loggedInUser.isBnOrNat">
+            <hr>
 
-        <settings-modal-requests />
+            <settings-modal-evaluator />
 
-        <hr>
+            <hr>
 
-        <settings-modal-languages />
+            <settings-modal-requests />
 
-        <hr>
+            <hr>
 
-        <settings-modal-preferences />
+            <settings-modal-languages />
 
-        <hr>
+            <hr>
+
+            <settings-modal-preferences />
+
+            <hr>
+        </template>
 
         <template v-if="loggedInUser.isNat">
             <settings-modal-discord />
@@ -35,6 +41,7 @@ import SettingsModalModeEvaluations from './SettingsModalModeEvaluations.vue';
 import SettingsModalRequests from './SettingsModalRequests.vue';
 import SettingsModalPreferences from './SettingsModalPreferences.vue';
 import SettingsModalLanguages from './SettingsModalLanguages.vue';
+import SettingsModalExplicit from './SettingsModalExplicit.vue';
 
 export default {
     components: {
@@ -45,6 +52,7 @@ export default {
         SettingsModalEvaluator,
         SettingsModalPreferences,
         SettingsModalLanguages,
+        SettingsModalExplicit,
     },
     computed: mapState([
         'loggedInUser',

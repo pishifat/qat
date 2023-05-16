@@ -10,7 +10,6 @@ const Logger = require('../models/log');
 const router = express.Router();
 
 router.use(middlewares.isLoggedIn);
-router.use(middlewares.hasBasicAccess);
 
 const defaultPopulate = [
     {
@@ -104,7 +103,7 @@ router.get('/searchDiscussionVote/:id', async (req, res) => {
 });
 
 /* POST create a new discussion vote. */
-router.post('/submit', async (req, res) => {
+router.post('/submit', middlewares.hasBasicAccess, async (req, res) => {
     const { discussionLink, title, shortReason, mode, isNatOnly, neutralAllowed, reasonAllowed, isContentReview, customText, agreeOverwriteText, neutralOverwriteText, disagreeOverwriteText } = req.body;
 
     if (discussionLink.length == 0 && isContentReview) {
@@ -218,7 +217,7 @@ router.post('/submit', async (req, res) => {
 });
 
 /* POST submit mediation */
-router.post('/submitMediation/:id', async (req, res) => {
+router.post('/submitMediation/:id', middlewares.hasBasicAccess, async (req, res) => {
     if (!req.body.vote) {
         return res.json({
             error: 'Select your vote!',

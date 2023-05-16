@@ -65,6 +65,9 @@
                                     <router-link class="dropdown-item" to="/qualityassurance">
                                         Quality Assurance (read-only)
                                     </router-link>
+                                    <router-link class="dropdown-item" to="/discussionvote">
+                                        Content Review (read-only)
+                                    </router-link>
                                 </div>
                             </li>
                         </template>
@@ -229,7 +232,7 @@
                             </a>
                         </li>
 
-                        <li v-if="loggedInUser.hasBasicAccess" class="nav-item">
+                        <li class="nav-item">
                             <a
                                 class="nav-link"
                                 href="#"

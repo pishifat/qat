@@ -580,6 +580,34 @@ router.post('/:id/switchIsBnFinderAnonymous', middlewares.isBnOrNat, async (req,
     );
 });
 
+/* POST toggle showExplicitContent */
+router.post('/:id/toggleShowExplicitContent', async (req, res) => {
+    const user = await User.findById(req.params.id).orFail();
+
+    if (req.session.mongoId != user.id && !res.locals.userRequest.isNat) {
+        return res.json({
+            error: 'Unauthorized',
+        });
+    }
+
+    user.showExplicitContent = !user.showExplicitContent;
+    await user.save();
+
+    console.log(user.showExplicitContent)
+
+    res.json({
+        user,
+        success: 'Toggled explicit content',
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Toggled "${user.username}" ${user.showExplicitContent ? 'on' : 'off'} for show explicit content setting`,
+        'user',
+        user._id
+    );
+});
+
 /* POST switch/update request status */
 router.post('/:id/updateRequestStatus', middlewares.isBnOrNat, async (req, res) => {
     if (req.body.requestLink) {

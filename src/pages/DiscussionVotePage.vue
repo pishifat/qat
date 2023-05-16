@@ -1,5 +1,17 @@
 <template>
-    <div class="row">
+    <div v-if="!loggedInUser.showExplicitContent && !tempShowExplicitContent" class="row">
+        <div class="col-md-12">
+            <section class="card card-body">
+                <div>
+                    This page may contain <b>explicit content</b>.
+                </div>
+                <div>
+                    If you would like to proceed, <a href="#" @click="toggleShowExplicitContent($event)">click here</a>.
+                </div>
+            </section>
+        </div>
+    </div>
+    <div v-else class="row">
         <div class="col-md-12">
             <filter-box
                 :placeholder="'enter to search discussion...'"
@@ -132,6 +144,7 @@ export default {
             skip: 20,
             limit: 20,
             reachedMax: false,
+            tempShowExplicitContent: false,
         };
     },
     watch: {
@@ -236,6 +249,11 @@ export default {
                 this.reachedMax = true;
                 await this.showMore(e);
             }
+        },
+        async toggleShowExplicitContent(e) {
+            await this.$http.executePost(`/users/${this.loggedInUser.id}/toggleShowExplicitContent`, {}, e);
+            
+            this.tempShowExplicitContent = true;
         },
     },
 };

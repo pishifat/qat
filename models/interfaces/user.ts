@@ -48,6 +48,7 @@ interface IUser {
     isBnFinderAnonymous: boolean;
     languages: string[];
     lastMarkedAsLowActivity: Date;
+    showExplicitContent: boolean;
 
     // not used in model
     genreCount: number;

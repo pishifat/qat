@@ -13,7 +13,7 @@
             </div>
         </div>
 
-        <ul>
+        <ul v-if="loggedInUser.hasBasicAccess">
             <li v-for="mediation in mediations" :key="mediation.id" class="small ml-2">
                 <span v-if="loggedInUser.hasFullReadAccess">
                     <user-link
