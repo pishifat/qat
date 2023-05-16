@@ -56,7 +56,7 @@ const userSchema = new mongoose.Schema({
     languages: [{ type: String, enum: enums.Languages, default: [] }],
     lastMarkedAsLowActivity: { type: Date },
     showExplicitContent: { type: Boolean, default: false },
-    cover: { type: String, default: '' },
+    cover: { type: String },
 
     /* temporary fields for qa leaderboard webhook */
     recentQaChecks: { type: Number },

@@ -610,7 +610,7 @@ router.get('/callback', async (req, res) => {
                 await user.save();
             }
 
-             if (!user.cover || user.cover != cover) {
+            if (!user.cover || user.cover != cover) {
                 user.cover = cover;
                 await user.save();
             }
