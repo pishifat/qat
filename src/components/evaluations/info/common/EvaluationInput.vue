@@ -45,7 +45,7 @@
                     name="vote"
                     value="1"
                 >
-                <label class="form-check-label text-pass" for="1">{{ selectedEvaluation.isApplication ? 'Pass' : selectedEvaluation.selfSummary ? 'Remain in NAT' : selectedEvaluation.isBnEvaluation ? 'Full BN' : 'Resign on good terms' }}</label>
+                <label class="form-check-label text-pass" for="1">{{ selectedEvaluation.isApplication ? 'Pass' : selectedEvaluation.user.isNat ? 'Remain in NAT' : selectedEvaluation.isBnEvaluation ? 'Full BN' : 'Resign on good terms' }}</label>
             </div>
             <div class="form-check form-check-inline">
                 <input
@@ -56,7 +56,7 @@
                     name="vote"
                     value="2"
                 >
-                <label class="form-check-label text-neutral" for="2">{{ selectedEvaluation.isApplication ? 'Neutral' : (selectedEvaluation.selfSummary && loggedInUser.isNatLeader) ? 'Investigate' : selectedEvaluation.isBnEvaluation ? 'Probation BN' : 'Resign on standard terms' }}</label>
+                <label class="form-check-label text-neutral" for="2">{{ selectedEvaluation.isApplication ? 'Neutral' : (selectedEvaluation.user.isNat && loggedInUser.isNatLeader) ? 'Investigate' : selectedEvaluation.isBnEvaluation ? 'Probation BN' : 'Resign on standard terms' }}</label>
             </div>
             <div v-if="!selectedEvaluation.isResignation" class="form-check form-check-inline">
                 <input
@@ -67,7 +67,7 @@
                     name="vote"
                     value="3"
                 >
-                <label class="form-check-label text-fail" for="3">{{ selectedEvaluation.isApplication ? 'Fail' : (selectedEvaluation.selfSummary && loggedInUser.isNatLeader) ? 'Remove from NAT' : 'Remove from BN' }}</label>
+                <label class="form-check-label text-fail" for="3">{{ selectedEvaluation.isApplication ? 'Fail' : (selectedEvaluation.user.isNat && loggedInUser.isNatLeader) ? 'Remove from NAT' : 'Remove from BN' }}</label>
             </div>
 
             <button class="btn btn-sm btn-primary" @click="submitEval($event)">

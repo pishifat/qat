@@ -26,7 +26,7 @@
                 :is-discussion="evaluation.discussion"
                 :is-active="evaluation.active"
                 :archived-at="evaluation.archivedAt"
-                :self-summary="evaluation.selfSummary"
+                :is-nat="evaluation.user.isNat"
             />
         </div>
     </div>

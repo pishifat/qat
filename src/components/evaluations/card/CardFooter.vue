@@ -11,7 +11,7 @@
         </span>
 
         <add-votes
-            v-else-if="(((loggedInUser.isNat || loggedInUser.isTrialNat) && !selfSummary) || loggedInUser.isNatLeader) && isDiscussion"
+            v-else-if="(((loggedInUser.isNat || loggedInUser.isTrialNat) && !isNat) || loggedInUser.isNatLeader) && isDiscussion"
             :inputs="reviews"
         />
 
@@ -67,10 +67,7 @@ export default {
         },
         isDiscussion: Boolean,
         isActive: Boolean,
-        selfSummary: {
-            type: Object,
-            default: null,
-        },
+        isNat: Boolean,
     },
     computed: {
         ...mapState([

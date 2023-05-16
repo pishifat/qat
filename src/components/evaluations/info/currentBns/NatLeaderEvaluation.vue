@@ -3,7 +3,8 @@
         <div class="row">
             <div class="col-sm-12">
                 <b>Self-reported summary:</b>
-                <span class="small" v-html="$md.render(selectedEvaluation.selfSummary.comment)" />
+                <span v-if="selectedEvaluation.selfSummary" class="small" v-html="$md.render(selectedEvaluation.selfSummary.comment)" />
+                <span v-else class="text-secondary">None...</span>
             </div>
         </div>
         <hr />
