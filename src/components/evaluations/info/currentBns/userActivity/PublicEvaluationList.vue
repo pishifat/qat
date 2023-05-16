@@ -17,8 +17,8 @@
                         {{ new Date(event.deadline).toString().slice(4, 10) }}
                     </td>
                     <td>
-                        <span :class="findConsensusColor(event.consensus)" class="text-capitalize" >
-                            {{ makeWordFromField(event.consensus).toUpperCase() }}
+                        <span :class="findConsensusColor(event.consensus)">
+                            {{ capitalizeFirstLetter(makeWordFromField(event.consensus)) }}
                         </span>
                     </td>
                 </tr>
