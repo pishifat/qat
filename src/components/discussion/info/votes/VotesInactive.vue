@@ -1,7 +1,7 @@
 <template>
     <div>
         <hr>
-        <button class="btn btn-sm btn-block btn-primary ml-2 mb-2" type="submit" @click="showAll = !showAll">
+        <button v-if="loggedInUser.hasBasicAccess" class="btn btn-sm btn-block btn-primary ml-2 mb-2" type="submit" @click="showAll = !showAll">
             {{ showAll ? 'Hide BN votes' : 'Show all votes' }}
         </button>
         <!-- agree -->
@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import VotesInactiveType from './VotesInactiveType.vue';
 
 export default {
@@ -52,6 +52,9 @@ export default {
         };
     },
     computed: {
+        ...mapState([
+            'loggedInUser',
+        ]),
         ...mapGetters('discussionVote', [
             'selectedDiscussionVote',
         ]),

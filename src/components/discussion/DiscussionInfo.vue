@@ -18,7 +18,7 @@
                 Conclude Vote
             </button>
 
-            <div v-if="selectedDiscussionVote.isActive">
+            <div v-if="selectedDiscussionVote.isActive && loggedInUser.hasBasicAccess">
                 <hr>
 
                 <!-- only show voting options for users of specified mode -->
