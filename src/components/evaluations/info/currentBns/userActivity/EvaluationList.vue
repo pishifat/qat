@@ -35,16 +35,12 @@
                         </td>
                         <td>
                             <span :class="'text-' + findVote(event.reviews)">
-                                {{ findVote(event.reviews).toUpperCase() }}
+                                {{ capitalizeFirstLetter(findVote(event.reviews)) }}
                             </span>
                         </td>
                         <td>
-                            <span :class="'text-' + event.consensus">
-                                {{
-                                    event.consensus
-                                        ? event.consensus.toUpperCase()
-                                        : 'NONE'
-                                }}
+                            <span :class="findConsensusColor(event.consensus)">
+                                {{ capitalizeFirstLetter(makeWordFromField(event.consensus)) }}
                             </span>
                         </td>
                     </tr>
@@ -58,9 +54,11 @@
 <script>
 import { mapState } from 'vuex';
 import DataTable from '../../../../DataTable.vue';
+import evaluations from '../../../../../mixins/evaluations.js';
 
 export default {
     name: 'EvaluationList',
+    mixins: [ evaluations ],
     components: {
         DataTable,
     },
@@ -147,6 +145,27 @@ export default {
             }
 
             return dateDeadline < reviewDate;
+        },
+        findConsensusColor (consensus) {
+            switch (consensus) {
+                case 'pass':
+                case 'fullBn':
+                case 'resignedOnGoodTerms':
+                    return 'text-pass';
+
+                case 'fail':
+                case 'removeFromBn':
+                    return 'text-fail';
+
+                case 'probationBn':
+                    return 'text-probation';
+
+                case 'resignedOnStandardTerms':
+                    return 'text-neutral';
+
+                default:
+                    return '';
+            }
         },
     },
 };
