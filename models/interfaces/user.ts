@@ -49,6 +49,7 @@ interface IUser {
     languages: string[];
     lastMarkedAsLowActivity: Date;
     showExplicitContent: boolean;
+    cover: string;
 
     // not used in model
     genreCount: number;
