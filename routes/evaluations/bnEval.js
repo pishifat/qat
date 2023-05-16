@@ -950,6 +950,21 @@ const applicationPopulate = [
     },
 ];
 
+const evaluationPopulate = [
+    {
+        path: 'user',
+        select: 'username osuId',
+    },
+    {
+        path: 'reviews',
+        select: 'evaluator behaviorComment moddingComment vote createdAt',
+        populate: {
+            path: 'evaluator',
+            select: 'username osuId groups',
+        },
+    },
+];
+
 /* GET aiess info */
 router.get('/activity', async (req, res) => {
     let days = parseInt(req.query.days);
@@ -994,7 +1009,7 @@ router.get('/activity', async (req, res) => {
                 mode: { $in: modes },
                 active: false,
             })
-            .populate(defaultPopulate)
+            .populate(evaluationPopulate)
             .sort({ deadline: 1 }),
     ]);
 
