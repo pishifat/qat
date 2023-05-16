@@ -28,7 +28,7 @@
                 :value="mode"
                 :selected="mode === filters.mode"
             >
-                {{ mode === '' ? 'All modes' : mode }}
+                {{ mode === '' ? 'All modes' : formatOption(mode) }}
             </option>
         </select>
 
@@ -44,7 +44,7 @@
                 :value="group"
                 :selected="group === filters.group"
             >
-                {{ group === '' ? 'All groups' : group }}
+                {{ group === '' ? 'All groups' : formatOption(group) }}
             </option>
         </select>
 
@@ -92,6 +92,26 @@ export default {
         updateFilterGroup (group) {
             this.$store.commit(this.storeModule + '/pageFilters/setFilterGroup', group);
         },
+        formatOption (option) {
+            switch(option) {
+                case 'osu':
+                    return 'osu!';
+                case 'taiko':
+                    return 'osu!taiko';
+                case 'catch':
+                    return 'osu!catch';
+                case 'mania':
+                    return 'osu!mania';
+                case 'bn':
+                    return 'BN';
+                case 'nat':
+                    return 'NAT';
+                case 'gmt':
+                    return 'GMT';
+                default:
+                    return option;
+            }
+        }
     },
 };
 </script>
