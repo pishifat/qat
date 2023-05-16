@@ -224,5 +224,5 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background-color: $scrollbar-color;
+    background-color: lighten($scrollbar-color, 10%);
 }
