@@ -75,7 +75,7 @@ export default {
         },
         /** @returns {string} */
         cardDecoration(user) {
-            let css = this.getUserCover(user);
+            let css = this.getCardBackground(user);
 
             if (user.group === 'nat') {
                 return css += 'border-left: 4px solid var(--danger);';
@@ -90,8 +90,12 @@ export default {
             }
         },
         /** @returns {string} */
-        getUserCover(user) {
-            return `background: linear-gradient(90deg, #2D3B42 6.19%, rgba(0, 0, 0, 0.82) 179.48%), url(https://a.ppy.sh/${user.osuId}) center no-repeat; background-size: cover;`;
+        getCardBackground(user) {
+            return `background: linear-gradient(90deg, #2D3B42 6.19%, rgba(0, 0, 0, 0.82) 179.48%), url(${this.getCover(user)}) center no-repeat; background-size: cover;`;
+        },
+        /** @returns {string} */
+        getCover(user) {
+            return user.cover ? user.cover : `https://a.ppy.sh/${user.osuId}` // fallback to avatar if no cover
         },
     }
 };

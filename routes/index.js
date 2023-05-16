@@ -572,6 +572,7 @@ router.get('/callback', async (req, res) => {
 
         const osuId = response.id;
         const username = response.username;
+        const cover = response.cover.url;
         const rankedBeatmapsets = response.ranked_and_approved_beatmapset_count;
         const user = await User.findOne({ osuId });
 
@@ -579,6 +580,7 @@ router.get('/callback', async (req, res) => {
             const newUser = new User();
             newUser.osuId = osuId;
             newUser.username = username;
+            newUser.cover = cover;
             newUser.groups = groups;
             newUser.rankedBeatmapsets = rankedBeatmapsets;
             await newUser.save();
@@ -605,6 +607,11 @@ router.get('/callback', async (req, res) => {
 
             if (user.rankedBeatmapsets != rankedBeatmapsets) {
                 user.rankedBeatmapsets = rankedBeatmapsets;
+                await user.save();
+            }
+
+             if (!user.cover || user.cover != cover) {
+                user.cover = cover;
                 await user.save();
             }
 
