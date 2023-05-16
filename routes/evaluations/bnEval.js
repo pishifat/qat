@@ -846,7 +846,7 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
     const beatmapsetIds = uniqueNominations.map(n => n.beatmapsetId);
     const qaBeatmapsetIds = qualityAssuranceChecks.map(qa => qa.event.beatmapsetId);
 
-    let [allNominationsDisqualified, allNominationsPopped, disqualifiedQualityAssuranceChecks/*, othersNominations*/] = await Promise.all([
+    let [allNominationsDisqualified, allNominationsPopped, disqualifiedQualityAssuranceChecks] = await Promise.all([
         Aiess.getRelatedBeatmapsetEvents(
             userOsuId,
             beatmapsetIds,
@@ -896,6 +896,7 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
                 .find({
                     beatmapsetId: event.beatmapsetId,
                     timestamp: { $lte: event.timestamp },
+                    type: { $ne: 'rank' },
                 })
                 .sort({ timestamp: -1 })
                 .limit(3);
