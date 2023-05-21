@@ -1,6 +1,8 @@
 const express = require('express');
 const middlewares = require('../helpers/middlewares');
+const discord = require('../helpers/discord');
 const Aiess = require('../models/aiess');
+const User = require('../models/user');
 const Logger = require('../models/log');
 
 const router = express.Router();
@@ -86,6 +88,40 @@ router.post('/updateContent/:id', middlewares.isNat, async (req, res) => {
     }
 });
 
+/* SEV rating webhook */
+async function sevRatingWebhook(event, req) {
+    for (const mode of event.modes) {
+        const previousEvents = await Aiess
+            .find({
+                beatmapsetId: event.beatmapsetId,
+                timestamp: { $lte: event.timestamp },
+                type: { $ne: 'rank' },
+            })
+            .sort({ timestamp: -1 })
+            .limit(event.type == 'nomination_reset' ? 1 : 2)
+            .skip(1);
+
+        const users = [];
+
+        for (const previousEvent of previousEvents) {
+            const user = await User.findOne({ osuId: previousEvent.userId });
+            users.push(user);
+        }
+
+        const x = users.map(u => `[${u.username}](https://osu.ppy.sh/users/${u.osuId})`);
+        const y = x.join(', ');
+
+        await discord.webhookPost(
+            [{
+                author: discord.defaultWebhookAuthor(req.session),
+                description: `Set **notable SEV on [nomination reset](https://osu.ppy.sh/beatmapsets/${event.beatmapsetId}/discussion/-/generalAll#/${event.discussionId})** (${y}): **${event.obviousness}/${event.severity}**`,
+                color: discord.webhookColors.lightPink,
+            }],
+            mode,
+        );
+    }
+}
+
 /* POST edit obviousness */
 router.post('/updateObviousness/:id', middlewares.isNat, async (req, res) => {
     let obviousness = parseInt(req.body.obviousness);
@@ -102,6 +138,10 @@ router.post('/updateObviousness/:id', middlewares.isNat, async (req, res) => {
         obviousness: event.obviousness,
         success: 'Updated obviousness',
     });
+
+    if ((event.obviousness || event.obviousness == 0) && (event.severity || event.severity == 0) && (event.obviousness + event.severity >= 2)) {
+        await sevRatingWebhook(event, req);
+    }
 
     Logger.generate(req.session.mongoId, `Updated obviousness of s/${event.beatmapsetId} to "${obviousness}"`, 'dataCollection', event._id);
 });
@@ -122,6 +162,10 @@ router.post('/updateSeverity/:id', middlewares.isNat, async (req, res) => {
         severity: event.severity,
         success: 'Updated severity',
     });
+
+    if ((event.obviousness || event.obviousness == 0) && (event.severity || event.severity == 0) && (event.obviousness + event.severity >= 2)) {
+        await sevRatingWebhook(event, req);
+    }
 
     Logger.generate(req.session.mongoId, `Updated severity of s/${event.beatmapsetId} to "${severity}"`, 'dataCollection', event._id);
 });
