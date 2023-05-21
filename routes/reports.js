@@ -47,26 +47,6 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
         });
     }
 
-    let reportCategory;
-
-    switch (req.body.category) {
-        case 'stolenBeatmap':
-            reportCategory = 'Stolen beatmap report';
-            break;
-        case 'contentCaseSong':
-            reportCategory = 'Song content report';
-            break;
-        case 'contentCaseVisual':
-            reportCategory = 'Visual content report';
-            break;
-        case 'behavior':
-            reportCategory = 'User behavior report';
-            break;
-        default:
-            reportCategory = 'Other report';
-            break;
-    }
-
     if (req.body.username) {
         let u = await User.findByUsername(req.body.username);
 
@@ -85,13 +65,15 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
             success: 'Sent!',
         });
 
+        const populatedReport = await Report.findById(report.id);
+
         await discord.webhookPost(
             [{
                 thumbnail: {
                     url: `https://a.ppy.sh/${u.osuId}`,
                 },
                 color: discord.webhookColors.darkRed,
-                description: `[${reportCategory}](http://bn.mappersguild.com/managereports?id=${report.id}) for **${u.username}**`,
+                description: `New [${populatedReport.reportCategory}](http://bn.mappersguild.com/managereports?id=${populatedReport.id}) for **${u.username}**`,
                 fields: notificationFields,
             }],
             'natUserReport'

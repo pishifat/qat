@@ -141,7 +141,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
     // find active events
-    let [activeApps, activeRounds, activeVetoes] = await Promise.all([
+    let [activeApps, activeRounds, activeVetoes, activeReports] = await Promise.all([
         AppEvaluation
             .find({
                 active: true,
@@ -160,6 +160,18 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
             .find({ isActive: true, createdAt: { $lte: sevenDaysAgo } })
             .populate(defaultReportPopulate),
     ]);
+
+    // post webhook for reports
+    for (const report of activeReports) {
+        const days = Math.round((new Date().getTime() - new Date(report.createdAt).getTime()) / (1000 * 60 * 60 * 24));
+        discord.webhookPost([{
+            color: discord.webhookColors.red,
+            description: `**Pending [${report.reportCategory}](https://bn.mappersguild.com/managereports?id=${report.id}) needs a response!** (${days} days since submitted)`,
+        }],
+        'natUserReport');
+    }
+
+    return;
 
     // find and post webhook for vetoes
     for (let i = 0; i < activeVetoes.length; i++) {

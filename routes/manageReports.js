@@ -151,7 +151,7 @@ router.post('/submitReportEval/:id', async (req, res) => {
             author: discord.defaultWebhookAuthor(req.session),
             thumbnail,
             color,
-            description: `Adjusted ${req.body.close ? 'status' : 'feedback'} on [report for **${report.culprit ? report.culprit.username : report.link}**](http://bn.mappersguild.com/managereports?id=${report.id})`,
+            description: `Adjusted ${req.body.close ? 'status' : 'feedback'} on [**${report.culprit ? 'report for ' + report.culprit.username : report.reportCategory}**](http://bn.mappersguild.com/managereports?id=${report.id})`,
             fields,
         }],
         'natUserReport'
@@ -283,7 +283,7 @@ router.post('/sendMessages/:id', async (req, res) => {
         [{
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.white,
-            description: `Sent chat messages for [report for **${report.culprit ? report.culprit.username : report.link}**](http://bn.mappersguild.com/managereports?id=${report.id})`,
+            description: `Sent chat messages for [**${report.culprit ? 'report for ' + report.culprit.username : report.reportCategory}**](http://bn.mappersguild.com/managereports?id=${report.id})`,
         }],
         'natUserReport'
     );

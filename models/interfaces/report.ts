@@ -10,6 +10,8 @@ interface IReportDocument extends Document {
     feedback: string;
     isActive: boolean;
     category: string;
+    reportCategory: string; // formatted verison of category fetched from category
+    createdAt: Date;
 }
 
 export default interface IReportModel extends Model<IReportDocument> { }
