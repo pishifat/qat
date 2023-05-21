@@ -146,6 +146,7 @@ router.post('/submitReportEval/:id', async (req, res) => {
         color = discord.webhookColors.red;
     }
 
+    // #bnsite-reports (internal)
     await discord.webhookPost(
         [{
             author: discord.defaultWebhookAuthor(req.session),
@@ -225,9 +226,6 @@ router.post('/sendToContentReview/:id', async (req, res) => {
         'contentCase'
     );
 
-    // #content-cases (BN server) (not doing this anymore i guess)
-    // await discord.roleHighlightWebhookPost('contentCase', ['gmt']);
-
     // #content-review (internal)
     await discord.webhookPost(
         [{
@@ -279,6 +277,7 @@ router.post('/sendMessages/:id', async (req, res) => {
         report._id
     );
 
+    // #bnsite-reports (internal)
     await discord.webhookPost(
         [{
             author: discord.defaultWebhookAuthor(req.session),

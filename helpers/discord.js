@@ -127,6 +127,9 @@ async function roleHighlightWebhookPost(webhook, roles, text) {
     let content = '';
 
     switch (webhook) {
+        case 'natUserReport':
+            url += `${config.natReportWebhook.id}/${config.natReportWebhook.token}`;
+            break;
         case 'contentCase':
             url += `${config.contentCasesWebhook.id}/${config.contentCasesWebhook.token}`;
             break;
@@ -157,6 +160,9 @@ async function roleHighlightWebhookPost(webhook, roles, text) {
                 break;
             case 'contentReview':
                 content += `<@&${config.announcementWebhook.contentReviewRole}> `;
+                break;
+            case 'natInternal':
+                content += `<@&${config.announcementWebhook.natInternalRole}> `;
                 break;
             case 'nat':
                 content += `<@&${config.announcementWebhook.natRole}> `;
