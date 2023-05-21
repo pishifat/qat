@@ -73,21 +73,6 @@ router.post('/toggleIsReviewed/:id', middlewares.isNatOrTrialNat, async (req, re
     Logger.generate(req.session.mongoId, `Toggled review status of s/${a.beatmapsetId} to ${a.isReviewed}`, 'dataCollection', a._id);
 });
 
-/* POST edit reason for dq/pop */
-router.post('/updateContent/:id', middlewares.isNat, async (req, res) => {
-    let a = await Aiess.findByIdAndUpdate(req.params.id, { content: req.body.reason });
-
-    if (!a) {
-        res.json({ error: 'Something went wrong' });
-    } else {
-        res.json({
-            reason: req.body.reason,
-            success: 'Updated content',
-        });
-        Logger.generate(req.session.mongoId, `Updated DQ reason of s/${a.beatmapsetId} to "${a.content}"`, 'dataCollection', a._id);
-    }
-});
-
 /* SEV rating webhook */
 async function sevRatingWebhook(event, req) {
     for (const mode of event.modes) {
@@ -116,11 +101,31 @@ async function sevRatingWebhook(event, req) {
                 author: discord.defaultWebhookAuthor(req.session),
                 description: `Set **notable SEV on [nomination reset](https://osu.ppy.sh/beatmapsets/${event.beatmapsetId}/discussion/-/generalAll#/${event.discussionId})** (${y}): **${event.obviousness}/${event.severity}**`,
                 color: discord.webhookColors.lightPink,
+                fields: [{
+                    name: 'Reason',
+                    value: event.content,
+                }],
             }],
             mode,
         );
     }
 }
+
+/* POST edit reason for dq/pop */
+router.post('/updateContent/:id', middlewares.isNat, async (req, res) => {
+    let event = await Aiess.findByIdAndUpdate(req.params.id, { content: req.body.reason }).orFail();
+
+    res.json({
+        reason: req.body.reason,
+        success: 'Updated content',
+    });
+
+    if ((event.obviousness || event.obviousness == 0) && (event.severity || event.severity == 0) && (event.obviousness + event.severity >= 2)) {
+        await sevRatingWebhook(event, req);
+    }
+
+    Logger.generate(req.session.mongoId, `Updated DQ reason of s/${event.beatmapsetId} to "${event.content}"`, 'dataCollection', a._id);
+});
 
 /* POST edit obviousness */
 router.post('/updateObviousness/:id', middlewares.isNat, async (req, res) => {
