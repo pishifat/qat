@@ -153,7 +153,9 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
             .find({ active: true })
             .populate(defaultPopulate),
 
-        Veto.find({ status: 'wip' }),
+        Veto
+            .find({ status: 'wip' })
+            .populate('mediations'),
         Report
             .find({ isActive: true, createdAt: { $lte: sevenDaysAgo } })
             .populate(defaultReportPopulate),
@@ -170,7 +172,33 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
             description += 'is due in less than 24 hours!';
         }
 
-        if (date > veto.deadline || veto.deadline < nearDeadline) {
+        let agreeMediations = 0;
+        let disagreeMediations = 0;
+
+        if (veto.reasons.length == 1) {
+            for (const mediation of veto.mediations) {
+                if (mediation.vote == 1 && mediation.comment) agreeMediations++;
+                if (mediation.vote == 3 && mediation.comment) disagreeMediations++;
+            }
+        }
+
+        if (agreeMediations > (veto.mediations.length/2) || disagreeMediations > (veto.mediations.length/2)) {
+            veto.status = 'archive';
+            await veto.save();
+
+            Logger.generate(
+                null,
+                `Veto concluded for "${veto.beatmapTitle}"`,
+                'veto',
+                veto._id
+            );
+            
+            discord.webhookPost([{
+                color: discord.webhookColors.purple,
+                description: `Automatically concluded mediation on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`,
+            }],
+            veto.mode);
+        } else if (date > veto.deadline || veto.deadline < nearDeadline) {
             await discord.webhookPost(
                 [{
                     description,

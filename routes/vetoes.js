@@ -307,19 +307,22 @@ router.post('/concludeMediation/:id', middlewares.isNat, async (req, res) => {
     veto.status = 'archive';
 
     await veto.save();
+
     res.json(veto);
+
     Logger.generate(
         req.session.mongoId,
         `Veto concluded for "${veto.beatmapTitle}"`,
         'veto',
         veto._id
     );
+    
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),
         color: discord.webhookColors.purple,
         description: `Concluded mediation on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`,
     }],
-        veto.mode);
+    veto.mode);
 });
 
 /* POST continue mediation */
@@ -329,6 +332,7 @@ router.post('/continueMediation/:id', middlewares.isNat, async (req, res) => {
         .populate(defaultPopulate);
 
     res.json(veto);
+
     Logger.generate(
         req.session.mongoId,
         `Veto mediation for "${veto.beatmapTitle}" re-initiated`,
