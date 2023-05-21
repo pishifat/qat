@@ -79,7 +79,7 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
             }],
             'natUserReport'
         );
-
+        
         await discord.roleHighlightWebhookPost('natUserReport', ['natInternal']);
 
         Logger.generate(
@@ -104,7 +104,7 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
         const populatedReport = await Report.findById(report.id);
 
         // #bnsite-reports (internal)
-        
+
         await discord.webhookPost([{
             description: `New [${populatedReport.reportCategory}](http://bn.mappersguild.com/managereports?id=${report.id})`,
             color: discord.webhookColors.darkRed,
@@ -112,7 +112,9 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
         }],
         'natUserReport');
 
-        await discord.roleHighlightWebhookPost('natUserReport', ['natInternal']);
+        if (report.category == 'other') {
+            await discord.roleHighlightWebhookPost('natUserReport', ['natInternal']);
+        }
 
         Logger.generate(
             null,
