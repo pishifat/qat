@@ -220,14 +220,16 @@ router.get('/findUserBadgeInfo', async (req, res) => {
 
 /* GET all NAT users in evaluation bag for relevant mode */
 router.get('/findBagUsers/:mode', async (req, res) => {
-    const u = await User.find({
+    const tempUsers = await User.find({
         groups: 'nat',
         'modesInfo.mode': req.params.mode,
         isBnEvaluator: true,
         inBag: true,
     }).sort({ username: 1 });
 
-    res.json(u);
+    const users = tempUsers.filter(u => u.evaluatorModes.includes(req.params.mode));
+
+    res.json(users);
 });
 
 /* POST edit badge value */

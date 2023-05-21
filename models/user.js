@@ -299,7 +299,9 @@ class UserService extends mongoose.Model {
      * @returns {Promise<[]>}
      */
     static async getAssignedNat (mode, excludeOsuIds, sampleSize) {
-        sampleSize = sampleSize || await Settings.getModeHasTrialNat(mode) ? await Settings.getModeEvaluationsRequired(mode) - 1 : await Settings.getModeEvaluationsRequired(mode);
+        if (!sampleSize) {
+            sampleSize = await Settings.getModeHasTrialNat(mode) ? await Settings.getModeEvaluationsRequired(mode) - 1 : await Settings.getModeEvaluationsRequired(mode);
+        }
 
         const query = User.aggregate([
             {
@@ -326,13 +328,18 @@ class UserService extends mongoose.Model {
         let uniqueAssignedNat = [];
 
         for (const user of assignedNat) {
-            if (!uniqueAssignedNatIds.includes(user._id.toString())) {
+            const modeInfo = user.modesInfo.find(m => m.mode == mode);
+
+            if (!uniqueAssignedNatIds.includes(user._id.toString()) && modeInfo.level == 'evaluator') {
                 uniqueAssignedNatIds.push(user._id.toString());
                 uniqueAssignedNat.push(user);
             }
         }
 
         let finalAssignedNat = [];
+
+        console.log(uniqueAssignedNatIds);
+        console.log(sampleSize);
 
         if (uniqueAssignedNatIds.length < sampleSize) {
             const newQuery = User.aggregate([
@@ -357,12 +364,17 @@ class UserService extends mongoose.Model {
                 .exec();
 
             for (const user of additionalAssignedNat) {
-                await User.findByIdAndUpdate(user._id, { inBag: true });
+                const modeInfo = user.modesInfo.find(m => m.mode == mode);
 
-                if (uniqueAssignedNatIds.length < sampleSize) {
-                    uniqueAssignedNatIds.push(user._id.toString());
-                    uniqueAssignedNat.push(user);
-                    await User.findByIdAndUpdate(user._id, { inBag: false });
+                if (modeInfo.level == 'evaluator') {
+                    await User.findByIdAndUpdate(user._id, { inBag: true });
+
+                    if (uniqueAssignedNatIds.length < sampleSize) {
+                        console.log(user.username);
+                        uniqueAssignedNatIds.push(user._id.toString());
+                        uniqueAssignedNat.push(user);
+                        await User.findByIdAndUpdate(user._id, { inBag: false });
+                    }
                 }
             }
         }

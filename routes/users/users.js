@@ -265,7 +265,7 @@ router.get('/findNatActivity2/:number/:mode', async (req, res) => {
         return res.json({ error: 'Invalid number' });
     }
 
-    const [users, appEvals, currentBnEvals] = await Promise.all([
+    const [tempUsers, appEvals, currentBnEvals] = await Promise.all([
         User
             .find({
                 groups: 'nat',
@@ -299,6 +299,8 @@ router.get('/findNatActivity2/:number/:mode', async (req, res) => {
 
     let info = [];
     let total = 0;
+
+    const users = tempUsers.filter(u => u.evaluatorModes.includes(mode));
 
     for (const user of users) {
         let participatedAppEvals = 0;
