@@ -41,7 +41,12 @@
 
                     <discord-id />
 
-                    <user-group-toggle v-if="selectedUser.isBn" />
+                    <div v-for="mode in selectedUser.modes" :key="mode">
+                        <user-group-toggle
+                            v-if="selectedUser.isBn"
+                            :mode="mode"
+                        />
+                    </div>
 
                     <modding-activity
                         :username="selectedUser.username"

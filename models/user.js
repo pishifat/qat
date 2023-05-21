@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
     modesInfo: [{
         _id: false,
         mode: { type: String, enum: ['osu', 'taiko', 'catch', 'mania'], required: true },
-        level: { type: String, enum: ['full', 'probation'], required: true },
+        level: { type: String, enum: ['full', 'probation', 'evaluator'], required: true },
     }],
     history: [{
         _id: false,
@@ -109,6 +109,10 @@ class UserService extends mongoose.Model {
 
     get probationModes () {
         return this.modesInfo && this.modesInfo.filter(m => m.level === 'probation').map(m => m.mode);
+    }
+
+    get evaluatorModes () {
+        return this.modesInfo && this.modesInfo.filter(m => m.level === 'evaluator').map(m => m.mode);
     }
 
     // History
@@ -215,6 +219,9 @@ class UserService extends mongoose.Model {
                     $unwind: '$modesInfo.mode',
                 },
                 {
+                    $unwind: '$modesInfo.level',
+                },
+                {
                     $unwind: '$groups',
                 },
             ]);
@@ -244,7 +251,7 @@ class UserService extends mongoose.Model {
             }
 
             return await query.collation({ locale: 'en' }).sort({
-                'groups': -1,
+                'modesInfo.level': 1,
                 'username': 1,
             }).group({
                 _id: '$modesInfo.mode',

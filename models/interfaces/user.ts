@@ -70,6 +70,7 @@ export interface IUserDocument extends IUser, Document {
     modes: string[];
     fullModes: string[];
     probationModes: string[];
+    evaluatorModes: string[];
     bnDuration: number;
     natDuration: number;
     isBnFor: (mode: string) => boolean;

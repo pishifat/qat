@@ -27,7 +27,7 @@ router.use(middlewares.hasFullReadAccessOrTrialNat);
 const defaultPopulate = [
     {
         path: 'user',
-        select: 'username osuId modesInfo groups',
+        select: 'username osuId modesInfo groups evaluatorModes',
     },
     {
         path: 'natEvaluators',
@@ -320,7 +320,7 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
         const i = user.modesInfo.findIndex(m => m.mode === evaluation.mode);
 
         // nat evaluation processing
-        if (user.isNat) {
+        if (user.evaluatorModes.includes(evaluation.mode)) {
             const userGroup = req.body.userGroup || 'nat';
 
             if (userGroup == 'nat') {

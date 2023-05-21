@@ -56,9 +56,9 @@
 
             <template v-if="selectedEvaluation.active">
                 <hr />
-                <evaluation-input v-if="!selectedEvaluation.user.isNat" />
-                <nat-self-evaluation v-else-if="selectedEvaluation.user.isNat && selectedEvaluation.user.id == loggedInUser.id && !selectedEvaluation.discussion" />
-                <nat-leader-evaluation v-else-if="selectedEvaluation.user.isNat && selectedEvaluation.discussion && loggedInUser.isNatLeader" />
+                <evaluation-input v-if="!selectedEvaluation.user.evaluatorModes.includes(selectedEvaluation.mode)" />
+                <nat-self-evaluation v-else-if="!selectedEvaluation.discussion && selectedEvaluation.user.id == loggedInUser.id && selectedEvaluation.user.evaluatorModes.includes(selectedEvaluation.mode)" />
+                <nat-leader-evaluation v-else-if="selectedEvaluation.discussion && loggedInUser.isNatLeader && selectedEvaluation.user.evaluatorModes.includes(selectedEvaluation.mode)" />
                 <div v-else>
                     There's nothing for you to do here. :)
                 </div>

@@ -14,6 +14,11 @@ router.post("/moveToNat", async (req, res) => {
     user.isTrialNat = false;
     const i = user.groups.findIndex((g) => g === "bn");
     if (i !== -1) user.groups.splice(i, 1, "nat");
+
+    for (let i = 0; i < user.modesInfo.length; i++) {
+        user.modesInfo[i].level = 'evaluator';
+    }
+
     await user.save();
 
     res.json({
@@ -29,6 +34,10 @@ router.post("/moveToTrialNat", async (req, res) => {
     const i = user.groups.findIndex((g) => g === "nat");
     if (i !== -1) user.groups.splice(i, 1, "bn");
     await user.save();
+
+    for (let i = 0; i < user.modesInfo.length; i++) {
+        user.modesInfo[i].level = 'full';
+    }
 
     res.json({
         user,

@@ -77,7 +77,7 @@ export default {
         cardDecoration(user) {
             let css = this.getCardBackground(user);
 
-            if (user.group === 'nat') {
+            if (user.level == 'evaluator') {
                 return css += 'border-left: 4px solid var(--danger);';
             }
 

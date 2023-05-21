@@ -1035,50 +1035,48 @@ router.post('/:id/updateMapperPreferences', middlewares.isBnOrNat, async (req, r
 });
 
 /* POST switch user group */
-router.post('/:id/switchUserGroup', middlewares.isNat, async (req, res) => {
+router.post('/:id/addToNat', middlewares.isNat, async (req, res) => {
     const user = await User.findById(req.params.id).orFail();
+    const mode = req.body.mode;
 
-    if (user.isNat) {
-        const i = user.groups.findIndex(g => g === 'nat');
-        if (i !== -1) user.groups.splice(i, 1, 'bn');
-    } else {
-        await Evaluation.deleteUserActiveEvaluations(user._id, user.modesInfo[0].mode);
-        user.isTrialNat = false;
-        const i = user.groups.findIndex(g => g === 'bn');
-        if (i !== -1) user.groups.splice(i, 1, 'nat');
-    }
+    await Evaluation.deleteUserActiveEvaluations(user._id, mode);
+    user.isTrialNat = false;
+    const i = user.groups.findIndex(g => g === 'bn');
+    if (i !== -1) user.groups.splice(i, 1, 'nat');
+    
 
-    for (const mode of user.modesInfo) {
-        mode.level = 'full';
-        const activityToCheck = Math.floor(Math.random() * (95 - 85) + 85); // between 85 and 95 days;
-        let deadline = new Date();
-        deadline.setDate(deadline.getDate() + activityToCheck);
-
-        if (user.isNat) {
-            await BnEvaluation.create({
-                user: user._id,
-                mode: mode.mode,
-                deadline,
-                activityToCheck,
-            });
+    for (let i = 0; i < user.modesInfo.length; i++) {
+        if (user.modesInfo[i].mode == mode) {
+            user.modesInfo[i].level = 'evaluator';
         }
-        
-        user.history.push({
-            date: new Date(),
-            mode: mode.mode,
-            kind: 'left',
-            group: user.isNat ? 'bn' : 'nat',
-            relatedEvaluation: null,
-        });
-
-        user.history.push({
-            date: new Date(),
-            mode: mode.mode,
-            kind: 'joined',
-            group: user.isNat ? 'nat' : 'bn',
-            relatedEvaluation: null,
-        });
     }
+
+    const activityToCheck = Math.floor(Math.random() * (50 - 40) + 40); // between 40 and 50 days;
+    let deadline = new Date();
+    deadline.setDate(deadline.getDate() + activityToCheck);
+
+    await BnEvaluation.create({
+        user: user._id,
+        mode,
+        deadline,
+        activityToCheck,
+    });
+    
+    user.history.push({
+        date: new Date(),
+        mode,
+        kind: 'left',
+        group: 'bn',
+        relatedEvaluation: null,
+    });
+
+    user.history.push({
+        date: new Date(),
+        mode,
+        kind: 'joined',
+        group: 'nat',
+        relatedEvaluation: null,
+    });
 
     await user.save();
 
@@ -1086,7 +1084,7 @@ router.post('/:id/switchUserGroup', middlewares.isNat, async (req, res) => {
         [{
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.darkGreen,
-            description: `Moved [**${user.username}**](http://osu.ppy.sh/users/${user.osuId}) from **${user.isNat ? 'BN' : 'NAT'}** to **${user.isNat ? 'NAT' : 'BN'}**.`,
+            description: `Moved [**${user.username}**](http://osu.ppy.sh/users/${user.osuId}) to **NAT** (${mode == 'osu' ? 'osu!' : 'osu!' + mode }).`,
         }],
         'all'
     );
