@@ -124,7 +124,7 @@ router.post('/updateContent/:id', middlewares.isNat, async (req, res) => {
         await sevRatingWebhook(event, req);
     }
 
-    Logger.generate(req.session.mongoId, `Updated DQ reason of s/${event.beatmapsetId} to "${event.content}"`, 'dataCollection', a._id);
+    Logger.generate(req.session.mongoId, `Updated DQ reason of s/${event.beatmapsetId} to "${event.content}"`, 'dataCollection', event._id);
 });
 
 /* POST edit obviousness */
