@@ -21,7 +21,7 @@ const store = new Vuex.Store({
         userMainMode (state) {
             if (state.loggedInUser && state.loggedInUser.modes && state.loggedInUser.modes.length) {
                 for (const mode of state.loggedInUser.modes) {
-                    if (mode.level == 'evaluator') return modes;
+                    if (mode.level == 'evaluator') return mode;
                 }
 
                 return state.loggedInUser.modes[0];
