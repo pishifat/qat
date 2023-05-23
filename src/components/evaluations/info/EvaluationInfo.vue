@@ -49,6 +49,15 @@
                     <modding-activity
                         :username="selectedEvaluation.user.username"
                     />
+                    <div v-if="loggedInUser.isPishifat" class="mb-2">
+                        <b>Debug</b>
+                        <div class="ml-4">
+                            <a href="#evalDocument" data-toggle="collapse">
+                                view evaluation document <i class="fas fa-angle-down" />
+                            </a>
+                            <pre id="evalDocument" class="collapse container text-white">{{ JSON.stringify(selectedEvaluation, null, 4) }}</pre>
+                        </div>
+                    </div>
                 </div>
             </template>
 

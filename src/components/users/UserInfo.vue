@@ -59,15 +59,15 @@
                 </div>
             </div>
             <div v-if="loggedInUser.isPishifat">
-                    <hr />
-                    <b>Debug</b>
-                        <div class="ml-4">
-                        <a href="#userDocument" data-toggle="collapse">
-                            view user document <i class="fas fa-angle-down" />
-                        </a>
-                        <pre id="userDocument" class="collapse container text-white">{{ JSON.stringify(selectedUser, null, 4) }}</pre>
-                    </div>
+                <hr />
+                <b>Debug</b>
+                <div class="ml-4">
+                    <a href="#userDocument" data-toggle="collapse">
+                        view user document <i class="fas fa-angle-down" />
+                    </a>
+                    <pre id="userDocument" class="collapse container text-white">{{ JSON.stringify(selectedUser, null, 4) }}</pre>
                 </div>
+            </div>
 
             <div v-if="loggedInUser.isNat" />
         </div>
