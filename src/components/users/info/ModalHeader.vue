@@ -41,12 +41,12 @@ export default {
         ]),
         /** @returns {string} */
         getCover() {
-            return this.selectedUser.cover ? this.selectedUser.cover : '';
+            return this.selectedUser.cover ? this.selectedUser.cover : `https://a.ppy.sh/${this.selectedUser.osuId}`;
         },
         /** @returns {string} */
         getCardBackground() {
-            const gradientColor = this.getCover ? 'rgba(0, 0, 0, 0.82)' : this.getUserColor;
-            return `background: linear-gradient(90deg, ${this.getUserColor} 5%, ${gradientColor} 70%), url(${this.getCover}) center no-repeat; background-size: cover; object-fit: fill !important;`;
+            // const gradientColor = this.getCover ? 'rgba(0, 0, 0, 0.82)' : this.getUserColor; // in case avatar fallback doesn't work properly
+            return `background: linear-gradient(90deg, ${this.getUserColor} 5%, rgba(0, 0, 0, 0.82) 70%), url(${this.getCover}) center no-repeat; background-size: cover; object-fit: fill !important;`;
         },
         /** @returns {string} */
         cardDecoration() {
