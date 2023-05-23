@@ -29,11 +29,16 @@
 
             <consensus />
 
-            <p>
-                <b>Feedback:</b>
-            </p>
+            <div v-if="!selectedEvaluation.isResignation && selectedEvaluation.feedback && selectedEvaluation.feedback !== 'None'">
+                <evaluation-link />
 
-            <div v-if="selectedEvaluation.feedback" class="card card-body small" v-html="$md.render(selectedEvaluation.feedback)" />
+                <p>
+                    <b>Feedback:</b>
+                </p>
+
+                <div v-if="selectedEvaluation.feedback" class="card card-body small" v-html="$md.render(selectedEvaluation.feedback)" />
+
+            </div>
 
             <hr>
 
@@ -60,6 +65,7 @@ import UserActivity from './currentBns/userActivity/UserActivity.vue';
 import ModalDialog from '../../ModalDialog.vue';
 import MainApplicationInfo from './applications/MainApplicationInfo.vue';
 import { AppEvaluationConsensus } from '../../../../shared/enums';
+import EvaluationLink from './common/EvaluationLink.vue';
 
 export default {
     name: 'ArchiveInfo',
@@ -70,6 +76,7 @@ export default {
         UserActivity,
         ModalDialog,
         MainApplicationInfo,
+        EvaluationLink,
     },
     computed: {
         ...mapState([

@@ -91,6 +91,7 @@ export default {
             else if (this.evaluation.user.probationModes.includes(this.evaluation.mode)) return 'probation';
             else if (this.evaluation.user.fullModes.includes(this.evaluation.mode)) return 'bn';
             else if (this.evaluation.user.evaluatorModes.includes(this.evaluation.mode)) return 'nat';
+            else return 'user';
         },
         isSelected () {
             if (!this.checkedEvaluations) return false;

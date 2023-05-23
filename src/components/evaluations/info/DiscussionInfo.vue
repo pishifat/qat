@@ -18,6 +18,7 @@
                     "
                 />
                 <evaluation-is-reviewed v-if="selectedEvaluation.feedback"/>
+                <evaluation-link v-if="selectedEvaluation.feedback" />
                 <feedback-info v-if="selectedEvaluation.consensus" />
             </div>
         </template>
@@ -45,6 +46,7 @@ import FeedbackInfo from './common/FeedbackInfo.vue';
 import evaluations from '../../../mixins/evaluations.js';
 import NextEvaluationEstimate from './common/NextEvaluationEstimate.vue';
 import EvaluationIsReviewed from './common/EvaluationIsReviewed.vue';
+import EvaluationLink from './common/EvaluationLink.vue';
 
 export default {
     name: 'DiscussionInfo',
@@ -55,6 +57,7 @@ export default {
         FeedbackInfo,
         NextEvaluationEstimate,
         EvaluationIsReviewed,
+        EvaluationLink,
     },
     mixins: [evaluations],
     computed: {
