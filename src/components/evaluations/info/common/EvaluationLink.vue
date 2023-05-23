@@ -2,7 +2,7 @@
     <div>
         <p>
             <b>Permalink:</b>
-            <a :href="'https://bn.mappersguild.com/message?eval=' + selectedEvaluation.id" target="_blank">
+            <a :href="'/message?eval=' + selectedEvaluation.id" target="_blank">
                 https://bn.mappersguild.com/message?eval={{ selectedEvaluation.id }}
             </a>
         </p>
