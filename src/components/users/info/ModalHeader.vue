@@ -1,7 +1,6 @@
 <template>
     <div
-        class="modal-header header d-flex flex-row align-items-center justify-content-between p-3"
-        :style="cardDecoration"
+        class="modal-header user-header d-flex flex-row align-items-center justify-content-between p-3"
     >
         <div class="d-flex flex-row align-items-center">
             <img :src="'https://a.ppy.sh/' + selectedUser.osuId" class="avatar-img mr-3">
@@ -41,24 +40,14 @@ export default {
         ]),
         /** @returns {string} */
         getCover() {
-            return this.selectedUser.cover ? this.selectedUser.cover : `https://a.ppy.sh/${this.selectedUser.osuId}`;
-        },
-        /** @returns {string} */
-        getCardBackground() {
-            // const gradientColor = this.getCover ? 'rgba(0, 0, 0, 0.82)' : this.getUserColor; // in case avatar fallback doesn't work properly
-            return `background: linear-gradient(90deg, ${this.getUserColor} 5%, rgba(0, 0, 0, 0.82) 70%), url(${this.getCover}) center no-repeat; background-size: cover; object-fit: fill !important;`;
-        },
-        /** @returns {string} */
-        cardDecoration() {
-            let css = this.getCardBackground;
-            return css += `border-bottom: 4px solid ${this.getUserColor};`;
+            return this.selectedUser.cover ? `url(${this.selectedUser.cover})` : `url(https://a.ppy.sh/${this.selectedUser.osuId})`;
         },
         /** @returns {string} */
         getUserColor() {
             if (this.selectedUser.probationModes.length && !this.selectedUser.isNat) {
                 return 'var(--probation)';
             } else if (!this.selectedUser.hasBasicAccess) {
-                return '';
+                return 'var(--primary)';
             }
             return `var(--${(this.selectedUser.groups.includes('nat') ? 'danger' : this.selectedUser.groups.includes('bn') ? 'bn' : 'primary')})`;
         },
@@ -79,6 +68,13 @@ export default {
     border-radius: 100%;
     box-shadow: 0 1px 1rem rgba(10, 10, 25, .9);
     background-color: var(--gray-dark);
+}
+
+.user-header {
+    background: linear-gradient(90deg, v-bind(getUserColor) 15%, rgba(0, 0, 0, 0.65) 75%), v-bind(getCover) center no-repeat;
+    background-size: cover;
+    object-fit: fill;
+    border-bottom: 4px solid v-bind(getUserColor);
 }
 
 </style>
