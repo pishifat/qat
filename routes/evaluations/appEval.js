@@ -2,7 +2,6 @@ const express = require('express');
 const moment = require('moment');
 const AppEvaluation = require('../../models/evaluations/appEvaluation');
 const BnEvaluation = require('../../models/evaluations/bnEvaluation');
-const ResignationEvaluation = require('../../models/evaluations/resignationEvaluation');
 const User = require('../../models/user');
 const Logger = require('../../models/log');
 const { submitEval, setGroupEval, setFeedback, replaceUser, findSkipProbationEligibility } = require('./evaluations');
@@ -13,6 +12,7 @@ const osu = require('../../helpers/osu');
 const { AppEvaluationConsensus } = require('../../shared/enums');
 const osuBot = require('../../helpers/osuBot');
 const config = require('../../config.json');
+const Settings = require('../../models/settings');
 
 const router = express.Router();
 
@@ -70,11 +70,29 @@ const inactiveBnDefaultPopulate = [
 router.get('/relevantInfo', async (req, res) => {
     let applications = [];
 
-    if (res.locals.userRequest.hasFullReadAccess || res.locals.userRequest.isTrialNat) {
+    if (res.locals.userRequest.hasFullReadAccess) {
         applications = await AppEvaluation
             .find({
                 active: true,
                 test: { $exists: true },
+            })
+            .populate(defaultPopulate)
+            .sort({
+                createdAt: 1,
+            });
+    } else if (res.locals.userRequest.isTrialNat) {
+        const settings = await Settings.findOne({}); // there's only one
+        const trialNatEnabledModeSettings = settings.modeSettings.filter(s => s.hasTrialNat == true);
+        const trialNatModes = trialNatEnabledModeSettings.map(s => s.mode);
+        
+        applications = await AppEvaluation
+            .find({
+                active: true,
+                test: { $exists: true },
+                $and: [
+                    { mode: res.locals.userRequest.modes },
+                    { mode: trialNatModes },
+                ]
             })
             .populate(defaultPopulate)
             .sort({
