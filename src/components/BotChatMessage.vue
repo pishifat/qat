@@ -4,9 +4,13 @@
             <span v-html="$md.render(message)" />
         </div>
 
-        <a v-if="users.length" class="btn btn-sm btn-block btn-success mb-2" @click="sendMessage($event)">
+        <a v-if="users.length && isReviewed" class="btn btn-sm btn-block btn-success mb-2" @click="sendMessage($event)">
             {{ customText }}
         </a>
+        <div v-else class="alert alert-primary mb-2 mt-2">
+                <i class="fas fa-exclamation-triangle"></i>
+                Feedback needs to be marked as reviewed before sending!
+            </div>
     </div>
 </template>
 
@@ -43,6 +47,10 @@ export default {
         customText: {
             type: String,
             default: 'Send messages',
+        },
+        isReviewed: {
+            type: Boolean,
+            default: true,
         },
     },
     methods: {

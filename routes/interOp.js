@@ -265,8 +265,57 @@ router.get('/bnRemoval/:osuId', middlewares.hasPrivateInterOpsAccess, async (req
         return res.status(404).send('User has no BN removal logged');
     }
 
+    let action = latestEvaluation.isResignation ? 'Resigned' : latestEvaluation.consensus === BnEvaluationConsensus.FullBn ? 'Full BN' : latestEvaluation.consensus === BnEvaluationConsensus.ProbationBn ? 'Moved to Probation BN' : 'Kicked'
+
+    if (action === 'Kicked' || action === 'Moved to Probation BN') {
+        switch (latestEvaluation.addition) {
+            case "lowActivityWarning":
+                action += ' for poor activity';
+                break;
+            case "behaviorWarning":
+                action += ' for poor behavior';
+                break;
+            case "mapQualityWarning":
+                action += ' for poor map quality';
+                break;
+            case "moddingQualityWarning":
+                action += ' for poor modding quality';
+                break;
+            default:
+                break;
+        }
+    } else if (action === 'Full BN') {
+        switch (latestEvaluation.addition) {
+            case "lowActivityWarning":
+                action += ' + low activity warning';
+                break;
+            case "behaviorWarning":
+                action += ' + behavior warning';
+                break;
+            case "mapQualityWarning":
+                action += ' + map quality warning';
+                break;
+            case "moddingQualityWarning":
+                action += ' + modding quality warning';
+                break;
+            default:
+                break;
+        }
+    } else if (action === 'Resigned') {
+        switch (latestEvaluation.consensus) {
+            case "resignedOnGoodTerms":
+                action += ' on good terms';
+                break;
+            case "resignedOnStandardTerms":
+                action += ' on standard terms';
+                break;
+            default:
+                break;
+        }
+    }
+
     res.json({
-        action: latestEvaluation.isResignation ? 'Resigned' : latestEvaluation.consensus === BnEvaluationConsensus.FullBn ? 'Moved to Full BN' : latestEvaluation.consensus === BnEvaluationConsensus.ProbationBn ? 'Moved to Probation BN' : 'Kicked',
+        action: action,
         timestamp: latestEvaluation.archivedAt,
     } );
 });
@@ -402,7 +451,10 @@ router.get('/assignedEvaluations/:osuId/:days', middlewares.hasPrivateInterOpsAc
         })
         .populate(evaluationPopulate);
 
-    res.json(assignedEvaluations.concat(assignedApplications));
+    res.json({
+        assignedApplications: assignedApplications,
+        assignedEvaluations: assignedEvaluations,
+    })
 });
 
 /* GET a user's previously assigned evaluations */
@@ -450,7 +502,10 @@ router.get('/previouslyAssignedEvaluations/:osuId/:days', middlewares.hasPrivate
         })
         .populate(evaluationPopulate);
 
-    res.json(previouslyAssignedEvaluations.concat(previouslyAssignedApps));
+    res.json({
+        previouslyAssignedApps: previouslyAssignedApps,
+        previouslyAssignedEvaluations: previouslyAssignedEvaluations,
+    });
 });
 
 module.exports = router;
