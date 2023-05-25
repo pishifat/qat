@@ -217,8 +217,16 @@ router.post('/selectMediators', middlewares.isNat, async (req, res) => {
         });
     }
 
-    if (vetoFormat == 4) {
-        return res.json(allUsers);
+    let users = [];
+
+    if (vetoFormat == 4 && mode == 'all') {
+        return res.json(allUsers)
+    } else if (vetoFormat == 4) {
+        for (const user of allUsers) {
+            console.log(user.modesInfo);
+            if (user.modesInfo.some(m => m.mode === mode)) users.push(user);
+        }
+        return res.json(users);
     }
 
     let totalMediators;
@@ -239,8 +247,6 @@ router.post('/selectMediators', middlewares.isNat, async (req, res) => {
 
     totalMediators = vetoFormat == 4 ? validMediators.length : Math.round(validMediators.length * 0.2);
     if (totalMediators < 11) totalMediators = 11;
-
-    let users = [];
 
     for (let i = 0; i < allUsers.length; i++) {
         let user = allUsers[i];
