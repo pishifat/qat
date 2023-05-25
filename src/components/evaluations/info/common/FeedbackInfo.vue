@@ -24,8 +24,11 @@
 
         <feedback-pm
             v-if="
-                (selectedEvaluation.feedback &&
-                    selectedEvaluation.feedback.length) ||
+                (
+                    selectedEvaluation.feedback &&
+                    selectedEvaluation.feedback.length &&
+                    selectedEvaluation.isReviewed
+                ) ||
                 selectedEvaluation.isResignation
             "
             :discord-link="discordLink"
