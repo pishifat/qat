@@ -72,7 +72,7 @@ export default {
     name: 'MediationInput',
     props: {
         vetoFormat: {
-            type: Boolean,
+            type: Number,
             required: true, 
         },
     },

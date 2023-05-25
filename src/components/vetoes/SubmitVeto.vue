@@ -1,6 +1,7 @@
 <template>
     <modal-dialog id="addVeto" title="Submit a veto for mediation">
         <div class="container">
+            <!-- game mode -->
             <p>Game mode:</p>
             <div class="row ml-4">
                 <label
@@ -82,8 +83,43 @@
             </div>
 
 
-            <p>Veto reasons:</p>
+            <!-- re-mediation -->
+            <p>Re-mediation:</p>
+                <div class="row ml-4">
+                <label
+                    class="mx-1"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="mediated by 20% of bns"
+                >
+                    <input
+                        v-model="remediation"
+                        type="radio"
+                        class="cross-radio hide-default"
+                        name="remediation"
+                        value="noRemediation"
+                    >
+                    <i class="fas fa-times fa-lg" />
+                </label>
+                <label
+                    class="mx-1"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="mediated by 100% of bns"
+                >
+                    <input
+                        v-model="remediation"
+                        type="radio"
+                        class="checkmark-radio hide-default"
+                        name="remediation"
+                        value="remediation"
+                    >
+                    <i class="fas fa-check fa-lg" />
+                </label>
+            </div>
 
+            <!-- veto reasons -->
+            <p>Veto reasons:</p>
             <div>
                 <ul>
                     <li v-if="!vetoReasons.length">
@@ -160,6 +196,7 @@ export default {
             link: '',
             summary: '',
             mode: null,
+            remediation: 'noRemediation',
         };
     },
     methods: {
@@ -228,6 +265,7 @@ export default {
                     {
                         reasons: this.vetoReasons,
                         mode: this.mode,
+                        remediation: this.remediation,
                     },
                     e
                 );

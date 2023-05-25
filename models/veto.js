@@ -16,6 +16,12 @@ const vetoesSchema = new mongoose.Schema({
     mediations: [{ type: 'ObjectId', ref: 'Mediation' }],
     deadline: { type: Date },
     vetoFormat: { type: Number },
+        /*
+            1 = og (no longer used)
+            2 = multi-reason vetoes (no longer used)
+            3 = no more "partially agree" (default veto)
+            4 = re-mediation (2 week deadline + all bns are selected)
+        */
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 /**

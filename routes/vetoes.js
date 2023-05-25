@@ -112,7 +112,7 @@ router.post('/submit', async (req, res) => {
         beatmapMapper: bmInfo.creator,
         beatmapMapperId: bmInfo.creator_id,
         mode: req.body.mode,
-        vetoFormat: 3,
+        vetoFormat: req.body.remediation ? 4 : 3,
     });
     veto = await Veto
         .findById(veto._id)
@@ -209,6 +209,7 @@ router.post('/submitMediation/:id', middlewares.isBnOrNat, async (req, res) => {
 router.post('/selectMediators', middlewares.isNat, async (req, res) => {
     let allUsers = await User.getAllMediators();
     const mode = req.body.mode;
+    const vetoFormat = req.body.vetoFormat;
 
     if (allUsers.error) {
         return res.json({
@@ -217,25 +218,23 @@ router.post('/selectMediators', middlewares.isNat, async (req, res) => {
     }
 
     let totalMediators;
+    let validMediators;
 
     if (mode === 'all') {
-        const validMediators = await User.find({
+        validMediators = await User.find({
             groups: { $in: ['nat', 'bn'] },
             isVetoMediator: true,
         });
-    
-        totalMediators = Math.round(validMediators.length * 0.2);
     } else {
-        const validMediators = await User.find({
+        validMediators = await User.find({
             groups: { $in: ['nat', 'bn'] },
             'modesInfo.mode': { $in: mode },
             isVetoMediator: true,
         });
-
-        totalMediators = Math.round(validMediators.length * 0.2);
-
-        if (totalMediators < 11) totalMediators = 11;
     }
+
+    totalMediators = vetoFormat == 4 ? validMediators.length : Math.round(validMediators.length * 0.2);
+    if (totalMediators < 11) totalMediators = 11;
 
     let users = [];
 
@@ -263,14 +262,15 @@ router.post('/selectMediators', middlewares.isNat, async (req, res) => {
 /* POST begin mediation */
 router.post('/beginMediation/:id', middlewares.isNat, async (req, res) => {
     const vetoReasons = req.body.reasons;
-    const vetoMediators = req.body.mediators;
+    const mediatorIds = req.body.mediatorIds;
+    let v;
 
-    for (let i = 0; i < vetoMediators.length; i++) {
-        let mediator = vetoMediators[i];
+    for (let i = 0; i < mediatorIds.length; i++) {
+        let mediatorId = mediatorIds[i];
 
         for (let j = 0; j < vetoReasons.length; j++) {
-            let m = await Mediation.create({ mediator: mediator._id, reasonIndex: j });
-            await Veto.findByIdAndUpdate(req.params.id, {
+            let m = await Mediation.create({ mediator: mediatorId, reasonIndex: j });
+            v = await Veto.findByIdAndUpdate(req.params.id, {
                 $push: { mediations: m },
                 status: 'wip',
             });
@@ -278,8 +278,10 @@ router.post('/beginMediation/:id', middlewares.isNat, async (req, res) => {
     }
 
     let date = new Date();
-    date.setDate(date.getDate() + 7);
-    const v = await Veto
+    let deadlineDays = 7;
+    if (v.vetoFormat == 4) deadlineDays = 14;
+    date.setDate(date.getDate() + deadlineDays);
+    v = await Veto
         .findByIdAndUpdate(req.params.id, { deadline: date })
         .populate(defaultPopulate);
 

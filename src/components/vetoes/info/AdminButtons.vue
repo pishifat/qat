@@ -137,7 +137,8 @@ export default {
             const result = confirm(`Are you sure?`);
 
             if (result) {
-                const veto = await this.$http.executePost(`/vetoes/beginMediation/${this.selectedVeto.id}`, { mediators: this.mediators, reasons: this.selectedVeto.reasons }, e);
+                const mediatorIds = this.mediators.map(m => m._id);
+                const veto = await this.$http.executePost(`/vetoes/beginMediation/${this.selectedVeto.id}`, { mediatorIds, reasons: this.selectedVeto.reasons }, e);
 
                 this.commitVeto(veto, 'Started veto mediation');
             }
@@ -176,7 +177,7 @@ export default {
 
             excludeUsers.push(this.selectedVeto.beatmapMapper.toLowerCase(), this.selectedVeto.vetoer.username.toLowerCase());
 
-            const result = await this.$http.executePost('/vetoes/selectMediators', { mode: this.selectedVeto.mode, excludeUsers }, e);
+            const result = await this.$http.executePost('/vetoes/selectMediators', { mode: this.selectedVeto.mode, vetoFormat: this.selectedVeto.vetoFormat, excludeUsers }, e);
 
             if (result && !result.error) {
                 this.mediators = result;
