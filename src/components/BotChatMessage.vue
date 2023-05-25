@@ -4,7 +4,7 @@
             <span v-html="$md.render(message)" />
         </div>
 
-        <a v-if="users.length && evalIsReviewed" class="btn btn-sm btn-block btn-success mb-2" @click="sendMessage($event)">
+        <a v-if="users.length && isReviewed" class="btn btn-sm btn-block btn-success mb-2" @click="sendMessage($event)">
             {{ customText }}
         </a>
         <div v-else class="alert alert-primary mb-2 mt-2">
@@ -48,7 +48,7 @@ export default {
             type: String,
             default: 'Send messages',
         },
-        evalIsReviewed: {
+        isReviewed: {
             type: Boolean,
             default: true,
         },

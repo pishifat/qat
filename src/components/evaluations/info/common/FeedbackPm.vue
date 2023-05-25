@@ -7,7 +7,7 @@
             :users="[{ username: selectedEvaluation.user.username, osuId: selectedEvaluation.user.osuId }]"
             :eval-type="selectedEvaluation.kind"
             :custom-text="'Send message & archive'"
-            :eval-is-reviewed="selectedEvaluation.isReviewed"
+            :is-reviewed="selectedEvaluation.isReviewed"
         />
     </div>
 </template>
