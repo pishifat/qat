@@ -8,7 +8,7 @@ const Logger = require('../models/log');
 const router = express.Router();
 
 router.use(middlewares.isLoggedIn);
-router.use(middlewares.hasFullReadAccess);
+router.use(middlewares.hasFullReadAccessOrTrialNat);
 
 /* GET dq/pop listing */
 router.get('/loadRecentEvents', async (req, res) => {
@@ -30,7 +30,7 @@ router.get('/loadRecentEvents', async (req, res) => {
 });
 
 /* GET unset dq/pop listing */
-router.get('/loadUnsetEvents', async (req, res) => {
+router.get('/loadUnsetEvents', middlewares.isNat, async (req, res) => {
     let date = new Date();
     date.setDate(date.getDate() - 365);
     let data = await Aiess
