@@ -8,7 +8,7 @@
         <votes-inactive-type
             :bn-mediations="agreeMediations('bn')"
             :nat-gmt-mediations="agreeMediations('natGmt')"
-            type="Yes/Agree"
+            :type="selectedDiscussionVote.agreeOverwriteText ? selectedDiscussionVote.agreeOverwriteText : 'Yes/Agree'"
             :total-bn-mediations="totalBnMediations"
             :total-nat-gmt-mediations="totalNatGmtMediations"
             :show-all="showAll"
@@ -29,7 +29,7 @@
         <votes-inactive-type
             :bn-mediations="disagreeMediations('bn')"
             :nat-gmt-mediations="disagreeMediations('natGmt')"
-            type="No/Disagree"
+            :type="selectedDiscussionVote.disagreeOverwriteText ? selectedDiscussionVote.disagreeOverwriteText : 'No/Disagree'"
             :total-bn-mediations="totalBnMediations"
             :total-nat-gmt-mediations="totalNatGmtMediations"
             :show-all="showAll"
