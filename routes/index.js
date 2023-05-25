@@ -560,9 +560,7 @@ router.get('/callback', async (req, res) => {
 
         if (groupIds.includes(7)) {
             groups.push('nat');
-        }
-
-        if (groupIds.includes(28) || groupIds.includes(32)) {
+        } else if (groupIds.includes(28) || groupIds.includes(32)) {
             groups.push('bn');
         }
 
