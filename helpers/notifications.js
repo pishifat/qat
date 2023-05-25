@@ -171,8 +171,6 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
         'natUserReport');
     }
 
-    return;
-
     // find and post webhook for vetoes
     for (let i = 0; i < activeVetoes.length; i++) {
         const veto = activeVetoes[i];
@@ -322,7 +320,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
         } else if (round.deadline < nearDeadline) {
             description += 'is due in less than 24 hours!';
             color = discord.webhookColors.lightRed;
-        } else if (round.deadline > startRange && round.deadline < endRange) {
+        } else if ((round.deadline > startRange && round.deadline < endRange) || (round.deadline < endRange && (!round.natEvaluators || !round.natEvaluators.length))) {
             description += 'is due in 1 week!';
             color = discord.webhookColors.pink;
         } else {
