@@ -26,8 +26,7 @@
             v-if="
                 (
                     selectedEvaluation.feedback &&
-                    selectedEvaluation.feedback.length &&
-                    selectedEvaluation.isReviewed
+                    selectedEvaluation.feedback.length 
                 ) ||
                 selectedEvaluation.isResignation
             "
