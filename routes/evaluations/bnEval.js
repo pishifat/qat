@@ -17,6 +17,7 @@ const discord = require('../../helpers/discord');
 const util = require('../../helpers/util');
 const { BnEvaluationConsensus, BnEvaluationAddition, ResignationConsensus } = require('../../shared/enums');
 const osuBot = require('../../helpers/osuBot');
+const Settings = require('../../models/settings');
 
 const router = express.Router();
 
@@ -177,20 +178,46 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
             const assignedNat = u.isNat ? [u] : await User.getAssignedNat(er.mode, [u.osuId]);
             er.natEvaluators = assignedNat;
             await er.populate(defaultPopulate).execPopulate();
+
+            const assignments = [];
+            const days = util.findDaysBetweenDates(new Date(), new Date(deadline));
+
+            for (const user of assignedNat) {
+                assignments.push({
+                    date: new Date(),
+                    user: user._id,
+                    daysOverdue: days,
+                });
+            }
+        
+            er.natEvaluatorHistory = assignments;
             await er.save();
+
+            let fields = [];
             const natList = assignedNat.map(u => u.username).join(', ');
+            
+            fields.push({
+                name: 'Assigned NAT',
+                value: natList,
+            });
+
+            // assign trial NAT
+            if (await Settings.getModeHasTrialNat(er.mode)) {
+                const assignedTrialNat = await User.getAssignedTrialNat(er.mode);
+                er.bnEvaluators = assignedTrialNat;
+                const trialNatList = assignedTrialNat.map(n => n.username).join(', ');
+                fields.push({
+                    name: 'Assigned BN',
+                    value: trialNatList,
+                });
+            }
 
             await discord.webhookPost(
                 [{
                     author: discord.defaultWebhookAuthor(req.session),
                     color: discord.webhookColors.white,
                     description: `Created [**${u.username}**'s ${u.isNat ? 'NAT' : isResignation ? 'resignation' : 'current BN'} eval](http://bn.mappersguild.com/bneval?id=${er.id})`,
-                    fields: [
-                        {
-                            name: 'Assigned NAT',
-                            value: natList,
-                        },
-                    ],
+                    fields,
                 }],
                 er.mode
             );
