@@ -220,12 +220,20 @@ router.post('/selectMediators', middlewares.isNat, async (req, res) => {
     let users = [];
 
     if (vetoFormat == 4 && mode == 'all') {
-        return res.json(allUsers)
+        for (const user of allUsers) {
+            if (!req.body.excludeUsers.includes(user.username.toLowerCase())) {
+                users.push(user);
+            }
+        }
+
+        return res.json(users)
     } else if (vetoFormat == 4) {
         for (const user of allUsers) {
-            console.log(user.modesInfo);
-            if (user.modesInfo.some(m => m.mode === mode)) users.push(user);
+            if (!req.body.excludeUsers.includes(user.username.toLowerCase()) && user.modesInfo.some(m => m.mode === mode)) {
+                users.push(user);
+            }
         }
+
         return res.json(users);
     }
 
