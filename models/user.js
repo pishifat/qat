@@ -281,7 +281,22 @@ class UserService extends mongoose.Model {
                     $match: {
                         groups: { $in: ['bn', 'nat'] },
                         isVetoMediator: true,
-                        'modesInfo.level': 'full',
+                        'modesInfo.level': { $ne: 'probation' },
+                    },
+                },
+                { $sample: { size: 1000 } },
+            ]);
+        } catch (error) {
+            return { error: error._message };
+        }
+    }
+
+    static async getAllBnAndNat () {
+        try {
+            return await this.aggregate([
+                {
+                    $match: {
+                        groups: { $in: ['bn', 'nat'] },
                     },
                 },
                 { $sample: { size: 1000 } },

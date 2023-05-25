@@ -207,14 +207,18 @@ router.post('/submitMediation/:id', middlewares.isBnOrNat, async (req, res) => {
 
 /* POST select mediators */
 router.post('/selectMediators', middlewares.isNat, async (req, res) => {
-    let allUsers = await User.getAllMediators();
     const mode = req.body.mode;
     const vetoFormat = req.body.vetoFormat;
+    const allUsers = vetoFormat == 4 ? await User.getAllBnAndNat() : await User.getAllMediators();
 
     if (allUsers.error) {
         return res.json({
             error: allUsers.error,
         });
+    }
+
+    if (vetoFormat == 4) {
+        return res.json(allUsers);
     }
 
     let totalMediators;
@@ -244,7 +248,7 @@ router.post('/selectMediators', middlewares.isNat, async (req, res) => {
         if (
             !req.body.excludeUsers.includes(user.username.toLowerCase()) &&
             (
-                (user.modesInfo.some(m => m.mode === mode && m.level === 'full') && mode != 'all') ||
+                (user.modesInfo.some(m => m.mode === mode && (m.level == 'full' || m.level == 'evaluator')) && mode != 'all') ||
                 (!user.modesInfo.some(m => m.level === 'probation') && mode == 'all')
             )
         ) {
@@ -373,7 +377,7 @@ router.post('/replaceMediator/:id', middlewares.isNat, async (req, res) => {
         newMediator = await User.aggregate([
             {
                 $match: {
-                    modesInfo: { $elemMatch: { mode: veto.mode, level: 'full' } },
+                    modesInfo: { $elemMatch: { mode: veto.mode, level: { $ne: 'probation' } } },
                     osuId: { $nin: currentMediators },
                     isVetoMediator: true,
                 },

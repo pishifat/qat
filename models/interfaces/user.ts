@@ -97,6 +97,7 @@ export interface IUserModel extends Model<IUserDocument> {
     findByUsernameOrOsuId?: (user: string | number) => DocumentQuery<IUserDocument, IUserDocument>;
     getAllByMode?: (includeFullBns: boolean, includeProbation: boolean, includeNat: boolean) => Promise<IUsersByGroup[] & { error?: string }>;
     getAllMediators?: () => Promise<IUser[] & { error?: string }>;
+    getAllBnAndNat?: () => Promise<IUser[] & { error?: string }>;
     getAssignedNat?: (mode: string, excludeOsuIds?: number[], sampleSize?: number) => Promise<IUserDocument[]>;
     getAssignedTrialNat?: (mode: string, excludeOsuIds?: number[], sampleSize?: number) => Promise<IUserDocument[]>;
 }
