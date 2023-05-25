@@ -28,6 +28,7 @@
                         : 90 + 7
                 "
                 :is-evaluation="true"
+                :is-nat="selectedEvaluation.user.isNat"
             />
             <template v-if="loggedInUser.isNat || loggedInUser.isTrialNat">
                 <p>

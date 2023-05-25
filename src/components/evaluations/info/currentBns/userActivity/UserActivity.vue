@@ -95,7 +95,7 @@
                 
             <template
                 v-else-if="
-                    !loggedInUser.isNat && selectedUser.isNat &&
+                    !loggedInUser.isNat && isNat &&
                     (assignedBnApplications || natApplications || natBnEvaluations)
                 "
             >
@@ -196,6 +196,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        isNat: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
@@ -205,7 +209,6 @@ export default {
     },
     computed: {
         ...mapState(['loggedInUser']),
-        ...mapGetters('users', ['selectedUser']),
         ...mapState('activity', [
             'nominations',
             'nominationsDisqualified',
@@ -284,7 +287,7 @@ export default {
                     res.disqualifiedQualityAssuranceChecks
                 );
 
-                if (this.loggedInUser.isNat || this.selectedUser.isNat) {
+                if (this.loggedInUser.isNat || this.isNat) {
                     this.$store.commit(
                         'activity/setBnApplications',
                         res.assignedBnApplications

@@ -25,6 +25,7 @@
                 :mongo-id="selectedEvaluation.user.id"
                 :unique="selectedEvaluation.id"
                 :overwrite-days="selectedEvaluation.activityToCheck ? selectedEvaluation.activityToCheck + 7 : 90 + 7"
+                :is-nat="selectedEvaluation.user.isNat"
             />
 
             <consensus />

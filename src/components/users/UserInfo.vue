@@ -24,6 +24,7 @@
                     :unique="selectedUser.id"
                     :overwrite-days="90"
                     :show-archive="true"
+                    :is-nat="selectedUser.isNat"
                 />
 
                 <div v-for="mode in selectedUser.modes" :key="mode">
