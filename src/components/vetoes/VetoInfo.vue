@@ -25,6 +25,7 @@
             <!-- show mediation input for active mediators -->
             <mediation-input
                 v-else-if="isMediator && selectedVeto.status == 'wip'"
+                :veto-format="selectedVeto.vetoFormat"
             />
         </div>
     </modal-dialog>

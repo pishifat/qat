@@ -29,7 +29,7 @@
                     <label class="form-check-label text-success" for="1">Agree</label>
                 </div>
 
-                <div class="form-check form-check-inline">
+                <div v-if="vetoFormat <= 2" class="form-check form-check-inline">
                     <input
                         :id="'2' + i"
                         v-model="vote.votes[i]"
@@ -70,6 +70,12 @@ import { mapGetters, mapState } from 'vuex';
 
 export default {
     name: 'MediationInput',
+    props: {
+        vetoFormat: {
+            type: Boolean,
+            required: true, 
+        },
+    },
     data() {
         return {
             input: {

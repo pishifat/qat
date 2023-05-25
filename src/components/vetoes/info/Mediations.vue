@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-if="selectedVeto.vetoFormat == 2">
+        <div v-if="selectedVeto.vetoFormat >= 2">
             <div v-for="(reason, reasonIndex) in selectedVeto.reasons" :key="reasonIndex">
                 <a v-if="selectedVeto.reasons.length > 1" :href="reason.link" target="_blank">{{ reasonIndex+1 }}. {{ reason.summary }}</a>
                 <span v-for="(mediation, i) in selectedVeto.mediations" :key="mediation.id">
