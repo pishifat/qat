@@ -248,7 +248,7 @@ export default {
                 } else {
                     text += `Only do this after feedback PMs have been sent.`;
                 }
-                console.log(this.loggedInUser);
+
                 const result = confirm(text);
 
                 if (result) {

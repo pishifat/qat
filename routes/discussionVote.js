@@ -194,7 +194,6 @@ router.post('/submit', middlewares.hasBasicAccess, async (req, res) => {
     );
 
     if (req.body.isContentReview) {
-        console.log(overwriteTitle);
         // #content-review (internal)
         await discord.webhookPost(
             [{

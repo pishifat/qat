@@ -575,7 +575,6 @@ router.post('/sendMessages/:id', middlewares.isNatOrTrialNat, async (req, res) =
     const message = await osuBot.sendAnnouncement(osuIds, channel, req.body.message);
 
     if (message !== true) {
-        console.log(message);
         return res.json({ error: `Messages were not sent. Please let pishifat know!` });
     }
 

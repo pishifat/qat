@@ -338,9 +338,6 @@ class UserService extends mongoose.Model {
 
         let finalAssignedNat = [];
 
-        console.log(uniqueAssignedNatIds);
-        console.log(sampleSize);
-
         if (uniqueAssignedNatIds.length < sampleSize) {
             const newQuery = User.aggregate([
                 {
@@ -370,7 +367,6 @@ class UserService extends mongoose.Model {
                     await User.findByIdAndUpdate(user._id, { inBag: true });
 
                     if (uniqueAssignedNatIds.length < sampleSize) {
-                        console.log(user.username);
                         uniqueAssignedNatIds.push(user._id.toString());
                         uniqueAssignedNat.push(user);
                         await User.findByIdAndUpdate(user._id, { inBag: false });

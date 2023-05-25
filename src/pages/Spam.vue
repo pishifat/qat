@@ -248,7 +248,6 @@ export default {
             }
         },
         toggleRole () {
-            console.log(this.selectedRole.length);
             if (!this.selectedRole.length) {
                 this.$store.dispatch('updateToastMessages', {
                     message: `Must select a role!`,

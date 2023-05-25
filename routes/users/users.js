@@ -595,8 +595,6 @@ router.post('/:id/toggleShowExplicitContent', async (req, res) => {
     user.showExplicitContent = !user.showExplicitContent;
     await user.save();
 
-    console.log(user.showExplicitContent)
-
     res.json({
         user,
         success: 'Toggled explicit content',
