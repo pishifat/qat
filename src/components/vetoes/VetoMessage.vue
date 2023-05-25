@@ -33,7 +33,7 @@
                 <hr>
                 <p><b>Please post your opinion on the veto <a :href="'/vetoes?id=' + veto.id">here</a> within one week.</b></p>
                 <div>Your decision will be anonymous to everyone but members of the NAT.</div>
-                <p>If you have a reason not to participate in veto mediations, contact a NAT member.</p>
+                <p>If you don't feel confident mediating this veto, talk to a member of the NAT.</p>
                 <div>Thank you!</div>
             </div>
         </div>

@@ -1,5 +1,6 @@
 <template>
     <div>
+        If you don't feel confident mediating this veto, talk to a member of the NAT.
         <hr>
         Mediation response:
         <div class="small px-4 mb-2 text-secondary">
