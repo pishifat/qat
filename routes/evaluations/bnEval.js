@@ -905,11 +905,17 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
                 .find({
                     beatmapsetId: event.beatmapsetId,
                     timestamp: { $lte: event.timestamp },
+                    $and: [
+                        { type: { $ne: 'rank' } },
+                        { type: { $ne: 'disqualify' } },
+                        { type: { $ne: 'nomination_reset' } },
+                        { type: { $exists: true } },
+                    ],
                 })
                 .sort({ timestamp: -1 })
-                .limit(2);
+                .limit(1);
 
-            if (a[1] && a[1].userId == userOsuId) {
+            if (a[0] && a[0].userId == userOsuId) {
                 nominationsPopped.push(event);
             }
         }
@@ -923,12 +929,17 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
                 .find({
                     beatmapsetId: event.beatmapsetId,
                     timestamp: { $lte: event.timestamp },
-                    type: { $ne: 'rank' },
+                    $and: [
+                        { type: { $ne: 'rank' } },
+                        { type: { $ne: 'disqualify' } },
+                        { type: { $ne: 'nomination_reset' } },
+                        { type: { $exists: true } },
+                    ],
                 })
                 .sort({ timestamp: -1 })
-                .limit(3);
+                .limit(event.type == 'nomination_reset' ? 1 : 2);
 
-            if ((a[1] && a[1].userId == userOsuId) || (a[2] && a[2].userId == userOsuId)) {
+            if ((a[0] && a[0].userId == userOsuId) || (a[1] && a[1].userId == userOsuId)) {
                 nominationsDisqualified.push(event);
             }
         }

@@ -80,11 +80,16 @@ async function sevRatingWebhook(event, req) {
             .find({
                 beatmapsetId: event.beatmapsetId,
                 timestamp: { $lte: event.timestamp },
-                type: { $ne: 'rank' },
+                $and: [
+                    { type: { $ne: 'rank' } },
+                    { type: { $ne: 'disqualify' } },
+                    { type: { $ne: 'nomination_reset' } },
+                    { type: { $exists: true } },
+                ],
+                
             })
             .sort({ timestamp: -1 })
-            .limit(event.type == 'nomination_reset' ? 1 : 2)
-            .skip(1);
+            .limit(event.type == 'nomination_reset' ? 1 : 2);
 
         const users = [];
 
