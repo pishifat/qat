@@ -10,6 +10,11 @@
         <div v-if="selectedVeto" class="container">
             <context />
 
+            <!-- show vote count to NAT who aren't active mediators -->
+            <vote-count 
+                v-if="loggedInUser.isNat && (selectedVeto.status != 'wip' || !isMediator)" 
+            />
+
             <!-- show mediations to NAT if they're not active mediators -->
             <div v-if="showMediations">
                 <hr>
@@ -39,6 +44,7 @@ import Mediations from './info/Mediations.vue';
 import AdminButtons from './info/AdminButtons.vue';
 import MediationInput from './info/MediationInput.vue';
 import ModalDialog from '../ModalDialog.vue';
+import VoteCount from './info/VoteCount.vue';
 
 export default {
     name: 'VetoInfo',
@@ -49,6 +55,7 @@ export default {
         AdminButtons,
         MediationInput,
         ModalDialog,
+        VoteCount,
     },
     computed: {
         ...mapState([
