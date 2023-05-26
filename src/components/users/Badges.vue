@@ -11,6 +11,7 @@
             Load badge info
         </button>
         <div v-if="badgeUsers.length">
+            <hr>
             <ul class="small">
                 <li>BN1y.png</li>
                 <li>BN2y.jpg</li>
@@ -22,6 +23,7 @@
                 <li>Longstanding contribution to the Beatmap Nominators - 3 Years</li>
                 <li>Longstanding contribution to the Beatmap Nominators - 4 Years</li>
                 <li>Longstanding contribution to the Beatmap Nominators - 5 Years</li>
+                <li>https://osu.ppy.sh/wiki/en/People/The_Team/Beatmap_Nominators</li>
                 <li>QAT1y.png</li>
                 <li>QAT2y.jpg</li>
                 <li>QAT3y.jpg</li>
@@ -34,9 +36,32 @@
                 <li>Longstanding contribution to the Nomination Assessment Team - 5 Years</li>
                 <li>Longstanding contribution to the Quality Assurance Team / Nomination Assessment Team - 4 Years</li>
                 <li>Longstanding contribution to the Quality Assurance Team / Nomination Assessment Team - 5 Years</li>
-                <li>https://osu.ppy.sh/wiki/en/People/The_Team/Beatmap_Nominators</li>
+                <li>https://osu.ppy.sh/wiki/en/People/Nomination_Assessment_Team</li>
             </ul>
-
+            <hr>
+            <h5>Users that need updates:</h5>
+                <div v-for="user in badgeUsers" :key="user.id" class="small mb-1">
+                    <div v-if="compareBadgeDuration(user.bnProfileBadge, user.bnDuration) || compareBadgeDuration(user.natProfileBadge, user.natDuration)">
+                        <user-link
+                            :osu-id="user.osuId"
+                            :username="user.username"
+                        /> {{ user.osuId }}
+                        <ul>
+                            <li :class="compareBadgeDuration(user.bnProfileBadge, user.bnDuration) ? 'background-fail' : ''">
+                                BN: {{ yearsDuration(user.bnDuration) }} -- badge: {{ user.bnProfileBadge }}
+                                <a href="#" @click.prevent="editBadgeValue(user.id, 'bn', true)"><i class="fas fa-plus" /></a>
+                                <a href="#" @click.prevent="editBadgeValue(user.id, 'bn', false)"><i class="fas fa-minus" /></a>
+                            </li>
+                            <li :class="compareBadgeDuration(user.natProfileBadge, user.natDuration) ? 'background-fail' : ''">
+                                NAT: {{ yearsDuration(user.natDuration) }} -- badge: {{ user.natProfileBadge }}
+                                <a href="#" @click.prevent="editBadgeValue(user.id, 'nat', true)"><i class="fas fa-plus" /></a>
+                                <a href="#" @click.prevent="editBadgeValue(user.id, 'nat', false)"><i class="fas fa-minus" /></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <hr>
+                <h5>All users:</h5>
             <div v-for="user in badgeUsers" :key="user.id" class="small mb-1">
                 <user-link
                     :osu-id="user.osuId"
