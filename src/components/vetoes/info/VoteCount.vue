@@ -4,17 +4,25 @@
         Stats:
 
         <ul>
-            <li >
-                <b>Agree:</b> {{ upholdMediations.length }} ({{ Math.round(upholdMediations.length / selectedVeto.mediations.length * 100) || '0' }}%)
+            <li>
+                <label class="mb-0" data-toggle="tooltip" data-placement="right" title="% of submitted votes">
+                    <b>Agree:</b> {{ upholdMediations.length }} ({{ Math.round(upholdMediations.length / submittedVotes * 100) || '0' }}%)
+                </label>
             </li>
             <li v-if="neutralMediations.length" >
-                <b>Partially Agree:</b> {{ neutralMediations.length }} ({{ Math.round(neutralMediations.length / selectedVeto.mediations.length * 100) || '0' }}%)
+                <label class="mb-0" data-toggle="tooltip" data-placement="right" title="% of submitted votes">
+                    <b>Partially Agree:</b> {{ neutralMediations.length }} ({{ Math.round(neutralMediations.length / submittedVotes * 100) || '0' }}%)
+                </label>
             </li>
             <li>
-                <b>Disagree:</b> {{ withdrawMediations.length }} ({{ Math.round(withdrawMediations.length / selectedVeto.mediations.length * 100) || '0' }}%)
+                <label class="mb-0" data-toggle="tooltip" data-placement="right" title="% of submitted votes">
+                    <b>Disagree:</b> {{ withdrawMediations.length }} ({{ Math.round(withdrawMediations.length / submittedVotes * 100) || '0' }}%)
+                </label>
             </li>
             <li>
-                <b>Submitted votes:</b> {{ upholdMediations.length + neutralMediations.length + withdrawMediations.length }} ({{ Math.round((upholdMediations.length + neutralMediations.length + withdrawMediations.length) / selectedVeto.mediations.length * 100) || '0' }}%)
+                <label class="mb-0" data-toggle="tooltip" data-placement="right" title="% of assigned mediators">
+                    <b>Submitted votes:</b> {{ submittedVotes }} ({{ Math.round(submittedVotes / selectedVeto.mediations.length * 100) || '0' }}%)
+                </label>
             </li>
             <li>
                 <b>Assigned mediators:</b> {{ selectedVeto.mediations.length }}
@@ -40,6 +48,9 @@ export default {
         },
         withdrawMediations () {
             return this.selectedVeto.mediations.filter(mediation => mediation.vote  == 3);
+        },
+        submittedVotes () {
+            return this.upholdMediations.length + this.neutralMediations.length + this.withdrawMediations.length;
         },
     },
 };
