@@ -278,6 +278,83 @@ const webhookColors = {
     black: 2564903,       // archive, deleteVeto
 };
 
+async function discussionWebhookPost(d, session) {
+    const agree = d.mediations.filter(m => m.vote == 1);
+    const neutral = d.mediations.filter(m => m.vote == 2);
+    const disagree = d.mediations.filter(m => m.vote == 3);
+
+    const natAgree = agree.filter(m => (m.mediator.groups.includes('nat') || m.mediator.groups.includes('gmt')));
+    const natNeutral = neutral.filter(m => (m.mediator.groups.includes('nat') || m.mediator.groups.includes('gmt')));
+    const natDisagree = disagree.filter(m => (m.mediator.groups.includes('nat') || m.mediator.groups.includes('gmt')));
+
+    const bnAgree = agree.filter(m => m.mediator.groups.includes('bn'));
+    const bnNeutral = neutral.filter(m => m.mediator.groups.includes('bn'));
+    const bnDisagree = disagree.filter(m => m.mediator.groups.includes('bn'));
+
+    const totalNatVotes = natAgree.length + natNeutral.length + natDisagree.length;
+    const natAgreePercentage = Math.round((natAgree.length / totalNatVotes) * 1000) / 10;
+    const natNeutralPercentage = Math.round((natNeutral.length / totalNatVotes) * 1000) / 10;
+    const natDisagreePercentage = Math.round((natDisagree.length / totalNatVotes) * 1000) / 10;
+
+    const totalBnVotes = bnAgree.length + bnNeutral.length + bnDisagree.length;
+    const bnAgreePercentage = Math.round((bnAgree.length / totalBnVotes) * 1000) / 10;
+    const bnNeutralPercentage = Math.round((bnNeutral.length / totalBnVotes) * 1000) / 10;
+    const bnDisagreePercentage = Math.round((bnDisagree.length / totalBnVotes) * 1000) / 10;
+
+    const totalVotes = agree.length + neutral.length + disagree.length;
+    const totalAgreePercentage = Math.round((agree.length / totalVotes) * 1000) / 10;
+    const totalNeutralPercentage = Math.round((neutral.length / totalVotes) * 1000) / 10;
+    const totalDisagreePercentage = Math.round((disagree.length / totalVotes) * 1000) / 10;
+
+    let description = `Concluded vote for [discussion on **${d.title}**](http://bn.mappersguild.com/discussionvote?id=${d.id})`;
+    description += "\n\n";
+
+    // agree
+    description += `- **${d.agreeOverwriteText ? d.agreeOverwriteText : 'Yes/Agree'}:**`;
+    if (totalBnVotes) {
+        description += "\n";
+        description += `  - **NAT:** ${natAgreePercentage}% (${natAgree.length}/${totalNatVotes})\n`;
+        description += `  - **BN:** ${bnAgreePercentage}% (${bnAgree.length}/${totalBnVotes})\n`;
+        description += `  - **Total:** ${totalAgreePercentage}% (${agree.length}/${totalVotes})\n`;
+    } else {
+        description += ` ${totalAgreePercentage}% (${agree.length}/${totalVotes})\n`;
+    }
+
+    // neutral (if allowed)
+    if (d.neutralAllowed) {
+        description += `- **${d.neutralOverwriteText ? d.neutralOverwriteText : 'Neutral'}:**`;
+        if (totalBnVotes) {
+            description += "\n";
+            description += `  - **NAT:** ${natNeutralPercentage}% (${natNeutral.length}/${totalNatVotes})\n`;
+            description += `  - **BN:** ${bnNeutralPercentage}% (${bnNeutral.length}/${totalBnVotes})\n`;
+            description += `  - **Total:** ${totalNeutralPercentage}% (${neutral.length}/${totalVotes})\n`;
+        } else {
+            description += ` ${totalNeutralPercentage}% (${neutral.length}/${totalVotes})\n`;
+        }
+    }
+
+    // disagree
+    description += `- **${d.disagreeOverwriteText ? d.disagreeOverwriteText : 'No/Disagree'}:**`;
+    if (totalBnVotes) {
+        description += "\n";
+        description += `  - **NAT:** ${natDisagreePercentage}% (${natDisagree.length}/${totalNatVotes})\n`;
+        description += `  - **BN:** ${bnDisagreePercentage}% (${bnDisagree.length}/${totalBnVotes})\n`;
+        description += `  - **Total:** ${totalDisagreePercentage}% (${disagree.length}/${totalVotes})\n`;
+    } else {
+        description += ` ${totalDisagreePercentage}% (${disagree.length}/${totalVotes})\n`;
+    }
+
+    await webhookPost(
+        [{
+            author: defaultWebhookAuthor(session),
+            color: webhookColors.darkYellow,
+            description,
+        }],
+        //discussion.mode -- disabling this because of trial nat
+        'all'
+    );    
+}
+
 async function contentCaseWebhookPost(d) {
     const agree = d.mediations.filter(m => m.vote == 1);
     const disagree = d.mediations.filter(m => m.vote == 3);
@@ -369,6 +446,7 @@ module.exports = {
     userHighlightWebhookPost,
     roleHighlightWebhookPost,
     defaultWebhookAuthor,
+    discussionWebhookPost,
     contentCaseWebhookPost,
     announcementWebhookPost,
     webhookColors,
