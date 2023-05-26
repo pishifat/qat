@@ -192,7 +192,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
             }
         }
 
-        if (agreeMediations > (veto.mediations.length/2) || disagreeMediations > (veto.mediations.length/2)) {
+        if ((agreeMediations > (veto.mediations.length/2) || disagreeMediations > (veto.mediations.length/2)) && (veto.deadline < date)) {
             veto.status = 'archive';
             await veto.save();
 
