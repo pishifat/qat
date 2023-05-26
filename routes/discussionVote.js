@@ -290,15 +290,7 @@ router.post('/concludeMediation/:id', middlewares.hasFullReadAccess, async (req,
         const { message, channel } = await discord.contentCaseWebhookPost(discussion);
         await osuBot.sendAnnouncement([discussion.creator.osuId], channel, message);
     } else {
-        discord.webhookPost(
-            [{
-                author: discord.defaultWebhookAuthor(req.session),
-                color: discord.webhookColors.darkYellow,
-                description: `Concluded vote for [discussion on **${discussion.title}**](http://bn.mappersguild.com/discussionvote?id=${discussion.id})`,
-            }],
-            //discussion.mode -- disabling this because of trial nat
-            'all'
-        );
+        discord.discussionWebhookPost(discussion, req.session);
     }
 
 });
