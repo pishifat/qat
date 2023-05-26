@@ -88,7 +88,7 @@
                 <div class="col-sm-9">
                     <b>Chat messages:</b>
                     <veto-chat-message
-                        :users="mediators"
+                        :users="slimmedMediators"
                     />
                 </div>
             </div>
@@ -117,6 +117,16 @@ export default {
         ...mapGetters('vetoes', [
             'selectedVeto',
         ]),
+        slimmedMediators() {
+            if (this.mediators) {
+                const tempUsers = [];
+                for (const mediator of this.mediators) {
+                    tempUsers.push({ osuId: mediator.osuId });
+                }
+
+                return tempUsers;
+            } else return [];
+        },
     },
     watch: {
         selectedVeto() {
