@@ -40,19 +40,22 @@ const routes = [
     { path: '/discussionvote', component: DiscussionVote, meta: { title: 'Content Review' } },
 
     // BN/NAT
-    { path: '/appeval', component: AppEvalPage, meta: { title: 'BN Application Evaluations', requiresBasicAccess: true } },
-    { path: '/modrequests/listing', component: ModRequests, meta: { title: 'BN Finder / Global Queue', requiresBasicAccess: true } },
+    { path: '/appeval', component: AppEvalPage, meta: { title: 'BN Application Evaluations', requiresBnOrNat: true } },
 
     // NAT and Trial NAT
-    { path: '/bneval', component: BnEvalPage, meta: { title: 'Current BN Evaluations', requiresFullReadAccessOrTrialNat: true } },
+    { path: '/bneval', component: BnEvalPage, meta: { title: 'Current BN Evaluations', requiresNatOrTrialNat: true } },
+
+    // NAT and GMT
+    { path: '/managereports', component: ManageReports, meta: { title: 'Manage Reports', requiresFullReadAccess: true } },
 
     // NAT
-    { path: '/managereports', component: ManageReports, meta: { title: 'Manage Reports', requiresFullReadAccess: true } },
-    { path: '/evalarchive', component: EvalArchive, meta: { title: 'Evaluation Archives', requiresFullReadAccess: true } },
-    { path: '/datacollection', component: DataCollection, meta: { title: 'Manage SEVs', requiresFullReadAccess: true } },
-    { path: '/managetest', component: ManageTest, meta: { title: 'Manage RC Test', requiresFullReadAccess: true } },
-    { path: '/logs', component: Logs, meta: { title: 'Logs', requiresFullReadAccess: true } },
-    { path: '/spam', component: Spam, meta: { title: 'Spam', requiresFullReadAccess: true } },
+    { path: '/evalarchive', component: EvalArchive, meta: { title: 'Evaluation Archives', requiresNat: true } },
+    { path: '/datacollection', component: DataCollection, meta: { title: 'Manage SEVs', requiresNat: true } },
+    { path: '/managetest', component: ManageTest, meta: { title: 'Manage RC Test', requiresNat: true } },
+    { path: '/logs', component: Logs, meta: { title: 'Logs', requiresNat: true } },
+    { path: '/spam', component: Spam, meta: { title: 'Spam', requiresNat: true } },
+    { path: '/modrequests/listing', component: ModRequests, meta: { title: 'BN Finder / Global Queue', requiresNat: true } },
+
 
     { path: '*', component: NotFound, meta: { title: 'Oops', public: true } },
 ];

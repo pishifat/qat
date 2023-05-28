@@ -10,7 +10,7 @@ const moment = require('moment');
 const router = express.Router();
 
 router.use(middlewares.isLoggedIn);
-router.use(middlewares.hasFullReadAccess);
+router.use(middlewares.isNat);
 
 //population
 const defaultAppPopulate = [

@@ -9,7 +9,7 @@ const Announcement = require('../models/announcement');
 const router = express.Router();
 
 router.use(middlewares.isLoggedIn);
-router.use(middlewares.hasFullReadAccess);
+router.use(middlewares.isNat);
 
 /* POST spam messages */
 router.post('/sendMessages', middlewares.isResponsibleWithButtons, async (req, res) => {

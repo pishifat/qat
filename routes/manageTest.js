@@ -8,7 +8,7 @@ const util = require('../helpers/util');
 const router = express.Router();
 
 router.use(middlewares.isLoggedIn);
-router.use(middlewares.hasFullReadAccess);
+router.use(middlewares.isNat);
 
 //population
 const defaultPopulate = [
