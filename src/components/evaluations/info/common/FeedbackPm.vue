@@ -7,6 +7,7 @@
             :users="[{ username: selectedEvaluation.user.username, osuId: selectedEvaluation.user.osuId }]"
             :eval-type="selectedEvaluation.kind"
             :custom-text="'Send message & archive'"
+            :is-reviewable="isReviewable"
             :is-reviewed="selectedEvaluation.isReviewed"
         />
     </div>
@@ -27,6 +28,10 @@ export default {
         discordLink: {
             type: String,
             default: '',
+        },
+        isReviewable: {
+            type: Boolean,
+            default: false,
         },
     },
     computed: {
