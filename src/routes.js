@@ -56,7 +56,6 @@ const routes = [
     { path: '/spam', component: Spam, meta: { title: 'Spam', requiresNat: true } },
     { path: '/modrequests/listing', component: ModRequests, meta: { title: 'BN Finder / Global Queue', requiresNat: true } },
 
-
     { path: '*', component: NotFound, meta: { title: 'Oops', public: true } },
 ];
 
