@@ -7,7 +7,7 @@
                 class="btn btn-sm btn-danger btn-block mb-2"
                 @click="continueMediation($event)"
             >
-                Re-initiate veto mediation
+                Resume veto mediation
             </button>
 
             <!-- conclude mediation -->
