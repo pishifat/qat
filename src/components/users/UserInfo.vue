@@ -53,11 +53,11 @@
                         :username="selectedUser.username"
                         class="mt-2"
                     />
-
-                    <hr>
-
-                    <notes />
                 </div>
+            </div>
+            <div v-if="loggedInUser.isNat">
+                <hr>
+                <notes />
             </div>
             <div v-if="loggedInUser.isPishifat">
                 <hr />
