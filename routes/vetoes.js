@@ -355,7 +355,7 @@ router.post('/concludeMediation/:id', middlewares.isNat, async (req, res) => {
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),
         color: discord.webhookColors.purple,
-        description: description,
+        description,
     }],
     veto.mode);
 });
