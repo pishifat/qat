@@ -143,7 +143,7 @@
                             </li>
                             <li class="nav-item">
                                 <router-link class="nav-link" to="/discussionvote">
-                                        Content Review
+                                    Content Review
                                 </router-link>
                             </li>
                             <li v-if="loggedInUser.hasFullReadAccess && !loggedInUser.isNat" class="nav-item dropdown">
