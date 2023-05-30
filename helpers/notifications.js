@@ -203,9 +203,20 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
                 veto._id
             );
             
+            const submittedMediations = agreeMediations + disagreeMediations;
+
+            let conclusion = `Automatically concluded mediation on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`;
+            conclusion += '\n\n';
+            conclusion += `- **Agree:** ${agreeMediations} (${Math.round(agreeMediations / submittedMediations * 100) || '0'}%)\n`;
+            conclusion += `- **Disagree:** ${disagreeMediations} (${Math.round(disagreeMediations / submittedMediations * 100)  || '0'}%)\n`;
+            conclusion += `- **Submitted votes:** ${submittedMediations} (${Math.round(submittedMediations / veto.mediations.length * 100) || '0'}%)\n`;
+            conclusion += `- **Assigned mediators:** ${veto.mediations.length}`;
+            conclusion += '\n\n';
+            conclusion += `Consensus: **${agreeMediations > disagreeMediations ? 'Upheld' : 'Dismissed'}**`;
+            
             discord.webhookPost([{
                 color: discord.webhookColors.purple,
-                description: `Automatically concluded mediation on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`,
+                description: conclusion,
             }],
             veto.mode);
         } else if (date > veto.deadline || veto.deadline < nearDeadline) {

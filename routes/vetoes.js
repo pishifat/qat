@@ -337,10 +337,25 @@ router.post('/concludeMediation/:id', middlewares.isNat, async (req, res) => {
         veto._id
     );
     
+    const agreeMediations = veto.mediations.filter(mediation => mediation.vote == 1);
+    const neutralMediations = veto.mediations.filter(mediation => mediation.vote == 2);
+    const disagreeMediations = veto.mediations.filter(mediation => mediation.vote == 3);
+    const submittedMediations = agreeMediations.length + neutralMediations.length + disagreeMediations.length;
+
+    let description = `Concluded mediation on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`;
+    description += '\n\n';
+    description += `- **Agree:** ${agreeMediations.length} (${Math.round(agreeMediations.length / submittedMediations * 100) || '0'}%)\n`;
+    neutralMediations.length ? description += `- **Partially Agree:** ${neutralMediations.length} (${Math.round(neutralMediations.length / submittedMediations * 100) || '0' }%)\n` : '';
+    description += `- **Disagree:** ${disagreeMediations.length} (${Math.round(disagreeMediations.length / submittedMediations * 100)  || '0'}%)\n`;
+    description += `- **Submitted votes:** ${submittedMediations} (${Math.round(submittedMediations / veto.mediations.length * 100) || '0'}%)\n`;
+    description += `- **Assigned mediators:** ${veto.mediations.length}`;
+    description += '\n\n';
+    description += `Consensus: **${agreeMediations.length > disagreeMediations.length ? 'Upheld' : 'Dismissed'}**`;
+
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),
         color: discord.webhookColors.purple,
-        description: `Concluded mediation on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`,
+        description: description,
     }],
     veto.mode);
 });
@@ -359,6 +374,13 @@ router.post('/continueMediation/:id', middlewares.isNat, async (req, res) => {
         'veto',
         veto._id
     );
+
+    discord.webhookPost([{
+        author: discord.defaultWebhookAuthor(req.session),
+        color: discord.webhookColors.purple,
+        description: `**Resumed** mediation on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`,
+    }],
+        veto.mode);
 });
 
 /* POST replace mediator */
