@@ -22,7 +22,7 @@ const Settings = require('../../models/settings');
 const router = express.Router();
 
 router.use(middlewares.isLoggedIn);
-router.use(middlewares.hasFullReadAccessOrTrialNat);
+router.use(middlewares.isNatOrTrialNat);
 
 //population
 const defaultPopulate = [

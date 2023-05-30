@@ -8,7 +8,7 @@ const Logger = require('../models/log');
 const router = express.Router();
 
 router.use(middlewares.isLoggedIn);
-router.use(middlewares.hasFullReadAccessOrTrialNat);
+router.use(middlewares.isNatOrTrialNat);
 
 /* GET dq/pop listing */
 router.get('/loadRecentEvents', async (req, res) => {

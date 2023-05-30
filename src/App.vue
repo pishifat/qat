@@ -129,11 +129,103 @@
                                     <router-link class="dropdown-item" to="/bneval">
                                         Current BNs
                                     </router-link>
+                                </div>
+                            </li>
+                        </template>
+
+                        <!-- GMT -->
+
+                        <template v-else-if="loggedInUser.hasFullReadAccess && !loggedInUser.isNat">
+                            <li class="nav-item">
+                                <router-link class="nav-link" to="/modrequests">
+                                    Request a BN
+                                </router-link>
+                            </li>
+                            <li class="nav-item">
+                                <router-link class="nav-link" to="/discussionvote">
+                                    Content Review
+                                </router-link>
+                            </li>
+                            <li v-if="loggedInUser.hasFullReadAccess && !loggedInUser.isNat" class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                    Reports
+                                </a>
+                                <div class="dropdown-menu">
+                                    <router-link class="dropdown-item" to="/reports">
+                                        Reports
+                                    </router-link>
+                                    <router-link class="dropdown-item" to="/managereports">
+                                        Manage Reports
+                                    </router-link>
+                                </div>
+                            </li>
+
+                            <!-- GMT + BN -->
+
+                            <li v-if="loggedInUser.isBn" class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                    Other
+                                </a>
+                                <div class="dropdown-menu">
                                     <router-link class="dropdown-item" to="/yourevals">
                                         Your Evaluations
                                     </router-link>
                                     <router-link class="dropdown-item" to="/testresults">
                                         RC Test Results
+                                    </router-link>
+                                </div>
+                            </li>
+                            <li v-if="loggedInUser.isBn" class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                    BN pages
+                                </a>
+                                <div class="dropdown-menu">
+                                    <router-link v-if="!loggedInUser.isTrialNat" class="dropdown-item" to="/appeval">
+                                        BN Application Evaluations
+                                    </router-link>
+                                    <router-link class="dropdown-item" to="/vetoes">
+                                        Vetoes
+                                    </router-link>
+                                    <router-link class="dropdown-item" to="/qualityassurance">
+                                        Quality Assurance
+                                    </router-link>
+                                </div>
+                            </li>
+
+                            <!-- GMT + Trial NAT -->
+
+                            <li v-if="loggedInUser.isTrialNat" class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                    Evaluations
+                                </a>
+                                <div class="dropdown-menu">
+                                    <router-link class="dropdown-item" to="/appeval">
+                                        Applications
+                                    </router-link>
+                                    <router-link class="dropdown-item" to="/bneval">
+                                        Current BNs
+                                    </router-link>
+                                </div>
+                            </li>
+
+                            <!-- GMT -->
+
+                            <li v-if="!loggedInUser.isBn" class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                    Other
+                                </a>
+                                <div class="dropdown-menu">
+                                    <router-link class="dropdown-item" to="/yourevals">
+                                        Your Evaluations
+                                    </router-link>
+                                    <router-link class="dropdown-item" to="/testresults">
+                                        RC Test Results
+                                    </router-link>
+                                    <router-link class="dropdown-item" to="/vetoes">
+                                        Vetoes (read-only)
+                                    </router-link>
+                                    <router-link class="dropdown-item" to="/qualityassurance">
+                                        Quality Assurance (read-only)
                                     </router-link>
                                 </div>
                             </li>

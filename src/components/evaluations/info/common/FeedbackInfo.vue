@@ -31,6 +31,7 @@
                 selectedEvaluation.isResignation
             "
             :discord-link="discordLink"
+            :is-reviewable="!selectedEvaluation.isResignation"
         />
     </div>
 </template>

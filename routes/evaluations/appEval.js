@@ -70,7 +70,7 @@ const inactiveBnDefaultPopulate = [
 router.get('/relevantInfo', async (req, res) => {
     let applications = [];
 
-    if (res.locals.userRequest.hasFullReadAccess) {
+    if (res.locals.userRequest.isNat) {
         applications = await AppEvaluation
             .find({
                 active: true,

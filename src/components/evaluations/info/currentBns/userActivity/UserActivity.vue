@@ -130,6 +130,7 @@
                 <hr />
                 <div>Archives</div>
                 <previous-evaluations
+                    v-if="loggedInUser.isNat"
                     :header="'Previous Evaluations'"
                     :event-id="'previousEvaluations'"
                     :mongo-id="mongoId"
@@ -145,7 +146,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 import EventsList from './EventsList.vue';
 import NominationResets from './NominationResets.vue';
 import EvaluationList from './EvaluationList.vue';

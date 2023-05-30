@@ -5,7 +5,7 @@ const middlewares = require('../helpers/middlewares');
 const router = express.Router();
 
 router.use(middlewares.isLoggedIn);
-router.use(middlewares.hasFullReadAccess);
+router.use(middlewares.isNat);
 
 const defaultPopulate = [{ path: 'user', select: 'username' }];
 
