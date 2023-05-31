@@ -191,7 +191,6 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
             }
         
             er.natEvaluatorHistory = assignments;
-            await er.save();
 
             let fields = [];
             const natList = assignedNat.map(u => u.username).join(', ');
@@ -211,6 +210,8 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
                     value: trialNatList,
                 });
             }
+
+            await er.save();
 
             await discord.webhookPost(
                 [{
