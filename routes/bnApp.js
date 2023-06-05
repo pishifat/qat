@@ -165,7 +165,7 @@ router.post('/apply', async (req, res) => {
     const requiredKudosu = mode == 'osu' ? 200 : 150;
 
     // deny if not enough kudosu
-    if (userInfo.kudosu.total <= requiredKudosu) {
+    if (userInfo.kudosu.total < requiredKudosu) {
         return res.json({ error: `You do not meet the required ${requiredKudosu} kudosu to apply. You currently have ${userInfo.kudosu.total} kudosu.` });
     }
 
