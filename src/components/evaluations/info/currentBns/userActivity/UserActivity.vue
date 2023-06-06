@@ -226,13 +226,13 @@ export default {
     },
     watch: {
         unique() {
-            this.findRelevantActivity();
             this.daysInput = this.overwriteDays;
+            this.findRelevantActivity();
         },
     },
     created() {
-        this.findRelevantActivity();
         this.daysInput = this.overwriteDays;
+        this.findRelevantActivity();
     },
     methods: {
         async search() {
