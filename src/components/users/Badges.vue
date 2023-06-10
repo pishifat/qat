@@ -108,6 +108,7 @@ export default {
             }
         },
         compareBadgeDuration (currentBadge, days) {
+            if ((this.yearsDuration(days) > 5) && (currentBadge === 5)) return false; // remove this line when +5 year badges are added
             return (currentBadge || 0) != this.yearsDuration(days);
         },
         yearsDuration (days) {
