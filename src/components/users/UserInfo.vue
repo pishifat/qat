@@ -38,7 +38,7 @@
                 <div v-if="loggedInUser.isNat">
                     <bn-evaluator-toggle />
 
-                    <trial-nat-toggle />
+                    <trial-nat-toggle v-if="selectedUser.isBn && selectedUser.fullModes.length" />
 
                     <discord-id />
 
