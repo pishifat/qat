@@ -3,7 +3,7 @@
         <eval-page
             kind="applications"
             :discussion-evaluations-title="
-                loggedInUser.isNat ?
+                loggedInUser.isNatOrTrialNat ?
                     'Group Evaluations' :
                     'Completed Evaluations'
             "

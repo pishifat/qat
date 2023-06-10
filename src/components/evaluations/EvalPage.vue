@@ -14,14 +14,14 @@
 
                     <div class="sort-filter sort-filter--small">
                         <span class="sort-filter__title--large">Mark selected as</span>
-                        <button class="btn btn-primary btn-sm ml-2" @click="setGroupEval($event)">
+                        <button class="btn btn-primary btn-sm ml-2 mt-2" @click="setGroupEval($event)">
                             Group evaluation
                         </button>
-                        <button class="btn btn-primary btn-sm ml-2" @click="setIndividualEval($event)">
+                        <button class="btn btn-primary btn-sm ml-2 mt-2" @click="setIndividualEval($event)">
                             Individual evaluation
                         </button>
                         <button
-                            class="btn btn-danger btn-sm ml-2"
+                            class="btn btn-danger btn-sm ml-2 mt-2"
                             data-toggle="tooltip"
                             data-placement="top"
                             title="Moves an evaluation to archives and applies its consensus to its user"

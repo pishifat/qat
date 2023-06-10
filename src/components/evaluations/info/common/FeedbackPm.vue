@@ -125,8 +125,6 @@ export default {
                     } else if (this.behaviorWarning) {
                         message += `the NAT believes that your behavior is concerning.`;
                         message += `\n\n`;
-                        message += `you are still a Full BN, but we will evaluate again 1 month from now!`;
-                        message += `\n\n`;
                         message += `review your evaluation here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id}`;
 
                     // full to full
