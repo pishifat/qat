@@ -62,7 +62,7 @@
                 </div>
             </template>
 
-            <discussion-info v-if="selectedEvaluation.discussion && !selectedEvaluation.user.isNat" />
+            <discussion-info v-if="selectedEvaluation.discussion && !selectedEvaluation.user.evaluatorModes.includes(selectedEvaluation.mode)" />
 
             <template v-if="selectedEvaluation.active">
                 <hr />
