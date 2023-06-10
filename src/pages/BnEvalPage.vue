@@ -6,7 +6,7 @@
             <template #individual-evaluations-title>
                 <button
                     v-if="loggedInUser.isNat"
-                    class="btn btn-primary"
+                    class="btn btn-primary ml-2"
                     data-toggle="modal"
                     data-target="#addEvaluations"
                     @click="openAddEvaluations()"
