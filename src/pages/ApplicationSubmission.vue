@@ -41,8 +41,8 @@
             <div>
                 After your application is evaluated, you will receive an osu!
                 message from the
-                <a href="https://osu.ppy.sh/users/23648635" target="_blank"
-                    >mappersguild bot</a
+                <a href="https://osu.ppy.sh/users/6616586" target="_blank"
+                    >NAT bot</a
                 >
                 with the results. If your application is denied, you cannot
                 apply to the same game mode again for 90 days (unless otherwise
@@ -94,29 +94,80 @@
                                 Nominators
                             </p>
                             <ul class="small ml-1">
-                                <li>Coverage of all difficulty levels</li>
+                                <li>Coverage of all common difficulty levels.</li>
+                                <ul class="ml-1">
+                                    <li>
+                                        Most beatmaps will have a spread of difficulties ranging from easy up to expert,
+                                        and so Beatmap Nominators must be proficient in modding such difficulties.
+                                        Proficiency in modding extremely high level difficulties is not required.
+                                    </li>
+                                </ul>
                                 <li>
-                                    Identification of unrankable issues, including ones
-                                    tools can't detect like timing/metadata
+                                    Identification of unrankable issues, including ones tools cannot
+                                    detect, such as incorrect timing or metadata.
                                 </li>
                                 <li>
-                                    Comparisons of parts of a map to support
-                                    issues/suggestions
+                                    Comparison between parts of a beatmap
+                                    to support issues or suggestions.
                                 </li>
+                                <ul class="ml-1">
+                                    <li>
+                                        Referencing other parts of the beatmap is useful for keeping suggestions
+                                        in line with the original styles and ideas the mapper has in their map.
+                                    </li>
+                                </ul>
                                 <li>
-                                    A wide variety of map elements, such as rhythm,
-                                    spacing, movement, intensity, contrast, and
-                                    consistency.
+                                    Commentary about a wide variety of beatmap elements,
+                                    such as rhythm, spacing, movement, intensity, contrast, and consistency.
                                 </li>
+                                <ul class="ml-1">
+                                    <li>
+                                        While Beatmap Nominators are encouraged to ask for help when needed,
+                                        they should be able to judge almost all aspects of mapping independently to a decent level.
+                                    </li>
+                                </ul>
                                 <li>
                                     Identification of both isolated issues and general
-                                    map-wide issues
+                                    map-wide issues.
                                 </li>
                                 <li>
                                     Consideration of mappers' intentions when
-                                    identifying issues and giving suggestions
+                                    identifying issues and giving suggestions.
                                 </li>
+                                <ul class="ml-1">
+                                    <li>
+                                        Avoid suggesting your own mapping styles or preferences if they contradict the mapper's intended style.
+                                        If there is an issue related to the mapper's style,
+                                        try to frame your suggestions around what they originally intended.
+                                    </li>
+                                </ul>
+                                <li>
+                                    Ability to make useful suggestions and spot mistakes for mappers of varying experience levels.
+                                </li>
+                                <ul class="ml-1">
+                                    <li>
+                                        Beatmap Nominators will often deal with very experienced mappers or high-quality maps
+                                        which may not require much feedback. It is important therefore to still be able to spot
+                                        mistakes and suggest improvements for even the most seasoned of mappers.
+                                    </li>
+                                    <li>
+                                        For the application, it is not recommended to submit mods on maps from beginner mappers
+                                        which lack the fundamentals. Instead, submitted mods should be on maps that are ready for a BN to look at.
+                                    </li>
+                                </ul>
+                                <li>
+                                    Clear communication with the mapper.
+                                </li>
+                                <ul class="ml-1">
+                                    <li>
+                                        Mod posts should explain the issue and the solution as clearly and concisely as possible to avoid confusing the mapper,
+                                        or even having their suggestion applied incorrectly. Specialised terminology should also generally be avoided.
+                                    </li>
+                                </ul>
                             </ul>
+                            <p>For more information about the application process and cooldowns, please check out 
+                                <a href="hhttps://osu.ppy.sh/wiki/en/People/Beatmap_Nominators/Becoming_a_Beatmap_Nominator#application-process" target="_blank">this page</a>.
+                            </p>
                         </div>
                     </div>
 
