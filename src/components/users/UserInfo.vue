@@ -56,6 +56,9 @@
                 </div>
             </div>
             <div v-if="loggedInUser.isNat">
+                <ban-toggle
+                        v-if="!selectedUser.isBnOrNat"
+                    />
                 <hr>
                 <notes />
             </div>
@@ -88,6 +91,7 @@ import UserGroupToggle from './info/UserGroupToggle.vue';
 import ModdingActivity from '../evaluations/info/currentBns/ModdingActivity.vue';
 import UserActivity from '../evaluations/info/currentBns/userActivity/UserActivity.vue';
 import Resign from './info/Resign.vue';
+import BanToggle from './info/BanToggle.vue';
 import ModalDialog from '../ModalDialog.vue';
 
 export default {
@@ -104,6 +108,7 @@ export default {
         ModdingActivity,
         UserActivity,
         Resign,
+        BanToggle,
         ModalDialog,
     },
     computed: {

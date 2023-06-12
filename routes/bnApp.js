@@ -71,6 +71,12 @@ router.post('/apply', async (req, res) => {
         });
     }
 
+    if (res.locals.userRequest.isBannedFromBn) {
+        return res.json({
+            error: `You're currently banned from joining the BN. Contact support@ppy.sh for details`
+        });
+    }
+
     // validate user input
     if (!mods || !mods.length || !Array.isArray(mods) ||
         !reasons || !reasons.length || !Array.isArray(reasons) ||
