@@ -65,7 +65,7 @@
             </div>
 
             <h5>Evaluators</h5>
-            <p>The consensus of your evaluation is final and appeals will not be taken. If you have questions about your evaluation though, please contact any member of the {{ evaluation.mode == 'osu' ? 'NAT or BN' : 'NAT' }} below!</p>
+            <p>If you have questions about your evaluation, please contact any user below! If you'd like to appeal this decision, send an email to <code>support@ppy.sh</code> with the reason for your appeal.</p>
             <div class="card card-body">
                 <ul>
                     <li v-for="review in natReviews" :key="review.id">

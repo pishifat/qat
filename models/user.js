@@ -27,6 +27,7 @@ const userSchema = new mongoose.Schema({
     isBnEvaluator: { type: Boolean, default: true },
     inBag: { type: Boolean, default: true },
     isTrialNat: { type: Boolean, default: false }, // used to give BNs some NAT permissions during trial run
+    isBannedFromBn: { type: Boolean, default: false },
     isNatLeader: { type: Boolean, default: false },
     bnProfileBadge: { type: Number, default: 0 },
     natProfileBadge: { type: Number, default: 0 },

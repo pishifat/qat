@@ -20,6 +20,7 @@ interface IUser {
     isBnEvaluator: boolean;
     inBag: boolean;
     isTrialNat: boolean;
+    isBannedFromBn: boolean;
     isNatLeader: boolean;
     bnProfileBadge: number;
     natProfileBadge: number;
