@@ -193,24 +193,21 @@ router.post('/:id/toggleIsTrialNat', middlewares.isNat, async (req, res) => {
     );
 });
 
-/* POST toggle isTrialNat */
+/* POST toggle isBannedFromBn */
 router.post('/:id/toggleIsBannedFromBn', middlewares.isNat, async (req, res) => {
     const user = await User.findById(req.params.id).orFail();
 
     user.isBannedFromBn = !user.isBannedFromBn;
     await user.save();
 
-    user.modes.forEach(async mode => {
-        await discord.webhookPost(
-            [{
-                author: discord.defaultWebhookAuthor(req.session),
-                color: discord.webhookColors.lightPink,
-                description: `**${user.isBannedFromBn ? "Banned" : "Unbanned"}** user [**${user.username}**](https://osu.ppy.sh/users/${user.osuId}) from BN`,
-            }],
-            mode
-        );
-        await util.sleep(500);
-    });
+    await discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            color: discord.webhookColors.lightPink,
+            description: `**${user.isBannedFromBn ? "Banned" : "Unbanned"}** user [**${user.username}**](https://osu.ppy.sh/users/${user.osuId}) from BN`,
+        }],
+        'all'
+    );
 
     res.json({
         user,
