@@ -54,7 +54,7 @@
                         </a>
                     </div>
 
-                    <button v-if="!showOldUsers" class="btn btn-primary btn-sm ml-2 float-right" @click="loadBannedUsers($event)">
+                    <button v-if="loggedInUser.isNat && !showOldUsers" class="btn btn-primary btn-sm ml-2 float-right" @click="loadBannedUsers($event)">
                         Show users banned from BN
                     </button>
                     

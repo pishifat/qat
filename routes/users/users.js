@@ -59,7 +59,7 @@ router.get('/loadPreviousBnAndNat', async (req, res) => {
 });
 
 /* GET users banned from BN */
-router.get('/loadBannedUsers', async (req, res) => {
+router.get('/loadBannedUsers', middlewares.isNat, async (req, res) => {
     const users = await User.find({
         isBannedFromBn : true,
     }).sort({ username: 1 });
