@@ -11,7 +11,7 @@ const moment = require('moment');
 const router = express.Router();
 
 router.use(middlewares.isLoggedIn);
-router.use(middlewares.isNat);
+router.use(middlewares.isNatOrTrialNat);
 
 //population
 const defaultAppPopulate = [
@@ -49,7 +49,7 @@ const defaultBnPopulate = [
 ];
 
 /* GET search for user */
-router.get('/search', async (req, res) => {
+router.get('/search', middlewares.isNat, async (req, res) => {
     const userToSearch = req.query.user && decodeURI(req.query.user);
     const idToSearch = req.query.id;
 
@@ -148,7 +148,7 @@ router.get('/participatedEvals', async (req, res) => {
 });
 
 /* POST unarchive application evaluation */
-router.post('/:id/unarchiveApp', async (req, res) => {
+router.post('/:id/unarchiveApp', middlewares.isNat, async (req, res) => {
     let app = await AppEvaluation.findById(req.params.id).orFail();
     let user = await User.findById(app.user).orFail();
 
@@ -191,7 +191,7 @@ router.post('/:id/unarchiveApp', async (req, res) => {
 });
 
 /* POST unarchive bn evaluation */
-router.post('/:id/unarchiveBn', async (req, res) => {
+router.post('/:id/unarchiveBn', middlewares.isNat, async (req, res) => {
     let evaluation = await Evaluation.findById(req.params.id).orFail();
     let user = await User.findById(evaluation.user).orFail();
 
