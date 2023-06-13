@@ -54,6 +54,10 @@
                         </a>
                     </div>
 
+                    <button v-if="loggedInUser.isNat && !showOldUsers" class="btn btn-primary btn-sm ml-2 float-right" @click="loadBannedUsers($event)">
+                        Show users banned from BN
+                    </button>
+                    
                     <button v-if="!showOldUsers" class="btn btn-primary btn-sm ml-2 float-right" @click="loadPreviousBnAndNat($event)">
                         Show previous BN/NAT
                     </button>
@@ -182,6 +186,15 @@ export default {
         },
         async loadPreviousBnAndNat(e) {
             const res = await this.$http.executeGet('/users/loadPreviousBnAndNat', e);
+
+            if (res) {
+                this.$store.commit('users/setShowOldUsers', true);
+                this.$store.commit('users/setUsers', res.users);
+                this.$store.dispatch('users/pageFilters/setFilterMode', '');
+            }
+        },
+        async loadBannedUsers(e) {
+            const res = await this.$http.executeGet('/users/loadBannedUsers', e);
 
             if (res) {
                 this.$store.commit('users/setShowOldUsers', true);

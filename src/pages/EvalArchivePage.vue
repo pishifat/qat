@@ -51,6 +51,28 @@
                         Show recent
                     </button>
                 </div>
+                <div class="form-inline mt-2">
+                    <input
+                        v-model="participatedSearchValue"
+                        type="text"
+                        placeholder="username or osuID..."
+                        maxlength="18"
+                        autocomplete="off"
+                        class="form-control"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="leave text field empty to load all users" 
+                        @keyup.enter="queryParticipatedEvals($event)"
+                    >
+                    <button 
+                        class="btn btn-sm btn-primary ml-2" 
+                        type="submit" 
+                        
+                        @click="queryParticipatedEvals($event)"
+                        >
+                        Show evals you've participated in
+                    </button>
+                </div>
             </section>
 
             <section v-if="wasLoaded" class="card card-body">
@@ -123,6 +145,7 @@ export default {
     data() {
         return {
             searchValue: null,
+            participatedSearchValue: '',
             limit: null,
             wasLoaded: false,
             mode: 'osu',
@@ -209,6 +232,13 @@ export default {
                 if (res && !res.error) {
                     this.$store.commit('evaluations/setEvaluations', [...res.bnApplications, ...res.evaluations]);
                 }
+            }
+        },
+        async queryParticipatedEvals(e) {
+            const res = await this.$http.executeGet(`/evalarchive/participatedEvals?user=${this.participatedSearchValue}`, e);
+
+            if (res && !res.error) {
+                this.$store.commit('evaluations/setEvaluations', [...res.bnApplications, ...res.evaluations]);
             }
         },
     },

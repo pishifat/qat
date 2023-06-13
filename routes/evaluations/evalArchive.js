@@ -1,6 +1,7 @@
 const express = require('express');
 const AppEvaluation = require('../../models/evaluations/appEvaluation');
 const Evaluation = require('../../models/evaluations/evaluation');
+const Review = require('../../models/evaluations/review');
 const User = require('../../models/user');
 const middlewares = require('../../helpers/middlewares');
 const discord = require('../../helpers/discord');
@@ -87,6 +88,52 @@ router.get('/search', async (req, res) => {
     } else {
         bnApplicationsQuery.where('mode', req.query.mode);
         bnEvaluationsQuery.where('mode', req.query.mode);
+    }
+
+    const [bnApplications, evaluations] = await Promise.all([
+        bnApplicationsQuery,
+        bnEvaluationsQuery,
+    ]);
+
+    res.json({
+        bnApplications,
+        evaluations,
+    });
+});
+
+/* GET evaluations where a user has participated in */
+router.get('/participatedEvals', async (req, res) => {
+    const userToSearch = req.query.user && decodeURI(req.query.user);
+
+    let reviews = await Review.find({ evaluator: req.session.mongoId });
+    
+    let bnApplicationsQuery = AppEvaluation
+        .find({
+            active: false,
+            consensus: { $exists: true },
+            reviews: { $in: reviews },
+        })
+        .populate(defaultAppPopulate)
+        .sort({ createdAt: -1 });
+    
+    let bnEvaluationsQuery = Evaluation
+        .find({
+            active: false,
+            consensus: { $exists: true },
+            reviews: { $in: reviews },
+        })
+        .populate(defaultBnPopulate)
+        .sort({ createdAt: -1 });
+
+    if (userToSearch) {
+        const user = await User.findByUsernameOrOsuId(userToSearch);
+
+        if (!user) {
+            return res.json({ error: 'Cannot find user!' });
+        }
+
+        bnApplicationsQuery.where('user', user.id);
+        bnEvaluationsQuery.where('user', user.id);
     }
 
     const [bnApplications, evaluations] = await Promise.all([
