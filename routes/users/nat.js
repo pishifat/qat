@@ -111,7 +111,7 @@ router.post('/saveNote/:id', async (req, res) => {
                 },
             ],
         }],
-        u.modes && u.modes.length ? u.modes[0] : u.history && u.history.length ? u.history[0].mode : 'osu' // priority: current mode > past mode > default to osu
+        u.modes && u.modes.length ? u.modes[0] : u.history && u.history.length ? u.history[0].mode : 'all' // priority: current mode > past mode > default to osu
     );
 
     if (evaluationId) {
