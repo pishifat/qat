@@ -129,6 +129,9 @@
                                     <router-link class="dropdown-item" to="/bneval">
                                         Current BNs
                                     </router-link>
+                                    <router-link class="dropdown-item" to="/evalarchive">
+                                        Archive
+                                    </router-link>
                                 </div>
                             </li>
                         </template>
@@ -204,6 +207,9 @@
                                     </router-link>
                                     <router-link class="dropdown-item" to="/bneval">
                                         Current BNs
+                                    </router-link>
+                                    <router-link class="dropdown-item" to="/evalarchive">
+                                        Archive
                                     </router-link>
                                 </div>
                             </li>

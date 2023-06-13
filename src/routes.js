@@ -42,14 +42,14 @@ const routes = [
     // BN/NAT
     { path: '/appeval', component: AppEvalPage, meta: { title: 'BN Application Evaluations', requiresBnOrNat: true } },
 
-    // NAT and Trial NAT
+    // NAT/Trial NAT
     { path: '/bneval', component: BnEvalPage, meta: { title: 'Current BN Evaluations', requiresNatOrTrialNat: true } },
+    { path: '/evalarchive', component: EvalArchive, meta: { title: 'Evaluation Archives', requiresNatOrTrialNat: true } },
 
-    // NAT and GMT
+    // NAT/GMT
     { path: '/managereports', component: ManageReports, meta: { title: 'Manage Reports', requiresFullReadAccess: true } },
 
     // NAT
-    { path: '/evalarchive', component: EvalArchive, meta: { title: 'Evaluation Archives', requiresNat: true } },
     { path: '/datacollection', component: DataCollection, meta: { title: 'Manage SEVs', requiresNat: true } },
     { path: '/managetest', component: ManageTest, meta: { title: 'Manage RC Test', requiresNat: true } },
     { path: '/logs', component: Logs, meta: { title: 'Logs', requiresNat: true } },

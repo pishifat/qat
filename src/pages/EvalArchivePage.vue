@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col-md-12">
             <section class="card card-body">
-                <div class="form-inline">
+                <div v-if="loggedInUser.isNat" class="form-inline">
                     <input
                         v-model="searchValue"
                         type="text"
@@ -17,7 +17,7 @@
                     </button>
                 </div>
 
-                <div class="form-inline mt-2">
+                <div v-if="loggedInUser.isNat" class="form-inline mt-2">
                     <input
                         v-model="limit"
                         type="text"
@@ -152,6 +152,9 @@ export default {
         };
     },
     computed: {
+        ...mapState([
+            'loggedInUser',
+        ]),
         ...mapState('evaluations', [
             'evaluations',
         ]),
@@ -175,31 +178,33 @@ export default {
         }
     },
     async created() {
-        const id = this.$route.query.id;
-        const user = this.$route.query.user;
-        let query = '';
-        query += id ? `id=${id}` : '';
-        query += user ? `user=${user}` : '';
+        if (this.loggedInUser.isNat) {
+            const id = this.$route.query.id;
+            const user = this.$route.query.user;
+            let query = '';
+            query += id ? `id=${id}` : '';
+            query += user ? `user=${user}` : '';
 
-        const data = await this.$http.initialRequest(`/evalArchive/search?${query}`);
+            const data = await this.$http.initialRequest(`/evalArchive/search?${query}`);
 
-        if (data.bnApplications || data.evaluations) {
-            this.$store.commit('evaluations/setEvaluations', [...data.evaluations, ...data.bnApplications]);
-            this.wasLoaded = true;
-        }
-
-        if (id) {
-            this.$store.commit('evaluations/setSelectedEvaluationId', id);
-
-            if (this.selectedEvaluation) {
-                $('#evaluationArchiveInfo').modal('show');
-            } else {
-                this.$store.dispatch('updateToastMessages', {
-                    message: `Couldn't find the evaluation!`,
-                    type: 'danger',
-                });
+            if (data.bnApplications || data.evaluations) {
+                this.$store.commit('evaluations/setEvaluations', [...data.evaluations, ...data.bnApplications]);
+                this.wasLoaded = true;
             }
-        }
+
+            if (id) {
+                this.$store.commit('evaluations/setSelectedEvaluationId', id);
+
+                if (this.selectedEvaluation) {
+                    $('#evaluationArchiveInfo').modal('show');
+                } else {
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `Couldn't find the evaluation!`,
+                        type: 'danger',
+                    });
+                }
+            }
+        } else this.wasLoaded = true;
     },
     methods: {
         async query(e) {
