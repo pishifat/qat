@@ -149,7 +149,7 @@ async function findAdditionalBnMonths (user) {
                     startDate = moment(startDate).add(1, 'months').toDate();
                     nextDate = moment(nextDate).add(1, 'months').toDate();
 
-                    const requirement = historyElement.mode == 'mania' ? 2 : 3;
+                    const requirement = (historyElement.mode == 'mania' || historyElement.mode == 'catch') ? 2 : 3;
 
                     if (count >= requirement) bnMonths++;
                 }
