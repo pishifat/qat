@@ -241,7 +241,6 @@ export default {
                 this.$store.commit('evaluations/setEvaluations', [...res.bnApplications, ...res.evaluations]);
             }
         },
-        
     },
 };
 </script>
