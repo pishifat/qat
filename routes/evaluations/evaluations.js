@@ -164,21 +164,46 @@ async function setGroupEval (evaluations, session) {
         });
 
         // Send moved notification
-
-        discord.webhookPost(
-            [{
-                author: discord.defaultWebhookAuthor(session),
-                color: discord.webhookColors.lightRed,
-                description: formatDescription(evaluation, 'Moved', 'to group discussion'),
-                fields: [
-                    {
-                        name: 'Votes',
-                        value: formatConsensus(evaluation.kind, totalPass, totalNeutral, totalFail),
+        
+        if (evaluation.user.evaluatorModes.includes(evaluation.mode)) {
+            const selfSummary = evaluation.selfSummary.comment || '*No summary provided*';
+            discord.webhookPost(
+                [{
+                    thumbnail: {
+                        url: `https://a.ppy.sh/${evaluation.user.osuId}`,
                     },
-                ],
-            }],
-            evaluation.mode
-        );
+                    author: discord.defaultWebhookAuthor(session),
+                    color: discord.webhookColors.lightRed,
+                    description: `Moved [**${evaluation.user.username}**'s NAT eval](https://bn.mappersguild.com/bneval?id=${evaluation.id}) to group discussion`,
+                    fields: [
+                        {
+                            name: 'Summary',
+                            value: selfSummary.length > 950 ? selfSummary.slice(0, 950) + '... *(truncated)*' : selfSummary,
+                        },
+                    ],
+                }],
+                evaluation.mode
+            );
+
+        } else {
+            discord.webhookPost(
+                [{
+                    thumbnail: {
+                        url: `https://a.ppy.sh/${evaluation.user.osuId}`,
+                    },
+                    author: discord.defaultWebhookAuthor(session),
+                    color: discord.webhookColors.lightRed,
+                    description: formatDescription(evaluation, 'Moved', 'to group discussion'),
+                    fields: [
+                        {
+                            name: 'Votes',
+                            value: formatConsensus(evaluation.kind, totalPass, totalNeutral, totalFail),
+                        },
+                    ],
+                }],
+                evaluation.mode
+            );
+        }
     }
 }
 
