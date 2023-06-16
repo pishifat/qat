@@ -20,6 +20,11 @@ const defaultNotePopulate = [
     { path: 'user', select: 'username osuId' },
 ];
 
+const defaultNatEvaluationPopulate = [
+    { path: 'user', select: 'username osuId' },
+    { path: 'selfSummary', populate: defaultNotePopulate },
+];
+
 /* GET user notes */
 router.get('/loadUserNotes/:id', async (req, res) => {
     const notes = await Note
@@ -99,11 +104,11 @@ router.post('/saveNote/:id', async (req, res) => {
         u._id
     );
 
-    discord.webhookPost(
+    if (!isSummary) discord.webhookPost(
         [{
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.brown,
-            description: `Added ${isWarning ? '**warning** note' : isSummary ? '**summary** note' : 'note'} to [**${note.user.username}**'s profile](http://bn.mappersguild.com/users?id=${note.user.id})`,
+            description: `Added ${isWarning ? '**warning** note' : 'note'} to [**${note.user.username}**'s profile](http://bn.mappersguild.com/users?id=${note.user.id})`,
             fields: [
                 {
                     name: 'Note',
@@ -111,7 +116,7 @@ router.post('/saveNote/:id', async (req, res) => {
                 },
             ],
         }],
-        u.modes && u.modes.length ? u.modes[0] : u.history && u.history.length ? u.history[0].mode : 'all' // priority: current mode > past mode > default to osu
+        u.modes && u.modes.length ? u.modes[0] : u.history && u.history.length ? u.history[0].mode : 'all' // priority: current mode > past mode > default to all
     );
 
     if (evaluationId) {
@@ -119,8 +124,30 @@ router.post('/saveNote/:id', async (req, res) => {
         const discordIds = natLeaders.map(u => u.discordId);
         const user = await User.findById(req.params.id);
         const mode = user.modes && user.modes.length ? user.modes[0] : 'osu' // priority: current mode > default to osu
+        const evaluation = await BnEvaluation.findById(evaluationId).populate(defaultNatEvaluationPopulate);
 
-        await discord.userHighlightWebhookPost(mode, discordIds, `https://bn.mappersguild.com/bneval?id=${evaluationId} you're assigned to this now :) `);
+        // Send moved to discussion notification
+        await discord.webhookPost(
+            [{
+                thumbnail: {
+                    url: `https://a.ppy.sh/${evaluation.user.osuId}`,
+                },
+                color: discord.webhookColors.gray,
+                description: `[**${evaluation.user.username}**'s NAT eval](https://bn.mappersguild.com/bneval?id=${evaluationId}) moved to group discussion`,
+                fields: [
+                    {
+                        name: 'Summary',
+                        value: comment.length > 950 ? comment.slice(0, 950) + '... *(truncated)*' : comment,
+                    },
+                    {
+                        name: 'Assigned NAT leaders',
+                        value: natLeaders.map(u => u.username).join(', '),
+                    }
+                ],
+            }],
+            mode
+        );
+        await discord.userHighlightWebhookPost(mode, discordIds);
     }
 });
 
