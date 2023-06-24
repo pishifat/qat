@@ -365,6 +365,8 @@ class UserService extends mongoose.Model {
         const lastEvaluation = await Evaluation
             .findOne({
                 user: evaluatedUserId,
+                active: false,
+                reviews: { $ne: [] },
             })
             .populate({ path: 'reviews', populate: 'evaluator' })
             .sort({ archivedAt: -1 });
@@ -376,7 +378,6 @@ class UserService extends mongoose.Model {
        let assignedNat = [];
             
         if (lastEvaluation) {
-            console.log(lastEvaluation.user);
             for (const review of lastEvaluation.reviews) {
                 if (assignedNat.length < sampleSize) {
                     if (review.evaluator.isNat && review.evaluator.inBag) {

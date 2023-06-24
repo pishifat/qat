@@ -1,7 +1,6 @@
 const cron = require('node-cron');
 const moment = require('moment');
 const discord = require('./discord');
-const osuv1 = require('./osuv1');
 const osu = require('./osu');
 const scrap = require('./scrap');
 const osuBot = require('./osuBot');
@@ -12,13 +11,14 @@ const BnEvaluation = require('../models/evaluations/bnEvaluation');
 const Veto = require('../models/veto');
 const BnFinderMatch = require('../models/bnFinderMatch');
 const User = require('../models/user');
-const BeatmapReport = require('../models/beatmapReport');
+const Aiess = require('../models/aiess');
 const Discussion = require('../models/discussion');
 const Report = require('../models/report');
 const Logger = require('../models/log');
-const Settings = require('../models/settings');
-const { user } = require('../models/evaluations/base');
 const ResignationEvaluation = require('../models/evaluations/resignationEvaluation');
+const { BnEvaluationConsensus, BnEvaluationAddition } = require('../shared/enums');
+const { makeWordFromField } = require('../helpers/scrap');
+const Settings = require('../models/settings');
 
 const defaultPopulate = [
     { path: 'user', select: 'id username osuId modesInfo groups' },
@@ -276,114 +276,200 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
     // find and post webhook for current BN evals
     for (let i = 0; i < activeRounds.length; i++) {
         const round = activeRounds[i];
+        let processed = false;
 
-        let description = `[**${round.user.username}**'s ${round.user.groups.includes('nat') ? 'NAT eval' : round.isResignation ? 'resignation' : 'current BN eval'}](http://bn.mappersguild.com/bneval?id=${round.id}) `;
-        let natList = '';
-        let trialNatList = '';
-        let generateWebhook = true;
-        let color;
-        let evaluators = await Settings.getModeHasTrialNat(round.mode) ? round.natEvaluators.concat(round.bnEvaluators) : round.natEvaluators;
-        let discordIds = findNatEvaluatorHighlights(round.reviews, evaluators, round.discussion);
+        // check if they have enough activity as a probation member to even have an eval
+        if (round.deadline < endRange) {
+            const modeInfo = round.user.modesInfo.find(m => m.mode == round.mode);
+            
+            if (modeInfo.level == 'probation') {
+                const uniqueNominations = await Aiess.getUniqueUserEvents(round.user.osuId, new Date(round.createdAt), new Date(), [round.mode], ['nominate', 'qualify']);
+                const nomRequirement = round.mode == 'mania' || round.mode == 'catch' ? 4 : 6;
 
-        if (round.deadline < endRange && (!round.natEvaluators || !round.natEvaluators.length)) {
-            round.natEvaluators = await User.getAssignedNat(round.mode, round.user.id);
-            await round.populate(defaultPopulate).execPopulate();
-            const days = util.findDaysBetweenDates(new Date(), new Date(round.deadline));
+                if (uniqueNominations.length < nomRequirement) {
+                    // check their last evaluation. if it was also probation + low activity, skip
+                    const lastEvaluation = await Evaluation
+                        .findOne({
+                            user: round.user.id,
+                            active: false,
+                            consensus: { $exists: true },
+                        })
+                        .sort({ archivedAt: -1 });
 
-            const assignments = [];
+                    if (lastEvaluation && lastEvaluation.consensus !== BnEvaluationConsensus.ProbationBn && lastEvaluation.addition !== BnEvaluationAddition.LowActivityWarning) {
+                        // process current eval
+                        round.active = false;
+                        round.discussion = true;
+                        round.isReviewed = true;
+                        round.feedback = `You have nominated only ${uniqueNominations.length} map(s) during your probationary period, which is less than the ${nomRequirement} nominations requirement for probation BNs. Your probationary period is getting automatically extended by another month in order to allow you to reach the total nominations threshold.`;
+                        round.archivedAt = new Date();
+                        round.consensus = BnEvaluationConsensus.ProbationBn;
+                        round.addition = BnEvaluationAddition.LowActivityWarning;
+                        await round.save();
 
-            for (const user of round.natEvaluators) {
-                assignments.push({
-                    date: new Date(),
-                    user: user._id,
-                    daysOverdue: days,
-                });
+                        // set up next eval
+                        let activityToCheck = 80;
+                        let deadline = new Date();
+                        deadline.setDate(deadline.getDate() + activityToCheck/2);
+                        
+                        await BnEvaluation.create({
+                            user: round.user,
+                            mode: round.mode,
+                            deadline,
+                            activityToCheck,
+                        });
+
+                        // logs/webhooks so NAT are aware of automatic action
+                        const consensusText = makeWordFromField(round.consensus);
+                        const additionText = makeWordFromField(round.addition);
+
+                        Logger.generate(
+                            null,
+                            `Automatically archived  ${round.user.username}'s ${round.mode}  as "${consensusText}" (not enough nominations during probation - ${uniqueNominations.length})`,
+                            'bnEvaluation',
+                            round._id
+                        );
+
+                        discord.webhookPost(
+                            [{
+                                color: discord.webhookColors.black,
+                                description: `Automatically archived [**${round.user.username}**'s BN eval](https://bn.mappersguild.com/bneval?id=${round.id}) with **${consensusText}** consensus and **${additionText}** addition (${uniqueNominations.length} nominations during probation.).`,
+                            }],
+                            round.mode
+                        );
+
+                        discord.webhookPost(
+                            [{
+                                color: discord.webhookColors.black,
+                                description: `Automatically created new BN eval for **${round.user.username}** set for **${activityToCheck/2} days** from now`,
+                            }],
+                            round.mode
+                        );
+
+                        const channel = {
+                            name: `BN Eval Results (${round.mode == 'osu' ? 'osu!' : `osu!${round.mode}`})`,
+                            description: `Results for your recent BN evaluation (${moment(round.createdAt).format('YYYY-MM-DD')})`,
+                        }
+                    
+                        await osuBot.sendAnnouncement([round.user.osuId, 14102976], channel, round.feedback);
+
+                        // skip the next section
+                        processed = true;
+                    }
+                }
             }
+        }
 
-            round.natEvaluatorHistory = assignments;
+        // set up evaluation
+        if (!processed) {
+            let description = `[**${round.user.username}**'s ${round.user.groups.includes('nat') ? 'NAT eval' : round.isResignation ? 'resignation' : 'current BN eval'}](http://bn.mappersguild.com/bneval?id=${round.id}) `;
+            let natList = '';
+            let trialNatList = '';
+            let generateWebhook = true;
+            let color;
+            let evaluators = await Settings.getModeHasTrialNat(round.mode) ? round.natEvaluators.concat(round.bnEvaluators) : round.natEvaluators;
+            let discordIds = findNatEvaluatorHighlights(round.reviews, evaluators, round.discussion);
 
-            await round.save();
+            if (round.deadline < endRange && (!round.natEvaluators || !round.natEvaluators.length)) {
+                round.natEvaluators = await User.getAssignedNat(round.mode, round.user.id);
+                await round.populate(defaultPopulate).execPopulate();
+                const days = util.findDaysBetweenDates(new Date(), new Date(round.deadline));
 
-            natList = round.natEvaluators.map(u => u.username).join(', ');
+                const assignments = [];
 
-            if (await Settings.getModeHasTrialNat(round.mode)) {
-                if (!round.bnEvaluators || !round.bnEvaluators.length) {
-                    round.bnEvaluators = await User.getAssignedTrialNat(round.mode, [round.user.osuId], (await Settings.getModeEvaluationsRequired(round.mode) - 1));
-                    await round.populate(defaultPopulate).execPopulate();
-                    await round.save();
+                for (const user of round.natEvaluators) {
+                    assignments.push({
+                        date: new Date(),
+                        user: user._id,
+                        daysOverdue: days,
+                    });
                 }
 
-                trialNatList = round.bnEvaluators.map(u => u.username).join(', ');
-            }
-        }
+                round.natEvaluatorHistory = assignments;
 
-        if (round.discussion) { // current BN evals in groups have 7 extra days
-            const tempDate = new Date(round.deadline);
-            tempDate.setDate(tempDate.getDate() + 7);
-            round.deadline = tempDate;
-        }
+                await round.save();
 
-        if (date > round.deadline) {
-            const days = findDaysAgo(round.deadline);
+                natList = round.natEvaluators.map(u => u.username).join(', ');
 
-            description += `was due ${days == 0 ? 'today!' : days == 1 ? days + ' day ago!' : days + ' days ago!'}`;
-            color = discord.webhookColors.red;
-        } else if (round.deadline < nearDeadline) {
-            description += 'is due in less than 24 hours!';
-            color = discord.webhookColors.lightRed;
-        } else if ((round.deadline > startRange && round.deadline < endRange) || (round.deadline < endRange && (!round.natEvaluators || !round.natEvaluators.length))) {
-            description += 'is due in 1 week!';
-            color = discord.webhookColors.pink;
-        } else {
-            generateWebhook = false;
-        }
+                if (await Settings.getModeHasTrialNat(round.mode)) {
+                    if (!round.bnEvaluators || !round.bnEvaluators.length) {
+                        round.bnEvaluators = await User.getAssignedTrialNat(round.mode, [round.user.osuId], (await Settings.getModeEvaluationsRequired(round.mode) - 1));
+                        await round.populate(defaultPopulate).execPopulate();
+                        await round.save();
+                    }
 
-        if (generateWebhook && !natList.length) {
-            description += findNatEvaluatorStatuses(round.reviews, evaluators, round.discussion);
-            description += findMissingContent(round.discussion, round.consensus, round.feedback);
-            await discord.webhookPost(
-                [{
-                    description,
-                    color,
-                }],
-                round.mode
-            );
-            await util.sleep(500);
-
-            discordIds = findNatEvaluatorHighlights(round.reviews, evaluators, round.discussion);
-            await discord.userHighlightWebhookPost(round.mode, discordIds);
-            await util.sleep(500);
-        } else if (generateWebhook && natList.length) {
-            let fields = [
-                {
-                    name: 'Assigned NAT',
-                    value: natList,
-                },
-            ];
-
-            if (trialNatList.length) {
-                fields.push({
-                    name: 'Assigned BN',
-                    value: trialNatList,
-                });
+                    trialNatList = round.bnEvaluators.map(u => u.username).join(', ');
+                }
             }
 
-            await discord.webhookPost(
-                [{
-                    description,
-                    color,
-                    fields,
-                }],
-                round.mode
-            );
-            await util.sleep(500);
+            if (round.discussion) { // current BN evals in groups have 7 extra days
+                const tempDate = new Date(round.deadline);
+                tempDate.setDate(tempDate.getDate() + 7);
+                round.deadline = tempDate;
+            }
 
-            // repeating "evaluators" and "discordIds" to get newly populated info into highlight webhook
-            evaluators = await Settings.getModeHasTrialNat(round.mode) ? round.natEvaluators.concat(round.bnEvaluators) : round.natEvaluators;
-            discordIds = findNatEvaluatorHighlights(round.reviews, evaluators, round.discussion);
+            if (date > round.deadline) {
+                const days = findDaysAgo(round.deadline);
 
-            await discord.userHighlightWebhookPost(round.mode, discordIds);
-            await util.sleep(500);
+                description += `was due ${days == 0 ? 'today!' : days == 1 ? days + ' day ago!' : days + ' days ago!'}`;
+                color = discord.webhookColors.red;
+            } else if (round.deadline < nearDeadline) {
+                description += 'is due in less than 24 hours!';
+                color = discord.webhookColors.lightRed;
+            } else if ((round.deadline > startRange && round.deadline < endRange) || (round.deadline < endRange && (!round.natEvaluators || !round.natEvaluators.length))) {
+                description += 'is due in 1 week!';
+                color = discord.webhookColors.pink;
+            } else {
+                generateWebhook = false;
+            }
+
+            if (generateWebhook && !natList.length) {
+                description += findNatEvaluatorStatuses(round.reviews, evaluators, round.discussion);
+                description += findMissingContent(round.discussion, round.consensus, round.feedback);
+                await discord.webhookPost(
+                    [{
+                        description,
+                        color,
+                    }],
+                    round.mode
+                );
+                await util.sleep(500);
+
+                discordIds = findNatEvaluatorHighlights(round.reviews, evaluators, round.discussion);
+                await discord.userHighlightWebhookPost(round.mode, discordIds);
+                await util.sleep(500);
+            } else if (generateWebhook && natList.length) {
+                let fields = [
+                    {
+                        name: 'Assigned NAT',
+                        value: natList,
+                    },
+                ];
+
+                if (trialNatList.length) {
+                    fields.push({
+                        name: 'Assigned BN',
+                        value: trialNatList,
+                    });
+                }
+
+                await discord.webhookPost(
+                    [{
+                        description,
+                        color,
+                        fields,
+                    }],
+                    round.mode
+                );
+                await util.sleep(500);
+
+                // repeating "evaluators" and "discordIds" to get newly populated info into highlight webhook
+                evaluators = await Settings.getModeHasTrialNat(round.mode) ? round.natEvaluators.concat(round.bnEvaluators) : round.natEvaluators;
+                discordIds = findNatEvaluatorHighlights(round.reviews, evaluators, round.discussion);
+
+                await discord.userHighlightWebhookPost(round.mode, discordIds);
+                await util.sleep(500);
+            }
         }
     }
 }, {

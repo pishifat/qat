@@ -139,8 +139,30 @@ async function findAdditionalBnMonths (user) {
     return bnMonths;
 }
 
+/**
+ * @param {string} field
+ * @returns {string}
+ */
+function makeWordFromField (field) {
+    if (!field) return 'none';
+
+    // Bn --> BN
+    let word = field.replace(/Bn/,'BN');
+    // Nat --> NAT
+    word = word.replace(/Nat/,'NAT');
+    // aWordWithBNOnIt --> a Word With BNOn It
+    word = word.replace(/([a-z])([A-Z])/g, '$1 $2');
+    // a Word With BNOn It --> a Word With BN On It
+    word = word.replace(/([A-Z])([A-Z][a-z])/g, '$1 $2');
+    // capitalize
+    word = word.charAt(0).toUpperCase() + word.slice(1);
+
+    return word;
+}
+
 module.exports = {
     getUserModsCount,
     findUniqueNominationsCount,
     findAdditionalBnMonths,
+    makeWordFromField,
 };

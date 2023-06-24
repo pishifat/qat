@@ -18,6 +18,7 @@ const util = require('../../helpers/util');
 const { BnEvaluationConsensus, BnEvaluationAddition, ResignationConsensus } = require('../../shared/enums');
 const osuBot = require('../../helpers/osuBot');
 const Settings = require('../../models/settings');
+const { makeWordFromField } = require('../../helpers/scrap');
 
 const router = express.Router();
 
@@ -310,27 +311,6 @@ router.post('/setIndividualEval/', middlewares.isNat, async (req, res) => {
         'bnEvaluation'
     );
 });
-
-/**
- * @param {string} field
- * @returns {string}
- */
-function makeWordFromField (field) {
-    if (!field) return 'none';
-
-    // Bn --> BN
-    let word = field.replace(/Bn/,'BN');
-    // Nat --> NAT
-    word = word.replace(/Nat/,'NAT');
-    // aWordWithBNOnIt --> a Word With BNOn It
-    word = word.replace(/([a-z])([A-Z])/g, '$1 $2');
-    // a Word With BNOn It --> a Word With BN On It
-    word = word.replace(/([A-Z])([A-Z][a-z])/g, '$1 $2');
-    // capitalize
-    word = word.charAt(0).toUpperCase() + word.slice(1);
-
-    return word;
-}
 
 /* POST set evals as complete */
 router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
