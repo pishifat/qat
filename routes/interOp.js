@@ -118,7 +118,7 @@ router.get('/qaInfo/', async (req, res) => {
         Aiess
             .find({
                 type: 'qualify',
-                timestamp: { $gte: date },
+                timestamp: { $gt: date },
             })
             .populate(populate)
             .sort({ timestamp: -1 }),
@@ -129,7 +129,7 @@ router.get('/qaInfo/', async (req, res) => {
                     { type: 'disqualify' },
                     { type: 'rank' },
                 ],
-                timestamp: { $gte: date },
+                timestamp: { $gt: date },
             })
             .populate(populate)
             .sort({ timestamp: -1 }),

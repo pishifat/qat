@@ -157,7 +157,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
             .find({ status: 'wip' })
             .populate('mediations'),
         Report
-            .find({ isActive: true, createdAt: { $lte: sevenDaysAgo } })
+            .find({ isActive: true, createdAt: { $lt: sevenDaysAgo } })
             .populate(defaultReportPopulate),
     ]);
 

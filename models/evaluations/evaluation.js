@@ -18,7 +18,7 @@ class EvaluationService extends mongoose.Model {
         if (isNat) {
             query = {
                 active: true,
-                deadline: { $lte: minDate },
+                deadline: { $lt: minDate },
             }
         } else {
             const [settings, user] = await Promise.all([
@@ -31,7 +31,7 @@ class EvaluationService extends mongoose.Model {
 
             query = {
                 active: true,
-                deadline: { $lte: minDate },
+                deadline: { $lt: minDate },
                 user: { $ne: mongoId },
                 $and: [
                     { mode: user.modes },
@@ -77,7 +77,7 @@ class EvaluationService extends mongoose.Model {
         return this
             .find({
                 active: true,
-                deadline: { $gte: minDate },
+                deadline: { $gt: minDate },
             })
             .populate([
                 {
@@ -111,7 +111,7 @@ class EvaluationService extends mongoose.Model {
         return this.deleteMany({
             user: userId,
             active: true,
-            deadline: { $gte: minDate },
+            deadline: { $gt: minDate },
             mode,
         });
     }

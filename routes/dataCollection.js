@@ -20,7 +20,7 @@ router.get('/loadRecentEvents', async (req, res) => {
                 { type: 'disqualify' },
                 { type: 'nomination_reset' },
             ],
-            timestamp: { $gte: date },
+            timestamp: { $gt: date },
         })
         .sort({ timestamp: -1 });
 
@@ -49,7 +49,7 @@ router.get('/loadUnsetEvents', middlewares.isNat, async (req, res) => {
                     ],
                 },
             ],
-            timestamp: { $gte: date },
+            timestamp: { $gt: date },
         })
         .sort({ timestamp: -1 });
 
@@ -79,7 +79,7 @@ async function sevRatingWebhook(event, req) {
         const previousEvents = await Aiess
             .find({
                 beatmapsetId: event.beatmapsetId,
-                timestamp: { $lte: event.timestamp },
+                timestamp: { $lt: event.timestamp },
                 $and: [
                     { type: { $ne: 'rank' } },
                     { type: { $ne: 'disqualify' } },

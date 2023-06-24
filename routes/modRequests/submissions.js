@@ -114,7 +114,7 @@ router.post('/store', middlewares.isLoggedIn, async (req, res) => {
     const [hasRequested, relevantBeatmaps] = await Promise.all([
         ModRequest.findOne({
             user: req.session.mongoId,
-            createdAt: { $gte: cooldown.toDate() },
+            createdAt: { $gt: cooldown.toDate() },
         }),
         Beatmapset.find({ osuId: parseInt(beatmapsetId, 10) }),
     ]);

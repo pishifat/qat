@@ -34,7 +34,7 @@ router.get('/all', async (req, res) => {
     const months = req.query.limit || 1;
     const maxDate = moment().subtract(months, 'month');
     const requests = await ModRequest
-        .find({ createdAt: { $gte: maxDate.toDate() } })
+        .find({ createdAt: { $gt: maxDate.toDate() } })
         .populate(defaultPopulate)
         .sort({ createdAt: -1 });
 

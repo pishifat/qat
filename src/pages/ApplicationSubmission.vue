@@ -295,6 +295,7 @@ export default {
             resignations: [],
             cooldownApps: [],
             cooldownEvals: [],
+            cooldownResignations: [],
             relevantResignation: null,
             cooldown: false,
             selectedMode: 'osu',
@@ -312,6 +313,7 @@ export default {
             this.resignations = data.resignations;
             this.cooldownApps = data.cooldownApps;
             this.cooldownEvals = data.cooldownEvals;
+            this.cooldownResignations = data.cooldownResignations;
         }
     },
     computed: {
@@ -338,6 +340,15 @@ export default {
                     active: evaluation.active,
                 });
             }
+
+            for (const resignation of this.cooldownResignations) {
+                cooldowns.push({
+                    id: resignation.id,
+                    mode: resignation.mode,
+                    date: new Date(resignation.cooldownDate),
+                    active: resignation.active,
+                });
+            };
 
             return cooldowns;
         },
@@ -382,7 +393,7 @@ export default {
             }
 
             if (result) {
-                this.successInfo = `Submitting & calculating mod score... (this will take a few seconds)`;
+                this.successInfo = `Submitting... (this will take a few seconds)`;
 
                 const data = await this.$http.executePost(
                     `/bnapps/apply`,

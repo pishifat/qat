@@ -79,8 +79,8 @@ class AiessService extends mongoose.Model
                         $in: types,
                     },
                     $and: [
-                        { timestamp: { $gte: minDate } },
-                        { timestamp: { $lte: maxDate } },
+                        { timestamp: { $gt: minDate } },
+                        { timestamp: { $lt: maxDate } },
                     ],
                     modes: { $in: modes },
                 },
@@ -113,8 +113,8 @@ class AiessService extends mongoose.Model
                     },
                     type,
                     $and: [
-                        { timestamp: { $gte: minDate } },
-                        { timestamp: { $lte: maxDate } },
+                        { timestamp: { $gt: minDate } },
+                        { timestamp: { $lt: maxDate } },
                     ],
                     modes: { $in: modes },
                 },
@@ -144,8 +144,8 @@ class AiessService extends mongoose.Model
                 {
                     $match: {
                         $and: [
-                            { timestamp: { $gte: minDate } },
-                            { timestamp: { $lte: maxDate } },
+                            { timestamp: { $gt: minDate } },
+                            { timestamp: { $lt: maxDate } },
                         ],
                         type: { $ne: 'rank' },
                         modes: mode,

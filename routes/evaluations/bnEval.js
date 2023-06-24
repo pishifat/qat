@@ -853,7 +853,7 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
         QualityAssuranceCheck
             .find({
                 user: mongoId,
-                timestamp: { $gte: minDate, $lte: maxDate },
+                timestamp: { $gt: minDate, $lt: maxDate },
             }).populate({
                 path: 'event',
                 select: 'beatmapsetId timestamp modes artistTitle creatorName creatorId',
@@ -861,7 +861,7 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
         BnFinderMatch
             .find({
                 user: mongoId,
-                createdAt: { $gte: minDate, $lte: maxDate },
+                createdAt: { $gt: minDate, $lt: maxDate },
                 isMatch: { $exists: true },
             })
             .populate({
@@ -893,7 +893,7 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
         ),
         Aiess.find({
             beatmapsetId: { $in: qaBeatmapsetIds },
-            timestamp: { $gte: minDate, $lte: maxDate },
+            timestamp: { $gt: minDate, $lt: maxDate },
             type: 'disqualify',
         }),
     ]);
@@ -905,7 +905,7 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
             let a = await Aiess
                 .find({
                     beatmapsetId: event.beatmapsetId,
-                    timestamp: { $lte: event.timestamp },
+                    timestamp: { $lt: event.timestamp },
                     $and: [
                         { type: { $ne: 'rank' } },
                         { type: { $ne: 'disqualify' } },
@@ -929,7 +929,7 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
             let a = await Aiess
                 .find({
                     beatmapsetId: event.beatmapsetId,
-                    timestamp: { $lte: event.timestamp },
+                    timestamp: { $lt: event.timestamp },
                     $and: [
                         { type: { $ne: 'rank' } },
                         { type: { $ne: 'disqualify' } },
@@ -1025,7 +1025,7 @@ router.get('/activity', async (req, res) => {
         .find({
             bnEvaluators: mongoId,
             mode: modes,
-            createdAt: { $gte: minDate },
+            createdAt: { $gt: minDate },
             discussion: true,
         })
         .populate(applicationPopulate)
@@ -1035,7 +1035,7 @@ router.get('/activity', async (req, res) => {
     let [appEvaluations, bnEvaluations] = await Promise.all([
         AppEvaluation
             .find({
-                createdAt: { $gte: minDate },
+                createdAt: { $gt: minDate },
                 mode: { $in: modes },
                 active: false,
                 bnEvaluators: { $ne: mongoId },
@@ -1045,7 +1045,7 @@ router.get('/activity', async (req, res) => {
 
         Evaluation
             .find({
-                deadline: { $gte: minDate },
+                deadline: { $gt: minDate },
                 mode: { $in: modes },
                 active: false,
             })

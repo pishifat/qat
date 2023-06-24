@@ -22,7 +22,7 @@ router.use(middlewares.isLoggedIn);
 router.get('/relevantInfo', async (req, res) => {
     const sixMonthsAgo = moment().subtract(6, 'months').toDate();
 
-    let [pendingTest, resignations, cooldownApps, cooldownEvals] = await Promise.all([
+    let [pendingTest, resignations, cooldownApps, cooldownEvals, cooldownResignations] = await Promise.all([
         TestSubmission
             .findOne({
                 applicant: req.session.mongoId,
@@ -51,6 +51,11 @@ router.get('/relevantInfo', async (req, res) => {
             consensus: 'removeFromBn',
             cooldownDate: { $gt: new Date() },
         }),
+        ResignationEvaluation.find({
+            user: req.session.mongoId,
+            active: false,
+            cooldownDate: { $gt: new Date() }
+        }),
     ]);
 
     res.json({
@@ -58,6 +63,7 @@ router.get('/relevantInfo', async (req, res) => {
         resignations,
         cooldownApps,
         cooldownEvals,
+        cooldownResignations,
     });
 });
 
@@ -115,12 +121,12 @@ router.post('/apply', async (req, res) => {
     }
 
     // begin checks
-    const [currentBnApp, currentBnEval, lastCurrentBnEval] = await Promise.all([
+    const [currentBnApp, currentBnEval, lastCurrentBnEval, cooldownResignation] = await Promise.all([
         AppEvaluation.findOne({
             user: req.session.mongoId,
             mode,
             $or: [
-                { cooldownDate: { $gte: new Date() } },
+                { cooldownDate: { $gt: new Date() } },
                 { active: true },
             ],
         }),
@@ -128,13 +134,20 @@ router.post('/apply', async (req, res) => {
             user: req.session.mongoId,
             mode,
             consensus: 'removeFromBn',
-            cooldownDate: { $gte: new Date() },
+            cooldownDate: { $gt: new Date() },
         }),
         BnEvaluation
             .findOne({
                 user: req.session.mongoId,
                 mode,
                 consensus: 'removeFromBn',
+            })
+            .sort({ createdAt: -1 }),
+        ResignationEvaluation
+            .findOne({
+                user: req.session.mongoId,
+                active: false,
+                cooldownDate: { $gt: new Date() }
             })
             .sort({ createdAt: -1 }),
     ]);
@@ -158,6 +171,15 @@ router.post('/apply', async (req, res) => {
             error: `You were recently removed from the Beatmap Nominators in this game mode. 
                     You may apply for this game mode again on 
                     ${new Date(currentBnEval.cooldownDate).toString().slice(4, 24)}.`,
+        });
+    }
+
+    // deny if relevant current bn eval
+    if (cooldownResignation) {
+        return res.json({
+            error: `You recently resigned the Beatmap Nominators in this game mode. 
+                    You may apply for this game mode again on 
+                    ${new Date(cooldownResignation.cooldownDate).toString().slice(4, 24)}.`,
         });
     }
 

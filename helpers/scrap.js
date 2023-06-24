@@ -78,27 +78,6 @@ async function getUserModsCount(accessToken, username, months) {
 }
 
 /**
- * Calculate mods score of an user
- * @param {string} username
- * @param {number} months number of months to look from
- * @param {string} mode
- * @returns {Promise<number|undefined>} mod score fixed to two decimals ex: 7,77
- */
-async function getUserModScore(accessToken, username, months, mode) {
-    if (!accessToken || !username) return undefined;
-
-    const modsCount = await getUserModsCount(accessToken, username, months);
-    let modScore = 0;
-    let expectedMods = (mode && mode == 'osu' ? 4 : 3);
-
-    for (let i = 0; i < modsCount.length; i++) {
-        modScore += Math.log(1 + modsCount[i]) / Math.log(Math.sqrt(1 + expectedMods)) - (2 * (1 + expectedMods)) / (1 + modsCount[i]);
-    }
-
-    return Math.round(modScore * 100) / 100;
-}
-
-/**
  * @param {Date} initialDate
  * @param {Date} endDate
  * @param {object} user
@@ -162,7 +141,6 @@ async function findAdditionalBnMonths (user) {
 
 module.exports = {
     getUserModsCount,
-    getUserModScore,
     findUniqueNominationsCount,
     findAdditionalBnMonths,
 };

@@ -220,7 +220,7 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
         AppEvaluation
             .find({
                 mode: req.params.mode,
-                createdAt: { $gte: minAppDate, $lte: maxDate },
+                createdAt: { $gt: minAppDate, $lt: maxDate },
                 discussion: true,
             })
             .populate(evaluationsPopulate),
@@ -228,7 +228,7 @@ router.get('/findNatActivity/:days/:mode', async (req, res) => {
         Evaluation
             .find({
                 mode: req.params.mode,
-                deadline: { $gte: minEvalDate, $lte: maxDate },
+                deadline: { $gt: minEvalDate, $lt: maxDate },
                 discussion: true,
             })
             .populate(evaluationsPopulate),
@@ -473,7 +473,7 @@ router.get('/findGmtActivity/:days', async (req, res) => {
         await Discussion
             .find({
                 isContentReview: true,
-                updatedAt: { $gte: minDate },
+                updatedAt: { $gt: minDate },
             })
             .populate('mediations'),
     ]);
@@ -1130,7 +1130,7 @@ router.get('/activity', async (req, res) => {
     let [appEvaluations, bnEvaluations] = await Promise.all([
         AppEvaluation
             .find({
-                createdAt: { $gte: minDate },
+                createdAt: { $gt: minDate },
                 mode: { $in: modes },
                 active: false,
                 bnEvaluators: { $ne: mongoId },
@@ -1141,7 +1141,7 @@ router.get('/activity', async (req, res) => {
 
         Evaluation
             .find({
-                deadline: { $gte: minDate },
+                deadline: { $gt: minDate },
                 mode: { $in: modes },
                 active: false,
             })

@@ -28,7 +28,7 @@ router.get('/relevantInfo', async (req, res) => {
         Aiess
             .find({
                 type: 'qualify',
-                timestamp: { $gte: date },
+                timestamp: { $gt: date },
             })
             .populate(defaultPopulate)
             .sort({ timestamp: -1 }),
@@ -39,7 +39,7 @@ router.get('/relevantInfo', async (req, res) => {
                     { type: 'disqualify' },
                     { type: 'rank' },
                 ],
-                timestamp: { $gte: date },
+                timestamp: { $gt: date },
             })
             .populate(defaultPopulate)
             .sort({ timestamp: -1 }),
@@ -59,7 +59,7 @@ router.get('/loadMore/:limit/:skip', async (req, res) => {
     const events = await Aiess
         .find({
             type: 'qualify',
-            timestamp: { $lte: date },
+            timestamp: { $lt: date },
             creatorId: { $exists: true },
         })
         .populate(defaultPopulate)
@@ -89,7 +89,7 @@ router.post('/assignUser/:id/:mode', middlewares.isBnOrNat, async (req, res) => 
                     { type: 'disqualify' },
                     { type: 'rank' },
                 ],
-                timestamp: { $gte: event.timestamp },
+                timestamp: { $gt: event.timestamp },
             })
             .sort({ timestamp: -1 }),
         Aiess
@@ -209,7 +209,7 @@ router.get('/loadLeaderboard', async (req, res) => {
                 ],
             })
             .sort({ username: 1 }),
-        QualityAssuranceCheck.find({ timestamp: { $gte: sevenDaysAgo } }),
+        QualityAssuranceCheck.find({ timestamp: { $gt: sevenDaysAgo } }),
         QualityAssuranceCheck.find({}),
     ]);
 
