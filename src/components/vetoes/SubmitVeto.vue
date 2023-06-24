@@ -84,38 +84,40 @@
 
 
             <!-- re-mediation -->
-            <p>Re-mediation:</p>
-                <div class="row ml-4">
-                <label
-                    class="mx-1"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="mediated by 20% of bns"
-                >
-                    <input
-                        v-model="remediation"
-                        type="radio"
-                        class="cross-radio hide-default"
-                        name="remediation"
-                        value="noRemediation"
+            <div v-if="loggedInUser.isNat">
+                <p>Re-mediation:</p>
+                    <div class="row ml-4">
+                    <label
+                        class="mx-1"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="mediated by 20% of bns"
                     >
-                    <i class="fas fa-times fa-lg" />
-                </label>
-                <label
-                    class="mx-1"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="mediated by 100% of bns"
-                >
-                    <input
-                        v-model="remediation"
-                        type="radio"
-                        class="checkmark-radio hide-default"
-                        name="remediation"
-                        value="remediation"
+                        <input
+                            v-model="remediation"
+                            type="radio"
+                            class="cross-radio hide-default"
+                            name="remediation"
+                            value="noRemediation"
+                        >
+                        <i class="fas fa-times fa-lg" />
+                    </label>
+                    <label
+                        class="mx-1"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="mediated by 100% of bns"
                     >
-                    <i class="fas fa-check fa-lg" />
-                </label>
+                        <input
+                            v-model="remediation"
+                            type="radio"
+                            class="checkmark-radio hide-default"
+                            name="remediation"
+                            value="remediation"
+                        >
+                        <i class="fas fa-check fa-lg" />
+                    </label>
+                </div>
             </div>
 
             <!-- veto reasons -->
@@ -183,6 +185,7 @@
 
 <script>
 import ModalDialog from '../ModalDialog.vue';
+import { mapState } from 'vuex';
 
 export default {
     name: 'SubmitVeto',
@@ -198,6 +201,11 @@ export default {
             mode: null,
             remediation: 'noRemediation',
         };
+    },
+    computed: {
+        ...mapState([
+            'loggedInUser',
+        ]),
     },
     methods: {
         addReason () {
