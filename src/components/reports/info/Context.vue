@@ -59,6 +59,8 @@ export default {
             switch (this.selectedReport.category) {
                 case 'stolenBeatmap':
                     return 'Stolen beatmap';
+                case 'beatmap':
+                    return 'beatmap';
                 case 'contentCaseSong':
                     return 'Inappropriate song';
                 case 'contentCaseVisual':

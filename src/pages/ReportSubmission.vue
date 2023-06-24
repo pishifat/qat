@@ -31,8 +31,8 @@
                         <option value="behavior">
                             Inappropriate behavior from a BN
                         </option>
-                        <option value="stolenBeatmap">
-                            Stolen beatmap
+                        <option value="beatmap">
+                            Beatmap
                         </option>
                         <option value="other">
                             Other
@@ -52,13 +52,13 @@
                     Before submitting a behavior report, check the <a href="https://osu.ppy.sh/wiki/Reporting_bad_behaviour" target="_blank">reporting policy on the osu! wiki</a>.
                 </div>
 
-                <hr>
-
-                <div v-if="category == 'stolenBeatmap'">
+                <div v-if="category == 'beatmap'">
                     If a beatmap you created is stolen and you want it removed from the beatmap listing, send notice to <code>copyright@ppy.sh</code> from as per osu!'s <a href="https://osu.ppy.sh/legal/Copyright" target="_blank">copyright policy</a>. Your notice should come from the email address linked to your osu! account.
                 </div>
 
-                <div v-else>
+                <hr>
+
+                <div>
                     <div class="row mb-2">
                         <div class="col-sm-12">
                             <h4>{{ primaryLinkHeader }}</h4>
@@ -158,6 +158,8 @@ export default {
             switch (this.category) {
                 case 'stolenBeatmap':
                     return 'Link to stolen beatmap:';
+                case 'beatmap':
+                    return 'Link to beatmap:';
                 case 'contentCaseSong':
                     return 'Link to song or beatmap:';
                 case 'contentCaseVisual':

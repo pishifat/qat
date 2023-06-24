@@ -8,7 +8,7 @@ const reportSchema = new mongoose.Schema({
     valid: { type: Number, enum: [1, 2, 3] },
     feedback: { type: String },
     isActive: { type: Boolean, default: true },
-    category: { type: String, enum: ['stolenBeatmap', 'contentCaseSong', 'contentCaseVisual', 'behavior', 'other'] },
+    category: { type: String, enum: ['stolenBeatmap', 'beatmap', 'contentCaseSong', 'contentCaseVisual', 'behavior', 'other'] },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 class ReportService extends mongoose.Model {
@@ -16,6 +16,8 @@ class ReportService extends mongoose.Model {
         switch (this.category) {
             case 'stolenBeatmap':
                 return 'stolen beatmap report';
+            case 'beatmap':
+                return 'beatmap report';
             case 'contentCaseSong':
                 return 'song content report';
             case 'contentCaseVisual':
