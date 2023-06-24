@@ -55,7 +55,8 @@ const notesPopulate = [
 
 /* GET current BN eval listing. */
 router.get('/relevantInfo', async (req, res) => {
-    const evaluations = await Evaluation.findActiveEvaluations(req.session.mongoId, res.locals.userRequest.isNat);
+    console.log(res.locals.userRequest);
+    const evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, res.locals.userRequest.isNat);
 
     res.json({
         evaluations,
@@ -161,7 +162,7 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
         error: `Didn't create any`,
     });
 
-    const evaluations = await Evaluation.findActiveEvaluations(req.session.mongoId, res.locals.userRequest.isNat);
+    const evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, res.locals.userRequest.isNat);
 
     res.json({
         evaluations,
@@ -285,7 +286,7 @@ router.post('/setGroupEval/', middlewares.isNat, async (req, res) => {
         .populate(defaultPopulate);
 
     await setGroupEval(evaluations, req.session);
-    evaluations = await Evaluation.findActiveEvaluations(req.session.mongoId, res.locals.userRequest.isNat);
+    evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, res.locals.userRequest.isNat);
     res.json(evaluations);
     Logger.generate(
         req.session.mongoId,
@@ -302,7 +303,7 @@ router.post('/setIndividualEval/', middlewares.isNat, async (req, res) => {
         discussion: false,
     });
 
-    const evaluations = await Evaluation.findActiveEvaluations(req.session.mongoId, res.locals.userRequest.isNat);
+    const evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, res.locals.userRequest.isNat);
 
     res.json(evaluations);
     Logger.generate(
@@ -577,7 +578,7 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
         
     }
 
-    evaluations = await Evaluation.findActiveEvaluations(req.session.mongoId, res.locals.userRequest.isNat);
+    evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, res.locals.userRequest.isNat);
 
     res.json(evaluations);
     Logger.generate(

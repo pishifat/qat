@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const baseSchema = require('./base');
 const Settings = require('../settings');
-const User = require('../user');
 
 const evaluationSchema = new mongoose.Schema({
     ...baseSchema,
@@ -9,7 +8,7 @@ const evaluationSchema = new mongoose.Schema({
 
 class EvaluationService extends mongoose.Model {
 
-    static async findActiveEvaluations(mongoId, isNat) {
+    static async findActiveEvaluations(user, isNat) {
         let minDate = new Date();
         minDate.setDate(minDate.getDate() + 7);
 
@@ -21,18 +20,14 @@ class EvaluationService extends mongoose.Model {
                 deadline: { $lt: minDate },
             }
         } else {
-            const [settings, user] = await Promise.all([
-                Settings.findOne({}), // there's only one
-                User.findById(mongoId),
-            ]);
-
+            const settings = await Settings.findOne({}); // there's only one
             const trialNatEnabledModeSettings = settings.modeSettings.filter(s => s.hasTrialNat == true);
             const trialNatModes = trialNatEnabledModeSettings.map(s => s.mode);
 
             query = {
                 active: true,
                 deadline: { $lt: minDate },
-                user: { $ne: mongoId },
+                user: { $ne: user._id },
                 $and: [
                     { mode: user.modes },
                     { mode: trialNatModes },

@@ -54,7 +54,7 @@ export interface IBnEvaluationDocument extends IEvaluationBase, Document {
 }
 
 export interface IBnEvaluationModel extends Model<IBnEvaluationDocument> {
-    findActiveEvaluations?: (mongoId: string, isNat: boolean) => Promise<IBnEvaluationDocument[]>;
+    findActiveEvaluations?: (user: IUserDocument, isNat: boolean) => Promise<IBnEvaluationDocument[]>;
     findInactiveEvaluations?: () => Promise<IEvaluationDocument[]>;
     deleteUserActiveEvaluations?: (userId: number, mode: string) => Promise<{ ok: number, deletedCount: number, n: number }>;
 }
@@ -74,7 +74,7 @@ export interface IEvaluationDocument extends IEvaluationBase, IBnEvaluationDocum
 }
 
 export interface IEvaluationModel extends Model<IEvaluationDocument> {
-    findActiveEvaluations?: (mongoId: string, isNat: boolean) => Promise<IEvaluationDocument[]>;
+    findActiveEvaluations?: (user: IUserDocument, isNat: boolean) => Promise<IEvaluationDocument[]>;
     findInactiveEvaluations?: () => Promise<IEvaluationDocument[]>;
     deleteUserActiveEvaluations?: (userId: number, mode: string) => Promise<{ ok: number, deletedCount: number, n: number }>;
 }
