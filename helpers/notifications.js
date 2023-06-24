@@ -21,7 +21,7 @@ const { user } = require('../models/evaluations/base');
 const ResignationEvaluation = require('../models/evaluations/resignationEvaluation');
 
 const defaultPopulate = [
-    { path: 'user', select: 'username osuId modesInfo groups' },
+    { path: 'user', select: 'id username osuId modesInfo groups' },
     { path: 'natEvaluators', select: 'username osuId discordId isBnEvaluator' },
     { path: 'bnEvaluators', select: 'username osuId discordId isBnEvaluator' },
     {
@@ -286,7 +286,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
         let discordIds = findNatEvaluatorHighlights(round.reviews, evaluators, round.discussion);
 
         if (round.deadline < endRange && (!round.natEvaluators || !round.natEvaluators.length)) {
-            round.natEvaluators = await User.getAssignedNat(round.mode);
+            round.natEvaluators = await User.getAssignedNat(round.mode, round.user.id);
             await round.populate(defaultPopulate).execPopulate();
             const days = util.findDaysBetweenDates(new Date(), new Date(round.deadline));
 

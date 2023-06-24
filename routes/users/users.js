@@ -1196,7 +1196,7 @@ router.post('/resignFromBn/:id', async (req, res) => {
 
     const fields = [];
 
-    const assignedNat = await User.getAssignedNat(mode, [user.osuId]);
+    const assignedNat = await User.getAssignedNat(mode, req.session.mongoId, [user.osuId]);
     resignation.natEvaluators = assignedNat;
     const natList = assignedNat.map(e => e.username).join(', ');
 
@@ -1236,7 +1236,8 @@ router.post('/resignFromBn/:id', async (req, res) => {
 
 /* POST cycle bag */
 router.post('/cycleBag/:mode', middlewares.isResponsibleWithButtons, async (req, res) => {
-    const users = await User.getAssignedNat(req.params.mode);
+    const tempEvaluation = await BnEvaluation.findOne({ active: true }); // a random eval for getAssignedNat to work
+    const users = await User.getAssignedNat(req.params.mode, tempEvaluation.user.toString());
 
     console.log('---\nfinalusers\n---');
 

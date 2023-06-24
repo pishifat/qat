@@ -4,6 +4,7 @@ const moment = require('moment');
 const Settings = require('./settings');
 const enums = require('../shared/enums');
 const config = require('../config.json');
+const Evaluation = require('./evaluations/evaluation');
 
 
 const userSchema = new mongoose.Schema({
@@ -308,96 +309,114 @@ class UserService extends mongoose.Model {
     }
 
     /**
-     * Note that when doing evaluation.natEvaluators = assignedNats, natEvaluators will be an array of ObjectsIds, NOT an array users objects. Populate again to work with it.
+     * 
      * @param {string} mode
      * @param {number[]} [excludeOsuIds]
      * @param {number} [sampleSize]
+     * @param {boolean} [isNat]
+     * @param {boolean} [isReset]
      * @returns {Promise<[]>}
      */
-    static async getAssignedNat (mode, excludeOsuIds, sampleSize) {
-        if (!sampleSize) {
-            sampleSize = await Settings.getModeHasTrialNat(mode) ? await Settings.getModeEvaluationsRequired(mode) - 1 : await Settings.getModeEvaluationsRequired(mode);
-        }
-
+    static async queryAssignmentUsers (mode, excludeOsuIds, sampleSize, isNat, isReset) {
+        // set query
         const query = User.aggregate([
             {
                 $match: {
-                    groups: 'nat',
+                    groups: isNat ? 'nat' : 'bn',
                     'modesInfo.mode': mode,
+                    'modesInfo.level': isNat ? 'evaluator' : 'full',
                     isBnEvaluator: true,
-                    inBag: true,
+                    inBag: isReset ? false : true,
+                    isTrialNat: isNat ? false : true,
                 },
             },
         ]);
 
+        // exclude anyone specified
         if (excludeOsuIds) {
             query.match({
                 osuId: { $nin: excludeOsuIds },
             });
         }
 
-        let assignedNat = await query
+        // execute
+        const assignedNat = await query
             .sample(sampleSize)
             .exec();
 
-        let uniqueAssignedNatIds = [];
-        let uniqueAssignedNat = [];
+        return assignedNat;
+    }
 
-        for (const user of assignedNat) {
-            const modeInfo = user.modesInfo.find(m => m.mode == mode);
-
-            if (!uniqueAssignedNatIds.includes(user._id.toString()) && modeInfo.level == 'evaluator') {
-                uniqueAssignedNatIds.push(user._id.toString());
-                uniqueAssignedNat.push(user);
-            }
+    /**
+     * Note that when doing evaluation.natEvaluators = assignedNats, natEvaluators will be an array of ObjectsIds, NOT an array users objects. Populate again to work with it.
+     * @param {string} mode
+     * @param {string} evaluatedUserId
+     * @param {number[]} [excludeOsuIds]
+     * @param {number} [sampleSize]
+     * @returns {Promise<[]>}
+     */
+    static async getAssignedNat (mode, evaluatedUserId, excludeOsuIds, sampleSize) {
+        // set samplesize if not already set
+        if (!sampleSize) {
+            sampleSize = await Settings.getModeHasTrialNat(mode) ? await Settings.getModeEvaluationsRequired(mode) - 1 : await Settings.getModeEvaluationsRequired(mode);
         }
 
-        let finalAssignedNat = [];
+        // get user's last eval for this mode (if it exists)
+        const lastEvaluation = await Evaluation
+            .findOne({
+                user: evaluatedUserId,
+            })
+            .populate({ path: 'reviews', populate: 'evaluator' })
+            .sort({ archivedAt: -1 });
 
-        if (uniqueAssignedNatIds.length < sampleSize) {
-            const newQuery = User.aggregate([
-                {
-                    $match: {
-                        groups: 'nat',
-                        'modesInfo.mode': mode,
-                        isBnEvaluator: true,
-                        inBag: false,
-                    },
-                },
-            ]);
-
-            if (excludeOsuIds) {
-                newQuery.match({
-                    osuId: { $nin: excludeOsuIds },
-                });
+        /* choose assigned nat. priority:
+            - users who are still NAT and inBag and evaluated the user's last evaluation
+            - anyone else in bag
+        */
+       let assignedNat = [];
+            
+        if (lastEvaluation) {
+            console.log(lastEvaluation.user);
+            for (const review of lastEvaluation.reviews) {
+                if (assignedNat.length < sampleSize) {
+                    if (review.evaluator.isNat && review.evaluator.inBag) {
+                        assignedNat.push(review.evaluator);
+                    }
+                }
             }
 
-            let additionalAssignedNat = await newQuery
-                .sample(100) // random sort all options
-                .exec();
+            // fill in the gaps, if any
+            if (assignedNat.length < sampleSize) {
+                const additionalAssignedNat = await this.queryAssignmentUsers(mode, excludeOsuIds, sampleSize - assignedNat.length, true, false);
+
+                assignedNat = assignedNat.concat(additionalAssignedNat);
+            }
+        } else {
+            assignedNat = await this.queryAssignmentUsers(mode, excludeOsuIds, sampleSize, true, false);
+        }
+
+        /* if there's not enough users in the bag:
+            - run query again
+            - reset inBag for all NAT
+        */
+        if (assignedNat.length < sampleSize) {
+            const additionalAssignedNat = await this.queryAssignmentUsers(mode, excludeOsuIds, 100, true, true);
 
             for (const user of additionalAssignedNat) {
-                const modeInfo = user.modesInfo.find(m => m.mode == mode);
+                await User.findByIdAndUpdate(user._id, { inBag: true });
 
-                if (modeInfo.level == 'evaluator') {
-                    await User.findByIdAndUpdate(user._id, { inBag: true });
-
-                    if (uniqueAssignedNatIds.length < sampleSize) {
-                        uniqueAssignedNatIds.push(user._id.toString());
-                        uniqueAssignedNat.push(user);
-                        await User.findByIdAndUpdate(user._id, { inBag: false });
-                    }
+                if (assignedNat.length < sampleSize) {
+                    assignedNat.push(user);
                 }
             }
         }
 
-        finalAssignedNat = uniqueAssignedNat;
-
-        for (const user of finalAssignedNat) {
+        // remove users from bag if they're assigned to this eval
+        for (const user of assignedNat) {
             await User.findByIdAndUpdate(user._id, { inBag: false });
         }
 
-        return finalAssignedNat;
+        return assignedNat;
     }
 
     /**
@@ -408,30 +427,12 @@ class UserService extends mongoose.Model {
      * @returns {Promise<[]>}
      */
     static async getAssignedTrialNat (mode, excludeOsuIds, sampleSize) {
-        sampleSize = sampleSize || await Settings.getModeHasTrialNat(mode) ? await Settings.getModeEvaluationsRequired(mode) - 1 : await Settings.getModeEvaluationsRequired(mode);
-
-        const query = User.aggregate([
-            {
-                $match: {
-                    groups: 'bn',
-                    'modesInfo.mode': mode,
-                    isBnEvaluator: true,
-                    isTrialNat: true,
-                },
-            },
-        ]);
-
-        if (excludeOsuIds) {
-            query.match({
-                osuId: { $nin: excludeOsuIds },
-            });
+        if (!sampleSize) {
+            sampleSize = await Settings.getModeHasTrialNat(mode) ? await Settings.getModeEvaluationsRequired(mode) - 1 : await Settings.getModeEvaluationsRequired(mode);
         }
 
-        return await query
-            .sample(sampleSize)
-            .exec();
+        return this.queryAssignmentUsers(mode, excludeOsuIds, sampleSize, false, false);
     }
-
 }
 
 userSchema.loadClass(UserService);

@@ -287,7 +287,7 @@ router.post('/rejoinApply', async (req, res) => {
     newBnApp.test = test._id;
 
     // assign NAT
-    const assignedNat = await User.getAssignedNat(test.mode);
+    const assignedNat = await User.getAssignedNat(test.mode, req.session.mongoId);
     newBnApp.natEvaluators = assignedNat;
 
     const assignments = [];

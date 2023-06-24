@@ -242,7 +242,7 @@ async function replaceUser (evaluation, currentUser, evaluatorId, isBn, selected
         newEvaluator.inBag = false;
         await newEvaluator.save();
     } else {
-        const evaluatorArray = isBn ? await User.getAssignedTrialNat(evaluation.mode, currentSelection, 1) : await User.getAssignedNat(evaluation.mode, currentSelection, 1);
+        const evaluatorArray = isBn ? await User.getAssignedTrialNat(evaluation.mode, currentSelection, 1) : await User.getAssignedNat(evaluation.mode, currentUser.id, currentSelection, 1);
         newEvaluator = evaluatorArray[0];
     }
 

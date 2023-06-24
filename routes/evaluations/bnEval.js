@@ -175,7 +175,7 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
         for (let i = 0; i < result.length; i++) {
             const er = result[i];
             const u = await User.findById(er.user);
-            const assignedNat = u.isNat ? [u] : await User.getAssignedNat(er.mode, [u.osuId]);
+            const assignedNat = u.isNat ? [u] : await User.getAssignedNat(er.mode, u.id, [u.osuId]);
             er.natEvaluators = assignedNat;
             await er.populate(defaultPopulate).execPopulate();
 

@@ -155,7 +155,7 @@ router.post('/submitTest', async (req, res) => {
     let discordIds = [];
 
     if (totalScore >= 12.5 || test.mode != 'osu') {
-        const assignedNat = await User.getAssignedNat(test.mode);
+        const assignedNat = await User.getAssignedNat(test.mode, req.session.mongoId);
         currentBnApp.natEvaluators = assignedNat;
 
         const assignments = [];
