@@ -378,6 +378,7 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
                 }
     
                 user.isTrialNat = false;
+                user.modesInfo[i].level = 'full';
 
                 await user.save();
 
