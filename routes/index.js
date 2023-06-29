@@ -653,6 +653,8 @@ router.get('/callback', async (req, res) => {
                     mode: 'osu',
                     level: 'evaluator',
                 }];
+
+                await user.save();
             }
 
             req.session.mongoId = user._id;
