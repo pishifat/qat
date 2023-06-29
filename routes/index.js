@@ -648,6 +648,11 @@ router.get('/callback', async (req, res) => {
 
                 user.modesInfo = modesInfo;
                 await user.save();
+            } else if (user.isPishifat) {
+                user.modesInfo = [{
+                    mode: 'osu',
+                    level: 'evaluator',
+                }];
             }
 
             req.session.mongoId = user._id;
