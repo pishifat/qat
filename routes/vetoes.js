@@ -112,7 +112,7 @@ router.post('/submit', async (req, res) => {
         beatmapMapper: bmInfo.creator,
         beatmapMapperId: bmInfo.creator_id,
         mode: req.body.mode,
-        vetoFormat: req.body.remediation ? 4 : 3,
+        vetoFormat: req.body.remediation == 'remediation' ? 4 : 3,
     });
     veto = await Veto
         .findById(veto._id)
