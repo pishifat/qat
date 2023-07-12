@@ -23,7 +23,7 @@
                 <li>Longstanding contribution to the Beatmap Nominators - 3 Years</li>
                 <li>Longstanding contribution to the Beatmap Nominators - 4 Years</li>
                 <li>Longstanding contribution to the Beatmap Nominators - 5 Years</li>
-                <li>https://osu.ppy.sh/wiki/en/People/The_Team/Beatmap_Nominators</li>
+                <li>https://osu.ppy.sh/wiki/en/People/Beatmap_Nominators</li>
                 <li>QAT1y.png</li>
                 <li>QAT2y.jpg</li>
                 <li>QAT3y.jpg</li>
@@ -134,7 +134,7 @@ export default {
 
         badgeCommand (osuId, currentBadge, days, type) {
             let command = '';
-            
+
             const natBadges = ['QAT1y.png', 'QAT2y.jpg', 'QAT3y.jpg', 'QAT4y.jpg', 'QAT5y.jpg'];
             const bnBadges = ['BN1y.png', 'BN2y.jpg', 'BN3y.jpg', 'BN4y.jpg', 'BN5y.jpg'];
             const natTooltip = [
@@ -152,7 +152,7 @@ export default {
                 'Longstanding contribution to the Beatmap Nominators - 5 Years',
             ];
             const natWiki = 'https://osu.ppy.sh/wiki/en/People/Nomination_Assessment_Team';
-            const bnWiki = 'https://osu.ppy.sh/wiki/en/People/The_Team/Beatmap_Nominators';
+            const bnWiki = 'https://osu.ppy.sh/wiki/en/People/Beatmap_Nominators';
 
             if (type == 'nat') {
                 command = `.add-badge ${osuId} ${natBadges[this.yearsDuration(days) - 1]} "${natTooltip[this.yearsDuration(days) -1]}" ${natWiki}`;
