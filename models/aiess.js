@@ -13,7 +13,12 @@ const aiessSchema = new mongoose.Schema({
     timestamp: { type: Date },
     creatorId: { type: Number },
     creatorName: { type: String },
-    drain: { type: Number },
+    beatmaps: [{
+        _id: false,
+        drain: { type: Number },
+        starRating: { type: Number },
+        userRating: { type: Number },
+    }],
 
     obviousness: { type: Number, default: null },
     severity: { type: Number, default: null },
