@@ -382,6 +382,7 @@ class UserService extends mongoose.Model {
                 if (assignedNat.length < sampleSize) {
                     if (review.evaluator.isNat && review.evaluator.inBag) {
                         assignedNat.push(review.evaluator);
+                        excludeOsuIds.push(review.evaluator.osuId);
                     }
                 }
             }
@@ -389,6 +390,10 @@ class UserService extends mongoose.Model {
             // fill in the gaps, if any
             if (assignedNat.length < sampleSize) {
                 const additionalAssignedNat = await this.queryAssignmentUsers(mode, excludeOsuIds, sampleSize - assignedNat.length, true, false);
+
+                for (const user of additionalAssignedNat) {
+                    excludeOsuIds.push(user.osuId);
+                }
 
                 assignedNat = assignedNat.concat(additionalAssignedNat);
             }
