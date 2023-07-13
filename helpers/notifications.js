@@ -294,7 +294,8 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
                             active: false,
                             consensus: { $exists: true },
                         })
-                        .sort({ archivedAt: -1 });
+                        .sort({ archivedAt: -1 })
+                        .skip(1);
 
                     if (lastEvaluation && lastEvaluation.consensus !== BnEvaluationConsensus.ProbationBn && lastEvaluation.addition !== BnEvaluationAddition.LowActivityWarning) {
                         // process current eval
