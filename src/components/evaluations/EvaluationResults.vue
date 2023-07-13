@@ -18,7 +18,7 @@
             The NAT are busy evaluating! Come back soon.
         </div>
 
-        <div>
+        <div v-if="consenus">
             <div v-if="evaluation.isApplication">
                 <a href="#applicationInfo" data-toggle="collapse">
                     <h5>Application details <i class="fas fa-angle-down" /></h5>
@@ -64,18 +64,20 @@
                 <div class="card card-body small mb-4" v-html="$md.render(evaluation.feedback)" />
             </div>
 
-            <h5>Evaluators</h5>
-            <p>If you have questions about your evaluation, please contact any member of the {{ evaluation.mode == 'osu' ? 'NAT or BN' : 'NAT' }} below!</p>
-            <div class="card card-body">
-                <ul>
-                    <li v-for="review in natReviews" :key="review.id">
-                        <user-link
-                            :class="review.evaluator.groups.includes('nat') ? 'text-nat' : review.evaluator.groups.includes('bn') ? 'text-probation' : ''"
-                            :osu-id="review.evaluator.osuId"
-                            :username="review.evaluator.username"
-                        />
-                    </li>
-                </ul>
+            <div v-if="natReviews.length">
+                <h5>Evaluators</h5>
+                <p>If you have questions about your evaluation, please contact any member of the {{ evaluation.mode == 'osu' ? 'NAT or BN' : 'NAT' }} below!</p>
+                <div class="card card-body">
+                    <ul>
+                        <li v-for="review in natReviews" :key="review.id">
+                            <user-link
+                                :class="review.evaluator.groups.includes('nat') ? 'text-nat' : review.evaluator.groups.includes('bn') ? 'text-probation' : ''"
+                                :osu-id="review.evaluator.osuId"
+                                :username="review.evaluator.username"
+                            />
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
