@@ -17,7 +17,7 @@ const Report = require('../models/report');
 const Logger = require('../models/log');
 const ResignationEvaluation = require('../models/evaluations/resignationEvaluation');
 const { BnEvaluationConsensus, BnEvaluationAddition } = require('../shared/enums');
-const { makeWordFromField } = require('../helpers/scrap');
+const { makeWordFromField } = require('./scrap');
 const Settings = require('../models/settings');
 
 const defaultPopulate = [

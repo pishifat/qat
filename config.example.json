@@ -1,5 +1,5 @@
 {
-    "enableNotifications": false,
+    "enableAutomation": false,
     "session": "",
     "v1token": "",
     "connection": "",

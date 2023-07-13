@@ -21,7 +21,7 @@ mongoose.plugin(schema => {
 });
 
 const Logger = require('./models/log');
-const notifications = require('./helpers/notifications');
+const automation = require('./helpers/automation');
 const indexRouter = require('./routes/index');
 const bnAppRouter = require('./routes/bnApp');
 const reportsRouter = require('./routes/reports');
@@ -198,14 +198,14 @@ app.set('port', port);
 const server = app.listen(port, () => {
     console.log('Listening on ' + port);
 
-    if (config.enableNotifications) {
-        notifications.notifyDeadlines.start();
-        notifications.lowActivityTask.start();
-        notifications.closeContentReviews.start();
-        notifications.checkMatchBeatmapStatuses.start();
-        notifications.checkBnEvaluationDeadlines.start();
-        notifications.lowActivityPerUserTask.start();
-        notifications.checkTenureValidity.start();
+    if (config.enableAutomation) {
+        automation.notifyDeadlines.start();
+        automation.lowActivityTask.start();
+        automation.closeContentReviews.start();
+        automation.checkMatchBeatmapStatuses.start();
+        automation.checkBnEvaluationDeadlines.start();
+        automation.lowActivityPerUserTask.start();
+        automation.checkTenureValidity.start();
     }
 });
 
