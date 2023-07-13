@@ -18,7 +18,7 @@
             The NAT are busy evaluating! Come back soon.
         </div>
 
-        <div v-if="consenus">
+        <div v-if="consensus">
             <div v-if="evaluation.isApplication">
                 <a href="#applicationInfo" data-toggle="collapse">
                     <h5>Application details <i class="fas fa-angle-down" /></h5>
