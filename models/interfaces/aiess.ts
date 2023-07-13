@@ -15,6 +15,7 @@ interface IAiess {
     timestamp: Date;
     creatorId: number;
     creatorName: string;
+    drain: number;
     valid: number;
     obviousness: number;
     severity: number;
