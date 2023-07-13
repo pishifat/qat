@@ -361,6 +361,10 @@ class UserService extends mongoose.Model {
             sampleSize = await Settings.getModeHasTrialNat(mode) ? await Settings.getModeEvaluationsRequired(mode) - 1 : await Settings.getModeEvaluationsRequired(mode);
         }
 
+        if (!excludeOsuIds) {
+            excludeOsuIds = [];
+        }
+
         // get user's last eval for this mode (if it exists)
         const lastEvaluation = await Evaluation
             .findOne({
