@@ -166,7 +166,7 @@
                                 </ul>
                             </ul>
                             <p>For more information about the application process and cooldowns, please check out 
-                                <a href="hhttps://osu.ppy.sh/wiki/en/People/Beatmap_Nominators/Becoming_a_Beatmap_Nominator#application-process" target="_blank">this page</a>.
+                                <a href="https://osu.ppy.sh/wiki/en/People/Beatmap_Nominators/Becoming_a_Beatmap_Nominator#application-process" target="_blank">this page</a>.
                             </p>
                         </div>
                     </div>
