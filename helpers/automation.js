@@ -297,7 +297,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
                         .sort({ archivedAt: -1 })
                         .skip(1);
 
-                    if (lastEvaluation && lastEvaluation.consensus !== BnEvaluationConsensus.ProbationBn && lastEvaluation.addition !== BnEvaluationAddition.LowActivityWarning) {
+                    if (lastEvaluation && lastEvaluation.consensus !== BnEvaluationConsensus.ProbationBn) {
                         // process current eval
                         round.active = false;
                         round.discussion = true;
