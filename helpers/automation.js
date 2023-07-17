@@ -887,4 +887,13 @@ const lowActivityPerUserTask = cron.schedule('22 22 * * *', async () => {
     scheduled: false,
 });
 
-module.exports = { notifyDeadlines, lowActivityTask, closeContentReviews, checkMatchBeatmapStatuses, checkBnEvaluationDeadlines, lowActivityPerUserTask, checkTenureValidity };
+/**
+ * Checks for bns with less than required nomination count daily
+ */
+const testlog = cron.schedule('* * * * *', async () => {
+    console.log('cron? hello?');
+}, {
+    scheduled: false,
+});
+
+module.exports = { notifyDeadlines, lowActivityTask, closeContentReviews, checkMatchBeatmapStatuses, checkBnEvaluationDeadlines, lowActivityPerUserTask, checkTenureValidity, testlog };
