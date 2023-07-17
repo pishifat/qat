@@ -156,58 +156,65 @@ export default {
             const confirmInput = confirm(`Are you sure?`);
 
             if (confirmInput) {
-                if (!this.selectedModes.length) {
-                    this.$store.dispatch('updateToastMessages', {
-                        message: `Must select game mode!`,
-                        type: 'danger',
-                    });
-
-                    return;
+                let confirmGroupsInput = true;
+                if (this.groups.length) {
+                    confirmGroupsInput = confirm(`Are you *really* sure? You should only select Probation/Full/NAT if you know what you're doing.`);
                 }
 
-                if (!this.groups.length && !this.includeUsers) {
-                    this.$store.dispatch('updateToastMessages', {
-                        message: `Must select user group or include specific users!`,
-                        type: 'danger',
-                    });
-
-                    return;
-                }
-
-                const data = await this.$http.executePost(
-                    '/bnEval/addEvaluations/',
-                    {
-                        modes: this.selectedModes,
-                        groups: this.groups,
-                        includeUsers: this.includeUsers,
-                        excludeUsers: this.excludeUsers,
-                        deadline: this.deadline,
-                        isResignation: this.isResignation,
-                    },
-                    e
-                );
-
-                if (this.$http.isValid(data)) {
-                    this.$store.commit('evaluations/setEvaluations', data.evaluations);
-
-                    if (data.evaluations.length) {
-
-                        if (data.failed.length) {
-                            const usernames = data.failed.join(', ');
-                            let errorMessage = `The following usernames could not be processed: ${usernames}`;
-
-                            this.$store.dispatch('updateToastMessages', {
-                                message: errorMessage,
-                                type: 'danger',
-                            });
-                        } else {
-                            $('#addEvaluations').modal('hide');
-                        }
-                    } else {
+                if (confirmGroupsInput) {
+                    if (!this.selectedModes.length) {
                         this.$store.dispatch('updateToastMessages', {
-                            message: `No eval rounds added. Maybe re-check spelling?`,
+                            message: `Must select game mode!`,
                             type: 'danger',
                         });
+
+                        return;
+                    }
+
+                    if (!this.groups.length && !this.includeUsers) {
+                        this.$store.dispatch('updateToastMessages', {
+                            message: `Must select user group or include specific users!`,
+                            type: 'danger',
+                        });
+
+                        return;
+                    }
+
+                    const data = await this.$http.executePost(
+                        '/bnEval/addEvaluations/',
+                        {
+                            modes: this.selectedModes,
+                            groups: this.groups,
+                            includeUsers: this.includeUsers,
+                            excludeUsers: this.excludeUsers,
+                            deadline: this.deadline,
+                            isResignation: this.isResignation,
+                        },
+                        e
+                    );
+
+                    if (this.$http.isValid(data)) {
+                        this.$store.commit('evaluations/setEvaluations', data.evaluations);
+
+                        if (data.evaluations.length) {
+
+                            if (data.failed.length) {
+                                const usernames = data.failed.join(', ');
+                                let errorMessage = `The following usernames could not be processed: ${usernames}`;
+
+                                this.$store.dispatch('updateToastMessages', {
+                                    message: errorMessage,
+                                    type: 'danger',
+                                });
+                            } else {
+                                $('#addEvaluations').modal('hide');
+                            }
+                        } else {
+                            this.$store.dispatch('updateToastMessages', {
+                                message: `No eval rounds added. Maybe re-check spelling?`,
+                                type: 'danger',
+                            });
+                        }
                     }
                 }
             }

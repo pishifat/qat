@@ -209,7 +209,6 @@ router.post('/submitMediation/:id', middlewares.isBnOrNat, async (req, res) => {
 router.post('/selectMediators', middlewares.isNat, async (req, res) => {
     const mode = req.body.mode;
     const vetoFormat = req.body.vetoFormat;
-    console.log(vetoFormat);
     const allUsers = vetoFormat == 4 ? await User.getAllBnAndNat() : await User.getAllMediators();
 
     if (allUsers.error) {
