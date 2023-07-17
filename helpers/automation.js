@@ -128,7 +128,7 @@ function findDaysAgo(deadline) {
     return days;
 }
 
-const notifyDeadlines = cron.schedule('1 19 * * *', async () => {
+const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
     // establish dates for reference
     const date = new Date();
     const nearDeadline = new Date();
