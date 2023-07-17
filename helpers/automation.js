@@ -128,7 +128,7 @@ function findDaysAgo(deadline) {
     return days;
 }
 
-const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
+const notifyDeadlines = cron.schedule('50 18 * * *', async () => {
     // establish dates for reference
     const date = new Date();
     const nearDeadline = new Date();
@@ -281,8 +281,8 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
         // check if they have enough activity as a probation member to even have an eval
         if (round.deadline < endRange) {
             const modeInfo = round.user.modesInfo.find(m => m.mode == round.mode);
-            
-            if (modeInfo.level == 'probation') {
+
+            if (modeInfo && modeInfo.level == 'probation') {
                 const uniqueNominations = await Aiess.getUniqueUserEvents(round.user.osuId, new Date(round.createdAt), new Date(), [round.mode], ['nominate', 'qualify']);
                 const nomRequirement = round.mode == 'mania' || round.mode == 'catch' ? 4 : 6;
 
