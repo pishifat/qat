@@ -53,6 +53,10 @@
                         :username="selectedUser.username"
                         class="mt-2"
                     />
+
+                    <badges
+                        :user="selectedUser" 
+                    />
                 </div>
             </div>
             <div v-if="loggedInUser.isNat">
@@ -92,6 +96,7 @@ import ModdingActivity from '../evaluations/info/currentBns/ModdingActivity.vue'
 import UserActivity from '../evaluations/info/currentBns/userActivity/UserActivity.vue';
 import Resign from './info/Resign.vue';
 import BanToggle from './info/BanToggle.vue';
+import Badges from './Badges.vue';
 import ModalDialog from '../ModalDialog.vue';
 
 export default {
@@ -110,6 +115,7 @@ export default {
         Resign,
         BanToggle,
         ModalDialog,
+        Badges,
     },
     computed: {
         ...mapState([

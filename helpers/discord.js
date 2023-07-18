@@ -105,6 +105,9 @@ async function userHighlightWebhookPost(webhook, discordIds, text) {
         case 'mania':
             url += `${config.maniaWebhook.id}/${config.maniaWebhook.token}`;
             break;
+        case 'all':
+            url += `${config.allWebhook.id}/${config.allWebhook.token}`;
+            break;
     }
 
     if (!text) text = '';
@@ -150,6 +153,9 @@ async function roleHighlightWebhookPost(webhook, roles, text) {
             break;
         case 'mania':
             url += `${config.maniaWebhook.id}/${config.maniaWebhook.token}`;
+            break;
+        case 'all':
+            url += `${config.allWebhook.id}/${config.allWebhook.token}`;
             break;
     }
 
@@ -251,7 +257,7 @@ const webhookColors = {
     red: 15607337,            // overdueNotifications, problemReport, lowActivity
 
     lightOrange: 15639928,    // enableBnEvaluators, suggestionReport
-    darkOrange: 7092736,      // replaceMediator
+    darkOrange: 7092736,      // replaceMediator, pending badge
     orange: 15169835,         // replaceEvaluator, switchBnEvaluator
 
     lightYellow: 16777104,    // rejoinBnRequest

@@ -8,6 +8,7 @@ const middlewares = require('../../helpers/middlewares');
 const discord = require('../../helpers/discord');
 const util = require('../../helpers/util');
 const scrap = require('../../helpers/scrap');
+const osu = require('../../helpers/osu');
 const config = require('../../config.json');
 
 const router = express.Router();
@@ -250,15 +251,44 @@ router.post('/:id/toggleIsBannedFromBn', middlewares.isNat, async (req, res) => 
 });
 
 /* GET all users with badge info */
-router.get('/findUserBadgeInfo', async (req, res) => {
-    const badgeUsers = await User.find({
-        history: { $exists: true, $ne: [] },
-    }).sort({ username: 1 });
+router.get('/findUserBadgeInfo/:userId', async (req, res) => {
+    let badgeUsers;
+
+    if (req.params.userId == 'false') {
+        badgeUsers = await User.find({
+            history: { $exists: true, $ne: [] },
+        }).sort({ username: 1 });
+    } else {
+        badgeUsers = await User.find({
+            _id: req.params.userId,
+        });
+    }
+
+    const response = await osu.getClientCredentialsGrant();
+    const token = response.access_token;
 
     const newUsers = [];
-
+        
     for (let i = 0; i < badgeUsers.length; i++) {
         const user = badgeUsers[i];
+
+        const mapperInfo = await osu.getOtherUserInfo(token, user.osuId);
+        await util.sleep(50);
+
+        const noms = mapperInfo.nominated_beatmapset_count;
+        let thresholdNominationCount = 0;
+
+        if (noms >= 200 && noms < 400) {
+            thresholdNominationCount = 200;
+        } else if (noms >= 400 && noms < 600) {
+            thresholdNominationCount = 400;
+        } else if (noms >= 600 && noms < 800) {
+            thresholdNominationCount = 600;
+        } else if (noms >= 800 && noms < 1000) {
+            thresholdNominationCount = 800;
+        } else if (noms >= 1000) {
+            thresholdNominationCount = 1000;
+        }
 
         newUsers.push({
             id: user.id,
@@ -266,8 +296,10 @@ router.get('/findUserBadgeInfo', async (req, res) => {
             username: user.username,
             bnProfileBadge: user.bnProfileBadge,
             natProfileBadge: user.natProfileBadge,
+            nominationsProfileBadge: user.nominationsProfileBadge,
             bnDuration: user.bnDuration += (30 * await scrap.findAdditionalBnMonths(user)),
             natDuration: user.natDuration,
+            actualNominationsProfileBadge: thresholdNominationCount/200,
         });
     }
 
@@ -293,15 +325,18 @@ router.post('/editBadgeValue/:id', async (req, res) => {
     let u = await User.findById(req.params.id);
 
     if (res.locals.userRequest.isResponsibleWithButtons) {
-        let years;
+        let value;
         let num = req.body.add ? 1 : -1;
 
         if (req.body.group == 'bn') {
-            years = u.bnProfileBadge + num;
-            await User.findByIdAndUpdate(req.params.id, { bnProfileBadge: years });
-        } else {
-            years = u.natProfileBadge + num;
-            await User.findByIdAndUpdate(req.params.id, { natProfileBadge: years });
+            value = u.bnProfileBadge + num;
+            await User.findByIdAndUpdate(req.params.id, { bnProfileBadge: value });
+        } else if (req.body.group == 'nat') {
+            value = u.natProfileBadge + num;
+            await User.findByIdAndUpdate(req.params.id, { natProfileBadge: value });
+        } else if (req.body.group == 'nom') {
+            let value = u.nominationsProfileBadge + num;
+            await User.findByIdAndUpdate(req.params.id, { nominationsProfileBadge: value });
         }
     }
 

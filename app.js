@@ -206,6 +206,7 @@ const server = app.listen(port, () => {
         automation.checkBnEvaluationDeadlines.start();
         automation.lowActivityPerUserTask.start();
         automation.checkTenureValidity.start();
+        automation.badgeTracker.start();
     }
 });
 

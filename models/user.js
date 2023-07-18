@@ -32,6 +32,7 @@ const userSchema = new mongoose.Schema({
     isNatLeader: { type: Boolean, default: false },
     bnProfileBadge: { type: Number, default: 0 },
     natProfileBadge: { type: Number, default: 0 },
+    nominationsProfileBadge: { type: Number, default: 0 },
     rankedBeatmapsets: { type: Number, default: 0 },
     discordId: { type: String },
     requestStatus: [{ type: String, enum: ['gameChat', 'personalQueue', 'closed'] }],

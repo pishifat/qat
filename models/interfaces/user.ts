@@ -24,6 +24,7 @@ interface IUser {
     isNatLeader: boolean;
     bnProfileBadge: number;
     natProfileBadge: number;
+    nominationsProfileBadge: number;
     rankedBeatmapsets: number;
     discordId: string;
     requestStatus: string[];

@@ -887,4 +887,176 @@ const lowActivityPerUserTask = cron.schedule('22 22 * * *', async () => {
     scheduled: false,
 });
 
-module.exports = { notifyDeadlines, lowActivityTask, closeContentReviews, checkMatchBeatmapStatuses, checkBnEvaluationDeadlines, lowActivityPerUserTask, checkTenureValidity };
+/**
+ * @param {number} days
+ */
+function yearsDuration(days) {
+    return Math.floor(days / 365);
+}
+
+/**
+ * @param {number} osuId
+ * @param {number} currentBadge
+ * @param {number} value
+ * @param {string} type
+ */
+function badgeCommand (osuId, currentBadge, value, type) {
+    let command = '';
+
+    if (type == 'nom') {
+        value = value / 200;
+    }
+
+    const natBadges = ['QAT1y.png', 'QAT2y.png', 'QAT3y.jpg', 'QAT4y.jpg', 'QAT5y.jpg'];
+    const bnBadges = ['BN1y.png', 'BN2y.jpg', 'BN3y.jpg', 'BN4y.jpg', 'BN5y.jpg'];
+    const nomBadges = ['nom200.jpg', 'nom400.jpg', 'nom600.jpg', 'nom800.jpg', 'nom1000.jpg'];
+    const natTooltip = [
+        'Longstanding contribution to the Nomination Assessment Team - 1 Year',
+        'Longstanding contribution to the Nomination Assessment Team - 2 Years',
+        'Longstanding contribution to the Nomination Assessment Team - 3 Years',
+        'Longstanding contribution to the Nomination Assessment Team - 4 Years',
+        'Longstanding contribution to the Nomination Assessment Team - 5 Years',
+    ];
+    const bnTooltip = [
+        'Longstanding contribution to the Beatmap Nominators - 1 Year',
+        'Longstanding contribution to the Beatmap Nominators - 2 Years',
+        'Longstanding contribution to the Beatmap Nominators - 3 Years',
+        'Longstanding contribution to the Beatmap Nominators - 4 Years',
+        'Longstanding contribution to the Beatmap Nominators - 5 Years',
+    ];
+    const nomTooltip = [
+        'Nominated 200+ beatmaps as a Beatmap Nominator',
+        'Nominated 400+ beatmaps as a Beatmap Nominator',
+        'Nominated 600+ beatmaps as a Beatmap Nominator',
+        'Nominated 800+ beatmaps as a Beatmap Nominator',
+        'Nominated 1,000+ beatmaps as a Beatmap Nominator',
+    ];
+    const natWiki = 'https://osu.ppy.sh/wiki/en/People/Nomination_Assessment_Team';
+    const bnWiki = 'https://osu.ppy.sh/wiki/en/People/Beatmap_Nominators';
+    const nomWiki = 'https://osu.ppy.sh/wiki/en/Beatmap_ranking_procedure#nominations';
+
+    if (type == 'nat') {
+        command = `.add-badge ${osuId} ${natBadges[value - 1]} "${natTooltip[value - 1]}" ${natWiki}`;
+        (currentBadge >= 1) ? command += ` --replace ${natBadges[currentBadge - 1]}` : '';
+    } else if (type == 'bn') {
+        command = `.add-badge ${osuId} ${bnBadges[value - 1]} "${bnTooltip[value - 1]}" ${bnWiki}`;
+        (currentBadge >= 1) ? command += ` --replace ${bnBadges[currentBadge - 1]}` : '';
+    } else if (type == 'nom') {
+        command = `.add-badge ${osuId} ${nomBadges[value - 1]} "${nomTooltip[value - 1]}" ${nomWiki}`;
+        (currentBadge >= 1) ? command += ` --replace ${nomBadges[currentBadge - 1]}` : '';
+    }
+
+    return command;
+}
+
+/**
+ * Tracks BN-related badges
+ */
+const badgeTracker = cron.schedule('5 17 * * *', async () => {
+    const users = await User.find({ history: { $ne: [], $exists: true } }).limit(1);
+
+    const response = await osu.getClientCredentialsGrant();
+    const token = response.access_token;
+    const natLeaders = await User.find({ isNatLeader: true });
+    const discordIds = natLeaders.map(u => u.discordId)
+
+    for (const user of users) {
+        // find nomination count stuff
+        const mapperInfo = await osu.getOtherUserInfo(token, user.osuId);
+        await util.sleep(500);
+
+        const noms = mapperInfo.nominated_beatmapset_count;
+        let thresholdNominationCount = 0;
+
+        if (noms >= 200 && noms < 400) {
+            thresholdNominationCount = 200;
+        } else if (noms >= 400 && noms < 600) {
+            thresholdNominationCount = 400;
+        } else if (noms >= 600 && noms < 800) {
+            thresholdNominationCount = 600;
+        } else if (noms >= 800 && noms < 1000) {
+            thresholdNominationCount = 800;
+        } else if (noms >= 1000) {
+            thresholdNominationCount = 1000;
+        }
+
+        if (thresholdNominationCount !== user.nominationsProfileBadge*200) {
+            await discord.userHighlightWebhookPost('all', discordIds);
+            await discord.webhookPost(
+                [{
+                    color: discord.webhookColors.darkOrange,
+                    description: `[**${user.username}**](https://osu.ppy.sh/users/${user.osuId}) needs new nomination count badge: **${user.nominationsProfileBadge*200} → ${thresholdNominationCount}**\n` + 
+                    '`' + badgeCommand(user.osuId, user.nominationsProfileBadge, thresholdNominationCount, 'nom') + '`'
+                }],
+                'all',
+            );
+        }
+
+        // find bn badge discrepency
+        const bnYears = yearsDuration(user.bnDuration + (30 * await scrap.findAdditionalBnMonths(user)));
+
+        if (bnYears <= 5 && bnYears !== user.bnProfileBadge) {
+            let filename;
+
+            switch (bnYears) {
+                case 1:
+                    filename = 'BN1y.png';
+                    break;
+                default:
+                    filename = `BN${bnYears}y.jpg`
+                    break;
+            }
+
+            await discord.userHighlightWebhookPost('all', discordIds);
+            await discord.webhookPost(
+                [{
+                    color: discord.webhookColors.darkOrange,
+                    description: `[**${user.username}**](https://osu.ppy.sh/users/${user.osuId}) needs new BN badge: **${user.bnProfileBadge} → ${bnYears}**\n` + 
+                    '`' + badgeCommand(user.osuId, user.bnProfileBadge, bnYears, 'bn') + '`',
+                    image: 
+                        {
+                            url: `https://assets.ppy.sh/profile-badges/${filename}`
+                        },
+                }],
+                'all',
+            );
+        }
+
+        // find nat badge discrepency
+        const natYears = yearsDuration(user.natDuration + (30 * await scrap.findAdditionalBnMonths(user)));
+
+        if (natYears <= 5 && natYears !== user.natProfileBadge) {
+            let filename;
+
+            switch (natYears) {
+                case 1:
+                    filename = 'QAT1y.png';
+                    break;
+                case 1:
+                    filename = 'QAT2y.png';
+                    break;
+                default:
+                    filename = `QAT${natYears}y.jpg`
+                    break;
+            }
+    
+            await discord.userHighlightWebhookPost('all', discordIds);
+            await discord.webhookPost(
+                [{
+                    color: discord.webhookColors.darkOrange,
+                    description: `[**${user.username}**](https://osu.ppy.sh/users/${user.osuId}) needs new NAT badge: **${user.natProfileBadge} → ${natYears}** \n` + 
+                    '`' + badgeCommand(user.osuId, user.natProfileBadge, natYears, 'nat') + '`',
+                    image: 
+                        {
+                            url: `https://assets.ppy.sh/profile-badges/${filename}`
+                        },
+                }],
+                'all',
+            );
+        }
+    }
+}, {
+    scheduled: false,
+});
+
+module.exports = { notifyDeadlines, lowActivityTask, closeContentReviews, checkMatchBeatmapStatuses, checkBnEvaluationDeadlines, lowActivityPerUserTask, checkTenureValidity, badgeTracker };
