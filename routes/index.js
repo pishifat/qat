@@ -614,7 +614,7 @@ router.get('/callback', async (req, res) => {
             }
 
             if (groups.some(g => !user.groups.includes(g)) || user.groups.some(g => !groups.includes(g))) {
-                if (!user.groups.includes('gmt') && groups.includes('gmt')) {
+                if (!user.groups.includes('gmt') && groups.includes('gmt') && !groups.includes('bn') && !groups.includes('nat')) {
                     Logger.generate(
                         user._id,
                         `User toggled on spectator role`,
