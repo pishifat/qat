@@ -986,7 +986,11 @@ const badgeTracker = cron.schedule('8 18 * * *', async () => {
                 [{
                     color: discord.webhookColors.darkOrange,
                     description: `[**${user.username}**](https://osu.ppy.sh/users/${user.osuId}) needs new nomination count badge: **${user.nominationsProfileBadge*200} → ${thresholdNominationCount}**\n` + 
-                    '`' + badgeCommand(user.osuId, user.nominationsProfileBadge, thresholdNominationCount, 'nom') + '`'
+                    '`' + badgeCommand(user.osuId, user.nominationsProfileBadge, thresholdNominationCount, 'nom') + '`',
+                    image: 
+                        {
+                            url: `https://assets.ppy.sh/profile-badges/noms${thresholdNominationCount}.png`
+                        },
                 }],
                 'all',
             );
