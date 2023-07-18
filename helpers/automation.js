@@ -952,8 +952,8 @@ function badgeCommand (osuId, currentBadge, value, type) {
 /**
  * Tracks BN-related badges
  */
-const badgeTracker = cron.schedule('5 17 * * *', async () => {
-    const users = await User.find({ history: { $ne: [], $exists: true } }).limit(1);
+const badgeTracker = cron.schedule('2 18 * * *', async () => {
+    const users = await User.find({ history: { $ne: [], $exists: true } });
 
     const response = await osu.getClientCredentialsGrant();
     const token = response.access_token;
