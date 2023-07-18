@@ -118,14 +118,6 @@ router.post('/assignUser/:id/:mode', middlewares.isBnOrNat, async (req, res) => 
         return res.json({ error: 'You cannot check your maps!' });
     }
 
-    if (!newChecker.fullModes.includes(req.params.mode)) {
-        return res.json({ error: 'You are not qualified for this game mode!' });
-    }
-
-    if (qaChecks.length >= 2) {
-        return res.json({ error: 'Map has too many checks for this mode!' });
-    }
-
     let newCheck = new QualityAssuranceCheck();
     newCheck.user = newChecker._id;
     newCheck.event = event._id;
