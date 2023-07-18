@@ -95,6 +95,7 @@ export default {
 
                 if (this.messageType == 'eval' && res.success) {
                     await this.$http.executePost(`/${route}/setComplete/`, { evalIds: [mongoId] });
+                    $('#evaluationInfo').modal('hide');
                     this.$router.push(`evalarchive?id=${mongoId}`);
                 }
 
