@@ -156,7 +156,7 @@ export default {
 
             const natBadges = ['QAT1y.png', 'QAT2y.png', 'QAT3y.jpg', 'QAT4y.jpg', 'QAT5y.jpg'];
             const bnBadges = ['BN1y.png', 'BN2y.jpg', 'BN3y.jpg', 'BN4y.jpg', 'BN5y.jpg'];
-            const nomBadges = ['nom200.jpg', 'nom400.jpg', 'nom600.jpg', 'nom800.jpg', 'nom1000.jpg'];
+            const nomBadges = ['nom200.png', 'nom400.png', 'nom600.png', 'nom800.png', 'nom1000.png'];
             const natTooltip = [
                 'Longstanding contribution to the Nomination Assessment Team - 1 Year',
                 'Longstanding contribution to the Nomination Assessment Team - 2 Years',
