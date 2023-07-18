@@ -1023,7 +1023,7 @@ const badgeTracker = cron.schedule('2 18 * * *', async () => {
         }
 
         // find nat badge discrepency
-        const natYears = yearsDuration(user.natDuration + (30 * await scrap.findAdditionalBnMonths(user)));
+        const natYears = yearsDuration(user.natDuration);
 
         if (natYears <= 5 && natYears !== user.natProfileBadge) {
             let filename;
