@@ -957,7 +957,7 @@ const badgeTracker = cron.schedule('8 18 * * *', async () => {
 
     const response = await osu.getClientCredentialsGrant();
     const token = response.access_token;
-    const natLeaders = await User.find({ osuId: 14102976 });
+    const natLeaders = await User.find({ isNatLeader: true });
     const discordIds = natLeaders.map(u => u.discordId)
 
     for (const user of users) {
