@@ -1064,13 +1064,13 @@ const badgeTracker = cron.schedule('8 18 * * *', async () => {
 });
 
 /**
- * Validate beatmaps info on events
+ * Validate beatmaps info on events, once per hour (xx:40)
  */
-const validateEvents = cron.schedule('40 * * * * *', async () => {
+const validateEvents = cron.schedule('40 * * * *', async () => {
     const events = await Aiess
         .find({ validated: { $ne: true }, beatmapsetId: { $exists: true } })
         .sort({ createdAt: -1 })
-        .limit(30);
+        .limit(500);
 
     const response = await osu.getClientCredentialsGrant();
     const token = response.access_token;
