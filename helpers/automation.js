@@ -1063,4 +1063,43 @@ const badgeTracker = cron.schedule('8 18 * * *', async () => {
     scheduled: false,
 });
 
-module.exports = { notifyDeadlines, lowActivityTask, closeContentReviews, checkMatchBeatmapStatuses, checkBnEvaluationDeadlines, lowActivityPerUserTask, checkTenureValidity, badgeTracker };
+/**
+ * Validate beatmaps info on events
+ */
+const validateEvents = cron.schedule('40 * * * * *', async () => {
+    const events = await Aiess
+        .find({ validated: { $ne: true }, beatmapsetId: { $exists: true } })
+        .sort({ createdAt: -1 })
+        .limit(30);
+
+    const response = await osu.getClientCredentialsGrant();
+    const token = response.access_token;
+
+    for (const event of events) {
+        const beatmapsetInfo = await osu.getBeatmapsetInfo(token, event.beatmapsetId);
+        await util.sleep(500);
+
+        console.log(beatmapsetInfo.artist + ' - ' + beatmapsetInfo.title);
+
+        if (beatmapsetInfo.ranked == 1) {
+            event.beatmaps = [];
+
+            for (const beatmap of beatmapsetInfo.beatmaps) {
+                const slimBeatmap = {
+                    drain: beatmap.hit_length,
+                    starRating: beatmap.difficulty_rating,
+                    userRating: 0, // this field is irrelevant after validation
+                };
+
+                event.beatmaps.push(slimBeatmap);
+            }
+
+            event.validated = true;
+            await event.save();
+        }
+    }
+}, {
+    scheduled: false,
+});
+
+module.exports = { notifyDeadlines, lowActivityTask, closeContentReviews, checkMatchBeatmapStatuses, checkBnEvaluationDeadlines, lowActivityPerUserTask, checkTenureValidity, badgeTracker, validateEvents };

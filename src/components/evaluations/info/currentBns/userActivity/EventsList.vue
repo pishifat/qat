@@ -37,6 +37,15 @@
 
                             {{ artistTitle(event) }}
                         </a>
+                        <span
+                            v-if="event.beatmaps && event.beatmaps.length"
+                            class="text-secondary small"
+                            data-toggle="tooltip"
+                            data-placement="right"
+                            :title="event.validated ? 'total drain time' : 'total drain time, not yet validated'"
+                        >
+                            ({{ totalDrain(event.beatmaps)}}{{ event.validated ? '' : '*' }})
+                        </span>
                         <a
                             v-if="(loggedInUser.isNat || loggedInUser.isTrialNat) && isEvaluation"
                             href="#"
@@ -183,6 +192,18 @@ export default {
             } else {
                 return event.timestamp;
             }
+        },
+        totalDrain(beatmaps) {
+            let drain = 0;
+
+            for (const beatmap of beatmaps) {
+                drain += beatmap.drain;
+            }
+
+            const seconds = drain % 60;
+            const minutes = (drain - seconds)/60
+
+            return minutes + ":" + seconds;
         },
     },
 };

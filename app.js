@@ -207,6 +207,7 @@ const server = app.listen(port, () => {
         automation.lowActivityPerUserTask.start();
         automation.checkTenureValidity.start();
         automation.badgeTracker.start();
+        automation.validateEvents.start();
     }
 });
 
