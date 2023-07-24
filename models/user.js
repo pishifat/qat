@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
     groups: [{ type: String, enum: ['user', 'bn', 'nat', 'gmt'], default: ['user'] }],
     modesInfo: [{
         _id: false,
-        mode: { type: String, enum: ['osu', 'taiko', 'catch', 'mania'], required: true },
+        mode: { type: String, enum: ['osu', 'taiko', 'catch', 'mania', 'none'], required: true },
         level: { type: String, enum: ['full', 'probation', 'evaluator'], required: true },
     }],
     history: [{

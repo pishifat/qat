@@ -650,7 +650,7 @@ router.get('/callback', async (req, res) => {
                 await user.save();
             } else if (user.isPishifat) {
                 user.modesInfo = [{
-                    mode: 'osu',
+                    mode: 'none',
                     level: 'evaluator',
                 }];
 
