@@ -4,7 +4,7 @@
             <a :href="userReports && `#${eventId}`" data-toggle="collapse"
                 >{{ header }} <i class="fas fa-angle-down"
             /></a>
-            ({{ isLoading ? '...' : userReports ? userReports.length : '0' }})
+            ({{ !userReports ? '...' : userReports.length }})
         </div>
 
         <div v-if="userReports" :id="eventId" class="collapse">

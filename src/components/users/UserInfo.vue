@@ -10,7 +10,7 @@
             <div v-if="selectedUser.isBn || selectedUser.isNat">
                 <next-evaluation
                     v-for="mode in selectedUser.modes"
-                    :key="mode"
+                    :key="mode + selectedUser.osuId"
                     :mode="mode"
                     :mongo-id="selectedUser.id"
                 />
