@@ -121,7 +121,7 @@ export default {
 
             if (users) {
                 this.badgeUsers = users.filter(user =>
-                    (this.yearsDuration(user.bnDuration) >= 1) || (this.yearsDuration(user.natDuration) >= 1 || user.nominationsProfileBadge >= 1)
+                    (this.yearsDuration(user.bnDuration) >= 1) || (this.yearsDuration(user.natDuration) >= 1 || user.actualNominationsProfileBadge >= 1)
                 );
             }
         },
