@@ -193,7 +193,7 @@ export default {
     methods: {
         filterOpenUsers(allUsersByMode) {
             const sortOrder = ['osu', 'taiko', 'catch', 'mania'];
-            const filtered = allUsersByMode;
+            const filtered = allUsersByMode.filter(a => a._id != 'none');
 
             // filter out users who have "closed" in their requestStatus array
             filtered.forEach((mode) => {
