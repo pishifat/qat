@@ -20,7 +20,7 @@ const store = new Vuex.Store({
     getters: {
         userMainMode (state) {
             if (state.loggedInUser && state.loggedInUser.modes && state.loggedInUser.modes.length) {
-                return state.loggedInUser.modes[0];
+                return state.loggedInUser.modes[0] == 'none' ? 'osu' : state.loggedInUser.modes[0];
             }
 
             return 'osu';

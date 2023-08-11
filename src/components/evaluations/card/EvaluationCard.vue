@@ -90,7 +90,7 @@ export default {
             if (this.evaluation.isApplication) return 'user';
             else if (this.evaluation.user.probationModes.includes(this.evaluation.mode)) return 'probation';
             else if (this.evaluation.user.fullModes.includes(this.evaluation.mode)) return 'bn';
-            else if (this.evaluation.user.evaluatorModes.includes(this.evaluation.mode)) return 'nat';
+            else if (this.evaluation.user.evaluatorModes.includes(this.evaluation.mode) || this.evaluation.user.evaluatorModes.includes('none')) return 'nat';
             else return 'user';
         },
         isSelected () {
