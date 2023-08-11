@@ -81,6 +81,16 @@ router.get('/loadNextEvaluation/:id/:mode', async (req, res) => {
     const er = await BnEvaluation.findOne({ user: req.params.id, mode: req.params.mode, active: true });
 
     if (!er) {
+        const user = await User.findById(req.params.id);
+
+        if (user && user.modesInfo[0].mode == 'none' && !user.modesInfo[1]) {
+            const noModeEvaluationRound = await BnEvaluation.findOne({ user: req.params.id, active: true });
+
+            if (noModeEvaluationRound) {
+                return res.json(noModeEvaluationRound.deadline);
+            }
+        }
+
         return res.json('Never');
     }
 

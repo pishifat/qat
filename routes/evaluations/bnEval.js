@@ -328,7 +328,7 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
         const i = user.modesInfo.findIndex(m => m.mode === evaluation.mode);
 
         // nat evaluation processing
-        if (user.evaluatorModes.includes(evaluation.mode)) {
+        if (user.evaluatorModes.includes(evaluation.mode) || user.evaluatorModes.includes('none')) {
             const userGroup = req.body.userGroup || 'nat';
 
             if (userGroup == 'nat') {
@@ -338,7 +338,7 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
 
                 await BnEvaluation.create({
                     user: evaluation.user,
-                    mode: evaluation.mode,
+                    mode: evaluation.mode == 'none' ? 'osu' : evaluation.mode,
                     deadline,
                     activityToCheck: random45,
                     natEvaluators: [evaluation.user],
