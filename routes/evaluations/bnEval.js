@@ -510,7 +510,7 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
 
                 const evaluationsWithoutIncident = await findEvaluationsWithoutIncident(user._id);
 
-                if (evaluationsWithoutIncident > 1 && (!evaluation.addition || evaluation.addition !== BnEvaluationAddition.None)) {
+                if (evaluation.mode != 'mania' && evaluationsWithoutIncident > 1 && (!evaluation.addition || evaluation.addition !== BnEvaluationAddition.None)) {
                     deadline.setDate(deadline.getDate() + random180);
                     activityToCheck = random180;
                 } else {
