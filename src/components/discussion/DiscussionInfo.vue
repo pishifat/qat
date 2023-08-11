@@ -23,7 +23,7 @@
 
                 <!-- only show voting options for users of specified mode -->
                 <mediator-options
-                    v-if="loggedInUser.modes.includes(selectedDiscussionVote.mode) || selectedDiscussionVote.mode == 'all'"
+                    v-if="loggedInUser.modes.includes(selectedDiscussionVote.mode) || selectedDiscussionVote.mode == 'all' || loggedInUser.modes.includes('none')"
                 />
                 <p v-else class="small">
                     Because you're not proficient in this proposal's game mode, you're not able to vote :(
