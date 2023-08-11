@@ -831,8 +831,8 @@ async function hasLowActivity(initialDate, bn, mode, months) {
     const uniqueNominationsCount = await scrap.findUniqueNominationsCount(initialDate, new Date(), bn);
 
     if (
-        (uniqueNominationsCount < (2 * months) && mode == 'mania') ||
-        (uniqueNominationsCount < (3 * months) && mode != 'mania')
+        (uniqueNominationsCount < (2 * months) && (mode == 'mania' || mode == 'catch')) ||
+        (uniqueNominationsCount < (3 * months) && (mode == 'osu' || mode == 'taiko'))
     ) {
         return true;
     }
