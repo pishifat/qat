@@ -81,13 +81,13 @@
                 Preview:
                 <div
                     class="pre-line"
-                    :class="announcement.length > 950 ? 'text-danger' : 'text-secondary'"
+                    :class="announcement.length > 4096 ? 'text-danger' : 'text-secondary'"
                 >
                     <b v-for="role in roles" :key="role">@{{ role }} </b>
                     <b>{{ title }}</b>
                     <span class="small" v-html="$md.render(announcement)"></span>
                 </div>
-                <b v-if="announcement.length > 950">TOO MANY CHARACTERS FOR DISCORD. shorten message pls</b>
+                <b v-if="announcement.length > 4096">TOO MANY CHARACTERS FOR DISCORD. shorten message pls</b>
             </div>
 
             <button v-if="announcement.length" class="btn btn-danger my-1" @click="sendAnnouncement($event)">
