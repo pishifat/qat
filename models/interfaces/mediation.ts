@@ -6,6 +6,7 @@ export interface IMediationDocument extends Document {
     comment?: string;
     vote?: number;
     reasonIndex?: number;
+    vccChecked?: string[];
 }
 
 export interface IMediationModel extends Model<IMediationDocument> { }

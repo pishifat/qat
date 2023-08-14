@@ -242,6 +242,7 @@ router.post('/submitMediation/:id', middlewares.hasBasicAccess, async (req, res)
 
     mediation.comment = req.body.comment;
     mediation.vote = req.body.vote;
+    mediation.vccChecked = req.body.vccChecked;
     await mediation.save();
 
     if (isNewMediation) {
@@ -286,13 +287,9 @@ router.post('/concludeMediation/:id', middlewares.hasFullReadAccess, async (req,
         discussion._id
     );
 
-    if (discussion.isContentReview) {
-        const { message, channel } = await discord.contentCaseWebhookPost(discussion);
-        await osuBot.sendAnnouncement([discussion.creator.osuId], channel, message);
-    } else {
+    if (!discussion.isContentReview) {
         discord.discussionWebhookPost(discussion, req.session);
     }
-
 });
 
 /* POST update discussion */

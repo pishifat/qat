@@ -1,9 +1,22 @@
 <template>
     <div>
         <hr>
+        <!-- vcc violations -->
+        <div v-if="selectedDiscussionVote.isContentReview && !selectedDiscussionVote.isAcceptable">
+            Violations against the <a href="https://osu.ppy.sh/wiki/en/Rules/Visual_Content_Considerations" target="_blank">Visual Content Considerations</a>:
+            <ul>
+                <span v-for="option in visualContentConsiderations" :key="option.name">
+                    <li v-if="countVccSelections(option.name)"><b>{{ option.text }}</b> - {{ countVccSelections(option.name)}} vote{{ countVccSelections(option.name) == 1 ? '' : 's' }}</li>
+                </span>
+            </ul>
+            <hr>
+        </div>
+
+        <!-- show/hide bns button -->
         <button v-if="loggedInUser.hasBasicAccess" class="btn btn-sm btn-block btn-primary ml-2 mb-2" type="submit" @click="showAll = !showAll">
             {{ showAll ? 'Hide BN votes' : 'Show all votes' }}
         </button>
+
         <!-- agree -->
         <votes-inactive-type
             :bn-mediations="agreeMediations('bn')"
@@ -40,6 +53,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import VotesInactiveType from './VotesInactiveType.vue';
+import { VisualContentConsiderations } from '../../../../../shared/enums.js';
 
 export default {
     name: 'VotesInactive',
@@ -49,6 +63,7 @@ export default {
     data () {
         return {
             showAll: true,
+            visualContentConsiderations: VisualContentConsiderations,
         };
     },
     computed: {
@@ -96,6 +111,17 @@ export default {
 
             return m;
         },
+        countVccSelections(name) {
+            let count = 0;
+
+            for (const mediation of this.selectedDiscussionVote.mediations) {
+                if (mediation.vccChecked && mediation.vccChecked.includes(name)) {
+                    count++;
+                }
+            }
+
+            return count;
+        }
     },
 };
 </script>

@@ -5,6 +5,7 @@ const mediationSchema = new mongoose.Schema({
     comment: { type: String },
     vote: { type: Number, enum: [1, 2, 3] },
     reasonIndex: { type: Number },
+    vccChecked: [{ type: String }], // for content review exclusively
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 /**

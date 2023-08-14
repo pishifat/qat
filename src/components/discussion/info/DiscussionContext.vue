@@ -104,7 +104,7 @@
             </span>
         </div>
 
-        <div v-if="selectedDiscussionVote.isContentReview">
+        <div v-if="selectedDiscussionVote.isContentReview && selectedDiscussionVote.isActive">
             <b>Content review notes:</b>
             <div class="small">
                 <ul>

@@ -46,8 +46,30 @@
                 </div>
             </div>
 
+            <div v-if="isContentReview && vote == 3">
+                Select the <a href="https://osu.ppy.sh/wiki/en/Rules/Visual_Content_Considerations" target="_blank">Visual Content Considerations</a> that are violated:
+                <div class="form-check ml-4" v-for="(option, i) in vccOptions" :key="i">
+                    <div v-if="option.active">
+                        <input
+                            :key="i"
+                            :id="option.name"
+                            v-model="vccChecked"
+                            class="form-check-input"
+                            type="checkbox"
+                            name="violation"
+                            :value="option.name"
+                        >
+                        <label class="form-check-label" :for="option.name">{{ option.text }}</label>
+                    </div>
+                </div>
+            </div>
+
             <div class="d-flex justify-content-end">
-                <button class="btn btn-sm btn-primary" @click="submitMediation($event)">
+                <button
+                    class="btn btn-sm btn-primary"
+                    @click="submitMediation($event)"
+                    :disabled="isContentReview && (!vote || (vote == 3 && !vccChecked.length))"
+                >
                     Submit vote
                 </button>
             </div>
@@ -57,14 +79,23 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import { VisualContentConsiderations } from '../../../../shared/enums.js';
 
 export default {
     name: 'MediatorOptions',
+    props: {
+        isContentReview: {
+            type: Boolean,
+            default: false, 
+        },
+    },
     data() {
         return {
             vote: null,
             comment: null,
             mediationId: null,
+            vccOptions: VisualContentConsiderations,
+            vccChecked: [],
         };
     },
     computed: {
@@ -105,6 +136,7 @@ export default {
                 '/discussionVote/submitMediation/' + this.selectedDiscussionVote.id, {
                     vote: this.vote,
                     comment: this.comment,
+                    vccChecked: this.vccChecked,
                 }, e);
 
             if (this.$http.isValid(data)) {
