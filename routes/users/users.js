@@ -176,7 +176,7 @@ router.post('/resetEvaluationDeadline/:id/:mode', middlewares.isNat, async (req,
 
             const evaluationsWithoutIncident = await findEvaluationsWithoutIncident(userId);
 
-            if (evaluationsWithoutIncident > 1) {
+            if (evaluation.mode != 'mania' && evaluationsWithoutIncident > 1 && (!evaluation.addition || evaluation.addition !== BnEvaluationAddition.None)) {
                 deadline.setDate(deadline.getDate() + random180);
                 activityToCheck = random180;
             } else {
