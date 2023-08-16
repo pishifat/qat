@@ -279,7 +279,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
         let processed = false;
 
         // check if they have enough activity as a probation member to even have an eval
-        if (round.deadline < endRange) {
+        /*if (round.deadline < endRange) {
             const modeInfo = round.user.modesInfo.find(m => m.mode == round.mode);
 
             if (modeInfo && modeInfo.level == 'probation') {
@@ -359,7 +359,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
                     }
                 }
             }
-        }
+        }*/
 
         // set up evaluation
         if (!processed) {
