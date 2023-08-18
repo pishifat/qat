@@ -62,7 +62,7 @@ export default {
 
             if (!this.skipProbation && (this.consensus == 'probationBn' || this.consensus == 'pass' || this.selectedEvaluation.addition == 'lowActivityWarning')) {
                 num = 1;
-            } else if (this.evaluationsWithoutIncident > 1 && (!this.selectedEvaluation.addition || this.selectedEvaluation.addition == 'none')) {
+            } else if (this.evaluationsWithoutIncident > 1 && (!this.selectedEvaluation.addition || this.selectedEvaluation.addition == 'none') && this.selectedEvaluation.mode != 'mania') {
                 num = 6;
             } else {
                 num = 3;
