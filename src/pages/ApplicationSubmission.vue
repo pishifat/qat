@@ -298,7 +298,7 @@ export default {
             cooldownResignations: [],
             relevantResignation: null,
             cooldown: false,
-            selectedMode: 'osu',
+            selectedMode: '',
             mods: [],
             reasons: [],
             oszs: [],
