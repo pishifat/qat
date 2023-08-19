@@ -35,7 +35,7 @@ function getBeatmapsetIdFromUrl(url) {
  * @returns {boolean}
  */
 function isValidUrl(url, contain) {
-    const regexp = /^(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/;
+    const regexp = /^(?:(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?|mailto:[^\s@]+@[^\s@]+\.[^\s@]+)$/;
 
     if (!regexp.test(url) || (contain && !url.includes(contain))) {
         return false;
