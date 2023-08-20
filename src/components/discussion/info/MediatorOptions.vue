@@ -119,6 +119,7 @@ export default {
             this.vote = null;
             this.comment = null;
             this.mediationId = null;
+            this.vccChecked = [];
 
             if (this.selectedDiscussionVote.mediations.length) {
                 for (const mediation of this.selectedDiscussionVote.mediations) {
@@ -126,6 +127,7 @@ export default {
                         if (mediation.vote) this.vote = mediation.vote;
                         if (mediation.comment) this.comment = mediation.comment;
                         this.mediationId = mediation.id;
+                        if (mediation.vccChecked && mediation.vccChecked.length) this.vccChecked = mediation.vccChecked;
                         break;
                     }
                 }
