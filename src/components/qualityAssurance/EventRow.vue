@@ -118,34 +118,7 @@ export default {
             return this.event.qualityAssuranceChecks.some(q => q.comment && q.comment.length);
         },
         isMaxChecks () {
-            let checks = this.event.qualityAssuranceChecks.filter(qa => qa.mode == this.pageFilters.filters.mode);
-
-            if (checks < 2) {
-                return false; // skips processing below for the majority of events
-            }
-
-            if (checks.length >= 4) {
-                return true; // 4 is the max allowed per mode
-            }
-
-            // order checks by timestamp
-            checks.sort((a, b) => {
-                if (a.timestamp > b.timestamp) return 1;
-                if (a.timestamp < b.timestamp) return -1;
-
-                return 0;
-            });
-
-            if (checks.length > 1) {
-                let sixHoursLater = new Date(checks[1].timestamp);
-                sixHoursLater.setHours(sixHoursLater.getHours() + 6);
-
-                if (new Date() > sixHoursLater) {
-                    return true; // second check was more than 6 hours ago
-                }
-            }
-
-            return false;
+            return this.event.qualityAssuranceChecks.length >= 4;
         },
     },
 };
