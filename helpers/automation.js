@@ -1031,7 +1031,7 @@ const badgeTracker = cron.schedule('8 18 * * *', async () => {
             await discord.webhookPost(
                 [{
                     color: discord.webhookColors.darkOrange,
-                    description: `[**${user.username}**](https://osu.ppy.sh/users/${user.osuId}) needs new BN badge: **${user.bnProfileBadge} → ${bnYears}**\n` + 
+                    description: `[**${user.username}**](https://bn.mappersguild.com/users?id=${user.id}) ([osu](https://osu.ppy.sh/users/${user.osuId})) needs new BN badge: **${user.bnProfileBadge} → ${bnYears}**\n` + 
                     '`' + badgeCommand(user.osuId, user.bnProfileBadge, bnYears, 'bn') + '`',
                     image: 
                         {
@@ -1064,7 +1064,7 @@ const badgeTracker = cron.schedule('8 18 * * *', async () => {
             await discord.webhookPost(
                 [{
                     color: discord.webhookColors.darkOrange,
-                    description: `[**${user.username}**](https://osu.ppy.sh/users/${user.osuId}) needs new NAT badge: **${user.natProfileBadge} → ${natYears}** \n` + 
+                    description: `[**${user.username}**](https://bn.mappersguild.com/users?id=${user.id}) ([osu](https://osu.ppy.sh/users/${user.osuId})) needs new NAT badge: **${user.natProfileBadge} → ${natYears}** \n` + 
                     '`' + badgeCommand(user.osuId, user.natProfileBadge, natYears, 'nat') + '`',
                     image: 
                         {
