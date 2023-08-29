@@ -1001,7 +1001,7 @@ const badgeTracker = cron.schedule('8 18 * * *', async () => {
             await discord.webhookPost(
                 [{
                     color: discord.webhookColors.darkOrange,
-                    description: `[**${user.username}**](https://osu.ppy.sh/users/${user.osuId}) needs new nomination count badge: **${user.nominationsProfileBadge*200} → ${thresholdNominationCount}**\n` + 
+                    description: `[**${user.username}**](https://bn.mappersguild.com/users?id=${user.id}) ([osu](https://osu.ppy.sh/users/${user.osuId})) needs new nomination count badge: **${user.nominationsProfileBadge*200} → ${thresholdNominationCount}**\n` + 
                     '`' + badgeCommand(user.osuId, user.nominationsProfileBadge, thresholdNominationCount, 'nom') + '`',
                     image: 
                         {
