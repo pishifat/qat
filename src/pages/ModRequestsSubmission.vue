@@ -14,14 +14,17 @@
                     class="row align-items-start"
                 >
                     <table v-for="usersByMode in openUsers" :key="usersByMode._id" class="table table-sm table-dark table-hover col-6 col-md-3">
-                        <thead>
-                            <td>{{ usersByMode._id == 'osu' ? 'osu!' : 'osu!' + usersByMode._id }}</td>
-                        </thead>
-                        <tbody>
-                            <tr v-for="user in usersByMode.users" :key="user.id"> 
-                                <user-card :user="user" />
-                            </tr>
-                        </tbody>
+                        <span v-if="usersByMode.users.length">
+                            <thead>
+                                <td v-if="usersByMode._id != 'none'">{{ usersByMode._id == 'osu' ? 'osu!' : 'osu!' + usersByMode._id }}</td>
+                                <td v-else>Structural NAT (see <a href="https://osu.ppy.sh/wiki/People/Nomination_Assessment_Team#structural">wiki</a>)</td>
+                            </thead>
+                            <tbody>
+                                <tr v-for="user in usersByMode.users" :key="user.id"> 
+                                    <user-card :user="user" />
+                                </tr>
+                            </tbody>
+                        </span>
                     </table>
                 </transition-group>
             </section>
@@ -192,8 +195,8 @@ export default {
     },
     methods: {
         filterOpenUsers(allUsersByMode) {
-            const sortOrder = ['osu', 'taiko', 'catch', 'mania'];
-            const filtered = allUsersByMode.filter(a => a._id != 'none');
+            const sortOrder = ['osu', 'taiko', 'catch', 'mania', 'none'];
+            const filtered = allUsersByMode;
 
             // filter out users who have "closed" in their requestStatus array
             filtered.forEach((mode) => {
