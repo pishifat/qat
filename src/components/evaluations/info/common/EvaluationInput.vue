@@ -102,11 +102,29 @@ export default {
         selectedEvaluation() {
             this.findUserReview();
         },
+        moddingComment() {
+            this.updateLocalStorage('mod', this.moddingComment);
+        },
+        behaviorComment() {
+            this.updateLocalStorage('behavior', this.behaviorComment);
+        },
     },
     mounted() {
         this.findUserReview();
     },
     methods: {
+        updateLocalStorage(type, text) {
+            window.localStorage.setItem(this.selectedEvaluation.id + type, text);
+        },
+        removeLocalStorage() {
+            if (window.localStorage.getItem(this.selectedEvaluation.id + 'mod')) {
+                window.localStorage.removeItem(this.selectedEvaluation.id + 'mod');
+            }
+
+            if (window.localStorage.getItem(this.selectedEvaluation.id + 'behavior')) {
+                window.localStorage.removeItem(this.selectedEvaluation.id + 'behavior');
+            }
+        },
         findUserReview() {
             this.moddingComment = '';
             this.behaviorComment = '';
@@ -119,6 +137,14 @@ export default {
                 this.behaviorComment = review.behaviorComment || '';
                 this.moddingComment = review.moddingComment || '';
                 this.vote = review.vote || 0;
+            } else {
+                if (window.localStorage.getItem(this.selectedEvaluation.id + 'mod')) {
+                    this.moddingComment = window.localStorage.getItem(this.selectedEvaluation.id + 'mod');
+                }
+
+                if (window.localStorage.getItem(this.selectedEvaluation.id + 'behavior')) {
+                    this.behaviorComment = window.localStorage.getItem(this.selectedEvaluation.id + 'behavior');
+                }
             }
         },
         async submitEval (e) {
@@ -136,6 +162,7 @@ export default {
                     }, e);
 
                 if (result && !result.error) {
+                    this.removeLocalStorage();
                     this.$store.commit('evaluations/updateEvaluation', result);
                     this.$store.dispatch('updateToastMessages', {
                         message: `Submitted evaluation`,
