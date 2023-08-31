@@ -1057,11 +1057,21 @@ router.post('/:id/updateMapperPreferences', middlewares.isBnOrNat, async (req, r
 router.post('/:id/addToNat', middlewares.isNat, async (req, res) => {
     const user = await User.findById(req.params.id).orFail();
     const mode = req.body.mode;
+    let isFormer = false;
+
+    if (!mode)
+        return res.json({
+            error: 'You must select a game mode!',
+        });
 
     await Evaluation.deleteUserActiveEvaluations(user._id, mode);
     user.isTrialNat = false;
     const i = user.groups.findIndex(g => g === 'bn');
     if (i !== -1) user.groups.splice(i, 1, 'nat');
+    else {
+        user.groups.push('nat');
+        isFormer = true;
+    }
     
 
     for (let i = 0; i < user.modesInfo.length; i++) {
@@ -1081,13 +1091,14 @@ router.post('/:id/addToNat', middlewares.isNat, async (req, res) => {
         activityToCheck,
     });
     
-    user.history.push({
-        date: new Date(),
-        mode,
-        kind: 'left',
-        group: 'bn',
-        relatedEvaluation: null,
-    });
+    if (!isFormer) 
+        user.history.push({
+            date: new Date(),
+            mode,
+            kind: 'left',
+            group: 'bn',
+            relatedEvaluation: null,
+        });
 
     user.history.push({
         date: new Date(),
@@ -1103,7 +1114,7 @@ router.post('/:id/addToNat', middlewares.isNat, async (req, res) => {
         [{
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.darkGreen,
-            description: `Moved [**${user.username}**](http://osu.ppy.sh/users/${user.osuId}) to **NAT** (${mode == 'osu' ? 'osu!' : 'osu!' + mode }).`,
+            description: `Moved [**${user.username}**](http://osu.ppy.sh/users/${user.osuId}) to **NAT** (${mode == 'osu' ? 'osu!' : 'osu!' + mode })`,
         }],
         'all'
     );

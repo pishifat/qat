@@ -1,7 +1,7 @@
 <template>
-    <div>
+    <div class="d-inline-flex align-items-center">
         <label
-            class="mx-1"
+            class="mx-1 my-0"
             data-toggle="tooltip"
             data-placement="top"
             title="osu!"
@@ -17,7 +17,7 @@
         </label>
 
         <label
-            class="mx-1"
+            class="mx-1 my-0"
             data-toggle="tooltip"
             data-placement="top"
             title="osu!taiko"
@@ -33,7 +33,7 @@
         </label>
 
         <label
-            class="mx-1"
+            class="mx-1 my-0"
             data-toggle="tooltip"
             data-placement="top"
             title="osu!catch"
@@ -49,7 +49,7 @@
         </label>
 
         <label
-            class="mx-1"
+            class="mx-1 my-0"
             data-toggle="tooltip"
             data-placement="top"
             title="osu!mania"
