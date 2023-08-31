@@ -6,7 +6,7 @@
             class="ml-1"
             data-toggle="tooltip"
             data-placement="top"
-            title="loads badge stuff"
+            title="loads badge tracker"
             href="#"
             @click.prevent="findUserBadgeInfo()"
         >
