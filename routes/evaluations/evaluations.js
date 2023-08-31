@@ -165,7 +165,7 @@ async function setGroupEval (evaluations, session) {
 
         // Send moved notification
         
-        if (evaluation.user.evaluatorModes.includes(evaluation.mode)) {
+        if (evaluation.user.evaluatorModes && evaluation.user.evaluatorModes.includes(evaluation.mode)) {
             const selfSummary = evaluation.selfSummary.comment || '*No summary provided*';
             discord.webhookPost(
                 [{
