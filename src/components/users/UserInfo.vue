@@ -59,11 +59,13 @@
                     />
                 </div>
             </div>
-            <div v-if="loggedInUser.isNat">
-                <ban-toggle
-                        v-if="!selectedUser.isBnOrNat"
-                    />
+            <div v-if="loggedInUser.isNat && !selectedUser.isBnOrNat">
+                <ban-toggle />
+
+                <former-user-group-toggle />
+
                 <hr>
+                
                 <notes />
             </div>
             <div v-if="loggedInUser.isPishifat">
@@ -92,6 +94,7 @@ import NextEvaluation from './info/NextEvaluation.vue';
 import BnEvaluatorToggle from './info/BnEvaluatorToggle.vue';
 import TrialNatToggle from './info/TrialNatToggle.vue';
 import UserGroupToggle from './info/UserGroupToggle.vue';
+import FormerUserGroupToggle from './info/FormerUserGroupToggle.vue';
 import ModdingActivity from '../evaluations/info/currentBns/ModdingActivity.vue';
 import UserActivity from '../evaluations/info/currentBns/userActivity/UserActivity.vue';
 import Resign from './info/Resign.vue';
@@ -110,6 +113,7 @@ export default {
         BnEvaluatorToggle,
         TrialNatToggle,
         UserGroupToggle,
+        FormerUserGroupToggle,
         ModdingActivity,
         UserActivity,
         Resign,

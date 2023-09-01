@@ -1,5 +1,5 @@
 <template>
-    <div class="my-2">
+    <div class="mb-2">
         <button
             v-if="!potentialNatInfo.length"
             class="btn btn-sm btn-primary my-1"

@@ -1,30 +1,32 @@
 <template>
-    <div>
-        <p>
+    <div class="d-inline-flex align-items-center">
             <b>
-                User group ({{ mode == 'osu' ? 'osu!' : 'osu!' + mode }}):
+                User group:
             </b>
+            <mode-radio-display v-model="selectedMode" class="ml-1" />
             <button
                 class="btn btn-sm btn-nat ml-1 mb-1"
                 href="#"
                 @click.prevent="addToNat()"
             >
-                {{ selectedUser.isBn ? 'Move to NAT' : 'Move to BN' }}
+                Move to NAT
             </button>
-        </p>
     </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
+import ModeRadioDisplay from './../../ModeRadioDisplay.vue';
 
 export default {
-    name: 'BnEvaluatorToggle',
-    props: {
-        mode: {
-            type: String,
-            required: true,
-        },
+    name: 'FormerUserGroupToggle',
+    components: {
+        ModeRadioDisplay,
+    },
+    data() {
+        return {
+            selectedMode: '',
+        };
     },
     computed: {
         ...mapGetters('users', [
@@ -36,7 +38,7 @@ export default {
             const result = confirm(`Are you sure?`);
 
             if (result) {
-                const data = await this.$http.executePost(`/users/${this.selectedUser.id}/addToNat`, { mode: this.mode });
+                const data = await this.$http.executePost(`/users/${this.selectedUser.id}/addToNat`, { mode: this.selectedMode });
 
                 if (this.$http.isValid(data)) {
                     this.$store.commit('users/updateUser', data.user);

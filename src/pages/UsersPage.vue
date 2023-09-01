@@ -85,8 +85,8 @@
                 <gmt-activity class="my-2" />
 
                 <template v-if="loggedInUser.isNat">
-                    <badges />
                     <potential-nat-info />
+                    <badges />
                 </template>
             </section>
         </div>
