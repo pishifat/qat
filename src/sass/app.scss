@@ -226,3 +226,13 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background-color: lighten($scrollbar-color, 10%);
 }
+
+::selection {
+    color: $white;
+    background: $selection-bg;
+}
+
+::-moz-selection { /* Firefox */
+    color: $white;
+    background: $selection-bg;
+}
