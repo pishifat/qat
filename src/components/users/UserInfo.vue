@@ -59,15 +59,18 @@
                     />
                 </div>
             </div>
+
             <div v-if="loggedInUser.isNat && !selectedUser.isBnOrNat">
                 <ban-toggle />
 
                 <former-user-group-toggle />
+            </div>
 
-                <hr>
-                
+            <div v-if="loggedInUser.isNat">
+                <hr> 
                 <notes />
             </div>
+
             <div v-if="loggedInUser.isPishifat">
                 <hr />
                 <b>Debug</b>
@@ -78,8 +81,6 @@
                     <pre id="userDocument" class="collapse container text-white">{{ JSON.stringify(selectedUser, null, 4) }}</pre>
                 </div>
             </div>
-
-            <div v-if="loggedInUser.isNat" />
         </div>
     </modal-dialog>
 </template>
