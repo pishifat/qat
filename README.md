@@ -27,4 +27,19 @@ Running the project sucks if you don't have data. One day I'll set up sample dat
 
 ## Data
 
-Some people use this website's /interOp routes for various data. If you're one of these people, tell me what you'd be doing with the info and I'll probably give you an access key. Don't share your key with anyone else.
+Some people use this website's `/interOp` routes for various data. If you're one of these people, tell me what you'd be doing with the info and I'll probably give you an access key. Don't share your key with anyone else.
+
+## WebSocket
+
+The project supports websocket connections for a few data outputs, which requires interOp access. You can connect to `/websocket/interOp` with the following headers:
+
+- `username`: your interOp username
+- `secret`: your interOp secret
+- `tags`: event tags that you want to listen to, separated by `+`
+
+### Available events
+
+- `users:request_status_update`
+- `data:sev`
+
+If you need websocket support for other events, please open a GitHub issue and/or contact me.
