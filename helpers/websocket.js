@@ -4,7 +4,7 @@
  */
 
 class WebsocketManager {
-  static availableTags = ["users:request_status_update"];
+  static availableTags = ["users:request_status_update", "data:sev"];
 
   static sendNotification(type, data) {
     for (const client of global.ws.filter((client) =>

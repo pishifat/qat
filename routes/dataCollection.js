@@ -4,6 +4,7 @@ const discord = require('../helpers/discord');
 const Aiess = require('../models/aiess');
 const User = require('../models/user');
 const Logger = require('../models/log');
+const { websocketManager } = require("../helpers/websocket");
 
 const router = express.Router();
 
@@ -149,6 +150,17 @@ router.post('/updateObviousness/:id', middlewares.isNat, async (req, res) => {
         success: 'Updated obviousness',
     });
 
+    // send websocket notification if both obviousness and severity are set
+    if (event.obviousness !== null && event.severity !== null) {
+        websocketManager.sendNotification("data:sev", {
+            obviousness: event.obviousness,
+            severity: event.severity,
+            discussionId: event.discussionId,
+            content: event.content,
+            timestamp: new Date(),
+        });
+    }
+
     if ((event.obviousness || event.obviousness == 0) && (event.severity || event.severity == 0) && (event.obviousness + event.severity >= 2)) {
         await sevRatingWebhook(event, req);
     }
@@ -172,6 +184,17 @@ router.post('/updateSeverity/:id', middlewares.isNat, async (req, res) => {
         severity: event.severity,
         success: 'Updated severity',
     });
+
+    // send websocket notification if both obviousness and severity are set
+    if (event.obviousness !== null && event.severity !== null) {
+        websocketManager.sendNotification("data:sev", {
+            obviousness: event.obviousness,
+            severity: event.severity,
+            discussionId: event.discussionId,
+            content: event.content,
+            timestamp: new Date(),
+        });
+    }
 
     if ((event.obviousness || event.obviousness == 0) && (event.severity || event.severity == 0) && (event.obviousness + event.severity >= 2)) {
         await sevRatingWebhook(event, req);
