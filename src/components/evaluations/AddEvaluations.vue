@@ -5,120 +5,75 @@
                 <div class="col-sm-12">
                     <b class="mr-4">Game mode:</b>
 
-                    <mode-radio-display
-                        v-model="selectedModes"
-                        class="ml-2"
-                        input-type="checkbox"
-                    />
+                    <mode-radio-display v-model="selectedModes" class="ml-2" input-type="checkbox" />
 
-                    <p class="small text-secondary ml-2">
+                    <p class="small text-secondary ml-2 mt-1">
                         Specify mode(s) for evaluations. Multi-mode BNs can generate multiple evaluations.
                     </p>
                 </div>
             </div>
-
             <div class="row mb-3">
-                <div class="col-sm-12">
-                    <b class="mr-4">User group:</b>
-                    <label
-                        class="mx-2"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        title="probation BN"
-                    >
-                        <input
-                            v-model="groups"
-                            type="checkbox"
-                            class="probation-bn-radio hide-default"
-                            value="probationBn"
-                        >
-                        <i class="fab fa-accessible-icon" />
-                    </label>
-                    <label
-                        class="mx-2"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        title="full BN"
-                    >
-                        <input
-                            v-model="groups"
-                            type="checkbox"
-                            class="full-bn-radio hide-default"
-                            value="fullBn"
-                        >
-                        <i class="fas fa-walking" />
-                    </label>
-                    <label
-                        class="mx-2"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        title="NAT"
-                    >
-                        <input
-                            v-model="groups"
-                            type="checkbox"
-                            class="nat-radio hide-default"
-                            value="nat"
-                        >
-                        <i class="fas fa-running" />
-                    </label>
-
-                    <p class="small text-secondary ml-2">
-                        Generate evaluations for all members of a user group. Only use this if you know what you're doing.
-                    </p>
+                <div class="col-sm-6">
+                    <b>User(s):</b>
+                    <input v-model="includeUsers" class="ml-2 form-control" type="text"
+                        placeholder="username1, username2, username3...">
                 </div>
             </div>
 
             <div class="row mb-3">
-                <div class="col-sm-6">
-                    <b>Include specific user(s):</b>
-                    <input
-                        v-model="includeUsers"
-                        class="ml-2 form-control"
-                        type="text"
-                        placeholder="username1, username2, username3..."
-                    >
-                </div>
-                <div class="col-sm-6">
-                    <b>Exclude specific user(s):</b>
-                    <input
-                        v-model="excludeUsers"
-                        class="ml-2 form-control"
-                        type="text"
-                        placeholder="username1, username2, username3..."
-                    >
-                </div>
-            </div>
-
-            <div class="row">
                 <div class="col-sm-12">
                     <b>Resignation:</b>
 
                     <div class="form-check ml-2">
-                        <input
-                            id="isResignation"
-                            v-model="isResignation"
-                            class="form-check-input"
-                            type="checkbox"
-                        >
+                        <input id="isResignation" v-model="isResignation" class="form-check-input" type="checkbox">
                         <label class="form-check-label text-secondary small" for="isResignation">
-                            Checking this will replace vote/consensus options with "resigned on good/standard terms" and set deadline to today.
+                            Checking this will replace vote/consensus options with "resigned on good/standard terms" and set
+                            deadline to today.
                         </label>
                     </div>
                 </div>
-                <div v-if="!isResignation" class="col-sm-12">
+                <div v-if="!isResignation" class="col-sm-12 mt-3">
                     <div class="form-inline">
                         <b>Deadline:</b>
-                        <input
-                            v-model="deadline"
-                            class="ml-1 form-control"
-                            type="date"
-                        >
+                        <input v-model="deadline" class="ml-1 form-control" type="date">
                     </div>
 
                     <small class="text-secondary ml-2 mt-1">
                         Only deadlines within the next week will be displayed.
                     </small>
+                </div>
+            </div>
+            <div v-if="loggedInUser.isResponsibleWithButtons" class="row">
+                <div class="col-sm-12">
+                    <p>
+                        <a href="#advancedSettings" data-toggle="collapse">
+                            Advanced settings <i class="fas fa-angle-down" />
+                        </a>
+                    </p>
+                    <div id="advancedSettings" class="collapse container col-sm-12">
+                        <b class="mr-4">User group:</b>
+                        <label class="mx-2" data-toggle="tooltip" data-placement="top" title="probation BN">
+                            <input v-model="groups" type="checkbox" class="probation-bn-radio hide-default" value="probationBn">
+                            <i class="fab fa-accessible-icon" />
+                        </label>
+                        <label class="mx-2" data-toggle="tooltip" data-placement="top" title="full BN">
+                            <input v-model="groups" type="checkbox" class="full-bn-radio hide-default" value="fullBn">
+                            <i class="fas fa-walking" />
+                        </label>
+                        <label class="mx-2" data-toggle="tooltip" data-placement="top" title="NAT">
+                            <input v-model="groups" type="checkbox" class="nat-radio hide-default" value="nat">
+                            <i class="fas fa-running" />
+                        </label>
+
+                        <p class="small text-secondary ml-2">
+                            Generate evaluations for all members of a user group. Only use this if you know what you're doing.
+                        </p>
+                        <div class="col-sm-6">
+                            <b>Exclude specific user(s):</b>
+                            <input v-model="excludeUsers" class="ml-2 form-control" type="text"
+                                placeholder="username1, username2, username3...">
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -132,6 +87,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import ModalDialog from '../ModalDialog.vue';
 import ModeRadioDisplay from '../ModeRadioDisplay.vue';
 
@@ -140,6 +96,11 @@ export default {
     components: {
         ModalDialog,
         ModeRadioDisplay,
+    },
+    computed: {
+        ...mapState([
+            'loggedInUser',
+        ]),
     },
     data() {
         return {
