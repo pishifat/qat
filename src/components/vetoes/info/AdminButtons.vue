@@ -67,11 +67,6 @@
                 {{ mediators ? 'Re-select mediators' : 'Select mediators' }}
             </button>
 
-            <!-- begin mediation -->
-            <button v-if="mediators && mediators.length" class="btn btn-sm btn-block btn-success mb-2" @click="beginMediation($event)">
-                Begin mediation
-            </button>
-
             <!-- view mediators -->
             <div v-if="mediators" class="mt-2 row">
                 <div class="col-sm-3 align-self-center">
@@ -92,6 +87,12 @@
                     />
                 </div>
             </div>
+
+            <!-- begin mediation -->
+            <button v-if="mediators && mediators.length" class="btn btn-sm btn-block btn-success my-2" @click="beginMediation($event)">
+                Begin mediation
+            </button>
+
         </div>
     </div>
 </template>
@@ -144,14 +145,18 @@ export default {
             }
         },
         async beginMediation (e) {
-            const result = confirm(`Are you sure?`);
+            const result = confirm(`Make sure to send messages prior to starting a mediation. If you've already done this, press OK.`);
 
             if (result) {
-                const mediatorIds = this.mediators.map(m => m._id);
-                const veto = await this.$http.executePost(`/vetoes/beginMediation/${this.selectedVeto.id}`, { mediatorIds, reasons: this.selectedVeto.reasons }, e);
+                const result2 = confirm(`ARE YOU REALLY SURE YOU'VE SENT THE MESSAGES? DON'T BE STUPID.`);
 
-                this.commitVeto(veto, 'Started veto mediation');
-            }
+                if (result2) {
+                    const mediatorIds = this.mediators.map(m => m._id);
+                    const veto = await this.$http.executePost(`/vetoes/beginMediation/${this.selectedVeto.id}`, { mediatorIds, reasons: this.selectedVeto.reasons }, e);
+
+                    this.commitVeto(veto, 'Started veto mediation');
+                }
+            } 
         },
         async concludeMediation (e, dismiss) {
             const result = confirm(`Are you sure?`);
