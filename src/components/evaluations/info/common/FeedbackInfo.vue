@@ -3,8 +3,21 @@
         <div v-if="!selectedEvaluation.isResignation">
             <p class="mb-2">
                 <b>Feedback:</b>
+                <a
+                    class="ml-1"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="toggle feedback preview"
+                    href="#"
+                    @click.prevent="togglePreviewFeedback()"
+                >
+                    <i class="fas fa-search" />
+                </a>
             </p>
-            <textarea v-model="feedback" class="form-control mb-2" rows="4" />
+
+            <div v-if="previewFeedback" class="small ml-2 card card-body" v-html="$md.render(feedback)" />
+            
+            <textarea v-else v-model="feedback" class="form-control mb-2" rows="4" />
 
             <button
                 class="btn btn-sm btn-block btn-primary my-2 ml-0 ml-sm-auto"
@@ -12,6 +25,8 @@
             >
                 Save feedback
             </button>
+
+        <hr />
 
             <input
                 v-if="selectedEvaluation.isApplication && positiveConsensus"
@@ -37,7 +52,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import evaluations from '../../../../mixins/evaluations.js';
 import FeedbackPm from './FeedbackPm.vue';
 
@@ -54,7 +69,9 @@ export default {
         };
     },
     computed: {
+        ...mapState('evaluations', ['previewFeedback']),
         ...mapGetters('evaluations', ['selectedEvaluation']),
+
         /** @returns {string} */
         consensus() {
             return this.selectedEvaluation.consensus;
@@ -67,8 +84,12 @@ export default {
     },
     mounted() {
         this.feedback = this.selectedEvaluation.feedback;
+        this.$store.commit('evaluations/resetPreviewState');
     },
     methods: {
+        togglePreviewFeedback() {
+            this.$store.commit('evaluations/togglePreviewFeedback');
+        },
         async setFeedback(e) {
             const result = await this.$http.executePost(
                 `/${
