@@ -210,6 +210,16 @@ router.post('/sendToContentReview/:id', async (req, res) => {
 
     // webhooks
 
+    // #bnsite-reports (internal)
+    await discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            description: `Converted [**${report.reportCategory}**](http://bn.mappersguild.com/managereports?id=${report.id}) to [${title}](http://bn.mappersguild.com/discussionvote?id=${d.id})`,
+            color: discord.webhookColors.red,
+        }],
+        'natUserReport'
+    );
+
     // #content-cases (BN server)
     await discord.webhookPost(
         [{
