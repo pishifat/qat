@@ -826,6 +826,17 @@ const checkTenureValidity = cron.schedule('40 4 4 * *', async () => {
                         'dev'
                     );
                 }
+
+                if (user.groups.length == 1 && user.modesInfo.length > 0) {
+                    await discord.webhookPost(
+                        [{
+                            title: `${user.username} ${mode} modesInfo is sus`,
+                            color: discord.webhookColors.red,
+                            description: `https://bn.mappersguild.com/users?id=${user.id}`,
+                        }],
+                        'dev'
+                    );
+                }
                 
             }
         }
