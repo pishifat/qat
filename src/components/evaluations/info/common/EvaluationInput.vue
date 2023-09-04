@@ -7,10 +7,26 @@
             <div class="col-sm-12">
                 <p>
                     <b>{{ selectedEvaluation.user.isNat && loggedInUser.isNatLeader ? 'NAT activity comments:' : 'Modding comments:' }}</b>
+                    <a
+                        class="ml-1"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="toggle comment preview"
+                        href="#"
+                        @click.prevent="togglePreviewModdingComment()"
+                    >
+                        <i class="fas fa-search" />
+                    </a>
                 </p>
 
                 <div class="form-group">
+                    <div 
+                        v-if="previewModdingComment" 
+                        class="small ml-2 card card-body" 
+                        v-html="$md.render(moddingComment)"
+                    />
                     <textarea
+                        v-else
                         v-model="moddingComment"
                         class="form-control"
                         rows="4"
@@ -22,10 +38,26 @@
             <div class="col-sm-12">
                 <p>
                     <b>Behavior comments:</b>
+                    <a
+                        class="ml-1"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="toggle comment preview"
+                        href="#"
+                        @click.prevent="togglePreviewBehaviorComment()"
+                    >
+                        <i class="fas fa-search" />
+                    </a>
                 </p>
 
                 <div class="form-group">
+                    <div 
+                        v-if="previewBehaviorComment" 
+                        class="small ml-2 card card-body" 
+                        v-html="$md.render(behaviorComment)"
+                    />
                     <textarea
+                    v-else
                         v-model="behaviorComment"
                         class="form-control"
                         rows="4"
@@ -45,7 +77,7 @@
                     name="vote"
                     value="1"
                 >
-                <label class="form-check-label text-pass" for="1">{{ selectedEvaluation.isApplication ? 'Pass' : selectedEvaluation.user.evaluatorModes.includes(selectedEvaluation.mode) && loggedInUser.isNatLeader ? 'Remain in NAT' : selectedEvaluation.isBnEvaluation ? 'Full BN' : 'Resign on good terms' }}</label>
+                <label class="form-check-label text-pass" for="1">{{ selectedEvaluation.isApplication ? 'Pass' : (selectedEvaluation.user.evaluatorModes.includes(selectedEvaluation.mode) || selectedEvaluation.user.evaluatorModes.includes("none")) && loggedInUser.isNatLeader ? 'Remain in NAT' : selectedEvaluation.isBnEvaluation ? 'Full BN' : 'Resign on good terms' }}</label>
             </div>
             <div class="form-check form-check-inline">
                 <input
@@ -56,7 +88,7 @@
                     name="vote"
                     value="2"
                 >
-                <label class="form-check-label text-neutral" for="2">{{ selectedEvaluation.isApplication ? 'Neutral' : selectedEvaluation.user.evaluatorModes.includes(selectedEvaluation.mode) && loggedInUser.isNatLeader ? 'Investigate' : selectedEvaluation.isBnEvaluation ? 'Probation BN' : 'Resign on standard terms' }}</label>
+                <label class="form-check-label text-neutral" for="2">{{ selectedEvaluation.isApplication ? 'Neutral' : (selectedEvaluation.user.evaluatorModes.includes(selectedEvaluation.mode) || selectedEvaluation.user.evaluatorModes.includes("none")) && loggedInUser.isNatLeader ? 'Investigate' : selectedEvaluation.isBnEvaluation ? 'Probation BN' : 'Resign on standard terms' }}</label>
             </div>
             <div v-if="!selectedEvaluation.isResignation" class="form-check form-check-inline">
                 <input
@@ -67,7 +99,7 @@
                     name="vote"
                     value="3"
                 >
-                <label class="form-check-label text-fail" for="3">{{ selectedEvaluation.isApplication ? 'Fail' : selectedEvaluation.user.evaluatorModes.includes(selectedEvaluation.mode) && loggedInUser.isNatLeader ? 'Remove from NAT' : 'Remove from BN' }}</label>
+                <label class="form-check-label text-fail" for="3">{{ selectedEvaluation.isApplication ? 'Fail' : (selectedEvaluation.user.evaluatorModes.includes(selectedEvaluation.mode) || selectedEvaluation.user.evaluatorModes.includes("none")) && loggedInUser.isNatLeader ? 'Remove from NAT' : 'Remove from BN' }}</label>
             </div>
 
             <button class="btn btn-sm btn-primary" @click="submitEval($event)">
@@ -94,6 +126,10 @@ export default {
         ...mapState([
             'loggedInUser',
         ]),
+        ...mapState('evaluations', [
+            'previewModdingComment',
+            'previewBehaviorComment',
+        ]),
         ...mapGetters('evaluations', [
             'selectedEvaluation',
         ]),
@@ -113,6 +149,12 @@ export default {
         this.findUserReview();
     },
     methods: {
+        togglePreviewModdingComment() {
+            this.$store.commit('evaluations/togglePreviewModdingComment');
+        },
+        togglePreviewBehaviorComment() {
+            this.$store.commit('evaluations/togglePreviewBehaviorComment');
+        },
         updateLocalStorage(type, text) {
             window.localStorage.setItem(this.selectedEvaluation.id + type, text);
         },

@@ -10,18 +10,33 @@ export default {
         evaluations: [],
         selectedEvaluationId: null,
         checkedEvaluations: [],
+        previewFeedback: false,
+        previewModdingComment: false,
+        previewBehaviorComment: false,
     }),
     mutations: {
         resetState (state) {
             state.evaluations = [];
             state.selectedEvaluationId = null;
             state.checkedEvaluations = [];
+            state.previewFeedback = false;
+            state.previewModdingComment = false;
+            state.previewBehaviorComment = false;
         },
         setEvaluations (state, evaluations) {
             state.evaluations = evaluations;
         },
         setSelectedEvaluationId (state, id) {
             state.selectedEvaluationId = id;
+        },
+        togglePreviewFeedback (state) {
+            state.previewFeedback = !state.previewFeedback;
+        },
+        togglePreviewModdingComment (state) {
+            state.previewModdingComment = !state.previewModdingComment;
+        },
+        togglePreviewBehaviorComment (state) {
+            state.previewBehaviorComment = !state.previewBehaviorComment;
         },
 
         // modify data
