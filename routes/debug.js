@@ -191,4 +191,20 @@ router.post("/toggleIsNatLeader", async (req, res) => {
     });
 });
 
+/* POST move user to structural NAT */
+router.post("/moveToStructuralNat", async (req, res) => {
+    const user = await User.findOne({ osuId: config.admin.pishifat });
+    user.modesInfo = [
+        { mode: 'none', level: 'evaluator' }
+    ];
+    user.modes = ['none'];
+    user.evaluatorModes = ['none'];
+    await user.save();
+
+    res.json({
+        user,
+        success: `moved to structural NAT`,
+    });
+});
+
 module.exports = router;
