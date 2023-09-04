@@ -1,6 +1,7 @@
 <template>
     <div class="card card-body">
         <select
+            v-if="loggedInUser.isNat"
             id="mode"
             v-model="category"
             class="form-control mb-4"
@@ -20,12 +21,27 @@
             </option>
         </select>
 
+        <select
+            v-else
+            id="mode"
+            v-model="publicCategory"
+            class="form-control mb-4"
+            @change="loadCategory($event)"
+        >
+            <option v-for="log in publicCategories" :key="log" :value="log">
+                {{ log }}
+            </option>
+        </select>
+
         <data-table
-            :headers="category == 'error' ? ['date', 'user', 'action', 'stack', 'extra'] : ['date', 'user', 'action']"
+            :headers="category == 'error' ? ['date', 'user', 'action', 'stack', 'extra'] : category == 'all' ? ['date', 'category', 'user', 'action'] : ['date', 'user', 'action']"
         >
             <tr v-for="log in logs" :key="log.id">
                 <td>
                     {{ log.createdAt }} GMT
+                </td>
+                <td v-if="category == 'all'">
+                    {{ log.category }}
                 </td>
                 <td>
                     {{ (log.user && log.user.username) || 'Anonymous' }}
@@ -87,8 +103,13 @@ export default {
                 'interOp',
                 'spam',
                 'bnFinder',
+                'notableNameChanges',
             ],
             category: 'all',
+            publicCategories: [
+                'notableNameChanges',
+            ],
+            publicCategory: 'notableNameChanges',
         };
     },
     computed: {
@@ -97,7 +118,10 @@ export default {
         ]),
     },
     async created () {
-        const logs = await this.$http.initialRequest(`/logs/search/${this.category}/0`);
+        const searchMode = this.loggedInUser.isNat ? 'search' : 'public';
+        const category = this.loggedInUser.isNat ? this.category : this.publicCategory;
+
+        const logs = await this.$http.initialRequest(`/logs/${searchMode}/${category}/0`);
 
         if (!logs.error) {
             this.logs = logs;
@@ -105,8 +129,11 @@ export default {
     },
     methods: {
         async loadCategory (e) {
+            const searchMode = this.loggedInUser.isNat ? 'search' : 'public';
+            const category = this.loggedInUser.isNat ? this.category : this.publicCategory;
             this.skip = 0;
-            const logs = await this.$http.executeGet(`/logs/search/${this.category}/${this.skip}`, e);
+
+            const logs = await this.$http.executeGet(`/logs/${searchMode}/${category}/${this.skip}`, e);
 
             if (!logs.error) {
                 this.skip += 300;
@@ -114,7 +141,10 @@ export default {
             }
         },
         async showMore (e) {
-            const logs = await this.$http.executeGet(`/logs/search/${this.category}/${this.skip}`, e);
+            const searchMode = this.loggedInUser.isNat ? 'search' : 'public';
+            const category = this.loggedInUser.isNat ? this.category : this.publicCategory;
+
+            const logs = await this.$http.executeGet(`/logs/${searchMode}/${category}/${this.skip}`, e);
 
             if (!logs.error) {
                 this.skip += 300;

@@ -592,13 +592,23 @@ router.get('/callback', async (req, res) => {
             );
         } else {
             if (user.username != username) {
-                Logger.generate(
-                    user._id,
-                    `Username changed from "${user.username}" to "${response.username}"`,
-                    'account',
-                    user._id
-                );
-
+                if (user.groups.length > 1) {
+                    Logger.generate(
+                        user._id,
+                        `Username changed from "${user.username}" to "${response.username}"`,
+                        'notableNameChanges',
+                        user._id
+                    );
+                }
+                else {
+                    Logger.generate(
+                        user._id,
+                        `Username changed from "${user.username}" to "${response.username}"`,
+                        'account',
+                        user._id
+                    );
+                }
+                
                 user.username = username;
                 await user.save();
             }
