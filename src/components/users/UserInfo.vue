@@ -49,6 +49,10 @@
                         />
                     </div>
 
+                    <nat-subgroup-toggle 
+                        v-if="loggedInUser.isResponsibleWithButtons && selectedUser.isNat" 
+                    />
+
                     <modding-activity
                         :username="selectedUser.username"
                         class="mt-2"
@@ -96,6 +100,7 @@ import BnEvaluatorToggle from './info/BnEvaluatorToggle.vue';
 import TrialNatToggle from './info/TrialNatToggle.vue';
 import UserGroupToggle from './info/UserGroupToggle.vue';
 import FormerUserGroupToggle from './info/FormerUserGroupToggle.vue';
+import NatSubgroupToggle from './info/NatSubgroupToggle.vue';
 import ModdingActivity from '../evaluations/info/currentBns/ModdingActivity.vue';
 import UserActivity from '../evaluations/info/currentBns/userActivity/UserActivity.vue';
 import Resign from './info/Resign.vue';
@@ -115,6 +120,7 @@ export default {
         TrialNatToggle,
         UserGroupToggle,
         FormerUserGroupToggle,
+        NatSubgroupToggle,
         ModdingActivity,
         UserActivity,
         Resign,
