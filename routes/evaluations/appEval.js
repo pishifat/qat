@@ -623,6 +623,15 @@ router.post('/overwriteEvaluationDate/:id/', middlewares.isNat, async (req, res)
         'appEvaluation',
         app._id
     );
+
+    discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            color: discord.webhookColors.darkBlue,
+            description: `**${app.user.username}**'s next BN evaluation date set to **${newDeadline.toISOString().slice(0,10)}**`,
+        }],
+        app.mode
+    );
 });
 
 /* POST toggle isReviewed for evaluations */
