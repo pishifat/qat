@@ -1080,6 +1080,13 @@ router.post('/:id/addToNat', middlewares.isNat, async (req, res) => {
         }
     }
 
+    if (!user.modesInfo.length) {
+        user.modesInfo.push({
+            mode: mode,
+            level: 'evaluator',
+        })
+    }
+
     const activityToCheck = Math.floor(Math.random() * (50 - 40) + 40); // between 40 and 50 days;
     let deadline = new Date();
     deadline.setDate(deadline.getDate() + activityToCheck);
