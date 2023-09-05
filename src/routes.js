@@ -52,7 +52,7 @@ const routes = [
     // NAT
     { path: '/datacollection', component: DataCollection, meta: { title: 'Manage SEVs', requiresNat: true } },
     { path: '/managetest', component: ManageTest, meta: { title: 'Manage RC Test', requiresNat: true } },
-    { path: '/logs', component: Logs, meta: { title: 'Logs', requiresNat: true } },
+    { path: '/logs', component: Logs, meta: { title: 'Logs' } },
     { path: '/spam', component: Spam, meta: { title: 'Spam', requiresNat: true } },
     { path: '/modrequests/listing', component: ModRequests, meta: { title: 'BN Finder / Global Queue', requiresNat: true } },
 
