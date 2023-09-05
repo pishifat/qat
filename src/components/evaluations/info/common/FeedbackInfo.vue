@@ -84,7 +84,6 @@ export default {
     },
     mounted() {
         this.feedback = this.selectedEvaluation.feedback;
-        this.$store.commit('evaluations/resetPreviewState');
     },
     methods: {
         togglePreviewFeedback() {

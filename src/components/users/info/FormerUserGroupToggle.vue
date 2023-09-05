@@ -1,16 +1,16 @@
 <template>
     <div class="d-inline-flex align-items-center">
-            <b>
-                User group:
-            </b>
-            <mode-radio-display v-model="selectedMode" class="ml-1" />
-            <button
-                class="btn btn-sm btn-nat ml-1 mb-1"
-                href="#"
-                @click.prevent="addToNat()"
-            >
-                Move to NAT
-            </button>
+        <b>
+            User group:
+        </b>
+        <mode-radio-display v-model="selectedMode" class="ml-1" />
+        <button
+            class="btn btn-sm btn-nat ml-1 mb-1"
+            href="#"
+            @click.prevent="addToNat()"
+        >
+            Move to NAT
+        </button>
     </div>
 </template>
 

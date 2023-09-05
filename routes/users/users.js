@@ -1080,6 +1080,13 @@ router.post('/:id/addToNat', middlewares.isNat, async (req, res) => {
         }
     }
 
+    if (!user.modesInfo.length) {
+        user.modesInfo.push({
+            mode: mode,
+            level: 'evaluator',
+        })
+    }
+
     const activityToCheck = Math.floor(Math.random() * (50 - 40) + 40); // between 40 and 50 days;
     let deadline = new Date();
     deadline.setDate(deadline.getDate() + activityToCheck);
@@ -1131,6 +1138,55 @@ router.post('/:id/addToNat', middlewares.isNat, async (req, res) => {
         user._id
     );
 });
+
+/* change evaluator mode */
+router.post('/:id/changeEvaluatorMode', middlewares.isNat, async (req, res) => {
+    const user = await User.findById(req.params.id).orFail();
+    const mode = req.body.mode;
+    let oldMode = '';
+
+    if (!mode)
+        return res.json({
+            error: 'You must select a game mode!',
+        });
+
+    for (let i = 0; i < user.modesInfo.length; i++) {
+        if (user.modesInfo[i].level == 'evaluator') {
+            oldMode = user.modesInfo[i].mode;
+            user.modesInfo[i].mode = mode;
+        }
+    }
+    
+    user.modes = [mode];
+    user.evaluatorModes = [mode];
+
+    await user.save();
+
+    const oldModeText = oldMode == 'none' ? 'structural' : oldMode == 'osu' ? 'osu!' : 'osu!' + oldMode;
+    const newModeText = mode == 'none' ? 'structural' : mode == 'osu' ? 'osu!' : 'osu!' + mode;
+
+    discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            color: discord.webhookColors.darkGreen,
+            description: `Moved [**${user.username}**](http://osu.ppy.sh/users/${user.osuId}) from **${oldModeText}** to **${newModeText}** NAT`,
+        }],
+        'all'
+    );
+
+    res.json({
+        user,
+        success: 'Changed NAT responsibility',
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Moved "${user.username}" from "${oldModeText} NAT" to "${newModeText} NAT"`,
+        'user',
+        user._id
+    );
+});
+
 
 /* GET aiess info */
 router.get('/activity', async (req, res) => {

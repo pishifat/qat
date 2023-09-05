@@ -15,6 +15,15 @@
                 move to NAT
                 </button>
                 <button
+                    class="btn btn-sm mb-3 mt-1 ml-1 btn-nat"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="Make sure you're already NAT with a mode before using this"
+                    @click="moveToStructuralNat($event)"
+                >
+                move to structural NAT
+                </button>
+                <button
                     class="btn btn-sm mb-3 mt-1 ml-1 btn-trial-nat"
                     @click="moveToTrialNat($event)"
                 >
@@ -181,6 +190,9 @@ export default {
         
         async toggleIsNatLeader (e) {
             await this.$http.executePost(`/debug/toggleIsNatLeader`, {}, e);
+        },
+        async moveToStructuralNat (e) {
+            await this.$http.executePost(`/debug/moveToStructuralNat`, {}, e);
         },
     },
 };
