@@ -122,6 +122,13 @@ import PaginationNav from '../components/PaginationNav.vue';
 
 export default {
     name: 'DiscussionVotePage',
+    // @ts-ignore
+    metaInfo: {
+        meta: [
+            { property: 'og:title', content: 'Content Review · NAT/BN Management' },
+            { property: 'og:description', content: 'The place for everything related to the Beatmap Nominators!' },
+        ],
+    },
     components: {
         ToastMessages,
         DiscussionCard,

@@ -1,6 +1,7 @@
 import './sass/app.scss';
 import './bootstrap';
 import Vue from 'vue';
+import Meta from 'vue-meta';
 import VueRouter from 'vue-router';
 import store from './store/main';
 import App from './App.vue';
@@ -10,6 +11,11 @@ import { faCircleArrowRight, faCircleCheck, faCircleXmark } from '@fortawesome/f
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 Vue.use(VueRouter);
+
+Vue.use(Meta, {
+    keyName: 'metaInfo',
+    refreshOnceOnNavigation: true,
+});
 
 const router = new VueRouter({
     mode: 'history',

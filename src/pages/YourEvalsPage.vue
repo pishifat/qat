@@ -64,6 +64,13 @@ import FilterBox from '../components/FilterBox.vue';
 
 export default {
     name: 'YourEvalsPage',
+    // @ts-ignore
+    metaInfo: {
+        meta: [
+            { property: 'og:title', content: 'Your Evaluations · NAT/BN Management' },
+            { property: 'og:description', content: 'The place for everything related to the Beatmap Nominators!' },
+        ],
+    },
     components: {
         ToastMessages,
         EvaluationCard,

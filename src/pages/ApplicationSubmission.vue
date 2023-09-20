@@ -285,6 +285,13 @@ import { mapState } from 'vuex';
 
 export default {
     name: 'ApplicationSubmission',
+    // @ts-ignore
+    metaInfo: {
+        meta: [
+            { property: 'og:title', content: 'Apply to BN · NAT/BN Management' },
+            { property: 'og:description', content: 'The place for everything related to the Beatmap Nominators!' },
+        ],
+    },
     components: {
         ToastMessages,
         ModeRadioDisplay,

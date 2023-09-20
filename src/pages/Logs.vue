@@ -80,6 +80,13 @@ import DataTable from '../components/DataTable.vue';
 
 export default {
     name: 'Logs',
+    // @ts-ignore
+    metaInfo: {
+        meta: [
+            { property: 'og:title', content: 'Logs · NAT/BN Management' },
+            { property: 'og:description', content: 'The place for everything related to the Beatmap Nominators!' },
+        ],
+    },
     components: {
         ToastMessages,
         DataTable,

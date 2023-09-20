@@ -125,6 +125,13 @@ import UserLink from '../components/UserLink.vue';
 
 export default {
     name: 'TestResultsPage',
+    // @ts-ignore
+    metaInfo: {
+        meta: [
+            { property: 'og:title', content: 'RC Test Results · NAT/BN Management' },
+            { property: 'og:description', content: 'The place for everything related to the Beatmap Nominators!' },
+        ],
+    },
     components: {
         ResultCard,
         UserLink,

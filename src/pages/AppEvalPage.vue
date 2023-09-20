@@ -27,6 +27,13 @@ import EvaluationInstructions from '../components/evaluations/EvaluationInstruct
 
 export default {
     name: 'AppEvalPage',
+    // @ts-ignore
+    metaInfo: {
+        meta: [
+            { property: 'og:title', content: 'Application Evaluations · NAT/BN Management' },
+            { property: 'og:description', content: 'The place for everything related to the Beatmap Nominators!' },
+        ],
+    },
     components: {
         EvalPage,
         EvaluationInstructions,

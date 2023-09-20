@@ -27,6 +27,13 @@ import EvalPage from '../components/evaluations/EvalPage.vue';
 
 export default {
     name: 'BnEvalPage',
+    // @ts-ignore
+    metaInfo: {
+        meta: [
+            { property: 'og:title', content: 'BN Evaluations · NAT/BN Management' },
+            { property: 'og:description', content: 'The place for everything related to the Beatmap Nominators!' },
+        ],
+    },
     components: {
         AddEvaluations,
         EvalPage,

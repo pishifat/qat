@@ -22,6 +22,13 @@ import VetoMessage from '../components/vetoes/VetoMessage.vue';
 
 export default {
     name: 'MessagePage',
+        // @ts-ignore
+    metaInfo: {
+        meta: [
+            { property: 'og:title', content: "Message from the NAT · NAT/BN Management" },
+            { property: 'og:description', content: 'The place for everything related to the Beatmap Nominators!' },
+        ],
+    },
     components: {
         EvaluationResults,
         ReportFeedback,
