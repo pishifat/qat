@@ -112,9 +112,9 @@ router.post('/submit', middlewares.hasBasicAccess, async (req, res) => {
         });
     }
 
-    if (discussionLink.length > 0 && discussionLink.includes('assets.ppy.sh')) {
+    if (discussionLink.length > 0 && discussionLink.includes('ppy.sh')) {
         return res.json({
-            error: 'assets.ppy.sh links are not allowed, please use a proper image hosting service instead',
+            error: 'images hosted on the osu! website are not allowed, as they can change at any time. please use a proper image hosting service instead.',
         });
     }
     

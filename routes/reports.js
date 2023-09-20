@@ -20,9 +20,9 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
         return res.json({ error: 'You must include a username or a link' });
     }
 
-    if (link.includes('assets.ppy.sh')) {
+    if (link.includes('ppy.sh')) {
         return res.json({
-            error: 'assets.ppy.sh links are not allowed, please use a proper image hosting service instead',
+            error: 'images hosted on the osu! website are not allowed, as they can change at any time. please use a proper image hosting service instead.',
         });
     }
 
