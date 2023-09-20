@@ -112,9 +112,14 @@ router.post('/submit', middlewares.hasBasicAccess, async (req, res) => {
         });
     }
 
-    if (discussionLink.length > 0 && discussionLink.includes('ppy.sh')) {
+    const blockedUrls = [
+        'ppy.sh',
+        'puu.sh',
+    ];
+    
+    if (discussionLink.length > 0 && blockedUrls.some(u => discussionLink.includes(u))) {
         return res.json({
-            error: 'images hosted on the osu! website are not allowed, as they can change at any time. please use a proper image hosting service instead.',
+            error: 'images hosted on this website are not allowed, as they can change/disappear quickly. please use a proper image hosting service instead.',
         });
     }
     

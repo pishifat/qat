@@ -20,9 +20,14 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
         return res.json({ error: 'You must include a username or a link' });
     }
 
-    if (link.includes('ppy.sh')) {
+    const blockedUrls = [
+        'ppy.sh',
+        'puu.sh',
+    ];
+
+    if (blockedUrls.some(url => link.includes(url))) {
         return res.json({
-            error: 'images hosted on the osu! website are not allowed, as they can change at any time. please use a proper image hosting service instead.',
+            error: 'images hosted on this website are not allowed, as they can change/disappear quickly. please use a proper image hosting service instead.',
         });
     }
 
