@@ -25,7 +25,7 @@ export default {
         // @ts-ignore
     metaInfo: {
         meta: [
-            { property: 'og:title', content: "Message from the NAT · NAT/BN Management" },
+            { property: 'og:title', content: "Message from the NAT · BN Management" },
             { property: 'og:description', content: 'The place for everything related to the Beatmap Nominators!' },
         ],
     },

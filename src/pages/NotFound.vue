@@ -18,7 +18,7 @@ export default {
     // @ts-ignore
     metaInfo: {
         meta: [
-            { property: 'og:title', content: 'not found :( · NAT/BN Management' },
+            { property: 'og:title', content: 'not found :( · BN Management' },
             { property: 'og:description', content: 'The place for everything related to the Beatmap Nominators!' },
         ],
     },

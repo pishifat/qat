@@ -91,7 +91,7 @@ export default {
     // @ts-ignore
     metaInfo: {
         meta: [
-            { property: 'og:title', content: 'Vetoes · NAT/BN Management' },
+            { property: 'og:title', content: 'Vetoes · BN Management' },
             { property: 'og:description', content: 'The place for everything related to the Beatmap Nominators!' },
         ],
     },

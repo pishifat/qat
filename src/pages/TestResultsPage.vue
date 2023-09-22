@@ -128,7 +128,7 @@ export default {
     // @ts-ignore
     metaInfo: {
         meta: [
-            { property: 'og:title', content: 'RC Test Results · NAT/BN Management' },
+            { property: 'og:title', content: 'RC Test Results · BN Management' },
             { property: 'og:description', content: 'The place for everything related to the Beatmap Nominators!' },
         ],
     },

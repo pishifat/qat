@@ -1,6 +1,6 @@
 # qat
 
-...aka NAT/BN Management, where the NAT handles BN applications and a bunch of other mapping/modding related things.
+...aka BN Management, where the NAT handles BN applications and a bunch of other mapping/modding related things.
 
 ## Requirements
 

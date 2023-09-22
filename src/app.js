@@ -24,7 +24,7 @@ const router = new VueRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-    document.title = to.meta.title || 'NAT/BN Management';
+    document.title = to.meta.title || 'BN Management';
 
     if (!store.state.initialized) {
         await store.dispatch('setInitialData');
