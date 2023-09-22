@@ -4,13 +4,23 @@
             <span v-html="$md.render(message)" />
         </div>
 
-        <a v-if="users.length && !isReviewable || isReviewed" class="btn btn-sm btn-block btn-success mb-2" @click="sendMessage($event)">
+        <a v-if="
+            users.length &&
+            ((!isReviewable || (isReviewed && !isSecurityCheckable)) || (isReviewed && isSecurityCheckable && isSecurityChecked))
+            "
+            class="btn btn-sm btn-block btn-success mb-2" 
+            @click="sendMessage($event)"
+        >
             {{ customText }}
         </a>
-        <div v-if="isReviewable && !isReviewed" class="alert alert-primary mb-2 mt-2">
-                <i class="fas fa-exclamation-triangle"></i>
-                Feedback needs to be marked as reviewed before sending!
-            </div>
+        <div v-if="isSecurityCheckable && !isSecurityChecked" class="alert alert-danger mb-2 mt-2">
+            <i class="fas fa-exclamation-triangle"></i>
+            User needs to be marked as security checked before proceeding!
+        </div>
+        <div v-else-if="isReviewable && !isReviewed" class="alert alert-warning mb-2 mt-2">
+            <i class="fas fa-exclamation-triangle"></i>
+            Feedback needs to be marked as reviewed before sending!
+        </div>
     </div>
 </template>
 
@@ -53,6 +63,14 @@ export default {
             default: false,
         },
         isReviewed: {
+            type: Boolean,
+            default: true,
+        },
+        isSecurityCheckable: {
+            type: Boolean,
+            default: false,
+        },
+        isSecurityChecked: {
             type: Boolean,
             default: true,
         },

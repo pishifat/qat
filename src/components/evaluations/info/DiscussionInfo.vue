@@ -17,6 +17,13 @@
                         loggedInUser.isNat
                     "
                 />
+                <evaluation-is-security-checked 
+                    v-if="
+                        loggedInUser.isNat && 
+                        selectedEvaluation.isApplication && 
+                        selectedEvaluation.consensus === 'pass'
+                    "
+                />
                 <evaluation-is-reviewed v-if="selectedEvaluation.feedback && loggedInUser.isNat" />
                 <evaluation-link v-if="selectedEvaluation.feedback" />
                 <feedback-info v-if="selectedEvaluation.consensus" />
@@ -46,6 +53,7 @@ import FeedbackInfo from './common/FeedbackInfo.vue';
 import evaluations from '../../../mixins/evaluations.js';
 import NextEvaluationEstimate from './common/NextEvaluationEstimate.vue';
 import EvaluationIsReviewed from './common/EvaluationIsReviewed.vue';
+import EvaluationIsSecurityChecked from './common/EvaluationIsSecurityChecked.vue';
 import EvaluationLink from './common/EvaluationLink.vue';
 
 export default {
@@ -57,6 +65,7 @@ export default {
         FeedbackInfo,
         NextEvaluationEstimate,
         EvaluationIsReviewed,
+        EvaluationIsSecurityChecked,
         EvaluationLink,
     },
     mixins: [evaluations],

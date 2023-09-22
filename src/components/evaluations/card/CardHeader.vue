@@ -15,8 +15,16 @@
                 data-toggle="tooltip"
                 data-placement="top"
                 :title="'feedback written' + (isReviewed ? ' (reviewed)' : ' (needs review)')"
-                class="fas fa-comment mx-1"
+                class="fas fa-comment mr-1"
                 :class="isReviewed ? '' : 'text-warning'"
+            />
+            <i
+                v-if="isSecurityCheckable && isNatOrTrialNat"
+                data-toggle="tooltip"
+                data-placement="top"
+                :title="isSecurityChecked ? 'is security checked' : 'needs a security check'"
+                class="fas fa-shield-alt mr-1"
+                :class="isSecurityChecked ? '' : 'text-danger'"
             />
         </p>
         <div v-if="consensus">
@@ -66,6 +74,18 @@ export default {
             default: '',
         },
         isReviewed: {
+            type: Boolean,
+            default: false,
+        },
+        isSecurityCheckable: {
+            type: Boolean,
+            default: false,
+        },
+        isSecurityChecked: {
+            type: Boolean,
+            default: false,
+        },
+        isNatOrTrialNat: {
             type: Boolean,
             default: false,
         },

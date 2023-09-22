@@ -9,6 +9,8 @@
             :custom-text="'Send message & archive'"
             :is-reviewable="isReviewable"
             :is-reviewed="selectedEvaluation.isReviewed"
+            :is-security-checkable="isSecurityCheckable"
+            :is-security-checked="selectedEvaluation.isSecurityChecked"
         />
     </div>
 </template>
@@ -30,6 +32,10 @@ export default {
             default: '',
         },
         isReviewable: {
+            type: Boolean,
+            default: false,
+        },
+        isSecurityCheckable: {
             type: Boolean,
             default: false,
         },
