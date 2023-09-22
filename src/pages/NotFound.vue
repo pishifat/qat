@@ -18,8 +18,8 @@ export default {
     // @ts-ignore
     metaInfo: {
         meta: [
-            { property: 'og:title', content: 'not found :( · BN Management' },
-            { property: 'og:description', content: 'The place for everything related to the Beatmap Nominators!' },
+            { property: 'og:title', content: 'not found :(' },
+            { property: 'og:description', content: 'The place for everything related to the Beatmap Nominators, not for whatever you were looking for.' },
         ],
     },
 };
