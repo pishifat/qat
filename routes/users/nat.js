@@ -325,19 +325,33 @@ router.post('/editBadgeValue/:id', async (req, res) => {
     let u = await User.findById(req.params.id);
 
     if (res.locals.userRequest.isResponsibleWithButtons) {
+        const type = req.body.group == 'bn' ? 'BN' : req.body.group == 'nat' ? 'NAT' : 'nomination';
+        let originalValue;
         let value;
         let num = req.body.add ? 1 : -1;
 
         if (req.body.group == 'bn') {
+            originalValue = u.bnProfileBadge;
             value = u.bnProfileBadge + num;
             await User.findByIdAndUpdate(req.params.id, { bnProfileBadge: value });
         } else if (req.body.group == 'nat') {
+            originalValue = u.natProfileBadge;
             value = u.natProfileBadge + num;
             await User.findByIdAndUpdate(req.params.id, { natProfileBadge: value });
         } else if (req.body.group == 'nom') {
-            let value = u.nominationsProfileBadge + num;
+            originalValue = u.nominationsProfileBadge;
+            value = u.nominationsProfileBadge + num;
             await User.findByIdAndUpdate(req.params.id, { nominationsProfileBadge: value });
         }
+
+        await discord.webhookPost(
+            [{
+                author: discord.defaultWebhookAuthor(req.session),
+                color: discord.webhookColors.lightPink,
+                description: `Updated **${type}** badge value for user [**${u.username}**](https://osu.ppy.sh/users/${u.osuId}): **${req.body.group == 'nom' ? originalValue * 200 : originalValue} → ${req.body.group == 'nom' ? value * 200 : value}**`,
+            }],
+            'all'
+        );
     }
 
     u = await User.findById(req.params.id);
