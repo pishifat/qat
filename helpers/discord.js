@@ -253,7 +253,7 @@ function defaultWebhookAuthor(session) {
 
 const webhookColors = {
     lightRed: 16742771,       // active: moveToGroupDiscussion, almostOverdueNotifications
-    darkRed: 8787477,         // report
+    darkRed: 8787477,         // report, toggleIsSecurityChecked
     red: 15607337,            // overdueNotifications, problemReport, lowActivity
 
     lightOrange: 15639928,    // enableBnEvaluators, suggestionReport
@@ -276,12 +276,13 @@ const webhookColors = {
     darkPurple: 4263999,      // submitVeto
     purple: 8536232,          // startVetoMediation, concludeVetoMediation
 
-    pink: 16728232,       // revealedCurrentBnEvalNotification, modified report, toggleHasTrialNat
-    lightPink: 16748236,  // isTrialNat, SEV
-    white: 15724527,      // unarchive, addEvaluation, sendMessages
-    brown: 7554849,       // submitUserNote
-    gray: 8815494,        // passive: moveToGroupDiscussion, dev
-    black: 2564903,       // archive, deleteVeto
+    pink: 16728232,           // revealedCurrentBnEvalNotification, modified report, toggleHasTrialNat
+    lightPink: 16748236,      // isTrialNat, SEV, toggleIsBannedFromBn, editBadgeValue
+
+    white: 15724527,          // unarchive, addEvaluation, sendMessages
+    brown: 7554849,           // submitUserNote
+    gray: 8815494,            // passive: moveToGroupDiscussion, dev
+    black: 2564903,           // archive, deleteVeto
 };
 
 async function discussionWebhookPost(d, session) {
