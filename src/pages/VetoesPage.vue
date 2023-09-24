@@ -88,6 +88,13 @@ import PaginationNav from '../components/PaginationNav.vue';
 
 export default {
     name: 'VetoesPage',
+    // @ts-ignore
+    metaInfo: {
+        meta: [
+            { property: 'og:title', content: 'Vetoes · BN Management' },
+            { property: 'og:description', content: 'The place for everything related to the Beatmap Nominators!' },
+        ],
+    },
     components: {
         ToastMessages,
         VetoCard,

@@ -1,6 +1,7 @@
 import './sass/app.scss';
 import './bootstrap';
 import Vue from 'vue';
+import Meta from 'vue-meta';
 import VueRouter from 'vue-router';
 import store from './store/main';
 import App from './App.vue';
@@ -11,6 +12,11 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 Vue.use(VueRouter);
 
+Vue.use(Meta, {
+    keyName: 'metaInfo',
+    refreshOnceOnNavigation: true,
+});
+
 const router = new VueRouter({
     mode: 'history',
     routes,
@@ -18,7 +24,7 @@ const router = new VueRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-    document.title = to.meta.title || 'NAT/BN Management';
+    document.title = to.meta.title || 'BN Management';
 
     if (!store.state.initialized) {
         await store.dispatch('setInitialData');

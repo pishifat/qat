@@ -15,5 +15,12 @@
 <script>
 export default {
     name: 'NotFound',
+    // @ts-ignore
+    metaInfo: {
+        meta: [
+            { property: 'og:title', content: 'not found :(' },
+            { property: 'og:description', content: 'The place for everything related to the Beatmap Nominators, not for whatever you were looking for.' },
+        ],
+    },
 };
 </script>
