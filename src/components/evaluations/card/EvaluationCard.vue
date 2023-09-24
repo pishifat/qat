@@ -17,6 +17,9 @@
                 :addition="evaluation.addition"
                 :feedback="evaluation.feedback"
                 :is-reviewed="evaluation.isReviewed"
+                :is-security-checkable="evaluation.isApplication && evaluation.consensus === 'pass'"
+                :is-security-checked="evaluation.isSecurityChecked"
+                :is-nat-or-trial-nat="loggedInUser.isNatOrTrialNat"
             />
 
             <card-footer

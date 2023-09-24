@@ -20,6 +20,7 @@ interface IEvaluationBase {
     isBnEvaluation?: boolean;
     isResignation?: boolean;
     isReviewed?: boolean;
+    isSecurityChecked?: boolean;
     natEvaluatorHistory: {
         date: Date;
         user: IUserDocument;

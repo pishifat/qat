@@ -648,13 +648,39 @@ router.post('/toggleIsReviewed/:id', middlewares.isNat, async (req, res) => {
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),
         color: discord.webhookColors.lightPurple,
-        description: `${app.isReviewed ? 'Reviewed feedback for ' : 'Unmarked feedback as reviewed for '} [**${app.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${app.id})`,
+        description: `${app.isReviewed ? 'Reviewed feedback for' : 'Unmarked feedback as reviewed for'} [**${app.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${app.id})`,
     }],
     app.mode);
 
     Logger.generate(
         req.session.mongoId,
         `Toggled "${app.user.username}" ${app.mode} BN app isReviewed to ${app.isReviewed}`,
+        'appEvaluation',
+        app._id
+    );
+});
+
+/* POST toggle isSecurityChecked for evaluations */
+router.post('/toggleIsSecurityChecked/:id', middlewares.isNat, async (req, res) => {
+    const app = await AppEvaluation
+        .findById(req.params.id)
+        .populate(defaultPopulate);
+        
+    app.isSecurityChecked = !app.isSecurityChecked;
+    await app.save();
+
+    res.json(app);
+
+    discord.webhookPost([{
+        author: discord.defaultWebhookAuthor(req.session),
+        color: discord.webhookColors.darkRed,
+        description: `${app.isSecurityChecked ? 'Marked' : 'Unmarked'} [**${app.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${app.id}) as security checked`,
+    }],
+    app.mode);
+
+    Logger.generate(
+        req.session.mongoId,
+        `Toggled "${app.user.username}" ${app.mode} BN app isSecurityChecked to ${app.isSecurityChecked}`,
         'appEvaluation',
         app._id
     );
