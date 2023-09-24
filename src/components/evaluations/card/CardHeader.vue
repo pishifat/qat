@@ -11,12 +11,12 @@
             <i v-else-if="mode == 'catch'" class="fas fa-apple-alt mx-1" />
             <i v-else-if="mode == 'mania'" class="fas fa-stream mx-1" />
             <i
-                v-if="feedback && !isReviewed"
+                v-if="(!feedback || !isReviewed) && isDiscussion"
                 data-toggle="tooltip"
                 data-placement="top"
-                :title="'feedback written' + (isReviewed ? ' (reviewed)' : ' (needs review)')"
+                :title="!feedback ? 'needs feedback' : 'feedback needs review'"
                 class="fas fa-comment mr-1"
-                :class="isReviewed ? '' : 'text-warning'"
+                :class="!feedback ? 'text-danger' : 'text-warning'"
             />
             <i
                 v-if="isSecurityCheckable && isNatOrTrialNat && !isSecurityChecked"
@@ -86,6 +86,10 @@ export default {
             default: false,
         },
         isNatOrTrialNat: {
+            type: Boolean,
+            default: false,
+        },
+        isDiscussion: {
             type: Boolean,
             default: false,
         },

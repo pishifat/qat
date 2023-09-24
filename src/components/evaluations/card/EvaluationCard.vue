@@ -20,6 +20,7 @@
                 :is-security-checkable="evaluation.isApplication && evaluation.consensus === 'pass'"
                 :is-security-checked="evaluation.isSecurityChecked"
                 :is-nat-or-trial-nat="loggedInUser.isNatOrTrialNat"
+                :is-discussion="evaluation.discussion"
             />
 
             <card-footer
