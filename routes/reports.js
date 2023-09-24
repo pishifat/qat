@@ -27,7 +27,7 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
 
     if (blockedUrls.some(url => link.includes(url))) {
         return res.json({
-            error: 'images hosted on this website are not allowed, as they can change/disappear quickly. please use a proper image hosting service instead.',
+            error: 'images hosted on this website are not allowed, as they can change/disappear quickly. please use a different image hosting service instead.',
         });
     }
 
