@@ -113,16 +113,20 @@ export default {
 
             if (this.user) {
                 users = await this.$http.executeGet(`/users/nat/findUserBadgeInfo/` + this.user.id, e);
+
+                if (users) {
+                    this.badgeUsers = users;
+                }
             } else {
                 this.loading = true;
                 users = await this.$http.executeGet('/users/nat/findUserBadgeInfo/false', e);
                 this.loading = false;
-            }
 
-            if (users) {
-                this.badgeUsers = users.filter(user =>
-                    (this.yearsDuration(user.bnDuration) >= 1) || (this.yearsDuration(user.natDuration) >= 1 || user.actualNominationsProfileBadge >= 1)
-                );
+                if (users) {
+                    this.badgeUsers = users.filter(user =>
+                        (this.yearsDuration(user.bnDuration) >= 1) || (this.yearsDuration(user.natDuration) >= 1 || user.actualNominationsProfileBadge >= 1)
+                    );
+                }
             }
         },
         compareBadgeDuration (currentBadge, days) {
