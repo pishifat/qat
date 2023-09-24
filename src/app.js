@@ -24,7 +24,23 @@ const router = new VueRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-    document.title = to.meta.title || 'BN Management';
+    document.title = to.meta.title ? `${to.meta.title} · BN Management` : 'BN Management';
+
+    const head = document.head || document.getElementsByTagName('head')[0];
+
+    const metaAttributes = [
+        { name: 'og:title', content: document.title },
+        { name: 'og:url', content: window.location.href },
+        { name: 'og:description', content: 'The place for everything related to the Beatmap Nominators!' },
+    ];
+
+    metaAttributes.forEach(meta => {
+        const tag = document.createElement('meta');
+        Object.keys(meta).forEach(key => {
+            tag[key] = meta[key];
+        });
+        head.appendChild(tag);
+    });
 
     if (!store.state.initialized) {
         await store.dispatch('setInitialData');
