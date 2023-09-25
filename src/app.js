@@ -26,6 +26,7 @@ router.beforeEach(async (to, from, next) => {
         { name: 'og:title', content: document.title },
         { name: 'og:url', content: window.location.href },
         { name: 'og:description', content: 'The place for everything related to the Beatmap Nominators!' },
+        { name: 'description', content: 'The place for everything related to the Beatmap Nominators!' },
         { name: 'og:image', content: '' },
         { name: 'og:type', content: 'website' },
     ];
