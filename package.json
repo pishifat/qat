@@ -42,7 +42,6 @@
     "sass": "^1.58.3",
     "vue": "^2.6.12",
     "vue-loader": "^15.9.3",
-    "vue-meta": "^2.4.0",
     "vue-router": "^3.4.3",
     "vue-template-compiler": "^2.6.12",
     "vuex": "^3.5.1",

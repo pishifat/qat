@@ -40,13 +40,6 @@ import EventsTable from '../components/dataCollection/EventsTable.vue';
 
 export default {
     name: 'DataCollectionPage',
-    // @ts-ignore
-    metaInfo: {
-        meta: [
-            { property: 'og:title', content: 'SEV Management · BN Management' },
-            { property: 'og:description', content: 'The place for everything related to the Beatmap Nominators!' },
-        ],
-    },
     components: {
         ToastMessages,
         FilterBox,

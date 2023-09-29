@@ -113,13 +113,6 @@ import PaginationNav from '../components/PaginationNav.vue';
 
 export default {
     name: 'UsersPage',
-    // @ts-ignore
-    metaInfo: {
-        meta: [
-            { property: 'og:title', content: 'BN/NAT Listing · BN Management' },
-            { property: 'og:description', content: 'The place for everything related to the Beatmap Nominators!' },
-        ],
-    },
     components: {
         ToastMessages,
         UserCard,

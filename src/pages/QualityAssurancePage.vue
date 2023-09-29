@@ -50,13 +50,6 @@ import Leaderboard from '../components/qualityAssurance/Leaderboard.vue';
 
 export default {
     name: 'QualityAssurancePage',
-    // @ts-ignore
-    metaInfo: {
-        meta: [
-            { property: 'og:title', content: 'Quality Assurance · BN Management' },
-            { property: 'og:description', content: 'The place for everything related to the Beatmap Nominators!' },
-        ],
-    },
     components: {
         ToastMessages,
         FilterBox,

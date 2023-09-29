@@ -53,14 +53,6 @@ import UserCard from '../components/home/UserCard.vue';
 
 export default {
     name: 'Index',
-    // @ts-ignore
-    metaInfo: {
-        meta: [
-            { property: 'og:url', content: 'https://bn.mappersguild.com/home' },
-            { property: 'og:title', content: 'BN Management' },
-            { property: 'og:description', content: 'The place for everything related to the Beatmap Nominators!' },
-        ],
-    },
     components: {
         ToastMessages,
         Announcements,

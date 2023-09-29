@@ -78,13 +78,6 @@ import { mapState } from 'vuex';
 
 export default {
     name: 'ManageTestPage',
-    // @ts-ignore
-    metaInfo: {
-        meta: [
-            { property: 'og:title', content: 'RC Test Management · BN Management' },
-            { property: 'og:description', content: 'The place for everything related to the Beatmap Nominators!' },
-        ],
-    },
     components: {
         ToastMessages,
         AddQuestion,
