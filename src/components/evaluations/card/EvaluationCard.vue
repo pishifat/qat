@@ -21,6 +21,8 @@
                 :is-security-checked="evaluation.isSecurityChecked"
                 :is-nat-or-trial-nat="loggedInUser.isNatOrTrialNat"
                 :is-discussion="evaluation.discussion"
+                :is-resignation="evaluation.kind == 'resignation'"
+                :is-nat-evaluation="evaluation.selfSummary"
             />
 
             <card-footer

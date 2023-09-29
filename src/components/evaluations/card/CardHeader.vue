@@ -11,7 +11,7 @@
             <i v-else-if="mode == 'catch'" class="fas fa-apple-alt mx-1" />
             <i v-else-if="mode == 'mania'" class="fas fa-stream mx-1" />
             <i
-                v-if="(!feedback || !isReviewed) && isDiscussion"
+                v-if="(!feedback || !isReviewed) && isDiscussion && !isResignation && !isNatEvaluation"
                 data-toggle="tooltip"
                 data-placement="top"
                 :title="!feedback ? 'needs feedback' : 'feedback needs review'"
@@ -90,6 +90,14 @@ export default {
             default: false,
         },
         isDiscussion: {
+            type: Boolean,
+            default: false,
+        },
+        isResignation: {
+            type: Boolean,
+            default: false,
+        },
+        isNatEvaluation: {
             type: Boolean,
             default: false,
         },
