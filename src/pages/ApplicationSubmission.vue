@@ -315,6 +315,7 @@ export default {
             this.cooldownEvals = data.cooldownEvals;
             this.cooldownResignations = data.cooldownResignations;
         }
+        this.relevantResignation = [...this.resignations].find(r => r.mode == this.selectedMode);
     },
     computed: {
         ...mapState([
