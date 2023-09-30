@@ -298,7 +298,7 @@ export default {
             cooldownResignations: [],
             relevantResignation: null,
             cooldown: false,
-            selectedMode: '',
+            selectedMode: 'osu',
             mods: [],
             reasons: [],
             oszs: [],
@@ -393,24 +393,27 @@ export default {
             }
 
             if (result) {
-                this.successInfo = `Submitting... (this will take a few seconds)`;
+                const result2 = confirm(`Are you sure you want to apply to join the ${this.selectedMode === 'osu' ? 'osu!' : 'osu!' + this.selectedMode} Beatmap Nominators?`);
+                if (result2) {
+                    this.successInfo = `Submitting... (this will take a few seconds)`;
 
-                const data = await this.$http.executePost(
-                    `/bnapps/apply`,
-                    {
-                        mode: this.selectedMode,
-                        mods: this.mods,
-                        reasons: this.reasons,
-                        oszs: this.oszs,
-                    },
-                    e
-                );
+                    const data = await this.$http.executePost(
+                        `/bnapps/apply`,
+                        {
+                            mode: this.selectedMode,
+                            mods: this.mods,
+                            reasons: this.reasons,
+                            oszs: this.oszs,
+                        },
+                        e
+                    );
 
-                if (!data.error) {
-                    this.hasPendingTest = true;
+                    if (!data.error) {
+                        this.hasPendingTest = true;
+                    }
+
+                    this.successInfo = '';
                 }
-
-                this.successInfo = '';
             }
         },
         async rejoinApply(e) {
