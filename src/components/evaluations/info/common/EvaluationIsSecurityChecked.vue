@@ -6,7 +6,7 @@
                 href="#"
                 data-toggle="tooltip"
                 data-placement="right"
-                title="@help in #gmt-help for a bn security check"
+                title="@help in #gmt-help"
                 @click.prevent="toggleEvaluationIsSecurityChecked($event)"
             >
                 <font-awesome-icon
