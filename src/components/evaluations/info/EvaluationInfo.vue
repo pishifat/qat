@@ -52,7 +52,7 @@
                     />
                     <div v-if="loggedInUser.isPishifat" class="mb-2">
                         <b>Debug</b>
-                        <div class="ml-4">
+                        <div class="ml-3">
                             <a href="#evalDocument" data-toggle="collapse">
                                 view evaluation document <i class="fas fa-angle-down" />
                             </a>
