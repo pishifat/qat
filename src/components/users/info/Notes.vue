@@ -37,65 +37,72 @@
             </div>
         </div>
 
-        <p class="mt-2">
-            <b>Other notes</b>
-        </p>
-        <ul class="mt-2">
-            <li v-if="!otherNotes" class="small">
-                ...
-            </li>
-            <li v-else-if="!otherNotes.length" class="small">
-                User has no notes
-            </li>
-            <li
-                v-for="note in otherNotes"
-                v-else
-                :key="note.id"
-                class="small"
-            >
-                <b>
-                    {{ note.updatedAt | toStandardDate }} -
-                    <user-link
-                        :osu-id="note.author.osuId"
-                        :username="note.author.username"
-                    />
-                </b>
-                <a
-                    href="#"
-                    class="ml-1 text-danger"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="delete note"
-                    @click.prevent="hideNote(note.id);"
-                >
-                    &times;
+        <div class="mt-2">
+            <b>
+                Other notes
+            </b>
+            <p class="p-40 mt-2 ml-3">
+                <a href="#otherNotes" data-toggle="collapse">
+                    Notes <i class="fas fa-angle-down" />
                 </a>
-                <a
-                    v-if="note.author.id == loggedInUser.id"
-                    href="#"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="edit note"
-                    @click.prevent="editNoteId == note.id ? editNoteId = '' : editNoteId = note.id, editNoteComment = note.comment"
+            </p>
+            <ul id="otherNotes" class="collapse mt-2">
+                <li v-if="!otherNotes" class="small">
+                    ...
+                </li>
+                <li v-else-if="!otherNotes.length" class="small">
+                    User has no notes
+                </li>
+                <li
+                    v-for="note in otherNotes"
+                    v-else
+                    :key="note.id"
+                    class="small"
                 >
-                    <i class="fas fa-edit" />
-                </a>
+                    <b>
+                        {{ note.updatedAt | toStandardDate }} -
+                        <user-link
+                            :osu-id="note.author.osuId"
+                            :username="note.author.username"
+                        />
+                    </b>
+                    <a
+                        href="#"
+                        class="ml-1 text-danger"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="delete note"
+                        @click.prevent="hideNote(note.id);"
+                    >
+                        &times;
+                    </a>
+                    <a
+                        v-if="note.author.id == loggedInUser.id"
+                        href="#"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="edit note"
+                        @click.prevent="editNoteId == note.id ? editNoteId = '' : editNoteId = note.id, editNoteComment = note.comment"
+                    >
+                        <i class="fas fa-edit" />
+                    </a>
 
-                <div v-if="note.id != editNoteId" class="text-secondary ml-2" v-html="$md.render(note.comment)" />
-                <div v-else>
-                    <textarea
-                        v-model="editNoteComment"
-                        placeholder="edit user note..."
-                        class="form-control"
-                        rows="2"
-                    />
+                    <div v-if="note.id != editNoteId" class="text-secondary ml-2" v-html="$md.render(note.comment)" />
+                    <div v-else>
+                        <textarea
+                            v-model="editNoteComment"
+                            placeholder="edit user note..."
+                            class="form-control"
+                            rows="2"
+                        />
 
-                    <button class="btn btn-primary btn-sm btn-block mt-1" @click="editNote($event)">
-                        Edit note
-                    </button>
-                </div>
-            </li>
-        </ul>
+                        <button class="btn btn-primary btn-sm btn-block mt-1" @click="editNote($event)">
+                            Edit note
+                        </button>
+                    </div>
+                </li>
+            </ul>
+        </div>
     </div>
 </template>
 
