@@ -78,7 +78,7 @@
             <div v-if="loggedInUser.isPishifat">
                 <hr />
                 <b>Debug</b>
-                <div class="ml-4">
+                <div class="ml-3">
                     <a href="#userDocument" data-toggle="collapse">
                         view user document <i class="fas fa-angle-down" />
                     </a>

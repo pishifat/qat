@@ -25,7 +25,7 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
         'puu.sh',
     ];
 
-    if (blockedUrls.some(url => link.includes(url))) {
+    if (req.body.category == 'contentCaseVisual' && blockedUrls.some(url => link.includes(url))) {
         return res.json({
             error: 'images hosted on this website are not allowed, as they can change/disappear quickly. please use a different image hosting service instead.',
         });

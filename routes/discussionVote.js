@@ -117,7 +117,7 @@ router.post('/submit', middlewares.hasBasicAccess, async (req, res) => {
         'puu.sh',
     ];
     
-    if (discussionLink.length > 0 && blockedUrls.some(u => discussionLink.includes(u))) {
+    if (isContentReview && discussionLink.length > 0 && blockedUrls.some(u => discussionLink.includes(u))) {
         return res.json({
             error: 'images hosted on this website are not allowed, as they can change/disappear quickly. please use a different image hosting service instead.',
         });
