@@ -162,21 +162,38 @@ export default {
         if (!data.error) {
             this.$store.commit('users/setUsers', data.users);
 
-            const id = this.$route.query.id;
+            const { id, osuId, username } = this.$route.query;
+            let i = -1;
 
             if (id) {
-                let i = this.users.findIndex(u => u.id == id);
+                i = this.users.findIndex(u => u.id == id);
 
                 if (i == -1) {
                     this.userInput = id.toString();
                     await this.loadUser();
                     i = this.users.findIndex(u => u.id == id);
                 }
+            } else if (osuId) {
+                i = this.users.findIndex(u => u.osuId == osuId);
 
-                if (i >= 0) {
-                    this.$store.commit('users/setSelectedUserId', id);
-                    $('#extendedInfo').modal('show');
+                if (i == -1) {
+                    this.userInput = osuId.toString();
+                    await this.loadUser();
+                    i = this.users.findIndex(u => u.osuId == osuId);
                 }
+            } else if (username) {
+                i = this.users.findIndex(u => u.username.toLowerCase() == username.toLowerCase());
+
+                if (i == -1) {
+                    this.userInput = username;
+                    await this.loadUser();
+                    i = this.users.findIndex(u => u.username.toLowerCase() == username.toLowerCase());
+                }
+            }
+
+            if (i >= 0) {
+                this.$store.commit('users/setSelectedUserId', this.users[i].id);
+                $('#extendedInfo').modal('show');
             }
         }
     },
