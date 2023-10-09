@@ -3,6 +3,11 @@
         <div class="card card-body small mb-4">
             <h4>Announcement (home page and BN server)</h4>
             <div class="text-secondary mb-2">This sends a message to the #announcements channel in the BN Discord server and displays the announcement on the front page of this website.</div>
+            <ul class="text-secondary mb-2">
+                <li>Announcements support markdown formatting</li>
+                <li>The announcement Discord embed will display the first image linked in the announcement</li>
+                <li>If you want your image to display on Discord, make sure its link ends with a file extension (i.e. jpg or png)</li>
+            </ul>
             <div>
                 Roles:
                 <select
@@ -74,10 +79,12 @@
                 />
             </div>
 
-            <div v-if="title.length && announcement.length" 
+            <div v-if="title.length && announcement.length"
+                class="mt-2"
                 data-toggle="tooltip"
                 data-placement="left"
-                title="embed links/images won't work in Discord, but they WILL work on the front page">
+                title="only the first image will appear on the discord announcement">
+                <hr />
                 Preview:
                 <div
                     class="pre-line"
@@ -88,6 +95,7 @@
                     <span class="small" v-html="$md.render(announcement)"></span>
                 </div>
                 <b v-if="announcement.length > 4096">TOO MANY CHARACTERS FOR DISCORD. shorten message pls</b>
+                <hr />
             </div>
 
             <button v-if="announcement.length" class="btn btn-danger my-1" @click="sendAnnouncement($event)">
@@ -96,11 +104,28 @@
         </div>
 
         <div class="card card-body small mb-4">
-            <h4>Message (mappersguild bot)</h4>
+            <h4>Message (NAT bot)</h4>
             <div class="text-secondary mb-2">You don't have permission to use this. If you think you should, talk to pishifat.</div>
             <div>
+                Title:
+                <input
+                    v-model="messageChannelTitle"
+                    class="form-control mb-2"
+                    type="text"
+                />
+            </div>
+            <div>
+                Description:
+                <span class="small text-secondary">(optional)</span>
+                <input
+                    v-model="messageChannelDescription"
+                    class="form-control mb-2"
+                    type="text"
+                />
+            </div>
+            <div>
                 Message:
-
+                <span class="small text-secondary">({{ message.length }}/1024)</span>
                 <textarea
                     v-model="message"
                     class="form-control form-control-sm"
@@ -109,22 +134,21 @@
                 />
             </div>
 
-            <div v-if="lines && lines.length && lines[0].length">
+            <div v-if="messageChannelTitle.length && message.length" class="mt-2">
+                <hr />
                 Preview:
-                <p
-                    v-for="(line, i) in lines"
-                    :key="i"
-                    class="small"
-                    :class="line.length > 400 ? 'text-danger' : 'text-secondary'"
+                <div
+                    class="pre-line"
+                    :class="message.length > 1024 ? 'text-danger' : 'text-secondary'"
                 >
-                    <b v-if="line.length > 400">THIS LINE WILL NOT SEND</b>
-                    {{ line }}
-                </p>
+                    <span class="small" v-html="$md.render(message)" />
+                    <b v-if="message.length > 1024">TOO MANY CHARACTERS. shorten message pls</b>
+                </div>
             </div>
 
             <hr>
 
-            User osu! IDs (separate by new lines):
+            osu! IDs (separate by commas):
 
             <textarea
                 v-model="users"
@@ -183,7 +207,7 @@
 
             <hr>
 
-            <button v-if="message.length" class="btn btn-danger my-1" @click="sendMessages($event)">
+            <button v-if="messageChannelTitle.length && message.length && users" class="btn btn-danger my-1" @click="sendMessages($event)">
                 Send message(s) to user(s) listed above
             </button>
         </div>
@@ -206,6 +230,8 @@ export default {
             title: '',
             selectedRole: '',
             roles: [],
+            messageChannelTitle: '',
+            messageChannelDescription: '',
             message: '',
             users: '',
             group: '',
@@ -216,12 +242,6 @@ export default {
         ...mapState([
             'loggedInUser',
         ]),
-        /** @returns {Array} */
-        lines() {
-            const lines = this.message.split('\n');
-
-            return lines;
-        },
     },
     methods: {
         async findUserOsuIds (e) {
@@ -237,7 +257,7 @@ export default {
                     if (!this.users.length) {
                         this.users += id;
                     } else {
-                        this.users += '\n' + id;
+                        this.users += ',' + id;
                     }
                 }
 
@@ -269,7 +289,7 @@ export default {
                 const result2 = confirm(`Are you really sure? Just double-checking in case you don't read.`);
 
                 if (result2) {
-                    await this.$http.executePost(`/spam/sendMessages/`, { users: this.users, lines: this.lines }, e);
+                    await this.$http.executePost(`/spam/sendMessages/`, { users: this.users, message: this.message, title: this.messageChannelTitle, description: this.messageChannelDescription }, e);
                 }
             }
         },

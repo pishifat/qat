@@ -13,51 +13,27 @@ router.use(middlewares.isNat);
 
 /* POST spam messages */
 router.post('/sendMessages', middlewares.isResponsibleWithButtons, async (req, res) => {
-    let messages = req.body.lines.filter(l => l.length);
-
-    if (!messages.length) {
-        return res.json({ error: 'No messages' });
+    const channel = {
+        name: req.body.title,
+        description: req.body.description
     }
 
-    let users = [];
+    let osuIds = req.body.users.split(',');
 
-    const splitIds = req.body.users.split('\n');
-    const unfilteredOsuIds = splitIds.filter(id => id.length);
-    const osuIds = [...new Set(unfilteredOsuIds)];
+    if (!osuIds.find(id => id == req.session.osuId))
+        osuIds.push(req.session.osuId);
 
-    if (!osuIds.length) {
-        return res.json({ error: 'No users' });
+    const message = await osuBot.sendAnnouncement(osuIds, channel, req.body.message);
+
+    if (message !== true) {
+        return res.json({ error: `Message was not sent. Please let pishifat know!` });
     }
 
-    for (const osuId of osuIds) {
-        const id = parseInt(osuId);
-
-        if (isNaN(id)) {
-            return res.json({ error: `User "${osuId}" wasn't found. Make sure it's an osu ID, not a username` });
-        }
-
-        users.push({ osuId: id });
-    }
-
-    let newMessages;
-
-    // send to all users
-    for (const user of users) {
-        newMessages = await osuBot.sendMessages(user.osuId, messages);
-    }
-
-    // sent to self for reference
-    await osuBot.sendMessages(req.session.osuId, messages);
-
-    if (newMessages !== true) {
-        return res.json({ error: `Messages were not sent. Please let pishifat know!` });
-    }
-
-    res.json({ success: 'Messages sent! A copy was sent to you for confirmation' });
+    res.json({ success: 'Message sent! A copy was sent to you for confirmation' });
 
     Logger.generate(
         req.session.mongoId,
-        `Spammed messages through u/mappersguild`,
+        `Spammed messages through NAT bot`,
         'spam',
         null
     );
