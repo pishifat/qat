@@ -16,10 +16,6 @@
             <settings-modal-languages />
 
             <hr>
-
-            <settings-modal-preferences />
-
-            <hr>
         </template>
 
         <template v-if="loggedInUser.isNat">
@@ -39,7 +35,6 @@ import SettingsModalEvaluator from './SettingsModalEvaluator.vue';
 import SettingsModalDiscord from './SettingsModalDiscord.vue';
 import SettingsModalModeEvaluations from './SettingsModalModeEvaluations.vue';
 import SettingsModalRequests from './SettingsModalRequests.vue';
-import SettingsModalPreferences from './SettingsModalPreferences.vue';
 import SettingsModalLanguages from './SettingsModalLanguages.vue';
 import SettingsModalExplicit from './SettingsModalExplicit.vue';
 
@@ -50,7 +45,6 @@ export default {
         SettingsModalDiscord,
         SettingsModalRequests,
         SettingsModalEvaluator,
-        SettingsModalPreferences,
         SettingsModalLanguages,
         SettingsModalExplicit,
     },
