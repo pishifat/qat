@@ -32,21 +32,32 @@ export default {
             editingIdInput: false,
         };
     },
+    watch: {
+        selectedUser() {
+            this.idInput = this.selectedUser.discordId;
+        },
+    },
+    mounted() {
+        this.idInput = this.selectedUser.discordId;
+    },
     computed: {
         ...mapGetters('users', [
             'selectedUser',
         ]),
     },
-    created () {
-        this.idInput = this.selectedUser.discordId;
-    },
     methods: {
         async save () {
             if (this.editingIdInput) {
-                await this.$http.executePost(`/users/updateDiscordId`, {
+                const res = await this.$http.executePost(`/users/updateDiscordId`, {
                     discordId: this.idInput,
                     userId: this.selectedUser.id,
                 });
+
+                if (this.$http.isValid(res)) {
+                let user = this.selectedUser;
+                user.discordId = res.discordId;
+                this.$store.commit('users/updateUser', user);
+            }
             }
 
             this.editingIdInput = !this.editingIdInput;
