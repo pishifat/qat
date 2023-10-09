@@ -39,6 +39,8 @@
             visit Mappers' Guild
         </a>
 
+        <user-info />
+        
         <toast-messages />
     </div>
 </template>
@@ -46,10 +48,12 @@
 <script>
 import { mapState } from 'vuex';
 import evaluations from '../mixins/evaluations';
+import usersHomeModule from '../store/usersHome';
 import ToastMessages from '../components/ToastMessages.vue';
 import Announcements from '../components/home/Announcements.vue';
 import UserLink from '../components/UserLink.vue';
 import UserCard from '../components/home/UserCard.vue';
+import UserInfo from '../components/home/UserInfo.vue';
 
 export default {
     name: 'Index',
@@ -58,6 +62,7 @@ export default {
         Announcements,
         UserLink,
         UserCard,
+        UserInfo,
     },
     mixins: [ evaluations ],
     computed: {
@@ -74,13 +79,49 @@ export default {
             });
         },
     },
+    beforeCreate () {
+        if (!this.$store.hasModule('usersHome')) {
+            this.$store.registerModule('usersHome', usersHomeModule);
+        }
+    },
     async created () {
         if (this.allUsersByMode.length) return;
 
         const data = await this.$http.executeGet('/relevantInfo');
 
         if (data.allUsersByMode) {
+            // set home users
             this.$store.commit('setHomeData', data.allUsersByMode);
+
+            // set actual users for modal state purposes
+            const users = data.allUsersByMode.reduce((acc, curr) => {
+                return [...acc, ...curr.users];
+            }, []);
+
+            this.$store.commit('usersHome/setUsers', users);
+
+            // set selected user if query param is present
+            const id = this.$route.query.id;
+
+            if (id) {
+                let i = this.users.findIndex(u => u.id == id);
+
+                if (i == -1) {
+                    this.userInput = id.toString();
+                    await this.loadUser();
+                    i = this.users.findIndex(u => u.id == id);
+                }
+
+                if (i >= 0) {
+                    this.$store.commit('usersHome/setSelectedUserId', id);
+                    
+                    // sleep for 1 second to allow the page to load
+                    // it doesn't work without the delay for some reason
+                    setTimeout(() => {
+                        $('#userInfo').modal('show');
+                    }, 500);
+                }
+            }
         }
     },
 };

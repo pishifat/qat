@@ -1,5 +1,11 @@
 <template>
-    <div class="card home-card" :style="cardDecoration(user)">
+    <div 
+        class="card home-card" 
+        :style="cardDecoration(user)" 
+        @click="selectUser()"
+        data-toggle="modal"
+        data-target="#userInfo"
+    >
         <img :src="'https://a.ppy.sh/' + user.osuId" class="card-avatar-img">
         <div class="body">
             <span>
@@ -44,8 +50,20 @@ export default {
             required: true,
         },
     },
+    computed: {
+        selectedUser () {
+            return this.user;
+        },
+    },
     mixins: [ evaluations ],
     methods: {
+        selectUser() {
+            this.$store.commit('usersHome/setSelectedUserId', this.user.id);
+
+            if (this.$route.query.id !== this.user.id) {
+                this.$router.replace(`/home?id=${this.user.id}`);
+            }
+        },
         /** @returns {array} */
         requestMethods(requestStatus) {
             let statusList = [...requestStatus];
