@@ -136,6 +136,7 @@
         </div>
 
         <edit-request-modal />
+        <user-info />
         <toast-messages />
     </div>
 </template>
@@ -149,6 +150,7 @@ import MyRequestRow from '../components/modRequests/MyRequestRow.vue';
 import ToastMessages from '../components/ToastMessages.vue';
 import BnFinder from '../components/modRequests/BnFinder.vue';
 import UserCard from '../components/home/UserCard.vue';
+import UserInfo from '../components/home/UserInfo.vue';
 
 export default {
     name: 'ModRequestsSubmission',
@@ -159,6 +161,7 @@ export default {
         ToastMessages,
         BnFinder,
         UserCard,
+        UserInfo,
     },
     data () {
         return {
@@ -182,10 +185,13 @@ export default {
         }
     },
     async created () {
+        /**
+         * ? BN Finder
         if (this.loggedInUser) {
             const data = await this.$http.initialRequest('/modRequests/owned');
             if (!data.error) this.$store.commit('modRequests/setOwnRequests', data);
         }
+        */
 
         const userData = await this.$http.initialRequest('/relevantInfo');
 
