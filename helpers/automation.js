@@ -802,7 +802,7 @@ const checkTenureValidity = cron.schedule('40 4 4 * *', async () => {
                 
                 if (lastModeNatHistory) {
                     if (lastModeNatHistory.kind == 'joined') {
-                        if (!natModes.includes(mode)) {
+                        if (!natModes.includes(mode) && mode !== 'none') {
                             notify = true;
                         }
                     } else {
@@ -830,14 +830,18 @@ const checkTenureValidity = cron.schedule('40 4 4 * *', async () => {
                 }
 
                 if (user.groups.length == 1 && user.modesInfo.length > 0) {
-                    await discord.webhookPost(
-                        [{
-                            title: `${user.username} ${mode} modesInfo is sus`,
-                            color: discord.webhookColors.red,
-                            description: `https://bn.mappersguild.com/users?id=${user.id}`,
-                        }],
-                        'dev'
-                    );
+                    const userModes = user.modesInfo.map(m => m.mode);
+                    
+                    if (userModes.includes(mode)) {
+                        await discord.webhookPost(
+                            [{
+                                title: `${user.username} ${mode} modesInfo is sus`,
+                                color: discord.webhookColors.red,
+                                description: `https://bn.mappersguild.com/users?id=${user.id}`,
+                            }],
+                            'dev'
+                        );
+                    }
                 }
                 
             }
