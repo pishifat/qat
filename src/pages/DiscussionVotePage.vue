@@ -182,6 +182,10 @@ export default {
                 this.$store.commit('discussionVote/setDiscussionVotes', [
                     discussionVote,
                 ]);
+                this.$store.commit(
+                    'discussionVote/setSelectedDiscussionVoteId',
+                    id
+                );
                 $('#extendedInfo').modal('show');
             }
         } else {
