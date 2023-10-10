@@ -525,6 +525,7 @@ router.post('/updateDiscordId', middlewares.isNatOrTrialNat, async (req, res) =>
 
     res.json({
         success: 'Updated',
+        discordId: user.discordId
     });
 
     Logger.generate(
@@ -713,13 +714,6 @@ router.post('/:id/updateGenrePreferences', middlewares.isBnOrNat, async (req, re
     const genre = req.body.genre;
     const isPreference = req.body.isPreference;
 
-    if (user.genrePreferences.length >= 3 && !user.genrePreferences.includes(genre) && isPreference) {
-        return res.json({
-            error: 'Cannot save more than 3 preferences',
-            user,
-        });
-    }
-
     if (genre.length && !user.genrePreferences.includes(genre) && isPreference) {
         user.genrePreferences.push(genre);
 
@@ -762,13 +756,6 @@ router.post('/:id/updateLanguagePreferences', middlewares.isBnOrNat, async (req,
 
     const language = req.body.language;
     const isPreference = req.body.isPreference;
-
-    if (user.languagePreferences.length >= 3 && !user.languagePreferences.includes(language) && isPreference) {
-        return res.json({
-            error: 'Cannot save more than 3 preferences',
-            user,
-        });
-    }
 
     if (language.length && !user.languagePreferences.includes(language) && isPreference) {
         user.languagePreferences.push(language);
@@ -823,13 +810,6 @@ router.post('/:id/updateStylePreferences/:mode', middlewares.isBnOrNat, async (r
 
     let relevantStylePreferences = mode == 'osu' ? user.osuStylePreferences : mode == 'taiko' ? user.taikoStylePreferences : mode == 'catch' ? user.catchStylePreferences : user.maniaStylePreferences;
     let relevantStyleNegativePreferences = mode == 'osu' ? user.osuStyleNegativePreferences : mode == 'taiko' ? user.taikoStyleNegativePreferences : mode == 'catch' ? user.catchStyleNegativePreferences : user.maniaStyleNegativePreferences;
-
-    if (relevantStylePreferences.length >= 3 && !relevantStylePreferences.includes(style) && isPreference) {
-        return res.json({
-            error: 'Cannot save more than 3 preferences',
-            user,
-        });
-    }
 
     if (style.length && !relevantStylePreferences.includes(style) && isPreference) {
         relevantStylePreferences.push(style);
@@ -895,13 +875,6 @@ router.post('/:id/updateKeymodePreferences', middlewares.isBnOrNat, async (req, 
     const keymode = req.body.keymode;
     const isPreference = req.body.isPreference;
 
-    if (user.maniaKeymodePreferences.length >= 3 && !user.maniaKeymodePreferences.includes(keymode) && isPreference) {
-        return res.json({
-            error: 'Cannot save more than 3 preferences',
-            user,
-        });
-    }
-
     if (keymode.length && !user.maniaKeymodePreferences.includes(keymode) && isPreference) {
         user.maniaKeymodePreferences.push(keymode);
 
@@ -952,13 +925,6 @@ router.post('/:id/updateDetailPreferences', middlewares.isBnOrNat, async (req, r
     const detail = req.body.detail;
     const isPreference = req.body.isPreference;
 
-    if (user.detailPreferences.length >= 3 && !user.detailPreferences.includes(detail) && isPreference) {
-        return res.json({
-            error: 'Cannot save more than 3 preferences',
-            user,
-        });
-    }
-
     if (detail.length && !user.detailPreferences.includes(detail) && isPreference) {
         user.detailPreferences.push(detail);
 
@@ -1008,13 +974,6 @@ router.post('/:id/updateMapperPreferences', middlewares.isBnOrNat, async (req, r
 
     const mapper = req.body.mapper;
     const isPreference = req.body.isPreference;
-
-    if (user.mapperPreferences.length >= 3 && !user.mapperPreferences.includes(mapper)) {
-        return res.json({
-            error: 'Cannot save more than 3 preferences',
-            user,
-        });
-    }
 
     if (mapper.length && !user.mapperPreferences.includes(mapper) && isPreference) {
         user.mapperPreferences.push(mapper);
@@ -1330,6 +1289,32 @@ router.post('/:id/findAdditionalBnMonths', async (req, res) => {
     let user = await User.findById(req.params.id);
 
     res.json(await findAdditionalBnMonths(user));
+});
+
+/* POST update request info */
+router.post('/:id/updateRequestInfo', async (req, res) => {
+    const user = await User.findById(req.params.id).orFail();
+
+    if (req.session.mongoId != user.id) {
+        return res.json({
+            error: 'Unauthorized',
+        });
+    }
+
+    user.requestInfo = req.body.requestInfo;
+    await user.save();
+
+    res.json({
+        success: 'Updated',
+        user,
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `User "${user.username}" updated their request info`,
+        'user',
+        user._id
+    );
 });
 
 module.exports = router;

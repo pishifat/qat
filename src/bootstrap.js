@@ -10,7 +10,7 @@ const md = new MarkdownIt('zero', {
     linkify: true,
     typographer: false,
 })
-    .enable(['emphasis', 'linkify', 'newline', 'link', 'image'])
+    .enable(['emphasis', 'linkify', 'newline', 'link', 'image', 'heading', 'list', 'hr'])
     .use(MarkdownItVideo);
 
 // Remember old renderer, if overridden, or proxy to default renderer
