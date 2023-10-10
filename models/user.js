@@ -294,6 +294,7 @@ class UserService extends mongoose.Model {
                         detailNegativePreferences: '$detailNegativePreferences',
                         mapperPreferences: '$mapperPreferences',
                         mapperNegativePreferences: '$mapperNegativePreferences',
+                        history: '$history',
                     },
                 },
             });

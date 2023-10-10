@@ -103,7 +103,7 @@
             <div class="col-sm-4 mb-4">
                 <h6>Map preferences</h6>
 
-                <div v-if="selectedUser.mode == 'osu'">
+                <div v-if="mode == 'osu'">
                     <div v-if="loggedInUser._id === selectedUser.id">
                         <div v-for="style in osuStyleOptions" :key="style">
                             <i
@@ -150,7 +150,7 @@
                         </small>
                     </div>
                 </div>
-                <div v-if="selectedUser.mode == 'taiko'">
+                <div v-if="mode == 'taiko'">
                     <div v-if="loggedInUser._id === selectedUser.id">
                         <div v-for="style in taikoStyleOptions" :key="style">
                             <i
@@ -197,7 +197,7 @@
                         </small>
                     </div>
                 </div>
-                <div v-if="selectedUser.mode == 'catch'">
+                <div v-if="mode == 'catch'">
                     <div v-if="loggedInUser._id === selectedUser.id">
                         <div v-for="style in catchStyleOptions" :key="style">
                             <i
@@ -244,7 +244,7 @@
                         </small>
                     </div>
                 </div>
-                <div v-if="selectedUser.mode == 'mania'">
+                <div v-if="mode == 'mania'">
                     <div v-if="loggedInUser._id === selectedUser.id">
                         <div v-for="style in maniaStyleOptions" :key="style">
                             <i
@@ -292,7 +292,7 @@
                     </div>
                 </div>
             </div>
-            <div v-if="selectedUser.mode == 'mania'" class="col-sm-4 mb-4">
+            <div v-if="mode == 'mania'" class="col-sm-4 mb-4">
                 <h6>Keymode preferences</h6>
 
                 
@@ -480,6 +480,7 @@ export default {
             maniaKeymodeOptions: ManiaKeymodePreferences,
             detailOptions: DetailPreferences,
             mapperOptions: MapperPreferences,
+            mode: 'osu',
             processing: false,
             defaultText: `Select up to 3 preferences. Crossed (red X) options will almost never be recommended to you.`,
         };
@@ -495,23 +496,24 @@ export default {
     watch: {
         selectedUser() {
             this.genrePreferences = this.selectedUser.genrePreferences;
-        this.genreNegativePreferences = this.selectedUser.genreNegativePreferences;
-        this.languagePreferences = this.selectedUser.languagePreferences;
-        this.languageNegativePreferences = this.selectedUser.languageNegativePreferences;
-        this.osuStylePreferences = this.selectedUser.osuStylePreferences;
-        this.osuStyleNegativePreferences = this.selectedUser.osuStyleNegativePreferences;
-        this.taikoStylePreferences = this.selectedUser.taikoStylePreferences;
-        this.taikoStyleNegativePreferences = this.selectedUser.taikoStyleNegativePreferences;
-        this.catchStylePreferences = this.selectedUser.catchStylePreferences;
-        this.catchStyleNegativePreferences = this.selectedUser.catchStyleNegativePreferences;
-        this.maniaStylePreferences = this.selectedUser.maniaStylePreferences;
-        this.maniaStyleNegativePreferences = this.selectedUser.maniaStyleNegativePreferences;
-        this.maniaKeymodePreferences = this.selectedUser.maniaKeymodePreferences;
-        this.maniaKeymodeNegativePreferences = this.selectedUser.maniaKeymodeNegativePreferences;
-        this.detailPreferences = this.selectedUser.detailPreferences;
-        this.detailNegativePreferences = this.selectedUser.detailNegativePreferences;
-        this.mapperPreferences = this.selectedUser.mapperPreferences;
-        this.mapperNegativePreferences = this.selectedUser.mapperNegativePreferences;
+            this.genreNegativePreferences = this.selectedUser.genreNegativePreferences;
+            this.languagePreferences = this.selectedUser.languagePreferences;
+            this.languageNegativePreferences = this.selectedUser.languageNegativePreferences;
+            this.osuStylePreferences = this.selectedUser.osuStylePreferences;
+            this.osuStyleNegativePreferences = this.selectedUser.osuStyleNegativePreferences;
+            this.taikoStylePreferences = this.selectedUser.taikoStylePreferences;
+            this.taikoStyleNegativePreferences = this.selectedUser.taikoStyleNegativePreferences;
+            this.catchStylePreferences = this.selectedUser.catchStylePreferences;
+            this.catchStyleNegativePreferences = this.selectedUser.catchStyleNegativePreferences;
+            this.maniaStylePreferences = this.selectedUser.maniaStylePreferences;
+            this.maniaStyleNegativePreferences = this.selectedUser.maniaStyleNegativePreferences;
+            this.maniaKeymodePreferences = this.selectedUser.maniaKeymodePreferences;
+            this.maniaKeymodeNegativePreferences = this.selectedUser.maniaKeymodeNegativePreferences;
+            this.detailPreferences = this.selectedUser.detailPreferences;
+            this.detailNegativePreferences = this.selectedUser.detailNegativePreferences;
+            this.mapperPreferences = this.selectedUser.mapperPreferences;
+            this.mapperNegativePreferences = this.selectedUser.mapperNegativePreferences;
+            this.mode = this.getMode();
         },
     },
     mounted () {
@@ -533,8 +535,16 @@ export default {
         this.detailNegativePreferences = this.selectedUser.detailNegativePreferences;
         this.mapperPreferences = this.selectedUser.mapperPreferences;
         this.mapperNegativePreferences = this.selectedUser.mapperNegativePreferences;
+        this.mode = this.getMode();
     },
     methods: {
+        getMode () {
+            if (this.selectedUser.mode == 'none') {
+                return this.selectedUser.history[this.selectedUser.history.length - 1].mode;
+            } else {
+                return this.selectedUser.mode;
+            }
+        },
         async updateGenrePreferences (genre, isPreference, e) {
             this.processing = true;
             const data = await this.$http.executePost(`/users/${this.loggedInUser.id}/updateGenrePreferences`, {
