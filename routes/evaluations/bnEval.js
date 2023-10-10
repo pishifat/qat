@@ -332,15 +332,15 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
             const userGroup = req.body.userGroup || 'nat';
 
             if (userGroup == 'nat') {
-                const random45 = Math.round(Math.random() * (50 - 40) + 40); // between 40 and 50 days
+                const random75 = Math.round(Math.random() * (80 - 70) + 70); // between 70 and 80 days
                 let deadline = new Date();
-                deadline.setDate(deadline.getDate() + random45);
+                deadline.setDate(deadline.getDate() + random75);
 
                 await BnEvaluation.create({
                     user: evaluation.user,
                     mode: evaluation.mode == 'none' ? 'osu' : evaluation.mode,
                     deadline,
-                    activityToCheck: random45,
+                    activityToCheck: random75,
                     natEvaluators: [evaluation.user],
                 });
 
