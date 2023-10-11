@@ -5,7 +5,7 @@
         </template>
 
         <div v-if="selectedUser">
-            <div class="ml-3">
+            <div class="mx-3">
                 <b>Status:</b>
                     <span
                         class="badge badge-pill mx-1 text-lowercase"
@@ -14,7 +14,7 @@
                         {{ getStatus(selectedUser.requestStatus) }}
                     </span>
             </div>
-            <div class="ml-3">
+            <div class="mx-3">
                 <b>Request methods:</b>
                     <span
                         v-for="method in requestMethods(selectedUser.requestStatus)"
@@ -24,7 +24,7 @@
                         v-html="$md.renderInline(formatLink(method, selectedUser.requestLink, selectedUser.osuId))"
                     />
             </div>
-            <div v-if="selectedUser.languages.length" class="ml-3">
+            <div v-if="selectedUser.languages.length" class="mx-3">
                 <b>Languages:</b>
                     <span
                         v-for="language in selectedUser.languages"
@@ -36,7 +36,7 @@
 
             <hr />
 
-            <div class="ml-3">
+            <div class="mx-3">
                 <div>
                     <b>Request information:</b>
                     <a
@@ -54,7 +54,7 @@
                         class="form-control form-control-sm my-2"
                         type="text"
                         rows="4"
-                        placeholder="BN requests info"
+                        placeholder="BN requests info (markdown is supported!)"
                     />
                     
                     <button type="submit" class="btn btn-sm btn-secondary" @click="updateRequestInfo($event)">
@@ -63,8 +63,6 @@
                     <button type="submit" class="btn btn-sm btn-primary mx-2" @click="isEditing = !isEditing">
                         Cancel
                     </button>
-                    
-                    
                 </div>
                 <div v-else>
                     <div v-if="selectedUser.requestInfo" class="card card-body small my-2">
