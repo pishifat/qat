@@ -61,7 +61,13 @@ export default {
             this.$store.commit('usersHome/setSelectedUserId', this.user.id);
 
             if (this.$route.query.id !== this.user.id) {
-                this.$router.replace(`/home?id=${this.user.id}`);
+                // if route doesnt exist, replace it with home, else push query
+                if (this.$route.path === '/') {
+                    this.$router.replace(`/home?id=${this.user.id}`);
+                } else {
+                    this.$router.push(`?id=${this.user.id}`);
+                }
+                //this.$router.replace(`/home?id=${this.user.id}`);
             }
         },
         /** @returns {array} */

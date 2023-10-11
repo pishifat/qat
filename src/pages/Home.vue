@@ -70,6 +70,9 @@ export default {
             'allUsersByMode',
             'loggedInUser',
         ]),
+        ...mapState('usersHome', [
+            'users',
+        ]),
         sorted () {
             const sortOrder = ['osu', 'taiko', 'catch', 'mania', 'none'];
             const sorted = [...this.allUsersByMode];
@@ -89,7 +92,7 @@ export default {
 
         const data = await this.$http.executeGet('/relevantInfo');
 
-        if (data.allUsersByMode) {
+        if (!data.error) {
             // set home users
             this.$store.commit('setHomeData', data.allUsersByMode);
 
@@ -106,20 +109,9 @@ export default {
             if (id) {
                 let i = this.users.findIndex(u => u.id == id);
 
-                if (i == -1) {
-                    this.userInput = id.toString();
-                    await this.loadUser();
-                    i = this.users.findIndex(u => u.id == id);
-                }
-
                 if (i >= 0) {
                     this.$store.commit('usersHome/setSelectedUserId', id);
-                    
-                    // sleep for 1 second to allow the page to load
-                    // it doesn't work without the delay for some reason
-                    setTimeout(() => {
-                        $('#userInfo').modal('show');
-                    }, 500);
+                    $('#userInfo').modal('show');
                 }
             }
         }
