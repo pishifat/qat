@@ -144,6 +144,7 @@
 <script>
 import { mapState } from 'vuex';
 import modRequestsModule from '../store/modRequests';
+import usersHomeModule from '../store/usersHome';
 import RequestsListing from '../components/modRequests/RequestsListing.vue';
 import EditRequestModal from '../components/modRequests/EditRequestModal.vue';
 import MyRequestRow from '../components/modRequests/MyRequestRow.vue';
@@ -175,6 +176,9 @@ export default {
         ...mapState([
             'loggedInUser',
         ]),
+        ...mapState('usersHome', [
+            'users',
+        ]),
         ...mapState('modRequests', [
             'ownRequests',
         ]),
@@ -182,6 +186,9 @@ export default {
     beforeCreate () {
         if (!this.$store.hasModule('modRequests')) {
             this.$store.registerModule('modRequests', modRequestsModule);
+        }
+        if (!this.$store.hasModule('usersHome')) {
+            this.$store.registerModule('usersHome', usersHomeModule);
         }
     },
     async created () {
@@ -196,6 +203,25 @@ export default {
         const userData = await this.$http.initialRequest('/relevantInfo');
 
         if (userData.allUsersByMode) {
+            // set actual users for modal state purposes
+            const users = userData.allUsersByMode.reduce((acc, curr) => {
+                return [...acc, ...curr.users];
+            }, []);
+
+            this.$store.commit('usersHome/setUsers', users);
+
+            // set selected user if query param is present
+            const id = this.$route.query.id;
+
+            if (id) {
+                let i = this.users.findIndex(u => u.id == id);
+
+                if (i >= 0) {
+                    this.$store.commit('usersHome/setSelectedUserId', id);
+                    $('#userInfo').modal('show');
+                }
+            }
+
             this.openUsers = this.filterOpenUsers(userData.allUsersByMode);
         }
     },
