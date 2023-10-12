@@ -48,7 +48,7 @@ const defaultBnPopulate = [
     },
 ];
 
-/* GET search for user */
+/* GET search for evaluation(s) */
 router.get('/search', middlewares.isNat, async (req, res) => {
     const userToSearch = req.query.user && decodeURI(req.query.user);
     const idToSearch = req.query.id;
@@ -61,7 +61,7 @@ router.get('/search', middlewares.isNat, async (req, res) => {
             consensus: { $exists: true },
         })
         .populate(defaultAppPopulate)
-        .sort({ createdAt: -1 })
+        .sort({ archivedAt: -1, createdAt: -1 })
         .limit(limit);
 
     let bnEvaluationsQuery = Evaluation
@@ -70,7 +70,7 @@ router.get('/search', middlewares.isNat, async (req, res) => {
             consensus: { $exists: true },
         })
         .populate(defaultBnPopulate)
-        .sort({ createdAt: -1 })
+        .sort({ archivedAt: -1, createdAt: -1 })
         .limit(limit);
 
     if (userToSearch) {
