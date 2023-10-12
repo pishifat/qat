@@ -5,7 +5,7 @@
             <div class="col-sm-4 mb-4">
                 <h6>Genre preferences</h6>
 
-                <div v-if="loggedInUser._id === selectedUser.id">
+                <div v-if="loggedInUser && loggedInUser._id === selectedUser.id">
                     <div v-for="genre in genreOptions" :key="genre">
                         <i
                             class="fa-check-circle fake-checkbox"
@@ -54,7 +54,7 @@
             <div class="col-sm-4 mb-4">
                 <h6>Language preferences</h6>
 
-                <div v-if="loggedInUser._id === selectedUser.id">
+                <div v-if="loggedInUser && loggedInUser._id === selectedUser.id">
                     <div v-for="language in languageOptions" :key="language">
                         <i
                             class="fa-check-circle fake-checkbox"
@@ -103,8 +103,8 @@
             <div class="col-sm-4 mb-4">
                 <h6>Map preferences</h6>
 
-                <div v-if="mode == 'osu'">
-                    <div v-if="loggedInUser._id === selectedUser.id">
+                <div v-if="modes.includes('osu')">
+                    <div v-if="loggedInUser && loggedInUser._id === selectedUser.id">
                         <div v-for="style in osuStyleOptions" :key="style">
                             <i
                                 class="fa-check-circle fake-checkbox"
@@ -146,12 +146,12 @@
                             v-if="!osuStylePreferences.length && !osuStyleNegativePreferences.length"
                             class="text-secondary ml-1"
                         >
-                        None...
+                        None... {{ modes.length > 1 ? '(osu!)' : '' }}
                         </small>
                     </div>
                 </div>
-                <div v-if="mode == 'taiko'">
-                    <div v-if="loggedInUser._id === selectedUser.id">
+                <div v-if="modes.includes('taiko')">
+                    <div v-if="loggedInUser && loggedInUser._id === selectedUser.id">
                         <div v-for="style in taikoStyleOptions" :key="style">
                             <i
                                 class="fa-check-circle fake-checkbox"
@@ -193,12 +193,12 @@
                             v-if="!taikoStylePreferences.length && !taikoStyleNegativePreferences.length"
                             class="text-secondary ml-1"
                         >
-                        None...
+                        None... {{ modes.length > 1 ? '(osu!taiko)' : '' }}
                         </small>
                     </div>
                 </div>
-                <div v-if="mode == 'catch'">
-                    <div v-if="loggedInUser._id === selectedUser.id">
+                <div v-if="modes.includes('catch')">
+                    <div v-if="loggedInUser && loggedInUser._id === selectedUser.id">
                         <div v-for="style in catchStyleOptions" :key="style">
                             <i
                                 class="fa-check-circle fake-checkbox"
@@ -240,12 +240,12 @@
                             v-if="!catchStylePreferences.length && !catchStyleNegativePreferences.length"
                             class="text-secondary ml-1"
                         >
-                        None...
+                        None... {{ modes.length > 1 ? '(osu!catch)' : '' }}
                         </small>
                     </div>
                 </div>
-                <div v-if="mode == 'mania'">
-                    <div v-if="loggedInUser._id === selectedUser.id">
+                <div v-if="modes.includes('mania')">
+                    <div v-if="loggedInUser && loggedInUser._id === selectedUser.id">
                         <div v-for="style in maniaStyleOptions" :key="style">
                             <i
                                 class="fa-check-circle fake-checkbox"
@@ -287,16 +287,16 @@
                             v-if="!maniaStylePreferences.length && !maniaStyleNegativePreferences.length"
                             class="text-secondary ml-1"
                         >
-                        None...
+                        None... {{ modes.length > 1 ? '(osu!mania)' : '' }}
                         </small>
                     </div>
                 </div>
             </div>
-            <div v-if="mode == 'mania'" class="col-sm-4 mb-4">
+            <div v-if="modes.includes('mania')" class="col-sm-4 mb-4">
                 <h6>Keymode preferences</h6>
 
                 
-                <div v-if="loggedInUser._id === selectedUser.id">
+                <div v-if="loggedInUser && loggedInUser._id === selectedUser.id">
                     <div v-for="keymode in maniaKeymodeOptions" :key="keymode">
                         <i
                             class="fa-check-circle fake-checkbox"
@@ -345,7 +345,7 @@
             <div class="col-sm-4 mb-4">
                 <h6>Song details preferences</h6>
 
-                <div v-if="loggedInUser._id === selectedUser.id">
+                <div v-if="loggedInUser && loggedInUser._id === selectedUser.id">
                     <div v-for="detail in detailOptions" :key="detail">
                         <i
                             class="fa-check-circle fake-checkbox"
@@ -395,7 +395,7 @@
             <div class="col-sm-4 mb-4">
                 <h6>Mapper preferences</h6>
 
-                <div v-if="loggedInUser._id === selectedUser.id">
+                <div v-if="loggedInUser && loggedInUser._id === selectedUser.id">
                     <div v-for="mapper in mapperOptions" :key="mapper">
                         <i
                             class="fa-check-circle fake-checkbox"
@@ -480,9 +480,8 @@ export default {
             maniaKeymodeOptions: ManiaKeymodePreferences,
             detailOptions: DetailPreferences,
             mapperOptions: MapperPreferences,
-            mode: 'osu',
+            modes: ['osu'],
             processing: false,
-            defaultText: `Select up to 3 preferences. Crossed (red X) options will almost never be recommended to you.`,
         };
     },
     computed: {
@@ -513,7 +512,7 @@ export default {
             this.detailNegativePreferences = this.selectedUser.detailNegativePreferences;
             this.mapperPreferences = this.selectedUser.mapperPreferences;
             this.mapperNegativePreferences = this.selectedUser.mapperNegativePreferences;
-            this.mode = this.getMode();
+            this.modes = this.getModes();
         },
     },
     mounted () {
@@ -535,14 +534,14 @@ export default {
         this.detailNegativePreferences = this.selectedUser.detailNegativePreferences;
         this.mapperPreferences = this.selectedUser.mapperPreferences;
         this.mapperNegativePreferences = this.selectedUser.mapperNegativePreferences;
-        this.mode = this.getMode();
+        this.modes = this.getModes();
     },
     methods: {
-        getMode () {
+        getModes () {
             if (this.selectedUser.mode == 'none') {
-                return this.selectedUser.history[this.selectedUser.history.length - 1].mode;
+                return [this.selectedUser.history[this.selectedUser.history.length - 1].mode];
             } else {
-                return this.selectedUser.mode;
+                return this.selectedUser.modesInfo.map(m => m.mode);
             }
         },
         async updateGenrePreferences (genre, isPreference, e) {

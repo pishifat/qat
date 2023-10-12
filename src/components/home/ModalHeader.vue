@@ -1,5 +1,6 @@
 <template>
     <div
+        v-if="selectedUser"
         class="modal-header user-header d-flex flex-row align-items-center justify-content-between p-3"
     >
         <div class="d-flex flex-row align-items-center">
@@ -13,7 +14,7 @@
                 />
 
                 <mode-display
-                    :modes="[selectedUser.mode]"
+                    :modes="modes"
                 />
             </h5>
         </div>
@@ -34,16 +35,35 @@ export default {
         ModeDisplay,
         UserLink,
     },
+    data() {
+        return {
+            modes: [],
+        };
+    },
     computed: {
         ...mapGetters('usersHome', [
             'selectedUser',
         ]),
+        
+    },
+    watch: {
+        selectedUser() {
+            this.modes = this.getModes();
+        },
+    },
+    mounted () {
+        this.modes = this.getModes();
+    },
+    methods: {
+        getModes () {
+            return this.selectedUser ? this.selectedUser.modesInfo.map(m => m.mode) : ["osu", "taiko", "catch", "mania"];
+        },
         /** @returns {string} */
-        getCover() {
+        getCover () {
             return this.selectedUser.cover ? `url(${this.selectedUser.cover})` : `url(https://a.ppy.sh/${this.selectedUser.osuId})`;
         },
         /** @returns {string} */
-        getUserColor() {
+        getUserColor () {
             if (this.selectedUser.groups == 'nat') {
                 return 'var(--danger)';
             }
@@ -72,10 +92,10 @@ export default {
 }
 
 .user-header {
-    background: linear-gradient(20deg, v-bind(getUserColor) 5%, rgba(0, 0, 0, 0.65) 65%), v-bind(getCover) center no-repeat;
+    background: linear-gradient(20deg, v-bind(getUserColor()) 5%, rgba(0, 0, 0, 0.65) 65%), v-bind(getCover()) center no-repeat;
     background-size: cover;
     object-fit: fill;
-    border-bottom: 4px solid v-bind(getUserColor);
+    border-bottom: 4px solid v-bind(getUserColor());
 }
 
 </style>

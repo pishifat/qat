@@ -13,7 +13,7 @@
             >
                 <tr v-for="event in events" :key="event.id">
                     <td class="text-nowrap">
-                        {{ timestamp(event) | toMonthDay }}
+                        {{ timestamp(event) | toMonthDayYear }}
                     </td>
                     <td>
                         <span v-if="eventsId == 'bnFinderMatches'">

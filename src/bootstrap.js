@@ -40,10 +40,10 @@ Vue.filter('toStandardDate', (date) => {
     return moment(date).format('YYYY-MM-DD');
 });
 
-Vue.filter('toMonthDay', (date) => {
+Vue.filter('toMonthDayYear', (date) => {
     if (!date) return '';
 
-    return moment(date).format('MMM DD');
+    return moment(date).format('MMM DD, YYYY');
 });
 
 Vue.filter('shorten', (text, length) => {

@@ -40,7 +40,7 @@
                 <div>
                     <b>Request information:</b>
                     <a
-                        v-if="loggedInUser._id === selectedUser.id && !isEditing"
+                        v-if="loggedInUser && loggedInUser._id === selectedUser.id && !isEditing"
                         href="#"
                         class="ml-1"
                         @click.prevent="isEditing = !isEditing"
@@ -76,7 +76,7 @@
 
             <preferences />
 
-            <div v-if="loggedInUser.isPishifat">
+            <div v-if="loggedInUser && loggedInUser.isPishifat">
                 <hr />
                 <div class="ml-3">
                     <b>Debug</b>

@@ -217,6 +217,11 @@ class UserService extends mongoose.Model {
         try {
             let query = this.aggregate([
                 {
+                    $addFields: {
+                        originalModesInfo: '$modesInfo', // Save the original array in a new field
+                    }
+                },
+                {
                     $unwind: '$modesInfo',
                 },
                 {
@@ -271,7 +276,7 @@ class UserService extends mongoose.Model {
                         languages: '$languages',
                         cover: '$cover',
                         mode: '$modesInfo.mode',
-                        modesInfo: '$modesInfo',
+                        modesInfo: '$originalModesInfo',
                         isNat: '$isNat',
                         hasBasicAccess: '$hasBasicAccess',
                         probationModes: '$probationModes',
