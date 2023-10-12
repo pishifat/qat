@@ -236,3 +236,9 @@ body {
     color: $white;
     background: $selection-bg;
 }
+
+/* Image overflow */
+img {
+    max-width: 100%;
+    height: auto;
+}
