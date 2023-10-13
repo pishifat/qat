@@ -548,8 +548,8 @@ const closeContentReviews = cron.schedule('0 9 * * *', async () => {
 const lowActivityTask = cron.schedule('0 23 1 * *', async () => {
     const lowActivityFields90 = [];
     const lowActivityFields30 = [];
-    const initialDate90 = moment().subtract(3, 'months').toDate();
-    const initialDate30 = moment().subtract(1, 'months').toDate();
+    const initialDate90 = moment().subtract(90, 'days').toDate();
+    const initialDate30 = moment().subtract(30, 'days').toDate();
 
     const bns = await User.find({ groups: 'bn' });
 
@@ -557,9 +557,9 @@ const lowActivityTask = cron.schedule('0 23 1 * *', async () => {
         const joinedHistory = bn.history.filter(h => h.kind === 'joined');
         const date = joinedHistory[joinedHistory.length - 1].date;
 
-        if (new Date(date) < initialDate90) {
+        if (new Date(date) < initialDate90 || (await scrap.findUniqueNominationsCount(date, new Date(), bn) == 0)) {
             for (const mode of bn.modes) {
-                if (await hasLowActivity(initialDate90, bn, mode, 3)) {
+                if (await hasLowActivity(initialDate90, bn, mode, 90)) {
                     lowActivityFields90.push({
                         name: bn.username,
                         value: `${await scrap.findUniqueNominationsCount(initialDate90, new Date(), bn)}`,
@@ -567,7 +567,7 @@ const lowActivityTask = cron.schedule('0 23 1 * *', async () => {
                         mode,
                     });
                 }
-                if (await hasLowActivity(initialDate30, bn, mode, 1)) {
+                if (await hasLowActivity(initialDate30, bn, mode, 30)) {
                     lowActivityFields30.push({
                         name: bn.username,
                         value: `${await scrap.findUniqueNominationsCount(initialDate30, new Date(), bn)}`,
@@ -860,12 +860,12 @@ const checkTenureValidity = cron.schedule('40 4 4 * *', async () => {
  * @param {number} months
  * @returns {Promise<boolean>} whether or not the user has 'low activity'
  */
-async function hasLowActivity(initialDate, bn, mode, months) {
+async function hasLowActivity(initialDate, bn, mode, days) {
     const uniqueNominationsCount = await scrap.findUniqueNominationsCount(initialDate, new Date(), bn);
 
     if (
-        (uniqueNominationsCount < (2 * months) && (mode == 'mania' || mode == 'catch')) ||
-        (uniqueNominationsCount < (3 * months) && (mode == 'osu' || mode == 'taiko'))
+        (uniqueNominationsCount < (2 * (days/30)) && (mode == 'mania' || mode == 'catch')) ||
+        (uniqueNominationsCount < (3 * (days/30)) && (mode == 'osu' || mode == 'taiko'))
     ) {
         return true;
     }
@@ -876,9 +876,11 @@ async function hasLowActivity(initialDate, bn, mode, months) {
 /**
  * Checks for bns with less than required nomination count daily
  */
-const lowActivityPerUserTask = cron.schedule('22 22 * * *', async () => {
-    const initialDate90 = moment().subtract(3, 'months').toDate();
-    const initialDate30 = moment().subtract(1, 'months').toDate();
+const lowActivityPerUserTask = cron.schedule('17 19 * * *', async () => {
+    const initialDate90 = moment().subtract(90, 'days').toDate();
+    const initialDate30 = moment().subtract(30, 'days').toDate();
+    const initialDate15 = moment().subtract(10, 'days').toDate();
+    const initialDate7 = moment().subtract(7, 'days').toDate();
 
     const bns = await User.find({ groups: 'bn' });
 
@@ -886,11 +888,15 @@ const lowActivityPerUserTask = cron.schedule('22 22 * * *', async () => {
         const joinedHistory = bn.history.filter(h => h.kind === 'joined');
         const date = joinedHistory[joinedHistory.length - 1].date;
 
-        if (new Date(date) < initialDate90) {
+        const newBnWarning = (await scrap.findUniqueNominationsCount(date, new Date(), bn) == 0) && initialDate15 > date;
+
+        if (new Date(date) < initialDate90 || newBnWarning)  {
             for (const mode of bn.modes) {
-                if (await hasLowActivity(initialDate90, bn, mode, 3) && (!bn.lastMarkedAsLowActivity || new Date(bn.lastMarkedAsLowActivity) < initialDate30)) {
-                    bn.lastMarkedAsLowActivity = new Date();
-                    await bn.save();
+                if (await hasLowActivity(initialDate90, bn, mode, 90)) {
+                    if ((new Date(bn.lastMarkedAsLowActivity) > initialDate30 && !newBnWarning) || (new Date(bn.lastMarkedAsLowActivity) > initialDate7 && newBnWarning)) {
+                        bn.lastMarkedAsLowActivity = new Date();
+                        await bn.save();
+                    }
 
                     let role;
 
@@ -909,7 +915,7 @@ const lowActivityPerUserTask = cron.schedule('22 22 * * *', async () => {
                             break;
                     }
 
-                    const text = `**${bn.username}** (<https://osu.ppy.sh/users/${bn.osuId}>) - ${await scrap.findUniqueNominationsCount(initialDate90, new Date(), bn)} nominations in 90 days!`;
+                    const text = `**${bn.username}** (<https://osu.ppy.sh/users/${bn.osuId}>) - ${await scrap.findUniqueNominationsCount(initialDate90, new Date(), bn)} nominations ${newBnWarning ? 'since joining BN >15 days ago!' : 'in 90 days!'}`;
 
                     await discord.roleHighlightWebhookPost(mode, [role], text);
                 }
