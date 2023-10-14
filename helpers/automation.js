@@ -893,31 +893,31 @@ const lowActivityPerUserTask = cron.schedule('17 19 * * *', async () => {
         if (new Date(date) < initialDate90 || newBnWarning)  {
             for (const mode of bn.modes) {
                 if (await hasLowActivity(initialDate90, bn, mode, 90)) {
-                    if ((new Date(bn.lastMarkedAsLowActivity) > initialDate30 && !newBnWarning) || (new Date(bn.lastMarkedAsLowActivity) > initialDate7 && newBnWarning)) {
+                    if ((new Date(bn.lastMarkedAsLowActivity) < initialDate30 && !newBnWarning) || (new Date(bn.lastMarkedAsLowActivity) < initialDate7 && newBnWarning)) {
                         bn.lastMarkedAsLowActivity = new Date();
                         await bn.save();
+                    
+                        let role;
+
+                        switch (mode) {
+                            case 'osu':
+                                role = 'natEvaluatorOsu';
+                                break;
+                            case 'taiko':
+                                role = 'natEvaluatorTaiko';
+                                break;
+                            case 'catch':
+                                role = 'natEvaluatorCatch';
+                                break;
+                            case 'mania':
+                                role = 'natEvaluatorMania';
+                                break;
+                        }
+
+                        const text = `**${bn.username}** (<https://osu.ppy.sh/users/${bn.osuId}>) - ${await scrap.findUniqueNominationsCount(initialDate90, new Date(), bn)} nominations ${newBnWarning ? 'since joining BN >15 days ago!' : 'in 90 days!'}`;
+
+                        await discord.roleHighlightWebhookPost(mode, [role], text);
                     }
-
-                    let role;
-
-                    switch (mode) {
-                        case 'osu':
-                            role = 'natEvaluatorOsu';
-                            break;
-                        case 'taiko':
-                            role = 'natEvaluatorTaiko';
-                            break;
-                        case 'catch':
-                            role = 'natEvaluatorCatch';
-                            break;
-                        case 'mania':
-                            role = 'natEvaluatorMania';
-                            break;
-                    }
-
-                    const text = `**${bn.username}** (<https://osu.ppy.sh/users/${bn.osuId}>) - ${await scrap.findUniqueNominationsCount(initialDate90, new Date(), bn)} nominations ${newBnWarning ? 'since joining BN >15 days ago!' : 'in 90 days!'}`;
-
-                    await discord.roleHighlightWebhookPost(mode, [role], text);
                 }
             }
         }
