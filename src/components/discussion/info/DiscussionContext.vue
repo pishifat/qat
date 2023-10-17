@@ -88,7 +88,7 @@
             <span :class="selectedDiscussionVote.isAcceptable == true ? 'text-success' : selectedDiscussionVote.isAcceptable == false ? 'text-danger' : 'text-secondary'">
                 {{ selectedDiscussionVote.isAcceptable == true ? 'Pass' : selectedDiscussionVote.isAcceptable == false ? 'Fail' : 'Unknown' }}
             </span>
-            <span v-if="!selectedDiscussionVote.isAcceptable && selectedDiscussionVote.isAcceptable != false" class="btn-group">
+            <span v-if="loggedInUser.hasFullReadAccess && !selectedDiscussionVote.isAcceptable && selectedDiscussionVote.isAcceptable != false" class="btn-group">
                 <button
                     class="btn btn-sm btn-success"
                     @click="setIsAcceptable(true, $event);"

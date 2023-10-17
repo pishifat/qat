@@ -2,8 +2,11 @@
     <div class="row">
         <div class="col-md-12">
             <section class="card card-body">
-                <h2>Application Evaluations</h2>
-
+                <h2>
+                    Application Evaluations
+                    <small>({{ applications.length }})</small>
+                </h2>
+                
                 <transition-group
                     v-if="applications.length"
                     name="list"
@@ -25,7 +28,10 @@
             </section>
 
             <section class="card card-body">
-                <h2>BN Evaluations</h2>
+                <h2>
+                    BN Evaluations
+                    <small>({{ currentBnEvaluations.length }})</small>
+                </h2>
 
                 <transition-group
                     v-if="currentBnEvaluations.length"

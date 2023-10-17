@@ -447,6 +447,36 @@ async function announcementWebhookPost(session, title, description) {
     return { success: 'ok' };
 }
 
+/**
+ * @param {Array} reviews
+ * @param {Array} natEvaluators
+ * @param {Boolean} discussion
+ * @returns {Array} discord IDs for relevant NAT
+ */
+function findNatEvaluatorHighlights(reviews, natEvaluators, discussion) {
+    let discordIds = [];
+
+    if (natEvaluators.length == 1) {
+        discordIds.push(natEvaluators[0].discordId);
+    } else if (discussion) {
+        for (const review of reviews) {
+            if (review.evaluator.groups.includes('nat') && review.evaluator.isBnEvaluator) {
+                discordIds.push(review.evaluator.discordId);
+            }
+        }
+    } else {
+        const evaluatorIds = reviews.map(r => r.evaluator.id);
+
+        for (const user of natEvaluators) {
+            if (!evaluatorIds.includes(user.id) && user.isBnEvaluator) {
+                discordIds.push(user.discordId);
+            }
+        }
+    }
+
+    return discordIds;
+}
+
 module.exports = {
     webhookPost,
     highlightWebhookPost,
@@ -457,4 +487,5 @@ module.exports = {
     contentCaseWebhookPost,
     announcementWebhookPost,
     webhookColors,
+    findNatEvaluatorHighlights,
 };

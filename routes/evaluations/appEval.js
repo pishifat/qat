@@ -22,15 +22,15 @@ router.use(middlewares.hasBasicAccess);
 //population
 const defaultPopulate = [
     { path: 'user', select: 'username osuId' },
-    { path: 'bnEvaluators', select: 'username osuId' },
-    { path: 'natEvaluators', select: 'username osuId' },
+    { path: 'bnEvaluators', select: 'username osuId discordId isBnEvaluator' },
+    { path: 'natEvaluators', select: 'username osuId discordId isBnEvaluator' },
     { path: 'test', select: 'totalScore comment' },
     {
         path: 'reviews',
         select: 'evaluator behaviorComment moddingComment vote',
         populate: {
             path: 'evaluator',
-            select: 'username osuId groups isTrialNat',
+            select: 'username osuId groups isTrialNat discordId isBnEvaluator',
         },
     },
 ];
@@ -340,14 +340,39 @@ router.post('/setConsensus/:id', middlewares.isNatOrTrialNat, async (req, res) =
         evaluation._id
     );
 
-    discord.webhookPost(
-        [{
+    const embed = [
+        {
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.lightBlue,
-            description: `[**${evaluation.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${evaluation.id}) set to **${req.body.consensus}**`,
-        }],
-        evaluation.mode
-    );
+            description: `[**${evaluation.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${evaluation.id}) consensus set to **${req.body.consensus}**`,
+        }
+    ];
+
+    if (req.body.consensus === AppEvaluationConsensus.Pass) 
+        embed.push({
+            author: null,
+            color: discord.webhookColors.red,
+            description: `Make sure to ping \`@help\` in <#844651592857944135> and request a BN security check!`,
+        });
+
+    await discord.webhookPost(embed, evaluation.mode);
+
+    if (req.body.consensus === AppEvaluationConsensus.Pass) {
+        const evaluators = evaluation.natEvaluators;
+
+        const discordIds = req.session.groups.includes("nat")
+            ? [req.session.discordId]
+            : discord.findNatEvaluatorHighlights(
+                  evaluation.reviews,
+                  evaluators,
+                  evaluation.discussion
+              );
+        const randomIndex = Math.floor(Math.random() * discordIds.length);
+
+        if (discordIds.length > 0) {
+        await discord.userHighlightWebhookPost(evaluation.mode, [discordIds[randomIndex]]);
+        }
+    }
 });
 
 /* POST set cooldown */
