@@ -76,7 +76,10 @@
             </section>
 
             <section v-if="wasLoaded" class="card card-body">
-                <h2>Application Evaluations</h2>
+                <h2>
+                    Application Evaluations
+                    <small>({{ applications.length }})</small>
+                </h2>
 
                 <transition-group
                     v-if="applications.length"
@@ -99,7 +102,10 @@
             </section>
 
             <section v-if="wasLoaded" class="card card-body">
-                <h2>BN/NAT Evaluations</h2>
+                <h2>
+                    BN/NAT Evaluations
+                    <small>({{ currentBnEvaluations.length }})</small>
+                </h2>
 
                 <transition-group
                     v-if="currentBnEvaluations.length"
