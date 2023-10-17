@@ -672,6 +672,8 @@ router.get('/callback', async (req, res) => {
 
         req.session.osuId = osuId;
         req.session.username = username;
+        req.session.groups = groups;
+        req.session.discordId = user.discordId;
 
         res.redirect(savedState.redirectUrl || '/');
     }
