@@ -46,29 +46,6 @@ const defaultReportPopulate = [
  * @param {Boolean} discussion
  * @returns {Array} discord IDs for relevant NAT
  */
-function findNatEvaluatorHighlights(reviews, natEvaluators, discussion) {
-    let discordIds = [];
-
-    if (natEvaluators.length == 1) {
-        discordIds.push(natEvaluators[0].discordId);
-    } else if (discussion) {
-        for (const review of reviews) {
-            if (review.evaluator.groups.includes('nat') && review.evaluator.isBnEvaluator) {
-                discordIds.push(review.evaluator.discordId);
-            }
-        }
-    } else {
-        const evaluatorIds = reviews.map(r => r.evaluator.id);
-
-        for (const user of natEvaluators) {
-            if (!evaluatorIds.includes(user.id) && user.isBnEvaluator) {
-                discordIds.push(user.discordId);
-            }
-        }
-    }
-
-    return discordIds;
-}
 
 /**
  * @param {Array} reviews
@@ -245,7 +222,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
         let evaluators = await Settings.getModeHasTrialNat(app.mode) ? app.natEvaluators.concat(app.bnEvaluators) : app.natEvaluators;
 
         if (date > deadline) {
-            discordIds = findNatEvaluatorHighlights(app.reviews, evaluators, app.discussion);
+            discordIds = discord.findNatEvaluatorHighlights(app.reviews, evaluators, app.discussion);
             const days = findDaysAgo(app.createdAt);
 
             description += `was due ${days == 0 ? 'today!' : days == 1 ? days + ' day ago!' : days + ' days ago!'}`;
@@ -386,7 +363,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
                 let generateWebhook = true;
                 let color;
                 let evaluators = await Settings.getModeHasTrialNat(round.mode) ? round.natEvaluators.concat(round.bnEvaluators) : round.natEvaluators;
-                let discordIds = findNatEvaluatorHighlights(round.reviews, evaluators, round.discussion);
+                let discordIds = discord.findNatEvaluatorHighlights(round.reviews, evaluators, round.discussion);
 
                 if (round.deadline < endRange && (!round.natEvaluators || !round.natEvaluators.length)) {
                     round.natEvaluators = await User.getAssignedNat(round.mode, round.user.id);
@@ -453,7 +430,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
                     );
                     await util.sleep(500);
 
-                    discordIds = findNatEvaluatorHighlights(round.reviews, evaluators, round.discussion);
+                    discordIds = discord.findNatEvaluatorHighlights(round.reviews, evaluators, round.discussion);
                     await discord.userHighlightWebhookPost(round.mode, discordIds);
                     await util.sleep(500);
                 } else if (generateWebhook && natList.length) {
@@ -483,7 +460,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
 
                     // repeating "evaluators" and "discordIds" to get newly populated info into highlight webhook
                     evaluators = await Settings.getModeHasTrialNat(round.mode) ? round.natEvaluators.concat(round.bnEvaluators) : round.natEvaluators;
-                    discordIds = findNatEvaluatorHighlights(round.reviews, evaluators, round.discussion);
+                    discordIds = discord.findNatEvaluatorHighlights(round.reviews, evaluators, round.discussion);
 
                     await discord.userHighlightWebhookPost(round.mode, discordIds);
                     await util.sleep(500);
