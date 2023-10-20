@@ -20,7 +20,9 @@ const router = new VueRouter({
 router.beforeEach(async (to, from, next) => {
     document.title = to.meta.title ? `${to.meta.title} · BN Management` : 'BN Management';
 
-    // * a more raw/hacky approach of handling opengraph headers because vue-meta isn't cooperating at all
+    /*
+    ? past attempt at opengraph tags which didn't work because CSR and it only works on SSR. keeping for reference
+
     const head = document.head || document.getElementsByTagName('head')[0];
     
     const metaAttributes = [
@@ -34,7 +36,6 @@ router.beforeEach(async (to, from, next) => {
     ];
 
     metaAttributes.forEach((meta) => {
-        // find existing meta tag, if it doesn't exist, create a new one
         let tag = head.querySelector(`meta[property="${meta.property}"]`);
 
         if (!tag) {
@@ -46,6 +47,7 @@ router.beforeEach(async (to, from, next) => {
             tag.setAttribute(key, meta[key]);
         });
     });
+    */
 
     if (!store.state.initialized) {
         await store.dispatch('setInitialData');
