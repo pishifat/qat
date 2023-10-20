@@ -23,15 +23,6 @@ router.beforeEach(async (to, from, next) => {
     // * a more raw/hacky approach of handling opengraph headers because vue-meta isn't cooperating at all
     const head = document.head || document.getElementsByTagName('head')[0];
     
-    // remove previous variable meta tags
-    // ? this might not be needed in production? remove if true
-    const tags = head.getElementsByTagName('meta');
-    for (let i = tags.length - 1; i >= 0; i--) {
-        if (tags[i].getAttribute('property') === 'og:title' || tags[i].getAttribute('property') === 'og:url') {
-            head.removeChild(tags[i]);
-        }
-    }
-
     const metaAttributes = [
         { property: 'og:title', content: to.meta.title || 'BN Management' },
         { property: 'og:site_name', content: to.meta.title ? 'BN Management' : '' },
@@ -50,7 +41,7 @@ router.beforeEach(async (to, from, next) => {
             tag = document.createElement("meta");
             head.appendChild(tag);
         }
-        
+
         Object.keys(meta).forEach((key) => {
             tag.setAttribute(key, meta[key]);
         });
