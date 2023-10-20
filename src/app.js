@@ -20,23 +20,31 @@ const router = new VueRouter({
 router.beforeEach(async (to, from, next) => {
     document.title = to.meta.title ? `${to.meta.title} · BN Management` : 'BN Management';
 
+    // * a more raw/hacky approach of handling opengraph headers because vue-meta isn't cooperating at all
     const head = document.head || document.getElementsByTagName('head')[0];
-
+    
     const metaAttributes = [
-        { name: 'og:title', content: document.title },
-        { name: 'og:url', content: window.location.href },
-        { name: 'og:description', content: 'The place for everything related to the Beatmap Nominators!' },
-        { name: 'description', content: 'The place for everything related to the Beatmap Nominators!' },
-        { name: 'og:image', content: '' },
-        { name: 'og:type', content: 'website' },
+        { property: 'og:title', content: to.meta.title || 'BN Management' },
+        { property: 'og:site_name', content: to.meta.title ? 'BN Management' : '' },
+        { property: 'og:url', content: `https://bn.mappersguild.com${to.fullPath}` },
+        { property: 'og:description', content: 'The place for everything related to the Beatmap Nominators!' },
+        { property: 'description', name: 'description', content: 'The place for everything related to the Beatmap Nominators!' },
+        { property: 'og:type', content: 'website' },
+        { property: 'theme-color', name: 'theme-color', content: '#27b6b3' },
     ];
 
-    metaAttributes.forEach(meta => {
-        const tag = document.createElement('meta');
-        Object.keys(meta).forEach(key => {
-            tag[key] = meta[key];
+    metaAttributes.forEach((meta) => {
+        // find existing meta tag, if it doesn't exist, create a new one
+        let tag = head.querySelector(`meta[property="${meta.property}"]`);
+
+        if (!tag) {
+            tag = document.createElement("meta");
+            head.appendChild(tag);
+        }
+
+        Object.keys(meta).forEach((key) => {
+            tag.setAttribute(key, meta[key]);
         });
-        head.appendChild(tag);
     });
 
     if (!store.state.initialized) {
