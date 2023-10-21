@@ -105,6 +105,65 @@ async function isPishifat(req, res, next) {
     next();
 }
 
+function discordEmbeds(req, res, next) {
+    // skip if user is not a discord crawler
+    if (req.headers["user-agent"] !== "Mozilla/5.0 (compatible; Discordbot/2.0; +https://discordapp.com)")
+        return next();
+
+    const routes = [
+        { path: '', title: 'BN Management' },
+        { path: 'home', title: 'BN Management' },
+        { path: 'bnapps', title: 'Beatmap Nominator Application' },
+        { path: 'testsubmission', title: 'Test Submission' },
+        { path: 'reports', title: 'Report Submission' },
+        { path: 'users', title: 'BN/NAT Listing' },
+        { path: 'vetoes', title: 'Vetoes' },
+        { path: 'qualityassurance', title: 'Quality Assurance' },
+        { path: 'testresults', title: 'Ranking Criteria Test Results' },
+        { path: 'yourevals', title: 'Your Evaluations' },
+        { path: 'message', title: 'Message from the NAT' },
+        { path: 'modrequests', title: 'Request a BN' },
+        { path: 'discussionvote', title: 'Content Review' },
+        { path: 'appeval', title: 'BN Application Evaluations' },
+        { path: 'bneval', title: 'Current BN Evaluations' },
+        { path: 'evalarchive', title: 'Evaluation Archives' },
+        { path: 'managereports', title: 'Manage Reports' },
+        { path: 'datacollection', title: 'Manage SEVs' },
+        { path: 'managetest', title: 'Manage RC Test' },
+        { path: 'logs', title: 'Logs' },
+        { path: 'spam', title: 'Spam' },
+    ];
+
+    const route = routes.find(r => r.path === req.path.substring(1));
+    const notFound = !route && req.path !== '/';
+
+    const title = !notFound ? route.title : 'not found :(';
+    const siteName = notFound || (route.path.length && route.path !== 'home') ? "BN Management" : "";
+    const url = `https://bn.mappersguild.com${req.path}`;
+    const description = `The place for everything related to the Beatmap Nominators${notFound ? ', not for whatever you were looking for.' : '!'}`
+
+    const html = `<html lang="en" prefix="og: https://ogp.me/ns#">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="icon" type="image/png" href="/images/qatlogo.png">
+
+      <meta property="og:title" content="${title}">
+      ${siteName.length ? `<meta property="og:site_name" content="${siteName}">` : ''}
+      <meta property="og:url" content="${url}">
+      <meta property="og:description" content="${description}">
+      <meta property="og:type" content="website">
+
+      <meta name="theme-color" content="#27b6b3">
+      <meta name="description" content="${description}">
+
+      <title>${title}</title>
+    </head>
+  </html>`;
+
+    res.status(notFound ? 404 : 200).send(html);
+}
+
 module.exports = {
     isLoggedIn,
     isBnOrNat,
@@ -116,4 +175,5 @@ module.exports = {
     hasFullReadAccess,
     hasPrivateInterOpsAccess,
     isPishifat,
+    discordEmbeds,
 };
