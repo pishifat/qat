@@ -24,6 +24,10 @@ const ManageTest = () => import(/* webpackChunkName: "nat", webpackPrefetch: tru
 const Logs = () => import(/* webpackChunkName: "nat", webpackPrefetch: true */ './pages/Logs.vue');
 const Spam = () => import(/* webpackChunkName: "nat", webpackPrefetch: true */ './pages/Spam.vue');
 
+/**
+ * ! when adding/editing routes here, make sure you do the same adjustments in /helpers/middlewares.js (discordEmbeds)
+ */
+
 const routes = [
     // Public
     { path: '/', component: Home, alias: '/home', name: 'home', meta: { public: true } },
