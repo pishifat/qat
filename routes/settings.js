@@ -41,6 +41,7 @@ router.post('/toggleHasTrialNat', async (req, res) => {
 
     await discord.webhookPost(
         [{
+            // @ts-ignore
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.pink,
             description: `**${settings.modeSettings[settingIndex].hasTrialNat ? "Enabled" : "Disabled"}** BN evaluators for **${parsedMode}**`,
@@ -63,12 +64,15 @@ router.get('/webhooks', async (req, res) => {
 
 /* POST update webhooks */
 router.post('/updateWebhooks', async (req, res) => {
-    const { webhook, id, token } = req.body;
+    const webhook = req.body.webhook;
+    const id = req.body.id;
+    const token = req.body.token;
 
     webhookConfig.update(webhook, id, token);
+    webhookConfig.reload();
 
     res.json({
-        success: 'updated webhook',
+        success: `updated ${webhook}`,
     });
 });
 
