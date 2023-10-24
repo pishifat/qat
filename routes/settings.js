@@ -63,7 +63,7 @@ router.get('/webhooks', async (req, res) => {
 });
 
 /* POST update webhooks */
-router.post('/updateWebhooks', async (req, res) => {
+router.post('/webhooks/update', async (req, res) => {
     const webhook = req.body.webhook;
     const id = req.body.id;
     const token = req.body.token;

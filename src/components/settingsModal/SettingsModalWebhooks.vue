@@ -66,7 +66,7 @@ export default {
             }
         },
         async update (webhook, id, token, e) {
-            const res = await this.$http.executePost(`/settings/updateWebhooks`, {
+            const res = await this.$http.executePost(`/settings/webhooks/update`, {
                 webhook,
                 id,
                 token,
