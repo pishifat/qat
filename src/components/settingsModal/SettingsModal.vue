@@ -24,6 +24,10 @@
             <hr>
 
             <settings-modal-mode-evaluations />
+
+            <hr>
+
+            <settings-modal-webhooks />
         </template>
     </modal-dialog>
 </template>
@@ -37,6 +41,7 @@ import SettingsModalModeEvaluations from './SettingsModalModeEvaluations.vue';
 import SettingsModalRequests from './SettingsModalRequests.vue';
 import SettingsModalLanguages from './SettingsModalLanguages.vue';
 import SettingsModalExplicit from './SettingsModalExplicit.vue';
+import SettingsModalWebhooks from './SettingsModalWebhooks.vue';
 
 export default {
     components: {
@@ -47,6 +52,7 @@ export default {
         SettingsModalEvaluator,
         SettingsModalLanguages,
         SettingsModalExplicit,
+        SettingsModalWebhooks,
     },
     computed: mapState([
         'loggedInUser',
