@@ -16,10 +16,13 @@ If you want to contribute, make a copy of `config.example.json` titled `config.j
 - `redirect`: osu! apiv2 oauth redirect (if it isn't `http://localhost:8080/callback` you need to change port in `webpack.dev.config.js` and `/callback` route in `index.js`)
 - `connection`: connection to mongodb
 - `interOpAccess`: for /interOp routes (optional)
-- webhooks: https://discord.com/developers/docs/resources/webhook (optional)
 - `admin`: needed to work with extra site permissions
   - pishifat: pishifat's or your own osu! user id
   - users: users who will be granted the `isResponsibleWithButtons` permission
+
+Optionally, you can make a copy of `webhooks.example.json` titled `webhooks.json` and fill out each webhook field.
+
+A Discord webhook link is formatted as `https://discord.com/api/webhooks/WEBHOOK_ID/WEBHOOK_TOKEN`, so fill each field with the corresponding id and token.
 
 Once config is set up, type `npm i` then `npm run dev` in console. You'll be able to connect on `http://localhost:8080`.
 
