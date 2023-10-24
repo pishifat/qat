@@ -4,12 +4,12 @@
         "token": "",
         "role": ""
     },
-    "catchWebhook": {
+    "taikoWebhook": {
         "id": "",
         "token": "",
         "role": ""
     },
-    "taikoWebhook": {
+    "catchWebhook": {
         "id": "",
         "token": "",
         "role": ""
