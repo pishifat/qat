@@ -15,6 +15,11 @@ function get() {
     return cachedConfig;
 }
 
+/**
+ * @param {string} webhook 
+ * @param {string} id 
+ * @param {string} token 
+ */
 function update(webhook, id, token) {
     cachedConfig[webhook] = {
         id,
