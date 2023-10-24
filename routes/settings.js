@@ -3,6 +3,7 @@ const middlewares = require('../helpers/middlewares');
 const Settings = require('../models/settings');
 const util = require('../helpers/util');
 const discord = require('../helpers/discord');
+const webhookConfig = require('../helpers/webhookConfig.js');
 
 const router = express.Router();
 
@@ -50,6 +51,24 @@ router.post('/toggleHasTrialNat', async (req, res) => {
 
     res.json({
         success: 'toggled hasTrialNat',
+    });
+});
+
+/* GET webhooks */
+router.get('/webhooks', async (req, res) => {
+    const config = webhookConfig.getConfig();
+
+    res.json(config);
+});
+
+/* POST update webhooks */
+router.post('/updateWebhooks', async (req, res) => {
+    const { webhook, id, token } = req.body;
+
+    webhookConfig.updateConfig(webhook, id, token);
+
+    res.json({
+        success: 'updated webhook',
     });
 });
 
