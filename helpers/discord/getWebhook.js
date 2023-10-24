@@ -1,5 +1,5 @@
 const webhookConfig = require('../webhookConfig.js');
-const config = webhookConfig.getConfig();
+const config = webhookConfig.get();
 
 function getWebhook(webhook) {
     let url = 'https://discordapp.com/api/webhooks/';

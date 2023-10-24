@@ -56,7 +56,7 @@ router.post('/toggleHasTrialNat', async (req, res) => {
 
 /* GET webhooks */
 router.get('/webhooks', async (req, res) => {
-    const config = webhookConfig.getConfig();
+    const config = webhookConfig.get();
 
     res.json(config);
 });
@@ -65,7 +65,7 @@ router.get('/webhooks', async (req, res) => {
 router.post('/updateWebhooks', async (req, res) => {
     const { webhook, id, token } = req.body;
 
-    webhookConfig.updateConfig(webhook, id, token);
+    webhookConfig.update(webhook, id, token);
 
     res.json({
         success: 'updated webhook',

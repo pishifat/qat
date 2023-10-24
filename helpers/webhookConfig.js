@@ -1,21 +1,21 @@
 const fs = require('fs');
 
-let cachedConfig = loadConfig();
+let cachedConfig = load();
 
-function loadConfig() {
+function load() {
     const config = JSON.parse(fs.readFileSync('webhooks.json', 'utf8'));
     return config;
 }
 
-function reloadConfig() {
-    cachedConfig = loadConfig();
+function reload() {
+    cachedConfig = load();
 }
 
-function getConfig() {
+function get() {
     return cachedConfig;
 }
 
-function updateConfig(webhook, id, token) {
+function update(webhook, id, token) {
     cachedConfig[webhook] = {
         id,
         token
@@ -25,7 +25,7 @@ function updateConfig(webhook, id, token) {
 }
 
 module.exports = {
-    reloadConfig,
-    getConfig,
-    updateConfig
+    reload,
+    get,
+    update
 };
