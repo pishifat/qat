@@ -1,0 +1,85 @@
+{
+    "standardWebhook": {
+        "id": "", 
+        "token": "",
+        "role": ""
+    },
+    "catchWebhook": {
+        "id": "",
+        "token": "",
+        "role": ""
+    },
+    "taikoWebhook": {
+        "id": "",
+        "token": "",
+        "role": ""
+    },
+    "maniaWebhook": {
+        "id": "",
+        "token": "",
+        "role": ""
+    },
+    "allWebhook": {
+        "id": "",
+        "token": "",
+        "role": ""
+    },
+    "standardQualityAssuranceWebhook": {
+        "id": "",
+        "token": ""
+    },
+    "taikoCatchManiaQualityAssuranceWebhook": {
+        "id": "",
+        "token": ""
+    },
+    "beatmapReportWebhook": {
+        "id": "",
+        "token": "",
+        "osuRole": "",
+        "taikoRole": "",
+        "catchRole": "",
+        "maniaRole": ""
+    },
+    "natReportWebhook": {
+        "id": "",
+        "token": ""
+    },
+    "contentCasesWebhook": {
+        "id": "",
+        "token": ""
+    },
+    "internalContentCasesWebhook": {
+        "id": "",
+        "token": ""
+    },
+    "devWebhook": {
+        "id": "",
+        "token": ""
+    },
+    "announcementWebhook": {
+        "id": "",
+        "token": "",
+        "gmtRole": "",
+        "contentReviewRole": "",
+        "natRole": "",
+        "natOsu": "",
+        "natTaiko": "",
+        "natCatch": "",
+        "natMania": "",
+        "natEvaluatorOsu": "",
+        "natEvaluatorTaiko": "",
+        "natEvaluatorCatch": "",
+        "natEvaluatorMania": "",
+        "bnRole": "",
+        "bnOsu": "",
+        "bnTaiko": "",
+        "bnCatch": "",
+        "bnMania": "",
+        "probationRole": "",
+        "probationOsu": "",
+        "probationTaiko": "",
+        "probationCatch": "",
+        "probationMania": "",
+        "groupMoversRole": ""
+    }
+}

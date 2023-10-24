@@ -25,6 +25,7 @@ jspm_packages/
 .env
 
 config.json
+webhooks.json
 dist/
 public/css/
 .vscode/
