@@ -12,7 +12,7 @@
             </h3>
         </section>
 
-        <section :id="target" class="card card-body collapse">
+        <section :id="target" class="card card-body collapse overflow-auto text-break">
             <data-table :headers="['Date', 'Mapset', 'Reason']">
                 <tr
                     v-for="event in events"

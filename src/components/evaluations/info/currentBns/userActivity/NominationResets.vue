@@ -6,7 +6,7 @@
             /></a>
             ({{ isLoading ? '...' : events ? filteredEvents.length : '0' }})
         </div>
-        <div v-if="events" :id="eventsId" class="collapse">
+        <div v-if="events" :id="eventsId" class="collapse overflow-auto text-break">
             <data-table
                 v-if="filteredEvents.length"
                 :headers="['Date', 'Mapset', 'Reason']"
