@@ -1,7 +1,10 @@
 const webhookConfig = require('../webhookConfig.js');
-const config = webhookConfig.get();
+let config = webhookConfig.get();
 
 function getRoles(roles) {
+    webhookConfig.reload();
+    config = webhookConfig.get();
+    
     let pings = '';
 
     for (const role of roles) {

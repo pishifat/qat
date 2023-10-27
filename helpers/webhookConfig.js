@@ -12,7 +12,7 @@ function reload() {
 }
 
 function get() {
-    return load();
+    return cachedConfig;
 }
 
 /**
