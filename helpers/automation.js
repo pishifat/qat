@@ -834,7 +834,7 @@ const checkTenureValidity = cron.schedule('40 4 4 * *', async () => {
  * @param {Date} initialDate
  * @param {object} bn
  * @param {string} mode
- * @param {number} months
+ * @param {number} days
  * @returns {Promise<boolean>} whether or not the user has 'low activity'
  */
 async function hasLowActivity(initialDate, bn, mode, days) {

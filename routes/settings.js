@@ -3,6 +3,7 @@ const middlewares = require('../helpers/middlewares');
 const Settings = require('../models/settings');
 const util = require('../helpers/util');
 const discord = require('../helpers/discord');
+const webhookConfig = require('../helpers/webhookConfig.js');
 
 const router = express.Router();
 
@@ -40,6 +41,7 @@ router.post('/toggleHasTrialNat', async (req, res) => {
 
     await discord.webhookPost(
         [{
+            // @ts-ignore
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.pink,
             description: `**${settings.modeSettings[settingIndex].hasTrialNat ? "Enabled" : "Disabled"}** BN evaluators for **${parsedMode}**`,
@@ -50,6 +52,27 @@ router.post('/toggleHasTrialNat', async (req, res) => {
 
     res.json({
         success: 'toggled hasTrialNat',
+    });
+});
+
+/* GET webhooks */
+router.get('/webhooks', async (req, res) => {
+    const config = webhookConfig.get();
+
+    res.json(config);
+});
+
+/* POST update webhooks */
+router.post('/webhooks/update', async (req, res) => {
+    const webhook = req.body.webhook;
+    const id = req.body.id;
+    const token = req.body.token;
+
+    webhookConfig.update(webhook, id, token);
+    webhookConfig.reload();
+
+    res.json({
+        success: `updated ${webhook}`,
     });
 });
 
