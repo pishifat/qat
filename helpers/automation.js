@@ -1253,4 +1253,28 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
     scheduled: false,
 });
 
-module.exports = { notifyDeadlines, lowActivityTask, closeContentReviews, checkMatchBeatmapStatuses, checkBnEvaluationDeadlines, lowActivityPerUserTask, checkTenureValidity, badgeTracker, validateEvents, notifyBeatmapReports };
+/**
+ * bump forward evaluation deadline if probation user has 6+ nominations before 30 days. checked daily
+ */
+const spawnProbationEvaluations = cron.schedule('0 16 * * *', async () => {
+    const probationBns = await User.find({ groups: 'bn', 'modesInfo.level': 'probation' });
+    const newDeadline = new Date();
+    newDeadline.setDate(newDeadline.getDate() + 7);
+
+    for (const bn of probationBns) {
+        const pendingEvaluation = await BnEvaluation.findOne({ user: bn._id, active: true, natEvaluators: [] });
+
+        if (pendingEvaluation) {
+            const nomCount = await scrap.findUniqueNominationsCount(new Date(pendingEvaluation.createdAt), new Date(), bn);
+            
+            if (nomCount >= 6) {
+                pendingEvaluation.deadline = newDeadline;
+                await pendingEvaluation.save();
+            }
+        }
+    }
+}, {
+    scheduled: false,
+});
+
+module.exports = { notifyDeadlines, lowActivityTask, closeContentReviews, checkMatchBeatmapStatuses, checkBnEvaluationDeadlines, lowActivityPerUserTask, checkTenureValidity, badgeTracker, validateEvents, notifyBeatmapReports, spawnProbationEvaluations };

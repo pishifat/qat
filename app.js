@@ -211,6 +211,7 @@ const server = app.listen(port, () => {
         automation.checkTenureValidity.start();
         automation.badgeTracker.start();
         automation.notifyBeatmapReports.start();
+        automation.spawnProbationEvaluations.start();
         //automation.validateEvents.start();
     }
 });

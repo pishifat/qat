@@ -232,7 +232,7 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
 
         if (evaluation.consensus === AppEvaluationConsensus.Pass) {
             let level = 'probation';
-            let activityToCheck = 40;
+            let activityToCheck = 37;
 
             const skipProbation = await findSkipProbationEligibility(user.id, evaluation.mode);
 

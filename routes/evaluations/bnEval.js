@@ -456,7 +456,7 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
                 await user.save();
             }
 
-            let activityToCheck = 40;
+            let activityToCheck = 37;
             let deadline = new Date();
             deadline.setDate(deadline.getDate() + activityToCheck);
 
@@ -492,7 +492,7 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
                 const difference = deadline.getTime() - today.getTime();
                 activityToCheck = Math.ceil(difference / (1000*3600*24)); // days between deadline and now
             } else if (evaluation.addition === BnEvaluationAddition.LowActivityWarning) {
-                deadline.setDate(deadline.getDate() + 40); // +40 days
+                deadline.setDate(deadline.getDate() + 37); // +37 days
             } else {
                 const random90 = Math.round(Math.random() * (95 - 85) + 85); // between 85 and 95 days
                 const random180 = Math.round(Math.random() * (185 - 175) + 175); // between 185 and 175 days

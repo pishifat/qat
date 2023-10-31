@@ -150,7 +150,7 @@ router.post('/resetEvaluationDeadline/:id/:mode', middlewares.isNat, async (req,
     let deadline = new Date(evaluation.archivedAt);
 
     if (evaluation.consensus === BnEvaluationConsensus.ProbationBn) {
-        deadline.setDate(deadline.getDate() + 40);
+        deadline.setDate(deadline.getDate() + 37);
         
         if (pendingEvaluation) {
             pendingEvaluation.deadline = deadline;
@@ -160,7 +160,7 @@ router.post('/resetEvaluationDeadline/:id/:mode', middlewares.isNat, async (req,
                 user: evaluation.user,
                 mode: evaluation.mode,
                 deadline,
-                activityToCheck: 40,
+                activityToCheck: 37,
             });
         }
     }
@@ -169,7 +169,7 @@ router.post('/resetEvaluationDeadline/:id/:mode', middlewares.isNat, async (req,
         let activityToCheck = 90;
 
         if (evaluation.addition === BnEvaluationAddition.LowActivityWarning) {
-            deadline.setDate(deadline.getDate() + 40); // +40 days
+            deadline.setDate(deadline.getDate() + 37); // +37 days
         } else {
             const random90 = Math.round(Math.random() * (95 - 85) + 85); // between 85 and 95 days
             const random180 = Math.round(Math.random() * (185 - 175) + 175); // between 185 and 175 days
