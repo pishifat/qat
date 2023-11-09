@@ -32,7 +32,7 @@
                 data-placement="top"
                 title="needs a NAT buddy"
                 class="fas fa-user mr-1"
-                :class="isSecurityChecked ? '' : 'text-warning'"
+                :class="hasNatBuddy ? '' : 'text-warning'"
             />
         </p>
         <div v-if="consensus">
