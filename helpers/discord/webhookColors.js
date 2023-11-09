@@ -12,7 +12,7 @@ const webhookColors = {
     yellow: 16777022,         // submitMediationDiscussionVote
 
     lightGreen: 8847214,      // submitEval, submitQA
-    darkGreen: 1921053,       // addToNat
+    darkGreen: 1921053,       // addToNat, assignNatBuddy
     green: 4380222,           // newBnApplication
 
     lightBlue: 8643583,       // setConsensus, announcement

@@ -9,6 +9,7 @@ const appEvaluationSchema = new mongoose.Schema({
     oszs: [{ type: String, required: true }],
     test: { type: 'ObjectId', ref: 'TestSubmission' },
     isRejoinRequest: { type: Boolean },
+    natBuddy: { type: 'ObjectId', ref: 'User' },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 class AppEvaluationService extends mongoose.Model {
@@ -36,6 +37,7 @@ class AppEvaluationService extends mongoose.Model {
             })
             .populate([
                 { path: 'user', select: 'username osuId' },
+                { path: 'natBuddy', select: 'username osuId' },
                 { path: 'bnEvaluators', select: 'username osuId' },
                 { path: 'natEvaluators', select: 'username osuId' },
                 { path: 'test', select: 'totalScore comment' },

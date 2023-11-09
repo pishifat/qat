@@ -22,6 +22,7 @@ router.use(middlewares.hasBasicAccess);
 //population
 const defaultPopulate = [
     { path: 'user', select: 'username osuId' },
+    { path: 'natBuddy', select: 'username osuId' },
     { path: 'bnEvaluators', select: 'username osuId discordId isBnEvaluator' },
     { path: 'natEvaluators', select: 'username osuId discordId isBnEvaluator' },
     { path: 'test', select: 'totalScore comment' },
@@ -706,6 +707,40 @@ router.post('/toggleIsSecurityChecked/:id', middlewares.isNat, async (req, res) 
     Logger.generate(
         req.session.mongoId,
         `Toggled "${app.user.username}" ${app.mode} BN app isSecurityChecked to ${app.isSecurityChecked}`,
+        'appEvaluation',
+        app._id
+    );
+});
+
+/* POST assign natBuddy */
+router.post('/assignNatBuddy/:appId/:userId', middlewares.isNat, async (req, res) => {
+    const [app, nat] = await Promise.all([
+        AppEvaluation
+            .findById(req.params.appId)
+            .populate(defaultPopulate)
+            .orFail(),
+        User
+            .findById(req.params.userId)
+            .orFail(),
+    ]);
+    
+    app.natBuddy = nat._id;
+    await app.save();
+
+    await app.populate(defaultPopulate).execPopulate();
+
+    res.json(app);
+
+    discord.webhookPost([{
+        author: discord.defaultWebhookAuthor(req.session),
+        color: discord.webhookColors.darkGreen,
+        description: `Assigned [${nat.username}](https://osu.ppy.sh/users/${nat.osuId}) as NAT buddy on [**${app.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${app.id})`,
+    }],
+    app.mode);
+
+    Logger.generate(
+        req.session.mongoId,
+        `Assigned "${nat.username}" as NAT buddy on ${app.user.username}'s BN app`,
         'appEvaluation',
         app._id
     );

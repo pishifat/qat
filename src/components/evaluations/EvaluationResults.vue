@@ -23,7 +23,7 @@
                 <a href="#applicationInfo" data-toggle="collapse">
                     <h5>Application details <i class="fas fa-angle-down" /></h5>
                 </a>
-                <div id="applicationInfo" class="collapse container">
+                <div id="applicationInfo" class="collapse mx-4">
                     <h5>Submitted mods</h5>
                     <div v-for="(mod, i) in evaluation.mods" :key="mod" class="row">
                         <div class="col-sm-3">
@@ -50,14 +50,44 @@
                 </div>
             </div>
 
+            <hr />
+
             <div v-if="evaluation.isApplication && positiveConsensus">
-                <h5>New BN Information</h5>
-                <p>You will be a Probationary Beatmap Nominator for about one month (exact date of your next evaluation can be seen from your <a :href="'/users?id=' + evaluation.user.id" target="_blank">user card</a>). This means you can only nominate beatmaps that have been nominated by Full Beatmap Nominators and you cannot disqualify maps.</p>
-                <p>During your evaluation, your activity/attitude/nomination quality will be evaluated by members of the NAT. If each of these areas are satisfactory, you will be promoted to Full Beatmap Nominator. If not, your probation period will be extended for another month or you'll be dismissed from the BN. In that second case, you will not be able to re-apply for another 90 days.</p>
-                <p>If you're a returning BN who recently resigned on good terms, you're already a Full Beatmap Nominator (yay!) and your next evaluation is ~3 months from now.</p>
-                <p>Read the following pages: <a href="https://osu.ppy.sh/help/wiki/People/Beatmap_Nominators/Rules" target="_blank">BN Rules</a>,  <a href="https://osu.ppy.sh/help/wiki/People/Beatmap_Nominators/General_Information" target="_blank">General Information for BNs</a>, and  <a href="https://osu.ppy.sh/help/wiki/People/The_Team/Beatmap_Nominators/Beatmap_Veto" target="_blank">Veto Information</a>.</p>
-                <p>Follow the golden rule: <b>don't fuck up</b></p>
+                <a href="#newBnInformation" data-toggle="collapse">
+                    <h5>New BN Information <i class="fas fa-angle-down" /></h5>
+                </a>
+
+                <div id="newBnInformation" class="mx-4 show">
+                    <h5>Next steps</h5>
+                    <div class="mx-4">
+                        <p><a :href="'/users?id=' + evaluation.user.id" target="_blank">This is you.</a> You're a <a href="https://osu.ppy.sh/groups/32" target="_blank">Probationary Beatmap Nominator</a>, which means you can only nominate maps that have been nominated by <a href="https://osu.ppy.sh/groups/28" target="_blank">Full Beatmap Nominators</a> and you cannot disqualify maps.</p>
+                        <p>Your BN activity will be evaluated when you do 6 nominations or after 1 month (whichever comes first). During your evaluation, your activity/attitude/nomination quality will be evaluated by members of the NAT. If each of these areas are satisfactory, you will be promoted to Full Beatmap Nominator. If not, your probation period will be extended for another month or you'll be dismissed from the BN. In that second case, you will not be able to re-apply for another 90 days.</p>
+                        <p>If you're a returning BN who recently resigned on good terms, you're already a Full Beatmap Nominator (yay!) and your next evaluation is ~3 months from now.</p>
+                    </div>
+                    <hr />
+                    <div v-if="evaluation.natBuddy">
+                        <h5>NAT mentor</h5>
+                        <div class="mx-4">
+                            <p><a :href="`https://osu.ppy.sh/users/${evaluation.natBuddy.osuId}`" target="_blank">{{ evaluation.natBuddy.username }}</a> is your new best friend. Feel free to contact them for questions or guidance related to being a Beatmap Nominator!</p>
+                        </div>
+                        <hr />
+                    </div>
+                    <h5>References</h5>
+                    <div class="mx-4">
+                        <p>Read the following pages:
+                            <ul>
+                                <li><a href="https://osu.ppy.sh/help/wiki/People/Beatmap_Nominators/Rules" target="_blank">BN Rules</a></li>
+                                <li><a href="https://osu.ppy.sh/wiki/en/People/Beatmap_Nominators/Expectations" target="_blank">BN Expectations</a></li>
+                                <li><a href="https://osu.ppy.sh/help/wiki/People/Beatmap_Nominators/General_Information" target="_blank">General Information for BNs</a></li>
+                                <li><a href="https://osu.ppy.sh/help/wiki/People/The_Team/Beatmap_Nominators/Beatmap_Veto" target="_blank">Veto Information</a></li>
+                            </ul>
+                        </p>
+                        <p>Follow the golden rule: <b>don't fuck up</b></p>
+                    </div>
+                </div>
             </div>
+
+            <hr />
 
             <div v-if="evaluation.feedback">
                 <h5>Feedback</h5>

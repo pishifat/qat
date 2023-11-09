@@ -6,20 +6,24 @@
 
         <a v-if="
             users.length &&
-            ((!isReviewable || (isReviewed && !isSecurityCheckable)) || (isReviewed && isSecurityCheckable && isSecurityChecked))
+            ((!isReviewable || (isReviewed && !isPassApp)) || (isReviewed && isPassApp && isSecurityChecked && hasNatBuddy))
             "
             class="btn btn-sm btn-block btn-success mb-2" 
             @click="sendMessage($event)"
         >
             {{ customText }}
         </a>
-        <div v-if="isSecurityCheckable && !isSecurityChecked" class="alert alert-danger mb-2 mt-2">
+        <div v-if="isReviewable && !isReviewed" class="alert alert-warning mb-2 mt-2">
+            <i class="fas fa-exclamation-triangle"></i>
+            Feedback needs to be marked as reviewed before sending!
+        </div>
+        <div v-if="isPassApp && !isSecurityChecked" class="alert alert-warning mb-2 mt-2">
             <i class="fas fa-exclamation-triangle"></i>
             User needs to be marked as security checked before proceeding!
         </div>
-        <div v-else-if="isReviewable && !isReviewed" class="alert alert-warning mb-2 mt-2">
+        <div v-if="isPassApp && !hasNatBuddy" class="alert alert-warning mb-2 mt-2">
             <i class="fas fa-exclamation-triangle"></i>
-            Feedback needs to be marked as reviewed before sending!
+            User is lonely and needs a NAT buddy before sending!
         </div>
     </div>
 </template>
@@ -66,13 +70,17 @@ export default {
             type: Boolean,
             default: true,
         },
-        isSecurityCheckable: {
+        isPassApp: {
             type: Boolean,
             default: false,
         },
         isSecurityChecked: {
             type: Boolean,
             default: true,
+        },
+        hasNatBuddy: {
+            type: Boolean,
+            default: false,
         },
     },
     methods: {

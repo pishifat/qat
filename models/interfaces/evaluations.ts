@@ -39,6 +39,7 @@ export interface IAppEvaluationDocument extends IEvaluationBase, Document {
     isRejoinRequest?: Boolean;
     deadline?: Date;
     kind?: string;
+    natBuddy?: IUserDocument;
 }
 
 export interface IAppEvaluationModel extends Model<IAppEvaluationDocument> {

@@ -24,8 +24,16 @@
                         selectedEvaluation.consensus === 'pass'
                     "
                 />
-                <evaluation-is-reviewed v-if="selectedEvaluation.feedback && loggedInUser.isNat" />
+                <nat-buddy-assignment 
+                    v-if="
+                        loggedInUser.isNat && 
+                        selectedEvaluation.isApplication && 
+                        selectedEvaluation.consensus === 'pass'
+                    "
+                />
+                <hr v-if="selectedEvaluation.consensus" />
                 <evaluation-link v-if="selectedEvaluation.feedback" />
+                <evaluation-is-reviewed v-if="selectedEvaluation.feedback && loggedInUser.isNat" />
                 <feedback-info v-if="selectedEvaluation.consensus" />
             </div>
         </template>
@@ -53,7 +61,8 @@ import FeedbackInfo from './common/FeedbackInfo.vue';
 import evaluations from '../../../mixins/evaluations.js';
 import NextEvaluationEstimate from './common/NextEvaluationEstimate.vue';
 import EvaluationIsReviewed from './common/EvaluationIsReviewed.vue';
-import EvaluationIsSecurityChecked from './common/EvaluationIsSecurityChecked.vue';
+import EvaluationIsSecurityChecked from './applications/EvaluationIsSecurityChecked.vue';
+import NatBuddyAssignment from './applications/NatBuddyAssignment.vue';
 import EvaluationLink from './common/EvaluationLink.vue';
 
 export default {
@@ -67,6 +76,7 @@ export default {
         EvaluationIsReviewed,
         EvaluationIsSecurityChecked,
         EvaluationLink,
+        NatBuddyAssignment,
     },
     mixins: [evaluations],
     computed: {

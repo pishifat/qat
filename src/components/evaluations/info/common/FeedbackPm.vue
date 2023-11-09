@@ -9,8 +9,9 @@
             :custom-text="'Send message & archive'"
             :is-reviewable="isReviewable"
             :is-reviewed="selectedEvaluation.isReviewed"
-            :is-security-checkable="isSecurityCheckable"
+            :is-pass-app="isPassApp"
             :is-security-checked="selectedEvaluation.isSecurityChecked"
+            :has-nat-buddy="Boolean(selectedEvaluation.natBuddy)"
         />
     </div>
 </template>
@@ -35,7 +36,7 @@ export default {
             type: Boolean,
             default: false,
         },
-        isSecurityCheckable: {
+        isPassApp: {
             type: Boolean,
             default: false,
         },
@@ -76,7 +77,7 @@ export default {
                     message += `hello! you are now an ${this.modeString} Beatmap Nominator! here's a few things to get you started:`;
                     message += `\n\n`;
                     message += `- read all BN pages on the wiki: https://osu.ppy.sh/help/wiki/People/The_Team/Beatmap_Nominators\n`;
-                    message += `- join the BN Discord server: ${this.discordLink ? this.discordLink : 'LINK DOES NOT EXIST'}\n`;
+                    message += `- join the BN Discord server: ${this.discordLink ? this.discordLink : '***LINK DOES NOT EXIST***'}\n`;
                     message += `- review your evaluation here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id}`;
                     message += `\n\n`;
                     message += `have fun!`;

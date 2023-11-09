@@ -19,11 +19,19 @@
                 :class="!feedback ? 'text-danger' : 'text-warning'"
             />
             <i
-                v-if="isSecurityCheckable && isNatOrTrialNat && !isSecurityChecked"
+                v-if="isPassApp && isNatOrTrialNat && !isSecurityChecked"
                 data-toggle="tooltip"
                 data-placement="top"
-                :title="isSecurityChecked ? 'is security checked' : 'needs a security check'"
+                title="needs a security check"
                 class="fas fa-shield-alt mr-1"
+                :class="isSecurityChecked ? '' : 'text-warning'"
+            />
+            <i
+                v-if="isPassApp && isNatOrTrialNat && !hasNatBuddy"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="needs a NAT buddy"
+                class="fas fa-user mr-1"
                 :class="isSecurityChecked ? '' : 'text-warning'"
             />
         </p>
@@ -77,7 +85,7 @@ export default {
             type: Boolean,
             default: false,
         },
-        isSecurityCheckable: {
+        isPassApp: {
             type: Boolean,
             default: false,
         },
@@ -98,6 +106,10 @@ export default {
             default: false,
         },
         isNatEvaluation: {
+            type: Boolean,
+            default: false,
+        },
+        hasNatBuddy: {
             type: Boolean,
             default: false,
         },

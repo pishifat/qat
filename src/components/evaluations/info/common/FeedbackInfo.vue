@@ -47,7 +47,7 @@
             "
             :discord-link="discordLink"
             :is-reviewable="!selectedEvaluation.isResignation"
-            :is-security-checkable="selectedEvaluation.isApplication && selectedEvaluation.consensus === 'pass'"
+            :is-pass-app="selectedEvaluation.isApplication && selectedEvaluation.consensus === 'pass'"
         />
     </div>
 </template>

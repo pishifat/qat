@@ -12,6 +12,7 @@ router.use(middlewares.isLoggedIn);
 //population
 const appPopulate = [
     { path: 'user', select: 'username osuId' },
+    { path: 'natBuddy', select: 'username osuId' },
     { path: 'bnEvaluators', select: 'username osuId' },
     { path: 'natEvaluators', select: 'username osuId' },
     { path: 'test', select: 'totalScore comment' },

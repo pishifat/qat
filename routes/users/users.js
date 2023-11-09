@@ -58,6 +58,13 @@ router.get('/loadPreviousBnAndNat', async (req, res) => {
     res.json({ users });
 });
 
+/* GET NAT list */
+router.get('/loadNatInMode/:mode', async (req, res) => {
+    const users = await User.find({ groups: 'nat', 'modesInfo.mode': req.params.mode }).sort({ username: 1 });
+
+    res.json(users);
+});
+
 /* GET users banned from BN */
 router.get('/loadBannedUsers', middlewares.isNat, async (req, res) => {
     const users = await User.find({

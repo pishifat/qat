@@ -43,6 +43,10 @@ class EvaluationService extends mongoose.Model {
                     select: 'username osuId modesInfo groups evaluatorModes',
                 },
                 {
+                    path: 'natBuddy',
+                    select: 'username osuId',
+                },
+                {
                     path: 'natEvaluators',
                     select: 'username osuId',
                 },
