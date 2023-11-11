@@ -43,7 +43,7 @@ const VisualContentConsiderations = [
     { name: 'suicide', text: 'imagery depicting suicidal or self-harming behaviour, including preparation or imminent attempts', active: true },
 ];
 
-// BN Finder
+// preferences
 const GenrePreferences = ['rock', 'pop', 'novelty', 'hip hop', 'electronic', 'metal', 'classical', 'folk', 'jazz', 'vocaloid', 'other'];
 const LanguagePreferences = ['instrumental', 'english', 'japanese', 'korean', 'chinese', 'other'];
 const DetailPreferences = ['anime', 'featured artist', 'game', 'movie', 'tv', 'doujin', 'cover', 'remix'];

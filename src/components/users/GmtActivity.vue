@@ -3,7 +3,7 @@
         <div class="form-inline">
             <input
                 v-model="gmtDays"
-                class="form-control"
+                class="form-control w-25"
                 type="number"
                 placeholder="days of activity..."
                 min="1"

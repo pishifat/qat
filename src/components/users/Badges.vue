@@ -12,10 +12,6 @@
         >
             <i class="fas fa-search" />
         </a>
-
-        <div v-if="loading">
-            this will take a few minutes because an api call required for every user (and there are lots of users)
-        </div>
         
         <div v-if="badgeUsers.length">
             <div v-for="user in badgeUsers" :key="user.id" class="small mb-1">
@@ -99,7 +95,6 @@ export default {
     data () {
         return {
             badgeUsers: [],
-            loading: false,
         };
     },
     watch: {
@@ -118,9 +113,7 @@ export default {
                     this.badgeUsers = users;
                 }
             } else {
-                this.loading = true;
                 users = await this.$http.executeGet('/users/nat/findUserBadgeInfo/false', e);
-                this.loading = false;
 
                 if (users) {
                     this.badgeUsers = users.filter(user =>

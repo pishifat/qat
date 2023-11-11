@@ -55,7 +55,6 @@ const userSchema = new mongoose.Schema({
     mapperPreferences: [{ type: String, enum: enums.MapperPreferences }],
     mapperNegativePreferences: [{ type: String, enum: enums.MapperPreferences }],
     requestLink: { type: String },
-    isBnFinderAnonymous: { type: Boolean, default: true },
     languages: [{ type: String, enum: enums.Languages, default: [] }],
     lastMarkedAsLowActivity: { type: Date },
     showExplicitContent: { type: Boolean, default: false },

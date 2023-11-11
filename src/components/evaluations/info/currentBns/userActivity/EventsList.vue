@@ -16,14 +16,6 @@
                         {{ timestamp(event) | toMonthDayYear }}
                     </td>
                     <td>
-                        <span v-if="eventsId == 'bnFinderMatches'">
-                            <span v-if="event.isMatch" class="text-success"
-                                ><i class="fas fa-check-circle"
-                            /></span>
-                            <span v-else class="text-danger"
-                                ><i class="fas fa-times-circle"
-                            /></span>
-                        </span>
                         <a
                             :href="
                                 'https://osu.ppy.sh/beatmapsets/' +
@@ -144,8 +136,6 @@ export default {
         beatmapsetId(event) {
             if (this.eventsId == 'qualityAssuranceChecks') {
                 return event.event.beatmapsetId;
-            } else if (this.eventsId == 'bnFinderMatches') {
-                return event.beatmapset.osuId;
             } else {
                 return event.beatmapsetId;
             }
@@ -153,8 +143,6 @@ export default {
         modes(event) {
             if (this.eventsId == 'qualityAssuranceChecks') {
                 return event.event.modes;
-            } else if (this.eventsId == 'bnFinderMatches') {
-                return event.beatmapset.modes;
             } else {
                 return event.modes;
             }
@@ -162,8 +150,6 @@ export default {
         artistTitle(event) {
             if (this.eventsId == 'qualityAssuranceChecks') {
                 return event.event.artistTitle;
-            } else if (this.eventsId == 'bnFinderMatches') {
-                return event.beatmapset.artist + ' - ' + event.beatmapset.title;
             } else {
                 return event.artistTitle;
             }
@@ -171,8 +157,6 @@ export default {
         creatorName(event) {
             if (this.eventsId == 'qualityAssuranceChecks') {
                 return event.event.creatorName;
-            } else if (this.eventsId == 'bnFinderMatches') {
-                return event.beatmapset.mapperUsername;
             } else {
                 return event.creatorName;
             }
@@ -180,18 +164,12 @@ export default {
         creatorId(event) {
             if (this.eventsId == 'qualityAssuranceChecks') {
                 return event.event.creatorId;
-            } else if (this.eventsId == 'bnFinderMatches') {
-                return event.beatmapset.mapperOsuId;
             } else {
                 return event.creatorId;
             }
         },
         timestamp(event) {
-            if (this.eventsId == 'bnFinderMatches') {
-                return event.createdAt;
-            } else {
-                return event.timestamp;
-            }
+            return event.timestamp;
         },
         totalDrain(beatmaps) {
             let drain = 0;

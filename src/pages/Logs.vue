@@ -102,7 +102,6 @@ export default {
                 'veto',
                 'interOp',
                 'spam',
-                'bnFinder',
                 'notableNameChanges',
             ],
             category: 'all',

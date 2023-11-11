@@ -1,6 +1,5 @@
 import Home from './pages/Home.vue';
 import NotFound from './pages/NotFound.vue';
-import ModRequestsSubmission from './pages/ModRequestsSubmission.vue';
 const ApplicationSubmission = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/ApplicationSubmission.vue');
 const TestSubmission = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/TestSubmissionPage.vue');
 const ReportSubmission = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/ReportSubmission.vue');
@@ -40,7 +39,7 @@ const routes = [
     { path: '/testresults', component: TestResults, meta: { title: 'Ranking Criteria Test Results' } },
     { path: '/yourevals', component: YourEvals, meta: { title: 'Your Evaluations' } },
     { path: '/message', component: Message, meta: { title: 'Message from the NAT' } },
-    { path: '/modrequests', component: ModRequestsSubmission, meta: { title: 'Request a BN', public: true } },
+    { path: '/modrequests', component: ModRequests, meta: { title: 'Request a BN', public: true } },
     { path: '/discussionvote', component: DiscussionVote, meta: { title: 'Content Review' } },
 
     // BN/NAT
@@ -58,7 +57,6 @@ const routes = [
     { path: '/managetest', component: ManageTest, meta: { title: 'Manage RC Test', requiresNat: true } },
     { path: '/logs', component: Logs, meta: { title: 'Logs' } },
     { path: '/spam', component: Spam, meta: { title: 'Spam', requiresNat: true } },
-    { path: '/modrequests/listing', component: ModRequests, meta: { title: 'BN Finder / Global Queue', requiresNat: true } },
 
     { path: '*', component: NotFound, meta: { title: 'Oops', public: true } },
 ];

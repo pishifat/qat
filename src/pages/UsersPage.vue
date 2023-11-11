@@ -80,14 +80,9 @@
 
             <!-- other tools -->
             <section class="card card-body">
-                <nat-activity-2 class="my-2" />
+                <h5>Admin tools</h5>
                 <bn-activity classs="my-2" />
                 <gmt-activity class="my-2" />
-
-                <template v-if="loggedInUser.isNat">
-                    <potential-nat-info />
-                    <badges />
-                </template>
             </section>
         </div>
 
@@ -103,11 +98,9 @@ import usersModule from '../store/users';
 import ToastMessages from '../components/ToastMessages.vue';
 import UserCard from '../components/users/UserCard.vue';
 import UserInfo from '../components/users/UserInfo.vue';
-import NatActivity2 from '../components/users/NatActivity2.vue';
 import BnActivity from '../components/users/BnActivity.vue';
 import GmtActivity from '../components/users/GmtActivity.vue';
 import Badges from '../components/users/Badges.vue';
-import PotentialNatInfo from '../components/users/PotentialNatInfo.vue';
 import FilterBox from '../components/FilterBox.vue';
 import PaginationNav from '../components/PaginationNav.vue';
 
@@ -117,11 +110,9 @@ export default {
         ToastMessages,
         UserCard,
         UserInfo,
-        NatActivity2,
         BnActivity,
         GmtActivity,
         Badges,
-        PotentialNatInfo,
         FilterBox,
         PaginationNav,
     },

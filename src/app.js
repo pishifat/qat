@@ -20,35 +20,6 @@ const router = new VueRouter({
 router.beforeEach(async (to, from, next) => {
     document.title = to.meta.title ? `${to.meta.title} · BN Management` : 'BN Management';
 
-    /*
-    ? past attempt at opengraph tags which didn't work because CSR and it only works on SSR. keeping for reference
-
-    const head = document.head || document.getElementsByTagName('head')[0];
-    
-    const metaAttributes = [
-        { property: 'og:title', content: to.meta.title || 'BN Management' },
-        { property: 'og:site_name', content: to.meta.title ? 'BN Management' : '' },
-        { property: 'og:url', content: `https://bn.mappersguild.com${to.fullPath}` },
-        { property: 'og:description', content: 'The place for everything related to the Beatmap Nominators!' },
-        { property: 'description', name: 'description', content: 'The place for everything related to the Beatmap Nominators!' },
-        { property: 'og:type', content: 'website' },
-        { property: 'theme-color', name: 'theme-color', content: '#27b6b3' },
-    ];
-
-    metaAttributes.forEach((meta) => {
-        let tag = head.querySelector(`meta[property="${meta.property}"]`);
-
-        if (!tag) {
-            tag = document.createElement("meta");
-            head.appendChild(tag);
-        }
-
-        Object.keys(meta).forEach((key) => {
-            tag.setAttribute(key, meta[key]);
-        });
-    });
-    */
-
     if (!store.state.initialized) {
         await store.dispatch('setInitialData');
     }

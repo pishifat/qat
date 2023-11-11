@@ -1,10 +1,8 @@
 const express = require('express');
 const moment = require('moment');
-const ModRequest = require('../../models/modRequests/modRequest');
-const Beatmapset = require('../../models/modRequests/beatmapset');
-const middlewares = require('../../helpers/middlewares');
-const util = require('../../helpers/util');
-const osu = require('../../helpers/osu');
+const middlewares = require('../helpers/middlewares');
+const util = require('../helpers/util');
+const osu = require('../helpers/osu');
 
 function getGenreName (id) {
     // note that there's no 8, 11, 12

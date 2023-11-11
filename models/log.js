@@ -19,7 +19,7 @@ const logSchema = new mongoose.Schema({
             'veto',
             'interOp',
             'spam',
-            'bnFinder',
+            'bnFinder', // no longer used
             'notableNameChanges',
         ],
     },

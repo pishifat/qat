@@ -47,7 +47,6 @@ interface IUser {
     mapperPreferences: string[];
     mapperNegativePreferences: string[];
     requestLink: string;
-    isBnFinderAnonymous: boolean;
     languages: string[];
     lastMarkedAsLowActivity: Date;
     showExplicitContent: boolean;

@@ -350,7 +350,7 @@ router.get('/logs/:osuId/:category', middlewares.hasPrivateInterOpsAccess, async
             'qualityAssurance',
             'veto',
             'spam',
-            'bnFinder',
+            'bnFinder' (no longer used),
             'notableNameChanges'`
         );
     }

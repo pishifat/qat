@@ -11,7 +11,6 @@ const Evaluation = require('../models/evaluations/evaluation');
 const BnEvaluation = require('../models/evaluations/bnEvaluation');
 const BeatmapReport = require('../models/beatmapReport');
 const Veto = require('../models/veto');
-const BnFinderMatch = require('../models/bnFinderMatch');
 const User = require('../models/user');
 const Aiess = require('../models/aiess');
 const Discussion = require('../models/discussion');
@@ -256,89 +255,6 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
     for (let i = 0; i < activeRounds.length; i++) {
         const round = activeRounds[i];
         let processed = false;
-
-        // check if they have enough activity as a probation member to even have an eval
-        /*if (round.deadline < endRange) {
-            const modeInfo = round.user.modesInfo.find(m => m.mode == round.mode);
-
-            if (modeInfo && modeInfo.level == 'probation') {
-                const uniqueNominations = await Aiess.getUniqueUserEvents(round.user.osuId, new Date(round.createdAt), new Date(), [round.mode], ['nominate', 'qualify']);
-                const nomRequirement = round.mode == 'mania' || round.mode == 'catch' ? 4 : 6;
-
-                if (uniqueNominations.length < nomRequirement) {
-                    // check their last evaluation. if it was also probation + low activity, skip
-                    const lastEvaluation = await Evaluation
-                        .findOne({
-                            user: round.user.id,
-                            active: false,
-                            consensus: { $exists: true },
-                        })
-                        .sort({ archivedAt: -1 })
-                        .skip(1);
-
-                    if (lastEvaluation && lastEvaluation.consensus !== BnEvaluationConsensus.ProbationBn) {
-                        // process current eval
-                        round.active = false;
-                        round.discussion = true;
-                        round.isReviewed = true;
-                        round.feedback = `You have nominated only ${uniqueNominations.length} map(s) during your probationary period, which is less than the ${nomRequirement} nominations requirement for probation BNs. Your probationary period is getting automatically extended by another month in order to allow you to reach the total nominations threshold.`;
-                        round.archivedAt = new Date();
-                        round.consensus = BnEvaluationConsensus.ProbationBn;
-                        round.addition = BnEvaluationAddition.LowActivityWarning;
-                        await round.save();
-
-                        // set up next eval
-                        let activityToCheck = 80;
-                        let deadline = new Date();
-                        deadline.setDate(deadline.getDate() + activityToCheck/2);
-                        
-                        await BnEvaluation.create({
-                            user: round.user,
-                            mode: round.mode,
-                            deadline,
-                            activityToCheck,
-                        });
-
-                        // logs/webhooks so NAT are aware of automatic action
-                        const consensusText = makeWordFromField(round.consensus);
-                        const additionText = makeWordFromField(round.addition);
-
-                        Logger.generate(
-                            null,
-                            `Automatically archived  ${round.user.username}'s ${round.mode}  as "${consensusText}" (not enough nominations during probation - ${uniqueNominations.length})`,
-                            'bnEvaluation',
-                            round._id
-                        );
-
-                        discord.webhookPost(
-                            [{
-                                color: discord.webhookColors.black,
-                                description: `Automatically archived [**${round.user.username}**'s BN eval](https://bn.mappersguild.com/bneval?id=${round.id}) with **${consensusText}** consensus and **${additionText}** addition (${uniqueNominations.length} nominations during probation.).`,
-                            }],
-                            round.mode
-                        );
-
-                        discord.webhookPost(
-                            [{
-                                color: discord.webhookColors.black,
-                                description: `Automatically created new BN eval for **${round.user.username}** set for **${activityToCheck/2} days** from now`,
-                            }],
-                            round.mode
-                        );
-
-                        const channel = {
-                            name: `BN Eval Results (${round.mode == 'osu' ? 'osu!' : `osu!${round.mode}`})`,
-                            description: `Results for your recent BN evaluation (${moment(round.createdAt).format('YYYY-MM-DD')})`,
-                        }
-                    
-                        await osuBot.sendAnnouncement([round.user.osuId, 14102976], channel, round.feedback);
-
-                        // skip the next section
-                        processed = true;
-                    }
-                }
-            }
-        }*/
 
         // set up evaluation
         if (!processed) {
@@ -631,33 +547,6 @@ const lowActivityTask = cron.schedule('0 23 1 * *', async () => {
         }
 
         await util.sleep(500);
-    }
-}, {
-    scheduled: false,
-});
-
-/**
- * Marks BN Finder Matches as Expired if not pending/WIP/graveyard
- */
- const checkMatchBeatmapStatuses = cron.schedule('2 22 * * *', async () => {
-    const response = await osu.getClientCredentialsGrant();
-    const token = response.access_token;
-
-    const matches = await BnFinderMatch
-        .find({
-            isMatch: { $exists: false },
-            isExpired: { $ne: true },
-        })
-        .populate('beatmapset');
-
-    for (const match of matches) {
-        const beatmapsetInfo = await osu.getBeatmapsetInfo(token, match.beatmapset.osuId);
-        await util.sleep(500);
-
-        // 4 = loved, 3 = qualified, 2 = approved, 1 = ranked, 0 = pending, -1 = WIP, -2 = graveyard
-        if (beatmapsetInfo.error || beatmapsetInfo.ranked > 0) {
-            await BnFinderMatch.findByIdAndUpdate(match.id, { isExpired: true });
-        }
     }
 }, {
     scheduled: false,
@@ -1143,22 +1032,6 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
         let discussionMessage = discussion.starting_post.message;
         let userId = discussion.user_id;
 
-        /* NO RE-OPENED POSTS FOR NOW
-        // find last reopen if it exists
-        const parentPosts = await osu.getDiscussions(token, `/posts?beatmapset_discussion_id=${discussion.id}`);
-        const posts = parentPosts.posts;
-        await util.sleep(500);
-        const postReported = await BeatmapReport.findOne({
-            postId: discussion.id,
-        });
-        // replace discussion details with reopen
-        if (postReported && posts[0] && posts[0].id !== discussion.starting_post.id) {
-            messageType = `reopen ${messageType}`;
-            discussionMessage = posts[0].message;
-            userId = posts[0].user_id;
-        }
-        NO RE-OPENED POSTS FOR NOW */
-
         // determine which posts haven't been sent to #report-feed
         let createWebhook;
 
@@ -1277,4 +1150,4 @@ const spawnProbationEvaluations = cron.schedule('0 16 * * *', async () => {
     scheduled: false,
 });
 
-module.exports = { notifyDeadlines, lowActivityTask, closeContentReviews, checkMatchBeatmapStatuses, checkBnEvaluationDeadlines, lowActivityPerUserTask, checkTenureValidity, badgeTracker, validateEvents, notifyBeatmapReports, spawnProbationEvaluations };
+module.exports = { notifyDeadlines, lowActivityTask, closeContentReviews, checkBnEvaluationDeadlines, lowActivityPerUserTask, checkTenureValidity, badgeTracker, validateEvents, notifyBeatmapReports, spawnProbationEvaluations };

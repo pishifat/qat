@@ -3,7 +3,6 @@ const moment = require('moment');
 const Logger = require('../../models/log');
 const Report = require('../../models/report');
 const BnEvaluation = require('../../models/evaluations/bnEvaluation');
-const BnFinderMatch = require('../../models/bnFinderMatch');
 const ResignationEvaluation = require('../../models/evaluations/resignationEvaluation');
 const Evaluation = require('../../models/evaluations/evaluation');
 const AppEvaluation = require('../../models/evaluations/appEvaluation');
@@ -816,7 +815,7 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
         return { error: 'Something went wrong!' };
     }
 
-    const [uniqueNominations, disqualifications, pops, qualityAssuranceChecks, bnFinderMatches] = await Promise.all([
+    const [uniqueNominations, disqualifications, pops, qualityAssuranceChecks] = await Promise.all([
         Aiess.getUniqueUserEvents(userOsuId, minDate, maxDate, modes, ['nominate', 'qualify']),
         Aiess.getUserEvents(userOsuId, minDate, maxDate, modes, ['disqualify']),
         Aiess.getUserEvents(userOsuId, minDate, maxDate, modes, ['nomination_reset']),
@@ -828,17 +827,6 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
                 path: 'event',
                 select: 'beatmapsetId timestamp modes artistTitle creatorName creatorId',
             }),
-        BnFinderMatch
-            .find({
-                user: mongoId,
-                createdAt: { $gt: minDate, $lt: maxDate },
-                isMatch: { $exists: true },
-            })
-            .populate({
-                path: 'beatmapset',
-                select: 'osuId artist title mapperOsuId mapperUsername modes createdAt'
-            })
-            .sort({ createdAt: -1  }),
     ]);
 
     const beatmapsetIds = uniqueNominations.map(n => n.beatmapsetId);
@@ -941,7 +929,6 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
         pops,
         qualityAssuranceChecks,
         disqualifiedQualityAssuranceChecks,
-        bnFinderMatches,
     };
 }
 

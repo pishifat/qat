@@ -358,49 +358,4 @@ router.post('/editBadgeValue/:id', async (req, res) => {
     res.json(u);
 });
 
-/* GET potential NAT info */
-router.get('/findPotentialNatInfo', async (req, res) => {
-    const [users, applications] = await Promise.all([
-        User.find({
-            groups: 'bn',
-            isBnEvaluator: true,
-        }).sort({ username: 1 }),
-
-        AppEvaluation.find({
-            bnEvaluators: {
-                $exists: true,
-                $not: { $size: 0 },
-            },
-            active: false,
-        }).populate([
-            { path: 'bnEvaluators', select: 'username osuId groups' },
-            {
-                path: 'reviews',
-                select: 'evaluator',
-                populate: {
-                    path: 'evaluator',
-                    select: 'username osuId groups',
-                },
-            },
-        ]),
-    ]);
-
-    let info = [];
-    users.forEach(user => {
-        const evaluatedApps = applications.filter(app => {
-            return app.reviews.some(review => review.evaluator.id == user.id);
-        });
-
-        info.push({
-            id: user.id,
-            username: user.username,
-            osuId: user.osuId,
-            modes: user.modes,
-            evaluatedApps: evaluatedApps.length,
-        });
-    });
-
-    res.json(info);
-});
-
 module.exports = router;

@@ -116,16 +116,6 @@
                 />
             </template>
 
-            <!--<template>
-                <div class="mt-2">Modding</div>
-                <events-list
-                    :events="bnFinderMatches"
-                    :events-id="'bnFinderMatches'"
-                    :header="'BN Finder matches'"
-                    :osu-id="osuId"
-                />
-            </template>-->
-
             <template v-if="loggedInUser.hasFullReadAccess && showArchive">
                 <hr />
                 <div>Archives</div>
@@ -221,7 +211,6 @@ export default {
             'assignedBnApplications',
             'natApplications',
             'natBnEvaluations',
-            'bnFinderMatches',
         ]),
     },
     watch: {
@@ -302,11 +291,6 @@ export default {
                         res.bnEvaluations
                     );
                 }
-
-                this.$store.commit(
-                    'activity/setBnFinderMatches',
-                    res.bnFinderMatches
-                );
 
                 this.$store.commit('activity/setIsLoading', false);
             }

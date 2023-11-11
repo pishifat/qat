@@ -60,24 +60,6 @@
                         </div>
                     </template>
                 </div>
-                <!--<div class="form-check">
-                    <input
-                        id="settings-requests-global"
-                        v-model="requestStatus"
-                        value="globalQueue"
-                        type="checkbox"
-                        class="form-check-input"
-                        @change="updateRequestStatus"
-                    >
-                    <label
-                        class="form-check-label text-secondary"
-                        for="settings-requests-global"
-                    >
-                        <a href="/modrequests/listing" target="_blank">
-                            Global queue
-                        </a>
-                    </label>
-                </div>-->
                 <div class="form-check">
                     <input
                         id="settings-requests-closed"
