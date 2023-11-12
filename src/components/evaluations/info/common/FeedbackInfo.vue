@@ -4,7 +4,7 @@
             <p class="mb-2">
                 <b>Feedback:</b>
                 <a
-                    class="ml-1"
+                    :class="'ml-1 ' + (previewFeedback ? 'text-success' : '')"
                     data-toggle="tooltip"
                     data-placement="top"
                     title="toggle feedback preview"
@@ -15,9 +15,9 @@
                 </a>
             </p>
 
-            <div v-if="previewFeedback" class="small ml-2 card card-body" v-html="$md.render(feedback)" />
+            <div v-if="previewFeedback" class="small mb-2 card card-body" v-html="$md.render(feedback)" />
             
-            <textarea v-else v-model="feedback" class="form-control mb-2" rows="4" />
+            <textarea v-model="feedback" class="form-control mb-2" rows="4" />
 
             <button
                 class="btn btn-sm btn-block btn-primary my-2 ml-0 ml-sm-auto"
