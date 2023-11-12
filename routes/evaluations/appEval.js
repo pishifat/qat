@@ -319,9 +319,11 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
 /* POST set consensus of eval */
 router.post('/setConsensus/:id', middlewares.isNatOrTrialNat, async (req, res) => {
     let evaluation = await AppEvaluation
-        .findByIdAndUpdate(req.params.id, { consensus: req.body.consensus })
+        .findById(req.params.id)
         .populate(defaultPopulate)
         .orFail();
+
+    evaluation.consensus = req.body.consensus;
 
     if (req.body.consensus === AppEvaluationConsensus.Fail) {
         let date = new Date(evaluation.createdAt);

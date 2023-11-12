@@ -106,6 +106,7 @@ export default {
                     { consensus: 'fullBn', color: 'btn-success' },
                     { consensus: 'probationBn', color: 'btn-probation' },
                     { consensus: 'removeFromBn', color: 'btn-danger' },
+                    { consensus: undefined, color: 'btn-neutral' },
                 ];
             }
 
@@ -113,6 +114,7 @@ export default {
                 return [
                     { consensus: 'resignedOnGoodTerms', color: 'btn-success' },
                     { consensus: 'resignedOnStandardTerms', color: 'btn-neutral' },
+                    { consensus: undefined, color: 'btn-primary' },
                 ];
             }
 
@@ -120,6 +122,7 @@ export default {
                 return [
                     { consensus: 'pass', color: 'btn-success' },
                     { consensus: 'fail', color: 'btn-danger' },
+                    { consensus: undefined, color: 'btn-neutral' },
                 ];
             }
 

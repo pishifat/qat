@@ -2,76 +2,104 @@
     <div class="row">
         <div class="col-md-12">
             <section class="card card-body">
-                <div v-if="loggedInUser.isNat" class="form-inline">
-                    <input
-                        v-model="searchValue"
-                        type="text"
-                        placeholder="username or osuID..."
-                        maxlength="18"
-                        autocomplete="off"
-                        class="form-control"
-                        @keyup.enter="query($event)"
-                    >
-                    <button class="btn btn-sm btn-primary ml-2" type="submit" @click="query($event)">
-                        Search archives
-                    </button>
-                </div>
-
-                <div v-if="loggedInUser.isNat" class="form-inline mt-2">
-                    <input
-                        v-model="limit"
-                        type="text"
-                        placeholder="# entries..."
-                        maxlength="3"
-                        autocomplete="off"
-                        class="form-control"
-                        @keyup.enter="queryRecent($event)"
-                    >
-
-                    <select
-                        v-model="mode"
-                        class="form-control ml-1"
-                        @change="findNatActivity($event)"
-                    >
-                        <option class="ml-2" value="osu" selected>
-                            osu!
-                        </option>
-                        <option class="ml-2" value="taiko">
-                            osu!taiko
-                        </option>
-                        <option class="ml-2" value="catch">
-                            osu!catch
-                        </option>
-                        <option class="ml-2" value="mania">
-                            osu!mania
-                        </option>
-                    </select>
-
-                    <button class="btn btn-sm btn-primary ml-2" type="submit" @click="queryRecent($event)">
-                        Show recent
-                    </button>
-                </div>
-                <div class="form-inline mt-2">
-                    <input
-                        v-model="participatedSearchValue"
-                        type="text"
-                        placeholder="username or osuID..."
-                        maxlength="18"
-                        autocomplete="off"
-                        class="form-control"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        title="leave text field empty to load all users" 
-                        @keyup.enter="queryParticipatedEvals($event)"
-                    >
-                    <button 
-                        class="btn btn-sm btn-primary ml-2" 
-                        type="submit" 
-                        
-                        @click="queryParticipatedEvals($event)"
+                <div v-if="loggedInUser.isNat" class="mb-4">
+                    <h4>
+                        Search for evaluations of a user
+                    </h4>
+                    <div class="form-inline">
+                        <input
+                            v-model="searchValue"
+                            type="text"
+                            placeholder="username or ID..."
+                            maxlength="18"
+                            autocomplete="off"
+                            class="form-control"
+                            @keyup.enter="query($event)"
                         >
-                        Show evals you've participated in
-                    </button>
+                        <button class="btn btn-sm btn-primary ml-2" type="submit" @click="query($event)">
+                            Search
+                        </button>
+                    </div>
+                </div>
+
+                <div v-if="loggedInUser.isNat" class="mb-4">
+                    <h4>
+                        Search for recent evaluations
+                    </h4>
+                    <div class="form-inline">
+                        <input
+                            v-model="limit"
+                            type="text"
+                            placeholder="# entries..."
+                            maxlength="3"
+                            autocomplete="off"
+                            class="form-control"
+                            @keyup.enter="queryRecent($event)"
+                        >
+
+                        <select
+                            v-model="mode"
+                            class="form-control ml-1"
+                            @change="findNatActivity($event)"
+                        >
+                            <option class="ml-2" value="osu" selected>
+                                osu!
+                            </option>
+                            <option class="ml-2" value="taiko">
+                                osu!taiko
+                            </option>
+                            <option class="ml-2" value="catch">
+                                osu!catch
+                            </option>
+                            <option class="ml-2" value="mania">
+                                osu!mania
+                            </option>
+                        </select>
+
+                        <button class="btn btn-sm btn-primary ml-2" type="submit" @click="queryRecent($event)">
+                            Show recent
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <h4>
+                        Search for evaluations participated in
+                    </h4>
+                    <div class="form-inline">
+                        <input
+                            v-model="participatedSearchValue"
+                            type="text"
+                            placeholder="username or ID..."
+                            maxlength="18"
+                            autocomplete="off"
+                            class="form-control"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            title="leave field empty to load all evaluated users" 
+                            @keyup.enter="queryParticipatedEvals($event)"
+                        >
+                        <input
+                            v-if="loggedInUser.isNat"
+                            v-model="evaluatorSearchValue"
+                            type="text"
+                            placeholder="evaluator username or ID..."
+                            maxlength="18"
+                            autocomplete="off"
+                            class="form-control"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            title="leave field empty to set yourself as evaluator"
+                            @keyup.enter="queryParticipatedEvals($event)"
+                        >
+                        <button 
+                            class="btn btn-sm btn-primary ml-2" 
+                            type="submit" 
+                            
+                            @click="queryParticipatedEvals($event)"
+                            >
+                            Search
+                        </button>
+                    </div>
                 </div>
             </section>
 
@@ -152,6 +180,7 @@ export default {
         return {
             searchValue: null,
             participatedSearchValue: '',
+            evaluatorSearchValue: '',
             limit: null,
             wasLoaded: false,
             mode: 'osu',
@@ -246,7 +275,7 @@ export default {
             }
         },
         async queryParticipatedEvals(e) {
-            const res = await this.$http.executeGet(`/evalarchive/participatedEvals?user=${this.participatedSearchValue}`, e);
+            const res = await this.$http.executeGet(`/evalarchive/participatedEvals?user=${this.participatedSearchValue}&evaluator=${this.evaluatorSearchValue}`, e);
 
             if (res && !res.error) {
                 this.$store.commit('evaluations/setEvaluations', [...res.bnApplications, ...res.evaluations]);

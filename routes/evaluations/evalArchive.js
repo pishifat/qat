@@ -105,7 +105,19 @@ router.get('/search', middlewares.isNat, async (req, res) => {
 router.get('/participatedEvals', async (req, res) => {
     const userToSearch = req.query.user && decodeURI(req.query.user);
 
-    let reviews = await Review.find({ evaluator: req.session.mongoId });
+    let evaluatorToSearch = req.session.mongoId;
+
+    if (req.query.evaluator && res.locals.userRequest.isNat) {
+        const evaluator = await User.findByUsernameOrOsuId(decodeURI(req.query.evaluator));
+
+        if (!evaluator) {
+            return res.json({ error: 'Cannot find evaluator!' });
+        }
+
+        evaluatorToSearch = evaluator._id;
+    }
+
+    let reviews = await Review.find({ evaluator: evaluatorToSearch });
     
     let bnApplicationsQuery = AppEvaluation
         .find({

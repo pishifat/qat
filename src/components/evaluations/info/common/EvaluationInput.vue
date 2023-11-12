@@ -8,7 +8,7 @@
                 <p>
                     <b>{{ selectedEvaluation.user.isNat && loggedInUser.isNatLeader ? 'NAT activity comments:' : 'Modding comments:' }}</b>
                     <a
-                        class="ml-1"
+                        :class="'ml-1 ' + (previewModdingComment ? 'text-success' : '')"
                         data-toggle="tooltip"
                         data-placement="top"
                         title="toggle comment preview"
@@ -22,11 +22,10 @@
                 <div class="form-group">
                     <div 
                         v-if="previewModdingComment" 
-                        class="small ml-2 card card-body" 
+                        class="small mb-2 card card-body" 
                         v-html="$md.render(moddingComment)"
                     />
                     <textarea
-                        v-else
                         v-model="moddingComment"
                         class="form-control"
                         rows="4"
@@ -39,7 +38,7 @@
                 <p>
                     <b>Behavior comments:</b>
                     <a
-                        class="ml-1"
+                        :class="'ml-1 ' + (previewBehaviorComment ? 'text-success' : '')"
                         data-toggle="tooltip"
                         data-placement="top"
                         title="toggle comment preview"
@@ -53,11 +52,10 @@
                 <div class="form-group">
                     <div 
                         v-if="previewBehaviorComment" 
-                        class="small ml-2 card card-body" 
+                        class="small mb-2 card card-body" 
                         v-html="$md.render(behaviorComment)"
                     />
                     <textarea
-                    v-else
                         v-model="behaviorComment"
                         class="form-control"
                         rows="4"
