@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col-md-12">
             <section class="card card-body">
-                <div v-if="loggedInUser.isNat" class="mb-4">
+                <div v-if="loggedInUser.isNat">
                     <h4>
                         Search for evaluations of a user
                     </h4>
@@ -20,11 +20,12 @@
                             Search
                         </button>
                     </div>
+                    <hr />
                 </div>
 
-                <div v-if="loggedInUser.isNat" class="mb-4">
+                <div v-if="loggedInUser.isNat">
                     <h4>
-                        Search for recent evaluations
+                        Show recent evaluations
                     </h4>
                     <div class="form-inline">
                         <input
@@ -60,7 +61,9 @@
                             Show recent
                         </button>
                     </div>
+                    <hr />
                 </div>
+                
                 <div>
                     <h4>
                         Search for evaluations participated in

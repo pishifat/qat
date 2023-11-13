@@ -50,9 +50,8 @@
                 </div>
             </div>
 
-            <hr />
-
             <div v-if="evaluation.isApplication && positiveConsensus">
+                <hr />
                 <a href="#newBnInformation" data-toggle="collapse">
                     <h5>New BN Information <i class="fas fa-angle-down" /></h5>
                 </a>
