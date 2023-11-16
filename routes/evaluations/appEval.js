@@ -347,10 +347,11 @@ router.post('/setConsensus/:id', middlewares.isNatOrTrialNat, async (req, res) =
         {
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.lightBlue,
-            description: `[**${evaluation.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${evaluation.id}) consensus set to **${req.body.consensus}**`,
+            description: `[**${evaluation.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${evaluation.id}) consensus set to **${req.body.consensus || 'none'}**`,
         }
     ];
 
+    // security check embed
     if (req.body.consensus === AppEvaluationConsensus.Pass) 
         embed.push({
             author: null,
@@ -360,6 +361,7 @@ router.post('/setConsensus/:id', middlewares.isNatOrTrialNat, async (req, res) =
 
     await discord.webhookPost(embed, evaluation.mode);
 
+    // security check ping
     if (req.body.consensus === AppEvaluationConsensus.Pass) {
         const evaluators = evaluation.natEvaluators;
 

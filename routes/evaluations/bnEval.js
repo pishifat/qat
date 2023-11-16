@@ -200,6 +200,8 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
                 value: natList,
             });
 
+            let discordIds = assignedNat.map(n => n.discordId).filter(d => d);
+
             // assign trial NAT
             if (await Settings.getModeHasTrialNat(er.mode)) {
                 const assignedTrialNat = await User.getAssignedTrialNat(er.mode);
@@ -209,6 +211,7 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
                     name: 'Assigned BN',
                     value: trialNatList,
                 });
+                discordIds = discordIds.concat(assignedTrialNat.map(n => n.discordId).filter(d => d));
             }
 
             await er.save();
@@ -223,6 +226,8 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
                 er.mode
             );
             await util.sleep(500);
+
+            await discord.userHighlightWebhookPost(er.mode, discordIds);
         }
     }
 
