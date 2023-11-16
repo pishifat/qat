@@ -1,6 +1,6 @@
 <template>
     <div class="modal-header bg-primary">
-        <h5 class="modal-title overflow-auto text-break">
+        <h5 class="modal-title overflow-auto text-break py-1">
             Report:
             <user-link
                 v-if="selectedReport.culprit"

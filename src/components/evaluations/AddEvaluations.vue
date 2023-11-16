@@ -68,10 +68,12 @@
                         <p class="small text-secondary ml-2">
                             Generate evaluations for all members of a user group. Only use this if you know what you're doing.
                         </p>
-                        <div class="col-sm-6">
-                            <b>Exclude specific user(s):</b>
-                            <input v-model="excludeUsers" class="ml-2 form-control" type="text"
-                                placeholder="username1, username2, username3...">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <b>Exclude specific user(s):</b>
+                                <input v-model="excludeUsers" class="ml-2 form-control" type="text"
+                                    placeholder="username1, username2, username3...">
+                            </div>
                         </div>
                     </div>
                 </div>
