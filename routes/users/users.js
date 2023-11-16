@@ -1047,6 +1047,8 @@ router.post('/resignFromBn/:id', async (req, res) => {
         value: natList,
     });
 
+    let discordIds = assignedNat.map(e => e.discordId).filter(e => e);
+
     if (await Settings.getModeHasTrialNat(mode)) {
         const assignedTrialNat = await User.getAssignedTrialNat(mode, [user.osuId]);
         resignation.bnEvaluators = assignedTrialNat;
@@ -1056,6 +1058,8 @@ router.post('/resignFromBn/:id', async (req, res) => {
             name: 'Assigned BN',
             value: trialNatList,
         });
+
+        discordIds = discordIds.concat(assignedTrialNat.map(e => e.discordId).filter(e => e));
     }
 
     await resignation.save();
@@ -1071,8 +1075,10 @@ router.post('/resignFromBn/:id', async (req, res) => {
     );
     await util.sleep(500);
 
+    await discord.userHighlightWebhookPost(mode, discordIds);
+
     res.json({
-        success: 'Your removal will be processed soon',
+        success: 'Your resignation will be processed soon',
     });
 });
 
