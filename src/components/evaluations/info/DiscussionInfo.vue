@@ -33,7 +33,10 @@
                 />
                 <hr v-if="selectedEvaluation.consensus" />
                 <evaluation-link v-if="selectedEvaluation.feedback" />
-                <evaluation-is-reviewed v-if="selectedEvaluation.feedback && loggedInUser.isNat" />
+                <evaluation-is-reviewed
+                    v-if="selectedEvaluation.feedback && loggedInUser.isNat"
+                    :feedback="selectedEvaluation.feedback"
+                />
                 <feedback-info v-if="selectedEvaluation.consensus" />
             </div>
         </template>

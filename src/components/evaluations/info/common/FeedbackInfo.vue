@@ -4,7 +4,8 @@
             <p class="mb-2">
                 <b>Feedback:</b>
                 <a
-                    :class="'ml-1 ' + (previewFeedback ? 'text-success' : '')"
+                    class="ml-1"
+                    :class="previewFeedback ? 'text-success' : ''"
                     data-toggle="tooltip"
                     data-placement="top"
                     title="toggle feedback preview"
@@ -17,10 +18,17 @@
 
             <div v-if="previewFeedback" class="small mb-2 card card-body" v-html="$md.render(feedback)" />
             
-            <textarea v-model="feedback" class="form-control mb-2" rows="4" />
+            <textarea
+                v-model="feedback"
+                :class="feedback != selectedEvaluation.feedback ? 'bg-dark' : ''"
+                class="form-control mb-2"
+                rows="4"
+            />
+
+            <span v-if="feedback != selectedEvaluation.feedback" class="small text-danger">Feedback is currently not saved.</span>
 
             <button
-                class="btn btn-sm btn-block btn-primary my-2 ml-0 ml-sm-auto"
+                class="btn btn-sm btn-block btn-primary ml-0 ml-sm-auto"
                 @click="setFeedback($event)"
             >
                 Save feedback
