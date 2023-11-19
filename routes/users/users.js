@@ -448,19 +448,22 @@ router.post('/:id/updateRequestStatus', middlewares.isBnOrNat, async (req, res) 
         });
     }
 
-    // Send websocket notification if request status has changed
-    if (user.requestStatus.filter((s) => s == "closed").length != req.body.requestStatus.filter((s) => s == "closed").length) 
+    // Send websocket notification + update lastOpenedForRequests if request status has changed
+    if (user.requestStatus.filter((s) => s == "closed").length != req.body.requestStatus.filter((s) => s == "closed").length) {
         websocketManager.sendNotification("users:request_status_update", {
             isOpen: !req.body.requestStatus.includes("closed"),
             user: user
         });
+
+        user.lastOpenedForRequests = new Date();
+    }
     
     user.requestStatus = req.body.requestStatus;
     user.requestLink = req.body.requestLink;
     await user.save();
 
     res.json({
-        success: 'Updated',
+        success: 'Updated request status',
         user,
     });
 

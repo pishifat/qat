@@ -276,6 +276,8 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
                 relatedEvaluation: evaluation._id,
             });
 
+            user.lastOpenedForRequests = new Date();
+
             await user.save();
 
             const userOsuInfo = await osu.getOtherUserInfo(req.session.accessToken, user.osuId);
