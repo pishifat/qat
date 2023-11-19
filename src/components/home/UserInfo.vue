@@ -1,5 +1,5 @@
 <template>
-    <modal-dialog id="userInfo">
+    <modal-dialog id="userInfo" :key="this.$route.query">
         <template v-if="selectedUser" #header>
             <modal-header />
         </template>
@@ -13,6 +13,17 @@
                     >
                         {{ getStatus(selectedUser.requestStatus) }}
                     </span>
+            </div>
+            <div class="mx-3">
+                <b>Last opened:</b>
+                <span 
+                    class="badge badge-pill mx-1 text-lowercase badge-secondary"
+                    data-toggle="tooltip"
+                    data-placement="right"
+                    :title="selectedUser.lastOpenedForRequests ? this.$moment(selectedUser.lastOpenedForRequests).format('YYYY-MM-DD hh:mm:ss A') : '¯\\_(ツ)_/¯'"
+                >
+                    {{ selectedUser.lastOpenedForRequests ? this.$moment(selectedUser.lastOpenedForRequests).fromNow() : 'unknown' }}
+                </span>
             </div>
             <div class="mx-3">
                 <b>Request methods:</b>
