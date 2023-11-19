@@ -60,6 +60,7 @@ const userSchema = new mongoose.Schema({
     showExplicitContent: { type: Boolean, default: false },
     cover: { type: String },
     requestInfo: { type: String },
+    lastOpenedForRequests: { type: Date },
 
     /* temporary fields for qa leaderboard webhook */
     recentQaChecks: { type: Number },
@@ -280,6 +281,7 @@ class UserService extends mongoose.Model {
                         hasBasicAccess: '$hasBasicAccess',
                         probationModes: '$probationModes',
                         requestInfo: '$requestInfo',
+                        lastOpenedForRequests: '$lastOpenedForRequests',
                         genrePreferences: '$genrePreferences',
                         genreNegativePreferences: '$genreNegativePreferences',
                         languagePreferences: '$languagePreferences',

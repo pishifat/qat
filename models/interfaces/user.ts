@@ -52,6 +52,7 @@ interface IUser {
     showExplicitContent: boolean;
     cover: string;
     requestInfo: string;
+    lastOpenedForRequests: Date;
 
     // not used in model
     genreCount: number;
