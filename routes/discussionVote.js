@@ -6,6 +6,7 @@ const util = require('../helpers/util');
 const Discussion = require('../models/discussion');
 const Mediation = require('../models/mediation');
 const Logger = require('../models/log');
+const User = require('../models/user');
 
 const router = express.Router();
 
@@ -104,7 +105,7 @@ router.get('/searchDiscussionVote/:id', async (req, res) => {
 
 /* POST create a new discussion vote. */
 router.post('/submit', middlewares.hasBasicAccess, async (req, res) => {
-    const { discussionLink, title, shortReason, mode, isNatOnly, neutralAllowed, reasonAllowed, isContentReview, customText, agreeOverwriteText, neutralOverwriteText, disagreeOverwriteText } = req.body;
+    const { discussionLink, title, shortReason, timestamps, mode, isNatOnly, neutralAllowed, reasonAllowed, isContentReview, customText, agreeOverwriteText, neutralOverwriteText, disagreeOverwriteText } = req.body;
 
     if (discussionLink.length == 0 && isContentReview) {
         return res.json({
@@ -137,6 +138,10 @@ router.post('/submit', middlewares.hasBasicAccess, async (req, res) => {
 
         if (req.body.shortReason.length) {
             overwriteShortReason += `\n\n*${req.body.shortReason}*`;
+        }
+
+        if (timestamps.length) {
+            overwriteShortReason += `\n\n**Timestamps:**\n${timestamps}`;
         }
     }
 
@@ -216,7 +221,15 @@ router.post('/submit', middlewares.hasBasicAccess, async (req, res) => {
         );
 
         // #content-review (internal)
-        await discord.roleHighlightWebhookPost('internalContentCase', ['contentReview']);
+
+        const users = await User.find({ isActiveContentReviewer: true });
+        const discordIds = users.map(u => u.discordId).filter(d => d);
+
+        // ping in groups of 10 to not hit character limit
+        for (let i = 0; i < discordIds.length; i += 10) {
+            await util.sleep(1000);
+            await discord.userHighlightWebhookPost('internalContentCase', discordIds.slice(i, i + 10));
+        }
     }
 });
 

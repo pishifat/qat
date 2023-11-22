@@ -343,7 +343,7 @@ router.get('/findGmtActivity/:days', async (req, res) => {
 });
 
 /* POST update discord ID */
-router.post('/updateDiscordId', middlewares.isNatOrTrialNat, async (req, res) => {
+router.post('/updateDiscordId', middlewares.hasFullReadAccessOrTrialNat, async (req, res) => {
     let user;
 
     if (req.body.userId) {
@@ -429,6 +429,32 @@ router.post('/:id/toggleShowExplicitContent', async (req, res) => {
     Logger.generate(
         req.session.mongoId,
         `Toggled "${user.username}" ${user.showExplicitContent ? 'on' : 'off'} for show explicit content setting`,
+        'user',
+        user._id
+    );
+});
+
+/* POST toggle isActiveContentReviewer */
+router.post('/:id/toggleIsActiveContentReviewer', middlewares.hasFullReadAccess, async (req, res) => {
+    const user = await User.findById(req.params.id).orFail();
+
+    if (req.session.mongoId != user.id && !res.locals.userRequest.hasFullReadAccess) {
+        return res.json({
+            error: 'Unauthorized',
+        });
+    }
+
+    user.isActiveContentReviewer = !user.isActiveContentReviewer;
+    await user.save();
+
+    res.json({
+        user,
+        success: 'Toggled content review pings',
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Opted "${user.username}" ${user.showExplicitContent ? 'in' : 'out of'} content review pings`,
         'user',
         user._id
     );

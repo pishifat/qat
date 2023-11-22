@@ -14,13 +14,19 @@
             <hr>
 
             <settings-modal-languages />
+        </template>
+
+        <template v-if="loggedInUser.hasFullReadAccess">
+            <hr>
+
+            <settings-modal-content-review />
 
             <hr>
+
+            <settings-modal-discord />
         </template>
 
         <template v-if="loggedInUser.isNat">
-            <settings-modal-discord />
-
             <hr>
 
             <settings-modal-mode-evaluations />
@@ -42,6 +48,7 @@ import SettingsModalRequests from './SettingsModalRequests.vue';
 import SettingsModalLanguages from './SettingsModalLanguages.vue';
 import SettingsModalExplicit from './SettingsModalExplicit.vue';
 import SettingsModalWebhooks from './SettingsModalWebhooks.vue';
+import SettingsModalContentReview from './SettingsModalContentReview.vue';
 
 export default {
     components: {
@@ -53,6 +60,7 @@ export default {
         SettingsModalLanguages,
         SettingsModalExplicit,
         SettingsModalWebhooks,
+        SettingsModalContentReview,
     },
     computed: mapState([
         'loggedInUser',
