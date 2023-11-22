@@ -150,11 +150,6 @@ input[type=number]::-webkit-outer-spin-button {
 input[type="radio"] + .fas { cursor: pointer; }
 
 /* Unchecked */
-.osu-radio + .fa-circle:before { content: "\f111"; }
-.taiko-radio + .fa-drum:before { content: "\f569"; }
-.catch-radio + .fa-apple-alt:before { content: "\f5d1"; }
-.mania-radio + .fa-stream:before { content: "\f550"; }
-.all-radio + .fa-globe:before { content: "\f0ac"; }
 .checkmark-radio + .fa-check:before { content: "\f00c"; }
 .cross-radio + .fa-check:before { content: "\f00d"; }
 .probation-bn-radio + .fa-stream:before { content: "\f368"; }
@@ -162,26 +157,6 @@ input[type="radio"] + .fas { cursor: pointer; }
 .nat-radio + .fa-stream:before { content: "\f70c"; }
 
 /* Checked */
-.osu-radio:checked + .fa-circle:before { 
-    color: var(--info);
-    content: "\f111"; 
-}
-.taiko-radio:checked + .fa-drum:before { 
-    color: var(--info);
-    content: "\f569"; 
-}
-.catch-radio:checked + .fa-apple-alt:before { 
-    color: var(--info);
-    content: "\f5d1"; 
-}
-.mania-radio:checked + .fa-stream:before { 
-    color: var(--info);
-    content: "\f550"; 
-}
-.all-radio:checked + .fa-globe:before { 
-    color: var(--info);
-    content: "\f0ac"; 
-}
 .checkmark-radio:checked + .fa-check:before { 
     color: var(--info);
     content: "\f00c"; 
@@ -241,4 +216,76 @@ body {
 img {
     max-width: 100%;
     height: auto;
+}
+
+/* game mode icons */
+.osu-icon {
+    content: url($osu);
+    height: 1em;
+    width: 1em;
+    display: inline-flex;
+    vertical-align: -0.1em;
+}
+
+.taiko-icon {
+    content: url($taiko);
+    height: 1em;
+    width: 1em;
+    display: inline-flex;
+    vertical-align: -0.1em;
+}
+
+.catch-icon {
+    content: url($catch);
+    height: 1em;
+    width: 1em;
+    display: inline-flex;
+    vertical-align: -0.1em;
+}
+
+.mania-icon {
+    content: url($mania);
+    height: 1em;
+    width: 1em;
+    display: inline-flex;
+    vertical-align: -0.1em;
+}
+
+.mode-icon-select {
+    &:hover {
+        cursor: pointer;
+        z-index: 1;
+    } 
+}
+
+.osu-icon-check {
+    content: url($osu-check);
+    height: 1em;
+    width: 1em;
+    display: inline-flex;
+    vertical-align: -0.1em;
+}
+
+.taiko-icon-check {
+    content: url($taiko-check);
+    height: 1em;
+    width: 1em;
+    display: inline-flex;
+    vertical-align: -0.1em;
+}
+
+.catch-icon-check {
+    content: url($catch-check);
+    height: 1em;
+    width: 1em;
+    display: inline-flex;
+    vertical-align: -0.1em;
+}
+
+.mania-icon-check {
+    content: url($mania-check);
+    height: 1em;
+    width: 1em;
+    display: inline-flex;
+    vertical-align: -0.1em;
 }

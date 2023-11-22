@@ -69,7 +69,10 @@
 
                 <div class="row">
                     <div class="col-sm-12 pl-4">
-                        <mode-radio-display v-model="selectedMode" />
+                        <mode-select
+                            v-model="selectedMode"
+                            :max-selection="1"
+                        />
                     </div>
                 </div>
 
@@ -280,14 +283,14 @@
 
 <script>
 import ToastMessages from '../components/ToastMessages.vue';
-import ModeRadioDisplay from '../components/ModeRadioDisplay.vue';
+import ModeSelect from '../components/ModeSelect.vue';
 import { mapState } from 'vuex';
 
 export default {
     name: 'ApplicationSubmission',
     components: {
         ToastMessages,
-        ModeRadioDisplay,
+        ModeSelect,
     },
     data() {
         return {

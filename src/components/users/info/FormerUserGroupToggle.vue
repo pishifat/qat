@@ -3,7 +3,11 @@
         <b>
             User group:
         </b>
-        <mode-radio-display v-model="selectedMode" class="ml-1" />
+        <mode-select
+            v-model="selectedMode"
+            :max-selection="1"
+            class="ml-1"
+        />
         <button
             class="btn btn-sm btn-nat ml-1 mb-1"
             href="#"
@@ -16,12 +20,12 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import ModeRadioDisplay from './../../ModeRadioDisplay.vue';
+import ModeSelect from '../../ModeSelect.vue';
 
 export default {
     name: 'FormerUserGroupToggle',
     components: {
-        ModeRadioDisplay,
+        ModeSelect,
     },
     data() {
         return {

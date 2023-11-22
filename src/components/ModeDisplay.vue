@@ -1,14 +1,14 @@
 <template>
     <span>
-        <i v-if="modes.includes('osu')" class="far fa-circle" />
-        <i v-if="modes.includes('taiko')" class="fas fa-drum" />
-        <i v-if="modes.includes('catch')" class="fas fa-apple-alt" />
-        <i v-if="modes.includes('mania')" class="fas fa-stream" />
+        <i v-if="modes.includes('osu')" class="osu-icon" />
+        <i v-if="modes.includes('taiko')" class="taiko-icon" />
+        <i v-if="modes.includes('catch')" class="catch-icon" />
+        <i v-if="modes.includes('mania')" class="mania-icon" />
         <span v-if="showAll && (!modes || modes.includes('all'))">
-            <i class="far fa-circle" />
-            <i class="fas fa-drum" />
-            <i class="fas fa-apple-alt" />
-            <i class="fas fa-stream" />
+            <i class="osu-icon" />
+            <i class="taiko-icon" />
+            <i class="catch-icon" />
+            <i class="mania-icon" />
         </span>
     </span>
 </template>

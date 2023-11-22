@@ -6,10 +6,10 @@
                 :osu-id="osuId"
                 :username="username"
             />
-            <i v-if="mode == 'osu'" class="far fa-circle mx-1" />
-            <i v-else-if="mode == 'taiko'" class="fas fa-drum mx-1" />
-            <i v-else-if="mode == 'catch'" class="fas fa-apple-alt mx-1" />
-            <i v-else-if="mode == 'mania'" class="fas fa-stream mx-1" />
+            <i v-if="mode == 'osu'" class="osu-icon mx-1" />
+            <i v-else-if="mode == 'taiko'" class="taiko-icon mx-1" />
+            <i v-else-if="mode == 'catch'" class="catch-icon mx-1" />
+            <i v-else-if="mode == 'mania'" class="mania-icon mx-1" />
             <i
                 v-if="(!feedback || !isReviewed) && isDiscussion && !isResignation && !isNatEvaluation"
                 data-toggle="tooltip"

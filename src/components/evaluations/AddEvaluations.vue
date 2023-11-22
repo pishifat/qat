@@ -5,7 +5,11 @@
                 <div class="col-sm-12">
                     <b class="mr-4">Game mode:</b>
 
-                    <mode-radio-display v-model="selectedModes" class="ml-2" input-type="checkbox" />
+                    <mode-select
+                        v-model="selectedModes"
+                        :max-selection="4"
+                        class="ml-2"
+                    />
 
                     <p class="small text-secondary ml-2 mt-1">
                         Specify mode(s) for evaluations. Multi-mode BNs can generate multiple evaluations.
@@ -91,13 +95,13 @@
 <script>
 import { mapState } from 'vuex';
 import ModalDialog from '../ModalDialog.vue';
-import ModeRadioDisplay from '../ModeRadioDisplay.vue';
+import ModeSelect from '../ModeSelect.vue';
 
 export default {
     name: 'AddEvaluations',
     components: {
         ModalDialog,
-        ModeRadioDisplay,
+        ModeSelect,
     },
     computed: {
         ...mapState([

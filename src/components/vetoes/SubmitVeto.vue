@@ -4,82 +4,12 @@
             <!-- game mode -->
             <p>Game mode:</p>
             <div class="row ml-4">
-                <label
-                    class="mx-1"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="osu!"
-                >
-                    <input
-                        v-model="mode"
-                        type="radio"
-                        class="osu-radio hide-default"
-                        name="osu"
-                        value="osu"
-                        checked
-                    >
-                    <i class="fas fa-circle fa-lg" />
-                </label>
-                <label
-                    class="mx-1"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="osu!taiko"
-                >
-                    <input
-                        v-model="mode"
-                        type="radio"
-                        class="taiko-radio hide-default"
-                        name="taiko"
-                        value="taiko"
-                    >
-                    <i class="fas fa-drum fa-lg" />
-                </label>
-                <label
-                    class="mx-1"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="osu!catch"
-                >
-                    <input
-                        v-model="mode"
-                        type="radio"
-                        class="catch-radio hide-default"
-                        name="catch"
-                        value="catch"
-                    >
-                    <i class="fas fa-apple-alt fa-lg" />
-                </label>
-                <label
-                    class="mx-1"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="osu!mania"
-                >
-                    <input
-                        v-model="mode"
-                        type="radio"
-                        class="mania-radio hide-default"
-                        name="mania"
-                        value="mania"
-                    >
-                    <i class="fas fa-stream fa-lg" />
-                </label>
-                <label
-                    class="mx-1"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="all game modes"
-                >
-                    <input
-                        v-model="mode"
-                        type="radio"
-                        class="all-radio hide-default"
-                        name="all"
-                        value="all"
-                    >
-                    <i class="fas fa-globe fa-lg" />
-                </label>
+                <mode-select
+                    v-model="mode"
+                    :max-selection="1"
+                    :all-modes="true"
+                    class="ml-2 mb-2"
+                />
             </div>
 
 
@@ -185,12 +115,14 @@
 
 <script>
 import ModalDialog from '../ModalDialog.vue';
+import ModeSelect from '../ModeSelect.vue';
 import { mapState } from 'vuex';
 
 export default {
     name: 'SubmitVeto',
     components: {
         ModalDialog,
+        ModeSelect,
     },
     data() {
         return {
