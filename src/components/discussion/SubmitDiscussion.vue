@@ -288,7 +288,7 @@
             <small v-if="isContentReview" class="mb-3 row">If this is a video submission, you'll need to provide timestamps of the clips that need to be reviewed</small>
 
             <div v-if="isContentReview && isVideoSubmission" class="row mb-3">
-                <small class="mb-1">Timestamps</small>
+                <small class="mb-1">Timestamps:</small>
                 <textarea
                     v-model="timestamps"
                     class="form-control"
@@ -378,14 +378,14 @@ export default {
     },
     methods: {
         async submitDiscussion(e) {
-            if (!this.videoStatus.length) {
+            if (this.isContentReview && !this.videoStatus.length) {
                 return this.$store.dispatch('updateToastMessages', {
                     type: 'danger',
                     message: 'You need to specify if this is a video submission or not!',
                 });
             }
 
-            if (this.isVideoSubmission && !this.timestamps.length) {
+            if (this.isContentReview && this.isVideoSubmission && !this.timestamps.length) {
                 return this.$store.dispatch('updateToastMessages', {
                     type: 'danger',
                     message: 'You need to provide timestamps for video submissions!',
