@@ -30,6 +30,7 @@
             id="mgsite"
             class="btn btn-sm btn-primary"
             href="https://mappersguild.com/"
+            target="_blank"
             style="
                 position: fixed;
                 z-index: 1060;

@@ -19,19 +19,22 @@
                         :key="status"
                         class="badge badge-pill mx-1 text-lowercase"
                         :class="status === 'closed' ? 'badge-danger' : status === 'open' ? 'badge-success' : 'badge-primary'"
-                        v-html="$md.renderInline(formatLink(status, user.requestLink, user.osuId))"
-                    />
-                </span>
-                <span v-if="user.languages">
-                    <span
-                        v-for="language in user.languages"
-                        :key="language"
-                        class="language-tag badge badge-pill mx-1 text-lowercase badge-secondary"
-                        v-html="language"
+                        v-html="requestType(status, user.requestLink, user.osuId).html || requestType(status, user.requestLink, user.osuId).type"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        :title="requestType(status, user.requestLink, user.osuId).type"
                     />
                 </span>
             </span>
         </div>
+        <span
+            class="text-light mr-2"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="view request info"
+        >
+            <i class="fas fa-ellipsis-v" />
+        </span>
     </div>
 </template>
 
@@ -67,7 +70,6 @@ export default {
                 } else {
                     this.$router.push(`?id=${this.user.id}`);
                 }
-                //this.$router.replace(`/home?id=${this.user.id}`);
             }
         },
         /** @returns {array} */
@@ -81,21 +83,24 @@ export default {
 
             return statusList;
         },
-        /** @returns {string} */
-        formatLink(status, requestLink, osuId) {
+        /** @returns {Object} */
+        requestType(status, requestLink, osuId) {
             status = this.makeWordFromField(status);
 
+            let requestType = {
+                type: status.toLowerCase(),
+                html: null,
+            };
+
             if (status === 'Personal Queue' && requestLink) {
-                return `[mod queue](${requestLink})`;
+                requestType.html = `<a href="${requestLink}" target="_blank"><i class="fas fa-external-link-alt" /></a>`;
             } else if (status === 'Personal Queue') {
-                return `mod queue`;
-            }
-            
-            if (status === 'Game Chat') {
-                return `[chat](https://osu.ppy.sh/community/chat?sendto=${osuId})`;
+                requestType.html = `<i class="fas fa-external-link-alt" />`;
+            } else if (status === 'Game Chat') {
+                requestType.html = `<a href="https://osu.ppy.sh/community/chat?sendto=${osuId}" target="_blank"><i class="fas fa-comment" /></a>`;
             }
 
-            return status;
+            return requestType;
         },
         /** @returns {string} */
         cardDecoration(user) {

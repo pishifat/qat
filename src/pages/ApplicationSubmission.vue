@@ -324,6 +324,9 @@ export default {
         ...mapState([
             'loggedInUser',
         ]),
+        wasBn() {
+            return this.loggedInUser.history && this.loggedInUser.history.length;
+        },
         outstandingCooldowns() {
             const cooldowns = [];
 
@@ -378,9 +381,6 @@ export default {
         },
     },
     methods: {
-        wasBn() {
-            return this.loggedInUser.history && this.loggedInUser.history.length;
-        },
         async apply(e) {
             let missingLinkCount = 0;
 

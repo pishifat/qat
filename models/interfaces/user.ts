@@ -53,6 +53,7 @@ interface IUser {
     cover: string;
     requestInfo: string;
     lastOpenedForRequests: Date;
+    isActiveContentReviewer: boolean;
 
     // not used in model
     genreCount: number;

@@ -239,7 +239,7 @@
                     placeholder="link..."
                 >
             </div>
-            <div class="row mb-2">
+            <div class="row mb-3">
                 <small class="mb-1">{{ isContentReview ? 'Beatmap link and/or additional information (optional)' : `Summarize the discussion's proposed change(s)` }}</small>
                 <textarea
                     v-model="shortReason"
@@ -248,6 +248,55 @@
                     rows="3"
                 />
             </div>
+
+            <div v-if="isContentReview" class="row">
+                <p>Video submission:</p>
+                <div class="row ml-1">
+                    <label
+                        class="mx-1"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="content is NOT a video"
+                    >
+                        <input
+                            v-model="videoStatus"
+                            type="radio"
+                            class="cross-radio hide-default"
+                            name="isVideo"
+                            value="noVideo"
+                        >
+                        <i class="fas fa-times fa-lg" />
+                    </label>
+                    <label
+                        class="mx-1"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="content is a video"
+                    >
+                        <input
+                            v-model="videoStatus"
+                            type="radio"
+                            class="checkmark-radio hide-default"
+                            name="isVideo"
+                            value="isVideo"
+                        >
+                        <i class="fas fa-check fa-lg" />
+                    </label>
+                </div>
+            </div>
+
+            <small v-if="isContentReview" class="mb-3 row">If this is a video submission, you'll need to provide timestamps of the clips that need to be reviewed</small>
+
+            <div v-if="isContentReview && isVideoSubmission" class="row mb-3">
+                <small class="mb-1">Timestamps:</small>
+                <textarea
+                    v-model="timestamps"
+                    class="form-control"
+                    placeholder="timestamps..."
+                    rows="3"
+                />
+            </div>
+
             <div v-if="!isContentReview" class="row mb-3">
                 <small class="mb-1">Title for discussion vote</small>
                 <input
@@ -258,12 +307,12 @@
                 >
             </div>
 
-
             <hr>
             <button type="submit" class="btn btn-primary float-right" @click="submitDiscussion($event)">
                 Submit
             </button>
         </div>
+        <toast-messages />
     </modal-dialog>
 </template>
 
@@ -271,12 +320,14 @@
 import { mapState } from 'vuex';
 import ModalDialog from '../ModalDialog.vue';
 import ModeSelect from '../ModeSelect.vue';
+import ToastMessages from '../ToastMessages.vue';
 
 export default {
     name: 'SubmitDiscussion',
     components: {
         ModalDialog,
         ModeSelect,
+        ToastMessages,
     },
     data() {
         return {
@@ -292,6 +343,8 @@ export default {
             agreeOverwriteText: '',
             neutralOverwriteText: '',
             disagreeOverwriteText: '',
+            videoStatus: '',
+            timestamps: '',
         };
     },
     computed: {
@@ -318,15 +371,34 @@ export default {
         customTextAllowed () {
             return this.customText == 'customText';
         },
+        /** @returns {boolean} */
+        isVideoSubmission () {
+            return this.videoStatus == 'isVideo';
+        },
     },
     methods: {
         async submitDiscussion(e) {
+            if (this.isContentReview && !this.videoStatus.length) {
+                return this.$store.dispatch('updateToastMessages', {
+                    type: 'danger',
+                    message: 'You need to specify if this is a video submission or not!',
+                });
+            }
+
+            if (this.isContentReview && this.isVideoSubmission && !this.timestamps.length) {
+                return this.$store.dispatch('updateToastMessages', {
+                    type: 'danger',
+                    message: 'You need to provide timestamps for video submissions!',
+                });
+            }
+
             const data = await this.$http.executePost(
                 '/discussionVote/submit',
                 {
                     discussionLink: this.discussionLink,
                     title: this.title,
                     shortReason: this.shortReason,
+                    timestamps: this.timestamps,
                     mode: this.mode,
                     isNatOnly: this.isNatOnly,
                     neutralAllowed: this.neutralAllowed,

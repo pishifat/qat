@@ -110,6 +110,54 @@
                         </div>
                     </div>
 
+                    <div v-if="category == 'contentCaseVisual'" class="row col-sm-12">
+                        <p>Video submission:</p>
+                        <div class="row ml-1">
+                            <label
+                                class="mx-1"
+                                data-toggle="tooltip"
+                                data-placement="top"
+                                title="content is NOT a video"
+                            >
+                                <input
+                                    v-model="videoStatus"
+                                    type="radio"
+                                    class="cross-radio hide-default"
+                                    name="isVideo"
+                                    value="noVideo"
+                                >
+                                <i class="fas fa-times fa-lg" />
+                            </label>
+                            <label
+                                class="mx-1"
+                                data-toggle="tooltip"
+                                data-placement="top"
+                                title="content is a video"
+                            >
+                                <input
+                                    v-model="videoStatus"
+                                    type="radio"
+                                    class="checkmark-radio hide-default"
+                                    name="isVideo"
+                                    value="isVideo"
+                                >
+                                <i class="fas fa-check fa-lg" />
+                            </label>
+                        </div>
+                    </div>
+
+                    <small v-if="category == 'contentCaseVisual'" class="mb-3 row col-sm-12">If this is a video submission, you'll need to provide timestamps of the clips that need to be reviewed</small>
+
+                    <div v-if="category == 'contentCaseVisual' && isVideoSubmission" class="row mb-3 col-sm-12">
+                        <small class="mb-1">Timestamps:</small>
+                        <textarea
+                            v-model="timestamps"
+                            class="form-control col-sm-12"
+                            placeholder="timestamps..."
+                            rows="3"
+                        />
+                    </div>
+
                     <div class="row">
                         <div class="col-sm-12 text-center">
                             <button
@@ -151,6 +199,8 @@ export default {
             link: '',
             successInfo: '',
             category: '',
+            videoStatus: '',
+            timestamps: '',
         };
     },
     computed: {
@@ -203,12 +253,29 @@ export default {
                     return null;
             }
         },
+        isVideoSubmission () {
+            return this.videoStatus == 'isVideo';
+        },
     },
     methods: {
         async submit (e) {
+            if (this.category == 'contentCaseVisual' && !this.videoStatus.length) {
+                return this.$store.dispatch('updateToastMessages', {
+                    type: 'danger',
+                    message: 'You need to specify if this is a video submission or not!',
+                });
+            }
+
+            if (this.category == 'contentCaseVisual' && this.isVideoSubmission && !this.timestamps.length) {
+                return this.$store.dispatch('updateToastMessages', {
+                    type: 'danger',
+                    message: 'You need to provide timestamps for video submissions!',
+                });
+            }
+
             const data = await this.$http.executePost(`/reports/submitReport`, {
                 username: this.username,
-                reason: this.reason,
+                reason: this.reason.concat(this.timestamps.length ? `\n\n**Timestamps:**\n${this.timestamps}` : ''),
                 link: this.link,
                 category: this.category,
             }, e);
