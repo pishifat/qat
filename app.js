@@ -202,7 +202,7 @@ const server = app.listen(port, () => {
     if (config.enableAutomation) {
         automation.notifyDeadlines.start();
         automation.lowActivityTask.start();
-        automation.closeContentReviews.start();
+        automation.handleContentReviews.start();
         automation.checkBnEvaluationDeadlines.start();
         automation.lowActivityPerUserTask.start();
         automation.checkTenureValidity.start();

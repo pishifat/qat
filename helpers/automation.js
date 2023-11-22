@@ -388,12 +388,14 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
     scheduled: false,
 });
 
-const closeContentReviews = cron.schedule('0 9 * * *', async () => {
+const handleContentReviews = cron.schedule('0 9 * * *', async () => {
     const twoDaysAgo = new Date();
     const threeDaysAgo = new Date();
+    const sixDaysAgo = new Date();
     const sevenDaysAgo = new Date();
     threeDaysAgo.setDate(threeDaysAgo.getDate() - 2);
     threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+    sixDaysAgo.setDate(sixDaysAgo.getDate() - 6);
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
     const discussionPopulate = [
@@ -412,11 +414,34 @@ const closeContentReviews = cron.schedule('0 9 * * *', async () => {
         .populate(discussionPopulate);
 
     for (const discussion of activeContentReviews) {
+        const sixDaysOld = discussion.createdAt < sixDaysAgo;
         const sevenDaysOld = discussion.createdAt < sevenDaysAgo;
         const threeDaysOld = discussion.createdAt < threeDaysAgo;
         const inactive = discussion.updatedAt < twoDaysAgo;
 
-        if (sevenDaysOld || (threeDaysOld && inactive)) {
+        if (sixDaysOld && discussion.mediations.length < 20) {
+            let activeContentReviewers = await User.find({ isActiveContentReviewer: true });
+
+            // Create a set of mediator IDs for faster lookup
+            let mediatorIds = new Set(discussion.mediations.map(mediation => mediation.mediator.id));
+
+            // Filter out the reviewers who have already voted
+            activeContentReviewers = activeContentReviewers.filter(user => !mediatorIds.has(user.id));
+
+            await discord.webhookPost(
+                [{
+                    description: `[**${discussion.title}**](https://bn.mappersguild.com/discussions?id=${discussion.id}) is 6 days old and has less than 20 votes!`,
+                    color: discord.webhookColors.lightRed,
+                }],
+                'internalContentCase'
+            );
+
+            util.sleep(500);
+            
+            await discord.userHighlightWebhookPost('internalContentCase', activeContentReviewers.map(user => user.discordId));
+        }
+
+        else if (sevenDaysOld || (threeDaysOld && inactive && discussion.mediations.length >= 20)) {
             await Discussion.findByIdAndUpdate(discussion.id, { isActive: false });
 
             Logger.generate(
@@ -1150,4 +1175,4 @@ const spawnProbationEvaluations = cron.schedule('0 16 * * *', async () => {
     scheduled: false,
 });
 
-module.exports = { notifyDeadlines, lowActivityTask, closeContentReviews, checkBnEvaluationDeadlines, lowActivityPerUserTask, checkTenureValidity, badgeTracker, validateEvents, notifyBeatmapReports, spawnProbationEvaluations };
+module.exports = { notifyDeadlines, lowActivityTask, handleContentReviews, checkBnEvaluationDeadlines, lowActivityPerUserTask, checkTenureValidity, badgeTracker, validateEvents, notifyBeatmapReports, spawnProbationEvaluations };
