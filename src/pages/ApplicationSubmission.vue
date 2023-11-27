@@ -262,12 +262,21 @@
                     </template>
 
                     <template v-else>
+                        <div v-if="!selectedMode.length" class="alert alert-danger mx-1">
+                            <i class="fas fa-exclamation-triangle"></i>
+                                You need to select a game mode to apply for!
+                        </div>
                         <button
-                            class="btn btn-block btn-primary"
+                            v-else
+                            class="btn btn-block btn-primary d-inline-flex align-items-center justify-content-center"
                             type="button"
                             @click="apply($event)"
                         >
-                            Apply
+                            <span>Apply</span>
+                            <mode-display
+                                class="ml-1"
+                                :modes="[selectedMode]"
+                            />
                         </button>
                         <div v-if="successInfo" class="mt-2 small">
                             {{ successInfo }}
@@ -284,6 +293,7 @@
 <script>
 import ToastMessages from '../components/ToastMessages.vue';
 import ModeSelect from '../components/ModeSelect.vue';
+import ModeDisplay from '../components/ModeDisplay.vue';
 import { mapState } from 'vuex';
 
 export default {
@@ -291,6 +301,7 @@ export default {
     components: {
         ToastMessages,
         ModeSelect,
+        ModeDisplay,
     },
     data() {
         return {
@@ -301,7 +312,7 @@ export default {
             cooldownResignations: [],
             relevantResignation: null,
             cooldown: false,
-            selectedMode: 'osu',
+            selectedMode: '',
             mods: [],
             reasons: [],
             oszs: [],
