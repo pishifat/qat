@@ -253,7 +253,14 @@ router.post('/sendToContentReview/:id', async (req, res) => {
     );
 
     // #content-review (internal)
-    await discord.roleHighlightWebhookPost('internalContentCase', ['contentReview']);
+        const users = await User.find({ isActiveContentReviewer: true });
+        const discordIds = users.map(u => u.discordId).filter(d => d);
+
+        // ping in groups of 20 to not hit character limit
+        for (let i = 0; i < discordIds.length; i += 20) {
+            await util.sleep(1000);
+            await discord.userHighlightWebhookPost('internalContentCase', discordIds.slice(i, i + 20));
+        }
 });
 
 /* POST send messages */
