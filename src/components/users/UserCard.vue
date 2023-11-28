@@ -89,9 +89,12 @@ export default {
 
 .card-icons {
     border-top: 2px solid #4e514f;
-    padding-top: 2px;
+    padding-top: 0.5rem;
     margin-top: auto;
     text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .card-body {
