@@ -837,7 +837,7 @@ function badgeCommand (osuId, currentBadge, value, type) {
         value = value / 200;
     }
 
-    const natBadges = ['QAT1y.png', 'QAT2y.png', 'QAT3y.jpg', 'QAT4y.jpg', 'QAT5y.jpg'];
+    const natBadges = ['QAT1y.png', 'QAT2y.jpg', 'QAT3y.jpg', 'QAT4y.jpg', 'QAT5y.jpg'];
     const bnBadges = ['BN1y.png', 'BN2y.jpg', 'BN3y.jpg', 'BN4y.jpg', 'BN5y.jpg'];
     const nomBadges = ['noms200.png', 'noms400.png', 'noms600.png', 'noms800.png', 'noms1000.png'];
     const natTooltip = [
@@ -967,7 +967,7 @@ const badgeTracker = cron.schedule('8 18 * * *', async () => {
                     filename = 'QAT1y.png';
                     break;
                 case 1:
-                    filename = 'QAT2y.png';
+                    filename = 'QAT2y.jpg';
                     break;
                 default:
                     filename = `QAT${natYears}y.jpg`
