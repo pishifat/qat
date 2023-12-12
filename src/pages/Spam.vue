@@ -92,7 +92,7 @@
                 >
                     <b v-for="role in roles" :key="role">@{{ role }} </b>
                     <b>{{ title }}</b>
-                    <span class="small" v-html="$md.render(announcement)"></span>
+                    <span class="small v-html-content" v-html="$md.render(announcement)"></span>
                 </div>
                 <b v-if="announcement.length > 4096">TOO MANY CHARACTERS FOR DISCORD. shorten message pls</b>
                 <hr />
@@ -141,7 +141,7 @@
                     class="pre-line"
                     :class="message.length > 1024 ? 'text-danger' : 'text-secondary'"
                 >
-                    <span class="small" v-html="$md.render(message)" />
+                    <span class="small v-html-content" v-html="$md.render(message)" />
                     <b v-if="message.length > 1024">TOO MANY CHARACTERS. shorten message pls</b>
                 </div>
             </div>

@@ -16,7 +16,7 @@
                 </a>
             </p>
 
-            <div v-if="previewFeedback" class="small mb-2 card card-body" v-html="$md.render(feedback)" />
+            <div v-if="previewFeedback" class="small mb-2 card card-body v-html-content" v-html="$md.render(feedback)" />
             
             <textarea
                 v-model="feedback"

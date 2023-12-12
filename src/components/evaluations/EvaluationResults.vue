@@ -90,7 +90,7 @@
 
             <div v-if="evaluation.feedback">
                 <h5>Feedback</h5>
-                <div class="card card-body small mb-4" v-html="$md.render(evaluation.feedback)" />
+                <div class="card card-body small mb-4 v-html-content" v-html="$md.render(evaluation.feedback)" />
             </div>
 
             <div v-if="natReviews.length">

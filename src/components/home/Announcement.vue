@@ -43,7 +43,7 @@
             </div>
 
             <div v-else>
-                <span v-html="$md.render(announcement.content)" />
+                <span class="v-html-content" v-html="$md.render(announcement.content)" />
                 <button v-if="loggedInUser && loggedInUser.isNat" type="submit" class="btn btn-primary float-right" @click="isEditingContent = !isEditingContent">
                     Edit
                 </button>
