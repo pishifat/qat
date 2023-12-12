@@ -15,7 +15,6 @@ const getUserModsCount = require('../../helpers/scrap').getUserModsCount;
 const findAdditionalBnMonths = require('../../helpers/scrap').findAdditionalBnMonths;
 const util = require('../../helpers/util');
 const { BnEvaluationConsensus, BnEvaluationAddition } = require('../../shared/enums');
-const { findEvaluationsWithoutIncident } = require('../evaluations/evaluations');
 const { websocketManager } = require("../../helpers/websocket");
 
 const router = express.Router();
@@ -179,17 +178,8 @@ router.post('/resetEvaluationDeadline/:id/:mode', middlewares.isNat, async (req,
             deadline.setDate(deadline.getDate() + 37); // +37 days
         } else {
             const random90 = Math.round(Math.random() * (95 - 85) + 85); // between 85 and 95 days
-            const random180 = Math.round(Math.random() * (185 - 175) + 175); // between 185 and 175 days
-
-            const evaluationsWithoutIncident = await findEvaluationsWithoutIncident(userId);
-
-            if (evaluation.mode != 'mania' && evaluationsWithoutIncident > 1 && (!evaluation.addition || evaluation.addition !== BnEvaluationAddition.None)) {
-                deadline.setDate(deadline.getDate() + random180);
-                activityToCheck = random180;
-            } else {
-                deadline.setDate(deadline.getDate() + random90);
-                activityToCheck = random90;
-            }
+            deadline.setDate(deadline.getDate() + random90);
+            activityToCheck = random90;
         }
 
         if (pendingEvaluation) {

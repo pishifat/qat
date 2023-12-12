@@ -40,7 +40,6 @@ export default {
     mixins: [ evaluations ],
     data() {
         return {
-            evaluationsWithoutIncident: null,
             skipProbation: false,
             isEditing: false,
             newDeadlineInput: '',
@@ -62,8 +61,6 @@ export default {
 
             if (!this.skipProbation && (this.consensus == 'probationBn' || this.consensus == 'pass' || this.selectedEvaluation.addition == 'lowActivityWarning')) {
                 num = 1;
-            } else if (this.evaluationsWithoutIncident > 1 && (!this.selectedEvaluation.addition || this.selectedEvaluation.addition == 'none') && this.selectedEvaluation.mode != 'mania') {
-                num = 6;
             } else {
                 num = 3;
             }
@@ -86,10 +83,6 @@ export default {
     },
     methods: {
         async findEstimateInfo() {
-            this.evaluationsWithoutIncident = await this.$http.executeGet(
-                `/bnEval/findEvaluationsWithoutIncident/${this.selectedEvaluation.user.id}`
-            );
-
             this.skipProbation = Boolean(await this.$http.executeGet(
                 `/bnEval/findSkipProbationEligibility/${this.selectedEvaluation.user.id}/${this.selectedEvaluation.mode}`
             ));

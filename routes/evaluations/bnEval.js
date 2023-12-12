@@ -10,7 +10,7 @@ const User = require('../../models/user');
 const Aiess = require('../../models/aiess');
 const QualityAssuranceCheck = require('../../models/qualityAssuranceCheck');
 const Note = require('../../models/note');
-const { submitEval, setGroupEval, setFeedback, replaceUser, findEvaluationsWithoutIncident, findSkipProbationEligibility } = require('./evaluations');
+const { submitEval, setGroupEval, setFeedback, replaceUser, findSkipProbationEligibility } = require('./evaluations');
 const middlewares = require('../../helpers/middlewares');
 const discord = require('../../helpers/discord');
 const util = require('../../helpers/util');
@@ -499,17 +499,8 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
                 deadline.setDate(deadline.getDate() + 37); // +37 days
             } else {
                 const random90 = Math.round(Math.random() * (95 - 85) + 85); // between 85 and 95 days
-                const random180 = Math.round(Math.random() * (185 - 175) + 175); // between 185 and 175 days
-
-                const evaluationsWithoutIncident = await findEvaluationsWithoutIncident(user._id);
-
-                if (evaluation.mode != 'mania' && evaluationsWithoutIncident > 1 && (!evaluation.addition || evaluation.addition !== BnEvaluationAddition.None)) {
-                    deadline.setDate(deadline.getDate() + random180);
-                    activityToCheck = random180;
-                } else {
-                    deadline.setDate(deadline.getDate() + random90);
-                    activityToCheck = random90;
-                }
+                deadline.setDate(deadline.getDate() + random90);
+                activityToCheck = random90;
             }
 
             await user.save();
@@ -738,13 +729,6 @@ router.get('/findPreviousEvaluations/:userId', async (req, res) => {
     }
 
     res.json({ previousEvaluations });
-});
-
-/* GET estimated next evaluation date */
-router.get('/findEvaluationsWithoutIncident/:userId', async (req, res) => {
-    const evaluationsWithoutIncident = await findEvaluationsWithoutIncident(req.params.userId);
-
-    res.json(evaluationsWithoutIncident);
 });
 
 /* GET skip probation eligibility */
