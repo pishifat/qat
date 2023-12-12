@@ -287,7 +287,7 @@
                                         Archive
                                     </router-link>
                                     <router-link class="dropdown-item" to="/datacollection">
-                                        Manage SEVs
+                                        Manage Resets
                                     </router-link>
                                     <router-link class="dropdown-item" to="/yourevals">
                                         Your Evaluations

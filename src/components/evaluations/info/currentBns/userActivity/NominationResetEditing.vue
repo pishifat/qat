@@ -2,12 +2,17 @@
     <td>
         <template v-if="!editing">
             <span
-                v-if="hasData"
-                :class="calculateColor"
+                v-if="loggedInUser.isNatOrTrialNat && hasData"
+                :class="event.impact ? 'text-warning' : 'text-success'"
                 data-toggle="tooltip"
-                :title="getSeverityTooltip(event.obviousness, event.severity)"
+                :title="event.impact ? 'Notable' : 'Minor'"
             >
-                ({{ event.obviousness }}/{{ event.severity }})
+                <i class="fas fa-exclamation-triangle" v-if="event.impact" />
+                <font-awesome-icon
+                    icon="fa-solid fa-circle-check"
+                    class="text-success"
+                    v-else
+                />
             </span>
             <span v-if="loggedInUser.isNat">
                 <a href="#" @click.prevent="editing = !editing">
@@ -24,12 +29,13 @@
 
         <template v-else>
             <span
-                v-if="hasData"
-                :class="calculateColor"
+                v-if="loggedInUser.isNat && hasData"
+                :class="event.impact ? 'text-warning' : 'text-success'"
                 data-toggle="tooltip"
-                :title="getSeverityTooltip(event.obviousness, event.severity)"
+                :title="event.impact ? 'Notable' : 'Minor'"
             >
-                ({{ event.obviousness }}/{{ event.severity }})
+                <i class="fas fa-exclamation-triangle" v-if="event.impact" />
+                <i class="fas fa-check" v-else />
             </span>
             <a href="#" @click.prevent="editing = !editing">
                 <i class="fas fa-edit" />
@@ -48,9 +54,10 @@
                 Save
             </button>
 
-            <obviousness-severity
-                :obviousness="event.obviousness"
-                :severity="event.severity"
+            <hr />
+
+            <impact
+                :impact="event.impact"
                 :event-id="event._id"
                 :type="event.type"
             />
@@ -60,12 +67,12 @@
 
 <script>
 import { mapState } from 'vuex';
-import ObviousnessSeverity from '../ObviousnessSeverity.vue';
+import Impact from '../Impact.vue';
 
 export default {
     name: 'NominationResetEditing',
     components: {
-        ObviousnessSeverity,
+        Impact,
     },
     props: {
         event: {
@@ -85,18 +92,7 @@ export default {
         ]),
         /** @returns {boolean} */
         hasData () {
-            if ((this.event.obviousness || this.event.obviousness == 0) && (this.event.severity || this.event.severity == 0)) {
-                return true;
-            } else {
-                return false;
-            }
-        },
-        /** @returns {string} */
-        calculateColor () {
-            let total = this.event.obviousness + this.event.severity;
-            if (total >= 4 || this.event.obviousness == 2 || this.event.severity == 3) return 'text-danger';
-            else if (total >= 2) return 'text-neutral';
-            else return 'text-success';
+            return this.event.impact !== undefined;
         },
     },
     watch: {
@@ -113,38 +109,6 @@ export default {
                 modifiedField: 'content',
                 value: data.reason,
             });
-        },
-        getSeverityTooltip (obviousness, severity) {
-            let tooltip = '';
-
-            switch (obviousness) {
-                case 0:
-                    tooltip += 'Not obvious';
-                    break;
-                case 1:
-                    tooltip += 'Can be found with experience';
-                    break;
-                case 2:
-                    tooltip += 'Can be found at a glance';
-                    break;
-            }
-
-            switch (severity) {
-                case 0:
-                    tooltip += ' / Not severe';
-                    break;
-                case 1:
-                    tooltip += ' / Slightly detrimental to gameplay';
-                    break;
-                case 2:
-                    tooltip += ' / Noticably detrimental to gameplay';
-                    break;
-                case 3:
-                    tooltip += ' / More or less unplayable';
-                    break;
-            }
-
-            return tooltip;
         },
     },
 };

@@ -28,9 +28,10 @@
                 Save
             </button>
 
-            <obviousness-severity
-                :obviousness="selectedEvent.obviousness"
-                :severity="selectedEvent.severity"
+            <hr />
+
+            <impact
+                :impact="selectedEvent.impact"
                 :event-id="selectedEvent._id"
                 :type="selectedEvent.type"
             />
@@ -40,13 +41,13 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import ObviousnessSeverity from '../evaluations/info/currentBns/ObviousnessSeverity.vue';
+import Impact from '../evaluations/info/currentBns/Impact.vue';
 import ModalDialog from '../ModalDialog.vue';
 
 export default {
     name: 'DataCollectionInfo',
     components: {
-        ObviousnessSeverity,
+        Impact,
         ModalDialog,
     },
     data() {

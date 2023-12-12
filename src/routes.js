@@ -53,7 +53,7 @@ const routes = [
     { path: '/managereports', component: ManageReports, meta: { title: 'Manage Reports', requiresFullReadAccess: true } },
 
     // NAT
-    { path: '/datacollection', component: DataCollection, meta: { title: 'Manage SEVs', requiresNat: true } },
+    { path: '/datacollection', component: DataCollection, meta: { title: 'Manage Resets', requiresNat: true } },
     { path: '/managetest', component: ManageTest, meta: { title: 'Manage RC Test', requiresNat: true } },
     { path: '/logs', component: Logs, meta: { title: 'Logs' } },
     { path: '/spam', component: Spam, meta: { title: 'Spam', requiresNat: true } },

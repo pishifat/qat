@@ -1,5 +1,20 @@
 <template>
     <td>
+        <!-- impact -->
+        <span
+            v-if="hasData"
+            :class="event.impact ? 'text-warning' : 'text-success'"
+            data-toggle="tooltip"
+            :title="event.impact ? 'Notable' : 'Minor'"
+        >
+            <i class="fas fa-exclamation-triangle" v-if="event.impact" />
+            <font-awesome-icon
+                icon="fa-solid fa-circle-check"
+                class="text-success"
+                v-else
+            />
+        </span>
+
         <!-- edit button -->
         <a
             href="#"
@@ -10,11 +25,6 @@
         >
             <i class="fas fa-edit" />
         </a>
-
-        <!-- obviousness/severity -->
-        <span v-if="hasData" :class="calculateColor">
-            ({{ event.obviousness }}/{{ event.severity }})
-        </span>
 
         <!-- dq reason -->
         <span v-html="$md.render(event.content)" />
@@ -33,13 +43,7 @@ export default {
     computed: {
         /** @returns {boolean} */
         hasData() {
-            return (this.event.obviousness || this.event.obviousness == 0) && (this.event.severity || this.event.severity == 0);
-        },
-        calculateColor() {
-            let total = this.event.obviousness + this.event.severity;
-            if (total >= 4 || this.event.obviousness == 2 || this.event.severity == 3) return 'text-danger';
-            else if (total >= 2) return 'text-neutral';
-            else return 'text-success';
+            return this.event.impact !== undefined;
         },
     },
     methods: {

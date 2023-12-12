@@ -7,7 +7,7 @@
                 store-module="dataCollection"
             >
                 <button class="btn btn-sm btn-block btn-primary mt-2" @click="isUnsetEvents ? loadRecentEvents($event) : loadUnsetEvents($event)">
-                    {{ isUnsetEvents ? 'Load all events from the last 90 days' : 'Load events without SEV scores from the last year' }}
+                    {{ isUnsetEvents ? 'Load all events from the last 90 days' : 'Load events without an impact level from the last year' }}
                 </button>
             </filter-box>
 
