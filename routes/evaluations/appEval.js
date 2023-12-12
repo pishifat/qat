@@ -329,7 +329,7 @@ router.post('/setConsensus/:id', middlewares.isNatOrTrialNat, async (req, res) =
 
     if (req.body.consensus === AppEvaluationConsensus.Fail) {
         let date = new Date(evaluation.createdAt);
-        date.setDate(date.getDate() + 90);
+        date.setDate(date.getDate() + 60);
         evaluation.cooldownDate = date;
     }
 

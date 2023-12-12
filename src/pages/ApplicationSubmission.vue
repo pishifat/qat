@@ -43,7 +43,7 @@
                     >NAT bot</a
                 >
                 with the results. If your application is denied, you cannot
-                apply to the same game mode again for 90 days (unless otherwise
+                apply to the same game mode again for 60 days (unless otherwise
                 specified).
             </div>
         </div>
