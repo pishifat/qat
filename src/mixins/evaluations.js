@@ -32,6 +32,19 @@ export default {
                     return '';
             }
         },
+        cooldownColor () {
+            switch (this.hasCooldown) {
+                case true:
+                    return 'text-pass';
+
+                case false:
+                case undefined:
+                    return 'text-neutral';
+
+                default:
+                    return '';
+            }
+        },
         positiveConsensus () {
             return this.consensus === AppEvaluationConsensus.Pass || this.consensus === BnEvaluationConsensus.FullBn || this.consensus === ResignationConsensus.ResignedOnGoodTerms;
         },

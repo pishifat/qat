@@ -665,23 +665,34 @@ router.post('/setAddition/:id', middlewares.isNatOrTrialNat, async (req, res) =>
 });
 
 /* POST set cooldown */
-router.post('/setCooldownDate/:id', middlewares.isNatOrTrialNat, async (req, res) => {
-    let evaluation = await BnEvaluation
-        .findByIdAndUpdate(req.params.id, { cooldownDate: req.body.cooldownDate })
+router.post('/setCooldown/:id', middlewares.isNatOrTrialNat, async (req, res) => {
+    const hasCooldown = req.body.hasCooldown;
+
+    const evaluation = await BnEvaluation
+        .findByIdAndUpdate(req.params.id, {
+            hasCooldown,
+        })
         .populate(defaultPopulate);
+
+    const defaultCooldownDate = moment(evaluation.deadline).add(60, 'days').toDate();
+    const reducedCooldownDate = moment(evaluation.deadline).add(30, 'days').toDate();
+
+    evaluation.cooldownDate = hasCooldown ? reducedCooldownDate : defaultCooldownDate;
+    await evaluation.save();
 
     res.json(evaluation);
     Logger.generate(
         req.session.mongoId,
-        `Changed cooldown date to ${req.body.cooldownDate.toString().slice(0,10)} for ${evaluation.user.username}'s ${evaluation.mode} current BN evaluation`,
+        `Set cooldown to "${hasCooldown ? 'reduced' : 'none'}" (${evaluation.cooldownDate.toISOString().slice(0,10)}) for ${evaluation.user.username}'s ${evaluation.mode} current BN evaluation`,
         'bnEvaluation',
         evaluation._id
     );
+
     discord.webhookPost(
         [{
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.darkBlue,
-            description: `**${evaluation.user.username}**'s re-application date set to **${req.body.cooldownDate.toString().slice(0,10)}**`,
+            description: `Set re-apply cooldown to **"${hasCooldown ? 'reduced' : 'none'}" (${evaluation.cooldownDate.toISOString().slice(0,10)})** for [**${evaluation.user.username}**'s current BN evaluation](http://bn.mappersguild.com/bneval?id=${evaluation.id})`,
         }],
         evaluation.mode
     );
