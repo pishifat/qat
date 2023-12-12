@@ -2,6 +2,51 @@ const { default: axios } = require('axios');
 const getWebhook = require('./discord/getWebhook');
 const getRoles = require('./discord/getRoles');
 const webhookColors = require('./discord/webhookColors');
+const util = require('./util');
+
+const username = 'bnsite';
+const avatar_url = 'https://bn.mappersguild.com/images/qatlogo.png';
+
+async function errorWebhookPost(error, message, webhook) {
+    const url = getWebhook('dev');
+    if (typeof url === 'object') return url;
+
+    const fields = [
+        {
+            name: 'webhook',
+            value: `\`${webhook}\``,
+        },
+        {
+            name: 'message',
+            value: util.shorten(`\`\`\`${message instanceof Object ? JSON.stringify(message, null, 2) : message}\`\`\``, 1024),
+        },
+    ];
+
+    const embed = [{
+        author: {
+            name: username,
+            icon_url: avatar_url,
+        },
+        color: webhookColors.red,
+        title: '❌ Embed error',
+        description:
+            '```' +
+            util.shorten(error.stack, 2000) +
+            '```',
+        fields,
+        timestamp: new Date(),
+    }];
+
+    try {
+        await axios.post(url, {
+            username,
+            avatar_url,
+            embeds: embed,
+        });
+    } catch (error) {
+        // ¯\_(ツ)_/¯
+    }
+}
 
 async function webhookPost(message, webhook) {
     let url = getWebhook(webhook);
@@ -9,10 +54,12 @@ async function webhookPost(message, webhook) {
     
     try {
         await axios.post(url, {
+            username,
+            avatar_url,
             embeds: message,
         });
     } catch (error) {
-        //
+        await errorWebhookPost(error, message, webhook);
     }
 }
 
@@ -23,10 +70,12 @@ async function highlightWebhookPost(message, webhook) {
 
     try {
         await axios.post(url, {
+            username,
+            avatar_url,
             content: role + ' ' + message,
         });
     } catch (error) {
-        //
+        await errorWebhookPost(error, message, webhook);
     }
 }
 
@@ -42,10 +91,12 @@ async function userHighlightWebhookPost(webhook, discordIds, text) {
 
     try {
         await axios.post(url, {
+            username,
+            avatar_url,
             content: text,
         });
     } catch (error) {
-        //
+        await errorWebhookPost(error, text, webhook);
     }
 }
 
@@ -58,10 +109,12 @@ async function roleHighlightWebhookPost(webhook, roles, text) {
 
     try {
         await axios.post(url, {
+            username,
+            avatar_url,
             content,
         });
     } catch (error) {
-        //
+        await errorWebhookPost(error, content, webhook);
     }
 }
 
@@ -215,7 +268,7 @@ async function contentCaseWebhookPost(d) {
 }
 
 async function announcementWebhookPost(session, title, description) {
-    title = '📢 ' + title
+    title = '📢 ' + title
     const firstImage = description.match(/https?:\/\/.*\.(?:png|jpg|jpeg|gif|png)/i);
 
     // replace all image links ![](LINK) with [image](LINK)
