@@ -585,9 +585,7 @@ router.post('/setConsensus/:id', middlewares.isNatOrTrialNat, async (req, res) =
     if (req.body.consensus === BnEvaluationConsensus.RemoveFromBn || evaluation.isResignation) {
         const date = new Date();
 
-        if (req.body.consensus == ResignationConsensus.ResignedOnGoodTerms || (req.body.consensus == BnEvaluationConsensus.RemoveFromBn && evaluation.addition == BnEvaluationAddition.LowActivityWarning)) {
-            date.setDate(date.getDate() + 30);
-        } else {
+        if (req.body.consensus != ResignationConsensus.ResignedOnGoodTerms && (req.body.consensus == BnEvaluationConsensus.RemoveFromBn && evaluation.addition != BnEvaluationAddition.LowActivityWarning)) {
             date.setDate(date.getDate() + 60);
         }
 
