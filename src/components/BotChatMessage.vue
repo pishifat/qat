@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="card card-body small mb-2">
+        <div class="card card-body small mb-2 v-html-content">
             <span v-html="$md.render(message)" />
         </div>
 

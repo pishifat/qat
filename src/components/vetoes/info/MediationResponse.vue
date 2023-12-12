@@ -29,6 +29,7 @@
             </div>
             <div
                 v-else
+                class="v-html-content"
                 v-html="$md.render(mediation.comment.trim())"
             />
         </div>

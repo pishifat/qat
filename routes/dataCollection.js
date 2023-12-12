@@ -4,7 +4,7 @@ const discord = require('../helpers/discord');
 const Aiess = require('../models/aiess');
 const User = require('../models/user');
 const Logger = require('../models/log');
-const { websocketManager } = require("../helpers/websocket");
+const util = require('../helpers/util');
 
 const router = express.Router();
 
@@ -37,12 +37,7 @@ router.get('/loadUnsetEvents', middlewares.isNat, async (req, res) => {
     let data = await Aiess
         .find({
             $and: [
-                {
-                    $or: [
-                        { obviousness: null },
-                        { severity: null },
-                    ],
-                },
+                { impact: undefined },
                 {
                     $or: [
                         { type: 'disqualify' },
@@ -74,8 +69,8 @@ router.post('/toggleIsReviewed/:id', middlewares.isNatOrTrialNat, async (req, re
     Logger.generate(req.session.mongoId, `Toggled review status of s/${a.beatmapsetId} to ${a.isReviewed}`, 'dataCollection', a._id);
 });
 
-/* SEV rating webhook */
-async function sevRatingWebhook(event, req) {
+/* impact webhook */
+async function impactWebhook(event, req) {
     for (const mode of event.modes) {
         const previousEvents = await Aiess
             .find({
@@ -105,12 +100,18 @@ async function sevRatingWebhook(event, req) {
         await discord.webhookPost(
             [{
                 author: discord.defaultWebhookAuthor(req.session),
-                description: `Set **notable SEV on [nomination reset](https://osu.ppy.sh/beatmapsets/${event.beatmapsetId}/discussion/-/generalAll#/${event.discussionId})** (${y}): **${event.obviousness}/${event.severity}**`,
+                description: `Changed **impact level on [nomination reset](https://osu.ppy.sh/beatmapsets/${event.beatmapsetId}/discussion/-/generalAll#/${event.discussionId})** (${y})`,
                 color: discord.webhookColors.lightPink,
-                fields: [{
+                fields: [
+                    {
+                        name: 'Impact',
+                        value: event.impact ? '⚠️ Notable' : '✅ Minor',
+                    },
+                    {
                     name: 'Reason',
-                    value: event.content,
-                }],
+                    value: util.shorten(event.content, 1000),
+                    }
+                ],
             }],
             mode,
         );
@@ -126,81 +127,25 @@ router.post('/updateContent/:id', middlewares.isNat, async (req, res) => {
         success: 'Updated content',
     });
 
-    if ((event.obviousness || event.obviousness == 0) && (event.severity || event.severity == 0) && (event.obviousness + event.severity >= 2)) {
-        await sevRatingWebhook(event, req);
+    if (event.impact) {
+        await impactWebhook(event, req);
     }
 
     Logger.generate(req.session.mongoId, `Updated DQ reason of s/${event.beatmapsetId} to "${event.content}"`, 'dataCollection', event._id);
 });
 
-/* POST edit obviousness */
-router.post('/updateObviousness/:id', middlewares.isNat, async (req, res) => {
-    let obviousness = parseInt(req.body.obviousness);
-    let event = await Aiess.findById(req.params.id).orFail();
-
-    if (obviousness == event.obviousness) {
-        obviousness = null;
-    }
-
-    event.obviousness = obviousness;
-    await event.save();
+/* POST edit impact */
+router.post('/updateImpact/:id', middlewares.isNat, async (req, res) => {
+    let event = await Aiess.findByIdAndUpdate(req.params.id, { impact: req.body.impact }).orFail();
 
     res.json({
-        obviousness: event.obviousness,
-        success: 'Updated obviousness',
+        impact: req.body.impact,
+        success: `Changed impact to ${req.body.impact ? 'notable' : 'minor'}`,
     });
 
-    // send websocket notification if both obviousness and severity are set
-    if (event.obviousness !== null && event.severity !== null) {
-        websocketManager.sendNotification("data:sev", {
-            obviousness: event.obviousness,
-            severity: event.severity,
-            discussionId: event.discussionId,
-            content: event.content,
-            timestamp: new Date(),
-        });
-    }
+    await impactWebhook(event, req);
 
-    if ((event.obviousness || event.obviousness == 0) && (event.severity || event.severity == 0) && (event.obviousness + event.severity >= 2)) {
-        await sevRatingWebhook(event, req);
-    }
-
-    Logger.generate(req.session.mongoId, `Updated obviousness of s/${event.beatmapsetId} to "${obviousness}"`, 'dataCollection', event._id);
-});
-
-/* POST edit severity */
-router.post('/updateSeverity/:id', middlewares.isNat, async (req, res) => {
-    let severity = parseInt(req.body.severity);
-    let event = await Aiess.findById(req.params.id).orFail();
-
-    if (severity == event.severity) {
-        severity = null;
-    }
-
-    event.severity = severity;
-    await event.save();
-
-    res.json({
-        severity: event.severity,
-        success: 'Updated severity',
-    });
-
-    // send websocket notification if both obviousness and severity are set
-    if (event.obviousness !== null && event.severity !== null) {
-        websocketManager.sendNotification("data:sev", {
-            obviousness: event.obviousness,
-            severity: event.severity,
-            discussionId: event.discussionId,
-            content: event.content,
-            timestamp: new Date(),
-        });
-    }
-
-    if ((event.obviousness || event.obviousness == 0) && (event.severity || event.severity == 0) && (event.obviousness + event.severity >= 2)) {
-        await sevRatingWebhook(event, req);
-    }
-
-    Logger.generate(req.session.mongoId, `Updated severity of s/${event.beatmapsetId} to "${severity}"`, 'dataCollection', event._id);
+    Logger.generate(req.session.mongoId, `Updated impact of s/${event.beatmapsetId} to "${event.impact}"`, 'dataCollection', event._id);
 });
 
 module.exports = router;

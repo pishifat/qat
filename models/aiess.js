@@ -20,8 +20,9 @@ const aiessSchema = new mongoose.Schema({
         userRating: { type: Number },
     }],
 
-    obviousness: { type: Number, default: null },
-    severity: { type: Number, default: null },
+    obviousness: { type: Number, default: null }, // old SEV system, replaced with impact
+    severity: { type: Number, default: null }, // old SEV system, replaced with impact
+    impact: { type: Boolean },
     mapperId: { type: Number },
     mapperTotalRanked: { type: Number },
     isBnOrNat: { type: Boolean, default: false },

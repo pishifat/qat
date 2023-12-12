@@ -289,3 +289,8 @@ img {
     display: inline-flex;
     vertical-align: -0.1em;
 }
+
+/* Line break */
+.v-html-content hr {
+    border-top: 1px solid $line-break;
+}

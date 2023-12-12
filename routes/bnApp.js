@@ -20,7 +20,7 @@ router.use(middlewares.isLoggedIn);
 
 /* GET bn app page */
 router.get('/relevantInfo', async (req, res) => {
-    const sixMonthsAgo = moment().subtract(6, 'months').toDate();
+    const oneYearAgo = moment().subtract(1, 'years').toDate();
 
     let [pendingTest, resignations, cooldownApps, cooldownEvals, cooldownResignations] = await Promise.all([
         TestSubmission
@@ -33,7 +33,7 @@ router.get('/relevantInfo', async (req, res) => {
                 user: req.session.mongoId,
                 active: false,
                 consensus: ResignationConsensus.ResignedOnGoodTerms,
-                archivedAt: { $gt: sixMonthsAgo },
+                archivedAt: { $gt: oneYearAgo },
                 cooldownDate: { $lt: new Date() }
             })
             .sort({
@@ -190,7 +190,7 @@ router.post('/apply', async (req, res) => {
         return res.json({ error: 'Something went wrong! Please retry again.' });
     }
 
-    const requiredKudosu = mode == 'osu' ? 200 : 150;
+    const requiredKudosu = 150;
 
     // deny if not enough kudosu
     if (userInfo.kudosu.total < requiredKudosu) {
@@ -246,7 +246,7 @@ router.post('/rejoinApply', async (req, res) => {
         });
     }
     
-    const sixMonthsAgo = moment().subtract(6, 'months').toDate();
+    const oneYearAgo = moment().subtract(1, 'years').toDate();
 
     const [cooldownApp, cooldownEval, lastResignation] = await Promise.all([
         AppEvaluation.findOne({
@@ -269,7 +269,7 @@ router.post('/rejoinApply', async (req, res) => {
                 active: false,
                 mode,
                 consensus: ResignationConsensus.ResignedOnGoodTerms,
-                archivedAt: { $gt: sixMonthsAgo },
+                archivedAt: { $gt: oneYearAgo },
                 cooldownDate: { $lt: new Date() }
             })
             .sort({

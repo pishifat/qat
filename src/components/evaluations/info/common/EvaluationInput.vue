@@ -22,7 +22,7 @@
                 <div class="form-group">
                     <div 
                         v-if="previewModdingComment" 
-                        class="small mb-2 card card-body" 
+                        class="small mb-2 card card-body v-html-content" 
                         v-html="$md.render(moddingComment)"
                     />
                     <textarea
@@ -52,7 +52,7 @@
                 <div class="form-group">
                     <div 
                         v-if="previewBehaviorComment" 
-                        class="small mb-2 card card-body" 
+                        class="small mb-2 card card-body v-html-content" 
                         v-html="$md.render(behaviorComment)"
                     />
                     <textarea

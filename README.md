@@ -17,8 +17,8 @@ If you want to contribute, make a copy of `config.example.json` titled `config.j
 - `connection`: connection to mongodb
 - `interOpAccess`: for /interOp routes (optional)
 - `admin`: needed to work with extra site permissions
-  - pishifat: pishifat's or your own osu! user id
-  - users: users who will be granted the `isResponsibleWithButtons` permission
+  - `pishifat`: pishifat's or your own osu! user id
+  - `users`: array of users who will be granted the `isResponsibleWithButtons` permission
 
 Optionally, you can make a copy of `webhooks.example.json` titled `webhooks.json` and fill out each webhook field.
 
@@ -43,6 +43,5 @@ The project supports websocket connections for a few data outputs, which require
 ### Available events
 
 - `users:request_status_update`
-- `data:sev`
 
 If you need websocket support for other events, please open a GitHub issue and/or contact me.

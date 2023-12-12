@@ -128,7 +128,7 @@ function discordEmbeds(req, res, next) {
         { path: 'bneval', title: 'Current BN Evaluations' },
         { path: 'evalarchive', title: 'Evaluation Archives' },
         { path: 'managereports', title: 'Manage Reports' },
-        { path: 'datacollection', title: 'Manage SEVs' },
+        { path: 'datacollection', title: 'Manage Resets' },
         { path: 'managetest', title: 'Manage RC Test' },
         { path: 'logs', title: 'Logs' },
         { path: 'spam', title: 'Spam' },

@@ -37,7 +37,7 @@
                     <b>Feedback:</b>
                 </p>
 
-                <div v-if="selectedEvaluation.feedback" class="card card-body small" v-html="$md.render(selectedEvaluation.feedback)" />
+                <div v-if="selectedEvaluation.feedback" class="card card-body small v-html-content" v-html="$md.render(selectedEvaluation.feedback)" />
 
             </div>
 

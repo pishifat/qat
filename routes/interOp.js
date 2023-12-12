@@ -181,7 +181,7 @@ router.get('/eventsByDate/:date', async (req, res) => {
         })
         .populate([
             { path: 'user', select: 'username osuId' },
-            { path: 'relatedId', select: 'obviousness severity discussionId' },
+            { path: 'relatedId', select: 'impact discussionId' },
         ])
         .sort({ createdAt: -1 });
 

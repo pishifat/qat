@@ -10,7 +10,7 @@ const User = require('../../models/user');
 const Aiess = require('../../models/aiess');
 const QualityAssuranceCheck = require('../../models/qualityAssuranceCheck');
 const Note = require('../../models/note');
-const { submitEval, setGroupEval, setFeedback, replaceUser, findEvaluationsWithoutIncident, findSkipProbationEligibility } = require('./evaluations');
+const { submitEval, setGroupEval, setFeedback, replaceUser, findSkipProbationEligibility } = require('./evaluations');
 const middlewares = require('../../helpers/middlewares');
 const discord = require('../../helpers/discord');
 const util = require('../../helpers/util');
@@ -499,17 +499,8 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
                 deadline.setDate(deadline.getDate() + 37); // +37 days
             } else {
                 const random90 = Math.round(Math.random() * (95 - 85) + 85); // between 85 and 95 days
-                const random180 = Math.round(Math.random() * (185 - 175) + 175); // between 185 and 175 days
-
-                const evaluationsWithoutIncident = await findEvaluationsWithoutIncident(user._id);
-
-                if (evaluation.mode != 'mania' && evaluationsWithoutIncident > 1 && (!evaluation.addition || evaluation.addition !== BnEvaluationAddition.None)) {
-                    deadline.setDate(deadline.getDate() + random180);
-                    activityToCheck = random180;
-                } else {
-                    deadline.setDate(deadline.getDate() + random90);
-                    activityToCheck = random90;
-                }
+                deadline.setDate(deadline.getDate() + random90);
+                activityToCheck = random90;
             }
 
             await user.save();
@@ -594,9 +585,7 @@ router.post('/setConsensus/:id', middlewares.isNatOrTrialNat, async (req, res) =
     if (req.body.consensus === BnEvaluationConsensus.RemoveFromBn || evaluation.isResignation) {
         const date = new Date();
 
-        if (req.body.consensus == ResignationConsensus.ResignedOnGoodTerms || (req.body.consensus == BnEvaluationConsensus.RemoveFromBn && evaluation.addition == BnEvaluationAddition.LowActivityWarning)) {
-            date.setDate(date.getDate() + 30);
-        } else {
+        if (req.body.consensus != ResignationConsensus.ResignedOnGoodTerms && (req.body.consensus == BnEvaluationConsensus.RemoveFromBn && evaluation.addition != BnEvaluationAddition.LowActivityWarning)) {
             date.setDate(date.getDate() + 60);
         }
 
@@ -665,23 +654,34 @@ router.post('/setAddition/:id', middlewares.isNatOrTrialNat, async (req, res) =>
 });
 
 /* POST set cooldown */
-router.post('/setCooldownDate/:id', middlewares.isNatOrTrialNat, async (req, res) => {
-    let evaluation = await BnEvaluation
-        .findByIdAndUpdate(req.params.id, { cooldownDate: req.body.cooldownDate })
+router.post('/setCooldown/:id', middlewares.isNatOrTrialNat, async (req, res) => {
+    const hasCooldown = req.body.hasCooldown;
+
+    const evaluation = await BnEvaluation
+        .findByIdAndUpdate(req.params.id, {
+            hasCooldown,
+        })
         .populate(defaultPopulate);
+
+    const defaultCooldownDate = moment(evaluation.deadline).add(60, 'days').toDate();
+    const reducedCooldownDate = moment(evaluation.deadline).add(30, 'days').toDate();
+
+    evaluation.cooldownDate = hasCooldown ? reducedCooldownDate : defaultCooldownDate;
+    await evaluation.save();
 
     res.json(evaluation);
     Logger.generate(
         req.session.mongoId,
-        `Changed cooldown date to ${req.body.cooldownDate.toString().slice(0,10)} for ${evaluation.user.username}'s ${evaluation.mode} current BN evaluation`,
+        `Set cooldown to "${hasCooldown ? 'reduced' : 'none'}" (${evaluation.cooldownDate.toISOString().slice(0,10)}) for ${evaluation.user.username}'s ${evaluation.mode} current BN evaluation`,
         'bnEvaluation',
         evaluation._id
     );
+
     discord.webhookPost(
         [{
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.darkBlue,
-            description: `**${evaluation.user.username}**'s re-application date set to **${req.body.cooldownDate.toString().slice(0,10)}**`,
+            description: `Set re-apply cooldown to **"${hasCooldown ? 'reduced' : 'none'}" (${evaluation.cooldownDate.toISOString().slice(0,10)})** for [**${evaluation.user.username}**'s current BN evaluation](http://bn.mappersguild.com/bneval?id=${evaluation.id})`,
         }],
         evaluation.mode
     );
@@ -727,13 +727,6 @@ router.get('/findPreviousEvaluations/:userId', async (req, res) => {
     }
 
     res.json({ previousEvaluations });
-});
-
-/* GET estimated next evaluation date */
-router.get('/findEvaluationsWithoutIncident/:userId', async (req, res) => {
-    const evaluationsWithoutIncident = await findEvaluationsWithoutIncident(req.params.userId);
-
-    res.json(evaluationsWithoutIncident);
 });
 
 /* GET skip probation eligibility */

@@ -7,6 +7,7 @@ const baseSchema = {
     isReviewed: { type: Boolean, default: false },
     isSecurityChecked: { type: Boolean, default: false },
     feedback: { type: String },
+    hasCooldown: { type: Boolean },
     cooldownDate: { type: Date },
     natEvaluators: [{ type: 'ObjectId', ref: 'User' }],
     bnEvaluators: [{ type: 'ObjectId', ref: 'User' }],

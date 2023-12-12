@@ -329,8 +329,9 @@ router.post('/setConsensus/:id', middlewares.isNatOrTrialNat, async (req, res) =
 
     if (req.body.consensus === AppEvaluationConsensus.Fail) {
         let date = new Date(evaluation.createdAt);
-        date.setDate(date.getDate() + 90);
+        date.setDate(date.getDate() + 60);
         evaluation.cooldownDate = date;
+        evaluation.hasCooldown = false;
     }
 
     evaluation.overwriteNextEvaluationDate = null;
@@ -383,23 +384,34 @@ router.post('/setConsensus/:id', middlewares.isNatOrTrialNat, async (req, res) =
 });
 
 /* POST set cooldown */
-router.post('/setCooldownDate/:id', middlewares.isNatOrTrialNat, async (req, res) => {
+router.post('/setCooldown/:id', middlewares.isNatOrTrialNat, async (req, res) => {
+    const hasCooldown = req.body.hasCooldown;
+
     const evaluation = await AppEvaluation
-        .findByIdAndUpdate(req.params.id, { cooldownDate: req.body.cooldownDate })
+        .findByIdAndUpdate(req.params.id, {
+            hasCooldown,
+        })
         .populate(defaultPopulate);
+
+    const defaultCooldownDate = moment(evaluation.createdAt).add(60, 'days').toDate();
+    const reducedCooldownDate = moment(evaluation.createdAt).add(30, 'days').toDate();
+
+    evaluation.cooldownDate = hasCooldown ? reducedCooldownDate : defaultCooldownDate;
+    await evaluation.save();
 
     res.json(evaluation);
     Logger.generate(
         req.session.mongoId,
-        `Changed cooldown date to ${req.body.cooldownDate.toString().slice(0,10)} for ${evaluation.user.username}'s ${evaluation.mode} BN app`,
+        `Set cooldown to "${hasCooldown ? 'reduced' : 'none'}" (${evaluation.cooldownDate.toISOString().slice(0,10)}) for ${evaluation.user.username}'s ${evaluation.mode} BN app`,
         'appEvaluation',
         evaluation._id
     );
+
     discord.webhookPost(
         [{
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.darkBlue,
-            description: `Re-application date set to **${req.body.cooldownDate.toString().slice(0,10)}** from [**${evaluation.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${evaluation.id})`,
+            description: `Set re-apply cooldown to **"${hasCooldown ? 'reduced' : 'none'}" (${evaluation.cooldownDate.toISOString().slice(0,10)})** for [**${evaluation.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${evaluation.id})`,
         }],
         evaluation.mode
     );
