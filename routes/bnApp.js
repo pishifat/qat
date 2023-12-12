@@ -190,7 +190,7 @@ router.post('/apply', async (req, res) => {
         return res.json({ error: 'Something went wrong! Please retry again.' });
     }
 
-    const requiredKudosu = mode == 'osu' ? 200 : 150;
+    const requiredKudosu = 150;
 
     // deny if not enough kudosu
     if (userInfo.kudosu.total < requiredKudosu) {

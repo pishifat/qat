@@ -14,14 +14,12 @@
             <div>Requirements for joining the BN:</div>
             <ul>
                 <li>
-                    At least 200
+                    At least 150
                     <a
                         href="https://osu.ppy.sh/wiki/en/Modding/Kudosu"
                         target="_blank"
                         >kudosu</a
                     >
-                    for osu! modders or 150 kudosu for
-                    osu!taiko/osu!catch/osu!mania modders
                 </li>
                 <li>
                     A score of 12.5 or higher on the
