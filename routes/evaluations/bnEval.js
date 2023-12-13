@@ -672,7 +672,7 @@ router.post('/setCooldown/:id', middlewares.isNatOrTrialNat, async (req, res) =>
     res.json(evaluation);
     Logger.generate(
         req.session.mongoId,
-        `Set cooldown to "${hasCooldown ? 'reduced' : 'none'}" (${evaluation.cooldownDate.toISOString().slice(0,10)}) for ${evaluation.user.username}'s ${evaluation.mode} current BN evaluation`,
+        `Set cooldown to "${hasCooldown ? 'reduced' : 'standard'}" (${evaluation.cooldownDate.toISOString().slice(0,10)}) for ${evaluation.user.username}'s ${evaluation.mode} current BN evaluation`,
         'bnEvaluation',
         evaluation._id
     );
@@ -681,7 +681,7 @@ router.post('/setCooldown/:id', middlewares.isNatOrTrialNat, async (req, res) =>
         [{
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.darkBlue,
-            description: `Set re-apply cooldown to **"${hasCooldown ? 'reduced' : 'none'}" (${evaluation.cooldownDate.toISOString().slice(0,10)})** for [**${evaluation.user.username}**'s current BN evaluation](http://bn.mappersguild.com/bneval?id=${evaluation.id})`,
+            description: `Set re-apply cooldown to **"${hasCooldown ? 'reduced' : 'standard'}" (${evaluation.cooldownDate.toISOString().slice(0,10)})** for [**${evaluation.user.username}**'s current BN evaluation](http://bn.mappersguild.com/bneval?id=${evaluation.id})`,
         }],
         evaluation.mode
     );
