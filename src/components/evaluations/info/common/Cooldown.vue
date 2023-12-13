@@ -5,7 +5,7 @@
             class="mr-2 text-capitalize"
             :class="cooldownColor"
         >
-            {{ hasCooldown ? 'Reduced' : 'None' }}
+            {{ hasCooldown ? 'Reduced' : 'Standard' }}
         </span>
 
         <span v-if="selectedEvaluation.active && (loggedInUser.isNat || loggedInUser.isTrialNat)" class="btn-group">
@@ -55,7 +55,7 @@ export default {
         buttons() {
             return [
                 { hasCooldown: true, color: 'btn-success', display: 'reduced' },
-                { hasCooldown: false, color: 'btn-neutral', display: 'none' },
+                { hasCooldown: false, color: 'btn-neutral', display: 'standard' },
             ];
         },
     },
