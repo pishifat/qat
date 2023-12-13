@@ -8,6 +8,7 @@ const baseSchema = {
     isSecurityChecked: { type: Boolean, default: false },
     feedback: { type: String },
     hasCooldown: { type: Boolean },
+    cooldown: { type: String, enum: ['reduced', 'standard', 'extended'] },
     cooldownDate: { type: Date },
     natEvaluators: [{ type: 'ObjectId', ref: 'User' }],
     bnEvaluators: [{ type: 'ObjectId', ref: 'User' }],

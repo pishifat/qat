@@ -8,7 +8,7 @@ const Settings = require('../models/settings');
 const middlewares = require('../helpers/middlewares');
 const discord = require('../helpers/discord');
 const util = require('../helpers/util');
-const { AppEvaluationConsensus } = require('../shared/enums');
+const { AppEvaluationConsensus, Cooldown } = require('../shared/enums');
 
 const router = express.Router();
 
@@ -213,6 +213,7 @@ router.post('/submitTest', async (req, res) => {
         let cooldown = new Date();
         cooldown.setDate(cooldown.getDate() + 30);
 
+        currentBnApp.cooldown = Cooldown.Reduced;
         currentBnApp.cooldownDate = cooldown;
         currentBnApp.active = false;
         currentBnApp.archivedAt = new Date();

@@ -11,6 +11,7 @@ interface IEvaluationBase {
     discussion?: boolean;
     feedback?: string;
     hasCooldown?: boolean;
+    cooldown?: string;
     cooldownDate?: Date;
     natEvaluators?: IUserDocument[];
     bnEvaluators?: IUserDocument[];
