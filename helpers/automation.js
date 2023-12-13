@@ -216,14 +216,12 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
 
         let description = `[**${app.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${app.id}) `;
         let generateWebhook = true;
-        let discordIds = [];
         let color;
         let evaluators = await Settings.getModeHasTrialNat(app.mode) ? app.natEvaluators.concat(app.bnEvaluators) : app.natEvaluators;
+        let discordIds = discord.findNatEvaluatorHighlights(app.reviews, evaluators, app.discussion);
 
         if (date > deadline) {
-            discordIds = discord.findNatEvaluatorHighlights(app.reviews, evaluators, app.discussion);
             const days = findDaysAgo(app.createdAt);
-
             description += `was due ${days == 0 ? 'today!' : days == 1 ? days + ' day ago!' : days + ' days ago!'}`;
             color = discord.webhookColors.red;
         } else if (deadline < nearDeadline) {
