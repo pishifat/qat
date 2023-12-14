@@ -8,6 +8,9 @@ export default {
         additionText () {
             return this.makeWordFromField(this.addition);
         },
+        cooldownText () {
+            return this.makeWordFromField(this.cooldown);
+        },
         consensusColor () {
             switch (this.consensus) {
                 case 'pass':
@@ -33,13 +36,15 @@ export default {
             }
         },
         cooldownColor () {
-            switch (this.hasCooldown) {
-                case true:
+            switch (this.cooldown) {
+                case 'reduced':
                     return 'text-pass';
 
-                case false:
-                case undefined:
+                case 'standard':
                     return 'text-neutral';
+
+                case 'extended':
+                    return 'text-fail';
 
                 default:
                     return '';

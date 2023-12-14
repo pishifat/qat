@@ -9,9 +9,8 @@ const middlewares = require('../../helpers/middlewares');
 const util = require('../../helpers/util');
 const discord = require('../../helpers/discord');
 const osu = require('../../helpers/osu');
-const { AppEvaluationConsensus } = require('../../shared/enums');
+const { AppEvaluationConsensus, Cooldown } = require('../../shared/enums');
 const osuBot = require('../../helpers/osuBot');
-const config = require('../../config.json');
 const Settings = require('../../models/settings');
 
 const router = express.Router();
@@ -331,7 +330,7 @@ router.post('/setConsensus/:id', middlewares.isNatOrTrialNat, async (req, res) =
         let date = new Date(evaluation.createdAt);
         date.setDate(date.getDate() + 60);
         evaluation.cooldownDate = date;
-        evaluation.hasCooldown = false;
+        evaluation.cooldown = Cooldown.Standard;
     }
 
     evaluation.overwriteNextEvaluationDate = null;
@@ -385,24 +384,40 @@ router.post('/setConsensus/:id', middlewares.isNatOrTrialNat, async (req, res) =
 
 /* POST set cooldown */
 router.post('/setCooldown/:id', middlewares.isNatOrTrialNat, async (req, res) => {
-    const hasCooldown = req.body.hasCooldown;
+    const { cooldown, baseDate } = req.body;
+    let cooldownDays = 60;
+
+    switch (cooldown) {
+        case 'none':
+            cooldownDays = 0;
+            break;
+        case 'reduced':
+            cooldownDays = 30;
+            break;
+        case 'standard':
+            cooldownDays = 60;
+            break;
+        case 'extended':
+            cooldownDays = 120;
+            break;
+        default:
+            break;
+    }
+
+    const cooldownDate = moment(new Date(baseDate)).add(cooldownDays, 'days').toDate();
 
     const evaluation = await AppEvaluation
         .findByIdAndUpdate(req.params.id, {
-            hasCooldown,
+            cooldown,
+            cooldownDate
         })
         .populate(defaultPopulate);
 
-    const defaultCooldownDate = moment(evaluation.createdAt).add(60, 'days').toDate();
-    const reducedCooldownDate = moment(evaluation.createdAt).add(30, 'days').toDate();
-
-    evaluation.cooldownDate = hasCooldown ? reducedCooldownDate : defaultCooldownDate;
-    await evaluation.save();
-
     res.json(evaluation);
+
     Logger.generate(
         req.session.mongoId,
-        `Set cooldown to "${hasCooldown ? 'reduced' : 'standard'}" (${evaluation.cooldownDate.toISOString().slice(0,10)}) for ${evaluation.user.username}'s ${evaluation.mode} BN app`,
+        `Set cooldown to "${cooldown}" (${evaluation.cooldownDate.toISOString().slice(0,10)}) for ${evaluation.user.username}'s ${evaluation.mode} BN app`,
         'appEvaluation',
         evaluation._id
     );
@@ -411,7 +426,7 @@ router.post('/setCooldown/:id', middlewares.isNatOrTrialNat, async (req, res) =>
         [{
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.darkBlue,
-            description: `Set re-apply cooldown to **"${hasCooldown ? 'reduced' : 'standard'}" (${evaluation.cooldownDate.toISOString().slice(0,10)})** for [**${evaluation.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${evaluation.id})`,
+            description: `Set re-apply cooldown to **"${cooldown}" (${evaluation.cooldownDate.toISOString().slice(0,10)})** for [**${evaluation.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${evaluation.id})`,
         }],
         evaluation.mode
     );

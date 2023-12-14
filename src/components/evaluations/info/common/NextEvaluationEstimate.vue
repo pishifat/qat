@@ -83,9 +83,13 @@ export default {
     },
     methods: {
         async findEstimateInfo() {
-            this.skipProbation = Boolean(await this.$http.executeGet(
-                `/bnEval/findSkipProbationEligibility/${this.selectedEvaluation.user.id}/${this.selectedEvaluation.mode}`
-            ));
+            if (this.consensus != 'probationBn') {
+                this.skipProbation = Boolean(await this.$http.executeGet(
+                    `/bnEval/findSkipProbationEligibility/${this.selectedEvaluation.user.id}/${this.selectedEvaluation.mode}`
+                ));
+            } else {
+                this.skipProbation = false;
+            }
         },
         async overwriteEvaluationDate(e) {
             const result = await this.$http.executePost(

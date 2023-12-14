@@ -14,7 +14,7 @@ const { submitEval, setGroupEval, setFeedback, replaceUser, findSkipProbationEli
 const middlewares = require('../../helpers/middlewares');
 const discord = require('../../helpers/discord');
 const util = require('../../helpers/util');
-const { BnEvaluationConsensus, BnEvaluationAddition, ResignationConsensus } = require('../../shared/enums');
+const { BnEvaluationConsensus, BnEvaluationAddition, ResignationConsensus, Cooldown } = require('../../shared/enums');
 const osuBot = require('../../helpers/osuBot');
 const Settings = require('../../models/settings');
 const { makeWordFromField } = require('../../helpers/scrap');
@@ -587,6 +587,7 @@ router.post('/setConsensus/:id', middlewares.isNatOrTrialNat, async (req, res) =
 
         if (req.body.consensus != ResignationConsensus.ResignedOnGoodTerms && (req.body.consensus == BnEvaluationConsensus.RemoveFromBn && evaluation.addition != BnEvaluationAddition.LowActivityWarning)) {
             date.setDate(date.getDate() + 60);
+            evaluation.cooldown = Cooldown.Standard;
         }
 
         evaluation.cooldownDate = date;
@@ -625,10 +626,8 @@ router.post('/setAddition/:id', middlewares.isNatOrTrialNat, async (req, res) =>
     evaluation.overwriteNextEvaluationDate = null;
 
     if (req.body.addition == BnEvaluationAddition.LowActivityWarning) {
-        const date = new Date();
-        date.setDate(date.getDate() + 30);
-
-        evaluation.cooldownDate = date;
+        evaluation.cooldown = Cooldown.None;
+        evaluation.cooldownDate = new Date();
     }
 
     await evaluation.save();
@@ -655,24 +654,42 @@ router.post('/setAddition/:id', middlewares.isNatOrTrialNat, async (req, res) =>
 
 /* POST set cooldown */
 router.post('/setCooldown/:id', middlewares.isNatOrTrialNat, async (req, res) => {
-    const hasCooldown = req.body.hasCooldown;
+    const { cooldown, baseDate } = req.body;
+    let cooldownDays = 60;
 
-    const evaluation = await BnEvaluation
+    switch (cooldown) {
+        case 'none':
+            cooldownDays = 0;
+            break;
+        case 'reduced':
+            cooldownDays = 30;
+            break;
+        case 'standard':
+            cooldownDays = 60;
+            break;
+        case 'extended':
+            cooldownDays = 120;
+            break;
+        default:
+            break;
+    }
+
+    const cooldownDate = moment(new Date(baseDate)).add(cooldownDays, 'days').toDate();
+
+    const evaluation = await Evaluation
         .findByIdAndUpdate(req.params.id, {
-            hasCooldown,
+            cooldown,
+            cooldownDate
         })
         .populate(defaultPopulate);
 
-    const defaultCooldownDate = moment(evaluation.deadline).add(60, 'days').toDate();
-    const reducedCooldownDate = moment(evaluation.deadline).add(30, 'days').toDate();
+    const newEvaluation = await Evaluation.findById(req.params.id).populate(defaultPopulate); // i dont know why this is necessary. it's not in appeval's setCooldown despite code using the same logic. please help
 
-    evaluation.cooldownDate = hasCooldown ? reducedCooldownDate : defaultCooldownDate;
-    await evaluation.save();
+    res.json(newEvaluation);
 
-    res.json(evaluation);
     Logger.generate(
         req.session.mongoId,
-        `Set cooldown to "${hasCooldown ? 'reduced' : 'standard'}" (${evaluation.cooldownDate.toISOString().slice(0,10)}) for ${evaluation.user.username}'s ${evaluation.mode} current BN evaluation`,
+        `Set cooldown to "${cooldown}" (${evaluation.cooldownDate.toISOString().slice(0,10)}) for ${evaluation.user.username}'s ${evaluation.mode} current BN evaluation`,
         'bnEvaluation',
         evaluation._id
     );
@@ -681,7 +698,7 @@ router.post('/setCooldown/:id', middlewares.isNatOrTrialNat, async (req, res) =>
         [{
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.darkBlue,
-            description: `Set re-apply cooldown to **"${hasCooldown ? 'reduced' : 'standard'}" (${evaluation.cooldownDate.toISOString().slice(0,10)})** for [**${evaluation.user.username}**'s current BN evaluation](http://bn.mappersguild.com/bneval?id=${evaluation.id})`,
+            description: `Set re-apply cooldown to **"${cooldown}" (${evaluation.cooldownDate.toISOString().slice(0,10)})** for [**${evaluation.user.username}**'s current BN evaluation](http://bn.mappersguild.com/bneval?id=${evaluation.id})`,
         }],
         evaluation.mode
     );
