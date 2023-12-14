@@ -22,7 +22,7 @@
                     data-placement="right"
                     :title="selectedUser.lastOpenedForRequests ? this.$moment(selectedUser.lastOpenedForRequests).format('YYYY-MM-DD hh:mm:ss A') : '¯\\_(ツ)_/¯'"
                 >
-                    {{ selectedUser.lastOpenedForRequests ? this.$moment(selectedUser.lastOpenedForRequests).fromNow() : 'unknown' }}
+                    {{ calculateDateFromNow(selectedUser.lastOpenedForRequests) }}
                 </span>
             </div>
             <div class="mx-3">
@@ -76,7 +76,7 @@
                     </button>
                 </div>
                 <div v-else>
-                    <div v-if="selectedUser.requestInfo" class="card card-body small my-2">
+                    <div v-if="selectedUser.requestInfo" class="card card-body small my-2 v-html-content">
                         <span v-html="$md.render(selectedUser.requestInfo)" />
                     </div>
                     <span v-else class="small text-secondary">None...</span>
@@ -190,6 +190,21 @@ export default {
             }
 
             return status;
+        },
+        /** @returns {string} */
+        calculateDateFromNow(date) {
+            if (!date) return 'unknown';
+
+            const daysFromNow = this.$moment().diff(date, 'days');
+
+            let years = Math.floor(daysFromNow / 365);
+            let remainingDays = Math.round(daysFromNow % 365);
+
+            if (years > 0) {
+                return `${years} ${years == 1 ? 'year' : 'years'}, ${remainingDays} days ago`;
+            } else {
+                return `${remainingDays} days ago`;
+            }
         },
     }
 };
