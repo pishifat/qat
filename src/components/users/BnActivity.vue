@@ -38,6 +38,18 @@
         </div>
 
         <div v-if="bnActivity">
+            <hr />
+            <div class="small mt-2">
+                <ul>
+                    <li>
+                        Total nominations: <b>{{ totalNominations }}</b>
+                    </li>
+                    <li>
+                        Total resets: <b>{{ totalResets }}</b>
+                    </li>
+                </ul>
+            </div>
+            <hr />
             <div v-for="user in bnActivity" :key="user.username" class="small mb-1">
                 <user-link
                     :osu-id="user.osuId"
@@ -76,6 +88,8 @@ export default {
     data() {
         return {
             bnActivity: null,
+            totalNominations: null,
+            totalResets: null,
             bnDays: null,
             bnDaysDisplay: '',
             bnMode: 'osu',
@@ -90,6 +104,8 @@ export default {
             if (activity) {
                 this.bnActivity = activity;
                 this.bnDaysDisplay = this.bnDays;
+                this.totalNominations = activity.reduce((total, element) => total + element.uniqueNominations, 0);
+                this.totalResets = activity.reduce((total, element) => total + element.nominationResets, 0);
             }
         },
     },
