@@ -80,8 +80,8 @@
 
             <!-- other tools -->
             <section class="card card-body">
-                <h5>Admin tools</h5>
-                <bn-activity classs="my-2" />
+                <h5>Stats</h5>
+                <bn-activity class="my-2" />
                 <gmt-activity class="my-2" />
             </section>
         </div>
