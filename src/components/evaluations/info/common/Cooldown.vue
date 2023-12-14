@@ -5,19 +5,19 @@
             class="mr-2 text-capitalize"
             :class="cooldownColor"
         >
-            {{ hasCooldown ? 'Reduced' : 'Standard' }}
+            {{ cooldownText }}
         </span>
 
         <span v-if="selectedEvaluation.active && (loggedInUser.isNat || loggedInUser.isTrialNat)" class="btn-group">
             <button
                 v-for="button in buttons"
-                :key="button.hasCooldown"
+                :key="button.cooldown"
                 class="btn btn-sm text-capitalize"
-                :disabled="hasCooldown == button.hasCooldown"
+                :disabled="cooldown == button.cooldown"
                 :class="button.color"
-                @click="setHasCooldown(button.hasCooldown, $event);"
+                @click="setCooldown(button.cooldown, $event);"
             >
-                {{ makeWordFromField(button.display) }}
+                {{ makeWordFromField(button.cooldown) }}
             </button>
         </span>
 
@@ -48,22 +48,24 @@ export default {
             'selectedEvaluation',
         ]),
         /** @returns {string} */
-        hasCooldown () {
-            return this.selectedEvaluation.hasCooldown;
+        cooldown () {
+            return this.selectedEvaluation.cooldown;
         },
         /** @returns {Array} */
         buttons() {
             return [
-                { hasCooldown: true, color: 'btn-success', display: 'reduced' },
-                { hasCooldown: false, color: 'btn-neutral', display: 'standard' },
+                { cooldown: 'none', color: 'btn-primary' },
+                { cooldown: 'reduced', color: 'btn-success' },
+                { cooldown: 'standard', color: 'btn-neutral' },
+                { cooldown: 'extended', color: 'btn-danger' },
             ];
         },
     },
     methods: {
-        async setHasCooldown(hasCooldown, e) {
+        async setCooldown(cooldown, e) {
             const result = await this.$http.executePost(
                 `/${this.selectedEvaluation.isApplication ? 'appEval' : 'bnEval'}/setCooldown/` + this.selectedEvaluation.id,
-                { hasCooldown },
+                { cooldown, baseDate: this.selectedEvaluation.isApplication ? this.selectedEvaluation.createdAt : this.selectedEvaluation.deadline },
                 e
             );
 

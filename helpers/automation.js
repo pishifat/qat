@@ -17,7 +17,7 @@ const Discussion = require('../models/discussion');
 const Report = require('../models/report');
 const Logger = require('../models/log');
 const ResignationEvaluation = require('../models/evaluations/resignationEvaluation');
-const { BnEvaluationConsensus, BnEvaluationAddition } = require('../shared/enums');
+const { BnEvaluationConsensus, BnEvaluationAddition, Cooldown } = require('../shared/enums');
 const { makeWordFromField } = require('./scrap');
 const Settings = require('../models/settings');
 
@@ -324,7 +324,7 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
 
                     if (activityIsTooLow) {
                         round.consensus = BnEvaluationConsensus.RemoveFromBn;
-                        round.hasCooldown = false;
+                        round.cooldown = Cooldown.None;
                         round.cooldownDate = new Date();
                         round.feedback = `Hello ${round.user.username},\n\nUnfortunately, you have nominated ${uniqueNomsCount} beatmaps out of the required ${(round.mode == 'osu' || round.mode == 'taiko') ? 9 : 6} nominations in a 90-day period, which means we have to remove you from the Beatmap Nominators for not reaching the bottom line activity requirement (${(round.mode == 'osu' || round.mode == 'taiko') ? 6 : 4} nominations).\n\nYou may re-apply at any time, given that you provide 3 mods for us to evaluate. Good luck!\n\n—NAT`;
                     } else {

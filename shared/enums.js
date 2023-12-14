@@ -32,6 +32,13 @@ const BnEvaluationAddition = Object.freeze({
     None: 'none',
 });
 
+const Cooldown = Object.freeze({
+    None: 'none',
+    Reduced: 'reduced',
+    Standard: 'standard',
+    Extended: 'extended',
+});
+
 const VisualContentConsiderations = [
     { name: 'sexualMinors', text: 'sexual content involving or targeted at minors', active: true },
     { name: 'gore', text: 'excessive violence, gore, dismemberment, decapitation, or maiming', active: true },
@@ -61,6 +68,7 @@ module.exports = {
     BnEvaluationConsensus,
     ResignationConsensus,
     BnEvaluationAddition,
+    Cooldown,
     VisualContentConsiderations,
     GenrePreferences,
     LanguagePreferences,
