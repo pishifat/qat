@@ -123,7 +123,7 @@ export default {
             }
         },
         compareBadgeDuration (currentBadge, days) {
-            if ((this.yearsDuration(days) > 5) && (currentBadge === 5)) return false; // remove this line when +5 year badges are added
+            if ((this.yearsDuration(days) > 10) && (currentBadge === 10)) return false; // remove this line when +5 year badges are added
             return (currentBadge || 0) != this.yearsDuration(days);
         },
         compareNominationsBadge (currentBadge, actual) {
@@ -151,8 +151,8 @@ export default {
                 value = this.yearsDuration(value);
             }
 
-            const natBadges = ['QAT1y.png', 'QAT2y.jpg', 'QAT3y.jpg', 'QAT4y.jpg', 'QAT5y.jpg'];
-            const bnBadges = ['BN1y.png', 'BN2y.jpg', 'BN3y.jpg', 'BN4y.jpg', 'BN5y.jpg'];
+            const natBadges = ['NAT1y.png', 'NAT2y.png', 'NAT3y.png', 'NAT4y.png', 'NAT5y.png', 'NAT6y.png', 'NAT7y.png', 'NAT8y.png', 'NAT9y.png', 'NAT10y.png'];
+            const bnBadges = ['BN1y.png', 'BN2y.png', 'BN3y.png', 'BN4y.png', 'BN5y.png', 'BN6y.png', 'BN7y.png', 'BN8y.png', 'BN9y.png', 'BN10y.png'];
             const nomBadges = ['noms200.png', 'noms400.png', 'noms600.png', 'noms800.png', 'noms1000.png'];
             const natTooltip = [
                 'Longstanding contribution to the Nomination Assessment Team - 1 Year',
@@ -160,6 +160,11 @@ export default {
                 'Longstanding contribution to the Nomination Assessment Team - 3 Years',
                 'Longstanding contribution to the Nomination Assessment Team - 4 Years',
                 'Longstanding contribution to the Nomination Assessment Team - 5 Years',
+                'Longstanding contribution to the Nomination Assessment Team - 6 Years',
+                'Longstanding contribution to the Nomination Assessment Team - 7 Years',
+                'Longstanding contribution to the Nomination Assessment Team - 8 Years',
+                'Longstanding contribution to the Nomination Assessment Team - 9 Years',
+                'Longstanding contribution to the Nomination Assessment Team - 10 Years',
             ];
             const bnTooltip = [
                 'Longstanding contribution to the Beatmap Nominators - 1 Year',
@@ -167,6 +172,11 @@ export default {
                 'Longstanding contribution to the Beatmap Nominators - 3 Years',
                 'Longstanding contribution to the Beatmap Nominators - 4 Years',
                 'Longstanding contribution to the Beatmap Nominators - 5 Years',
+                'Longstanding contribution to the Beatmap Nominators - 6 Years',
+                'Longstanding contribution to the Beatmap Nominators - 7 Years',
+                'Longstanding contribution to the Beatmap Nominators - 8 Years',
+                'Longstanding contribution to the Beatmap Nominators - 9 Years',
+                'Longstanding contribution to the Beatmap Nominators - 10 Years',
             ];
             const nomTooltip = [
                 'Nominated 200+ beatmaps as a Beatmap Nominator',

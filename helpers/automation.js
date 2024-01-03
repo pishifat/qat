@@ -886,8 +886,8 @@ function badgeCommand (osuId, currentBadge, value, type) {
         value = value / 200;
     }
 
-    const natBadges = ['QAT1y.png', 'QAT2y.jpg', 'QAT3y.jpg', 'QAT4y.jpg', 'QAT5y.jpg'];
-    const bnBadges = ['BN1y.png', 'BN2y.jpg', 'BN3y.jpg', 'BN4y.jpg', 'BN5y.jpg'];
+    const natBadges = ['NAT1y.png', 'NAT2y.png', 'NAT3y.png', 'NAT4y.png', 'NAT5y.png', 'NAT6y.png', 'NAT7y.png', 'NAT8y.png', 'NAT9y.png', 'NAT10y.png'];
+    const bnBadges = ['BN1y.png', 'BN2y.png', 'BN3y.png', 'BN4y.png', 'BN5y.png', 'BN6y.png', 'BN7y.png', 'BN8y.png', 'BN9y.png', 'BN10y.png'];
     const nomBadges = ['noms200.png', 'noms400.png', 'noms600.png', 'noms800.png', 'noms1000.png'];
     const natTooltip = [
         'Longstanding contribution to the Nomination Assessment Team - 1 Year',
@@ -895,6 +895,11 @@ function badgeCommand (osuId, currentBadge, value, type) {
         'Longstanding contribution to the Nomination Assessment Team - 3 Years',
         'Longstanding contribution to the Nomination Assessment Team - 4 Years',
         'Longstanding contribution to the Nomination Assessment Team - 5 Years',
+        'Longstanding contribution to the Nomination Assessment Team - 6 Years',
+        'Longstanding contribution to the Nomination Assessment Team - 7 Years',
+        'Longstanding contribution to the Nomination Assessment Team - 8 Years',
+        'Longstanding contribution to the Nomination Assessment Team - 9 Years',
+        'Longstanding contribution to the Nomination Assessment Team - 10 Years',
     ];
     const bnTooltip = [
         'Longstanding contribution to the Beatmap Nominators - 1 Year',
@@ -902,6 +907,11 @@ function badgeCommand (osuId, currentBadge, value, type) {
         'Longstanding contribution to the Beatmap Nominators - 3 Years',
         'Longstanding contribution to the Beatmap Nominators - 4 Years',
         'Longstanding contribution to the Beatmap Nominators - 5 Years',
+        'Longstanding contribution to the Beatmap Nominators - 6 Years',
+        'Longstanding contribution to the Beatmap Nominators - 7 Years',
+        'Longstanding contribution to the Beatmap Nominators - 8 Years',
+        'Longstanding contribution to the Beatmap Nominators - 9 Years',
+        'Longstanding contribution to the Beatmap Nominators - 10 Years',
     ];
     const nomTooltip = [
         'Nominated 200+ beatmaps as a Beatmap Nominator',
@@ -959,16 +969,16 @@ const badgeTracker = cron.schedule('8 18 * * *', async () => {
             thresholdNominationCount = 1000;
         }
 
-        if (thresholdNominationCount !== user.nominationsProfileBadge*200) {
+        if (thresholdNominationCount !== user.nominationsProfileBadge * 200) {
             await discord.userHighlightWebhookPost('all', discordIds);
             await discord.webhookPost(
                 [{
                     color: discord.webhookColors.darkOrange,
-                    description: `[**${user.username}**](https://bn.mappersguild.com/users?id=${user.id}) ([osu](https://osu.ppy.sh/users/${user.osuId})) needs new nomination count badge: **${user.nominationsProfileBadge*200} → ${thresholdNominationCount}**\n` + 
+                    description: `[**${user.username}**](https://bn.mappersguild.com/users?id=${user.id}) ([osu!](https://osu.ppy.sh/users/${user.osuId})) needs new nomination count badge: **${user.nominationsProfileBadge*200} → ${thresholdNominationCount}**\n` + 
                     '`' + badgeCommand(user.osuId, user.nominationsProfileBadge, thresholdNominationCount, 'nom') + '`',
                     image: 
                         {
-                            url: `https://assets.ppy.sh/profile-badges/noms${thresholdNominationCount}.png`
+                            url: `https://assets.ppy.sh/profile-badges/noms${thresholdNominationCount}@2x.png`
                         },
                 }],
                 'all',
@@ -978,27 +988,16 @@ const badgeTracker = cron.schedule('8 18 * * *', async () => {
         // find bn badge discrepency
         const bnYears = yearsDuration(user.bnDuration + (30 * await scrap.findAdditionalBnMonths(user)));
 
-        if (bnYears <= 5 && bnYears !== user.bnProfileBadge) {
-            let filename;
-
-            switch (bnYears) {
-                case 1:
-                    filename = 'BN1y.png';
-                    break;
-                default:
-                    filename = `BN${bnYears}y.jpg`
-                    break;
-            }
-
+        if (bnYears <= 10 && bnYears !== user.bnProfileBadge) {
             await discord.userHighlightWebhookPost('all', discordIds);
             await discord.webhookPost(
                 [{
                     color: discord.webhookColors.darkOrange,
-                    description: `[**${user.username}**](https://bn.mappersguild.com/users?id=${user.id}) ([osu](https://osu.ppy.sh/users/${user.osuId})) needs new BN badge: **${user.bnProfileBadge} → ${bnYears}**\n` + 
+                    description: `[**${user.username}**](https://bn.mappersguild.com/users?id=${user.id}) ([osu!](https://osu.ppy.sh/users/${user.osuId})) needs new BN badge: **${user.bnProfileBadge} → ${bnYears}**\n` + 
                     '`' + badgeCommand(user.osuId, user.bnProfileBadge, bnYears, 'bn') + '`',
                     image: 
                         {
-                            url: `https://assets.ppy.sh/profile-badges/${filename}`
+                            url: `https://assets.ppy.sh/profile-badges/BN${bnYears}y@2x.png`
                         },
                 }],
                 'all',
@@ -1008,30 +1007,16 @@ const badgeTracker = cron.schedule('8 18 * * *', async () => {
         // find nat badge discrepency
         const natYears = yearsDuration(user.natDuration);
 
-        if (natYears <= 5 && natYears !== user.natProfileBadge) {
-            let filename;
-
-            switch (natYears) {
-                case 1:
-                    filename = 'QAT1y.png';
-                    break;
-                case 1:
-                    filename = 'QAT2y.jpg';
-                    break;
-                default:
-                    filename = `QAT${natYears}y.jpg`
-                    break;
-            }
-    
+        if (natYears <= 10 && natYears !== user.natProfileBadge) {
             await discord.userHighlightWebhookPost('all', discordIds);
             await discord.webhookPost(
                 [{
                     color: discord.webhookColors.darkOrange,
-                    description: `[**${user.username}**](https://bn.mappersguild.com/users?id=${user.id}) ([osu](https://osu.ppy.sh/users/${user.osuId})) needs new NAT badge: **${user.natProfileBadge} → ${natYears}** \n` + 
+                    description: `[**${user.username}**](https://bn.mappersguild.com/users?id=${user.id}) ([osu!](https://osu.ppy.sh/users/${user.osuId})) needs new NAT badge: **${user.natProfileBadge} → ${natYears}** \n` + 
                     '`' + badgeCommand(user.osuId, user.natProfileBadge, natYears, 'nat') + '`',
                     image: 
                         {
-                            url: `https://assets.ppy.sh/profile-badges/${filename}`
+                            url: `https://assets.ppy.sh/profile-badges/NAT${natYears}y@2x.png`
                         },
                 }],
                 'all',
