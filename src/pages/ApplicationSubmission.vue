@@ -227,7 +227,7 @@
 
             <div class="row">
                 <div class="col-sm-12 text-center">
-                    <template v-if="relevantResignation">
+                    <template v-if="relevantResignation && !outstandingCooldowns.length">
                         <button
                             v-if="!successInfo"
                             class="btn btn-block btn-success"
@@ -327,6 +327,7 @@ export default {
             this.cooldownEvals = data.cooldownEvals;
             this.cooldownResignations = data.cooldownResignations;
         }
+
         this.relevantResignation = [...this.resignations].find(r => r.mode == this.selectedMode);
     },
     computed: {
