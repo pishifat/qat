@@ -74,11 +74,9 @@
                     </div>
                 </div>
 
-                
-
                 <hr />
 
-                <div v-if="!relevantResignation">
+                <div v-if="!relevantResignation || recentlyRemovedForLowActivity">
                     <div class="row mb-2">
                         <div class="col-sm-12">
                             <h4>Example mods</h4>
@@ -227,7 +225,7 @@
 
             <div class="row">
                 <div class="col-sm-12 text-center">
-                    <template v-if="relevantResignation && !outstandingCooldowns.length">
+                    <template v-if="relevantResignation && !outstandingCooldowns.length && !recentlyRemovedForLowActivity">
                         <button
                             v-if="!successInfo"
                             class="btn btn-block btn-success"
@@ -308,6 +306,7 @@ export default {
             cooldownApps: [],
             cooldownEvals: [],
             cooldownResignations: [],
+            recentlyRemovedForLowActivity: false,
             relevantResignation: null,
             cooldown: false,
             selectedMode: '',
@@ -326,6 +325,7 @@ export default {
             this.cooldownApps = data.cooldownApps;
             this.cooldownEvals = data.cooldownEvals;
             this.cooldownResignations = data.cooldownResignations;
+            this.recentlyRemovedForLowActivity = data.recentlyRemovedForLowActivity;
         }
 
         this.relevantResignation = [...this.resignations].find(r => r.mode == this.selectedMode);

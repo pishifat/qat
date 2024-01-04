@@ -22,7 +22,7 @@ router.use(middlewares.isLoggedIn);
 router.get('/relevantInfo', async (req, res) => {
     const oneYearAgo = moment().subtract(1, 'years').toDate();
 
-    let [pendingTest, resignations, cooldownApps, cooldownEvals, cooldownResignations] = await Promise.all([
+    let [pendingTest, resignations, cooldownApps, cooldownEvals, cooldownResignations, lowActivityRemoval, lastRemoval] = await Promise.all([
         TestSubmission
             .findOne({
                 applicant: req.session.mongoId,
@@ -56,7 +56,26 @@ router.get('/relevantInfo', async (req, res) => {
             active: false,
             cooldownDate: { $gt: new Date() }
         }),
+        BnEvaluation
+            .findOne({
+                user: req.session.mongoId,
+                consensus: 'removeFromBn',
+                addition: 'lowActivityWarning',
+            })
+            .sort({ archivedAt: -1 }),
+        BnEvaluation
+            .findOne({
+                user: req.session.mongoId,
+                consensus: 'removeFromBn',
+            })
+            .sort({ archivedAt: -1 }),
     ]);
+
+    let recentlyRemovedForLowActivity;
+
+    if (lowActivityRemoval && lastRemoval && lowActivityRemoval.id == lastRemoval.id) {
+        recentlyRemovedForLowActivity = true;
+    }
 
     res.json({
         hasPendingTest: Boolean(pendingTest),
@@ -64,6 +83,7 @@ router.get('/relevantInfo', async (req, res) => {
         cooldownApps,
         cooldownEvals,
         cooldownResignations,
+        recentlyRemovedForLowActivity,
     });
 });
 
