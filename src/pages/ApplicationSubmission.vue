@@ -238,7 +238,7 @@
                             {{ successInfo }}    
                         </p>
                         <p class="small mt-2">
-                            This option is available until {{ this.$moment(relevantResignation.archivedAt).add(6, 'months').format('YYYY-MM-DD') }} because you recently resigned from the {{ relevantResignation.mode == 'osu' ? 'osu!' : 'osu!' + relevantResignation.mode }} Beatmap Nominators.
+                            This option is available until {{ this.$moment(relevantResignation.archivedAt).add(1, 'years').format('YYYY-MM-DD') }} because you recently resigned from the {{ relevantResignation.mode == 'osu' ? 'osu!' : 'osu!' + relevantResignation.mode }} Beatmap Nominators.
                         </p>
                         <p class="small mt-2">
                             You will not need to take the Ranking Criteria test. The NAT will review for any potential concerns and re-admit you to the Beatmap Nominators if everything is okay!
