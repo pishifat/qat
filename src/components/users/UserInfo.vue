@@ -67,6 +67,8 @@
             <div v-if="loggedInUser.isNat && !selectedUser.isBnOrNat">
                 <ban-toggle />
 
+                <content-review-toggle />
+
                 <former-user-group-toggle />
             </div>
 
@@ -106,6 +108,7 @@ import UserActivity from '../evaluations/info/currentBns/userActivity/UserActivi
 import Resign from './info/Resign.vue';
 import BanToggle from './info/BanToggle.vue';
 import Badges from './Badges.vue';
+import ContentReviewToggle from './info/ContentReviewToggle.vue';
 import ModalDialog from '../ModalDialog.vue';
 
 export default {
@@ -127,6 +130,7 @@ export default {
         BanToggle,
         ModalDialog,
         Badges,
+        ContentReviewToggle,
     },
     computed: {
         ...mapState([

@@ -237,6 +237,14 @@ router.get('/callback', async (req, res) => {
                 );
             }
 
+            // toggle isActiveContentReviewer to false if user is not in gmt or nat
+            if (!groups.includes('gmt') && !groups.includes('nat')) {
+                if (user.isActiveContentReviewer) {
+                    user.isActiveContentReviewer = false;
+                    await user.save();
+                }
+            }
+
             // ensure correct groups for debugging users after re-log
             if (user.isPishifat && !user.modesInfo.length) {
                 const modesInfo = [];
