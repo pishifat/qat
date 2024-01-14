@@ -200,7 +200,7 @@ export default {
                     message += `\n\n`;
 
                     if (this.selectedEvaluation.isResignation && this.positiveConsensus) {
-                        message += `You may also instantly re-join the BN any time within the next 6 months (no test or application required!) :)`;
+                        message += `You may also instantly re-join the BN any time within the next 12 months (no test or application required!) :)`;
                         message += `\n\n`;
                     }
 
