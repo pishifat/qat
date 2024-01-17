@@ -11,7 +11,7 @@ const getGeneralEvents = require('./evaluations/bnEval').getGeneralEvents;
 const { BnEvaluationConsensus } = require('../shared/enums');
 const middlewares = require('../helpers/middlewares');
 const BnEvaluation = require('../models/evaluations/bnEvaluation');
-const ResignationEvaluation = require('../models/evaluations/resignationEvaluation');
+const Discussion = require('../models/discussion');
 
 const router = express.Router();
 
@@ -507,6 +507,31 @@ router.get('/previouslyAssignedEvaluations/:osuId/:days', middlewares.hasPrivate
         previouslyAssignedApps: previouslyAssignedApps,
         previouslyAssignedEvaluations: previouslyAssignedEvaluations,
     });
+});
+
+/* GET content review */
+router.get('/contentReview/:limit', async (req, res) => {
+    let limit = parseInt(req.params.limit);
+
+    if (isNaN(limit)) {
+        return res.status(404).send('Invalid limit');
+    }
+
+    if (limit > 100) {
+        limit = 100;
+    }
+    res.json(
+        await Discussion
+            .find({
+                isNatOnly: false,
+                mode: 'all',
+                discussionLink: { $exists: true },
+                title: { $regex: 'Content review' },
+            })
+            .limit(limit)
+            .select('discussionLink shortReason title')
+            .sort({ createdAt: -1 }),
+    );
 });
 
 module.exports = router;
