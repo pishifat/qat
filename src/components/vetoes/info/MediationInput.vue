@@ -15,6 +15,7 @@
                 class="form-control mb-2"
                 placeholder="Why you agree/disagree with the above veto reason..."
                 rows="3"
+                @change="updateLocalStorage(i, input.comments[i])"
             />
 
             <div class="d-flex justify-content-end mb-2">
@@ -119,6 +120,10 @@ export default {
                             this.input.comments[i] = mediation.comment;
                             this.vote.votes[i] = mediation.vote;
                             this.mediation.mediationIds[i] = mediation.id;
+                        } else {
+                            if (window.localStorage.getItem(this.selectedVeto.id + i.toString())) {
+                                this.input.comments[i] = window.localStorage.getItem(this.selectedVeto.id + i.toString());
+                            }
                         }
                     }
                 }
@@ -138,6 +143,9 @@ export default {
             if (this.$http.isValid(data)) {
                 this.$store.commit('vetoes/updateVeto', data.veto);
             }
+        },
+        updateLocalStorage(index, text) {
+            window.localStorage.setItem(this.selectedVeto.id + index.toString(), text);
         },
     },
 };
