@@ -29,7 +29,10 @@
                             Visual Content Considerations violation
                         </option>
                         <option value="behavior">
-                            Inappropriate behavior from a BN
+                            Inappropriate behavior from a BN member
+                        </option>
+                        <option value="nat">
+                            Inappropriate behavior from a NAT or GMT member
                         </option>
                         <option value="beatmap">
                             Beatmap
@@ -56,9 +59,12 @@
                     If a beatmap you created is stolen and you want it removed from the beatmap listing, send notice to <code>copyright@ppy.sh</code> from as per osu!'s <a href="https://osu.ppy.sh/legal/Copyright" target="_blank">copyright policy</a>. Your notice should come from the email address linked to your osu! account.
                 </div>
 
-                <hr>
+                <div v-if="category == 'nat'">
+                    Send your report to <code>support@ppy.sh</code> as per osu!'s <a href="https://osu.ppy.sh/wiki/Reporting_bad_behaviour" target="_blank">reporting bad behaviour policy</a>.
+                </div>
 
-                <div>
+                <div v-if="category != 'nat'">
+                    <hr>
                     <div class="row mb-2">
                         <div class="col-sm-12">
                             <h4>{{ primaryLinkHeader }}</h4>
