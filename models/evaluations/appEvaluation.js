@@ -10,6 +10,7 @@ const appEvaluationSchema = new mongoose.Schema({
     test: { type: 'ObjectId', ref: 'TestSubmission' },
     isRejoinRequest: { type: Boolean },
     natBuddy: { type: 'ObjectId', ref: 'User' },
+    vibeChecks: [{ type: 'ObjectId', ref: 'Mediation' }],
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 class AppEvaluationService extends mongoose.Model {

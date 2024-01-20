@@ -2,6 +2,7 @@ import { Document, Model } from 'mongoose'
 import { IUserDocument } from './user';
 import { ITestSubmissionDocument } from './testSubmission';
 import { IReviewDocument } from './review';
+import { IMediationDocument } from './mediation';
 
 interface IEvaluationBase {
     user: IUserDocument;
@@ -29,6 +30,7 @@ interface IEvaluationBase {
         daysOverdue: number;
     }[];
     overwriteNextEvaluationDate?: Date;
+    vibeChecks?: IMediationDocument[];
 }
 
 export interface IAppEvaluationDocument extends IEvaluationBase, Document {

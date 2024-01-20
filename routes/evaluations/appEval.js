@@ -12,6 +12,7 @@ const osu = require('../../helpers/osu');
 const { AppEvaluationConsensus, Cooldown } = require('../../shared/enums');
 const osuBot = require('../../helpers/osuBot');
 const Settings = require('../../models/settings');
+const Mediation = require('../../models/mediation');
 
 const router = express.Router();
 
@@ -25,6 +26,14 @@ const defaultPopulate = [
     { path: 'bnEvaluators', select: 'username osuId discordId isBnEvaluator' },
     { path: 'natEvaluators', select: 'username osuId discordId isBnEvaluator' },
     { path: 'test', select: 'totalScore comment' },
+    { 
+        path: 'vibeChecks',
+        select: 'mediator vote',
+        populate: {
+            path: 'mediator',
+            select: 'username osuId groups',
+        },
+    },
     {
         path: 'reviews',
         select: 'evaluator behaviorComment moddingComment vote',
@@ -40,6 +49,14 @@ function getActiveBnDefaultPopulate(mongoId) {
     return [
         { path: 'user', select: 'username osuId' },
         { path: 'test', select: 'comment totalScore' },
+        { 
+            path: 'vibeChecks',
+            select: 'mediator vote',
+            populate: {
+                path: 'mediator',
+                select: 'username osuId groups',
+            },
+        },
         {
             path: 'reviews',
             select: 'behaviorComment moddingComment vote',
@@ -776,6 +793,39 @@ router.post('/assignNatBuddy/:appId/:userId', middlewares.isNat, async (req, res
         `Assigned "${nat.username}" as NAT buddy on ${app.user.username}'s BN app`,
         'appEvaluation',
         app._id
+    );
+});
+
+/* POST submit or edit eval */
+router.post('/submitVibeCheck/:id', middlewares.isBnOrNat, async (req, res) => {
+    let evaluation = await AppEvaluation
+        .findOne({
+            _id: req.params.id,
+            active: true,
+        })
+        .populate(defaultPopulate)
+        .orFail();
+
+    const mediation = new Mediation();
+    mediation.mediator = req.session.mongoId;
+    mediation.vote = req.body.vote;
+    await mediation.save();
+
+    evaluation.vibeChecks.push(mediation);
+    await evaluation.save();
+
+    evaluation = await AppEvaluation
+        .findById(req.params.id)
+        .populate(defaultPopulate)
+        .orFail();
+
+    res.json(evaluation);
+
+    Logger.generate(
+        req.session.mongoId,
+        `Submitted vibe check for ${evaluation.mode} BN app evaluation for "${evaluation.user.username}"`,
+        'appEvaluation',
+        evaluation._id
     );
 });
 
