@@ -485,7 +485,7 @@ router.post('/:id/updateRequestStatus', middlewares.isBnOrNat, async (req, res) 
 
     Logger.generate(
         req.session.mongoId,
-        `Updated "${user.username}" status to ${user.requestStatus} (${user.requestLink || 'No link'})`,
+        `Updated "${user.username}" status to ${user.requestStatus} (${req.body.requestStatus.includes("closed") ? "closed" : "open"}) (${user.requestLink || 'No link'})`,
         'user',
         user._id
     );
