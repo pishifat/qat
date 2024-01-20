@@ -17,7 +17,7 @@
                 <b>Pre-evaluation:</b>
                 <div class="small ml-4">Based on what you currently know about this user, would you pass or fail their application?</div>
                 <div class="small ml-4">Feel free to look at the <a :href="`https://osu.ppy.sh/users/${this.selectedEvaluation.user.osuId}`" target="_blank">user's profile</a>, but do not research their mods yet.</div>
-                <div class="small ml-4 mt-2">Your vote will not be shown to the applicant.</div>
+                <div class="small ml-4 mt-2">Your vote will not be shown to the applicant (or anyone else). This only exists to gather fun stats.</div>
                 <div class="form-inline justify-content-end">
                     <div class="form-check form-check-inline">
                         <input
