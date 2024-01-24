@@ -12,6 +12,7 @@ const router = express.Router();
 
 router.use(middlewares.isLoggedIn);
 router.use(middlewares.isNatOrTrialNat);
+router.use(middlewares.isResponsibleWithButtons);
 
 //population
 const defaultAppPopulate = [
