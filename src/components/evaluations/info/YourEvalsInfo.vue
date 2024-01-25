@@ -43,7 +43,9 @@
 
             <div v-if="loggedInUser && loggedInUser.isNat">
                 <hr>
-                <reviews-listing />
+                <reviews-listing 
+                    v-if="loggedInUser.isNatLeader || !['remainInNat', 'moveToBn', 'removeFromNat'].includes(selectedEvaluation.consensus)"
+                />
             </div>
 
         </div>
