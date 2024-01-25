@@ -44,7 +44,7 @@
             <hr>
 
             <reviews-listing 
-                v-if="loggedInUser.isNatLeader || !selectedEvaluation.selfSummary"
+                v-if="loggedInUser.isNatLeader || !['remainInNat', 'moveToBn', 'removeFromNat'].includes(selectedEvaluation.consensus)"
             />
 
             <button
