@@ -63,7 +63,7 @@
 
         <div class="card card-body">
             <div v-if="!hasPendingTest">
-                <h4>Game-mode</h4>
+                <h4>Game mode</h4>
 
                 <div class="row">
                     <div class="col-sm-12 pl-4">
