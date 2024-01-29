@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div :key="mongoId">
         <p class="font-weight-bold form-inline">
             <span>User activity:</span>
             <input
@@ -18,44 +18,54 @@
             </a>
         </p>
 
+        <p v-if="modes.length > 1" class="font-weight-bold form-inline">
+            Game mode:
+                <mode-select 
+                class="ml-2"
+                v-model="selectedMode"
+                :max-selection="1"
+                :modes-filter="modes"
+            />
+        </p>
+
         <div class="container mb-3">
             <div>Nominations</div>
             <events-list
-                :events="nominations"
+                :events="filterEvents(nominations, selectedMode)"
                 :events-id="'uniqueNominations'"
                 :header="'Unique nominations'"
                 :osu-id="osuId"
                 :is-evaluation="isEvaluation"
             />
             <nomination-resets
-                :events="nominationsDisqualified"
+                :events="filterEvents(nominationsDisqualified, selectedMode)"
                 :events-id="'nominationsDisqualified'"
                 :header="'Nominations disqualified'"
             />
             <nomination-resets
-                :events="nominationsPopped"
+                :events="filterEvents(nominationsPopped, selectedMode)"
                 :events-id="'nominationsPopped'"
                 :header="'Nominations popped'"
             />
             <nomination-resets
-                :events="disqualifications"
+                :events="filterEvents(disqualifications, selectedMode)"
                 :events-id="'disqualificationsByUser'"
                 :header="'Disqualifications done by user'"
             />
             <nomination-resets
-                :events="pops"
+                :events="filterEvents(pops, selectedMode)"
                 :events-id="'popsByUser'"
                 :header="'Pops done by user'"
             />
             <div class="mt-2">Quality Assurance</div>
             <events-list
-                :events="qualityAssuranceChecks"
+                :events="filterEvents(qualityAssuranceChecks, selectedMode)"
                 :events-id="'qualityAssuranceChecks'"
                 :header="'Quality Assurance Checks'"
                 :osu-id="osuId"
             />
             <nomination-resets
-                :events="disqualifiedQualityAssuranceChecks"
+                :events="filterEvents(disqualifiedQualityAssuranceChecks, selectedMode)"
                 :events-id="'disqualifiedQualityAssuranceChecks'"
                 :header="'Disqualified Quality Assurance Checks'"
             />
@@ -143,6 +153,7 @@ import EvaluationList from './EvaluationList.vue';
 import PublicEvaluationList from './PublicEvaluationList.vue';
 import PreviousEvaluations from './PreviousEvaluations.vue';
 import Reports from './Reports.vue';
+import ModeSelect from '../../../../ModeSelect.vue';
 
 export default {
     name: 'UserActivity',
@@ -153,6 +164,7 @@ export default {
         PublicEvaluationList,
         PreviousEvaluations,
         Reports,
+        ModeSelect,
     },
     props: {
         modes: {
@@ -196,6 +208,7 @@ export default {
         return {
             daysInput: this.overwriteDays,
             editingDaysInput: false,
+            selectedMode: null,
         };
     },
     computed: {
@@ -216,11 +229,13 @@ export default {
     watch: {
         unique() {
             this.daysInput = this.overwriteDays;
+            this.selectedMode = null;
             this.findRelevantActivity();
         },
     },
     created() {
         this.daysInput = this.overwriteDays;
+        this.selectedMode = null;
         this.findRelevantActivity();
     },
     methods: {
@@ -230,6 +245,17 @@ export default {
             }
 
             this.editingDaysInput = !this.editingDaysInput;
+        },
+        filterEvents (events, mode) {
+            if (!mode) return events;
+
+            return events.filter(event => {
+                if (this.eventsId == 'qualityAssuranceChecks') {
+                    return event.event.modes.includes(mode);
+                } else {
+                    return event.modes.includes(mode);
+                }
+            });
         },
         async findRelevantActivity() {
             this.$store.commit('activity/setIsLoading', true);

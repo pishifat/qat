@@ -12,21 +12,23 @@
                 <font-awesome-icon icon="fa-solid fa-circle-check" class="text-success"/>
                 Minor
             </span>
+            <span class="ml-2 btn-group">
+                <button 
+                    class="btn btn-sm btn-warning"
+                    @click.prevent="updateImpact(true)"
+                    :disabled="impact === true"
+                >
+                    Notable
+                </button>
+                <button 
+                    class="btn btn-sm btn-success"
+                    @click.prevent="updateImpact(false)"
+                    :disabled="impact === false"
+                >
+                    Minor
+                </button>
+            </span>
         </p>
-        <button 
-            class="btn btn-sm btn-warning"
-            @click.prevent="updateImpact(true)"
-        >
-            <i class="fas fa-exclamation-triangle mr-1"></i>
-            Mark as notable
-        </button>
-        <button 
-            class="btn btn-sm btn-success"
-            @click.prevent="updateImpact(false)"
-        >
-        <font-awesome-icon icon="fa-solid fa-circle-check" class="mr-1"/>
-            Mark as minor
-        </button>
     </div>
 </template>
 

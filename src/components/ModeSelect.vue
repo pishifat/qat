@@ -1,33 +1,58 @@
 <template>
     <div class="d-inline-flex align-items-center">
-        <i
-            :class="osuCheck ? 'osu-icon-check' : 'osu-icon'"
-            class="mode-icon-select fa-xl mr-1"
-            @click="osuCheck = !osuCheck, updateSelectedMode('osu')"
-        />
-        <i
-            :class="taikoCheck ? 'taiko-icon-check' : 'taiko-icon'"
-            class="mode-icon-select fa-xl mr-1"
-            @click="taikoCheck = !taikoCheck, updateSelectedMode('taiko')"
-        />
-        <i
-            :class="catchCheck ? 'catch-icon-check' : 'catch-icon'"
-            class="mode-icon-select fa-xl mr-1"
-            @click="catchCheck = !catchCheck, updateSelectedMode('catch')"
-        />
-        <i
-            :class="maniaCheck ? 'mania-icon-check' : 'mania-icon'"
-            class="mode-icon-select fa-xl mr-1"
-            @click="maniaCheck = !maniaCheck, updateSelectedMode('mania')"
-        />
-        <b
-            v-if="allModes"
-            :class="allModesCheck ? 'text-info' : ''"
-            class="mode-icon-select"
-            @click="allModesCheck = !allModesCheck, updateSelectedMode('all')"
+        <span 
+            v-if="!modesFilter || modesFilter && modesFilter.includes('osu')" 
+            data-toggle="tooltip" 
+            title="osu!"
         >
-            all modes
-        </b>
+            <i
+                :class="osuCheck ? 'osu-icon-check' : 'osu-icon'"
+                class="mode-icon-select fa-xl mr-1"
+                
+                @click="osuCheck = !osuCheck, updateSelectedMode('osu')"
+            />
+        </span>
+        <span 
+            v-if="!modesFilter || modesFilter && modesFilter.includes('taiko')" 
+            data-toggle="tooltip" 
+            title="osu!taiko"
+        >
+            <i
+                :class="taikoCheck ? 'taiko-icon-check' : 'taiko-icon'"
+                class="mode-icon-select fa-xl mr-1"
+                @click="taikoCheck = !taikoCheck, updateSelectedMode('taiko')"
+            />
+        </span>
+        <span 
+            v-if="!modesFilter || modesFilter && modesFilter.includes('catch')" 
+            data-toggle="tooltip" 
+            title="osu!catch"
+        >
+            <i
+                :class="catchCheck ? 'catch-icon-check' : 'catch-icon'"
+                class="mode-icon-select fa-xl mr-1"
+                @click="catchCheck = !catchCheck, updateSelectedMode('catch')"
+            />
+        </span>
+        <span 
+            v-if="!modesFilter || modesFilter && modesFilter.includes('mania')" 
+            data-toggle="tooltip" 
+            title="osu!mania"
+        >
+            <i
+                :class="maniaCheck ? 'mania-icon-check' : 'mania-icon'"
+                class="mode-icon-select fa-xl mr-1"
+                @click="maniaCheck = !maniaCheck, updateSelectedMode('mania')"
+            />
+        </span>
+        <span data-toggle="tooltip" title="all modes">
+            <i
+                v-if="allModes"
+                :class="allModesCheck ? 'text-info' : ''"
+                class="mode-icon-select fas fa-asterisk mb-2"
+                @click="allModesCheck = !allModesCheck, updateSelectedMode('all')"
+            />
+        </span>
     </div>
 </template>
 
@@ -50,6 +75,10 @@ export default {
         allModes: {
             type: Boolean,
             default: false,
+        },
+        modesFilter: {
+            type: [ String, Array ],
+            required: false,
         },
     },
     data () {
