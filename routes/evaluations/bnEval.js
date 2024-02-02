@@ -585,7 +585,11 @@ router.post('/setConsensus/:id', middlewares.isNatOrTrialNat, async (req, res) =
     if (req.body.consensus === BnEvaluationConsensus.RemoveFromBn || evaluation.isResignation) {
         const date = new Date();
 
-        if (req.body.consensus != ResignationConsensus.ResignedOnGoodTerms && (req.body.consensus == BnEvaluationConsensus.RemoveFromBn && evaluation.addition != BnEvaluationAddition.LowActivityWarning)) {
+        if (
+            req.body.consensus == ResignationConsensus.ResignedOnStandardTerms ||
+            (req.body.consensus == BnEvaluationConsensus.RemoveFromBn &&
+                evaluation.addition != BnEvaluationAddition.LowActivityWarning)
+        ) {
             date.setDate(date.getDate() + 60);
             evaluation.cooldown = Cooldown.Standard;
         }
@@ -628,6 +632,11 @@ router.post('/setAddition/:id', middlewares.isNatOrTrialNat, async (req, res) =>
     if (req.body.addition == BnEvaluationAddition.LowActivityWarning) {
         evaluation.cooldown = Cooldown.None;
         evaluation.cooldownDate = new Date();
+    } else if (evaluation.consensus === BnEvaluationConsensus.RemoveFromBn) {
+        const date = new Date();
+        date.setDate(date.getDate() + 60);
+        evaluation.cooldown = Cooldown.Standard;
+        evaluation.cooldownDate = date;
     }
 
     await evaluation.save();
