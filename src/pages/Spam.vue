@@ -104,8 +104,8 @@
         </div>
 
         <div class="card card-body small mb-4">
-            <h4>Message (NAT bot)</h4>
-            <div class="text-secondary mb-2">You don't have permission to use this. If you think you should, talk to pishifat.</div>
+            <h4>Message (<a href="https://osu.ppy.sh/users/6616586" target="_blank">NAT bot</a>)</h4>
+            <div v-if="!loggedInUser.isResponsibleWithButtons" class="text-secondary mb-2">You don't have permission to use this. If you think you should, talk to pishifat.</div>
             <div>
                 Title:
                 <input
@@ -208,7 +208,7 @@
             <hr>
 
             <button v-if="messageChannelTitle.length && message.length && users" class="btn btn-danger my-1" @click="sendMessages($event)">
-                Send message(s) to user(s) listed above
+                Send message to user(s) listed above
             </button>
         </div>
         <toast-messages />
