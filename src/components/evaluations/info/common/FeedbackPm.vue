@@ -179,7 +179,7 @@ export default {
 
                         // resigned on standard terms
                         } else {
-                            message +=  `your resignation will be on standard terms`;
+                            message +=  `your resignation will be on standard terms.`;
                         }
 
                     // kick

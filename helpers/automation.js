@@ -479,7 +479,7 @@ const handleContentReviews = cron.schedule('0 9 * * *', async () => {
 
             await discord.webhookPost(
                 [{
-                    description: `[**${discussion.title}**](https://bn.mappersguild.com/discussions?id=${discussion.id}) is 6 days old and has less than 20 votes!`,
+                    description: `[**${discussion.title}**](https://bn.mappersguild.com/discussionvote?id=${discussion.id}) is 6 days old and has less than 20 votes!`,
                     color: discord.webhookColors.lightRed,
                 }],
                 'internalContentCase'

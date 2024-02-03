@@ -10,6 +10,7 @@
             <i v-else-if="mode == 'taiko'" class="taiko-icon mx-1" />
             <i v-else-if="mode == 'catch'" class="catch-icon mx-1" />
             <i v-else-if="mode == 'mania'" class="mania-icon mx-1" />
+            <i v-if="isResignation" class="fas fa-walking mr-1" />
             <i
                 v-if="(!feedback || !isReviewed) && isDiscussion && !isResignation && !isNatEvaluation"
                 data-toggle="tooltip"
