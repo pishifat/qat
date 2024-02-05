@@ -37,8 +37,8 @@
             :headers="category == 'error' ? ['date', 'user', 'action', 'stack', 'extra'] : category == 'all' ? ['date', 'category', 'user', 'action'] : ['date', 'user', 'action']"
         >
             <tr v-for="log in logs" :key="log.id">
-                <td>
-                    {{ log.createdAt }} GMT
+                <td data-toggle="tooltip" data-placement="left" :title="log.createdAt | toStandardDetailedDate">
+                    {{ log.createdAt | toRelativeDate }} 
                 </td>
                 <td v-if="category == 'all'">
                     {{ log.category }}
