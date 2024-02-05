@@ -9,6 +9,7 @@ const QualityAssurance = () => import(/* webpackChunkName: "public", webpackPref
 const TestResults = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/TestResultsPage.vue');
 const YourEvals = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/YourEvalsPage.vue');
 const Message = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/MessagePage.vue');
+const GroupHistory = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/GroupHistoryPage.vue');
 
 const ModRequests = () => import(/* webpackChunkName: "bn", webpackPrefetch: true */ './pages/ModRequests.vue');
 const DiscussionVote = () => import(/* webpackChunkName: "bn", webpackPrefetch: true */ './pages/DiscussionVotePage.vue');
@@ -41,6 +42,7 @@ const routes = [
     { path: '/message', component: Message, meta: { title: 'Message from the NAT' } },
     { path: '/modrequests', component: ModRequests, meta: { title: 'Request a BN', public: true } },
     { path: '/discussionvote', component: DiscussionVote, meta: { title: 'Content Review' } },
+    { path: '/grouphistory', component: GroupHistory, meta: { title: 'Group History' } },
 
     // BN/NAT
     { path: '/appeval', component: AppEvalPage, meta: { title: 'BN Application Evaluations', requiresBnOrNat: true } },

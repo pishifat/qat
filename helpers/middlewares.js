@@ -132,6 +132,7 @@ function discordEmbeds(req, res, next) {
         { path: 'managetest', title: 'Manage RC Test' },
         { path: 'logs', title: 'Logs' },
         { path: 'spam', title: 'Spam' },
+        { path: 'grouphistory', title: 'Group History'}
     ];
 
     const route = routes.find(r => r.path === req.path.substring(1));

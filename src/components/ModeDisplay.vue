@@ -2,7 +2,7 @@
     <span>
         <i v-if="modes.includes('osu')" class="osu-icon align-middle mb-1" />
         <i v-if="modes.includes('taiko')" class="taiko-icon align-middle mb-1" />
-        <i v-if="modes.includes('catch')" class="catch-icon align-middle mb-1" />
+        <i v-if="modes.includes('catch') || modes.includes('fruits')" class="catch-icon align-middle mb-1" />
         <i v-if="modes.includes('mania')" class="mania-icon align-middle mb-1" />
         <div v-if="showAll && (!modes || modes.includes('all'))">
             <i class="osu-icon align-middle" />
