@@ -68,6 +68,9 @@
                                     <router-link class="dropdown-item" to="/discussionvote">
                                         Content Review (read-only)
                                     </router-link>
+                                    <router-link class="dropdown-item" to="/grouphistory">
+                                        Group History
+                                    </router-link>
                                 </div>
                             </li>
                         </template>
@@ -93,6 +96,9 @@
                                     </router-link>
                                     <router-link class="dropdown-item" to="/reports">
                                         Reports
+                                    </router-link>
+                                    <router-link class="dropdown-item" to="/grouphistory">
+                                        Group History
                                     </router-link>
                                 </div>
                             </li>
@@ -233,6 +239,9 @@
                                     <router-link class="dropdown-item" to="/qualityassurance">
                                         Quality Assurance (read-only)
                                     </router-link>
+                                    <router-link class="dropdown-item" to="/grouphistory">
+                                        Group History
+                                    </router-link>
                                 </div>
                             </li>
                         </template>
@@ -269,6 +278,9 @@
                                     </router-link>
                                     <router-link class="dropdown-item" to="/modrequests">
                                         Request a BN
+                                    </router-link>
+                                    <router-link class="dropdown-item" to="/grouphistory">
+                                        Group History
                                     </router-link>
                                 </div>
                             </li>
