@@ -46,6 +46,7 @@ const messageRouter = require('./routes/message');
 const settingsRouter = require('./routes/settings');
 const spamRouter = require('./routes/spam');
 const debugRouter = require('./routes/debug');
+const groupHistoryRouter = require('./routes/groupHistory');
 const { websocketManager } = require('./helpers/websocket');
 
 const app = express();
@@ -129,6 +130,7 @@ app.use('/message', messageRouter);
 app.use('/settings', settingsRouter);
 app.use('/spam', spamRouter);
 app.use('/debug', debugRouter);
+app.use('/groupHistory', groupHistoryRouter);
 
 // catch 404
 app.use(function (req, res) {
