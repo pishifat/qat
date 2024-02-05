@@ -46,6 +46,18 @@ Vue.filter('toMonthDayYear', (date) => {
     return moment(date).format('MMM DD, YYYY');
 });
 
+Vue.filter('toStandardDetailedDate', (date) => {
+    if (!date) return '';
+
+    return moment(date).format('YYYY-MM-DD hh:mm:ss A');
+});
+
+Vue.filter('toRelativeDate', (date) => {
+    if (!date) return '';
+
+    return moment(date).fromNow();
+});
+
 Vue.filter('shorten', (text, length) => {
     if (!text) return '';
 
