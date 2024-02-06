@@ -7,6 +7,20 @@
         <div v-if="selectedUser" class="container">
             <duration />
 
+            <div v-if="!selectedUser.isBn && !selectedUser.isNat && selectedUser.history.length">
+                <hr>
+                <user-activity
+                    :modes="getModesFromHistory()"
+                    :deadline="getUserLastHistoryDate()"
+                    :osu-id="selectedUser.osuId"
+                    :mongo-id="selectedUser.id"
+                    :unique="selectedUser.id"
+                    :overwrite-days="90"
+                    :show-archive="true"
+                    :is-nat="selectedUser.isNat"
+                />
+            </div>
+
             <div v-if="selectedUser.isBn || selectedUser.isNat">
                 <next-evaluation
                     v-for="mode in selectedUser.modes"
@@ -139,6 +153,14 @@ export default {
         ...mapGetters('users', [
             'selectedUser',
         ]),
+    },
+    methods: {
+        getUserLastHistoryDate() {
+            return this.selectedUser.history[this.selectedUser.history.length - 1].date;
+        },
+        getModesFromHistory() {
+            return [...new Set(this.selectedUser.history.map(history => history.mode))];
+        }
     },
 };
 </script>
