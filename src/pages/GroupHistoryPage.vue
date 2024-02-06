@@ -52,29 +52,27 @@
         </section>
 
         <section class="card card-body">
-            <data-table
-                :headers="['date', 'action', 'user', 'group']"
-            >
-            <tr v-for="event in events" :key="event.id">
-                <td data-toggle="tooltip" data-placement="left" :title="event.created_at | toStandardDetailedDate">
-                    {{ event.created_at | toRelativeDate }} 
-                </td>
-                <td>
-                    <i class="mr-1 fas" :class="parseAction(event.type, 'icon')" />
-                    <span>{{ parseAction(event.type, 'text') }}</span>
-                </td>
-                <td>
-                    <a :href="'https://osu.ppy.sh/users/' + event.user_id" target="_blank">
-                        {{ event.user_name }}
-                    </a>
-                </td>
-                <td>
-                    <a :href="'https://osu.ppy.sh/groups/' + event.group_id" target="_blank">
-                        {{ event.group_name }}
-                    </a>
-                    <mode-display v-if="event.playmodes" class="ml-1" :modes="event.playmodes" />
-                </td>
-            </tr>
+            <data-table :headers="['date', 'action', 'user', 'group']">
+                <tr v-for="event in events" :key="event.id">
+                    <td data-toggle="tooltip" data-placement="left" :title="event.created_at | toStandardDetailedDate">
+                        {{ event.created_at | toRelativeDate }} 
+                    </td>
+                    <td>
+                        <i class="mr-1 fas" :class="parseAction(event.type, 'icon')" />
+                        <span>{{ parseAction(event.type, 'text') }}</span>
+                    </td>
+                    <td>
+                        <a :href="'https://osu.ppy.sh/users/' + event.user_id" target="_blank">
+                            {{ event.user_name }}
+                        </a>
+                    </td>
+                    <td>
+                        <a :href="'https://osu.ppy.sh/groups/' + event.group_id" target="_blank">
+                            {{ event.group_name }}
+                        </a>
+                        <mode-display v-if="event.playmodes" class="ml-1" :modes="event.playmodes" />
+                    </td>
+                </tr>
             </data-table>
             <button
                 v-if="params.cursor_string"
