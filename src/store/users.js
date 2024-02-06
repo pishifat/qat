@@ -53,7 +53,17 @@ export default {
             const value = rootState.users.pageFilters.filters.value;
 
             if (mode) {
-                users = users.filter(u => u.modes.includes(mode));
+                const currentUsers = users.filter((u) => u.modes.includes(mode));
+
+                // if user is not BN/NAT, check if mode exists in their history
+                const formerUsers = users.filter(
+                    (u) =>
+                        !u.isBnOrNat &&
+                        u.history.length > 0 &&
+                        u.history.some(h => h.mode === mode)
+                );
+
+                users = [...currentUsers, ...formerUsers];
             }
 
             if (group) {
