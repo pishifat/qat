@@ -393,8 +393,8 @@ router.post('/setConsensus/:id', middlewares.isNatOrTrialNat, async (req, res) =
               );
         const randomIndex = Math.floor(Math.random() * discordIds.length);
 
-        if (discordIds.length > 0) {
-        await discord.userHighlightWebhookPost(evaluation.mode, [discordIds[randomIndex]]);
+        if (discordIds && discordIds.length) {
+            await discord.userHighlightWebhookPost(evaluation.mode, [discordIds[randomIndex]]);
         }
     }
 });

@@ -18,7 +18,6 @@ const Report = require('../models/report');
 const Logger = require('../models/log');
 const ResignationEvaluation = require('../models/evaluations/resignationEvaluation');
 const { BnEvaluationConsensus, BnEvaluationAddition, Cooldown } = require('../shared/enums');
-const { makeWordFromField } = require('./scrap');
 const Settings = require('../models/settings');
 
 const defaultPopulate = [
@@ -244,8 +243,10 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
             );
             await util.sleep(500);
 
-            await discord.userHighlightWebhookPost(app.mode, discordIds);
-            await util.sleep(500);
+            if (discordIds && discordIds.length) {
+                await discord.userHighlightWebhookPost(app.mode, discordIds);
+                await util.sleep(500);
+            }
         }
     }
 
@@ -395,8 +396,11 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
                 await util.sleep(500);
 
                 discordIds = discord.findNatEvaluatorHighlights(round.reviews, evaluators, round.discussion);
-                await discord.userHighlightWebhookPost(round.mode, discordIds);
-                await util.sleep(500);
+
+                if (discordIds && discordIds.length) {
+                    await discord.userHighlightWebhookPost(round.mode, discordIds);
+                    await util.sleep(500);
+                }
 
             // generate assignment webhooks
             } else if (generateWebhook && natList.length) {
@@ -428,8 +432,10 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
                 evaluators = await Settings.getModeHasTrialNat(round.mode) ? round.natEvaluators.concat(round.bnEvaluators) : round.natEvaluators;
                 discordIds = discord.findNatEvaluatorHighlights(round.reviews, evaluators, round.discussion);
 
-                await discord.userHighlightWebhookPost(round.mode, discordIds);
-                await util.sleep(500);
+                if (discordIds && discordIds.length) {
+                    await discord.userHighlightWebhookPost(round.mode, discordIds);
+                    await util.sleep(500);
+                }
             }
         }
     }
@@ -487,7 +493,9 @@ const handleContentReviews = cron.schedule('0 9 * * *', async () => {
 
             util.sleep(500);
             
-            await discord.userHighlightWebhookPost('internalContentCase', activeContentReviewers.map(user => user.discordId));
+            if (activeContentReviewers && activeContentReviewers.length) {
+                await discord.userHighlightWebhookPost('internalContentCase', activeContentReviewers.map(user => user.discordId));
+            }
         }
 
         else if (sevenDaysOld || (threeDaysOld && inactive && discussion.mediations.length >= 20)) {
@@ -970,7 +978,11 @@ const badgeTracker = cron.schedule('8 18 * * *', async () => {
         }
 
         if (thresholdNominationCount !== user.nominationsProfileBadge * 200) {
-            await discord.userHighlightWebhookPost('all', discordIds);
+            if (discordIds && discordIds.length) {
+                await discord.userHighlightWebhookPost('all', discordIds);
+                await util.sleep(500);
+            }
+            
             await discord.webhookPost(
                 [{
                     color: discord.webhookColors.darkOrange,
@@ -989,7 +1001,11 @@ const badgeTracker = cron.schedule('8 18 * * *', async () => {
         const bnYears = yearsDuration(user.bnDuration + (30 * await scrap.findAdditionalBnMonths(user)));
 
         if (bnYears <= 10 && bnYears !== user.bnProfileBadge) {
-            await discord.userHighlightWebhookPost('all', discordIds);
+            if (discordIds && discordIds.length) {
+                await discord.userHighlightWebhookPost('all', discordIds);
+                await util.sleep(500);
+            }
+
             await discord.webhookPost(
                 [{
                     color: discord.webhookColors.darkOrange,
@@ -1008,7 +1024,11 @@ const badgeTracker = cron.schedule('8 18 * * *', async () => {
         const natYears = yearsDuration(user.natDuration);
 
         if (natYears <= 10 && natYears !== user.natProfileBadge) {
-            await discord.userHighlightWebhookPost('all', discordIds);
+            if (discordIds && discordIds.length) {
+                await discord.userHighlightWebhookPost('all', discordIds);
+                await util.sleep(500);
+            }
+
             await discord.webhookPost(
                 [{
                     color: discord.webhookColors.darkOrange,
