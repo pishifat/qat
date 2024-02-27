@@ -23,11 +23,12 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
     const blockedUrls = [
         'ppy.sh',
         'puu.sh',
+        'cdn.discord'
     ];
 
     if (req.body.category == 'contentCaseVisual' && blockedUrls.some(url => link.includes(url))) {
         return res.json({
-            error: 'images hosted on this website are not allowed, as they can change/disappear quickly. please use a different image hosting service instead.',
+            error: 'images hosted on this website are not allowed, as they can change/get deleted quickly. please use a different image hosting service instead.',
         });
     }
 
