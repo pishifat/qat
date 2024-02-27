@@ -14,7 +14,7 @@ const getGeneralEvents = require('../evaluations/bnEval').getGeneralEvents;
 const getUserModsCount = require('../../helpers/scrap').getUserModsCount;
 const findAdditionalBnMonths = require('../../helpers/scrap').findAdditionalBnMonths;
 const util = require('../../helpers/util');
-const { BnEvaluationConsensus, BnEvaluationAddition } = require('../../shared/enums');
+const { BnEvaluationConsensus, BnEvaluationAddition, AppEvaluationConsensus } = require('../../shared/enums');
 const { websocketManager } = require("../../helpers/websocket");
 
 const router = express.Router();
@@ -290,7 +290,7 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
 
     res.json(info);
 });
-
+/* GET gmt activity */
 router.get('/findGmtActivity/:days', async (req, res) => {
     let minDate = new Date();
     minDate.setDate(minDate.getDate() - parseInt(req.params.days));
@@ -330,6 +330,71 @@ router.get('/findGmtActivity/:days', async (req, res) => {
     res.json({
         info,
     });
+});
+
+/* GET vibe check stats */
+router.get('/findVibeCheckStats', middlewares.isPishifat, async (req, res) => {
+    const apps = await AppEvaluation
+        .find({ 
+            vibeChecks: { $exists: true, $ne: [] },
+            consensus: { $exists: true },
+            active: false,
+        })
+        .populate([
+            { 
+                path: 'vibeChecks',
+                select: 'mediator vote',
+                populate: {
+                    path: 'mediator',
+                    select: 'username osuId groups',
+                },
+            },
+        ]);
+
+    const users = [];
+
+    for (const app of apps) {
+        for (const vibeCheck of app.vibeChecks) {
+            // add user if they don't exist yet
+            if (!users.find(u => u.osuId == vibeCheck.mediator.osuId)) {
+                users.push({
+                    username: vibeCheck.mediator.username,
+                    osuId: vibeCheck.mediator.osuId,
+                    correct: 0,
+                    incorrect: 0,
+                    positiveVibes: 0,
+                    negativeVibes: 0,
+                    accuracy: 0,
+                });
+            }
+
+            // count vibes
+            const i = users.findIndex(u => u.osuId == vibeCheck.mediator.osuId);
+
+            if (vibeCheck.vote == 1 && app.consensus == AppEvaluationConsensus.Pass) {
+                users[i].correct++;
+                users[i].positiveVibes++;
+            } else if (vibeCheck.vote == 1 && app.consensus == AppEvaluationConsensus.Fail) {
+                users[i].incorrect++;
+                users[i].positiveVibes++;
+            } else if (vibeCheck.vote == 3 && app.consensus == AppEvaluationConsensus.Pass) {
+                users[i].incorrect++;
+                users[i].negativeVibes++;
+            } else if (vibeCheck.vote == 3 && app.consensus == AppEvaluationConsensus.Fail) {
+                users[i].correct++;
+                users[i].negativeVibes++;
+            }
+        }
+    }
+
+    for (let i = 0; i < users.length; i++) {
+        const user = users[i];
+        const total = user.correct + user.incorrect;
+        const accuracy = user.correct/total;
+        users[i].accuracy = Math.round(accuracy * 100);
+    }
+
+    res.json(users);
 });
 
 /* POST update discord ID */

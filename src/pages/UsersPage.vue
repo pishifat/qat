@@ -84,6 +84,10 @@
                 <bn-activity class="my-2" />
                 <gmt-activity class="my-2" />
             </section>
+
+            <section v-if="loggedInUser.isPishifat" class="card card-body">
+                <vibe-check-stats />
+            </section>
         </div>
 
         <user-info />
@@ -103,6 +107,7 @@ import GmtActivity from '../components/users/GmtActivity.vue';
 import Badges from '../components/users/Badges.vue';
 import FilterBox from '../components/FilterBox.vue';
 import PaginationNav from '../components/PaginationNav.vue';
+import VibeCheckStats from '../components/users/VibeCheckStats.vue';
 
 export default {
     name: 'UsersPage',
@@ -115,6 +120,7 @@ export default {
         Badges,
         FilterBox,
         PaginationNav,
+        VibeCheckStats,
     },
     data () {
         return {
