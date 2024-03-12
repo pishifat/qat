@@ -1,6 +1,9 @@
 <template>
     <div>
         <div class="card card-body mb-3">
+            <h5>Beatmap Nominator applications are closed for now. Come back in a week!</h5>
+        </div>
+        <!--<div class="card card-body mb-3">
             <div>
                 The
                 <a
@@ -280,7 +283,9 @@
                     </template>
                 </div>
             </div>
-        </div>
+        </div>-->
+
+        <h4></h4>
 
         <toast-messages />
     </div>
