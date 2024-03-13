@@ -202,7 +202,7 @@ const server = app.listen(port, () => {
     console.log('Listening on ' + port);
 
     if (config.enableAutomation) {
-        automation.notifyDeadlines.start();
+        //automation.notifyDeadlines.start();
         automation.lowActivityTask.start();
         automation.handleContentReviews.start();
         automation.checkBnEvaluationDeadlines.start();
