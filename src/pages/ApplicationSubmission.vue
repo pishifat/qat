@@ -1,10 +1,7 @@
 <template>
     <div>
         <div class="card card-body mb-3">
-            <h5>Beatmap Nominator applications are closed for now. Come back in a week!</h5>
-        </div>
-        <!--<div class="card card-body mb-3">
-            <div>
+            <div class="mb-3">
                 The
                 <a
                     href="https://osu.ppy.sh/help/wiki/People/Beatmap_Nominators"
@@ -25,18 +22,10 @@
                     >
                 </li>
                 <li>
-                    A score of 12.5 or higher on the
-                    <a
-                        href="https://osu.ppy.sh/wiki/en/People/The_Team/Beatmap_Nominators/Beatmap_Nominator_Test"
-                        target="_blank"
-                        >Beatmap Nominator Test</a
-                    >
-                    (this begins after clicking "Apply" below).
+                    An ability to recognise maps that should (and should not) be nominated
                 </li>
                 <li>
-                    Competent modding abilities/behavior. This is evaluated by
-                    the NAT through your submitted mods, other modding history,
-                    and community interaction
+                    No outstanding behaviour issues
                 </li>
             </ul>
             <div>
@@ -46,8 +35,7 @@
                     >NAT bot</a
                 >
                 with the results. If your application is denied, you cannot
-                apply to the same game mode again for 60 days (unless otherwise
-                specified).
+                apply to the same game mode again for 60 days.
             </div>
         </div>
 
@@ -65,225 +53,331 @@
         </template>
 
         <div class="card card-body">
-            <div v-if="!hasPendingTest">
+            <!-- game mode -->
+            <div v-if="step == 0">
                 <h4>Game mode</h4>
 
-                <div class="row">
-                    <div class="col-sm-12 pl-4">
-                        <mode-select
-                            v-model="selectedMode"
-                            :max-selection="1"
-                        />
+                <mode-select
+                    v-model="selectedMode"
+                    :max-selection="1"
+                />
+            </div>
+
+            <!-- beatmap 1 -->
+            <div v-if="step == 1">
+                <h4>Beatmap 1</h4>
+                    <div class="ml-2">
+                        Submit a beatmap that...
+                        <ul>
+                            <li>Has 0 nominations</li>
+                            <li>You would nominate if you were a BN</li>
+                        </ul>
                     </div>
+
+                    <input
+                        v-model="mods[i - 1]"
+                        type="text"
+                        class="form-control ml-2 mb-2"
+                        placeholder="beatmap link"
+                        maxlength="1000"
+                    />
+
+                    <div class="ml-2">
+                        Answer these questions:
+                        <ul>
+                            <li>In general, what do you think is required for a map to be rankable?</li>
+                            <li>Why do you believe this beatmap is ready to be nominated?</li>
+                        </ul>
+                    </div>
+
+                    <textarea
+                        v-model="reasons[i - 1]"
+                        type="text"
+                        class="form-control ml-2 mb-2"
+                        placeholder="responses"
+                        maxlength="1000"
+                        rows="2"
+                    />
+
+                    <div class="ml-2">
+                        Provide a copy of the map at the time of your application. If it's updated, your decision to nominate might change!
+                    </div>
+
+                    <input
+                        v-model="oszs[i - 1]"
+                        type="text"
+                        class="form-control ml-2 mb-2"
+                        placeholder=".osz link (current)"
+                        maxlength="1000"
+                    />
+            </div>
+
+            <!-- beatmap 2 -->
+            <div v-if="step == 2">
+                <h4>Beatmap 2</h4>
+                    <div class="ml-2">
+                        Submit a beatmap that...
+                        <ul>
+                            <li>Was created by a different mapper</li>
+                            <li>Was improved by your mod</li>
+                            <li>Has 0 nominations</li>
+                            <li>You would nominate if you were a BN</li>
+                        </ul>
+                    </div>
+
+                    <input
+                        v-model="mods[i - 1]"
+                        type="text"
+                        class="form-control ml-2 mb-2"
+                        placeholder="beatmap link"
+                        maxlength="1000"
+                    />
+
+                    <div class="ml-2">
+                        Answer these questions:
+                        <ul>
+                            <li>How did your mod improve this beatmap?</li>
+                            <li>Why do you believe this beatmap is ready to be nominated?</li>
+                        </ul>
+                    </div>
+
+                    <textarea
+                        v-model="reasons[i - 1]"
+                        type="text"
+                        class="form-control ml-2 mb-2"
+                        placeholder="responses"
+                        maxlength="1000"
+                        rows="2"
+                    />
+
+                    <div class="ml-2">
+                        Provide a copy of the map <i>before</i> your mod was applied. If you can't find this, write "none".
+                    </div>
+
+                    <input
+                        v-model="oszs[i - 1]"
+                        type="text"
+                        class="form-control ml-2 mb-2"
+                        placeholder=".osz link (before mod)"
+                        maxlength="1000"
+                    />
+
+                    <div class="ml-2">
+                        Provide a copy of the map at the time of your application. If it's updated, your decision to nominate might change!
+                    </div>
+
+                    <input
+                        v-model="oszs[i - 1]"
+                        type="text"
+                        class="form-control ml-2 mb-2"
+                        placeholder=".osz link (current)"
+                        maxlength="1000"
+                    />
+            </div>
+
+            <!-- beatmap 3 -->
+            <div v-if="step == 3">
+                <h4>Beatmap 3</h4>
+                    <div class="ml-2">
+                        Submit a beatmap that...
+                        <ul>
+                            <li>Was created by a different mapper</li>
+                            <li>You would NOT nominate if you were a BN</li>
+                        </ul>
+                    </div>
+
+                    <input
+                        v-model="mods[i - 1]"
+                        type="text"
+                        class="form-control ml-2 mb-2"
+                        placeholder="beatmap link"
+                        maxlength="1000"
+                    />
+
+                    <div class="ml-2">
+                        Answer these questions:
+                        <ul>
+                            <li>Why is this beatmap NOT ready to be nominated?</li>
+                            <li>What needs to be changed to make the beatmap worth nominating?</li>
+                        </ul>
+                    </div>
+
+                    <textarea
+                        v-model="reasons[i - 1]"
+                        type="text"
+                        class="form-control ml-2 mb-2"
+                        placeholder="responses"
+                        maxlength="1000"
+                        rows="2"
+                    />
+
+                    <div class="ml-2">
+                        Provide a copy of the map at the time of your application. If it's updated, your decision to nominate might change!
+                    </div>
+
+                    <input
+                        v-model="oszs[i - 1]"
+                        type="text"
+                        class="form-control ml-2 mb-2"
+                        placeholder=".osz link (current)"
+                        maxlength="1000"
+                    />
+            </div>
+
+            <!-- beatmap 4 -->
+            <div v-if="step == 4">
+                <h4>Beatmap 4</h4>
+                    <div class="ml-2">
+                        Submit a beatmap that...
+                        <ul>
+                            <li>Was created by a different mapper</li>
+                            <li>Was improved by your mod</li>
+                            <li>You would NOT nominate if you were a BN</li>
+                        </ul>
+                    </div>
+
+                    <input
+                        v-model="mods[i - 1]"
+                        type="text"
+                        class="form-control ml-2 mb-2"
+                        placeholder="beatmap link"
+                        maxlength="1000"
+                    />
+
+                    <div class="ml-2">
+                        Answer these questions:
+                        <ul>
+                            <li>How did your mod improve this beatmap?</li>
+                            <li>Why is this beatmap NOT ready to be nominated?</li>
+                            <li>What needs to be changed to make the beatmap worth nominating?</li>
+                        </ul>
+                    </div>
+
+                    <textarea
+                        v-model="reasons[i - 1]"
+                        type="text"
+                        class="form-control ml-2 mb-2"
+                        placeholder="responses"
+                        maxlength="1000"
+                        rows="2"
+                    />
+
+                    <div class="ml-2">
+                        Provide a copy of the map <i>before</i> your mod was applied. If you can't find this, write "none".
+                    </div>
+
+                    <input
+                        v-model="oszs[i - 1]"
+                        type="text"
+                        class="form-control ml-2 mb-2"
+                        placeholder=".osz link (before mod)"
+                        maxlength="1000"
+                    />
+
+                    <div class="ml-2">
+                        Provide a copy of the map at the time of your application. If it's updated, your decision to nominate might change!
+                    </div>
+
+                    <input
+                        v-model="oszs[i - 1]"
+                        type="text"
+                        class="form-control ml-2 mb-2"
+                        placeholder=".osz link (current)"
+                        maxlength="1000"
+                    />
+            </div>
+
+            <div v-if="step == 5">
+                (list of everything the user submitted)
+                <button
+                    class="btn btn-block btn-success"
+                    type="button"
+                    @click="apply($event)"
+                >
+                    Apply for BN
+                    <mode-display
+                        :modes="[selectedMode]"
+                    />
+                </button>
+                <div v-if="successInfo" class="mt-2 small">
+                    {{ successInfo }}
                 </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div v-if="step != 0" :class="step == 5 ? 'col-sm-12' : 'col-sm-6'">
+                    <button
+                        class="btn btn-block btn-primary mt-2"
+                        type="button"
+                        @click="step--"
+                    >
+                        <i class="ml-1 fas fa-arrow-left" />    
+                        Back
+                    </button>
+                </div>
+                <div v-if="step != 5" :class="step == 0 ? 'col-sm-12' : 'col-sm-6'">
+                    <button
+                        class="btn btn-block btn-primary mt-2"
+                        type="button"
+                        @click="step++"
+                        :disabled="!selectedMode"
+                    >
+                        Next
+                        <i class="ml-1 fas fa-arrow-right" />
+                    </button>
+                </div>
+                
+            </div>
 
-                <hr />
-
+            <!--<div v-if="!hasPendingTest">
                 <div v-if="!relevantResignation || recentlyRemovedForLowActivity">
                     <div class="row mb-2">
                         <div class="col-sm-12">
-                            <h4>Example mods</h4>
-                            <p class="small ml-4">
-                                Link the discussion pages of {{ wasBn ? "at least two" : "three" }} mapsets you
-                                have modded in the last six months. Include at
-                                least one map you would nominate and one you wouldn't,
-                                so the NAT can understand your nomination quality
-                                standards. These (and potentially more) will be
-                                evaluated by the NAT.
+                            <h4>Application</h4>
+                            <p class="ml-2">
+                                As a Beatmap Nominator, the main thing you'll be doing is... nominating beatmaps!
                             </p>
-                            <p class="small ml-4">
-                                The following are modding traits expected of Beatmap
-                                Nominators
+                            <p class="ml-2">
+                                In this application, your goal is to prove that you know what maps should (and should not) be nominated for Ranked status. Read everything below carefully, and explain your thought processes as clearly as possible!
                             </p>
-                            <ul class="small ml-1">
-                                <li>Coverage of all common difficulty levels.</li>
-                                <ul class="ml-1">
-                                    <li>
-                                        Most beatmaps will have a spread of difficulties ranging from easy up to expert,
-                                        and so Beatmap Nominators must be proficient in modding such difficulties.
-                                        Proficiency in modding extremely high level difficulties is not required.
-                                    </li>
-                                </ul>
-                                <li>
-                                    Identification of unrankable issues, including ones tools cannot
-                                    detect, such as incorrect timing or metadata.
-                                </li>
-                                <li>
-                                    Comparison between parts of a beatmap
-                                    to support issues or suggestions.
-                                </li>
-                                <ul class="ml-1">
-                                    <li>
-                                        Referencing other parts of the beatmap is useful for keeping suggestions
-                                        in line with the original styles and ideas the mapper has in their map.
-                                    </li>
-                                </ul>
-                                <li>
-                                    Commentary about a wide variety of beatmap elements,
-                                    such as rhythm, spacing, movement, intensity, contrast, and consistency.
-                                </li>
-                                <ul class="ml-1">
-                                    <li>
-                                        While Beatmap Nominators are encouraged to ask for help when needed,
-                                        they should be able to judge almost all aspects of mapping independently to a decent level.
-                                    </li>
-                                </ul>
-                                <li>
-                                    Identification of both isolated issues and general
-                                    map-wide issues.
-                                </li>
-                                <li>
-                                    Consideration of mappers' intentions when
-                                    identifying issues and giving suggestions.
-                                </li>
-                                <ul class="ml-1">
-                                    <li>
-                                        Avoid suggesting your own mapping styles or preferences if they contradict the mapper's intended style.
-                                        If there is an issue related to the mapper's style,
-                                        try to frame your suggestions around what they originally intended.
-                                    </li>
-                                </ul>
-                                <li>
-                                    Ability to make useful suggestions and spot mistakes for mappers of varying experience levels.
-                                </li>
-                                <ul class="ml-1">
-                                    <li>
-                                        Beatmap Nominators will often deal with very experienced mappers or high-quality maps
-                                        which may not require much feedback. It is important therefore to still be able to spot
-                                        mistakes and suggest improvements for even the most seasoned of mappers.
-                                    </li>
-                                    <li>
-                                        For the application, it is not recommended to submit mods on maps from beginner mappers
-                                        which lack the fundamentals. Instead, submitted mods should be on maps that are ready for a BN to look at.
-                                    </li>
-                                </ul>
-                                <li>
-                                    Clear communication with the mapper.
-                                </li>
-                                <ul class="ml-1">
-                                    <li>
-                                        Mod posts should explain the issue and the solution as clearly and concisely as possible to avoid confusing the mapper,
-                                        or even having their suggestion applied incorrectly. Specialised terminology should also generally be avoided.
-                                    </li>
-                                </ul>
-                            </ul>
-                            <p>For more information about the application process and cooldowns, please check out 
-                                <a href="https://osu.ppy.sh/wiki/en/People/Beatmap_Nominators/Becoming_a_Beatmap_Nominator#application-process" target="_blank">this page</a>.
+                            <p class="ml-2">
+                                If you struggle with English, write with the language that's easiest for you. The people reviewing your application will try to find a translator.
                             </p>
                         </div>
                     </div>
 
                     <div class="row mb-2">
                         <div class="col-sm-12">
-                            <div v-for="i in 3" :key="i" class="form-group">
-                                <p>Mod {{ i }}:</p>
-
-                                <input
-                                    v-model="mods[i - 1]"
-                                    type="text"
-                                    class="form-control ml-2 mb-2"
-                                    placeholder="link to beatmap discussion"
-                                    maxlength="1000"
-                                />
-
-                                <div class="ml-2 small">
-                                    Additional mod info
-                                    <ul>
-                                        <li>
-                                            Would you nominate this beatmap? If not,
-                                            why?
-                                        </li>
-                                        <li>
-                                            Is there anything else you'd like the NAT to
-                                            know about this mod?
-                                        </li>
-                                    </ul>
-                                </div>
-
-                                <textarea
-                                    v-model="reasons[i - 1]"
-                                    type="text"
-                                    class="form-control ml-2"
-                                    placeholder="responses to the bullet points above"
-                                    maxlength="1000"
-                                    rows="2"
-                                />
-
-                                <div class="ml-2 small">
-                                        Please provide a copy of the map before your mod was applied. If you do not have a copy of the map, write "none":
-                                </div>
-
-                                <input
-                                    v-model="oszs[i - 1]"
-                                    type="text"
-                                    class="form-control ml-2 mb-2"
-                                    placeholder="link to .osz of map before mod was applied"
-                                    maxlength="1000"
-                                />
+                            <div class="form-group">
+                                
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>-->
 
-            <div class="row">
+            <div v-if="relevantResignation && !outstandingCooldowns.length && !recentlyRemovedForLowActivity" class="row">
                 <div class="col-sm-12 text-center">
-                    <template v-if="relevantResignation && !outstandingCooldowns.length && !recentlyRemovedForLowActivity">
-                        <button
-                            v-if="!successInfo"
-                            class="btn btn-block btn-success"
-                            type="button"
-                            @click="rejoinApply($event)"
-                        >
-                            Request to re-join the Beatmap Nominators
-                        </button>
-                        <p v-if="successInfo" class="mt-2">
-                            {{ successInfo }}    
-                        </p>
-                        <p class="small mt-2">
-                            This option is available until {{ this.$moment(relevantResignation.archivedAt).add(1, 'years').format('YYYY-MM-DD') }} because you recently resigned from the {{ relevantResignation.mode == 'osu' ? 'osu!' : 'osu!' + relevantResignation.mode }} Beatmap Nominators.
-                        </p>
-                        <p class="small mt-2">
-                            You will not need to take the Ranking Criteria test. The NAT will review for any potential concerns and re-admit you to the Beatmap Nominators if everything is okay!
-                        </p>
-                    </template>
-                    <template v-else-if="hasPendingTest">
-                        <a
-                            href="/testsubmission"
-                            class="btn btn-success btn-block"
-                        >
-                            Begin Ranking Criteria test
-                        </a>
-
-                        <p class="small mt-2">
-                            Before your application can be reviewed, you must take a short test.
-                        </p>
-                    </template>
-
-                    <template v-else>
-                        <div v-if="!selectedMode.length" class="alert alert-danger mx-1">
-                            <i class="fas fa-exclamation-triangle"></i>
-                                You need to select a game mode to apply for!
-                        </div>
-                        <button
-                            v-else
-                            class="btn btn-block btn-primary d-inline-flex align-items-center justify-content-center"
-                            type="button"
-                            @click="apply($event)"
-                        >
-                            <span>Apply</span>
-                            <mode-display
-                                class="ml-1"
-                                :modes="[selectedMode]"
-                            />
-                        </button>
-                        <div v-if="successInfo" class="mt-2 small">
-                            {{ successInfo }}
-                        </div>
-                    </template>
+                    <button
+                        v-if="!successInfo"
+                        class="btn btn-block btn-success"
+                        type="button"
+                        @click="rejoinApply($event)"
+                    >
+                        Request to re-join the Beatmap Nominators
+                    </button>
+                    <p v-if="successInfo" class="mt-2">
+                        {{ successInfo }}    
+                    </p>
+                    <p class="small mt-2">
+                        This option is available until {{ this.$moment(relevantResignation.archivedAt).add(1, 'years').format('YYYY-MM-DD') }} because you recently resigned from the {{ relevantResignation.mode == 'osu' ? 'osu!' : 'osu!' + relevantResignation.mode }} Beatmap Nominators.
+                    </p>
+                    <p class="small mt-2">
+                        You will not need to take the Ranking Criteria test. The NAT will review for any potential concerns and re-admit you to the Beatmap Nominators if everything is okay!
+                    </p>
                 </div>
             </div>
-        </div>-->
+        </div>
 
         <h4></h4>
 
@@ -306,6 +400,7 @@ export default {
     },
     data() {
         return {
+            step: 0,
             hasPendingTest: false,
             resignations: [],
             cooldownApps: [],
