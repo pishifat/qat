@@ -91,7 +91,6 @@ router.get('/relevantInfo', async (req, res) => {
         applications = await AppEvaluation
             .find({
                 active: true,
-                test: { $exists: true },
             })
             .populate(defaultPopulate)
             .sort({
