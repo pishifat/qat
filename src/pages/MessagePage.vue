@@ -3,6 +3,8 @@
         <evaluation-results
             v-if="evaluation"
             :evaluation="evaluation"
+            :is-new-evaluation-format="isNewEvaluationFormat"
+            :nat-user-list="natUserList"
         />
         <report-feedback
             v-else-if="report"
@@ -30,6 +32,8 @@ export default {
     data() {
         return {
             evaluation: null,
+            isNewEvaluationFormat: null,
+            natUserList: [],
             report: null,
             veto: null,
         };
@@ -40,10 +44,12 @@ export default {
         const vetoId = this.$route.query.veto;
 
         if (evalId) {
-            const evaluation = await this.$http.initialRequest('/message/evaluation/' + evalId);
+            const result = await this.$http.initialRequest('/message/evaluation/' + evalId);
 
-            if (evaluation && !evaluation.error) {
-                this.evaluation = evaluation;
+            if (result && !result.error) {
+                this.evaluation = result.evaluation;
+                this.isNewEvaluationFormat = result.isNewEvaluationFormat;
+                this.natUserList = result.natUserList;
             }
         } else if (reportId) {
             const report = await this.$http.initialRequest('/message/report/' + reportId);

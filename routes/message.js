@@ -10,10 +10,37 @@ const router = express.Router();
 router.use(middlewares.isLoggedIn);
 
 //population
+const appPopulateOld = [
+    { path: 'user', select: 'username osuId' },
+    { path: 'natBuddy', select: 'username osuId' },
+    { path: 'bnEvaluators', select: 'username osuId' },
+    { path: 'natEvaluators', select: 'username osuId' },
+    {
+        path: 'reviews',
+        select: 'evaluator',
+        populate: {
+            path: 'evaluator',
+            select: 'username osuId groups isTrialNat',
+        },
+    },
+];
+
 const appPopulate = [
     { path: 'user', select: 'username osuId' },
     { path: 'natBuddy', select: 'username osuId' },
     { path: 'bnEvaluators', select: 'username osuId' },
+    { path: 'natEvaluators', select: 'username osuId' },
+    {
+        path: 'reviews',
+        populate: {
+            path: 'evaluator',
+            select: 'groups isTrialNat',
+        },
+    },
+];
+
+const bnEvalPopulateOld = [
+    { path: 'user', select: 'username osuId' },
     { path: 'natEvaluators', select: 'username osuId' },
     {
         path: 'reviews',
@@ -30,10 +57,9 @@ const bnEvalPopulate = [
     { path: 'natEvaluators', select: 'username osuId' },
     {
         path: 'reviews',
-        select: 'evaluator',
         populate: {
             path: 'evaluator',
-            select: 'username osuId groups isTrialNat',
+            select: 'groups isTrialNat',
         },
     },
 ];
@@ -69,10 +95,41 @@ router.get('/evaluation/:id', async (req, res) => {
 
     let evaluation;
 
-    evaluation = await AppEvaluation.findOne(query).populate(appPopulate);
-    if (!evaluation) evaluation = await Evaluation.findOne(query).populate(bnEvalPopulate);
+    // in march 2024, the evaluation message changed to show evaluator's individual comments, but not attach their names
+    // i don't know which format an eval uses (or whether it's an app or an eval) until after an initial query, so querying all at once is actually most efficient, despite looking dumb
+    // anyway, the new format requires a query that hides evaluator names, which is the "evaluation" returned to the user (app, eval)
+    // buuuut the message page also shows the NAT who were involved (not directly tied to their evals), so those need to be fetched somehow. using the old format's population works, so this is (again, stupidly) efficient
+    const [appOldPopulate, app, evalOldPopulate, eval] = await Promise.all([
+        AppEvaluation.findOne(query).populate(appPopulateOld),
+        AppEvaluation.findOne(query).populate(appPopulate),
+        Evaluation.findOne(query).populate(bnEvalPopulateOld),
+        Evaluation.findOne(query).populate(bnEvalPopulate)
+    ]);
 
-    return res.json(evaluation);
+    if (appOldPopulate) evaluation = appOldPopulate;
+    else if (evalOldPopulate) evaluation = evalOldPopulate;
+
+    const newEvaluationFormatCutoff = new Date('2024-03-25');
+    const isNewEvaluationFormat = new Date(evaluation.archivedAt) > newEvaluationFormatCutoff;
+
+    if (isNewEvaluationFormat) {
+        if (app) evaluation = app;
+        else if (eval) evaluation = eval;
+    }
+
+    let natUserList;
+    
+    if (evaluation.kind == 'application') {
+        natUserList = appOldPopulate.reviews.map(r => r.evaluator);
+    } else {
+        natUserList = evalOldPopulate.reviews.map(r => r.evaluator);
+    }
+
+    return res.json({
+        evaluation,
+        isNewEvaluationFormat,
+        natUserList: natUserList.sort(() => .5 - Math.random()),
+    });
 });
 
 /* GET report by ID */

@@ -1,22 +1,15 @@
 <template>
     <div>
         <template v-if="loggedInUser.isNat || loggedInUser.isTrialNat">
+            <hr>
             <p>
                 <a href="#consensusSettings" data-toggle="collapse">
                     Consensus settings <i class="fas fa-angle-down" />
                 </a>
             </p>
 
-            <div id="consensusSettings" class="collapse container">
+            <div id="consensusSettings" class="collapse container mb-4">
                 <consensus />
-                <cooldown v-if="selectedEvaluation && negativeConsensus" />
-                <next-evaluation-estimate
-                    v-else-if="
-                        selectedEvaluation.consensus &&
-                        selectedEvaluation.kind != 'resignation' &&
-                        loggedInUser.isNat
-                    "
-                />
                 <evaluation-is-security-checked 
                     v-if="
                         loggedInUser.isNat && 
@@ -58,11 +51,9 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import Consensus from './common/Consensus.vue';
-import Cooldown from './common/Cooldown.vue';
 import ReviewsListing from './common/ReviewsListing.vue';
 import FeedbackInfo from './common/FeedbackInfo.vue';
 import evaluations from '../../../mixins/evaluations.js';
-import NextEvaluationEstimate from './common/NextEvaluationEstimate.vue';
 import EvaluationIsReviewed from './common/EvaluationIsReviewed.vue';
 import EvaluationIsSecurityChecked from './applications/EvaluationIsSecurityChecked.vue';
 import NatBuddyAssignment from './applications/NatBuddyAssignment.vue';
@@ -72,10 +63,8 @@ export default {
     name: 'DiscussionInfo',
     components: {
         Consensus,
-        Cooldown,
         ReviewsListing,
         FeedbackInfo,
-        NextEvaluationEstimate,
         EvaluationIsReviewed,
         EvaluationIsSecurityChecked,
         EvaluationLink,

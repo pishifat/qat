@@ -24,19 +24,16 @@
                     <h5>Application details <i class="fas fa-angle-down" /></h5>
                 </a>
                 <div id="applicationInfo" class="collapse mx-4">
-                    <h5>Submitted mods</h5>
-                    <div v-for="(mod, i) in evaluation.mods" :key="mod" class="row">
-                        <div class="col-sm-3">
-                            Mod {{ i+1 }}:
-                            <span v-html="$md.render(mod)" />
-                        </div>
-                        <div class="col-sm-6">
-                            Additional info:
-                            <span class="small" v-html="$md.render(evaluation.reasons[i])" />
-                        </div>
-                        <div class="col-sm-3" v-if="evaluation.oszs && evaluation.oszs.length">
-                            .osz:
-                            <span class="small" v-html="$md.render(evaluation.oszs[i])" />
+                    <div class="card card-body">
+                        <div v-for="(mod, i) in evaluation.mods" :key="mod" class="row">
+                            <div class="col-sm-3">
+                                <b>Beatmap {{ i+1 }}:</b>
+                                <span v-html="$md.render(mod)" />
+                            </div>
+                            <div class="col-sm-9">
+                                <b>Response to application prompts:</b>
+                                <span class="small text-secondary" v-html="$md.render(evaluation.reasons[i])" />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -48,7 +45,7 @@
                     <h5>New BN Information <i class="fas fa-angle-down" /></h5>
                 </a>
 
-                <div id="newBnInformation" class="mx-4 show">
+                <div id="newBnInformation" class="mx-4 show card card-body">
                     <h5>Next steps</h5>
                     <div class="mx-4">
                         <p><a :href="'/users?id=' + evaluation.user.id" target="_blank">This is you.</a> You're a <a href="https://osu.ppy.sh/groups/32" target="_blank">Probationary Beatmap Nominator</a>, which means you can only nominate maps that have been nominated by <a href="https://osu.ppy.sh/groups/28" target="_blank">Full Beatmap Nominators</a> and you cannot disqualify maps.</p>
@@ -80,21 +77,42 @@
 
             <hr />
 
+            <div v-if="isNewEvaluationFormat">
+                <h5>Evaluations</h5>
+                <div v-for="review in evaluation.reviews" :key="review.id">
+                    <div class="row my-3">
+                        <div class="col-sm-2">
+                            <div class="text-center my-2" :class="voteColor(review.vote)">
+                                <b>User ({{ review.evaluator && review.evaluator.groups.includes('nat') ? 'NAT' : 'BN' }})</b>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-10">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="small ml-2 card card-body" v-html="$md.render(review.moddingComment)" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div v-if="evaluation.feedback">
-                <h5>Feedback</h5>
+                <h5>{{ isNewEvaluationFormat ? 'Additional feedback' : 'Feedback' }}</h5>
                 <div class="card card-body small mb-4 v-html-content" v-html="$md.render(evaluation.feedback)" />
             </div>
 
-            <div v-if="natReviews.length">
+            <div v-if="natUserList.length">
                 <h5>Evaluators</h5>
                 <p>If you have questions about your evaluation, please contact any member of the {{ evaluation.mode == 'osu' ? 'NAT or BN' : 'NAT' }} below!</p>
                 <div class="card card-body">
                     <ul>
-                        <li v-for="review in natReviews" :key="review.id">
+                        <li v-for="user in natUserList" :key="user.id">
                             <user-link
-                                :class="review.evaluator.groups.includes('nat') ? 'text-nat' : review.evaluator.groups.includes('bn') ? 'text-probation' : ''"
-                                :osu-id="review.evaluator.osuId"
-                                :username="review.evaluator.username"
+                                :class="user.groups.includes('nat') ? 'text-nat' : user.groups.includes('bn') ? 'text-probation' : ''"
+                                :osu-id="user.osuId"
+                                :username="user.username"
                             />
                         </li>
                     </ul>
@@ -120,12 +138,17 @@ export default {
             type: Object,
             required: true,
         },
+        isNewEvaluationFormat: {
+            type: Boolean,
+        },
+        natUserList: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
     },
     computed: {
-        /** @returns {array} */
-        natReviews () {
-            return this.evaluation.reviews.filter(r => r.evaluator.isNat || r.evaluator.isTrialNat);
-        },
         /** @returns {string} */
         consensus () {
             return this.evaluation.consensus;
@@ -134,6 +157,17 @@ export default {
         addition () {
             if (this.evaluation.addition !== BnEvaluationAddition.None) return this.evaluation.addition;
             else return null;
+        },
+    },
+    methods: {
+        voteColor(vote) {
+            if (vote == 1) {
+                return 'text-pass';
+            } else if (vote == 2) {
+                return 'text-neutral';
+            } else if (vote == 3) {
+                return 'text-fail';
+            }
         },
     },
 };

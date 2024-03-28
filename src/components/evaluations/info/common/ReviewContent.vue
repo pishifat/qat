@@ -23,7 +23,7 @@
                     <b>{{ selectedEvaluation.user.isNat ? 'NAT activity:' : 'Modding:' }}</b>
                     <div class="small ml-2 card card-body" v-html="$md.render(review.moddingComment)" />
                 </div>
-                <div class="col-sm-12">
+                <div v-if="review.behaviorComment" class="col-sm-12">
                     <b>Behavior:</b>
                     <div class="small ml-2 card card-body" v-html="$md.render(review.behaviorComment)" />
                 </div>
