@@ -14,7 +14,7 @@ const logSchema = new mongoose.Schema({
             'dataCollection',
             'discussionVote',
             'report',
-            'test',
+            'test', // no longer used
             'qualityAssurance',
             'veto',
             'interOp',

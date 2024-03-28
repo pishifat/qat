@@ -11,7 +11,6 @@ router.use(middlewares.isLoggedIn);
 // population
 const defaultAppPopulate = [
     { path: 'user', select: 'username osuId' },
-    { path: 'test', select: 'totalScore comment' },
 ];
 
 const defaultBnPopulate = [

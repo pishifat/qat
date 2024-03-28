@@ -1,12 +1,10 @@
 const express = require('express');
 const middlewares = require('../helpers/middlewares');
 const util = require('../helpers/util');
-const { getUserModsCount } = require('../helpers/scrap');
 const osu = require('../helpers/osu');
 const AppEvaluation = require('../models/evaluations/appEvaluation.js');
 const BnEvaluation = require('../models/evaluations/bnEvaluation');
 const Logger = require('../models/log.js');
-const TestSubmission = require('../models/bnTest/testSubmission');
 const ResignationEvaluation = require('../models/evaluations/resignationEvaluation');
 const { ResignationConsensus, BnEvaluationAddition } = require('../shared/enums');
 const moment = require('moment');
@@ -22,12 +20,7 @@ router.use(middlewares.isLoggedIn);
 router.get('/relevantInfo', async (req, res) => {
     const oneYearAgo = moment().subtract(1, 'years').toDate();
 
-    let [pendingTest, resignations, cooldownApps, cooldownEvals, cooldownResignations, lowActivityRemoval, lastRemoval] = await Promise.all([
-        TestSubmission
-            .findOne({
-                applicant: req.session.mongoId,
-                status: { $ne: 'finished' },
-            }),
+    let [resignations, cooldownApps, cooldownEvals, cooldownResignations] = await Promise.all([
         ResignationEvaluation
             .find({
                 user: req.session.mongoId,
@@ -56,40 +49,19 @@ router.get('/relevantInfo', async (req, res) => {
             active: false,
             cooldownDate: { $gt: new Date() }
         }),
-        BnEvaluation
-            .findOne({
-                user: req.session.mongoId,
-                consensus: 'removeFromBn',
-                addition: 'lowActivityWarning',
-            })
-            .sort({ archivedAt: -1 }),
-        BnEvaluation
-            .findOne({
-                user: req.session.mongoId,
-                consensus: 'removeFromBn',
-            })
-            .sort({ archivedAt: -1 }),
     ]);
 
-    let recentlyRemovedForLowActivity;
-
-    if (lowActivityRemoval && lastRemoval && lowActivityRemoval.id == lastRemoval.id) {
-        recentlyRemovedForLowActivity = true;
-    }
-
     res.json({
-        hasPendingTest: Boolean(pendingTest),
         resignations,
         cooldownApps,
         cooldownEvals,
         cooldownResignations,
-        recentlyRemovedForLowActivity,
     });
 });
 
 /* POST apply for BN */
 router.post('/apply', async (req, res) => {
-    const { mods, reasons, oszs, mode } = req.body;
+    const { mods, reasons, oszs, mode, comment, isPublic } = req.body;
 
     if (res.locals.userRequest.modes.includes(mode)) {
         return res.json({
@@ -110,14 +82,6 @@ router.post('/apply', async (req, res) => {
         !mode
     ) {
         return res.json({ error: 'All fields must be completed!' });
-    }
-
-    const wasBn = res.locals.userRequest.history && res.locals.userRequest.history.length;
-
-    if (mods.length !== 3 && !wasBn) {
-        return res.json({ error: `You must enter three mods!` });
-    } else if (mods.length < 2) {
-        return res.json({ error: `You must enter at least two mods!` });
     }
 
     for (let i = 0; i < mods.length; i++) {
@@ -141,7 +105,7 @@ router.post('/apply', async (req, res) => {
     }
 
     // begin checks
-    const [currentBnApp, currentBnEval, lastCurrentBnEval, cooldownResignation] = await Promise.all([
+    const [currentBnApp, currentBnEval, cooldownResignation] = await Promise.all([
         AppEvaluation.findOne({
             user: req.session.mongoId,
             mode,
@@ -156,13 +120,6 @@ router.post('/apply', async (req, res) => {
             consensus: 'removeFromBn',
             cooldownDate: { $gt: new Date() },
         }),
-        BnEvaluation
-            .findOne({
-                user: req.session.mongoId,
-                mode,
-                consensus: 'removeFromBn',
-            })
-            .sort({ createdAt: -1 }),
         ResignationEvaluation
             .findOne({
                 user: req.session.mongoId,
@@ -194,7 +151,7 @@ router.post('/apply', async (req, res) => {
         });
     }
 
-    // deny if relevant current bn eval
+    // deny if relevant resignation
     if (cooldownResignation) {
         return res.json({
             error: `You recently resigned the Beatmap Nominators in this game mode. 
@@ -217,36 +174,76 @@ router.post('/apply', async (req, res) => {
         return res.json({ error: `You do not meet the required ${requiredKudosu} kudosu to apply. You currently have ${userInfo.kudosu.total} kudosu.` });
     }
 
-    // check if user has sufficient modding activity (only relevant if removed for activity in the past)
-    const kickedForActivity = lastCurrentBnEval && lastCurrentBnEval.addition === BnEvaluationAddition.LowActivityWarning;
-
-    if (kickedForActivity && mode !== 'catch') {
-        const modsCount = await getUserModsCount(req.session.accessToken, req.session.username, 2); // 2 months of mods
-        const reducer = (accumulator, currentValue) => accumulator + currentValue;
-        const modsThreshold = 8;
-
-        const totalMods = modsCount.reduce(reducer);
-
-        if (totalMods < modsThreshold) {
-            return res.json({ error: `You need at least ${modsThreshold} mods within the last 60 days to apply because you were recently removed for low activity!` } );
-        }
-    }
-
-    // create app & test
-    const [newBnApp, test] = await Promise.all([
-        AppEvaluation.create({
+    // create app
+    const newBnApp = await AppEvaluation.create({
             user: req.session.mongoId,
             mode,
             mods,
             reasons,
             oszs,
-        }),
-        TestSubmission.generateTest(req.session.mongoId, mode),
-    ]);
+            comment,
+            isPublic,
+        });
 
-    if (!newBnApp || !test) {
+    if (!newBnApp) {
         return res.json({ error: 'Failed to process application!' });
     }
+
+    // set NAT assignments
+    const assignedNat = await User.getAssignedNat(mode, req.session.mongoId);
+    newBnApp.natEvaluators = assignedNat;
+
+    const assignments = [];
+
+    for (const user of assignedNat) {
+        assignments.push({
+            date: new Date(),
+            user: user._id,
+        });
+    }
+
+    let fields = [];
+    let discordIds = [];
+
+    const natList = assignedNat.map(n => n.username).join(', ');
+    const natDiscordIds = assignedNat.map(n => n.discordId);
+    discordIds = discordIds.concat(natDiscordIds);
+
+    fields.push({
+        name: 'Assigned NAT',
+        value: natList,
+    });
+
+    // set trialNat assignments
+    if (await Settings.getModeHasTrialNat(mode)) {
+        const assignedTrialNat = await User.getAssignedTrialNat(mode);
+        newBnApp.bnEvaluators = assignedTrialNat;
+        const trialNatList = assignedTrialNat.map(n => n.username).join(', ');
+        const trialNatDiscordIds = assignedTrialNat.map(n => n.discordId);
+        fields.push({
+            name: 'Assigned BN',
+            value: trialNatList,
+        });
+        discordIds = discordIds.concat(trialNatDiscordIds);
+    }
+
+    // save all assignments
+    await newBnApp.save();
+
+    console.log(newBnApp);
+
+    // webhooks
+    await discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            description: `Submitted [BN application](http://bn.mappersguild.com/appeval?id=${newBnApp.id})`,
+            color: discord.webhookColors.green,
+            fields,
+        }],
+        mode
+    );
+
+    await discord.userHighlightWebhookPost(mode, discordIds);
 
     // proceed
     res.json({
@@ -254,6 +251,14 @@ router.post('/apply', async (req, res) => {
     });
 
     Logger.generate(req.session.mongoId, `Applied for ${mode} BN`, 'application', newBnApp._id);
+
+    // logs
+    Logger.generate(
+        req.session.mongoId,
+        `Applied for ${mode} BN`,
+        'application',
+        newBnApp._id
+    );
 });
 
 /* POST request to rejoin bn */
@@ -304,47 +309,32 @@ router.post('/rejoinApply', async (req, res) => {
         });
     }
 
-    // create app & test
-    const [newBnApp, test] = await Promise.all([
-        AppEvaluation.create({
+    // create app
+    const newBnApp = await AppEvaluation.create({
             user: req.session.mongoId,
             mode,
             mods: [],
             reasons: [],
             oszs: [],
-        }),
-        TestSubmission.generateTest(req.session.mongoId, mode),
-    ]);
+            isRejoinRequest: true,
+        });
 
-    if (!newBnApp || !test) {
+    if (!newBnApp) {
         return res.json({ error: 'Failed to process application!' });
     }
 
-    newBnApp.isRejoinRequest = true;
-    
-    // skip test
-    test.status = 'finished';
-    test.submittedAt = new Date;
-    test.totalScore = 0;
-    newBnApp.test = test._id;
-
     // assign NAT
-    const assignedNat = await User.getAssignedNat(test.mode, req.session.mongoId);
+    const assignedNat = await User.getAssignedNat(mode, req.session.mongoId);
     newBnApp.natEvaluators = assignedNat;
 
     const assignments = [];
-
-    const days = util.findDaysBetweenDates(new Date(), new Date(newBnApp.deadline));
 
     for (const user of assignedNat) {
         assignments.push({
             date: new Date(),
             user: user._id,
-            daysOverdue: days,
         });
     }
-
-    newBnApp.natEvaluatorHistory = assignments;
 
     let fields = [];
     const natList = assignedNat.map(n => n.username).join(', ');
@@ -355,8 +345,8 @@ router.post('/rejoinApply', async (req, res) => {
     });
 
     // assign trial NAT
-    if (await Settings.getModeHasTrialNat(test.mode)) {
-        const assignedTrialNat = await User.getAssignedTrialNat(test.mode);
+    if (await Settings.getModeHasTrialNat(mode)) {
+        const assignedTrialNat = await User.getAssignedTrialNat(mode);
         newBnApp.bnEvaluators = assignedTrialNat;
         const trialNatList = assignedTrialNat.map(n => n.username).join(', ');
         fields.push({
@@ -366,10 +356,7 @@ router.post('/rejoinApply', async (req, res) => {
     }
 
     // save
-    await Promise.all([
-        test.save(),
-        newBnApp.save(),
-    ]);
+    await newBnApp.save();
 
     // proceed
     res.json({

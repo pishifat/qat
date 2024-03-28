@@ -104,7 +104,6 @@ export default {
             if (this.selectedEvaluation.isBnEvaluation) {
                 return [
                     { consensus: 'fullBn', color: 'btn-success' },
-                    { consensus: 'probationBn', color: 'btn-probation' },
                     { consensus: 'removeFromBn', color: 'btn-danger' },
                     { consensus: undefined, color: 'btn-neutral' },
                 ];

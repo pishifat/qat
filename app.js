@@ -34,9 +34,6 @@ const manageReportsRouter = require('./routes/manageReports');
 const usersRouter = require('./routes//users/users');
 const natRouter = require('./routes/users/nat');
 const vetoesRouter = require('./routes/vetoes');
-const testSubmissionRouter = require('./routes/testSubmission');
-const manageTestRouter = require('./routes/manageTest');
-const testResultsRouter = require('./routes/testResults');
 const discussionVoteRouter = require('./routes/discussionVote');
 const qualityAssuranceRouter = require('./routes/qualityAssurance');
 const logsRouter = require('./routes/logs');
@@ -118,9 +115,6 @@ app.use('/manageReports', manageReportsRouter);
 app.use('/users', usersRouter);
 app.use('/users/nat', natRouter);
 app.use('/vetoes', vetoesRouter);
-app.use('/testSubmission', testSubmissionRouter);
-app.use('/managetest', manageTestRouter);
-app.use('/testresults', testResultsRouter);
 app.use('/discussionVote', discussionVoteRouter);
 app.use('/qualityassurance', qualityAssuranceRouter);
 app.use('/logs', logsRouter);
@@ -202,7 +196,7 @@ const server = app.listen(port, () => {
     console.log('Listening on ' + port);
 
     if (config.enableAutomation) {
-        //automation.notifyDeadlines.start();
+        automation.notifyDeadlines.start();
         automation.lowActivityTask.start();
         automation.handleContentReviews.start();
         automation.checkBnEvaluationDeadlines.start();

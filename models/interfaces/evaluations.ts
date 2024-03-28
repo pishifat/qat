@@ -1,6 +1,5 @@
 import { Document, Model } from 'mongoose'
 import { IUserDocument } from './user';
-import { ITestSubmissionDocument } from './testSubmission';
 import { IReviewDocument } from './review';
 import { IMediationDocument } from './mediation';
 
@@ -23,12 +22,6 @@ interface IEvaluationBase {
     isResignation?: boolean;
     isReviewed?: boolean;
     isSecurityChecked?: boolean;
-    natEvaluatorHistory: {
-        date: Date;
-        user: IUserDocument;
-        previousUser?: IUserDocument;
-        daysOverdue: number;
-    }[];
     overwriteNextEvaluationDate?: Date;
     vibeChecks?: IMediationDocument[];
 }
@@ -38,7 +31,6 @@ export interface IAppEvaluationDocument extends IEvaluationBase, Document {
     mods: string[];
     reasons: string[];
     oszs: string[];
-    test?: ITestSubmissionDocument;
     isRejoinRequest?: Boolean;
     deadline?: Date;
     kind?: string;

@@ -6,7 +6,7 @@
             </div>
             <div class="col-sm-12">
                 <p>
-                    <b>{{ selectedEvaluation.user.isNat && loggedInUser.isNatLeader ? 'NAT activity comments:' : 'Modding comments:' }}</b>
+                    <b>{{ selectedEvaluation.user.isNat && loggedInUser.isNatLeader ? 'NAT activity comments:' : 'Evaluation:' }}</b>
                     <a
                         :class="'ml-1 ' + (previewModdingComment ? 'text-success' : '')"
                         data-toggle="tooltip"
@@ -27,36 +27,6 @@
                     />
                     <textarea
                         v-model="moddingComment"
-                        class="form-control"
-                        rows="4"
-                        maxlength="5000"
-                    />
-                </div>
-            </div>
-
-            <div class="col-sm-12">
-                <p>
-                    <b>Behavior comments:</b>
-                    <a
-                        :class="'ml-1 ' + (previewBehaviorComment ? 'text-success' : '')"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        title="toggle comment preview"
-                        href="#"
-                        @click.prevent="togglePreviewBehaviorComment()"
-                    >
-                        <i class="fas fa-search" />
-                    </a>
-                </p>
-
-                <div class="form-group">
-                    <div 
-                        v-if="previewBehaviorComment" 
-                        class="small mb-2 card card-body v-html-content" 
-                        v-html="$md.render(behaviorComment)"
-                    />
-                    <textarea
-                        v-model="behaviorComment"
                         class="form-control"
                         rows="4"
                         maxlength="5000"
@@ -188,7 +158,7 @@ export default {
             }
         },
         async submitEval (e) {
-            if (!this.vote || !this.moddingComment.length || !this.behaviorComment.length) {
+            if (!this.vote || !this.moddingComment.length) {
                 this.$store.dispatch('updateToastMessages', {
                     message: `Cannot leave fields blank!`,
                     type: 'danger',

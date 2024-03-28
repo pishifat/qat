@@ -7,10 +7,11 @@ const appEvaluationSchema = new mongoose.Schema({
     mods: [{ type: String, required: true }],
     reasons: [{ type: String, required: true }],
     oszs: [{ type: String, required: true }],
-    test: { type: 'ObjectId', ref: 'TestSubmission' },
     isRejoinRequest: { type: Boolean },
     natBuddy: { type: 'ObjectId', ref: 'User' },
     vibeChecks: [{ type: 'ObjectId', ref: 'Mediation' }],
+    comment: { type: String },
+    visibleToPublic: { type: Boolean },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 class AppEvaluationService extends mongoose.Model {
@@ -34,14 +35,12 @@ class AppEvaluationService extends mongoose.Model {
         return AppEvaluation
             .find({
                 active: true,
-                test: { $exists: true },
             })
             .populate([
                 { path: 'user', select: 'username osuId' },
                 { path: 'natBuddy', select: 'username osuId' },
                 { path: 'bnEvaluators', select: 'username osuId' },
                 { path: 'natEvaluators', select: 'username osuId' },
-                { path: 'test', select: 'totalScore comment' },
                 {
                     path: 'reviews',
                     select: 'evaluator behaviorComment moddingComment vote',

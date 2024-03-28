@@ -66,6 +66,7 @@
                     :is-evaluation="true"
                     :is-nat="selectedEvaluation.user.isNat"
                 />
+                <hr>
                 <template v-if="loggedInUser.isNat || loggedInUser.isTrialNat">
                     <p>
                         <a href="#additionalInfo" data-toggle="collapse">
@@ -73,20 +74,25 @@
                         </a>
                     </p>
 
-                    <div id="additionalInfo" class="collapse container">
+                    <div id="additionalInfo" class="collapse container mb-4">
                         <evaluator-assignments />
+                        <hr>
                         <previous-evaluations
                             :user-mongo-id="selectedEvaluation.user.id"
                         />
+                        <hr>
                         <user-notes :user-mongo-id="selectedEvaluation.user.id" />
+                        <hr>
                         <user-reports
                             v-if="loggedInUser.isNat"
                             :user-mongo-id="selectedEvaluation.user.id"
                         />
+                        <hr>
                         <modding-activity
                             :username="selectedEvaluation.user.username"
                         />
                         <div v-if="loggedInUser.isPishifat" class="mb-2">
+                            <hr>
                             <b>Debug</b>
                             <div class="ml-3">
                                 <a href="#evalDocument" data-toggle="collapse">

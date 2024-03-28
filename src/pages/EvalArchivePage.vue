@@ -41,7 +41,7 @@
                         <select
                             v-model="mode"
                             class="form-control ml-1"
-                            @change="findNatActivity($event)"
+                            @change="queryRecent($event)"
                         >
                             <option class="ml-2" value="osu" selected>
                                 osu!

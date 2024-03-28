@@ -25,7 +25,6 @@ const defaultPopulate = [
     { path: 'natBuddy', select: 'username osuId' },
     { path: 'bnEvaluators', select: 'username osuId discordId isBnEvaluator' },
     { path: 'natEvaluators', select: 'username osuId discordId isBnEvaluator' },
-    { path: 'test', select: 'totalScore comment' },
     { 
         path: 'vibeChecks',
         select: 'mediator vote',
@@ -48,7 +47,6 @@ const defaultPopulate = [
 function getActiveBnDefaultPopulate(mongoId) {
     return [
         { path: 'user', select: 'username osuId' },
-        { path: 'test', select: 'comment totalScore' },
         { 
             path: 'vibeChecks',
             select: 'mediator vote',
@@ -72,7 +70,6 @@ function getActiveBnDefaultPopulate(mongoId) {
 
 const inactiveBnDefaultPopulate = [
     { path: 'user', select: 'username osuId' },
-    { path: 'test', select: 'comment totalScore' },
     {
         path: 'reviews',
         select: 'behaviorComment moddingComment vote',
@@ -91,7 +88,6 @@ router.get('/relevantInfo', async (req, res) => {
         applications = await AppEvaluation
             .find({
                 active: true,
-                test: { $exists: true },
             })
             .populate(defaultPopulate)
             .sort({
@@ -105,7 +101,6 @@ router.get('/relevantInfo', async (req, res) => {
         applications = await AppEvaluation
             .find({
                 active: true,
-                test: { $exists: true },
                 $and: [
                     { mode: res.locals.userRequest.modes },
                     { mode: trialNatModes },
@@ -120,7 +115,6 @@ router.get('/relevantInfo', async (req, res) => {
             AppEvaluation
                 .find({
                     bnEvaluators: req.session.mongoId,
-                    test: { $exists: true },
                     active: true,
                 })
                 .select(['active', 'user', 'discussion', 'reviews', 'mode', 'mods', 'reasons', 'oszs', 'createdAt', 'updatedAt'])
@@ -131,7 +125,6 @@ router.get('/relevantInfo', async (req, res) => {
                 AppEvaluation
                     .find({
                         bnEvaluators: req.session.mongoId,
-                        test: { $exists: true },
                         active: false,
                         discussion: true,
                     })
@@ -471,16 +464,6 @@ router.post('/replaceUser/:id', middlewares.isNat, async (req, res) => {
 
     if (replaceNat) {
         replacement = await replaceUser(evaluation, res.locals.userRequest, req.body.evaluatorId, false, req.body.selectedUserId);
-
-        const days = util.findDaysBetweenDates(new Date(), new Date(evaluation.deadline));
-
-        evaluation.natEvaluatorHistory.push({
-            date: new Date(),
-            user: replacement._id,
-            previousUser: req.body.evaluatorId,
-            daysOverdue: days,
-        });
-
         await evaluation.save();
     } else {
         let invalids = evaluation.bnEvaluators.map(bn => bn.osuId);

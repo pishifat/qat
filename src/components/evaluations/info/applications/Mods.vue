@@ -1,27 +1,41 @@
 <template>
     <div>
-        <p>
-            <b>Modding:</b>
-        </p>
-
-        <ul>
-            <li v-for="(mod, i) in mods" :key="i" class="small">
-                Mod: <a :href="modUrl(mod)" target="_blank">{{ modUrl(mod) }}</a><br>
-                Additional info: <span
-                    v-if="reasons && reasons.length"
-                    class="text-secondary"
-                    v-html="$md.render(reasons[i])"
-                />
-                .osz: <span
-                    v-if="oszs && oszs.length"
-                    class="text-secondary"
-                    v-html="$md.render(oszs[i])"
-                />
-            </li>
-            <li class="small">
-                <a :href="'https://osu.ppy.sh/beatmapsets/events?user=' + osuId + '&types%5B%5D=kudosu_gain&types%5B%5D=kudosu_lost&min_date=&max_date='" target="_blank">All history</a>
-            </li>
-        </ul>
+        <div v-for="(mod, i) in mods" :key="i">
+            <div>
+                <b>Beatmap {{ i+1 }}:</b>
+                <ul class="small text-secondary">
+                    <li>
+                        Mod:
+                        <a :href="modUrl(mod)" target="_blank">{{ modUrl(mod) }}</a>
+                    </li>
+                    <li>
+                        .osz: 
+                        <a
+                            v-if="isValidUrl(oszs[i])"
+                            :href="oszs[i]"
+                            target="_blank"
+                        >
+                            {{ oszs[i] }}
+                        </a>
+                        <span v-else class="text-secondary">
+                            {{ oszs[i] }}
+                        </span>
+                    </li>
+                    <li>
+                        <b v-if="i == 0">Briefly describe why the map is ready (or nearly ready) to be nominated:</b>
+                        <b v-else-if="i == 1">Briefly explain why the map is NOT ready to be nominated (use your modding to back up your reasons!):</b>
+                        <b v-else-if="i == 2">
+                            Respond to either of these:
+                            <ul>
+                                <li>Briefly describe why the map is ready (or nearly ready) to be nominated</li>
+                                <li>Briefly explain why the map is NOT ready to be nominated</li>
+                            </ul>
+                        </b>
+                        <span v-html="$md.render(reasons[i])" />
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -64,6 +78,15 @@ export default {
                 return mod;
             }
         },
+        isValidUrl(url, contain) {
+            const regexp = /^(?:(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?|mailto:[^\s@]+@[^\s@]+\.[^\s@]+)$/;
+
+            if (!regexp.test(url) || (contain && !url.includes(contain))) {
+                return false;
+            } else {
+                return true;
+            }
+        }
     },
 };
 </script>

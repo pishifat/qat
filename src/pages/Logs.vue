@@ -97,7 +97,6 @@ export default {
                 'dataCollection',
                 'discussionVote',
                 'report',
-                'test',
                 'qualityAssurance',
                 'veto',
                 'interOp',
