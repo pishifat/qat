@@ -336,8 +336,6 @@ router.post('/rejoinApply', async (req, res) => {
         });
     }
 
-    newBnApp.natEvaluatorHistory = assignments;
-
     let fields = [];
     const natList = assignedNat.map(n => n.username).join(', ');
 

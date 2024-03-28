@@ -180,17 +180,13 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
             await er.populate(defaultPopulate).execPopulate();
 
             const assignments = [];
-            const days = util.findDaysBetweenDates(new Date(), new Date(deadline));
 
             for (const user of assignedNat) {
                 assignments.push({
                     date: new Date(),
                     user: user._id,
-                    daysOverdue: days,
                 });
             }
-        
-            er.natEvaluatorHistory = assignments;
 
             let fields = [];
             const natList = assignedNat.map(u => u.username).join(', ');
@@ -793,19 +789,6 @@ router.post('/replaceUser/:id', middlewares.isNat, async (req, res) => {
         .orFail();
 
     let newEvaluator = await replaceUser(evaluation, res.locals.userRequest, req.body.evaluatorId, !replaceNat, req.body.selectedUserId);
-
-    if (replaceNat) {
-        const days = util.findDaysBetweenDates(new Date(), new Date(evaluation.deadline));
-
-        evaluation.natEvaluatorHistory.push({
-            date: new Date(),
-            user: newEvaluator._id,
-            previousUser: req.body.evaluatorId,
-            daysOverdue: days,
-        });
-
-        await evaluation.save();
-    }
 
     evaluation = await Evaluation
         .findById(req.params.id)

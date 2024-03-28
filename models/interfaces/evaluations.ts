@@ -22,12 +22,6 @@ interface IEvaluationBase {
     isResignation?: boolean;
     isReviewed?: boolean;
     isSecurityChecked?: boolean;
-    natEvaluatorHistory: {
-        date: Date;
-        user: IUserDocument;
-        previousUser?: IUserDocument;
-        daysOverdue: number;
-    }[];
     overwriteNextEvaluationDate?: Date;
     vibeChecks?: IMediationDocument[];
 }

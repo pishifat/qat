@@ -283,7 +283,6 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
             if (round.deadline < endRange && (!round.natEvaluators || !round.natEvaluators.length)) {
                 round.natEvaluators = await User.getAssignedNat(round.mode, round.user.id);
                 await round.populate(defaultPopulate).execPopulate();
-                const days = util.findDaysBetweenDates(new Date(), new Date(round.deadline));
 
                 const assignments = [];
 
@@ -291,11 +290,8 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
                     assignments.push({
                         date: new Date(),
                         user: user._id,
-                        daysOverdue: days,
                     });
                 }
-
-                round.natEvaluatorHistory = assignments;
 
                 const initialDate90 = moment().subtract(90, 'days').toDate();
                 const userHasLowActivity = await hasLowActivity(initialDate90, round.user, round.mode, 90);

@@ -464,16 +464,6 @@ router.post('/replaceUser/:id', middlewares.isNat, async (req, res) => {
 
     if (replaceNat) {
         replacement = await replaceUser(evaluation, res.locals.userRequest, req.body.evaluatorId, false, req.body.selectedUserId);
-
-        const days = util.findDaysBetweenDates(new Date(), new Date(evaluation.deadline));
-
-        evaluation.natEvaluatorHistory.push({
-            date: new Date(),
-            user: replacement._id,
-            previousUser: req.body.evaluatorId,
-            daysOverdue: days,
-        });
-
         await evaluation.save();
     } else {
         let invalids = evaluation.bnEvaluators.map(bn => bn.osuId);
