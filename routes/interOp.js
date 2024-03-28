@@ -346,7 +346,7 @@ router.get('/logs/:osuId/:category', middlewares.hasPrivateInterOpsAccess, async
             'dataCollection',
             'discussionVote',
             'report',
-            'test',
+            'test', (no longer used)
             'qualityAssurance',
             'veto',
             'spam',

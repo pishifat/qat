@@ -1,6 +1,5 @@
 import { Document, Model } from 'mongoose'
 import { IUserDocument } from './user';
-import { ITestSubmissionDocument } from './testSubmission';
 import { IReviewDocument } from './review';
 import { IMediationDocument } from './mediation';
 
@@ -38,7 +37,6 @@ export interface IAppEvaluationDocument extends IEvaluationBase, Document {
     mods: string[];
     reasons: string[];
     oszs: string[];
-    test?: ITestSubmissionDocument;
     isRejoinRequest?: Boolean;
     deadline?: Date;
     kind?: string;

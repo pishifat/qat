@@ -25,7 +25,6 @@ const defaultPopulate = [
     { path: 'natBuddy', select: 'username osuId' },
     { path: 'bnEvaluators', select: 'username osuId discordId isBnEvaluator' },
     { path: 'natEvaluators', select: 'username osuId discordId isBnEvaluator' },
-    { path: 'test', select: 'totalScore comment' },
     { 
         path: 'vibeChecks',
         select: 'mediator vote',
@@ -48,7 +47,6 @@ const defaultPopulate = [
 function getActiveBnDefaultPopulate(mongoId) {
     return [
         { path: 'user', select: 'username osuId' },
-        { path: 'test', select: 'comment totalScore' },
         { 
             path: 'vibeChecks',
             select: 'mediator vote',
@@ -72,7 +70,6 @@ function getActiveBnDefaultPopulate(mongoId) {
 
 const inactiveBnDefaultPopulate = [
     { path: 'user', select: 'username osuId' },
-    { path: 'test', select: 'comment totalScore' },
     {
         path: 'reviews',
         select: 'behaviorComment moddingComment vote',
@@ -104,7 +101,6 @@ router.get('/relevantInfo', async (req, res) => {
         applications = await AppEvaluation
             .find({
                 active: true,
-                test: { $exists: true },
                 $and: [
                     { mode: res.locals.userRequest.modes },
                     { mode: trialNatModes },
@@ -119,7 +115,6 @@ router.get('/relevantInfo', async (req, res) => {
             AppEvaluation
                 .find({
                     bnEvaluators: req.session.mongoId,
-                    test: { $exists: true },
                     active: true,
                 })
                 .select(['active', 'user', 'discussion', 'reviews', 'mode', 'mods', 'reasons', 'oszs', 'createdAt', 'updatedAt'])
@@ -130,7 +125,6 @@ router.get('/relevantInfo', async (req, res) => {
                 AppEvaluation
                     .find({
                         bnEvaluators: req.session.mongoId,
-                        test: { $exists: true },
                         active: false,
                         discussion: true,
                     })

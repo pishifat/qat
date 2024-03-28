@@ -35,14 +35,12 @@ class AppEvaluationService extends mongoose.Model {
         return AppEvaluation
             .find({
                 active: true,
-                test: { $exists: true },
             })
             .populate([
                 { path: 'user', select: 'username osuId' },
                 { path: 'natBuddy', select: 'username osuId' },
                 { path: 'bnEvaluators', select: 'username osuId' },
                 { path: 'natEvaluators', select: 'username osuId' },
-                { path: 'test', select: 'totalScore comment' },
                 {
                     path: 'reviews',
                     select: 'evaluator behaviorComment moddingComment vote',

@@ -1062,7 +1062,7 @@ router.get('/activity', async (req, res) => {
                 bnEvaluators: { $ne: mongoId },
             })
             .populate(evaluationsPopulate)
-            .select('-feedback -id -_id -natEvaluatorHistory -mods -reasons -oszs -bnEvaluators -test -user')
+            .select('-feedback -id -_id -natEvaluatorHistory -mods -reasons -oszs -bnEvaluators -user')
             .sort({ deadline: 1 }),
 
         Evaluation

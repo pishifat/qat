@@ -15,7 +15,6 @@ const appPopulate = [
     { path: 'natBuddy', select: 'username osuId' },
     { path: 'bnEvaluators', select: 'username osuId' },
     { path: 'natEvaluators', select: 'username osuId' },
-    { path: 'test', select: 'totalScore comment' },
     {
         path: 'reviews',
         select: 'evaluator',

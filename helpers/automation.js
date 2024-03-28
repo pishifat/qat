@@ -122,7 +122,6 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
         AppEvaluation
             .find({
                 active: true,
-                test: { $exists: true },
             })
             .populate(defaultPopulate),
 

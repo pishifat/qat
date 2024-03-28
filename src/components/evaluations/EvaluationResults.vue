@@ -39,14 +39,6 @@
                             <span class="small" v-html="$md.render(evaluation.oszs[i])" />
                         </div>
                     </div>
-                    <h5>Test results</h5>
-                    <p>
-                        Final score:
-                        <span :class="scoreColor">
-                            {{ evaluation.test.totalScore }}/20
-                        </span>
-                    </p>
-                    <p><a :href="'/testresults?test=' + evaluation.test.id" target="_blank">View your full test breakdown here</a></p>
                 </div>
             </div>
 
@@ -133,16 +125,6 @@ export default {
         /** @returns {array} */
         natReviews () {
             return this.evaluation.reviews.filter(r => r.evaluator.isNat || r.evaluator.isTrialNat);
-        },
-        /** @returns {string} */
-        scoreColor() {
-            if (this.evaluation.test.totalScore > 15) {
-                return 'text-success';
-            } else if (this.evaluation.test.totalScore > 12.5) {
-                return 'text-neutral';
-            } else {
-                return 'text-danger';
-            }
         },
         /** @returns {string} */
         consensus () {

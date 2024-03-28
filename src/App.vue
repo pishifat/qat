@@ -53,9 +53,6 @@
                                     <router-link class="dropdown-item" to="/yourevals">
                                         Your Evaluations
                                     </router-link>
-                                    <router-link class="dropdown-item" to="/testresults">
-                                        RC Test Results
-                                    </router-link>
                                     <router-link class="dropdown-item" to="/reports">
                                         Reports
                                     </router-link>
@@ -90,9 +87,6 @@
                                 <div class="dropdown-menu">
                                     <router-link class="dropdown-item" to="/yourevals">
                                         Your Evaluations
-                                    </router-link>
-                                    <router-link class="dropdown-item" to="/testresults">
-                                        RC Test Results
                                     </router-link>
                                     <router-link class="dropdown-item" to="/reports">
                                         Reports
@@ -179,9 +173,6 @@
                                     <router-link class="dropdown-item" to="/yourevals">
                                         Your Evaluations
                                     </router-link>
-                                    <router-link class="dropdown-item" to="/testresults">
-                                        RC Test Results
-                                    </router-link>
                                 </div>
                             </li>
                             <li v-if="loggedInUser.isBn" class="nav-item dropdown">
@@ -229,9 +220,6 @@
                                 <div class="dropdown-menu">
                                     <router-link class="dropdown-item" to="/yourevals">
                                         Your Evaluations
-                                    </router-link>
-                                    <router-link class="dropdown-item" to="/testresults">
-                                        RC Test Results
                                     </router-link>
                                     <router-link class="dropdown-item" to="/vetoes">
                                         Vetoes (read-only)
@@ -303,19 +291,6 @@
                                     </router-link>
                                     <router-link class="dropdown-item" to="/yourevals">
                                         Your Evaluations
-                                    </router-link>
-                                </div>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
-                                    RC Test
-                                </a>
-                                <div class="dropdown-menu">
-                                    <router-link class="dropdown-item" to="/managetest">
-                                        Questions
-                                    </router-link>
-                                    <router-link class="dropdown-item" to="/testresults">
-                                        Results
                                     </router-link>
                                 </div>
                             </li>
