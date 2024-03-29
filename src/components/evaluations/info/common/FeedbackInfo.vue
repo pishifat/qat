@@ -22,8 +22,10 @@
                 v-model="feedback"
                 :class="feedback != selectedEvaluation.feedback ? 'bg-dark' : ''"
                 class="form-control mb-2"
-                rows="4"
+                rows="2"
             />
+
+            <b v-if="feedback.length > 500" class="text-warning float-right">{{ feedback.length }}</b>
 
             <span v-if="feedback != selectedEvaluation.feedback" class="small text-danger">Feedback is currently not saved.</span>
 

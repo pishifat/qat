@@ -43,6 +43,12 @@
                     apply to the same game mode again for 60 days.
                 </div>
                 <hr>
+                <div>If you're interested in becoming a BN, here are a few resources:</div>
+                <ul>
+                    <li><a href="https://osu.ppy.sh/wiki/en/People/Beatmap_Nominators/Becoming_a_Beatmap_Nominator" target="_blank">Becoming a Beatmap Nominator</a></li>
+                    <li><a href="https://osu.ppy.sh/wiki/en/People/Beatmap_Nominators" target="_blank">General Beatmap Nominator information</a></li>
+                    <li><a href="https://osu.ppy.sh/wiki/en/People/Beatmap_Nominators/Expectations" target="_blank">Expectations for Beatmap Nominators</a></li>
+                </ul>
                 <div>
                     As part of <a href="https://osu.ppy.sh/community/forums/topics/1898076" target="_blank">recent BN application process changes</a>, a few things are still under construction! Thanks for your patience. :)
                 </div>
@@ -120,17 +126,17 @@
                                 <div class="small text-secondary"><small>This intends to show your issue identification skills, communication skills, and understanding of standards for Ranked maps.</small></div>
                                 <div class="mt-2">This map should...</div>
                                 <ul>
-                                    <li>include Normal, Hard, and Insane difficulties</li>
-                                    <li>be created by different mappers from the previous map</li>
+                                    <li>include a spread with at least Normal, Hard, and Insane difficulties</li>
+                                    <li>be hosted by a different user from the previous map</li>
                                 </ul>
                             </div>
                             <div v-else-if="i == 3">
                                 Submit your mod on a map that, in your opinion, <b>proves you're able to judge map quality and readiness for Ranked.</b> You're free to choose a map that you would or would <i>not</i> nominate.
-                                <div class="small text-secondary"><small>This gives you an opportunity to fill any missing gaps your application, keeping in mind the intentions stated in the descriptions of the previous submissions.</small></div>
+                                <div class="small text-secondary"><small>This gives you an opportunity to fill any missing gaps in your application, keeping in mind the intentions stated in the descriptions of the previous submissions.</small></div>
                                 <div class="mt-2">This map should...</div>
                                 <ul>
                                     <li>have 0 nominations when the application is submitted</li>
-                                    <li>be created by different mappers from the previous maps</li>
+                                    <li>be hosted by different users from the previous maps</li>
                                 </ul>
                             </div>
                             
@@ -207,9 +213,9 @@
                         Missing application details:
                         <ul>
                             <li v-if="!selectedMode">Game mode</li>
-                            <li v-if="mods.length !== 3">Beatmap links (current: {{ mods.length }} - required: 3)</li>
-                            <li v-if="reasons.length !== 3">Responses (current: {{ reasons.length }} - required: 3)</li>
-                            <li v-if="oszs.length !== 3">.osz links (current: {{ reasons.length }} - required: 3)</li>
+                            <li v-if="missingInput(mods)">Beatmap links</li>
+                            <li v-if="missingInput(reasons)">Responses</li>
+                            <li v-if="missingInput(oszs)">.osz links</li>
                         </ul>
                     </div>
 
@@ -394,6 +400,13 @@ export default {
         },
     },
     methods: {
+        missingInput(array) {
+            if (array.length < 3 || !array[0] || !array[1] || !array[2]) {
+                return true;
+            }
+
+            return false;
+        },
         async apply(e) {
             let missingLinkCount = 0;
 
