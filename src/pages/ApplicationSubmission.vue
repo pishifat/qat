@@ -115,6 +115,7 @@
                             <div class="mt-2">This map should...</div>
                             <ul>
                                 <li>have 0 nominations when the application is submitted</li>
+                                <li>be modded by you in the last 6 months</li>
                             </ul>
                         </div>
                         <div v-else-if="i == 2">
@@ -124,6 +125,7 @@
                             <ul>
                                 <li>include a spread with at least Normal, Hard, and Insane difficulties</li>
                                 <li>be hosted by a different user from the previous map</li>
+                                <li>be modded by you in the last 6 months</li>
                             </ul>
                         </div>
                         <div v-else-if="i == 3">
@@ -133,6 +135,7 @@
                             <ul>
                                 <li>have 0 nominations when the application is submitted</li>
                                 <li>be hosted by different users from the previous maps</li>
+                                <li>be modded by you in the last 6 months</li>
                             </ul>
                         </div>
                         
