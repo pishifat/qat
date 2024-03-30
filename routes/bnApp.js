@@ -123,6 +123,7 @@ router.post('/apply', async (req, res) => {
         ResignationEvaluation
             .findOne({
                 user: req.session.mongoId,
+                mode,
                 active: false,
                 cooldownDate: { $gt: new Date() }
             })
