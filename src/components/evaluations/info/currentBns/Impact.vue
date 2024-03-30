@@ -15,15 +15,15 @@
             <span class="ml-2 btn-group">
                 <button 
                     class="btn btn-sm btn-warning"
-                    @click.prevent="updateImpact(true)"
-                    :disabled="impact === true"
+                    @click.prevent="updateImpact(1)"
+                    :disabled="impact === 1"
                 >
                     Notable
                 </button>
                 <button 
                     class="btn btn-sm btn-success"
-                    @click.prevent="updateImpact(false)"
-                    :disabled="impact === false"
+                    @click.prevent="updateImpact(0)"
+                    :disabled="impact === 0"
                 >
                     Minor
                 </button>
