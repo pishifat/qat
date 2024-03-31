@@ -181,6 +181,7 @@ body {
 
 ::-webkit-scrollbar {
     width: 10px;
+    height: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -283,4 +284,10 @@ img {
 /* Line break */
 .v-html-content hr {
     border-top: 1px solid $line-break;
+}
+
+/* Code blocks */
+pre {
+    background-color: $body-bg;
+    padding: 1rem;
 }
