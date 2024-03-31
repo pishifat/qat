@@ -28,7 +28,7 @@
                     :disabled="impact === 2"
                 >
                     Severe
-                </button>                
+                </button>
             </span>
         </p>
     </div>
