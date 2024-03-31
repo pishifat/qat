@@ -207,4 +207,25 @@ router.post("/moveToStructuralNat", async (req, res) => {
     });
 });
 
+/* GET session info */
+router.get("/session", async (req, res) => {
+    res.json({
+        session: req.session,
+    });
+});
+
+/* POST update session info */
+router.post("/session", async (req, res) => {
+    req.session.mongoId = req.body.mongoId;
+    req.session.osuId = Number(req.body.osuId);
+    req.session.username = req.body.username;
+    req.session.groups = req.body.groups.split(",");
+    req.session.discordId = req.body.discordId;
+
+    res.json({
+        success: "updated session",
+        session: req.session,
+    });
+});
+
 module.exports = router;
