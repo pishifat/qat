@@ -114,7 +114,7 @@ export default {
                 { id: 48, identifier: 'bsc', name: 'Beatmap Spotlight Curators' },
                 { id: 11, identifier: 'dev', name: 'Developers' },
                 { id: 22, identifier: 'support', name: 'Technical Support Team' },
-                { id: 35, identifier: 'featured_artist', name: 'Featured Artist' },
+                { id: 35, identifier: 'featured_artist', name: 'Featured Artists' },
             ],
             params: {
                 user: '',
