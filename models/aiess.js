@@ -22,7 +22,8 @@ const aiessSchema = new mongoose.Schema({
 
     obviousness: { type: Number, default: null }, // old SEV system, replaced with impact
     severity: { type: Number, default: null }, // old SEV system, replaced with impact
-    impact: { type: Number },
+    impact: { type: Boolean }, // old impact system, replaced with impactNum
+    impactNum: { type: Number },
     mapperId: { type: Number },
     mapperTotalRanked: { type: Number },
     isBnOrNat: { type: Boolean, default: false },

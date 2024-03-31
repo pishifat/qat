@@ -23,7 +23,8 @@ interface IAiess {
     valid: number;
     obviousness: number;
     severity: number;
-    impact: number;
+    impact: boolean;
+    impactNum: number;
     mapperId: number;
     mapperTotalRanked: number;
     isBnOrNat: boolean;
