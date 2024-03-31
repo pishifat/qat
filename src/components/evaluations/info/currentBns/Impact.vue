@@ -2,17 +2,19 @@
     <div>
         <p>
             <b class="mr-1">Impact level:</b>
-            <span v-if="impact === undefined" class="text-secondary">
-                <i class="fas fa-question"></i> Unknown
-            </span>
-            <span v-else-if="impact" class="text-warning">
-                <i class="fas fa-exclamation-triangle"></i> Notable
-            </span>
-            <span v-else class="text-success">
-                <font-awesome-icon icon="fa-solid fa-circle-check" class="text-success"/>
-                Minor
+            <span :class="getImpact(impact).color">
+                <i v-if="impact !== 0" :class="getImpact(impact).icon" />
+                <font-awesome-icon v-else :icon="getImpact(impact).icon" />
+                {{ getImpact(impact).text }}
             </span>
             <span class="ml-2 btn-group">
+                <button 
+                    class="btn btn-sm btn-success"
+                    @click.prevent="updateImpact(0)"
+                    :disabled="impact === 0"
+                >
+                    Minor
+                </button>
                 <button 
                     class="btn btn-sm btn-warning"
                     @click.prevent="updateImpact(1)"
@@ -21,12 +23,12 @@
                     Notable
                 </button>
                 <button 
-                    class="btn btn-sm btn-success"
-                    @click.prevent="updateImpact(0)"
-                    :disabled="impact === 0"
+                    class="btn btn-sm btn-danger"
+                    @click.prevent="updateImpact(2)"
+                    :disabled="impact === 2"
                 >
-                    Minor
-                </button>
+                    Severe
+                </button>                
             </span>
         </p>
     </div>
@@ -37,7 +39,7 @@ export default {
     name: 'Impact',
     props: {
         impact: {
-            type: Boolean,
+            type: Number,
         },
         eventId: {
             type: String,
@@ -49,15 +51,27 @@ export default {
         },
     },
     methods: {
-        async updateImpact(impact) {
-            let data = await this.$http.executePost('/dataCollection/updateImpact/' + this.eventId, { impact });
+        getImpact(impact) {
+            switch (impact) {
+                case 2:
+                    return { color: 'text-danger', icon: 'fas fa-times-circle', text: 'Severe' };
+                case 1:
+                    return { color: 'text-warning', icon: 'fas fa-exclamation-circle', text: 'Notable' };
+                case 0:
+                    return { color: 'text-success', icon: 'fa-solid fa-circle-check', text: 'Minor' };
+                default:
+                    return { color: 'text-secondary', icon: 'fas fa-question', text: 'Unknown' };
+            }
+        },
+        async updateImpact(impactNum) {
+            let data = await this.$http.executePost('/dataCollection/updateImpact/' + this.eventId, { impactNum });
 
             if (this.$http.isValid(data)) {
                 this.$store.commit('dataCollection/updateEvent', {
                     id: this.eventId,
                     type: this.type,
-                    modifiedField: 'impact',
-                    value: data.impact,
+                    modifiedField: 'impactNum',
+                    value: data.impactNum,
                 });
             }
         },

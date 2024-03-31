@@ -3,16 +3,12 @@
         <template v-if="!editing">
             <span
                 v-if="loggedInUser.isNatOrTrialNat && hasData"
-                :class="event.impact ? 'text-warning' : 'text-success'"
+                :class="getImpact(event.impactNum).color"
                 data-toggle="tooltip"
-                :title="event.impact ? 'Notable' : 'Minor'"
+                :title="getImpact(event.impactNum).text"
             >
-                <i class="fas fa-exclamation-triangle" v-if="event.impact" />
-                <font-awesome-icon
-                    icon="fa-solid fa-circle-check"
-                    class="text-success"
-                    v-else
-                />
+                <i v-if="event.impactNum !== 0" :class="getImpact(event.impactNum).icon" />
+                <font-awesome-icon v-else :icon="getImpact(event.impactNum).icon" />
             </span>
             <span v-if="loggedInUser.isNat">
                 <a href="#" @click.prevent="editing = !editing">
@@ -30,12 +26,12 @@
         <template v-else>
             <span
                 v-if="loggedInUser.isNat && hasData"
-                :class="event.impact ? 'text-warning' : 'text-success'"
+                :class="getImpact(event.impactNum).color"
                 data-toggle="tooltip"
-                :title="event.impact ? 'Notable' : 'Minor'"
+                :title="getImpact(event.impactNum).text"
             >
-                <i class="fas fa-exclamation-triangle" v-if="event.impact" />
-                <i class="fas fa-check" v-else />
+                <i v-if="event.impactNum !== 0" :class="getImpact(event.impactNum).icon" />
+                <font-awesome-icon v-else :icon="getImpact(event.impactNum).icon" />
             </span>
             <a href="#" @click.prevent="editing = !editing">
                 <i class="fas fa-edit" />
@@ -57,7 +53,7 @@
             <hr />
 
             <impact
-                :impact="event.impact"
+                :impact="event.impactNum"
                 :event-id="event._id"
                 :type="event.type"
             />
@@ -92,7 +88,7 @@ export default {
         ]),
         /** @returns {boolean} */
         hasData () {
-            return this.event.impact !== undefined;
+            return this.event.impactNum !== undefined;
         },
     },
     watch: {
@@ -101,6 +97,18 @@ export default {
         },
     },
     methods: {
+        getImpact(impact) {
+            switch (impact) {
+                case 2:
+                    return { color: 'text-danger', icon: 'fas fa-times-circle', text: 'Severe' };
+                case 1:
+                    return { color: 'text-warning', icon: 'fas fa-exclamation-circle', text: 'Notable' };
+                case 0:
+                    return { color: 'text-success', icon: 'fa-solid fa-circle-check', text: 'Minor' };
+                default:
+                    return;
+            }
+        },
         async updateContent (e) {
             const data = await this.$http.executePost('/dataCollection/updateContent/' + this.event._id, { reason: this.newEventContent }, e);
             this.$store.commit('dataCollection/updateEvent', {

@@ -31,7 +31,7 @@
             <hr />
 
             <impact
-                :impact="selectedEvent.impact"
+                :impact="selectedEvent.impactNum"
                 :event-id="selectedEvent._id"
                 :type="selectedEvent.type"
             />
