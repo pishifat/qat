@@ -23,7 +23,7 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
     const blockedUrls = [
         'ppy.sh',
         'puu.sh',
-        'cdn.discord'
+        'cdn.discordapp.com'
     ];
 
     if (req.body.category == 'contentCaseVisual' && blockedUrls.some(url => link.includes(url))) {
