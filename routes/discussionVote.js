@@ -3,6 +3,7 @@ const middlewares = require('../helpers/middlewares');
 const discord = require('../helpers/discord');
 const osuBot = require('../helpers/osuBot');
 const util = require('../helpers/util');
+const { websocketManager } = require('../helpers/websocket');
 const Discussion = require('../models/discussion');
 const Mediation = require('../models/mediation');
 const Logger = require('../models/log');
@@ -116,7 +117,7 @@ router.post('/submit', middlewares.hasBasicAccess, async (req, res) => {
     const blockedUrls = [
         'ppy.sh',
         'puu.sh',
-        'cdn.discord'
+        'cdn.discordapp.com'
     ];
     
     if (isContentReview && discussionLink.length > 0 && blockedUrls.some(u => discussionLink.includes(u))) {
@@ -185,6 +186,16 @@ router.post('/submit', middlewares.hasBasicAccess, async (req, res) => {
         'discussionVote',
         discussion._id
     );
+
+    // websocket for CRs
+    if (isContentReview) {
+        websocketManager.sendNotification('data:content_review', {
+            title: discussion.title,
+            shortReason: discussion.shortReason,
+            discussionLink: discussion.discussionLink,
+            timestamp: new Date(),
+        });
+    }
 
     // webhooks
 

@@ -43,5 +43,6 @@ The project supports websocket connections for a few data outputs, which require
 ### Available events
 
 - `users:request_status_update`
+- `data:content_review`
 
 If you need websocket support for other events, please open a GitHub issue and/or contact me.
