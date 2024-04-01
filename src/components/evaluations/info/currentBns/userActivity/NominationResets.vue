@@ -106,7 +106,7 @@ export default {
 
             // @ts-ignore
             if (this.filter && this.loggedInUser.isNatOrTrialNat) {
-                events = events.filter(e => e.impact != 0);
+                events = events.filter(e => e.impactNum != 0);
             }
 
             return events;

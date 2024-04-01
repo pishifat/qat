@@ -37,7 +37,7 @@ router.get('/loadUnsetEvents', middlewares.isNat, async (req, res) => {
     let data = await Aiess
         .find({
             $and: [
-                { impact: undefined },
+                { impactNum: undefined },
                 {
                     $or: [
                         { type: 'disqualify' },
@@ -71,6 +71,8 @@ router.post('/toggleIsReviewed/:id', middlewares.isNatOrTrialNat, async (req, re
 
 /* impact webhook */
 async function impactWebhook(event, req) {
+    const impactString = ['✅ Minor', '⚠️ Notable','❌ Severe'];
+
     for (const mode of event.modes) {
         const previousEvents = await Aiess
             .find({
@@ -94,18 +96,17 @@ async function impactWebhook(event, req) {
             users.push(user);
         }
 
-        const x = users.map(u => `[${u.username}](https://osu.ppy.sh/users/${u.osuId})`);
-        const y = x.join(', ');
+        const nominators = users.map(u => `[${u.username}](https://osu.ppy.sh/users/${u.osuId})`).join(', ');
 
         await discord.webhookPost(
             [{
                 author: discord.defaultWebhookAuthor(req.session),
-                description: `Changed **impact level on [nomination reset](https://osu.ppy.sh/beatmapsets/${event.beatmapsetId}/discussion/-/generalAll#/${event.discussionId})** (${y})`,
+                description: `Changed **impact level on [nomination reset](https://osu.ppy.sh/beatmapsets/${event.beatmapsetId}/discussion/-/generalAll#/${event.discussionId})** (${nominators})`,
                 color: discord.webhookColors.lightPink,
                 fields: [
                     {
                         name: 'Impact',
-                        value: event.impact ? '⚠️ Notable' : '✅ Minor',
+                        value: impactString[event.impactNum],
                     },
                     {
                     name: 'Reason',
@@ -127,7 +128,7 @@ router.post('/updateContent/:id', middlewares.isNat, async (req, res) => {
         success: 'Updated content',
     });
 
-    if (event.impact) {
+    if (typeof event.impactNum === 'number') {
         await impactWebhook(event, req);
     }
 
@@ -136,16 +137,18 @@ router.post('/updateContent/:id', middlewares.isNat, async (req, res) => {
 
 /* POST edit impact */
 router.post('/updateImpact/:id', middlewares.isNat, async (req, res) => {
-    let event = await Aiess.findByIdAndUpdate(req.params.id, { impact: req.body.impact }).orFail();
+    const impactString = ['Minor', 'Notable','Severe'];
+
+    let event = await Aiess.findByIdAndUpdate(req.params.id, { impactNum: req.body.impactNum }).orFail();
 
     res.json({
-        impact: req.body.impact,
-        success: `Changed impact to ${req.body.impact ? 'notable' : 'minor'}`,
+        impactNum: req.body.impactNum,
+        success: `Changed impact to: ${impactString[req.body.impactNum]}`,
     });
 
     await impactWebhook(event, req);
 
-    Logger.generate(req.session.mongoId, `Updated impact of s/${event.beatmapsetId} to "${event.impact}"`, 'dataCollection', event._id);
+    Logger.generate(req.session.mongoId, `Updated impact of s/${event.beatmapsetId} to "${event.impactNum}"`, 'dataCollection', event._id);
 });
 
 module.exports = router;

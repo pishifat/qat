@@ -3,16 +3,12 @@
         <!-- impact -->
         <span
             v-if="hasData"
-            :class="event.impact ? 'text-warning' : 'text-success'"
+            :class="getImpact(event.impactNum).color"
             data-toggle="tooltip"
-            :title="event.impact ? 'Notable' : 'Minor'"
+            :title="getImpact(event.impactNum).text"
         >
-            <i class="fas fa-exclamation-triangle" v-if="event.impact" />
-            <font-awesome-icon
-                icon="fa-solid fa-circle-check"
-                class="text-success"
-                v-else
-            />
+            <i v-if="event.impactNum !== 0" :class="getImpact(event.impactNum).icon" />
+            <font-awesome-icon v-else :icon="getImpact(event.impactNum).icon" />
         </span>
 
         <!-- edit button -->
@@ -43,10 +39,22 @@ export default {
     computed: {
         /** @returns {boolean} */
         hasData() {
-            return this.event.impact !== undefined;
+            return this.event.impactNum !== undefined;
         },
     },
     methods: {
+        getImpact(impact) {
+            switch (impact) {
+                case 2:
+                    return { color: 'text-danger', icon: 'fas fa-times-circle', text: 'Severe' };
+                case 1:
+                    return { color: 'text-warning', icon: 'fas fa-exclamation-circle', text: 'Notable' };
+                case 0:
+                    return { color: 'text-success', icon: 'fa-solid fa-circle-check', text: 'Minor' };
+                default:
+                    return;
+            }
+        },
         selectEvent () {
             this.$store.commit('dataCollection/setSelectedEventId', this.event.id);
         },
