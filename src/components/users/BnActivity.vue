@@ -39,6 +39,8 @@
 
         <div v-if="bnActivity">
             <hr />
+            <!-- TODO: rewrite this to return accurate and non-duped numbers -->
+            <!--
             <div class="small mt-2">
                 <ul>
                     <li>
@@ -50,6 +52,7 @@
                 </ul>
             </div>
             <hr />
+            -->
             <div v-for="user in bnActivity" :key="user.username" class="small mb-1">
                 <user-link
                     :osu-id="user.osuId"

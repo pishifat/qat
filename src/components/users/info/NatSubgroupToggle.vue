@@ -14,7 +14,7 @@
                 href="#"
                 @click.prevent="changeMode()"
             >
-                Assign to {{ isStructuralNat() ? 'evaluation' : 'structural' }}
+                {{ isStructuralNat() ? 'Evaluation' : 'Structural' }}
             </button>
     </div>
 </template>
