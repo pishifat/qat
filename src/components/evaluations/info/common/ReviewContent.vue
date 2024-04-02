@@ -6,7 +6,16 @@
                 :user="review.evaluator"
                 :text-color="voteColor(review.vote)"
                 :align-start="true"
-            />
+            >
+                <a
+                    v-if="loggedInUser.isResponsibleWithButtons"
+                    href="#"
+                    @click.prevent="deleteReview()"
+                    class="text-danger"
+                >
+                    <i class="fas fa-trash-alt" />
+                </a>
+            </user-avatar>
 
             <div v-else class="small text-center my-2" :class="voteColor(review.vote)">
                 User {{ index }} ({{ review.evaluator && review.evaluator.groups.includes('nat') ? 'NAT' : 'BN' }})
@@ -69,6 +78,22 @@ export default {
                 return 'text-neutral';
             } else if (vote == 3) {
                 return 'text-fail';
+            }
+        },
+        async deleteReview() {
+            if (confirm('Are you sure you want to delete this review?')) {
+                const res = await this.$http.executePost(`/${this.selectedEvaluation.isApplication ? 'appEval' : 'bnEval'}/deleteReview/${this.selectedEvaluation.id}`, {
+                    reviewId: this.review.id,
+                });
+
+                if (this.$http.isValid(res)) {
+                    this.$store.commit('evaluations/updateEvaluation', res);
+
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `Deleted review`,
+                        type: 'success',
+                    });
+                }
             }
         },
     },

@@ -779,7 +779,7 @@ router.post('/assignNatBuddy/:appId/:userId', middlewares.isNat, async (req, res
     );
 });
 
-/* POST submit or edit eval */
+/* POST submit vibe check */
 router.post('/submitVibeCheck/:id', middlewares.isBnOrNat, async (req, res) => {
     let evaluation = await AppEvaluation
         .findOne({
@@ -806,9 +806,41 @@ router.post('/submitVibeCheck/:id', middlewares.isBnOrNat, async (req, res) => {
 
     Logger.generate(
         req.session.mongoId,
-        `Submitted vibe check for ${evaluation.mode} BN app evaluation for "${evaluation.user.username}"`,
+        `Submitted vibe check for ${evaluation.mode} BN app for "${evaluation.user.username}"`,
         'appEvaluation',
         evaluation._id
+    );
+});
+
+/* POST delete review */
+router.post('/deleteReview/:id', middlewares.isResponsibleWithButtons, async (req, res) => {
+    const app = await AppEvaluation
+        .findById(req.params.id)
+        .populate(defaultPopulate);
+
+    const review = app.reviews.find(r => r._id == req.body.reviewId);
+
+    if (!review) {
+        return res.json({ error: 'Review not found' });
+    }
+
+    app.reviews.pull(review);
+    await app.save();
+
+    res.json(app);
+
+    discord.webhookPost([{
+        author: discord.defaultWebhookAuthor(req.session),
+        color: discord.webhookColors.black,
+        description: `Deleted review by **${review.evaluator.username}** in [**${app.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${app.id})`,
+    }],
+    app.mode);
+
+    Logger.generate(
+        req.session.mongoId,
+        `Deleted review by "${review.evaluator.username}" in ${app.mode} BN app for "${app.user.username}"`,
+        'appEvaluation',
+        app._id
     );
 });
 
