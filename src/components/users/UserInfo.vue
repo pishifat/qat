@@ -31,7 +31,7 @@
                 <hr>
 
                 <user-activity
-                    :modes="selectedUser.modes"
+                    :modes="selectedUser.modes.includes('none') ? getModesFromHistory() : selectedUser.modes"
                     :deadline="new Date().toString()"
                     :osu-id="selectedUser.osuId"
                     :mongo-id="selectedUser.id"
