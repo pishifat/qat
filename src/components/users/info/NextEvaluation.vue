@@ -36,6 +36,16 @@
             class="btn btn-sm btn-primary ml-2" type="submit" @click="reset($event)">
             Reset
         </button>
+
+        <button
+        v-if="loggedInUser.isNat"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="create an evaluation with a deadline of 7 days from now"
+            class="btn btn-sm btn-nat ml-2" type="submit" @click="createEvaluation($event)"
+            >
+            Create evaluation
+        </button>
     </p>
 </template>
 
@@ -131,6 +141,35 @@ export default {
             if (res.deadline) {
                 this.processDeadline(res.deadline);
                 this.isEditing = false;
+            }
+        },
+        async createEvaluation(e) {
+            const confirmInput = confirm(`Are you sure?`);
+
+            if (confirmInput) {
+                const res = await this.$http.executePost(
+                    '/bnEval/addEvaluations/',
+                    {
+                        modes: [this.mode],
+                        groups: [],
+                        includeUsers: this.selectedUser.username,
+                        excludeUsers: null,
+                        isResignation: false,
+                        deadline: this.$moment().add(7, 'days').format('YYYY-MM-DD'),
+                    },
+                    e
+                );
+
+                if (this.$http.isValid(res)) {
+                    $('#extendedInfo').modal('hide');
+                    const evaluation = res.evaluations.find(e => e.user.id == this.selectedUser.id);
+                    if (evaluation) 
+                        this.$router.replace(`/bneval?id=${evaluation.id}`);
+                    else 
+                        this.$store.dispatch('updateToastMessages', { 
+                            message: 'Error redirecting to evaluation, try navigating manually', type: 'danger' 
+                        });
+                }
             }
         },
     },
