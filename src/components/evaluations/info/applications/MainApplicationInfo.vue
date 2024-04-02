@@ -10,8 +10,6 @@
         <applicant-comment
             :comment="selectedEvaluation.comment"
         />
-
-        <evaluation-link />
     </div>
 </template>
 

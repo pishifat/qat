@@ -27,11 +27,11 @@
                 :overwrite-days="selectedEvaluation.activityToCheck ? selectedEvaluation.activityToCheck + 7 : 90 + 7"
                 :is-nat="selectedEvaluation.user.isNat"
             />
+            <evaluation-link />
 
             <consensus />
 
             <div v-if="!selectedEvaluation.isResignation && selectedEvaluation.feedback && selectedEvaluation.feedback !== 'None'">
-                <evaluation-link />
 
                 <p>
                     <b>Feedback:</b>

@@ -66,6 +66,7 @@
                     :is-evaluation="true"
                     :is-nat="selectedEvaluation.user.isNat"
                 />
+                <evaluation-link />
                 <hr>
                 <template v-if="loggedInUser.isNat || loggedInUser.isTrialNat">
                     <p>
@@ -131,6 +132,7 @@ import NatSelfEvaluation from './currentBns/NatSelfEvaluation.vue';
 import NatLeaderEvaluation from './currentBns/NatLeaderEvaluation.vue';
 import UserActivity from './currentBns/userActivity/UserActivity.vue';
 import EvaluationInput from './common/EvaluationInput.vue';
+import EvaluationLink from './common/EvaluationLink.vue';
 import EvaluatorAssignments from './common/EvaluatorAssignments.vue';
 import ModalDialog from '../../ModalDialog.vue';
 import MainApplicationInfo from './applications/MainApplicationInfo.vue';
@@ -148,6 +150,7 @@ export default {
         NatLeaderEvaluation,
         UserActivity,
         EvaluationInput,
+        EvaluationLink,
         EvaluatorAssignments,
         ModalDialog,
         MainApplicationInfo,
