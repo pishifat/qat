@@ -35,21 +35,6 @@ export default {
                     return '';
             }
         },
-        cooldownColor () {
-            switch (this.cooldown) {
-                case 'reduced':
-                    return 'text-pass';
-
-                case 'standard':
-                    return 'text-neutral';
-
-                case 'extended':
-                    return 'text-fail';
-
-                default:
-                    return '';
-            }
-        },
         positiveConsensus () {
             return this.consensus === AppEvaluationConsensus.Pass || this.consensus === BnEvaluationConsensus.FullBn || this.consensus === ResignationConsensus.ResignedOnGoodTerms;
         },

@@ -587,7 +587,6 @@ router.post('/setConsensus/:id', middlewares.isNatOrTrialNat, async (req, res) =
                 evaluation.addition != BnEvaluationAddition.LowActivityWarning)
         ) {
             date.setDate(date.getDate() + 60);
-            evaluation.cooldown = Cooldown.Standard;
         }
 
         evaluation.cooldownDate = date;
@@ -626,12 +625,10 @@ router.post('/setAddition/:id', middlewares.isNatOrTrialNat, async (req, res) =>
     evaluation.overwriteNextEvaluationDate = null;
 
     if (req.body.addition == BnEvaluationAddition.LowActivityWarning) {
-        evaluation.cooldown = Cooldown.None;
         evaluation.cooldownDate = new Date();
     } else if (evaluation.consensus === BnEvaluationConsensus.RemoveFromBn) {
         const date = new Date();
         date.setDate(date.getDate() + 60);
-        evaluation.cooldown = Cooldown.Standard;
         evaluation.cooldownDate = date;
     }
 
@@ -652,58 +649,6 @@ router.post('/setAddition/:id', middlewares.isNatOrTrialNat, async (req, res) =>
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.lightBlue,
             description: `[**${evaluation.user.username}**'s current BN eval](http://bn.mappersguild.com/bneval?id=${evaluation.id}) addition set to **${additionText}**`,
-        }],
-        evaluation.mode
-    );
-});
-
-/* POST set cooldown */
-router.post('/setCooldown/:id', middlewares.isNatOrTrialNat, async (req, res) => {
-    const { cooldown, baseDate } = req.body;
-    let cooldownDays = 60;
-
-    switch (cooldown) {
-        case 'none':
-            cooldownDays = 0;
-            break;
-        case 'reduced':
-            cooldownDays = 30;
-            break;
-        case 'standard':
-            cooldownDays = 60;
-            break;
-        case 'extended':
-            cooldownDays = 120;
-            break;
-        default:
-            break;
-    }
-
-    const cooldownDate = moment(new Date(baseDate)).add(cooldownDays, 'days').toDate();
-
-    const evaluation = await Evaluation
-        .findByIdAndUpdate(req.params.id, {
-            cooldown,
-            cooldownDate
-        })
-        .populate(defaultPopulate);
-
-    const newEvaluation = await Evaluation.findById(req.params.id).populate(defaultPopulate); // i dont know why this is necessary. it's not in appeval's setCooldown despite code using the same logic. please help
-
-    res.json(newEvaluation);
-
-    Logger.generate(
-        req.session.mongoId,
-        `Set cooldown to "${cooldown}" (${evaluation.cooldownDate.toISOString().slice(0,10)}) for ${evaluation.user.username}'s ${evaluation.mode} current BN evaluation`,
-        'bnEvaluation',
-        evaluation._id
-    );
-
-    discord.webhookPost(
-        [{
-            author: discord.defaultWebhookAuthor(req.session),
-            color: discord.webhookColors.darkBlue,
-            description: `Set re-apply cooldown to **"${cooldown}" (${evaluation.cooldownDate.toISOString().slice(0,10)})** for [**${evaluation.user.username}**'s current BN evaluation](http://bn.mappersguild.com/bneval?id=${evaluation.id})`,
         }],
         evaluation.mode
     );

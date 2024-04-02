@@ -53,13 +53,40 @@
         <hr />
 
         <!-- cooldowns -->
-        <template v-if="outstandingCooldowns.length">
+        <template v-if="cooldowns.length || activeApps.length">
             <div class="card card-body">
                 <h4>Application status</h4>
-                You have one or more outstanding cooldowns that prevents you from joining the Beatmap Nominators for the following modes:
-                <ul class="text-danger">
-                    <li v-for="evaluation in outstandingCooldowns" :key="evaluation.id">{{ evaluation.mode == 'osu' ? 'osu!' : 'osu!' + evaluation.mode }}: {{ evaluation.active ? 'Evaluation in progress' : evaluation.date }}</li>
+                <!-- active applications -->
+                <div v-if="activeApps.length">
+                    <div v-for="application in activeApps" :key="application.id">
+                        <ul>
+                            <li><b>{{ application.mode == 'osu' ? 'osu!' : 'osu!' + application.mode }}:</b> Application is in progress</li>
+                            <ol>
+                                <li class="text-success">Application submitted</li>
+                                <!-- todo: make this account for each mode's -->
+                                <li :class="application.discussion || application.reviews.length >= 1 ? 'text-success' : 'text-danger'">Evaluated by 1 of 3 users</li>
+                                <li :class="application.discussion || application.reviews.length >= 2 ? 'text-success' : 'text-danger'">Evaluated by 2 of 3 users</li>
+                                <li :class="application.discussion || application.reviews.length >= 3 ? 'text-success' : 'text-danger'">Evaluated by 3 of 3 users</li>
+                                <li :class="application.consensus ? 'text-success' : 'text-danger'">Consensus set</li>
+                                <li :class="!application.active ? 'text-success' : 'text-danger'">Application returned</li>
+                            </ol>
+                        </ul>
+                    </div>
+                </div>
+                <!-- cooldowns -->
+                <ul v-if="cooldowns.length">
+                    <li v-for="evaluation in cooldowns" :key="evaluation.id">
+                        <div v-if="evaluation.isApplication"><b>{{ evaluation.mode == 'osu' ? 'osu!' : 'osu!' + evaluation.mode }}:</b> Because <a :href="'/message?eval=' + evaluation.id" target="_blank">your application was denied</a>, you cannot re-apply until <i>{{ new Date(evaluation.cooldownDate) }}</i></div>
+                        <div v-else-if="evaluation.isBnEvaluation"><b>{{ evaluation.mode == 'osu' ? 'osu!' : 'osu!' + evaluation.mode }}:</b> Because <a :href="'/message?eval=' + evaluation.id" target="_blank">you were removed from the BN</a>, you cannot re-apply until <i>{{ new Date(evaluation.cooldownDate) }}</i></div>
+                        <div v-else-if="evaluation.isResignation"><b>{{ evaluation.mode == 'osu' ? 'osu!' : 'osu!' + evaluation.mode }}:</b> Because of <a :href="'/message?eval=' + evaluation.id" target="_blank">the circumstances of your resignation</a>, you cannot re-apply until <i>{{ new Date(evaluation.cooldownDate) }}</i></div>
+                    </li>
                 </ul>
+                <!-- current BN modes -->
+                <div v-if="loggedInUser.modes && loggedInUser.modes.length">
+                    <ul v-for="mode in loggedInUser.modes" :key="mode">
+                        <li v-if="mode != 'none'"><b>{{ mode == 'osu' ? 'osu!' : 'osu!' + mode }}:</b> You're already a BN for this mode!</li>
+                    </ul>
+                </div>
             </div>
             <hr />
         </template>
@@ -311,11 +338,9 @@ export default {
         return {
             step: 1,
             resignations: [],
-            cooldownApps: [],
-            cooldownEvals: [],
-            cooldownResignations: [],
+            activeApps: [],
             relevantResignation: null,
-            cooldown: false,
+            cooldowns: [],
             selectedMode: '',
             mods: [],
             reasons: [],
@@ -330,12 +355,14 @@ export default {
 
         if (!data.error) {
             this.resignations = data.resignations;
-            this.cooldownApps = data.cooldownApps;
-            this.cooldownEvals = data.cooldownEvals;
-            this.cooldownResignations = data.cooldownResignations;
+            this.activeApps = data.activeApps;
+            this.cooldowns = data.cooldowns;
         }
 
-        this.relevantResignation = [...this.resignations].find(r => r.mode == this.selectedMode);
+        // this won't show selectedMode, but it'll filter relevantResignation and show the associated rejoin option if applicable
+        if (this.loggedInUser.history && this.loggedInUser.history.length) {
+            this.selectedMode = this.loggedInUser.history[this.loggedInUser.history.length - 1].mode;
+        }
     },
     computed: {
         ...mapState([
@@ -344,57 +371,11 @@ export default {
         wasBn() {
             return this.loggedInUser.history && this.loggedInUser.history.length;
         },
-        outstandingCooldowns() {
-            const cooldowns = [];
-
-            for (const app of this.cooldownApps) {
-                cooldowns.push({
-                    id: app.id,
-                    mode: app.mode,
-                    date: new Date(app.cooldownDate),
-                    active: app.active,
-                });
-            };
-
-            for (const evaluation of this.cooldownEvals) {
-                cooldowns.push({
-                    id: evaluation.id,
-                    mode: evaluation.mode,
-                    date: new Date(evaluation.cooldownDate),
-                    active: evaluation.active,
-                });
-            }
-
-            for (const resignation of this.cooldownResignations) {
-                cooldowns.push({
-                    id: resignation.id,
-                    mode: resignation.mode,
-                    date: new Date(resignation.cooldownDate),
-                    active: resignation.active,
-                });
-            };
-
-            return cooldowns;
-        },
     },
     watch: {
         selectedMode() {
             this.successInfo = '';
             this.relevantResignation = [...this.resignations].find(r => r.mode == this.selectedMode);
-
-            let cooldownApp;
-    
-            if (this.cooldownApps && this.cooldownApps.length) {
-                cooldownApp = Boolean([...this.cooldownApps].find(a => a.mode == this.selectedMode));
-            }
-
-            let cooldownEval;
-
-            if (this.cooldownEvals && this.cooldownEvals.length) {
-                cooldownEval = Boolean([...this.cooldownEvals].find(e => e.mode == this.selectedMode))
-            } 
-            
-            this.cooldown = Boolean(cooldownApp) || Boolean(cooldownEval);
         },
     },
     methods: {
@@ -425,7 +406,7 @@ export default {
                 if (result2) {
                     this.successInfo = `Submitting... (this will take a few seconds)`;
 
-                    const data = await this.$http.executePost(
+                    const application = await this.$http.executePost(
                         `/bnapps/apply`,
                         {
                             mode: this.selectedMode,
@@ -440,13 +421,8 @@ export default {
 
                     this.successInfo = '';
 
-                    if (data && !data.error) {
-                        this.cooldownApps.push({
-                            id: 'temp',
-                            mode: this.selectedMode,
-                            date: new Date(),
-                            active: true,
-                        });
+                    if (application && !application.error) {
+                        this.activeApps.push(application);
                         this.step = 1;
                         this.mods = [];
                         this.reasons = [];
@@ -460,7 +436,7 @@ export default {
         },
         async rejoinApply(e) {
             this.successInfo = `Submitting... (this will take a few seconds)`;
-            const data = await this.$http.executePost(
+            const application = await this.$http.executePost(
                 `/bnapps/rejoinApply`,
                 {
                     mode: this.selectedMode,
@@ -471,12 +447,7 @@ export default {
             this.successInfo = '';
 
             if (data && !data.error) {
-                this.cooldownApps.push({
-                    id: 'temp',
-                    mode: this.selectedMode,
-                    date: new Date(),
-                    active: true,
-                });
+                this.activeApps.push(application);
             }
         },
     },

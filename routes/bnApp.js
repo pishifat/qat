@@ -6,7 +6,7 @@ const AppEvaluation = require('../models/evaluations/appEvaluation.js');
 const BnEvaluation = require('../models/evaluations/bnEvaluation');
 const Logger = require('../models/log.js');
 const ResignationEvaluation = require('../models/evaluations/resignationEvaluation');
-const { ResignationConsensus, BnEvaluationAddition } = require('../shared/enums');
+const { ResignationConsensus } = require('../shared/enums');
 const moment = require('moment');
 const User = require('../models/user');
 const Settings = require('../models/settings');
@@ -20,7 +20,7 @@ router.use(middlewares.isLoggedIn);
 router.get('/relevantInfo', async (req, res) => {
     const oneYearAgo = moment().subtract(1, 'years').toDate();
 
-    let [resignations, cooldownApps, cooldownEvals, cooldownResignations] = await Promise.all([
+    let [resignations, activeApps, cooldownApps, cooldownEvals, cooldownResignations] = await Promise.all([
         ResignationEvaluation
             .find({
                 user: req.session.mongoId,
@@ -34,14 +34,17 @@ router.get('/relevantInfo', async (req, res) => {
             }),
         AppEvaluation.find({
             user: req.session.mongoId,
-            $or: [
-                { cooldownDate: { $gt: new Date() } },
-                { active: true },
-            ],
+            active: true,
+        }).select('-natEvaluators -bnEvaluators'),
+        AppEvaluation.find({
+            user: req.session.mongoId,
+            active: false,
+            cooldownDate: { $gt: new Date() },
         }),
         BnEvaluation.find({
             user: req.session.mongoId,
             consensus: 'removeFromBn',
+            active: false,
             cooldownDate: { $gt: new Date() },
         }),
         ResignationEvaluation.find({
@@ -53,9 +56,8 @@ router.get('/relevantInfo', async (req, res) => {
 
     res.json({
         resignations,
-        cooldownApps,
-        cooldownEvals,
-        cooldownResignations,
+        activeApps,
+        cooldowns: [].concat(cooldownApps, cooldownEvals, cooldownResignations),
     });
 });
 
@@ -231,8 +233,6 @@ router.post('/apply', async (req, res) => {
     // save all assignments
     await newBnApp.save();
 
-    console.log(newBnApp);
-
     // webhooks
     await discord.webhookPost(
         [{
@@ -247,9 +247,7 @@ router.post('/apply', async (req, res) => {
     await discord.userHighlightWebhookPost(mode, discordIds);
 
     // proceed
-    res.json({
-        success: 'Applied',
-    });
+    res.json(newBnApp);
 
     Logger.generate(req.session.mongoId, `Applied for ${mode} BN`, 'application', newBnApp._id);
 
@@ -360,9 +358,7 @@ router.post('/rejoinApply', async (req, res) => {
     await newBnApp.save();
 
     // proceed
-    res.json({
-        success: 'Applied',
-    });
+    res.json(newBnApp);
 
     await discord.webhookPost(
         [{

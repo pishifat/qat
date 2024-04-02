@@ -4,7 +4,7 @@
             <filter-box
                 :placeholder="'enter to search username...'"
                 :modes="['', 'osu', 'taiko', 'catch', 'mania']"
-                :groups="['', 'bn', 'nat']"
+                :groups="kind == 'applications' ? null : ['', 'bn', 'nat']"
                 store-module="evaluations"
             >
                 <template v-if="loggedInUser.isNat">

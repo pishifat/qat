@@ -48,13 +48,6 @@
         </div>
 
         <feedback-pm
-            v-if="
-                (
-                    selectedEvaluation.feedback &&
-                    selectedEvaluation.feedback.length 
-                ) ||
-                selectedEvaluation.isResignation
-            "
             :discord-link="discordLink"
             :is-reviewable="!selectedEvaluation.isResignation"
             :is-pass-app="selectedEvaluation.isApplication && selectedEvaluation.consensus === 'pass'"

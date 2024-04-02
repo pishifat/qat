@@ -340,7 +340,6 @@ router.post('/setConsensus/:id', middlewares.isNatOrTrialNat, async (req, res) =
         let date = new Date(evaluation.createdAt);
         date.setDate(date.getDate() + 60);
         evaluation.cooldownDate = date;
-        evaluation.cooldown = Cooldown.Standard;
     }
 
     evaluation.overwriteNextEvaluationDate = null;
@@ -390,56 +389,6 @@ router.post('/setConsensus/:id', middlewares.isNatOrTrialNat, async (req, res) =
             await discord.userHighlightWebhookPost(evaluation.mode, [discordIds[randomIndex]]);
         }
     }
-});
-
-/* POST set cooldown */
-router.post('/setCooldown/:id', middlewares.isNatOrTrialNat, async (req, res) => {
-    const { cooldown, baseDate } = req.body;
-    let cooldownDays = 60;
-
-    switch (cooldown) {
-        case 'none':
-            cooldownDays = 0;
-            break;
-        case 'reduced':
-            cooldownDays = 30;
-            break;
-        case 'standard':
-            cooldownDays = 60;
-            break;
-        case 'extended':
-            cooldownDays = 120;
-            break;
-        default:
-            break;
-    }
-
-    const cooldownDate = moment(new Date(baseDate)).add(cooldownDays, 'days').toDate();
-
-    const evaluation = await AppEvaluation
-        .findByIdAndUpdate(req.params.id, {
-            cooldown,
-            cooldownDate
-        })
-        .populate(defaultPopulate);
-
-    res.json(evaluation);
-
-    Logger.generate(
-        req.session.mongoId,
-        `Set cooldown to "${cooldown}" (${evaluation.cooldownDate.toISOString().slice(0,10)}) for ${evaluation.user.username}'s ${evaluation.mode} BN app`,
-        'appEvaluation',
-        evaluation._id
-    );
-
-    discord.webhookPost(
-        [{
-            author: discord.defaultWebhookAuthor(req.session),
-            color: discord.webhookColors.darkBlue,
-            description: `Set re-apply cooldown to **"${cooldown}" (${evaluation.cooldownDate.toISOString().slice(0,10)})** for [**${evaluation.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${evaluation.id})`,
-        }],
-        evaluation.mode
-    );
 });
 
 /* POST set feedback of eval */
