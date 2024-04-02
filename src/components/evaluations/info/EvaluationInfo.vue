@@ -163,7 +163,8 @@ export default {
         ...mapGetters('evaluations', ['selectedEvaluation']),
         modes() {
             if (!this.selectedEvaluation) return [];
-            if (this.selectedEvaluation.user.modes.length)
+            
+            if (this.selectedEvaluation.user.modes.length && !this.selectedEvaluation.user.modes.includes('none'))
                 return this.selectedEvaluation.user.modes;
 
             return this.selectedEvaluation.mode;

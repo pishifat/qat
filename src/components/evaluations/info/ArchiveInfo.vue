@@ -89,7 +89,9 @@ export default {
         /** @returns {string | string[]} */
         modes () {
             if (!this.selectedEvaluation) return [];
-            if (this.selectedEvaluation.user.modes.length) return this.selectedEvaluation.user.modes;
+            
+            if (this.selectedEvaluation.user.modes.length && !this.selectedEvaluation.user.modes.includes('none'))
+                return this.selectedEvaluation.user.modes;
 
             return this.selectedEvaluation.mode;
         },
