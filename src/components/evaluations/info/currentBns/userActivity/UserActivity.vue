@@ -57,18 +57,6 @@
                 :events-id="'popsByUser'"
                 :header="'Pops done by user'"
             />
-            <div class="mt-2">Quality Assurance</div>
-            <events-list
-                :events="filterEvents(qualityAssuranceChecks, selectedMode)"
-                :events-id="'qualityAssuranceChecks'"
-                :header="'Quality Assurance Checks'"
-                :osu-id="osuId"
-            />
-            <nomination-resets
-                :events="filterEvents(disqualifiedQualityAssuranceChecks, selectedMode)"
-                :events-id="'disqualifiedQualityAssuranceChecks'"
-                :header="'Disqualified Quality Assurance Checks'"
-            />
 
             <template
                 v-if="
@@ -127,8 +115,7 @@
             </template>
 
             <template v-if="loggedInUser.hasFullReadAccess && showArchive">
-                <hr />
-                <div>Archives</div>
+                <div class="mt-2">Archives</div>
                 <previous-evaluations
                     v-if="loggedInUser.isNat"
                     :header="'Previous Evaluations'"
@@ -140,6 +127,7 @@
                     :event-id="'reports'"
                     :mongo-id="mongoId"
                 />
+                <hr />
             </template>
         </div>
     </div>

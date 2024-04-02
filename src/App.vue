@@ -59,9 +59,6 @@
                                     <router-link class="dropdown-item" to="/vetoes">
                                         Vetoes (read-only)
                                     </router-link>
-                                    <router-link class="dropdown-item" to="/qualityassurance">
-                                        Quality Assurance (read-only)
-                                    </router-link>
                                     <router-link class="dropdown-item" to="/discussionvote">
                                         Content Review (read-only)
                                     </router-link>
@@ -109,9 +106,6 @@
                                     </router-link>
                                     <router-link class="dropdown-item" to="/vetoes">
                                         Vetoes
-                                    </router-link>
-                                    <router-link class="dropdown-item" to="/qualityassurance">
-                                        Quality Assurance
                                     </router-link>
                                 </div>
                             </li>
@@ -186,9 +180,6 @@
                                     <router-link class="dropdown-item" to="/vetoes">
                                         Vetoes
                                     </router-link>
-                                    <router-link class="dropdown-item" to="/qualityassurance">
-                                        Quality Assurance
-                                    </router-link>
                                 </div>
                             </li>
 
@@ -224,9 +215,6 @@
                                     <router-link class="dropdown-item" to="/vetoes">
                                         Vetoes (read-only)
                                     </router-link>
-                                    <router-link class="dropdown-item" to="/qualityassurance">
-                                        Quality Assurance (read-only)
-                                    </router-link>
                                     <router-link class="dropdown-item" to="/grouphistory">
                                         Group History
                                     </router-link>
@@ -260,9 +248,6 @@
                                     </router-link>
                                     <router-link class="dropdown-item" to="/discussionvote">
                                         Content Review
-                                    </router-link>
-                                    <router-link class="dropdown-item" to="/qualityassurance">
-                                        Quality Assurance
                                     </router-link>
                                     <router-link class="dropdown-item" to="/modrequests">
                                         Request a BN
@@ -378,7 +363,7 @@
                                 <ul>
                                     <li>Apply to join the Beatmap Nominators</li>
                                     <li>Report members of the BN/NAT</li>
-                                    <li>View detailed BN/NAT listings, beatmap vetoes, and beatmap quality assurance info</li>
+                                    <li>View detailed BN/NAT listings, beatmap vetoes, and content review info</li>
                                 </ul>
                             </div>
                         </div>
