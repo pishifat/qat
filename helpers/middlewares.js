@@ -93,7 +93,7 @@ function isResponsibleWithButtons(req, res, next) {
 async function hasPrivateInterOpsAccess(req, res, next) {
     const u = await User.findOne({ username: req.headers.username });
 
-    if (!u.hasFullReadAccess) return unauthorize(req, res, `You can't use this`);
+    if (!u.isNat) return unauthorize(req, res, `You can't use this`);
 
     next();
 }

@@ -30,9 +30,9 @@ Running the project sucks if you don't have data. One day I'll set up sample dat
 
 ## Data
 
-Some people use this website's `/interOp` routes for various data. If you're one of these people, tell me what you'd be doing with the info and I'll probably give you an access key. Don't share your key with anyone else.
+Some people use this website's [`/interOp`](https://github.com/pishifat/qat/blob/master/routes/interOp.js) routes for various data. If you're one of these people, tell me what you'd be doing with the info and I'll probably give you an access key. Don't share your key with anyone else.
 
-## WebSocket
+### WebSocket
 
 The project supports websocket connections for a few data outputs, which requires interOp access. You can connect to `/websocket/interOp` with the following headers:
 
@@ -40,7 +40,7 @@ The project supports websocket connections for a few data outputs, which require
 - `secret`: your interOp secret
 - `tags`: event tags that you want to listen to, separated by `+`
 
-### Available events
+#### Available events
 
 - `users:request_status_update`
 - `data:content_review`
