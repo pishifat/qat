@@ -741,8 +741,8 @@ router.get('/findPreviousEvaluations/:userId', async (req, res) => {
         previousEvaluations.sort((a, b) => {
             const dateA = (a.archivedAt ? a.archivedAt : a.deadline);
             const dateB = (b.archivedAt ? b.archivedAt : b.deadline);
-            if (dateA > dateB) return 1;
-            if (dateA < dateB) return -1;
+            if (dateA > dateB) return -1;
+            if (dateA < dateB) return 1;
 
             return 0;
         });
@@ -1135,6 +1135,38 @@ router.post('/toggleIsReviewed/:id', middlewares.isNat, async (req, res) => {
         `Toggled "${er.user.username}" ${er.mode} current BN evaluation isReviewed to ${er.isReviewed}`,
         'bnEvaluation',
         er._id
+    );
+});
+
+/* POST delete review */
+router.post('/deleteReview/:id', middlewares.isResponsibleWithButtons, async (req, res) => {
+    const eval = await BnEvaluation
+        .findById(req.params.id)
+        .populate(defaultPopulate);
+
+    const review = eval.reviews.find(r => r._id == req.body.reviewId);
+
+    if (!review) {
+        return res.json({ error: 'Review not found' });
+    }
+
+    eval.reviews.pull(review);
+    await eval.save();
+    
+    res.json(eval);
+
+    discord.webhookPost([{
+        author: discord.defaultWebhookAuthor(req.session),
+        color: discord.webhookColors.black,
+        description: `Deleted review by **${review.evaluator.username}** in [**${eval.user.username}**'s current BN eval](http://bn.mappersguild.com/bneval?id=${eval.id})`,
+    }],
+    eval.mode);
+
+    Logger.generate(
+        req.session.mongoId,
+        `Deleted review by "${review.evaluator.username}" in ${eval.mode} current BN eval for "${eval.user.username}"`,
+        'bnEvaluation',
+        eval._id
     );
 });
 

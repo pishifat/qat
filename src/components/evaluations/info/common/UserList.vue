@@ -45,14 +45,14 @@
                         class="form-control ml-2"
                     >
                         <option
-                            v-for="bagUser in bagUsers"
-                            :key="bagUser.id"
-                            :value="bagUser.id"
+                            v-for="user in nat"
+                            :key="user.id"
+                            :value="user.id"
                         >
-                            {{ bagUser.username }}
+                            {{ user.username }}
                         </option>
-                        <option v-if="!bagUsers.length" disabled>
-                            no users in bag :(
+                        <option v-if="!nat.length" disabled>
+                            ...
                         </option>
                     </select>
                     <a
@@ -73,7 +73,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 
 export default {
     name: 'UserList',
@@ -104,18 +104,21 @@ export default {
             isEditing: false,
             editedEvaluatorId: '',
             selectedUserId: '',
-            bagUsers: [],
+            nat: [],
         };
     },
     computed: {
         ...mapState([
             'loggedInUser',
         ]),
+        ...mapGetters('evaluations', [
+            'selectedEvaluation',
+        ]),
     },
     watch: {
-        isEditing () {
+        async isEditing () {
             if (this.replaceNat) {
-                this.findBagUsers();
+                await this.loadNat();
             }
         },
         userList () {
@@ -162,12 +165,13 @@ export default {
                 }
             }
         },
-        async findBagUsers() {
-            const users = await this.$http.executeGet(`/users/nat/findBagUsers/${this.mode}`);
+        async loadNat() {
+            const nat = await this.$http.executeGet(
+                `/users/loadNatInMode/${this.selectedEvaluation.mode}`
+            );
 
-            if (users) {
-                const assignedUserIds = this.userList.map(u => u.id);
-                this.bagUsers = users.filter(user => !assignedUserIds.includes(user.id));
+            if (this.$http.isValid(nat)) {
+                this.nat = nat;
             }
         },
     },

@@ -48,7 +48,7 @@
 
         <div class="row">
             <div class="col text-right">
-                <button class="btn btn-success" @click="update($event)">
+                <button class="btn btn-sm btn-success" @click="update($event)">
                     Save
                 </button>
             </div>
