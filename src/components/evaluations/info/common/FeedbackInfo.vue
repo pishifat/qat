@@ -1,31 +1,27 @@
 <template>
     <div>
         <div v-if="!selectedEvaluation.isResignation">
-            <p class="mb-2">
-                <b>Feedback:</b>
-                <a
-                    class="ml-1"
-                    :class="previewFeedback ? 'text-success' : ''"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="toggle feedback preview"
-                    href="#"
-                    @click.prevent="togglePreviewFeedback()"
-                >
-                    <i class="fas fa-search" />
-                </a>
-            </p>
+            <div>
+                <b>Additional feedback:</b>
+            </div>
 
-            <div v-if="previewFeedback" class="small mb-2 card card-body v-html-content" v-html="$md.render(feedback)" />
-            
-            <textarea
-                v-model="feedback"
-                :class="feedback != selectedEvaluation.feedback ? 'bg-dark' : ''"
-                class="form-control mb-2"
-                rows="2"
-            />
+            <div class="row">
+                <div class="col-sm-6">
+                    <textarea
+                        v-model="feedback"
+                        :class="feedback != selectedEvaluation.feedback ? 'bg-dark' : ''"
+                        class="form-control mb-2"
+                        rows="2"
+                        placeholder="optional..."
+                    />
+                </div>
+                <div class="col-sm-6 mb-2">
+                    <div v-if="feedback && feedback.length" class="small card card-body v-html-content" v-html="$md.render(feedback)" />
+                    <div v-else class="small card card-body text-secondary">feedback preview</div>
+                </div>
+            </div>
 
-            <b v-if="feedback.length > 500" class="text-warning float-right">{{ feedback.length }}</b>
+            <b v-if="feedback && feedback.length > 500" class="text-warning float-right">{{ feedback.length }}</b>
 
             <span v-if="feedback != selectedEvaluation.feedback" class="small text-danger">Feedback is currently not saved.</span>
 
@@ -90,9 +86,6 @@ export default {
         this.feedback = this.selectedEvaluation.feedback;
     },
     methods: {
-        togglePreviewFeedback() {
-            this.$store.commit('evaluations/togglePreviewFeedback');
-        },
         async setFeedback(e) {
             const result = await this.$http.executePost(
                 `/${

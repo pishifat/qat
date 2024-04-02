@@ -9,27 +9,37 @@
             </p>
 
             <div id="consensusSettings" class="collapse container mb-4">
-                <consensus />
-                <evaluation-is-security-checked 
-                    v-if="
-                        loggedInUser.isNat && 
-                        selectedEvaluation.isApplication && 
-                        selectedEvaluation.consensus === 'pass'
-                    "
-                />
-                <nat-buddy-assignment 
-                    v-if="
-                        loggedInUser.isNat && 
-                        selectedEvaluation.isApplication && 
-                        selectedEvaluation.consensus === 'pass'
-                    "
-                />
+                <div class="row align-items-center">
+                    <div class="col-sm-12">
+                        <consensus />
+                    </div>
+                    <div class="col-sm-4">
+                        <evaluation-is-reviewed
+                            v-if="loggedInUser.isNat && selectedEvaluation.consensus"
+                            :feedback="selectedEvaluation.feedback"
+                        />
+                    </div>
+                    <div class="col-sm-4">
+                        <evaluation-is-security-checked 
+                            v-if="
+                                loggedInUser.isNat && 
+                                selectedEvaluation.isApplication && 
+                                selectedEvaluation.consensus === 'pass'
+                            "
+                        />
+                    </div>
+                    <div class="col-sm-4">
+                        <nat-buddy-assignment 
+                            v-if="
+                                loggedInUser.isNat && 
+                                selectedEvaluation.isApplication && 
+                                selectedEvaluation.consensus === 'pass'
+                            "
+                        />
+                    </div>
+                </div>            
+                
                 <hr v-if="selectedEvaluation.consensus" />
-                <evaluation-link v-if="selectedEvaluation.feedback" />
-                <evaluation-is-reviewed
-                    v-if="loggedInUser.isNat"
-                    :feedback="selectedEvaluation.feedback"
-                />
                 <feedback-info v-if="selectedEvaluation.consensus" />
             </div>
         </template>

@@ -1,33 +1,29 @@
 <template>
-    <div>
-        <p>
-            <span class="form-inline">
-                <b>NAT buddy: </b>
-                <select
-                    id="user"
-                    v-model="selectedUserId"
-                    class="form-control form-control-sm ml-2"
-                    @change="assignNatBuddy($event);"
-                >
-                    <option
-                        value=""
-                        disabled
-                    >
-                        Select a user
-                    </option>
-                    <option
-                        v-for="user in nat"
-                        :key="user.id"
-                        :value="user.id"
-                    >
-                        {{ user.username }}
-                    </option>
-                    <option v-if="!nat.length" disabled>
-                        ...
-                    </option>
-                </select>
-            </span>
-        </p>
+    <div class="form-inline">
+        <b>NAT buddy: </b>
+        <select
+            id="user"
+            v-model="selectedUserId"
+            class="form-control form-control-sm ml-2"
+            @change="assignNatBuddy($event);"
+        >
+            <option
+                value=""
+                disabled
+            >
+                Select a user
+            </option>
+            <option
+                v-for="user in nat"
+                :key="user.id"
+                :value="user.id"
+            >
+                {{ user.username }}
+            </option>
+            <option v-if="!nat.length" disabled>
+                ...
+            </option>
+        </select>
     </div>
 </template>
 

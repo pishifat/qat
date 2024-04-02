@@ -1,7 +1,7 @@
 <template>
     <div>
         <p>
-            <b>Permalink:</b>
+            <b>Message link:</b>
             <a :href="'/message?eval=' + selectedEvaluation.id" target="_blank">
                 https://bn.mappersguild.com/message?eval={{ selectedEvaluation.id }}
             </a>

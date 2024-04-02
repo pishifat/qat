@@ -1,20 +1,18 @@
 <template>
     <div>
-        <p>
-            <b>Security checked: </b>
-            <a
-                href="#"
-                data-toggle="tooltip"
-                data-placement="right"
-                title="@help in #gmt-help"
-                @click.prevent="toggleEvaluationIsSecurityChecked($event)"
-            >
-                <font-awesome-icon
-                    icon="fa-solid fa-circle-check"
-                    :class="selectedEvaluation.isSecurityChecked ? 'text-success' : 'text-secondary'"
-                />
-            </a>
-        </p>
+        <b>Security checked: </b>
+        <a
+            href="#"
+            data-toggle="tooltip"
+            data-placement="right"
+            title="@help in #gmt-help"
+            @click.prevent="toggleEvaluationIsSecurityChecked($event)"
+        >
+            <font-awesome-icon
+                icon="fa-solid fa-circle-check"
+                :class="selectedEvaluation.isSecurityChecked ? 'text-success' : 'text-secondary'"
+            />
+        </a>
     </div>
 </template>
 

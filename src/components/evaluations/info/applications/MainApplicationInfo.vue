@@ -10,6 +10,8 @@
         <applicant-comment
             :comment="selectedEvaluation.comment"
         />
+
+        <evaluation-link />
     </div>
 </template>
 
@@ -17,12 +19,14 @@
 import { mapState, mapGetters } from 'vuex';
 import Mods from './Mods.vue';
 import ApplicantComment from './ApplicantComment.vue';
+import EvaluationLink from '../common/EvaluationLink.vue';
 
 export default {
     name: 'MainApplicationInfo',
     components: {
         Mods,
         ApplicantComment,
+        EvaluationLink,
     },
     computed: {
         ...mapState([

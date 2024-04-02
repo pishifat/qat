@@ -15,7 +15,7 @@
         </a>
         <div v-if="isReviewable && !isReviewed" class="alert alert-warning mb-2 mt-2">
             <i class="fas fa-exclamation-triangle"></i>
-            Feedback needs to be marked as reviewed before sending!
+            Evaluation needs to be marked as reviewed before sending!
         </div>
         <div v-if="isPassApp && !isSecurityChecked" class="alert alert-warning mb-2 mt-2">
             <i class="fas fa-exclamation-triangle"></i>

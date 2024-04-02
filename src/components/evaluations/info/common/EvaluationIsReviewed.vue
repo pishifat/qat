@@ -1,20 +1,18 @@
 <template>
     <div>
-        <p>
-            <b>Reviewed: </b>
-            <a
-                href="#"
-                data-toggle="tooltip"
-                data-placement="right"
-                title="toggle review status"
-                @click.prevent="toggleEvaluationIsReviewed($event)"
-            >
-                <font-awesome-icon
-                    icon="fa-solid fa-circle-check"
-                    :class="selectedEvaluation.isReviewed ? 'text-success' : 'text-secondary'"
-                />
-            </a>
-        </p>
+        <b>Reviewed: </b>
+        <a
+            href="#"
+            data-toggle="tooltip"
+            data-placement="right"
+            title="toggle review status for evaluation"
+            @click.prevent="toggleEvaluationIsReviewed($event)"
+        >
+            <font-awesome-icon
+                icon="fa-solid fa-circle-check"
+                :class="selectedEvaluation.isReviewed ? 'text-success' : 'text-secondary'"
+            />
+        </a>
     </div>
 </template>
 

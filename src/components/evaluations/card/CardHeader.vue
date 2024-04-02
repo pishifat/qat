@@ -12,12 +12,11 @@
             <i v-else-if="mode == 'mania'" class="mania-icon mx-1" />
             <i v-if="isResignation" class="fas fa-walking mr-1" />
             <i
-                v-if="(!feedback || !isReviewed) && isDiscussion && !isResignation && !isNatEvaluation"
+                v-if="!isReviewed && isDiscussion && !isResignation && !isNatEvaluation"
                 data-toggle="tooltip"
                 data-placement="top"
-                :title="!feedback ? 'needs feedback' : 'feedback needs review'"
-                class="fas fa-comment mr-1"
-                :class="!feedback ? 'text-danger' : 'text-warning'"
+                title="needs review"
+                class="fa fa-eye mr-1 text-warning"
             />
             <i
                 v-if="isPassApp && isNatOrTrialNat && !isSecurityChecked"

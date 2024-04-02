@@ -110,7 +110,7 @@ router.get('/evaluation/:id', async (req, res) => {
     else if (evalOldPopulate) evaluation = evalOldPopulate;
 
     const newEvaluationFormatCutoff = new Date('2024-03-25');
-    const isNewEvaluationFormat = new Date(evaluation.archivedAt) > newEvaluationFormatCutoff;
+    const isNewEvaluationFormat = new Date(evaluation.archivedAt) > newEvaluationFormatCutoff || new Date(evaluation.createdAt > newEvaluationFormatCutoff);
 
     if (isNewEvaluationFormat) {
         if (app) evaluation = app;

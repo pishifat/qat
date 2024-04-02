@@ -77,6 +77,11 @@
 
             <hr />
 
+            <div v-if="evaluation.feedback && evaluation.feedback.length">
+                <h5>{{ isNewEvaluationFormat ? 'Additional feedback' : 'Feedback' }}</h5>
+                <div class="card card-body small mb-4 v-html-content" v-html="$md.render(evaluation.feedback)" />
+            </div>
+
             <div v-if="isNewEvaluationFormat">
                 <h5>Evaluations</h5>
                 <div v-for="review in evaluation.reviews" :key="review.id">
@@ -96,11 +101,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div v-if="evaluation.feedback">
-                <h5>{{ isNewEvaluationFormat ? 'Additional feedback' : 'Feedback' }}</h5>
-                <div class="card card-body small mb-4 v-html-content" v-html="$md.render(evaluation.feedback)" />
             </div>
 
             <div v-if="natUserList.length">
