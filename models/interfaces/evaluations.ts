@@ -34,6 +34,8 @@ export interface IAppEvaluationDocument extends IEvaluationBase, Document {
     deadline?: Date;
     kind?: string;
     natBuddy?: IUserDocument;
+    comment?: string;
+    isPublic?: boolean;
 }
 
 export interface IAppEvaluationModel extends Model<IAppEvaluationDocument> {

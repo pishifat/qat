@@ -11,7 +11,7 @@ const appEvaluationSchema = new mongoose.Schema({
     natBuddy: { type: 'ObjectId', ref: 'User' },
     vibeChecks: [{ type: 'ObjectId', ref: 'Mediation' }],
     comment: { type: String },
-    visibleToPublic: { type: Boolean },
+    isPublic: { type: Boolean },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 class AppEvaluationService extends mongoose.Model {

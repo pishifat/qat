@@ -34,6 +34,13 @@
                 class="fas fa-user mr-1"
                 :class="hasNatBuddy ? '' : 'text-warning'"
             />
+            <i
+                v-if="!isActive && isApplication && isPublic"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="visible in public archives"
+                class="fas fa-globe-americas mr-1 text-success"
+            />
         </p>
         <div v-if="consensus">
             Consensus:
@@ -112,6 +119,18 @@ export default {
         hasNatBuddy: {
             type: Boolean,
             default: false,
+        },
+        isApplication: {
+            type: Boolean,
+            default: false,
+        },
+        isPublic: {
+            type: Boolean,
+            default: false,
+        },
+        isActive: {
+            type: Boolean,
+            default: true,
         },
     },
 };
