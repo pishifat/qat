@@ -60,9 +60,9 @@
             <section class="card card-body">
                 <h2>
                     Inactive votes
-                    <small v-if="paginatedInactiveDiscussionVotes"
-                        >({{ inactiveDiscussionVotes.length }})</small
-                    >
+                    <small v-if="paginatedInactiveDiscussionVotes">
+                        ({{ inactiveDiscussionVotes.length  + (reachedMax ? '' : '+')}})
+                    </small>
 
                     <button
                         v-if="!reachedMax"

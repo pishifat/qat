@@ -12,7 +12,7 @@
 
             <!-- show vote count to NAT who aren't active mediators -->
             <vote-count 
-                v-if="loggedInUser.isNat && (selectedVeto.status != 'wip' || !isMediator)" 
+                v-if="loggedInUser.isNat && selectedVeto.status == 'archive' && !isMediator" 
             />
 
             <!-- show mediations to NAT if they're not active mediators -->
@@ -24,13 +24,12 @@
 
             <!-- show admin buttons to NAT who aren't active mediators -->
             <admin-buttons
-                v-if="loggedInUser.isNat && (selectedVeto.status != 'wip' || !isMediator)"
+                v-if="loggedInUser.isNat && !isMediator"
             />
 
             <!-- show mediation input for active mediators -->
             <mediation-input
                 v-else-if="isMediator && selectedVeto.status == 'wip'"
-                :veto-format="selectedVeto.vetoFormat"
             />
         </div>
     </modal-dialog>

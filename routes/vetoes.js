@@ -112,7 +112,7 @@ router.post('/submit', async (req, res) => {
         beatmapMapper: bmInfo.creator,
         beatmapMapperId: bmInfo.creator_id,
         mode: req.body.mode,
-        vetoFormat: req.body.remediation == 'remediation' ? 4 : 3,
+        vetoFormat: 4,
     });
     veto = await Veto
         .findById(veto._id)
@@ -208,8 +208,7 @@ router.post('/submitMediation/:id', middlewares.isBnOrNat, async (req, res) => {
 /* POST select mediators */
 router.post('/selectMediators', middlewares.isNat, async (req, res) => {
     const mode = req.body.mode;
-    const vetoFormat = req.body.vetoFormat;
-    const allUsers = vetoFormat == 4 ? await User.getAllBnAndNat() : await User.getAllMediators();
+    const allUsers = await User.getAllBnAndNat();
 
     if (allUsers.error) {
         return res.json({
@@ -219,57 +218,12 @@ router.post('/selectMediators', middlewares.isNat, async (req, res) => {
 
     let users = [];
 
-    if (vetoFormat == 4 && mode == 'all') {
-        for (const user of allUsers) {
-            if (!req.body.excludeUsers.includes(user.username.toLowerCase())) {
+    for (const user of allUsers) {
+        if (!req.body.excludeUsers.includes(user.username.toLowerCase())) {
+            if (mode == 'all') {
                 users.push(user);
-            }
-        }
-
-        return res.json(users)
-    } else if (vetoFormat == 4) {
-        for (const user of allUsers) {
-            if (!req.body.excludeUsers.includes(user.username.toLowerCase()) && user.modesInfo.some(m => m.mode === mode)) {
+            } else if (user.modesInfo.some(m => m.mode === mode)) {
                 users.push(user);
-            }
-        }
-
-        return res.json(users);
-    }
-
-    let totalMediators;
-    let validMediators;
-
-    if (mode === 'all') {
-        validMediators = await User.find({
-            groups: { $in: ['nat', 'bn'] },
-            isVetoMediator: true,
-        });
-    } else {
-        validMediators = await User.find({
-            groups: { $in: ['nat', 'bn'] },
-            'modesInfo.mode': { $in: mode },
-            isVetoMediator: true,
-        });
-    }
-
-    totalMediators = vetoFormat == 4 ? validMediators.length : Math.round(validMediators.length * 0.2);
-    if (totalMediators < 11) totalMediators = 11;
-
-    for (let i = 0; i < allUsers.length; i++) {
-        let user = allUsers[i];
-
-        if (
-            !req.body.excludeUsers.includes(user.username.toLowerCase()) &&
-            (
-                (user.modesInfo.some(m => m.mode === mode && (m.level == 'full' || m.level == 'evaluator')) && mode != 'all') ||
-                (!user.modesInfo.some(m => m.level === 'probation') && mode == 'all')
-            )
-        ) {
-            users.push(user);
-
-            if (users.length >= totalMediators) {
-                break;
             }
         }
     }
@@ -297,7 +251,6 @@ router.post('/beginMediation/:id', middlewares.isNat, async (req, res) => {
 
     let date = new Date();
     let deadlineDays = 7;
-    if (v.vetoFormat == 4) deadlineDays = 14;
     date.setDate(date.getDate() + deadlineDays);
     v = await Veto
         .findByIdAndUpdate(req.params.id, { deadline: date })
@@ -320,7 +273,7 @@ router.post('/beginMediation/:id', middlewares.isNat, async (req, res) => {
 
 /* POST conclude mediation */
 router.post('/concludeMediation/:id', middlewares.isNat, async (req, res) => {
-    let veto = await Veto
+    const veto = await Veto
         .findById(req.params.id)
         .populate(defaultPopulate);
 
@@ -336,26 +289,11 @@ router.post('/concludeMediation/:id', middlewares.isNat, async (req, res) => {
         'veto',
         veto._id
     );
-    
-    const agreeMediations = veto.mediations.filter(mediation => mediation.vote == 1);
-    const neutralMediations = veto.mediations.filter(mediation => mediation.vote == 2);
-    const disagreeMediations = veto.mediations.filter(mediation => mediation.vote == 3);
-    const submittedMediations = agreeMediations.length + neutralMediations.length + disagreeMediations.length;
-
-    let description = `Concluded mediation on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`;
-    description += '\n\n';
-    description += `- **Agree:** ${agreeMediations.length} (${Math.round(agreeMediations.length / submittedMediations * 100) || '0'}%)\n`;
-    neutralMediations.length ? description += `- **Partially Agree:** ${neutralMediations.length} (${Math.round(neutralMediations.length / submittedMediations * 100) || '0' }%)\n` : '';
-    description += `- **Disagree:** ${disagreeMediations.length} (${Math.round(disagreeMediations.length / submittedMediations * 100)  || '0'}%)\n`;
-    description += `- **Submitted votes:** ${submittedMediations} (${Math.round(submittedMediations / veto.mediations.length * 100) || '0'}%)\n`;
-    description += `- **Assigned mediators:** ${veto.mediations.length}`;
-    description += '\n\n';
-    description += `Consensus: **${agreeMediations.length > disagreeMediations.length ? 'Upheld' : 'Dismissed'}**`;
 
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),
         color: discord.webhookColors.purple,
-        description,
+        description: `Concluded mediation on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`,
     }],
     veto.mode);
 });
@@ -379,81 +317,6 @@ router.post('/continueMediation/:id', middlewares.isNat, async (req, res) => {
         author: discord.defaultWebhookAuthor(req.session),
         color: discord.webhookColors.purple,
         description: `**Resumed** mediation on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`,
-    }],
-        veto.mode);
-});
-
-/* POST replace mediator */
-router.post('/replaceMediator/:id', middlewares.isNat, async (req, res) => {
-    let veto = await Veto
-        .findById(req.params.id)
-        .populate(defaultPopulate);
-
-    const mediationIds = [];
-
-    let oldMediationUsername;
-    let newMediationUsername;
-
-    for (const mediation of veto.mediations) {
-        if (mediation.mediator.id == req.body.userId) {
-            mediationIds.push(mediation.id);
-            oldMediationUsername = mediation.mediator.username;
-        }
-    }
-
-    let currentMediators = veto.mediations.map(m => m.mediator.osuId);
-    let newMediator;
-
-    if (veto.mode === 'all') {
-        newMediator = await User.aggregate([
-            { $match: { osuId: { $nin: currentMediators }, isVetoMediator: true, groups: { $in: ['bn', 'nat'] } } },
-            { $sample: { size: 1 } },
-        ]);
-    } else {
-        newMediator = await User.aggregate([
-            {
-                $match: {
-                    modesInfo: { $elemMatch: { mode: veto.mode, level: { $ne: 'probation' } } },
-                    osuId: { $nin: currentMediators },
-                    isVetoMediator: true,
-                },
-            },
-            { $sample: { size: 1 } },
-        ]);
-    }
-
-    for (let i = 0; i < mediationIds.length; i++) {
-        const mediationId = mediationIds[i];
-        const newMediation = await Mediation
-            .findByIdAndUpdate(mediationId, { mediator: newMediator[0]._id })
-            .populate({
-                path: 'mediator',
-                select: 'username',
-            });
-
-        newMediationUsername = newMediation.mediator.username;
-    }
-
-    veto = await Veto
-        .findById(req.params.id)
-        .populate(defaultPopulate);
-
-    res.json({
-        veto,
-        success: 'Replaced mediator',
-    });
-
-    Logger.generate(
-        req.session.mongoId,
-        'Re-selected a single veto mediator',
-        'veto',
-        veto._id
-    );
-
-    discord.webhookPost([{
-        author: discord.defaultWebhookAuthor(req.session),
-        color: discord.webhookColors.darkOrange,
-        description: `Replaced **${oldMediationUsername}** with **${newMediationUsername}** as mediator on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`,
     }],
         veto.mode);
 });
@@ -496,11 +359,11 @@ router.post('/sendMessages/:id', middlewares.isNat, async (req, res) => {
         description: 'Request to participate in a veto mediation',
     }
 
-    const message = await osuBot.sendAnnouncement(osuIds, channel, req.body.message);
+    /*const message = await osuBot.sendAnnouncement(osuIds, channel, req.body.message);
 
     if (message !== true) {
         return res.json({ error: `Messages were not sent. Please let pishifat know!` });
-    }
+    }*/
 
     res.json({ success: 'Messages sent! A copy was sent to you for confirmation' });
 

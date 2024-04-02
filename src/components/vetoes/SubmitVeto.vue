@@ -12,44 +12,6 @@
                 />
             </div>
 
-
-            <!-- re-mediation -->
-            <div v-if="loggedInUser.isNat">
-                <p>Re-mediation:</p>
-                    <div class="row ml-4">
-                    <label
-                        class="mx-1"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        title="mediated by 20% of bns"
-                    >
-                        <input
-                            v-model="remediation"
-                            type="radio"
-                            class="cross-radio hide-default"
-                            name="remediation"
-                            value="noRemediation"
-                        >
-                        <i class="fas fa-times fa-lg" />
-                    </label>
-                    <label
-                        class="mx-1"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        title="mediated by 100% of bns"
-                    >
-                        <input
-                            v-model="remediation"
-                            type="radio"
-                            class="checkmark-radio hide-default"
-                            name="remediation"
-                            value="remediation"
-                        >
-                        <i class="fas fa-check fa-lg" />
-                    </label>
-                </div>
-            </div>
-
             <!-- veto reasons -->
             <p>Veto reasons:</p>
             <div>
@@ -131,7 +93,6 @@ export default {
             link: '',
             summary: '',
             mode: null,
-            remediation: 'noRemediation',
         };
     },
     computed: {
@@ -205,7 +166,6 @@ export default {
                     {
                         reasons: this.vetoReasons,
                         mode: this.mode,
-                        remediation: this.remediation,
                     },
                     e
                 );

@@ -1,7 +1,7 @@
 <template>
     <div class="mb-2">
         <hr>
-        Stats:
+        <b>Stats:</b>
 
         <ul>
             <li>
@@ -25,7 +25,9 @@
                 </label>
             </li>
             <li>
-                <b>Assigned mediators:</b> {{ selectedVeto.mediations.length }}
+                <label class="mb-0" data-toggle="tooltip" data-placement="right" title="users involved">
+                    <b>Assigned mediators:</b> {{ selectedVeto.mediations.length / selectedVeto.reasons.length }}
+                </label>
             </li>
         </ul>
     </div>

@@ -48,14 +48,14 @@
 
             <!-- specify mediators -->
             <div class="mb-2">
-                <span>Exclude specific user(s):</span>
+                <b>Exclude specific user(s):</b>
                 <input
                     v-model="excludeUsers"
-                    class="form-control ml-1 w-75 small"
+                    class="form-control w-75 small"
                     type="text"
                     placeholder="username1, username2, username3..."
-                ><br>
-                <div class="small px-4">
+                >
+                <div class="small text-secondary">
                     The mapper and veto submitter are automatically excluded. Please manually exclude any guest difficulty creators and the nominating BNs.
                 </div>
             </div>
@@ -63,36 +63,40 @@
                 Delete veto
             </button>
 
-            <button class="btn btn-sm btn-block btn-primary mb-2" @click="selectMediators($event)">
+            <button class="btn btn-sm btn-block btn-primary" @click="selectMediators($event)">
                 {{ mediators ? 'Re-select mediators' : 'Select mediators' }}
             </button>
 
-            <!-- view mediators -->
-            <div v-if="mediators" class="mt-2 row">
-                <div class="col-sm-3 align-self-center">
-                    <b>Users:</b>
-                    <div id="usernames" class="card card-body small">
-                        <ul class="list-unstyled">
-                            <li v-for="user in mediators" :key="user.id">
-                                {{ user.username }}
-                            </li>
-                        </ul>
+            <div v-if="mediators">
+                <hr />
+
+                <!-- begin mediation -->
+                <button class="btn btn-sm btn-block btn-success mb-2" @click="beginMediation($event)">
+                    Begin mediation
+                </button>
+
+                <!-- list mediators -->
+                <div class="row">
+                    <div class="col-sm-3 align-self-center">
+                        <b>Users:</b>
+                        <div id="usernames" class="card card-body small">
+                            <ul class="list-unstyled">
+                                <li v-for="user in mediators" :key="user.id">
+                                    {{ user.username }}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- chat preview -->
+                    <div class="col-sm-9">
+                        <b>Chat messages:</b>
+                        <veto-chat-message
+                            :users="slimmedMediators"
+                        />
                     </div>
                 </div>
-
-                <div class="col-sm-9">
-                    <b>Chat messages:</b>
-                    <veto-chat-message
-                        :users="slimmedMediators"
-                    />
-                </div>
             </div>
-
-            <!-- begin mediation -->
-            <button v-if="mediators && mediators.length" class="btn btn-sm btn-block btn-success my-2" @click="beginMediation($event)">
-                Begin mediation
-            </button>
-
         </div>
     </div>
 </template>
@@ -192,7 +196,7 @@ export default {
 
             excludeUsers.push(this.selectedVeto.beatmapMapper.toLowerCase(), this.selectedVeto.vetoer.username.toLowerCase());
 
-            const result = await this.$http.executePost('/vetoes/selectMediators', { mode: this.selectedVeto.mode, vetoFormat: this.selectedVeto.vetoFormat, excludeUsers }, e);
+            const result = await this.$http.executePost('/vetoes/selectMediators', { mode: this.selectedVeto.mode, excludeUsers }, e);
 
             if (result && !result.error) {
                 this.mediators = result;

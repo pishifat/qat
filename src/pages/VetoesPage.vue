@@ -35,9 +35,9 @@
             <section class="card card-body">
                 <h2>
                     Archived vetoes
-                    <small v-if="paginatedResolvedVetoes"
-                        >({{ resolvedVetoes.length }})</small
-                    >
+                    <small v-if="paginatedResolvedVetoes">
+                        ({{ resolvedVetoes.length + (reachedMax ? '' : '+')}})
+                    </small>
                     <button
                         v-if="!reachedMax"
                         type="button"

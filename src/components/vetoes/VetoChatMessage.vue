@@ -37,8 +37,6 @@ export default {
             message += `\n\n`;
             message += `read details here: https://bn.mappersguild.com/message?veto=${this.selectedVeto.id}`;
             message += `\n\n`;
-            message += `if you don't feel confident mediating this veto, talk to a member of the NAT`;
-            message += `\n\n`;
             message += `thank you!`;
             message += `\n\n`;
             message += `—NAT`;

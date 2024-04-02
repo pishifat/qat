@@ -6,17 +6,7 @@
                 :user="mediation.mediator"
                 :text-color="voteColor(mediation.vote)"
             >
-                <span v-if="mediation.vote == 2" class="text-secondary small">(partially agree)</span>
-                <a
-                    v-if="!mediation.comment && selectedVeto.status === 'wip'"
-                    href="#"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="replace mediator"
-                    @click.prevent="replaceMediator(mediation.mediator.id);"
-                >
-                    <i class="fas fa-redo-alt text-success" />
-                </a>
+                <span v-if="mediation.vote == 2" class="text-secondary small">(partially agree)</span> <!-- only used in vetoFormat 1 and 2-->
             </user-avatar>
 
             <div v-else class="text-center my-2" :class="voteColor(mediation.vote)">
@@ -71,17 +61,6 @@ export default {
                     return 'text-success'; // agree/partially agree
                 case 3:
                     return 'text-danger'; // disagree
-            }
-        },
-        async replaceMediator (userId) {
-            const result = confirm(`Are you sure? This should only be done if a mistake was made.`);
-
-            if (result) {
-                const data = await this.$http.executePost(`/vetoes/replaceMediator/${this.selectedVeto.id}`, { userId });
-
-                if (this.$http.isValid(data)) {
-                    this.$store.commit('vetoes/updateVeto', data.veto);
-                }
             }
         },
     },

@@ -1,10 +1,9 @@
 <template>
     <div>
-        If you don't feel confident mediating this veto, talk to a member of the NAT.
         <hr>
-        Mediation response:
+        <b>Mediation response:</b>
         <div class="small px-4 mb-2 text-secondary">
-            Your comments will be shown anonymously on the map thread. Clearly explain why you agree or disagree with each reason. Inappropriate responses will be discarded.
+           Briefly explain why you agree or disagree with each veto reason below. You don't need to write a lot — even one sentence is okay! Your response will be anonymous.
         </div>
 
         <div v-for="(reason, i) in selectedVeto.reasons" :key="i">
@@ -13,8 +12,9 @@
                 id="comment"
                 v-model="input.comments[i]"
                 class="form-control mb-2"
-                placeholder="Why you agree/disagree with the above veto reason..."
-                rows="3"
+                placeholder="your thoughts..."
+                rows="2"
+                maxlength="500"
                 @change="updateLocalStorage(i, input.comments[i])"
             />
 
@@ -31,18 +31,6 @@
                     <label class="form-check-label text-success" for="1">Agree</label>
                 </div>
 
-                <div v-if="vetoFormat <= 2" class="form-check form-check-inline">
-                    <input
-                        :id="'2' + i"
-                        v-model="vote.votes[i]"
-                        class="form-check-input"
-                        type="radio"
-                        :name="'vote' + i"
-                        value="2"
-                    >
-                    <label class="form-check-label text-success" for="2">Partially agree</label>
-                </div>
-
                 <div class="form-check form-check-inline">
                     <input
                         :id="'3' + i"
@@ -54,6 +42,7 @@
                     >
                     <label class="form-check-label text-danger" for="3">Disagree</label>
                 </div>
+                <b v-if="input.comments[i] && input.comments[i].length > 250" :class="input.comments[i].length == 500 ? 'text-danger' : input.comments[i].length > 400 ? 'text-warning' : 'text-secondary'">{{ input.comments[i].length }}</b>
             </div>
         </div>
 
@@ -72,12 +61,6 @@ import { mapGetters, mapState } from 'vuex';
 
 export default {
     name: 'MediationInput',
-    props: {
-        vetoFormat: {
-            type: Number,
-            required: true, 
-        },
-    },
     data() {
         return {
             input: {

@@ -111,7 +111,7 @@
                     <li>Explicit Content label is for <i>song</i> content <b>only</b>. If you think a song is acceptable only with an Explicit Content label, mention it in the text input below.</li>
                     <li>Videos, SBs, BGs, Skin elements, <b>must</b> abide by <a href="https://osu.ppy.sh/wiki/en/Rules/Visual_Content_Considerations" target="_blank">Visual Content Considerations</a> or they can't be ranked. The explicit content filter will <b>not</b> allow riskier visual content to get ranked in present time.</li>
                     <li>Do not vote <i>yes</i> for visual stuff if you think it should have an explicit content label. That would be a <i>no</i>.</li>
-                    <li>Do not vote if you haven't even seen the content! If there's issues with it being region locked or otherwise not visible, let a NAT know so we can mirror it and re-run the vote.</li>
+                    <li>Do not vote if you haven't even seen the content! If there's issues with it being region locked or otherwise not visible, let a NAT member know so we can mirror it and re-run the vote.</li>
                 </ul>
             </div>
         </div>
