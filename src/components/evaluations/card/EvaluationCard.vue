@@ -24,6 +24,9 @@
                 :is-discussion="evaluation.discussion"
                 :is-resignation="evaluation.kind == 'resignation'"
                 :is-nat-evaluation="evaluation.selfSummary"
+                :is-application="evaluation.isApplication"
+                :is-public="evaluation.isPublic"
+                :is-active="evaluation.active"
             />
 
             <card-footer

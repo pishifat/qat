@@ -793,4 +793,25 @@ router.post('/deleteReview/:id', middlewares.isResponsibleWithButtons, async (re
     );
 });
 
+/* POST toggle visibility */
+router.post('/toggleVisibility/:id', middlewares.isNat, async (req, res) => {
+    const app = await AppEvaluation
+        .findById(req.params.id)
+        .populate(defaultPopulate);
+
+    console.log(app.isPublic);
+
+    app.isPublic = req.body.isPublic;
+    await app.save();
+
+    res.json(app);
+
+    Logger.generate(
+        req.session.mongoId,
+        `Changed visibility  of ${app.user.username}'s ${app.mode} BN app to "${app.isPublic ? 'public' : 'private'}"`,
+        'appEvaluation',
+        app._id
+    );
+});
+
 module.exports = router;
