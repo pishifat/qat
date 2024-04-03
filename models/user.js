@@ -357,8 +357,12 @@ class UserService extends mongoose.Model {
             {
                 $match: {
                     groups: isNat ? 'nat' : 'bn',
-                    'modesInfo.mode': mode,
-                    'modesInfo.level': isNat ? 'evaluator' : 'full',
+                    modesInfo: {
+                        $elemMatch: {
+                            mode,
+                            level: isNat ? 'evaluator' : 'full'
+                        }
+                    },
                     isBnEvaluator: true,
                     inBag: isReset ? false : true,
                     isTrialNat: isNat ? false : true,
@@ -404,7 +408,8 @@ class UserService extends mongoose.Model {
             .findOne({
                 user: evaluatedUserId,
                 active: false,
-                reviews: { $ne: [] },
+                mode,
+                consensus: { $exists: true },
             })
             .populate({ path: 'reviews', populate: 'evaluator' })
             .sort({ archivedAt: -1 });
