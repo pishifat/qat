@@ -228,7 +228,7 @@ router.post('/sendToContentReview/:id', async (req, res) => {
             description: `**New discussion up for vote:** [${title}](http://bn.mappersguild.com/discussionvote?id=${d.id})`,
             fields: [
                 {
-                    name: `Question/Proposal`,
+                    name: `Topic`,
                     value: shortReason.length > 900 ? shortReason.slice(0, 900) + '... *(truncated)*' : shortReason,
                 },
             ],
@@ -244,7 +244,7 @@ router.post('/sendToContentReview/:id', async (req, res) => {
             description: `**New discussion up for vote:** [${title}](http://bn.mappersguild.com/discussionvote?id=${d.id})`,
             fields: [
                 {
-                    name: `Question/Proposal`,
+                    name: `Topic`,
                     value: shortReason.length > 900 ? shortReason.slice(0, 900) + '... *(truncated)*' : shortReason,
                 },
             ],

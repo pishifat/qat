@@ -1,76 +1,79 @@
 <template>
     <div>
         <div class="mb-2">
+            <!-- comment -->
             <textarea
-                v-if="selectedDiscussionVote.reasonAllowed"
                 id="comment"
                 v-model="comment"
                 class="form-control"
-                placeholder="your thoughts on the question/proposal above... (optional)"
-                rows="3"
+                placeholder="your thoughts... (optional)"
+                rows="2"
             />
 
-            <div class="form-inline justify-content-end mb-2 my-1">
-                <div class="form-check form-check-inline">
-                    <input
-                        id="1"
-                        v-model="vote"
-                        class="form-check-input"
-                        type="radio"
-                        name="vote"
-                        value="1"
-                    >
-                    <label class="form-check-label text-pass" for="1">{{ selectedDiscussionVote.agreeOverwriteText ? selectedDiscussionVote.agreeOverwriteText : 'Yes/Agree' }}</label>
-                </div>
-                <div v-if="selectedDiscussionVote.neutralAllowed" class="form-check form-check-inline">
-                    <input
-                        id="2"
-                        v-model="vote"
-                        class="form-check-input"
-                        type="radio"
-                        name="vote"
-                        value="2"
-                    >
-                    <label class="form-check-label text-neutral" for="2">{{ selectedDiscussionVote.neutralOverwriteText ? selectedDiscussionVote.neutralOverwriteText : 'Neutral' }}</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input
-                        id="3"
-                        v-model="vote"
-                        class="form-check-input"
-                        type="radio"
-                        name="vote"
-                        value="3"
-                    >
-                    <label class="form-check-label text-fail" for="3">{{ selectedDiscussionVote.disagreeOverwriteText ? selectedDiscussionVote.disagreeOverwriteText : 'No/Disagree' }}</label>
-                </div>
-            </div>
-
-            <div v-if="isContentReview && vote == 3">
-                Select the <a href="https://osu.ppy.sh/wiki/en/Rules/Visual_Content_Considerations" target="_blank">Visual Content Considerations</a> that are violated:
-                <div class="form-check ml-4" v-for="(option, i) in vccOptions" :key="i">
-                    <div v-if="option.active">
+            <!-- vote -->
+            <div v-if="!selectedDiscussionVote.onlyWrittenInput" class="mt-2">
+                <div class="form-inline justify-content-end">
+                    <div class="form-check form-check-inline">
                         <input
-                            :key="i"
-                            :id="option.name"
-                            v-model="vccChecked"
+                            id="1"
+                            v-model="vote"
                             class="form-check-input"
-                            type="checkbox"
-                            name="violation"
-                            :value="option.name"
+                            type="radio"
+                            name="vote"
+                            value="1"
                         >
-                        <label class="form-check-label" :for="option.name">{{ option.text }}</label>
+                        <label class="form-check-label text-pass" for="1">{{ selectedDiscussionVote.agreeOverwriteText ? selectedDiscussionVote.agreeOverwriteText : 'Yes/Agree' }}</label>
+                    </div>
+                    <div v-if="selectedDiscussionVote.neutralAllowed" class="form-check form-check-inline">
+                        <input
+                            id="2"
+                            v-model="vote"
+                            class="form-check-input"
+                            type="radio"
+                            name="vote"
+                            value="2"
+                        >
+                        <label class="form-check-label text-neutral" for="2">{{ selectedDiscussionVote.neutralOverwriteText ? selectedDiscussionVote.neutralOverwriteText : 'Neutral' }}</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input
+                            id="3"
+                            v-model="vote"
+                            class="form-check-input"
+                            type="radio"
+                            name="vote"
+                            value="3"
+                        >
+                        <label class="form-check-label text-fail" for="3">{{ selectedDiscussionVote.disagreeOverwriteText ? selectedDiscussionVote.disagreeOverwriteText : 'No/Disagree' }}</label>
+                    </div>
+                </div>
+
+                <div v-if="isContentReview && vote == 3">
+                    Select the <a href="https://osu.ppy.sh/wiki/en/Rules/Visual_Content_Considerations" target="_blank">Visual Content Considerations</a> that are violated:
+                    <div class="form-check ml-4" v-for="(option, i) in vccOptions" :key="i">
+                        <div v-if="option.active">
+                            <input
+                                :key="i"
+                                :id="option.name"
+                                v-model="vccChecked"
+                                class="form-check-input"
+                                type="checkbox"
+                                name="violation"
+                                :value="option.name"
+                            >
+                            <label class="form-check-label" :for="option.name">{{ option.text }}</label>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="d-flex justify-content-end">
+            <div class="d-flex justify-content-end mt-2">
                 <button
                     class="btn btn-sm btn-primary"
                     @click="submitMediation($event)"
                     :disabled="isContentReview && (!vote || (vote == 3 && !vccChecked.length))"
                 >
-                    Submit vote
+                    Submit
                 </button>
             </div>
         </div>

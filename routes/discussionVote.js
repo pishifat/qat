@@ -106,9 +106,9 @@ router.get('/searchDiscussionVote/:id', async (req, res) => {
 
 /* POST create a new discussion vote. */
 router.post('/submit', middlewares.hasBasicAccess, async (req, res) => {
-    const { discussionLink, title, shortReason, timestamps, mode, isNatOnly, neutralAllowed, reasonAllowed, isContentReview, customText, agreeOverwriteText, neutralOverwriteText, disagreeOverwriteText } = req.body;
+    const { discussionLink, title, shortReason, mode, isNatOnly, neutralAllowed, onlyWrittenInput, isContentReview, customText, agreeOverwriteText, neutralOverwriteText, disagreeOverwriteText } = req.body;
 
-    if (discussionLink.length == 0 && isContentReview) {
+    if (!discussionLink.length && isContentReview) {
         return res.json({
             error: 'No link provided',
         });
@@ -126,24 +126,20 @@ router.post('/submit', middlewares.hasBasicAccess, async (req, res) => {
         });
     }
     
-    if (discussionLink.length > 0 && !isContentReview) {
+    if (discussionLink.length) {
         util.isValidUrlOrThrow(discussionLink);
     }
 
     let overwriteTitle = title;
     let overwriteShortReason = shortReason;
 
-    if (req.body.isContentReview) {
-        const contentReviews = await Discussion.find({ isContentReview: true });
-        overwriteTitle = `Content review #${contentReviews.length + 251}`;
+    if (isContentReview) {
+        const contentReviewCount = await Discussion.countDocuments({ isContentReview: true });
+        overwriteTitle = `Content review #${contentReviewCount + 251}`;
         overwriteShortReason = `Is this content appropriate for a beatmap? ${discussionLink}`;
 
-        if (req.body.shortReason.length) {
-            overwriteShortReason += `\n\n*${req.body.shortReason}*`;
-        }
-
-        if (timestamps.length) {
-            overwriteShortReason += `\n\n**Timestamps:**\n${timestamps}`;
+        if (shortReason.length) {
+            overwriteShortReason += `\n\n*${shortReason}*`;
         }
     }
 
@@ -165,7 +161,8 @@ router.post('/submit', middlewares.hasBasicAccess, async (req, res) => {
         creator: req.session.mongoId,
         isNatOnly,
         neutralAllowed,
-        reasonAllowed,
+        reasonAllowed: true,
+        onlyWrittenInput,
         isContentReview,
         agreeOverwriteText: finalAgreeText,
         neutralOverwriteText: finalNeutralText,
@@ -207,15 +204,15 @@ router.post('/submit', middlewares.hasBasicAccess, async (req, res) => {
             description: `**New discussion up for vote:** [${overwriteTitle}](http://bn.mappersguild.com/discussionvote?id=${discussion.id})`,
             fields: [
                 {
-                    name: `Question/Proposal`,
+                    name: `Topic`,
                     value: overwriteShortReason.length > 900 ? overwriteShortReason.slice(0, 900) + '... *(truncated)*' : overwriteShortReason,
                 },
             ],
         }],
-        req.body.isContentReview ? 'contentCase' : 'all'
+        isContentReview ? 'contentCase' : 'all'
     );
 
-    if (req.body.isContentReview) {
+    if (isContentReview) {
         // #content-review (internal)
         await discord.webhookPost(
             [{
@@ -224,7 +221,7 @@ router.post('/submit', middlewares.hasBasicAccess, async (req, res) => {
                 description: `**New discussion up for vote:** [${overwriteTitle}](http://bn.mappersguild.com/discussionvote?id=${discussion.id})`,
                 fields: [
                     {
-                        name: `Question/Proposal`,
+                        name: `Topic`,
                         value: overwriteShortReason.length > 900 ? overwriteShortReason.slice(0, 900) + '... *(truncated)*' : overwriteShortReason,
                     },
                 ],
@@ -247,15 +244,15 @@ router.post('/submit', middlewares.hasBasicAccess, async (req, res) => {
 
 /* POST submit mediation */
 router.post('/submitMediation/:id', middlewares.hasBasicAccess, async (req, res) => {
-    if (!req.body.vote) {
+    const discussion = await Discussion
+        .findById(req.params.id)
+        .populate('mediations');
+
+    if (!req.body.vote && !discussion.onlyWrittenInput) {
         return res.json({
             error: 'Select your vote!',
         });
     }
-
-    const discussion = await Discussion
-        .findById(req.params.id)
-        .populate('mediations');
 
     if (discussion.isNatOnly && !res.locals.userRequest.isNatOrTrialNat) {
         return res.json({ error: 'Only NAT members can vote on this' });
@@ -271,7 +268,7 @@ router.post('/submitMediation/:id', middlewares.hasBasicAccess, async (req, res)
     }
 
     mediation.comment = req.body.comment;
-    mediation.vote = req.body.vote;
+    mediation.vote = discussion.onlyWrittenInput ? 2 : req.body.vote;
     mediation.vccChecked = req.body.vccChecked;
     await mediation.save();
 

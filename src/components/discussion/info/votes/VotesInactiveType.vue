@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div>
+        <div v-if="!onlyWrittenInput">
             {{ mediations.length }} "{{ type }}" {{ mediations.length == 1 ? 'vote' : 'votes' }}
             <div class="font-weight-bold small">
                 GMT/NAT: {{ Math.round((natGmtMediations.length/totalNatGmtMediations)*1000) / 10 || 0 }}%
@@ -55,17 +55,18 @@ export default {
         },
         type: {
             type: String,
-            required: true,
+            default: 'Neutral',
         },
         totalBnMediations: {
             type: Number,
-            required: true,
+            default: 1,
         },
         totalNatGmtMediations: {
             type: Number,
-            required: true,
+            default: 1,
         },
         showAll: Boolean,
+        onlyWrittenInput: Boolean,
     },
     computed: {
         ...mapState([

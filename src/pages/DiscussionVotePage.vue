@@ -1,110 +1,118 @@
 <template>
-    <div v-if="!loggedInUser.showExplicitContent && !tempShowExplicitContent" class="row">
-        <div class="col-md-12">
-            <section class="card card-body">
-                <div>
-                    This page may contain <b>explicit content</b>.
-                </div>
-                <div>
-                    If you would like to proceed, <a href="#" @click="toggleShowExplicitContent($event)">click here</a>.
-                </div>
-            </section>
-        </div>
+    <div v-if="!loggedInUser.showExplicitContent && !tempShowExplicitContent">
+        <section class="card card-body">
+            <div>
+                This page may contain <b>explicit content</b>.
+            </div>
+            <div>
+                If you would like to proceed, <a href="#" @click="toggleShowExplicitContent($event)">click here</a>.
+            </div>
+        </section>
     </div>
-    <div v-else class="row">
-        <div class="col-md-12">
-            <filter-box
-                :placeholder="'enter to search discussion...'"
-                :modes="['', 'osu', 'taiko', 'catch', 'mania']"
-                store-module="discussionVote"
+    <div v-else>
+        <filter-box
+            :placeholder="'enter to search discussion...'"
+            :modes="['', 'osu', 'taiko', 'catch', 'mania']"
+            store-module="discussionVote"
+        >
+            <div v-if="loggedInUser.hasBasicAccess" class="row">
+                <div :class="loggedInUser.isNat ? 'col-sm-6' : 'col-sm-12'">
+                    <button
+                        class="btn btn-block btn-primary my-1"
+                        data-toggle="modal"
+                        data-target="#addDiscussion"
+                        @click="isContentReview = true"
+                    >
+                        Submit content for review
+                    </button>
+                </div>
+                <div v-if="loggedInUser.isNat" class="col-sm-6">
+                    <button
+                        class="btn btn-block btn-primary my-1"
+                        data-toggle="modal"
+                        data-target="#addDiscussion"
+                        @click="isContentReview = false"
+                    >
+                        Submit topic for vote/discussion
+                    </button>
+                </div>
+            </div>
+        </filter-box>
+
+        <section class="card card-body">
+            <h2>
+                Active votes
+                <small v-if="activeDiscussionVotes"
+                    >({{ activeDiscussionVotes.length }})</small
+                >
+            </h2>
+
+            <div
+                v-if="!activeDiscussionVotes.length"
+                class="ml-4 text-white-50"
             >
+                None...
+            </div>
+
+            <transition-group name="list" tag="div" class="row">
+                <discussion-card
+                    v-for="discussion in activeDiscussionVotes"
+                    :key="discussion.id"
+                    :discussion="discussion"
+                    :user-id="loggedInUser.userId"
+                />
+            </transition-group>
+        </section>
+
+        <section class="card card-body">
+            <h2>
+                Inactive votes
+                <small v-if="paginatedInactiveDiscussionVotes">
+                    ({{ inactiveDiscussionVotes.length  + (reachedMax ? '' : '+')}})
+                </small>
+
                 <button
-                    v-if="loggedInUser.hasBasicAccess"
-                    class="btn btn-block btn-primary my-1"
-                    data-toggle="modal"
-                    data-target="#addDiscussion"
+                    v-if="!reachedMax"
+                    type="button"
+                    class="btn btn-primary ml-2"
+                    @click="showMore($event)"
                 >
-                    {{
-                        loggedInUser.isNat
-                            ? 'Submit topic for vote'
-                            : 'Submit content for review'
-                    }}
+                    Show more discussion votes
                 </button>
-            </filter-box>
-
-            <section class="card card-body">
-                <h2>
-                    Active votes
-                    <small v-if="activeDiscussionVotes"
-                        >({{ activeDiscussionVotes.length }})</small
-                    >
-                </h2>
-
-                <div
-                    v-if="!activeDiscussionVotes.length"
-                    class="ml-4 text-white-50"
+                <button
+                    v-if="!reachedMax"
+                    type="button"
+                    class="btn btn-secondary ml-2"
+                    @click="showAll($event)"
                 >
-                    None...
-                </div>
+                    Show all discussion votes
+                </button>
+            </h2>
 
-                <transition-group name="list" tag="div" class="row">
-                    <discussion-card
-                        v-for="discussion in activeDiscussionVotes"
-                        :key="discussion.id"
-                        :discussion="discussion"
-                        :user-id="loggedInUser.userId"
-                    />
-                </transition-group>
-            </section>
+            <div
+                v-if="!paginatedInactiveDiscussionVotes.length"
+                class="ml-4 text-white-50"
+            >
+                None...
+            </div>
 
-            <section class="card card-body">
-                <h2>
-                    Inactive votes
-                    <small v-if="paginatedInactiveDiscussionVotes">
-                        ({{ inactiveDiscussionVotes.length  + (reachedMax ? '' : '+')}})
-                    </small>
+            <transition-group name="list" tag="div" class="row">
+                <discussion-card
+                    v-for="discussion in paginatedInactiveDiscussionVotes"
+                    :key="discussion.id"
+                    :discussion="discussion"
+                    :user-id="loggedInUser.userId"
+                />
+            </transition-group>
 
-                    <button
-                        v-if="!reachedMax"
-                        type="button"
-                        class="btn btn-primary ml-2"
-                        @click="showMore($event)"
-                    >
-                        Show more discussion votes
-                    </button>
-                    <button
-                        v-if="!reachedMax"
-                        type="button"
-                        class="btn btn-secondary ml-2"
-                        @click="showAll($event)"
-                    >
-                        Show all discussion votes
-                    </button>
-                </h2>
-
-                <div
-                    v-if="!paginatedInactiveDiscussionVotes.length"
-                    class="ml-4 text-white-50"
-                >
-                    None...
-                </div>
-
-                <transition-group name="list" tag="div" class="row">
-                    <discussion-card
-                        v-for="discussion in paginatedInactiveDiscussionVotes"
-                        :key="discussion.id"
-                        :discussion="discussion"
-                        :user-id="loggedInUser.userId"
-                    />
-                </transition-group>
-
-                <pagination-nav store-module="discussionVote" />
-            </section>
-        </div>
+            <pagination-nav store-module="discussionVote" />
+        </section>
 
         <discussion-info />
 
-        <submit-discussion />
+        <submit-discussion
+            :is-content-review="isContentReview"
+        />
 
         <toast-messages />
     </div>
@@ -145,6 +153,7 @@ export default {
             limit: 20,
             reachedMax: false,
             tempShowExplicitContent: false,
+            isContentReview: true,
         };
     },
     watch: {

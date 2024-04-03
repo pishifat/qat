@@ -70,7 +70,7 @@
                 <i class="fas fa-edit" />
             </a>
 
-            <b>Question/Proposal:</b>
+            <b>Topic:</b>
 
             <textarea
                 v-if="isEditingProposal"

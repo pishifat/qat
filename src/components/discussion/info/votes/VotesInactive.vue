@@ -13,12 +13,13 @@
         </div>
 
         <!-- show/hide bns button -->
-        <button v-if="loggedInUser.hasBasicAccess" class="btn btn-sm btn-block btn-primary ml-2 mb-2" type="submit" @click="showAll = !showAll">
+        <button v-if="selectedDiscussionVote.isContentReview" class="btn btn-sm btn-block btn-primary ml-2 mb-2" type="submit" @click="showAll = !showAll">
             {{ showAll ? 'Hide BN votes' : 'Show all votes' }}
         </button>
 
         <!-- agree -->
         <votes-inactive-type
+            v-if="!selectedDiscussionVote.onlyWrittenInput"
             :bn-mediations="agreeMediations('bn')"
             :nat-gmt-mediations="agreeMediations('natGmt')"
             :type="selectedDiscussionVote.agreeOverwriteText ? selectedDiscussionVote.agreeOverwriteText : 'Yes/Agree'"
@@ -29,7 +30,7 @@
 
         <!-- neutral -->
         <votes-inactive-type
-            v-if="selectedDiscussionVote.neutralAllowed"
+            v-if="!selectedDiscussionVote.onlyWrittenInput && selectedDiscussionVote.neutralAllowed"
             :bn-mediations="neutralMediations('bn')"
             :nat-gmt-mediations="neutralMediations('natGmt')"
             type="Neutral"
@@ -40,12 +41,22 @@
 
         <!-- disagree -->
         <votes-inactive-type
+            v-if="!selectedDiscussionVote.onlyWrittenInput"
             :bn-mediations="disagreeMediations('bn')"
             :nat-gmt-mediations="disagreeMediations('natGmt')"
             :type="selectedDiscussionVote.disagreeOverwriteText ? selectedDiscussionVote.disagreeOverwriteText : 'No/Disagree'"
             :total-bn-mediations="totalBnMediations"
             :total-nat-gmt-mediations="totalNatGmtMediations"
             :show-all="showAll"
+        />
+
+        <!-- only written input -->
+        <votes-inactive-type
+            v-if="selectedDiscussionVote.onlyWrittenInput"
+            :bn-mediations="neutralMediations('bn')"
+            :nat-gmt-mediations="neutralMediations('natGmt')"
+            :show-all="showAll"
+            :only-written-input="true"
         />
     </div>
 </template>

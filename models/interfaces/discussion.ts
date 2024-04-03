@@ -11,6 +11,7 @@ interface IDiscussionDocument extends Document {
     isNatOnly: boolean;
     neutralAllowed: boolean;
     reasonAllowed: boolean;
+    onlyWrittenInput: boolean;
     isContentReview: boolean;
     isAcceptable: boolean;
     agreeOverwriteText: string;
