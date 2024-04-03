@@ -359,7 +359,7 @@ class UserService extends mongoose.Model {
                     groups: isNat ? 'nat' : 'bn',
                     modesInfo: {
                         $elemMatch: {
-                            mode: mode,
+                            mode,
                             level: isNat ? 'evaluator' : 'full'
                         }
                     },
@@ -408,7 +408,7 @@ class UserService extends mongoose.Model {
             .findOne({
                 user: evaluatedUserId,
                 active: false,
-                mode: mode,
+                mode,
                 consensus: { $exists: true },
             })
             .populate({ path: 'reviews', populate: 'evaluator' })
