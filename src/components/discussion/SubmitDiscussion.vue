@@ -146,7 +146,7 @@
                 <div v-if="isContentReview" class="col-sm-10 mb-3 text-secondary small">
                     Only submit inappropriate songs or visuals from qualified or soon-to-be-qualified maps. For Ranked or Graveyard maps, use the beatmap report system on osu-web.
                 </div>
-                <div class="col-sm-2">
+                <div :class="isContentReview ? 'col-sm-2' : 'col-sm-12'">
                     <button type="submit" class="btn btn-primary float-right" @click="submitDiscussion($event)">
                         Submit
                     </button>
