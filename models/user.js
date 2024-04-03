@@ -408,7 +408,8 @@ class UserService extends mongoose.Model {
             .findOne({
                 user: evaluatedUserId,
                 active: false,
-                reviews: { $ne: [] },
+                mode: mode,
+                consensus: { $exists: true },
             })
             .populate({ path: 'reviews', populate: 'evaluator' })
             .sort({ archivedAt: -1 });
