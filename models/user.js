@@ -357,8 +357,12 @@ class UserService extends mongoose.Model {
             {
                 $match: {
                     groups: isNat ? 'nat' : 'bn',
-                    'modesInfo.mode': mode,
-                    'modesInfo.level': isNat ? 'evaluator' : 'full',
+                    modesInfo: {
+                        $elemMatch: {
+                            mode: mode,
+                            level: isNat ? 'evaluator' : 'full'
+                        }
+                    },
                     isBnEvaluator: true,
                     inBag: isReset ? false : true,
                     isTrialNat: isNat ? false : true,
