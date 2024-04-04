@@ -90,11 +90,11 @@ export default {
                     let additional = '';
 
                     if (years) {
-                        additional += `${years} year${years > 1 ? 's' : ''} and `;
+                        additional += `${years} year${years > 1 ? 's' : ''}`;
                     }
 
                     if (remainingMonths) {
-                        additional += `${remainingMonths} month${remainingMonths > 1 ? 's' : ''}`;
+                        additional += ` and ${remainingMonths} month${remainingMonths > 1 ? 's' : ''}`;
                     }
 
                     this.additional = additional;
