@@ -32,9 +32,9 @@ export default {
                 const natReviews = this.selectedEvaluation.reviews.filter(r => r.evaluator.isNat);
                 const bnReviews = this.selectedEvaluation.reviews.filter(r => !r.evaluator.isNat);
 
-                return natReviews.concat(bnReviews);
+                return natReviews.concat(bnReviews).filter(r => r.vote);
             } else {
-                return this.selectedEvaluation.reviews;
+                return this.selectedEvaluation.reviews.filter(r => r.vote);
             }
         },
     },
