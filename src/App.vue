@@ -50,6 +50,9 @@
                                     Other
                                 </a>
                                 <div class="dropdown-menu">
+                                    <router-link class="dropdown-item" to="/publicarchive">
+                                        Public Evaluation Archives
+                                    </router-link>
                                     <router-link class="dropdown-item" to="/yourevals">
                                         Your Evaluations
                                     </router-link>
@@ -85,6 +88,9 @@
                                     <router-link class="dropdown-item" to="/yourevals">
                                         Your Evaluations
                                     </router-link>
+                                    <router-link class="dropdown-item" to="/publicarchive">
+                                        Public Evaluation Archives
+                                    </router-link>
                                     <router-link class="dropdown-item" to="/reports">
                                         Reports
                                     </router-link>
@@ -98,9 +104,6 @@
                                     BN pages
                                 </a>
                                 <div class="dropdown-menu">
-                                    <router-link v-if="!loggedInUser.isTrialNat" class="dropdown-item" to="/appeval">
-                                        BN Application Evaluations
-                                    </router-link>
                                     <router-link class="dropdown-item" to="/discussionvote">
                                         Content Review
                                     </router-link>
@@ -167,15 +170,8 @@
                                     <router-link class="dropdown-item" to="/yourevals">
                                         Your Evaluations
                                     </router-link>
-                                </div>
-                            </li>
-                            <li v-if="loggedInUser.isBn" class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
-                                    BN pages
-                                </a>
-                                <div class="dropdown-menu">
-                                    <router-link v-if="!loggedInUser.isTrialNat" class="dropdown-item" to="/appeval">
-                                        BN Application Evaluations
+                                    <router-link class="dropdown-item" to="/publicarchive">
+                                        Public Evaluation Archives
                                     </router-link>
                                     <router-link class="dropdown-item" to="/vetoes">
                                         Vetoes
@@ -211,6 +207,9 @@
                                 <div class="dropdown-menu">
                                     <router-link class="dropdown-item" to="/yourevals">
                                         Your Evaluations
+                                    </router-link>
+                                    <router-link class="dropdown-item" to="/publicarchive">
+                                        Public Evaluation Archives
                                     </router-link>
                                     <router-link class="dropdown-item" to="/vetoes">
                                         Vetoes (read-only)
@@ -269,7 +268,10 @@
                                         Current BNs
                                     </router-link>
                                     <router-link class="dropdown-item" to="/evalarchive">
-                                        Archive
+                                        Archives
+                                    </router-link>
+                                    <router-link class="dropdown-item" to="/publicarchive">
+                                        Public Archives
                                     </router-link>
                                     <router-link class="dropdown-item" to="/datacollection">
                                         Manage Resets
