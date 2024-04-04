@@ -88,7 +88,7 @@ export default {
         selectedEvaluation: (state) => {
             return state.evaluations.find(e => e.id === state.selectedEvaluationId);
         },
-        paginatedEvaluationss: (state, getters, rootState) => {
+        paginatedEvaluations: (state, getters, rootState) => {
             const limit = rootState.evaluations.pagination.limit;
             const page = rootState.evaluations.pagination.page;
 
