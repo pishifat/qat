@@ -66,7 +66,6 @@ import evaluationsModule from '../store/evaluations';
 import ToastMessages from '../components/ToastMessages.vue';
 import EvaluationCard from '../components/evaluations/card/EvaluationCard.vue';
 import YourEvalsInfo from '../components/evaluations/info/YourEvalsInfo.vue';
-import FilterBox from '../components/FilterBox.vue';
 
 export default {
     name: 'YourEvalsPage',
@@ -74,15 +73,8 @@ export default {
         ToastMessages,
         EvaluationCard,
         YourEvalsInfo,
-        FilterBox,
     },
     computed: {
-        ...mapState([
-            'loggedInUser',
-        ]),
-        ...mapGetters([
-            'userMainMode',
-        ]),
         ...mapState('evaluations', [
             'evaluations',
         ]),
@@ -106,10 +98,6 @@ export default {
         }
     },
     async created() {
-        if (this.userMainMode) {
-            this.$store.commit(`evaluations/pageFilters/setFilterMode`, this.userMainMode);
-        }
-
         const id = this.$route.query.id;
         const query = id ? `?id=${id}` : '';
 
