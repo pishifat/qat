@@ -33,7 +33,7 @@
             v-if="!selectedDiscussionVote.onlyWrittenInput && selectedDiscussionVote.neutralAllowed"
             :bn-mediations="neutralMediations('bn')"
             :nat-gmt-mediations="neutralMediations('natGmt')"
-            type="Neutral"
+            :type="selectedDiscussionVote.neutralOverwriteText ? selectedDiscussionVote.neutralOverwriteText : 'Neutral'"
             :total-bn-mediations="totalBnMediations"
             :total-nat-gmt-mediations="totalNatGmtMediations"
             :show-all="showAll"
