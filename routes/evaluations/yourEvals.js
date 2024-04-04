@@ -3,6 +3,7 @@ const AppEvaluation = require('../../models/evaluations/appEvaluation');
 const Evaluation = require('../../models/evaluations/evaluation');
 const User = require('../../models/user');
 const middlewares = require('../../helpers/middlewares');
+const util = require('../../helpers/util');
 
 const router = express.Router();
 
@@ -11,31 +12,76 @@ router.use(middlewares.isLoggedIn);
 // population
 const defaultAppPopulate = [
     { path: 'user', select: 'username osuId' },
+    { path: 'natBuddy', select: 'username osuId groups' },
+    {
+        path: 'reviews',
+        select: 'moddingComment vote',
+        populate: {
+            path: 'evaluator',
+            select: 'username osuId groups isTrialNat',
+        },
+    },
 ];
 
 const defaultBnPopulate = [
-    { path: 'user', select: 'username osuId modesInfo' },
+    { path: 'user', select: 'username osuId modesInfo groups' },
+    {
+        path: 'reviews',
+        select: 'moddingComment vote',
+        populate: {
+            path: 'evaluator',
+            select: 'username osuId groups isTrialNat',
+        },
+    },
     
 ];
+
+function sanitizeReviews(reviews) {
+    return reviews.map(review => {
+        return {
+            evaluator: {
+                username: review.evaluator.username,
+                osuId: review.evaluator.osuId,
+                groups: review.evaluator.groups,
+                isTrialNat: review.evaluator.isTrialNat,
+            },
+            moddingComment: review.moddingComment,
+            vote: review.vote,
+            id: review.id,
+            _id: review._id,
+        };
+    });
+}
+
+function sanitizePublicReviews(reviews) {
+    return reviews.map(review => {
+        return {
+            evaluator: {
+                isTrialNat: review.evaluator.isTrialNat,
+                groups: review.evaluator.groups,
+            },
+            moddingComment: review.moddingComment,
+            vote: review.vote,
+            id: review.id,
+            _id: review._id,
+        };
+    });
+}
+
+function sanitizeBareboneReviews(reviews) {
+    return reviews.map(review => {
+        return {
+            id: review.id,
+            _id: review._id,
+        }
+    });
+}
 
 /* GET search for your evals */
 router.get('/search', async (req, res) => {
     const userToSearch = req.session.osuId;
     const idToSearch = req.query.id;
-    
-    if (res.locals.userRequest.isNat) {
-        const reviewsPopulate = {
-            path: 'reviews',
-            select: 'evaluator behaviorComment moddingComment vote',
-            populate: {
-                path: 'evaluator',
-                select: 'username osuId groups',
-            },
-        };
-
-        defaultAppPopulate.push(reviewsPopulate);
-        defaultBnPopulate.push(reviewsPopulate);
-    }
+    const isNat = res.locals.userRequest.isNat;
 
     let bnApplicationsQuery = AppEvaluation
         .find({
@@ -72,9 +118,61 @@ router.get('/search', async (req, res) => {
         bnEvaluationsQuery,
     ]);
 
+    // JSON-ify applications to modify them directly because we can't exclude review ids from population in certain cases (and we need to, for security reasons)
+    let applicationsJson = [];
+
+    for (let app of bnApplications) {
+        app = app.toObject();
+
+        // add an evaluators array to the application object which contains each reviewer's username and osuId
+        app.evaluators = app.reviews.map(review => {
+            return {
+                username: review.evaluator.username,
+                osuId: review.evaluator.osuId,
+                groups: review.evaluator.groups,
+            };
+        });
+
+        if (isNat) {
+            app.reviews = sanitizeReviews(app.reviews);
+        } else if (app.isNewEvaluationFormat) {
+            app.reviews = sanitizePublicReviews(app.reviews);
+        } else {
+            app.reviews = sanitizeBareboneReviews(app.reviews);
+        }
+
+        // shuffle the reviews array for non-NATs
+        if (!isNat) app.reviews = util.shuffleArray(app.reviews);
+
+        applicationsJson.push(app);
+    }
+
+    // JSON-ify bn apps for the same reason above
+    let evaluationsJson = [];
+
+    for (let eval of evaluations) {
+        eval = eval.toObject();
+
+        eval.evaluators = eval.reviews.map(review => {
+            return {
+                username: review.evaluator.username,
+                osuId: review.evaluator.osuId,
+                groups: review.evaluator.groups,
+            };
+        });
+
+        if (isNat) {
+            eval.reviews = sanitizeReviews(eval.reviews);
+        } else {
+            eval.reviews = sanitizeBareboneReviews(eval.reviews);
+        }
+
+        evaluationsJson.push(eval);
+    }
+
     res.json({
-        bnApplications,
-        evaluations,
+        bnApplications: applicationsJson,
+        evaluations: evaluationsJson,
     });
 });
 
