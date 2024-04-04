@@ -24,6 +24,7 @@ interface IEvaluationBase {
     overwriteNextEvaluationDate?: Date;
     vibeChecks?: IMediationDocument[];
     isNewEvaluationFormat?: boolean;
+    isPublic?: boolean;
 }
 
 export interface IAppEvaluationDocument extends IEvaluationBase, Document {
@@ -36,7 +37,6 @@ export interface IAppEvaluationDocument extends IEvaluationBase, Document {
     kind?: string;
     natBuddy?: IUserDocument;
     comment?: string;
-    isPublic?: boolean;
 }
 
 export interface IAppEvaluationModel extends Model<IAppEvaluationDocument> {
