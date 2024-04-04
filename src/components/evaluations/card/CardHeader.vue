@@ -35,7 +35,7 @@
                 :class="hasNatBuddy ? '' : 'text-warning'"
             />
             <i
-                v-if="!isActive && isApplication && isPublic"
+                v-if="!isActive && isPublic"
                 data-toggle="tooltip"
                 data-placement="top"
                 title="visible in public archives"
@@ -117,10 +117,6 @@ export default {
             default: false,
         },
         hasNatBuddy: {
-            type: Boolean,
-            default: false,
-        },
-        isApplication: {
             type: Boolean,
             default: false,
         },

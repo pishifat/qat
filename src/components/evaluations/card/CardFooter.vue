@@ -1,7 +1,7 @@
 <template>
     <div class="card-footer d-flex justify-content-start align-items-center">
         <span
-            v-if="(loggedInUser.isNat || loggedInUser.isTrialNat) && !isDiscussion"
+            v-if="(loggedInUser.isNatOrTrialNat) && !isDiscussion"
             class="badge badge-info mx-1"
             data-toggle="tooltip"
             data-placement="top"
@@ -11,7 +11,7 @@
         </span>
 
         <add-votes
-            v-else-if="(((loggedInUser.isNat || loggedInUser.isTrialNat) && !isNat) || loggedInUser.isNatLeader || isPublic) && isDiscussion"
+            v-else-if="((loggedInUser.isNatOrTrialNat && !isNat) || loggedInUser.isNatLeader || isPublic) && isDiscussion"
             :inputs="reviews"
         />
 

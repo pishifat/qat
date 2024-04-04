@@ -24,7 +24,6 @@
                 :is-discussion="evaluation.discussion"
                 :is-resignation="evaluation.kind == 'resignation'"
                 :is-nat-evaluation="Boolean(evaluation.selfSummary)"
-                :is-application="evaluation.isApplication"
                 :is-public="evaluation.isPublic"
                 :is-active="evaluation.active"
             />
@@ -36,7 +35,7 @@
                 :is-discussion="evaluation.discussion"
                 :is-active="evaluation.active"
                 :archived-at="evaluation.archivedAt"
-                :is-nat="evaluation.user.isNat"
+                :is-nat="['remainInNat', 'moveToBn', 'removeFromNat'].includes(evaluation.consensus)"
                 :is-public="evaluation.isPublic"
             />
         </div>
