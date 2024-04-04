@@ -1,5 +1,6 @@
 const express = require('express');
 const middlewares = require('../helpers/middlewares');
+const util = require('../helpers/util');
 const AppEvaluation = require('../models/evaluations/appEvaluation');
 const Evaluation = require('../models/evaluations/evaluation');
 const Report = require('../models/report');
@@ -89,8 +90,9 @@ const vetoPrivatePopulate = [
 /* GET evaluation results by ID */
 router.get('/evaluation/:id', async (req, res) => {
     let query;
+    const isNatOrTrialNat = res.locals.userRequest.isNat || res.locals.userRequest.isTrialNat;
 
-    if (res.locals.userRequest.isNat || res.locals.userRequest.isTrialNat) query = { _id: req.params.id };
+    if (isNatOrTrialNat) query = { _id: req.params.id };
     else query = { _id: req.params.id, active: false };
 
     let evaluation;
@@ -130,7 +132,7 @@ router.get('/evaluation/:id', async (req, res) => {
     return res.json({
         evaluation,
         isNewEvaluationFormat,
-        natUserList: natUserList.sort(() => .5 - Math.random()),
+        natUserList: isNatOrTrialNat ? natUserList : util.shuffleArray(natUserList),
     });
 });
 
