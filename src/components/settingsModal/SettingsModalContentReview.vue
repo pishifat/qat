@@ -10,7 +10,7 @@
             <div class="col-sm-6">
                 <div class="form-check">
                     <input
-                        id="settings-explicit"
+                        id="settings-content-review"
                         :checked="loggedInUser.isActiveContentReviewer"
                         type="checkbox"
                         class="form-check-input"
@@ -18,7 +18,7 @@
                     >
                     <label
                         class="form-check-label text-secondary"
-                        for="settings-explicit"
+                        for="settings-content-review"
                     >
                     Content review pings
                     </label>
