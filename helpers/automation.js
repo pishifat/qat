@@ -287,7 +287,6 @@ const notifyDeadlines = cron.schedule('0 17 * * *', async () => {
 
                 // need to check for full bn
                 if (userHasLowActivity && !round.user.probationModes.includes(round.mode)) {
-                    console.log('in');
                     toggleActivityAutomation = true;
                     round.discussion = true;
                     round.addition = BnEvaluationAddition.LowActivityWarning;
