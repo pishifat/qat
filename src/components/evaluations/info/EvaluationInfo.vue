@@ -194,7 +194,6 @@ export default {
                     type: 'danger',
                 });
             } else {
-                console.log('in');
                 const result = await this.$http.executePost(
                     `/appEval/submitVibeCheck/${this.selectedEvaluation.id}`, {
                         vote: this.vote,
