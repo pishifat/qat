@@ -16,6 +16,7 @@ router.use(middlewares.isNatOrTrialNat);
 //population
 const defaultAppPopulate = [
     { path: 'user', select: 'username osuId' },
+    { path: 'natBuddy', select: 'username osuId groups' },
     { path: 'bnEvaluators', select: 'username osuId' },
     { path: 'natEvaluators', select: 'username osuId' },
     {
