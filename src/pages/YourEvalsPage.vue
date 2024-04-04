@@ -18,7 +18,7 @@
                         :key="application.id"
                         :evaluation="application"
                         store-module="evaluations"
-                        target="#yourEvalsInfo"
+                        target="#extendedInfo"
                     />
                 </transition-group>
 
@@ -44,7 +44,7 @@
                         :key="evaluation.id"
                         :evaluation="evaluation"
                         store-module="evaluations"
-                        target="#yourEvalsInfo"
+                        target="#extendedInfo"
                     />
                 </transition-group>
 
@@ -53,7 +53,7 @@
                 </p>
             </section>
 
-            <your-evals-info />
+            <public-evals-info />
 
             <toast-messages />
         </div>
@@ -65,24 +65,16 @@ import { mapState, mapGetters } from 'vuex';
 import evaluationsModule from '../store/evaluations';
 import ToastMessages from '../components/ToastMessages.vue';
 import EvaluationCard from '../components/evaluations/card/EvaluationCard.vue';
-import YourEvalsInfo from '../components/evaluations/info/YourEvalsInfo.vue';
-import FilterBox from '../components/FilterBox.vue';
+import PublicEvalsInfo from '../components/evaluations/info/PublicEvalsInfo.vue';
 
 export default {
     name: 'YourEvalsPage',
     components: {
         ToastMessages,
         EvaluationCard,
-        YourEvalsInfo,
-        FilterBox,
+        PublicEvalsInfo,
     },
     computed: {
-        ...mapState([
-            'loggedInUser',
-        ]),
-        ...mapGetters([
-            'userMainMode',
-        ]),
         ...mapState('evaluations', [
             'evaluations',
         ]),
@@ -106,10 +98,6 @@ export default {
         }
     },
     async created() {
-        if (this.userMainMode) {
-            this.$store.commit(`evaluations/pageFilters/setFilterMode`, this.userMainMode);
-        }
-
         const id = this.$route.query.id;
         const query = id ? `?id=${id}` : '';
 
@@ -123,7 +111,7 @@ export default {
             this.$store.commit('evaluations/setSelectedEvaluationId', id);
 
             if (this.selectedEvaluation) {
-                $('#yourEvalsInfo').modal('show');
+                $('#extendedInfo').modal('show');
             } else {
                 this.$store.dispatch('updateToastMessages', {
                     message: `Couldn't find the evaluation!`,

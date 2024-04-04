@@ -1,10 +1,12 @@
 import Vue from 'vue';
 import pageFilters from './modules/pageFilters';
+import pagination from './modules/pagination';
 
 export default {
     namespaced: true,
     modules: {
         pageFilters,
+        pagination,
     },
     state: () => ({
         evaluations: [],
@@ -85,6 +87,15 @@ export default {
         },
         selectedEvaluation: (state) => {
             return state.evaluations.find(e => e.id === state.selectedEvaluationId);
+        },
+        paginatedEvaluations: (state, getters, rootState) => {
+            const limit = rootState.evaluations.pagination.limit;
+            const page = rootState.evaluations.pagination.page;
+
+            return getters.filteredEvaluations.slice(
+                limit * (page - 1),
+                limit * page
+            );
         },
     },
 };

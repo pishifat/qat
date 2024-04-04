@@ -126,29 +126,22 @@ export default {
 
         const id = this.$route.query.id;
 
-        await this.showMore(null, true);
+        if (!id) await this.showMore(null, true);
 
-        if (id) {
+        else {
             const veto = await this.$http.initialRequest(
                 `/vetoes/searchVeto/${id}`
             );
 
-            const i = this.vetoes.findIndex((d) => d.id == id);
-
-            if (i >= 0) {
+            if (this.$http.isValid(veto)) {
+                this.$store.commit('vetoes/setVetoes', [veto]);
                 this.$store.commit('vetoes/setSelectedVetoId', id);
                 $('#extendedInfo').modal('show');
             } else {
-                this.$store.commit('vetoes/setVetoes', [veto]);
-                $('#extendedInfo').modal('show');
-            }
-        } else {
-            const data = await this.$http.initialRequest(
-                `/vetoes/relevantInfo/${this.limit}`
-            );
-
-            if (data.vetoes) {
-                this.$store.commit('vetoes/setVetoes', data.vetoes);
+                this.$store.dispatch('updateToastMessages', {
+                    message: 'Veto not found',
+                    type: 'danger',
+                });
             }
         }
     },

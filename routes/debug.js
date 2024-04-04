@@ -215,7 +215,7 @@ router.get("/session", async (req, res) => {
 });
 
 /* POST update session info */
-router.post("/session", async (req, res) => {
+router.post("/updateSession", async (req, res) => {
     req.session.mongoId = req.body.mongoId;
     req.session.osuId = Number(req.body.osuId);
     req.session.username = req.body.username;

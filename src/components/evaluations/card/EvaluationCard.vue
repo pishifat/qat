@@ -23,7 +23,7 @@
                 :is-nat-or-trial-nat="loggedInUser.isNatOrTrialNat"
                 :is-discussion="evaluation.discussion"
                 :is-resignation="evaluation.kind == 'resignation'"
-                :is-nat-evaluation="evaluation.selfSummary"
+                :is-nat-evaluation="Boolean(evaluation.selfSummary)"
                 :is-application="evaluation.isApplication"
                 :is-public="evaluation.isPublic"
                 :is-active="evaluation.active"
@@ -32,11 +32,12 @@
             <card-footer
                 :evaluation-id="evaluation.id"
                 :reviews="evaluation.reviews"
-                :deadline="deadline"
+                :deadline="deadline.toString()"
                 :is-discussion="evaluation.discussion"
                 :is-active="evaluation.active"
                 :archived-at="evaluation.archivedAt"
                 :is-nat="evaluation.user.isNat"
+                :is-public="evaluation.isPublic"
             />
         </div>
     </div>
@@ -96,11 +97,11 @@ export default {
         osuId () {
             return this.evaluation.user.osuId;
         },
-        imageClass () {
-            if (this.evaluation.isApplication) return 'user';
-            else if (this.evaluation.user.probationModes.includes(this.evaluation.mode)) return 'probation';
-            else if (this.evaluation.user.fullModes.includes(this.evaluation.mode)) return 'bn';
-            else if (this.evaluation.user.evaluatorModes.includes(this.evaluation.mode) || this.evaluation.user.evaluatorModes.includes('none')) return 'nat';
+        imageClass() {
+            if (this.evaluation.isApplication || this.evaluation.isResignation || this.evaluation.consensus === 'removeFromNat') return 'user';
+            else if (this.evaluation.user.probationModes.includes(this.evaluation.mode) || this.evaluation.consensus === 'probationBn') return 'probation';
+            else if (this.evaluation.user.fullModes.includes(this.evaluation.mode) || this.evaluation.consensus === 'fullBn' || this.evaluation.consensus === 'moveToBn') return 'bn';
+            else if (this.evaluation.user.evaluatorModes.includes(this.evaluation.mode) || this.evaluation.user.evaluatorModes.includes('none') || this.evaluation.consensus === 'remainInNat') return 'nat';
             else return 'user';
         },
         isSelected () {
@@ -123,7 +124,10 @@ export default {
         select() {
             this.$store.commit('evaluations/setSelectedEvaluationId', this.evaluation.id);
 
-            if (this.$route.query.id !== this.evaluation.id && !this.loggedInUser.isBn) {
+            if (
+                this.$route.query.id !== this.evaluation.id && 
+                (this.loggedInUser.isNatOrTrialNat || this.evaluation.isPublic)
+            ) {
                 let url = this.$route.path;
 
                 if (this.evaluation.active) {

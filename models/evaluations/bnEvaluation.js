@@ -13,6 +13,15 @@ bnEvaluationSchema.virtual('isBnEvaluation').get(function () {
     return true;
 });
 
+/*
+    * in march 2024, the evaluation message changed to show evaluator's individual comments, but not attach their names
+    * this bool is needed to identify said evaluations
+*/
+bnEvaluationSchema.virtual('isNewEvaluationFormat').get(function () {
+    const newEvaluationFormatCutoff = new Date('2024-03-25');
+    return new Date(this.archivedAt || this.createdAt) > newEvaluationFormatCutoff;
+});
+
 /**
  * @type {import('../interfaces/evaluations').IBnEvaluationModel}
  */

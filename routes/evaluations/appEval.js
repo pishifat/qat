@@ -799,8 +799,6 @@ router.post('/toggleVisibility/:id', middlewares.isNat, async (req, res) => {
         .findById(req.params.id)
         .populate(defaultPopulate);
 
-    console.log(app.isPublic);
-
     app.isPublic = req.body.isPublic;
     await app.save();
 

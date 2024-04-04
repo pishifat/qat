@@ -32,6 +32,17 @@
 
             <consensus />
 
+            <div v-if="selectedEvaluation.isApplication && selectedEvaluation.consensus == 'pass' && selectedEvaluation.natBuddy">
+                <p>
+                    <b>NAT Buddy:</b>
+                    <user-link
+                        :class="selectedEvaluation.natBuddy.groups.includes('nat') ? 'text-nat' : selectedEvaluation.natBuddy.groups.includes('bn') ? 'text-probation' : ''"
+                        osu-id="user.osuId"
+                        :username="selectedEvaluation.natBuddy.username"
+                    />
+                </p>
+            </div>
+
             <div v-if="!selectedEvaluation.isResignation && selectedEvaluation.feedback && selectedEvaluation.feedback !== 'None'">
                 <p>
                     <b>Feedback:</b>
@@ -67,6 +78,7 @@ import ModalDialog from '../../ModalDialog.vue';
 import MainApplicationInfo from './applications/MainApplicationInfo.vue';
 import { AppEvaluationConsensus } from '../../../../shared/enums';
 import EvaluationLink from './common/EvaluationLink.vue';
+import UserLink from '../../UserLink.vue';
 
 export default {
     name: 'ArchiveInfo',
@@ -78,6 +90,7 @@ export default {
         ModalDialog,
         MainApplicationInfo,
         EvaluationLink,
+        UserLink,
     },
     computed: {
         ...mapState([

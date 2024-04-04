@@ -1,5 +1,6 @@
 const express = require('express');
 const middlewares = require('../helpers/middlewares');
+const util = require('../helpers/util');
 const AppEvaluation = require('../models/evaluations/appEvaluation');
 const Evaluation = require('../models/evaluations/evaluation');
 const Report = require('../models/report');
@@ -89,16 +90,19 @@ const vetoPrivatePopulate = [
 /* GET evaluation results by ID */
 router.get('/evaluation/:id', async (req, res) => {
     let query;
+    const isNatOrTrialNat = res.locals.userRequest.isNat || res.locals.userRequest.isTrialNat;
 
-    if (res.locals.userRequest.isNat || res.locals.userRequest.isTrialNat) query = { _id: req.params.id };
+    if (isNatOrTrialNat) query = { _id: req.params.id };
     else query = { _id: req.params.id, active: false };
 
     let evaluation;
 
-    // in march 2024, the evaluation message changed to show evaluator's individual comments, but not attach their names
-    // i don't know which format an eval uses (or whether it's an app or an eval) until after an initial query, so querying all at once is actually most efficient, despite looking dumb
-    // anyway, the new format requires a query that hides evaluator names, which is the "evaluation" returned to the user (app, eval)
-    // buuuut the message page also shows the NAT who were involved (not directly tied to their evals), so those need to be fetched somehow. using the old format's population works, so this is (again, stupidly) efficient
+    /*
+        * in march 2024, the evaluation message changed to show evaluator's individual comments, but not attach their names
+        * i don't know which format an eval uses (or whether it's an app or an eval) until after an initial query, so querying all at once is actually most efficient, despite looking dumb
+        * anyway, the new format requires a query that hides evaluator names, which is the "evaluation" returned to the user (app, eval)
+        *buuuut the message page also shows the NAT who were involved (not directly tied to their evals), so those need to be fetched somehow. using the old format's population works, so this is (again, stupidly) efficient
+    */
     const [appOldPopulate, app, evalOldPopulate, eval] = await Promise.all([
         AppEvaluation.findOne(query).populate(appPopulateOld),
         AppEvaluation.findOne(query).populate(appPopulate),
@@ -128,7 +132,7 @@ router.get('/evaluation/:id', async (req, res) => {
     return res.json({
         evaluation,
         isNewEvaluationFormat,
-        natUserList: natUserList.sort(() => .5 - Math.random()),
+        natUserList: isNatOrTrialNat ? natUserList : util.shuffleArray(natUserList),
     });
 });
 

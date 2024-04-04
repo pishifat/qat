@@ -12,14 +12,14 @@
             <i v-else-if="mode == 'mania'" class="mania-icon mx-1" />
             <i v-if="isResignation" class="fas fa-walking mr-1" />
             <i
-                v-if="!isReviewed && isDiscussion && !isResignation && !isNatEvaluation"
+                v-if="isActive && !isReviewed && isDiscussion && !isResignation && !isNatEvaluation"
                 data-toggle="tooltip"
                 data-placement="top"
                 title="needs review"
                 class="fa fa-eye mr-1 text-warning"
             />
             <i
-                v-if="isPassApp && isNatOrTrialNat && !isSecurityChecked"
+                v-if="isActive && isPassApp && isNatOrTrialNat && !isSecurityChecked"
                 data-toggle="tooltip"
                 data-placement="top"
                 title="needs a security check"
@@ -27,7 +27,7 @@
                 :class="isSecurityChecked ? '' : 'text-warning'"
             />
             <i
-                v-if="isPassApp && isNatOrTrialNat && !hasNatBuddy"
+                v-if="isActive && isPassApp && isNatOrTrialNat && !hasNatBuddy"
                 data-toggle="tooltip"
                 data-placement="top"
                 title="needs a NAT buddy"
