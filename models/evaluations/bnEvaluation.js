@@ -22,6 +22,10 @@ bnEvaluationSchema.virtual('isNewEvaluationFormat').get(function () {
     return new Date(this.archivedAt || this.createdAt) > newEvaluationFormatCutoff;
 });
 
+bnEvaluationSchema.virtual('isNatEvaluation').get(function () {
+    return this.consensus === 'remainInNat' || this.consensus === 'moveToBn' || this.consensus === 'removeFromNat';
+});
+
 /**
  * @type {import('../interfaces/evaluations').IBnEvaluationModel}
  */
