@@ -1,6 +1,6 @@
 const express = require('express');
 const AppEvaluation = require('../../models/evaluations/appEvaluation');
-const User = require('../../models/user');
+const util = require('../../helpers/util');
 const middlewares = require('../../helpers/middlewares');
 
 const router = express.Router();
@@ -10,7 +10,7 @@ router.use(middlewares.isLoggedIn);
 // population
 const defaultAppPopulate = [
     { path: 'user', select: 'username osuId' },
-    { path: 'natBuddy', select: 'username osuId' },
+    { path: 'natBuddy', select: 'username osuId groups' },
     { path: 'bnEvaluators', select: 'username osuId groups' },
     { path: 'natEvaluators', select: 'username osuId groups' },
     {
@@ -23,22 +23,7 @@ const defaultAppPopulate = [
     },
 ];
 
-/*function concatReviewsPopulate(populate) {
-    let newPopulate = [...populate];
-
-    const reviewsPopulate = {
-        path: 'reviews',
-        select: 'moddingComment vote',
-        populate: {
-            path: 'evaluator',
-            select: 'username osuId groups isTrialNat',
-        },
-    };
-
-    return [...newPopulate, reviewsPopulate];
-}*/
-
-function sanitizeReviewers(reviews) {
+function sanitizeReviews(reviews) {
     return reviews.map(review => {
         return {
             evaluator: {
@@ -55,7 +40,7 @@ function sanitizeReviewers(reviews) {
     });
 }
 
-function sanitizePublicReviewers(reviews) {
+function sanitizePublicReviews(reviews) {
     return reviews.map(review => {
         return {
             evaluator: {
@@ -67,6 +52,15 @@ function sanitizePublicReviewers(reviews) {
             id: review.id,
             _id: review._id,
         };
+    });
+}
+
+function sanitizeBareboneReviews(reviews) {
+    return reviews.map(review => {
+        return {
+            id: review.id,
+            _id: review._id,
+        }
     });
 }
 
@@ -100,10 +94,15 @@ router.get('/relevantInfo/:limit', async (req, res) => {
         });
 
         if (isNat) {
-            app.reviews = sanitizeReviewers(app.reviews);
+            app.reviews = sanitizeReviews(app.reviews);
         } else if (app.isNewEvaluationFormat) {
-            app.reviews = sanitizePublicReviewers(app.reviews);
+            app.reviews = sanitizePublicReviews(app.reviews);
+        } else {
+            app.reviews = sanitizeBareboneReviews(app.reviews);
         }
+
+        // shuffle the reviews array for non-NATs
+        if (!isNat) app.reviews = util.shuffleArray(app.reviews);
 
         applicationsJson.push(app);
     }
@@ -118,7 +117,7 @@ router.get('/search/:id', async (req, res) => {
     const id = req.params.id;
     const isNat = res.locals.userRequest.isNat;
 
-    let application = await AppEvaluation.findOne({
+    let app = await AppEvaluation.findOne({
         _id: id,
         active: false,
         consensus: { $exists: true },
@@ -126,10 +125,10 @@ router.get('/search/:id', async (req, res) => {
     }).populate(defaultAppPopulate);
     
     // JSON-ify the object to modify it directly because we can't exclude ids from population (and we need to, for security reasons)
-    application = application.toObject();
+    app = app.toObject();
 
     // add an evaluators array to the application object which contains each reviewer's username and osuId
-    application.evaluators = application.reviews.map(review => {
+    app.evaluators = app.reviews.map(review => {
         return {
             username: review.evaluator.username,
             osuId: review.evaluator.osuId,
@@ -138,13 +137,18 @@ router.get('/search/:id', async (req, res) => {
     });
 
     if (isNat) {
-        application.reviews = sanitizeReviewers(application.reviews);
-    } else if (application.isNewEvaluationFormat) {
-        application.reviews = sanitizePublicReviewers(application.reviews);
+        app.reviews = sanitizeReviews(app.reviews);
+    } else if (app.isNewEvaluationFormat) {
+        app.reviews = sanitizePublicReviews(app.reviews);
+    } else {
+        app.reviews = sanitizeBareboneReviews(app.reviews);
     }
 
+        // shuffle the reviews array for non-NATs
+        if (!isNat) app.reviews = util.shuffleArray(app.reviews);
+
     res.json({
-        application,
+        application: app,
     });
 });
 
