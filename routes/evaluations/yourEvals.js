@@ -33,7 +33,6 @@ const defaultBnPopulate = [
             select: 'username osuId groups isTrialNat',
         },
     },
-    
 ];
 
 function sanitizeReviews(reviews) {
@@ -163,6 +162,8 @@ router.get('/search', async (req, res) => {
 
         if (isNat) {
             eval.reviews = sanitizeReviews(eval.reviews);
+        }else if (eval.isNewEvaluationFormat) {
+            eval.reviews = sanitizePublicReviews(eval.reviews);
         } else {
             eval.reviews = sanitizeBareboneReviews(eval.reviews);
         }
