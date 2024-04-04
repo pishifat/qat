@@ -72,7 +72,7 @@ export default {
             }
         },
         async save() {
-            const res = await this.$http.executePost(`/debug/session`, {
+            const res = await this.$http.executePost(`/debug/updateSession`, {
                 mongoId: this.mongoId,
                 osuId: this.osuId,
                 username: this.username,
