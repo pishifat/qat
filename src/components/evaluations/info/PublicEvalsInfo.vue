@@ -1,6 +1,6 @@
 <template>
     <modal-dialog
-        id="yourEvalsInfo"
+        id="extendedInfo"
         modal-size="xl"
     >
         <template v-if="selectedEvaluation" #header>
@@ -31,6 +31,17 @@
 
             <consensus />
 
+            <div v-if="selectedEvaluation.isApplication && selectedEvaluation.consensus == 'pass' && selectedEvaluation.natBuddy">
+                <p>
+                    <b>NAT Buddy:</b>
+                    <user-link
+                        :class="selectedEvaluation.natBuddy.groups.includes('nat') ? 'text-nat' : selectedEvaluation.natBuddy.groups.includes('bn') ? 'text-probation' : ''"
+                        osu-id="user.osuId"
+                        :username="selectedEvaluation.natBuddy.username"
+                    />
+                </p>
+            </div>
+
             <div v-if="!selectedEvaluation.isResignation && selectedEvaluation.feedback && selectedEvaluation.feedback !== 'None'">
 
                 <p>
@@ -41,13 +52,29 @@
 
             </div>
 
-            <div v-if="loggedInUser && loggedInUser.isNat">
+            <div v-if="selectedEvaluation.evaluators && selectedEvaluation.evaluators.length">
+                <p class="mt-2">
+                    <b>Evaluators:</b>
+                </p>
+                <div class="card card-body">
+                    <ul class="mb-0">
+                        <li v-for="user in selectedEvaluation.evaluators" :key="user.osuIid">
+                            <user-link
+                                :class="user.groups.includes('nat') ? 'text-nat' : user.groups.includes('bn') ? 'text-probation' : ''"
+                                :osu-id="user.osuId"
+                                :username="user.username"
+                            />
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div v-if="loggedInUser">
                 <hr>
                 <reviews-listing 
                     v-if="loggedInUser.isNatLeader || !['remainInNat', 'moveToBn', 'removeFromNat'].includes(selectedEvaluation.consensus)"
                 />
             </div>
-
         </div>
     </modal-dialog>
 </template>
@@ -61,9 +88,10 @@ import UserActivity from './currentBns/userActivity/UserActivity.vue';
 import ModalDialog from '../../ModalDialog.vue';
 import MainApplicationInfo from './applications/MainApplicationInfo.vue';
 import EvaluationLink from './common/EvaluationLink.vue';
+import UserLink from '../../UserLink.vue';
 
 export default {
-    name: 'YourEvalsInfo',
+    name: 'PublicEvalsInfo',
     components: {
         ModalHeader,
         Consensus,
@@ -72,6 +100,7 @@ export default {
         ModalDialog,
         MainApplicationInfo,
         EvaluationLink,
+        UserLink,
     },
     computed: {
         ...mapState([
