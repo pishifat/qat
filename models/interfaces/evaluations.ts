@@ -23,6 +23,7 @@ interface IEvaluationBase {
     isSecurityChecked?: boolean;
     overwriteNextEvaluationDate?: Date;
     vibeChecks?: IMediationDocument[];
+    isNewEvaluationFormat?: boolean;
 }
 
 export interface IAppEvaluationDocument extends IEvaluationBase, Document {
