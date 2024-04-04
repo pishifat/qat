@@ -1,5 +1,6 @@
 const express = require('express');
 const AppEvaluation = require('../../models/evaluations/appEvaluation');
+const Evaluation = require('../../models/evaluations/evaluation');
 const util = require('../../helpers/util');
 const middlewares = require('../../helpers/middlewares');
 
@@ -13,6 +14,18 @@ const defaultAppPopulate = [
     { path: 'natBuddy', select: 'username osuId groups' },
     { path: 'bnEvaluators', select: 'username osuId groups' },
     { path: 'natEvaluators', select: 'username osuId groups' },
+    {
+        path: 'reviews',
+        select: 'moddingComment vote',
+        populate: {
+            path: 'evaluator',
+            select: 'username osuId groups isTrialNat',
+        },
+    },
+];
+
+const defaultBnPopulate = [
+    { path: 'user', select: 'username osuId modesInfo groups' },
     {
         path: 'reviews',
         select: 'moddingComment vote',
@@ -69,6 +82,7 @@ router.get('/relevantInfo/:limit', async (req, res) => {
     const limit = parseInt(req.params.limit);
     const isNat = res.locals.userRequest.isNat;
     let applicationsJson = [];
+    let bnEvaluationsJson = [];
 
     let applications = await AppEvaluation
         .find({
@@ -78,7 +92,17 @@ router.get('/relevantInfo/:limit', async (req, res) => {
         })
         .populate(defaultAppPopulate)
         .sort({ createdAt: -1 })
-        .limit(limit);
+        .limit(Math.floor(limit / 2));
+
+    let bnEvaluations = await Evaluation
+        .find({
+            active: false,
+            consensus: { $exists: true },
+            isPublic: true,
+        })
+        .populate(defaultBnPopulate)
+        .sort({ createdAt: -1 })
+        .limit(Math.floor(limit / 2));
 
     for (let app of applications) {
         // JSON-ify the object to modify it directly because we can't exclude ids from population (and we need to, for security reasons)
@@ -107,8 +131,36 @@ router.get('/relevantInfo/:limit', async (req, res) => {
         applicationsJson.push(app);
     }
 
+    for (let eval of bnEvaluations) {
+        // JSON-ify the object to modify it directly because we can't exclude ids from population (and we need to, for security reasons)
+        eval = eval.toObject();
+
+        // add an evaluators array to the application object which contains each reviewer's username and osuId
+        eval.evaluators = eval.reviews.map(review => {
+            return {
+                username: review.evaluator.username,
+                osuId: review.evaluator.osuId,
+                groups: review.evaluator.groups,
+            };
+        });
+
+        if (isNat) {
+            eval.reviews = sanitizeReviews(eval.reviews);
+        } else if (eval.isNewEvaluationFormat) {
+            eval.reviews = sanitizePublicReviews(eval.reviews);
+        } else {
+            eval.reviews = sanitizeBareboneReviews(eval.reviews);
+        }
+
+        // shuffle the reviews array for non-NATs
+        if (!isNat) eval.reviews = util.shuffleArray(eval.reviews);
+
+        bnEvaluationsJson.push(eval);
+    }
+
     res.json({
         applications: applicationsJson,
+        bnEvaluations: bnEvaluationsJson,
     });
 });
 
@@ -117,18 +169,27 @@ router.get('/search/:id', async (req, res) => {
     const id = req.params.id;
     const isNat = res.locals.userRequest.isNat;
 
-    let app = await AppEvaluation.findOne({
+    let eval = await AppEvaluation.findOne({
         _id: id,
         active: false,
         consensus: { $exists: true },
         isPublic: true,
     }).populate(defaultAppPopulate);
+
+    if (!eval) {
+        eval = await Evaluation.findOne({
+            _id: id,
+            active: false,
+            consensus: { $exists: true },
+            isPublic: true,
+        }).populate(defaultBnPopulate);
+    }
     
     // JSON-ify the object to modify it directly because we can't exclude ids from population (and we need to, for security reasons)
-    app = app.toObject();
+    eval = eval.toObject();
 
     // add an evaluators array to the application object which contains each reviewer's username and osuId
-    app.evaluators = app.reviews.map(review => {
+    eval.evaluators = eval.reviews.map(review => {
         return {
             username: review.evaluator.username,
             osuId: review.evaluator.osuId,
@@ -137,18 +198,18 @@ router.get('/search/:id', async (req, res) => {
     });
 
     if (isNat) {
-        app.reviews = sanitizeReviews(app.reviews);
-    } else if (app.isNewEvaluationFormat) {
-        app.reviews = sanitizePublicReviews(app.reviews);
+        eval.reviews = sanitizeReviews(eval.reviews);
+    } else if (eval.isNewEvaluationFormat) {
+        eval.reviews = sanitizePublicReviews(eval.reviews);
     } else {
-        app.reviews = sanitizeBareboneReviews(app.reviews);
+        eval.reviews = sanitizeBareboneReviews(eval.reviews);
     }
 
         // shuffle the reviews array for non-NATs
-        if (!isNat) app.reviews = util.shuffleArray(app.reviews);
+        if (!isNat) eval.reviews = util.shuffleArray(eval.reviews);
 
     res.json({
-        application: app,
+        eval,
     });
 });
 

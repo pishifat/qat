@@ -1213,4 +1213,53 @@ router.post('/:id/updateRequestInfo', async (req, res) => {
     );
 });
 
+/* POST toggle eval visibility */
+router.post('/toggleEvalVisibility/:id', async (req, res) => {
+    let isApp = true;
+    let eval = await AppEvaluation
+        .findById(req.params.id)
+        .populate(evaluationsPopulate);
+    
+    if (!eval) {
+        isApp = false;
+        eval = await BnEvaluation
+            .findById(req.params.id)
+            .populate(evaluationsPopulate);
+    }
+
+    if (!eval) {
+        return res.json({
+            error: 'Evaluation not found',
+        });
+    }
+
+    console.log(eval);
+
+    //check eval ownership
+    if (req.session.mongoId != eval.user.id) {
+        return res.json({
+            error: 'Unauthorized',
+        });
+    }
+
+    // disallow editing nat evals
+    if (eval.isNatEvaluation) {
+        return res.json({
+            error: 'Unauthorized',
+        });
+    }
+
+    eval.isPublic = req.body.isPublic;
+    await eval.save();
+
+    res.json({ isPublic: eval.isPublic });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Changed visibility of ${eval.user.username}'s ${eval.mode} ${isApp ? 'BN app' : 'current BN eval'} to "${eval.isPublic ? 'public' : 'private'}"`,
+        isApp ? 'appEvaluation' : 'bnEvaluation',
+        eval._id
+    );
+});
+
 module.exports = router;

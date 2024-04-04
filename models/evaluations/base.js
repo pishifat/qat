@@ -11,6 +11,7 @@ const baseSchema = {
     natEvaluators: [{ type: 'ObjectId', ref: 'User' }],
     bnEvaluators: [{ type: 'ObjectId', ref: 'User' }],
     archivedAt: { type: Date },
+    isPublic: { type: Boolean },
     overwriteNextEvaluationDate: { type: Date },
 };
 

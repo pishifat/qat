@@ -7,35 +7,36 @@
                 :modes="['', 'osu', 'taiko', 'catch', 'mania']"
                 :groups="null"
                 store-module="evaluations"
-            />
+            >
+            <div v-if="!reachedMax" class="mt-2">
+                <button
+                    type="button"
+                    class="btn btn-primary btn-sm float-left"
+                    @click="showMore($event)"
+                >
+                    Show more
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-secondary btn-sm ml-2 float-left"
+                    @click="showAll($event)"
+                >
+                    Show all
+                </button>
+            </div>
+            </filter-box>
 
             <section class="card card-body">
                 <h2>
                     Application Evaluations
-                    <small v-if="paginatedEvaluations">
-                        ({{ evaluations.length + (reachedMax ? '' : '+')}})
+                    <small v-if="paginatedApplications">
+                        ({{ applications.length + (reachedMax ? '' : '+')}})
                     </small>
-                    <button
-                        v-if="!reachedMax"
-                        type="button"
-                        class="btn btn-primary ml-2"
-                        @click="showMore($event)"
-                    >
-                        Show more
-                    </button>
-                    <button
-                        v-if="!reachedMax"
-                        type="button"
-                        class="btn btn-secondary ml-2"
-                        @click="showAll($event)"
-                    >
-                        Show all
-                    </button>
+                    
                 </h2>
-
                 <transition-group name="list" tag="div" class="row">
                     <evaluation-card
-                        v-for="application in paginatedEvaluations"
+                        v-for="application in paginatedApplications"
                         :key="application._id"
                         :evaluation="application"
                         store-module="evaluations"
@@ -43,6 +44,29 @@
                     />
                 </transition-group>
                 
+            </section>
+
+            <section class="card card-body">
+                <h2>
+                    BN Evaluations
+                    <small v-if="paginatedBnEvaluations">
+                        ({{ currentBnEvaluations.length + (reachedMax ? '' : '+')}})
+                    </small>
+                </h2>
+
+                <transition-group name="list" tag="div" class="row">
+                    <evaluation-card
+                        v-for="evaluation in paginatedBnEvaluations"
+                        :key="evaluation._id"
+                        :evaluation="evaluation"
+                        store-module="evaluations"
+                        target="#extendedInfo"
+                    />
+                </transition-group>
+                
+            </section>
+
+            <section v-if="pagination.page > 1" class="card card-body">
                 <pagination-nav store-module="evaluations" />
             </section>
 
@@ -83,8 +107,20 @@ export default {
         ]),
         ...mapGetters('evaluations', [
             'selectedEvaluation',
-            'paginatedEvaluations',
+            'paginatedApplications',
+            'paginatedBnEvaluations',
         ]),
+        /** @returns {Array} */
+        applications () {
+            return this.evaluations.filter(e => e.isApplication);
+        },
+        /** @returns {Array} */
+        currentBnEvaluations () {
+            return this.evaluations.filter(e => e.isBnEvaluation || e.isResignation);
+        },
+        pagination () {
+            return this.$store.state['evaluations'].pagination;
+        },
     },
     watch: {
         evaluations(v) {
@@ -109,8 +145,8 @@ export default {
             );
 
             if (this.$http.isValid(res)) {
-                this.$store.commit('evaluations/setEvaluations', [res.application]);
-                this.$store.commit('evaluations/setSelectedEvaluationId', res.application.id);
+                this.$store.commit('evaluations/setEvaluations', [res.eval]);
+                this.$store.commit('evaluations/setSelectedEvaluationId', res.eval.id);
                 if (this.selectedEvaluation) {
                     $('#extendedInfo').modal('show');
                 } else {
@@ -153,9 +189,9 @@ export default {
             }
 
             if (data.applications) {
-                this.$store.commit('evaluations/setEvaluations', data.applications);
+                this.$store.commit('evaluations/setEvaluations', [...data.applications, ...data.bnEvaluations]);
 
-                if (data.applications.length == startEvaluationsCount || data.applications.length < this.skip) {
+                if ([...data.applications, ...data.bnEvaluations].length == startEvaluationsCount || [...data.applications, ...data.bnEvaluations].length < this.skip) {
                     this.reachedMax = true;
                 }
             }
