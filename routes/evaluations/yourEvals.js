@@ -14,10 +14,7 @@ const defaultAppPopulate = [
 ];
 
 const defaultBnPopulate = [
-    {
-        path: 'user',
-        select: 'username osuId modesInfo',
-    },
+    { path: 'user', select: 'username osuId modesInfo' },
     
 ];
 
@@ -56,19 +53,19 @@ router.get('/search', async (req, res) => {
         .populate(defaultBnPopulate)
         .sort({ createdAt: -1 });
 
-        if (idToSearch) {
-            bnApplicationsQuery.where('_id', idToSearch);
-            bnEvaluationsQuery.where('_id', idToSearch);
-        } else {
-            const user = await User.findByUsernameOrOsuId(userToSearch);
+    if (idToSearch) {
+        bnApplicationsQuery.where('_id', idToSearch);
+        bnEvaluationsQuery.where('_id', idToSearch);
+    } else {
+        const user = await User.findByUsernameOrOsuId(userToSearch);
 
-            if (!user) {
-                return res.json({ error: 'Cannot find user!' });
-            }
+        if (!user) {
+            return res.json({ error: 'Cannot find user!' });
+        }
 
-            bnApplicationsQuery.where('user', user.id);
-            bnEvaluationsQuery.where('user', user.id);
-    } 
+        bnApplicationsQuery.where('user', user.id);
+        bnEvaluationsQuery.where('user', user.id);
+    }
 
     const [bnApplications, evaluations] = await Promise.all([
         bnApplicationsQuery,
