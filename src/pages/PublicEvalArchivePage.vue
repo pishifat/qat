@@ -1,0 +1,174 @@
+
+<template>
+    <div class="row">
+        <div class="col-md-12">
+            <filter-box
+                :placeholder="'enter to search username...'"
+                :modes="['', 'osu', 'taiko', 'catch', 'mania']"
+                :groups="null"
+                store-module="evaluations"
+            />
+
+            <section class="card card-body">
+                <h2>
+                    Application Evaluations
+                    <small v-if="paginatedEvaluations">
+                        ({{ evaluations.length + (reachedMax ? '' : '+')}})
+                    </small>
+                    <button
+                        v-if="!reachedMax"
+                        type="button"
+                        class="btn btn-primary ml-2"
+                        @click="showMore($event)"
+                    >
+                        Show more
+                    </button>
+                    <button
+                        v-if="!reachedMax"
+                        type="button"
+                        class="btn btn-secondary ml-2"
+                        @click="showAll($event)"
+                    >
+                        Show all
+                    </button>
+                </h2>
+
+                <transition-group name="list" tag="div" class="row">
+                    <evaluation-card
+                        v-for="application in paginatedEvaluations"
+                        :key="application._id"
+                        :evaluation="application"
+                        store-module="evaluations"
+                        target="#extendedInfo"
+                    />
+                </transition-group>
+                
+                <pagination-nav store-module="evaluations" />
+            </section>
+
+            <public-evals-info />
+            <toast-messages />
+        </div>
+    </div>
+</template>
+
+<script>
+import { mapState, mapGetters } from 'vuex';
+import evaluationsModule from '../store/evaluations';
+import ToastMessages from '../components/ToastMessages.vue';
+import EvaluationCard from '../components/evaluations/card/EvaluationCard.vue';
+import PublicEvalsInfo from '../components/evaluations/info/PublicEvalsInfo.vue';
+import FilterBox from '../components/FilterBox.vue';
+import PaginationNav from '../components/PaginationNav.vue';
+
+export default {
+    name: 'PublicEvalArchivePage',
+    components: {
+        ToastMessages,
+        EvaluationCard,
+        PublicEvalsInfo,
+        FilterBox,
+        PaginationNav,
+    },
+    data() {
+        return {
+            skip: 24,
+            limit: 24,
+            reachedMax: false,
+        };
+    },
+    computed: {
+        ...mapState('evaluations', [
+            'evaluations',
+        ]),
+        ...mapGetters('evaluations', [
+            'selectedEvaluation',
+            'paginatedEvaluations',
+        ]),
+    },
+    watch: {
+        evaluations(v) {
+            this.$store.dispatch('evaluations/pagination/updateMaxPages', v.length);
+        },
+    },
+    beforeCreate() {
+        if (this.$store.hasModule('evaluations')) {
+            this.$store.commit('evaluations/resetState');
+        } else {
+            this.$store.registerModule('evaluations', evaluationsModule);
+        }
+    },
+    async created() {
+        const id = this.$route.query.id;
+
+        if (!id) await this.showMore(null, true);
+        
+        else {
+            const res = await this.$http.initialRequest(
+                `/publicArchive/search/${id}`
+            );
+
+            if (this.$http.isValid(res)) {
+                this.$store.commit('evaluations/setEvaluations', [res.application]);
+                this.$store.commit('evaluations/setSelectedEvaluationId', res.application.id);
+                if (this.selectedEvaluation) {
+                    $('#extendedInfo').modal('show');
+                } else {
+                    this.$store.dispatch('updateToastMessages', {
+                        message: `Couldn't find the evaluation!`,
+                        type: 'danger',
+                    });
+            }
+            } else {
+                this.$store.dispatch('updateToastMessages', {
+                    message: 'Application not found',
+                    type: 'danger',
+                });
+            }
+        }
+    },
+    mounted() {
+        setInterval(async () => {
+            this.limit -= this.skip;
+            await this.showMore(null);
+        }, 21600000);
+    },
+    methods: {
+        async showMore(e, firstLoad) {
+            this.limit += this.skip;
+
+            const startEvaluationsCount = this.evaluations.length;
+
+            let data;
+
+            if (firstLoad) {
+                data = await this.$http.initialRequest(
+                    `/publicArchive/relevantInfo/${this.limit}`
+                );
+            } else {
+                data = await this.$http.executeGet(
+                    `/publicArchive/relevantInfo/${this.limit}`,
+                    e
+                );
+            }
+
+            if (data.applications) {
+                this.$store.commit('evaluations/setEvaluations', data.applications);
+
+                if (data.applications.length == startEvaluationsCount || data.applications.length < this.skip) {
+                    this.reachedMax = true;
+                }
+            }
+        },
+        async showAll(e) {
+            const result = confirm(`Are you sure? This will take a while.`);
+            if (result) {
+                this.limit = 10000;
+                this.reachedMax = true;
+                await this.showMore(e);
+            }
+        },
+    },
+};
+
+</script>
