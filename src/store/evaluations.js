@@ -88,11 +88,28 @@ export default {
         selectedEvaluation: (state) => {
             return state.evaluations.find(e => e.id === state.selectedEvaluationId);
         },
-        paginatedEvaluations: (state, getters, rootState) => {
+        paginatedApplications: (state, getters, rootState) => {
             const limit = rootState.evaluations.pagination.limit;
             const page = rootState.evaluations.pagination.page;
 
-            return getters.filteredEvaluations.slice(
+            const filteredApplications = getters.filteredEvaluations.filter(
+                a => a.isApplication
+            );
+
+            return filteredApplications.slice(
+                limit * (page - 1),
+                limit * page
+            );
+        },
+        paginatedBnEvaluations: (state, getters, rootState) => {
+            const limit = rootState.evaluations.pagination.limit;
+            const page = rootState.evaluations.pagination.page;
+
+            const filteredBnEvaluations = getters.filteredEvaluations.filter(
+                a => a.kind !== 'application'
+            );
+
+            return filteredBnEvaluations.slice(
                 limit * (page - 1),
                 limit * page
             );
