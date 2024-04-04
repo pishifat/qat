@@ -36,12 +36,15 @@ export default {
     },
     methods: {
         async toggleVisibility(isPublic, e) {
-            const res = await this.$http.executePost(`/appEval/toggleVisibility/${this.selectedEvaluation.id}`, {
+            const res = await this.$http.executePost(`/users/toggleEvalVisibility/${this.selectedEvaluation.id}`, {
                 isPublic,
             });
 
             if (this.$http.isValid(res)) {
-                this.$store.commit('evaluations/updateEvaluation', res);
+                let updatedEval = this.selectedEvaluation;
+                updatedEval.isPublic = res.isPublic;
+
+                this.$store.commit('evaluations/updateEvaluation', updatedEval);
                 this.$store.dispatch('updateToastMessages', {
                     message: `Set visibility to ${isPublic ? 'public' : 'private'}`,
                     type: 'success',

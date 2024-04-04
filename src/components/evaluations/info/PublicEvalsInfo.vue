@@ -17,6 +17,7 @@
 
         <div v-if="selectedEvaluation" class="container">
             <main-application-info v-if="selectedEvaluation.isApplication" />
+
             <user-activity
                 v-else
                 :osu-id="selectedEvaluation.user.osuId"
@@ -27,6 +28,9 @@
                 :overwrite-days="selectedEvaluation.activityToCheck ? selectedEvaluation.activityToCheck + 7 : 90 + 7"
                 :is-nat="selectedEvaluation.user.isNat"
             />
+
+            <evaluation-visibility v-if="!selectedEvaluation.isApplication && !isNatEvaluation" />
+
             <evaluation-link />
 
             <consensus />
@@ -72,7 +76,7 @@
             <div v-if="loggedInUser">
                 <hr>
                 <reviews-listing 
-                    v-if="loggedInUser.isNatLeader || !['remainInNat', 'moveToBn', 'removeFromNat'].includes(selectedEvaluation.consensus)"
+                    v-if="loggedInUser.isNatLeader || !isNatEvaluation"
                 />
             </div>
         </div>
@@ -89,6 +93,7 @@ import ModalDialog from '../../ModalDialog.vue';
 import MainApplicationInfo from './applications/MainApplicationInfo.vue';
 import EvaluationLink from './common/EvaluationLink.vue';
 import UserLink from '../../UserLink.vue';
+import EvaluationVisibility from './common/EvaluationVisibility.vue';
 
 export default {
     name: 'PublicEvalsInfo',
@@ -101,6 +106,7 @@ export default {
         MainApplicationInfo,
         EvaluationLink,
         UserLink,
+        EvaluationVisibility,
     },
     computed: {
         ...mapState([
@@ -117,6 +123,9 @@ export default {
                 return this.selectedEvaluation.user.modes;
 
             return this.selectedEvaluation.mode;
+        },
+        isNatEvaluation () {
+            return ['remainInNat', 'moveToBn', 'removeFromNat'].includes(this.selectedEvaluation.consensus);
         },
     },
 };
