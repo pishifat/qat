@@ -202,6 +202,7 @@ export default {
     beforeCreate() {
         if (this.$store.hasModule('evaluations')) {
             this.$store.commit('evaluations/resetState');
+            this.$store.commit('evaluations/pageFilters/resetFilters');
         } else {
             this.$store.registerModule('evaluations', evaluationsModule);
         }

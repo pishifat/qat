@@ -17,5 +17,10 @@ export default {
         setFilterGroup (state, group) {
             state.filters.group = group;
         },
+        resetFilters (state) {
+            state.filters.mode = '';
+            state.filters.value = '';
+            state.filters.group = '';
+        },
     },
 };
