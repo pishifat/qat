@@ -8,6 +8,60 @@
                 :groups="null"
                 store-module="evaluations"
             >
+            <div class="mt-2 ml-1">
+                Consensus:
+                <div class="ml-2 btn-group">
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-info ml-2"
+                        @click="applyConsensusFilter(null)"
+                        :disabled="consensusFilter === null"
+                    >
+                        Any
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-success"
+                        @click="applyConsensusFilter('pass')"
+                        :disabled="consensusFilter === 'pass'"
+                    >
+                        Pass
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-danger"
+                        @click="applyConsensusFilter('fail')"
+                        :disabled="consensusFilter === 'fail'"
+                    >
+                        Fail
+                    </button>
+                
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-bn"
+                        @click="applyConsensusFilter('fullBn')"
+                        :disabled="consensusFilter === 'fullBn'"
+                    >
+                        Full BN
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-probation"
+                        @click="applyConsensusFilter('probationBn')"
+                        :disabled="consensusFilter === 'probationBn'"
+                    >
+                        Probation BN
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-danger"
+                        @click="applyConsensusFilter('removeFromBn')"
+                        :disabled="consensusFilter === 'removeFromBn'"
+                    >
+                        Remove From BN
+                    </button>
+                 </div>
+            </div>
             <div v-if="!reachedMax" class="mt-2">
                 <button
                     type="button"
@@ -30,46 +84,16 @@
                 <h2>
                     Application Evaluations
                     <small v-if="archivedApplications">
-                        ({{ filterEvals(archivedApplications, appConsensusFilter).length + (reachedMax ? '' : '+')}})
+                        ({{ filterEvals(archivedApplications, consensusFilter).length + (reachedMax ? '' : '+')}})
                     </small>
                 </h2>
-                <div class="mt-2">
-                    Consensus:
-                        <div class="ml-2 btn-group">
-                            <button
-                                type="button"
-                                class="btn btn-sm btn-info ml-2"
-                                @click="appConsensusFilter = null"
-                                :disabled="appConsensusFilter === null"
-                            >
-                                Any
-                            </button>
-                            <button
-                                type="button"
-                                class="btn btn-sm btn-success"
-                                @click="appConsensusFilter = 'pass'"
-                                :disabled="appConsensusFilter === 'pass'"
-                            >
-                                Pass
-                            </button>
-                            <button
-                                type="button"
-                                class="btn btn-sm btn-danger"
-                                @click="appConsensusFilter = 'fail'"
-                                :disabled="appConsensusFilter === 'fail'"
-                            >
-                                Fail
-                            </button>
-                        </div>
-                    </div>
-                <hr>
-                <span v-if="!filterEvals(archivedApplications, appConsensusFilter).length" class="ml-4">
+                <span v-if="!filterEvals(archivedApplications, consensusFilter).length" class="ml-4">
                     None...
                 </span>
                 <transition-group name="list" tag="div" class="row">
                     <evaluation-card
-                        v-if="filterEvals(archivedApplications, appConsensusFilter)"
-                        v-for="application in filterEvals(archivedApplications, appConsensusFilter)"
+                        v-if="filterEvals(paginatedArchivedApplications, consensusFilter)"
+                        v-for="application in filterEvals(paginatedArchivedApplications, consensusFilter)"
                         :key="application._id"
                         :evaluation="application"
                         store-module="evaluations"
@@ -79,83 +103,30 @@
                         None...
                     </span>
                 </transition-group>
-                
+                <pagination-nav store-module="evaluations" type="applications" />
             </section>
 
             <section class="card card-body">
                 <h2>
                     BN Evaluations
                     <small v-if="archivedCurrentBnEvals">
-                        ({{ filterEvals(archivedCurrentBnEvals, bnEvalConsensusFilter).length + (reachedMax ? '' : '+')}})
+                        ({{ filterEvals(archivedCurrentBnEvals, consensusFilter).length + (reachedMax ? '' : '+')}})
                     </small>
                 </h2>
-                <div class="mt-2">
-                    Consensus:
-                    <div class="ml-2 btn-group">
-                        <button
-                            type="button"
-                            class="btn btn-sm btn-info ml-2"
-                            @click="bnEvalConsensusFilter = null"
-                            :disabled="bnEvalConsensusFilter === null"
-                        >
-                            Any
-                        </button>
-                        <button
-                            type="button"
-                            class="btn btn-sm btn-success"
-                            @click="bnEvalConsensusFilter = 'fullBn'"
-                            :disabled="bnEvalConsensusFilter === 'fullBn'"
-                        >
-                            Full BN
-                        </button>
-                        <button
-                            type="button"
-                            class="btn btn-sm btn-probation"
-                            @click="bnEvalConsensusFilter = 'probationBn'"
-                            :disabled="bnEvalConsensusFilter === 'probationBn'"
-                        >
-                            Probation BN
-                        </button>
-                        <button
-                            type="button"
-                            class="btn btn-sm btn-danger"
-                            @click="bnEvalConsensusFilter = 'removeFromBn'"
-                            :disabled="bnEvalConsensusFilter === 'removeFromBn'"
-                        >
-                            Remove From BN
-                        </button>
-                        <button
-                            type="button"
-                            class="btn btn-sm btn-secondary"
-                            @click="bnEvalConsensusFilter = 'resignedOnGoodTerms'"
-                            :disabled="bnEvalConsensusFilter === 'resignedOnGoodTerms'"
-                        >
-                            Resigned on Good Terms
-                        </button>
-                        <button
-                            type="button"
-                            class="btn btn-sm btn-primary"
-                            @click="bnEvalConsensusFilter = 'resignedOnStandardTerms'"
-                            :disabled="bnEvalConsensusFilter === 'resignedOnStandardTerms'"
-                        >
-                            Resigned on Standard Terms
-                        </button>
-                    </div>
-                </div>
-                <hr>
-                <span v-if="!filterEvals(archivedCurrentBnEvals, bnEvalConsensusFilter).length" class="ml-4">
+                <span v-if="!filterEvals(archivedCurrentBnEvals, consensusFilter).length" class="ml-4">
                     None...
                 </span>
                 <transition-group name="list"tag="div"class="row">
                     <evaluation-card
-                        v-if="filterEvals(archivedCurrentBnEvals, bnEvalConsensusFilter).length"
-                        v-for="evaluation in filterEvals(archivedCurrentBnEvals, bnEvalConsensusFilter)"
+                        v-if="filterEvals(paginatedArchivedCurrentBnEvals, consensusFilter).length"
+                        v-for="evaluation in filterEvals(paginatedArchivedCurrentBnEvals, consensusFilter)"
                         :key="evaluation._id"
                         :evaluation="evaluation"
                         store-module="evaluations"
                         target="#extendedInfo"
                     />
                 </transition-group>
+                <pagination-nav store-module="evaluations" type="evaluations" />
             </section>
 
             <public-evals-info />
@@ -171,6 +142,7 @@ import ToastMessages from '../components/ToastMessages.vue';
 import EvaluationCard from '../components/evaluations/card/EvaluationCard.vue';
 import PublicEvalsInfo from '../components/evaluations/info/PublicEvalsInfo.vue';
 import FilterBox from '../components/FilterBox.vue';
+import PaginationNav from '../components/PaginationNav.vue';
 
 export default {
     name: 'PublicEvalArchivePage',
@@ -179,14 +151,14 @@ export default {
         EvaluationCard,
         PublicEvalsInfo,
         FilterBox,
+        PaginationNav,
     },
     data() {
         return {
             skip: 24,
             limit: 24,
             reachedMax: false,
-            appConsensusFilter: null,
-            bnEvalConsensusFilter: null,
+            consensusFilter: null,
         };
     },
     computed: {
@@ -197,7 +169,17 @@ export default {
             'selectedEvaluation',
             'archivedApplications',
             'archivedCurrentBnEvals',
+            'paginatedArchivedApplications',
+            'paginatedArchivedCurrentBnEvals',
         ]),
+    },
+    watch: {
+        archivedApplications(v) {
+            this.$store.dispatch('evaluations/evalPagination/updateArchivedAppsMaxPages', v.length);
+        },
+        archivedCurrentBnEvals(v) {
+            this.$store.dispatch('evaluations/evalPagination/updateArchivedCurrentBnEvalsMaxPages', v.length);
+        },
     },
     beforeCreate() {
         if (this.$store.hasModule('evaluations')) {
@@ -275,7 +257,10 @@ export default {
             if (consensus === null) return evals;
             return evals.filter(e => e.consensus === consensus);
         },
+        applyConsensusFilter(consensus) {
+            this.consensusFilter = consensus;
+            this.$store.commit('evaluations/pageFilters/setFilterConsensus', consensus);
+        }
     },
 };
-
 </script>

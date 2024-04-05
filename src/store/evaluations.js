@@ -1,10 +1,12 @@
 import Vue from 'vue';
 import pageFilters from './modules/pageFilters';
+import evalPagination from './modules/evalPagination';
 
 export default {
     namespaced: true,
     modules: {
         pageFilters,
+        evalPagination,
     },
     state: () => ({
         evaluations: [],
@@ -58,6 +60,7 @@ export default {
             const mode = rootState.evaluations.pageFilters.filters.mode;
             const group = rootState.evaluations.pageFilters.filters.group;
             const value = rootState.evaluations.pageFilters.filters.value;
+            const consensus = rootState.evaluations.pageFilters.filters.consensus;
 
             if (mode) {
                 evaluations = evaluations.filter(a => a.mode == mode);
@@ -72,6 +75,12 @@ export default {
             if (value) {
                 evaluations = evaluations.filter(a =>
                     a.user.username.toLowerCase().includes(value.toLowerCase())
+                );
+            }
+
+            if (consensus) {
+                evaluations = evaluations.filter(a =>
+                    a.consensus == consensus
                 );
             }
 
@@ -91,6 +100,24 @@ export default {
         },
         selectedEvaluation: (state) => {
             return state.evaluations.find(e => e.id === state.selectedEvaluationId);
+        },
+        paginatedArchivedApplications: (state, getters, rootState) => {
+            const limit = rootState.evaluations.evalPagination.limit;
+            const page = rootState.evaluations.evalPagination.archivedAppsPage;
+
+            return getters.archivedApplications.slice(
+                limit * (page - 1),
+                limit * page
+            );
+        },
+        paginatedArchivedCurrentBnEvals: (state, getters, rootState) => {
+            const limit = rootState.evaluations.evalPagination.limit;
+            const page = rootState.evaluations.evalPagination.archivedCurrentBnEvalsPage;
+
+            return getters.archivedCurrentBnEvals.slice(
+                limit * (page - 1),
+                limit * page
+            );
         },
     },
 };
