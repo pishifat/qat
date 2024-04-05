@@ -5,6 +5,7 @@
             :reasons="selectedEvaluation.reasons"
             :oszs="selectedEvaluation.oszs"
             :osu-id="selectedEvaluation.user.osuId"
+            :is-new-evaluation-format="selectedEvaluation.isNewEvaluationFormat"
         />
 
         <applicant-comment

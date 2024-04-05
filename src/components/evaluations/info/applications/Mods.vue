@@ -5,11 +5,11 @@
                 <b>Beatmap {{ i+1 }}:</b>
                 <ul class="small text-secondary">
                     <li>
-                        Mod:
+                        <b>Mod:</b>
                         <a :href="modUrl(mod)" target="_blank">{{ modUrl(mod) }}</a>
                     </li>
                     <li>
-                        .osz: 
+                        <b>.osz:</b> 
                         <a
                             v-if="isValidUrl(oszs[i])"
                             :href="oszs[i]"
@@ -22,15 +22,20 @@
                         </span>
                     </li>
                     <li>
-                        <b v-if="i == 0">Briefly describe why the map is ready (or nearly ready) to be nominated:</b>
-                        <b v-else-if="i == 1">Briefly explain why the map is NOT ready to be nominated (use your modding to back up your reasons!):</b>
-                        <b v-else-if="i == 2">
-                            Respond to either of these:
-                            <ul>
-                                <li>Briefly describe why the map is ready (or nearly ready) to be nominated</li>
-                                <li>Briefly explain why the map is NOT ready to be nominated</li>
-                            </ul>
-                        </b>
+                        <span v-if="isNewEvaluationFormat">
+                            <b v-if="i == 0">Briefly describe why the map is ready (or nearly ready) to be nominated:</b>
+                            <b v-else-if="i == 1">Briefly explain why the map is NOT ready to be nominated (use your modding to back up your reasons!):</b>
+                            <b v-else-if="i == 2">
+                                Respond to either of these:
+                                <ul>
+                                    <li>Briefly describe why the map is ready (or nearly ready) to be nominated</li>
+                                    <li>Briefly explain why the map is NOT ready to be nominated</li>
+                                </ul>
+                            </b>
+                        </span>
+                        <span v-else>
+                            <b>Additional info:</b>
+                        </span>
                         <span v-html="$md.render(reasons[i])" />
                     </li>
                 </ul>
@@ -65,6 +70,7 @@ export default {
             type: Number,
             required: true,
         },
+        isNewEvaluationFormat: Boolean,
     },
     methods: {
         modUrl(mod) {
