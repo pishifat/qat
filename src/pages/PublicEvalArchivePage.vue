@@ -273,7 +273,6 @@ export default {
         },
         filterEvals(evals, consensus) {
             if (consensus === null) return evals;
-
             return evals.filter(e => e.consensus === consensus);
         },
     },
