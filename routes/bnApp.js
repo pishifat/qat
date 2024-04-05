@@ -196,15 +196,6 @@ router.post('/apply', async (req, res) => {
     const assignedNat = await User.getAssignedNat(mode, req.session.mongoId);
     newBnApp.natEvaluators = assignedNat;
 
-    const assignments = [];
-
-    for (const user of assignedNat) {
-        assignments.push({
-            date: new Date(),
-            user: user._id,
-        });
-    }
-
     let fields = [];
     let discordIds = [];
 
@@ -325,15 +316,6 @@ router.post('/rejoinApply', async (req, res) => {
     // assign NAT
     const assignedNat = await User.getAssignedNat(mode, req.session.mongoId);
     newBnApp.natEvaluators = assignedNat;
-
-    const assignments = [];
-
-    for (const user of assignedNat) {
-        assignments.push({
-            date: new Date(),
-            user: user._id,
-        });
-    }
 
     let fields = [];
     const natList = assignedNat.map(n => n.username).join(', ');

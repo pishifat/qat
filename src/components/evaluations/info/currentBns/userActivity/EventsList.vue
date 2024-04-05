@@ -34,9 +34,9 @@
                             class="text-secondary small"
                             data-toggle="tooltip"
                             data-placement="right"
-                            :title="event.validated ? 'total drain time' : 'total drain time, not yet validated'"
+                            title="total drain time"
                         >
-                            ({{ totalDrain(event.beatmaps)}}{{ event.validated ? '' : '*' }})
+                            ({{ totalDrain(event.beatmaps)}})
                         </span>
                         <a
                             v-if="(loggedInUser.isNat || loggedInUser.isTrialNat) && isEvaluation"
@@ -178,7 +178,8 @@ export default {
                 drain += beatmap.drain;
             }
 
-            const seconds = drain % 60;
+            const rawSeconds = drain % 60;
+            const seconds = rawSeconds > 9 ? rawSeconds : '0' + rawSeconds;
             const minutes = (drain - seconds)/60
 
             return minutes + ":" + seconds;

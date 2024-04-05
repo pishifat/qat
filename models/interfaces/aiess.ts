@@ -33,7 +33,6 @@ interface IAiess {
     responsibleNominators: number[];
     isReviewed: boolean;
     qaComment: string; // temporary field added during user activity for disqualified qa checks
-    validated: boolean;
     qualityAssuranceChecks: IQualityAssuranceCheckDocument[]; // virtual
 }
 

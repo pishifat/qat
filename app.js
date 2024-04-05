@@ -53,10 +53,7 @@ global.ws = []; // array to access websocket clients
 const wsServer = new ws.Server({ noServer: true, path: "/websocket/interOp" });
 
 wsServer.on("connection", (socket, request) => {
-  console.log(
-    `${
-      request.headers["x-forwarded-for"] || request.socket.remoteAddress
-    } is connected via websocket`);
+	console.log(`${request.headers["x-forwarded-for"] || request.socket.remoteAddress} is connected via websocket`);
 });
 
 // discord embeds
@@ -198,94 +195,95 @@ const server = app.listen(port, () => {
     console.log('Listening on ' + port);
 
     if (config.enableAutomation) {
-        automation.notifyDeadlines.start();
-        automation.lowActivityTask.start();
-        automation.handleContentReviews.start();
+        automation.notifyReports.start();
+		automation.notifyVetoes.start();
+		automation.notifyApplicationEvaluations.start();
+        automation.notifyCurrentBnEvaluations.start();
+		automation.archiveInvalidEvaluations.start();
+		automation.notifyContentReviews.start();
         automation.checkBnEvaluationDeadlines.start();
-        automation.lowActivityPerUserTask.start();
         automation.checkTenureValidity.start();
         automation.badgeTracker.start();
         automation.notifyBeatmapReports.start();
         automation.spawnProbationEvaluations.start();
-        //automation.validateEvents.start();
     }
 });
 
 // setup websocket
 server.on("upgrade", (request, socket, head) => {
     wsServer.handleUpgrade(request, socket, head, (socket, request) => {
-      const secret = request.headers?.secret;
-      const username = request.headers?.username;
-      const tags = request.headers?.tags;
-  
-      if (!config.interOpAccess[username?.toString()])
-        return sendError(401, "User not found!");
-  
-      if (!tags || tags.toString().split("+").length == 0)
-        return sendError(400, "Provide valid tags to listen to!");
-  
-      if (
-        !secret ||
-        !username ||
-        config.interOpAccess[username?.toString()].secret !== secret
-      )
-        return sendError(401, "Invalid key!");
-  
-      function sendError(code, text) {
-        socket.send(
-          JSON.stringify({
-            status: code,
-            statusText: text,
-          })
-        );
-  
-        socket.close();
-      }
-  
-      const socketId = crypto.randomBytes(25).toString("hex");
-  
-      const stopPingListener = () => {
-          const socketIndex = global.ws.findIndex((s) => s.id == socketId);
-  
-          if (socketIndex == -1) return;
-  
-          if (global.ws[socketIndex]) {
-              clearInterval(global.ws[socketIndex].pingInterval)
-  
-              return console.log(`Stop ping listener for ${request.headers['x-forwarded-for'] || request.socket.remoteAddress}`);
-          }
-      }
-  
-      (global.ws || []).push({
-        tags: sanitizeTags(tags),
-        ws: socket,
-        pingInterval: setInterval(() => {
-          socket.send(JSON.stringify({
-              type: "PING",
-              data: null
-          }), (err) => {
-              if (err) return stopPingListener;
-  
-              return console.log(`Sent ping for ${request.headers['x-forwarded-for'] || request.socket.remoteAddress}`);
-          })
-        }, 300000), // Ping at every 5 minutes
-        id: socketId,
-      });
-  
-      socket.onclose = stopPingListener;
-  
-      wsServer.emit("connection", socket, request);
+		const secret = request.headers?.secret;
+		const username = request.headers?.username;
+		const tags = request.headers?.tags;
+	
+		if (!config.interOpAccess[username?.toString()])
+			return sendError(401, "User not found!");
+	
+		if (!tags || tags.toString().split("+").length == 0)
+			return sendError(400, "Provide valid tags to listen to!");
+	
+		if (
+			!secret ||
+			!username ||
+			config.interOpAccess[username?.toString()].secret !== secret
+		)
+			return sendError(401, "Invalid key!");
+	
+		function sendError(code, text) {
+			socket.send(
+			JSON.stringify({
+				status: code,
+				statusText: text,
+			})
+			);
+	
+			socket.close();
+		}
+	
+		const socketId = crypto.randomBytes(25).toString("hex");
+	
+		const stopPingListener = () => {
+			const socketIndex = global.ws.findIndex((s) => s.id == socketId);
+	
+			if (socketIndex == -1) return;
+	
+			if (global.ws[socketIndex]) {
+				clearInterval(global.ws[socketIndex].pingInterval)
+	
+				return console.log(`Stop ping listener for ${request.headers['x-forwarded-for'] || request.socket.remoteAddress}`);
+			}
+		}
+	
+		(global.ws || []).push({
+			tags: sanitizeTags(tags),
+			ws: socket,
+			pingInterval: setInterval(() => {
+			socket.send(JSON.stringify({
+				type: "PING",
+				data: null
+			}), (err) => {
+				if (err) return stopPingListener;
+	
+				return console.log(`Sent ping for ${request.headers['x-forwarded-for'] || request.socket.remoteAddress}`);
+			})
+			}, 300000), // Ping at every 5 minutes
+			id: socketId,
+		});
+	
+		socket.onclose = stopPingListener;
+	
+		wsServer.emit("connection", socket, request);
     });
   
     function sanitizeTags(requestTags) {
-      const tags = requestTags.toString().split("+");
-      const availableTags = websocketManager.availableTags;
-      const sanitizedTags = tags
-        .map((t) => (t || "").toLowerCase().trim())
-        .filter((t) => t.trim().toLowerCase() != "")
-        .filter((t) => availableTags.includes(t));
+		const tags = requestTags.toString().split("+");
+		const availableTags = websocketManager.availableTags;
+		const sanitizedTags = tags
+			.map((t) => (t || "").toLowerCase().trim())
+			.filter((t) => t.trim().toLowerCase() != "")
+			.filter((t) => availableTags.includes(t));
   
-      return sanitizedTags;
+      	return sanitizedTags;
     }
 });
 

@@ -140,29 +140,55 @@ async function findAdditionalBnMonths (user) {
 }
 
 /**
- * @param {string} field
- * @returns {string}
+ * @param {Array} reviews
+ * @param {Array} evaluators
+ * @param {Boolean} discussion
+ * @returns {string} text for webhook
  */
-function makeWordFromField (field) {
-    if (!field) return 'none';
+function findEvaluatorStatuses(reviews, evaluators, discussion) {
+    let text = '';
 
-    // Bn --> BN
-    let word = field.replace(/Bn/,'BN');
-    // Nat --> NAT
-    word = word.replace(/Nat/,'NAT');
-    // aWordWithBNOnIt --> a Word With BNOn It
-    word = word.replace(/([a-z])([A-Z])/g, '$1 $2');
-    // a Word With BNOn It --> a Word With BN On It
-    word = word.replace(/([A-Z])([A-Z][a-z])/g, '$1 $2');
-    // capitalize
-    word = word.charAt(0).toUpperCase() + word.slice(1);
+    if (!discussion) {
+        const evaluatorIds = reviews.map(r => r.evaluator.id);
 
-    return word;
+        for (const user of evaluators) {
+            if (evaluatorIds.includes(user.id)) {
+                text += `\n✅ `;
+            } else {
+                text += `\n❌ `;
+            }
+
+            text += `[${user.username}](https://osu.ppy.sh/users/${user.osuId})`;
+        }
+    }
+
+    return text;
+}
+
+/**
+ * @param {Boolean} discussion
+ * @param {string} consensus
+ * @param {string} feedback
+ * @returns {string} text for webhook
+ */
+function findMissingContent(discussion, consensus) {
+    let text = '\n**Next step:** ';
+
+    if (!discussion) {
+        text += `get more evaluations`;
+    } else if (!consensus) {
+        text += `decide consensus`;
+    } else {
+        text += `send PM`;
+    }
+
+    return text;
 }
 
 module.exports = {
     getUserModsCount,
     findUniqueNominationsCount,
     findAdditionalBnMonths,
-    makeWordFromField,
+    findEvaluatorStatuses,
+    findMissingContent,
 };

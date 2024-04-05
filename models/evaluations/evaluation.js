@@ -48,18 +48,18 @@ class EvaluationService extends mongoose.Model {
                 },
                 {
                     path: 'natEvaluators',
-                    select: 'username osuId',
+                    select: 'username osuId discordId isBnEvaluator',
                 },
                 {
                     path: 'bnEvaluators',
-                    select: 'username osuId',
+                    select: 'username osuId discordId isBnEvaluator',
                 },
                 {
                     path: 'reviews',
                     select: 'evaluator behaviorComment moddingComment vote',
                     populate: {
                         path: 'evaluator',
-                        select: 'username osuId groups',
+                        select: 'username osuId groups discordId isBnEvaluator',
                     },
                 },
                 {

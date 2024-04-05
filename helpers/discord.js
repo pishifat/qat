@@ -290,25 +290,28 @@ async function announcementWebhookPost(session, title, description) {
 
 /**
  * @param {Array} reviews
- * @param {Array} natEvaluators
+ * @param {Array} evaluators
  * @param {Boolean} discussion
  * @returns {Array} discord IDs for relevant NAT
  */
-function findNatEvaluatorHighlights(reviews, natEvaluators, discussion) {
+function findEvaluatorHighlights(reviews, evaluators, discussion) {
     let discordIds = [];
 
-    if (natEvaluators.length == 1) {
-        discordIds.push(natEvaluators[0].discordId);
+    if (evaluators.length == 1) {
+        // NAT evaluation: ping the user or NAT leader
+        discordIds.push(evaluators[0].discordId);
     } else if (discussion) {
+        // group evaluation: ping anyone who evaluated
         for (const review of reviews) {
             if (review.evaluator.groups.includes('nat') && review.evaluator.isBnEvaluator) {
                 discordIds.push(review.evaluator.discordId);
             }
         }
     } else {
+        // individual evaluation: ping anyone assigned who hasn't already evaluated
         const evaluatorIds = reviews.map(r => r.evaluator.id);
 
-        for (const user of natEvaluators) {
+        for (const user of evaluators) {
             if (!evaluatorIds.includes(user.id) && user.isBnEvaluator) {
                 discordIds.push(user.discordId);
             }
@@ -328,5 +331,5 @@ module.exports = {
     contentCaseWebhookPost,
     announcementWebhookPost,
     webhookColors,
-    findNatEvaluatorHighlights,
+    findEvaluatorHighlights,
 };

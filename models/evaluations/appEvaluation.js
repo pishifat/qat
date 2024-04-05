@@ -47,14 +47,14 @@ class AppEvaluationService extends mongoose.Model {
             .populate([
                 { path: 'user', select: 'username osuId' },
                 { path: 'natBuddy', select: 'username osuId' },
-                { path: 'bnEvaluators', select: 'username osuId' },
-                { path: 'natEvaluators', select: 'username osuId' },
+                { path: 'bnEvaluators', select: 'username osuId discordId isBnEvaluator' },
+                { path: 'natEvaluators', select: 'username osuId discordId isBnEvaluator' },
                 {
                     path: 'reviews',
                     select: 'evaluator behaviorComment moddingComment vote',
                     populate: {
                         path: 'evaluator',
-                        select: 'username osuId groups',
+                        select: 'username osuId groups discordId isBnEvaluator',
                     },
                 },
             ])

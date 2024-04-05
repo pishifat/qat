@@ -17,7 +17,6 @@ const util = require('../../helpers/util');
 const { BnEvaluationConsensus, BnEvaluationAddition, ResignationConsensus, Cooldown } = require('../../shared/enums');
 const osuBot = require('../../helpers/osuBot');
 const Settings = require('../../models/settings');
-const { makeWordFromField } = require('../../helpers/scrap');
 
 const router = express.Router();
 
@@ -402,6 +401,10 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
                     user.groups.splice(natIndex, 1);
                 }
 
+                if (i !== -1) {
+                    user.modesInfo.splice(i, 1);
+                }
+
                 await user.save();
 
                 evaluation.consensus = BnEvaluationConsensus.RemoveFromNat;
@@ -535,8 +538,8 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
 
         // bn eval logs
         else {
-            const consensusText = makeWordFromField(evaluation.consensus);
-            const additionText = makeWordFromField(evaluation.addition);
+            const consensusText = util.makeWordFromField(evaluation.consensus);
+            const additionText = util.makeWordFromField(evaluation.addition);
 
             Logger.generate(
                 req.session.mongoId,
@@ -595,7 +598,7 @@ router.post('/setConsensus/:id', middlewares.isNatOrTrialNat, async (req, res) =
     await evaluation.save();
     res.json(evaluation);
 
-    const consensusText = makeWordFromField(evaluation.consensus);
+    const consensusText = util.makeWordFromField(evaluation.consensus);
 
     Logger.generate(
         req.session.mongoId,
@@ -635,7 +638,7 @@ router.post('/setAddition/:id', middlewares.isNatOrTrialNat, async (req, res) =>
     await evaluation.save();
     res.json(evaluation);
 
-    const additionText = makeWordFromField(evaluation.addition);
+    const additionText = util.makeWordFromField(evaluation.addition);
 
     Logger.generate(
         req.session.mongoId,

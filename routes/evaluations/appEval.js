@@ -378,7 +378,7 @@ router.post('/setConsensus/:id', middlewares.isNatOrTrialNat, async (req, res) =
 
         const discordIds = req.session.groups.includes("nat")
             ? [req.session.discordId]
-            : discord.findNatEvaluatorHighlights(
+            : discord.findEvaluatorHighlights(
                   evaluation.reviews,
                   evaluators,
                   evaluation.discussion
