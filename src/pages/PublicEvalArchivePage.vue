@@ -30,18 +30,54 @@
                 <h2>
                     Application Evaluations
                     <small v-if="archivedApplications">
-                        ({{ archivedApplications.length + (reachedMax ? '' : '+')}})
+                        ({{ filterEvals(archivedApplications, appConsensusFilter).length + (reachedMax ? '' : '+')}})
                     </small>
-                    
                 </h2>
+                <div class="mt-2">
+                    Consensus:
+                        <div class="ml-2 btn-group">
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-info ml-2"
+                                @click="appConsensusFilter = null"
+                                :disabled="appConsensusFilter === null"
+                            >
+                                Any
+                            </button>
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-success"
+                                @click="appConsensusFilter = 'pass'"
+                                :disabled="appConsensusFilter === 'pass'"
+                            >
+                                Pass
+                            </button>
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-danger"
+                                @click="appConsensusFilter = 'fail'"
+                                :disabled="appConsensusFilter === 'fail'"
+                            >
+                                Fail
+                            </button>
+                        </div>
+                    </div>
+                <hr>
+                <span v-if="!filterEvals(archivedApplications, appConsensusFilter).length" class="ml-4">
+                    None...
+                </span>
                 <transition-group name="list" tag="div" class="row">
                     <evaluation-card
-                        v-for="application in archivedApplications"
+                        v-if="filterEvals(archivedApplications, appConsensusFilter)"
+                        v-for="application in filterEvals(archivedApplications, appConsensusFilter)"
                         :key="application._id"
                         :evaluation="application"
                         store-module="evaluations"
                         target="#extendedInfo"
                     />
+                    <span v-else class="small">
+                        None...
+                    </span>
                 </transition-group>
                 
             </section>
@@ -50,20 +86,76 @@
                 <h2>
                     BN Evaluations
                     <small v-if="archivedCurrentBnEvals">
-                        ({{ archivedCurrentBnEvals.length + (reachedMax ? '' : '+')}})
+                        ({{ filterEvals(archivedCurrentBnEvals, bnEvalConsensusFilter).length + (reachedMax ? '' : '+')}})
                     </small>
                 </h2>
-
-                <transition-group name="list" tag="div" class="row">
+                <div class="mt-2">
+                    Consensus:
+                    <div class="ml-2 btn-group">
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-info ml-2"
+                            @click="bnEvalConsensusFilter = null"
+                            :disabled="bnEvalConsensusFilter === null"
+                        >
+                            Any
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-success"
+                            @click="bnEvalConsensusFilter = 'fullBn'"
+                            :disabled="bnEvalConsensusFilter === 'fullBn'"
+                        >
+                            Full BN
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-probation"
+                            @click="bnEvalConsensusFilter = 'probationBn'"
+                            :disabled="bnEvalConsensusFilter === 'probationBn'"
+                        >
+                            Probation BN
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-danger"
+                            @click="bnEvalConsensusFilter = 'removeFromBn'"
+                            :disabled="bnEvalConsensusFilter === 'removeFromBn'"
+                        >
+                            Remove From BN
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-secondary"
+                            @click="bnEvalConsensusFilter = 'resignedOnGoodTerms'"
+                            :disabled="bnEvalConsensusFilter === 'resignedOnGoodTerms'"
+                        >
+                            Resigned on Good Terms
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-primary"
+                            @click="bnEvalConsensusFilter = 'resignedOnStandardTerms'"
+                            :disabled="bnEvalConsensusFilter === 'resignedOnStandardTerms'"
+                        >
+                            Resigned on Standard Terms
+                        </button>
+                    </div>
+                </div>
+                <hr>
+                <span v-if="!filterEvals(archivedCurrentBnEvals, bnEvalConsensusFilter).length" class="ml-4">
+                    None...
+                </span>
+                <transition-group name="list"tag="div"class="row">
                     <evaluation-card
-                        v-for="evaluation in archivedCurrentBnEvals"
+                        v-if="filterEvals(archivedCurrentBnEvals, bnEvalConsensusFilter).length"
+                        v-for="evaluation in filterEvals(archivedCurrentBnEvals, bnEvalConsensusFilter)"
                         :key="evaluation._id"
                         :evaluation="evaluation"
                         store-module="evaluations"
                         target="#extendedInfo"
                     />
                 </transition-group>
-                
             </section>
 
             <public-evals-info />
@@ -93,6 +185,8 @@ export default {
             skip: 24,
             limit: 24,
             reachedMax: false,
+            appConsensusFilter: null,
+            bnEvalConsensusFilter: null,
         };
     },
     computed: {
@@ -175,6 +269,11 @@ export default {
                 this.reachedMax = true;
                 await this.showMore(e);
             }
+        },
+        filterEvals(evals, consensus) {
+            if (consensus === null) return evals;
+
+            return evals.filter(e => e.consensus === consensus);
         },
     },
 };
