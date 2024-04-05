@@ -1,12 +1,10 @@
 import Vue from 'vue';
 import pageFilters from './modules/pageFilters';
-import pagination from './modules/pagination';
 
 export default {
     namespaced: true,
     modules: {
         pageFilters,
-        pagination,
     },
     state: () => ({
         evaluations: [],
@@ -80,39 +78,19 @@ export default {
             return evaluations;
         },
         individualEvaluations: (state, getters) => {
-            return getters.filteredEvaluations.filter(a => !a.discussion);
+            return getters.filteredEvaluations.filter(e => !e.discussion);
         },
         discussionEvaluations: (state, getters) => {
-            return getters.filteredEvaluations.filter(a => a.discussion);
+            return getters.filteredEvaluations.filter(e => e.discussion);
+        },
+        archivedApplications: (state, getters) => {
+            return getters.filteredEvaluations.filter(e => e.isApplication);
+        },
+        archivedCurrentBnEvals: (state, getters) => {
+            return getters.filteredEvaluations.filter(e => !e.isApplication);
         },
         selectedEvaluation: (state) => {
             return state.evaluations.find(e => e.id === state.selectedEvaluationId);
-        },
-        paginatedApplications: (state, getters, rootState) => {
-            const limit = rootState.evaluations.pagination.limit;
-            const page = rootState.evaluations.pagination.page;
-
-            const filteredApplications = getters.filteredEvaluations.filter(
-                a => a.isApplication
-            );
-
-            return filteredApplications.slice(
-                limit * (page - 1),
-                limit * page
-            );
-        },
-        paginatedBnEvaluations: (state, getters, rootState) => {
-            const limit = rootState.evaluations.pagination.limit;
-            const page = rootState.evaluations.pagination.page;
-
-            const filteredBnEvaluations = getters.filteredEvaluations.filter(
-                a => a.kind !== 'application'
-            );
-
-            return filteredBnEvaluations.slice(
-                limit * (page - 1),
-                limit * page
-            );
         },
     },
 };

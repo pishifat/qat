@@ -29,14 +29,14 @@
             <section class="card card-body">
                 <h2>
                     Application Evaluations
-                    <small v-if="paginatedApplications">
-                        ({{ applications.length + (reachedMax ? '' : '+')}})
+                    <small v-if="archivedApplications">
+                        ({{ archivedApplications.length + (reachedMax ? '' : '+')}})
                     </small>
                     
                 </h2>
                 <transition-group name="list" tag="div" class="row">
                     <evaluation-card
-                        v-for="application in paginatedApplications"
+                        v-for="application in archivedApplications"
                         :key="application._id"
                         :evaluation="application"
                         store-module="evaluations"
@@ -49,14 +49,14 @@
             <section class="card card-body">
                 <h2>
                     BN Evaluations
-                    <small v-if="paginatedBnEvaluations">
-                        ({{ currentBnEvaluations.length + (reachedMax ? '' : '+')}})
+                    <small v-if="archivedCurrentBnEvals">
+                        ({{ archivedCurrentBnEvals.length + (reachedMax ? '' : '+')}})
                     </small>
                 </h2>
 
                 <transition-group name="list" tag="div" class="row">
                     <evaluation-card
-                        v-for="evaluation in paginatedBnEvaluations"
+                        v-for="evaluation in archivedCurrentBnEvals"
                         :key="evaluation._id"
                         :evaluation="evaluation"
                         store-module="evaluations"
@@ -64,10 +64,6 @@
                     />
                 </transition-group>
                 
-            </section>
-
-            <section v-if="pagination.page > 1" class="card card-body">
-                <pagination-nav store-module="evaluations" />
             </section>
 
             <public-evals-info />
@@ -83,7 +79,6 @@ import ToastMessages from '../components/ToastMessages.vue';
 import EvaluationCard from '../components/evaluations/card/EvaluationCard.vue';
 import PublicEvalsInfo from '../components/evaluations/info/PublicEvalsInfo.vue';
 import FilterBox from '../components/FilterBox.vue';
-import PaginationNav from '../components/PaginationNav.vue';
 
 export default {
     name: 'PublicEvalArchivePage',
@@ -92,7 +87,6 @@ export default {
         EvaluationCard,
         PublicEvalsInfo,
         FilterBox,
-        PaginationNav,
     },
     data() {
         return {
@@ -107,25 +101,9 @@ export default {
         ]),
         ...mapGetters('evaluations', [
             'selectedEvaluation',
-            'paginatedApplications',
-            'paginatedBnEvaluations',
+            'archivedApplications',
+            'archivedCurrentBnEvals',
         ]),
-        /** @returns {Array} */
-        applications () {
-            return this.evaluations.filter(e => e.isApplication);
-        },
-        /** @returns {Array} */
-        currentBnEvaluations () {
-            return this.evaluations.filter(e => e.isBnEvaluation || e.isResignation);
-        },
-        pagination () {
-            return this.$store.state['evaluations'].pagination;
-        },
-    },
-    watch: {
-        evaluations(v) {
-            this.$store.dispatch('evaluations/pagination/updateMaxPages', v.length);
-        },
     },
     beforeCreate() {
         if (this.$store.hasModule('evaluations')) {
@@ -162,12 +140,6 @@ export default {
                 });
             }
         }
-    },
-    mounted() {
-        setInterval(async () => {
-            this.limit -= this.skip;
-            await this.showMore(null);
-        }, 21600000);
     },
     methods: {
         async showMore(e, firstLoad) {
