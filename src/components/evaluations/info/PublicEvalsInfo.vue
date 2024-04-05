@@ -29,7 +29,7 @@
                 :is-nat="selectedEvaluation.user.isNat"
             />
 
-            <evaluation-visibility v-if="!selectedEvaluation.isApplication && !isNatEvaluation" />
+            <evaluation-visibility v-if="selectedEvaluation.kind ==='currentBn' && !isNatEvaluation" />
 
             <evaluation-link />
 

@@ -5,6 +5,7 @@ export default {
             mode: '',
             value: '',
             group: '',
+            consensus: null,
         },
     }),
     mutations: {
@@ -16,6 +17,9 @@ export default {
         },
         setFilterGroup (state, group) {
             state.filters.group = group;
+        },
+        setFilterConsensus (state, consensus) {
+            state.filters.consensus = consensus;
         },
         resetFilters (state) {
             state.filters.mode = '';

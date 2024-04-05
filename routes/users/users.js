@@ -1233,8 +1233,6 @@ router.post('/toggleEvalVisibility/:id', async (req, res) => {
         });
     }
 
-    console.log(eval);
-
     //check eval ownership
     if (req.session.mongoId != eval.user.id) {
         return res.json({

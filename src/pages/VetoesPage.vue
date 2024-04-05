@@ -98,8 +98,8 @@ export default {
     },
     data() {
         return {
-            skip: 20,
-            limit: 20,
+            skip: 24,
+            limit: 24,
             reachedMax: false,
         };
     },
