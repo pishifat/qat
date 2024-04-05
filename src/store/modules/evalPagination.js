@@ -1,7 +1,7 @@
 export default {
     namespaced: true,
     state: () => ({
-        limit: 24,
+        limit: 12,
         archivedAppsPage: 1,
         archivedAppsMaxPages: 1,
         archivedCurrentBnEvalsPage: 1,

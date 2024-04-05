@@ -91,14 +91,16 @@
                     None...
                 </span>
                 <transition-group name="list" tag="div" class="row">
-                    <evaluation-card
-                        v-if="filterEvals(paginatedArchivedApplications, consensusFilter)"
-                        v-for="application in filterEvals(paginatedArchivedApplications, consensusFilter)"
-                        :key="application._id"
-                        :evaluation="application"
-                        store-module="evaluations"
-                        target="#extendedInfo"
-                    />
+                    <template v-if="filterEvals(paginatedArchivedApplications, consensusFilter)">
+                        <evaluation-card
+                            
+                            v-for="application in filterEvals(paginatedArchivedApplications, consensusFilter)"
+                            :key="application._id"
+                            :evaluation="application"
+                            store-module="evaluations"
+                            target="#extendedInfo"
+                        />
+                    </template>
                     <span v-else class="small">
                         None...
                     </span>
@@ -116,15 +118,19 @@
                 <span v-if="!filterEvals(archivedCurrentBnEvals, consensusFilter).length" class="ml-4">
                     None...
                 </span>
-                <transition-group name="list"tag="div"class="row">
-                    <evaluation-card
-                        v-if="filterEvals(paginatedArchivedCurrentBnEvals, consensusFilter).length"
-                        v-for="evaluation in filterEvals(paginatedArchivedCurrentBnEvals, consensusFilter)"
-                        :key="evaluation._id"
-                        :evaluation="evaluation"
-                        store-module="evaluations"
-                        target="#extendedInfo"
-                    />
+                <transition-group name="list" tag="div" class="row">
+                    <template v-if="filterEvals(paginatedArchivedCurrentBnEvals, consensusFilter).length">
+                        <evaluation-card
+                            v-for="evaluation in filterEvals(paginatedArchivedCurrentBnEvals, consensusFilter)"
+                            :key="evaluation._id"
+                            :evaluation="evaluation"
+                            store-module="evaluations"
+                            target="#extendedInfo"
+                        />
+                    </template>
+                    <span v-else class="small">
+                        None...
+                    </span>
                 </transition-group>
                 <pagination-nav store-module="evaluations" type="evaluations" />
             </section>
@@ -155,8 +161,8 @@ export default {
     },
     data() {
         return {
-            skip: 24,
-            limit: 24,
+            skip: 48,
+            limit: 48,
             reachedMax: false,
             consensusFilter: null,
         };
