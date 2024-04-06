@@ -40,7 +40,7 @@
                     <b>NAT Buddy:</b>
                     <user-link
                         :class="selectedEvaluation.natBuddy.groups.includes('nat') ? 'text-nat' : selectedEvaluation.natBuddy.groups.includes('bn') ? 'text-probation' : ''"
-                        osu-id="user.osuId"
+                        :osu-id="user.osuId"
                         :username="selectedEvaluation.natBuddy.username"
                     />
                 </p>
