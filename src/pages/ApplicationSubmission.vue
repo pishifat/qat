@@ -92,7 +92,7 @@
         </template>
 
         <!-- instant rejoin -->
-        <template v-if="relevantResignation && !outstandingCooldowns.length">
+        <template v-if="relevantResignation && !cooldowns.length">
             <div class="card card-body">
                 <h4>Bypass application</h4>
                 <p class="mt-2">
