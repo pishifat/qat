@@ -105,7 +105,7 @@
 
             <div v-if="natUserList.length" class="my-3">
                 <h5>Evaluators</h5>
-                <p>The users below evaluated your {{ evaluation.isApplication ? 'application' : 'current BN status' }}. <span v-if="isNewEvaluationFormat">If you ask questions below, one of them will respond!</span></p>
+                <p>The users below evaluated your {{ evaluation.isApplication ? 'application' : 'current BN status' }}. <span v-if="isNewEvaluationFormat">If you disagree with the outcome and have questions, reply below!</span></p>
                 <div class="card card-body">
                     <ul>
                         <li v-for="user in natUserList" :key="user.id">
