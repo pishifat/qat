@@ -196,11 +196,12 @@ const server = app.listen(port, () => {
 
     if (config.enableAutomation) {
         automation.notifyReports.start();
-		automation.notifyVetoes.start();
-		automation.notifyApplicationEvaluations.start();
+        automation.notifyVetoes.start();
+        automation.notifyApplicationEvaluations.start();
         automation.notifyCurrentBnEvaluations.start();
-		automation.archiveInvalidEvaluations.start();
-		automation.notifyContentReviews.start();
+        automation.archiveInvalidEvaluations.start();
+        automation.lockEvaluationMessages.start();
+        automation.notifyContentReviews.start();
         automation.checkBnEvaluationDeadlines.start();
         automation.checkTenureValidity.start();
         automation.badgeTracker.start();

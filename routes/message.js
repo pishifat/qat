@@ -1,5 +1,7 @@
 const express = require('express');
 const middlewares = require('../helpers/middlewares');
+const discord = require('../helpers/discord');
+const osuBot = require('../helpers/osuBot');
 const util = require('../helpers/util');
 const AppEvaluation = require('../models/evaluations/appEvaluation');
 const Evaluation = require('../models/evaluations/evaluation');
@@ -10,7 +12,7 @@ const router = express.Router();
 
 router.use(middlewares.isLoggedIn);
 
-//population
+// population
 const appPopulateOld = [
     { path: 'user', select: 'username osuId' },
     { path: 'natBuddy', select: 'username osuId' },
@@ -21,7 +23,7 @@ const appPopulateOld = [
         select: 'evaluator',
         populate: {
             path: 'evaluator',
-            select: 'username osuId groups isTrialNat',
+            select: 'username osuId groups isTrialNat discordId',
         },
     },
 ];
@@ -113,10 +115,7 @@ router.get('/evaluation/:id', async (req, res) => {
     if (appOldPopulate) evaluation = appOldPopulate;
     else if (evalOldPopulate) evaluation = evalOldPopulate;
 
-    const newEvaluationFormatCutoff = new Date('2024-03-25');
-    const isNewEvaluationFormat = new Date(evaluation.archivedAt) > newEvaluationFormatCutoff;
-
-    if (isNewEvaluationFormat) {
+    if (evaluation.isNewEvaluationFormat) {
         if (app) evaluation = app;
         else if (eval) evaluation = eval;
     }
@@ -131,7 +130,7 @@ router.get('/evaluation/:id', async (req, res) => {
 
     return res.json({
         evaluation,
-        isNewEvaluationFormat,
+        isNewEvaluationFormat: evaluation.isNewEvaluationFormat,
         natUserList: isNatOrTrialNat ? natUserList : util.shuffleArray(natUserList),
     });
 });
@@ -167,6 +166,90 @@ router.get('/vetoMediators/:id', async (req, res) => {
     }
 
     return res.json(users.sort(() => .5 - Math.random()));
+});
+
+/* POST submit message */
+router.post('/submitEvaluationMessage/:id', async (req, res) => {
+    let evaluation;
+    const id = req.params.id;
+    const newMessage = req.body.message;
+
+    const [appOldPopulate, app, evalOldPopulate, eval] = await Promise.all([
+        AppEvaluation.findById(id).populate(appPopulateOld),
+        AppEvaluation.findById(id).populate(appPopulate),
+        Evaluation.findById(id).populate(bnEvalPopulateOld),
+        Evaluation.findById(id).populate(bnEvalPopulate)
+    ]);
+
+    if (app) evaluation = app;
+    else if (eval) evaluation = evaluation;
+    else if (appOldPopulate) evaluation = appOldPopulate;
+    else if (evalOldPopulate) evaluation = evalOldPopulate;
+
+    evaluation.messagesLocked = false;
+    evaluation.messages.push({
+        date: new Date(),
+        content: newMessage,
+        isNat: req.session.groups.includes('nat'),
+    });
+    
+    await evaluation.save();
+
+    let discordIds;
+
+    if (evaluation.kind == 'application') {
+        discordIds = appOldPopulate.reviews.map(r => r.evaluator.discordId);
+    } else {
+        discordIds = evalOldPopulate.reviews.map(r => r.evaluator.discordId);
+    }
+
+    if (req.session.groups.includes('nat')) {
+        const channel = {
+            name: 'Evaluation response',
+            description: 'Response from the NAT about your recent evaluation',
+        }
+    
+        const message = await osuBot.sendAnnouncement([evaluation.user.osuId, req.session.osuId], channel, newMessage + `\n\nVisit https://bn.mappersguild.com/message?eval=${evaluation.id} to reply`);
+    
+        if (message !== true) {
+            return res.json({ error: `Messages were not sent. Please let pishifat know!` });
+        }
+    } else {
+        await discord.webhookPost(
+            [{
+                color: discord.webhookColors.darkBlue,
+                description: `Response received on [**${evaluation.user.username}**'s ${evaluation.isApplication ? 'application' : 'current BN eval'}](http://bn.mappersguild.com/message?eval=${evaluation.id})`,
+            }],
+            evaluation.mode,
+        );
+        await discord.userHighlightWebhookPost(evaluation.mode, discordIds);    
+    }
+
+    return res.json(evaluation.messages);
+});
+
+/* POST toggle messagesLocked on evaluations */
+router.post('/toggleMessagesLocked/:id', middlewares.isNat, async (req, res) => {
+    let evaluation;
+    const id = req.params.id;
+
+    const [appOldPopulate, app, evalOldPopulate, eval] = await Promise.all([
+        AppEvaluation.findById(id).populate(appPopulateOld),
+        AppEvaluation.findById(id).populate(appPopulate),
+        Evaluation.findById(id).populate(bnEvalPopulateOld),
+        Evaluation.findById(id).populate(bnEvalPopulate)
+    ]);
+
+    if (app) evaluation = app;
+    else if (eval) evaluation = evaluation;
+    else if (appOldPopulate) evaluation = appOldPopulate;
+    else if (evalOldPopulate) evaluation = evalOldPopulate;
+
+    evaluation.messagesLocked = !evaluation.messagesLocked;
+
+    await evaluation.save();
+
+    return res.json(evaluation);
 });
 
 module.exports = router;

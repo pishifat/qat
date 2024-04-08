@@ -16,7 +16,7 @@ const webhookColors = {
     green: 4380222,           // newBnApplication
 
     lightBlue: 8643583,       // setConsensus, announcement
-    darkBlue: 1911891,        // overwriteEvaluationDate
+    darkBlue: 1911891,        // eval message received
     blue: 6786559,            // setFeedback
 
     lightPurple: 11173873,    // submitVetoMediation, toggleIsReviewed

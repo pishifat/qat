@@ -12,7 +12,13 @@ const baseSchema = {
     bnEvaluators: [{ type: 'ObjectId', ref: 'User' }],
     archivedAt: { type: Date },
     isPublic: { type: Boolean },
-    overwriteNextEvaluationDate: { type: Date },
+    messages: [{
+        _id: false,
+        date: { type: Date, required: true },
+        content: { type: String, required: true },
+        isNat: { type: Boolean, required: true },
+    }],
+    messagesLocked: { type: Boolean },
 };
 
 module.exports = baseSchema;

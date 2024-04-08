@@ -259,13 +259,6 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
             let deadline = new Date();
             deadline.setDate(deadline.getDate() + activityToCheck);
 
-            if (evaluation.overwriteNextEvaluationDate) {
-                deadline = new Date(evaluation.overwriteNextEvaluationDate); // manually set deadline
-                const today = new Date();
-                const difference = deadline.getTime() - today.getTime();
-                activityToCheck = Math.ceil(difference / (1000*3600*24)); // days between deadline and now
-            }
-
             await BnEvaluation.create({
                 user: evaluation.user,
                 mode: evaluation.mode,
@@ -342,7 +335,6 @@ router.post('/setConsensus/:id', middlewares.isNatOrTrialNat, async (req, res) =
         evaluation.cooldownDate = date;
     }
 
-    evaluation.overwriteNextEvaluationDate = null;
     await evaluation.save();
 
     res.json(evaluation);
@@ -601,45 +593,6 @@ router.post('/sendMessages/:id', middlewares.isNatOrTrialNat, async (req, res) =
         description: `Sent **${req.body.type}** chat messages for [**${application.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${application.id})`,
     }],
     application.mode);
-});
-
-/* POST overwrite next evaluation deadline */
-router.post('/overwriteEvaluationDate/:id/', middlewares.isNat, async (req, res) => {
-    const app = await AppEvaluation
-        .findById(req.params.id)
-        .populate(defaultPopulate);
-
-    const newDeadline = new Date(req.body.newDeadline);
-    
-    const twoWeeks = new Date();
-    twoWeeks.setDate(twoWeeks.getDate() + 14);
-
-    if (newDeadline < twoWeeks) {
-        return res.json({
-            error: 'New deadline is too soon.'
-        });
-    }
-
-    app.overwriteNextEvaluationDate = newDeadline;
-    await app.save();
-
-    res.json(app);
-
-    Logger.generate(
-        req.session.mongoId,
-        `Overwrote "${app.user.username}" ${app.mode} next current BN evaluation deadline to ${newDeadline.toISOString().slice(0,10)}`,
-        'appEvaluation',
-        app._id
-    );
-
-    discord.webhookPost(
-        [{
-            author: discord.defaultWebhookAuthor(req.session),
-            color: discord.webhookColors.darkBlue,
-            description: `**${app.user.username}**'s next BN evaluation date set to **${newDeadline.toISOString().slice(0,10)}**`,
-        }],
-        app.mode
-    );
 });
 
 /* POST toggle isReviewed for evaluations */

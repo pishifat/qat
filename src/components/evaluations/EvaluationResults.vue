@@ -103,9 +103,9 @@
                 </div>
             </div>
 
-            <div v-if="natUserList.length">
+            <div v-if="natUserList.length" class="my-3">
                 <h5>Evaluators</h5>
-                <p>If you have questions about your evaluation, please contact any member of the {{ evaluation.mode == 'osu' ? 'NAT or BN' : 'NAT' }} below!</p>
+                <p>The users below evaluated your {{ evaluation.isApplication ? 'application' : 'current BN status' }}. <span v-if="isNewEvaluationFormat">If you ask questions below, one of them will respond!</span></p>
                 <div class="card card-body">
                     <ul>
                         <li v-for="user in natUserList" :key="user.id">
@@ -118,11 +118,55 @@
                     </ul>
                 </div>
             </div>
+
+            <div v-if="isNewEvaluationFormat">
+                <h5 v-if="evaluation.messages && evaluation.messages.length">Messages</h5>
+                <div 
+                    v-for="(message, i) in evaluation.messages"
+                    :key="i"
+                    class="card card-body mb-2"
+                    :class="`card-bg-${message.isNat ? 'nat' : 'user'}`"
+                >
+                    <div><b>{{ new Date(message.date).toLocaleDateString() }}</b></div>
+                    <div v-html="$md.render(message.content)" />
+                </div>
+
+                <div v-if="(loggedInUser.id == evaluation.user.id && !evaluation.messagesLocked) || loggedInUser.isNat">
+                    <div class="card card-body">
+                        <textarea
+                            id="messageInput"
+                            v-model="messageInput"
+                            class="form-control"
+                            :placeholder="evaluation.messages && evaluation.messages.length > 1 ? 'type a reply...' : 'type a question about your evaluation...'"
+                            rows="2"
+                            :disabled="evaluation.messagesLocked"
+                        />
+                        <div class="row">
+                            <div :class="loggedInUser.isNat ? 'col-sm-8' : 'col-sm-12'">
+                                <button
+                                    class="btn btn-primary btn-block btn-sm mt-1"
+                                    @click="saveMessage($event)"
+                                    :disabled="evaluation.messagesLocked"
+                                >
+                                    Send message
+                                </button>
+                            </div>
+                            <div v-if="loggedInUser.isNat" class="col-sm-4">
+                                <button class="btn btn-danger btn-block btn-sm mt-1" @click="toggleMessagesLocked($event)">
+                                    {{ evaluation.messagesLocked ? 'Unlock' : 'Lock' }} messages
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
+import { mapState } from 'vuex';
+import ToastMessages from '../../components/ToastMessages.vue';
 import evaluations from '../../mixins/evaluations.js';
 import { BnEvaluationAddition } from '../../../shared/enums';
 import UserLink from '../../components/UserLink.vue';
@@ -130,6 +174,7 @@ import UserLink from '../../components/UserLink.vue';
 export default {
     name: 'EvaluationResults',
     components: {
+        ToastMessages,
         UserLink,
     },
     mixins: [ evaluations ],
@@ -148,7 +193,15 @@ export default {
             },
         },
     },
+    data () {
+        return {
+            messageInput: '',
+        };
+    },
     computed: {
+        ...mapState([
+            'loggedInUser',
+        ]),
         /** @returns {string} */
         consensus () {
             return this.evaluation.consensus;
@@ -169,6 +222,42 @@ export default {
                 return 'text-fail';
             }
         },
+        async saveMessage (e) {
+            const messages = await this.$http.executePost('/message/submitEvaluationMessage/' + this.evaluation.id, { message: this.messageInput }, e);
+
+            if (this.$http.isValid(messages)) {
+                this.$store.commit('message/updateEvaluationMessages', messages);
+                this.messageInput = '';
+                this.$store.dispatch('updateToastMessages', {
+                    message: 'Message sent',
+                    type: 'success',
+                });
+            }
+        },
+        async toggleMessagesLocked (e) {
+            const locked = await this.$http.executePost('/message/toggleMessagesLocked/' + this.evaluation.id, {}, e);
+
+            if (this.$http.isValid(locked)) {
+                this.$store.commit('message/toggleEvaluationMessagesLocked');
+                this.$store.dispatch('updateToastMessages', {
+                    message: 'Locked',
+                    type: 'success',
+                });
+            }
+        },
     },
 };
 </script>
+
+<style scoped>
+.card-bg-nat {
+    background-image: url('~/public/images/nat.png');
+    background-repeat: repeat-y;
+    background-position: left;
+}
+.card-bg-user {
+    background-image: url('~/public/images/user.png');
+    background-repeat: repeat-y;
+    background-position: left;
+}
+</style>

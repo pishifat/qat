@@ -209,6 +209,38 @@ const notifyContentReviews = cron.schedule('0 9 * * *', async () => {
 });
 
 /**
+ * lock messages on new format evaluations that haven't had activity for a week
+ */
+const lockEvaluationMessages = cron.schedule('0 10 * * *', async () => {
+    const sevenDaysAgo = moment().subtract(7, 'days').toDate();
+
+    // find relevant evaluations
+    const [applications, evaluations] = await Promise.all([
+        AppEvaluation.find({ archivedAt: { $gt: sevenDaysAgo }}),
+        Evaluation.find({ archivedAt: { $gt: sevenDaysAgo }}),
+    ]);
+
+    const combined = applications.concat(evaluations);
+
+    // lock anything with inactivity >7d
+    for (const eval of combined) {
+        if (eval.messages && eval.messages.length) {
+            const lastMessageDate = new Date(eval.messages[eval.messages.length - 1].date);
+
+            if (sevenDaysAgo > lastMessageDate) {
+                eval.messagesLocked = true;
+                eval.save();
+            }
+        } else {
+            eval.messagesLocked = true;
+            eval.save();
+        }
+    }
+}, {
+    scheduled: false,
+});
+
+/**
  * send webhooks for reports submitted 7+ days ago
  */
 const notifyReports = cron.schedule('0 17 * * *', async () => {
@@ -861,6 +893,7 @@ module.exports = {
     notifyApplicationEvaluations,
     notifyCurrentBnEvaluations,
     archiveInvalidEvaluations,
+    lockEvaluationMessages,
     notifyContentReviews,
     checkBnEvaluationDeadlines,
     checkTenureValidity,

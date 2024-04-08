@@ -14,6 +14,7 @@ router.post("/moveToNat", async (req, res) => {
     user.isTrialNat = false;
     const i = user.groups.findIndex((g) => g === "bn");
     if (i !== -1) user.groups.splice(i, 1, "nat");
+    else user.groups.push('nat');
 
     for (let i = 0; i < user.modesInfo.length; i++) {
         user.modesInfo[i].level = 'evaluator';

@@ -21,10 +21,15 @@ interface IEvaluationBase {
     isResignation?: boolean;
     isReviewed?: boolean;
     isSecurityChecked?: boolean;
-    overwriteNextEvaluationDate?: Date;
     vibeChecks?: IMediationDocument[];
     isNewEvaluationFormat?: boolean;
     isPublic?: boolean;
+    messages: {
+        date: Date;
+        content: string;
+        isNat: boolean;
+    }[]
+    messagesLocked?: boolean;
 }
 
 export interface IAppEvaluationDocument extends IEvaluationBase, Document {
