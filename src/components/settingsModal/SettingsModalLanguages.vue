@@ -11,7 +11,7 @@
             <div class="col-sm-6">
                 <div class="input-group">
                     <select
-                        id="user"
+                        id="user-languages"
                         v-model="selectedLanguage"
                         class="form-control ml-2"
                     >
