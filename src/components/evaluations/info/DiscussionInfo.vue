@@ -10,22 +10,13 @@
 
             <div id="consensusSettings" class="collapse container mb-4">
                 <div class="row align-items-center">
-                    <div class="col-sm-12">
+                    <div :class="selectedEvaluation.isApplication ? 'col-sm-5' : 'col-sm-12'">
                         <consensus />
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-3">
                         <evaluation-is-reviewed
                             v-if="loggedInUser.isNat && selectedEvaluation.consensus"
                             :feedback="selectedEvaluation.feedback"
-                        />
-                    </div>
-                    <div class="col-sm-4">
-                        <evaluation-is-security-checked 
-                            v-if="
-                                loggedInUser.isNat && 
-                                selectedEvaluation.isApplication && 
-                                selectedEvaluation.consensus === 'pass'
-                            "
                         />
                     </div>
                     <div class="col-sm-4">

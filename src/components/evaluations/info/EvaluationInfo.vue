@@ -50,6 +50,7 @@
 
             <div v-else>
                 <main-application-info v-if="selectedEvaluation.isApplication" />
+                <evaluation-is-security-checked class="mb-2" v-if="loggedInUser.isNat && selectedEvaluation.isApplication" />
 
                 <user-activity
                     v-else
@@ -137,6 +138,7 @@ import EvaluatorAssignments from './common/EvaluatorAssignments.vue';
 import ModalDialog from '../../ModalDialog.vue';
 import MainApplicationInfo from './applications/MainApplicationInfo.vue';
 import DiscussionInfo from './DiscussionInfo.vue';
+import EvaluationIsSecurityChecked from './applications/EvaluationIsSecurityChecked.vue';
 
 export default {
     name: 'EvaluationInfo',
@@ -155,6 +157,7 @@ export default {
         ModalDialog,
         MainApplicationInfo,
         DiscussionInfo,
+        EvaluationIsSecurityChecked,
     },
     data () {
         return {

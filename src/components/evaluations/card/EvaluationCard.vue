@@ -26,6 +26,7 @@
                 :is-nat-evaluation="Boolean(evaluation.selfSummary)"
                 :is-public="evaluation.isPublic"
                 :is-active="evaluation.active"
+                :is-app="evaluation.isApplication"
             />
 
             <card-footer

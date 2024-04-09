@@ -3,9 +3,6 @@
         <b>Security checked: </b>
         <a
             href="#"
-            data-toggle="tooltip"
-            data-placement="right"
-            title="@help in #gmt-help"
             @click.prevent="toggleEvaluationIsSecurityChecked($event)"
         >
             <font-awesome-icon
