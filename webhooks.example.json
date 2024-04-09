@@ -81,5 +81,11 @@
         "probationCatch": "",
         "probationMania": "",
         "groupMoversRole": ""
+    },
+    "securityCheckWebhook": {
+        "id": "",
+        "token": "",
+        "threadId": "",
+        "role": ""
     }
 }

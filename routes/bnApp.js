@@ -107,6 +107,38 @@ router.post('/apply', async (req, res) => {
     }
 
     // begin checks
+
+    // get user's osu! information
+    const userInfo = await osu.getUserInfo(req.session.accessToken);
+
+    if (!userInfo || userInfo.error) {
+        return res.json({ error: 'Something went wrong! Please retry again.' });
+    }
+
+    // check for silences
+    const accountHistory = userInfo.account_history;
+
+    // deny if there's a silence longer than 42 hours
+    if (accountHistory.length) {
+        const silenceThreshold = 153600; // 42 hours
+
+        for (const silence of accountHistory) {
+            if (silence.length >= silenceThreshold) {
+                return res.json({
+                    error: 'You have a recent silence that is too long to apply for BN. Please wait until it\'s removed from your account history.',
+                });
+            }
+        }
+    }
+
+    // check user kudosu total count
+    const requiredKudosu = 150;
+
+    // deny if not enough kudosu
+    if (userInfo.kudosu.total < requiredKudosu) {
+        return res.json({ error: `You do not meet the required ${requiredKudosu} kudosu to apply. You currently have ${userInfo.kudosu.total} kudosu.` });
+    }
+
     const [currentBnApp, currentBnEval, cooldownResignation] = await Promise.all([
         AppEvaluation.findOne({
             user: req.session.mongoId,
@@ -163,20 +195,6 @@ router.post('/apply', async (req, res) => {
         });
     }
 
-    // check user kudosu total count
-    const userInfo = await osu.getUserInfo(req.session.accessToken);
-
-    if (!userInfo || userInfo.error) {
-        return res.json({ error: 'Something went wrong! Please retry again.' });
-    }
-
-    const requiredKudosu = 150;
-
-    // deny if not enough kudosu
-    if (userInfo.kudosu.total < requiredKudosu) {
-        return res.json({ error: `You do not meet the required ${requiredKudosu} kudosu to apply. You currently have ${userInfo.kudosu.total} kudosu.` });
-    }
-
     // create app
     const newBnApp = await AppEvaluation.create({
             user: req.session.mongoId,
@@ -224,7 +242,7 @@ router.post('/apply', async (req, res) => {
     // save all assignments
     await newBnApp.save();
 
-    // webhooks
+    // NAT webhook
     await discord.webhookPost(
         [{
             author: discord.defaultWebhookAuthor(req.session),
@@ -236,6 +254,20 @@ router.post('/apply', async (req, res) => {
     );
 
     await discord.userHighlightWebhookPost(mode, discordIds);
+
+    await util.sleep(500);
+
+    // security check webhook
+    const embed = [{
+        author: discord.defaultWebhookAuthor(req.session),
+        description: `Submitted a BN application`,
+        color: discord.webhookColors.green,
+        fields,
+    }];
+
+    const securityCheckMessage = `Please conduct a BN security check on [**${userInfo.username}**](<https://osu.ppy.sh/users/${userInfo.id}>), then inform any of the assigned NAT below.`
+
+    await discord.highlightWebhookPost(securityCheckMessage, embed, 'securityCheck');
 
     // proceed
     res.json(newBnApp);
@@ -259,6 +291,29 @@ router.post('/rejoinApply', async (req, res) => {
         return res.json({
             error: `You're already a BN for this game mode!`,
         });
+    }
+
+    // get user's osu! information
+    const userInfo = await osu.getUserInfo(req.session.accessToken);
+
+    if (!userInfo || userInfo.error) {
+        return res.json({ error: 'Something went wrong! Please retry again.' });
+    }
+
+    // check for silences
+    const accountHistory = userInfo.account_history;
+
+    // deny if there's a silence longer than 42 hours
+    if (accountHistory.length) {
+        const silenceThreshold = 153600; // 42 hours
+
+        for (const silence of accountHistory) {
+            if (silence.length >= silenceThreshold) {
+                return res.json({
+                    error: 'You have a recent silence that is too long to apply for BN. Please wait until it\'s removed from your account history.',
+                });
+            }
+        }
     }
     
     const oneYearAgo = moment().subtract(1, 'years').toDate();
@@ -318,7 +373,11 @@ router.post('/rejoinApply', async (req, res) => {
     newBnApp.natEvaluators = assignedNat;
 
     let fields = [];
+    let discordIds = [];
+
     const natList = assignedNat.map(n => n.username).join(', ');
+    const natDiscordIds = assignedNat.map(n => n.discordId);
+    discordIds = discordIds.concat(natDiscordIds);
 
     fields.push({
         name: 'Assigned NAT',
@@ -330,18 +389,18 @@ router.post('/rejoinApply', async (req, res) => {
         const assignedTrialNat = await User.getAssignedTrialNat(mode);
         newBnApp.bnEvaluators = assignedTrialNat;
         const trialNatList = assignedTrialNat.map(n => n.username).join(', ');
+        const trialNatDiscordIds = assignedTrialNat.map(n => n.discordId);
         fields.push({
             name: 'Assigned BN',
             value: trialNatList,
         });
+        discordIds = discordIds.concat(trialNatDiscordIds);
     }
 
     // save
     await newBnApp.save();
 
-    // proceed
-    res.json(newBnApp);
-
+    // NAT webhook
     await discord.webhookPost(
         [{
             author: discord.defaultWebhookAuthor(req.session),
@@ -352,7 +411,26 @@ router.post('/rejoinApply', async (req, res) => {
         mode
     );
 
-    Logger.generate(req.session.mongoId, `Applied for ${mode} BN`, 'application', newBnApp._id);
+    await discord.userHighlightWebhookPost(mode, discordIds);
+
+    await util.sleep(500);
+
+    // security check webhook
+    const embed = [{
+        author: discord.defaultWebhookAuthor(req.session),
+        description: `Requested to re-join ${mode == 'osu' ? 'osu!' : 'osu!' + mode} BN after recent resignation.`,
+        color: discord.webhookColors.lightYellow,
+        fields,
+    }];
+
+    const securityCheckMessage = `Please conduct a BN security check on [**${userInfo.username}**](<https://osu.ppy.sh/users/${userInfo.id}>), then inform any of the assigned NAT below.`
+
+    await discord.highlightWebhookPost(securityCheckMessage, embed, 'securityCheck');
+
+    // proceed
+    res.json(newBnApp);
+
+    Logger.generate(req.session.mongoId, `Requested to re-join ${mode} BN`, 'application', newBnApp._id);
     
 });
 
