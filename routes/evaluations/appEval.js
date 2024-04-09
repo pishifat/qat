@@ -354,33 +354,7 @@ router.post('/setConsensus/:id', middlewares.isNatOrTrialNat, async (req, res) =
         }
     ];
 
-    // security check embed
-    if (req.body.consensus === AppEvaluationConsensus.Pass) 
-        embed.push({
-            author: null,
-            color: discord.webhookColors.red,
-            description: `Make sure to ping \`@help\` in <#844651592857944135> and request a BN security check!`,
-        });
-
     await discord.webhookPost(embed, evaluation.mode);
-
-    // security check ping
-    if (req.body.consensus === AppEvaluationConsensus.Pass) {
-        const evaluators = evaluation.natEvaluators;
-
-        const discordIds = req.session.groups.includes("nat")
-            ? [req.session.discordId]
-            : discord.findEvaluatorHighlights(
-                  evaluation.reviews,
-                  evaluators,
-                  evaluation.discussion
-              );
-        const randomIndex = Math.floor(Math.random() * discordIds.length);
-
-        if (discordIds && discordIds.length) {
-            await discord.userHighlightWebhookPost(evaluation.mode, [discordIds[randomIndex]]);
-        }
-    }
 });
 
 /* POST set feedback of eval */
