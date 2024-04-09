@@ -8,75 +8,37 @@
                 :groups="null"
                 store-module="evaluations"
             >
-            <div class="mt-2 ml-1">
-                Consensus:
-                <div class="ml-2 btn-group">
+            <select
+                class="form-control"
+                v-model="consensusFilter"
+                @change="applyConsensusFilter($event.target.value)"
+            >
+                <option value="">Any consensus</option>
+                <option value="pass">Pass</option>
+                <option value="fail">Fail</option>
+                <option value="fullBn">Full BN</option>
+                <option value="probationBn">Probation BN</option>
+                <option value="removeFromBn">Remove From BN</option>
+            </select>
+            <div v-if="!reachedMax" class="row">
+                <div class="col-sm-6">
                     <button
                         type="button"
-                        class="btn btn-sm btn-info ml-2"
-                        @click="applyConsensusFilter(null)"
-                        :disabled="consensusFilter === null"
+                        class="mt-2 form-control btn btn-primary btn-sm"
+                        @click="showMore($event)"
                     >
-                        Any
+                        Show more
                     </button>
+                </div>
+                <div class="col-sm-6">
                     <button
                         type="button"
-                        class="btn btn-sm btn-success"
-                        @click="applyConsensusFilter('pass')"
-                        :disabled="consensusFilter === 'pass'"
+                        class="mt-2 form-control btn btn-secondary btn-sm"
+                        @click="showAll($event)"
                     >
-                        Pass
+                        Show all
                     </button>
-                    <button
-                        type="button"
-                        class="btn btn-sm btn-danger"
-                        @click="applyConsensusFilter('fail')"
-                        :disabled="consensusFilter === 'fail'"
-                    >
-                        Fail
-                    </button>
-                
-                    <button
-                        type="button"
-                        class="btn btn-sm btn-bn"
-                        @click="applyConsensusFilter('fullBn')"
-                        :disabled="consensusFilter === 'fullBn'"
-                    >
-                        Full BN
-                    </button>
-                    <button
-                        type="button"
-                        class="btn btn-sm btn-probation"
-                        @click="applyConsensusFilter('probationBn')"
-                        :disabled="consensusFilter === 'probationBn'"
-                    >
-                        Probation BN
-                    </button>
-                    <button
-                        type="button"
-                        class="btn btn-sm btn-danger"
-                        @click="applyConsensusFilter('removeFromBn')"
-                        :disabled="consensusFilter === 'removeFromBn'"
-                    >
-                        Remove From BN
-                    </button>
-                 </div>
-            </div>
-            <div v-if="!reachedMax" class="mt-2">
-                <button
-                    type="button"
-                    class="btn btn-primary btn-sm float-left"
-                    @click="showMore($event)"
-                >
-                    Show more
-                </button>
-                <button
-                    type="button"
-                    class="btn btn-secondary btn-sm ml-2 float-left"
-                    @click="showAll($event)"
-                >
-                    Show all
-                </button>
+                </div>
             </div>
             </filter-box>
 
@@ -164,7 +126,7 @@ export default {
             skip: 48,
             limit: 48,
             reachedMax: false,
-            consensusFilter: null,
+            consensusFilter: '',
         };
     },
     computed: {
@@ -260,7 +222,7 @@ export default {
             }
         },
         filterEvals(evals, consensus) {
-            if (consensus === null) return evals;
+            if (!consensus.length) return evals;
             return evals.filter(e => e.consensus === consensus);
         },
         applyConsensusFilter(consensus) {
