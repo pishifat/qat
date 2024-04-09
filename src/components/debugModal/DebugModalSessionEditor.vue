@@ -23,9 +23,6 @@
                     <div class="row">
                         <span class="text-secondary col-sm-4">groups</span> <input class="form-control form-control-sm col-sm-6" v-model="groups" />
                     </div>
-                    <div class="row">
-                        <span class="text-secondary col-sm-4">discordId</span> <input class="form-control form-control-sm col-sm-6" v-model="discordId" />
-                    </div>
                     <div class="row mt-3">
                         <button class="btn btn-sm btn-success col-sm-10" @click="save()">Save</button>
                     </div>
@@ -67,7 +64,6 @@ export default {
                 this.osuId = res.session.osuId;
                 this.username = res.session.username;
                 this.groups = res.session.groups;
-                this.discordId = res.session.discordId;
                 this.rawSession = res.session;
             }
         },
@@ -85,7 +81,6 @@ export default {
                 this.osuId = res.session.osuId;
                 this.username = res.session.username;
                 this.groups = res.session.groups;
-                this.discordId = res.session.discordId;
                 this.rawSession = res.session;
             }
         },

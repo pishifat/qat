@@ -128,7 +128,7 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
             // send highlights
             if (messageType.includes('problem') || (mongoUser && mongoUser.isBnOrNat)) {
                 modes.forEach(mode => {
-                    discord.highlightWebhookPost('', `${mode}BeatmapReport`);
+                    discord.highlightWebhookPost('', null, `${mode}BeatmapReport`);
                 });
             }
         }

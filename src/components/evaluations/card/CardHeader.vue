@@ -19,7 +19,7 @@
                 class="fa fa-eye mr-1 text-warning"
             />
             <i
-                v-if="isActive && isPassApp && isNatOrTrialNat && !isSecurityChecked"
+                v-if="isActive && isApp && isNatOrTrialNat && !isSecurityChecked"
                 data-toggle="tooltip"
                 data-placement="top"
                 title="needs a security check"
@@ -127,6 +127,10 @@ export default {
         isActive: {
             type: Boolean,
             default: true,
+        },
+        isApp: {
+            type: Boolean,
+            default: false,
         },
     },
 };

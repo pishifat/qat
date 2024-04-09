@@ -11,7 +11,7 @@
                         v-model="feedback"
                         :class="feedback != selectedEvaluation.feedback ? 'bg-dark' : ''"
                         class="form-control mb-2"
-                        rows="2"
+                        :rows="getRows()"
                         placeholder="optional..."
                     />
                 </div>
@@ -102,6 +102,10 @@ export default {
                     type: 'success',
                 });
             }
+        },
+        getRows() {
+            const lines = this.feedback.split('\n');
+            return Math.max(lines.length, 2);
         },
     },
 };

@@ -90,6 +90,9 @@ function getRoles(roles) {
             case 'maniaBeatmapReport':
                 pings += `<@&${config.beatmapReportWebhook.maniaRole}> `;
                 break;
+            case 'securityCheck':
+                pings += `<@&${config.securityCheckWebhook.role}> `;
+                break;
         }
     }
     

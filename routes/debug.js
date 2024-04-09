@@ -221,7 +221,6 @@ router.post("/updateSession", async (req, res) => {
     req.session.osuId = Number(req.body.osuId);
     req.session.username = req.body.username;
     req.session.groups = req.body.groups.split(",");
-    req.session.discordId = req.body.discordId;
 
     res.json({
         success: "updated session",

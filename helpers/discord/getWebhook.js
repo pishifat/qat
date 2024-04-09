@@ -53,6 +53,9 @@ function getWebhook(webhook) {
         case 'maniaBeatmapReport':
             return url += `${config.beatmapReportWebhook.id}/${config.beatmapReportWebhook.token}`;
 
+        case 'securityCheck': 
+            return url += `${config.securityCheckWebhook.id}/${config.securityCheckWebhook.token}?thread_id=${config.securityCheckWebhook.threadId}`;
+
         default:
             return { error: 'no webhook specified' };
     }

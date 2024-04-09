@@ -63,7 +63,7 @@ async function webhookPost(message, webhook) {
     }
 }
 
-async function highlightWebhookPost(message, webhook) {
+async function highlightWebhookPost(message, embeds, webhook) {
     const url = getWebhook(webhook);
     const role = getRoles([webhook])
     if (typeof url === 'object') return url;
@@ -72,6 +72,7 @@ async function highlightWebhookPost(message, webhook) {
         await axios.post(url, {
             username,
             avatar_url,
+            embeds,
             content: role + ' ' + message,
         });
     } catch (error) {
