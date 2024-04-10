@@ -79,11 +79,11 @@ export default {
     },
     watch: {
         selectedEvaluation() {
-            this.feedback = this.selectedEvaluation.feedback;
+            this.feedback = this.selectedEvaluation.feedback || '';
         },
     },
     mounted() {
-        this.feedback = this.selectedEvaluation.feedback;
+        this.feedback = this.selectedEvaluation.feedback || '';
     },
     methods: {
         async setFeedback(e) {
