@@ -7,6 +7,7 @@ const AppEvaluation = require('../models/evaluations/appEvaluation');
 const Evaluation = require('../models/evaluations/evaluation');
 const Report = require('../models/report');
 const Veto = require('../models/veto');
+const Logger = require('../models/log');
 
 const router = express.Router();
 
@@ -50,7 +51,7 @@ const bnEvalPopulateOld = [
         select: 'evaluator',
         populate: {
             path: 'evaluator',
-            select: 'username osuId groups isTrialNat',
+            select: 'username osuId groups isTrialNat discordId',
         },
     },
 ];
@@ -182,11 +183,14 @@ router.post('/submitEvaluationMessage/:id', async (req, res) => {
     ]);
 
     if (app) evaluation = app;
-    else if (eval) evaluation = evaluation;
+    else if (eval) evaluation = eval;
     else if (appOldPopulate) evaluation = appOldPopulate;
     else if (evalOldPopulate) evaluation = evalOldPopulate;
 
-    evaluation.messagesLocked = false;
+    if (evaluation.messagesLocked) {
+        return res.json({ error: 'Messages are locked for this evaluation' });
+    }
+
     evaluation.messages.push({
         date: new Date(),
         content: newMessage,
@@ -208,22 +212,35 @@ router.post('/submitEvaluationMessage/:id', async (req, res) => {
             name: 'Evaluation response',
             description: 'Response from the NAT about your recent evaluation',
         }
+
+        let response = '';
+        response += `The NAT responded to your message on your **${evaluation.isApplication ? 'BN application' : 'current BN eval'}**. Visit [this page](http://bn.mappersguild.com/message?eval=${evaluation.id}) to view and reply.`;
+        response += `\n\n${util.shorten(newMessage, 700, '... *(truncated)*')}`;
     
-        const message = await osuBot.sendAnnouncement([evaluation.user.osuId, req.session.osuId], channel, newMessage + `\n\nVisit https://bn.mappersguild.com/message?eval=${evaluation.id} to reply`);
+        const message = await osuBot.sendAnnouncement([evaluation.user.osuId, req.session.osuId], channel, response);
     
         if (message !== true) {
             return res.json({ error: `Messages were not sent. Please let pishifat know!` });
         }
     } else {
-        await discord.webhookPost(
-            [{
-                color: discord.webhookColors.darkBlue,
-                description: `Response received on [**${evaluation.user.username}**'s ${evaluation.isApplication ? 'application' : 'current BN eval'}](http://bn.mappersguild.com/message?eval=${evaluation.id})`,
-            }],
-            evaluation.mode,
-        );
-        await discord.userHighlightWebhookPost(evaluation.mode, discordIds);    
+        await discord.userHighlightWebhookPost(evaluation.mode, discordIds);
     }
+
+    await discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            color: discord.webhookColors.darkBlue,
+            description: `Response ${req.session.groups.includes('nat') ? 'sent' : 'received'} on [**${evaluation.user.username}**'s ${evaluation.isApplication ? 'application' : 'current BN eval'}](http://bn.mappersguild.com/message?eval=${evaluation.id})\n\n${util.shorten(newMessage, 925, '... *(truncated)*')}`,
+        }],
+        evaluation.mode,
+    );
+
+    Logger.generate(
+        req.session.mongoId,
+        `Sent a response to ${evaluation.user.username}'s ${evaluation.isApplication ? 'application' : 'current BN eval'}`,
+        evaluation.isApplication ? 'appEvaluation' : 'bnEvaluation',
+        evaluation.id,
+    );
 
     return res.json(evaluation.messages);
 });
@@ -241,13 +258,29 @@ router.post('/toggleMessagesLocked/:id', middlewares.isNat, async (req, res) => 
     ]);
 
     if (app) evaluation = app;
-    else if (eval) evaluation = evaluation;
+    else if (eval) evaluation = eval;
     else if (appOldPopulate) evaluation = appOldPopulate;
     else if (evalOldPopulate) evaluation = evalOldPopulate;
 
     evaluation.messagesLocked = !evaluation.messagesLocked;
 
     await evaluation.save();
+
+    await discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            color: discord.webhookColors.black,
+            description: `**${evaluation.messagesLocked ? 'Locked' : 'Unlocked'}** messages for [**${evaluation.user.username}**'s ${evaluation.isApplication ? 'application' : 'current BN eval'}](http://bn.mappersguild.com/message?eval=${evaluation.id})`,
+        }],
+        evaluation.mode,
+    );
+
+    Logger.generate(
+        req.session.mongoId,
+        `${evaluation.messagesLocked ? 'Locked' : 'Unlocked'} messages for ${evaluation.user.username}'s ${evaluation.isApplication ? 'application' : 'current BN eval'}`,
+        evaluation.isApplication ? 'appEvaluation' : 'bnEvaluation',
+        evaluation.id,
+    );
 
     return res.json(evaluation);
 });

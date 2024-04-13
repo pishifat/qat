@@ -137,7 +137,7 @@
                             id="messageInput"
                             v-model="messageInput"
                             class="form-control"
-                            :placeholder="evaluation.messages && evaluation.messages.length > 1 ? 'type a reply...' : 'type a question about your evaluation...'"
+                            :placeholder="evaluation.messagesLocked ? 'messages are disabled.' : evaluation.messages && evaluation.messages.length > 1 ? 'type a reply...' : 'type a question about your evaluation...'"
                             rows="2"
                             :disabled="evaluation.messagesLocked"
                         />
@@ -240,7 +240,7 @@ export default {
             if (this.$http.isValid(locked)) {
                 this.$store.commit('message/toggleEvaluationMessagesLocked');
                 this.$store.dispatch('updateToastMessages', {
-                    message: 'Locked',
+                    message: this.evaluation.messagesLocked ? 'Locked' : 'Unlocked',
                     type: 'success',
                 });
             }
