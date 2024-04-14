@@ -27,8 +27,9 @@ router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
     ];
 
     if (req.body.category == 'contentCaseVisual' && blockedUrls.some(url => link.includes(url))) {
+        const url = new URL(link).hostname;
         return res.json({
-            error: 'images hosted on this website are not allowed, as they can change/get deleted quickly. please use a different image hosting service instead.',
+            error: `Images hosted on ${url} are not allowed as they can expire quickly. please use a different image host.`,
         });
     }
 
