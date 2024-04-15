@@ -121,8 +121,9 @@ router.post('/submit', middlewares.hasBasicAccess, async (req, res) => {
     ];
     
     if (isContentReview && discussionLink.length > 0 && blockedUrls.some(u => discussionLink.includes(u))) {
+        const url = new URL(discussionLink).hostname;
         return res.json({
-            error: 'images hosted on this website are not allowed, as they can change/get deleted quickly. please use a different image hosting service instead.',
+            error: `Images hosted on ${url} are not allowed as they can expire quickly. please use a different image host.`,
         });
     }
     

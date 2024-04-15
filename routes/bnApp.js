@@ -104,6 +104,18 @@ router.post('/apply', async (req, res) => {
                 error: `Must to write something in the ".osz" field for each mod`,
             });
         }
+
+        const blockedUrls = [
+            'puu.sh',
+            'cdn.discordapp.com'
+        ];
+
+        if (blockedUrls.some(url => oszs[i].includes(url))) {
+            const url = new URL(oszs[i]).hostname;
+            return res.json({
+                error: `Files hosted on ${url} are not allowed as they can expire quickly. Please use a different file host.`
+            });
+        }
     }
 
     // begin checks
