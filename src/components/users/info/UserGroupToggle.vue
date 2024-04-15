@@ -2,7 +2,7 @@
     <div>
         <p>
             <b>
-                User group ({{ mode == 'osu' ? 'osu!' : 'osu!' + mode }}):
+                User group ({{ mode | formatMode }}):
             </b>
             <button
                 class="btn btn-sm btn-nat ml-1 mb-1"

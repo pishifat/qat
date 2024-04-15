@@ -13,12 +13,14 @@
 <script>
 import { mapGetters } from 'vuex';
 import BotChatMessage from '../../../BotChatMessage.vue';
+import evaluations from '../../../../mixins/evaluations';
 
 export default {
     name: 'EnableBnEvaluatorsChatMessage',
     components: {
         BotChatMessage,
     },
+    mixins: [ evaluations ],
     props: {
         users: {
             type: Array,
@@ -33,7 +35,7 @@ export default {
         ]),
         /** @returns {string} */
         message () {
-            let message =`hello! you've been selected to help evaluate the ${this.selectedEvaluation.mode == 'osu' ? 'osu!' : 'osu!' + this.selectedEvaluation.mode} mode BN app for [${this.selectedEvaluation.user.username}](https://osu.ppy.sh/users/${this.selectedEvaluation.user.osuId})`;
+            let message =`hello! you've been selected to help evaluate the ${this.formatMode(this.selectedEvaluation.mode)} mode BN app for [${this.selectedEvaluation.user.username}](https://osu.ppy.sh/users/${this.selectedEvaluation.user.osuId})`;
             message += `\n\n`;
             message += `please post your thoughts on their behavior and modding (based on the submitted mods and anything else you know) on the [BN/NAT website](https://bn.mappersguild.com/appeval) — your input is anonymous to everyone but the NAT!`;
             message += `\n\n`;

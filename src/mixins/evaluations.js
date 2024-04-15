@@ -79,6 +79,13 @@ export default {
         },
         capitalizeFirstLetter (string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
+        },
+        formatMode (string) {
+            if (!string) return '';
+
+            if (string == 'none') return 'structural';
+            else if (string == 'osu') return 'osu!';
+            else return 'osu!' + string;
         }
     },
 };

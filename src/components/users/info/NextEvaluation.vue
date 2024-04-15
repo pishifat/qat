@@ -1,7 +1,7 @@
 <template>
     <p class="form-inline">
         <b class="mr-1">
-            {{ displayMode ? `Next ${mode == 'osu' ? 'osu!' : 'osu!' + mode} evaluation:` : 'Next evaluation:' }}
+            {{ displayMode ? `Next ${formatMode(mode)} evaluation:` : 'Next evaluation:' }}
             <span v-if="isEditing">(deadline)</span>
         </b>
 
@@ -51,9 +51,11 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import evaluations from '../../../mixins/evaluations';
 
 export default {
     name: 'NextEvaluation',
+    mixins: [ evaluations ],
     props: {
         mode: {
             type: String,

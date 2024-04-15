@@ -70,6 +70,14 @@ Vue.filter('shorten', (text, length) => {
     }
 });
 
+Vue.filter('formatMode', (mode) => {
+    if (!mode) return '';
+
+    if (mode == 'none') return 'structural';
+    else if (mode == 'osu') return 'osu!';
+    else return 'osu!' + mode;
+});
+
 $(document).ready(function() {
     ($('body')).tooltip({ selector: '[data-toggle=tooltip]', trigger: 'hover' });
 });

@@ -34,7 +34,7 @@
                         "
                     />
                 </a>
-                {{ setting.mode == 'osu' ? 'osu!' : 'osu!' + setting.mode }}
+                {{ setting.mode | formatMode }}
             </label>
             <div class="col-sm-8">
                 <input
