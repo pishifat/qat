@@ -60,7 +60,7 @@
                 <div v-if="activeApps.length">
                     <div v-for="application in activeApps" :key="application.id">
                         <ul>
-                            <li><b>{{ application.mode == 'osu' ? 'osu!' : 'osu!' + application.mode }}:</b> Application is in progress</li>
+                            <li><b>{{ application.mode | formatMode }}:</b> Application is in progress</li>
                             <ol>
                                 <li class="text-success">Application submitted</li>
                                 <!-- todo: make this account for each mode's -->
@@ -76,15 +76,15 @@
                 <!-- cooldowns -->
                 <ul v-if="cooldowns.length">
                     <li v-for="evaluation in cooldowns" :key="evaluation.id">
-                        <div v-if="evaluation.isApplication"><b>{{ evaluation.mode == 'osu' ? 'osu!' : 'osu!' + evaluation.mode }}:</b> Because <a :href="'/message?eval=' + evaluation.id" target="_blank">your application was denied</a>, you cannot re-apply until <i>{{ new Date(evaluation.cooldownDate) }}</i></div>
-                        <div v-else-if="evaluation.isBnEvaluation"><b>{{ evaluation.mode == 'osu' ? 'osu!' : 'osu!' + evaluation.mode }}:</b> Because <a :href="'/message?eval=' + evaluation.id" target="_blank">you were removed from the BN</a>, you cannot re-apply until <i>{{ new Date(evaluation.cooldownDate) }}</i></div>
-                        <div v-else-if="evaluation.isResignation"><b>{{ evaluation.mode == 'osu' ? 'osu!' : 'osu!' + evaluation.mode }}:</b> Because of <a :href="'/message?eval=' + evaluation.id" target="_blank">the circumstances of your resignation</a>, you cannot re-apply until <i>{{ new Date(evaluation.cooldownDate) }}</i></div>
+                        <div v-if="evaluation.isApplication"><b>{{ evaluation.mode | formatMode }}:</b> Because <a :href="'/message?eval=' + evaluation.id" target="_blank">your application was denied</a>, you cannot re-apply until <i>{{ new Date(evaluation.cooldownDate) }}</i></div>
+                        <div v-else-if="evaluation.isBnEvaluation"><b>{{ evaluation.mode | formatMode }}:</b> Because <a :href="'/message?eval=' + evaluation.id" target="_blank">you were removed from the BN</a>, you cannot re-apply until <i>{{ new Date(evaluation.cooldownDate) }}</i></div>
+                        <div v-else-if="evaluation.isResignation"><b>{{ evaluation.mode | formatMode }}:</b> Because of <a :href="'/message?eval=' + evaluation.id" target="_blank">the circumstances of your resignation</a>, you cannot re-apply until <i>{{ new Date(evaluation.cooldownDate) }}</i></div>
                     </li>
                 </ul>
                 <!-- current BN modes -->
                 <div v-if="loggedInUser.modes && loggedInUser.modes.length">
                     <ul v-for="mode in loggedInUser.modes" :key="mode">
-                        <li v-if="mode != 'none'"><b>{{ mode == 'osu' ? 'osu!' : 'osu!' + mode }}:</b> You're already a BN for this mode!</li>
+                        <li v-if="mode != 'none'"><b>{{ mode | formatMode }}:</b> You're already a BN for this mode!</li>
                     </ul>
                 </div>
             </div>
@@ -96,7 +96,7 @@
             <div class="card card-body">
                 <h4>Bypass application</h4>
                 <p class="mt-2">
-                    This option is available until {{ this.$moment(relevantResignation.archivedAt).add(1, 'years').format('YYYY-MM-DD') }} because you recently resigned from the {{ relevantResignation.mode == 'osu' ? 'osu!' : 'osu!' + relevantResignation.mode }} Beatmap Nominators.
+                    This option is available until {{ this.$moment(relevantResignation.archivedAt).add(1, 'years').format('YYYY-MM-DD') }} because you recently resigned from the {{ relevantResignation.mode | formatMode }} Beatmap Nominators.
                 </p>
                 <p class="mt-2">
                     The NAT will review for any potential concerns and re-admit you to the Beatmap Nominators if everything is okay!
@@ -107,7 +107,7 @@
                     type="button"
                     @click="rejoinApply($event)"
                 >
-                    Request to re-join the Beatmap Nominators ({{ relevantResignation.mode == 'osu' ? 'osu!' : 'osu!' + relevantResignation.mode }})
+                    Request to re-join the Beatmap Nominators ({{ relevantResignation.mode | formatMode }})
                 </button>
                 <p v-if="successInfo" class="mt-2">
                     {{ successInfo }}    
@@ -326,6 +326,7 @@ import ToastMessages from '../components/ToastMessages.vue';
 import ModeSelect from '../components/ModeSelect.vue';
 import ModeDisplay from '../components/ModeDisplay.vue';
 import { mapState } from 'vuex';
+import evaluations from '../mixins/evaluations';
 
 export default {
     name: 'ApplicationSubmission',
@@ -334,6 +335,7 @@ export default {
         ModeSelect,
         ModeDisplay,
     },
+    mixins: [ evaluations ],
     data() {
         return {
             step: 1,
@@ -402,7 +404,7 @@ export default {
             }
 
             if (result) {
-                const result2 = confirm(`Are you sure you want to apply to join the ${this.selectedMode === 'osu' ? 'osu!' : 'osu!' + this.selectedMode} Beatmap Nominators?`);
+                const result2 = confirm(`Are you sure you want to apply to join the ${this.formatMode(this.selectedMode)} Beatmap Nominators?`);
                 if (result2) {
                     this.successInfo = `Submitting... (this will take a few seconds)`;
 

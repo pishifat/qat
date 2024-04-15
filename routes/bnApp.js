@@ -416,7 +416,7 @@ router.post('/rejoinApply', async (req, res) => {
     await discord.webhookPost(
         [{
             author: discord.defaultWebhookAuthor(req.session),
-            description: `Requested to re-join ${mode == 'osu' ? 'osu!' : 'osu!' + mode} BN after recent resignation. See [BN application](http://bn.mappersguild.com/appeval?id=${newBnApp.id})`,
+            description: `Requested to re-join ${util.formatMode(mode)} BN after recent resignation. See [BN application](http://bn.mappersguild.com/appeval?id=${newBnApp.id})`,
             color: discord.webhookColors.lightYellow,
             fields,
         }],
@@ -430,7 +430,7 @@ router.post('/rejoinApply', async (req, res) => {
     // security check webhook
     const embed = [{
         author: discord.defaultWebhookAuthor(req.session),
-        description: `Requested to re-join ${mode == 'osu' ? 'osu!' : 'osu!' + mode} BN after recent resignation.`,
+        description: `Requested to re-join ${util.formatMode(mode)} BN after recent resignation.`,
         color: discord.webhookColors.lightYellow,
         fields,
     }];

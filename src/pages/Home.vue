@@ -14,7 +14,7 @@
             >
                 <table v-for="usersByMode in sorted" :key="usersByMode._id" class="table table-sm table-dark table-hover col-6 col-md-3">
                     <thead>
-                        <td v-if="usersByMode._id != 'none'">{{ usersByMode._id == 'osu' ? 'osu!' : 'osu!' + usersByMode._id }}</td>
+                        <td v-if="usersByMode._id != 'none'">{{ usersByMode._id | formatMode }}</td>
                         <td v-else>Structural NAT (see <a href="https://osu.ppy.sh/wiki/People/Nomination_Assessment_Team#structural">wiki</a>)</td>
                     </thead>
                     <tbody>

@@ -970,7 +970,7 @@ router.post('/:id/addToNat', middlewares.isNat, async (req, res) => {
         [{
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.darkGreen,
-            description: `Moved [**${user.username}**](http://osu.ppy.sh/users/${user.osuId}) to **NAT** (${mode == 'osu' ? 'osu!' : 'osu!' + mode })`,
+            description: `Moved [**${user.username}**](http://osu.ppy.sh/users/${user.osuId}) to **NAT** (${util.formatMode(mode)})`,
         }],
         'all'
     );
@@ -1011,14 +1011,11 @@ router.post('/:id/changeEvaluatorMode', middlewares.isNat, async (req, res) => {
 
     await user.save();
 
-    const oldModeText = oldMode == 'none' ? 'structural' : oldMode == 'osu' ? 'osu!' : 'osu!' + oldMode;
-    const newModeText = mode == 'none' ? 'structural' : mode == 'osu' ? 'osu!' : 'osu!' + mode;
-
     discord.webhookPost(
         [{
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.darkGreen,
-            description: `Moved [**${user.username}**](http://osu.ppy.sh/users/${user.osuId}) from **${oldModeText}** to **${newModeText}** NAT`,
+            description: `Moved [**${user.username}**](http://osu.ppy.sh/users/${user.osuId}) from **${util.formatMode(oldMode)}** to **${util.formatMode(mode)}** NAT`,
         }],
         'all'
     );
@@ -1030,7 +1027,7 @@ router.post('/:id/changeEvaluatorMode', middlewares.isNat, async (req, res) => {
 
     Logger.generate(
         req.session.mongoId,
-        `Moved "${user.username}" from "${oldModeText} NAT" to "${newModeText} NAT"`,
+        `Moved "${user.username}" from "${util.formatMode(oldMode)} NAT" to "${util.formatMode(mode)} NAT"`,
         'user',
         user._id
     );

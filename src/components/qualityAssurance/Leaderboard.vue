@@ -10,7 +10,7 @@
                 <div v-for="(data, i) in leaderboard" :key="i" class="col-sm-3">
                     <div class="card px-2">
                         <p class="font-weight-bold text-center mt-1">
-                            {{ data.mode == 'osu' ? 'osu!' : 'osu!' + data.mode }}
+                            {{ data.mode | formatMode }}
                         </p>
                         <div v-if="data.recentDisplayUsers.length">
                             <p class="ml-2">

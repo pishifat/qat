@@ -138,7 +138,6 @@ function parseTimestamps(text) {
 /**
  * Shuffle an array
  * @param {Array} array
-
  */
 function shuffleArray(array) {
     let currentIndex = array.length, randomIndex;
@@ -178,6 +177,25 @@ function yearsDuration(days) {
     return Math.floor(days / 365);
 }
 
+/**
+ * formats a mode string
+ * @param {string} mode
+ * @returns {string}
+ * 
+ * @example
+ * formatMode('osu'); // returns 'osu!'
+ * formatMode('taiko'); // returns 'osu!taiko'
+ * formatMode('none'); // returns 'structural'
+ */
+function formatMode(mode) {
+    if (!mode) return '';
+
+    if (mode == 'none') return 'structural';
+    else if (mode == 'osu') return 'osu!';
+    else if (mode == 'fruits') return 'osu!catch';
+    else return 'osu!' + mode;
+}
+
 module.exports = {
     escapeUsername,
     getBeatmapsetIdFromUrl,
@@ -191,4 +209,5 @@ module.exports = {
     shuffleArray,
     makeWordFromField,
     yearsDuration,
+    formatMode,
 };
