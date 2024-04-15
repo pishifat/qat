@@ -22,6 +22,7 @@
                     id="messageInput"
                     v-model="messageInput"
                     class="form-control"
+                    maxlength="1000"
                     :placeholder="
                         evaluation.messagesLocked
                             ? 'messages are disabled.'
@@ -30,7 +31,9 @@
                             : 'type a question about your evaluation...'
                     "
                     rows="2"
-                    :disabled="evaluation.messagesLocked" />
+                    :disabled="evaluation.messagesLocked"
+                />
+                <b v-if="messageInput && messageInput.length > 900" :class="messageInput.length == 1000 ? 'text-danger' : messageInput.length > 900 ? 'text-warning' : 'text-secondary'">{{ messageInput.length }}</b>
                 <div class="row">
                     <div :class="loggedInUser.isNat ? 'col-sm-8' : 'col-sm-12'">
                         <button
