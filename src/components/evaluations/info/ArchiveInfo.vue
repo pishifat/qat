@@ -55,7 +55,12 @@
             <hr>
 
             <reviews-listing 
-                v-if="loggedInUser.isNatLeader || !['remainInNat', 'moveToBn', 'removeFromNat'].includes(selectedEvaluation.consensus)"
+                v-if="loggedInUser.isNatLeader || !isNatEvaluation"
+            />
+
+            <evaluation-messages
+                :evaluation="selectedEvaluation"
+                :is-new-evaluation-format="selectedEvaluation.isNewEvaluationFormat"
             />
 
             <button
@@ -79,6 +84,7 @@ import MainApplicationInfo from './applications/MainApplicationInfo.vue';
 import { AppEvaluationConsensus } from '../../../../shared/enums';
 import EvaluationLink from './common/EvaluationLink.vue';
 import UserLink from '../../UserLink.vue';
+import EvaluationMessages from './common/EvaluationMessages.vue';
 
 export default {
     name: 'ArchiveInfo',
@@ -91,6 +97,7 @@ export default {
         MainApplicationInfo,
         EvaluationLink,
         UserLink,
+        EvaluationMessages,
     },
     computed: {
         ...mapState([
@@ -107,6 +114,9 @@ export default {
                 return this.selectedEvaluation.user.modes;
 
             return this.selectedEvaluation.mode;
+        },
+        isNatEvaluation () {
+            return ['remainInNat', 'moveToBn', 'removeFromNat'].includes(this.selectedEvaluation.consensus);
         },
     },
     methods: {

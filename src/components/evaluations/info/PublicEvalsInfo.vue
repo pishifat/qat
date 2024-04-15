@@ -78,6 +78,11 @@
                 <reviews-listing 
                     v-if="loggedInUser.isNatLeader || !isNatEvaluation"
                 />
+
+                <evaluation-messages
+                    :evaluation="selectedEvaluation"
+                    :is-new-evaluation-format="selectedEvaluation.isNewEvaluationFormat"
+                />
             </div>
         </div>
     </modal-dialog>
@@ -94,6 +99,7 @@ import MainApplicationInfo from './applications/MainApplicationInfo.vue';
 import EvaluationLink from './common/EvaluationLink.vue';
 import UserLink from '../../UserLink.vue';
 import EvaluationVisibility from './common/EvaluationVisibility.vue';
+import EvaluationMessages from './common/EvaluationMessages.vue';
 
 export default {
     name: 'PublicEvalsInfo',
@@ -107,6 +113,7 @@ export default {
         EvaluationLink,
         UserLink,
         EvaluationVisibility,
+        EvaluationMessages,
     },
     computed: {
         ...mapState([
