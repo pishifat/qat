@@ -11,9 +11,9 @@ async function executeRequest (requestType, url, data, e, updateLoadingState, st
         let res;
 
         if (requestType == 'post') {
-            res = await Axios.post(url, data);
+            res = await Axios.post('/api' + url, data);
         } else {
-            res = await Axios.get(url);
+            res = await Axios.get('/api' + url);
         }
 
         if (res.data.error) {
