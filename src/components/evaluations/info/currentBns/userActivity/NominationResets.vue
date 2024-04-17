@@ -27,6 +27,14 @@
                         {{ event.timestamp | toMonthDayYear }}
                     </td>
                     <td class="w-25">
+                        <a 
+                            :href="'osu://dl/' + event.beatmapsetId"
+                            data-toggle="tooltip"
+                            data-placement="right"
+                            title="osu!direct download"
+                        >
+                            <i class="fas fa-file-download" />
+                        </a>
                         <a
                             :href="
                                 event.discussionId
@@ -51,7 +59,7 @@
                             data-placement="right"
                             title="total drain time"
                         >
-                            ({{ totalDrain(event.beatmaps)}})
+                            ({{ totalDrain(event.beatmaps) }})
                         </span>
                     </td>
                     <nomination-reset-editing :event="event" />

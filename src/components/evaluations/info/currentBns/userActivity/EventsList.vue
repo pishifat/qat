@@ -16,6 +16,14 @@
                         {{ timestamp(event) | toMonthDayYear }}
                     </td>
                     <td>
+                        <a 
+                            :href="'osu://dl/' + beatmapsetId(event)"
+                            data-toggle="tooltip"
+                            data-placement="right"
+                            title="osu!direct download"
+                        >
+                            <i class="fas fa-file-download" />
+                        </a>
                         <a
                             :href="
                                 'https://osu.ppy.sh/beatmapsets/' +
