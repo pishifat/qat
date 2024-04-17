@@ -41,6 +41,11 @@ const evaluationPopulate = [
     },
 ];
 
+/* GET test endpoint */
+router.get('/', (req, res) => {
+    res.status(200).send({ response: 'Connected', username: req.header('username') });
+});
+
 /* GET users in BN/NAT */
 router.get('/users', async (_, res) => {
     res.json(await User.find({ groups: { $in: ['bn', 'nat'] } }));
