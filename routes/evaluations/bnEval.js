@@ -699,6 +699,7 @@ router.get('/findUserNotes/:id', async (req, res) => {
             user: req.params.id,
             isHidden: { $ne: true },
         })
+        .sort({ createdAt: -1 })
         .populate(notesPopulate);
 
     res.json({ userNotes });
