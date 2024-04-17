@@ -126,12 +126,14 @@ apiRouter.use('/message', messageRouter);
 apiRouter.use('/settings', settingsRouter);
 apiRouter.use('/spam', spamRouter);
 apiRouter.use('/debug', debugRouter);
-apiRouter.use('/groupHistory', groupHistoryRouterapiRouter);
+apiRouter.use('/groupHistory', groupHistoryRouter);
 
 app.use('/api', apiRouter);
 
-// legacy (pre-api) routes
-app.use('/interOp', interOpRouter);
+// don't break 3rd party access
+app.use('/interOp/*', (req, res) => {
+    res.redirect(req.originalUrl.replace('/interOp', '/api/interOp'));
+});
 
 
 // catch 404
