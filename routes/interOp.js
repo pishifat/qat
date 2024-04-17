@@ -20,7 +20,7 @@ router.use((req, res, next) => {
     const isWs = req.header('Upgrade');
 
     if (!secret || !username || config.interOpAccess[username].secret !== secret) {
-        if (isWs != "websocket") return res.status(401).send('Invalid key');
+        if (isWs != "websocket") return res.status(401).send({ error: 'Invalid credentials' });
     }
 
     return next();
@@ -58,8 +58,14 @@ router.get('/users/all', async (_, res) => {
 });
 
 /* GET specific user info */
-router.get('/users/:osuId', async (req, res) => {
-    res.json(await User.findOne({ osuId: parseInt(req.params.osuId) }));
+router.get('/users/:userInput', async (req, res) => {
+    const user = await User.findByUsernameOrOsuId(req.params.userInput);
+
+    if (!user) {
+        res.status(404).send({ error: 'User not found' });
+    }
+
+    res.json(user);
 });
 
 /* GET events for beatmapsetID */
@@ -89,8 +95,8 @@ router.get('/dqInfoByDiscussionId/:discussionId', async (req, res) => {
 });
 
 /* GET activity by user and days */
-router.get('/nominationResets/:osuId/:days/', async (req, res) => {
-    const user = await User.findOne({ osuId: parseInt(req.params.osuId) });
+router.get('/nominationResets/:userInput/:days/', async (req, res) => {
+    const user = await User.findByUsernameOrOsuId(req.params.userInput);
 
     if (!user) {
         return res.status(404).send({ error: 'User not found' });
@@ -158,8 +164,8 @@ router.get('/contentReview/:limit', async (req, res) => {
 // ! NAT-only endpoints
 
 /* GET latest evaluation or appevaluation */
-router.get('/latestEvaluation/:osuId', middlewares.hasPrivateInterOpsAccess, async (req, res) => {
-    const user = await User.findOne({ osuId: parseInt(req.params.osuId) });
+router.get('/latestEvaluation/:userInput', middlewares.hasPrivateInterOpsAccess, async (req, res) => {
+    const user = await User.findByUsernameOrOsuId(req.params.userInput);
 
     if (!user) {
         return res.status(404).send({ error: 'User not found' });
@@ -212,8 +218,8 @@ router.get('/latestEvaluation/:osuId', middlewares.hasPrivateInterOpsAccess, asy
 });
 
 /* GET general reason for BN removal */
-router.get('/bnRemoval/:osuId', middlewares.hasPrivateInterOpsAccess, async (req, res) => {
-    const user = await User.findOne({ osuId: parseInt(req.params.osuId) });
+router.get('/bnRemoval/:userInput', middlewares.hasPrivateInterOpsAccess, async (req, res) => {
+    const user = await User.findByUsernameOrOsuId(req.params.userInput);
 
     if (!user) {
         return res.status(404).send({ error: 'User not found' });
@@ -242,8 +248,8 @@ router.get('/bnRemoval/:osuId', middlewares.hasPrivateInterOpsAccess, async (req
 });
 
 /* GET all of a user's logs */
-router.get('/logs/:osuId/:category', middlewares.hasPrivateInterOpsAccess, async (req, res) => {
-    const user = await User.findOne({ osuId: parseInt(req.params.osuId) });
+router.get('/logs/:userInput/:category', middlewares.hasPrivateInterOpsAccess, async (req, res) => {
+    const user = await User.findByUsernameOrOsuId(req.params.userInput);
 
     if (!user) {
         return res.status(404).send({ error: 'User not found' });
@@ -280,8 +286,8 @@ router.get('/logs/:osuId/:category', middlewares.hasPrivateInterOpsAccess, async
 });
 
 /* GET a user's submitted evaluations */
-router.get('/submittedEvaluations/:osuId/:days', middlewares.hasPrivateInterOpsAccess, async (req, res) => {
-    const user = await User.findOne({ osuId: parseInt(req.params.osuId) });
+router.get('/submittedEvaluations/:userInput/:days', middlewares.hasPrivateInterOpsAccess, async (req, res) => {
+    const user = await User.findByUsernameOrOsuId(req.params.userInput);
     const days = parseInt(req.params.days);
 
     if (!user) {
@@ -329,8 +335,9 @@ router.get('/submittedEvaluations/:osuId/:days', middlewares.hasPrivateInterOpsA
 });
 
 /* GET a user's assigned evaluations */
-router.get('/assignedEvaluations/:osuId/:days', middlewares.hasPrivateInterOpsAccess, async (req, res) => {
-    const user = await User.findOne({ osuId: parseInt(req.params.osuId) });
+router.get('/assignedEvaluations/:userInput/:days', middlewares.hasPrivateInterOpsAccess, async (req, res) => {
+    const user = await User.findByUsernameOrOsuId(req.params.userInput);
+
     const days = parseInt(req.params.days);
 
     if (!user) {
