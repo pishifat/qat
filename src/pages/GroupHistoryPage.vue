@@ -27,18 +27,20 @@
                 <input
                     id="min_date"
                     class="form-control col-md-6"
-                    type="date"
-                    data-toggle="tooltip"
-                    title="start date"
+                    type="text"
                     v-model="params.min_date"
+                    placeholder="start date..."
+                    @focus="setInputType($event, 'date')"
+                    @blur="setInputType($event, 'text')"
                 >
                 <input
                     id="max_date"
                     class="form-control col-md-6"
-                    type="date"
-                    data-toggle="tooltip"
-                    title="end date"
+                    type="text"
                     v-model="params.max_date"
+                    placeholder="end date..."
+                    @focus="setInputType($event, 'date')"
+                    @blur="setInputType($event, 'text')"
                 >
                 <button
                     class="btn btn-primary col-md-12 mt-3"
@@ -178,7 +180,7 @@ export default {
             return type === 'icon' ? icon : text;
         },
         async getHistory() {
-            const response = await this.$http.initialRequest('/groupHistory/get')
+            const response = await this.$http.initialRequest('/groupHistory')
 
             if (this.params.cursor_string) {
                 this.events = this.events.concat(response.data.events);
@@ -188,7 +190,7 @@ export default {
 
             this.params.cursor_string = response.data.cursor_string;
         },
-        async showMore(e) {
+        async showMore(e, clearEvents = false) {
             let params = '';
             for (const key in this.params) {
                 if (this.params[key]) {
@@ -196,20 +198,23 @@ export default {
                 }
             }
 
-            const response = await this.$http.executeGet(`/groupHistory/get?${params}`, e);
 
-            if (response.data.events.length) {
-                this.events = this.events.concat(response.data.events);
-            } else {
-                this.events = response.data.events;
-            }
+            const response = await this.$http.executeGet(`/groupHistory?${params}`, e);
+
+            if (clearEvents) this.events = [];
+
+            if (response.data.events.length) this.events = [...this.events, ...response.data.events]
+            
             this.params.cursor_string = response.data.cursor_string;
         },
         async search(e) {
             this.params.cursor_string = null;
-            this.events = [];   
-            await this.showMore(e)
-        }
+            await this.showMore(e, true)
+        },
+        setInputType(e, type) {
+            if (type === 'text' && e.target.value === '') e.target.type = 'text';
+            else e.target.type = 'date';            
+        },
     },
 };
 </script>
