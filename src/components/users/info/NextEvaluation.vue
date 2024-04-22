@@ -1,61 +1,73 @@
 <template>
-    <p class="form-inline">
-        <b class="mr-1">
-            {{ displayMode ? `Next ${formatMode(mode)} evaluation:` : 'Next evaluation:' }}
-            <span v-if="isEditing">(deadline)</span>
-        </b>
+    <div>
+        <p class="form-inline">
+            <b class="mr-1">
+                {{ displayMode ? `Next ${formatMode(mode)} evaluation:` : 'Next evaluation:' }}
+                <span v-if="isEditing">(deadline)</span>
+            </b>
 
-        <input
-            v-if="isEditing && loggedInUser.isNat"
-            v-model="newDeadlineInput"
-            class="form-control form-control-sm w-50 mb-2"
-            type="text"
-            placeholder="new date (yyyy-mm-dd)"
-            @keyup.enter="adjustEvaluationDeadline($event)"
-        >
-
-        <span v-else>{{ nextEvaluationText }}</span>
-
-        <a
-            v-if="isEditable && loggedInUser.isNat"
-            href="#"
-            data-toggle="tooltip"
-            data-placement="top"
-            title="edit next evaluation date"
-            class="ml-1"
-            @click.prevent="isEditing = !isEditing"
-        >
-            <i class="fas fa-edit" />
-        </a>
-
-        <button 
-            v-if="loggedInUser.isNat" 
-            data-toggle="tooltip"
-            data-placement="top"
-            title="reset next evaluation date to default based on previous evaluations"
-            class="btn btn-sm btn-primary ml-2" type="submit" @click="reset($event)">
-            Reset
-        </button>
-
-        <button
-        v-if="loggedInUser.isNat"
-            data-toggle="tooltip"
-            data-placement="top"
-            title="create an evaluation with a deadline of 7 days from now"
-            class="btn btn-sm btn-nat ml-2" type="submit" @click="createEvaluation($event)"
+            <input
+                v-if="isEditing && loggedInUser.isNat"
+                v-model="newDeadlineInput"
+                class="form-control form-control-sm w-50 mb-2"
+                type="text"
+                placeholder="new date (yyyy-mm-dd)"
+                @keyup.enter="adjustEvaluationDeadline($event)"
             >
-            Create evaluation
-        </button>
-    </p>
+
+            <span 
+                v-else
+                data-toggle="tooltip"
+                data-placement="top"
+                title="evaluation can happen at any time in this interval"
+            >{{ nextEvaluationText }}</span>
+
+            <a
+                v-if="isEditable && loggedInUser.isNat"
+                href="#"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="edit next evaluation date"
+                class="ml-1"
+                @click.prevent="isEditing = !isEditing"
+            >
+                <i class="fas fa-edit" />
+            </a>
+
+            <button 
+                v-if="loggedInUser.isNat" 
+                data-toggle="tooltip"
+                data-placement="top"
+                title="reset next evaluation date to default based on previous evaluations"
+                class="btn btn-sm btn-primary ml-2" type="submit" @click="reset($event)">
+                Reset
+            </button>
+
+            <button
+            v-if="loggedInUser.isNat"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="create an evaluation with a deadline of 7 days from now"
+                class="btn btn-sm btn-nat ml-2" type="submit" @click="createEvaluation($event)"
+                >
+                Create evaluation
+            </button>
+        </p>
+        <progress-bar v-if="displayProgressBar" :evaluation="nextEvaluation" />
+    </div>
 </template>
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import ProgressBar from '../../evaluations/info/common/ProgressBar.vue';
 import evaluations from '../../../mixins/evaluations';
 
 export default {
     name: 'NextEvaluation',
     mixins: [ evaluations ],
+    components: {
+        ProgressBar,
+    },
     props: {
         mode: {
             type: String,
@@ -68,10 +80,12 @@ export default {
     },
     data() {
         return {
+            nextEvaluation: null,
             nextEvaluationText: '...',
             newDeadlineInput: '',
             isEditable: false,
             isEditing: false,
+            displayProgressBar: false,
         };
     },
     computed: {
@@ -118,15 +132,19 @@ export default {
 
                 const nextEvaluationText = `Between ${firstDate.toISOString().slice(0,10)} and ${secondDate.toISOString().slice(0,10)}`;
                 this.nextEvaluationText = nextEvaluationText;
+
+                this.displayProgressBar = today >= firstDate;
+                
             } else {
                 this.nextEvaluationText = deadline;
             }
         },
         async loadNextEvaluation() {
-            const deadline = await this.$http.executeGet(`/users/loadNextEvaluation/${this.selectedUser.id}/${this.mode}`);
+            const evaluation = await this.$http.executeGet(`/users/loadNextEvaluation/${this.selectedUser.id}/${this.mode}`);
 
-            if (deadline) {
-                this.processDeadline(deadline);
+            if (evaluation) {
+                this.processDeadline(evaluation.deadline);
+                this.nextEvaluation = evaluation;
             }
         },
         async adjustEvaluationDeadline() {
