@@ -34,7 +34,7 @@
 
         <select
             v-if="groups && groups.length"
-            id="mode"
+            id="group"
             class="form-control"
             @change="updateFilterGroup(groups[$event.target.selectedIndex])"
         >
