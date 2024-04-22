@@ -93,14 +93,14 @@ router.get('/loadNextEvaluation/:id/:mode', async (req, res) => {
             const noModeEvaluationRound = await BnEvaluation.findOne({ user: req.params.id, active: true });
 
             if (noModeEvaluationRound) {
-                return res.json(noModeEvaluationRound.deadline);
+                return res.json(noModeEvaluationRound);
             }
         }
 
-        return res.json('Never');
+        return res.json({ deadline: 'Never' });
     }
 
-    res.json(er.deadline);
+    res.json(er);
 });
 
 /* POST adjust next evaluation deadline */
