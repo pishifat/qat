@@ -56,7 +56,7 @@
                     name="vote"
                     value="2"
                 >
-                <label class="form-check-label text-neutral" for="2">{{ selectedEvaluation.isApplication ? 'Neutral' : (selectedEvaluation.user.evaluatorModes.includes(selectedEvaluation.mode) || selectedEvaluation.user.evaluatorModes.includes("none")) && loggedInUser.isNatLeader ? 'Investigate' : selectedEvaluation.isBnEvaluation ? 'Probation BN' : 'Resign on standard terms' }}</label>
+                <label class="form-check-label text-neutral" for="2">{{ selectedEvaluation.isApplication ? 'Neutral' : (selectedEvaluation.user.evaluatorModes.includes(selectedEvaluation.mode) || selectedEvaluation.user.evaluatorModes.includes("none")) && loggedInUser.isNatLeader ? 'Investigate' : selectedEvaluation.isBnEvaluation ? 'Warning' : 'Resign on standard terms' }}</label>
             </div>
             <div v-if="!selectedEvaluation.isResignation" class="form-check form-check-inline">
                 <input
