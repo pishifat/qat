@@ -377,7 +377,14 @@ export default {
     watch: {
         selectedMode() {
             this.successInfo = '';
-            this.relevantResignation = [...this.resignations].find(r => r.mode == this.selectedMode);
+            
+            let modes = [];
+
+            if (this.loggedInUser.modes && this.loggedInUser.modes.length) {
+                modes = this.loggedInUser.modes;
+            }
+
+            this.relevantResignation = [...this.resignations].find(r => r.mode == this.selectedMode && !modes.includes(this.selectedMode));
         },
     },
     methods: {
