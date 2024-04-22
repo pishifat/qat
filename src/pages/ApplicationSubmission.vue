@@ -56,20 +56,15 @@
         <template v-if="cooldowns.length || activeApps.length">
             <div class="card card-body">
                 <h4>Application status</h4>
+                <p class="text-secondary small">Applications tend to take around 15 days from submission to be concluded.</p>
                 <!-- active applications -->
                 <div v-if="activeApps.length">
                     <div v-for="application in activeApps" :key="application.id">
                         <ul>
-                            <li><b>{{ application.mode | formatMode }}:</b> Application is in progress</li>
-                            <ol>
-                                <li class="text-success">Application submitted</li>
-                                <!-- todo: make this account for each mode's -->
-                                <li :class="application.discussion || application.reviews.length >= 1 ? 'text-success' : 'text-danger'">Evaluated by 1 of 3 users</li>
-                                <li :class="application.discussion || application.reviews.length >= 2 ? 'text-success' : 'text-danger'">Evaluated by 2 of 3 users</li>
-                                <li :class="application.discussion || application.reviews.length >= 3 ? 'text-success' : 'text-danger'">Evaluated by 3 of 3 users</li>
-                                <li :class="application.consensus ? 'text-success' : 'text-danger'">Consensus set</li>
-                                <li :class="!application.active ? 'text-success' : 'text-danger'">Application returned</li>
-                            </ol>
+                            <li><b>{{ application.mode | formatMode }}:</b> Application is in progress...
+                            <span class="text-secondary small">(applied {{ application.createdAt | toRelativeDate }})</span>
+                            </li>
+                            <progress-bar :evaluation="application" />
                         </ul>
                     </div>
                 </div>
@@ -325,6 +320,7 @@
 import ToastMessages from '../components/ToastMessages.vue';
 import ModeSelect from '../components/ModeSelect.vue';
 import ModeDisplay from '../components/ModeDisplay.vue';
+import ProgressBar from '../components/evaluations/info/common/ProgressBar.vue'
 import { mapState } from 'vuex';
 import evaluations from '../mixins/evaluations';
 
@@ -334,6 +330,7 @@ export default {
         ToastMessages,
         ModeSelect,
         ModeDisplay,
+        ProgressBar,
     },
     mixins: [ evaluations ],
     data() {
