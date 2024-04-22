@@ -10,7 +10,7 @@
             <div class="row mb-3">
                 <div class="col-sm-6">
                     <b>User:</b>
-                    <input v-model="username" class="ml-2 form-control" type="text" placeholder="username or osuID...">
+                    <input v-model="username" class="form-control" type="text" placeholder="username or osuID...">
                 </div>
             </div>
             <div class="row col-sm-6">
