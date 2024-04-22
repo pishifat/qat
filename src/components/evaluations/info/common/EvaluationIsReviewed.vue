@@ -5,7 +5,7 @@
             href="#"
             data-toggle="tooltip"
             data-placement="right"
-            title="toggle review status for evaluation"
+            title="toggle eval review status"
             @click.prevent="toggleEvaluationIsReviewed($event)"
         >
             <font-awesome-icon
@@ -33,7 +33,7 @@ export default {
             if (result && !result.error) {
                 this.$store.commit('evaluations/updateEvaluation', result);
                 this.$store.dispatch('updateToastMessages', {
-                    message: `Toggled feedback sanity check`,
+                    message: `Toggled eval review status`,
                     type: 'success',
                 });
             }  
