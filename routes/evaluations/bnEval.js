@@ -67,7 +67,7 @@ function isValidMode(modeToCheck, isOsu, isTaiko, isCatch, isMania) {
         (modeToCheck == 'mania' && isMania));
 }
 
-/* POST submit or edit eval */
+/* POST manually create eval */
 router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
     const includeFullBns = req.body.groups.includes('fullBn');
     const includeProbationBns = req.body.groups.includes('probationBn');
@@ -159,14 +159,7 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
         error: `Didn't create any`,
     });
 
-    const evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, res.locals.userRequest.isNat);
-
-    res.json({
-        evaluations,
-        failed,
-        success: 'Generated evaluations',
-    });
-
+    // assign users
     let minDate = new Date();
     minDate.setDate(minDate.getDate() + 7);
 
@@ -225,6 +218,14 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
             await discord.userHighlightWebhookPost(er.mode, discordIds);
         }
     }
+
+    const evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, res.locals.userRequest.isNat);
+
+    res.json({
+        evaluations,
+        failed,
+        success: 'Generated evaluations!',
+    });
 
     Logger.generate(
         req.session.mongoId,

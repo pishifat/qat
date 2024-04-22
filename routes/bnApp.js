@@ -284,8 +284,6 @@ router.post('/apply', async (req, res) => {
     // proceed
     res.json(newBnApp);
 
-    Logger.generate(req.session.mongoId, `Applied for ${mode} BN`, 'application', newBnApp._id);
-
     // logs
     Logger.generate(
         req.session.mongoId,
