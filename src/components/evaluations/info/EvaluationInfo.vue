@@ -79,11 +79,11 @@
                     <div id="additionalInfo" class="collapse container mb-4">
                         <evaluator-assignments />
                         <hr>
+                        <user-notes :user-mongo-id="selectedEvaluation.user.id" />
+                        <hr>
                         <previous-evaluations
                             :user-mongo-id="selectedEvaluation.user.id"
                         />
-                        <hr>
-                        <user-notes :user-mongo-id="selectedEvaluation.user.id" />
                         <hr>
                         <user-reports
                             v-if="loggedInUser.isNat"
