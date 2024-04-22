@@ -143,6 +143,104 @@ router.get('/relevantInfo', async (req, res) => {
     });
 });
 
+/* POST manually create a bn application */
+router.post('/AddApplication', middlewares.isNat, async (req, res) => {
+    const username = req.body.username;
+    const mode = req.body.mode;
+    const comment = req.body.comment;
+
+    if (!username || !mode) {
+        return res.json({ error: 'No user or mode specified!' });
+    }
+
+    const user = await User.findByUsernameOrOsuId(username).orFail();
+
+    // check if there's an active app of the same mode
+    const currentBnApp = await AppEvaluation.findOne({
+        user: user.id,
+        mode,
+        active: true,
+    });
+
+    if (currentBnApp) {
+        return res.json({ error: 'User already has an active application for this mode!' });
+    }
+
+    // create app
+    const newBnApp = await AppEvaluation.create({
+        user: user.id,
+        mode,
+        mods: [],
+        reasons: [],
+        oszs: [],
+        comment,
+        isPublic: false,
+    });
+
+    if (!newBnApp) {
+        return res.json({ error: 'Failed to process application!' });
+    }
+
+    // set NAT assignments
+    const assignedNat = await User.getAssignedNat(mode, user.id);
+    newBnApp.natEvaluators = assignedNat;
+
+    let fields = [];
+    let discordIds = [];
+
+    const natList = assignedNat.map(n => n.username).join(', ');
+    const natDiscordIds = assignedNat.map(n => n.discordId);
+    discordIds = discordIds.concat(natDiscordIds);
+
+    fields.push({
+        name: 'Assigned NAT',
+        value: natList,
+    });
+
+    // set trialNat assignments
+    if (await Settings.getModeHasTrialNat(mode)) {
+        const assignedTrialNat = await User.getAssignedTrialNat(mode);
+        newBnApp.bnEvaluators = assignedTrialNat;
+        const trialNatList = assignedTrialNat.map(n => n.username).join(', ');
+        const trialNatDiscordIds = assignedTrialNat.map(n => n.discordId);
+        fields.push({
+            name: 'Assigned BN',
+            value: trialNatList,
+        });
+        discordIds = discordIds.concat(trialNatDiscordIds);
+    }
+
+    // save all assignments
+    await newBnApp.save();
+
+    // NAT webhook
+    await discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            description: `Created [**${user.username}**'s BN application](http://bn.mappersguild.com/appeval?id=${newBnApp.id})`,
+            color: discord.webhookColors.white,
+            fields,
+        }],
+        mode
+    );
+
+    await discord.userHighlightWebhookPost(mode, discordIds);
+
+    const applications = await AppEvaluation.findActiveApps();
+
+    res.json({
+        applications,
+        success: 'Created application!',
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Created a BN application for "${user.username}"`,
+        'appEvaluation',
+        evaluation._id
+    );
+});
+
 /* POST submit or edit eval */
 router.post('/submitEval/:id', middlewares.isBnOrNat, async (req, res) => {
     let evaluation = await AppEvaluation
