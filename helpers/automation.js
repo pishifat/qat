@@ -216,8 +216,8 @@ const lockEvaluationMessages = cron.schedule('0 10 * * *', async () => {
 
     // find relevant evaluations
     const [applications, evaluations] = await Promise.all([
-        AppEvaluation.find({ archivedAt: { $gt: sevenDaysAgo }}),
-        Evaluation.find({ archivedAt: { $gt: sevenDaysAgo }}),
+        AppEvaluation.find({ archivedAt: { $lt: sevenDaysAgo }}),
+        Evaluation.find({ archivedAt: { $lt: sevenDaysAgo }}),
     ]);
 
     const combined = applications.concat(evaluations);
