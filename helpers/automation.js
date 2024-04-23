@@ -216,14 +216,20 @@ const lockEvaluationMessages = cron.schedule('0 10 * * *', async () => {
 
     // find relevant evaluations
     const [applications, evaluations] = await Promise.all([
-        AppEvaluation.find({ archivedAt: { $gt: sevenDaysAgo }}),
-        Evaluation.find({ archivedAt: { $gt: sevenDaysAgo }}),
+        AppEvaluation.find({ 
+            active: false,
+            consensus: { $exists: true },
+            archivedAt:{ $gt: sevenDaysAgo }
+        }),
+        Evaluation.find({ 
+            active: false,
+            consensus: { $exists: true },
+            archivedAt: { $gt: sevenDaysAgo }
+        }),
     ]);
 
-    const combined = applications.concat(evaluations);
-
     // lock anything with inactivity >7d
-    for (const eval of combined) {
+    for (const eval of [...applications, ...evaluations]) {
         if (eval.messages && eval.messages.length) {
             const lastMessageDate = new Date(eval.messages[eval.messages.length - 1].date);
 
