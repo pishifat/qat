@@ -13,7 +13,7 @@ If you want to contribute, make a copy of `config.example.json` titled `config.j
 - `v1token`: osu! apiv1 key
 - `id`: osu! apiv2 oauth id
 - `secret`: osu! apiv2 oauth secret
-- `redirect`: osu! apiv2 oauth redirect (if it isn't `http://localhost:8080/callback` you need to change port in `webpack.dev.config.js` and `/callback` route in `index.js`)
+- `redirect`: osu! apiv2 oauth redirect (if it isn't `http://localhost:8080/api/callback` you need to change port in `webpack.dev.config.js` and `/callback` route in `index.js`)
 - `connection`: connection to mongodb
 - `interOpAccess`: for /interOp routes (optional)
 - `admin`: needed to work with extra site permissions
