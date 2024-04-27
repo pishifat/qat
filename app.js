@@ -53,7 +53,7 @@ global.ws = []; // array to access websocket clients
 const wsServer = new ws.Server({ noServer: true, path: "/websocket/interOp" });
 
 wsServer.on("connection", (socket, request) => {
-	console.log(`${request.headers["x-forwarded-for"] || request.socket.remoteAddress} is connected via websocket`);
+	console.log(`${request.headers['username'] || request.socket.remoteAddress} is connected via websocket`);
 });
 
 // discord embeds
@@ -262,7 +262,7 @@ server.on("upgrade", (request, socket, head) => {
 			if (global.ws[socketIndex]) {
 				clearInterval(global.ws[socketIndex].pingInterval)
 	
-				return console.log(`Stop ping listener for ${request.headers['x-forwarded-for'] || request.socket.remoteAddress}`);
+				return console.log(`Stopped websocket ping listener for ${request.headers['username'] || request.socket.remoteAddress}`);
 			}
 		}
 	
@@ -276,7 +276,7 @@ server.on("upgrade", (request, socket, head) => {
 			}), (err) => {
 				if (err) return stopPingListener;
 	
-				return console.log(`Sent ping for ${request.headers['x-forwarded-for'] || request.socket.remoteAddress}`);
+				return console.log(`Sent websocket ping for ${request.headers['username'] || request.socket.remoteAddress}`);
 			})
 			}, 300000), // Ping at every 5 minutes
 			id: socketId,
