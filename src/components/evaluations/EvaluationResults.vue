@@ -82,7 +82,7 @@
                 <div class="card card-body small mb-4 v-html-content" v-html="$md.render(evaluation.feedback)" />
             </div>
 
-            <div v-if="isNewEvaluationFormat">
+            <div v-if="isNewEvaluationFormat && !evaluation.isNatEvaluation">
                 <h5>Evaluations</h5>
                 <div v-for="review in evaluation.reviews" :key="review.id">
                     <div class="row my-3">
