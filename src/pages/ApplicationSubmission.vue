@@ -65,7 +65,7 @@
                             <span class="text-secondary small">(applied {{ application.createdAt | toRelativeDate }})</span>
                             </li>
                             <progress-bar :evaluation="application" />
-                            <p class="text-secondary small">In total, there are currently <b>{{ totalByMode(application.mode) }}</b> <b v-if="totalByModeOverdue(application.mode)" class="text-warning">({{ totalByModeOverdue(application.mode) }} overdue)</b> {{ application.mode == 'osu' ? 'osu!' : 'osu!' + application.mode }} applications being processed.</p>
+                            <p class="text-secondary small">In total, there are currently <b>{{ totalByMode(application.mode) }}</b> <b v-if="totalByModeOverdue(application.mode)" class="text-warning">({{ totalByModeOverdue(application.mode) }} overdue)</b> {{ application.mode == 'osu' ? 'osu!' : 'osu!' + application.mode }} application(s) being processed.</p>
                         </ul>
                     </div>
                 </div>
@@ -127,7 +127,7 @@
 
             <div v-if="selectedMode.length">
                 <div>
-                    In total, there are currently <b>{{ totalByMode(selectedMode) }}</b> <b v-if="totalByModeOverdue(selectedMode)" class="text-warning">({{ totalByModeOverdue(selectedMode) }} overdue)</b> {{ selectedMode == 'osu' ? 'osu!' : 'osu!' + selectedMode }} applications being processed.
+                    In total, there are currently <b>{{ totalByMode(selectedMode) }}</b> <b v-if="totalByModeOverdue(selectedMode)" class="text-warning">({{ totalByModeOverdue(selectedMode) }} overdue)</b> {{ selectedMode == 'osu' ? 'osu!' : 'osu!' + selectedMode }} application(s) being processed.
                 </div>
                 <div v-if="totalByModeOverdue(selectedMode) > 10">
                     Your application may take a while to process...
