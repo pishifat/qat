@@ -218,6 +218,7 @@ const server = app.listen(port, () => {
         automation.badgeTracker.start();
         automation.notifyBeatmapReports.start();
         automation.spawnProbationEvaluations.start();
+        automation.spawnHighActivityEvaluations.start();
     }
 });
 

@@ -31,8 +31,7 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
     const discussions = parentDiscussions.discussions;
 
     // find database's discussion posts
-    const date = new Date();
-    date.setDate(date.getDate() - 10); // used to be 7, but backlog in qualified maps feed caused duplicate reports
+    const date = moment().subtract(10, 'days').toDate(); // used to be 7, but backlog in qualified maps feed caused duplicate reports
     let beatmapReports = await BeatmapReport.find({ createdAt: { $gte: date } });
     await util.sleep(500);
 
@@ -670,8 +669,7 @@ const badgeTracker = cron.schedule('8 18 * * *', async () => {
  */
 const spawnProbationEvaluations = cron.schedule('0 19 * * *', async () => {
     const probationBns = await User.find({ groups: 'bn', 'modesInfo.level': 'probation' });
-    const newDeadline = new Date();
-    newDeadline.setDate(newDeadline.getDate() + 7);
+    const newDeadline = moment().add(7, 'days').toDate();
 
     for (const bn of probationBns) {
         const pendingEvaluation = await BnEvaluation.findOne({ user: bn._id, active: true, natEvaluators: [] });
@@ -680,6 +678,31 @@ const spawnProbationEvaluations = cron.schedule('0 19 * * *', async () => {
             const nomCount = await scrap.findUniqueNominationsCount(new Date(pendingEvaluation.createdAt), new Date(), bn);
             
             if (nomCount >= 6) {
+                pendingEvaluation.deadline = newDeadline;
+                await pendingEvaluation.save();
+            }
+        }
+    }
+}, {
+    scheduled: false,
+});
+
+/**
+ * bump forward evaluation deadline if user has 30+ nominations since their last evaluation. checked daily
+ */
+const spawnHighActivityEvaluations = cron.schedule('20 32 * * * *', async () => {
+    const bns = await User.find({ groups: 'bn' });
+    const newDeadline = moment().add(7, 'days').toDate();
+
+    for (const bn of bns) {
+        const pendingEvaluation = await BnEvaluation.findOne({ user: bn._id, active: true, natEvaluators: [] });
+
+        if (pendingEvaluation) {
+            const nomCount = await scrap.findUniqueNominationsCount(new Date(pendingEvaluation.createdAt), new Date(), bn);
+            
+            if (nomCount >= 30) {
+                const days = util.findDaysBetweenDates(new Date(), new Date(pendingEvaluation.createdAt));
+                pendingEvaluation.activityToCheck = days;
                 pendingEvaluation.deadline = newDeadline;
                 await pendingEvaluation.save();
             }
@@ -899,5 +922,6 @@ module.exports = {
     checkTenureValidity,
     badgeTracker,
     notifyBeatmapReports,
-    spawnProbationEvaluations
+    spawnProbationEvaluations,
+    spawnHighActivityEvaluations,
 };
