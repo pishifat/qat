@@ -43,7 +43,7 @@ const store = new Vuex.Store({
     },
     actions: {
         async setInitialData ({ commit }) {
-            const { data } = await Axios.get('/me');
+            const { data } = await Axios.get('/api/me');
             commit('setInitialData', data);
         },
     },

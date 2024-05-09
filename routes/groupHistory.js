@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.use(middlewares.isLoggedIn);
 
-router.get('/get', async (req, res) => {
+router.get('/', async (req, res) => {
     let params = req.query;
     try {
         const response = await axios.get('https://osu.ppy.sh/groups/history', {

@@ -112,7 +112,7 @@ export default {
         },
         async submitMediation (e) {
             const data = await this.$http.executePost(
-                `vetoes/submitMediation/${this.selectedVeto.id}`,
+                `/vetoes/submitMediation/${this.selectedVeto.id}`,
                 {
                     mediation: this.mediation,
                     vote: this.vote,

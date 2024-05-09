@@ -53,7 +53,7 @@ global.ws = []; // array to access websocket clients
 const wsServer = new ws.Server({ noServer: true, path: "/websocket/interOp" });
 
 wsServer.on("connection", (socket, request) => {
-	console.log(`${request.headers["x-forwarded-for"] || request.socket.remoteAddress} is connected via websocket`);
+	console.log(`${request.headers['username'] || request.socket.remoteAddress} is connected via websocket`);
 });
 
 // discord embeds
@@ -101,29 +101,40 @@ if (app.get('env') === 'production') {
 
 app.use(session(sessionConfig));
 
-app.use('/', indexRouter);
-app.use('/bnApps', bnAppRouter);
-app.use('/reports', reportsRouter);
-app.use('/appEval', appEvalRouter);
-app.use('/bnEval', bnEvalRouter);
-app.use('/dataCollection', dataCollectionRouter);
-app.use('/evalArchive', evalArchiveRouter);
-app.use('/publicArchive', publicArchiveRouter);
-app.use('/yourEvals', yourEvalsRouter);
-app.use('/manageReports', manageReportsRouter);
-app.use('/users', usersRouter);
-app.use('/users/nat', natRouter);
-app.use('/vetoes', vetoesRouter);
-app.use('/discussionVote', discussionVoteRouter);
-app.use('/qualityassurance', qualityAssuranceRouter);
-app.use('/logs', logsRouter);
-app.use('/interOp', interOpRouter);
-app.use('/modrequests', modRequestsRouter);
-app.use('/message', messageRouter);
-app.use('/settings', settingsRouter);
-app.use('/spam', spamRouter);
-app.use('/debug', debugRouter);
-app.use('/groupHistory', groupHistoryRouter);
+// setup api routes
+const apiRouter = express.Router();
+
+apiRouter.use('/', indexRouter);
+apiRouter.use('/bnApps', bnAppRouter);
+apiRouter.use('/reports', reportsRouter);
+apiRouter.use('/appEval', appEvalRouter);
+apiRouter.use('/bnEval', bnEvalRouter);
+apiRouter.use('/dataCollection', dataCollectionRouter);
+apiRouter.use('/evalArchive', evalArchiveRouter);
+apiRouter.use('/publicArchive', publicArchiveRouter);
+apiRouter.use('/yourEvals', yourEvalsRouter);
+apiRouter.use('/manageReports', manageReportsRouter);
+apiRouter.use('/users', usersRouter);
+apiRouter.use('/users/nat', natRouter);
+apiRouter.use('/vetoes', vetoesRouter);
+apiRouter.use('/discussionVote', discussionVoteRouter);
+apiRouter.use('/qualityassurance', qualityAssuranceRouter);
+apiRouter.use('/logs', logsRouter);
+apiRouter.use('/interOp', interOpRouter);
+apiRouter.use('/modrequests', modRequestsRouter);
+apiRouter.use('/message', messageRouter);
+apiRouter.use('/settings', settingsRouter);
+apiRouter.use('/spam', spamRouter);
+apiRouter.use('/debug', debugRouter);
+apiRouter.use('/groupHistory', groupHistoryRouter);
+
+app.use('/api', apiRouter);
+
+// don't break 3rd party access
+app.use('/interOp/*', (req, res) => {
+    res.redirect(req.originalUrl.replace('/interOp', '/api/interOp'));
+});
+
 
 // catch 404
 app.use(function (req, res) {
@@ -251,7 +262,7 @@ server.on("upgrade", (request, socket, head) => {
 			if (global.ws[socketIndex]) {
 				clearInterval(global.ws[socketIndex].pingInterval)
 	
-				return console.log(`Stop ping listener for ${request.headers['x-forwarded-for'] || request.socket.remoteAddress}`);
+				return console.log(`Stopped websocket ping listener for ${request.headers['username'] || request.socket.remoteAddress}`);
 			}
 		}
 	
@@ -265,7 +276,7 @@ server.on("upgrade", (request, socket, head) => {
 			}), (err) => {
 				if (err) return stopPingListener;
 	
-				return console.log(`Sent ping for ${request.headers['x-forwarded-for'] || request.socket.remoteAddress}`);
+				return console.log(`Sent websocket ping for ${request.headers['username'] || request.socket.remoteAddress}`);
 			})
 			}, 300000), // Ping at every 5 minutes
 			id: socketId,

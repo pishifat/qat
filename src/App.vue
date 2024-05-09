@@ -316,7 +316,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="/logout">
+                            <a class="nav-link" href="/api/logout">
                                 <i class="fas fa-sign-out-alt text-danger" />
                             </a>
                         </li>
@@ -354,7 +354,7 @@
                                 <div v-if="!isPublicPage" class="text-danger font-weight-bold my-3 text-center">
                                     Login first to visit this page!
                                 </div>
-                                <a href="/login" class="btn btn-lg btn-primary" type="submit">
+                                <a href="/api/login" class="btn btn-lg btn-primary" type="submit">
                                     Authorize your osu! account
                                 </a>
                             </div>
