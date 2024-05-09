@@ -5,7 +5,7 @@ const webhookColors = {
 
     lightOrange: 15639928,    // enableBnEvaluators, suggestionReport
     darkOrange: 7092736,      // pending badge
-    orange: 15169835,         // replaceEvaluator, switchBnEvaluator
+    orange: 15169835,         // replaceUser, switchBnEvaluator
 
     lightYellow: 16777104,    // rejoinBnRequest
     darkYellow: 7105536,      // concludeDiscussionVote

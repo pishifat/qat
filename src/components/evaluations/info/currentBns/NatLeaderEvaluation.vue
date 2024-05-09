@@ -1,6 +1,10 @@
 <template>
     <div>
         <div class="row">
+            <p class="col-sm-12" v-if="selectedEvaluation.user.rerolledEvaluationCount">
+                <b>Re-rolled evaluations:</b>
+                {{ selectedEvaluation.user.rerolledEvaluationCount }}
+            </p>
             <div class="col-sm-12">
                 <b>Self-reported summary:</b>
                 <span v-if="selectedEvaluation.selfSummary" class="small" v-html="$md.render(selectedEvaluation.selfSummary.comment)" />

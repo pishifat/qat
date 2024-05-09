@@ -40,7 +40,7 @@ class EvaluationService extends mongoose.Model {
             .populate([
                 {
                     path: 'user',
-                    select: 'username osuId modesInfo groups evaluatorModes',
+                    select: 'username osuId modesInfo groups evaluatorModes rerolledEvaluationCount',
                 },
                 {
                     path: 'natBuddy',

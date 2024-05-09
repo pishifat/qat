@@ -232,7 +232,7 @@ async function setFeedback (evaluation, feedback, session) {
     return evaluation;
 }
 
-async function replaceUser (evaluation, currentUser, evaluatorId, isBn, selectedUserId) {
+async function replaceUser (evaluation, currentUserId, evaluatorId, isBn, selectedUserId) {
     const currentSelection = isBn ? evaluation.bnEvaluators.map(u => u.osuId) : evaluation.natEvaluators.map(u => u.osuId);
     let newEvaluator;
 
@@ -242,7 +242,7 @@ async function replaceUser (evaluation, currentUser, evaluatorId, isBn, selected
         newEvaluator.inBag = false;
         await newEvaluator.save();
     } else {
-        const evaluatorArray = isBn ? await User.getAssignedTrialNat(evaluation.mode, currentSelection, 1) : await User.getAssignedNat(evaluation.mode, currentUser.id, currentSelection, 1);
+        const evaluatorArray = isBn ? await User.getAssignedTrialNat(evaluation.mode, currentSelection, 1) : await User.getAssignedNat(evaluation.mode, currentUserId, currentSelection, 1);
         newEvaluator = evaluatorArray[0];
     }
 

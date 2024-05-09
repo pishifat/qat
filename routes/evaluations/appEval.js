@@ -175,6 +175,7 @@ router.post('/AddApplication', middlewares.isNat, async (req, res) => {
         oszs: [],
         comment,
         isPublic: false,
+        tempDeadline: moment().add(3, 'days').toDate(),
     });
 
     if (!newBnApp) {
@@ -182,7 +183,7 @@ router.post('/AddApplication', middlewares.isNat, async (req, res) => {
     }
 
     // set NAT assignments
-    const assignedNat = await User.getAssignedNat(mode, user.id);
+    const assignedNat = await User.getAssignedNat(mode, user.id, [], 1);
     newBnApp.natEvaluators = assignedNat;
 
     let fields = [];
@@ -476,7 +477,7 @@ router.post('/replaceUser/:id', middlewares.isNat, async (req, res) => {
     let replacement;
 
     if (replaceNat) {
-        replacement = await replaceUser(evaluation, res.locals.userRequest, req.body.evaluatorId, false, req.body.selectedUserId);
+        replacement = await replaceUser(evaluation, res.locals.userRequest.id, req.body.evaluatorId, false, req.body.selectedUserId);
         await evaluation.save();
     } else {
         let invalids = evaluation.bnEvaluators.map(bn => bn.osuId);

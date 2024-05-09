@@ -27,7 +27,7 @@ router.use(middlewares.isNatOrTrialNat);
 const defaultPopulate = [
     {
         path: 'user',
-        select: 'username osuId modesInfo groups evaluatorModes',
+        select: 'username osuId modesInfo groups evaluatorModes rerolledEvaluationCount',
     },
     {
         path: 'natEvaluators',
@@ -724,7 +724,7 @@ router.post('/replaceUser/:id', middlewares.isNat, async (req, res) => {
         .populate(defaultPopulate)
         .orFail();
 
-    let newEvaluator = await replaceUser(evaluation, res.locals.userRequest, req.body.evaluatorId, !replaceNat, req.body.selectedUserId);
+    let newEvaluator = await replaceUser(evaluation, res.locals.userRequest.id, req.body.evaluatorId, !replaceNat, req.body.selectedUserId);
 
     evaluation = await Evaluation
         .findById(req.params.id)

@@ -18,6 +18,7 @@ const Report = require('../models/report');
 const Logger = require('../models/log');
 const ResignationEvaluation = require('../models/evaluations/resignationEvaluation');
 const Settings = require('../models/settings');
+const { replaceUser } = require('../routes/evaluations/evaluations');
 
 /**
  * Beatmap report feed every hour
@@ -331,6 +332,11 @@ const notifyVetoes = cron.schedule('1 17 * * *', async () => {
 
 /**
  * send webhooks for active applications
+ * 
+ * how to revert to previous eval assignment system:
+ * 1. in this function, remove "rerollUser", the (!app.discussion) conditional in (today > deadline) conditional, and (rerollUser) conditional
+ * 2. remove all instances of "tempDeadline" and "rerolledEvaluationCount"
+ * 3. change getAssignedNat functions to not use sampleSize 1
  */
 const notifyApplicationEvaluations = cron.schedule('2 17 * * *', async () => {
     const activeApps = await AppEvaluation.findActiveApps();
@@ -339,11 +345,12 @@ const notifyApplicationEvaluations = cron.schedule('2 17 * * *', async () => {
 
     // process apps
     for (const app of activeApps) {
-        const deadline = new Date(app.deadline);
+        const deadline = app.discussion || !app.tempDeadline ? app.deadline : new Date(app.tempDeadline);
 
         let description = `[**${app.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${app.id}) `;
         let color;
         let generateWebhook;
+        let rerollUser;
 
         // set webhook content based on deadline
         if (today > deadline) {
@@ -351,6 +358,16 @@ const notifyApplicationEvaluations = cron.schedule('2 17 * * *', async () => {
             description += `was due ${days == 0 ? 'today!' : days == 1 ? days + ' day ago!' : days + ' days ago!'}`;
             color = discord.webhookColors.red;
             generateWebhook = true;
+
+            if (!app.discussion && app.tempDeadline) {
+                const reviewerIds = app.reviews.map(r => r.evaluator.id);
+
+                for (const user of app.natEvaluators) {
+                    if (!reviewerIds.includes(user.id)) {
+                        rerollUser = user; // there should only be one
+                    }
+                }
+            }
         } else if (tomorrow > deadline) {
             description += 'is due in less than 24 hours!';
             color = discord.webhookColors.lightRed;
@@ -359,7 +376,7 @@ const notifyApplicationEvaluations = cron.schedule('2 17 * * *', async () => {
 
         // send webhooks
         if (generateWebhook) {
-            const evaluators = await Settings.getModeHasTrialNat(app.mode) ? app.natEvaluators.concat(app.bnEvaluators) : app.natEvaluators;
+            let evaluators = await Settings.getModeHasTrialNat(app.mode) ? app.natEvaluators.concat(app.bnEvaluators) : app.natEvaluators;
             description += scrap.findEvaluatorStatuses(app.reviews, evaluators, app.discussion);
             description += scrap.findMissingContent(app.discussion, app.consensus);
 
@@ -373,7 +390,35 @@ const notifyApplicationEvaluations = cron.schedule('2 17 * * *', async () => {
             );
             await util.sleep(500);
 
-            // discord ping webhook
+            if (rerollUser) {
+                // replace user, count skipped evaluation
+                const replacement = await replaceUser(app, app.user.id, rerollUser.id, false, null);
+                app.tempDeadline = moment().add(3, 'days').toDate();
+                rerollUser.rerolledEvaluationCount = rerollUser.rerolledEvaluationCount ? rerollUser.rerolledEvaluationCount++ : 1;
+                await Promise.all([
+                    app.save(),
+                    rerollUser.save(),
+                ]);
+
+                // replace user webhook
+                await discord.webhookPost(
+                    [{
+                        color: discord.webhookColors.orange,
+                        description: `Replaced **${rerollUser.username}** with **${replacement.username}** as NAT evaluator for [**${app.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${app.id})`,
+                    }],
+                    app.mode
+                );
+                await util.sleep(500);
+
+                // get updated evaluators
+                await app.populate([
+                    { path: 'bnEvaluators', select: 'username osuId discordId isBnEvaluator' },
+                    { path: 'natEvaluators', select: 'username osuId discordId isBnEvaluator' },
+                ]).execPopulate();
+                evaluators = await Settings.getModeHasTrialNat(app.mode) ? app.natEvaluators.concat(app.bnEvaluators) : app.natEvaluators;
+            }
+
+            // ping users
             const discordIds = discord.findEvaluatorHighlights(app.reviews, evaluators, app.discussion);
 
             if (discordIds && discordIds.length) {

@@ -54,6 +54,7 @@ interface IUser {
     requestInfo: string;
     lastOpenedForRequests: Date;
     isActiveContentReviewer: boolean;
+    rerolledEvaluationCount: number;
 
     // not used in model
     genreCount: number;

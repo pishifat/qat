@@ -216,6 +216,7 @@ router.post('/apply', async (req, res) => {
             oszs,
             comment,
             isPublic,
+            tempDeadline: moment().add(3, 'days').toDate(),
         });
 
     if (!newBnApp) {
@@ -223,7 +224,7 @@ router.post('/apply', async (req, res) => {
     }
 
     // set NAT assignments
-    const assignedNat = await User.getAssignedNat(mode, req.session.mongoId);
+    const assignedNat = await User.getAssignedNat(mode, req.session.mongoId, [], 1);
     newBnApp.natEvaluators = assignedNat;
 
     let fields = [];
