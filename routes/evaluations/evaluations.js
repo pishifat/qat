@@ -63,7 +63,7 @@ function formatConsensus(evaluationKind, totalPass, totalNeutral, totalFail) {
     return consensus;
 }
 
-async function submitEval (evaluation, session, isNat, behaviorComment, moddingComment, vote) {
+async function submitEval (evaluation, session, isNat, comment, vote) {
     let review = evaluation.reviews.find(e => e.evaluator._id.toString() == session.mongoId);
     let isNewEvaluation = false;
 
@@ -73,8 +73,7 @@ async function submitEval (evaluation, session, isNat, behaviorComment, moddingC
         review.evaluator = session.mongoId;
     }
 
-    review.behaviorComment = util.parseTimestamps(behaviorComment);
-    review.moddingComment = util.parseTimestamps(moddingComment);
+    review.moddingComment = util.parseTimestamps(comment);
     review.vote = vote;
     await review.save();
 
@@ -102,17 +101,20 @@ async function submitEval (evaluation, session, isNat, behaviorComment, moddingC
 
         if (isNat && !evaluation.discussion) {
             let totalPass = 0;
+            let totalNatPass = 0;
             let totalNeutral = 0;
             let totalFail = 0;
             let totalNatFail = 0;
             let totalNat = 1; // +1 because r.evaluator isn't an user object just the ID so won't be counted in
 
+            if (vote == 1 && isNat) totalNatPass++;
             if (vote == 3 && isNat) totalNatFail++;
 
             for (const review of evaluation.reviews) {
                 if (review.evaluator.isNat || review.evaluator.isTrialNat) {
                     totalNat++;
                     
+                    if (review.vote == 1) totalNatPass++;
                     if (review.vote == 3) totalNatFail++;
                 }
                 if (review.vote == 1) totalPass++;
@@ -120,7 +122,7 @@ async function submitEval (evaluation, session, isNat, behaviorComment, moddingC
                 else if (review.vote == 3) totalFail++;
             }
 
-            if (totalNat >= evaluationsRequired || (totalNat == (evaluationsRequired - 1) && totalNat == totalNatFail)) {
+            if (totalNat >= evaluationsRequired || (totalNat == (evaluationsRequired - 1) && (totalNat == totalNatFail || totalNat == totalNatPass))) {
                 evaluation.discussion = true;
                 await evaluation.save();
 

@@ -85,7 +85,6 @@ export default {
     data() {
         return {
             moddingComment: '',
-            behaviorComment: '',
             vote: 0,
             evaluationId: null,
         };
@@ -96,7 +95,6 @@ export default {
         ]),
         ...mapState('evaluations', [
             'previewModdingComment',
-            'previewBehaviorComment',
         ]),
         ...mapGetters('evaluations', [
             'selectedEvaluation',
@@ -109,9 +107,6 @@ export default {
         moddingComment() {
             this.updateLocalStorage('mod', this.moddingComment);
         },
-        behaviorComment() {
-            this.updateLocalStorage('behavior', this.behaviorComment);
-        },
     },
     mounted() {
         this.findUserReview();
@@ -120,9 +115,6 @@ export default {
         togglePreviewModdingComment() {
             this.$store.commit('evaluations/togglePreviewModdingComment');
         },
-        togglePreviewBehaviorComment() {
-            this.$store.commit('evaluations/togglePreviewBehaviorComment');
-        },
         updateLocalStorage(type, text) {
             window.localStorage.setItem(this.selectedEvaluation.id + type, text);
         },
@@ -130,30 +122,20 @@ export default {
             if (window.localStorage.getItem(this.selectedEvaluation.id + 'mod')) {
                 window.localStorage.removeItem(this.selectedEvaluation.id + 'mod');
             }
-
-            if (window.localStorage.getItem(this.selectedEvaluation.id + 'behavior')) {
-                window.localStorage.removeItem(this.selectedEvaluation.id + 'behavior');
-            }
         },
         findUserReview() {
             this.moddingComment = '';
-            this.behaviorComment = '';
             this.vote = 0;
             this.evaluationId = null;
             const review = this.selectedEvaluation.reviews.find(r => r.evaluator && r.evaluator.id == this.loggedInUser.id);
 
             if (review) {
                 this.evaluationId = review.id || null;
-                this.behaviorComment = review.behaviorComment || '';
                 this.moddingComment = review.moddingComment || '';
                 this.vote = review.vote || 0;
             } else {
                 if (window.localStorage.getItem(this.selectedEvaluation.id + 'mod')) {
                     this.moddingComment = window.localStorage.getItem(this.selectedEvaluation.id + 'mod');
-                }
-
-                if (window.localStorage.getItem(this.selectedEvaluation.id + 'behavior')) {
-                    this.behaviorComment = window.localStorage.getItem(this.selectedEvaluation.id + 'behavior');
                 }
             }
         },
@@ -168,7 +150,6 @@ export default {
                     `/${this.selectedEvaluation.isApplication ? 'appEval' : 'bnEval'}/submitEval/${this.selectedEvaluation.id}`, {
                         vote: this.vote,
                         moddingComment: this.moddingComment,
-                        behaviorComment: this.behaviorComment,
                     }, e);
 
                 if (result && !result.error) {

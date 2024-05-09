@@ -14,7 +14,6 @@ export default {
         checkedEvaluations: [],
         previewFeedback: false,
         previewModdingComment: false,
-        previewBehaviorComment: false,
     }),
     mutations: {
         resetState (state) {
@@ -23,7 +22,6 @@ export default {
             state.checkedEvaluations = [];
             state.previewFeedback = false;
             state.previewModdingComment = false;
-            state.previewBehaviorComment = false;
         },
         setEvaluations (state, evaluations) {
             state.evaluations = evaluations;
@@ -36,9 +34,6 @@ export default {
         },
         togglePreviewModdingComment (state) {
             state.previewModdingComment = !state.previewModdingComment;
-        },
-        togglePreviewBehaviorComment (state) {
-            state.previewBehaviorComment = !state.previewBehaviorComment;
         },
 
         // modify data

@@ -21,7 +21,7 @@ class AppEvaluationService extends mongoose.Model {
     }
 
     get deadline () {
-        let delay = this.isRejoinRequest ? 1 : this.discussion ? 14 : 7;
+        let delay = this.isRejoinRequest ? 1 : this.discussion ? 14 : 9;
         let createdAt = this.createdAt;
 
         return new Date(createdAt.setDate(createdAt.getDate() + delay));

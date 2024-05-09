@@ -248,7 +248,6 @@ router.post('/submitEval/:id', middlewares.isNatOrTrialNat, async (req, res) => 
         evaluation,
         req.session,
         res.locals.userRequest.isNat || res.locals.userRequest.isTrialNat,
-        req.body.behaviorComment,
         req.body.moddingComment,
         req.body.vote,
     );

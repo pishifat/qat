@@ -337,6 +337,7 @@ const notifyVetoes = cron.schedule('1 17 * * *', async () => {
  * 1. in this function, remove "rerollUser", the (!app.discussion) conditional in (today > deadline) conditional, and (rerollUser) conditional
  * 2. remove all instances of "tempDeadline" and "rerolledEvaluationCount"
  * 3. change getAssignedNat functions to not use sampleSize 1
+ * 4. remove conditional in appEval.js /submitEval
  */
 const notifyApplicationEvaluations = cron.schedule('2 17 * * *', async () => {
     const activeApps = await AppEvaluation.findActiveApps();
@@ -359,7 +360,7 @@ const notifyApplicationEvaluations = cron.schedule('2 17 * * *', async () => {
             color = discord.webhookColors.red;
             generateWebhook = true;
 
-            if (!app.discussion && app.tempDeadline) {
+            if (!app.discussion && app.tempDeadline && today > app.deadline) {
                 const reviewerIds = app.reviews.map(r => r.evaluator.id);
 
                 for (const user of app.natEvaluators) {
