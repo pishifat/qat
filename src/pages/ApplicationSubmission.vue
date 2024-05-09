@@ -65,6 +65,7 @@
                             <span class="text-secondary small">(applied {{ application.createdAt | toRelativeDate }})</span>
                             </li>
                             <progress-bar :evaluation="application" />
+                            <p class="text-secondary small">In total, there are currently <b>{{ totalByMode(application.mode) }}</b> <b v-if="totalByModeOverdue(application.mode)" class="text-warning">({{ totalByModeOverdue(application.mode) }} overdue)</b> {{ application.mode == 'osu' ? 'osu!' : 'osu!' + application.mode }} applications being processed.</p>
                         </ul>
                     </div>
                 </div>
@@ -122,6 +123,15 @@
                     v-model="selectedMode"
                     :max-selection="1"
                 />
+            </div>
+
+            <div v-if="selectedMode.length">
+                <div>
+                    In total, there are currently <b>{{ totalByMode(selectedMode) }}</b> <b v-if="totalByModeOverdue(selectedMode)" class="text-warning">({{ totalByModeOverdue(selectedMode) }} overdue)</b> {{ selectedMode == 'osu' ? 'osu!' : 'osu!' + selectedMode }} applications being processed.
+                </div>
+                <div v-if="totalByModeOverdue(selectedMode) > 10">
+                    Your application may take a while to process...
+                </div>
             </div>
 
             <hr />
@@ -347,6 +357,7 @@ export default {
             comment: '',
             isPublic: false,
             successInfo: '',
+            totalActiveApplications: [],
         };
     },
     async created() {
@@ -356,6 +367,7 @@ export default {
             this.resignations = data.resignations;
             this.activeApps = data.activeApps;
             this.cooldowns = data.cooldowns;
+            this.totalActiveApplications = data.totalActiveApplications;
         }
 
         // this won't show selectedMode, but it'll filter relevantResignation and show the associated rejoin option if applicable
@@ -385,6 +397,12 @@ export default {
         },
     },
     methods: {
+        totalByMode(mode) {
+            return this.totalActiveApplications.filter(a => a.mode == mode).length;
+        },
+        totalByModeOverdue(mode) {
+            return this.totalActiveApplications.filter(a => a.mode == mode && new Date(a.deadline) < new Date()).length;
+        },
         missingInput(array) {
             if (array.length < 3 || !array[0] || !array[1] || !array[2]) {
                 return true;

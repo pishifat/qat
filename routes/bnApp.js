@@ -20,7 +20,7 @@ router.use(middlewares.isLoggedIn);
 router.get('/relevantInfo', async (req, res) => {
     const oneYearAgo = moment().subtract(1, 'years').toDate();
 
-    let [resignations, activeApps, cooldownApps, cooldownEvals, cooldownResignations] = await Promise.all([
+    let [resignations, activeApps, cooldownApps, cooldownEvals, cooldownResignations, totalActiveApplications] = await Promise.all([
         ResignationEvaluation
             .find({
                 user: req.session.mongoId,
@@ -52,12 +52,18 @@ router.get('/relevantInfo', async (req, res) => {
             active: false,
             cooldownDate: { $gt: new Date() }
         }),
+        AppEvaluation
+            .find({
+                active: true,
+            })
+            .select('createdAt mode'),
     ]);
 
     res.json({
         resignations,
         activeApps,
         cooldowns: [].concat(cooldownApps, cooldownEvals, cooldownResignations),
+        totalActiveApplications,
     });
 });
 
