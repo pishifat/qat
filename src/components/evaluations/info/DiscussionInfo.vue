@@ -15,7 +15,7 @@
                     </div>
                     <div class="col-sm-3">
                         <evaluation-is-reviewed
-                            v-if="loggedInUser.isNat && selectedEvaluation.consensus"
+                            v-if="loggedInUser.isNat && selectedEvaluation.consensus && !selectedEvaluation.isResignation"
                             :feedback="selectedEvaluation.feedback"
                         />
                     </div>

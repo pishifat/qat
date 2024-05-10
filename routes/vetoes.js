@@ -180,10 +180,21 @@ router.post('/submitMediation/:id', middlewares.isBnOrNat, async (req, res) => {
     }
 
     if (isFirstComment) {
+        let description = `Submitted opinion on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`;
+
+        if (veto.reasons.length > 1) {
+            for (let i = 0; i < veto.reasons.length; i++) {
+                const submittedFilteredMediations = veto.mediations.filter(mediation => mediation.vote && mediation.reasonIndex == i);
+                description += `\n- **Reason ${i + 1}:** ${veto.reasons[i].summary} (${submittedFilteredMediations.length}/${veto.mediations.length / veto.reasons.length})`;
+            }
+        } else {
+            description += ` (${count}/${veto.mediations.length})`;
+        }
+
         discord.webhookPost([{
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.lightPurple,
-            description: `Submitted opinion on [veto for **${veto.beatmapTitle}** (${count}/${veto.mediations.length})](https://bn.mappersguild.com/vetoes?id=${veto.id})`,
+            description,
         }],
             veto.mode);
     }

@@ -182,6 +182,9 @@ export default {
                             message +=  `your resignation will be on standard terms.`;
                         }
 
+                        message += `\n\n`;
+                        message += `review your evaluation here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id}`;
+
                     // kick
                     } else {
                         message +=  `you have been removed from the Beatmap Nominators :(`;
@@ -196,7 +199,7 @@ export default {
                     }
                     
                     // reapply date
-                    message += `If you want to apply for BN again, you may do so on **${this.toStandardDate(this.selectedEvaluation.cooldownDate)}**`;
+                    message += `If you want to apply for BN again, you may do so on **${this.toStandardDate(this.selectedEvaluation.cooldownDate)}**.`;
                     message += `\n\n`;
 
                     if (this.selectedEvaluation.isResignation && this.positiveConsensus) {
