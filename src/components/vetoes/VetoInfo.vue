@@ -10,17 +10,17 @@
         <div v-if="selectedVeto" class="container">
             <context />
 
-            <!-- show vote count to NAT who aren't active mediators -->
-            <vote-count 
-                v-if="loggedInUser.isNat && selectedVeto.status == 'archive' && !isMediator" 
-            />
-
             <!-- show mediations to NAT if they're not active mediators -->
             <div v-if="showMediations">
                 <hr>
                 <mediations />
-                <hr>
             </div>
+
+            <!-- show vote count to NAT who aren't active mediators -->
+            <vote-count 
+                v-if="loggedInUser.isNat && !isMediator" 
+            />
+            <hr>
 
             <!-- show admin buttons to NAT who aren't active mediators -->
             <admin-buttons
