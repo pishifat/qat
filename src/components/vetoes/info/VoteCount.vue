@@ -3,33 +3,38 @@
         <hr>
         <b>Stats:</b>
 
-        <ul>
-            <li>
-                <label class="mb-0" data-toggle="tooltip" data-placement="right" title="% of submitted votes">
-                    <b>Agree:</b> {{ upholdMediations.length }} ({{ Math.round(upholdMediations.length / submittedVotes * 100) || '0' }}%)
-                </label>
-            </li>
-            <li v-if="neutralMediations.length" >
-                <label class="mb-0" data-toggle="tooltip" data-placement="right" title="% of submitted votes">
-                    <b>Partially Agree:</b> {{ neutralMediations.length }} ({{ Math.round(neutralMediations.length / submittedVotes * 100) || '0' }}%)
-                </label>
-            </li>
-            <li>
-                <label class="mb-0" data-toggle="tooltip" data-placement="right" title="% of submitted votes">
-                    <b>Disagree:</b> {{ withdrawMediations.length }} ({{ Math.round(withdrawMediations.length / submittedVotes * 100) || '0' }}%)
-                </label>
-            </li>
-            <li>
-                <label class="mb-0" data-toggle="tooltip" data-placement="right" title="% of assigned mediators">
-                    <b>Submitted votes:</b> {{ submittedVotes }} ({{ Math.round(submittedVotes / selectedVeto.mediations.length * 100) || '0' }}%)
-                </label>
-            </li>
-            <li>
-                <label class="mb-0" data-toggle="tooltip" data-placement="right" title="users involved">
-                    <b>Assigned mediators:</b> {{ selectedVeto.mediations.length / selectedVeto.reasons.length }}
-                </label>
-            </li>
-        </ul>
+        <div v-if="selectedVeto.vetoFormat >= 2">
+            <div v-for="(reason, reasonIndex) in selectedVeto.reasons" :key="reasonIndex">
+                <a v-if="selectedVeto.reasons.length > 1" :href="reason.link" target="_blank">{{ reasonIndex + 1 }}. {{ reason.summary }}</a>
+                <ul>
+                    <li>
+                        <label class="mb-0" data-toggle="tooltip" data-placement="right" title="% of submitted votes">
+                            <b>Agree:</b> {{ filterMediationsByIndex(upholdMediations, reasonIndex).length }} ({{ Math.round(filterMediationsByIndex(upholdMediations, reasonIndex).length / submittedVotes * 100) || '0' }}%)
+                        </label>
+                    </li>
+                    <li v-if="filterMediationsByIndex(neutralMediations, reasonIndex).length" >
+                        <label class="mb-0" data-toggle="tooltip" data-placement="right" title="% of submitted votes">
+                            <b>Partially Agree:</b> {{ filterMediationsByIndex(neutralMediations, reasonIndex).length }} ({{ Math.round(filterMediationsByIndex(neutralMediations, reasonIndex).length / submittedVotes * 100) || '0' }}%)
+                        </label>
+                    </li>
+                    <li>
+                        <label class="mb-0" data-toggle="tooltip" data-placement="right" title="% of submitted votes">
+                            <b>Disagree:</b> {{ filterMediationsByIndex(withdrawMediations, reasonIndex).length }} ({{ Math.round(filterMediationsByIndex(withdrawMediations, reasonIndex).length / submittedVotes * 100) || '0' }}%)
+                        </label>
+                    </li>
+                    <li>
+                        <label class="mb-0" data-toggle="tooltip" data-placement="right" title="% of assigned mediators">
+                            <b>Submitted votes:</b> {{ filterMediationsByIndex(validMediations, reasonIndex).length }} ({{ Math.round(filterMediationsByIndex(validMediations, reasonIndex).length / selectedVeto.mediations.length * 100) || '0' }}%)
+                        </label>
+                    </li>
+                    <li>
+                        <label class="mb-0" data-toggle="tooltip" data-placement="right" title="users involved">
+                            <b>Assigned mediators:</b> {{ selectedVeto.mediations.length / selectedVeto.reasons.length }}
+                        </label>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -54,6 +59,14 @@ export default {
         submittedVotes () {
             return this.upholdMediations.length + this.neutralMediations.length + this.withdrawMediations.length;
         },
+        validMediations () {
+            return this.selectedVeto.mediations.filter(mediation => mediation.vote);
+        }
     },
+    methods: {
+        filterMediationsByIndex(mediations, index) {
+            return mediations.filter(mediation => mediation.reasonIndex == index);
+        },
+    }
 };
 </script>
