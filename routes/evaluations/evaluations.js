@@ -122,7 +122,7 @@ async function submitEval (evaluation, session, isNat, comment, vote) {
                 else if (review.vote == 3) totalFail++;
             }
 
-            if (totalNat >= evaluationsRequired || (totalNat == (evaluationsRequired - 1) && (totalNat == totalNatFail || totalNat == totalNatPass))) {
+            if (totalNat >= evaluationsRequired || (totalNat == (evaluationsRequired - 1) && (totalNat == totalNatFail || (evaluation.isApplication && totalNat == totalNatPass)))) {
                 evaluation.discussion = true;
                 await evaluation.save();
 
