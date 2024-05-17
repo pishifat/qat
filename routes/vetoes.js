@@ -370,11 +370,11 @@ router.post('/sendMessages/:id', middlewares.isNat, async (req, res) => {
         description: 'Request to participate in a veto mediation',
     }
 
-    /*const message = await osuBot.sendAnnouncement(osuIds, channel, req.body.message);
+    const message = await osuBot.sendAnnouncement(osuIds, channel, req.body.message);
 
     if (message !== true) {
         return res.json({ error: `Messages were not sent. Please let pishifat know!` });
-    }*/
+    }
 
     res.json({ success: 'Messages sent! A copy was sent to you for confirmation' });
 
