@@ -32,6 +32,7 @@
                 </li>
             </ul>
         </div>
+        <hr>
     </div>
 </template>
 

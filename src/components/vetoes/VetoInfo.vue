@@ -20,7 +20,6 @@
             <vote-count 
                 v-if="loggedInUser.isNat && !isMediator" 
             />
-            <hr>
 
             <!-- show admin buttons to NAT who aren't active mediators -->
             <admin-buttons

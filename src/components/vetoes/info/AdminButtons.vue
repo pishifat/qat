@@ -44,7 +44,6 @@
 
         <!-- set up veto for mediation -->
         <div v-else-if="selectedVeto.status !== 'archive'">
-            <hr>
 
             <!-- specify mediators -->
             <div class="mb-2">
