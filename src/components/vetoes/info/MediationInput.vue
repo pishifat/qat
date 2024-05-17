@@ -28,7 +28,7 @@
                         :name="'vote' + i"
                         value="1"
                     >
-                    <label class="form-check-label text-success" for="1">Agree</label>
+                    <label class="form-check-label text-success" for="1">Agree with the veto</label>
                 </div>
 
                 <div class="form-check form-check-inline">
@@ -40,7 +40,7 @@
                         :name="'vote' + i"
                         value="3"
                     >
-                    <label class="form-check-label text-danger" for="3">Disagree</label>
+                    <label class="form-check-label text-danger" for="3">Disagree with the veto</label>
                 </div>
                 <b v-if="input.comments[i] && input.comments[i].length > 250" :class="input.comments[i].length == 500 ? 'text-danger' : input.comments[i].length > 400 ? 'text-warning' : 'text-secondary'">{{ input.comments[i].length }}</b>
             </div>
