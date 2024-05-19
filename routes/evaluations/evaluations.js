@@ -47,7 +47,7 @@ function formatConsensus(evaluationKind, totalPass, totalNeutral, totalFail) {
 
     if (evaluationKind === EvaluationKind.BnEvaluation) {
         passText = 'Full BN';
-        neutralText = 'Probation BN';
+        neutralText = 'Warning';
         failText = 'Remove from BN';
     } else if (evaluationKind === EvaluationKind.Resignation) {
         passText = 'Resign on good terms';
