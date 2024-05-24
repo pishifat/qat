@@ -393,7 +393,9 @@ export default {
                 modes = this.loggedInUser.modes;
             }
 
-            this.relevantResignation = [...this.resignations].find(r => r.mode == this.selectedMode && !modes.includes(this.selectedMode));
+            if (!this.cooldowns.length) {
+                this.relevantResignation = [...this.resignations].find(r => r.mode == this.selectedMode && !modes.includes(this.selectedMode));
+            }
         },
     },
     methods: {
