@@ -613,9 +613,7 @@ router.post('/setAddition/:id', middlewares.isNatOrTrialNat, async (req, res) =>
 
     evaluation.addition = req.body.addition;
 
-    if (req.body.addition == BnEvaluationAddition.LowActivityWarning) {
-        evaluation.cooldownDate = new Date();
-    } else if (evaluation.consensus === BnEvaluationConsensus.RemoveFromBn) {
+    if (evaluation.consensus === BnEvaluationConsensus.RemoveFromBn) {
         const date = new Date();
         date.setDate(date.getDate() + 60);
         evaluation.cooldownDate = date;
