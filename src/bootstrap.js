@@ -3,6 +3,7 @@ import MarkdownIt from 'markdown-it';
 import moment from 'moment';
 import MarkdownItVideo from 'markdown-it-video';
 import http from './store/http';
+import osuTimestamps from './bootstrap/markdown-it-osu-timestamps';
 
 const md = new MarkdownIt('default', {
     html: false,
@@ -13,6 +14,7 @@ const md = new MarkdownIt('default', {
 })
     .enable(['emphasis', 'linkify', 'newline', 'link', 'image', 'heading', 'list', 'hr', 'code'])
     .disable(['lheading'])
+    .use(osuTimestamps)
     .use(MarkdownItVideo);
 
 // Remember old renderer, if overridden, or proxy to default renderer
