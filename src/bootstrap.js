@@ -12,6 +12,7 @@ const md = new MarkdownIt('default', {
     highlight: null,
 })
     .enable(['emphasis', 'linkify', 'newline', 'link', 'image', 'heading', 'list', 'hr', 'code'])
+    .disable(['lheading'])
     .use(MarkdownItVideo);
 
 // Remember old renderer, if overridden, or proxy to default renderer
