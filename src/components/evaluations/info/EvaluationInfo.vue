@@ -102,7 +102,7 @@
                                 <a href="#evalDocument" data-toggle="collapse">
                                     view evaluation document <i class="fas fa-angle-down" />
                                 </a>
-                                <pre id="evalDocument" class="collapse container text-white">{{ JSON.stringify(selectedEvaluation, null, 4) }}</pre>
+                                <pre id="evalDocument" class="collapse container">{{ JSON.stringify(selectedEvaluation, null, 4) }}</pre>
                             </div>
                         </div>
                     </div>

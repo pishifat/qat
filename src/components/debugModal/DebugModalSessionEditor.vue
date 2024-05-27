@@ -33,7 +33,7 @@
                             view raw session <i class="fas fa-angle-down" />
                         </a>
                     </p>
-                    <pre id="sessionInfo" class="collapse container text-white">{{ JSON.stringify(rawSession, null, 4) }}</pre>
+                    <pre id="sessionInfo" class="collapse container">{{ JSON.stringify(rawSession, null, 4) }}</pre>
                 </div>
             </div>
         </div>
