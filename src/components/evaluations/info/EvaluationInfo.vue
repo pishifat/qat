@@ -49,8 +49,10 @@
             </div>
 
             <div v-else>
-                <main-application-info v-if="selectedEvaluation.isApplication" />
-                <evaluation-is-security-checked class="mb-2" v-if="loggedInUser.isNat && selectedEvaluation.isApplication" />
+                <div v-if="selectedEvaluation.isApplication">
+                    <main-application-info />
+                    <evaluation-is-security-checked class="mb-2" v-if="loggedInUser.isNat" />
+                </div>
 
                 <user-activity
                     v-else
