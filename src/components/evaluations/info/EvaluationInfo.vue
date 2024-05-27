@@ -49,8 +49,10 @@
             </div>
 
             <div v-else>
-                <main-application-info v-if="selectedEvaluation.isApplication" />
-                <evaluation-is-security-checked class="mb-2" v-if="loggedInUser.isNat && selectedEvaluation.isApplication" />
+                <div v-if="selectedEvaluation.isApplication">
+                    <main-application-info />
+                    <evaluation-is-security-checked class="mb-2" v-if="loggedInUser.isNat" />
+                </div>
 
                 <user-activity
                     v-else
@@ -100,7 +102,7 @@
                                 <a href="#evalDocument" data-toggle="collapse">
                                     view evaluation document <i class="fas fa-angle-down" />
                                 </a>
-                                <pre id="evalDocument" class="collapse container text-white">{{ JSON.stringify(selectedEvaluation, null, 4) }}</pre>
+                                <pre id="evalDocument" class="collapse container">{{ JSON.stringify(selectedEvaluation, null, 4) }}</pre>
                             </div>
                         </div>
                     </div>
