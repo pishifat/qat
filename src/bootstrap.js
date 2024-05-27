@@ -3,7 +3,7 @@ import MarkdownIt from 'markdown-it';
 import moment from 'moment';
 import MarkdownItVideo from 'markdown-it-video';
 import http from './store/http';
-import osuTimestamps from './bootstrap/markdown-it-osu-timestamps';
+import osuTimestamps from './plugins/markdown-it-osu-timestamps';
 
 const md = new MarkdownIt('default', {
     html: false,
