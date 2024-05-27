@@ -1,4 +1,6 @@
-export default function osuTimestamps(md) {
+export default function osuTimestamps(md, options = {}) {
+    const { wrapInCode = true } = options;
+
     function osuTimestampsParser(state) {
         const regex = /(\d+):(\d{2}):(\d{3})\s*(\(((\d+(\|)?,?)+)\))?/gim;
         const Token = state.Token;
@@ -30,19 +32,27 @@ export default function osuTimestamps(md) {
                     }
 
                     // timestamp tokens
-                    const linkToken = new Token("link_open", "a", 1);
-                    linkToken.attrs = [["href", url]];
-                    tokens.push(linkToken);
-                    const codeToken = new Token("code_inline", "", 0);
-                    codeToken.content = timestamp;
-                    tokens.push(codeToken);
+                    const linkOpenToken = new Token("link_open", "a", 1);
+                    linkOpenToken.attrs = [["href", url]];
+                    tokens.push(linkOpenToken);
+
+                    if (wrapInCode) {
+                        const codeToken = new Token("code_inline", "code", 0);
+                        codeToken.content = timestamp;
+                        tokens.push(codeToken);
+                    } else {
+                        const textToken = new Token("text", "", 0);
+                        textToken.content = timestamp;
+                        tokens.push(textToken);
+                    }
+
                     const linkCloseToken = new Token("link_close", "a", -1);
                     tokens.push(linkCloseToken);
 
                     // add a space
-                    const textToken = new Token("text", "", 0);
-                    textToken.content = " ";
-                    tokens.push(textToken);
+                    const spaceToken = new Token("text", "", 0);
+                    spaceToken.content = " ";
+                    tokens.push(spaceToken);
 
                     lastIndex = regex.lastIndex;
                 }

@@ -14,7 +14,7 @@ const md = new MarkdownIt('default', {
 })
     .enable(['emphasis', 'linkify', 'newline', 'link', 'image', 'heading', 'list', 'hr', 'code'])
     .disable(['lheading'])
-    .use(osuTimestamps)
+    .use(osuTimestamps, { wrapInCode: true })
     .use(MarkdownItVideo);
 
 // Remember old renderer, if overridden, or proxy to default renderer
