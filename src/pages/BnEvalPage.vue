@@ -14,6 +14,9 @@
                     Add users to evaluate
                 </button>
             </template>
+            <template #instructions>
+                <trial-instructions v-if="loggedInUser.isNatOrTrialNat" />
+            </template>
         </eval-page>
 
         <add-evaluations />
@@ -24,12 +27,14 @@
 import { mapState } from 'vuex';
 import AddEvaluations from '../components/evaluations/AddEvaluations.vue';
 import EvalPage from '../components/evaluations/EvalPage.vue';
+import TrialInstructions from '../components/evaluations/TrialInstructions.vue';
 
 export default {
     name: 'BnEvalPage',
     components: {
         AddEvaluations,
         EvalPage,
+        TrialInstructions,
     },
     computed: {
         ...mapState([

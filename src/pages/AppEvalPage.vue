@@ -26,6 +26,7 @@
             </template>
             <template #instructions>
                 <evaluation-instructions />
+                <trial-instructions v-if="loggedInUser.isNatOrTrialNat" />
             </template>
         </eval-page>
 
@@ -37,6 +38,7 @@
 import { mapState } from 'vuex';
 import EvalPage from '../components/evaluations/EvalPage.vue';
 import EvaluationInstructions from '../components/evaluations/EvaluationInstructions.vue';
+import TrialInstructions from '../components/evaluations/TrialInstructions.vue';
 import AddApplication from '../components/evaluations/AddApplication.vue';
 
 export default {
@@ -44,6 +46,7 @@ export default {
     components: {
         EvalPage,
         EvaluationInstructions,
+        TrialInstructions,
         AddApplication,
     },
     computed: {
