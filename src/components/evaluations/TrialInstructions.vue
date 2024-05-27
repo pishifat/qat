@@ -13,6 +13,7 @@
                     <li><code>*Italic text*</code></li>
                     <li><code>~~Strikethrough~~</code></li>
                     <li><code>`Inline code`</code></li>
+                    <li><code>> Quote block</code></li>
                     <li><code>[Link text](https://osu.ppy.sh)</code></li>
                     <li><code>![](imageLink)</code> to insert images</li>
                     <li><code>@[youtube](youtubeVideoId)</code> to embed a YouTube video</li>
