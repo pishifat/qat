@@ -300,3 +300,15 @@ code:not(pre > code) {
     padding: 0.25rem;
     border-radius: 0.25rem;
 }
+
+/* Quote blocks */
+
+blockquote {
+    border-left: 2px solid $link-color;
+    padding-left: 1rem;
+    padding-top: 0px;
+
+    p {
+        margin-bottom: 0;
+    }
+}
