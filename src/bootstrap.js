@@ -4,13 +4,14 @@ import moment from 'moment';
 import MarkdownItVideo from 'markdown-it-video';
 import http from './store/http';
 
-const md = new MarkdownIt('zero', {
+const md = new MarkdownIt('default', {
     html: false,
     breaks: true,
     linkify: true,
     typographer: false,
+    highlight: null,
 })
-    .enable(['emphasis', 'linkify', 'newline', 'link', 'image', 'heading', 'list', 'hr'])
+    .enable(['emphasis', 'linkify', 'newline', 'link', 'image', 'heading', 'list', 'hr', 'code'])
     .use(MarkdownItVideo);
 
 // Remember old renderer, if overridden, or proxy to default renderer
