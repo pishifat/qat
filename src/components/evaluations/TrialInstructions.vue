@@ -23,10 +23,10 @@
             <br>
             <h5>Evaluating applicants</h5>
             <p class="small ml-4">
-                This can be done in any way as long as it emphasizes the main issues of the applicant with examples and explanations, skipping on the smaller issues so the applicant doesn't get overwhelmed.
+                This can be done in any way as long as it emphasizes the main issues of the applicant with examples and explanations, skipping on the smaller issues so the applicant doesn't get overwhelmed. Think of it as a modpost on their modding, in a way.
             </p>
             <p class="small ml-4">
-                You should also factor in their level of decision making since this will be the most important aspect of their bn work. think of it as a modpost on their modding, in a way.
+                You should also factor in their level of decision making since this will be the most important aspect of their bn work.
             </p>
             <p class="small ml-4">
                 Also, make sure to be formal in your writing and address the applicant directly as your eval will be visible to them and maybe even displayed in the public archive.
