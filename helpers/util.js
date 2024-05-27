@@ -110,32 +110,6 @@ function setSession(session, response) {
 }
 
 /**
- * Convert timestamps to links
- * @param {string} text
- */
-function parseTimestamps(text) {
-    const regex = /\s(\d+):(\d{2}):(\d{3})\s*(\(((\d+(\|)?,?)+)\))?\s/gim;
-    const timestamps = text.match(regex);
-
-    if (!timestamps) return text;
-
-    for (const timestamp of timestamps) {
-        const res = regex.exec(timestamp);
-		regex.lastIndex = 0;
-		if (!res) continue;
-
-		let url = ` [${timestamp.trim()}](<osu://edit/${res[1]}:${res[2]}:${res[3]}`;
-
-		if (res[4]) url += `-${res[4]}`;
-        
-		url += ">) ";
-
-		text = text.replace(timestamp, url);
-	}
-
-	return text;  
-}
-/**
  * Shuffle an array
  * @param {Array} array
  */
@@ -205,7 +179,6 @@ module.exports = {
     sleep,
     findDaysBetweenDates,
     setSession,
-    parseTimestamps,
     shuffleArray,
     makeWordFromField,
     yearsDuration,
