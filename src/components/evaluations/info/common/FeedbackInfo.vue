@@ -33,6 +33,21 @@
             </button>
 
         <hr />
+            <div v-if="negativeConsensus" class="mb-3">
+                <b>Hide cooldown text: </b>
+                <a
+                    href="#"
+                    data-toggle="tooltip"
+                    data-placement="right"
+                    title="Will reset on page refresh"
+                    @click.prevent="toggleHideCooldownText($event)"
+                >
+                    <font-awesome-icon
+                        icon="fa-solid fa-circle-check"
+                        :class="hideCooldownText ? 'text-success' : 'text-secondary'"
+                    />
+                </a>
+            </div>
 
             <input
                 v-if="selectedEvaluation.isApplication && positiveConsensus"
@@ -47,6 +62,7 @@
             :discord-link="discordLink"
             :is-reviewable="!selectedEvaluation.isResignation"
             :is-pass-app="selectedEvaluation.isApplication && selectedEvaluation.consensus === 'pass'"
+            :hide-cooldown-text="hideCooldownText"
         />
     </div>
 </template>
@@ -66,6 +82,7 @@ export default {
         return {
             feedback: '',
             discordLink: '',
+            hideCooldownText: false,
         };
     },
     computed: {
@@ -106,6 +123,9 @@ export default {
         getRows() {
             const lines = this.feedback.split('\n');
             return Math.max(lines.length, 2);
+        },
+        toggleHideCooldownText(e) {
+            this.hideCooldownText = !this.hideCooldownText;
         },
     },
 };

@@ -95,7 +95,7 @@
                         <a href="#userDocument" data-toggle="collapse">
                             view user document <i class="fas fa-angle-down" />
                         </a>
-                        <pre id="userDocument" class="collapse container text-white">{{ JSON.stringify(selectedUser, null, 4) }}</pre>
+                        <pre id="userDocument" class="collapse container">{{ JSON.stringify(selectedUser, null, 4) }}</pre>
                     </div>
                 </div>
             </div>

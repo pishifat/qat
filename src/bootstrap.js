@@ -3,14 +3,18 @@ import MarkdownIt from 'markdown-it';
 import moment from 'moment';
 import MarkdownItVideo from 'markdown-it-video';
 import http from './store/http';
+import osuTimestamps from './plugins/markdown-it-osu-timestamps';
 
-const md = new MarkdownIt('zero', {
+const md = new MarkdownIt('default', {
     html: false,
     breaks: true,
     linkify: true,
     typographer: false,
+    highlight: null,
 })
-    .enable(['emphasis', 'linkify', 'newline', 'link', 'image', 'heading', 'list', 'hr'])
+    .enable(['emphasis', 'linkify', 'newline', 'link', 'image', 'heading', 'list', 'hr', 'code'])
+    .disable(['lheading'])
+    .use(osuTimestamps, { wrapInCode: true })
     .use(MarkdownItVideo);
 
 // Remember old renderer, if overridden, or proxy to default renderer

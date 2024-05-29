@@ -40,6 +40,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        hideCooldownText: {
+            type: Boolean,
+            default: false,
+        },
     },
     computed: {
         ...mapGetters('evaluations', [
@@ -89,10 +93,12 @@ export default {
                     message += `\n\n`;
                     message += `review reasons for your rejection here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id}`;
                     message += `\n\n`;
-                    message += `you can apply for BN in this game mode again on **${this.toStandardDate(this.selectedEvaluation.cooldownDate)}**`;
-                    message += `\n\n`;
-                    message += `good luck!`;
-                    message += `\n\n`;
+                    if (!this.hideCooldownText) {
+                        message += `you can apply for BN in this game mode again on **${this.toStandardDate(this.selectedEvaluation.cooldownDate)}**`;
+                        message += `\n\n`;
+                        message += `good luck!`;
+                        message += `\n\n`;
+                    }
                 }
 
             // current BN evaluation
@@ -199,8 +205,10 @@ export default {
                     }
                     
                     // reapply date
-                    message += `If you want to apply for BN again, you may do so on **${this.toStandardDate(this.selectedEvaluation.cooldownDate)}**.`;
-                    message += `\n\n`;
+                    if (!this.hideCooldownText) {
+                        message += `If you want to apply for BN again, you may do so on **${this.toStandardDate(this.selectedEvaluation.cooldownDate)}**.`;
+                        message += `\n\n`;
+                    }
 
                     if (this.selectedEvaluation.isResignation && this.positiveConsensus) {
                         message += `You may also instantly re-join the BN any time within the next 12 months! :)`;
@@ -208,7 +216,9 @@ export default {
                     }
 
                     // cheeky sign-off
-                    message += `good luck!`;
+                    if (!this.hideCooldownText) {
+                        message += `good luck!`;
+                    }
                 }
             }
 

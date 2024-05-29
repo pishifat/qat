@@ -73,7 +73,7 @@ async function submitEval (evaluation, session, isNat, comment, vote) {
         review.evaluator = session.mongoId;
     }
 
-    review.moddingComment = util.parseTimestamps(comment);
+    review.moddingComment = comment;
     review.vote = vote;
     await review.save();
 
@@ -219,7 +219,7 @@ async function setFeedback (evaluation, feedback, session) {
         evaluation._id
     );
 
-    evaluation.feedback = util.parseTimestamps(feedback);
+    evaluation.feedback = feedback;
     await evaluation.save();
 
     discord.webhookPost(
