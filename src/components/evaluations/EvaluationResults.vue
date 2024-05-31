@@ -84,11 +84,11 @@
 
             <div v-if="isNewEvaluationFormat && !evaluation.isNatEvaluation">
                 <h5>Evaluations</h5>
-                <div v-for="review in evaluation.reviews" :key="review.id">
+                <div v-for="(review, index) in evaluation.reviews" :key="review.id">
                     <div class="row my-3">
                         <div class="col-sm-2">
                             <div class="text-center my-2" :class="voteColor(review.vote)">
-                                <b>User ({{ review.evaluator && review.evaluator.groups.includes('nat') ? 'NAT' : 'BN' }})</b>
+                                <b>User {{ index + 1 }}</b>
                             </div>
                         </div>
 
