@@ -3,7 +3,7 @@
         data-toggle="tooltip"
         :title="tooltip"
     >
-        {{ momented.fromNow() }}
+        {{ momented.locale('en').fromNow() }}
     </span>
 </template>
 
