@@ -38,6 +38,27 @@ Vue.prototype.$md = md;
 Vue.prototype.$moment = moment;
 Vue.prototype.$http = http;
 
+// locale for short dates
+moment.defineLocale('short', {
+    parentLocale: 'en',
+    relativeTime : {
+        future: "in %s",
+        past:   "%s ago",
+        s  : '1s',
+        ss : '%ds',
+        m:  "1m",
+        mm: "%dm",
+        h:  "1h",
+        hh: "%dh",
+        d:  "1d",
+        dd: "%dd",
+        M:  "1mo",
+        MM: "%dmo",
+        y:  "1y",
+        yy: "%dy"
+    }
+});
+
 Vue.filter('toStandardDate', (date) => {
     if (!date) return '';
 
@@ -59,7 +80,13 @@ Vue.filter('toStandardDetailedDate', (date) => {
 Vue.filter('toRelativeDate', (date) => {
     if (!date) return '';
 
-    return moment(date).fromNow();
+    return moment(date).locale('en').fromNow();
+});
+
+Vue.filter('toRelativeShortDate', (date) => {
+    if (!date) return '';
+
+    return moment(date).locale('short').fromNow();
 });
 
 Vue.filter('shorten', (text, length) => {
