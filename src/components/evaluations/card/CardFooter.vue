@@ -87,7 +87,10 @@ export default {
         isActive: Boolean,
         isNat: Boolean,
         isPublic: Boolean,
-        isApplication: Boolean,
+        isApplication: {
+            type: Boolean,
+            default: false,
+        },
     },
     computed: {
         ...mapState([
@@ -105,9 +108,11 @@ export default {
     methods: {
         transformedDeadline (deadline) {
             if (this.isActive) {
-                return this.$moment(deadline).fromNow();
+                return this.isApplication ? 
+                    this.$options.filters.toRelativeShortDate(deadline) :
+                    this.$options.filters.toRelativeDate(deadline);
             } else if (this.archivedAt && this.archivedAt.length) {
-                return this.$options.filters.toStandardDate(archivedAt);
+                return this.$options.filters.toStandardDate(this.archivedAt);
             } else {
                 return this.$options.filters.toStandardDate(deadline);
             }
