@@ -22,7 +22,22 @@
                 data-placement="top"
                 title="deadline"
             />
-            {{ transformedDeadline }}
+            <span
+                v-if="individualDeadline"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="individual deadline"
+            >
+                {{ transformedDeadline(individualDeadline) }}
+            </span>
+            —
+            <span
+                data-toggle="tooltip"
+                data-placement="top"
+                title="final deadline"
+            >
+                {{ transformedDeadline(deadline) }}
+            </span>
         </span>
 
         <input
@@ -61,6 +76,10 @@ export default {
             type: String,
             required: true,
         },
+        individualDeadline: {
+            type: String,
+            default: null,
+        },
         archivedAt: {
             type: String,
             default: '',
@@ -69,6 +88,7 @@ export default {
         isActive: Boolean,
         isNat: Boolean,
         isPublic: Boolean,
+        isApplication: Boolean,
     },
     computed: {
         ...mapState([
@@ -82,17 +102,17 @@ export default {
                 this.$store.commit('evaluations/updateCheckedEvaluations', checks);
             },
         },
-        transformedDeadline () {
-            if (this.isActive) {
-                return this.$moment(this.deadline).fromNow();
-            } else if (this.archivedAt && this.archivedAt.length) {
-                return this.$options.filters.toStandardDate(this.archivedAt);
-            } else {
-                return this.$options.filters.toStandardDate(this.deadline);
-            }
-        },
     },
     methods: {
+        transformedDeadline (deadline) {
+            if (this.isActive) {
+                return this.$moment(deadline).fromNow();
+            } else if (this.archivedAt && this.archivedAt.length) {
+                return this.$options.filters.toStandardDate(archivedAt);
+            } else {
+                return this.$options.filters.toStandardDate(deadline);
+            }
+        },
         separateEvals() {
             let bn = 0;
             let nat = 0;
