@@ -28,9 +28,8 @@
                 data-placement="top"
                 title="individual deadline"
             >
-                {{ transformedDeadline(individualDeadline) }}
+                {{ transformedDeadline(individualDeadline) }} —
             </span>
-            —
             <span
                 data-toggle="tooltip"
                 data-placement="top"
