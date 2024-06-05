@@ -5,9 +5,17 @@
         <template v-if="loggedInUser.isBnOrNat">
             <hr>
 
-            <settings-modal-evaluator />
+            <template v-if="loggedInUser.isNatOrTrialNat">
+                <settings-modal-evaluator />
 
-            <hr>
+                <hr>
+            </template>
+
+            <template v-if="loggedInUser.isBn && loggedInUser.modesInfo.some(m => m.mode === 'osu')">
+                <settings-modal-subjective-eval-feedback />
+
+                <hr>
+            </template>
 
             <settings-modal-requests />
 
@@ -49,6 +57,7 @@ import SettingsModalLanguages from './SettingsModalLanguages.vue';
 import SettingsModalExplicit from './SettingsModalExplicit.vue';
 import SettingsModalWebhooks from './SettingsModalWebhooks.vue';
 import SettingsModalContentReview from './SettingsModalContentReview.vue';
+import SettingsModalSubjectiveEvalFeedback from './SettingsModalSubjectiveEvalFeedback.vue';
 
 export default {
     components: {
@@ -61,6 +70,7 @@ export default {
         SettingsModalExplicit,
         SettingsModalWebhooks,
         SettingsModalContentReview,
+        SettingsModalSubjectiveEvalFeedback,
     },
     computed: mapState([
         'loggedInUser',
