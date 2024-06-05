@@ -5,9 +5,11 @@
         <template v-if="loggedInUser.isBnOrNat">
             <hr>
 
-            <settings-modal-evaluator />
+            <template v-if="loggedInUser.isNatOrTrialNat">
+                <settings-modal-evaluator />
 
-            <hr>
+                <hr>
+            </template>
 
             <template v-if="loggedInUser.isBn && loggedInUser.modesInfo.some(m => m.mode === 'osu')">
                 <settings-modal-subjective-eval-feedback />
