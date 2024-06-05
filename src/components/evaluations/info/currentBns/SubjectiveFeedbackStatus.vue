@@ -1,6 +1,6 @@
 <template>
     <p>
-        <b>Subjective feeback: </b>
+        <b>Subjective feedback: </b>
         <span 
             v-if="selectedEvaluation.user.subjectiveEvalFeedback"
             class="text-success"
