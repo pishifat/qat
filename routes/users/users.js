@@ -1257,4 +1257,37 @@ router.post('/toggleEvalVisibility/:id', async (req, res) => {
     );
 });
 
+/* POST toggle subjectiveEvalFeedback */
+router.post('/:id/toggleSubjectiveEvalFeedback', middlewares.isBnOrNat, async (req, res) => {
+    const user = await User.findById(req.params.id).orFail();
+
+    if (req.session.mongoId != user.id) {
+        return res.json({
+            error: 'Unauthorized',
+        });
+    }
+
+    // osu! only
+    if (!user.isBnFor('osu')) {
+        return res.json({
+            error: 'only osu! BNs can do this.',
+        });
+    }
+
+    user.subjectiveEvalFeedback = !user.subjectiveEvalFeedback;
+    await user.save();
+
+    res.json({
+        user,
+        success: 'Toggled receiving subjective eval feedback!',
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Opted "${user.username}" ${user.showExplicitContent ? 'in' : 'out of'} receiving subjective eval feedback`,
+        'user',
+        user._id
+    );
+});
+
 module.exports = router;

@@ -54,23 +54,30 @@
                     <evaluation-is-security-checked class="mb-2" v-if="loggedInUser.isNat" />
                 </div>
 
-                <user-activity
-                    v-else
-                    :osu-id="selectedEvaluation.user.osuId"
-                    :modes="modes"
-                    :deadline="selectedEvaluation.deadline"
-                    :mongo-id="selectedEvaluation.user.id"
-                    :unique="selectedEvaluation.id"
-                    :overwrite-days="
-                        selectedEvaluation.activityToCheck
-                            ? selectedEvaluation.activityToCheck + 7
-                            : 90 + 7
-                    "
-                    :is-evaluation="true"
-                    :is-nat="selectedEvaluation.user.isNat"
-                />
+                <div v-else>
+                    <user-activity
+                        :osu-id="selectedEvaluation.user.osuId"
+                        :modes="modes"
+                        :deadline="selectedEvaluation.deadline"
+                        :mongo-id="selectedEvaluation.user.id"
+                        :unique="selectedEvaluation.id"
+                        :overwrite-days="
+                            selectedEvaluation.activityToCheck
+                                ? selectedEvaluation.activityToCheck + 7
+                                : 90 + 7
+                        "
+                        :is-evaluation="true"
+                        :is-nat="selectedEvaluation.user.isNat"
+                    />
+                    <subjective-feedback-status 
+                        v-if="selectedEvaluation.user.isBn && !selectedEvaluation.isResignation" 
+                    />
+                </div>
+
                 <evaluation-link />
+
                 <hr>
+
                 <template v-if="loggedInUser.isNat || loggedInUser.isTrialNat">
                     <p>
                         <a href="#additionalInfo" data-toggle="collapse">
@@ -141,6 +148,7 @@ import ModalDialog from '../../ModalDialog.vue';
 import MainApplicationInfo from './applications/MainApplicationInfo.vue';
 import DiscussionInfo from './DiscussionInfo.vue';
 import EvaluationIsSecurityChecked from './applications/EvaluationIsSecurityChecked.vue';
+import SubjectiveFeedbackStatus from './currentBns/SubjectiveFeedbackStatus.vue';
 
 export default {
     name: 'EvaluationInfo',
@@ -160,6 +168,7 @@ export default {
         MainApplicationInfo,
         DiscussionInfo,
         EvaluationIsSecurityChecked,
+        SubjectiveFeedbackStatus,
     },
     data () {
         return {
