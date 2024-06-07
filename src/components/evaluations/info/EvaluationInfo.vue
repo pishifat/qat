@@ -70,7 +70,7 @@
                         :is-nat="selectedEvaluation.user.isNat"
                     />
                     <subjective-feedback-status 
-                        v-if="selectedEvaluation.user.isBn && !selectedEvaluation.isResignation" 
+                        v-if="selectedEvaluation.user.isBn && !selectedEvaluation.isResignation && selectedEvaluation.mode === 'osu'" 
                     />
                 </div>
 
