@@ -82,7 +82,7 @@ export default {
                 if (step === 2) return true;
             }
             if (this.evaluation.discussion || this.evaluation.reviews.length >= 3) {
-                this.statusText = `Evaluated by 3 of 3 users. Your ${this.evaluation.isApplication ? 'application' : 'evalaution'} is currently in the group stage, where NAT members discuss and decide the consensus!`;
+                this.statusText = `Evaluated by 3 of 3 users. Your ${this.evaluation.isApplication ? 'application' : 'evaluation'} is currently in the group stage, where NAT members discuss and decide the consensus!`;
                 if (step === 3) return true;
             }
             if (this.evaluation.discussion && this.evaluation.consensus) {
