@@ -91,7 +91,7 @@ router.get('/relevantInfo/:limit', async (req, res) => {
             isPublic: true,
         })
         .populate(defaultAppPopulate)
-        .sort({ createdAt: -1 })
+        .sort({ archivedAt: -1, createdAt: -1 })
         .limit(Math.floor(limit / 2));
 
     let bnEvaluations = await Evaluation
@@ -101,7 +101,7 @@ router.get('/relevantInfo/:limit', async (req, res) => {
             isPublic: true,
         })
         .populate(defaultBnPopulate)
-        .sort({ createdAt: -1 })
+        .sort({ archivedAt: -1, createdAt: -1 })
         .limit(Math.floor(limit / 2));
 
     for (let app of applications) {
