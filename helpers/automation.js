@@ -880,7 +880,7 @@ const checkTenureValidity = cron.schedule('0 0 2 * *', async () => {
                 }
             }
 
-            const modes = ['osu', 'taiko', 'catch', 'mania'];
+            const modes = ['osu', 'taiko', 'catch', 'mania', 'none'];
 
             for (const mode of modes) {
                 const modeBnHistory = bnHistory.filter(h => h.mode == mode);
