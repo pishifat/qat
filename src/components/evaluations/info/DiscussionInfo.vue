@@ -1,6 +1,6 @@
 <template>
     <div>
-        <template v-if="loggedInUser.isNat || loggedInUser.isTrialNat">
+        <template v-if="(loggedInUser.isNat || loggedInUser.isTrialNat) && !selectedEvaluation.user.isNat">
             <hr>
             <p>
                 <a href="#consensusSettings" data-toggle="collapse">
@@ -43,7 +43,7 @@
                 loggedInUser.isTrialNat
             "
         >
-            <hr />
+            <hr v-if="selectedEvaluation.reviews.length" />
             <reviews-listing />
         </template>
     </div>
