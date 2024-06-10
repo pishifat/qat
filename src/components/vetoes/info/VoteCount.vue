@@ -7,22 +7,22 @@
             <ul>
                 <li>
                     <label class="mb-0" data-toggle="tooltip" data-placement="right" title="% of submitted votes">
-                        <b>Agree:</b> {{ filterMediationsByIndex(upholdMediations, reasonIndex).length }} ({{ Math.round(filterMediationsByIndex(upholdMediations, reasonIndex).length / submittedVotes * 100) || '0' }}%)
+                        <b>Agree:</b> {{ filterMediationsByIndex(upholdMediations, reasonIndex).length }} ({{ Math.round(filterMediationsByIndex(upholdMediations, reasonIndex).length / filterMediationsByIndex(validMediations, reasonIndex).length * 100) || '0' }}%)
                     </label>
                 </li>
                 <li v-if="filterMediationsByIndex(neutralMediations, reasonIndex).length" >
                     <label class="mb-0" data-toggle="tooltip" data-placement="right" title="% of submitted votes">
-                        <b>Partially Agree:</b> {{ filterMediationsByIndex(neutralMediations, reasonIndex).length }} ({{ Math.round(filterMediationsByIndex(neutralMediations, reasonIndex).length / submittedVotes * 100) || '0' }}%)
+                        <b>Partially Agree:</b> {{ filterMediationsByIndex(neutralMediations, reasonIndex).length }} ({{ Math.round(filterMediationsByIndex(neutralMediations, reasonIndex).length / filterMediationsByIndex(validMediations, reasonIndex).length * 100) || '0' }}%)
                     </label>
                 </li>
                 <li>
                     <label class="mb-0" data-toggle="tooltip" data-placement="right" title="% of submitted votes">
-                        <b>Disagree:</b> {{ filterMediationsByIndex(withdrawMediations, reasonIndex).length }} ({{ Math.round(filterMediationsByIndex(withdrawMediations, reasonIndex).length / submittedVotes * 100) || '0' }}%)
+                        <b>Disagree:</b> {{ filterMediationsByIndex(withdrawMediations, reasonIndex).length }} ({{ Math.round(filterMediationsByIndex(withdrawMediations, reasonIndex).length / filterMediationsByIndex(validMediations, reasonIndex).length * 100) || '0' }}%)
                     </label>
                 </li>
                 <li>
                     <label class="mb-0" data-toggle="tooltip" data-placement="right" title="% of assigned mediators">
-                        <b>Submitted votes:</b> {{ filterMediationsByIndex(validMediations, reasonIndex).length }} ({{ Math.round(filterMediationsByIndex(validMediations, reasonIndex).length / selectedVeto.mediations.length * 100) || '0' }}%)
+                        <b>Submitted votes:</b> {{ filterMediationsByIndex(validMediations, reasonIndex).length }} ({{ Math.round(filterMediationsByIndex(validMediations, reasonIndex).length / (selectedVeto.mediations.length / selectedVeto.reasons.length) * 100) || '0' }}%)
                     </label>
                 </li>
                 <li>
