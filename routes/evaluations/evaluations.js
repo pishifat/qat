@@ -269,6 +269,7 @@ async function findSkipProbationEligibility (userId, mode) {
             user: userId,
             mode,
             archivedAt: { $gt: oneYearAgo },
+            consensus: ResignationConsensus.ResignedOnGoodTerms
         })
         .sort({
             updatedAt: -1,
@@ -286,12 +287,12 @@ async function findSkipProbationEligibility (userId, mode) {
 
     let skipProbation = false;
 
-    if (lastResignation && lastCurrentBnEval && lastResignation.archivedAt && lastCurrentBnEval.archivedAt && lastResignation.consensus === ResignationConsensus.ResignedOnGoodTerms) {
+    if (lastResignation && lastCurrentBnEval && lastResignation.archivedAt && lastCurrentBnEval.archivedAt) {
         const resignationArchiveDate = new Date(lastResignation.archivedAt);
         const currentBnEvalArchiveDate = new Date(lastCurrentBnEval.archivedAt);
 
         // skip probation on condition
-        if (resignationArchiveDate > currentBnEvalArchiveDate && resignationArchiveDate > oneYearAgo) {
+        if (resignationArchiveDate > currentBnEvalArchiveDate) {
             skipProbation = true;
         }
     }
