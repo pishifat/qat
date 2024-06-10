@@ -444,7 +444,8 @@ const notifyCurrentBnEvaluations = cron.schedule('3 17 * * *', async () => {
     for (const eval of activeBnEvaluations) {
         const deadline = eval.discussion ? moment(eval.deadline).add(7, 'days').toDate() : new Date(eval.deadline); // front-end adds 7 days to deadline for evals in group phase, so webhooks should reflect that
 
-        let description = `[**${eval.user.username}**'s ${eval.user.groups.includes('nat') ? 'NAT eval' : eval.isResignation ? 'resignation' : 'current BN eval'}](http://bn.mappersguild.com/bneval?id=${eval.id}) `;
+        const isNat = eval.user.groups.includes('nat');
+        let description = `[**${eval.user.username}**'s ${isNat ? 'NAT eval' : eval.isResignation ? 'resignation' : 'current BN eval'}](http://bn.mappersguild.com/bneval?id=${eval.id}) `;
         let color;
         let generateWebhook;
 
@@ -453,12 +454,16 @@ const notifyCurrentBnEvaluations = cron.schedule('3 17 * * *', async () => {
 
         // add user assignments
         if (!hasAssignedNatEvaluators) {
-            eval.natEvaluators = await User.getAssignedNat(eval.mode, eval.user.id);
+            if (isNat) {
+                eval.natEvaluators = [eval.user._id];
+            } else {
+                eval.natEvaluators = await User.getAssignedNat(eval.mode, eval.user.id);
             
-            if (await Settings.getModeHasTrialNat(eval.mode) && !hasAssignedBnEvaluators) {
-                eval.bnEvaluators = await User.getAssignedTrialNat(eval.mode, [eval.user.osuId], (await Settings.getModeEvaluationsRequired(eval.mode) - 1));
+                if (await Settings.getModeHasTrialNat(eval.mode) && !hasAssignedBnEvaluators) {
+                    eval.bnEvaluators = await User.getAssignedTrialNat(eval.mode, [eval.user.osuId], (await Settings.getModeEvaluationsRequired(eval.mode) - 1));
+                }
             }
-    
+
             // repopulate with evaluator details
             await eval
                 .populate([
@@ -496,7 +501,7 @@ const notifyCurrentBnEvaluations = cron.schedule('3 17 * * *', async () => {
 
         // send webhooks
         if (generateWebhook) {
-            const evaluators = await Settings.getModeHasTrialNat(eval.mode) ? eval.natEvaluators.concat(eval.bnEvaluators) : eval.natEvaluators;
+            const evaluators = await Settings.getModeHasTrialNat(eval.mode) && !isNat ? eval.natEvaluators.concat(eval.bnEvaluators) : eval.natEvaluators;
             const discordIds = discord.findEvaluatorHighlights(eval.reviews, evaluators, eval.discussion);
             const fields = [];
 
