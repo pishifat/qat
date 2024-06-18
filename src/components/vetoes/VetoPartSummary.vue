@@ -7,7 +7,7 @@
             <div v-if="upholdMediations.length > withdrawMediations.length">
                 <div v-for="(mediation, i) in upholdMediations" :key="mediation.id">
                     <div class="mb-2">
-                        <b>User {{ i + 1 }} - {{ mediation.vote === 2 ? 'partially agree' : 'agree' }}:</b>
+                        <b>Anonymous - {{ mediation.vote === 2 ? 'partially agree' : 'agree' }}:</b>
                         <div class="pre-line">{{ mediation.comment }}</div>
                     </div>
                 </div>
@@ -16,7 +16,7 @@
             <div v-else>
                 <div v-for="(mediation, i) in withdrawMediations" :key="mediation.id">
                     <div class="mb-2">
-                        <b>User {{ i + 1 }} - {{ mediation.vote === 2 ? 'partially agree' : 'disagree' }}:</b>
+                        <b>Anonymous - {{ mediation.vote === 2 ? 'partially agree' : 'disagree' }}:</b>
                         <div class="pre-line">{{ mediation.comment }}</div>
                     </div>
                 </div>

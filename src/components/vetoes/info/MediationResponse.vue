@@ -10,7 +10,7 @@
             </user-avatar>
 
             <div v-else class="text-center my-2" :class="voteColor(mediation.vote)">
-                User {{ i + 1 }}
+                Anonymous
             </div>
         </div>
         <div class="col-sm-10 card card-body small">

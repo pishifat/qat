@@ -88,7 +88,7 @@
                     <div class="row my-3">
                         <div class="col-sm-2">
                             <div class="text-center my-2" :class="voteColor(review.vote)">
-                                <b>User {{ index + 1 }}</b>
+                                Anonymous
                             </div>
                         </div>
 

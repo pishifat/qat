@@ -18,7 +18,7 @@
             </user-avatar>
 
             <div v-else class="small text-center my-2" :class="voteColor(review.vote)">
-                User {{ index }}
+                Anonymous
 
                 <div v-if="review.evaluator && review.evaluator.id == loggedInUser.id">
                     (this is you!)
