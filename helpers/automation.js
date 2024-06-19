@@ -810,7 +810,8 @@ const checkUserActivity = cron.schedule('2 19 * * *', async () => {
                             modeInfo.mode,
                         );
                     }
-                    
+                } else if (user.hasActivityWarning) {
+                    user.hasActivityWarning = false;
                 }
             } else if (warningCheck) {
                 if (nomCount < normalBnThreshold) {
