@@ -56,7 +56,7 @@ router.get('/relevantInfo', async (req, res) => {
             .find({
                 active: true,
             })
-            .select('createdAt mode'),
+            .select('createdAt mode discussion isRejoinRequest'),
     ]);
 
     res.json({
