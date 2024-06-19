@@ -56,6 +56,8 @@ interface IUser {
     isActiveContentReviewer: boolean;
     rerolledEvaluationCount: number;
     subjectiveEvalFeedback: boolean;
+    lastActivityCheck: Date;
+    hasActivityWarning: boolean;
 
     // not used in model
     genreCount: number;

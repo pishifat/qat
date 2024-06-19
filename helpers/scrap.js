@@ -83,17 +83,35 @@ async function getUserModsCount(accessToken, username, months) {
  * @param {object} user
  * @returns {Promise<number>} number of unique bubbled/qualified
  */
-async function findUniqueNominationsCount(initialDate, endDate, user) {
-    const events = await Aiess.distinct('beatmapsetId', {
-        userId: user.osuId,
-        type: {
-            $in: ['nominate', 'qualify'],
-        },
-        timestamp: {
-            $gt: initialDate,
-            $lt: endDate
-        },
-    });
+async function findUniqueNominationsCount(initialDate, endDate, user, mode) {
+    let query;
+
+    if (mode) {
+        query = {
+            userId: user.osuId,
+            type: {
+                $in: ['nominate', 'qualify'],
+            },
+            timestamp: {
+                $gt: initialDate,
+                $lt: endDate
+            },
+            modes: mode, // this line is the only difference
+        }
+    } else {
+        query = {
+            userId: user.osuId,
+            type: {
+                $in: ['nominate', 'qualify'],
+            },
+            timestamp: {
+                $gt: initialDate,
+                $lt: endDate
+            },
+        }
+    }
+    
+    const events = await Aiess.distinct('beatmapsetId', query);
 
     return events.length;
 }
@@ -124,7 +142,7 @@ async function findAdditionalBnMonths (user) {
                         nextDate = moment(bnSiteLeftTheWomb).add(1, 'months').toDate();
                     }
 
-                    const count = await findUniqueNominationsCount(startDate, nextDate, user);
+                    const count = await findUniqueNominationsCount(startDate, nextDate, user, historyElement.mode);
                     startDate = moment(startDate).add(1, 'months').toDate();
                     nextDate = moment(nextDate).add(1, 'months').toDate();
 

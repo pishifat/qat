@@ -8,7 +8,7 @@ const webhookColors = {
     orange: 15169835,         // replaceUser, switchBnEvaluator, progressive eval assignment
 
     lightYellow: 16777104,    // rejoinBnRequest
-    darkYellow: 7105536,      // concludeDiscussionVote
+    darkYellow: 7105536,      // concludeDiscussionVote, send auto activity warning
     yellow: 16777022,         // submitMediationDiscussionVote
 
     lightGreen: 8847214,      // submitEval, submitQA

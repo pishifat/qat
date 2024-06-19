@@ -19,6 +19,7 @@ const Logger = require('../models/log');
 const ResignationEvaluation = require('../models/evaluations/resignationEvaluation');
 const Settings = require('../models/settings');
 const { replaceUser } = require('../routes/evaluations/evaluations');
+const { BnEvaluationConsensus, BnEvaluationAddition } = require('../shared/enums');
 
 /**
  * Beatmap report feed every hour
@@ -741,7 +742,7 @@ const spawnProbationEvaluations = cron.schedule('0 19 * * *', async () => {
 /**
  * bump forward evaluation deadline if user has 30+ nominations since their last evaluation. checked daily
  */
-const spawnHighActivityEvaluations = cron.schedule('20 32 * * * *', async () => {
+const spawnHighActivityEvaluations = cron.schedule('1 19 * * *', async () => {
     const bns = await User.find({ groups: 'bn' });
     const newDeadline = moment().add(7, 'days').toDate();
 
@@ -757,6 +758,79 @@ const spawnHighActivityEvaluations = cron.schedule('20 32 * * * *', async () => 
                 pendingEvaluation.deadline = newDeadline;
                 await pendingEvaluation.save();
             }
+        }
+    }
+}, {
+    scheduled: false,
+});
+
+/**
+ * bump forward evaluation deadline if user has 30+ nominations since their last evaluation. checked daily
+ */
+const checkUserActivity = cron.schedule('2 19 * * *', async () => {
+    const ninetyDaysAgo = moment().subtract(90, 'days').toDate();
+    const thirtyDaysAgo = moment().subtract(30, 'days').toDate();
+    const users = await User.find({
+        $or: [
+            //{ groups: 'nat' },
+            { groups: 'bn' },
+        ],
+    });
+    
+    for (const user of users) {
+        const isBnFor90Days = new Date(user.history[user.history.length - 1].date) < ninetyDaysAgo;
+        const neverChecked = !user.lastActivityCheck;
+        const regularCheck = user.lastActivityCheck < thirtyDaysAgo && !user.hasActivityWarning;
+        const warningCheck = user.lastActivityCheck < thirtyDaysAgo && user.hasActivityWarning;
+        const check = isBnFor90Days && (regularCheck || neverChecked || warningCheck);
+        const normalBnThreshold = 6;
+        const hybridBnTotalThreshold = 9;   // unused for now
+        const hybridBnPerModeThreshold = 3; // unused for now
+
+        const channel = {
+            name: `BN Activity warning`,
+            description: 'Notice for low beatmap nominator activity',
+        }
+
+        if (check) {
+            const nomCount = await scrap.findUniqueNominationsCount(ninetyDaysAgo, new Date(), user);
+
+            if (regularCheck || neverChecked) {
+                if (nomCount < normalBnThreshold) {
+                    const message = `Hello ${user.username}! You've nominated ${nomCount} beatmaps in the last 90 days, which is lower than the minimum **${normalBnThreshold} nominations per 90 days**.\n\nYour activity will be checked again in **30 days**. If you don't have ${normalBnThreshold} nominations within the next 90 day period (the last 60 days + the next 30 days), you will be removed from the Beatmap Nominators for inactivity.\n\n[View your nomination activity here!](https://bn.mappersguild.com/users?id=${user.id})`;
+                    await osuBot.sendAnnouncement([user.osuId], channel, message);
+                    user.hasActivityWarning = true;
+                    
+                    for (const modeInfo of user.modesInfo) {
+                        await discord.webhookPost(
+                            [{
+                                description: `Sent low activity warning for [**${user.username}**](https://osu.ppy.sh/users/${user.osuId}) ([**${nomCount} nominations** in 90 days](https://bn.mappersguild.com/users?id=${user.id}))`,
+                                color: discord.webhookColors.darkYellow,
+                            }],
+                            modeInfo.mode,
+                        );
+                    }
+                    
+                }
+            } else if (warningCheck) {
+                if (nomCount < normalBnThreshold) {
+                    const pendingEvaluation = await BnEvaluation.findOne({ user: user._id, active: true, natEvaluators: [] });
+                    
+                    if (pendingEvaluation) {
+                        pendingEvaluation.activityToCheck = 90;
+                        pendingEvaluation.deadline = new Date();
+                        pendingEvaluation.discussion = true;
+                        pendingEvaluation.consensus = BnEvaluationConsensus.RemoveFromBn;
+                        pendingEvaluation.addition = BnEvaluationAddition.LowActivityWarning;
+                        pendingEvaluation.feedback = `Hello! You've nominated ${nomCount} beatmaps in the last 90 days, which is lower than the minimum **${normalBnThreshold} nominations per 3 months**. Because you haven't reached the minimum threshold since your warning, you have been removed from the BN for inactivity.`;
+                        await pendingEvaluation.save();
+                        user.hasActivityWarning = false;
+                    }
+                }
+            }
+
+            user.lastActivityCheck = new Date();
+            await user.save();
         }
     }
 }, {
@@ -975,4 +1049,5 @@ module.exports = {
     notifyBeatmapReports,
     spawnProbationEvaluations,
     spawnHighActivityEvaluations,
+    checkUserActivity,
 };
