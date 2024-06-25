@@ -4,7 +4,7 @@ const AppEvaluation = require('../../models/evaluations/appEvaluation');
 const BnEvaluation = require('../../models/evaluations/bnEvaluation');
 const User = require('../../models/user');
 const Logger = require('../../models/log');
-const { submitEval, setGroupEval, setFeedback, replaceUser, findSkipProbationEligibility } = require('./evaluations');
+const { submitEval, setGroupEval, setFeedback, replaceUser } = require('./evaluations');
 const middlewares = require('../../helpers/middlewares');
 const util = require('../../helpers/util');
 const discord = require('../../helpers/discord');
@@ -373,7 +373,7 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
             let level = 'probation';
             let activityToCheck = 37;
 
-            const skipProbation = await findSkipProbationEligibility(user.id, evaluation.mode);
+            const skipProbation = evaluation.isRejoinRequest;
 
             if (skipProbation) {
                 level = 'full';

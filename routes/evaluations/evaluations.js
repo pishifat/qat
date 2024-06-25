@@ -261,49 +261,9 @@ async function replaceUser (evaluation, currentUserId, evaluatorId, isBn, select
     return newEvaluator;
 }
 
-async function findSkipProbationEligibility (userId, mode) {
-    const oneYearAgo = moment().subtract(1, 'years').toDate();
-
-    const lastResignation = await ResignationEvaluation
-        .findOne({
-            user: userId,
-            mode,
-            archivedAt: { $gt: oneYearAgo },
-            consensus: ResignationConsensus.ResignedOnGoodTerms
-        })
-        .sort({
-            updatedAt: -1,
-        });
-
-    const lastCurrentBnEval = await BnEvaluation
-        .findOne({
-            user: userId,
-            mode,
-            archivedAt: { $gt: oneYearAgo },
-        })
-        .sort({
-            updatedAt: -1,
-        });
-
-    let skipProbation = false;
-
-    if (lastResignation && lastCurrentBnEval && lastResignation.archivedAt && lastCurrentBnEval.archivedAt) {
-        const resignationArchiveDate = new Date(lastResignation.archivedAt);
-        const currentBnEvalArchiveDate = new Date(lastCurrentBnEval.archivedAt);
-
-        // skip probation on condition
-        if (resignationArchiveDate > currentBnEvalArchiveDate) {
-            skipProbation = true;
-        }
-    }
-
-    return skipProbation;
-}
-
 module.exports = {
     submitEval,
     setGroupEval,
     setFeedback,
     replaceUser,
-    findSkipProbationEligibility,
 };
