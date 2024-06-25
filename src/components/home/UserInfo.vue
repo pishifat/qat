@@ -135,10 +135,12 @@ export default {
    watch: {
         selectedUser() {
             this.requestInfo = this.selectedUser.requestInfo;
+            this.isEditing = false;
         },
     },
     mounted() {
         this.requestInfo = this.selectedUser.requestInfo;
+        this.isEditing = false;
     },
     mixins: [ evaluations ],
     methods: {
