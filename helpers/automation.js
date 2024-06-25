@@ -765,7 +765,7 @@ const spawnHighActivityEvaluations = cron.schedule('1 19 * * *', async () => {
 });
 
 /**
- * bump forward evaluation deadline if user has 30+ nominations since their last evaluation. checked daily
+ * check user activity (daily)
  */
 const checkUserActivity = cron.schedule('2 19 * * *', async () => {
     const ninetyDaysAgo = moment().subtract(90, 'days').toDate();
