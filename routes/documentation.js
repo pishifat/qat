@@ -49,7 +49,7 @@ router.post('/create', middlewares.isResponsibleWithButtons, async (req, res) =>
     const existingArticle = await Article.findByTitleOrId(req.body.title);
 
     if (existingArticle) {
-        return res.status(409).json({ error: 'article already exists' });
+        return res.json({ error: 'article already exists' });
     }
 
     const article = new Article({

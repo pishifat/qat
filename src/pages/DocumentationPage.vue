@@ -20,7 +20,9 @@
                             :rows="Math.min(article.content.split('\n').length + 1, 20)"
                         />
                     </div>
-                    <span class="small text-secondary my-1">Last updated: {{ article.updatedAt | toRelativeDate }} ({{ article.updatedAt | toStandardDetailedDate }})</span>
+                    <span class="small text-secondary my-1">
+                        Last updated: {{ article.updatedAt | toRelativeDate }} ({{ article.updatedAt | toStandardDetailedDate }})
+                    </span>
                     <div class="d-flex align-items-center">  
                         <button
                             class="btn btn-secondary"
