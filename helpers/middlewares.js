@@ -131,6 +131,7 @@ function discordEmbeds(req, res, next) {
         { path: 'spam', title: 'Spam' },
         { path: 'grouphistory', title: 'Group History'},
         { path: 'publicarchive', title: 'Public Evaluation Archives' },
+        { path: 'docs', title: 'Documentation' },
     ];
 
     const route = routes.find(r => r.path === req.path.substring(1));
