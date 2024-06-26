@@ -12,7 +12,7 @@
                 id="comment"
                 v-model="input.comments[i]"
                 class="form-control mb-2"
-                placeholder="your thoughts..."
+                placeholder="your thoughts (required)..."
                 rows="2"
                 maxlength="500"
                 @change="updateLocalStorage(i, input.comments[i])"

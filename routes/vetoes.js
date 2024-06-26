@@ -150,6 +150,10 @@ router.post('/submitMediation/:id', middlewares.isBnOrNat, async (req, res) => {
     for (let i = 0; i < mediationData.mediationIds.length; i++) {
         const mediationId = mediationData.mediationIds[i];
 
+        if (!inputData.comments[i]) {
+            return res.json({ error: 'Mediation comments cannot be empty!' });
+        }
+
         const mediation = await Mediation
             .findOne({
                 _id: mediationId,
