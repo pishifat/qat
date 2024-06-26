@@ -283,7 +283,8 @@ router.get('/logs/:userInput/:category', middlewares.hasPrivateInterOpsAccess, a
             'veto',
             'spam',
             'bnFinder' (no longer used),
-            'notableNameChanges'`,
+            'notableNameChanges',
+            'documentation'`,
         });
     }
 

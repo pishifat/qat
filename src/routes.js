@@ -21,6 +21,8 @@ const EvalArchive = () => import(/* webpackChunkName: "nat", webpackPrefetch: tr
 const DataCollection = () => import(/* webpackChunkName: "nat", webpackPrefetch: true */ './pages/DataCollectionPage.vue');
 const Logs = () => import(/* webpackChunkName: "nat", webpackPrefetch: true */ './pages/Logs.vue');
 const Spam = () => import(/* webpackChunkName: "nat", webpackPrefetch: true */ './pages/Spam.vue');
+const DocumentationIndex = () => import(/* webpackChunkName: "nat", webpackPrefetch: true */ './pages/DocumentationIndexPage.vue');
+const Documentation = () => import(/* webpackChunkName: "nat", webpackPrefetch: true */ './pages/DocumentationPage.vue');
 
 /**
  * ! when adding/editing routes here, make sure you do the same adjustments in /helpers/middlewares.js (discordEmbeds)
@@ -50,6 +52,8 @@ const routes = [
 
     // NAT/GMT
     { path: '/managereports', component: ManageReports, meta: { title: 'Manage Reports', requiresFullReadAccess: true } },
+    { path: '/docs', component: DocumentationIndex, meta: { title: 'Documentation', requiresFullReadAccess: true } },
+    { path: '/docs/:slug', component: Documentation, meta: { title: 'Documentation', requiresFullReadAccess: true } },
 
     // NAT
     { path: '/datacollection', component: DataCollection, meta: { title: 'Manage Resets', requiresNat: true } },

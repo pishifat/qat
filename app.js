@@ -22,6 +22,8 @@ mongoose.plugin(schema => {
 
 const Logger = require('./models/log');
 const automation = require('./helpers/automation');
+const { websocketManager } = require('./helpers/websocket');
+
 const indexRouter = require('./routes/index');
 const bnAppRouter = require('./routes/bnApp');
 const reportsRouter = require('./routes/reports');
@@ -32,7 +34,7 @@ const publicArchiveRouter = require('./routes/evaluations/publicArchive');
 const yourEvalsRouter = require('./routes/evaluations/yourEvals');
 const dataCollectionRouter = require('./routes/dataCollection');
 const manageReportsRouter = require('./routes/manageReports');
-const usersRouter = require('./routes//users/users');
+const usersRouter = require('./routes/users/users');
 const natRouter = require('./routes/users/nat');
 const vetoesRouter = require('./routes/vetoes');
 const discussionVoteRouter = require('./routes/discussionVote');
@@ -45,7 +47,7 @@ const settingsRouter = require('./routes/settings');
 const spamRouter = require('./routes/spam');
 const debugRouter = require('./routes/debug');
 const groupHistoryRouter = require('./routes/groupHistory');
-const { websocketManager } = require('./helpers/websocket');
+const documentationRouter = require('./routes/documentation');
 
 const app = express();
 
@@ -127,6 +129,7 @@ apiRouter.use('/settings', settingsRouter);
 apiRouter.use('/spam', spamRouter);
 apiRouter.use('/debug', debugRouter);
 apiRouter.use('/groupHistory', groupHistoryRouter);
+apiRouter.use('/docs', documentationRouter);
 
 app.use('/api', apiRouter);
 

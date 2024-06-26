@@ -333,7 +333,7 @@ router.get('/findGmtActivity/:days', async (req, res) => {
 });
 
 /* GET vibe check stats */
-router.get('/findVibeCheckStats', middlewares.isPishifat, async (req, res) => {
+router.get('/findVibeCheckStats', middlewares.isResponsibleWithButtons, async (req, res) => {
     const apps = await AppEvaluation
         .find({ 
             vibeChecks: { $exists: true, $ne: [] },

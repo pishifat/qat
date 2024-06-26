@@ -49,8 +49,10 @@
                     <h5>Next steps</h5>
                     <div class="mx-4">
                         <p><a :href="'/users?id=' + evaluation.user.id" target="_blank">This is you.</a> You're a <a href="https://osu.ppy.sh/groups/32" target="_blank">Probationary Beatmap Nominator</a>, which means you can only nominate maps that have been nominated by <a href="https://osu.ppy.sh/groups/28" target="_blank">Full Beatmap Nominators</a> and you cannot disqualify maps.</p>
-                        <p>Your BN activity will be evaluated when you do 6 nominations or after 1 month (whichever comes first). During your evaluation, your activity/attitude/nomination quality will be evaluated by members of the NAT. If each of these areas are satisfactory, you will be promoted to Full Beatmap Nominator. If not, your probation period will be extended for another month or you'll be dismissed from the BN. In that second case, you will not be able to re-apply for another 60 days.</p>
+                        <p>Your BN activity will be evaluated when you do 6 nominations or after 1 month (whichever comes first). During your evaluation, your activity/behavior/nomination quality will be evaluated by members of the NAT. If each of these areas are satisfactory, you will be promoted to Full Beatmap Nominator. If not, you may be moved to Full BN with a warning, or if the issues are severe enough, you'll be dismissed from the BN. If the latter happens, you will not be able to re-apply for another 60 days.</p>
+                        <hr>
                         <p>If you're a returning BN who recently resigned on good terms, you're already a Full Beatmap Nominator (yay!) and your next evaluation is ~3 months from now.</p>
+                        <p>Do note that you have to reach your game mode's minimum activity requirements during the first month to not risk being automatically dismissed.</p>
                     </div>
                     <hr />
                     <div v-if="evaluation.natBuddy">

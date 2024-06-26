@@ -85,7 +85,7 @@
                 <gmt-activity class="my-2" />
             </section>
 
-            <section v-if="loggedInUser.isPishifat" class="card card-body">
+            <section v-if="loggedInUser.isResponsibleWithButtons" class="card card-body">
                 <vibe-check-stats />
             </section>
         </div>
