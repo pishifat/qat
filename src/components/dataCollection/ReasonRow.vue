@@ -23,7 +23,8 @@
         </a>
 
         <!-- dq reason -->
-        <span v-html="$md.render(event.content)" />
+        <span v-if="event.content" v-html="$md.render(event.content)" />
+        <i v-else class="text-danger">No reason provided.</i>
     </td>
 </template>
 
