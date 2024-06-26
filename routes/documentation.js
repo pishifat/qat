@@ -1,6 +1,7 @@
 const express = require('express');
 const middlewares = require('../helpers/middlewares');
 const Article = require('../models/article');
+const Logger = require('../models/log');
 
 const router = express.Router();
 
@@ -42,11 +43,18 @@ router.post('/:slug/edit', middlewares.isNat, async (req, res) => {
     await article.save();
 
     res.json(article);
+
+    Logger.generate(
+        req.session.mongoId,
+        `Edited article "${article.title}"`,
+        'documentation',
+        null
+    );
 });
 
 /* POST create documentation article */
 router.post('/create', middlewares.isResponsibleWithButtons, async (req, res) => {
-    const existingArticle = await Article.findByTitleOrId(req.body.title);
+    const existingArticle = await Article.findByTitle(req.body.title);
 
     if (existingArticle) {
         return res.json({ error: 'article already exists' });
@@ -60,6 +68,13 @@ router.post('/create', middlewares.isResponsibleWithButtons, async (req, res) =>
     await article.save();
 
     res.json(article);
+
+    Logger.generate(
+        req.session.mongoId,
+        `Created article "${article.title}"`,
+        'documentation',
+        null
+    );
 });
 
 module.exports = router;

@@ -102,6 +102,7 @@ export default {
                 'interOp',
                 'spam',
                 'notableNameChanges',
+                'documentation',
             ],
             category: 'all',
             publicCategories: [
