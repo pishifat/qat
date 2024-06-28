@@ -2,15 +2,25 @@
     <div>
         <b>Mediations:</b>
         <div v-if="selectedVeto.vetoFormat >= 2">
-            <div v-for="(reason, reasonIndex) in selectedVeto.reasons" :key="reasonIndex">
-                <a v-if="selectedVeto.reasons.length > 1" :href="'#reason-' + (reasonIndex + 1)" data-toggle="collapse">{{ reasonIndex + 1 }}. {{ reason.summary }} <i class="fas fa-angle-down" /></a>
-                <a v-else :href="'#reason-' + (reasonIndex + 1)" data-toggle="collapse">View mediations <i class="fas fa-angle-down" /></a>
+            <div v-for="(reason, reasonIndex) in selectedVeto.reasons" :key="reasonIndex" class="mb-2">
+
+                <!-- collapse menu -->
+                <a v-if="selectedVeto.reasons.length" :href="'#reason-' + (reasonIndex + 1)" data-toggle="collapse">
+                    {{ reasonIndex + 1 }}. {{ reason.summary }} <i class="fas fa-angle-down" />
+                </a>
+
+                <!-- menu content -->
                 <div :id="'reason-' + (reasonIndex + 1)" class="collapse">
-                    <span v-if="selectedVeto.reasons.length > 1">
+
+                    <!-- discussion link + stats -->
+                    <span v-if="selectedVeto.reasons.length">
                         <hr />
                         <b>Discussion link:</b>
                         <a :href="reason.link" target="_blank">{{ reason.link }}</a>
+                        <vote-stats v-if="loggedInUser.isNat && !isMediator" :reason-index="reasonIndex" />
                     </span>
+
+                    <!-- mediations -->
                     <span v-for="(mediation, i) in selectedVeto.mediations" :key="mediation.id">
                         <div v-if="mediation.reasonIndex == reasonIndex">
                             <mediation-response
@@ -22,6 +32,8 @@
                 </div>
             </div>
         </div>
+
+        <!-- old mediations -->
         <div v-else>
             <div v-for="(mediation, i) in selectedVeto.mediations" :key="mediation.id">
                 <mediation-response
@@ -36,11 +48,13 @@
 <script>
 import { mapGetters, mapState } from 'vuex';
 import MediationResponse from './MediationResponse.vue';
+import VoteStats from './VoteStats.vue';
 
 export default {
     name: 'Mediations',
     components: {
         MediationResponse,
+        VoteStats,
     },
     computed: {
         ...mapState([
@@ -48,6 +62,7 @@ export default {
         ]),
         ...mapGetters('vetoes', [
             'selectedVeto',
+            'isMediator',
         ]),
     },
 };

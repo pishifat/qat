@@ -2,8 +2,7 @@
     <div v-if="selectedVeto.vetoFormat >= 2">
         <hr>
         <b>Stats:</b>
-        <div v-for="(reason, reasonIndex) in selectedVeto.reasons" :key="reasonIndex">
-            <a v-if="selectedVeto.reasons.length > 1" :href="reason.link" target="_blank">{{ reasonIndex + 1 }}. {{ reason.summary }}</a>
+        <div :key="reasonIndex">
             <ul>
                 <li>
                     <label class="mb-0" data-toggle="tooltip" data-placement="right" title="% of submitted votes">
@@ -40,7 +39,13 @@
 import { mapGetters } from 'vuex';
 
 export default {
-    name: 'VoteCount',
+    name: 'VoteStats',
+    props: {
+        reasonIndex: {
+            type: Number,
+            required: true,
+        },
+    },
     computed: {
         ...mapGetters('vetoes', [
             'selectedVeto',
