@@ -216,8 +216,39 @@ router.post('/submitMediation/:id', middlewares.isBnOrNat, async (req, res) => {
         'veto',
         veto._id
     );
+});
 
+/* POST reset mediation comment */
+router.post('/resetMediation/:id', middlewares.isAdmin, async (req, res) => {
+    const veto = await Veto
+        .findById(req.params.id)
+        .populate(
+            getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
+        );
 
+    const mediation = veto.mediations.find(mediation => mediation._id == req.body.mediationId);
+
+    mediation.comment = undefined;
+    mediation.vote = undefined;
+
+    await mediation.save();
+
+    discord.webhookPost([{
+        author: discord.defaultWebhookAuthor(req.session),
+        color: discord.webhookColors.black,
+        description: `Reset mediation vote and comment by **${mediation.mediator.username}** for [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`,
+    }],
+        veto.mode
+    );
+
+    res.json(veto);
+
+    Logger.generate(
+        req.session.mongoId,
+        `Deleted mediation comment by ${mediation.mediator.username} for "${veto.beatmapTitle}"`,
+        'veto',
+        veto._id
+    );
 });
 
 /* POST select mediators */
