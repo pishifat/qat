@@ -12,6 +12,9 @@
                     href="#"
                     @click.prevent="deleteReview()"
                     class="text-danger"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="Delete review"
                 >
                     <i class="fas fa-trash-alt" />
                 </a>
