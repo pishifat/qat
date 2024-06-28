@@ -131,7 +131,6 @@ router.post('/adjustEvaluationDeadline/:id/:mode', middlewares.isNat, async (req
 router.post('/resetEvaluationDeadline/:id/:mode', middlewares.isNat, async (req, res) => {
     const userId = req.params.id;
     const mode = req.params.mode;
-
     const [evaluation, pendingEvaluation] = await Promise.all([
         BnEvaluation
             .findOne({
@@ -140,7 +139,12 @@ router.post('/resetEvaluationDeadline/:id/:mode', middlewares.isNat, async (req,
                 consensus: { $exists: true },
                 active: false,
             })
-            .sort({ updatedAt: -1 }),
+            .populate({
+                path: "user",
+                select: "username",
+            })
+            .sort({ archivedAt: -1 }),
+
         BnEvaluation
             .findOne({
                 user: userId,
@@ -157,7 +161,7 @@ router.post('/resetEvaluationDeadline/:id/:mode', middlewares.isNat, async (req,
 
     if (evaluation.consensus === BnEvaluationConsensus.ProbationBn) {
         deadline.setDate(deadline.getDate() + 37);
-        
+
         if (pendingEvaluation) {
             pendingEvaluation.deadline = deadline;
             await pendingEvaluation.save();
@@ -169,9 +173,7 @@ router.post('/resetEvaluationDeadline/:id/:mode', middlewares.isNat, async (req,
                 activityToCheck: 37,
             });
         }
-    }
-
-    else if (evaluation.consensus === BnEvaluationConsensus.FullBn) {
+    } else if (evaluation.consensus === BnEvaluationConsensus.FullBn) {
         let activityToCheck = 90;
 
         if (evaluation.addition === BnEvaluationAddition.LowActivityWarning) {
@@ -196,15 +198,13 @@ router.post('/resetEvaluationDeadline/:id/:mode', middlewares.isNat, async (req,
         }
     }
 
-    res.json({
-        deadline
-    });
+    res.json({ deadline });
 
     Logger.generate(
         req.session.mongoId,
-        `Reset "${pendingEvaluation.user.username}" ${mode} current BN evaluation deadline to ${deadline.toISOString().slice(0,10)}`,
+        `Reset ${evaluation?.user.username}'s ${mode} current BN evaluation deadline to ${deadline.toISOString().slice(0, 10)}`,
         'bnEvaluation',
-        pendingEvaluation._id
+        pendingEvaluation?._id || evaluation?.user._id
     );
 });
 
@@ -333,7 +333,7 @@ router.get('/findGmtActivity/:days', async (req, res) => {
 });
 
 /* GET vibe check stats */
-router.get('/findVibeCheckStats', middlewares.isResponsibleWithButtons, async (req, res) => {
+router.get('/findVibeCheckStats', middlewares.isAdmin, async (req, res) => {
     const apps = await AppEvaluation
         .find({ 
             vibeChecks: { $exists: true, $ne: [] },
@@ -902,7 +902,7 @@ router.post('/:id/updateMapperPreferences', middlewares.isBnOrNat, async (req, r
     );
 });
 
-/* POST switch user group */
+/* POST add to NAT */
 router.post('/:id/addToNat', middlewares.isNat, async (req, res) => {
     const user = await User.findById(req.params.id).orFail();
     const mode = req.body.mode;
@@ -977,7 +977,7 @@ router.post('/:id/addToNat', middlewares.isNat, async (req, res) => {
 
     res.json({
         user,
-        success: 'Changed user group',
+        success: 'Added to NAT',
     });
 
     Logger.generate(
@@ -1028,6 +1028,79 @@ router.post('/:id/changeEvaluatorMode', middlewares.isNat, async (req, res) => {
     Logger.generate(
         req.session.mongoId,
         `Moved "${user.username}" from "${util.formatMode(oldMode)} NAT" to "${util.formatMode(mode)} NAT"`,
+        'user',
+        user._id
+    );
+});
+
+/* POST force move from probation to full BN */
+router.post('/:id/forceFullBn', middlewares.isAdmin, async (req, res) => {
+    const user = await User.findById(req.params.id).orFail();
+    const mode = req.body.mode;
+
+    if (!mode)
+        return res.json({
+            error: 'Failed to get game mode!',
+        });
+    
+    for (const modeInfo of user.modesInfo) {
+        if (modeInfo.mode == mode) {
+            modeInfo.level = 'full';
+        }
+    }
+
+    const [evaluation, pendingEvaluation] = await Promise.all([
+        AppEvaluation
+            .findOne({
+                user,
+                mode,
+                consensus: 'pass',
+                active: false,
+            })
+            .sort({ archivedAt: -1 }),
+
+        BnEvaluation
+            .findOne({
+                user,
+                mode,
+                active: true,
+            }),
+    ]);
+
+    let deadline = new Date(evaluation.archivedAt);
+    deadline.setDate(deadline.getDate() + 90);
+
+    if (pendingEvaluation) {
+        pendingEvaluation.deadline = deadline;
+        await pendingEvaluation.save();
+    } else {
+        await BnEvaluation.create({
+            user,
+            mode,
+            deadline,
+            activityToCheck: 90,
+        });
+    }
+
+    await user.save();
+
+    discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            color: discord.webhookColors.darkGreen,
+            description: `Force moved [**${user.username}**](http://osu.ppy.sh/users/${user.osuId}) to **full BN**`,
+        }],
+        mode
+    );
+
+    res.json({
+        user,
+        success: 'Force moved to full BN',
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Force moved "${user.username}" to full BN`,
         'user',
         user._id
     );
@@ -1164,7 +1237,7 @@ router.post('/resignFromBn/:id', async (req, res) => {
 });
 
 /* POST cycle bag */
-router.post('/cycleBag/:mode', middlewares.isResponsibleWithButtons, async (req, res) => {
+router.post('/cycleBag/:mode', middlewares.isAdmin, async (req, res) => {
     const tempEvaluation = await BnEvaluation.findOne({ active: true }); // a random eval for getAssignedNat to work
     const users = await User.getAssignedNat(req.params.mode, tempEvaluation.user.toString());
 

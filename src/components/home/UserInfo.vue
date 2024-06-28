@@ -87,18 +87,10 @@
 
             <preferences />
 
-            <div v-if="loggedInUser && loggedInUser.isPishifat">
-                <hr />
-                <div class="ml-3">
-                    <b>Debug</b>
-                    <div class="ml-3">
-                        <a href="#userDocument" data-toggle="collapse">
-                            view user document <i class="fas fa-angle-down" />
-                        </a>
-                        <pre id="userDocument" class="collapse container">{{ JSON.stringify(selectedUser, null, 4) }}</pre>
-                    </div>
-                </div>
-            </div>
+            <debug-view-document
+                v-if="loggedInUser && loggedInUser.isAdmin"
+                :document="selectedUser"
+            />
         </div>
 
     </modal-dialog>
@@ -110,6 +102,7 @@ import ModalHeader from './ModalHeader.vue';
 import ModalDialog from '../ModalDialog.vue';
 import Preferences from './info/Preferences.vue';
 import evaluations from '../../mixins/evaluations';
+import DebugViewDocument from '../DebugViewDocument.vue';
 
 export default {
     name: 'UserInfo',
@@ -117,6 +110,7 @@ export default {
         ModalHeader,
         ModalDialog,
         Preferences,
+        DebugViewDocument,
     },
     computed: {
         ...mapState([

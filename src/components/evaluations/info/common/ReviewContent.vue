@@ -8,10 +8,13 @@
                 :align-start="true"
             >
                 <a
-                    v-if="loggedInUser.isResponsibleWithButtons"
+                    v-if="loggedInUser.isAdmin"
                     href="#"
                     @click.prevent="deleteReview()"
                     class="text-danger"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="Delete review"
                 >
                     <i class="fas fa-trash-alt" />
                 </a>

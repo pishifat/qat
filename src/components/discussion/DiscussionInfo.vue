@@ -8,15 +8,18 @@
             <discussion-context />
 
             <votes-active
-                v-if="selectedDiscussionVote.isActive"
+                v-if="selectedDiscussionVote.isActive && !loggedInUser.isAdmin"
             />
-            <votes-inactive
-                v-else-if="!selectedDiscussionVote.isActive"
-            />
+            <votes-inactive v-else />
 
             <button v-if="selectedDiscussionVote.isActive && loggedInUser.hasFullReadAccess" class="btn btn-sm btn-danger btn-block mt-3" @click="concludeMediation($event)">
                 Conclude Vote
             </button>
+
+            <debug-view-document 
+                v-if="loggedInUser.isAdmin"
+                :document="selectedDiscussionVote"
+            />
 
             <div v-if="selectedDiscussionVote.isActive && loggedInUser.hasBasicAccess">
                 <hr>
@@ -29,7 +32,7 @@
                 <p v-else class="small">
                     Because you're not proficient in this proposal's game mode, you're not able to vote :(
                 </p>
-            </div>
+            </div> 
         </div>
     </modal-dialog>
 </template>
@@ -42,6 +45,7 @@ import VotesActive from './info/votes/VotesActive.vue';
 import VotesInactive from './info/votes/VotesInactive.vue';
 import MediatorOptions from './info/MediatorOptions.vue';
 import ModalDialog from '../ModalDialog.vue';
+import DebugViewDocument from '../DebugViewDocument.vue';
 
 export default {
     name: 'DiscussionInfo',
@@ -52,6 +56,7 @@ export default {
         VotesInactive,
         MediatorOptions,
         ModalDialog,
+        DebugViewDocument,
     },
     computed: {
         ...mapState([

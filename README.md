@@ -18,7 +18,7 @@ If you want to contribute, make a copy of `config.example.json` titled `config.j
 - `interOpAccess`: for /interOp routes (optional)
 - `admin`: needed to work with extra site permissions
   - `pishifat`: pishifat's or your own osu! user id
-  - `users`: array of users who will be granted the `isResponsibleWithButtons` permission
+  - `users`: array of users who will be granted the `isAdmin` permission
 
 Optionally, you can make a copy of `webhooks.example.json` titled `webhooks.json` and fill out each webhook field.
 

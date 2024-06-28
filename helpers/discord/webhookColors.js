@@ -12,7 +12,7 @@ const webhookColors = {
     yellow: 16777022,         // submitMediationDiscussionVote
 
     lightGreen: 8847214,      // submitEval, submitQA
-    darkGreen: 1921053,       // addToNat, assignNatBuddy
+    darkGreen: 1921053,       // addToNat, assignNatBuddy, changeEvaluatorMode, forceFullBn
     green: 4380222,           // newBnApplication
 
     lightBlue: 8643583,       // setConsensus, announcement
@@ -29,7 +29,7 @@ const webhookColors = {
     white: 15724527,          // unarchive, addEvaluation, sendMessages
     brown: 7554849,           // submitUserNote
     gray: 8815494,            // passive: moveToGroupDiscussion, dev
-    black: 2564903,           // archive, deleteVeto, deleteReview, toggleMessagesLocked
+    black: 2564903,           // archive, deleteVeto, deleteReview, toggleMessagesLocked, resetMediation
 };
 
 module.exports = webhookColors;

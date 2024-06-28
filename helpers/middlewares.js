@@ -81,7 +81,7 @@ function isNatOrTrialNat(req, res, next) {
     next();
 }
 
-function isResponsibleWithButtons(req, res, next) {
+function isAdmin(req, res, next) {
     const u = res.locals.userRequest;
     const valid = config.admin.users;
 
@@ -170,7 +170,7 @@ module.exports = {
     isNat,
     hasFullReadAccessOrTrialNat,
     isNatOrTrialNat,
-    isResponsibleWithButtons,
+    isAdmin,
     hasBasicAccess,
     hasFullReadAccess,
     hasPrivateInterOpsAccess,

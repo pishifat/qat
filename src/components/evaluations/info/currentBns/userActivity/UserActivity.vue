@@ -196,7 +196,7 @@ export default {
         return {
             daysInput: this.overwriteDays,
             editingDaysInput: false,
-            selectedMode: null,
+            selectedMode: '',
         };
     },
     computed: {
@@ -217,13 +217,13 @@ export default {
     watch: {
         unique() {
             this.daysInput = this.overwriteDays;
-            this.selectedMode = null;
+            this.selectedMode = '';
             this.findRelevantActivity();
         },
     },
     created() {
         this.daysInput = this.overwriteDays;
-        this.selectedMode = null;
+        this.selectedMode = '';
         this.findRelevantActivity();
     },
     methods: {
@@ -235,7 +235,7 @@ export default {
             this.editingDaysInput = !this.editingDaysInput;
         },
         filterEvents (events, mode) {
-            if (!mode) return events;
+            if (!mode.length) return events;
 
             return events.filter(event => {
                 if (this.eventsId == 'qualityAssuranceChecks') {

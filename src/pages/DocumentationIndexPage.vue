@@ -25,7 +25,7 @@
                 <p>No documentation pages found.</p>
             </section>
 
-            <section v-if="loggedInUser.isResponsibleWithButtons" class="card card-body">
+            <section v-if="loggedInUser.isAdmin" class="card card-body">
                 <h5>Create page</h5>
                 <div>
                     Title:

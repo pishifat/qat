@@ -63,6 +63,11 @@
                 :is-new-evaluation-format="selectedEvaluation.isNewEvaluationFormat"
             />
 
+            <debug-view-document 
+                v-if="loggedInUser.isAdmin"
+                :document="selectedEvaluation" 
+            />
+
             <button
                 class="btn btn-sm btn-danger float-right"
                 @click="unarchive($event)"
@@ -85,6 +90,7 @@ import { AppEvaluationConsensus } from '../../../../shared/enums';
 import EvaluationLink from './common/EvaluationLink.vue';
 import UserLink from '../../UserLink.vue';
 import EvaluationMessages from './common/EvaluationMessages.vue';
+import DebugViewDocument from '../../DebugViewDocument.vue';
 
 export default {
     name: 'ArchiveInfo',
@@ -98,6 +104,7 @@ export default {
         EvaluationLink,
         UserLink,
         EvaluationMessages,
+        DebugViewDocument,
     },
     computed: {
         ...mapState([
@@ -113,7 +120,7 @@ export default {
             if (this.selectedEvaluation.user.modes.length && !this.selectedEvaluation.user.modes.includes('none'))
                 return this.selectedEvaluation.user.modes;
 
-            return this.selectedEvaluation.mode;
+            return [this.selectedEvaluation.mode];
         },
         isNatEvaluation () {
             return ['remainInNat', 'moveToBn', 'removeFromNat'].includes(this.selectedEvaluation.consensus);
