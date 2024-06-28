@@ -1,5 +1,5 @@
 <template>
-    <modal-dialog id="userInfo" :key="this.$route.query">
+    <modal-dialog id="userInfo" :key="queryString">
         <template v-if="selectedUser" #header>
             <modal-header />
         </template>
@@ -125,6 +125,9 @@ export default {
         ...mapGetters('usersHome', [
             'selectedUser',
         ]),
+        queryString() {
+            return new URLSearchParams(this.$route.query).toString();
+        },
     },
     data () {
         return {
@@ -139,7 +142,7 @@ export default {
         },
     },
     mounted() {
-        this.requestInfo = this.selectedUser.requestInfo;
+        this.requestInfo = this.selectedUser?.requestInfo ?? '';
         this.isEditing = false;
     },
     mixins: [ evaluations ],
