@@ -64,7 +64,7 @@
                     </div>
 
                     <nat-subgroup-toggle 
-                        v-if="loggedInUser.isResponsibleWithButtons && selectedUser.isNat" 
+                        v-if="loggedInUser.isAdmin && selectedUser.isNat" 
                     />
 
                     <modding-activity

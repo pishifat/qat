@@ -1027,7 +1027,7 @@ router.post('/toggleIsReviewed/:id', middlewares.isNat, async (req, res) => {
 });
 
 /* POST delete review */
-router.post('/deleteReview/:id', middlewares.isResponsibleWithButtons, async (req, res) => {
+router.post('/deleteReview/:id', middlewares.isAdmin, async (req, res) => {
     const eval = await BnEvaluation
         .findById(req.params.id)
         .populate(defaultPopulate);

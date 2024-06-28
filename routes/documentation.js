@@ -53,7 +53,7 @@ router.post('/:slug/edit', middlewares.isNat, async (req, res) => {
 });
 
 /* POST create documentation article */
-router.post('/create', middlewares.isResponsibleWithButtons, async (req, res) => {
+router.post('/create', middlewares.isAdmin, async (req, res) => {
     const existingArticle = await Article.findByTitle(req.body.title);
 
     if (existingArticle) {

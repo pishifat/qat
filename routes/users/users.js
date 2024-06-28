@@ -333,7 +333,7 @@ router.get('/findGmtActivity/:days', async (req, res) => {
 });
 
 /* GET vibe check stats */
-router.get('/findVibeCheckStats', middlewares.isResponsibleWithButtons, async (req, res) => {
+router.get('/findVibeCheckStats', middlewares.isAdmin, async (req, res) => {
     const apps = await AppEvaluation
         .find({ 
             vibeChecks: { $exists: true, $ne: [] },
@@ -1164,7 +1164,7 @@ router.post('/resignFromBn/:id', async (req, res) => {
 });
 
 /* POST cycle bag */
-router.post('/cycleBag/:mode', middlewares.isResponsibleWithButtons, async (req, res) => {
+router.post('/cycleBag/:mode', middlewares.isAdmin, async (req, res) => {
     const tempEvaluation = await BnEvaluation.findOne({ active: true }); // a random eval for getAssignedNat to work
     const users = await User.getAssignedNat(req.params.mode, tempEvaluation.user.toString());
 

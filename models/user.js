@@ -103,7 +103,7 @@ class UserService extends mongoose.Model {
         return this.osuId === config.admin.pishifat;
     }
 
-    get isResponsibleWithButtons () {
+    get isAdmin () {
         return config.admin.users.includes(this.osuId);
     }
 

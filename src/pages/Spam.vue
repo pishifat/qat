@@ -105,7 +105,7 @@
 
         <div class="card card-body small mb-4">
             <h4>Message (<a href="https://osu.ppy.sh/users/6616586" target="_blank">NAT bot</a>)</h4>
-            <div v-if="!loggedInUser.isResponsibleWithButtons" class="text-secondary mb-2">You don't have permission to use this. If you think you should, talk to pishifat.</div>
+            <div v-if="!loggedInUser.isAdmin" class="text-secondary mb-2">You don't have permission to use this. If you think you should, talk to pishifat.</div>
             <div>
                 Title:
                 <input

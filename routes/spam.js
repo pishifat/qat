@@ -12,7 +12,7 @@ router.use(middlewares.isLoggedIn);
 router.use(middlewares.isNat);
 
 /* POST spam messages */
-router.post('/sendMessages', middlewares.isResponsibleWithButtons, async (req, res) => {
+router.post('/sendMessages', middlewares.isAdmin, async (req, res) => {
     const channel = {
         name: req.body.title,
         description: req.body.description
