@@ -19,11 +19,18 @@
                 v-if="loggedInUser.isNat && !isMediator" 
             />
 
+            <!-- show debug info to admins -->
+            
+            <debug-view-document 
+                v-if="loggedInUser.isAdmin"
+                :document="selectedVeto"
+            />
+
             <hr />
 
-            <!-- show admin buttons to NAT who aren't active mediators -->
+            <!-- show admin buttons to NAT who aren't active mediators, or admins -->
             <admin-buttons
-                v-if="loggedInUser.isNat && !isMediator"
+                v-if="(loggedInUser.isNat && !isMediator) || loggedInUser.isAdmin"
             />
 
             <!-- show mediation input for active mediators -->
@@ -41,6 +48,7 @@ import Mediations from './info/Mediations.vue';
 import AdminButtons from './info/AdminButtons.vue';
 import MediationInput from './info/MediationInput.vue';
 import ModalDialog from '../ModalDialog.vue';
+import DebugViewDocument from '../DebugViewDocument.vue';
 
 export default {
     name: 'VetoInfo',
@@ -50,6 +58,7 @@ export default {
         AdminButtons,
         MediationInput,
         ModalDialog,
+        DebugViewDocument,
     },
     computed: {
         ...mapState([

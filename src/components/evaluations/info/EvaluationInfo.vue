@@ -102,16 +102,10 @@
                         <modding-activity
                             :username="selectedEvaluation.user.username"
                         />
-                        <div v-if="loggedInUser.isPishifat" class="mb-2">
-                            <hr>
-                            <b>Debug</b>
-                            <div class="ml-3">
-                                <a href="#evalDocument" data-toggle="collapse">
-                                    view evaluation document <i class="fas fa-angle-down" />
-                                </a>
-                                <pre id="evalDocument" class="collapse container">{{ JSON.stringify(selectedEvaluation, null, 4) }}</pre>
-                            </div>
-                        </div>
+                        <debug-view-document 
+                            v-if="loggedInUser.isAdmin"
+                            :document="selectedEvaluation" 
+                        />
                     </div>
                 </template>
 
@@ -149,6 +143,7 @@ import MainApplicationInfo from './applications/MainApplicationInfo.vue';
 import DiscussionInfo from './DiscussionInfo.vue';
 import EvaluationIsSecurityChecked from './applications/EvaluationIsSecurityChecked.vue';
 import SubjectiveFeedbackStatus from './currentBns/SubjectiveFeedbackStatus.vue';
+import DebugViewDocument from '../../DebugViewDocument.vue';
 
 export default {
     name: 'EvaluationInfo',
@@ -169,6 +164,7 @@ export default {
         DiscussionInfo,
         EvaluationIsSecurityChecked,
         SubjectiveFeedbackStatus,
+        DebugViewDocument,
     },
     data () {
         return {
@@ -184,7 +180,7 @@ export default {
             if (this.selectedEvaluation.user.modes.length && !this.selectedEvaluation.user.modes.includes('none'))
                 return this.selectedEvaluation.user.modes;
 
-            return this.selectedEvaluation.mode;
+            return [this.selectedEvaluation.mode];
         },
     },
     methods: {

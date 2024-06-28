@@ -7,6 +7,11 @@
         <div v-if="selectedReport" class="container">
             <context />
 
+            <debug-view-document 
+                v-if="loggedInUser.isAdmin"
+                :document="selectedReport" 
+            />
+
             <hr>
 
             <feedback class="mb-3" />
@@ -25,6 +30,7 @@ import Context from './info/Context.vue';
 import Feedback from './info/Feedback.vue';
 import ReportFeedbackPm from './info/ReportFeedbackPm.vue';
 import ModalDialog from '../ModalDialog.vue';
+import DebugViewDocument from '../DebugViewDocument.vue';
 
 export default {
     name: 'ReportInfo',
@@ -34,6 +40,7 @@ export default {
         Feedback,
         ReportFeedbackPm,
         ModalDialog,
+        DebugViewDocument,
     },
     computed: {
         ...mapState([

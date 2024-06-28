@@ -91,16 +91,10 @@
                 <notes />
             </div>
 
-            <div v-if="loggedInUser.isPishifat">
-                <hr />
-                <b>Debug</b>
-                <div class="ml-3">
-                    <a href="#userDocument" data-toggle="collapse">
-                        view user document <i class="fas fa-angle-down" />
-                    </a>
-                    <pre id="userDocument" class="collapse container">{{ JSON.stringify(selectedUser, null, 4) }}</pre>
-                </div>
-            </div>
+            <debug-view-document 
+                v-if="loggedInUser.isAdmin"
+                :document="selectedUser"
+            />
         </div>
     </modal-dialog>
 </template>
@@ -124,6 +118,7 @@ import BanToggle from './info/BanToggle.vue';
 import Badges from './Badges.vue';
 import ContentReviewToggle from './info/ContentReviewToggle.vue';
 import ModalDialog from '../ModalDialog.vue';
+import DebugViewDocument from '../DebugViewDocument.vue';
 
 export default {
     name: 'UserInfo',
@@ -145,6 +140,7 @@ export default {
         ModalDialog,
         Badges,
         ContentReviewToggle,
+        DebugViewDocument,
     },
     computed: {
         ...mapState([
