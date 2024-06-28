@@ -10,9 +10,10 @@
         <div v-if="selectedVeto" class="container">
 
             <!-- show mediations to NAT if they're not active mediators -->
-            <div v-if="showMediations">
-                <mediations />
-            </div>
+            <mediations v-if="showMediations" />
+
+            <!-- show context when mediations aren't visible -->
+            <context v-else />
 
             <!-- show vote count to NAT who aren't active mediators -->
             <vote-count 
@@ -20,13 +21,10 @@
             />
 
             <!-- show debug info to admins -->
-            
             <debug-view-document 
                 v-if="loggedInUser.isAdmin"
                 :document="selectedVeto"
             />
-
-            <hr />
 
             <!-- show admin buttons to NAT who aren't active mediators, or admins -->
             <admin-buttons
@@ -49,6 +47,7 @@ import AdminButtons from './info/AdminButtons.vue';
 import MediationInput from './info/MediationInput.vue';
 import ModalDialog from '../ModalDialog.vue';
 import DebugViewDocument from '../DebugViewDocument.vue';
+import Context from './info/Context.vue';
 
 export default {
     name: 'VetoInfo',
@@ -59,6 +58,7 @@ export default {
         MediationInput,
         ModalDialog,
         DebugViewDocument,
+        Context,
     },
     computed: {
         ...mapState([
