@@ -128,7 +128,7 @@ router.post('/adjustEvaluationDeadline/:id/:mode', middlewares.isNat, async (req
 });
 
 /* POST reset next evaluation deadline based on previous evaluations */
-router.post("/resetEvaluationDeadline/:id/:mode", middlewares.isNat, async (req, res) => {
+router.post('/resetEvaluationDeadline/:id/:mode', middlewares.isNat, async (req, res) => {
     const userId = req.params.id;
     const mode = req.params.mode;
     const [evaluation, pendingEvaluation] = await Promise.all([
