@@ -8,11 +8,9 @@
             <discussion-context />
 
             <votes-active
-                v-if="selectedDiscussionVote.isActive"
+                v-if="selectedDiscussionVote.isActive && !loggedInUser.isAdmin"
             />
-            <votes-inactive
-                v-else-if="!selectedDiscussionVote.isActive"
-            />
+            <votes-inactive v-else />
 
             <button v-if="selectedDiscussionVote.isActive && loggedInUser.hasFullReadAccess" class="btn btn-sm btn-danger btn-block mt-3" @click="concludeMediation($event)">
                 Conclude Vote
