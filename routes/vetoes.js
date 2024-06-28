@@ -131,10 +131,17 @@ router.post('/submit', async (req, res) => {
         'veto',
         veto._id
     );
+
+    let description = `Submitted [veto for **${veto.beatmapTitle}** by **${veto.beatmapMapper}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`;
+
+    for (let i = 0; i < veto.reasons.length; i++) {
+        description += `\n- **Reason ${i + 1}:** ${veto.reasons[i].summary}`;
+    }
+
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),
         color: discord.webhookColors.darkPurple,
-        description: `Submitted [veto for **${veto.beatmapTitle}** by **${veto.beatmapMapper}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`,
+        description,
     }],
         req.body.mode);
 });
