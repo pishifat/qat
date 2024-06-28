@@ -83,6 +83,67 @@
             <span v-else class="small" v-html="$md.render(selectedDiscussionVote.shortReason)" />
         </p>
 
+        <p v-if="isEditable && !selectedDiscussionVote.isContentReview">
+            <a
+                href="#"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="edit title"
+                @click.prevent="editOptions"
+            >
+                <i class="fas fa-edit" />
+            </a>
+
+            <b>Voting options:</b>
+
+            <input
+                v-if="isEditingOptions"
+                v-model="agreeOverwriteTextEditContent"
+                class="form-control form-control-sm w-50"
+                type="text"
+                placeholder="submit custom agree option..."
+                @keyup.enter="update()"
+            >
+            <input
+                v-if="isEditingOptions && selectedDiscussionVote.neutralAllowed"
+                v-model="neutralOverwriteTextEditContent"
+                class="form-control form-control-sm w-50"
+                type="text"
+                placeholder="submit custom neutral option..."
+                @keyup.enter="update()"
+            >
+            <input
+                v-if="isEditingOptions"
+                v-model="disagreeOverwriteTextEditContent"
+                class="form-control form-control-sm w-50"
+                type="text"
+                placeholder="submit custom disagree option..."
+                @keyup.enter="update()"
+            >
+
+            <input
+                id="neutralAllowedEdit"
+                v-if="isEditingOptions"
+                v-model="neutralAllowedEdit"
+                type="checkbox"
+                class="mt-2"
+                @change="update()"
+            >
+            <label
+                v-if="isEditingOptions"
+                for="neutralAllowedEdit"
+                class="form-check-label text-secondary"
+            >
+                Neutral option allowed
+            </label>
+
+            <ul v-else class="small">
+                <li>{{ selectedDiscussionVote.agreeOverwriteText || 'Yes/Agree' }}</li>
+                <li v-if="selectedDiscussionVote.neutralAllowed">{{ selectedDiscussionVote.neutralOverwriteText || 'Neutral' }}</li>
+                <li>{{ selectedDiscussionVote.disagreeOverwriteText || 'No/Disagree' }}</li>
+            </ul>
+        </p>
+
         <div v-if="selectedDiscussionVote.isContentReview && !selectedDiscussionVote.isActive">
             <b>Consensus:</b> 
             <span :class="selectedDiscussionVote.isAcceptable == true ? 'text-success' : selectedDiscussionVote.isAcceptable == false ? 'text-danger' : 'text-secondary'">
@@ -131,6 +192,11 @@ export default {
             editProposalContent: '',
             isEditingLink: false,
             editLinkContent: '',
+            isEditingOptions: false,
+            agreeOverwriteTextEditContent: '',
+            neutralOverwriteTextEditContent: '',
+            disagreeOverwriteTextEditContent: '',
+            neutralAllowedEdit: false,
         };
     },
     computed: {
@@ -143,7 +209,7 @@ export default {
         /** @returns {boolean} */
         isEditable() {
             return this.selectedDiscussionVote.isActive &&
-                ((!this.selectedDiscussionVote.isContentReview && this.selectedDiscussionVote.creator.id == this.loggedInUser.id && this.selectedDiscussionVote.isActive) ||
+                ((!this.selectedDiscussionVote.isContentReview && (this.selectedDiscussionVote.creator.id == this.loggedInUser.id || this.loggedInUser.isAdmin)) ||
                 (this.selectedDiscussionVote.isContentReview && (this.loggedInUser.groups.includes('nat') || this.loggedInUser.groups.includes('gmt'))));
         },
         /** @returns {boolean} */
@@ -159,6 +225,11 @@ export default {
             this.editProposalContent = this.selectedDiscussionVote.shortReason;
             this.isEditingLink = false;
             this.editLinkContent = this.selectedDiscussionVote.discussionLink;
+            this.isEditingOptions = false;
+            this.agreeOverwriteTextEditContent = this.selectedDiscussionVote.agreeOverwriteText;
+            this.neutralOverwriteTextEditContent = this.selectedDiscussionVote.neutralOverwriteText;
+            this.disagreeOverwriteTextEditContent = this.selectedDiscussionVote.disagreeOverwriteText;
+            this.neutralAllowedEdit = this.selectedDiscussionVote.neutralAllowed;
         },
     },
     created () {
@@ -166,6 +237,10 @@ export default {
             this.editTitleContent = this.selectedDiscussionVote.title;
             this.editProposalContent = this.selectedDiscussionVote.shortReason;
             this.editLinkContent = this.selectedDiscussionVote.discussionLink;
+            this.agreeOverwriteTextEditContent = this.selectedDiscussionVote.agreeOverwriteText;
+            this.neutralOverwriteTextEditContent = this.selectedDiscussionVote.neutralOverwriteText;
+            this.disagreeOverwriteTextEditContent = this.selectedDiscussionVote.disagreeOverwriteText;
+            this.neutralAllowedEdit = this.selectedDiscussionVote.neutralAllowed;
         }
     },
     methods: {
@@ -190,12 +265,23 @@ export default {
                 this.isEditingProposal = true;
             }
         },
+        editOptions () {
+            if (this.isEditingOptions) {
+                this.update();
+            } else {
+                this.isEditingOptions = true;
+            }
+        },
         async update () {
             const data = await this.$http.executePost(
                 `/discussionVote/${this.selectedDiscussionVote.id}/update`, {
                     title: this.editTitleContent,
                     shortReason: this.editProposalContent,
                     discussionLink: this.editLinkContent,
+                    agreeOverwriteText: this.agreeOverwriteTextEditContent,
+                    neutralOverwriteText: this.neutralOverwriteTextEditContent,
+                    disagreeOverwriteText: this.disagreeOverwriteTextEditContent,
+                    neutralAllowed: this.neutralAllowedEdit,
                 });
 
             if (this.$http.isValid(data)) {

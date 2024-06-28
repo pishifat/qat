@@ -325,6 +325,10 @@ router.post('/:id/update', middlewares.hasFullReadAccess, async (req, res) => {
     const title = req.body.title;
     const shortReason = req.body.shortReason;
     const discussionLink = req.body.discussionLink || '';
+    const agreeOverwriteText = req.body.agreeOverwriteText || '';
+    const neutralOverwriteText = req.body.neutralOverwriteText || '';
+    const disagreeOverwriteText = req.body.disagreeOverwriteText || '';
+    const neutralAllowed = req.body.neutralAllowed || false;
 
     if (!title || !shortReason) {
         return res.json({
@@ -343,6 +347,11 @@ router.post('/:id/update', middlewares.hasFullReadAccess, async (req, res) => {
     discussion.title = title;
     discussion.shortReason = shortReason;
     discussion.discussionLink = discussionLink;
+    discussion.agreeOverwriteText = agreeOverwriteText;
+    discussion.neutralOverwriteText = neutralOverwriteText;
+    discussion.disagreeOverwriteText = disagreeOverwriteText;
+    discussion.neutralAllowed = neutralAllowed;
+
     await discussion.save();
 
     res.json({
