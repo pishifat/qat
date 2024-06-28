@@ -15,9 +15,10 @@
                     <!-- discussion link + stats -->
                     <span v-if="selectedVeto.reasons.length">
                         <hr />
+                        <vote-stats :reason-index="reasonIndex" />
                         <b>Discussion link:</b>
                         <a :href="reason.link" target="_blank">{{ reason.link }}</a>
-                        <vote-stats v-if="loggedInUser.isNat && !isMediator" :reason-index="reasonIndex" />
+                        <hr />
                     </span>
 
                     <!-- mediations -->

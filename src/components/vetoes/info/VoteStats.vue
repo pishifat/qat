@@ -1,6 +1,5 @@
 <template>
     <div v-if="selectedVeto.vetoFormat >= 2">
-        <hr>
         <b>Stats:</b>
         <div :key="reasonIndex">
             <ul>
@@ -31,7 +30,6 @@
                 </li>
             </ul>
         </div>
-        <hr>
     </div>
 </template>
 
