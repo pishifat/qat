@@ -128,10 +128,9 @@ router.post('/adjustEvaluationDeadline/:id/:mode', middlewares.isNat, async (req
 });
 
 /* POST reset next evaluation deadline based on previous evaluations */
-router.post('/resetEvaluationDeadline/:id/:mode', middlewares.isNat, async (req, res) => {
+router.post("/resetEvaluationDeadline/:id/:mode", middlewares.isNat, async (req, res) => {
     const userId = req.params.id;
     const mode = req.params.mode;
-
     const [evaluation, pendingEvaluation] = await Promise.all([
         BnEvaluation
             .findOne({
@@ -140,7 +139,12 @@ router.post('/resetEvaluationDeadline/:id/:mode', middlewares.isNat, async (req,
                 consensus: { $exists: true },
                 active: false,
             })
-            .sort({ updatedAt: -1 }),
+            .populate({
+                path: "user",
+                select: "username",
+            })
+            .sort({ archivedAt: -1 }),
+
         BnEvaluation
             .findOne({
                 user: userId,
@@ -157,7 +161,7 @@ router.post('/resetEvaluationDeadline/:id/:mode', middlewares.isNat, async (req,
 
     if (evaluation.consensus === BnEvaluationConsensus.ProbationBn) {
         deadline.setDate(deadline.getDate() + 37);
-        
+
         if (pendingEvaluation) {
             pendingEvaluation.deadline = deadline;
             await pendingEvaluation.save();
@@ -169,9 +173,7 @@ router.post('/resetEvaluationDeadline/:id/:mode', middlewares.isNat, async (req,
                 activityToCheck: 37,
             });
         }
-    }
-
-    else if (evaluation.consensus === BnEvaluationConsensus.FullBn) {
+    } else if (evaluation.consensus === BnEvaluationConsensus.FullBn) {
         let activityToCheck = 90;
 
         if (evaluation.addition === BnEvaluationAddition.LowActivityWarning) {
@@ -196,15 +198,13 @@ router.post('/resetEvaluationDeadline/:id/:mode', middlewares.isNat, async (req,
         }
     }
 
-    res.json({
-        deadline
-    });
+    res.json({ deadline });
 
     Logger.generate(
         req.session.mongoId,
-        `Reset "${pendingEvaluation.user.username}" ${mode} current BN evaluation deadline to ${deadline.toISOString().slice(0,10)}`,
+        `Reset ${evaluation?.user.username}'s ${mode} current BN evaluation deadline to ${deadline.toISOString().slice(0, 10)}`,
         'bnEvaluation',
-        pendingEvaluation._id
+        pendingEvaluation?._id || evaluation?.user._id
     );
 });
 
