@@ -92,7 +92,7 @@ export default {
             confirmDelete: null,
             link: '',
             summary: '',
-            mode: null,
+            mode: '',
         };
     },
     computed: {

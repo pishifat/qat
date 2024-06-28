@@ -243,7 +243,7 @@
                 <div class="text-danger mt-4" v-if="!selectedMode || mods.length !== 3 || reasons.length !== 3 || oszs.length !== 3"">
                     Missing application details:
                     <ul>
-                        <li v-if="!selectedMode">Game mode</li>
+                        <li v-if="selectedMode.length === 0">Game mode</li>
                         <li v-if="missingInput(mods)">Beatmap links</li>
                         <li v-if="missingInput(reasons)">Responses</li>
                         <li v-if="missingInput(oszs)">.osz links</li>
