@@ -902,7 +902,7 @@ router.post('/:id/updateMapperPreferences', middlewares.isBnOrNat, async (req, r
     );
 });
 
-/* POST switch user group */
+/* POST add to NAT */
 router.post('/:id/addToNat', middlewares.isNat, async (req, res) => {
     const user = await User.findById(req.params.id).orFail();
     const mode = req.body.mode;
@@ -977,7 +977,7 @@ router.post('/:id/addToNat', middlewares.isNat, async (req, res) => {
 
     res.json({
         user,
-        success: 'Changed user group',
+        success: 'Added to NAT',
     });
 
     Logger.generate(
@@ -1028,6 +1028,79 @@ router.post('/:id/changeEvaluatorMode', middlewares.isNat, async (req, res) => {
     Logger.generate(
         req.session.mongoId,
         `Moved "${user.username}" from "${util.formatMode(oldMode)} NAT" to "${util.formatMode(mode)} NAT"`,
+        'user',
+        user._id
+    );
+});
+
+/* POST force move from probation to full BN */
+router.post('/:id/forceFullBn', middlewares.isAdmin, async (req, res) => {
+    const user = await User.findById(req.params.id).orFail();
+    const mode = req.body.mode;
+
+    if (!mode)
+        return res.json({
+            error: 'Failed to get game mode!',
+        });
+    
+    for (const modeInfo of user.modesInfo) {
+        if (modeInfo.mode == mode) {
+            modeInfo.level = 'full';
+        }
+    }
+
+    const [evaluation, pendingEvaluation] = await Promise.all([
+        AppEvaluation
+            .findOne({
+                user,
+                mode,
+                consensus: 'pass',
+                active: false,
+            })
+            .sort({ archivedAt: -1 }),
+
+        BnEvaluation
+            .findOne({
+                user,
+                mode,
+                active: true,
+            }),
+    ]);
+
+    let deadline = new Date(evaluation.archivedAt);
+    deadline.setDate(deadline.getDate() + 90);
+
+    if (pendingEvaluation) {
+        pendingEvaluation.deadline = deadline;
+        await pendingEvaluation.save();
+    } else {
+        await BnEvaluation.create({
+            user,
+            mode,
+            deadline,
+            activityToCheck: 90,
+        });
+    }
+
+    await user.save();
+
+    discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            color: discord.webhookColors.darkGreen,
+            description: `Force moved [**${user.username}**](http://osu.ppy.sh/users/${user.osuId}) to **full BN**`,
+        }],
+        mode
+    );
+
+    res.json({
+        user,
+        success: 'Force moved to full BN',
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Force moved "${user.username}" to full BN`,
         'user',
         user._id
     );
