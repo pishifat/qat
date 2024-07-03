@@ -275,7 +275,7 @@ router.post('/selectMediators', middlewares.isNat, async (req, res) => {
         if (!req.body.excludeUsers.includes(user.username.toLowerCase())) {
             if (mode == 'all') {
                 users.push(user);
-            } else if (user.modesInfo.some(m => m.mode === mode)) {
+            } else if (user.modesInfo.some(m => m.mode === mode || m.mode === 'none')) {
                 users.push(user);
             }
         }
