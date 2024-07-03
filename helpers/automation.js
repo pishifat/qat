@@ -1078,7 +1078,7 @@ const checkTenureValidity = cron.schedule('0 0 2 * *', async () => {
                 if (user.groups.length == 1 && user.modesInfo.length > 0) {
                     const userModes = user.modesInfo.map(m => m.mode);
                     
-                    if (userModes.includes(mode)) {
+                    if (userModes.includes(mode) && !userModes.includes('none')) {
                         await discord.webhookPost(
                             [{
                                 title: `${user.username} ${mode} modesInfo is sus`,
