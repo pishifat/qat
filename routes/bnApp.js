@@ -39,6 +39,7 @@ router.get('/relevantInfo', async (req, res) => {
         AppEvaluation.find({
             user: req.session.mongoId,
             active: false,
+            consensus: 'fail',
             cooldownDate: { $gt: new Date() },
         }),
         BnEvaluation.find({
