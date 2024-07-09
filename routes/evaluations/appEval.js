@@ -175,7 +175,7 @@ router.post('/AddApplication', middlewares.isNat, async (req, res) => {
         oszs: [],
         comment,
         isPublic: false,
-        tempDeadline: moment().add(3, 'days').toDate(),
+        tempDeadline: moment().add(4, 'days').toDate(),
     });
 
     if (!newBnApp) {
@@ -285,7 +285,7 @@ router.post('/submitEval/:id', middlewares.isBnOrNat, async (req, res) => {
             const assignedNatArray = await User.getAssignedNat(evaluation.mode, evaluation.user.id, reviewerOsuIds, 1);
             const assignedNat = assignedNatArray[0]; // dumb workaround
             evaluation.natEvaluators.push(assignedNat);
-            evaluation.tempDeadline = moment().add(3, 'days').toDate();
+            evaluation.tempDeadline = moment().add(4, 'days').toDate();
             await evaluation.save();
 
             evaluation = await AppEvaluation

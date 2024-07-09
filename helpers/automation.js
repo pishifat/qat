@@ -352,7 +352,7 @@ const notifyApplicationEvaluations = cron.schedule('2 17 * * *', async () => {
         let description = `[**${app.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${app.id}) `;
         let color;
         let generateWebhook;
-        let rerollUser;
+        let needsNewEvaluator;
 
         // set webhook content based on deadline
         if (today > deadline) {
@@ -362,13 +362,7 @@ const notifyApplicationEvaluations = cron.schedule('2 17 * * *', async () => {
             generateWebhook = true;
 
             if (!app.discussion && app.tempDeadline && today > app.deadline) {
-                const reviewerIds = app.reviews.map(r => r.evaluator.id);
-
-                for (const user of app.natEvaluators) {
-                    if (!reviewerIds.includes(user.id)) {
-                        rerollUser = user; // there should only be one
-                    }
-                }
+                needsNewEvaluator = true;
             }
         } else if (tomorrow > deadline) {
             description += 'is due in less than 24 hours!';
@@ -392,21 +386,22 @@ const notifyApplicationEvaluations = cron.schedule('2 17 * * *', async () => {
             );
             await util.sleep(500);
 
-            if (rerollUser) {
-                // replace user, count skipped evaluation
-                const replacement = await replaceUser(app, app.user.id, rerollUser.id, false, null);
-                app.tempDeadline = moment().add(3, 'days').toDate();
-                rerollUser.rerolledEvaluationCount = rerollUser.rerolledEvaluationCount ? rerollUser.rerolledEvaluationCount++ : 1;
-                await Promise.all([
-                    app.save(),
-                    rerollUser.save(),
-                ]);
+            if (needsNewEvaluator) {
+                // add new evaluator to app
+                const natEvaluatorOsuIds = app.natEvaluators.map(n => n.osuId);
+                const reviewerOsuIds = app.reviews.map(r => r.evaluator.osuId);
+                const excludeOsuIds = natEvaluatorOsuIds.concat(reviewerOsuIds);
+                const newEvaluator = await User.getAssignedNat(app.mode, app.user.id, excludeOsuIds, 1);
+                app.natEvaluators.push(newEvaluator);
+                app.tempDeadline = moment().add(4, 'days').toDate();
+                
+                await app.save();
 
-                // replace user webhook
+                // add new user webhook
                 await discord.webhookPost(
                     [{
                         color: discord.webhookColors.orange,
-                        description: `Replaced **${rerollUser.username}** with **${replacement.username}** as NAT evaluator for [**${app.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${app.id})`,
+                        description: `Added **${newEvaluator.username}** as NAT evaluator for [**${app.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${app.id})`,
                     }],
                     app.mode
                 );

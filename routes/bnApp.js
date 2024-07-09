@@ -222,7 +222,7 @@ router.post('/apply', async (req, res) => {
             oszs,
             comment,
             isPublic,
-            tempDeadline: moment().add(3, 'days').toDate(),
+            tempDeadline: moment().add(4, 'days').toDate(),
         });
 
     if (!newBnApp) {

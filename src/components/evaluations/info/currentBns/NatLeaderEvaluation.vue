@@ -2,7 +2,7 @@
     <div>
         <div class="row">
             <p class="col-sm-12" v-if="selectedEvaluation.user.rerolledEvaluationCount">
-                <b>Re-rolled evaluations:</b>
+                <b>Re-assigned evaluations:</b>
                 {{ selectedEvaluation.user.rerolledEvaluationCount }}
             </p>
             <div class="col-sm-12">
