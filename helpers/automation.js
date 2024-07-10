@@ -391,8 +391,9 @@ const notifyApplicationEvaluations = cron.schedule('2 17 * * *', async () => {
                 const natEvaluatorOsuIds = app.natEvaluators.map(n => n.osuId);
                 const reviewerOsuIds = app.reviews.map(r => r.evaluator.osuId);
                 const excludeOsuIds = natEvaluatorOsuIds.concat(reviewerOsuIds);
-                const newEvaluator = await User.getAssignedNat(app.mode, app.user.id, excludeOsuIds, 1);
-                app.natEvaluators.push(newEvaluator);
+                const newEvaluatorArray = await User.getAssignedNat(app.mode, app.user.id, excludeOsuIds, 1);
+                const newEvaluator = newEvaluatorArray[0];
+                app.natEvaluators.push(newEvaluator._id);
                 app.tempDeadline = moment().add(4, 'days').toDate();
                 
                 await app.save();
