@@ -88,10 +88,8 @@
                 <h5>Evaluations</h5>
                 <div v-for="(review, index) in evaluation.reviews" :key="review.id">
                     <div class="row my-3">
-                        <div class="col-sm-2">
-                            <div class="text-center my-2" :class="voteColor(review.vote)">
-                                Anonymous
-                            </div>
+                        <div class="col-sm-2 text-center my-2 text-pastel-blue">
+                            <b>Anonymous</b>
                         </div>
 
                         <div class="col-sm-10">
@@ -177,17 +175,6 @@ export default {
         addition () {
             if (this.evaluation.addition !== BnEvaluationAddition.None) return this.evaluation.addition;
             else return null;
-        },
-    },
-    methods: {
-        voteColor(vote) {
-            if (vote == 1) {
-                return 'text-pass';
-            } else if (vote == 2) {
-                return 'text-neutral';
-            } else if (vote == 3) {
-                return 'text-fail';
-            }
         },
     },
 };

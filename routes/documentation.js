@@ -10,7 +10,11 @@ router.use(middlewares.hasFullReadAccess);
 
 /* GET documentation index */
 router.get('/', async (req, res) => {
-    const articles = await Article.find({ type: 'documentation' }).sort({ title: 1 });
+    const articles = await Article.find({ type: 'documentation' });
+
+    articles.sort((a, b) => {
+        return a.title.toLowerCase().localeCompare(b.title.toLowerCase());
+    });
 
     res.json(articles.map(article => ({
         title: article.title,

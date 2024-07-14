@@ -9,6 +9,8 @@
             </ul>
             <p>Most reports are evaluated by the GMT/NAT on a case-by-case basis. In special cases, members of the BN/GMT/NAT evaluate inappropriate content through anonymous votes.</p>
             <p>Excluding those special cases, authors of reports are anonymous until a consensus is met. The consensus will be relayed to you via osu! chat.</p>
+            <hr>
+            <p>Reports may take up to <b>7 days</b> to be answered, given that the team has to discuss each report and decide on a consensus.</p>
         </section>
 
         <section class="card card-body">
