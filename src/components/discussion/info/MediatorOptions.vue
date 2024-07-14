@@ -1,6 +1,27 @@
 <template>
     <div>
         <div class="mb-2">
+            <!-- VCC violations checkbox -->
+            <div v-if="!selectedDiscussionVote.onlyWrittenInput && isContentReview && vote == 3">
+                Select the <a href="https://osu.ppy.sh/wiki/en/Rules/Visual_Content_Considerations" target="_blank">Visual Content Considerations</a> that are violated:
+                <div class="form-check ml-4" v-for="(option, i) in vccOptions" :key="i">
+                    <div v-if="option.active">
+                        <input
+                            :key="i"
+                            :id="option.name"
+                            v-model="vccChecked"
+                            class="form-check-input"
+                            type="checkbox"
+                            name="violation"
+                            :value="option.name"
+                         >
+                        <label class="form-check-label" :for="option.name">{{ option.text }}</label>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
             <!-- comment -->
             <textarea
                 id="comment"
@@ -45,24 +66,6 @@
                             value="3"
                         >
                         <label class="form-check-label text-fail" for="3">{{ selectedDiscussionVote.disagreeOverwriteText ? selectedDiscussionVote.disagreeOverwriteText : 'No/Disagree' }}</label>
-                    </div>
-                </div>
-
-                <div v-if="isContentReview && vote == 3">
-                    Select the <a href="https://osu.ppy.sh/wiki/en/Rules/Visual_Content_Considerations" target="_blank">Visual Content Considerations</a> that are violated:
-                    <div class="form-check ml-4" v-for="(option, i) in vccOptions" :key="i">
-                        <div v-if="option.active">
-                            <input
-                                :key="i"
-                                :id="option.name"
-                                v-model="vccChecked"
-                                class="form-check-input"
-                                type="checkbox"
-                                name="violation"
-                                :value="option.name"
-                            >
-                            <label class="form-check-label" :for="option.name">{{ option.text }}</label>
-                        </div>
                     </div>
                 </div>
             </div>
