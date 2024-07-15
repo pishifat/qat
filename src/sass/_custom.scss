@@ -32,12 +32,16 @@
 
     & > thead > tr {
         @extend .text-center, .text-uppercase, .font-weight-bold;
-        background-color: rgba(124, 151, 165, 0.2);
-        border-color: rgba(124, 151, 165, 0.2);
+        background-color: $bright-blue-gray;
+        border-color: rgba($bright-blue-gray, 0.2);
 
         & th {
             border-color: rgba(124, 151, 165, 0.2);
         }
+    }
+
+    & > tbody > tr {
+        transition: all 0.1s ease;
     }
 }
 
@@ -47,14 +51,14 @@ header {
     width: 100%;
     height: 160px;
     position: absolute;
-    background-image: linear-gradient(0deg, rgba(89, 168, 202, 0.07), transparent);
+    background-image: linear-gradient(0deg, rgba($bright-blue, 0.1), transparent);
 }
 
 .navbar-nat {
     z-index: 1000;
-    background-image: url('~/public/images/partial.png');
     background-repeat: repeat-x;
     background-position: bottom;
+    filter: hue-rotate(-10deg);
 
     & .nav-link {
         font-weight: bold;
@@ -170,5 +174,11 @@ header {
 }
 
 .dropdown-item:hover {
-    background-color: #3b4e57 !important;
+    background-color: $primary !important;
+}
+
+// Modals ========================================================================
+
+.modal-body {
+    background-color: $blue-gray;
 }

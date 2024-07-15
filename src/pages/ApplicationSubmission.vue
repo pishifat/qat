@@ -311,7 +311,7 @@
                 </div>
                 <div v-if="step != 4" :class="step == 1 ? 'col-sm-12' : 'col-sm-6'">
                     <button
-                        class="btn btn-block btn-primary mt-2"
+                        class="btn btn-block btn-secondary mt-2"
                         type="button"
                         @click="step++"
                     >
