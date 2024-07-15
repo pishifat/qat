@@ -164,7 +164,7 @@ export default {
     border-bottom: 2px solid rgba(124, 151, 165, 0.2);
 }
 ::v-deep thead tr th {
-    background-color: rgba(124, 151, 165, 0.2);
+    background-color: var(--bright-blue-gray);
     border-color: rgba(124, 151, 165, 0.2);
     padding: 5px 10px;
 }
