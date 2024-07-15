@@ -120,7 +120,7 @@ export default {
         },
         /** @returns {string} */
         getCardBackground(user) {
-            return `background: linear-gradient(90deg, #2D3B42 6%, rgba(0, 0, 0, 0.82) 140%), url(${this.getCover(user)}) center no-repeat; background-size: cover;`;
+            return `background: linear-gradient(90deg, var(--bright-blue-gray) 6%, rgba(0, 0, 0, 0.82) 140%), url(${this.getCover(user)}) center no-repeat; background-size: cover;`;
         },
         /** @returns {string} */
         getCover(user) {
