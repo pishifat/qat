@@ -92,7 +92,7 @@ export default {
 }
 
 .user-header {
-    background: linear-gradient(20deg, v-bind(getUserColor()) 5%, rgba(0, 0, 0, 0.65) 65%), v-bind(getCover()) center no-repeat;
+    background: linear-gradient(0deg, v-bind(getUserColor()) -150%, rgba(0, 0, 0, 0.65) 130%), v-bind(getCover()) center no-repeat;
     background-size: cover;
     object-fit: fill;
     border-bottom: 4px solid v-bind(getUserColor());
