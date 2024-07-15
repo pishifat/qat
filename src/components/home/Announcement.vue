@@ -33,7 +33,7 @@
                     rows="4"
                     placeholder="new content"
                 />
-                <button type="submit" class="btn btn-primary float-right" @click="updateAnnouncement($event)">
+                <button type="submit" class="btn btn-secondary float-right" @click="updateAnnouncement($event)">
                     Update
                 </button>
                 <button type="submit" class="btn btn-primary float-right mx-2" @click="isEditingContent = !isEditingContent">
