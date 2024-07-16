@@ -966,6 +966,8 @@ router.post('/:id/addToNat', middlewares.isNat, async (req, res) => {
 
     await user.save();
 
+    await util.invalidateSessions(user.id);
+
     discord.webhookPost(
         [{
             author: discord.defaultWebhookAuthor(req.session),
