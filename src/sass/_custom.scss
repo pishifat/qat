@@ -52,13 +52,30 @@ header {
     height: 160px;
     position: absolute;
     background-image: linear-gradient(0deg, rgba($bright-blue, 0.1), transparent);
+
+    @include media-breakpoint-up(lg) {
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            height: 100%;
+            background-image: url('~/public/images/banner.jpg');
+            width: 130dvh;
+            filter: hue-rotate(-10deg) blur(50px);
+            z-index: -2;
+            opacity: 0.4;
+        }
+    }
 }
 
 .navbar-nat {
     z-index: 1000;
+    background-image: url('~/public/images/partial.png');
     background-repeat: repeat-x;
     background-position: bottom;
-    filter: hue-rotate(-10deg);
+    filter: hue-rotate(-15deg);
 
     & .nav-link {
         font-weight: bold;

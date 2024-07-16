@@ -89,7 +89,7 @@
                 <div v-for="(review, index) in evaluation.reviews" :key="review.id">
                     <div class="row my-3">
                         <div class="col-sm-2 text-center my-2 text-pastel-blue">
-                            <b>Anonymous</b>
+                            <b>Evaluator {{ index + 1 }}</b>
                         </div>
 
                         <div class="col-sm-10">

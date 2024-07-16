@@ -20,8 +20,8 @@
                 </a>
             </user-avatar>
 
-            <div v-else class="small text-center my-2" :class="voteColor(review.vote)">
-                Anonymous
+            <div v-else class="text-center my-2 text-pastel-blue">
+                <b>Evaluator {{ index }}</b>
 
                 <div v-if="review.evaluator && review.evaluator.id == loggedInUser.id">
                     (this is you!)

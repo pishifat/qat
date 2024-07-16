@@ -11,7 +11,7 @@
         </span>
 
         <add-votes
-            v-else-if="((loggedInUser.isNatOrTrialNat && !isNat) || loggedInUser.isNatLeader || isPublic) && isDiscussion"
+            v-else-if="((loggedInUser.isNatOrTrialNat && !isNat) || loggedInUser.isNatLeader) && isDiscussion"
             :inputs="reviews"
         />
 
