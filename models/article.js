@@ -13,7 +13,6 @@ class ArticleService extends mongoose.Model {
 
     static findByTitle(title) {
         const parsedTitle = title.toLowerCase().replace(/_/g, ' ');
-        console.log('parsedTitle', parsedTitle);
         return Article.findOne({
             type: 'documentation',
             $or: [

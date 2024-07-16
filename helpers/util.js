@@ -1,4 +1,5 @@
 const moment = require('moment');
+const mongoose = require('mongoose');
 
 /**
  * Just replaces () and [] for now..
@@ -110,6 +111,21 @@ function setSession(session, response) {
 }
 
 /**
+ * Invalidates a given user's sessions, forcing them to re-login
+ * @param {string} mongoId 
+ */
+async function invalidateSessions(mongoId) {
+    const sessionsCollection = mongoose.connection.collection("sessions");
+
+    const result = await sessionsCollection.deleteMany({
+        session: {
+            $regex: mongoId,
+            $options: "i",
+        },
+    });
+}
+
+/**
  * Shuffle an array
  * @param {Array} array
  */
@@ -179,6 +195,7 @@ module.exports = {
     sleep,
     findDaysBetweenDates,
     setSession,
+    invalidateSessions,
     shuffleArray,
     makeWordFromField,
     yearsDuration,

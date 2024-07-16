@@ -24,7 +24,6 @@ router.get('/', async (req, res) => {
 
 /* GET documentation article */
 router.get('/:slug', async (req, res) => {
-    console.log(req.params.slug);
     const article = await Article.findByTitle(req.params.slug);
 
     if (!article) {

@@ -312,6 +312,7 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
         .populate(defaultPopulate);
 
     for (const evaluation of evaluations) {
+        let resetSession = false;
         let user = await User.findById(evaluation.user);
         const i = user.modesInfo.findIndex(m => m.mode === evaluation.mode);
 
@@ -382,6 +383,7 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
                 });
 
                 evaluation.consensus = BnEvaluationConsensus.MoveToBn;
+                resetSession = true;
                 evaluation.feedback = 'None';
                 evaluation.isReviewed = true;
             } else if (userGroup == 'user') {
@@ -408,10 +410,10 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
                 await user.save();
 
                 evaluation.consensus = BnEvaluationConsensus.RemoveFromNat;
+                resetSession = true;
                 evaluation.feedback = 'None';
                 evaluation.isReviewed = true;
             }
-            
         }
 
         // bn evaluation processing
@@ -546,7 +548,7 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
             );
         }
 
-        
+        if (resetSession) await util.invalidateSessions(user.id);
     }
 
     evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, res.locals.userRequest.isNat);
