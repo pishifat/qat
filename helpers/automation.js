@@ -561,7 +561,7 @@ function badgeCommand (osuId, currentBadge, value, type) {
 
     const natBadges = ['NAT1y.png', 'NAT2y.png', 'NAT3y.png', 'NAT4y.png', 'NAT5y.png', 'NAT6y.png', 'NAT7y.png', 'NAT8y.png', 'NAT9y.png', 'NAT10y.png'];
     const bnBadges = ['BN1y.png', 'BN2y.png', 'BN3y.png', 'BN4y.png', 'BN5y.png', 'BN6y.png', 'BN7y.png', 'BN8y.png', 'BN9y.png', 'BN10y.png'];
-    const nomBadges = ['noms200.png', 'noms400.png', 'noms600.png', 'noms800.png', 'noms1000.png'];
+    const nomBadges = ['noms200.png', 'noms400.png', 'noms600.png', 'noms800.png', 'noms1000.png', 'noms1500.png', 'noms2000.png'];
     const natTooltip = [
         'Longstanding contribution to the Nomination Assessment Team - 1 Year',
         'Longstanding contribution to the Nomination Assessment Team - 2 Years',
@@ -592,6 +592,8 @@ function badgeCommand (osuId, currentBadge, value, type) {
         'Nominated 600+ beatmaps as a Beatmap Nominator',
         'Nominated 800+ beatmaps as a Beatmap Nominator',
         'Nominated 1,000+ beatmaps as a Beatmap Nominator',
+        'Nominated 1,500+ beatmaps as a Beatmap Nominator',
+        'Nominated 2,000+ beatmaps as a Beatmap Nominator',
     ];
     const natWiki = 'https://osu.ppy.sh/wiki/en/People/Nomination_Assessment_Team';
     const bnWiki = 'https://osu.ppy.sh/wiki/en/People/Beatmap_Nominators';
@@ -638,8 +640,12 @@ const badgeTracker = cron.schedule('8 18 * * *', async () => {
             thresholdNominationCount = 600;
         } else if (noms >= 800 && noms < 1000) {
             thresholdNominationCount = 800;
-        } else if (noms >= 1000) {
+        } else if (noms >= 1000 && noms < 1500) {
             thresholdNominationCount = 1000;
+        } else if (noms >= 1500 && noms < 2000) {
+            thresholdNominationCount = 1500;
+        } else if (noms >= 2000) {
+            thresholdNominationCount = 2000;
         }
 
         if (thresholdNominationCount !== user.nominationsProfileBadge * 200) {
