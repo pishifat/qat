@@ -72,9 +72,6 @@
                         class="mt-2"
                     />
 
-                    <badges
-                        :user="selectedUser" 
-                    />
                 </div>
             </div>
 
@@ -87,6 +84,11 @@
             </div>
 
             <div v-if="loggedInUser.isNat">
+                <badges
+                    v-if="loggedInUser.isNatLeader"
+                    class="mt-2"
+                    :user="selectedUser" 
+                />
                 <hr> 
                 <notes />
             </div>
