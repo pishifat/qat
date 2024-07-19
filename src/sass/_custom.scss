@@ -45,6 +45,28 @@
     }
 }
 
+// Screen Background Overlays ===================================================
+
+@include media-breakpoint-up(lg) {
+    .screen-background-overlays {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: -1;
+
+        .overlay-triangles {
+            position: absolute;
+            width: 100%;
+            height: 90px;
+            filter: hue-rotate(var(--base-hue-deg)) saturate(.6);
+
+            background-image: url('~/public/images/partial.png');
+            background-position: bottom;
+            background-repeat: repeat-x;
+        }
+    }
+}
+
 // Navs ========================================================================
 
 @include media-breakpoint-up(lg) {
