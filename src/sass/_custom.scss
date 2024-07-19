@@ -47,36 +47,61 @@
 
 // Navs ========================================================================
 
-header {
-    width: 100%;
-    height: 160px;
-    position: absolute;
-    background-image: linear-gradient(0deg, rgba($bright-blue, 0.1), transparent);
+@include media-breakpoint-up(lg) {
+    div.header-container {
+        position: absolute;
+        width: 100%;
+        height: 160px;
 
-    @include media-breakpoint-up(lg) {
-        &::before {
-            content: '';
+        .header-background-container {
+            z-index: -2;
             position: absolute;
             top: 0;
-            left: 50%;
-            transform: translateX(-50%);
             height: 100%;
-            background-image: url('~/public/images/banner.jpg');
-            width: 130dvh;
-            filter: hue-rotate(-10deg) blur(50px);
-            z-index: -2;
-            opacity: 0.4;
+            width: 100%;
+            background-color: hsl(180, 20%, 15%);
+
+            .header-background {
+                height: 100%;
+                margin: auto;
+                background-color: #0a9590;
+                opacity: .5;
+
+                @include media-breakpoint-only(lg) {
+                    width: 992px;
+
+                    &::before {
+                        background-image: linear-gradient(to right, hsl(180, 20%, 15%), transparent 200px, transparent 792px, hsl(180, 20%, 15%) 992px);
+                    }
+                }
+
+                @include media-breakpoint-only(xl) {
+                    width: 1200px;
+
+                    &::before {
+                        background-image: linear-gradient(to right, hsl(180, 20%, 15%), transparent 200px, transparent 940px, hsl(180, 20%, 15%) 1200px);
+                    }
+                }
+
+                &::before {
+                    content: "";
+                    display: block;
+                    height: 100%;
+                }
+            }
+        }
+    }
+
+    header {
+        @include media-breakpoint-down(md) {
+            position: absolute;
+            width: 100%;
+            height: 160px;
         }
     }
 }
 
 .navbar-nat {
-    z-index: 1000;
-    background-image: url('~/public/images/partial.png');
-    background-repeat: repeat-x;
-    background-position: bottom;
-    filter: hue-rotate(-15deg);
-
     & .nav-link {
         font-weight: bold;
     }
