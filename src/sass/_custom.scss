@@ -58,7 +58,7 @@
             position: absolute;
             width: 100%;
             height: 90px;
-            filter: hue-rotate(var(--base-hue-deg)) saturate(.6);
+            filter: hue-rotate(-15deg);
 
             background-image: url('~/public/images/partial.png');
             background-position: bottom;
@@ -86,7 +86,7 @@
             .header-background {
                 height: 100%;
                 margin: auto;
-                background-color: #0a9590;
+                background-color: #007967;
                 opacity: .5;
 
                 @include media-breakpoint-only(lg) {
