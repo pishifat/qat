@@ -84,23 +84,30 @@ router.get('/loadUser/:userInput', async (req, res) => {
 
 /* GET user next evaluation */
 router.get('/loadNextEvaluation/:id/:mode', async (req, res) => {
-    const er = await BnEvaluation.findOne({ user: req.params.id, mode: req.params.mode, active: true });
+    let eval = await BnEvaluation
+        .findOne({ user: req.params.id, mode: req.params.mode, active: true })
+        .select('reviews deadline discussion consensus active');
 
-    if (!er) {
+    if (!eval) {
         const user = await User.findById(req.params.id);
 
         if (user && user.modesInfo[0].mode == 'none' && !user.modesInfo[1]) {
-            const noModeEvaluationRound = await BnEvaluation.findOne({ user: req.params.id, active: true });
+            const noModeEvaluationRound = await BnEvaluation
+                .findOne({ user: req.params.id, active: true })
+                .select('reviews deadline discussion consensus active');
 
-            if (noModeEvaluationRound) {
-                return res.json(noModeEvaluationRound);
+            if (!noModeEvaluationRound) {
+                return res.json({ deadline: 'Never' });
             }
-        }
 
-        return res.json({ deadline: 'Never' });
+            eval = noModeEvaluationRound;
+        }
     }
 
-    res.json(er);
+    eval = eval.toJSON();
+    eval.consensus = eval.consensus && eval.consensus.length ? 'fuck you' : undefined;
+
+    res.json(eval);
 });
 
 /* POST adjust next evaluation deadline */

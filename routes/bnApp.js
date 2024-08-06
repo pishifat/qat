@@ -35,7 +35,7 @@ router.get('/relevantInfo', async (req, res) => {
         AppEvaluation.find({
             user: req.session.mongoId,
             active: true,
-        }).select('-natEvaluators -bnEvaluators'),
+        }).select('-natEvaluators -bnEvaluators -cooldownDate -feedback'),
         AppEvaluation.find({
             user: req.session.mongoId,
             active: false,
@@ -59,6 +59,12 @@ router.get('/relevantInfo', async (req, res) => {
             })
             .select('createdAt mode discussion isRejoinRequest'),
     ]);
+
+    activeApps = activeApps.map(app => {
+        app = app.toObject();
+        app.consensus = app.consensus = app.consensus && app.consensus.length ? 'fuck you' : undefined;
+        return app;
+    });
 
     res.json({
         resignations,
