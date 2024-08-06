@@ -81,19 +81,19 @@
             top: 0;
             height: 100%;
             width: 100%;
-            background-color: hsl(180, 20%, 15%);
+            background-color: $blue-gray;
 
             .header-background {
                 height: 100%;
                 margin: auto;
-                background-color: #007967;
+                background-color: $bright-blue;
                 opacity: .5;
 
                 @include media-breakpoint-only(lg) {
                     width: 992px;
 
                     &::before {
-                        background-image: linear-gradient(to right, hsl(180, 20%, 15%), transparent 200px, transparent 792px, hsl(180, 20%, 15%) 992px);
+                        background-image: linear-gradient(to right, $blue-gray, transparent 200px, transparent 792px, $blue-gray 992px);
                     }
                 }
 
@@ -101,7 +101,7 @@
                     width: 1200px;
 
                     &::before {
-                        background-image: linear-gradient(to right, hsl(180, 20%, 15%), transparent 200px, transparent 940px, hsl(180, 20%, 15%) 1200px);
+                        background-image: linear-gradient(to right, $blue-gray, transparent 200px, transparent 940px, $blue-gray 1200px);
                     }
                 }
 
@@ -115,6 +115,7 @@
     }
 
     header {
+        background-image: linear-gradient(0deg, hsla(170, 50%, 50%, 0.07), transparent);
         @include media-breakpoint-down(md) {
             position: absolute;
             width: 100%;
@@ -124,6 +125,7 @@
 }
 
 .navbar-nat {
+    background-image: none;
     & .nav-link {
         font-weight: bold;
     }
