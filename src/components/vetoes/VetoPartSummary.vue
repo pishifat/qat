@@ -1,10 +1,20 @@
 <template>
     <div>
-        <h5 v-if="veto.reasons.length == 1">Veto consensus: <span :class="upholdMediations.length > withdrawMediations.length ? 'text-success' : 'text-danger'">{{ upholdMediations.length > withdrawMediations.length ? 'upheld' : 'dismissed' }}</span></h5>
-        <h5 v-else>Veto reason #{{ reasonIndex+1 }} of {{ veto.reasons.length }} - <span :class="upholdMediations.length > withdrawMediations.length ? 'text-success' : 'text-danger'"></span>{{ upholdMediations.length > withdrawMediations.length ? 'upheld' : 'dismissed' }}</h5>
+        <h5 v-if="veto.reasons.length == 1">
+            Veto consensus:
+            <span :class="isUpheld ? 'text-success' : 'text-danger'">
+                {{ isUpheld ? 'upheld' : 'dismissed' }}
+            </span>
+        </h5>
+        <h5 v-else>
+            Veto reason #{{ reasonIndex+1 }} of {{ veto.reasons.length }} -
+            <span :class="isUpheld ? 'text-success' : 'text-danger'">
+                {{ isUpheld ? 'upheld' : 'dismissed' }}
+            </span>
+        </h5>
         <div class="card card-body small mb-4">
             <a :href="reason.link" target="_blank" class="mb-2">{{ reason.summary }}</a>
-            <div v-if="upholdMediations.length > withdrawMediations.length">
+            <div v-if="isUpheld">
                 <div v-for="(mediation, i) in upholdMediations" :key="mediation.id">
                     <div class="mb-2">
                         <b>Anonymous - {{ mediation.vote === 2 ? 'partially agree' : 'agree' }}:</b>
@@ -12,7 +22,6 @@
                     </div>
                 </div>
             </div>
-
             <div v-else>
                 <div v-for="(mediation, i) in withdrawMediations" :key="mediation.id">
                     <div class="mb-2">
@@ -58,6 +67,16 @@ export default {
         },
         withdrawMediations () {
             return this.veto.mediations.filter(mediation => mediation.vote && mediation.reasonIndex == this.reasonIndex && mediation.vote !== 1);
+        },
+        isUpheld () {
+            if (this.veto.vetoFormat >= 5) {
+                const sum = this.upholdMediations.length + this.withdrawMediations.length;
+                const threshold = 0.7 * sum;
+
+                return this.upholdMediations.length > threshold;
+            } else {
+                return this.upholdMediations.length > this.withdrawMediations.length;
+            }
         },
     },
 };

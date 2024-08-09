@@ -21,6 +21,7 @@ const vetoesSchema = new mongoose.Schema({
             2 = multi-reason vetoes (no longer used)
             3 = no more "partially agree" (default veto) (no longer used)
             4 = previously "re-mediation" with all BNs and 2 week deadline, now selects all BNs with 1 week deadline
+            5 = uphold % from 50 to 70, requires 60% of meditators to vote before concluding
         */
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 

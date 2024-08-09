@@ -6,11 +6,11 @@
         <span>**Original post:** {{ selectedVeto.reasons[reasonIndex].link }}</span>
         <br>
 
-        <span>After an anonymous vote, this {{ selectedVeto.reasons.length > 1 ? 'portion of the veto' : 'veto' }} will be {{ upholdMediations.length > withdrawMediations.length ? '**upheld**' : '**dismissed**' }}.</span>
-        <span>Reasons why Beatmap Nominators {{ upholdMediations.length > withdrawMediations.length ? 'agree' : 'disagree' }} with it can be found here: https://bn.mappersguild.com/message?veto={{ selectedVeto.id }}</span>
+        <span>After an anonymous vote, this {{ selectedVeto.reasons.length > 1 ? 'portion of the veto' : 'veto' }} will be {{ isUpheld ? '**upheld**' : '**dismissed**' }}.</span>
+        <span>Reasons why Beatmap Nominators {{ isUpheld ? 'agree' : 'disagree' }} with it can be found here: https://bn.mappersguild.com/message?veto={{ selectedVeto.id }}</span>
         <br>
 
-        <div v-if="upholdMediations.length > withdrawMediations.length">
+        <div v-if="isUpheld">
             <span>This beatmap cannot be nominated until changes are made that address the veto's concerns and the veto-ing nominator is satisfied (within reasonable limits).</span>
         </div>
 
@@ -50,6 +50,16 @@ export default {
         },
         withdrawMediations () {
             return this.selectedVeto.mediations.filter(mediation => mediation.vote && mediation.reasonIndex == this.reasonIndex && mediation.vote !== 1);
+        },
+        isUpheld () {
+            if (this.selectedVeto.vetoFormat >= 5) {
+                const sum = this.upholdMediations.length + this.withdrawMediations.length;
+                const threshold = 0.7 * sum;
+
+                return this.upholdMediations.length > threshold;
+            } else {
+                return this.upholdMediations.length > this.withdrawMediations.length;
+            }
         },
     },
 };

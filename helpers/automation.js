@@ -280,7 +280,7 @@ const notifyVetoes = cron.schedule('1 17 * * *', async () => {
     for (const veto of activeVetoes) {
         let autoConclude = true;
 
-        // (un)set condition to automatically conclude vetoes with majority
+        // (un)set condition to automatically conclude if less than 60% of people have voted
         for (const [i] of veto.reasons.entries()) {
             let agreeMediations = 0;
             let disagreeMediations = 0;
@@ -291,7 +291,9 @@ const notifyVetoes = cron.schedule('1 17 * * *', async () => {
                 if (mediation.vote == 3 && mediation.comment) disagreeMediations++;
             }
 
-            if (agreeMediations < (relevantMediations.length/2) && disagreeMediations < (relevantMediations.length/2)) {
+            const threshold = 0.6 * relevantMediations.length;
+
+            if (agreeMediations + disagreeMediations < threshold) {
                 autoConclude = false;
             }
         }
@@ -316,10 +318,10 @@ const notifyVetoes = cron.schedule('1 17 * * *', async () => {
                 'veto',
                 veto._id
             );
-        } else { // send overdue webhook
+        } else { // send overdue webhook and reminders to users
             await discord.webhookPost(
                 [{
-                    description: `Veto mediation for [**${veto.beatmapTitle}**](http://bn.mappersguild.com/vetoes?id=${veto.id}) is overdue!`,
+                    description: `Veto mediation for [**${veto.beatmapTitle}**](http://bn.mappersguild.com/vetoes?id=${veto.id}) is overdue!\n\nLess than 60% of users have voted.`,
                     color: discord.webhookColors.red,
                 }],
                 veto.mode
