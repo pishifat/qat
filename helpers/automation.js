@@ -274,7 +274,16 @@ const notifyVetoes = cron.schedule('1 17 * * *', async () => {
     // find overdue vetoes
     const activeVetoes = await Veto
         .find({ status: 'wip', deadline: { $lt: sevenDaysAgo } })
-        .populate('mediations');
+        .populate([
+            {
+                path: 'mediations',
+                populate: {
+                    path: 'mediator',
+                    select: 'username osuId groups',
+                },
+            },
+        ]);
+
 
     // process vetoes
     for (const veto of activeVetoes) {
@@ -321,12 +330,21 @@ const notifyVetoes = cron.schedule('1 17 * * *', async () => {
         } else { // send overdue webhook and reminders to users
             await discord.webhookPost(
                 [{
-                    description: `Veto mediation for [**${veto.beatmapTitle}**](http://bn.mappersguild.com/vetoes?id=${veto.id}) is overdue!\n\nLess than 60% of users have voted.`,
+                    description: `Veto mediation for [**${veto.beatmapTitle}**](http://bn.mappersguild.com/vetoes?id=${veto.id}) is overdue!\n\nLess than 60% of users have voted. Sending reminders...`,
                     color: discord.webhookColors.red,
                 }],
                 veto.mode
             );
             await util.sleep(500);
+
+            const unfinishedMediations = veto.mediations.filter(m => !m.comment && !m.vote);
+            const pendingOsuIds = unfinishedMediations.map(m => m.mediator.osuId);
+            const channel = {
+                name: `Veto mediation reminder`,
+                description: 'Notice for veto mediation',
+            }
+            const message = `This veto still needs your input! Please submit your opinion here: http://bn.mappersguild.com/vetoes?id=${veto.id}`;
+            await osuBot.sendAnnouncement(pendingOsuIds, channel, message);
         }
     }
 }, {
