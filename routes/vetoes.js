@@ -435,4 +435,39 @@ router.post('/sendMessages/:id', middlewares.isNat, async (req, res) => {
         veto.mode);
 });
 
+// TODO delete this route when we're done using it
+/* POST migrate mediations */
+router.post('/migrateMediations', middlewares.isAdmin, async (req, res) => {
+    const oldVetoId = req.body.oldVetoId;
+    const newVetoId = req.body.newVetoId;
+
+    const [oldVeto, newVeto] = await Promise.all([
+        Veto.findById(oldVetoId).populate(defaultPopulate).orFail(),
+        Veto.findById(newVetoId).populate(defaultPopulate).orFail(),
+    ]);
+
+    if (oldVeto.beatmapId != newVeto.beatmapId) {
+        return res.json({ error: 'Beatmap IDs do not match!' });
+    }
+
+    let migrationCount = 0;
+
+    for (const newMediation of newVeto.mediations) {
+        for (const oldMediation of oldVeto.mediations) {
+            if (newMediation.reasonIndex == oldMediation.reasonIndex && newMediation.mediator.osuId == oldMediation.mediator.osuId) {
+                newMediation.comment = oldMediation.comment;
+                newMediation.vote = oldMediation.vote;
+                try {
+                    await newMediation.save();
+                    migrationCount++;
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+        }
+    }
+
+    res.json({ success: `Migrated ${migrationCount} mediations!` });
+});
+
 module.exports = router;

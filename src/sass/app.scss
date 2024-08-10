@@ -294,11 +294,22 @@ pre {
     border-radius: 0.25rem;
 }
 
-code:not(pre > code) {
-    background-color: $dark-blue-gray;
-    color: $link-color;
-    padding: 0.25rem;
-    border-radius: 0.25rem;
+/* osu! timestamps */
+a.timestamp-link {
+    text-decoration: none;
+
+    code.timestamp {
+        background-color: $dark-blue-gray;
+        color: $link-color;
+        padding: 0.25rem;
+        border-radius: 0.25rem;
+        transition: background-color 0.3s ease;
+    
+        &:hover {
+            cursor: pointer;
+            background-color: lighten($dark-blue-gray, 5%);
+        }
+    }
 }
 
 /* Quote blocks */
