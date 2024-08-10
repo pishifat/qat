@@ -66,7 +66,7 @@
 
                 <pagination-nav store-module="vetoes" />
             </section>
-            <section  class="card card-body">
+            <section v-if="loggedInUser.isAdmin" class="card card-body">
                 <h2>Admin</h2>
                 <span class="text-sm text-secondary mb-2">
                     Note: reason order needs to match in both vetoes
