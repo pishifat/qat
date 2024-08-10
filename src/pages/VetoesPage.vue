@@ -66,6 +66,32 @@
 
                 <pagination-nav store-module="vetoes" />
             </section>
+            <section  class="card card-body">
+                <h2>Admin</h2>
+                <span class="text-sm text-secondary mb-2">
+                    Note: reason order needs to match in both vetoes
+                </span>
+                <div class="form-inline">
+                    <input 
+                        v-model="oldVetoId"
+                        class="form-control mb-2"
+                        type="text"
+                        placeholder="old veto ID..." 
+                    />
+                    <input 
+                        v-model="newVetoId"
+                        class="form-control mb-2"
+                        type="text"
+                        placeholder="new veto ID..." 
+                    />
+                    <button
+                        class="btn btn-sm btn-secondary mb-2 ml-2"
+                        @click="migrateMediations"
+                    >
+                        Migrate mediations
+                    </button>
+                </div>
+            </section>
         </div>
 
         <veto-info />
@@ -101,9 +127,14 @@ export default {
             skip: 24,
             limit: 24,
             reachedMax: false,
+            oldVetoId: '',
+            newVetoId: '',
         };
     },
     computed: {
+        ...mapState([
+            'loggedInUser',
+        ]),
         ...mapState('vetoes', ['vetoes']),
         ...mapGetters('vetoes', [
             'activeVetoes',
@@ -184,6 +215,15 @@ export default {
                 this.limit = 10000;
                 this.reachedMax = true;
                 await this.showMore(e);
+            }
+        },
+        async migrateMediations() {
+            const result = confirm(`Are you sure?`);
+            if (result) {
+                const data = await this.$http.executePost(
+                    '/vetoes/migrateMediations',
+                    { oldVetoId: this.oldVetoId, newVetoId: this.newVetoId }
+                );
             }
         },
     },
