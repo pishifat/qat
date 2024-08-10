@@ -62,7 +62,7 @@ router.get('/relevantInfo', async (req, res) => {
 
     activeApps = activeApps.map(app => {
         app = app.toObject();
-        app.consensus = app.consensus = app.consensus && app.consensus.length ? 'fuck you' : undefined;
+        app.consensus = app.consensus && app.consensus.length ? 'fuck you' : undefined;
         return app;
     });
 
