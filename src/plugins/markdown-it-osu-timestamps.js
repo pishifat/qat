@@ -34,11 +34,13 @@ export default function osuTimestamps(md, options = {}) {
                     // timestamp tokens
                     const linkOpenToken = new Token("link_open", "a", 1);
                     linkOpenToken.attrs = [["href", url]];
+                    linkOpenToken.attrPush(['class', 'timestamp-link']);
                     tokens.push(linkOpenToken);
 
                     if (wrapInCode) {
                         const codeToken = new Token("code_inline", "code", 0);
                         codeToken.content = timestamp;
+                        codeToken.attrPush(['class', 'timestamp']);
                         tokens.push(codeToken);
                     } else {
                         const textToken = new Token("text", "", 0);
