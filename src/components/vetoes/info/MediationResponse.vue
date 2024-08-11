@@ -19,6 +19,7 @@
                 >
                     <i class="fas fa-undo" />
                 </a>
+                <span v-if="loggedInUser.isAdmin">{{ mediation.id }}</span>
             </user-avatar>
 
             <div v-else class="text-center my-2" :class="voteColor(mediation.vote)">
