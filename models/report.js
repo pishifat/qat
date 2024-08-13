@@ -28,6 +28,12 @@ class ReportService extends mongoose.Model {
                 return 'other category report';
         }
     }
+
+    get isContentCase () {
+        if (this.category == 'contentCaseSong' || this.category == 'contentCaseVisual') {
+            return true;
+        }
+    }
 }
 
 reportSchema.loadClass(ReportService);

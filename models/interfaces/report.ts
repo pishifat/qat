@@ -11,6 +11,7 @@ interface IReportDocument extends Document {
     isActive: boolean;
     category: string;
     reportCategory: string; // formatted verison of category fetched from category
+    isContentCase: boolean; // populated field
     createdAt: Date;
 }
 

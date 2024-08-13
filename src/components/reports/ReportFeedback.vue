@@ -69,11 +69,19 @@ export default {
         consensusText() {
             switch (this.report.valid) {
                 case 1:
-                    return 'Valid';
+                    if (this.report.isContentCase) {
+                        return 'Valid for use'
+                    } else {
+                        return 'Valid';
+                    }
                 case 2:
                     return 'Partially valid';
                 default: // case 3:
-                    return 'Invalid';
+                if (this.report.isContentCase) {
+                        return 'Invalid for use'
+                    } else {
+                        return 'Invalid';
+                    }
             }
         },
         /** @returns {string} */
