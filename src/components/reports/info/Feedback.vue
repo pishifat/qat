@@ -26,9 +26,9 @@
                         name="vote"
                         value="1"
                     >
-                    <label class="form-check-label text-success" for="1">Valid</label>
+                    <label class="form-check-label text-success" for="1">{{ selectedReport.isContentCase ? 'Valid for use' : 'Valid' }}</label>
                 </div>
-                <div class="form-check form-check-inline">
+                <div v-if="!selectedReport.isContentCase" class="form-check form-check-inline">
                     <input
                         id="2"
                         v-model="vote"
@@ -48,7 +48,7 @@
                         name="vote"
                         value="3"
                     >
-                    <label class="form-check-label text-danger" for="3">Invalid</label>
+                    <label class="form-check-label text-danger" for="3">{{ selectedReport.isContentCase ? 'Invalid for use' : 'Invalid' }}</label>
                 </div>
             </div>
 

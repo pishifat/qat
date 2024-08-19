@@ -133,7 +133,7 @@ router.post('/submitReportEval/:id', async (req, res) => {
 
         fields.push({
             name: 'Report vote',
-            value: validity,
+            value: report.isContentCase ? `${validity} for use` : validity,
         });
     }
 
