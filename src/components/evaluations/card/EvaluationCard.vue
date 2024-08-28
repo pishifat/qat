@@ -36,7 +36,7 @@
                 :is-discussion="evaluation.discussion"
                 :is-active="evaluation.active"
                 :archived-at="evaluation.archivedAt"
-                :is-nat="['remainInNat', 'moveToBn', 'removeFromNat'].includes(evaluation.consensus)"
+                :is-nat="['remainInNat', 'moveToBn', 'removeFromNat'].includes(evaluation.consensus) || evaluation.selfSummary"
                 :is-public="evaluation.isPublic"
                 :is-application="evaluation.isApplication"
             />
