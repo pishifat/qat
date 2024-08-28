@@ -175,7 +175,6 @@ router.post('/AddApplication', middlewares.isNat, async (req, res) => {
         oszs: [],
         comment,
         isPublic: false,
-        tempDeadline: moment().add(4, 'days').toDate(),
     });
 
     if (!newBnApp) {
@@ -183,7 +182,7 @@ router.post('/AddApplication', middlewares.isNat, async (req, res) => {
     }
 
     // set NAT assignments
-    const assignedNat = await User.getAssignedNat(mode, user.id, [], 1);
+    const assignedNat = await User.getAssignedNat(mode, user.id);
     newBnApp.natEvaluators = assignedNat;
 
     let fields = [];
@@ -269,43 +268,6 @@ router.post('/submitEval/:id', middlewares.isBnOrNat, async (req, res) => {
         req.body.moddingComment,
         req.body.vote,
     );
-
-    evaluation = await AppEvaluation
-        .findById(req.params.id)
-        .populate(
-            res.locals.userRequest.isNat || res.locals.userRequest.isTrialNat ? defaultPopulate : getActiveBnDefaultPopulate(req.session.mongoId)
-        );
-
-    if (evaluation.tempDeadline && !evaluation.discussion && isNewEvaluation) {
-        const reviewerIds = evaluation.reviews.map(r => r.evaluator.id);
-        const assignedNatIds = evaluation.natEvaluators.map(n => n.id);
-        const reviewerOsuIds = evaluation.reviews.map(r => r.evaluator.osuId);
-
-        if (assignedNatIds.includes(req.session.mongoId) && reviewerIds.includes(req.session.mongoId)) {
-            const assignedNatArray = await User.getAssignedNat(evaluation.mode, evaluation.user.id, reviewerOsuIds, 1);
-            const assignedNat = assignedNatArray[0]; // dumb workaround
-            evaluation.natEvaluators.push(assignedNat);
-            evaluation.tempDeadline = moment().add(4, 'days').toDate();
-            await evaluation.save();
-
-            evaluation = await AppEvaluation
-                .findById(req.params.id)
-                .populate(
-                    res.locals.userRequest.isNat || res.locals.userRequest.isTrialNat ? defaultPopulate : getActiveBnDefaultPopulate(req.session.mongoId)
-                );
-
-            await util.sleep(250);
-            await discord.webhookPost(
-                [{
-                    description: `**${assignedNat.username}** assigned to [**${evaluation.user.username}**'s BN application](http://bn.mappersguild.com/appeval?id=${evaluation.id})`,
-                    color: discord.webhookColors.orange,
-                }],
-                evaluation.mode
-            );
-
-            await discord.userHighlightWebhookPost(evaluation.mode, [assignedNat.discordId]);
-        }
-    }
 
     res.json(evaluation);
     Logger.generate(

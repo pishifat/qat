@@ -229,7 +229,6 @@ router.post('/apply', async (req, res) => {
             oszs,
             comment,
             isPublic,
-            tempDeadline: moment().add(4, 'days').toDate(),
         });
 
     if (!newBnApp) {
@@ -237,7 +236,7 @@ router.post('/apply', async (req, res) => {
     }
 
     // set NAT assignments
-    const assignedNat = await User.getAssignedNat(mode, req.session.mongoId, [], 1);
+    const assignedNat = await User.getAssignedNat(mode, req.session.mongoId);
     newBnApp.natEvaluators = assignedNat;
 
     let fields = [];
@@ -292,7 +291,7 @@ router.post('/apply', async (req, res) => {
     }];
 
     const securityCheckMessage = `Please conduct a BN security check on [**${userInfo.username}**](<https://osu.ppy.sh/users/${userInfo.id}>), then inform any of the assigned NAT below.`
-
+    
     await discord.highlightWebhookPost(securityCheckMessage, embed, 'securityCheck');
 
     // proceed

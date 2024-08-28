@@ -23,14 +23,6 @@
                 title="deadline"
             />
             <span
-                v-if="individualDeadline"
-                data-toggle="tooltip"
-                data-placement="top"
-                title="individual deadline"
-            >
-                {{ transformedDeadline(individualDeadline) }} —
-            </span>
-            <span
                 data-toggle="tooltip"
                 data-placement="top"
                 title="final deadline"
@@ -75,10 +67,6 @@ export default {
             type: String,
             required: true,
         },
-        individualDeadline: {
-            type: String,
-            default: null,
-        },
         archivedAt: {
             type: String,
             default: '',
@@ -108,9 +96,7 @@ export default {
     methods: {
         transformedDeadline (deadline) {
             if (this.isActive) {
-                return this.isApplication ? 
-                    this.$options.filters.toRelativeShortDate(deadline) :
-                    this.$options.filters.toRelativeDate(deadline);
+                return this.$options.filters.toRelativeDate(deadline);
             } else if (this.archivedAt && this.archivedAt.length) {
                 return this.$options.filters.toStandardDate(this.archivedAt);
             } else {

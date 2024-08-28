@@ -54,7 +54,6 @@ interface IUser {
     requestInfo: string;
     lastOpenedForRequests: Date;
     isActiveContentReviewer: boolean;
-    rerolledEvaluationCount: number;
     subjectiveEvalFeedback: boolean;
     lastActivityCheck: Date;
     hasActivityWarning: boolean;

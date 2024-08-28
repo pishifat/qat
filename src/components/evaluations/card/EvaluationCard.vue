@@ -38,7 +38,6 @@
                 :archived-at="evaluation.archivedAt"
                 :is-nat="['remainInNat', 'moveToBn', 'removeFromNat'].includes(evaluation.consensus)"
                 :is-public="evaluation.isPublic"
-                :individual-deadline="evaluation.discussion ? null : evaluation.tempDeadline"
                 :is-application="evaluation.isApplication"
             />
         </div>

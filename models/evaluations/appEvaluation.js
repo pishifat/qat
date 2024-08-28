@@ -11,7 +11,6 @@ const appEvaluationSchema = new mongoose.Schema({
     natBuddy: { type: 'ObjectId', ref: 'User' },
     vibeChecks: [{ type: 'ObjectId', ref: 'Mediation' }],
     comment: { type: String },
-    tempDeadline: { type: Date },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 class AppEvaluationService extends mongoose.Model {
@@ -21,7 +20,7 @@ class AppEvaluationService extends mongoose.Model {
     }
 
     get deadline () {
-        let delay = this.isRejoinRequest ? 1 : this.discussion ? 16 : 12;
+        let delay = this.isRejoinRequest ? 1 : this.discussion ? 14 : 9;
         let createdAt = this.createdAt;
 
         return new Date(createdAt.setDate(createdAt.getDate() + delay));
@@ -49,7 +48,7 @@ class AppEvaluationService extends mongoose.Model {
                 { path: 'user', select: 'username osuId' },
                 { path: 'natBuddy', select: 'username osuId' },
                 { path: 'bnEvaluators', select: 'username osuId discordId isBnEvaluator' },
-                { path: 'natEvaluators', select: 'username osuId discordId isBnEvaluator rerolledEvaluationCount' },
+                { path: 'natEvaluators', select: 'username osuId discordId isBnEvaluator' },
                 {
                     path: 'reviews',
                     select: 'evaluator behaviorComment moddingComment vote',

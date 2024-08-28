@@ -27,7 +27,7 @@ router.use(middlewares.isNatOrTrialNat);
 const defaultPopulate = [
     {
         path: 'user',
-        select: 'username osuId modesInfo groups evaluatorModes rerolledEvaluationCount subjectiveEvalFeedback',
+        select: 'username osuId modesInfo groups evaluatorModes subjectiveEvalFeedback',
     },
     {
         path: 'natEvaluators',

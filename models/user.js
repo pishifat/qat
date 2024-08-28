@@ -62,7 +62,6 @@ const userSchema = new mongoose.Schema({
     requestInfo: { type: String },
     lastOpenedForRequests: { type: Date },
     isActiveContentReviewer: { type: Boolean, default: false },
-    rerolledEvaluationCount: { type: Number },
     subjectiveEvalFeedback: { type: Boolean, default: false },
     lastActivityCheck: { type: Date },
     hasActivityWarning: { type: Boolean },

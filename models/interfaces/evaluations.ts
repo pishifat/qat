@@ -42,7 +42,6 @@ export interface IAppEvaluationDocument extends IEvaluationBase, Document {
     kind?: string;
     natBuddy?: IUserDocument;
     comment?: string;
-    tempDeadline?: Date;
 }
 
 export interface IAppEvaluationModel extends Model<IAppEvaluationDocument> {

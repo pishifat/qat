@@ -351,15 +351,6 @@ const notifyVetoes = cron.schedule('1 17 * * *', async () => {
     scheduled: false,
 });
 
-/**
- * send webhooks for active applications
- * 
- * how to revert to previous eval assignment system:
- * 1. in this function, remove "rerollUser", the (!app.discussion) conditional in (today > deadline) conditional, and (rerollUser) conditional
- * 2. remove all instances of "tempDeadline" and "rerolledEvaluationCount"
- * 3. change getAssignedNat functions to not use sampleSize 1
- * 4. remove conditional in appEval.js /submitEval
- */
 const notifyApplicationEvaluations = cron.schedule('2 17 * * *', async () => {
     const activeApps = await AppEvaluation.findActiveApps();
     const today = new Date();
@@ -367,8 +358,7 @@ const notifyApplicationEvaluations = cron.schedule('2 17 * * *', async () => {
 
     // process apps
     for (const app of activeApps) {
-        const deadline = app.discussion || !app.tempDeadline ? app.deadline : new Date(app.tempDeadline);
-
+        const deadline = new Date(app.deadline);
         let description = `[**${app.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${app.id}) `;
         let color;
         let generateWebhook;
@@ -381,7 +371,7 @@ const notifyApplicationEvaluations = cron.schedule('2 17 * * *', async () => {
             color = discord.webhookColors.red;
             generateWebhook = true;
 
-            if (!app.discussion && app.tempDeadline && today > app.deadline) {
+            if (!app.discussion && today > app.deadline) {
                 needsNewEvaluator = true;
             }
         } else if (tomorrow > deadline) {
@@ -414,7 +404,6 @@ const notifyApplicationEvaluations = cron.schedule('2 17 * * *', async () => {
                 const newEvaluatorArray = await User.getAssignedNat(app.mode, app.user.id, excludeOsuIds, 1);
                 const newEvaluator = newEvaluatorArray[0];
                 app.natEvaluators.push(newEvaluator._id);
-                app.tempDeadline = moment().add(4, 'days').toDate();
                 
                 await app.save();
 
