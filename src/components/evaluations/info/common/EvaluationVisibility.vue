@@ -5,7 +5,7 @@
             <span :class="selectedEvaluation.isPublic ? 'text-success' : 'text-danger'">
                 {{ selectedEvaluation.isPublic ? 'Public' : 'Private' }}
             </span>
-            <span v-if="loggedInUser.id === selectedEvaluation.user.id" class="btn-group ml-2">
+            <span v-if="loggedInUser && loggedInUser.id === selectedEvaluation.user.id" class="btn-group ml-2">
                 <button
                     class="btn btn-sm btn-success"
                     :disabled="selectedEvaluation.isPublic"

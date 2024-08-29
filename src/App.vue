@@ -370,12 +370,11 @@
                             </div>
 
                             <div class="col-lg-7 d-flex flex-column justify-content-center">
-                                <p>"Authorizing" will identify you through your osu! account.</p>
-                                <p>You can do any of these after authorization:</p>
+                                <p><b>"Authorizing" will identify you through your osu! account.</b> You'll need to authorize before doing most things on this website, like...</p>
                                 <ul>
                                     <li>Apply to join the Beatmap Nominators</li>
                                     <li>Report members of the BN/NAT</li>
-                                    <li>View detailed BN/NAT listings, beatmap vetoes, and content review info</li>
+                                    <li>Use BN/NAT tools</li>
                                 </ul>
                             </div>
                         </div>

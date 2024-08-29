@@ -73,7 +73,7 @@ export default {
             if (!getters.selectedVeto) return false;
 
             return getters.selectedVeto.mediations.some(m =>
-                m.mediator && m.mediator.id == rootState.loggedInUser.id
+                rootState.loggedInUser && m.mediator && m.mediator.id == rootState.loggedInUser.id
             );
         },
     },

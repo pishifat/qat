@@ -1,12 +1,11 @@
 const express = require('express');
 const AppEvaluation = require('../../models/evaluations/appEvaluation');
 const Evaluation = require('../../models/evaluations/evaluation');
+const User = require('../../models/user');
 const util = require('../../helpers/util');
 const middlewares = require('../../helpers/middlewares');
 
 const router = express.Router();
-
-router.use(middlewares.isLoggedIn);
 
 // population
 const defaultAppPopulate = [
@@ -79,8 +78,14 @@ function sanitizeBareboneReviews(reviews) {
 
 /* GET public evals */
 router.get('/relevantInfo/:limit', async (req, res) => {
+    let isNat;
+
+    if (req.session.mongoId) {
+        const user = await User.findById(req.session.mongoId);
+        isNat = user.isNat;
+    }
+
     const limit = parseInt(req.params.limit);
-    const isNat = res.locals.userRequest.isNat;
     let applicationsJson = [];
     let bnEvaluationsJson = [];
 
@@ -167,7 +172,12 @@ router.get('/relevantInfo/:limit', async (req, res) => {
 /* GET specific public eval */
 router.get('/search/:id', async (req, res) => {
     const id = req.params.id;
-    const isNat = res.locals.userRequest.isNat;
+    let isNat;
+
+    if (req.session.mongoId) {
+        const user = await User.findById(req.session.mongoId);
+        isNat = user.isNat;
+    }
 
     let eval = await AppEvaluation.findOne({
         _id: id,

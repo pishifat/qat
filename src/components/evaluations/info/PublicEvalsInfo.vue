@@ -73,20 +73,19 @@
                 </div>
             </div>
 
-            <div v-if="loggedInUser">
-                <hr>
-                <reviews-listing 
-                    v-if="loggedInUser.isNatLeader || !isNatEvaluation"
-                />
+            <hr>
+            <reviews-listing 
+                v-if="loggedInUser && loggedInUser.isNatLeader || !isNatEvaluation"
+            />
 
-                <evaluation-messages
-                    :evaluation="selectedEvaluation"
-                    :is-new-evaluation-format="selectedEvaluation.isNewEvaluationFormat"
-                />
-            </div>
+            <evaluation-messages
+                v-if="loggedInUser"
+                :evaluation="selectedEvaluation"
+                :is-new-evaluation-format="selectedEvaluation.isNewEvaluationFormat"
+            />
 
             <debug-view-document 
-                v-if="loggedInUser.isAdmin"
+                v-if="loggedInUser && loggedInUser.isAdmin"
                 :document="selectedEvaluation"
             />
         </div>

@@ -7,7 +7,7 @@
                 :groups="['', 'bn', 'nat']"
                 store-module="users"
             >
-                <div v-if="loggedInUser.isNat" class="row">
+                <div v-if="loggedInUser && loggedInUser.isNat" class="row">
                     <div class="col-sm-4 input-group">
                         <input
                             id="search"
@@ -54,7 +54,7 @@
                         </a>
                     </div>
 
-                    <button v-if="loggedInUser.isNat && !showOldUsers" class="btn btn-primary btn-sm ml-2 float-right" @click="loadBannedUsers($event)">
+                    <button v-if="loggedInUser && loggedInUser.isNat && !showOldUsers" class="btn btn-primary btn-sm ml-2 float-right" @click="loadBannedUsers($event)">
                         Show users banned from BN
                     </button>
                     
@@ -85,7 +85,7 @@
                 <gmt-activity class="my-2" />
             </section>
 
-            <section v-if="loggedInUser.isAdmin" class="card card-body">
+            <section v-if="loggedInUser && loggedInUser.isAdmin" class="card card-body">
                 <vibe-check-stats />
             </section>
         </div>

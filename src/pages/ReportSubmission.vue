@@ -1,6 +1,6 @@
 <template>
     <div>
-        <section class="card card-body mb-3">
+        <section class="card card-body mb-2">
             <p>Reports can be made about anything mapping/modding related, including but not limited to:</p>
             <ul>
                 <li>Beatmap songs violating osu!'s <a href="https://osu.ppy.sh/wiki/en/Rules/Song_Content_Rules" target="_blank">Song Content Rules</a></li>
@@ -20,6 +20,7 @@
                     <select
                         v-model="category"
                         class="form-control my-1"
+                        :disabled="!loggedInUser"
                     >
                         <option value="" disabled>
                             Select a category

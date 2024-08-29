@@ -2,7 +2,7 @@
     <td>
         <template v-if="!editing">
             <span
-                v-if="loggedInUser.isNatOrTrialNat && hasData"
+                v-if="loggedInUser && loggedInUser.isNatOrTrialNat && hasData"
                 :class="getImpact(event.impactNum).color"
                 data-toggle="tooltip"
                 :title="getImpact(event.impactNum).text"
@@ -10,7 +10,7 @@
                 <i v-if="event.impactNum !== 0" :class="getImpact(event.impactNum).icon" />
                 <font-awesome-icon v-else :icon="getImpact(event.impactNum).icon" />
             </span>
-            <span v-if="loggedInUser.isNat">
+            <span v-if="loggedInUser && loggedInUser.isNat">
                 <a href="#" @click.prevent="editing = !editing">
                     <i class="fas fa-edit" />
                 </a>
@@ -25,7 +25,7 @@
 
         <template v-else>
             <span
-                v-if="loggedInUser.isNat && hasData"
+                v-if="loggedInUser && loggedInUser.isNat && hasData"
                 :class="getImpact(event.impactNum).color"
                 data-toggle="tooltip"
                 :title="getImpact(event.impactNum).text"

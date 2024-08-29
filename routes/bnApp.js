@@ -14,10 +14,12 @@ const discord = require('../helpers/discord');
 
 const router = express.Router();
 
-router.use(middlewares.isLoggedIn);
-
 /* GET bn app page */
 router.get('/relevantInfo', async (req, res) => {
+    if (!req.session.mongoId) {
+        return res.json({});
+    }
+
     const oneYearAgo = moment().subtract(1, 'years').toDate();
 
     let [resignations, activeApps, cooldownApps, cooldownEvals, cooldownResignations, totalActiveApplications] = await Promise.all([
@@ -75,7 +77,7 @@ router.get('/relevantInfo', async (req, res) => {
 });
 
 /* POST apply for BN */
-router.post('/apply', async (req, res) => {
+router.post('/apply', middlewares.isLoggedIn, async (req, res) => {
     const { mods, reasons, oszs, mode, comment, isPublic } = req.body;
 
     if (res.locals.userRequest.modes.includes(mode)) {
@@ -307,7 +309,7 @@ router.post('/apply', async (req, res) => {
 });
 
 /* POST request to rejoin bn */
-router.post('/rejoinApply', async (req, res) => {
+router.post('/rejoinApply', middlewares.isLoggedIn, async (req, res) => {
     const mode = req.body.mode;
 
     if (res.locals.userRequest.modes.includes(mode)) {

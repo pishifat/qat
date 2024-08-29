@@ -11,8 +11,6 @@ const discord = require('../helpers/discord');
 
 const router = express.Router();
 
-router.use(middlewares.isLoggedIn);
-
 const defaultPopulate = [
     {
         path: 'vetoer',
@@ -49,13 +47,25 @@ function getPopulate(isNat, mongoId) {
 
 /* GET vetoes list. */
 router.get('/relevantInfo/:limit', async (req, res) => {
-    let vetoes = await Veto
-        .find({})
-        .populate(
-            getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
-        )
-        .sort({ createdAt: -1 })
-        .limit(parseInt(req.params.limit));
+    let vetoes;
+
+    if (!req.session.mongoId) {
+        vetoes = await Veto
+            .find({})
+            .populate(
+                getPopulate(false, null)
+            )
+            .sort({ createdAt: -1 })
+            .limit(parseInt(req.params.limit));
+    } else {
+        vetoes = await Veto
+            .find({})
+            .populate(
+                getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
+            )
+            .sort({ createdAt: -1 })
+            .limit(parseInt(req.params.limit));
+    }
 
     res.json({
         vetoes,
@@ -64,17 +74,27 @@ router.get('/relevantInfo/:limit', async (req, res) => {
 
 /* GET specific veto */
 router.get('/searchVeto/:id', async (req, res) => {
-    let veto = await Veto
-        .findById(req.params.id)
-        .populate(
-            getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
-        );
+    let veto;
+
+    if (!req.session.mongoId) {
+        veto = await Veto
+            .findById(req.params.id)
+            .populate(
+                getPopulate(false, null)
+            );
+    } else {
+        let veto = await Veto
+            .findById(req.params.id)
+            .populate(
+                getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
+            );
+    }
 
     res.json(veto);
 });
 
 /* POST create a new veto. */
-router.post('/submit', async (req, res) => {
+router.post('/submit', middlewares.isLoggedIn, async (req, res) => {
     if (!req.body.reasons.length) {
         return res.json({ error: 'Veto must include reasons!' });
     }

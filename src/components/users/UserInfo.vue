@@ -43,13 +43,13 @@
 
                 <div v-for="mode in selectedUser.modes" :key="mode">
                     <resign
-                        v-if="selectedUser.id == loggedInUser.id && loggedInUser.isBn"
+                        v-if="loggedInUser && selectedUser.id == loggedInUser.id && loggedInUser.isBn"
                         :mode="mode"
                         class="mb-2"
                     />
                 </div>
 
-                <div v-if="loggedInUser.isNat">
+                <div v-if="loggedInUser && loggedInUser.isNat">
                     <bn-evaluator-toggle />
 
                     <trial-nat-toggle v-if="selectedUser.isBn && selectedUser.fullModes.length" />
@@ -64,7 +64,7 @@
                     </div>
 
                     <nat-subgroup-toggle 
-                        v-if="loggedInUser.isAdmin && selectedUser.isNat" 
+                        v-if="loggedInUser && loggedInUser.isAdmin && selectedUser.isNat" 
                     />
 
                     <modding-activity
@@ -75,7 +75,7 @@
                 </div>
             </div>
 
-            <div v-if="loggedInUser.isNat && !selectedUser.isBnOrNat">
+            <div v-if="loggedInUser && loggedInUser.isNat && !selectedUser.isBnOrNat">
                 <ban-toggle />
 
                 <content-review-toggle />
@@ -83,7 +83,7 @@
                 <former-user-group-toggle />
             </div>
 
-            <div v-if="loggedInUser.isNat">
+            <div v-if="loggedInUser && loggedInUser.isNat">
                 <badges
                     v-if="loggedInUser.isNatLeader"
                     class="mt-2"
@@ -94,7 +94,7 @@
             </div>
 
             <debug-view-document 
-                v-if="loggedInUser.isAdmin"
+                v-if="loggedInUser && loggedInUser.isAdmin"
                 :document="selectedUser"
             />
         </div>

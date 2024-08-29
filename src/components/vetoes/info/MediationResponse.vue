@@ -2,14 +2,14 @@
     <div class="row my-3">
         <div class="col-sm-2 small">
             <user-avatar
-                v-if="loggedInUser.isNat"
+                v-if="loggedInUser && loggedInUser.isNat"
                 :user="mediation.mediator"
                 :text-color="voteColor(mediation.vote)"
             >
                 <span v-if="mediation.vote == 2" class="text-secondary small">(partially agree)</span> <!-- only used in vetoFormat 1 and 2-->
 
                 <a
-                    v-if="loggedInUser.isAdmin"
+                    v-if="loggedInUser && loggedInUser.isAdmin"
                     href="#"
                     @click.prevent="resetMediation()"
                     class="text-danger"

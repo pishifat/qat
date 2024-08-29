@@ -19,8 +19,6 @@ const { websocketManager } = require("../../helpers/websocket");
 
 const router = express.Router();
 
-router.use(middlewares.isLoggedIn);
-
 const evaluationsPopulate = [
     {
         path: 'reviews',
@@ -58,7 +56,7 @@ router.get('/loadPreviousBnAndNat', async (req, res) => {
 });
 
 /* GET NAT list */
-router.get('/loadNatInMode/:mode', async (req, res) => {
+router.get('/loadNatInMode/:mode', middlewares.isNatOrTrialNat, async (req, res) => {
     const users = await User.find({ groups: 'nat', 'modesInfo.mode': req.params.mode }).sort({ username: 1 });
 
     res.json(users);
@@ -471,7 +469,7 @@ router.post('/:id/switchBnEvaluator', middlewares.isBnOrNat, async (req, res) =>
 });
 
 /* POST toggle showExplicitContent */
-router.post('/:id/toggleShowExplicitContent', async (req, res) => {
+router.post('/:id/toggleShowExplicitContent', middlewares.isLoggedIn, async (req, res) => {
     const user = await User.findById(req.params.id).orFail();
 
     if (req.session.mongoId != user.id && !res.locals.userRequest.isNat) {

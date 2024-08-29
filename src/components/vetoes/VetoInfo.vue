@@ -17,18 +17,18 @@
 
             <!-- show vote count to NAT who aren't active mediators -->
             <vote-count 
-                v-if="loggedInUser.isNat && !isMediator" 
+                v-if="loggedInUser && loggedInUser.isNat && !isMediator" 
             />
 
             <!-- show debug info to admins -->
             <debug-view-document 
-                v-if="loggedInUser.isAdmin"
+                v-if="loggedInUser && loggedInUser.isAdmin"
                 :document="selectedVeto"
             />
 
             <!-- show admin buttons to NAT who aren't active mediators, or admins -->
             <admin-buttons
-                v-if="(loggedInUser.isNat && !isMediator) || loggedInUser.isAdmin"
+                v-if="loggedInUser && ((loggedInUser.isNat && !isMediator) || loggedInUser.isAdmin)"
             />
 
             <!-- show mediation input for active mediators -->
@@ -71,7 +71,7 @@ export default {
         showMediations() {
             if (this.selectedVeto.mediations.length) {
                 // NAT can see only if they're not mediators
-                if (this.loggedInUser.isNat && !this.isMediator) {
+                if (this.loggedInUser && this.loggedInUser.isNat && !this.isMediator) {
                     return true;
                 // everyone can see when archived
                 } else if (this.selectedVeto.status == 'archive') {

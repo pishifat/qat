@@ -7,7 +7,7 @@
             </b>
 
             <input
-                v-if="isEditing && loggedInUser.isNat"
+                v-if="isEditing && loggedInUser && loggedInUser.isNat"
                 v-model="newDeadlineInput"
                 class="form-control form-control-sm w-50 mb-2"
                 type="text"
@@ -23,7 +23,7 @@
             >{{ nextEvaluationText }}</span>
 
             <a
-                v-if="isEditable && loggedInUser.isNat"
+                v-if="isEditable && loggedInUser && loggedInUser.isNat"
                 href="#"
                 data-toggle="tooltip"
                 data-placement="top"
@@ -35,7 +35,7 @@
             </a>
 
             <button 
-                v-if="loggedInUser.isNat" 
+                v-if="loggedInUser && loggedInUser.isNat" 
                 data-toggle="tooltip"
                 data-placement="top"
                 title="reset next evaluation date to default based on previous evaluations"
@@ -44,7 +44,7 @@
             </button>
 
             <button
-            v-if="loggedInUser.isNat"
+            v-if="loggedInUser && loggedInUser.isNat"
                 data-toggle="tooltip"
                 data-placement="top"
                 title="create an evaluation with a deadline of 7 days from now"

@@ -47,7 +47,7 @@
                             ({{ totalDrain(event.beatmaps)}})
                         </span>
                         <a
-                            v-if="(loggedInUser.isNat || loggedInUser.isTrialNat) && isEvaluation"
+                            v-if="loggedInUser && (loggedInUser.isNat || loggedInUser.isTrialNat) && isEvaluation"
                             href="#"
                             :class="processing ? 'processing' : ''"
                             data-toggle="tooltip"

@@ -2,13 +2,13 @@
     <div class="row my-3">
         <div class="col-sm-2">
             <user-avatar
-                v-if="(loggedInUser.isNat || loggedInUser.isTrialNat) && review.evaluator.username"
+                v-if="loggedInUser && (loggedInUser.isNat || loggedInUser.isTrialNat) && review.evaluator.username"
                 :user="review.evaluator"
                 :text-color="voteColor(review.vote)"
                 :align-start="true"
             >
                 <a
-                    v-if="loggedInUser.isAdmin"
+                    v-if="loggedInUser && loggedInUser.isAdmin"
                     href="#"
                     @click.prevent="deleteReview()"
                     class="text-danger"
@@ -23,7 +23,7 @@
             <div v-else class="text-center my-2 text-pastel-blue">
                 <b>Evaluator {{ index }}</b>
 
-                <div v-if="review.evaluator && review.evaluator.id == loggedInUser.id">
+                <div v-if="loggedInUser && review.evaluator && review.evaluator.id == loggedInUser.id">
                     (this is you!)
                 </div>
             </div>

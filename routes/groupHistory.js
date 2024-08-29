@@ -4,8 +4,6 @@ const { default: axios } = require('axios');
 
 const router = express.Router();
 
-router.use(middlewares.isLoggedIn);
-
 router.get('/', async (req, res) => {
     let params = req.query;
     try {

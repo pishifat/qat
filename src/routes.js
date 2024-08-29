@@ -31,17 +31,17 @@ const Documentation = () => import(/* webpackChunkName: "nat", webpackPrefetch: 
 const routes = [
     // Public
     { path: '/', component: Home, alias: '/home', name: 'home', meta: { public: true } },
-    { path: '/bnapps', component: ApplicationSubmission, meta: { title: 'Beatmap Nominator Application' } },
-    { path: '/reports', component: ReportSubmission, meta: { title: 'Report Submission' } },
-    { path: '/users', component: Users, meta: { title: 'BN/NAT Listing' } },
-    { path: '/vetoes', component: Vetoes, meta: { title: 'Vetoes' } },
+    { path: '/bnapps', component: ApplicationSubmission, meta: { title: 'Beatmap Nominator Application' }, meta: { public: true } },
+    { path: '/reports', component: ReportSubmission, meta: { title: 'Report Submission' }, meta: { public: true } },
+    { path: '/users', component: Users, meta: { title: 'BN/NAT Listing' }, meta: { public: true } },
+    { path: '/vetoes', component: Vetoes, meta: { title: 'Vetoes' }, meta: { public: true } },
     { path: '/qualityassurance', component: QualityAssurance, meta: { title: 'Quality Assurance' } },
     { path: '/yourevals', component: YourEvals, meta: { title: 'Your Evaluations' } },
     { path: '/message', component: Message, meta: { title: 'Message from the NAT' } },
     { path: '/modrequests', component: ModRequests, meta: { title: 'Request a BN', public: true } },
     { path: '/discussionvote', component: DiscussionVote, meta: { title: 'Content Review' } },
-    { path: '/grouphistory', component: GroupHistory, meta: { title: 'Group History' } },
-    { path: '/publicarchive', component: PublicEvalArchive, meta: { title: 'Public Evaluation Archives' } },
+    { path: '/grouphistory', component: GroupHistory, meta: { title: 'Group History', public: true } },
+    { path: '/publicarchive', component: PublicEvalArchive, meta: { title: 'Public Evaluation Archives' }, meta: { public: true } },
 
     // BN/NAT
     { path: '/appeval', component: AppEvalPage, meta: { title: 'BN Application Evaluations', requiresBnOrNat: true } },

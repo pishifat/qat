@@ -28,7 +28,7 @@ export default {
             'selectedEvaluation',
         ]),
         sortedReviews () {
-            if (this.loggedInUser.isNat) {
+            if (this.loggedInUser && this.loggedInUser.isNat) {
                 const natReviews = this.selectedEvaluation.reviews.filter(r => r.evaluator.isNat);
                 const bnReviews = this.selectedEvaluation.reviews.filter(r => !r.evaluator.isNat);
 

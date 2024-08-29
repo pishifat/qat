@@ -8,7 +8,7 @@
         </div>
         <div v-if="events" :id="eventsId" class="collapse overflow-auto text-break">
             <div 
-                v-if="loggedInUser.isNatOrTrialNat && events && events.length && (eventsId == 'nominationsDisqualified' || eventsId == 'nominationsPopped')"
+                v-if="loggedInUser && loggedInUser.isNatOrTrialNat && events && events.length && (eventsId == 'nominationsDisqualified' || eventsId == 'nominationsPopped')"
                 class="text-secondary small"
             >
                 <button
@@ -113,7 +113,7 @@ export default {
             let events = [...this.events];
 
             // @ts-ignore
-            if (this.filter && this.loggedInUser.isNatOrTrialNat) {
+            if (this.filter && this.loggedInUser && this.loggedInUser.isNatOrTrialNat) {
                 events = events.filter(e => e.impactNum != 0);
             }
 

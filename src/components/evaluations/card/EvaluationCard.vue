@@ -20,7 +20,7 @@
                 :is-pass-app="evaluation.isApplication && evaluation.consensus === 'pass'"
                 :is-security-checked="evaluation.isSecurityChecked"
                 :has-nat-buddy="Boolean(evaluation.natBuddy)"
-                :is-nat-or-trial-nat="loggedInUser.isNatOrTrialNat"
+                :is-nat-or-trial-nat="loggedInUser && loggedInUser.isNatOrTrialNat"
                 :is-discussion="evaluation.discussion"
                 :is-resignation="evaluation.kind == 'resignation'"
                 :is-nat-evaluation="Boolean(evaluation.selfSummary)"
@@ -73,7 +73,7 @@ export default {
             'checkedEvaluations',
         ]),
         relevantReviewVote () {
-            const review = this.evaluation.reviews.find(e => e.evaluator && e.evaluator.id == this.loggedInUser.id);
+            const review = this.evaluation.reviews.find(e => this.loggedInUser && e.evaluator && e.evaluator.id == this.loggedInUser.id);
 
             if (review) {
                 switch (review.vote) {
@@ -89,8 +89,8 @@ export default {
             return '';
         },
         isAssigned () {
-            return (this.evaluation.natEvaluators && this.evaluation.natEvaluators.some(e => e.id == this.loggedInUser.id) ||
-            this.evaluation.bnEvaluators && this.evaluation.bnEvaluators.some(e => e.id == this.loggedInUser.id));
+            return (this.evaluation.natEvaluators && this.evaluation.natEvaluators.some(e => this.loggedInUser && e.id == this.loggedInUser.id) ||
+            this.evaluation.bnEvaluators && this.evaluation.bnEvaluators.some(e => e.id == this.loggedInUser && this.loggedInUser.id));
         },
         username () {
             return this.evaluation.user.username;
@@ -127,7 +127,7 @@ export default {
 
             if (
                 this.$route.query.id !== this.evaluation.id && 
-                (this.loggedInUser.isNatOrTrialNat || this.evaluation.isPublic)
+                ((this.loggedInUser && this.loggedInUser.isNatOrTrialNat) || this.evaluation.isPublic)
             ) {
                 let url = this.$route.path;
 

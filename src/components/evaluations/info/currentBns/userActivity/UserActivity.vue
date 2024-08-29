@@ -60,6 +60,7 @@
 
             <template
                 v-if="
+                    loggedInUser && 
                     loggedInUser.isNat &&
                     (assignedBnApplications || natApplications || natBnEvaluations)
                 "
@@ -93,7 +94,7 @@
                 
             <template
                 v-else-if="
-                    !loggedInUser.isNat && isNat &&
+                    loggedInUser && !loggedInUser.isNat && isNat &&
                     (assignedBnApplications || natApplications || natBnEvaluations)
                 "
             >
@@ -114,10 +115,10 @@
                 />
             </template>
 
-            <template v-if="loggedInUser.hasFullReadAccess && showArchive">
+            <template v-if="loggedInUser && loggedInUser.hasFullReadAccess && showArchive">
                 <div class="mt-2">Archives</div>
                 <previous-evaluations
-                    v-if="loggedInUser.isNat"
+                    v-if="loggedInUser && loggedInUser.isNat"
                     :header="'Previous Evaluations'"
                     :event-id="'previousEvaluations'"
                     :mongo-id="mongoId"
@@ -254,7 +255,7 @@ export default {
             else if (days < 2) days = 2;
             this.daysInput = days;
 
-            const route = this.loggedInUser.isNat ? 'bnEval' : 'users';
+            const route = this.loggedInUser && loggedInUser.isNat ? 'bnEval' : 'users';
 
             const res = await this.$http.executeGet(
                 `/${route}/activity?osuId=${this.osuId}&modes=${
@@ -291,7 +292,7 @@ export default {
                     res.disqualifiedQualityAssuranceChecks
                 );
 
-                if (this.loggedInUser.isNat || this.isNat) {
+                if ((this.loggedInUser && this.loggedInUser.isNat) || this.isNat) {
                     this.$store.commit(
                         'activity/setBnApplications',
                         res.assignedBnApplications

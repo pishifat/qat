@@ -1,7 +1,7 @@
 <template>
     <div>
         <!-- static info -->
-        <div class="card card-body mb-3">
+        <div class="card card-body mb-2">
             <div class="mb-3">
                 The
                 <a
@@ -45,12 +45,7 @@
                 <li><a href="https://osu.ppy.sh/wiki/en/People/Beatmap_Nominators" target="_blank">General Beatmap Nominator information</a></li>
                 <li><a href="https://osu.ppy.sh/wiki/en/People/Beatmap_Nominators/Expectations" target="_blank">Expectations for Beatmap Nominators</a></li>
             </ul>
-            <div>
-                As part of <a href="https://osu.ppy.sh/community/forums/topics/1898076" target="_blank">recent BN application process changes</a>, a few things are still under construction! Thanks for your patience. :)
-            </div>
         </div>
-
-        <hr />
 
         <!-- cooldowns -->
         <template v-if="cooldowns.length || activeApps.length">
@@ -177,6 +172,7 @@
                             class="form-control ml-2 mb-2"
                             placeholder="beatmap link"
                             maxlength="1000"
+                            :disabled="!loggedInUser"
                         />
 
                         <hr />
@@ -199,6 +195,7 @@
                             placeholder="response"
                             maxlength="1000"
                             rows="2"
+                            :disabled="!loggedInUser"
                         />
 
                         <b v-if="step == i && reasons[i - 1] && reasons[i - 1].length > 800" class="text-danger float-right">{{ reasons[i - 1].length }}/1000</b>
@@ -215,6 +212,7 @@
                             class="form-control ml-2 mb-2"
                             placeholder=".osz link"
                             maxlength="1000"
+                            :disabled="!loggedInUser"
                         />
                     </div>
                 </div>
@@ -314,6 +312,7 @@
                         class="btn btn-block btn-secondary mt-2"
                         type="button"
                         @click="step++"
+                        :disabled="!loggedInUser"
                     >
                         Next
                         <i class="ml-1 fas fa-arrow-right" />

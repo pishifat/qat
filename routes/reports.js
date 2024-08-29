@@ -11,7 +11,7 @@ const router = express.Router();
 router.use(middlewares.isLoggedIn);
 
 /* POST submit report (Report) */
-router.post('/submitReport/', middlewares.isLoggedIn, async (req, res) => {
+router.post('/submitReport/', async (req, res) => {
     const link = req.body.link;
     const username = req.body.username;
     let validUrl = util.isValidUrl(link);

@@ -62,8 +62,8 @@ export default {
     },
     methods: {
         isAssigned () {
-            return (this.natEvaluators && this.natEvaluators.some(e => e.id == this.loggedInUser.id) ||
-            this.bnEvaluators && this.bnEvaluators.some(e => e.id == this.loggedInUser.id));
+            return (this.natEvaluators && this.natEvaluators.some(e => this.loggedInUser && e.id == this.loggedInUser.id) ||
+            this.bnEvaluators && this.bnEvaluators.some(e => this.loggedInUser && e.id == this.loggedInUser.id));
         },
     },
 };
