@@ -238,7 +238,7 @@
                     </div>
                     
                 </div>
-                <div class="text-danger mt-4" v-if="!selectedMode || mods.length !== 3 || reasons.length !== 3 || oszs.length !== 3"">
+                <div class="text-danger mt-4" v-if="!selectedMode || mods.length !== 3 || reasons.length !== 3 || oszs.length !== 3">
                     Missing application details:
                     <ul>
                         <li v-if="selectedMode.length === 0">Game mode</li>
