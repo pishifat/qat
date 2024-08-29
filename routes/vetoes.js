@@ -58,10 +58,13 @@ router.get('/relevantInfo/:limit', async (req, res) => {
             .sort({ createdAt: -1 })
             .limit(parseInt(req.params.limit));
     } else {
+        const user = await User.findById(req.session.mongoId);
+        const isNat = user.isNat;
+
         vetoes = await Veto
             .find({})
             .populate(
-                getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
+                getPopulate(isNat, req.session.mongoId)
             )
             .sort({ createdAt: -1 })
             .limit(parseInt(req.params.limit));
@@ -83,10 +86,13 @@ router.get('/searchVeto/:id', async (req, res) => {
                 getPopulate(false, null)
             );
     } else {
+        const user = await User.findById(req.session.mongoId);
+        const isNat = user.isNat;
+
         let veto = await Veto
             .findById(req.params.id)
             .populate(
-                getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
+                getPopulate(isNat, req.session.mongoId)
             );
     }
 

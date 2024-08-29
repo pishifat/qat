@@ -194,6 +194,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import ToastMessages from '../components/ToastMessages.vue';
 
 export default {
@@ -213,6 +214,9 @@ export default {
         };
     },
     computed: {
+        ...mapState([
+            'loggedInUser',
+        ]),
         primaryLinkHeader () {
             switch (this.category) {
                 case 'stolenBeatmap':
