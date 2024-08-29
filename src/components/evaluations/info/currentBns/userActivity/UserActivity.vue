@@ -255,7 +255,7 @@ export default {
             else if (days < 2) days = 2;
             this.daysInput = days;
 
-            const route = this.loggedInUser && loggedInUser.isNat ? 'bnEval' : 'users';
+            const route = this.loggedInUser && this.loggedInUser.isNat ? 'bnEval' : 'users';
 
             const res = await this.$http.executeGet(
                 `/${route}/activity?osuId=${this.osuId}&modes=${
