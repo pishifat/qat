@@ -47,7 +47,7 @@ export default {
         };
     },
     mounted() {
-        //this.findVibeCheckStats();
+        this.findVibeCheckStats();
     },
     methods: {
         async findVibeCheckStats() {

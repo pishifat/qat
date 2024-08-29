@@ -1,6 +1,6 @@
 <template>
     <div>
-        <template v-if="(loggedInUser.isNat || loggedInUser.isTrialNat) && !selectedEvaluation.user.isNat">
+        <template v-if="(loggedInUser && (loggedInUser.isNat || loggedInUser.isTrialNat)) && !selectedEvaluation.user.isNat">
             <hr>
             <p>
                 <a href="#consensusSettings" data-toggle="collapse">
@@ -15,13 +15,14 @@
                     </div>
                     <div class="col-sm-3">
                         <evaluation-is-reviewed
-                            v-if="loggedInUser.isNat && selectedEvaluation.consensus && !selectedEvaluation.isResignation"
+                            v-if="loggedInUser && loggedInUser.isNat && selectedEvaluation.consensus && !selectedEvaluation.isResignation"
                             :feedback="selectedEvaluation.feedback"
                         />
                     </div>
                     <div class="col-sm-4">
                         <nat-buddy-assignment 
                             v-if="
+                                loggedInUser &&
                                 loggedInUser.isNat && 
                                 selectedEvaluation.isApplication && 
                                 selectedEvaluation.consensus === 'pass'
@@ -38,9 +39,10 @@
         <!-- Only NAT can see the reviews if the application is active -->
         <template
             v-if="
-                !selectedEvaluation.active ||
+                loggedInUser && 
+                (!selectedEvaluation.active ||
                 loggedInUser.isNat ||
-                loggedInUser.isTrialNat
+                loggedInUser.isTrialNat)
             "
         >
             <hr v-if="selectedEvaluation.reviews.length" />

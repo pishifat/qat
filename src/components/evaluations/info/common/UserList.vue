@@ -7,16 +7,16 @@
             <li v-for="user in userList" :key="user.id" class="small">
                 {{ user.username }}
                 <a
-                    v-if="nominatorAssessmentMongoId && loggedInUser.isNat && !isEditing"
+                    v-if="nominatorAssessmentMongoId && loggedInUser && loggedInUser.isNat && !isEditing"
                     href="#"
                     @click="isEditing = true; editedEvaluatorId = user.id"
                 >
                     <i class="fas fa-edit" />
                 </a>
 
-                <span v-if="nominatorAssessmentMongoId && loggedInUser.isNat && isEditing && user.id == editedEvaluatorId">
+                <span v-if="nominatorAssessmentMongoId && loggedInUser && loggedInUser.isNat && isEditing && user.id == editedEvaluatorId">
                     <a
-                        v-if="nominatorAssessmentMongoId && loggedInUser.isNat && isEditing && user.id == editedEvaluatorId"
+                        v-if="nominatorAssessmentMongoId && loggedInUser && loggedInUser.isNat && isEditing && user.id == editedEvaluatorId"
                         href="#"
                         data-toggle="tooltip"
                         data-placement="top"
@@ -26,7 +26,7 @@
                         <i class="fas fa-times-circle text-danger" />
                     </a>
                     <a
-                        v-if="nominatorAssessmentMongoId && loggedInUser.isNat"
+                        v-if="nominatorAssessmentMongoId && loggedInUser && loggedInUser.isNat"
                         href="#"
                         data-toggle="tooltip"
                         data-placement="top"
@@ -38,7 +38,7 @@
                     </a>
                 </span>
 
-                <span v-if="nominatorAssessmentMongoId && loggedInUser.isNat && isEditing && user.id == editedEvaluatorId && replaceNat" class="form-inline">
+                <span v-if="nominatorAssessmentMongoId && loggedInUser && loggedInUser.isNat && isEditing && user.id == editedEvaluatorId && replaceNat" class="form-inline">
                     <select
                         id="user"
                         v-model="selectedUserId"
@@ -56,7 +56,7 @@
                         </option>
                     </select>
                     <a
-                        v-if="nominatorAssessmentMongoId && loggedInUser.isNat"
+                        v-if="nominatorAssessmentMongoId && loggedInUser && loggedInUser.isNat"
                         href="#"
                         data-toggle="tooltip"
                         data-placement="top"

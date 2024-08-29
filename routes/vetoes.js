@@ -173,7 +173,7 @@ router.post('/submit', middlewares.isLoggedIn, async (req, res) => {
 });
 
 /* POST submit mediation */
-router.post('/submitMediation/:id', middlewares.isBnOrNat, async (req, res) => {
+router.post('/submitMediation/:id', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
     const mediationData = req.body.mediation;
     const voteData = req.body.vote;
     const inputData = req.body.input;
@@ -252,7 +252,7 @@ router.post('/submitMediation/:id', middlewares.isBnOrNat, async (req, res) => {
 });
 
 /* POST reset mediation comment */
-router.post('/resetMediation/:id', middlewares.isAdmin, async (req, res) => {
+router.post('/resetMediation/:id', middlewares.isLoggedIn, middlewares.isAdmin, async (req, res) => {
     const veto = await Veto
         .findById(req.params.id)
         .populate(
@@ -285,7 +285,7 @@ router.post('/resetMediation/:id', middlewares.isAdmin, async (req, res) => {
 });
 
 /* POST select mediators */
-router.post('/selectMediators', middlewares.isNat, async (req, res) => {
+router.post('/selectMediators', middlewares.isLoggedIn, middlewares.isNat, async (req, res) => {
     const mode = req.body.mode;
     const allUsers = await User.getAllBnAndNat();
 
@@ -311,7 +311,7 @@ router.post('/selectMediators', middlewares.isNat, async (req, res) => {
 });
 
 /* POST begin mediation */
-router.post('/beginMediation/:id', middlewares.isNat, async (req, res) => {
+router.post('/beginMediation/:id', middlewares.isLoggedIn, middlewares.isNat, async (req, res) => {
     const vetoReasons = req.body.reasons;
     const mediatorIds = req.body.mediatorIds;
     let v;
@@ -351,7 +351,7 @@ router.post('/beginMediation/:id', middlewares.isNat, async (req, res) => {
 });
 
 /* POST conclude mediation */
-router.post('/concludeMediation/:id', middlewares.isNat, async (req, res) => {
+router.post('/concludeMediation/:id', middlewares.isLoggedIn, middlewares.isNat, async (req, res) => {
     const veto = await Veto
         .findById(req.params.id)
         .populate(defaultPopulate);
@@ -378,7 +378,7 @@ router.post('/concludeMediation/:id', middlewares.isNat, async (req, res) => {
 });
 
 /* POST continue mediation */
-router.post('/continueMediation/:id', middlewares.isNat, async (req, res) => {
+router.post('/continueMediation/:id', middlewares.isLoggedIn, middlewares.isNat, async (req, res) => {
     const veto = await Veto
         .findByIdAndUpdate(req.params.id, { status: 'wip' })
         .populate(defaultPopulate);
@@ -401,7 +401,7 @@ router.post('/continueMediation/:id', middlewares.isNat, async (req, res) => {
 });
 
 /* POST delete veto */
-router.post('/deleteVeto/:id', middlewares.isNat, async (req, res) => {
+router.post('/deleteVeto/:id', middlewares.isLoggedIn, middlewares.isNat, async (req, res) => {
     const veto = await Veto
         .findByIdAndRemove(req.params.id)
         .orFail();
@@ -424,7 +424,7 @@ router.post('/deleteVeto/:id', middlewares.isNat, async (req, res) => {
 });
 
 /* POST send messages */
-router.post('/sendMessages/:id', middlewares.isNat, async (req, res) => {
+router.post('/sendMessages/:id', middlewares.isLoggedIn, middlewares.isNat, async (req, res) => {
     const veto = await Veto
         .findById(req.params.id)
         .orFail();
@@ -463,7 +463,7 @@ router.post('/sendMessages/:id', middlewares.isNat, async (req, res) => {
 
 // TODO delete this route when we're done using it
 /* POST migrate mediations */
-router.post('/migrateMediations', middlewares.isAdmin, async (req, res) => {
+router.post('/migrateMediations', middlewares.isLoggedIn, middlewares.isAdmin, async (req, res) => {
     const oldVetoId = req.body.oldVetoId;
     const newVetoId = req.body.newVetoId;
 

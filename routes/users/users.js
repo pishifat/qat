@@ -56,14 +56,18 @@ router.get('/loadPreviousBnAndNat', async (req, res) => {
 });
 
 /* GET NAT list */
-router.get('/loadNatInMode/:mode', middlewares.isNatOrTrialNat, async (req, res) => {
+router.get('/loadNatInMode/:mode', middlewares.isLoggedIn, middlewares.isNatOrTrialNat, async (req, res) => {
+    console.log('in');
+    console.log('???');
     const users = await User.find({ groups: 'nat', 'modesInfo.mode': req.params.mode }).sort({ username: 1 });
+
+    console.log(users);
 
     res.json(users);
 });
 
 /* GET users banned from BN */
-router.get('/loadBannedUsers', middlewares.isNat, async (req, res) => {
+router.get('/loadBannedUsers', middlewares.isLoggedIn, middlewares.isNat, async (req, res) => {
     const users = await User.find({
         isBannedFromBn : true,
     }).sort({ username: 1 });
@@ -109,7 +113,7 @@ router.get('/loadNextEvaluation/:id/:mode', async (req, res) => {
 });
 
 /* POST adjust next evaluation deadline */
-router.post('/adjustEvaluationDeadline/:id/:mode', middlewares.isNat, async (req, res) => {
+router.post('/adjustEvaluationDeadline/:id/:mode', middlewares.isLoggedIn, middlewares.isNat, async (req, res) => {
     const er = await BnEvaluation
         .findOne({ user: req.params.id, mode: req.params.mode, active: true })
         .populate({ path: 'user', select: 'username' });
@@ -133,7 +137,7 @@ router.post('/adjustEvaluationDeadline/:id/:mode', middlewares.isNat, async (req
 });
 
 /* POST reset next evaluation deadline based on previous evaluations */
-router.post('/resetEvaluationDeadline/:id/:mode', middlewares.isNat, async (req, res) => {
+router.post('/resetEvaluationDeadline/:id/:mode', middlewares.isLoggedIn, middlewares.isNat, async (req, res) => {
     const userId = req.params.id;
     const mode = req.params.mode;
     const [evaluation, pendingEvaluation] = await Promise.all([
@@ -338,7 +342,7 @@ router.get('/findGmtActivity/:days', async (req, res) => {
 });
 
 /* GET vibe check stats */
-router.get('/findVibeCheckStats', middlewares.isAdmin, async (req, res) => {
+router.get('/findVibeCheckStats', middlewares.isLoggedIn, middlewares.isAdmin, async (req, res) => {
     const apps = await AppEvaluation
         .find({ 
             vibeChecks: { $exists: true, $ne: [] },
@@ -403,7 +407,7 @@ router.get('/findVibeCheckStats', middlewares.isAdmin, async (req, res) => {
 });
 
 /* POST update discord ID */
-router.post('/updateDiscordId', middlewares.hasFullReadAccessOrTrialNat, async (req, res) => {
+router.post('/updateDiscordId', middlewares.isLoggedIn, middlewares.hasFullReadAccessOrTrialNat, async (req, res) => {
     let user;
 
     if (req.body.userId) {
@@ -429,7 +433,7 @@ router.post('/updateDiscordId', middlewares.hasFullReadAccessOrTrialNat, async (
 });
 
 /* POST switch bn evaluator */
-router.post('/:id/switchBnEvaluator', middlewares.isBnOrNat, async (req, res) => {
+router.post('/:id/switchBnEvaluator', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
     const user = await User.findById(req.params.id).orFail();
 
     if (req.session.mongoId != user.id && !res.locals.userRequest.isNat) {
@@ -495,7 +499,7 @@ router.post('/:id/toggleShowExplicitContent', middlewares.isLoggedIn, async (req
 });
 
 /* POST toggle isActiveContentReviewer */
-router.post('/:id/toggleIsActiveContentReviewer', middlewares.hasFullReadAccess, async (req, res) => {
+router.post('/:id/toggleIsActiveContentReviewer', middlewares.isLoggedIn, middlewares.hasFullReadAccess, async (req, res) => {
     const user = await User.findById(req.params.id).orFail();
 
     if (req.session.mongoId != user.id && !res.locals.userRequest.hasFullReadAccess) {
@@ -521,7 +525,7 @@ router.post('/:id/toggleIsActiveContentReviewer', middlewares.hasFullReadAccess,
 });
 
 /* POST switch/update request status */
-router.post('/:id/updateRequestStatus', middlewares.isBnOrNat, async (req, res) => {
+router.post('/:id/updateRequestStatus', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
     if (req.body.requestLink) {
         util.isValidUrlOrThrow(req.body.requestLink);
     }
@@ -562,7 +566,7 @@ router.post('/:id/updateRequestStatus', middlewares.isBnOrNat, async (req, res) 
 });
 
 /* POST update languages */
-router.post('/:id/updateLanguages', middlewares.isBnOrNat, async (req, res) => {
+router.post('/:id/updateLanguages', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
     const user = await User.findById(req.params.id).orFail();
 
     if (req.session.mongoId != user.id && !res.locals.userRequest.isNat) {
@@ -597,7 +601,7 @@ router.post('/:id/updateLanguages', middlewares.isBnOrNat, async (req, res) => {
 });
 
 /* POST update genre preferences */
-router.post('/:id/updateGenrePreferences', middlewares.isBnOrNat, async (req, res) => {
+router.post('/:id/updateGenrePreferences', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
     const user = await User.findById(req.params.id).orFail();
 
     if (req.session.mongoId != user.id) {
@@ -640,7 +644,7 @@ router.post('/:id/updateGenrePreferences', middlewares.isBnOrNat, async (req, re
 });
 
 /* POST update language preferences */
-router.post('/:id/updateLanguagePreferences', middlewares.isBnOrNat, async (req, res) => {
+router.post('/:id/updateLanguagePreferences', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
     const user = await User.findById(req.params.id).orFail();
 
     if (req.session.mongoId != user.id) {
@@ -690,7 +694,7 @@ router.post('/:id/updateLanguagePreferences', middlewares.isBnOrNat, async (req,
 });
 
 /* POST update map style preferences */
-router.post('/:id/updateStylePreferences/:mode', middlewares.isBnOrNat, async (req, res) => {
+router.post('/:id/updateStylePreferences/:mode', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
     const user = await User.findById(req.params.id).orFail();
 
     if (req.session.mongoId != user.id) {
@@ -758,7 +762,7 @@ router.post('/:id/updateStylePreferences/:mode', middlewares.isBnOrNat, async (r
 });
 
 /* POST update mania keymode preferences */
-router.post('/:id/updateKeymodePreferences', middlewares.isBnOrNat, async (req, res) => {
+router.post('/:id/updateKeymodePreferences', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
     const user = await User.findById(req.params.id).orFail();
 
     if (req.session.mongoId != user.id) {
@@ -808,7 +812,7 @@ router.post('/:id/updateKeymodePreferences', middlewares.isBnOrNat, async (req, 
 });
 
 /* POST update song detail preferences */
-router.post('/:id/updateDetailPreferences', middlewares.isBnOrNat, async (req, res) => {
+router.post('/:id/updateDetailPreferences', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
     const user = await User.findById(req.params.id).orFail();
 
     if (req.session.mongoId != user.id) {
@@ -858,7 +862,7 @@ router.post('/:id/updateDetailPreferences', middlewares.isBnOrNat, async (req, r
 });
 
 /* POST update mapper preferences */
-router.post('/:id/updateMapperPreferences', middlewares.isBnOrNat, async (req, res) => {
+router.post('/:id/updateMapperPreferences', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
     const user = await User.findById(req.params.id).orFail();
 
     if (req.session.mongoId != user.id) {
@@ -908,7 +912,7 @@ router.post('/:id/updateMapperPreferences', middlewares.isBnOrNat, async (req, r
 });
 
 /* POST add to NAT */
-router.post('/:id/addToNat', middlewares.isNat, async (req, res) => {
+router.post('/:id/addToNat', middlewares.isLoggedIn, middlewares.isNat, async (req, res) => {
     const user = await User.findById(req.params.id).orFail();
     const mode = req.body.mode;
     let isFormer = false;
@@ -996,7 +1000,7 @@ router.post('/:id/addToNat', middlewares.isNat, async (req, res) => {
 });
 
 /* POST change evaluator mode */
-router.post('/:id/changeEvaluatorMode', middlewares.isNat, async (req, res) => {
+router.post('/:id/changeEvaluatorMode', middlewares.isLoggedIn, middlewares.isNat, async (req, res) => {
     const user = await User.findById(req.params.id).orFail();
     const mode = req.body.mode;
     let oldMode = '';
@@ -1041,7 +1045,7 @@ router.post('/:id/changeEvaluatorMode', middlewares.isNat, async (req, res) => {
 });
 
 /* POST force move from probation to full BN */
-router.post('/:id/forceFullBn', middlewares.isAdmin, async (req, res) => {
+router.post('/:id/forceFullBn', middlewares.isLoggedIn, middlewares.isAdmin, async (req, res) => {
     const user = await User.findById(req.params.id).orFail();
     const mode = req.body.mode;
 
@@ -1244,7 +1248,7 @@ router.post('/resignFromBn/:id', async (req, res) => {
 });
 
 /* POST cycle bag */
-router.post('/cycleBag/:mode', middlewares.isAdmin, async (req, res) => {
+router.post('/cycleBag/:mode', middlewares.isLoggedIn, middlewares.isAdmin, async (req, res) => {
     const tempEvaluation = await BnEvaluation.findOne({ active: true }); // a random eval for getAssignedNat to work
     const users = await User.getAssignedNat(req.params.mode, tempEvaluation.user.toString());
 
@@ -1338,7 +1342,7 @@ router.post('/toggleEvalVisibility/:id', async (req, res) => {
 });
 
 /* POST toggle subjectiveEvalFeedback */
-router.post('/:id/toggleSubjectiveEvalFeedback', middlewares.isBnOrNat, async (req, res) => {
+router.post('/:id/toggleSubjectiveEvalFeedback', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
     const user = await User.findById(req.params.id).orFail();
 
     if (req.session.mongoId != user.id) {
