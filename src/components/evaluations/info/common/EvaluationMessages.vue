@@ -1,6 +1,12 @@
 <template>
     <div v-if="isNewEvaluationFormat">
-        <h5 v-if="evaluation.messages && evaluation.messages.length">Messages</h5>
+        <div v-if="evaluation.messages && evaluation.messages.length">
+            <h5>Messages</h5>
+            <p v-if="isMessagePage">
+                The outcome of your evaluation is final.
+                <span v-if="!evaluation.messagesLocked">If you have questions, reply below!</span>
+            </p>
+        </div>
         <div
             v-for="(message, i) in evaluation.messages"
             :key="i"
@@ -72,7 +78,11 @@ export default {
         replies: {
             type: Boolean,
             default: false,
-        }
+        },
+        isMessagePage: {
+            type: Boolean,
+            default: false,
+        },
     },
     data () {
         return {
