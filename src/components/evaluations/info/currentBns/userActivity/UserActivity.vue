@@ -1,22 +1,6 @@
 <template>
     <div :key="mongoId">
-        <p class="font-weight-bold form-inline">
-            <span>User activity:</span>
-            <input
-                v-if="editingDaysInput"
-                v-model="daysInput"
-                class="form-control form-control-sm w-days"
-                type="number"
-                min="1"
-                max="9999"
-                @keyup.enter="search"
-            />
-            <span v-else class="mx-1">{{ daysInput }}</span>
-            days
-            <a href="#" @click.prevent="search">
-                <i class="fas fa-edit ml-1" />
-            </a>
-        </p>
+        <activity-standing v-if="showActivityStanding" />
 
         <p v-if="modes.length > 1" class="font-weight-bold form-inline">
             Game mode:
@@ -26,6 +10,24 @@
                 :max-selection="1"
                 :modes-filter="modes"
             />
+        </p>
+
+        <p class="font-weight-bold form-inline">
+            <span>User activity</span>
+            <input
+                v-if="editingDaysInput"
+                v-model="daysInput"
+                class="form-control form-control-sm w-days"
+                type="number"
+                min="1"
+                max="9999"
+                @keyup.enter="search"
+            />
+            <span v-else class="mx-1">({{ daysInput }}</span>
+            days)
+            <a href="#" @click.prevent="search">
+                <i class="fas fa-edit ml-1" />
+            </a>
         </p>
 
         <div class="container mb-3">
@@ -128,9 +130,9 @@
                     :event-id="'reports'"
                     :mongo-id="mongoId"
                 />
-                <hr />
             </template>
         </div>
+        <hr />
     </div>
 </template>
 
@@ -143,6 +145,7 @@ import PublicEvaluationList from './PublicEvaluationList.vue';
 import PreviousEvaluations from './PreviousEvaluations.vue';
 import Reports from './Reports.vue';
 import ModeSelect from '../../../../ModeSelect.vue';
+import ActivityStanding from './ActivityStanding.vue';
 
 export default {
     name: 'UserActivity',
@@ -154,6 +157,7 @@ export default {
         PreviousEvaluations,
         Reports,
         ModeSelect,
+        ActivityStanding,
     },
     props: {
         modes: {
@@ -192,6 +196,14 @@ export default {
             type: Boolean,
             default: false,
         },
+        user: {
+            type: Object,
+            required: true,
+        },
+        showActivityStanding: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
@@ -213,6 +225,7 @@ export default {
             'assignedBnApplications',
             'natApplications',
             'natBnEvaluations',
+            'isLoading',
         ]),
     },
     watch: {
@@ -257,54 +270,26 @@ export default {
 
             const route = this.loggedInUser && this.loggedInUser.isNat ? 'bnEval' : 'users';
 
-            const res = await this.$http.executeGet(
-                `/${route}/activity?osuId=${this.osuId}&modes=${
-                    this.modes
-                }&deadline=${new Date(this.deadline).getTime()}&mongoId=${
-                    this.mongoId
-                }&days=${days}`
-            );
+            const res = await this.$http.executeGet(`/${route}/activity?osuId=${this.osuId}&modes=${this.modes}&deadline=${new Date(this.deadline).getTime()}&mongoId=${this.mongoId}&days=${days}`);
 
             if (res) {
-                this.$store.commit(
-                    'activity/setNominations',
-                    res.uniqueNominations
-                );
-                this.$store.commit(
-                    'activity/setNominationsDisqualified',
-                    res.nominationsDisqualified
-                );
-                this.$store.commit(
-                    'activity/setNominationsPopped',
-                    res.nominationsPopped
-                );
-                this.$store.commit(
-                    'activity/setDisqualifications',
-                    res.disqualifications
-                );
+                this.$store.commit('activity/setNominations', res.uniqueNominations);
+                this.$store.commit('activity/setNominationsDisqualified', res.nominationsDisqualified);
+                this.$store.commit('activity/setNominationsPopped', res.nominationsPopped);
+                this.$store.commit('activity/setDisqualifications', res.disqualifications);
                 this.$store.commit('activity/setPops', res.pops);
-                this.$store.commit(
-                    'activity/setQualityAssuranceChecks',
-                    res.qualityAssuranceChecks
-                );
-                this.$store.commit(
-                    'activity/setDisqualifiedQualityAssuranceChecks',
-                    res.disqualifiedQualityAssuranceChecks
-                );
+                this.$store.commit('activity/setQualityAssuranceChecks', res.qualityAssuranceChecks);
+                this.$store.commit('activity/setDisqualifiedQualityAssuranceChecks', res.disqualifiedQualityAssuranceChecks);
+                this.$store.commit('activity/setMonth1Nominations', res.month1Nominations);
+                this.$store.commit('activity/setMonth2Nominations', res.month2Nominations);
+                this.$store.commit('activity/setMonth3Nominations', res.month3Nominations);
+                this.$store.commit('activity/setCurrentMonthNominations', res.currentMonthNominations);
+                this.$store.commit('activity/setSelectedUser', this.user);
 
                 if ((this.loggedInUser && this.loggedInUser.isNat) || this.isNat) {
-                    this.$store.commit(
-                        'activity/setBnApplications',
-                        res.assignedBnApplications
-                    );
-                    this.$store.commit(
-                        'activity/setNatApplications',
-                        res.appEvaluations
-                    );
-                    this.$store.commit(
-                        'activity/setNatBnEvaluations',
-                        res.bnEvaluations
-                    );
+                    this.$store.commit('activity/setBnApplications', res.assignedBnApplications);
+                    this.$store.commit('activity/setNatApplications', res.appEvaluations);
+                    this.$store.commit('activity/setNatBnEvaluations', res.bnEvaluations);
                 }
 
                 this.$store.commit('activity/setIsLoading', false);

@@ -13,7 +13,12 @@ export default {
         assignedBnApplications: [],
         natApplications: [],
         natBnEvaluations: [],
+        month1Nominations: [],
+        month2Nominations: [],
+        month3Nominations: [],
+        currentMonthNominations: [],
         isLoading: true,
+        selectedUser: null,
     }),
     mutations: {
         setIsLoading (state, value) {
@@ -48,6 +53,21 @@ export default {
         },
         setNatBnEvaluations (state, evaluations) {
             state.natBnEvaluations = evaluations;
+        },
+        setMonth1Nominations (state, month1Nominations) {
+            state.month1Nominations = month1Nominations;
+        },
+        setMonth2Nominations (state, month2Nominations) {
+            state.month2Nominations = month2Nominations;
+        },
+        setMonth3Nominations (state, month3Nominations) {
+            state.month3Nominations = month3Nominations;
+        },
+        setCurrentMonthNominations (state, currentMonthNominations) {
+            state.currentMonthNominations = currentMonthNominations;
+        },
+        setSelectedUser (state, user) {
+            state.selectedUser = user;
         },
         updateEvent (state, event) {
             let i;

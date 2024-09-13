@@ -40,7 +40,7 @@ class EvaluationService extends mongoose.Model {
             .populate([
                 {
                     path: 'user',
-                    select: 'username osuId modesInfo groups evaluatorModes subjectiveEvalFeedback',
+                    select: 'username osuId modesInfo groups evaluatorModes subjectiveEvalFeedback history',
                 },
                 {
                     path: 'natBuddy',

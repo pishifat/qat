@@ -20,6 +20,7 @@ const ResignationEvaluation = require('../models/evaluations/resignationEvaluati
 const Settings = require('../models/settings');
 const { replaceUser } = require('../routes/evaluations/evaluations');
 const { BnEvaluationConsensus, BnEvaluationAddition } = require('../shared/enums');
+const getGeneralEvents = require('../routes/evaluations/bnEval').getGeneralEvents;
 
 /**
  * Beatmap report feed every hour
@@ -778,136 +779,58 @@ const spawnHighActivityEvaluations = cron.schedule('1 19 * * *', async () => {
 /**
  * check user activity (daily)
  */
-const checkUserActivity = cron.schedule('2 19 * * *', async () => {
-    const ninetyDaysAgo = moment().subtract(90, 'days').toDate();
-    const thirtyDaysAgo = moment().subtract(30, 'days').toDate();
-    const normalBnThreshold = 6;
-    const hybridBnTotalThreshold = 9;   // unused for now
-    const hybridBnPerModeThreshold = 3; // unused for now
+const checkUserActivity = cron.schedule('0 8 1 * *', async () => {
+    const users = await User.find({ groups: 'bn' });
+
+    let warnOsuIds = [];
     const channel = {
         name: `BN Activity warning`,
-        description: 'Notice for low beatmap nominator activity',
+        description: 'notice for low beatmap nominator activity',
     }
-    const users = await User.find({
-        $or: [
-            //{ groups: 'nat' },
-            { groups: 'bn' },
-        ],
-    });
-    
+    const message = `hello! you need at least **2 nominations per month** to stay in the BN, and last month (${moment().subtract(1, 'months').format('MMMM YYYY')}) you were below that threshold.\n\nif you don't nominate 2 maps this month (${moment().format('MMMM YYYY')}), you may be removed from the BN!`;
+
     for (const user of users) {
-        const isBnFor90Days = new Date(user.history[user.history.length - 1].date) < ninetyDaysAgo;
-        const neverChecked = !user.lastActivityCheck;
-        const regularCheck = user.lastActivityCheck < thirtyDaysAgo && !user.hasActivityWarning;
-        const warningCheck = user.lastActivityCheck < thirtyDaysAgo && user.hasActivityWarning;
-        const check = isBnFor90Days && (regularCheck || neverChecked || warningCheck);
+        const { month1Nominations, month2Nominations, month3Nominations, currentMonthNominations } = await getGeneralEvents(user.osuId, user.id, user.modes, new Date(), new Date());
 
-        if (check) {
-            const nomCount = await scrap.findUniqueNominationsCount(ninetyDaysAgo, new Date(), user);
+        let bnJoinDate = new Date();
 
-            // single mode bns
-            if (user.modesInfo.length == 1) {
-                if (regularCheck || neverChecked) {
-                    if (nomCount < normalBnThreshold) {
-                        const message = `Hello ${user.username}! You've nominated ${nomCount} beatmaps in the last 90 days. BNs require at least **${normalBnThreshold} nominations per 90 days**.\n\nYour activity will be checked again in **30 days**. If you don't meet the minimum requirements for the next 90 day period (the last 60 days + the next 30 days), you will be removed from the Beatmap Nominators for inactivity.\n\n[View your nomination activity here!](https://bn.mappersguild.com/users?id=${user.id})`;
-                        await osuBot.sendAnnouncement([user.osuId], channel, message);
-                        user.hasActivityWarning = true;
+        if (user.history && user.history.length) {
+            bnJoinDate = new Date(user.history[user.history.length - 1].date);
+        }
+
+        /* only check
+            - BNs who have been around for 2 month periods (based on their last join date)
+            - single mode BNs (check multi-mode BNs manually or something. they're too complex)
+        */
+        if (bnJoinDate < new Date(moment().subtract(2, 'months').startOf('month')) && month3Nominations < 2 && user.modes.length == 1) {
+            if (month2Nominations < 2) {
+                const pendingEvaluation = await BnEvaluation.findOne({ user: user._id, active: true, natEvaluators: [] });
                         
-                        await discord.webhookPost(
-                            [{
-                                description: `Sent low activity warning for [**${user.username}**](https://osu.ppy.sh/users/${user.osuId}) ([**${nomCount} nominations** in 90 days](https://bn.mappersguild.com/users?id=${user.id}))`,
-                                color: discord.webhookColors.darkYellow,
-                            }],
-                            user.modesInfo[0].mode,
-                        );
-
-                    } else if (user.hasActivityWarning) {
-                        user.hasActivityWarning = false;
-                    }
-                } else if (warningCheck) {
-                    if (nomCount < normalBnThreshold) {
-                        const pendingEvaluation = await BnEvaluation.findOne({ user: user._id, active: true, natEvaluators: [] });
-                        
-                        if (pendingEvaluation) {
-                            pendingEvaluation.activityToCheck = 90;
-                            pendingEvaluation.deadline = new Date();
-                            pendingEvaluation.discussion = true;
-                            pendingEvaluation.consensus = BnEvaluationConsensus.RemoveFromBn;
-                            pendingEvaluation.addition = BnEvaluationAddition.LowActivityWarning;
-                            pendingEvaluation.feedback = `Hello! You've nominated ${nomCount} beatmaps in the last 90 days, which is lower than the minimum **${normalBnThreshold} nominations per 90 days**. Because you haven't reached the minimum threshold since your warning, you have been removed from the BN for inactivity.`;
-                            await pendingEvaluation.save();
-                            user.hasActivityWarning = false;
-                        }
-                    }
+                if (pendingEvaluation) {
+                    pendingEvaluation.activityToCheck = 90;
+                    pendingEvaluation.deadline = new Date();
+                    pendingEvaluation.discussion = true;
+                    pendingEvaluation.consensus = BnEvaluationConsensus.RemoveFromBn;
+                    pendingEvaluation.addition = BnEvaluationAddition.LowActivityWarning;
+                    pendingEvaluation.feedback = `Hello! You were warned about having low BN activity a month ago, and unfortunately your activity is still below the threshold, so we've chosen to remove you from the Beatmap Nominators. Feel free to re-join when you can maintain at least 2 nominations per month!`;
+                    await pendingEvaluation.save();
                 }
+            } else {
+                warnOsuIds.push(user.osuId);
+
+                await discord.webhookPost(
+                    [{
+                        description: `Sent low activity warning for [**${user.username}**](https://osu.ppy.sh/users/${user.osuId}) ([see BN activity](https://bn.mappersguild.com/users?id=${user.id}))`,
+                        color: discord.webhookColors.darkYellow,
+                    }],
+                    user.modesInfo[0].mode,
+                );
+                await util.sleep(500);
             }
-
-            // hybrid bns (untested)
-            if (user.modesInfo.length > 1) {
-                let warningSent = false;
-
-                for (const modeInfo of user.modesInfo) {
-                    const mode = modeInfo.mode;
-                    const nomCountMode = await scrap.findUniqueNominationsCount(ninetyDaysAgo, new Date(), user, mode);
-
-                    if (regularCheck || neverChecked) {
-                        let message = `Hello ${user.username}! `;
-                        let send = false;
-
-                        if (nomCount < hybridBnTotalThreshold) {
-                            send = true;
-                            message += `You've nominated ${nomCount} beatmaps in the last 90 days. `; 
-                        }
-
-                        if (nomCountMode < hybridBnPerModeThreshold) {
-                            message += `Only ${nomCountMode} of your nominations were on ${mode} maps. `;
-                        }
-
-                        if (send && !warningSent) {
-                            message += `Hybrid BNs require at least **${hybridBnTotalThreshold} total nominations per 90 days** and at least **${hybridBnPerModeThreshold} nominations in each eligible mode per 90 days**.\n\nIf you don't meet the minimum requirements for the next 90 day period (the last 60 days + the next 30 days), you will be removed from the Beatmap Nominators for inactivity.\n\n[View your nomination activity here!](https://bn.mappersguild.com/users?id=${user.id})`;
-
-                            await osuBot.sendAnnouncement([user.osuId], channel, message);
-                            user.hasActivityWarning = true;
-
-                            for (const nestedModeInfo of user.modesInfo) {
-                                await discord.webhookPost(
-                                    [{
-                                        description: `Sent low activity warning for [**${user.username}**](https://osu.ppy.sh/users/${user.osuId}) ([**${nomCount} nominations** in 90 days, **${nomCountMode} in ${mode}**](https://bn.mappersguild.com/users?id=${user.id}))`,
-                                        color: discord.webhookColors.darkYellow,
-                                    }],
-                                    nestedModeInfo.mode,
-                                );
-                            }
-
-                            warningSent = true;
-                        }
-                        
-                        if (!send && user.hasActivityWarning) {
-                            user.hasActivityWarning = false;
-                        }
-                    } else if (warningCheck) {
-                        if (nomCount < hybridBnTotalThreshold || nomCountMode < hybridBnPerModeThreshold) {
-                            const pendingEvaluation = await BnEvaluation.findOne({ user: user._id, active: true, natEvaluators: [], mode });
-                            
-                            if (pendingEvaluation) {
-                                pendingEvaluation.activityToCheck = 90;
-                                pendingEvaluation.deadline = new Date();
-                                pendingEvaluation.discussion = true;
-                                pendingEvaluation.consensus = BnEvaluationConsensus.RemoveFromBn;
-                                pendingEvaluation.addition = BnEvaluationAddition.LowActivityWarning;
-                                pendingEvaluation.feedback = `Hello! You've nominated ${nomCount} beatmaps and only ${nomCountMode} beatmaps in ${mode} in the last 90 days, which is lower than the minimum **${hybridBnTotalThreshold} total nominations** and **${hybridBnPerModeThreshold} nominations per eligible mode** in 90 days. Because you haven't reached the minimum threshold since your warning, you have been removed from the ${mode} BN for inactivity.`;
-                                await pendingEvaluation.save();
-                                user.hasActivityWarning = false;
-                            }
-                        }
-                    }
-                }
-            }
-            
-            user.lastActivityCheck = new Date();
-            await user.save();
         }
     }
+
+    await osuBot.sendAnnouncement(warnOsuIds, channel, message);
 }, {
     scheduled: false,
 });

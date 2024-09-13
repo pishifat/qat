@@ -68,6 +68,8 @@
                         "
                         :is-evaluation="true"
                         :is-nat="selectedEvaluation.user.isNat"
+                        :user="selectedEvaluation.user"
+                        :show-activity-standing="true"
                     />
                     <subjective-feedback-status 
                         v-if="selectedEvaluation.user.isBn && !selectedEvaluation.isResignation && selectedEvaluation.mode === 'osu'" 

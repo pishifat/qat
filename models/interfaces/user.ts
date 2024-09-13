@@ -56,7 +56,6 @@ interface IUser {
     isActiveContentReviewer: boolean;
     subjectiveEvalFeedback: boolean;
     lastActivityCheck: Date;
-    hasActivityWarning: boolean;
 
     // not used in model
     genreCount: number;

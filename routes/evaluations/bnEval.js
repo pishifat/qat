@@ -750,7 +750,8 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
         return { error: 'Something went wrong!' };
     }
 
-    const [uniqueNominations, disqualifications, pops, qualityAssuranceChecks] = await Promise.all([
+    // get base data
+    const [uniqueNominations, disqualifications, pops, qualityAssuranceChecks, uniqueNominations3Months] = await Promise.all([
         Aiess.getUniqueUserEvents(userOsuId, minDate, maxDate, modes, ['nominate', 'qualify']),
         Aiess.getUserEvents(userOsuId, minDate, maxDate, modes, ['disqualify']),
         Aiess.getUserEvents(userOsuId, minDate, maxDate, modes, ['nomination_reset']),
@@ -762,11 +763,13 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
                 path: 'event',
                 select: 'beatmapsetId timestamp modes artistTitle creatorName creatorId',
             }),
+        Aiess.getUniqueUserEvents(userOsuId, new Date(moment().subtract(3, 'months').startOf('month')), new Date(), modes, ['nominate', 'qualify']),
     ]);
 
     const beatmapsetIds = uniqueNominations.map(n => n.beatmapsetId);
     const qaBeatmapsetIds = qualityAssuranceChecks.map(qa => qa.event.beatmapsetId);
 
+    // get data that requires base data
     let [allNominationsDisqualified, allNominationsPopped, disqualifiedQualityAssuranceChecks] = await Promise.all([
         Aiess.getRelatedBeatmapsetEvents(
             userOsuId,
@@ -791,6 +794,7 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
         }),
     ]);
 
+    // filter nominationsPopped
     let nominationsPopped = [];
 
     for (const event of allNominationsPopped) {
@@ -815,6 +819,7 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
         }
     }
 
+    // filter nominationsDisqualified
     let nominationsDisqualified = [];
 
     for (const event of allNominationsDisqualified) {
@@ -839,6 +844,7 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
         }
     }
 
+    // filter disqualifiedQualityAssuranceChecks
     disqualifiedQualityAssuranceChecks = disqualifiedQualityAssuranceChecks.filter(dq =>
         qualityAssuranceChecks.some(qa => qa.event.beatmapsetId == dq.beatmapsetId && qa.event.timestamp < dq.timestamp)
     );
@@ -856,6 +862,31 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
         }
     }
 
+    // find unique nominations per month for the last 3 months and current month (for activity standing display)
+    const month1Nominations = [];
+    const month2Nominations = [];
+    const month3Nominations = [];
+    const currentMonthNominations = [];
+
+    const month1Start = moment().subtract(3, 'months').startOf('month');
+    const month2Start = moment().subtract(2, 'months').startOf('month');
+    const month3Start = moment().subtract(1, 'months').startOf('month');
+    const currentMonthStart = moment().startOf('month');
+    const today = new Date();
+
+    for (const nomination of uniqueNominations3Months) {
+        const timestamp = new Date(nomination.timestamp);
+        if (timestamp >= month1Start && timestamp < month2Start) {
+            month1Nominations.push(nomination);
+        } else if (timestamp >= month2Start && timestamp < month3Start) {
+            month2Nominations.push(nomination);
+        } else if (timestamp >= month3Start && timestamp < currentMonthStart) {
+            month3Nominations.push(nomination);
+        } else if (timestamp >= currentMonthStart && timestamp < today) {
+            currentMonthNominations.push(nomination);
+        }
+    }
+
     return {
         uniqueNominations,
         nominationsDisqualified,
@@ -864,6 +895,10 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
         pops,
         qualityAssuranceChecks,
         disqualifiedQualityAssuranceChecks,
+        month1Nominations: month1Nominations.length,
+        month2Nominations: month2Nominations.length,
+        month3Nominations: month3Nominations.length,
+        currentMonthNominations: currentMonthNominations.length,
     };
 }
 

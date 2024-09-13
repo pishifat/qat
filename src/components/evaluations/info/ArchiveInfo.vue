@@ -26,6 +26,7 @@
                 :unique="selectedEvaluation.id"
                 :overwrite-days="selectedEvaluation.activityToCheck ? selectedEvaluation.activityToCheck + 7 : 90 + 7"
                 :is-nat="selectedEvaluation.user.isNat"
+                :user="selectedEvaluation.user"
             />
 
             <evaluation-link />

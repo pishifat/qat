@@ -18,6 +18,8 @@
                     :overwrite-days="90"
                     :show-archive="true"
                     :is-nat="selectedUser.isNat"
+                    :user="selectedUser"
+                    :show-activity-standing="true"
                 />
             </div>
 
@@ -39,6 +41,8 @@
                     :overwrite-days="90"
                     :show-archive="true"
                     :is-nat="selectedUser.isNat"
+                    :user="selectedUser"
+                    :show-activity-standing="true"
                 />
 
                 <div v-for="mode in selectedUser.modes" :key="mode">
