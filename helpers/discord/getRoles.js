@@ -18,6 +18,9 @@ function getRoles(roles) {
             case 'natInternal':
                 pings += `<@&${config.announcementWebhook.natInternalRole}> `;
                 break;
+            case 'mappingModdingCommunityInternal':
+                pings += `<@&${config.announcementWebhook.mappingModdingCommunityInternal}> `;
+                break;
             case 'nat':
                 pings += `<@&${config.announcementWebhook.natRole}> `;
                 break;

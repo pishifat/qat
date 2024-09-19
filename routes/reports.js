@@ -87,7 +87,7 @@ router.post('/submitReport/', async (req, res) => {
             'natUserReport'
         );
         
-        await discord.roleHighlightWebhookPost('natUserReport', ['natInternal']);
+        await discord.roleHighlightWebhookPost('natUserReport', ['mappingModdingCommunityInternal']);
 
         Logger.generate(
             null,
@@ -120,7 +120,7 @@ router.post('/submitReport/', async (req, res) => {
         'natUserReport');
 
         if (report.category == 'other') {
-            await discord.roleHighlightWebhookPost('natUserReport', ['natInternal']);
+            await discord.roleHighlightWebhookPost('natUserReport', ['mappingModdingCommunityInternal']);
         }
 
         Logger.generate(
