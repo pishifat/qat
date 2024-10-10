@@ -89,7 +89,7 @@ router.get('/searchVeto/:id', async (req, res) => {
         const user = await User.findById(req.session.mongoId);
         const isNat = user.isNat;
 
-        let veto = await Veto
+        veto = await Veto
             .findById(req.params.id)
             .populate(
                 getPopulate(isNat, req.session.mongoId)
