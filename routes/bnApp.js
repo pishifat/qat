@@ -27,7 +27,7 @@ router.get('/relevantInfo', async (req, res) => {
             .find({
                 user: req.session.mongoId,
                 active: false,
-                consensus: ResignationConsensus.ResignedOnGoodTerms,
+                consensus: { $exists: true },
                 archivedAt: { $gt: oneYearAgo },
                 cooldownDate: { $lt: new Date() }
             })

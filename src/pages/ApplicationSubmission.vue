@@ -78,7 +78,7 @@
         </template>
 
         <!-- instant rejoin -->
-        <template v-if="relevantResignation && !cooldowns.length">
+        <template v-if="relevantResignation && relevantResignation.consensus === 'resignedOnGoodTerms' && !cooldowns.length">
             <div class="card card-body">
                 <h4>Bypass application</h4>
                 <p class="mt-2">
