@@ -222,7 +222,6 @@ const server = app.listen(port, () => {
         automation.notifyBeatmapReports.start();
         automation.spawnProbationEvaluations.start();
         automation.spawnHighActivityEvaluations.start();
-        //automation.checkUserActivity.start();
     }
 });
 

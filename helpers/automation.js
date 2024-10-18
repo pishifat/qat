@@ -459,8 +459,54 @@ const notifyCurrentBnEvaluations = cron.schedule('3 17 * * *', async () => {
         const hasAssignedNatEvaluators = eval.natEvaluators && eval.natEvaluators.length;
         const hasAssignedBnEvaluators = eval.natEvaluators && eval.natEvaluators.length;
 
-        // add user assignments
         if (!hasAssignedNatEvaluators) {
+            // check user activity, send notice if too low
+            const [lastApp, lastEval] = await Promise.all([
+                AppEvaluation
+                    .findOne({
+                        user: eval.user,
+                        active: false,
+                        consensus: { $exists: true },
+                        archivedAt: { $exists: true },
+                        mode: eval.mode,
+                    })
+                    .sort({ archivedAt: -1 }),
+                BnEvaluation
+                    .findOne({
+                        user: eval.user,
+                        active: false,
+                        consensus: { $exists: true },
+                        archivedAt: { $exists: true },
+                        mode: eval.mode,
+                    })
+                    .sort({ archivedAt: -1 }),
+            ]);
+
+            if (lastApp && lastEval && new Date(lastEval.archivedAt) > new Date(lastApp.archivedAt)) { // only check people who haven't recently rejoined BN
+                
+                const uniqueNominations = await scrap.findUniqueNominationsCount(moment().subtract(eval.activityToCheck, 'days').toDate(), new Date(), eval.user);
+                
+                if (uniqueNominations < 6) {
+                    const channel = {
+                        name: `BN Activity warning`,
+                        description: 'notice for low beatmap nominator activity',
+                    }
+                    const message = `hello! you need at least **6 nominations every 3 months** to stay in the BN, and you currently have ${uniqueNominations}.\n\nplease raise that to 6 within the next week, otherwise you may be removed from the BN for low activity!`;
+                    
+                    await discord.webhookPost(
+                        [{
+                            description: `Sent low activity warning for [**${eval.user.username}**](https://osu.ppy.sh/users/${eval.user.osuId}) ([see BN activity](https://bn.mappersguild.com/users?id=${eval.user.id}))`,
+                            color: discord.webhookColors.darkYellow,
+                        }],
+                        eval.mode,
+                    );
+                    await util.sleep(500);
+
+                    await osuBot.sendAnnouncement([eval.user.osuId], channel, message);
+                }
+            }
+            
+            // add user assignments
             if (isNat) {
                 eval.natEvaluators = [eval.user._id];
             } else {
@@ -550,7 +596,6 @@ const notifyCurrentBnEvaluations = cron.schedule('3 17 * * *', async () => {
                 await util.sleep(500);
             }
         }
-        
     }
 }, {
     scheduled: false,
@@ -777,65 +822,6 @@ const spawnHighActivityEvaluations = cron.schedule('1 19 * * *', async () => {
 });
 
 /**
- * check user activity (daily)
- */
-const checkUserActivity = cron.schedule('0 8 1 * *', async () => {
-    const users = await User.find({ groups: 'bn' });
-
-    let warnOsuIds = [];
-    const channel = {
-        name: `BN Activity warning`,
-        description: 'notice for low beatmap nominator activity',
-    }
-    const message = `hello! you need at least **2 nominations per month** to stay in the BN, and last month (${moment().subtract(1, 'months').format('MMMM YYYY')}) you were below that threshold.\n\nif you don't nominate 2 maps this month (${moment().format('MMMM YYYY')}), you may be removed from the BN!`;
-
-    for (const user of users) {
-        const { month1Nominations, month2Nominations, month3Nominations, currentMonthNominations } = await getGeneralEvents(user.osuId, user.id, user.modes, new Date(), new Date());
-
-        let bnJoinDate = new Date();
-
-        if (user.history && user.history.length) {
-            bnJoinDate = new Date(user.history[user.history.length - 1].date);
-        }
-
-        /* only check
-            - BNs who have been around for 2 month periods (based on their last join date)
-            - single mode BNs (check multi-mode BNs manually or something. they're too complex)
-        */
-        if (bnJoinDate < new Date(moment().subtract(2, 'months').startOf('month')) && month3Nominations < 2 && user.modes.length == 1) {
-            if (month2Nominations < 2) {
-                const pendingEvaluation = await BnEvaluation.findOne({ user: user._id, active: true, natEvaluators: [] });
-                        
-                if (pendingEvaluation) {
-                    pendingEvaluation.activityToCheck = 90;
-                    pendingEvaluation.deadline = new Date();
-                    pendingEvaluation.discussion = true;
-                    pendingEvaluation.consensus = BnEvaluationConsensus.RemoveFromBn;
-                    pendingEvaluation.addition = BnEvaluationAddition.LowActivityWarning;
-                    pendingEvaluation.feedback = `Hello! You were warned about having low BN activity a month ago, and unfortunately your activity is still below the threshold, so we've chosen to remove you from the Beatmap Nominators. Feel free to re-join when you can maintain at least 2 nominations per month!`;
-                    await pendingEvaluation.save();
-                }
-            } else {
-                warnOsuIds.push(user.osuId);
-
-                await discord.webhookPost(
-                    [{
-                        description: `Sent low activity warning for [**${user.username}**](https://osu.ppy.sh/users/${user.osuId}) ([see BN activity](https://bn.mappersguild.com/users?id=${user.id}))`,
-                        color: discord.webhookColors.darkYellow,
-                    }],
-                    user.modesInfo[0].mode,
-                );
-                await util.sleep(500);
-            }
-        }
-    }
-
-    await osuBot.sendAnnouncement(warnOsuIds, channel, message);
-}, {
-    scheduled: false,
-});
-
-/**
  * everything below this point is a development webhook (they only appear for pishifat to find or fix broken things)
  * i also don't fully trust any of them to do what they aim to do, but they're too insignificant to be worth the effort to investigate and fix
  */
@@ -1047,5 +1033,4 @@ module.exports = {
     notifyBeatmapReports,
     spawnProbationEvaluations,
     spawnHighActivityEvaluations,
-    checkUserActivity,
 };
