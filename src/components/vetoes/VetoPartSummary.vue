@@ -73,7 +73,7 @@ export default {
                 const sum = this.upholdMediations.length + this.withdrawMediations.length;
                 const threshold = 0.7 * sum;
 
-                return this.upholdMediations.length > threshold;
+                return this.upholdMediations.length >= threshold;
             } else {
                 return this.upholdMediations.length > this.withdrawMediations.length;
             }
