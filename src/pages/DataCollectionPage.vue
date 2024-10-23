@@ -22,6 +22,8 @@
                 title="Nomination resets"
                 target="resets"
             />
+
+            <sync-events />
         </div>
 
         <data-collection-info />
@@ -37,6 +39,7 @@ import ToastMessages from '../components/ToastMessages.vue';
 import FilterBox from '../components/FilterBox.vue';
 import DataCollectionInfo from '../components/dataCollection/DataCollectionInfo.vue';
 import EventsTable from '../components/dataCollection/EventsTable.vue';
+import SyncEvents from '../components/dataCollection/SyncEvents.vue';
 
 export default {
     name: 'DataCollectionPage',
@@ -45,6 +48,7 @@ export default {
         FilterBox,
         DataCollectionInfo,
         EventsTable,
+        SyncEvents,
     },
     data () {
         return {
