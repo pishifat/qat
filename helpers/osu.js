@@ -156,6 +156,32 @@ async function getDiscussions(token, params) {
     return (await axios(options)).data;
 }
 
+/**
+ * Returns the events of a beatmapset of predefined types
+ * * Event types: [`nominate`, `qualify`, `disqualify`, `nomination_reset`, `rank`]
+ * @param {string} token 
+ * @param {number | string} beatmapsetId 
+ */
+async function getBeatmapsetEvents(token, beatmapsetId) {
+    const events = ['nominate', 'qualify', 'disqualify', 'nomination_reset', 'rank'];
+
+    const params = new URLSearchParams({ beatmapset_id: beatmapsetId });
+    events.forEach(event => params.append('types[]', event));
+
+    const url = `https://osu.ppy.sh/api/v2/beatmapsets/events?${params.toString()}`;
+
+    /** @type {import('axios').AxiosRequestConfig} */
+    const options = {
+        method: 'GET',
+        url,
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    };
+
+    return (await axios(options)).data.events;
+}
+
 module.exports = {
     getToken,
     refreshToken,
@@ -164,4 +190,5 @@ module.exports = {
     getOtherUserInfo,
     getBeatmapsetInfo,
     getDiscussions,
+    getBeatmapsetEvents,
 };
