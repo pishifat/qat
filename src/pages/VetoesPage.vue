@@ -68,7 +68,7 @@
             </section>
             <section v-if="loggedInUser && loggedInUser.isAdmin" class="card card-body">
                 <h2>Admin</h2>
-                <span class="text-sm text-secondary mb-2">
+                <span class="small text-secondary mb-2">
                     Note: reason order needs to match in both vetoes
                 </span>
                 <div class="form-inline">
