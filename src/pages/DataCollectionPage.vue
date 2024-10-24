@@ -19,7 +19,7 @@
 
             <events-table
                 :events="pops"
-                title="Nomination resets"
+                title="Nomination Resets"
                 target="resets"
             />
 
