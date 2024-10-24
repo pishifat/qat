@@ -86,6 +86,12 @@ export default {
             if (string == 'none') return 'structural';
             else if (string == 'osu') return 'osu!';
             else return 'osu!' + string;
+        },
+        getBeatmapsetIdFromLink (url) {
+            const regex = /^https:\/\/osu\.ppy\.sh\/beatmapsets\/(\d+)(?:#(osu|taiko|fruits|mania)\/\d+)?$/;
+            const match = url.match(regex);
+  
+            return match && match[1] ? match[1] : null;
         }
     },
 };
