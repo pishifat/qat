@@ -123,6 +123,10 @@ router.post('/submitReport/', async (req, res) => {
             await discord.roleHighlightWebhookPost('natUserReport', ['mappingModdingCommunityInternal']);
         }
 
+        if (report.category == 'contentCaseSong' || report.category == 'contentCaseVisual') {
+            await discord.roleHighlightWebhookPost('natUserReport', ['contentModeration']);
+        }
+
         Logger.generate(
             null,
             'Reported something without a username included',

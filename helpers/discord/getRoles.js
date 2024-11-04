@@ -12,8 +12,8 @@ function getRoles(roles) {
             case 'gmt':
                 pings += `<@&${config.announcementWebhook.gmtRole}> `;
                 break;
-            case 'contentReview':
-                pings += `<@&${config.announcementWebhook.contentReviewRole}> `;
+            case 'contentModeration':
+                pings += `<@&${config.announcementWebhook.contentModerationRole}> `;
                 break;
             case 'natInternal':
                 pings += `<@&${config.announcementWebhook.natInternalRole}> `;
