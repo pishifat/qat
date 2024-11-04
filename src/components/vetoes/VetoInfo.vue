@@ -15,9 +15,9 @@
             <!-- show context when mediations aren't visible -->
             <context v-else />
 
-            <!-- show vote count to NAT who aren't active mediators -->
+            <!-- show vote count to NATs -->
             <vote-count 
-                v-if="isNotMediatorOrIsAdmin" 
+                v-if="loggedInUser && loggedInUser.isNat"
             />
 
             <!-- show debug info to admins -->
@@ -26,9 +26,9 @@
                 :document="selectedVeto"
             />
 
-            <!-- show admin buttons to NAT who aren't active mediators, or admins -->
+            <!-- show admin buttons to NATs -->
             <admin-buttons
-                v-if="isNotMediatorOrIsAdmin"
+                v-if="loggedInUser && loggedInUser.isNat"
             />
 
             <!-- show mediation input for active mediators -->
@@ -70,8 +70,8 @@ export default {
         ]),
         showMediations() {
             if (this.selectedVeto.mediations.length) {
-                // NAT can see only if they're not mediators
-                if (this.isNotMediatorOrIsAdmin) {
+                // NAT can see when active
+                if (this.loggedInUser && this.loggedInUser.isNat) {
                     return true;
                 // everyone can see when archived
                 } else if (this.selectedVeto.status == 'archive') {
@@ -81,9 +81,6 @@ export default {
 
             return false;
         },
-        isNotMediatorOrIsAdmin() {
-            return (this.loggedInUser && ((this.loggedInUser.isNat && !this.isMediator) || this.loggedInUser.isAdmin));
-        }
     },
 };
 </script>
