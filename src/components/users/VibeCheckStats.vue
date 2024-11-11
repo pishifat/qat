@@ -1,12 +1,16 @@
 <template>
     <div>
-        <div v-for="user in users" :key=user.osuId>
+        <!-- button that toggles natFilter-->
+        <button v-if="users" @click="natFilter = !natFilter" class="btn btn-sm btn-primary mb-2">
+            {{ natFilter ? 'Show all' : 'Show NAT only' }}
+        </button>
+        <div v-for="user in users" :key=user.osuId v-if="!natFilter || user.isNat">
             <b>
-                    <user-link
+                <user-link
                     :osu-id="user.osuId"
                     :username="user.username"
                 />
-                -
+                —
                 <span :class="user.accuracy >= 66 ? 'text-success' : user.accuracy >= 33 ? 'text-warning' : 'text-danger'">{{ user.accuracy }}%</span>
                 <small>({{ user.correct }}/{{ user.correct + user.incorrect }})</small>
             </b>
@@ -44,6 +48,7 @@ export default {
     data() {
         return {
             users: null,
+            natFilter: true,
         };
     },
     mounted() {

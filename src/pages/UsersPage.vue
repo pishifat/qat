@@ -86,6 +86,7 @@
             </section>
 
             <section v-if="loggedInUser && loggedInUser.isAdmin" class="card card-body">
+                <h5>Vibe checks</h5>
                 <vibe-check-stats />
             </section>
         </div>

@@ -369,6 +369,7 @@ router.get('/findVibeCheckStats', middlewares.isLoggedIn, middlewares.isAdmin, a
                 users.push({
                     username: vibeCheck.mediator.username,
                     osuId: vibeCheck.mediator.osuId,
+                    isNat: vibeCheck.mediator.groups.includes('nat'),
                     correct: 0,
                     incorrect: 0,
                     positiveVibes: 0,
