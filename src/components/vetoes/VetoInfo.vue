@@ -33,7 +33,7 @@
 
             <!-- show mediation input for active mediators -->
             <mediation-input
-                v-else-if="isMediator && selectedVeto.status == 'wip'"
+                v-if="isMediator && selectedVeto.status == 'wip'"
             />
         </div>
     </modal-dialog>
