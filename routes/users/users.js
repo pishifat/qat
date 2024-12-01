@@ -1375,4 +1375,67 @@ router.post('/:id/toggleSubjectiveEvalFeedback', middlewares.isLoggedIn, middlew
     );
 });
 
+/* GET get unique mapper stats */
+router.get('/getUniqueMapperStats', middlewares.isLoggedIn, middlewares.isAdmin, async (req, res) => {
+    const minDate = new Date(req.query.date);
+    const maxDate = new Date();
+
+    if (isNaN(minDate.getTime())) {
+        return res.json({
+            error: 'Invalid date',
+        });
+    }
+
+    // get nominate or qualify events
+    const events = await Aiess
+        .find({ timestamp: { $gte: minDate, $lte: maxDate }, type: { $in: ['nominate', 'qualify'] } })
+
+    // parse mode stats
+    // get unique nominations and mappers for each mode
+    let modeStats = [];
+    const modes = ['osu', 'taiko', 'catch', 'mania'];
+
+    for (const mode of modes) {
+        const modeEvents = events.filter(e => e.modes == mode);
+        const uniqueNominations = new Set(modeEvents.map(e => e.beatmapsetId));
+        const uniqueMappers = new Set(modeEvents.map(e => e.creatorId));
+
+        modeStats.push({
+            mode,
+            uniqueNominations: uniqueNominations.size,
+            uniqueMappers: uniqueMappers.size,
+            uniqueMappersPercentage: Math.round(uniqueMappers.size / uniqueNominations.size * 100),
+        });
+    }
+
+    
+    // parse nominator stats
+    const uniqueNominators = new Set(events.map(e => e.userId).filter(e => e));
+
+    let nominatorStats = [];
+
+    for (const nominatorId of uniqueNominators) {
+        const nominatorEvents = events.filter(e => e.userId == nominatorId);
+        const uniqueNominations = new Set(nominatorEvents.map(e => e.beatmapsetId));
+        const uniqueMappers = new Set(nominatorEvents.map(e => e.creatorId));
+        const nominator = await User.findOne({ osuId: nominatorId });
+
+        nominatorStats.push({
+            username: nominator.username,
+            userId: nominator.osuId,
+            modes: nominator.modes.length ? nominator.modes : ['resigned'],
+            uniqueNominationCount: uniqueNominations.size,
+            uniqueMapperCount: uniqueMappers.size,
+            uniqueMappersPercentage: Math.round(uniqueMappers.size / uniqueNominations.size * 100),
+        });
+    }
+
+    nominatorStats.sort((a, b) => b.uniqueNominationCount - a.uniqueNominationCount);
+
+    res.json({
+        modeStats,
+        nominatorStats,
+    });
+});
+
 module.exports = router;

@@ -80,7 +80,7 @@
 
             <!-- other tools -->
             <section class="card card-body">
-                <h5>Stats</h5>
+                <h5>Activity stats</h5>
                 <bn-activity class="my-2" />
                 <gmt-activity class="my-2" />
             </section>
@@ -88,6 +88,11 @@
             <section v-if="loggedInUser && loggedInUser.isAdmin" class="card card-body">
                 <h5>Vibe checks</h5>
                 <vibe-check-stats />
+            </section>
+
+            <section v-if="loggedInUser && loggedInUser.isAdmin" class="card card-body">
+                <h5>Unique mapper stats</h5>
+                <unique-mapper-stats />
             </section>
         </div>
 
@@ -109,6 +114,7 @@ import Badges from '../components/users/Badges.vue';
 import FilterBox from '../components/FilterBox.vue';
 import PaginationNav from '../components/PaginationNav.vue';
 import VibeCheckStats from '../components/users/VibeCheckStats.vue';
+import UniqueMapperStats from '../components/users/UniqueMapperStats.vue';
 
 export default {
     name: 'UsersPage',
@@ -122,6 +128,7 @@ export default {
         FilterBox,
         PaginationNav,
         VibeCheckStats,
+        UniqueMapperStats,
     },
     data () {
         return {
