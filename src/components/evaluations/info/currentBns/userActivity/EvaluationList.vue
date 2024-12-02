@@ -10,9 +10,8 @@
         <div v-if="loggedInUser.isNat">
             <div v-if="events" :id="eventsId" class="collapse">
                 <ul v-if="events.length">
-                    <li class="small">Total Evaluations: {{ totalEvaluations }}</li>
-                    <li class="small">Total Completed Evaluations: {{ totalCompletedEvaluations }}</li>
-                    <li class="small">Total Overdue Evaluations: {{ totalOverdueEvaluations }}</li>
+                    <li class="small">Total Assigned Evaluations: {{ totalEvaluations }}</li>
+                    <li class="small">Total Completed Evaluations: {{ totalCompletedEvaluations }} ({{ totalOverdueEvaluations }} overdue)</li>
                     <li class="small">Total Unfinished Evaluations: {{ totalUnfinishedEvaluations }}</li>
                 </ul>
                 <data-table
