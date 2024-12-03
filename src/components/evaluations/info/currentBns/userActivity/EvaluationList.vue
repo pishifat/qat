@@ -4,11 +4,16 @@
             <a :href="events && `#${eventsId}`" data-toggle="collapse"
                 >{{ header }} <i class="fas fa-angle-down"
             /></a>
-            ({{ isLoading ? '...' : events ? events.filter(e => findVote(e.reviews).toUpperCase() !== 'NONE').length : '0' }})
+            ({{ isLoading ? '...' : events.length ? getCompletedEvaluations(events).length + '/' + events.length : '0' }})
         </div>
 
         <div v-if="loggedInUser.isNat">
             <div v-if="events" :id="eventsId" class="collapse">
+                <ul v-if="events.length">
+                    <li class="small">Total Assigned Evaluations: {{ totalEvaluations }}</li>
+                    <li class="small">Total Completed Evaluations: {{ totalCompletedEvaluations }} ({{ totalOverdueEvaluations }} overdue)</li>
+                    <li class="small">Total Unfinished Evaluations: {{ totalUnfinishedEvaluations }}</li>
+                </ul>
                 <data-table
                     v-if="events.length"
                     :headers="['Deadline', 'Eval submitted', 'Evaluation', 'Vote', 'Consensus']"
@@ -86,8 +91,24 @@ export default {
     computed: {
         ...mapState('activity', ['isLoading']), 
         ...mapState(['loggedInUser']),
+
+        totalEvaluations() {
+            return this.events.length;
+        },
+        totalCompletedEvaluations() {
+            return this.getCompletedEvaluations(this.events).length;
+        },
+        totalOverdueEvaluations() {
+            return this.getCompletedEvaluations(this.events).filter(e => this.evaluatedAfterDeadline(e.deadline, e.reviews)).length;
+        },
+        totalUnfinishedEvaluations() {
+            return this.events.length - this.getCompletedEvaluations(this.events).length;
+        },
     },
     methods: {
+        getCompletedEvaluations(events) {
+            return events.filter(e => this.findVote(e.reviews).toUpperCase() !== 'NONE');
+        },
         findVote(reviews) {
             let vote;
 
