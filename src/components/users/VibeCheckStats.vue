@@ -1,7 +1,9 @@
 <template>
     <div>
-        <!-- button that toggles natFilter-->
-        <button v-if="users" @click="natFilter = !natFilter" class="btn btn-sm btn-primary mb-2">
+        <button v-if="!users" @click="findVibeCheckStats($event)" class="btn btn-sm btn-primary my-2">
+            Load vibes
+        </button>
+        <button v-else @click="natFilter = !natFilter" class="btn btn-sm btn-primary my-2">
             {{ natFilter ? 'Show all' : 'Show NAT only' }}
         </button>
         <div v-for="user in users" :key=user.osuId v-if="!natFilter || user.isNat">
@@ -51,12 +53,9 @@ export default {
             natFilter: true,
         };
     },
-    mounted() {
-        this.findVibeCheckStats();
-    },
     methods: {
-        async findVibeCheckStats() {
-            const users = await this.$http.executeGet('/users/findVibeCheckStats/');
+        async findVibeCheckStats(e) {
+            const users = await this.$http.executeGet('/users/findVibeCheckStats', e);
 
             if (users) {
                 this.users = users.sort((a, b) => {
