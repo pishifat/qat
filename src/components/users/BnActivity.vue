@@ -61,15 +61,15 @@
                 (joined {{ user.joinDate | toStandardDate }})
                 <ul>
                     <li
-                        :class="user.uniqueNominations < bnDaysDisplay/10 ?
+                        :class="user.uniqueNominations < Math.round(bnDaysDisplay/30) ?
                             'background-fail' :
-                            user.uniqueNominations < bnDaysDisplay/6 ?
+                            user.uniqueNominations < (Math.round(bnDaysDisplay/30)*2) ?
                                 'background-warn' :
                                 'background-pass'"
                     >
-                        {{ user.uniqueNominations }} nominations
+                        {{ user.uniqueNominations }} {{ user.uniqueNominations == 1 ? 'nomination' : 'nominations' }}
                     </li>
-                    <li>{{ user.nominationResets }} nomination resets</li>
+                    <li>{{ user.nominationResets }} nomination {{ user.nominationResets == 1 ? 'reset' : 'resets' }}</li>
                     <li>Next evaluation: {{ user.nextEvaluation ? user.nextEvaluation : 'Never' }}</li>
                 </ul>
             </div>
