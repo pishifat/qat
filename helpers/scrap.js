@@ -119,7 +119,7 @@ async function findUniqueNominationsCount(initialDate, endDate, user, mode) {
 /* find months of sufficient BN activity for members of NAT */
 async function findAdditionalBnMonths (user) {
     const bnSiteLeftTheWomb = new Date('2019-05-01');
-    const bnActivityRequirement = 2;
+    const activityRequirementChange = new Date('2024-11-03');
 
     let bnMonths = 0;
 
@@ -147,6 +147,11 @@ async function findAdditionalBnMonths (user) {
                     const count = await findUniqueNominationsCount(startDate, nextDate, user, historyElement.mode);
                     startDate = moment(startDate).add(1, 'months').toDate();
                     nextDate = moment(nextDate).add(1, 'months').toDate();
+
+                    const oldActivityRequirement = (historyElement.mode == 'mania' || historyElement.mode == 'catch') ? 2 : 3;
+                    const newActivityRequirement = 2;
+
+                    const bnActivityRequirement = startDate < activityRequirementChange ? oldActivityRequirement : newActivityRequirement;
 
                     if (count >= bnActivityRequirement) bnMonths++;
                 }
