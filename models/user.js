@@ -139,23 +139,22 @@ class UserService extends mongoose.Model {
         if (!this.history) return null;
 
         const bnHistory = this.history.filter(h => h.group === group);
+        const relevantHistory = [];
 
         let historyKind;
+        let isBn = 0;
 
         for (let i = 0; i < bnHistory.length; i++) {
             const history = bnHistory[i];
+            history.kind == 'joined' ? isBn++ : isBn--;
 
-            if (historyKind !== history.kind) {
-                historyKind = history.kind;
-            } else {
-                if (history.kind == 'joined') bnHistory.splice(i, 1);
-                else if (history.kind == 'left') bnHistory.splice(i+1, 1);
+            if ((history.kind == 'joined' && isBn == 1) || (history.kind == 'left' && isBn == 0)) {
+                relevantHistory.push(history);
             }
-
         }
 
-        const joinedHistory = bnHistory.filter(h => h.kind === 'joined');
-        const leftHistory = bnHistory.filter(h => h.kind === 'left');
+        const joinedHistory = relevantHistory.filter(h => h.kind === 'joined');
+        const leftHistory = relevantHistory.filter(h => h.kind === 'left');
         let bnDuration = 0;
         let unendingDate;
 
