@@ -218,7 +218,7 @@ const server = app.listen(port, () => {
         automation.notifyContentReviews.start();
         automation.checkBnEvaluationDeadlines.start();
         automation.checkTenureValidity.start();
-        //automation.badgeTracker.start();
+        automation.badgeTracker.start();
         automation.notifyBeatmapReports.start();
         automation.spawnProbationEvaluations.start();
         automation.spawnHighActivityEvaluations.start();
