@@ -159,7 +159,7 @@ class UserService extends mongoose.Model {
         let unendingDate;
 
         for (const history of joinedHistory) {
-            const i = leftHistory.findIndex(d => d.date > history.date && d.mode === history.mode);
+            const i = leftHistory.findIndex(d => d.date > history.date);
             const leftDate = leftHistory[i];
             leftHistory.splice(i, 1);
 
