@@ -174,7 +174,11 @@ router.post('/syncBeatmapsetEvents/:beatmapsetId', middlewares.isNat, async (req
     // get beatmapset info for modes, genre, language
     const osuBeatmapset = await osu.getBeatmapsetInfo(req.session.accessToken, req.params.beatmapsetId);
 
-    const osuModes = Array.from(new Set(osuBeatmapset.beatmaps.map(beatmap => beatmap.mode)));
+    // Convert the modes to something that can be saved in the database
+    let convertedModes = osuBeatmapset.beatmaps.map(beatmap => {
+        return util.formatModeForDatabase(beatmap.mode);
+    });
+    const osuModes = Array.from(new Set(convertedModes));
 
     // create new aiess events
     for (const osuEvent of filteredOsuEvents) {

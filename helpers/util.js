@@ -186,6 +186,19 @@ function formatMode(mode) {
     else return 'osu!' + mode;
 }
 
+/**
+ * @param {string} mode The mode how we receive it from the osu API
+ * @returns {string} The mode how it is saved in our database
+ */
+function formatModeForDatabase(mode) {
+    // The osu API uses the term fruits, but we use catch internally
+    if (mode === 'fruits') {
+        return 'catch'
+    } else {
+        return mode
+    }
+}
+
 module.exports = {
     escapeUsername,
     getBeatmapsetIdFromUrl,
@@ -200,4 +213,5 @@ module.exports = {
     makeWordFromField,
     yearsDuration,
     formatMode,
+    formatModeForDatabase
 };
