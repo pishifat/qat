@@ -41,7 +41,21 @@
 
             <ul class="text-secondary">
                 <li v-for="history in sortedNatHistory" :key="history.date" class="small">
-                    {{ history.date | toStandardDate }}: {{ history.kind }} ({{ history.mode }})
+                    {{ history.date | toStandardDate }}: {{ history.kind }}
+                    <mode-display
+                        :modes="history.mode"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        :title="history.mode | formatMode"
+                    />
+                        <a
+                            v-if="history.relatedEvaluation && isEligibleToViewEvals"
+                            :href="`/${loggedInUser.isNat ? 'evalarchive' : 'yourevals'}?id=${history.relatedEvaluation}`"
+                            target="_blank"
+                            
+                        >
+                            (eval)
+                        </a>
                 </li>
             </ul>
         </div>
