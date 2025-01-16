@@ -7,7 +7,21 @@
 
             <ul class="text-secondary">
                 <li v-for="history in sortedBnHistory" :key="history.date" class="small">
-                    {{ history.date | toStandardDate }}: {{ history.kind }} ({{ history.mode }})
+                    {{ history.date | toStandardDate }}: {{ history.kind }}
+                    <mode-display
+                        :modes="history.mode"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        :title="history.mode | formatMode"
+                    />
+                        <a
+                            v-if="history.relatedEvaluation && isEligibleToViewEvals"
+                            :href="`/${loggedInUser.isNat ? 'evalarchive' : 'yourevals'}?id=${history.relatedEvaluation}`"
+                            target="_blank"
+                            
+                        >
+                            (eval)
+                        </a>
                 </li>
                 <li 
                     v-if="this.additional"
@@ -35,18 +49,25 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import duration from '../../../mixins/duration.js';
+import ModeDisplay from '../../ModeDisplay.vue';
 
 export default {
     name: 'Duration',
     mixins: [ duration ],
+    components: {
+        ModeDisplay,
+    },
     data () {
         return {
             additional: null,
         };
     },
     computed: {
+        ...mapState([
+            'loggedInUser',
+        ]),
         ...mapGetters('users', [
             'selectedUser',
         ]),
@@ -65,6 +86,9 @@ export default {
 
                 return 0;
             });
+        },
+        isEligibleToViewEvals () {
+            return this.loggedInUser.isNat || this.loggedInUser.id === this.selectedUser.id;
         },
     },
     created () {
@@ -93,8 +117,12 @@ export default {
                         additional += `${years} year${years > 1 ? 's' : ''}`;
                     }
 
+                    if (years && remainingMonths) {
+                        additional += ' and ';
+                    }
+
                     if (remainingMonths) {
-                        additional += ` and ${remainingMonths} month${remainingMonths > 1 ? 's' : ''}`;
+                        additional += `${remainingMonths} month${remainingMonths > 1 ? 's' : ''}`;
                     }
 
                     this.additional = additional;
