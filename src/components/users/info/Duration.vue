@@ -88,6 +88,7 @@ export default {
             });
         },
         isEligibleToViewEvals () {
+            if (!this.loggedInUser) return false;
             return this.loggedInUser.isNat || this.loggedInUser.id === this.selectedUser.id;
         },
     },
