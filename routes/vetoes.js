@@ -301,7 +301,7 @@ router.post('/selectMediators', middlewares.isLoggedIn, middlewares.isNat, async
         if (!req.body.excludeUsers.includes(user.username.toLowerCase())) {
             if (mode == 'all') {
                 users.push(user);
-            } else if (user.modesInfo.some(m => m.mode === mode || m.mode === 'none')) {
+            } else if (user.modesInfo.some(m => m.mode === mode)) {
                 users.push(user);
             }
         }
