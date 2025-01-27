@@ -455,19 +455,21 @@ export default {
             }
         },
         async rejoinApply(e) {
-            this.successInfo = `Submitting... (this will take a few seconds)`;
-            const application = await this.$http.executePost(
-                `/bnapps/rejoinApply`,
-                {
-                    mode: this.selectedMode,
-                },
-                e
-            );
+            if (confirm(`Are you sure?`)) {
+                this.successInfo = `Submitting... (this will take a few seconds)`;
+                const application = await this.$http.executePost(
+                    `/bnapps/rejoinApply`,
+                    {
+                        mode: this.selectedMode,
+                    },
+                    e
+                );
 
-            this.successInfo = '';
+                this.successInfo = '';
 
-            if (data && !data.error) {
-                this.activeApps.push(application);
+                if (data && !data.error) {
+                    this.activeApps.push(application);
+                }
             }
         },
     },
