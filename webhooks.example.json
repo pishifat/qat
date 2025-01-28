@@ -40,6 +40,10 @@
         "catchRole": "",
         "maniaRole": ""
     },
+    "rankedBeatmapReportWebhook": {
+        "id": "",
+        "token": ""
+    },
     "natReportWebhook": {
         "id": "",
         "token": ""
