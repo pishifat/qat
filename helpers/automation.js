@@ -30,7 +30,7 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
     const token = response.access_token;
 
     const qualifiedCutoffDate = moment().subtract(10, 'days').toDate(); // used to be 7, but backlog in qualified maps feed caused duplicate reports
-    const rankedCutoffDate = moment().subtract(10, 'days').toDate();
+    const rankedCutoffDate = moment().subtract(2, 'days').toDate();
 
     // find pending discussion posts on qualified beatmapsets
     const qualifiedParentDiscussions = await osu.getDiscussions(token, '?beatmapset_status=qualified&limit=50&message_types%5B%5D=suggestion&message_types%5B%5D=problem&only_unresolved=on');
