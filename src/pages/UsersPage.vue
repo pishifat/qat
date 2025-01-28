@@ -94,6 +94,11 @@
                 <h5>Unique mapper stats</h5>
                 <unique-mapper-stats />
             </section>
+
+            <section v-if="loggedInUser && loggedInUser.isPishifat" class="card card-body">
+                <h5>Temporary button</h5>
+                <temporary-info />
+            </section>
         </div>
 
         <user-info />
@@ -115,6 +120,8 @@ import FilterBox from '../components/FilterBox.vue';
 import PaginationNav from '../components/PaginationNav.vue';
 import VibeCheckStats from '../components/users/VibeCheckStats.vue';
 import UniqueMapperStats from '../components/users/UniqueMapperStats.vue';
+import TemporaryInfo from '../components/users/TemporaryInfo.vue';
+
 
 export default {
     name: 'UsersPage',
@@ -129,6 +136,7 @@ export default {
         PaginationNav,
         VibeCheckStats,
         UniqueMapperStats,
+        TemporaryInfo,
     },
     data () {
         return {

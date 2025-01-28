@@ -276,18 +276,26 @@ router.get('/findUserBadgeInfo/:userId', async (req, res) => {
         await util.sleep(50);
 
         const noms = mapperInfo.nominated_beatmapset_count;
-        let thresholdNominationCount = 0;
+        let thresholdIndex = 0;
 
-        if (noms >= 200 && noms < 400) {
-            thresholdNominationCount = 200;
+        if (noms < 100) {
+            thresholdIndex = 0;
+        } else if (noms >= 100 && noms < 200) {
+            thresholdIndex = 1;
+        } else if (noms >= 200 && noms < 400) {
+            thresholdIndex = 2;
         } else if (noms >= 400 && noms < 600) {
-            thresholdNominationCount = 400;
+            thresholdIndex = 3;
         } else if (noms >= 600 && noms < 800) {
-            thresholdNominationCount = 600;
+            thresholdIndex = 4;
         } else if (noms >= 800 && noms < 1000) {
-            thresholdNominationCount = 800;
-        } else if (noms >= 1000) {
-            thresholdNominationCount = 1000;
+            thresholdIndex = 5;
+        } else if (noms >= 1000 && noms < 1500) {
+            thresholdIndex = 6;
+        } else if (noms >= 1500 && noms < 2000) {
+            thresholdIndex = 7;
+        } else if (noms >= 2000) {
+            thresholdIndex = 8;
         }
 
         newUsers.push({
@@ -299,7 +307,7 @@ router.get('/findUserBadgeInfo/:userId', async (req, res) => {
             nominationsProfileBadge: user.nominationsProfileBadge,
             bnDuration: user.bnDuration += (30 * await scrap.findAdditionalBnMonths(user)),
             natDuration: user.natDuration,
-            actualNominationsProfileBadge: thresholdNominationCount/200,
+            actualNominationsProfileBadge: thresholdIndex,
         });
     }
 
@@ -344,11 +352,13 @@ router.post('/editBadgeValue/:id', async (req, res) => {
             await User.findByIdAndUpdate(req.params.id, { nominationsProfileBadge: value });
         }
 
+        const thresholds = [0, 100, 200, 400, 600, 800, 1000, 1500, 2000];
+
         await discord.webhookPost(
             [{
                 author: discord.defaultWebhookAuthor(req.session),
                 color: discord.webhookColors.lightPink,
-                description: `Updated **${type}** badge value for user [**${u.username}**](https://osu.ppy.sh/users/${u.osuId}): **${req.body.group == 'nom' ? originalValue * 200 : originalValue} → ${req.body.group == 'nom' ? value * 200 : value}**`,
+                description: `Updated **${type}** badge value for user [**${u.username}**](https://osu.ppy.sh/users/${u.osuId}): **${req.body.group == 'nom' ? thresholds[originalValue] : originalValue} → ${req.body.group == 'nom' ? thresholds[value] : value}**`,
             }],
             'all'
         );

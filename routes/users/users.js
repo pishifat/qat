@@ -1438,4 +1438,30 @@ router.get('/getUniqueMapperStats', middlewares.isLoggedIn, middlewares.isAdmin,
     });
 });
 
+/* POST temporary things */
+router.post('/doTemporaryThing', middlewares.isLoggedIn, middlewares.isAdmin, async (req, res) => {
+    const input = req.body.input;
+    console.log(input + '\n---');
+
+    /* users with nomination badges */
+
+    /* const users = await User
+        .find({
+            nominationsProfileBadge: { $exists: true, $gt: 0 },
+        });
+
+    for (const user of users) {
+        console.log(user.username + ": " + user.nominationsProfileBadge);
+        user.nominationsProfileBadge++;
+        await user.save();
+        console.log(user.username + ": " + user.nominationsProfileBadge);
+    }*/
+
+    console.log(users.length);
+
+    res.json({
+        success: 'ok'
+    });
+});
+
 module.exports = router;

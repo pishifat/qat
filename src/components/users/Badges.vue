@@ -32,7 +32,7 @@
                             <a href="#" @click.prevent="editBadgeValue(user.id, 'nat', false)"><i class="fas fa-minus" /></a>
                         </li>
                         <li :class="compareNominationsBadge(user.nominationsProfileBadge, user.actualNominationsProfileBadge) ? 'background-fail' : ''">
-                            Nominations: {{ user.actualNominationsProfileBadge*200 }} -- badge: {{ user.nominationsProfileBadge*200 }}
+                            Nominations: {{ thresholds[user.actualNominationsProfileBadge] }} -- badge: {{ thresholds[user.nominationsProfileBadge] }}
                             <a href="#" @click.prevent="editBadgeValue(user.id, 'nom', true)"><i class="fas fa-plus" /></a>
                             <a href="#" @click.prevent="editBadgeValue(user.id, 'nom', false)"><i class="fas fa-minus" /></a>
                         </li>
@@ -67,7 +67,7 @@
                             <a href="#" @click.prevent="editBadgeValue(user.id, 'nat', false)"><i class="fas fa-minus" /></a>
                         </li>
                         <li :class="compareNominationsBadge(user.nominationsProfileBadge, user.actualNominationsProfileBadge) ? 'background-fail' : ''">
-                            Nominations: {{ user.actualNominationsProfileBadge*200 }} -- badge: {{ user.nominationsProfileBadge*200 }}
+                            Nominations: {{ thresholds[user.actualNominationsProfileBadge] }} -- badge: {{ thresholds[user.nominationsProfileBadge] }}
                             <a href="#" @click.prevent="editBadgeValue(user.id, 'nom', true)"><i class="fas fa-plus" /></a>
                             <a href="#" @click.prevent="editBadgeValue(user.id, 'nom', false)"><i class="fas fa-minus" /></a>
                         </li>
@@ -95,6 +95,7 @@ export default {
     data () {
         return {
             badgeUsers: [],
+            thresholds: [0, 100, 200, 400, 600, 800, 1000, 1500, 2000],
         };
     },
     watch: {
@@ -153,7 +154,7 @@ export default {
 
             const natBadges = ['NAT1y.png', 'NAT2y.png', 'NAT3y.png', 'NAT4y.png', 'NAT5y.png', 'NAT6y.png', 'NAT7y.png', 'NAT8y.png', 'NAT9y.png', 'NAT10y.png'];
             const bnBadges = ['BN1y.png', 'BN2y.png', 'BN3y.png', 'BN4y.png', 'BN5y.png', 'BN6y.png', 'BN7y.png', 'BN8y.png', 'BN9y.png', 'BN10y.png'];
-            const nomBadges = ['noms200.png', 'noms400.png', 'noms600.png', 'noms800.png', 'noms1000.png'];
+            const nomBadges = ['100_noms.png', 'noms200.png', 'noms400.png', 'noms600.png', 'noms800.png', 'noms1000.png'];
             const natTooltip = [
                 'Longstanding contribution to the Nomination Assessment Team - 1 Year',
                 'Longstanding contribution to the Nomination Assessment Team - 2 Years',
@@ -179,6 +180,7 @@ export default {
                 'Longstanding contribution to the Beatmap Nominators - 10 Years',
             ];
             const nomTooltip = [
+                'Nominated 100+ beatmaps as a Beatmap Nominator',
                 'Nominated 200+ beatmaps as a Beatmap Nominator',
                 'Nominated 400+ beatmaps as a Beatmap Nominator',
                 'Nominated 600+ beatmaps as a Beatmap Nominator',
