@@ -47,7 +47,7 @@
                     </small>
                 </div>
             </div>
-            <div v-if="loggedInUser.isAdmin" class="row">
+            <div v-if="loggedInUser.isNatLeader" class="row">
                 <div class="col-sm-12">
                     <p>
                         <a href="#advancedSettings" data-toggle="collapse">

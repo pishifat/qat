@@ -8,7 +8,7 @@
                 :align-start="true"
             >
                 <a
-                    v-if="loggedInUser && loggedInUser.isAdmin"
+                    v-if="loggedInUser && loggedInUser.isNatLeader"
                     href="#"
                     @click.prevent="deleteReview()"
                     class="text-danger"

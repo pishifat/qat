@@ -85,12 +85,12 @@
                 <gmt-activity class="my-2" />
             </section>
 
-            <section v-if="loggedInUser && loggedInUser.isAdmin" class="card card-body">
+            <section v-if="loggedInUser && loggedInUser.isNatLeader" class="card card-body">
                 <h5>Vibe checks</h5>
                 <vibe-check-stats />
             </section>
 
-            <section v-if="loggedInUser && loggedInUser.isAdmin" class="card card-body">
+            <section v-if="loggedInUser && loggedInUser.isNatLeader" class="card card-body">
                 <h5>Unique mapper stats</h5>
                 <unique-mapper-stats />
             </section>

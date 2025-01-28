@@ -30,7 +30,7 @@
                     <span class="small float-left">{{ discussion.createdAt | toStandardDate }}</span>
 
                     <add-votes
-                        v-if="!discussion.isActive || loggedInUser.isAdmin"
+                        v-if="!discussion.isActive || loggedInUser.isNatLeader"
                         class="ml-2"
                         :inputs="discussion.mediations"
                     />

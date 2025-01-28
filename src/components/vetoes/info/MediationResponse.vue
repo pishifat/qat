@@ -9,7 +9,7 @@
                 <span v-if="mediation.vote == 2" class="text-secondary small">(partially agree)</span> <!-- only used in vetoFormat 1 and 2-->
 
                 <a
-                    v-if="loggedInUser && loggedInUser.isAdmin"
+                    v-if="loggedInUser && loggedInUser.isNatLeader"
                     href="#"
                     @click.prevent="resetMediation()"
                     class="text-danger"

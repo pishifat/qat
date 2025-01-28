@@ -12,7 +12,7 @@
                 Move to NAT
             </button>
             <button
-                v-if="loggedInUser.isAdmin && selectedUser.probationModes.includes(mode)"
+                v-if="loggedInUser.isNatLeader && selectedUser.probationModes.includes(mode)"
                 class="btn btn-sm btn-bn ml-1 mb-1"
                 href="#"
                 data-toggle="tooltip"

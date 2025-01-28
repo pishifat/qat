@@ -324,7 +324,7 @@ router.get('/findBagUsers/:mode', async (req, res) => {
 router.post('/editBadgeValue/:id', async (req, res) => {
     let u = await User.findById(req.params.id);
 
-    if (res.locals.userRequest.isAdmin) {
+    if (res.locals.userRequest.isNatLeader) {
         const type = req.body.group == 'bn' ? 'BN' : req.body.group == 'nat' ? 'NAT' : 'nomination';
         let originalValue;
         let value;

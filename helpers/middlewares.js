@@ -85,7 +85,7 @@ function isAdmin(req, res, next) {
     const u = res.locals.userRequest;
     const valid = config.admin.users;
 
-    if (!valid.includes(u.osuId)) return unauthorize(req, res, `You can't use this`);
+    if (!valid.includes(u.osuId) && !u.isNatLeader) return unauthorize(req, res, `You can't use this`);
 
     next();
 }

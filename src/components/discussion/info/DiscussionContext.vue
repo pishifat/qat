@@ -209,7 +209,7 @@ export default {
         /** @returns {boolean} */
         isEditable() {
             return this.selectedDiscussionVote.isActive &&
-                ((!this.selectedDiscussionVote.isContentReview && (this.selectedDiscussionVote.creator.id == this.loggedInUser.id || this.loggedInUser.isAdmin)) ||
+                ((!this.selectedDiscussionVote.isContentReview && (this.selectedDiscussionVote.creator.id == this.loggedInUser.id || this.loggedInUser.isNatLeader)) ||
                 (this.selectedDiscussionVote.isContentReview && (this.loggedInUser.groups.includes('nat') || this.loggedInUser.groups.includes('gmt'))));
         },
         /** @returns {boolean} */

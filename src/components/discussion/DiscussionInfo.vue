@@ -8,7 +8,7 @@
             <discussion-context />
 
             <votes-active
-                v-if="selectedDiscussionVote.isActive && !loggedInUser.isAdmin"
+                v-if="selectedDiscussionVote.isActive && !loggedInUser.isNatLeader"
             />
             <votes-inactive v-else />
 
