@@ -42,7 +42,8 @@
     },
     "rankedBeatmapReportWebhook": {
         "id": "",
-        "token": ""
+        "token": "",
+        "threadId": ""
     },
     "natReportWebhook": {
         "id": "",

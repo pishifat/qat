@@ -33,7 +33,7 @@ function getWebhook(webhook) {
             return url += `${config.beatmapReportWebhook.id}/${config.beatmapReportWebhook.token}`;
 
         case 'rankedBeatmapReport':
-            return url += `${config.rankedBeatmapReportWebhook.id}/${config.rankedBeatmapReportWebhook.token}`;
+            return url += `${config.rankedBeatmapReportWebhook.id}/${config.rankedBeatmapReportWebhook.token}?thread_id=${config.rankedBeatmapReportWebhook.threadId}`;
 
         case 'natUserReport':
             return url += `${config.natReportWebhook.id}/${config.natReportWebhook.token}`;
