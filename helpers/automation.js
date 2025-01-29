@@ -29,109 +29,127 @@ const notifyBeatmapReports = cron.schedule('0 * * * *', async () => {
     const response = await osu.getClientCredentialsGrant();
     const token = response.access_token;
 
-    // find pending discussion posts
-    const parentDiscussions = await osu.getDiscussions(token, '?beatmapset_status=qualified&limit=50&message_types%5B%5D=suggestion&message_types%5B%5D=problem&only_unresolved=on');
-    const discussions = parentDiscussions.discussions;
+    const qualifiedCutoffDate = moment().subtract(10, 'days').toDate(); // used to be 7, but backlog in qualified maps feed caused duplicate reports
+    const rankedCutoffDate = moment().subtract(2, 'days').toDate();
+
+    // find pending discussion posts on qualified beatmapsets
+    const qualifiedParentDiscussions = await osu.getDiscussions(token, '?beatmapset_status=qualified&limit=50&message_types%5B%5D=suggestion&message_types%5B%5D=problem&only_unresolved=on');
+    const qualifiedDiscussions = qualifiedParentDiscussions.discussions;
+
+    // find pending discussion posts on recently ranked beatmapsets
+    const rankedParentDiscussions = await osu.getDiscussions(token, '?beatmapset_status=ranked&limit=10&message_types%5B%5D=suggestion&message_types%5B%5D=problem&only_unresolved=on');
+    const eligibleRankedBeatmapsets = rankedParentDiscussions.beatmapsets.filter(beatmapset => new Date(beatmapset.ranked_date) >= rankedCutoffDate);
+    const eligibleRankedBeatmapsetIds = eligibleRankedBeatmapsets.map(beatmapset => beatmapset.id);
+    const rankedDiscussions = rankedParentDiscussions.discussions.filter(discussion => eligibleRankedBeatmapsetIds.includes(discussion.beatmapset_id));
+
+    const discussionGroups = [{discussions: qualifiedDiscussions, isRankedSet: false}, {discussions: rankedDiscussions, isRankedSet: true}]
 
     // find database's discussion posts
-    const date = moment().subtract(10, 'days').toDate(); // used to be 7, but backlog in qualified maps feed caused duplicate reports
-    let beatmapReports = await BeatmapReport.find({ createdAt: { $gte: date } });
+    let beatmapReports = await BeatmapReport.find({ createdAt: { $gte: qualifiedCutoffDate } });
     await util.sleep(500);
 
     // create array of reported beatmapsetIds
     const beatmapsetIds = beatmapReports.map(r => r.beatmapsetId);
 
-    for (const discussion of discussions) {
-        let messageType = discussion.message_type;
-        let discussionMessage = discussion.starting_post.message;
-        let userId = discussion.user_id;
+    for (const discussionGroup of discussionGroups) {
+        const isRankedSet = discussionGroup.isRankedSet;
 
-        // determine which posts haven't been sent to #report-feed
-        let createWebhook;
-
-        if (!beatmapsetIds.includes(discussion.beatmapset_id)) {
-            createWebhook = true;
-        } else {
-            let alreadyReported = await BeatmapReport.findOne({
-                createdAt: { $gte: date },
-                beatmapsetId: discussion.beatmapset_id,
-                reporterUserId: userId,
-            });
-
-            if (!alreadyReported) {
+        for (const discussion of discussionGroup.discussions) {
+            let messageType = discussion.message_type;
+            let discussionMessage = discussion.starting_post.message;
+            let userId = discussion.user_id;
+    
+            // determine which posts haven't been sent to the relative report feed
+            let createWebhook;
+    
+            if (!beatmapsetIds.includes(discussion.beatmapset_id)) {
                 createWebhook = true;
-            }
-        }
-
-        if (createWebhook) {
-            // don't let the same map repeat in hourly cycle
-            beatmapsetIds.push(discussion.beatmapset_id);
-
-            // create event in db
-            await BeatmapReport.create({
-                beatmapsetId: discussion.beatmapset_id,
-                postId: discussion.id,
-                reporterUserId: userId,
-            });
-
-            // get user data
-            const userInfo = await osuv1.getUserInfoV1(userId);
-            await util.sleep(500);
-
-            const mongoUser = await User.findOne({ osuId: userId });
-
-            // identify modes
-            let modes = [];
-
-            let beatmapsetInfo = await osuv1.beatmapsetInfo(discussion.beatmapset_id, true);
-            beatmapsetInfo.forEach(beatmap => {
-                switch (beatmap.mode) {
-                    case '0':
-                        if (!modes.includes('osu')) modes.push('osu');
-                        break;
-                    case '1':
-                        if (!modes.includes('taiko')) modes.push('taiko');
-                        break;
-                    case '2':
-                        if (!modes.includes('catch')) modes.push('catch');
-                        break;
-                    case '3':
-                        if (!modes.includes('mania')) modes.push('mania');
-                        break;
-                }
-            });
-
-            await util.sleep(500);
-
-            // send webhook
-            await discord.webhookPost(
-                [{
-                    author: {
-                        name: userInfo.username,
-                        icon_url: `https://a.ppy.sh/${userId}`,
-                        url: `https://osu.ppy.sh/users/${userId}`,
-                    },
-                    description: `[**${beatmapsetInfo[0].artist} - ${beatmapsetInfo[0].title}**](https://osu.ppy.sh/beatmapsets/${discussion.beatmapset_id}/discussion/-/generalAll#/${discussion.id})\nMapped by [${beatmapsetInfo[0].creator}](https://osu.ppy.sh/users/${beatmapsetInfo[0].creator_id}) [**${modes.join(', ')}**]`,
-                    thumbnail: {
-                        url: `https://b.ppy.sh/thumb/${discussion.beatmapset_id}.jpg`,
-                    },
-                    color: messageType.includes('problem') ? discord.webhookColors.red : mongoUser && mongoUser.isBnOrNat ? discord.webhookColors.orange : discord.webhookColors.lightOrange,
-                    fields: [
-                        {
-                            name: messageType,
-                            value: discussionMessage.length > 500 ? discussionMessage.slice(0, 500) + '... *(truncated)*' : discussionMessage,
-                        },
-                    ],
-                }],
-                'beatmapReport'
-            );
-            await util.sleep(500);
-
-            // send highlights
-            if (messageType.includes('problem') || (mongoUser && mongoUser.isBnOrNat)) {
-                modes.forEach(mode => {
-                    discord.highlightWebhookPost('', null, `${mode}BeatmapReport`);
+            } else {
+                // for ranked sets, we're going to look only at reports created after the map has been ranked
+                let alreadyReported = await BeatmapReport.findOne({
+                    createdAt: { $gte: !isRankedSet ? qualifiedCutoffDate : 
+                        new Date(eligibleRankedBeatmapsets.find(r => r.id === discussion.beatmapset_id).ranked_date) },
+                    beatmapsetId: discussion.beatmapset_id,
+                    reporterUserId: userId,
                 });
+    
+                if (!alreadyReported) {
+                    createWebhook = true;
+                }
+            }
+    
+            if (createWebhook) {
+                // don't let the same map repeat in hourly cycle
+                beatmapsetIds.push(discussion.beatmapset_id);
+    
+                // create event in db
+                await BeatmapReport.create({
+                    beatmapsetId: discussion.beatmapset_id,
+                    postId: discussion.id,
+                    reporterUserId: userId,
+                });
+    
+                // get user data
+                const userInfo = await osuv1.getUserInfoV1(userId);
+                await util.sleep(500);
+    
+                const mongoUser = await User.findOne({ osuId: userId });
+    
+                // identify modes
+                let modes = [];
+    
+                let beatmapsetInfo = await osuv1.beatmapsetInfo(discussion.beatmapset_id, true);
+                beatmapsetInfo.forEach(beatmap => {
+                    switch (beatmap.mode) {
+                        case '0':
+                            if (!modes.includes('osu')) modes.push('osu');
+                            break;
+                        case '1':
+                            if (!modes.includes('taiko')) modes.push('taiko');
+                            break;
+                        case '2':
+                            if (!modes.includes('catch')) modes.push('catch');
+                            break;
+                        case '3':
+                            if (!modes.includes('mania')) modes.push('mania');
+                            break;
+                    }
+                });
+    
+                await util.sleep(500);
+    
+                // send webhook
+                await discord.webhookPost(
+                    [{
+                        author: {
+                            name: userInfo.username,
+                            icon_url: `https://a.ppy.sh/${userId}`,
+                            url: `https://osu.ppy.sh/users/${userId}`,
+                        },
+                        description: `[**${beatmapsetInfo[0].artist} - ${beatmapsetInfo[0].title}**](https://osu.ppy.sh/beatmapsets/${discussion.beatmapset_id}/discussion/-/generalAll#/${discussion.id})\nMapped by [${beatmapsetInfo[0].creator}](https://osu.ppy.sh/users/${beatmapsetInfo[0].creator_id}) [**${modes.join(', ')}**]`,
+                        thumbnail: {
+                            url: `https://b.ppy.sh/thumb/${discussion.beatmapset_id}.jpg`,
+                        },
+                        color: messageType.includes('problem') ? discord.webhookColors.red : mongoUser && mongoUser.isBnOrNat ? discord.webhookColors.orange : discord.webhookColors.lightOrange,
+                        fields: [
+                            {
+                                name: messageType,
+                                value: discussionMessage.length > 500 ? discussionMessage.slice(0, 500) + '... *(truncated)*' : discussionMessage,
+                            },
+                        ],
+                    }],
+                    !isRankedSet ? 'beatmapReport' : 'rankedBeatmapReport'
+                );
+                await util.sleep(500);
+    
+                // send highlights
+                if (isRankedSet) {
+                    discord.roleHighlightWebhookPost('rankedBeatmapReport', ['natInternal'], '');
+                } else if (messageType.includes('problem') || (mongoUser && mongoUser.isBnOrNat)) {
+                    modes.forEach(mode => {
+                        discord.highlightWebhookPost('', null, `${mode}BeatmapReport`);
+                    });
+                }
             }
         }
     }
