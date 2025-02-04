@@ -703,12 +703,6 @@ const badgeTracker = cron.schedule('8 18 * * *', async () => {
         const thresholds = [0, 100, 200, 400, 600, 800, 1000, 1500, 2000];
         let thresholdIndex = 0;
 
-        // TODO: remove this after first run
-        if (noms >= 100 && noms < 200 && user.nominationsProfileBadge === 0) {
-            user.nominationsProfileBadge = 1;
-            await user.save();
-        }
-
         if (noms < 100) {
             thresholdIndex = 0;
         } else if (noms >= 100 && noms < 200) {
