@@ -136,7 +136,7 @@
                             <div class="small text-secondary"><small>This intends to show your ability to conduct the final steps of the modding process and independently evaluate a map's readiness for Ranked.</small></div>
                             <div class="mt-2">This map should...</div>
                             <ul>
-                                <li>have 0 nominations when the application is submitted</li>
+                                <li>have had 0 nominations when your mod was posted</li>
                                 <li>be modded by you in the last 6 months</li>
                             </ul>
                         </div>
@@ -155,7 +155,7 @@
                             <div class="small text-secondary"><small>This gives you an opportunity to fill any missing gaps in your application, keeping in mind the intentions stated in the descriptions of the previous submissions.</small></div>
                             <div class="mt-2">This map should...</div>
                             <ul>
-                                <li>have 0 nominations when the application is submitted</li>
+                                <li>have had 0 nominations when your mod was posted</li>
                                 <li>be hosted by different users from the previous maps</li>
                                 <li>be modded by you in the last 6 months</li>
                             </ul>
