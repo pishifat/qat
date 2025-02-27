@@ -1418,7 +1418,7 @@ router.get('/getEliteNominatorStats', middlewares.isLoggedIn, middlewares.isAdmi
     let nominatorStats = [];
 
     // infer main game mode from the most popular mode in nominations
-    const inferMainMode = (nominatorId, nominatorEvents) => {
+    const inferMainMode = (nominatorEvents) => {
         const modeCounts = nominatorEvents.reduce((acc, e) => {
             acc[e.modes] = (acc[e.modes] || 0) + 1;
             return acc;
@@ -1444,7 +1444,7 @@ router.get('/getEliteNominatorStats', middlewares.isLoggedIn, middlewares.isAdmi
         nominatorStats.push({
             username: nominator.username,
             userId: nominator.osuId,
-            modes: nominator.modes.length ? nominator.modes : [inferMainMode(nominatorId, nominatorEvents)],
+            modes: nominator.modes.length ? nominator.modes : [inferMainMode(nominatorEvents)],
             uniqueNominationCount: uniqueNominations.size,
             uniqueMapperCount: uniqueMappers.size,
             uniqueMappersPercentage: Math.round(uniqueMappers.size / uniqueNominations.size * 100),
