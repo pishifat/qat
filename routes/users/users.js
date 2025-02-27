@@ -1375,12 +1375,12 @@ router.post('/:id/toggleSubjectiveEvalFeedback', middlewares.isLoggedIn, middlew
     );
 });
 
-/* GET get unique mapper stats */
-router.get('/getUniqueMapperStats', middlewares.isLoggedIn, middlewares.isAdmin, async (req, res) => {
-    const minDate = new Date(req.query.date);
-    const maxDate = new Date();
+/* GET get various bn stats in a time period */
+router.get('/getEliteNominatorStats', middlewares.isLoggedIn, middlewares.isAdmin, async (req, res) => {
+    const minDate = new Date(req.query.minDate);
+    const maxDate = new Date(req.query.maxDate);
 
-    if (isNaN(minDate.getTime())) {
+    if (isNaN(minDate.getTime()) || isNaN(maxDate.getTime())) {
         return res.json({
             error: 'Invalid date',
         });
@@ -1388,7 +1388,11 @@ router.get('/getUniqueMapperStats', middlewares.isLoggedIn, middlewares.isAdmin,
 
     // get nominate or qualify events
     const events = await Aiess
-        .find({ timestamp: { $gte: minDate, $lte: maxDate }, type: { $in: ['nominate', 'qualify'] } })
+        .find({ timestamp: { $gte: minDate, $lte: maxDate }, type: { $in: ['nominate', 'qualify'] } });
+
+    // get disqualify or nomination_reset events
+    const disqualifyEvents = await Aiess
+        .find({ timestamp: { $gte: minDate, $lte: maxDate }, type: { $in: ['disqualify', 'nomination_reset'] } });
 
     // parse mode stats
     // get unique nominations and mappers for each mode
@@ -1408,25 +1412,47 @@ router.get('/getUniqueMapperStats', middlewares.isLoggedIn, middlewares.isAdmin,
         });
     }
 
-    
     // parse nominator stats
     const uniqueNominators = new Set(events.map(e => e.userId).filter(e => e));
 
     let nominatorStats = [];
+
+    // infer main game mode from the most popular mode in nominations
+    const inferMainMode = (nominatorEvents) => {
+        const modeCounts = nominatorEvents.reduce((acc, e) => {
+            acc[e.modes] = (acc[e.modes] || 0) + 1;
+            return acc;
+        }, {});
+
+        return Object.keys(modeCounts).reduce((a, b) => modeCounts[a] > modeCounts[b] ? a : b);
+    }
 
     for (const nominatorId of uniqueNominators) {
         const nominatorEvents = events.filter(e => e.userId == nominatorId);
         const uniqueNominations = new Set(nominatorEvents.map(e => e.beatmapsetId));
         const uniqueMappers = new Set(nominatorEvents.map(e => e.creatorId));
         const nominator = await User.findOne({ osuId: nominatorId });
+        const uniqueNominationCount = uniqueNominations.size;
+        const disqualifyCount = disqualifyEvents.filter(e => e.userId == nominatorId).length;
+        const minorDisqualifyCount = disqualifyEvents.filter(e => e.userId == nominatorId && e.impactNum === 0).length;
+        const notableDisqualifyCount = disqualifyEvents.filter(e => e.userId == nominatorId && e.impactNum === 1).length;
+        const severeDisqualifyCount = disqualifyEvents.filter(e => e.userId == nominatorId && e.impactNum === 2).length;
+
+        // nomScore = uniqueNominationCount * (0.995^minorDisqualifyCount) * (0.98^notableDisqualifyCount) * (0.95^severeDisqualifyCount)
+        const nomScore = uniqueNominationCount * Math.pow(0.995, minorDisqualifyCount) * Math.pow(0.98, notableDisqualifyCount) * Math.pow(0.95, severeDisqualifyCount);
 
         nominatorStats.push({
             username: nominator.username,
             userId: nominator.osuId,
-            modes: nominator.modes.length ? nominator.modes : ['resigned'],
+            modes: nominator.modes.length ? nominator.modes : [inferMainMode(nominatorEvents)],
             uniqueNominationCount: uniqueNominations.size,
             uniqueMapperCount: uniqueMappers.size,
             uniqueMappersPercentage: Math.round(uniqueMappers.size / uniqueNominations.size * 100),
+            disqualifyCount,
+            minorDisqualifyCount,
+            notableDisqualifyCount,
+            severeDisqualifyCount,
+            nomScore: Math.round(nomScore * 100) / 100,
         });
     }
 
