@@ -10,10 +10,17 @@
                 <div class="col-sm-12 form-inline">
                     <label for="date">Start date:</label>
                     <input 
-                        v-model="date"
+                        v-model="minDate"
                         class="form-control mx-2"
                         type="date"
                         placeholder="Start date..." 
+                    />
+                    <label for="date">End date:</label>
+                    <input 
+                        v-model="maxDate"
+                        class="form-control mx-2"
+                        type="date"
+                        placeholder="End date..."
                     />
                     <button
                         class="btn btn-sm btn-primary"
@@ -39,7 +46,7 @@
                 </div>
                 <div class="col-sm-12" v-for="mode in modes" :key="mode">
                     <h4 v-if="mode">{{ mode | formatMode }}</h4>
-                    <pre>{{ 'userId,username,uniqueNominationCount,uniqueMapperCount,uniqueMappersPercentage\n' + getStatsCsvByMode(mode) }}</pre>
+                    <pre>{{ 'userId,username,uniqueNominationCount,uniqueMapperCount,uniqueMappersPercentage,dqCount,minorCount,notableCount,severeCount,nomScore\n' + getStatsCsvByMode(mode) }}</pre>
                 </div>
             </div>
         </div>
@@ -50,13 +57,14 @@
 import UserLink from '../UserLink.vue';
 
 export default {
-    name: 'UniqueMapperStats',
+    name: 'EliteNominatorStats',
     components: {
         UserLink,
     },
     data () {
         return {
-            date: null,
+            minDate: null,
+            maxDate: null,
             jsonData: null,
             modes: ['osu', 'taiko', 'catch', 'mania', 'none', 'resigned'],
             modeStats: [],
@@ -70,7 +78,7 @@ export default {
                 type: 'info',
             });
 
-            const data = await this.$http.executeGet(`/users/getUniqueMapperStats?date=${this.date}`, e);
+            const data = await this.$http.executeGet(`/users/getEliteNominatorStats?minDate=${this.minDate}&maxDate=${this.maxDate}`);
 
             if (this.$http.isValid(data)) {
                 this.jsonData = data;
@@ -89,7 +97,7 @@ export default {
         },
         getStatsCsvByMode(mode) {
             const stats = this.getStatsByMode(mode);
-            return stats.map(user => `${user.userId},${user.username},${user.uniqueNominationCount},${user.uniqueMapperCount},${user.uniqueMappersPercentage}`).join('\n');
+            return stats.map(user => `${user.userId},${user.username},${user.uniqueNominationCount},${user.uniqueMapperCount},${user.uniqueMappersPercentage},${user.disqualifyCount},${user.minorDisqualifyCount},${user.notableDisqualifyCount},${user.severeDisqualifyCount},${user.nomScore}`).join('\n');
         },
         getModeStats() {
             return this.modeStats.map(stat => `${stat.mode},${stat.uniqueNominations},${stat.uniqueMappers},${stat.uniqueMappersPercentage}`).join('\n');

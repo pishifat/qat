@@ -91,8 +91,8 @@
             </section>
 
             <section v-if="loggedInUser && loggedInUser.isNatLeader" class="card card-body">
-                <h5>Unique mapper stats</h5>
-                <unique-mapper-stats />
+                <h5>Elite Nominator stats</h5>
+                <elite-nominator-stats />
             </section>
 
             <section v-if="loggedInUser && loggedInUser.isPishifat" class="card card-body">
@@ -119,7 +119,7 @@ import Badges from '../components/users/Badges.vue';
 import FilterBox from '../components/FilterBox.vue';
 import PaginationNav from '../components/PaginationNav.vue';
 import VibeCheckStats from '../components/users/VibeCheckStats.vue';
-import UniqueMapperStats from '../components/users/UniqueMapperStats.vue';
+import EliteNominatorStats from '../components/users/EliteNominatorStats.vue';
 import TemporaryInfo from '../components/users/TemporaryInfo.vue';
 
 
@@ -135,7 +135,7 @@ export default {
         FilterBox,
         PaginationNav,
         VibeCheckStats,
-        UniqueMapperStats,
+        EliteNominatorStats,
         TemporaryInfo,
     },
     data () {
