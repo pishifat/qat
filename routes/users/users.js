@@ -1452,7 +1452,7 @@ router.get('/getEliteNominatorStats', middlewares.isLoggedIn, middlewares.isAdmi
             minorDisqualifyCount,
             notableDisqualifyCount,
             severeDisqualifyCount,
-            nomScor: Math.round(nomScore * 100) / 100,
+            nomScore: Math.round(nomScore * 100) / 100,
         });
     }
 
