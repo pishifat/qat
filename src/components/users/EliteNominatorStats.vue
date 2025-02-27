@@ -78,7 +78,7 @@ export default {
                 type: 'info',
             });
 
-            const data = await this.$http.executeGet(`/users/getEliteNominatorStats?minDate=${this.minDate}&maxDate=${this.maxDate}`);
+            const data = await this.$http.executeGet(`/users/getEliteNominatorStats?minDate=${this.minDate}&maxDate=${this.maxDate}`, e);
 
             if (this.$http.isValid(data)) {
                 this.jsonData = data;
