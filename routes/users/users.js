@@ -1434,9 +1434,9 @@ router.get('/getEliteNominatorStats', middlewares.isLoggedIn, middlewares.isAdmi
         const nominator = await User.findOne({ osuId: nominatorId });
         const uniqueNominationCount = uniqueNominations.size;
         const disqualifyCount = disqualifyEvents.filter(e => e.userId == nominatorId).length;
-        const minorDisqualifyCount = disqualifyEvents.filter(e => e.userId == nominatorId && e.impactNum === 0).length;
-        const notableDisqualifyCount = disqualifyEvents.filter(e => e.userId == nominatorId && e.impactNum === 1).length;
-        const severeDisqualifyCount = disqualifyEvents.filter(e => e.userId == nominatorId && e.impactNum === 2).length;
+        const minorDisqualifyCount = disqualifyEvents.filter(e => e.userId == nominatorId && e.impactNum === 0 || (e.obviousness + e.severity < 2 && e.obviousness !== 2)).length;
+        const notableDisqualifyCount = disqualifyEvents.filter(e => e.userId == nominatorId && e.impactNum === 1 || (e.obviousness + e.severity >= 2 && e.obviousness + e.severity < 4 && e.obviousness !== 2 && e.severity !== 3)).length;
+        const severeDisqualifyCount = disqualifyEvents.filter(e => e.userId == nominatorId && e.impactNum === 2 || (e.obviousness + e.severity >= 4 || e.obviousness == 2 || e.severity == 3)).length;
 
         // nomScore = uniqueNominationCount * (0.995^minorDisqualifyCount) * (0.98^notableDisqualifyCount) * (0.95^severeDisqualifyCount)
         const nomScore = uniqueNominationCount * Math.pow(0.995, minorDisqualifyCount) * Math.pow(0.98, notableDisqualifyCount) * Math.pow(0.95, severeDisqualifyCount);

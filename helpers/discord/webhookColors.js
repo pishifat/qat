@@ -24,7 +24,7 @@ const webhookColors = {
     purple: 8536232,          // startVetoMediation, concludeVetoMediation
 
     pink: 16728232,           // revealedCurrentBnEvalNotification, modified report, toggleHasTrialNat
-    lightPink: 16748236,      // isTrialNat, impactNum, toggleIsBannedFromBn, editBadgeValue
+    lightPink: 16748236,      // isTrialNat, SEV, toggleIsBannedFromBn, editBadgeValue
 
     white: 15724527,          // unarchive, addEvaluation, sendMessages
     brown: 7554849,           // submitUserNote

@@ -38,7 +38,12 @@ router.get('/loadUnsetEvents', middlewares.isNat, async (req, res) => {
     let data = await Aiess
         .find({
             $and: [
-                { impactNum: undefined },
+                {
+                    $or: [
+                        { obviousness: null },
+                        { severity: null },
+                    ],
+                },
                 {
                     $or: [
                         { type: 'disqualify' },
@@ -70,10 +75,8 @@ router.post('/toggleIsReviewed/:id', middlewares.isNatOrTrialNat, async (req, re
     Logger.generate(req.session.mongoId, `Toggled review status of s/${a.beatmapsetId} to ${a.isReviewed}`, 'dataCollection', a._id);
 });
 
-/* impact webhook */
-async function impactWebhook(event, req) {
-    const impactString = ['✅ Minor', '⚠️ Notable','❌ Severe'];
-
+/* SEV rating webhook */
+async function sevRatingWebhook(event, req) {
     for (const mode of event.modes) {
         const previousEvents = await Aiess
             .find({
@@ -85,7 +88,7 @@ async function impactWebhook(event, req) {
                     { type: { $ne: 'nomination_reset' } },
                     { type: { $exists: true } },
                 ],
-                
+
             })
             .sort({ timestamp: -1 })
             .limit(event.type == 'nomination_reset' ? 1 : 2);
@@ -97,23 +100,19 @@ async function impactWebhook(event, req) {
             users.push(user);
         }
 
-        const nominators = users.map(u => `[${u.username}](https://osu.ppy.sh/users/${u.osuId})`).join(', ');
+        const x = users.map(u => `[${u.username}](https://osu.ppy.sh/users/${u.osuId})`);
+        const y = x.join(', ');
 
         await discord.webhookPost(
             [{
                 author: discord.defaultWebhookAuthor(req.session),
-                description: `Changed **impact level on [nomination reset](https://osu.ppy.sh/beatmapsets/${event.beatmapsetId}/discussion/-/generalAll#/${event.discussionId})** (${nominators})`,
+                description: `Set **notable SEV on [nomination reset](https://osu.ppy.sh/beatmapsets/${event.beatmapsetId}/discussion/-/generalAll#/${event.discussionId})** (${y}): **${event.obviousness}/${event.severity}**`,
                 color: discord.webhookColors.lightPink,
-                fields: [
-                    {
-                        name: 'Impact',
-                        value: impactString[event.impactNum],
-                    },
-                    {
+                fields: [{
                     name: 'Reason',
-                    value: util.shorten(event.content, 1000),
-                    }
-                ],
+                    value: event.content,
+                }],
+
             }],
             mode,
         );
@@ -129,27 +128,11 @@ router.post('/updateContent/:id', middlewares.isNat, async (req, res) => {
         success: 'Updated content',
     });
 
-    if (typeof event.impactNum === 'number') {
-        await impactWebhook(event, req);
+    if ((event.obviousness || event.obviousness == 0) && (event.severity || event.severity == 0) && (event.obviousness + event.severity >= 2)) {
+        await sevRatingWebhook(event, req);
     }
 
     Logger.generate(req.session.mongoId, `Updated DQ reason of s/${event.beatmapsetId} to "${event.content}"`, 'dataCollection', event._id);
-});
-
-/* POST edit impact */
-router.post('/updateImpact/:id', middlewares.isNat, async (req, res) => {
-    const impactString = ['Minor', 'Notable','Severe'];
-
-    let event = await Aiess.findByIdAndUpdate(req.params.id, { impactNum: req.body.impactNum }).orFail();
-
-    res.json({
-        impactNum: req.body.impactNum,
-        success: `Changed impact to: ${impactString[req.body.impactNum]}`,
-    });
-
-    await impactWebhook(event, req);
-
-    Logger.generate(req.session.mongoId, `Updated impact of s/${event.beatmapsetId} to "${event.impactNum}"`, 'dataCollection', event._id);
 });
 
 /* POST sync beatmapset events */
@@ -220,7 +203,8 @@ router.post('/syncBeatmapsetEvents/:beatmapsetId', middlewares.isNat, async (req
                 aiessEvent.content = relevantNominate.content;
                 aiessEvent.discussionId = relevantNominate.discussionId;
                 aiessEvent.isReviewed = relevantNominate.isReviewed;
-                aiessEvent.impactNum = relevantNominate.impactNum;
+                aiessEvent.obviousness = relevantNominate.obviousness;
+                aiessEvent.severity = relevantNominate.severity;
                 await aiessEvent.save();
                 await relevantNominate.remove();
             }
@@ -239,6 +223,54 @@ router.post('/syncBeatmapsetEvents/:beatmapsetId', middlewares.isNat, async (req
     });
 
     Logger.generate(req.session.mongoId, `Synced ${finalEventsLength - initialEventsLength} new events for s/${req.params.beatmapsetId}`, 'dataCollection');
+});
+
+/* POST edit obviousness */
+router.post('/updateObviousness/:id', middlewares.isNat, async (req, res) => {
+    let obviousness = parseInt(req.body.obviousness);
+    let event = await Aiess.findById(req.params.id).orFail();
+
+    if (obviousness == event.obviousness) {
+        obviousness = null;
+    }
+
+    event.obviousness = obviousness;
+    await event.save();
+
+    res.json({
+        obviousness: event.obviousness,
+        success: 'Updated obviousness',
+    });
+
+    if ((event.obviousness || event.obviousness == 0) && (event.severity || event.severity == 0) && (event.obviousness + event.severity >= 2)) {
+        await sevRatingWebhook(event, req);
+    }
+
+    Logger.generate(req.session.mongoId, `Updated obviousness of s/${event.beatmapsetId} to "${obviousness}"`, 'dataCollection', event._id);
+});
+
+/* POST edit severity */
+router.post('/updateSeverity/:id', middlewares.isNat, async (req, res) => {
+    let severity = parseInt(req.body.severity);
+    let event = await Aiess.findById(req.params.id).orFail();
+
+    if (severity == event.severity) {
+        severity = null;
+    }
+
+    event.severity = severity;
+    await event.save();
+
+    res.json({
+        severity: event.severity,
+        success: 'Updated severity',
+    });
+
+    if ((event.obviousness || event.obviousness == 0) && (event.severity || event.severity == 0) && (event.obviousness + event.severity >= 2)) {
+        await sevRatingWebhook(event, req);
+    }
+
+    Logger.generate(req.session.mongoId, `Updated severity of s/${event.beatmapsetId} to "${severity}"`, 'dataCollection', event._id);
 });
 
 module.exports = router;

@@ -15,7 +15,7 @@
                     class="btn btn-sm btn-primary mb-2"
                     @click="filter = !filter"
                 >
-                    {{ `${filter == true ? 'Show' : 'Hide'} minor disqualifications/resets` }}
+                    {{ `${filter == true ? 'Show' : 'Hide'} 0/0 SEV events` }}
                 </button>
             </div>
             <data-table
@@ -112,9 +112,18 @@ export default {
         filteredEvents () {
             let events = [...this.events];
 
-            // @ts-ignore
             if (this.filter && this.loggedInUser && this.loggedInUser.isNatOrTrialNat) {
-                events = events.filter(e => e.impactNum != 0);
+                events = events.filter(e => {
+                    if (e.obviousness == 0 && e.severity == 0) {
+                        return false;
+                    }
+
+                    if (e.impactNum == 0) {
+                        return false;
+                    }
+
+                    return true;
+                });
             }
 
             return events;

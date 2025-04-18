@@ -19,11 +19,10 @@ const aiessSchema = new mongoose.Schema({
         starRating: { type: Number },
         userRating: { type: Number },
     }],
-
-    obviousness: { type: Number, default: null }, // old SEV system, replaced with impact
-    severity: { type: Number, default: null }, // old SEV system, replaced with impact
-    impact: { type: Boolean }, // old impact system, replaced with impactNum
-    impactNum: { type: Number },
+    obviousness: { type: Number, default: null }, // 2023-12-12: old SEV system, replaced with impact. 2025-04-18: we're back to SEVs lol
+    severity: { type: Number, default: null }, // 2023-12-12: old SEV system, replaced with impact. 2025-04-18: we're back to SEVs lol
+    impact: { type: Boolean }, // 2024-03-30: old impact system, replaced with impactNum
+    impactNum: { type: Number }, // 2025-04-18: old impactNum system, replaced with SEVs (again)
     mapperId: { type: Number },
     mapperTotalRanked: { type: Number },
     isBnOrNat: { type: Boolean, default: false },

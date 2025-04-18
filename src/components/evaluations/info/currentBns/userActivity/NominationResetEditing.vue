@@ -1,14 +1,25 @@
 <template>
     <td>
         <template v-if="!editing">
-            <span
-                v-if="loggedInUser && loggedInUser.isNatOrTrialNat && hasData"
-                :class="getImpact(event.impactNum).color"
-                data-toggle="tooltip"
-                :title="getImpact(event.impactNum).text"
-            >
-                <i v-if="event.impactNum !== 0" :class="getImpact(event.impactNum).icon" />
-                <font-awesome-icon v-else :icon="getImpact(event.impactNum).icon" />
+            <!-- SEV/impact -->
+            <span v-if="loggedInUser && loggedInUser.isNatOrTrialNat">
+                <span
+                    v-if="hasSEV"
+                    :class="calculateSEVColor"
+                    data-toggle="tooltip"
+                    :title="getSeverityTooltip(event.obviousness, event.severity)"
+                >
+                    ({{ event.obviousness }}/{{ event.severity }})
+                </span>
+                <span
+                    v-else-if="hasImpact"
+                    :class="getImpact(event.impactNum).color"
+                    data-toggle="tooltip"
+                    :title="getImpact(event.impactNum).text"
+                >
+                    <i v-if="event.impactNum !== 0" :class="getImpact(event.impactNum).icon" />
+                    <font-awesome-icon v-else :icon="getImpact(event.impactNum).icon" />
+                </span>
             </span>
             <span v-if="loggedInUser && loggedInUser.isNat">
                 <a href="#" @click.prevent="editing = !editing">
@@ -52,7 +63,15 @@
 
             <hr />
 
+            <obviousness-severity
+                :obviousness="event.obviousness"
+                :severity="event.severity"
+                :event-id="event._id"
+                :type="event.type"
+                :is-nomination-reset-editing="true"
+            />
             <impact
+                v-if="hasImpact"
                 :impact="event.impactNum"
                 :event-id="event._id"
                 :type="event.type"
@@ -64,11 +83,13 @@
 <script>
 import { mapState } from 'vuex';
 import Impact from '../Impact.vue';
+import ObviousnessSeverity from '../ObviousnessSeverity.vue';
 
 export default {
     name: 'NominationResetEditing',
     components: {
         Impact,
+        ObviousnessSeverity,
     },
     props: {
         event: {
@@ -87,8 +108,19 @@ export default {
             'loggedInUser',
         ]),
         /** @returns {boolean} */
-        hasData () {
+        hasSEV() {
+            return (this.event.obviousness || this.event.obviousness == 0) && (this.event.severity || this.event.severity == 0);
+        },
+        /** @returns {boolean} */
+        hasImpact() {
             return this.event.impactNum !== undefined;
+        },
+        /** @returns {string} */
+        calculateSEVColor() {
+            let total = this.event.obviousness + this.event.severity;
+            if (total >= 4 || this.event.obviousness == 2 || this.event.severity == 3) return 'text-danger';
+            else if (total >= 2) return 'text-neutral';
+            else return 'text-success';
         },
     },
     watch: {
@@ -108,6 +140,38 @@ export default {
                 default:
                     return;
             }
+        },
+        getSeverityTooltip (obviousness, severity) {
+            let tooltip = '';
+
+            switch (obviousness) {
+                case 0:
+                    tooltip += 'Not obvious';
+                    break;
+                case 1:
+                    tooltip += 'Can be found with experience';
+                    break;
+                case 2:
+                    tooltip += 'Can be found at a glance';
+                    break;
+            }
+
+            switch (severity) {
+                case 0:
+                    tooltip += ' / Not severe';
+                    break;
+                case 1:
+                    tooltip += ' / Slightly detrimental to gameplay';
+                    break;
+                case 2:
+                    tooltip += ' / Noticably detrimental to gameplay';
+                    break;
+                case 3:
+                    tooltip += ' / More or less unplayable';
+                    break;
+            }
+
+            return tooltip;
         },
         async updateContent (e) {
             const data = await this.$http.executePost('/dataCollection/updateContent/' + this.event._id, { reason: this.newEventContent }, e);
