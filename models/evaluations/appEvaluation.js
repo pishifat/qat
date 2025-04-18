@@ -57,6 +57,19 @@ class AppEvaluationService extends mongoose.Model {
                         select: 'username osuId groups discordId isBnEvaluator',
                     },
                 },
+                {
+                    path: 'rerolls',
+                    populate: [
+                        {
+                            path: 'oldEvaluator',
+                            select: 'username osuId',
+                        },
+                        {
+                            path: 'newEvaluator',
+                            select: 'username osuId',
+                        },
+                    ],
+                }
             ])
             .sort({
                 createdAt: 1,

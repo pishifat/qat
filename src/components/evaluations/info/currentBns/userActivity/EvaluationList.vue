@@ -9,16 +9,38 @@
 
         <div v-if="loggedInUser.isNat">
             <div v-if="events" :id="eventsId" class="collapse">
-                <ul v-if="events.length">
-                    <li class="small">Total Assigned Evaluations: {{ totalEvaluations }}</li>
-                    <li class="small">Total Completed Evaluations: {{ totalCompletedEvaluations }} ({{ totalOverdueEvaluations }} overdue)</li>
-                    <li class="small">Total Unfinished Evaluations: {{ totalUnfinishedEvaluations }}</li>
+                <ul v-if="events.length" class="small">
+                    <li><b>Assigned Evaluations:</b> {{ totalEvaluations }}</li>
+                    <ul>
+                        <li><b>Completed:</b> {{ totalCompletedEvaluations }} <span class="text-danger">({{ totalOverdueEvaluations }} overdue)</span></li>
+                        <li><b>Unfinished:</b> {{ totalUnfinishedEvaluations }}</li>
+                    </ul>
+                    <li><b>Rerolls:</b> {{ totalRerolls }}</li>
+                    <ul>
+                        <li><b>Removed from:</b> {{ totalRemovedFromRerolls }}</li>
+                        <li><b>Added to (manual):</b> {{ totalAddedToManualRerolls }}</li>
+                        <li><b>Added to (automatic):</b> {{ totalAddedToAutomaticRerolls }}</li>
+                    </ul>
                 </ul>
                 <data-table
                     v-if="events.length"
-                    :headers="['Deadline', 'Eval submitted', 'Evaluation', 'Vote', 'Consensus']"
+                    :headers="['', 'Deadline', 'Eval submitted', 'Evaluation', 'Vote', 'Consensus']"
                 >
                     <tr v-for="event in events" :key="event.id">
+                        <td>
+                            <i
+                                v-if="wasRerolled(event.rerolls)"
+                                class="fas fa-undo-alt text-warning"
+                                data-toggle="tooltip"
+                                title="replaced someone else"
+                            />
+                            <i
+                                v-else
+                                class="fas fa-clipboard-check text-success"
+                                data-toggle="tooltip" 
+                                title="assigned"
+                            />
+                        </td>
                         <td class="text-nowrap">
                             {{ new Date(event.deadline).toString().slice(4, 10) }}
                         </td>
@@ -104,6 +126,54 @@ export default {
         totalUnfinishedEvaluations() {
             return this.events.length - this.getCompletedEvaluations(this.events).length;
         },
+        totalRerolls() {
+            return this.totalRemovedFromRerolls + this.totalAddedToAutomaticRerolls + this.totalAddedToManualRerolls;
+        },
+        totalRemovedFromRerolls() {
+            let count = 0;
+
+            for (const event of this.events) {
+                if (event.rerolls) {
+                    for (const reroll of event.rerolls) {
+                        if (reroll.oldEvaluator.id == this.mongoId) {
+                            count++;
+                        }
+                    }
+                }
+            }
+            
+            return count;
+        },
+        totalAddedToManualRerolls() {
+            let count = 0;
+
+            for (const event of this.events) {
+                if (event.rerolls) {
+                    for (const reroll of event.rerolls) {
+                        if (reroll.newEvaluator.id == this.mongoId && reroll.type == 'manual') {
+                            count++;
+                        }
+                    }
+                }
+            }
+            
+            return count;
+        },
+        totalAddedToAutomaticRerolls() {
+            let count = 0;
+
+            for (const event of this.events) {
+                if (event.rerolls) {
+                    for (const reroll of event.rerolls) {
+                        if (reroll.newEvaluator.id == this.mongoId && reroll.type == 'automatic') {
+                            count++;
+                        }
+                    }
+                }
+            }
+            
+            return count;
+        },
     },
     methods: {
         getCompletedEvaluations(events) {
@@ -187,6 +257,17 @@ export default {
                 default:
                     return '';
             }
+        },
+        wasRerolled (rerolls) {
+            if (rerolls.length) {
+                for (const reroll of rerolls) {
+                    if (reroll.newEvalutor.id == this.mongoId) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         },
     },
 };

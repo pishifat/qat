@@ -53,7 +53,6 @@ export default {
         generateDisplayText (month, i) {
             const monthName = this.$moment().subtract(3 - i, 'months').format('MMMM');
 
-            console.log(month);
             return `${monthName}: ${month} nominations`;
         },
         bgClass (month, i) {

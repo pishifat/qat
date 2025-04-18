@@ -256,6 +256,13 @@ async function replaceUser (evaluation, currentUserId, evaluatorId, isBn, select
         evaluation.natEvaluators.splice(i, 1, newEvaluator._id);
     }
 
+    evaluation.rerolls.push({
+        createdAt: new Date(),
+        oldEvaluator: evaluatorId,
+        newEvaluator: newEvaluator._id,
+        type: 'manual',
+    });
+
     await evaluation.save();
 
     return newEvaluator;

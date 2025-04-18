@@ -89,6 +89,7 @@
 
                     <div id="additionalInfo" class="collapse container mb-4">
                         <evaluator-assignments />
+                        <assignment-history v-if="loggedInUser.isNatLeader && selectedEvaluation.rerolls && selectedEvaluation.rerolls.length" />
                         <hr>
                         <user-notes :user-mongo-id="selectedEvaluation.user.id" />
                         <hr>
@@ -140,6 +141,7 @@ import UserActivity from './currentBns/userActivity/UserActivity.vue';
 import EvaluationInput from './common/EvaluationInput.vue';
 import EvaluationLink from './common/EvaluationLink.vue';
 import EvaluatorAssignments from './common/EvaluatorAssignments.vue';
+import AssignmentHistory from './common/AssignmentHistory.vue';
 import ModalDialog from '../../ModalDialog.vue';
 import MainApplicationInfo from './applications/MainApplicationInfo.vue';
 import DiscussionInfo from './DiscussionInfo.vue';
@@ -167,6 +169,7 @@ export default {
         EvaluationIsSecurityChecked,
         SubjectiveFeedbackStatus,
         DebugViewDocument,
+        AssignmentHistory,
     },
     data () {
         return {

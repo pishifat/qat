@@ -63,6 +63,19 @@ class EvaluationService extends mongoose.Model {
                     },
                 },
                 {
+                    path: 'rerolls',
+                    populate: [
+                        {
+                            path: 'oldEvaluator',
+                            select: 'username osuId',
+                        },
+                        {
+                            path: 'newEvaluator',
+                            select: 'username osuId',
+                        },
+                    ],
+                },
+                {
                     path: 'selfSummary',
                 },
             ])

@@ -45,6 +45,19 @@ const defaultPopulate = [
             select: 'username osuId groups isTrialNat',
         },
     },
+    {
+        path: 'rerolls',
+        populate: [
+            {
+                path: 'oldEvaluator',
+                select: 'username osuId',
+            },
+            {
+                path: 'newEvaluator',
+                select: 'username osuId',
+            },
+        ],
+    }
 ];
 
 const notesPopulate = [
@@ -915,6 +928,19 @@ const applicationPopulate = [
             select: 'username osuId groups',
         },
     },
+    {
+        path: 'rerolls',
+        populate: [
+            {
+                path: 'oldEvaluator',
+                select: 'username osuId',
+            },
+            {
+                path: 'newEvaluator',
+                select: 'username osuId',
+            },
+        ],
+    }
 ];
 
 const evaluationPopulate = [
@@ -930,6 +956,19 @@ const evaluationPopulate = [
             select: 'username osuId groups',
         },
     },
+    {
+        path: 'rerolls',
+        populate: [
+            {
+                path: 'oldEvaluator',
+                select: 'username osuId',
+            },
+            {
+                path: 'newEvaluator',
+                select: 'username osuId',
+            },
+        ],
+    }
 ];
 
 /* GET aiess info */

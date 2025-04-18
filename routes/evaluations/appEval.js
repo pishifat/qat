@@ -41,6 +41,19 @@ const defaultPopulate = [
             select: 'username osuId groups isTrialNat discordId isBnEvaluator',
         },
     },
+    {
+        path: 'rerolls',
+        populate: [
+            {
+                path: 'oldEvaluator',
+                select: 'username osuId',
+            },
+            {
+                path: 'newEvaluator',
+                select: 'username osuId',
+            },
+        ],
+    }
 ];
 
 // hides all reviews other than current user

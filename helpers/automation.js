@@ -423,6 +423,11 @@ const notifyApplicationEvaluations = cron.schedule('2 17 * * *', async () => {
                 const newEvaluatorArray = await User.getAssignedNat(app.mode, app.user.id, excludeOsuIds, 1);
                 const newEvaluator = newEvaluatorArray[0];
                 app.natEvaluators.push(newEvaluator._id);
+                app.rerolls.push({
+                    createdAt: new Date(),
+                    newEvaluator: newEvaluator._id,
+                    type: 'automatic',
+                });
                 
                 await app.save();
 

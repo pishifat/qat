@@ -28,8 +28,14 @@ interface IEvaluationBase {
         date: Date;
         content: string;
         isNat: boolean;
-    }[]
+    }[];
     messagesLocked?: boolean;
+    rerolls?: {
+        createdAt: Date;
+        oldEvaluator: IUserDocument;
+        newEvaluator: IUserDocument;
+        type: string;
+    }[];
 }
 
 export interface IAppEvaluationDocument extends IEvaluationBase, Document {

@@ -19,6 +19,13 @@ const baseSchema = {
         isNat: { type: Boolean, required: true },
     }],
     messagesLocked: { type: Boolean },
+    rerolls: [{
+        _id: false,
+        createdAt: { type: Date, required: true },
+        oldEvaluator: { type: 'ObjectId', ref: 'User' },
+        newEvaluator: { type: 'ObjectId', ref: 'User', required: true },
+        type: { type: String, enum: ['automatic', 'manual'] },
+    }],
 };
 
 module.exports = baseSchema;

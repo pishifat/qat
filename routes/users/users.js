@@ -57,11 +57,7 @@ router.get('/loadPreviousBnAndNat', async (req, res) => {
 
 /* GET NAT list */
 router.get('/loadNatInMode/:mode', middlewares.isLoggedIn, middlewares.isNatOrTrialNat, async (req, res) => {
-    console.log('in');
-    console.log('???');
     const users = await User.find({ groups: 'nat', 'modesInfo.mode': req.params.mode }).sort({ username: 1 });
-
-    console.log(users);
 
     res.json(users);
 });
@@ -1252,12 +1248,6 @@ router.post('/resignFromBn/:id', async (req, res) => {
 router.post('/cycleBag/:mode', middlewares.isLoggedIn, middlewares.isAdmin, async (req, res) => {
     const tempEvaluation = await BnEvaluation.findOne({ active: true }); // a random eval for getAssignedNat to work
     const users = await User.getAssignedNat(req.params.mode, tempEvaluation.user.toString());
-
-    console.log('---\nfinalusers\n---');
-
-    for (const user of users) {
-        console.log(user.username);
-    }
 
     res.json({ success: 'ok' });
 });
