@@ -6,14 +6,58 @@
                     Open Beatmap Nominators
                 </h4>
                 <p class="mx-auto mb-3 text-center">This is a list of Beatmap Nominators who are currently open for requests. Make sure to pay attention to their request methods and guidelines listed in their userpages!</p>
+                <a
+                    data-toggle="collapse"
+                    href='#filters'
+                >
+                    <h5>Filter by preferences <i class="fas fa-angle-down" /></h5>
+                </a>
+                <div id="filters" class="row collapse">
+                    <preference-filter
+                        :title="'Genres'"
+                        :values="genres"
+                    />
+                    <preference-filter
+                        :title="'Languages'"
+                        :values="languages"
+                    />
+                    <preference-filter
+                        :title="'Details'"
+                        :values="details"
+                    />
+                    <preference-filter
+                        :title="'Mappers'"
+                        :values="mappers"
+                    />
+                    <preference-filter
+                        :title="'osu! styles'"
+                        :values="osuStyles"
+                    />
+                    <preference-filter
+                        :title="'osu!taiko styles'"
+                        :values="taikoStyles"
+                    />
+                    <preference-filter
+                        :title="'osu!catch styles'"
+                        :values="catchStyles"
+                    />
+                    <preference-filter
+                        :title="'osu!mania styles'"
+                        :values="maniaStyles"
+                    />
+                    <preference-filter
+                        :title="'osu!mania keymodes'"
+                        :values="maniaKeymodes"
+                    />
+                </div>
                 <transition-group
                     appear
                     name="route-transition"
                     mode="out-in"
                     tag="div"
-                    class="row align-items-start"
+                    class="row align-items-start mt-2"
                 >
-                    <table v-for="usersByMode in openUsers" :key="usersByMode._id" class="table table-sm table-dark table-hover col-6 col-md-3">
+                    <table v-for="usersByMode in filteredUsers" :key="usersByMode._id" class="table table-sm table-dark table-hover col-6 col-md-3">
                         <span v-if="usersByMode.users.length">
                             <thead>
                                 <td v-if="usersByMode._id != 'none'">{{ usersByMode._id | formatMode }}</td>
@@ -36,12 +80,14 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import modRequestsModule from '../store/modRequests';
 import usersHomeModule from '../store/usersHome';
 import ToastMessages from '../components/ToastMessages.vue';
 import UserCard from '../components/home/UserCard.vue';
 import UserInfo from '../components/home/UserInfo.vue';
+import PreferenceFilter from '../components/modRequests/PreferenceFilter.vue';
+import { GenrePreferences, LanguagePreferences, DetailPreferences, MapperPreferences, OsuStylePreferences, TaikoStylePreferences, CatchStylePreferences, ManiaStylePreferences, ManiaKeymodePreferences } from '../../shared/enums';
 
 export default {
     name: 'ModRequests',
@@ -49,13 +95,19 @@ export default {
         ToastMessages,
         UserCard,
         UserInfo,
+        PreferenceFilter,
     },
     data () {
         return {
-            link: '',
-            category: '',
-            comment: '',
-            openUsers: [],
+            genres: GenrePreferences,
+            languages: LanguagePreferences,
+            details: DetailPreferences,
+            mappers: MapperPreferences,
+            osuStyles: OsuStylePreferences,
+            taikoStyles: TaikoStylePreferences,
+            catchStyles: CatchStylePreferences,
+            maniaStyles: ManiaStylePreferences,
+            maniaKeymodes: ManiaKeymodePreferences,
         };
     },
     computed: {
@@ -66,7 +118,10 @@ export default {
             'users',
         ]),
         ...mapState('modRequests', [
-            'ownRequests',
+            'included'
+        ]),
+        ...mapGetters('modRequests', [
+            'filteredUsers'
         ]),
     },
     beforeCreate () {
@@ -100,25 +155,16 @@ export default {
                 }
             }
 
-            this.openUsers = this.filterOpenUsers(userData.allUsersByMode);
+            this.$store.commit('modRequests/setUsers', userData.allUsersByMode);
         }
-    },
-    methods: {
-        filterOpenUsers(allUsersByMode) {
-            const sortOrder = ['osu', 'taiko', 'catch', 'mania', 'none'];
-            const filtered = allUsersByMode;
-
-            // filter out users who have "closed" in their requestStatus array
-            filtered.forEach((mode) => {
-                mode.users = mode.users.filter((user) => {
-                    return (!user.requestStatus?.includes('closed') && user.requestStatus?.length);
-                });
-            });
-
-            return filtered.sort(function(a, b) {
-                return sortOrder.indexOf(a._id) - sortOrder.indexOf(b._id);
-            });
-        },
     },
 };
 </script>
+
+<style scoped>
+.fake-checkbox:hover {
+    cursor: pointer;
+    color: lightblue;
+    opacity: 0.7;
+}
+</style>
