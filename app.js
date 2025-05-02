@@ -84,6 +84,7 @@ mongoose.connect(config.connection, {
     maxPoolSize: 10,
     minPoolSize: 1,
 });
+
 const db = mongoose.connection;
 db.on('connected', () => console.log('MongoDB connected'));
 db.on('disconnected', () => console.warn('MongoDB disconnected'));
@@ -92,6 +93,15 @@ db.on('error', err => console.error('MongoDB error:', err));
 db.once('open', function () {
     console.log('natdb connected');
 });
+
+setInterval(async () => {
+    try {
+      await mongoose.connection.db.admin().ping();
+    } catch {
+      console.error('no connection. hopefully the next line initiates `pm2 restart`');
+      process.exit(1);
+    }
+  }, 300000);
 
 const sessionConfig = {
     name: 'bnsite_session',
