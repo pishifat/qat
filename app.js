@@ -77,9 +77,18 @@ mongoose.connect(config.connection, {
     useFindAndModify: false,
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    keepAlive: true,
+    keepAliveInitialDelay: 300000,
+    serverSelectionTimeoutMS: 10000,
+    socketTimeoutMS: 45000,
+    maxPoolSize: 10,
+    minPoolSize: 1,
 });
 const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'db connection error:'));
+db.on('connected', () => console.log('MongoDB connected'));
+db.on('disconnected', () => console.warn('MongoDB disconnected'));
+db.on('reconnected', () => console.log('MongoDB reconnected'));
+db.on('error', err => console.error('MongoDB error:', err));
 db.once('open', function () {
     console.log('natdb connected');
 });
