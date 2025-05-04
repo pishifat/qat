@@ -138,7 +138,7 @@ router.post('/submit', middlewares.isLoggedIn, async (req, res) => {
         beatmapMapper: bmInfo.creator,
         beatmapMapperId: bmInfo.creator_id,
         mode: req.body.mode,
-        vetoFormat: 5,
+        vetoFormat: 6,
     });
     veto = await Veto
         .findById(veto._id)

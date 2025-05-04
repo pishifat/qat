@@ -71,7 +71,15 @@ export default {
         isUpheld () {
             if (this.veto.vetoFormat >= 5) {
                 const sum = this.upholdMediations.length + this.withdrawMediations.length;
-                const threshold = 0.7 * sum;
+                let threshold;
+
+                if (this.veto.vetoFormat == 5) {
+                    threshold = 0.7 * sum;
+                }
+                
+                if (this.veto.vetoFormat == 6) {
+                    threshold = 0.6 * sum;
+                }
 
                 return this.upholdMediations.length >= threshold;
             } else {
