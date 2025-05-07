@@ -478,6 +478,7 @@ const notifyCurrentBnEvaluations = cron.schedule('3 17 * * *', async () => {
         let description = `[**${eval.user.username}**'s ${isNat ? 'NAT eval' : eval.isResignation ? 'resignation' : 'current BN eval'}](http://bn.mappersguild.com/bneval?id=${eval.id}) `;
         let color;
         let generateWebhook;
+        let needsNewEvaluator;
 
         const hasAssignedNatEvaluators = eval.natEvaluators && eval.natEvaluators.length;
         const hasAssignedBnEvaluators = eval.natEvaluators && eval.natEvaluators.length;
@@ -565,6 +566,10 @@ const notifyCurrentBnEvaluations = cron.schedule('3 17 * * *', async () => {
             description += `was due ${days == 0 ? 'today!' : days == 1 ? days + ' day ago!' : days + ' days ago!'}`;
             color = discord.webhookColors.red;
             generateWebhook = true;
+
+            if (!eval.discussion) {
+                needsNewEvaluator = true;
+            }
         } else if (tomorrow > deadline) {
             description += 'is due in less than 24 hours!';
             color = discord.webhookColors.lightRed;
@@ -577,8 +582,7 @@ const notifyCurrentBnEvaluations = cron.schedule('3 17 * * *', async () => {
 
         // send webhooks
         if (generateWebhook) {
-            const evaluators = await Settings.getModeHasTrialNat(eval.mode) && !isNat ? eval.natEvaluators.concat(eval.bnEvaluators) : eval.natEvaluators;
-            const discordIds = discord.findEvaluatorHighlights(eval.reviews, evaluators, eval.discussion);
+            let evaluators = await Settings.getModeHasTrialNat(eval.mode) && !isNat ? eval.natEvaluators.concat(eval.bnEvaluators) : eval.natEvaluators;
             const fields = [];
 
             // set more webhook content
@@ -612,6 +616,42 @@ const notifyCurrentBnEvaluations = cron.schedule('3 17 * * *', async () => {
                 eval.mode
             );
             await util.sleep(500);
+
+            if (needsNewEvaluator) {
+                // add new evaluator to app
+                const natEvaluatorOsuIds = eval.natEvaluators.map(n => n.osuId);
+                const reviewerOsuIds = eval.reviews.map(r => r.evaluator.osuId);
+                const excludeOsuIds = natEvaluatorOsuIds.concat(reviewerOsuIds);
+                const newEvaluatorArray = await User.getAssignedNat(eval.mode, eval.user.id, excludeOsuIds, 1);
+                const newEvaluator = newEvaluatorArray[0];
+                eval.natEvaluators.push(newEvaluator._id);
+                eval.rerolls.push({
+                    createdAt: new Date(),
+                    newEvaluator: newEvaluator._id,
+                    type: 'automatic',
+                });
+                
+                await eval.save();
+
+                // add new user webhook
+                await discord.webhookPost(
+                    [{
+                        color: discord.webhookColors.orange,
+                        description: `Added **${newEvaluator.username}** as NAT evaluator for [**${eval.user.username}**'s current BN eval](http://bn.mappersguild.com/bneval?id=${eval.id})`,
+                    }],
+                    eval.mode
+                );
+                await util.sleep(500);
+
+                // get updated evaluators
+                await eval.populate([
+                    { path: 'bnEvaluators', select: 'username osuId discordId isBnEvaluator' },
+                    { path: 'natEvaluators', select: 'username osuId discordId isBnEvaluator' },
+                ]).execPopulate();
+                evaluators = await Settings.getModeHasTrialNat(eval.mode) ? eval.natEvaluators.concat(eval.bnEvaluators) : eval.natEvaluators;
+            }
+
+            const discordIds = discord.findEvaluatorHighlights(eval.reviews, evaluators, eval.discussion);
 
             // discord ping webhook
             if (discordIds && discordIds.length) {
