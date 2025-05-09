@@ -38,20 +38,20 @@
                     </a>
                 </span>
 
-                <span v-if="nominatorAssessmentMongoId && loggedInUser && loggedInUser.isNat && isEditing && user.id == editedEvaluatorId && replaceNat" class="form-inline">
+                <span v-if="nominatorAssessmentMongoId && loggedInUser && loggedInUser.isNat && isEditing && user.id == editedEvaluatorId" class="form-inline">
                     <select
                         id="user"
                         v-model="selectedUserId"
                         class="form-control ml-2"
                     >
                         <option
-                            v-for="user in nat"
+                            v-for="user in replaceNat ? nat : trialNat"
                             :key="user.id"
                             :value="user.id"
                         >
                             {{ user.username }}
                         </option>
-                        <option v-if="!nat.length" disabled>
+                        <option v-if="!nat.length && !trialNat.length" disabled>
                             ...
                         </option>
                     </select>
@@ -94,6 +94,7 @@ export default {
             default: null,
         },
         replaceNat: Boolean,
+        replaceTrialNat: Boolean,
         mode: {
             type: String,
             default: '',
@@ -105,6 +106,7 @@ export default {
             editedEvaluatorId: '',
             selectedUserId: '',
             nat: [],
+            trialNat: [],
         };
     },
     computed: {
@@ -119,6 +121,10 @@ export default {
         async isEditing () {
             if (this.replaceNat) {
                 await this.loadNat();
+            }
+
+            if (this.replaceTrialNat) {
+                await this.loadTrialNat();
             }
         },
         userList () {
@@ -172,6 +178,15 @@ export default {
 
             if (this.$http.isValid(nat)) {
                 this.nat = nat;
+            }
+        },
+        async loadTrialNat() {
+            const trialNat = await this.$http.executeGet(
+                `/users/loadTrialNatInMode/${this.selectedEvaluation.mode}`
+            );
+
+            if (this.$http.isValid(trialNat)) {
+                this.trialNat = trialNat;
             }
         },
     },

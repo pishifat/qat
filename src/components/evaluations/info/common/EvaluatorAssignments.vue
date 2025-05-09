@@ -18,6 +18,8 @@
                     :user-list="selectedEvaluation.bnEvaluators"
                     :is-application="selectedEvaluation.isApplication"
                     :nominator-assessment-mongo-id="selectedEvaluation.id"
+                    :replace-trial-nat="true"
+                    :mode="selectedEvaluation.mode"
                 />
             </div>
             <div :class="selectedEvaluation.bnEvaluators && selectedEvaluation.bnEvaluators.length ? 'col-lg-4' : 'col-sm-6'">

@@ -62,6 +62,20 @@ router.get('/loadNatInMode/:mode', middlewares.isLoggedIn, middlewares.isNatOrTr
     res.json(users);
 });
 
+/* GET trial NAT list */
+router.get('/loadTrialNatInMode/:mode', middlewares.isLoggedIn, middlewares.isNatOrTrialNat, async (req, res) => {
+    const users = await User
+        .find({
+            groups: 'bn',
+            'modesInfo.mode': req.params.mode,
+            isBnEvaluator: true,
+            isTrialNat: true,
+        })
+        .sort({ username: 1 });
+
+    res.json(users);
+});
+
 /* GET users banned from BN */
 router.get('/loadBannedUsers', middlewares.isLoggedIn, middlewares.isNat, async (req, res) => {
     const users = await User.find({
