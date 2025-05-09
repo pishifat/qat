@@ -481,28 +481,8 @@ router.post('/replaceUser/:id', middlewares.isNat, async (req, res) => {
         .orFail();
     let replacement;
 
-    if (replaceNat) {
-        replacement = await replaceUser(evaluation, res.locals.userRequest.id, req.body.evaluatorId, false, req.body.selectedUserId);
-        await evaluation.save();
-    } else {
-        let invalids = evaluation.bnEvaluators.map(bn => bn.osuId);
-        const evaluatorArray = await User.aggregate([
-            {
-                $match: {
-                    groups: 'bn',
-                    modesInfo: { $elemMatch: { mode: evaluation.mode, level: 'full' } },
-                    osuId: { $nin: invalids },
-                    isBnEvaluator: true,
-                },
-            },
-            { $sample: { size: 1 } },
-        ]);
-        replacement = evaluatorArray[0];
-
-        const i = evaluation.bnEvaluators.findIndex(e => e.id == req.body.evaluatorId);
-        evaluation.bnEvaluators.splice(i, 1, replacement._id);
-        await evaluation.save();
-    }
+    replacement = await replaceUser(evaluation, res.locals.userRequest.id, req.body.evaluatorId, !replaceNat, req.body.selectedUserId);
+    await evaluation.save();
 
     evaluation = await AppEvaluation
         .findById(req.params.id)
