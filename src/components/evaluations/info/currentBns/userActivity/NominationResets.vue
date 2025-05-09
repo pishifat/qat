@@ -118,7 +118,7 @@ export default {
                         return false;
                     }
 
-                    if (e.impactNum == 0) {
+                    if (e.impactNum == 0 && e.obviousness === undefined && e.severity === undefined) { // events marked as "minor" later had SEV assigned as 1/0, and NAT wanted them to appear
                         return false;
                     }
 
