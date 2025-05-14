@@ -135,7 +135,7 @@ export default {
             for (const event of this.events) {
                 if (event.rerolls) {
                     for (const reroll of event.rerolls) {
-                        if (reroll.oldEvaluator.id == this.mongoId) {
+                        if (reroll.oldEvaluator && reroll.oldEvaluator.id == this.mongoId) {
                             count++;
                         }
                     }
@@ -261,7 +261,7 @@ export default {
         wasRerolled (rerolls) {
             if (rerolls.length) {
                 for (const reroll of rerolls) {
-                    if (reroll.newEvalutor.id == this.mongoId) {
+                    if (reroll.newEvaluator.id == this.mongoId) {
                         return true;
                     }
                 }
