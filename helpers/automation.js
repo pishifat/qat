@@ -567,7 +567,7 @@ const notifyCurrentBnEvaluations = cron.schedule('3 17 * * *', async () => {
             color = discord.webhookColors.red;
             generateWebhook = true;
 
-            if (!eval.discussion) {
+            if (!eval.discussion && !eval.user.groups.includes('nat')) {
                 needsNewEvaluator = true;
             }
         } else if (tomorrow > deadline) {
