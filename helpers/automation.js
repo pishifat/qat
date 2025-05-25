@@ -624,24 +624,27 @@ const notifyCurrentBnEvaluations = cron.schedule('3 17 * * *', async () => {
                 const excludeOsuIds = natEvaluatorOsuIds.concat(reviewerOsuIds);
                 const newEvaluatorArray = await User.getAssignedNat(eval.mode, eval.user.id, excludeOsuIds, 1);
                 const newEvaluator = newEvaluatorArray[0];
-                eval.natEvaluators.push(newEvaluator._id);
-                eval.rerolls.push({
-                    createdAt: new Date(),
-                    newEvaluator: newEvaluator._id,
-                    type: 'automatic',
-                });
                 
-                await eval.save();
+                if (newEvaluator) {
+                    eval.natEvaluators.push(newEvaluator._id);
+                    eval.rerolls.push({
+                        createdAt: new Date(),
+                        newEvaluator: newEvaluator._id,
+                        type: 'automatic',
+                    });
 
-                // add new user webhook
-                await discord.webhookPost(
-                    [{
-                        color: discord.webhookColors.orange,
-                        description: `Added **${newEvaluator.username}** as NAT evaluator for [**${eval.user.username}**'s current BN eval](http://bn.mappersguild.com/bneval?id=${eval.id})`,
-                    }],
-                    eval.mode
-                );
-                await util.sleep(500);
+                    await eval.save();
+
+                    // add new user webhook
+                    await discord.webhookPost(
+                        [{
+                            color: discord.webhookColors.orange,
+                            description: `Added **${newEvaluator.username}** as NAT evaluator for [**${eval.user.username}**'s current BN eval](http://bn.mappersguild.com/bneval?id=${eval.id})`,
+                        }],
+                        eval.mode
+                    );
+                    await util.sleep(500);
+                }
 
                 // get updated evaluators
                 await eval.populate([
