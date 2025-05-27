@@ -304,7 +304,7 @@ function findEvaluatorHighlights(reviews, evaluators, discussion) {
     } else if (discussion) {
         // group evaluation: ping anyone who evaluated
         for (const review of reviews) {
-            if (review.evaluator.groups.includes('nat') && review.evaluator.isBnEvaluator) {
+            if (review.evaluators && review.evaluator.groups.includes('nat') && review.evaluator.isBnEvaluator) {
                 discordIds.push(review.evaluator.discordId);
             }
         }
