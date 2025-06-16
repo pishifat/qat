@@ -28,6 +28,8 @@ config.json
 webhooks.json
 dist/
 public/css/
+public/js/
+public/index.html
 .vscode/
 *.csv
 yarn.lock

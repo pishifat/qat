@@ -447,7 +447,8 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import { GenrePreferences, LanguagePreferences, DetailPreferences, MapperPreferences, OsuStylePreferences, TaikoStylePreferences, CatchStylePreferences, ManiaStylePreferences, ManiaKeymodePreferences } from '../../../../shared/enums';
+import enums from 'shared/enums';
+const { GenrePreferences, LanguagePreferences, DetailPreferences, MapperPreferences, OsuStylePreferences, TaikoStylePreferences, CatchStylePreferences, ManiaStylePreferences, ManiaKeymodePreferences } = enums;
 
 export default {
     name: 'Preferences',

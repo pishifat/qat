@@ -85,7 +85,8 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import { VisualContentConsiderations } from '../../../../shared/enums.js';
+import enums from 'shared/enums';
+const { VisualContentConsiderations } = enums;
 
 export default {
     name: 'MediatorOptions',

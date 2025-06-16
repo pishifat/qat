@@ -158,12 +158,13 @@ app.use('/interOp/*', (req, res) => {
 });
 
 
-// catch 404
+// catch 404 and serve SPA for non-API routes
 app.use(function (req, res) {
-    res.render('index', {
-        layout: false,
-        loggedIn: req.session.mongoId,
-    });
+    if (req.path.startsWith('/api')) {
+        return res.status(404).json({ error: 'Not found' });
+    }
+    
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // error handler

@@ -30,7 +30,7 @@ $green:   #6ebf65;
 $teal:    #20c997;
 $cyan:    #3688bf;
 
-$primary:       lighten($bright-blue-gray, 7%);
+$primary:       hsl(170, 20%, 23.5%);
 $secondary:     hsl(165, 15%, 80%);
 $success:       $green;
 $info:          $cyan;
@@ -78,12 +78,12 @@ $link-color:                      $pastel-blue;
 // Forms
 
 $input-height-border:               3px;
-$input-bg:                          lighten($bright-blue-gray, 5%);
+$input-bg:                          hsl(170, 20%, 22%);
 $input-color:                     #fff;
 $input-border-color:                transparent;
 $input-border-width:                3px;
-$input-focus-border-color:          lighten($bright-blue-gray, 20%);
-$input-disabled-bg:                 darken($bright-blue-gray, 10%);
+$input-focus-border-color:          hsl(170, 20%, 32%);
+$input-disabled-bg:                 hsl(170, 20%, 16%);
 
 $input-group-addon-color:           $gray-500;
 $input-group-addon-bg:              $gray-700;
@@ -125,10 +125,10 @@ $card-bg:                           $blue-gray;
 
 // Modals
 
-$modal-content-bg:                  lighten($blue-gray, 5%);
-$modal-content-border-color:        lighten($blue-gray, 5%);
+$modal-content-bg:                  hsl(170, 20%, 16.5%);
+$modal-content-border-color:        hsl(170, 20%, 16.5%);
 
-$modal-header-border-color:         lighten($blue-gray, 5%);
+$modal-header-border-color:         hsl(170, 20%, 16.5%);
 
 // Close
 
@@ -143,7 +143,7 @@ $box-shadow-lg:               0 1px 3px rgba(0, 0, 0, .5) !default;
 
 // Misc
 
-$scrollbar-color:             lighten($bright-blue-gray, 15%);
+$scrollbar-color:             hsl(170, 20%, 29%);
 $selection-bg:                $bright-blue;
 
 // Game mode icons

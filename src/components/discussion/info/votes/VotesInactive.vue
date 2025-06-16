@@ -64,7 +64,8 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import VotesInactiveType from './VotesInactiveType.vue';
-import { VisualContentConsiderations } from '../../../../../shared/enums.js';
+import enums from 'shared/enums';
+const { VisualContentConsiderations } = enums;
 
 export default {
     name: 'VotesInactive',

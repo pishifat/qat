@@ -54,7 +54,8 @@
 
 <script>
 import { mapState } from 'vuex';
-import { Languages } from '../../../shared/enums';
+import enums from 'shared/enums';
+const { Languages } = enums;
 
 export default {
     data () {
