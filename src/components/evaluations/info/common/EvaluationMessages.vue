@@ -124,17 +124,17 @@ export default {
 
 <style scoped>
 .card-bg-nat {
-    background-image: url('~/public/images/nat.png');
+    background-image: url('/images/nat.png');
     background-repeat: repeat-y;
     background-position: left;
 }
 .card-bg-user {
-    background-image: url('~/public/images/user.png');
+    background-image: url('/images/user.png');
     background-repeat: repeat-y;
     background-position: left;
 }
 .card-bg-bn {
-    background-image: url('~/public/images/bn.png');
+    background-image: url('/images/bn.png');
     background-repeat: repeat-y;
     background-position: left;
 }

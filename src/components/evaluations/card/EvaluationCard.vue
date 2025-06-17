@@ -36,7 +36,7 @@
                 :is-discussion="evaluation.discussion"
                 :is-active="evaluation.active"
                 :archived-at="evaluation.archivedAt"
-                :is-nat="['remainInNat', 'moveToBn', 'removeFromNat'].includes(evaluation.consensus) || evaluation.selfSummary"
+                :is-nat="['remainInNat', 'moveToBn', 'removeFromNat'].includes(evaluation.consensus) || Boolean(evaluation.selfSummary)"
                 :is-public="evaluation.isPublic"
                 :is-application="evaluation.isApplication"
             />
@@ -149,23 +149,23 @@ export default {
 <style>
 
 .card-bg-bn {
-    background-image: url('~/public/images/bn-transparent.png');
+    background-image: url('/images/bn-transparent.png');
     background-repeat: repeat-y;
     background-position: left top;
 }
 .card-bg-probation {
-    background-image: url('~/public/images/probation-transparent.png');
+    background-image: url('/images/probation-transparent.png');
     background-repeat: repeat-y;
     background-position: left top;
 }
 .card-bg-user {
-    background-image: url('~/public/images/user-transparent.png');
+    background-image: url('/images/user-transparent.png');
     background-repeat: repeat-y;
     background-position: left top;
 }
 
 .card-bg-nat {
-    background-image: url('~/public/images/nat.png');
+    background-image: url('/images/nat.png');
     background-repeat: repeat-y;
     background-position: left top;
 }

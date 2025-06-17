@@ -69,31 +69,31 @@ moment.defineLocale('short', {
 Vue.filter('toStandardDate', (date) => {
     if (!date) return '';
 
-    return moment(date).format('YYYY-MM-DD');
+    return moment(new Date(date)).format('YYYY-MM-DD');
 });
 
 Vue.filter('toMonthDayYear', (date) => {
     if (!date) return '';
 
-    return moment(date).format('MMM DD, YYYY');
+    return moment(new Date(date)).format('MMM DD, YYYY');
 });
 
 Vue.filter('toStandardDetailedDate', (date) => {
     if (!date) return '';
 
-    return moment(date).format('YYYY-MM-DD hh:mm:ss A');
+    return moment(new Date(date)).format('YYYY-MM-DD hh:mm:ss A');
 });
 
 Vue.filter('toRelativeDate', (date) => {
     if (!date) return '';
 
-    return moment(date).locale('en').fromNow();
+    return moment(new Date(date)).locale('en').fromNow();
 });
 
 Vue.filter('toRelativeShortDate', (date) => {
     if (!date) return '';
 
-    return moment(date).locale('short').fromNow();
+    return moment(new Date(date)).locale('short').fromNow();
 });
 
 Vue.filter('shorten', (text, length) => {

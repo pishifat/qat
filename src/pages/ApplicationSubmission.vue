@@ -15,7 +15,7 @@
             <div>Requirements for joining the BN:</div>
             <ul>
                 <li>
-                    Have at least 150 <a href="https://osu.ppy.sh/wiki/en/Modding/Kudosu"target="_blank">kudosu</a>
+                    Have at least 150 <a href="https://osu.ppy.sh/wiki/en/Modding/Kudosu" target="_blank">kudosu</a>
                 </li>
                 <li>
                     Have an ability to recognise maps that should (and should not) be nominated
