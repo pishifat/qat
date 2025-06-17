@@ -42,7 +42,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
-      'shared/enums': resolve(__dirname, 'shared/enums.mjs'),
+      'shared/enums': resolve(__dirname, './shared/enums.mjs'),
       'vue': 'vue/dist/vue.esm.js' // Use full build for Vue 2
     },
     extensions: ['.mjs', '.js', '.vue', '.json']
