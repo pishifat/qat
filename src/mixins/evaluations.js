@@ -1,4 +1,5 @@
-import { BnEvaluationConsensus, AppEvaluationConsensus, ResignationConsensus, BnEvaluationAddition } from '../../shared/enums';
+import enums from 'shared/enums';
+const { BnEvaluationConsensus, AppEvaluationConsensus, ResignationConsensus, BnEvaluationAddition } = enums;
 
 export default {
     computed: {

@@ -1,5 +1,5 @@
 @import "variables";
-@import "~bootstrap/scss/bootstrap";
+@import "bootstrap/scss/bootstrap";
 @import "custom";
 
 // Vue transitions  ======================================================
@@ -30,7 +30,7 @@
 // =========================================================================
 
 .body-triangles::before {
-    background-image: url('~/public/images/triangles.png');
+    background-image: url('/images/triangles.png');
     opacity: .25;
     position: fixed;
     width: 100%;
@@ -190,7 +190,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background-color: lighten($scrollbar-color, 10%);
+    background-color: hsl(170, 20%, 32%);
 }
 
 ::selection {
@@ -310,7 +310,7 @@ a.timestamp-link {
     
         &:hover {
             cursor: pointer;
-            background-color: lighten($dark-blue-gray, 5%);
+            background-color: hsl(170, 15%, 12%);
         }
     }
 }

@@ -87,7 +87,8 @@ import ToastMessages from '../components/ToastMessages.vue';
 import UserCard from '../components/home/UserCard.vue';
 import UserInfo from '../components/home/UserInfo.vue';
 import PreferenceFilter from '../components/modRequests/PreferenceFilter.vue';
-import { GenrePreferences, LanguagePreferences, DetailPreferences, MapperPreferences, OsuStylePreferences, TaikoStylePreferences, CatchStylePreferences, ManiaStylePreferences, ManiaKeymodePreferences } from '../../shared/enums';
+import enums from 'shared/enums';
+const { GenrePreferences, LanguagePreferences, DetailPreferences, MapperPreferences, OsuStylePreferences, TaikoStylePreferences, CatchStylePreferences, ManiaStylePreferences, ManiaKeymodePreferences } = enums;
 
 export default {
     name: 'ModRequests',

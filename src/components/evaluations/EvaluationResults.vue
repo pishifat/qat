@@ -132,7 +132,8 @@
 import { mapState } from 'vuex';
 import ToastMessages from '../../components/ToastMessages.vue';
 import evaluations from '../../mixins/evaluations.js';
-import { BnEvaluationAddition } from '../../../shared/enums';
+import enums from 'shared/enums';
+const { BnEvaluationAddition } = enums;
 import UserLink from '../../components/UserLink.vue';
 import EvaluationMessages from './info/common/EvaluationMessages.vue';
 

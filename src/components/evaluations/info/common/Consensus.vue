@@ -75,7 +75,8 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import evaluations from '../../../../mixins/evaluations.js';
-import { EvaluationKind } from '../../../../../shared/enums.js';
+import enums from 'shared/enums';
+const { EvaluationKind } = enums;
 
 export default {
     name: 'Consensus',

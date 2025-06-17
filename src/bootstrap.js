@@ -5,6 +5,11 @@ import MarkdownItVideo from 'markdown-it-video';
 import http from './store/http';
 import osuTimestamps from './plugins/markdown-it-osu-timestamps';
 import MarkdownItColor from 'markdown-it-color';
+import $ from 'jquery';
+import 'bootstrap';
+
+// Make jQuery available globally
+window.$ = window.jQuery = $;
 
 const md = new MarkdownIt('default', {
     html: false,

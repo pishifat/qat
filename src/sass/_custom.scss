@@ -60,7 +60,7 @@
             height: 90px;
             filter: hue-rotate(-15deg);
 
-            background-image: url('~/public/images/partial.png');
+            background-image: url('/images/partial.png');
             background-position: bottom;
             background-repeat: repeat-x;
         }
@@ -115,7 +115,6 @@
     }
 
     header {
-        background-image: linear-gradient(0deg, hsla(170, 50%, 50%, 0.07), transparent);
         @include media-breakpoint-down(md) {
             position: absolute;
             width: 100%;
@@ -177,7 +176,7 @@
 // Cards
 
 .card-header-img {
-    background-image: url('~/public/images/cat.png');
+    background-image: url('/images/cat.png');
     background-repeat: no-repeat;
     background-size: contain;
     width: 40px;
@@ -235,7 +234,7 @@
     background-color: $bright-blue-gray;
 
     & .form-control {
-        background-color: lighten($bright-blue-gray, 5%);
+        background-color: hsl(170, 20%, 22%);
     }
 }
 
