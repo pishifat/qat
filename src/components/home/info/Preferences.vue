@@ -23,6 +23,44 @@
                             {{ genre }}
                         </label>
                     </div>
+                    
+                    <!-- Custom genre preferences -->
+                    <div>
+                        <div v-for="genre in customGenrePreferences" :key="genre">
+                            <i
+                                class="fa-check-circle text-success fas"
+                                :class="[loggedInUser && loggedInUser._id === selectedUser.id ? 'fake-checkbox' : '', processing ? 'fake-disabled' : '']"
+                                @click="loggedInUser && loggedInUser._id === selectedUser.id ? removeCustomGenre(genre, $event) : null"
+                            />
+                            <label class="form-check-label text-secondary ml-1">
+                                {{ genre }}
+                            </label>
+                            <i
+                                v-if="loggedInUser && (loggedInUser._id === selectedUser.id || loggedInUser.groups.includes('nat') || loggedInUser.groups.includes('gmt'))"
+                                class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
+                                :class="[processing ? 'fake-disabled' : '']"
+                                @click="removeCustomGenre(genre, $event)"
+                                title="Remove custom genre"
+                            />
+                        </div>
+                        <div class="d-flex mt-2">
+                            <input 
+                                v-model="customGenreInput"
+                                type="text" 
+                                class="form-control form-control-sm" 
+                                placeholder="Add custom genre..."
+                                @keyup.enter="addCustomGenre"
+                            />
+                            <button 
+                                class="btn btn-outline-success btn-sm ml-2" 
+                                type="button" 
+                                @click="addCustomGenre"
+                                :disabled="!customGenreInput.trim() || processing"
+                            >
+                                Add
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div v-else>
                     <div v-for="genre in genreOptions" :key="genre">
@@ -43,8 +81,24 @@
                             {{ genre }}
                         </label>
                     </div>
+                    <!-- Display custom genres for other users -->
+                    <div v-for="genre in customGenrePreferences" :key="genre">
+                        <i
+                            class="fa-check-circle text-success fas"
+                        />
+                        <label class="form-check-label text-secondary ml-1">
+                            {{ genre }}
+                        </label>
+                        <i
+                            v-if="loggedInUser && (loggedInUser.groups.includes('nat') || loggedInUser.groups.includes('gmt'))"
+                            class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
+                            :class="[processing ? 'fake-disabled' : '']"
+                            @click="removeCustomGenre(genre, $event)"
+                            title="Remove custom genre"
+                        />
+                    </div>
                     <small
-                        v-if="!genrePreferences.length && !genreNegativePreferences.length"
+                        v-if="!genrePreferences.length && !genreNegativePreferences.length && !customGenrePreferences.length"
                         class="text-secondary ml-1"
                     >
                     None...
@@ -72,6 +126,44 @@
                             {{ language }}
                         </label>
                     </div>
+                    
+                    <!-- Custom language preferences -->
+                    <div>
+                        <div v-for="language in customLanguagePreferences" :key="language">
+                            <i
+                                class="fa-check-circle text-success fas"
+                                :class="[loggedInUser && loggedInUser._id === selectedUser.id ? 'fake-checkbox' : '', processing ? 'fake-disabled' : '']"
+                                @click="loggedInUser && loggedInUser._id === selectedUser.id ? removeCustomLanguage(language, $event) : null"
+                            />
+                            <label class="form-check-label text-secondary ml-1">
+                                {{ language }}
+                            </label>
+                            <i
+                                v-if="loggedInUser && (loggedInUser._id === selectedUser.id || loggedInUser.groups.includes('nat') || loggedInUser.groups.includes('gmt'))"
+                                class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
+                                :class="[processing ? 'fake-disabled' : '']"
+                                @click="removeCustomLanguage(language, $event)"
+                                title="Remove custom language"
+                            />
+                        </div>
+                        <div class="d-flex mt-2">
+                            <input 
+                                v-model="customLanguageInput"
+                                type="text" 
+                                class="form-control form-control-sm" 
+                                placeholder="Add custom language..."
+                                @keyup.enter="addCustomLanguage"
+                            />
+                            <button 
+                                class="btn btn-outline-success btn-sm ml-2" 
+                                type="button" 
+                                @click="addCustomLanguage"
+                                :disabled="!customLanguageInput.trim() || processing"
+                            >
+                                Add
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div v-else>
                     <div v-for="language in languageOptions" :key="language">
@@ -92,8 +184,24 @@
                             {{ language }}
                         </label>
                     </div>
+                    <!-- Display custom languages for other users -->
+                    <div v-for="language in customLanguagePreferences" :key="language">
+                        <i
+                            class="fa-check-circle text-success fas"
+                        />
+                        <label class="form-check-label text-secondary ml-1">
+                            {{ language }}
+                        </label>
+                        <i
+                            v-if="loggedInUser && (loggedInUser.groups.includes('nat') || loggedInUser.groups.includes('gmt'))"
+                            class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
+                            :class="[processing ? 'fake-disabled' : '']"
+                            @click="removeCustomLanguage(language, $event)"
+                            title="Remove custom language"
+                        />
+                    </div>
                     <small
-                        v-if="!languagePreferences.length && !languageNegativePreferences.length"
+                        v-if="!languagePreferences.length && !languageNegativePreferences.length && !customLanguagePreferences.length"
                         class="text-secondary ml-1"
                     >
                     None...
@@ -117,7 +225,7 @@
                                 @click="updateStylePreferences(style, false, 'osu', $event)"
                             />
                             <label
-                                class="form-check-label text-secondary"
+                                class="form-check-label text-secondary ml-1"
                             >
                                 {{ style }} <span class="small">(osu!)</span>
                             </label>
@@ -164,7 +272,7 @@
                                 @click="updateStylePreferences(style, false, 'taiko', $event)"
                             />
                             <label
-                                class="form-check-label text-secondary"
+                                class="form-check-label text-secondary ml-1"
                             >
                                 {{ style }} <span class="small">(osu!taiko)</span>
                             </label>
@@ -211,7 +319,7 @@
                                 @click="updateStylePreferences(style, false, 'catch', $event)"
                             />
                             <label
-                                class="form-check-label text-secondary"
+                                class="form-check-label text-secondary ml-1"
                             >
                                 {{ style }} <span class="small">(osu!catch)</span>
                             </label>
@@ -258,7 +366,7 @@
                                 @click="updateStylePreferences(style, false, 'mania', $event)"
                             />
                             <label
-                                class="form-check-label text-secondary"
+                                class="form-check-label text-secondary ml-1"
                             >
                                 {{ style }} <span class="small">(osu!mania)</span>
                             </label>
@@ -291,6 +399,64 @@
                         </small>
                     </div>
                 </div>
+                
+                <!-- Custom map preferences -->
+                <div v-if="loggedInUser && loggedInUser._id === selectedUser.id">
+                    <div>
+                        <div v-for="map in customMapPreferences" :key="map">
+                            <i
+                                class="fa-check-circle text-success fas"
+                                :class="[loggedInUser && loggedInUser._id === selectedUser.id ? 'fake-checkbox' : '', processing ? 'fake-disabled' : '']"
+                                @click="loggedInUser && loggedInUser._id === selectedUser.id ? removeCustomMap(map, $event) : null"
+                            />
+                            <label class="form-check-label text-secondary ml-1">
+                                {{ map }}
+                            </label>
+                            <i
+                                v-if="loggedInUser && (loggedInUser._id === selectedUser.id || loggedInUser.hasFullReadAccess)"
+                                class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
+                                :class="[processing ? 'fake-disabled' : '']"
+                                @click="removeCustomMap(map, $event)"
+                                title="Remove custom map preference"
+                            />
+                        </div>
+                        <div class="d-flex mt-2">
+                            <input 
+                                v-model="customMapInput"
+                                type="text" 
+                                class="form-control form-control-sm" 
+                                placeholder="Add custom map preference..."
+                                @keyup.enter="addCustomMap"
+                            />
+                            <button 
+                                class="btn btn-outline-success btn-sm ml-2" 
+                                type="button" 
+                                @click="addCustomMap"
+                                :disabled="!customMapInput.trim() || processing"
+                            >
+                                Add
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div v-else>
+                    <!-- Display custom map preferences for other users -->
+                    <div v-for="map in customMapPreferences" :key="map">
+                        <i
+                            class="fa-check-circle text-success fas"
+                        />
+                        <label class="form-check-label text-secondary ml-1">
+                            {{ map }}
+                        </label>
+                        <i
+                            v-if="loggedInUser && loggedInUser.hasFullReadAccess"
+                            class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
+                            :class="[processing ? 'fake-disabled' : '']"
+                            @click="removeCustomMap(map, $event)"
+                            title="Remove custom map preference"
+                        />
+                    </div>
+                </div>
             </div>
             <div v-if="modes.includes('mania')" class="col-sm-4 mb-4">
                 <h6>Keymode preferences</h6>
@@ -309,7 +475,7 @@
                             @click="updateKeymodePreferences(keymode, false, $event)"
                         />
                         <label
-                            class="form-check-label text-secondary"
+                            class="form-check-label text-secondary ml-1"
                         >
                             {{ keymode }}
                         </label>
@@ -358,41 +524,95 @@
                             @click="updateDetailPreferences(detail, false, $event)"
                         />
                         <label
-                            class="form-check-label text-secondary"
-                        >
-                            {{ detail }}
-                        </label>
-                    </div>
-                </div>
-                <div v-else>
-                    <div v-for="detail in detailOptions" :key="detail">
-                        <i
-                            v-if="detailPreferences.includes(detail)"
-                            class="fa-check-circle"
-                            :class ="detailPreferences.includes(detail) ? 'text-success fas' : 'far'"
-                        />
-                        <i
-                            v-else-if="detailNegativePreferences.includes(detail)"
-                            class="fa-times-circle"
-                            :class="detailNegativePreferences.includes(detail) ? 'text-danger fas' : 'far'"
-                        />
-                        <label
-                            v-if="detailPreferences.includes(detail) || detailNegativePreferences.includes(detail)"
                             class="form-check-label text-secondary ml-1"
                         >
                             {{ detail }}
                         </label>
                     </div>
-                    <small
-                        v-if="!detailPreferences.length && !detailNegativePreferences.length"
-                        class="text-secondary ml-1"
-                    >
-                    None...
-                    </small>
+                    
+                    <!-- Custom detail preferences -->
+                    <div>
+                        <div v-for="detail in customDetailPreferences" :key="detail">
+                            <i
+                                class="fa-check-circle text-success fas"
+                                :class="[loggedInUser && loggedInUser._id === selectedUser.id ? 'fake-checkbox' : '', processing ? 'fake-disabled' : '']"
+                                @click="loggedInUser && loggedInUser._id === selectedUser.id ? removeCustomDetail(detail, $event) : null"
+                            />
+                            <label class="form-check-label text-secondary ml-1">
+                                {{ detail }}
+                            </label>
+                            <i
+                                v-if="loggedInUser && (loggedInUser._id === selectedUser.id || loggedInUser.hasFullReadAccess)"
+                                class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
+                                :class="[processing ? 'fake-disabled' : '']"
+                                @click="removeCustomDetail(detail, $event)"
+                                title="Remove custom detail preference"
+                            />
+                        </div>
+                        <div class="d-flex mt-2">
+                            <input 
+                                v-model="customDetailInput"
+                                type="text" 
+                                class="form-control form-control-sm" 
+                                placeholder="Add custom detail preference..."
+                                @keyup.enter="addCustomDetail"
+                            />
+                            <button 
+                                class="btn btn-outline-success btn-sm ml-2" 
+                                type="button" 
+                                @click="addCustomDetail"
+                                :disabled="!customDetailInput.trim() || processing"
+                            >
+                                Add
+                            </button>
+                        </div>
+                    </div>
                 </div>
+            <div v-else>
+                <div v-for="detail in detailOptions" :key="detail">
+                    <i
+                        v-if="detailPreferences.includes(detail)"
+                        class="fa-check-circle"
+                        :class ="detailPreferences.includes(detail) ? 'text-success fas' : 'far'"
+                    />
+                    <i
+                        v-else-if="detailNegativePreferences.includes(detail)"
+                        class="fa-times-circle"
+                        :class="detailNegativePreferences.includes(detail) ? 'text-danger fas' : 'far'"
+                    />
+                    <label
+                        v-if="detailPreferences.includes(detail) || detailNegativePreferences.includes(detail)"
+                        class="form-check-label text-secondary ml-1"
+                    >
+                        {{ detail }}
+                    </label>
+                </div>
+                <!-- Display custom detail preferences for other users -->
+                <div v-for="detail in customDetailPreferences" :key="detail">
+                    <i
+                        class="fa-check-circle text-success fas"
+                    />
+                    <label class="form-check-label text-secondary ml-1">
+                        {{ detail }}
+                    </label>
+                    <i
+                        v-if="loggedInUser && loggedInUser.hasFullReadAccess"
+                        class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
+                        :class="[processing ? 'fake-disabled' : '']"
+                        @click="removeCustomDetail(detail, $event)"
+                        title="Remove custom detail preference"
+                    />
+                </div>
+                <small
+                    v-if="!detailPreferences.length && !detailNegativePreferences.length && !customDetailPreferences.length"
+                    class="text-secondary ml-1"
+                >
+                None...
+                </small>
             </div>
+        </div>
 
-            <div class="col-sm-4 mb-4">
+        <div class="col-sm-4 mb-4">
                 <h6>Mapper preferences</h6>
 
                 <div v-if="loggedInUser && loggedInUser._id === selectedUser.id">
@@ -408,39 +628,93 @@
                             @click="updateMapperPreferences(mapper, false, $event)"
                         />
                         <label
-                            class="form-check-label text-secondary"
-                        >
-                            {{ mapper }}
-                        </label>
-                    </div>
-                </div>
-                <div v-else>
-                    <div v-for="mapper in mapperOptions" :key="mapper">
-                        <i
-                            v-if="mapperPreferences.includes(mapper)"
-                            class="fa-check-circle"
-                            :class ="mapperPreferences.includes(mapper) ? 'text-success fas' : 'far'"
-                        />
-                        <i
-                            v-else-if="mapperNegativePreferences.includes(mapper)"
-                            class="fa-times-circle"
-                            :class="mapperNegativePreferences.includes(mapper) ? 'text-danger fas' : 'far'"
-                        />
-                        <label
-                            v-if="mapperPreferences.includes(mapper) || mapperNegativePreferences.includes(mapper)"
                             class="form-check-label text-secondary ml-1"
                         >
                             {{ mapper }}
                         </label>
                     </div>
-                    <small
-                        v-if="!mapperPreferences.length && !mapperNegativePreferences.length"
-                        class="text-secondary ml-1"
-                    >
-                    None...
-                    </small>
+                    
+                    <!-- Custom mapper preferences -->
+                    <div>
+                        <div v-for="mapper in customMapperPreferences" :key="mapper">
+                            <i
+                                class="fa-check-circle text-success fas"
+                                :class="[loggedInUser && loggedInUser._id === selectedUser.id ? 'fake-checkbox' : '', processing ? 'fake-disabled' : '']"
+                                @click="loggedInUser && loggedInUser._id === selectedUser.id ? removeCustomMapper(mapper, $event) : null"
+                            />
+                            <label class="form-check-label text-secondary ml-1">
+                                {{ mapper }}
+                            </label>
+                            <i
+                                v-if="loggedInUser && (loggedInUser._id === selectedUser.id || loggedInUser.hasFullReadAccess)"
+                                class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
+                                :class="[processing ? 'fake-disabled' : '']"
+                                @click="removeCustomMapper(mapper, $event)"
+                                title="Remove custom mapper preference"
+                            />
+                        </div>
+                        <div class="d-flex mt-2">
+                            <input 
+                                v-model="customMapperInput"
+                                type="text" 
+                                class="form-control form-control-sm" 
+                                placeholder="Add custom mapper preference..."
+                                @keyup.enter="addCustomMapper"
+                            />
+                            <button 
+                                class="btn btn-outline-success btn-sm ml-2" 
+                                type="button" 
+                                @click="addCustomMapper"
+                                :disabled="!customMapperInput.trim() || processing"
+                            >
+                                Add
+                            </button>
+                        </div>
+                    </div>
                 </div>
+            <div v-else>
+                <div v-for="mapper in mapperOptions" :key="mapper">
+                    <i
+                        v-if="mapperPreferences.includes(mapper)"
+                        class="fa-check-circle"
+                        :class ="mapperPreferences.includes(mapper) ? 'text-success fas' : 'far'"
+                    />
+                    <i
+                        v-else-if="mapperNegativePreferences.includes(mapper)"
+                        class="fa-times-circle"
+                        :class="mapperNegativePreferences.includes(mapper) ? 'text-danger fas' : 'far'"
+                    />
+                    <label
+                        v-if="mapperPreferences.includes(mapper) || mapperNegativePreferences.includes(mapper)"
+                        class="form-check-label text-secondary ml-1"
+                    >
+                        {{ mapper }}
+                    </label>
+                </div>
+                <!-- Display custom mapper preferences for other users -->
+                <div v-for="mapper in customMapperPreferences" :key="mapper">
+                    <i
+                        class="fa-check-circle text-success fas"
+                    />
+                    <label class="form-check-label text-secondary ml-1">
+                        {{ mapper }}
+                    </label>
+                    <i
+                        v-if="loggedInUser && loggedInUser.hasFullReadAccess"
+                        class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
+                        :class="[processing ? 'fake-disabled' : '']"
+                        @click="removeCustomMapper(mapper, $event)"
+                        title="Remove custom mapper preference"
+                    />
+                </div>
+                <small
+                    v-if="!mapperPreferences.length && !mapperNegativePreferences.length && !customMapperPreferences.length"
+                    class="text-secondary ml-1"
+                >
+                None...
+                </small>
             </div>
+        </div>
         </div>
     </div>
 </template>
@@ -456,8 +730,12 @@ export default {
         return {
             genrePreferences: [],
             genreNegativePreferences: [],
+            customGenrePreferences: [],
+            customGenreInput: '',
             languagePreferences: [],
             languageNegativePreferences: [],
+            customLanguagePreferences: [],
+            customLanguageInput: '',
             osuStylePreferences: [],
             osuStyleNegativePreferences: [],
             taikoStylePreferences: [],
@@ -470,8 +748,14 @@ export default {
             maniaKeymodeNegativePreferences: [],
             detailPreferences: [],
             detailNegativePreferences: [],
+            customDetailPreferences: [],
+            customDetailInput: '',
             mapperPreferences: [],
             mapperNegativePreferences: [],
+            customMapperPreferences: [],
+            customMapperInput: '',
+            customMapPreferences: [],
+            customMapInput: '',
             genreOptions: GenrePreferences,
             languageOptions: LanguagePreferences,
             osuStyleOptions: OsuStylePreferences,
@@ -497,8 +781,10 @@ export default {
         selectedUser() {
             this.genrePreferences = this.selectedUser.genrePreferences;
             this.genreNegativePreferences = this.selectedUser.genreNegativePreferences;
+            this.customGenrePreferences = this.selectedUser.customGenrePreferences || [];
             this.languagePreferences = this.selectedUser.languagePreferences;
             this.languageNegativePreferences = this.selectedUser.languageNegativePreferences;
+            this.customLanguagePreferences = this.selectedUser.customLanguagePreferences || [];
             this.osuStylePreferences = this.selectedUser.osuStylePreferences;
             this.osuStyleNegativePreferences = this.selectedUser.osuStyleNegativePreferences;
             this.taikoStylePreferences = this.selectedUser.taikoStylePreferences;
@@ -511,16 +797,21 @@ export default {
             this.maniaKeymodeNegativePreferences = this.selectedUser.maniaKeymodeNegativePreferences;
             this.detailPreferences = this.selectedUser.detailPreferences;
             this.detailNegativePreferences = this.selectedUser.detailNegativePreferences;
+            this.customDetailPreferences = this.selectedUser.customDetailPreferences || [];
             this.mapperPreferences = this.selectedUser.mapperPreferences;
             this.mapperNegativePreferences = this.selectedUser.mapperNegativePreferences;
+            this.customMapperPreferences = this.selectedUser.customMapperPreferences || [];
+            this.customMapPreferences = this.selectedUser.customMapPreferences || [];
             this.modes = this.getModes();
         },
     },
     mounted () {
         this.genrePreferences = this.selectedUser.genrePreferences;
         this.genreNegativePreferences = this.selectedUser.genreNegativePreferences;
+        this.customGenrePreferences = this.selectedUser.customGenrePreferences || [];
         this.languagePreferences = this.selectedUser.languagePreferences;
         this.languageNegativePreferences = this.selectedUser.languageNegativePreferences;
+        this.customLanguagePreferences = this.selectedUser.customLanguagePreferences || [];
         this.osuStylePreferences = this.selectedUser.osuStylePreferences;
         this.osuStyleNegativePreferences = this.selectedUser.osuStyleNegativePreferences;
         this.taikoStylePreferences = this.selectedUser.taikoStylePreferences;
@@ -533,8 +824,11 @@ export default {
         this.maniaKeymodeNegativePreferences = this.selectedUser.maniaKeymodeNegativePreferences;
         this.detailPreferences = this.selectedUser.detailPreferences;
         this.detailNegativePreferences = this.selectedUser.detailNegativePreferences;
+        this.customDetailPreferences = this.selectedUser.customDetailPreferences || [];
         this.mapperPreferences = this.selectedUser.mapperPreferences;
         this.mapperNegativePreferences = this.selectedUser.mapperNegativePreferences;
+        this.customMapperPreferences = this.selectedUser.customMapperPreferences || [];
+        this.customMapPreferences = this.selectedUser.customMapPreferences || [];
         this.modes = this.getModes();
     },
     methods: {
@@ -657,6 +951,221 @@ export default {
             user.mapperNegativePreferences = data.user.mapperNegativePreferences;
             this.$store.commit('usersHome/updateUser', user);
             
+            this.processing = false;
+        },
+        addCustomGenre() {
+            const genre = this.customGenreInput.trim();
+            if (!genre || this.customGenrePreferences.includes(genre)) {
+                this.customGenreInput = '';
+                return;
+            }
+            this.updateCustomGenrePreferences(genre);
+            this.customGenreInput = '';
+        },
+        async updateCustomGenrePreferences(genre, e) {
+            this.processing = true;
+            const data = await this.$http.executePost(`/users/${this.loggedInUser.id}/updateCustomGenrePreferences`, {
+                genre,
+            }, e);
+
+            this.customGenrePreferences = data.user.customGenrePreferences || [];
+
+            let user = this.selectedUser;
+            user.customGenrePreferences = data.user.customGenrePreferences || [];
+            this.$store.commit('usersHome/updateUser', user);
+
+            this.processing = false;
+        },
+        async removeCustomGenre(genre, e) {
+            // Show confirm dialog for moderators removing other users' preferences
+            if (this.loggedInUser._id !== this.selectedUser.id && this.loggedInUser.hasFullReadAccess) {
+                const result = confirm(`Are you sure?`);
+                if (!result) return;
+            }
+
+            this.processing = true;
+            const data = await this.$http.executePost(`/users/${this.selectedUser.id}/removeCustomGenre`, {
+                genre,
+            }, e);
+
+            this.customGenrePreferences = data.user.customGenrePreferences || [];
+
+            let user = this.selectedUser;
+            user.customGenrePreferences = data.user.customGenrePreferences || [];
+            this.$store.commit('usersHome/updateUser', user);
+
+            this.processing = false;
+        },
+        addCustomLanguage() {
+            const language = this.customLanguageInput.trim();
+            if (!language || this.customLanguagePreferences.includes(language)) {
+                this.customLanguageInput = '';
+                return;
+            }
+            this.updateCustomLanguagePreferences(language);
+            this.customLanguageInput = '';
+        },
+        async updateCustomLanguagePreferences(language, e) {
+            this.processing = true;
+            const data = await this.$http.executePost(`/users/${this.loggedInUser.id}/updateCustomLanguagePreferences`, {
+                language,
+            }, e);
+
+            this.customLanguagePreferences = data.user.customLanguagePreferences || [];
+
+            let user = this.selectedUser;
+            user.customLanguagePreferences = data.user.customLanguagePreferences || [];
+            this.$store.commit('usersHome/updateUser', user);
+
+            this.processing = false;
+        },
+        async removeCustomLanguage(language, e) {
+            // Show confirm dialog for moderators removing other users' preferences
+            if (this.loggedInUser._id !== this.selectedUser.id && this.loggedInUser.hasFullReadAccess) {
+                const result = confirm(`Are you sure?`);
+                if (!result) return;
+            }
+
+            this.processing = true;
+            const data = await this.$http.executePost(`/users/${this.selectedUser.id}/removeCustomLanguage`, {
+                language,
+            }, e);
+
+            this.customLanguagePreferences = data.user.customLanguagePreferences || [];
+
+            let user = this.selectedUser;
+            user.customLanguagePreferences = data.user.customLanguagePreferences || [];
+            this.$store.commit('usersHome/updateUser', user);
+
+            this.processing = false;
+        },
+        addCustomMap() {
+            const map = this.customMapInput.trim();
+            if (!map || this.customMapPreferences.includes(map)) {
+                this.customMapInput = '';
+                return;
+            }
+            this.updateCustomMapPreferences(map);
+            this.customMapInput = '';
+        },
+        async updateCustomMapPreferences(map, e) {
+            this.processing = true;
+            const data = await this.$http.executePost(`/users/${this.selectedUser.id}/updateCustomMapPreferences`, {
+                map,
+            }, e);
+
+            this.customMapPreferences = data.user.customMapPreferences || [];
+
+            let user = this.selectedUser;
+            user.customMapPreferences = data.user.customMapPreferences || [];
+            this.$store.commit('usersHome/updateUser', user);
+
+            this.processing = false;
+        },
+        async removeCustomMap(map, e) {
+            // Show confirm dialog for moderators removing other users' preferences
+            if (this.loggedInUser._id !== this.selectedUser.id && this.loggedInUser.hasFullReadAccess) {
+                const result = confirm(`Are you sure?`);
+                if (!result) return;
+            }
+
+            this.processing = true;
+            const data = await this.$http.executePost(`/users/${this.selectedUser.id}/removeCustomMap`, {
+                map,
+            }, e);
+
+            this.customMapPreferences = data.user.customMapPreferences || [];
+
+            let user = this.selectedUser;
+            user.customMapPreferences = data.user.customMapPreferences || [];
+            this.$store.commit('usersHome/updateUser', user);
+
+            this.processing = false;
+        },
+        addCustomDetail() {
+            const detail = this.customDetailInput.trim();
+            if (!detail || this.customDetailPreferences.includes(detail)) {
+                this.customDetailInput = '';
+                return;
+            }
+            this.updateCustomDetailPreferences(detail);
+            this.customDetailInput = '';
+        },
+        async updateCustomDetailPreferences(detail, e) {
+            this.processing = true;
+            const data = await this.$http.executePost(`/users/${this.selectedUser.id}/updateCustomDetailPreferences`, {
+                detail,
+            }, e);
+
+            this.customDetailPreferences = data.user.customDetailPreferences || [];
+
+            let user = this.selectedUser;
+            user.customDetailPreferences = data.user.customDetailPreferences || [];
+            this.$store.commit('usersHome/updateUser', user);
+
+            this.processing = false;
+        },
+        async removeCustomDetail(detail, e) {
+            // Show confirm dialog for moderators removing other users' preferences
+            if (this.loggedInUser._id !== this.selectedUser.id && this.loggedInUser.hasFullReadAccess) {
+                const result = confirm(`Are you sure?`);
+                if (!result) return;
+            }
+
+            this.processing = true;
+            const data = await this.$http.executePost(`/users/${this.selectedUser.id}/removeCustomDetail`, {
+                detail,
+            }, e);
+
+            this.customDetailPreferences = data.user.customDetailPreferences || [];
+
+            let user = this.selectedUser;
+            user.customDetailPreferences = data.user.customDetailPreferences || [];
+            this.$store.commit('usersHome/updateUser', user);
+
+            this.processing = false;
+        },
+        addCustomMapper() {
+            const mapper = this.customMapperInput.trim();
+            if (!mapper || this.customMapperPreferences.includes(mapper)) {
+                this.customMapperInput = '';
+                return;
+            }
+            this.updateCustomMapperPreferences(mapper);
+            this.customMapperInput = '';
+        },
+        async updateCustomMapperPreferences(mapper, e) {
+            this.processing = true;
+            const data = await this.$http.executePost(`/users/${this.selectedUser.id}/updateCustomMapperPreferences`, {
+                mapper,
+            }, e);
+
+            this.customMapperPreferences = data.user.customMapperPreferences || [];
+
+            let user = this.selectedUser;
+            user.customMapperPreferences = data.user.customMapperPreferences || [];
+            this.$store.commit('usersHome/updateUser', user);
+
+            this.processing = false;
+        },
+        async removeCustomMapper(mapper, e) {
+            // Show confirm dialog for moderators removing other users' preferences
+            if (this.loggedInUser._id !== this.selectedUser.id && this.loggedInUser.hasFullReadAccess) {
+                const result = confirm(`Are you sure?`);
+                if (!result) return;
+            }
+
+            this.processing = true;
+            const data = await this.$http.executePost(`/users/${this.selectedUser.id}/removeCustomMapper`, {
+                mapper,
+            }, e);
+
+            this.customMapperPreferences = data.user.customMapperPreferences || [];
+
+            let user = this.selectedUser;
+            user.customMapperPreferences = data.user.customMapperPreferences || [];
+            this.$store.commit('usersHome/updateUser', user);
+
             this.processing = false;
         },
     },

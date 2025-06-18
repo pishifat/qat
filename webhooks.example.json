@@ -94,5 +94,9 @@
         "token": "",
         "threadId": "",
         "role": ""
+    },
+    "preferenceModerationWebhook": {
+        "id": "",
+        "token": ""
     }
 }

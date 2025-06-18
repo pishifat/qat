@@ -704,6 +704,441 @@ router.post('/:id/updateLanguagePreferences', middlewares.isLoggedIn, middleware
     );
 });
 
+/* POST update custom genre preferences */
+router.post('/:id/updateCustomGenrePreferences', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
+    const user = await User.findById(req.params.id).orFail();
+
+    if (req.session.mongoId != user.id) {
+        return res.json({
+            error: 'Unauthorized',
+        });
+    }
+
+    const genre = req.body.genre.trim();
+
+    if (!genre || genre.length === 0) {
+        return res.json({
+            error: 'Genre cannot be empty',
+        });
+    }
+
+    if (!user.customGenrePreferences.includes(genre)) {
+        user.customGenrePreferences.push(genre);
+    }
+
+    await user.save();
+
+    res.json({
+        success: 'Updated',
+        user,
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Added custom genre preference "${genre}" for "${user.username}"`,
+        'user',
+        user._id
+    );
+
+    discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            description: `Added [**${user.username}**'s custom genre preference](https://bn.mappersguild.com/home?id=${user.id}): **${genre}**`,
+            color: discord.webhookColors.lightYellow,
+        }],
+        'preferenceModeration'
+    );
+});
+
+/* POST remove custom genre */
+router.post('/:id/removeCustomGenre', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
+    const user = await User.findById(req.params.id).orFail();
+
+    if (req.session.mongoId != user.id && !res.locals.userRequest.hasFullReadAccess) {
+        return res.json({
+            error: 'Unauthorized',
+        });
+    }
+
+    const genre = req.body.genre;
+
+    if (user.customGenrePreferences.includes(genre)) {
+        const i = user.customGenrePreferences.indexOf(genre);
+        user.customGenrePreferences.splice(i, 1);
+    }
+
+    await user.save();
+
+    res.json({
+        success: 'Removed',
+        user,
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Removed custom genre preference "${genre}" for "${user.username}"`,
+        'user',
+        user._id
+    );
+
+    discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            description: `Removed [**${user.username}**'s custom genre preference](https://bn.mappersguild.com/home?id=${user.id}): **${genre}**`,
+            color: discord.webhookColors.darkOrange,
+        }],
+        'preferenceModeration'
+    );
+});
+
+/* POST update custom language preferences */
+router.post('/:id/updateCustomLanguagePreferences', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
+    const user = await User.findById(req.params.id).orFail();
+
+    if (req.session.mongoId != user.id) {
+        return res.json({
+            error: 'Unauthorized',
+        });
+    }
+
+    const language = req.body.language.trim();
+
+    if (!language || language.length === 0) {
+        return res.json({
+            error: 'Language cannot be empty',
+        });
+    }
+
+    if (!user.customLanguagePreferences.includes(language)) {
+        user.customLanguagePreferences.push(language);
+    }
+
+    await user.save();
+
+    res.json({
+        success: 'Updated',
+        user,
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Added custom language preference "${language}" for "${user.username}"`,
+        'user',
+        user._id
+    );
+
+    discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            description: `Added [**${user.username}**'s custom language preference](https://bn.mappersguild.com/home?id=${user.id}): **${language}**`,
+            color: discord.webhookColors.lightYellow,
+        }],
+        'preferenceModeration'
+    );
+});
+
+/* POST remove custom language */
+router.post('/:id/removeCustomLanguage', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
+    const user = await User.findById(req.params.id).orFail();
+
+    if (req.session.mongoId != user.id && !res.locals.userRequest.hasFullReadAccess) {
+        return res.json({
+            error: 'Unauthorized',
+        });
+    }
+
+    const language = req.body.language;
+
+    if (user.customLanguagePreferences.includes(language)) {
+        const i = user.customLanguagePreferences.indexOf(language);
+        user.customLanguagePreferences.splice(i, 1);
+    }
+
+    await user.save();
+
+    res.json({
+        success: 'Removed',
+        user,
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Removed custom language preference "${language}" for "${user.username}"`,
+        'user',
+        user._id
+    );
+
+    discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            description: `Removed [**${user.username}**'s custom language preference](https://bn.mappersguild.com/home?id=${user.id}): **${language}**`,
+            color: discord.webhookColors.darkOrange,
+        }],
+        'preferenceModeration'
+    );
+});
+
+/* POST update custom map preferences */
+router.post('/:id/updateCustomMapPreferences', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
+    const user = await User.findById(req.params.id).orFail();
+
+    if (req.session.mongoId != user.id) {
+        return res.json({
+            error: 'Unauthorized',
+        });
+    }
+
+    const map = req.body.map.trim();
+
+    if (!map || map.length === 0) {
+        return res.json({
+            error: 'Map preference cannot be empty',
+        });
+    }
+
+    if (!user.customMapPreferences.includes(map)) {
+        user.customMapPreferences.push(map);
+    }
+
+    await user.save();
+
+    res.json({
+        success: 'Updated',
+        user,
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Added custom map preference "${map}" for "${user.username}"`,
+        'user',
+        user._id
+    );
+
+    discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            description: `Added [**${user.username}**'s custom map preference](https://bn.mappersguild.com/home?id=${user.id}): **${map}**`,
+            color: discord.webhookColors.lightYellow,
+        }],
+        'preferenceModeration'
+    );
+});
+
+/* POST remove custom map */
+router.post('/:id/removeCustomMap', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
+    const user = await User.findById(req.params.id).orFail();
+
+    if (req.session.mongoId != user.id && !res.locals.userRequest.hasFullReadAccess) {
+        return res.json({
+            error: 'Unauthorized',
+        });
+    }
+
+    const map = req.body.map;
+
+    if (user.customMapPreferences.includes(map)) {
+        const i = user.customMapPreferences.indexOf(map);
+        user.customMapPreferences.splice(i, 1);
+    }
+
+    await user.save();
+
+    res.json({
+        success: 'Removed',
+        user,
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Removed custom map preference "${map}" for "${user.username}"`,
+        'user',
+        user._id
+    );
+
+    discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            description: `Removed [**${user.username}**'s custom map preference](https://bn.mappersguild.com/home?id=${user.id}): **${map}**`,
+            color: discord.webhookColors.darkOrange,
+        }],
+        'preferenceModeration'
+    );
+});
+
+/* POST update custom detail preferences */
+router.post('/:id/updateCustomDetailPreferences', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
+    const user = await User.findById(req.params.id).orFail();
+
+    if (req.session.mongoId != user.id) {
+        return res.json({
+            error: 'Unauthorized',
+        });
+    }
+
+    const detail = req.body.detail.trim();
+
+    if (!detail || detail.length === 0) {
+        return res.json({
+            error: 'Detail preference cannot be empty',
+        });
+    }
+
+    if (!user.customDetailPreferences.includes(detail)) {
+        user.customDetailPreferences.push(detail);
+    }
+
+    await user.save();
+
+    res.json({
+        success: 'Updated',
+        user,
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Added custom detail preference "${detail}" for "${user.username}"`,
+        'user',
+        user._id
+    );
+
+    discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            description: `Added [**${user.username}**'s custom detail preference](https://bn.mappersguild.com/home?id=${user.id}): **${detail}**`,
+            color: discord.webhookColors.lightYellow,
+        }],
+        'preferenceModeration'
+    );
+});
+
+/* POST remove custom detail */
+router.post('/:id/removeCustomDetail', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
+    const user = await User.findById(req.params.id).orFail();
+
+    if (req.session.mongoId != user.id && !res.locals.userRequest.hasFullReadAccess) {
+        return res.json({
+            error: 'Unauthorized',
+        });
+    }
+
+    const detail = req.body.detail;
+
+    if (user.customDetailPreferences.includes(detail)) {
+        const i = user.customDetailPreferences.indexOf(detail);
+        user.customDetailPreferences.splice(i, 1);
+    }
+
+    await user.save();
+
+    res.json({
+        success: 'Removed',
+        user,
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Removed custom detail preference "${detail}" for "${user.username}"`,
+        'user',
+        user._id
+    );
+
+    discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            description: `Removed [**${user.username}**'s custom detail preference](https://bn.mappersguild.com/home?id=${user.id}): **${detail}**`,
+            color: discord.webhookColors.darkOrange,
+        }],
+        'preferenceModeration'
+    );
+});
+
+/* POST update custom mapper preferences */
+router.post('/:id/updateCustomMapperPreferences', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
+    const user = await User.findById(req.params.id).orFail();
+
+    if (req.session.mongoId != user.id) {
+        return res.json({
+            error: 'Unauthorized',
+        });
+    }
+
+    const mapper = req.body.mapper.trim();
+
+    if (!mapper || mapper.length === 0) {
+        return res.json({
+            error: 'Mapper preference cannot be empty',
+        });
+    }
+
+    if (!user.customMapperPreferences.includes(mapper)) {
+        user.customMapperPreferences.push(mapper);
+    }
+
+    await user.save();
+
+    res.json({
+        success: 'Updated',
+        user,
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Added custom mapper preference "${mapper}" for "${user.username}"`,
+        'user',
+        user._id
+    );
+
+    discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            description: `Added [**${user.username}**'s custom mapper preference](https://bn.mappersguild.com/home?id=${user.id}): **${mapper}**`,
+            color: discord.webhookColors.lightYellow,
+        }],
+        'preferenceModeration'
+    );
+});
+
+/* POST remove custom mapper */
+router.post('/:id/removeCustomMapper', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
+    const user = await User.findById(req.params.id).orFail();
+
+    if (req.session.mongoId != user.id && !res.locals.userRequest.hasFullReadAccess) {
+        return res.json({
+            error: 'Unauthorized',
+        });
+    }
+
+    const mapper = req.body.mapper;
+
+    if (user.customMapperPreferences.includes(mapper)) {
+        const i = user.customMapperPreferences.indexOf(mapper);
+        user.customMapperPreferences.splice(i, 1);
+    }
+
+    await user.save();
+
+    res.json({
+        success: 'Removed',
+        user,
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Removed custom mapper preference "${mapper}" for "${user.username}"`,
+        'user',
+        user._id
+    );
+
+    discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            description: `Removed [**${user.username}**'s custom mapper preference](https://bn.mappersguild.com/home?id=${user.id}): **${mapper}**`,
+            color: discord.webhookColors.darkOrange,
+        }],
+        'preferenceModeration'
+    );
+});
+
 /* POST update map style preferences */
 router.post('/:id/updateStylePreferences/:mode', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
     const user = await User.findById(req.params.id).orFail();

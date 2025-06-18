@@ -59,6 +59,9 @@ function getWebhook(webhook) {
         case 'securityCheck': 
             return url += `${config.securityCheckWebhook.id}/${config.securityCheckWebhook.token}?thread_id=${config.securityCheckWebhook.threadId}`;
 
+        case 'preferenceModeration':
+            return url += `${config.preferenceModerationWebhook.id}/${config.preferenceModerationWebhook.token}`;
+
         default:
             return { error: 'no webhook specified' };
     }

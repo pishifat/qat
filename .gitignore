@@ -33,3 +33,4 @@ public/index.html
 .vscode/
 *.csv
 yarn.lock
+.claude/

@@ -4,10 +4,10 @@ const webhookColors = {
     red: 15607337,            // overdueNotifications, problemReport, lowActivity
 
     lightOrange: 15639928,    // enableBnEvaluators, suggestionReport
-    darkOrange: 7092736,      // pending badge
+    darkOrange: 7092736,      // pending badge, removeCustomPreference (genre, language, map, detail, mapper)
     orange: 15169835,         // replaceUser, switchBnEvaluator, progressive eval assignment
 
-    lightYellow: 16777104,    // rejoinBnRequest
+    lightYellow: 16777104,    // rejoinBnRequest, addCustomPreference (genre, language, map, detail, mapper)
     darkYellow: 7105536,      // concludeDiscussionVote, send auto activity warning
     yellow: 16777022,         // submitMediationDiscussionVote
 
