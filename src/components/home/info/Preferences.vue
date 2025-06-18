@@ -251,7 +251,7 @@
                             </label>
                         </div>
                         <small
-                            v-if="!osuStylePreferences.length && !osuStyleNegativePreferences.length"
+                            v-if="!osuStylePreferences.length && !osuStyleNegativePreferences.length && !customMapPreferences.length"
                             class="text-secondary ml-1"
                         >
                         None... {{ modes.length > 1 ? '(osu!)' : '' }}
@@ -298,7 +298,7 @@
                             </label>
                         </div>
                         <small
-                            v-if="!taikoStylePreferences.length && !taikoStyleNegativePreferences.length"
+                            v-if="!taikoStylePreferences.length && !taikoStyleNegativePreferences.length && !customMapPreferences.length"
                             class="text-secondary ml-1"
                         >
                         None... {{ modes.length > 1 ? '(osu!taiko)' : '' }}
@@ -345,7 +345,7 @@
                             </label>
                         </div>
                         <small
-                            v-if="!catchStylePreferences.length && !catchStyleNegativePreferences.length"
+                            v-if="!catchStylePreferences.length && !catchStyleNegativePreferences.length && !customMapPreferences.length"
                             class="text-secondary ml-1"
                         >
                         None... {{ modes.length > 1 ? '(osu!catch)' : '' }}
@@ -392,7 +392,7 @@
                             </label>
                         </div>
                         <small
-                            v-if="!maniaStylePreferences.length && !maniaStyleNegativePreferences.length"
+                            v-if="!maniaStylePreferences.length && !maniaStyleNegativePreferences.length && !customMapPreferences.length"
                             class="text-secondary ml-1"
                         >
                         None... {{ modes.length > 1 ? '(osu!mania)' : '' }}
