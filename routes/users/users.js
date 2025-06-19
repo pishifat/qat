@@ -14,7 +14,7 @@ const getGeneralEvents = require('../evaluations/bnEval').getGeneralEvents;
 const getUserModsCount = require('../../helpers/scrap').getUserModsCount;
 const findAdditionalBnMonths = require('../../helpers/scrap').findAdditionalBnMonths;
 const util = require('../../helpers/util');
-const { BnEvaluationConsensus, BnEvaluationAddition, AppEvaluationConsensus } = require('../../shared/enums');
+const { BnEvaluationConsensus, BnEvaluationAddition, AppEvaluationConsensus, GenrePreferences, LanguagePreferences, DetailPreferences, MapperPreferences, OsuStylePreferences, TaikoStylePreferences, CatchStylePreferences, ManiaStylePreferences } = require('../../shared/enums');
 const { websocketManager } = require("../../helpers/websocket");
 
 const router = express.Router();
@@ -722,6 +722,12 @@ router.post('/:id/updateCustomGenrePreferences', middlewares.isLoggedIn, middlew
         });
     }
 
+    if (GenrePreferences.map(g => g.toLowerCase()).includes(genre.toLowerCase())) {
+        return res.json({
+            error: 'This genre already exists in the standard options',
+        });
+    }
+
     if (!user.customGenrePreferences.includes(genre)) {
         user.customGenrePreferences.push(genre);
     }
@@ -806,6 +812,12 @@ router.post('/:id/updateCustomLanguagePreferences', middlewares.isLoggedIn, midd
     if (!language || language.length === 0) {
         return res.json({
             error: 'Language cannot be empty',
+        });
+    }
+
+    if (LanguagePreferences.map(l => l.toLowerCase()).includes(language.toLowerCase())) {
+        return res.json({
+            error: 'This language already exists in the standard options',
         });
     }
 
@@ -896,6 +908,16 @@ router.post('/:id/updateCustomMapPreferences', middlewares.isLoggedIn, middlewar
         });
     }
 
+    const mapLower = map.toLowerCase();
+    if (OsuStylePreferences.map(p => p.toLowerCase()).includes(mapLower) || 
+        TaikoStylePreferences.map(p => p.toLowerCase()).includes(mapLower) || 
+        CatchStylePreferences.map(p => p.toLowerCase()).includes(mapLower) || 
+        ManiaStylePreferences.map(p => p.toLowerCase()).includes(mapLower)) {
+        return res.json({
+            error: 'This map preference already exists in the standard options',
+        });
+    }
+
     if (!user.customMapPreferences.includes(map)) {
         user.customMapPreferences.push(map);
     }
@@ -983,6 +1005,12 @@ router.post('/:id/updateCustomDetailPreferences', middlewares.isLoggedIn, middle
         });
     }
 
+    if (DetailPreferences.map(d => d.toLowerCase()).includes(detail.toLowerCase())) {
+        return res.json({
+            error: 'This detail preference already exists in the standard options',
+        });
+    }
+
     if (!user.customDetailPreferences.includes(detail)) {
         user.customDetailPreferences.push(detail);
     }
@@ -1067,6 +1095,12 @@ router.post('/:id/updateCustomMapperPreferences', middlewares.isLoggedIn, middle
     if (!mapper || mapper.length === 0) {
         return res.json({
             error: 'Mapper preference cannot be empty',
+        });
+    }
+
+    if (MapperPreferences.map(m => m.toLowerCase()).includes(mapper.toLowerCase())) {
+        return res.json({
+            error: 'This mapper preference already exists in the standard options',
         });
     }
 

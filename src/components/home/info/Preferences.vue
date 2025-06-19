@@ -964,17 +964,19 @@ export default {
         },
         async updateCustomGenrePreferences(genre, e) {
             this.processing = true;
-            const data = await this.$http.executePost(`/users/${this.loggedInUser.id}/updateCustomGenrePreferences`, {
-                genre,
-            }, e);
+            try {
+                const data = await this.$http.executePost(`/users/${this.loggedInUser.id}/updateCustomGenrePreferences`, {
+                    genre,
+                }, e);
 
-            this.customGenrePreferences = data.user.customGenrePreferences || [];
+                this.customGenrePreferences = data.user.customGenrePreferences || [];
 
-            let user = this.selectedUser;
-            user.customGenrePreferences = data.user.customGenrePreferences || [];
-            this.$store.commit('usersHome/updateUser', user);
-
-            this.processing = false;
+                let user = this.selectedUser;
+                user.customGenrePreferences = data.user.customGenrePreferences || [];
+                this.$store.commit('usersHome/updateUser', user);
+            } finally {
+                this.processing = false;
+            }
         },
         async removeCustomGenre(genre, e) {
             // Show confirm dialog for moderators removing other users' preferences
@@ -1007,17 +1009,19 @@ export default {
         },
         async updateCustomLanguagePreferences(language, e) {
             this.processing = true;
-            const data = await this.$http.executePost(`/users/${this.loggedInUser.id}/updateCustomLanguagePreferences`, {
-                language,
-            }, e);
+            try {
+                const data = await this.$http.executePost(`/users/${this.loggedInUser.id}/updateCustomLanguagePreferences`, {
+                    language,
+                }, e);
 
-            this.customLanguagePreferences = data.user.customLanguagePreferences || [];
+                this.customLanguagePreferences = data.user.customLanguagePreferences || [];
 
-            let user = this.selectedUser;
-            user.customLanguagePreferences = data.user.customLanguagePreferences || [];
-            this.$store.commit('usersHome/updateUser', user);
-
-            this.processing = false;
+                let user = this.selectedUser;
+                user.customLanguagePreferences = data.user.customLanguagePreferences || [];
+                this.$store.commit('usersHome/updateUser', user);
+            } finally {
+                this.processing = false;
+            }
         },
         async removeCustomLanguage(language, e) {
             // Show confirm dialog for moderators removing other users' preferences
@@ -1050,17 +1054,19 @@ export default {
         },
         async updateCustomMapPreferences(map, e) {
             this.processing = true;
-            const data = await this.$http.executePost(`/users/${this.selectedUser.id}/updateCustomMapPreferences`, {
-                map,
-            }, e);
+            try {
+                const data = await this.$http.executePost(`/users/${this.selectedUser.id}/updateCustomMapPreferences`, {
+                    map,
+                }, e);
 
-            this.customMapPreferences = data.user.customMapPreferences || [];
+                this.customMapPreferences = data.user.customMapPreferences || [];
 
-            let user = this.selectedUser;
-            user.customMapPreferences = data.user.customMapPreferences || [];
-            this.$store.commit('usersHome/updateUser', user);
-
-            this.processing = false;
+                let user = this.selectedUser;
+                user.customMapPreferences = data.user.customMapPreferences || [];
+                this.$store.commit('usersHome/updateUser', user);
+            } finally {
+                this.processing = false;
+            }
         },
         async removeCustomMap(map, e) {
             // Show confirm dialog for moderators removing other users' preferences
@@ -1093,17 +1099,19 @@ export default {
         },
         async updateCustomDetailPreferences(detail, e) {
             this.processing = true;
-            const data = await this.$http.executePost(`/users/${this.selectedUser.id}/updateCustomDetailPreferences`, {
-                detail,
-            }, e);
+            try {
+                const data = await this.$http.executePost(`/users/${this.selectedUser.id}/updateCustomDetailPreferences`, {
+                    detail,
+                }, e);
 
-            this.customDetailPreferences = data.user.customDetailPreferences || [];
+                this.customDetailPreferences = data.user.customDetailPreferences || [];
 
-            let user = this.selectedUser;
-            user.customDetailPreferences = data.user.customDetailPreferences || [];
-            this.$store.commit('usersHome/updateUser', user);
-
-            this.processing = false;
+                let user = this.selectedUser;
+                user.customDetailPreferences = data.user.customDetailPreferences || [];
+                this.$store.commit('usersHome/updateUser', user);
+            } finally {
+                this.processing = false;
+            }
         },
         async removeCustomDetail(detail, e) {
             // Show confirm dialog for moderators removing other users' preferences
@@ -1136,17 +1144,19 @@ export default {
         },
         async updateCustomMapperPreferences(mapper, e) {
             this.processing = true;
-            const data = await this.$http.executePost(`/users/${this.selectedUser.id}/updateCustomMapperPreferences`, {
-                mapper,
-            }, e);
+            try {
+                const data = await this.$http.executePost(`/users/${this.selectedUser.id}/updateCustomMapperPreferences`, {
+                    mapper,
+                }, e);
 
-            this.customMapperPreferences = data.user.customMapperPreferences || [];
+                this.customMapperPreferences = data.user.customMapperPreferences || [];
 
-            let user = this.selectedUser;
-            user.customMapperPreferences = data.user.customMapperPreferences || [];
-            this.$store.commit('usersHome/updateUser', user);
-
-            this.processing = false;
+                let user = this.selectedUser;
+                user.customMapperPreferences = data.user.customMapperPreferences || [];
+                this.$store.commit('usersHome/updateUser', user);
+            } finally {
+                this.processing = false;
+            }
         },
         async removeCustomMapper(mapper, e) {
             // Show confirm dialog for moderators removing other users' preferences
