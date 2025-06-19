@@ -28,12 +28,19 @@
                     <div>
                         <div v-for="genre in customGenrePreferences" :key="genre">
                             <i
+                                v-if="genre.startsWith('NOT ')"
+                                class="fa-times-circle text-danger fas"
+                                :class="[loggedInUser && loggedInUser._id === selectedUser.id ? 'fake-checkbox' : '', processing ? 'fake-disabled' : '']"
+                                @click="loggedInUser && loggedInUser._id === selectedUser.id ? removeCustomGenre(genre, $event) : null"
+                            />
+                            <i
+                                v-else
                                 class="fa-check-circle text-success fas"
                                 :class="[loggedInUser && loggedInUser._id === selectedUser.id ? 'fake-checkbox' : '', processing ? 'fake-disabled' : '']"
                                 @click="loggedInUser && loggedInUser._id === selectedUser.id ? removeCustomGenre(genre, $event) : null"
                             />
                             <label class="form-check-label text-secondary ml-1">
-                                {{ genre }}
+                                {{ genre.startsWith('NOT ') ? genre.substring(4) : genre }}
                             </label>
                             <i
                                 v-if="loggedInUser && (loggedInUser._id === selectedUser.id || loggedInUser.groups.includes('nat') || loggedInUser.groups.includes('gmt'))"
@@ -84,10 +91,15 @@
                     <!-- Display custom genres for other users -->
                     <div v-for="genre in customGenrePreferences" :key="genre">
                         <i
+                            v-if="genre.startsWith('NOT ')"
+                            class="fa-times-circle text-danger fas"
+                        />
+                        <i
+                            v-else
                             class="fa-check-circle text-success fas"
                         />
                         <label class="form-check-label text-secondary ml-1">
-                            {{ genre }}
+                            {{ genre.startsWith('NOT ') ? genre.substring(4) : genre }}
                         </label>
                         <i
                             v-if="loggedInUser && (loggedInUser.groups.includes('nat') || loggedInUser.groups.includes('gmt'))"
@@ -131,12 +143,19 @@
                     <div>
                         <div v-for="language in customLanguagePreferences" :key="language">
                             <i
+                                v-if="language.startsWith('NOT ')"
+                                class="fa-times-circle text-danger fas"
+                                :class="[loggedInUser && loggedInUser._id === selectedUser.id ? 'fake-checkbox' : '', processing ? 'fake-disabled' : '']"
+                                @click="loggedInUser && loggedInUser._id === selectedUser.id ? removeCustomLanguage(language, $event) : null"
+                            />
+                            <i
+                                v-else
                                 class="fa-check-circle text-success fas"
                                 :class="[loggedInUser && loggedInUser._id === selectedUser.id ? 'fake-checkbox' : '', processing ? 'fake-disabled' : '']"
                                 @click="loggedInUser && loggedInUser._id === selectedUser.id ? removeCustomLanguage(language, $event) : null"
                             />
                             <label class="form-check-label text-secondary ml-1">
-                                {{ language }}
+                                {{ language.startsWith('NOT ') ? language.substring(4) : language }}
                             </label>
                             <i
                                 v-if="loggedInUser && (loggedInUser._id === selectedUser.id || loggedInUser.groups.includes('nat') || loggedInUser.groups.includes('gmt'))"
@@ -187,10 +206,15 @@
                     <!-- Display custom languages for other users -->
                     <div v-for="language in customLanguagePreferences" :key="language">
                         <i
+                            v-if="language.startsWith('NOT ')"
+                            class="fa-times-circle text-danger fas"
+                        />
+                        <i
+                            v-else
                             class="fa-check-circle text-success fas"
                         />
                         <label class="form-check-label text-secondary ml-1">
-                            {{ language }}
+                            {{ language.startsWith('NOT ') ? language.substring(4) : language }}
                         </label>
                         <i
                             v-if="loggedInUser && (loggedInUser.groups.includes('nat') || loggedInUser.groups.includes('gmt'))"
@@ -405,12 +429,19 @@
                     <div>
                         <div v-for="map in customMapPreferences" :key="map">
                             <i
+                                v-if="map.startsWith('NOT ')"
+                                class="fa-times-circle text-danger fas"
+                                :class="[loggedInUser && loggedInUser._id === selectedUser.id ? 'fake-checkbox' : '', processing ? 'fake-disabled' : '']"
+                                @click="loggedInUser && loggedInUser._id === selectedUser.id ? removeCustomMap(map, $event) : null"
+                            />
+                            <i
+                                v-else
                                 class="fa-check-circle text-success fas"
                                 :class="[loggedInUser && loggedInUser._id === selectedUser.id ? 'fake-checkbox' : '', processing ? 'fake-disabled' : '']"
                                 @click="loggedInUser && loggedInUser._id === selectedUser.id ? removeCustomMap(map, $event) : null"
                             />
                             <label class="form-check-label text-secondary ml-1">
-                                {{ map }}
+                                {{ map.startsWith('NOT ') ? map.substring(4) : map }}
                             </label>
                             <i
                                 v-if="loggedInUser && (loggedInUser._id === selectedUser.id || loggedInUser.hasFullReadAccess)"
@@ -443,10 +474,15 @@
                     <!-- Display custom map preferences for other users -->
                     <div v-for="map in customMapPreferences" :key="map">
                         <i
+                            v-if="map.startsWith('NOT ')"
+                            class="fa-times-circle text-danger fas"
+                        />
+                        <i
+                            v-else
                             class="fa-check-circle text-success fas"
                         />
                         <label class="form-check-label text-secondary ml-1">
-                            {{ map }}
+                            {{ map.startsWith('NOT ') ? map.substring(4) : map }}
                         </label>
                         <i
                             v-if="loggedInUser && loggedInUser.hasFullReadAccess"
@@ -534,12 +570,19 @@
                     <div>
                         <div v-for="detail in customDetailPreferences" :key="detail">
                             <i
+                                v-if="detail.startsWith('NOT ')"
+                                class="fa-times-circle text-danger fas"
+                                :class="[loggedInUser && loggedInUser._id === selectedUser.id ? 'fake-checkbox' : '', processing ? 'fake-disabled' : '']"
+                                @click="loggedInUser && loggedInUser._id === selectedUser.id ? removeCustomDetail(detail, $event) : null"
+                            />
+                            <i
+                                v-else
                                 class="fa-check-circle text-success fas"
                                 :class="[loggedInUser && loggedInUser._id === selectedUser.id ? 'fake-checkbox' : '', processing ? 'fake-disabled' : '']"
                                 @click="loggedInUser && loggedInUser._id === selectedUser.id ? removeCustomDetail(detail, $event) : null"
                             />
                             <label class="form-check-label text-secondary ml-1">
-                                {{ detail }}
+                                {{ detail.startsWith('NOT ') ? detail.substring(4) : detail }}
                             </label>
                             <i
                                 v-if="loggedInUser && (loggedInUser._id === selectedUser.id || loggedInUser.hasFullReadAccess)"
@@ -590,10 +633,15 @@
                 <!-- Display custom detail preferences for other users -->
                 <div v-for="detail in customDetailPreferences" :key="detail">
                     <i
+                        v-if="detail.startsWith('NOT ')"
+                        class="fa-times-circle text-danger fas"
+                    />
+                    <i
+                        v-else
                         class="fa-check-circle text-success fas"
                     />
                     <label class="form-check-label text-secondary ml-1">
-                        {{ detail }}
+                        {{ detail.startsWith('NOT ') ? detail.substring(4) : detail }}
                     </label>
                     <i
                         v-if="loggedInUser && loggedInUser.hasFullReadAccess"
@@ -638,12 +686,19 @@
                     <div>
                         <div v-for="mapper in customMapperPreferences" :key="mapper">
                             <i
+                                v-if="mapper.startsWith('NOT ')"
+                                class="fa-times-circle text-danger fas"
+                                :class="[loggedInUser && loggedInUser._id === selectedUser.id ? 'fake-checkbox' : '', processing ? 'fake-disabled' : '']"
+                                @click="loggedInUser && loggedInUser._id === selectedUser.id ? removeCustomMapper(mapper, $event) : null"
+                            />
+                            <i
+                                v-else
                                 class="fa-check-circle text-success fas"
                                 :class="[loggedInUser && loggedInUser._id === selectedUser.id ? 'fake-checkbox' : '', processing ? 'fake-disabled' : '']"
                                 @click="loggedInUser && loggedInUser._id === selectedUser.id ? removeCustomMapper(mapper, $event) : null"
                             />
                             <label class="form-check-label text-secondary ml-1">
-                                {{ mapper }}
+                                {{ mapper.startsWith('NOT ') ? mapper.substring(4) : mapper }}
                             </label>
                             <i
                                 v-if="loggedInUser && (loggedInUser._id === selectedUser.id || loggedInUser.hasFullReadAccess)"
@@ -694,10 +749,15 @@
                 <!-- Display custom mapper preferences for other users -->
                 <div v-for="mapper in customMapperPreferences" :key="mapper">
                     <i
+                        v-if="mapper.startsWith('NOT ')"
+                        class="fa-times-circle text-danger fas"
+                    />
+                    <i
+                        v-else
                         class="fa-check-circle text-success fas"
                     />
                     <label class="form-check-label text-secondary ml-1">
-                        {{ mapper }}
+                        {{ mapper.startsWith('NOT ') ? mapper.substring(4) : mapper }}
                     </label>
                     <i
                         v-if="loggedInUser && loggedInUser.hasFullReadAccess"
