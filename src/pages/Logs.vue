@@ -103,6 +103,7 @@ export default {
                 'spam',
                 'notableNameChanges',
                 'documentation',
+                'charts',
             ],
             category: 'all',
             publicCategories: [
