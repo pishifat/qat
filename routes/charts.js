@@ -1,9 +1,74 @@
 const express = require('express');
 const Aiess = require('../models/aiess');
+const User = require('../models/user');
 const Logger = require('../models/log');
 const middlewares = require('../helpers/middlewares');
 
 const router = express.Router();
+
+/* GET user's ranked nominations for a specific month */
+router.get('/:id/rankedNominations/:year/:month', middlewares.isLoggedIn, async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id).orFail();
+        
+        if (req.session.mongoId != user.id) {
+            return res.json({ error: 'Unauthorized' });
+        }
+
+        const year = parseInt(req.params.year);
+        const month = parseInt(req.params.month) - 1; // Month is 0-indexed in Date constructor
+        
+        if (isNaN(year) || isNaN(month) || month < 0 || month > 11) {
+            return res.json({ error: 'Invalid year or month' });
+        }
+
+        // Create date range for ranked maps in the specified month
+        const rankStartDate = new Date(year, month, 1);
+        const rankEndDate = new Date(year, month + 1, 0); // Last day of the month
+        
+        // Look back 1 year for nominations prior to the rank month
+        const nominationStartDate = new Date(year - 1, month, 1);
+        const nominationEndDate = rankEndDate;
+
+        // Get unique user events (nominations/qualifications) from the past year
+        const modes = user.modes.length && !user.modes.includes('none') 
+            ? user.modes 
+            : ['osu', 'taiko', 'catch', 'mania'];
+        
+        const uniqueUserEvents = await Aiess.getUniqueUserEvents(
+            user.osuId,
+            nominationStartDate,
+            nominationEndDate,
+            modes,
+            ['nominate', 'qualify']
+        );
+
+        if (!uniqueUserEvents || uniqueUserEvents.length === 0) {
+            return res.json({ events: [] });
+        }
+
+        // Extract beatmapset IDs
+        const beatmapsetIds = uniqueUserEvents.map(event => event.beatmapsetId);
+
+        // Find corresponding rank events for these beatmapsets that ranked in the specified month
+        const rankEvents = await Aiess
+            .find({
+                beatmapsetId: { $in: beatmapsetIds },
+                type: 'rank',
+                timestamp: { $gte: rankStartDate, $lte: rankEndDate }
+            })
+            .sort({ timestamp: -1 });
+
+        res.json({ 
+            events: rankEvents,
+            month: req.params.month,
+            year: req.params.year
+        });
+    } catch (error) {
+        console.error('Error fetching ranked nominations:', error);
+        res.json({ error: 'Failed to fetch ranked nominations' });
+    }
+});
 
 /* GET charted events for a specific month */
 router.get('/month/:year/:month', async (req, res) => {
@@ -176,7 +241,6 @@ router.post('/:eventId/vote', middlewares.isLoggedIn, middlewares.isBnOrNat, asy
         await event.save();
 
         res.json({
-            success: true,
             action,
             upvoteCount: event.chartUpvoted.length,
             downvoteCount: event.chartDownvoted.length,

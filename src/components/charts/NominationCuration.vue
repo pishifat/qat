@@ -149,7 +149,7 @@ export default {
                     
                     monthPromises.push({
                         date,
-                        promise: this.$http.executeGet(`/users/${this.loggedInUser.id}/rankedNominations/${year}/${month}`)
+                        promise: this.$http.executeGet(`/charts/${this.loggedInUser.id}/rankedNominations/${year}/${month}`)
                     });
                 }
                 
@@ -197,7 +197,7 @@ export default {
             this.loading = true;
             
             try {
-                const response = await this.$http.executeGet(`/users/${this.loggedInUser.id}/rankedNominations/${this.selectedYear}/${this.selectedMonth}`);
+                const response = await this.$http.executeGet(`/charts/${this.loggedInUser.id}/rankedNominations/${this.selectedYear}/${this.selectedMonth}`);
                 
                 if (response.error) {
                     console.error('Error loading ranked nominations:', response.error);

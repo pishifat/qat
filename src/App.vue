@@ -107,7 +107,7 @@
                                         </router-link>
                                     </div>
                                 </li>
-                                <li v-if="!loggedInUser.isTrialNat" class="nav-item dropdown">
+                                <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
                                         Evaluations
                                     </a>

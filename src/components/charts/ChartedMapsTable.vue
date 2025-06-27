@@ -5,7 +5,7 @@
         </div>
         <data-table
             v-if="events.length"
-            :headers="['', 'Ranked', 'Mapset', 'Charter']"
+            :headers="['', 'Ranked', 'Mapset', 'Nominator']"
         >
             <tr v-for="event in sortedEvents" :key="event._id" :class="getRowClass(event)">
                 <td>
@@ -22,7 +22,7 @@
                         </span>
                         <span class="ml-1 mr-2 small text-success">{{ getUpvoteCount(event) }}</span>
                         
-                        <span
+                        <!--<span
                             data-toggle="tooltip" 
                             :title="canVote ? '' : 'Only BNs can vote'"
                             class="vote-button-wrapper"
@@ -32,7 +32,7 @@
                                 @click="vote(event, 'down')"
                             />
                         </span>
-                        <span class="ml-1 small text-danger">{{ getDownvoteCount(event) }}</span>
+                        <span class="ml-1 small text-danger">{{ getDownvoteCount(event) }}</span>-->
                     </div>
                 </td>
                 <td class="text-nowrap">
@@ -59,7 +59,7 @@
                             <user-link
                                 :username="charter.username"
                                 :osu-id="charter.osuId"
-                            />{{ i < event.charted.length - 1 ? ', ' : '' }}
+                            />{{ i < event.charted.length - 1 ? '/ ' : '' }}
                         </span>
                     </span>
                     <span v-else class="text-muted">None</span>
@@ -167,7 +167,8 @@ export default {
         },
         getNetVoteScore(event) {
             const upvotes = this.getUpvoteCount(event);
-            const downvotes = this.getDownvoteCount(event);
+            //const downvotes = this.getDownvoteCount(event);
+            const downvotes = 0;
             return upvotes - downvotes;
         },
         async vote(event, voteType) {
