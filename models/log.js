@@ -6,6 +6,7 @@ const logSchema = new mongoose.Schema({
     category: {
         type: String,
         enum: [
+            'charts',
             'account',
             'user',
             'application',

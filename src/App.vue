@@ -51,11 +51,8 @@
                                         Other
                                     </a>
                                     <div class="dropdown-menu">
-                                        <router-link class="dropdown-item" to="/publicarchive">
-                                            Public Evaluation Archives
-                                        </router-link>
-                                        <router-link class="dropdown-item" to="/yourevals">
-                                            Your Evaluations
+                                        <router-link class="dropdown-item" to="/charts">
+                                            Charts
                                         </router-link>
                                         <router-link class="dropdown-item" to="/reports">
                                             Reports
@@ -68,6 +65,19 @@
                                         </router-link>
                                         <router-link class="dropdown-item" to="/grouphistory">
                                             Group History
+                                        </router-link>
+                                    </div>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                        Evaluations
+                                    </a>
+                                    <div class="dropdown-menu">
+                                        <router-link class="dropdown-item" to="/publicarchive">
+                                            Public Evaluation Archives
+                                        </router-link>
+                                        <router-link class="dropdown-item" to="/yourevals">
+                                            Your Evaluations
                                         </router-link>
                                     </div>
                                 </li>
@@ -86,11 +96,8 @@
                                         Other
                                     </a>
                                     <div class="dropdown-menu">
-                                        <router-link class="dropdown-item" to="/yourevals">
-                                            Your Evaluations
-                                        </router-link>
-                                        <router-link class="dropdown-item" to="/publicarchive">
-                                            Public Evaluation Archives
+                                        <router-link class="dropdown-item" to="/charts">
+                                            Charts
                                         </router-link>
                                         <router-link class="dropdown-item" to="/reports">
                                             Reports
@@ -98,6 +105,30 @@
                                         <router-link class="dropdown-item" to="/grouphistory">
                                             Group History
                                         </router-link>
+                                    </div>
+                                </li>
+                                <li v-if="!loggedInUser.isTrialNat" class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                        Evaluations
+                                    </a>
+                                    <div class="dropdown-menu">
+                                        <router-link class="dropdown-item" to="/publicarchive">
+                                            Public Evaluation Archives
+                                        </router-link>
+                                        <router-link class="dropdown-item" to="/yourevals">
+                                            Your Evaluations
+                                        </router-link>
+                                        <span v-if="loggedInUser.isTrialNat">
+                                            <router-link class="dropdown-item" to="/appeval">
+                                                Applications
+                                            </router-link>
+                                            <router-link class="dropdown-item" to="/bneval">
+                                                Current BNs
+                                            </router-link>
+                                            <router-link class="dropdown-item" to="/evalarchive">
+                                                Archive
+                                            </router-link>
+                                        </span>
                                     </div>
                                 </li>
                                 <li class="nav-item dropdown">
@@ -110,25 +141,6 @@
                                         </router-link>
                                         <router-link class="dropdown-item" to="/vetoes">
                                             Vetoes
-                                        </router-link>
-                                    </div>
-                                </li>
-
-                                <!-- Trial NAT -->
-
-                                <li v-if="loggedInUser.isTrialNat" class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
-                                        Evaluations
-                                    </a>
-                                    <div class="dropdown-menu">
-                                        <router-link class="dropdown-item" to="/appeval">
-                                            Applications
-                                        </router-link>
-                                        <router-link class="dropdown-item" to="/bneval">
-                                            Current BNs
-                                        </router-link>
-                                        <router-link class="dropdown-item" to="/evalarchive">
-                                            Archive
                                         </router-link>
                                     </div>
                                 </li>
@@ -168,11 +180,8 @@
                                         Other
                                     </a>
                                     <div class="dropdown-menu">
-                                        <router-link class="dropdown-item" to="/yourevals">
-                                            Your Evaluations
-                                        </router-link>
-                                        <router-link class="dropdown-item" to="/publicarchive">
-                                            Public Evaluation Archives
+                                        <router-link class="dropdown-item" to="/charts">
+                                            Charts
                                         </router-link>
                                         <router-link class="dropdown-item" to="/vetoes">
                                             Vetoes
@@ -182,20 +191,28 @@
 
                                 <!-- GMT + Trial NAT -->
 
-                                <li v-if="loggedInUser.isTrialNat" class="nav-item dropdown">
+                                <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
                                         Evaluations
                                     </a>
                                     <div class="dropdown-menu">
-                                        <router-link class="dropdown-item" to="/appeval">
-                                            Applications
+                                        <router-link class="dropdown-item" to="/yourevals">
+                                            Your Evaluations
                                         </router-link>
-                                        <router-link class="dropdown-item" to="/bneval">
-                                            Current BNs
+                                        <router-link class="dropdown-item" to="/publicarchive">
+                                            Public Evaluation Archives
                                         </router-link>
-                                        <router-link class="dropdown-item" to="/evalarchive">
-                                            Archive
-                                        </router-link>
+                                        <span v-if="loggedInUser.isTrialNat">
+                                            <router-link class="dropdown-item" to="/appeval">
+                                                Applications
+                                            </router-link>
+                                            <router-link class="dropdown-item" to="/bneval">
+                                                Current BNs
+                                            </router-link>
+                                            <router-link class="dropdown-item" to="/evalarchive">
+                                                Archive
+                                            </router-link>
+                                        </span>
                                     </div>
                                 </li>
 
@@ -206,17 +223,25 @@
                                         Other
                                     </a>
                                     <div class="dropdown-menu">
-                                        <router-link class="dropdown-item" to="/yourevals">
-                                            Your Evaluations
-                                        </router-link>
-                                        <router-link class="dropdown-item" to="/publicarchive">
-                                            Public Evaluation Archives
+                                        <router-link class="dropdown-item" to="/charts">
+                                            Charts
                                         </router-link>
                                         <router-link class="dropdown-item" to="/vetoes">
                                             Vetoes (read-only)
                                         </router-link>
                                         <router-link class="dropdown-item" to="/grouphistory">
                                             Group History
+                                        </router-link>
+                                    </div>
+                                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                        Evaluations
+                                    </a>
+                                    <div class="dropdown-menu">
+                                        <router-link class="dropdown-item" to="/yourevals">
+                                            Your Evaluations
+                                        </router-link>
+                                        <router-link class="dropdown-item" to="/publicarchive">
+                                            Public Evaluation Archives
                                         </router-link>
                                     </div>
                                 </li>
@@ -243,6 +268,9 @@
                                         Other
                                     </a>
                                     <div class="dropdown-menu">
+                                        <router-link class="dropdown-item" to="/charts">
+                                            Charts
+                                        </router-link>
                                         <router-link class="dropdown-item" to="/vetoes">
                                             Vetoes
                                         </router-link>
@@ -251,9 +279,6 @@
                                         </router-link>
                                         <router-link class="dropdown-item" to="/modrequests">
                                             Request a BN
-                                        </router-link>
-                                        <router-link class="dropdown-item" to="/grouphistory">
-                                            Group History
                                         </router-link>
                                     </div>
                                 </li>
@@ -292,10 +317,18 @@
                                         Spam
                                     </router-link>
                                 </li>
-                                <li class="nav-item">
-                                    <router-link class="nav-link" to="/logs">
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
                                         Logs
-                                    </router-link>
+                                    </a>
+                                    <div class="dropdown-menu">
+                                        <router-link class="dropdown-item" to="/logs">
+                                            BN website logs
+                                        </router-link>
+                                        <router-link class="dropdown-item" to="/grouphistory">
+                                            Group History
+                                        </router-link>
+                                    </div>
                                 </li>
                             </template>
 

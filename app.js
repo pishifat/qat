@@ -48,6 +48,7 @@ const spamRouter = require('./routes/spam');
 const debugRouter = require('./routes/debug');
 const groupHistoryRouter = require('./routes/groupHistory');
 const documentationRouter = require('./routes/documentation');
+const chartsRouter = require('./routes/charts');
 
 const app = express();
 
@@ -149,6 +150,7 @@ apiRouter.use('/spam', spamRouter);
 apiRouter.use('/debug', debugRouter);
 apiRouter.use('/groupHistory', groupHistoryRouter);
 apiRouter.use('/docs', documentationRouter);
+apiRouter.use('/charts', chartsRouter);
 
 app.use('/api', apiRouter);
 

@@ -4,6 +4,10 @@
             <section class="card card-body">
                 <nomination-curation />
             </section>
+            
+            <section class="card card-body mt-3">
+                <monthly-charts />
+            </section>
         </div>
 
         <toast-messages />
@@ -13,13 +17,15 @@
 <script>
 import { mapState } from 'vuex';
 import ToastMessages from '../components/ToastMessages.vue';
-import NominationCuration from '../components/users/NominationCuration.vue';
+import NominationCuration from '../components/charts/NominationCuration.vue';
+import MonthlyCharts from '../components/charts/MonthlyCharts.vue';
 
 export default {
     name: 'BnCharts',
     components: {
         ToastMessages,
         NominationCuration,
+        MonthlyCharts,
     },
     computed: {
         ...mapState([
