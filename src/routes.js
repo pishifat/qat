@@ -11,6 +11,7 @@ const GroupHistory = () => import(/* webpackChunkName: "public", webpackPrefetch
 const PublicEvalArchive = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/PublicEvalArchivePage.vue');
 
 const ModRequests = () => import(/* webpackChunkName: "bn", webpackPrefetch: true */ './pages/ModRequests.vue');
+const BnCharts = () => import(/* webpackChunkName: "bn", webpackPrefetch: true */ './pages/BnCharts.vue');
 const DiscussionVote = () => import(/* webpackChunkName: "bn", webpackPrefetch: true */ './pages/DiscussionVotePage.vue');
 const AppEvalPage = () => import(/* webpackChunkName: "bn", webpackPrefetch: true */ './pages/AppEvalPage.vue');
 
@@ -39,6 +40,7 @@ const routes = [
     { path: '/yourevals', component: YourEvals, meta: { title: 'Your Evaluations' } },
     { path: '/message', component: Message, meta: { title: 'Message from the NAT' } },
     { path: '/modrequests', component: ModRequests, meta: { title: 'Request a BN', public: true } },
+    { path: '/charts', component: BnCharts, meta: { title: 'BN Charts' } },
     { path: '/discussionvote', component: DiscussionVote, meta: { title: 'Content Review' } },
     { path: '/grouphistory', component: GroupHistory, meta: { title: 'Group History', public: true } },
     { path: '/publicarchive', component: PublicEvalArchive, meta: { title: 'Public Evaluation Archives' }, meta: { public: true } },

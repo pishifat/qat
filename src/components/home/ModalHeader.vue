@@ -2,6 +2,7 @@
     <div
         v-if="selectedUser"
         class="modal-header user-header d-flex flex-row align-items-center justify-content-between p-3"
+        :style="userHeaderStyle"
     >
         <div class="d-flex flex-row align-items-center">
             <img :src="'https://a.ppy.sh/' + selectedUser.osuId" class="avatar-img mr-3">
@@ -44,7 +45,15 @@ export default {
         ...mapGetters('usersHome', [
             'selectedUser',
         ]),
-        
+        /** @returns {Object} */
+        userHeaderStyle() {
+            if (!this.selectedUser) return {};
+            return {
+                background: `linear-gradient(0deg, ${this.getUserColor()} -150%, rgba(0, 0, 0, 0.65) 130%), ${this.getCover()} center no-repeat`,
+                backgroundSize: 'cover',
+                borderBottom: `4px solid ${this.getUserColor()}`
+            };
+        },
     },
     watch: {
         selectedUser() {
@@ -92,10 +101,7 @@ export default {
 }
 
 .user-header {
-    background: linear-gradient(0deg, v-bind(getUserColor()) -150%, rgba(0, 0, 0, 0.65) 130%), v-bind(getCover()) center no-repeat;
-    background-size: cover;
     object-fit: fill;
-    border-bottom: 4px solid v-bind(getUserColor());
 }
 
 </style>

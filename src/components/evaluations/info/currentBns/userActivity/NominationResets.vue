@@ -33,7 +33,7 @@
                             data-placement="right"
                             title="osu!direct download"
                         >
-                            <i class="fas fa-file-download" />
+                            <i class="fas fa-file-download mr-1" />
                         </a>
                         <a
                             :href="

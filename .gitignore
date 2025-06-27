@@ -34,3 +34,4 @@ public/index.html
 *.csv
 yarn.lock
 .claude/
+CLAUDE.md

@@ -1735,6 +1735,57 @@ router.post('/cycleBag/:mode', middlewares.isLoggedIn, middlewares.isAdmin, asyn
     res.json({ success: 'ok' });
 });
 
+/* GET user's ranked nominations */
+router.get('/:id/rankedNominations', middlewares.isLoggedIn, async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id).orFail();
+        
+        if (req.session.mongoId != user.id) {
+            return res.json({ error: 'Unauthorized' });
+        }
+
+        const LIMIT = 20;
+        let minDate = new Date();
+        minDate.setFullYear(minDate.getFullYear() - 2); // Look back 2 years
+        let maxDate = new Date();
+
+        // Get unique user events (nominations/qualifications)
+        const modes = user.modes.length && !user.modes.includes('none') 
+            ? user.modes 
+            : ['osu', 'taiko', 'catch', 'mania'];
+        
+        const uniqueUserEvents = await Aiess.getUniqueUserEvents(
+            user.osuId,
+            minDate,
+            maxDate,
+            modes,
+            ['nominate', 'qualify']
+        );
+
+        if (!uniqueUserEvents || uniqueUserEvents.length === 0) {
+            return res.json({ events: [] });
+        }
+
+        // Extract beatmapset IDs
+        const beatmapsetIds = uniqueUserEvents.map(event => event.beatmapsetId);
+
+        // Find corresponding rank events for these beatmapsets
+        const rankEvents = await Aiess
+            .find({
+                beatmapsetId: { $in: beatmapsetIds },
+                type: 'rank',
+                timestamp: { $gte: minDate, $lte: maxDate }
+            })
+            .sort({ timestamp: -1 })
+            .limit(LIMIT);
+
+        res.json({ events: rankEvents });
+    } catch (error) {
+        console.error('Error fetching ranked nominations:', error);
+        res.json({ error: 'Failed to fetch ranked nominations' });
+    }
+});
+
 /* GET additional user BN months (for people who were in NAT but still nominated maps) */
 router.post('/:id/findAdditionalBnMonths', async (req, res) => {
     let user = await User.findById(req.params.id);
