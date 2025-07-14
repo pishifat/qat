@@ -122,8 +122,7 @@ export default {
                         return '';
                 }
 
-                // FIX USERS EVENTUALLY (to `this.users`)
-                const res = await this.$http.executePost(`/${route}/sendMessages/${mongoId}`, { users: [3178418], message: this.message, type }, e);
+                const res = await this.$http.executePost(`/${route}/sendMessages/${mongoId}`, { users: this.users, message: this.message, type }, e);
 
                 if (this.messageType == 'eval' && res.success) {
                     await this.$http.executePost(`/${route}/setComplete/`, { evalIds: [mongoId] });

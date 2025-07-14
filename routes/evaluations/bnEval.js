@@ -79,7 +79,6 @@ const notesPopulate = [
 /* GET current BN eval listing. */
 router.get('/relevantInfo', async (req, res) => {
     const evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, res.locals.userRequest.isNat, res.locals.userRequest.isTrialNat);
-    console.log(evaluations);
 
     // Strip reviews field for mock evaluators on active evaluations
     const processedEvaluations = evaluations.map(evaluation => {
