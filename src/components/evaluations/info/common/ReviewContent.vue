@@ -21,9 +21,9 @@
             </user-avatar>
 
             <div v-else class="text-center my-2 text-pastel-blue">
-                <b>Evaluator {{ index }}</b>
+                <b :class="voteColor(review.vote)">Evaluator {{ index }}</b>
 
-                <div v-if="loggedInUser && review.evaluator && review.evaluator.id == loggedInUser.id">
+                <div v-if="loggedInUser && review.evaluator && review.evaluator.id == loggedInUser.id" :class="voteColor(review.vote)">
                     (this is you!)
                 </div>
             </div>

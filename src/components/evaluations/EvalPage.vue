@@ -78,7 +78,6 @@
                     </sup>
                     <small v-if="discussionEvaluations">({{ discussionEvaluations.length }})</small>
                 </h2>
-
                 <transition-group name="list" tag="div" class="row">
                     <evaluation-card
                         v-for="evaluation in discussionEvaluations"

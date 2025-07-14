@@ -5,7 +5,7 @@
         <template v-if="loggedInUser.isBnOrNat">
             <hr>
 
-            <template v-if="loggedInUser.isNatOrTrialNat">
+            <template>
                 <settings-modal-evaluator />
 
                 <hr>

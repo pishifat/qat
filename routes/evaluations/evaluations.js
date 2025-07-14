@@ -150,6 +150,28 @@ async function submitEval (evaluation, session, isNat, comment, vote) {
     return isNewEvaluation;
 }
 
+async function submitMockEval (evaluation, session, comment, vote) {
+    let mockReview = evaluation.mockReviews.find(e => e.evaluator._id.toString() == session.mongoId);
+    let isNewEvaluation = false;
+
+    if (!mockReview) {
+        isNewEvaluation = true;
+        mockReview = new Review();
+        mockReview.evaluator = session.mongoId;
+    }
+
+    mockReview.moddingComment = comment;
+    mockReview.vote = vote;
+    await mockReview.save();
+
+    if (isNewEvaluation) {
+        evaluation.mockReviews.push(mockReview);
+        await evaluation.save();
+    }
+
+    return isNewEvaluation;
+}
+
 async function setGroupEval (evaluations, session) {
     for (const evaluation of evaluations) {
         evaluation.discussion = true;
@@ -270,6 +292,7 @@ async function replaceUser (evaluation, currentUserId, evaluatorId, isBn, select
 
 module.exports = {
     submitEval,
+    submitMockEval,
     setGroupEval,
     setFeedback,
     replaceUser,

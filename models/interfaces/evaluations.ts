@@ -13,6 +13,7 @@ interface IEvaluationBase {
     cooldownDate?: Date;
     natEvaluators?: IUserDocument[];
     bnEvaluators?: IUserDocument[];
+    mockEvaluators?: IUserDocument[];
     archivedAt?: Date;
     createdAt?: Date;
     updatedAt?: Date;
@@ -36,6 +37,7 @@ interface IEvaluationBase {
         newEvaluator: IUserDocument;
         type: string;
     }[];
+    mockReviews?: IReviewDocument[];
 }
 
 export interface IAppEvaluationDocument extends IEvaluationBase, Document {

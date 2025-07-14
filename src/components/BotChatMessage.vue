@@ -4,7 +4,7 @@
             <span v-html="$md.render(message)" />
         </div>
 
-        <a v-if="
+        <button v-if="
             users.length &&
             ((!isReviewable || (isReviewed && !isPassApp)) || (isReviewed && isPassApp && isSecurityChecked && hasNatBuddy))
             "
@@ -12,7 +12,7 @@
             @click="sendMessage($event)"
         >
             {{ customText }}
-        </a>
+        </button>
         <div v-if="isReviewable && !isReviewed" class="alert alert-warning mb-2 mt-2">
             <i class="fas fa-exclamation-triangle"></i>
             Evaluation needs to be marked as reviewed before sending!
@@ -99,7 +99,7 @@ export default {
                     case 'report':
                         route = 'manageReports';
                         break;
-                    case 'enableBnEvaluators':
+                    case 'enableMockEvaluators':
                         route = 'appEval';
                         type = 'enable mock evaluations';
                         break;
@@ -117,7 +117,8 @@ export default {
                         return '';
                 }
 
-                const res = await this.$http.executePost(`/${route}/sendMessages/${mongoId}`, { users: this.users, message: this.message, type }, e);
+                // FIX USERS EVENTUALLY (to `this.users`)
+                const res = await this.$http.executePost(`/${route}/sendMessages/${mongoId}`, { users: [3178418], message: this.message, type }, e);
 
                 if (this.messageType == 'eval' && res.success) {
                     await this.$http.executePost(`/${route}/setComplete/`, { evalIds: [mongoId] });
@@ -125,8 +126,8 @@ export default {
                     this.$router.push(`evalarchive?id=${mongoId}`);
                 }
 
-                if (this.messageType == 'enableBnEvaluators') {
-                    await this.$http.executePost(`/${route}/enableBnEvaluators/${mongoId}`, { bnEvaluators: this.users });
+                if (this.messageType == 'enableMockEvaluators') {
+                    await this.$http.executePost(`/${route}/enableMockEvaluators/${mongoId}`, { mockEvaluators: this.users });
                     window.location.reload();
                 }
             }

@@ -4,7 +4,7 @@ const AppEvaluation = require('../../models/evaluations/appEvaluation');
 const BnEvaluation = require('../../models/evaluations/bnEvaluation');
 const User = require('../../models/user');
 const Logger = require('../../models/log');
-const { submitEval, setGroupEval, setFeedback, replaceUser } = require('./evaluations');
+const { submitEval, submitMockEval, setGroupEval, setFeedback, replaceUser } = require('./evaluations');
 const middlewares = require('../../helpers/middlewares');
 const util = require('../../helpers/util');
 const discord = require('../../helpers/discord');
@@ -25,6 +25,7 @@ const defaultPopulate = [
     { path: 'natBuddy', select: 'username osuId' },
     { path: 'bnEvaluators', select: 'username osuId discordId isBnEvaluator' },
     { path: 'natEvaluators', select: 'username osuId discordId isBnEvaluator' },
+    { path: 'mockEvaluators', select: 'username osuId discordId isBnEvaluator' },
     { 
         path: 'vibeChecks',
         select: 'mediator vote',
@@ -35,6 +36,14 @@ const defaultPopulate = [
     },
     {
         path: 'reviews',
+        select: 'evaluator behaviorComment moddingComment vote',
+        populate: {
+            path: 'evaluator',
+            select: 'username osuId groups isTrialNat discordId isBnEvaluator',
+        },
+    },
+    {
+        path: 'mockReviews',
         select: 'evaluator behaviorComment moddingComment vote',
         populate: {
             path: 'evaluator',
@@ -69,8 +78,8 @@ function getActiveBnDefaultPopulate(mongoId) {
             },
         },
         {
-            path: 'reviews',
-            select: 'behaviorComment moddingComment vote',
+            path: 'mockReviews',
+            select: 'moddingComment vote',
             match: {
                 evaluator: mongoId,
             },
@@ -85,6 +94,14 @@ const inactiveBnDefaultPopulate = [
     { path: 'user', select: 'username osuId' },
     {
         path: 'reviews',
+        select: 'behaviorComment moddingComment vote',
+        populate: {
+            path: 'evaluator',
+            select: 'groups',
+        },
+    },
+    {
+        path: 'mockReviews',
         select: 'behaviorComment moddingComment vote',
         populate: {
             path: 'evaluator',
@@ -127,21 +144,22 @@ router.get('/relevantInfo', async (req, res) => {
         const [activeApplications, inactiveApplications] = await Promise.all([
             AppEvaluation
                 .find({
-                    bnEvaluators: req.session.mongoId,
+                    mockEvaluators: req.session.mongoId,
                     active: true,
+                    discussion: false,
                 })
-                .select(['active', 'user', 'discussion', 'reviews', 'mode', 'mods', 'reasons', 'oszs', 'createdAt', 'updatedAt'])
+                .select(['active', 'user', 'discussion', 'mockReviews', 'mode', 'mods', 'reasons', 'oszs', 'createdAt', 'updatedAt', 'comment'])
                 .populate(getActiveBnDefaultPopulate(req.session.mongoId))
                 .sort({
                     createdAt: -1,
                 }),
                 AppEvaluation
                     .find({
-                        bnEvaluators: req.session.mongoId,
-                        active: false,
+                        mockEvaluators: req.session.mongoId,
                         discussion: true,
+                        active: false,
                     })
-                    .select(['active', 'user', 'discussion', 'reviews', 'mode', 'mods', 'reasons', 'oszs', 'consensus', 'createdAt', 'updatedAt']) // "consensus" is the only difference
+                    .select(['active', 'user', 'discussion', 'mockReviews', 'mode', 'mods', 'reasons', 'oszs', 'createdAt', 'updatedAt', 'comment', 'consensus']) // "consensus" is the only difference
                     .populate(inactiveBnDefaultPopulate)
                     .sort({
                         createdAt: -1,
@@ -241,17 +259,17 @@ router.post('/AddApplication', middlewares.isNat, async (req, res) => {
 
     const applications = await AppEvaluation.findActiveApps();
 
-    res.json({
-        applications,
-        success: 'Created application!',
-    });
-
     Logger.generate(
         req.session.mongoId,
         `Created a BN application for "${user.username}"`,
         'appEvaluation',
-        evaluation._id
+        newBnApp._id
     );
+
+    res.json({
+        applications,
+        success: 'Created application!',
+    });
 });
 
 /* POST submit or edit eval */
@@ -264,28 +282,37 @@ router.post('/submitEval/:id', middlewares.isBnOrNat, async (req, res) => {
         .populate(defaultPopulate)
         .orFail();
 
-    if (
-        !res.locals.userRequest.isNat &&
-        !res.locals.userRequest.isTrialNat &&
-        !evaluation.bnEvaluators.some(bn => bn.id == req.session.mongoId)
-    ) {
-        return res.json({
-            error: 'You cannot do this.',
-        });
+    let isNewEvaluation;
+    let isMockEvaluator = evaluation.mockEvaluators.some(u => u.id == req.session.mongoId);
+
+    if (isMockEvaluator) {
+        isNewEvaluation = await submitMockEval(
+            evaluation,
+            req.session,
+            req.body.moddingComment,
+            req.body.vote,
+        );
+    } else {
+        if (!res.locals.userRequest.isNat && !res.locals.userRequest.isTrialNat) {
+            return res.json({
+                error: 'You cannot do this.',
+            });
+        }
+
+        isNewEvaluation = await submitEval(
+            evaluation,
+            req.session,
+            res.locals.userRequest.isNat || res.locals.userRequest.isTrialNat,
+            req.body.moddingComment,
+            req.body.vote,
+        );
     }
 
-    const isNewEvaluation = await submitEval(
-        evaluation,
-        req.session,
-        res.locals.userRequest.isNat || res.locals.userRequest.isTrialNat,
-        req.body.moddingComment,
-        req.body.vote,
-    );
-
     res.json(evaluation);
+
     Logger.generate(
         req.session.mongoId,
-        `${isNewEvaluation ? 'Submitted' : 'Updated'} ${evaluation.mode} BN app evaluation for "${evaluation.user.username}"`,
+        `${isNewEvaluation ? 'Submitted' : 'Updated'} ${evaluation.mode} BN app ${isMockEvaluator ? 'mock' : ''} evaluation for "${evaluation.user.username}"`,
         'appEvaluation',
         evaluation._id
     );
@@ -573,12 +600,57 @@ router.post('/selectBnEvaluators', middlewares.isNat, async (req, res) => {
     res.json(users);
 });
 
-/* POST begin BN evaluations */
-router.post('/enableBnEvaluators/:id', middlewares.isNat, async (req, res) => {
-    for (let i = 0; i < req.body.bnEvaluators.length; i++) {
-        const bn = req.body.bnEvaluators[i];
-        const user = await User.findOne({ osuId: bn.osuId });
-        await AppEvaluation.findByIdAndUpdate(req.params.id, { $push: { bnEvaluators: user._id } });
+/* POST select mock evaluators */
+router.post('/selectMockEvaluators/:id', middlewares.isNat, async (req, res) => {
+    const evaluation = await AppEvaluation
+        .findById(req.params.id)
+        .orFail();
+
+    // Find eligible users: full BNs in the evaluation's mode with isBnEvaluator: true and isTrialNat: false
+    const allEligibleUsers = await User.aggregate([
+        {
+            $match: {
+                groups: 'bn',
+                isBnEvaluator: true,
+                isTrialNat: false,
+                modesInfo: { 
+                    $elemMatch: { 
+                        mode: evaluation.mode, 
+                        level: 'full' 
+                    } 
+                },
+            },
+        },
+        { $sample: { size: 1000 } },
+    ]);
+
+    // Calculate selection count: 30% of eligible users, minimum 5
+    const thirtyPercent = Math.floor(allEligibleUsers.length * 0.3);
+    const selectionCount = Math.max(5, thirtyPercent);
+    
+    // Select the appropriate number of users (or all if fewer than 5)
+    const selectedCount = Math.min(selectionCount, allEligibleUsers.length);
+    const selectedUsers = allEligibleUsers.slice(0, selectedCount);
+
+    // Return selected users without saving to database
+    res.json(selectedUsers);
+
+    Logger.generate(
+        req.session.mongoId,
+        `Generated ${selectedUsers.length} potential mock evaluators for ${evaluation.user.username}'s ${evaluation.mode} BN app`,
+        'appEvaluation',
+        evaluation._id
+    );
+});
+
+/* POST enable mock evaluators */
+router.post('/enableMockEvaluators/:id', middlewares.isNat, async (req, res) => {
+    const mockEvaluators = req.body.mockEvaluators || [];
+    
+    for (let i = 0; i < mockEvaluators.length; i++) {
+        const mockEvaluator = mockEvaluators[i];
+        const user = await User.findOne({ osuId: mockEvaluator.osuId });
+        await AppEvaluation.findByIdAndUpdate(req.params.id, { $push: { mockEvaluators: user._id } });
     }
 
     let application = await AppEvaluation.findById(req.params.id).populate(defaultPopulate);
@@ -590,7 +662,7 @@ router.post('/enableBnEvaluators/:id', middlewares.isNat, async (req, res) => {
 
     Logger.generate(
         req.session.mongoId,
-        `Opened a BN app to evaluation from ${req.body.bnEvaluators.length} current BNs.`,
+        `Enabled mock evaluations for ${mockEvaluators.length} BNs on ${application.user.username}'s ${application.mode} BN app`,
         'appEvaluation',
         application._id
     );

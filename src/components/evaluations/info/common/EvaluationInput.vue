@@ -127,12 +127,23 @@ export default {
             this.moddingComment = '';
             this.vote = 0;
             this.evaluationId = null;
-            const review = this.selectedEvaluation.reviews.find(r => r.evaluator && r.evaluator.id == this.loggedInUser.id);
+            
+            // First check for regular reviews
+            const reviews = this.selectedEvaluation.reviews || [];
+            const review = reviews.find(r => r.evaluator && r.evaluator.id == this.loggedInUser.id);
+            
+            // Then check for mock reviews
+            const mockReviews = this.selectedEvaluation.mockReviews || [];
+            const mockReview = mockReviews.find(r => r.evaluator && r.evaluator.id == this.loggedInUser.id);
 
             if (review) {
                 this.evaluationId = review.id || null;
                 this.moddingComment = review.moddingComment || '';
                 this.vote = review.vote || 0;
+            } else if (mockReview) {
+                this.evaluationId = mockReview.id || null;
+                this.moddingComment = mockReview.moddingComment || '';
+                this.vote = mockReview.vote || 0;
             } else {
                 if (window.localStorage.getItem(this.selectedEvaluation.id + 'mod')) {
                     this.moddingComment = window.localStorage.getItem(this.selectedEvaluation.id + 'mod');

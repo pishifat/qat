@@ -3,7 +3,7 @@ const webhookColors = {
     darkRed: 8787477,         // report, toggleIsSecurityChecked
     red: 15607337,            // overdueNotifications, problemReport, lowActivity
 
-    lightOrange: 15639928,    // enableBnEvaluators, suggestionReport
+    lightOrange: 15639928,    // enableMockEvaluators, suggestionReport
     darkOrange: 7092736,      // pending badge, removeCustomPreference (genre, language, map, detail, mapper)
     orange: 15169835,         // replaceUser, switchBnEvaluator, progressive eval assignment
 

@@ -2,7 +2,7 @@
     <div>
         <!-- assignments -->
         <div class="row">
-            <div :class="selectedEvaluation.bnEvaluators && selectedEvaluation.bnEvaluators.length ? 'col-lg-4' : 'col-sm-6'">
+            <div :class="columnClasses.natEvaluators">
                 <user-list
                     :header="'Assigned NAT:'"
                     :user-list="selectedEvaluation.natEvaluators"
@@ -12,7 +12,7 @@
                     :mode="selectedEvaluation.mode"
                 />
             </div>
-            <div v-if="selectedEvaluation.bnEvaluators && selectedEvaluation.bnEvaluators.length" class="col-lg-4">
+            <div v-if="selectedEvaluation.bnEvaluators && selectedEvaluation.bnEvaluators.length" :class="columnClasses.bnEvaluators">
                 <user-list
                     :header="'Assigned BN:'"
                     :user-list="selectedEvaluation.bnEvaluators"
@@ -22,70 +22,46 @@
                     :mode="selectedEvaluation.mode"
                 />
             </div>
-            <div :class="selectedEvaluation.bnEvaluators && selectedEvaluation.bnEvaluators.length ? 'col-lg-4' : 'col-sm-6'">
+            <div :class="columnClasses.mockEvaluators">
+                <div v-if="selectedEvaluation.mockEvaluators && selectedEvaluation.mockEvaluators.length">
+                    <user-list
+                        :header="'Mock evaluators:'"
+                        :user-list="selectedEvaluation.mockEvaluators"
+                        :is-application="selectedEvaluation.isApplication"
+                        :nominator-assessment-mongo-id="selectedEvaluation.id"
+                        :mode="selectedEvaluation.mode"
+                        :disable-replace="true"
+                    />
+                </div>
+                <div v-else>
+                    <p><b>Mock evaluators:</b></p>
+                    <button class="btn btn-sm btn-secondary btn-block" @click="enableMockEvaluators">
+                        {{ potentialMockEvaluators ? 'Re-select mock evaluators' : 'Enable mock evaluators' }}
+                    </button>
+                    
+                    <div v-if="potentialMockEvaluators && potentialMockEvaluators.length">
+                        <p class="my-3">
+                            Users:
+                        </p>
+                        <div id="mockUsernames" class="mb-4">
+                            <ul class="small">
+                                <li v-for="user in potentialMockEvaluators" :key="user.id">
+                                    {{ user.username }}
+                                </li>
+                            </ul>
+                        </div>
+
+                        <enable-mock-evaluators-chat-message
+                            :users="potentialMockEvaluators"
+                        />
+                    </div>
+                </div>
+            </div>
+            <div :class="columnClasses.totalEvaluations">
                 <user-list
                     :header="'Total evaluations: (' + selectedEvaluation.reviews.length + ')'"
                     :user-list="submittedEvaluators"
                 />
-            </div>
-        </div>
-
-        <!-- mock evaluations (catch only) -->
-        <div>
-            <div v-if="selectedEvaluation.mode == 'catch' && loggedInUser.isNat && (!selectedEvaluation.bnEvaluators || !selectedEvaluation.bnEvaluators.length) && selectedEvaluation.isApplication && !selectedEvaluation.discussion" class="col-sm-12">
-                <hr>
-                <div class="row">
-                    <div class="col-sm-3">
-                        <b>Total mock evaluators</b>
-                        <input
-                            v-model="totalUsers"
-                            class="form-control"
-                            type="number"
-                            min="1"
-                            max="10"
-                            placeholder="#"
-                        >
-                    </div>
-                    <div class="col-sm-4">
-                        <b>Include specific user(s):</b>
-                        <input
-                            v-model="includeUsers"
-                            class="form-control"
-                            type="text"
-                            placeholder="username1, username2, username3..."
-                        >
-                    </div>
-                    <div class="col-sm-4">
-                        <b>Exclude specific user(s):</b>
-                        <input
-                            v-model="excludeUsers"
-                            class="form-control"
-                            type="text"
-                            placeholder="username1, username2, username3..."
-                        >
-                    </div>
-                </div>
-
-                <button class="btn btn-sm btn-primary my-2 btn-block" @click="selectBnEvaluators($event)">
-                    {{ potentialBnEvaluators ? 'Re-select mock evaluators' : 'Select mock evaluators' }}
-                </button>
-
-                <div v-if="potentialBnEvaluators && potentialBnEvaluators.length">
-                    <p class="my-3">
-                        Users:
-                    </p>
-                    <div id="usernames" class="mb-4">
-                        <ul class="small">
-                            <li v-for="user in potentialBnEvaluators" :key="user.id">
-                                {{ user.username }}
-                            </li>
-                        </ul>
-                    </div>
-
-                    <enable-bn-evaluators-chat-message
-                        :users="potentialBnEvaluators"
-                    />
-                </div>
             </div>
         </div>
     </div>
@@ -94,13 +70,13 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import UserList from './UserList.vue';
-import EnableBnEvaluatorsChatMessage from '../applications/EnableBnEvaluatorsChatMessage.vue';
+import EnableMockEvaluatorsChatMessage from '../applications/EnableMockEvaluatorsChatMessage.vue';
 
 export default {
     name: 'EvaluatorAssignments',
     components: {
         UserList,
-        EnableBnEvaluatorsChatMessage,
+        EnableMockEvaluatorsChatMessage,
     },
     data() {
         return {
@@ -108,6 +84,7 @@ export default {
             includeUsers: null,
             excludeUsers: null,
             potentialBnEvaluators: null,
+            potentialMockEvaluators: null,
         };
     },
     computed: {
@@ -119,12 +96,37 @@ export default {
         ]),
         /** @returns {Object[]} */
         submittedEvaluators() {
-            return this.selectedEvaluation.reviews.map(review => review.evaluator);
+            const evaluators = this.selectedEvaluation.reviews.map(review => review.evaluator);
+            const mockReviews = this.selectedEvaluation.mockReviews || [];
+            
+            // Add mock evaluators to the list with a special flag for styling (only those who submitted reviews)
+            const mockEvaluatorsWithFlag = mockReviews.map(review => ({
+                ...review.evaluator,
+                isMockEvaluator: true
+            }));
+            
+            return [...evaluators, ...mockEvaluatorsWithFlag];
+        },
+        hasMockEvaluators() {
+            return this.selectedEvaluation.mockEvaluators && this.selectedEvaluation.mockEvaluators.length > 0;
+        },
+        columnClasses() {
+            const hasBnEvaluators = this.selectedEvaluation.bnEvaluators && this.selectedEvaluation.bnEvaluators.length;
+            const columnCount = hasBnEvaluators ? 4 : 3; // NAT, BN (optional), Mock, Total
+            const colClass = columnCount === 4 ? 'col-lg-3' : 'col-lg-4';
+            
+            return {
+                natEvaluators: colClass,
+                bnEvaluators: colClass,
+                mockEvaluators: colClass,
+                totalEvaluations: colClass
+            };
         },
     },
     watch: {
         selectedEvaluation() {
             this.potentialBnEvaluators = null;
+            this.potentialMockEvaluators = null;
         },
     },
     methods: {
@@ -139,6 +141,17 @@ export default {
 
             if (r && !r.error) {
                 this.potentialBnEvaluators = r;
+            }
+        },
+        async enableMockEvaluators(e) {
+            const r = await this.$http.executePost(`/appeval/selectMockEvaluators/${this.selectedEvaluation.id}`, {}, e);
+
+            if (r && !r.error) {
+                this.potentialMockEvaluators = r;
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Generated ${r.length} potential mock evaluators`,
+                    type: 'success',
+                });
             }
         },
     },

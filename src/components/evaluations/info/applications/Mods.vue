@@ -6,7 +6,9 @@
                 <ul class="small text-secondary">
                     <li>
                         <b>Mod:</b>
-                        <a :href="modUrl(mod)" target="_blank">{{ modUrl(mod) }}</a>
+                        <a :href="modUrl(mod)" target="_blank">
+                            {{ modUrl(mod) }}
+                        </a>
                     </li>
                     <li>
                         <b>.osz:</b> 

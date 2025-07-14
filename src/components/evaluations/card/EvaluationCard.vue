@@ -73,7 +73,10 @@ export default {
             'checkedEvaluations',
         ]),
         relevantReviewVote () {
-            const review = this.evaluation.reviews.find(e => this.loggedInUser && e.evaluator && e.evaluator.id == this.loggedInUser.id);
+            const reviews = this.evaluation.reviews || [];
+            const mockReviews = this.evaluation.mockReviews || [];
+            const combinedReviews = reviews.concat(mockReviews);
+            let review = combinedReviews.find(e => this.loggedInUser && e.evaluator && e.evaluator.id == this.loggedInUser.id);
 
             if (review) {
                 switch (review.vote) {

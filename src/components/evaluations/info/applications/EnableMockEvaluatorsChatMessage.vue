@@ -2,7 +2,7 @@
     <div>
         <bot-chat-message
             :message="message"
-            :message-type="'enableBnEvaluators'"
+            :message-type="'enableMockEvaluators'"
             :mongo-id="selectedEvaluation.id"
             :users="users"
             :custom-text="'Send message & enable mock evaluations'"
@@ -16,7 +16,7 @@ import BotChatMessage from '../../../BotChatMessage.vue';
 import evaluations from '../../../../mixins/evaluations';
 
 export default {
-    name: 'EnableBnEvaluatorsChatMessage',
+    name: 'EnableMockEvaluatorsChatMessage',
     components: {
         BotChatMessage,
     },

@@ -4,17 +4,17 @@
             <b>{{ header }}</b>
         </p>
         <ul>
-            <li v-for="user in userList" :key="user.id" class="small">
+            <li v-for="user in userList" :key="user.id" class="small" :class="{ 'text-muted': user.isMockEvaluator }">
                 {{ user.username }}
                 <a
-                    v-if="nominatorAssessmentMongoId && loggedInUser && loggedInUser.isNat && !isEditing"
+                    v-if="nominatorAssessmentMongoId && loggedInUser && loggedInUser.isNat && !isEditing && !disableReplace"
                     href="#"
                     @click="isEditing = true; editedEvaluatorId = user.id"
                 >
                     <i class="fas fa-edit" />
                 </a>
 
-                <span v-if="nominatorAssessmentMongoId && loggedInUser && loggedInUser.isNat && isEditing && user.id == editedEvaluatorId">
+                <span v-if="nominatorAssessmentMongoId && loggedInUser && loggedInUser.isNat && isEditing && user.id == editedEvaluatorId && !disableReplace">
                     <a
                         v-if="nominatorAssessmentMongoId && loggedInUser && loggedInUser.isNat && isEditing && user.id == editedEvaluatorId"
                         href="#"
@@ -38,7 +38,7 @@
                     </a>
                 </span>
 
-                <span v-if="nominatorAssessmentMongoId && loggedInUser && loggedInUser.isNat && isEditing && user.id == editedEvaluatorId" class="form-inline">
+                <span v-if="nominatorAssessmentMongoId && loggedInUser && loggedInUser.isNat && isEditing && user.id == editedEvaluatorId && !disableReplace" class="form-inline">
                     <select
                         id="user"
                         v-model="selectedUserId"
@@ -98,6 +98,10 @@ export default {
         mode: {
             type: String,
             default: '',
+        },
+        disableReplace: {
+            type: Boolean,
+            default: false,
         },
     },
     data () {

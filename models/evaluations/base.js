@@ -10,6 +10,7 @@ const baseSchema = {
     cooldownDate: { type: Date },
     natEvaluators: [{ type: 'ObjectId', ref: 'User' }],
     bnEvaluators: [{ type: 'ObjectId', ref: 'User' }],
+    mockEvaluators: [{ type: 'ObjectId', ref: 'User' }],
     archivedAt: { type: Date },
     isPublic: { type: Boolean },
     messages: [{
@@ -26,6 +27,7 @@ const baseSchema = {
         newEvaluator: { type: 'ObjectId', ref: 'User', required: true },
         type: { type: String, enum: ['automatic', 'manual'] },
     }],
+    mockReviews: [{ type: 'ObjectId', ref: 'Review' }],
 };
 
 module.exports = baseSchema;

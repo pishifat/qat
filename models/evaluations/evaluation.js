@@ -55,6 +55,10 @@ class EvaluationService extends mongoose.Model {
                     select: 'username osuId discordId isBnEvaluator',
                 },
                 {
+                    path: 'mockEvaluators',
+                    select: 'username osuId discordId isBnEvaluator',
+                },
+                {
                     path: 'reviews',
                     select: 'evaluator behaviorComment moddingComment vote',
                     populate: {
@@ -102,6 +106,10 @@ class EvaluationService extends mongoose.Model {
                 },
                 {
                     path: 'bnEvaluators',
+                    select: 'username osuId',
+                },
+                {
+                    path: 'mockEvaluators',
                     select: 'username osuId',
                 },
                 {
