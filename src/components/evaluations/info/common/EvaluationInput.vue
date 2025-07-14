@@ -127,12 +127,8 @@ export default {
             this.moddingComment = '';
             this.vote = 0;
             this.evaluationId = null;
-            
-            // First check for regular reviews
             const reviews = this.selectedEvaluation.reviews || [];
             const review = reviews.find(r => r.evaluator && r.evaluator.id == this.loggedInUser.id);
-            
-            // Then check for mock reviews
             const mockReviews = this.selectedEvaluation.mockReviews || [];
             const mockReview = mockReviews.find(r => r.evaluator && r.evaluator.id == this.loggedInUser.id);
 

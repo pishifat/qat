@@ -10,7 +10,7 @@ const User = require('../../models/user');
 const Aiess = require('../../models/aiess');
 const QualityAssuranceCheck = require('../../models/qualityAssuranceCheck');
 const Note = require('../../models/note');
-const { submitEval, setGroupEval, setFeedback, replaceUser } = require('./evaluations');
+const { submitEval, submitMockEval, selectMockEvaluators, setGroupEval, setFeedback, replaceUser } = require('./evaluations');
 const middlewares = require('../../helpers/middlewares');
 const discord = require('../../helpers/discord');
 const util = require('../../helpers/util');
@@ -21,7 +21,7 @@ const Settings = require('../../models/settings');
 const router = express.Router();
 
 router.use(middlewares.isLoggedIn);
-router.use(middlewares.isNatOrTrialNat);
+router.use(middlewares.hasBasicAccess);
 
 //population
 const defaultPopulate = [
@@ -46,6 +46,18 @@ const defaultPopulate = [
         },
     },
     {
+        path: 'mockEvaluators',
+        select: 'username osuId discordId isBnEvaluator',
+    },
+    {
+        path: 'mockReviews',
+        select: 'evaluator behaviorComment moddingComment vote createdAt',
+        populate: {
+            path: 'evaluator',
+            select: 'username osuId groups isTrialNat discordId isBnEvaluator',
+        },
+    },
+    {
         path: 'rerolls',
         populate: [
             {
@@ -66,10 +78,29 @@ const notesPopulate = [
 
 /* GET current BN eval listing. */
 router.get('/relevantInfo', async (req, res) => {
-    const evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, res.locals.userRequest.isNat);
+    const evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, res.locals.userRequest.isNat, res.locals.userRequest.isTrialNat);
+    console.log(evaluations);
+
+    // Strip reviews field for mock evaluators on active evaluations
+    const processedEvaluations = evaluations.map(evaluation => {
+        // Check if current user is a mock evaluator and evaluation is active
+        const isMockEvaluator = evaluation.mockEvaluators && 
+            evaluation.mockEvaluators.some(mockEvaluator => 
+                mockEvaluator._id.toString() === req.session.mongoId
+            );
+        
+        if (isMockEvaluator && evaluation.active) {
+            // Create a copy without the reviews field
+            const evalCopy = evaluation.toObject();
+            delete evalCopy.reviews;
+            return evalCopy;
+        }
+        
+        return evaluation;
+    });
 
     res.json({
-        evaluations,
+        evaluations: processedEvaluations,
     });
 });
 
@@ -232,7 +263,7 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
         }
     }
 
-    const evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, res.locals.userRequest.isNat);
+    const evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, true);
 
     res.json({
         evaluations,
@@ -248,7 +279,7 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
 });
 
 /* POST submit or edit eval */
-router.post('/submitEval/:id', middlewares.isNatOrTrialNat, async (req, res) => {
+router.post('/submitEval/:id', async (req, res) => {
     let evaluation = await Evaluation
         .findOne({
             _id: req.params.id,
@@ -257,19 +288,31 @@ router.post('/submitEval/:id', middlewares.isNatOrTrialNat, async (req, res) => 
         .populate(defaultPopulate)
         .orFail();
 
-    const isNewEvaluation = await submitEval(
-        evaluation,
-        req.session,
-        res.locals.userRequest.isNat || res.locals.userRequest.isTrialNat,
-        req.body.moddingComment,
-        req.body.vote,
-    );
+    let isNewEvaluation;
+    let isMockEvaluator = evaluation.mockEvaluators.some(u => u.id == req.session.mongoId);
+
+    if (isMockEvaluator) {
+        isNewEvaluation = await submitMockEval(
+            evaluation,
+            req.session,
+            req.body.moddingComment,
+            req.body.vote,
+        );
+    } else {
+        isNewEvaluation = await submitEval(
+            evaluation,
+            req.session,
+            res.locals.userRequest.isNat || res.locals.userRequest.isTrialNat,
+            req.body.moddingComment,
+            req.body.vote,
+        );
+    }
 
     evaluation = await Evaluation.findById(req.params.id).populate(defaultPopulate);
     res.json(evaluation);
     Logger.generate(
         req.session.mongoId,
-        `${isNewEvaluation ? 'Submitted' : 'Updated'} ${evaluation.mode} BN evaluation for "${evaluation.user.username}"`,
+        `${isNewEvaluation ? 'Submitted' : 'Updated'} ${evaluation.mode} BN ${isMockEvaluator ? 'mock' : ''} evaluation for "${evaluation.user.username}"`,
         'bnEvaluation',
         evaluation._id
     );
@@ -286,7 +329,7 @@ router.post('/setGroupEval/', middlewares.isNat, async (req, res) => {
         .populate(defaultPopulate);
 
     await setGroupEval(evaluations, req.session);
-    evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, res.locals.userRequest.isNat);
+    evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, true);
     res.json(evaluations);
     Logger.generate(
         req.session.mongoId,
@@ -303,7 +346,7 @@ router.post('/setIndividualEval/', middlewares.isNat, async (req, res) => {
         discussion: false,
     });
 
-    const evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, res.locals.userRequest.isNat);
+    const evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, true);
 
     res.json(evaluations);
     Logger.generate(
@@ -314,7 +357,7 @@ router.post('/setIndividualEval/', middlewares.isNat, async (req, res) => {
 });
 
 /* POST set evals as complete */
-router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
+router.post('/setComplete/', middlewares.isNat, async (req, res) => {
     let evaluations = await Evaluation
         .find({
             _id: {
@@ -564,7 +607,7 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
         if (resetSession) await util.invalidateSessions(user.id);
     }
 
-    evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, res.locals.userRequest.isNat);
+    evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, true);
 
     res.json(evaluations);
     Logger.generate(
@@ -668,7 +711,7 @@ router.post('/setFeedback/:id', middlewares.isNatOrTrialNat, async (req, res) =>
 });
 
 /* GET find previous evaluations */
-router.get('/findPreviousEvaluations/:userId', async (req, res) => {
+router.get('/findPreviousEvaluations/:userId', middlewares.isNatOrTrialNat, async (req, res) => {
     const evaluations = await Evaluation.find({
         user: req.params.userId,
         active: false,
@@ -699,7 +742,7 @@ router.get('/findPreviousEvaluations/:userId', async (req, res) => {
 });
 
 /* GET find user notes */
-router.get('/findUserNotes/:id', async (req, res) => {
+router.get('/findUserNotes/:id', middlewares.isNatOrTrialNat, async (req, res) => {
     const userNotes = await Note
         .find({
             user: req.params.id,
@@ -1131,6 +1174,58 @@ router.post('/deleteReview/:id', middlewares.isAdmin, async (req, res) => {
         `Deleted review by "${review.evaluator.username}" in ${eval.mode} current BN eval for "${eval.user.username}"`,
         'bnEvaluation',
         eval._id
+    );
+});
+
+/* POST select mock evaluators */
+router.post('/selectMockEvaluators/:id', middlewares.isNat, async (req, res) => {
+    const evaluation = await BnEvaluation
+        .findById(req.params.id)
+        .orFail();
+
+    const selectedUsers = await selectMockEvaluators(evaluation);
+
+    // Return selected users without saving to database
+    res.json(selectedUsers);
+
+    Logger.generate(
+        req.session.mongoId,
+        `Generated ${selectedUsers.length} potential mock evaluators for ${evaluation.user.username}'s ${evaluation.mode} BN eval`,
+        'bnEvaluation',
+        evaluation._id
+    );
+});
+
+/* POST enable mock evaluators */
+router.post('/enableMockEvaluators/:id', middlewares.isNat, async (req, res) => {
+    const mockEvaluators = req.body.mockEvaluators || [];
+    
+    for (let i = 0; i < mockEvaluators.length; i++) {
+        const mockEvaluator = mockEvaluators[i];
+        const user = await User.findOne({ osuId: mockEvaluator.osuId });
+        await BnEvaluation.findByIdAndUpdate(req.params.id, { $push: { mockEvaluators: user._id } });
+    }
+
+    let evaluation = await BnEvaluation.findById(req.params.id).populate(defaultPopulate);
+
+    res.json({
+        evaluation,
+        success: 'Enabled mock evaluations',
+    });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Enabled mock evaluations for ${mockEvaluators.length} BNs on ${evaluation.user.username}'s ${evaluation.mode} BN eval`,
+        'bnEvaluation',
+        evaluation._id
+    );
+    discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            color: discord.webhookColors.lightOrange,
+            description: `Enabled mock evaluations for [**${evaluation.user.username}**'s BN eval](http://bn.mappersguild.com/bneval?id=${evaluation.id})`,
+        }],
+        evaluation.mode
     );
 });
 

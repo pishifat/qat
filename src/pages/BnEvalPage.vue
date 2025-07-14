@@ -2,6 +2,16 @@
     <div>
         <eval-page
             kind="currentBns"
+            :discussion-evaluations-title="
+                loggedInUser.isNatOrTrialNat ?
+                    'Group Evaluations' :
+                    'Completed Evaluations'
+            "
+            :discussion-evaluations-help="
+                loggedInUser.isNat ?
+                    'After individual evals are completed, their responses are made visible to allow discussion and form a consensus' :
+                    'Results of archived evaluations you were assigned to'
+            "
         >
             <template #individual-evaluations-title>
                 <button

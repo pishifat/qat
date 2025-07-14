@@ -4,7 +4,7 @@ const AppEvaluation = require('../../models/evaluations/appEvaluation');
 const BnEvaluation = require('../../models/evaluations/bnEvaluation');
 const User = require('../../models/user');
 const Logger = require('../../models/log');
-const { submitEval, submitMockEval, setGroupEval, setFeedback, replaceUser } = require('./evaluations');
+const { submitEval, submitMockEval, selectMockEvaluators, setGroupEval, setFeedback, replaceUser } = require('./evaluations');
 const middlewares = require('../../helpers/middlewares');
 const util = require('../../helpers/util');
 const discord = require('../../helpers/discord');
@@ -606,31 +606,7 @@ router.post('/selectMockEvaluators/:id', middlewares.isNat, async (req, res) => 
         .findById(req.params.id)
         .orFail();
 
-    // Find eligible users: full BNs in the evaluation's mode with isBnEvaluator: true and isTrialNat: false
-    const allEligibleUsers = await User.aggregate([
-        {
-            $match: {
-                groups: 'bn',
-                isBnEvaluator: true,
-                isTrialNat: false,
-                modesInfo: { 
-                    $elemMatch: { 
-                        mode: evaluation.mode, 
-                        level: 'full' 
-                    } 
-                },
-            },
-        },
-        { $sample: { size: 1000 } },
-    ]);
-
-    // Calculate selection count: 30% of eligible users, minimum 5
-    const thirtyPercent = Math.floor(allEligibleUsers.length * 0.3);
-    const selectionCount = Math.max(5, thirtyPercent);
-    
-    // Select the appropriate number of users (or all if fewer than 5)
-    const selectedCount = Math.min(selectionCount, allEligibleUsers.length);
-    const selectedUsers = allEligibleUsers.slice(0, selectedCount);
+    const selectedUsers = await selectMockEvaluators(evaluation);
 
     // Return selected users without saving to database
     res.json(selectedUsers);

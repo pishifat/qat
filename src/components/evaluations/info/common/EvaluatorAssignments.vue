@@ -33,7 +33,7 @@
                         :disable-replace="true"
                     />
                 </div>
-                <div v-else>
+                <div v-else-if="!selectedEvaluation.user.isNat">
                     <p><b>Mock evaluators:</b></p>
                     <button class="btn btn-sm btn-secondary btn-block" @click="enableMockEvaluators">
                         {{ potentialMockEvaluators ? 'Re-select mock evaluators' : 'Enable mock evaluators' }}
@@ -59,7 +59,7 @@
             </div>
             <div :class="columnClasses.totalEvaluations">
                 <user-list
-                    :header="'Total evaluations: (' + selectedEvaluation.reviews.length + ')'"
+                    :header="'Total evaluations: (' + (selectedEvaluation.reviews || []).length + ')'"
                     :user-list="submittedEvaluators"
                 />
             </div>
@@ -96,7 +96,8 @@ export default {
         ]),
         /** @returns {Object[]} */
         submittedEvaluators() {
-            const evaluators = this.selectedEvaluation.reviews.map(review => review.evaluator);
+            const reviews = this.selectedEvaluation.reviews || [];
+            const evaluators = reviews.map(review => review.evaluator);
             const mockReviews = this.selectedEvaluation.mockReviews || [];
             
             // Add mock evaluators to the list with a special flag for styling (only those who submitted reviews)
@@ -144,7 +145,8 @@ export default {
             }
         },
         async enableMockEvaluators(e) {
-            const r = await this.$http.executePost(`/appeval/selectMockEvaluators/${this.selectedEvaluation.id}`, {}, e);
+            const route = this.selectedEvaluation.isApplication ? 'appeval' : 'bneval';
+            const r = await this.$http.executePost(`/${route}/selectMockEvaluators/${this.selectedEvaluation.id}`, {}, e);
 
             if (r && !r.error) {
                 this.potentialMockEvaluators = r;

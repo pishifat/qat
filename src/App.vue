@@ -118,14 +118,14 @@
                                         <router-link class="dropdown-item" to="/yourevals">
                                             Your Evaluations
                                         </router-link>
-                                        <span v-if="loggedInUser.isTrialNat">
+                                        <span v-if="loggedInUser.isBnEvaluator">
                                             <router-link class="dropdown-item" to="/appeval">
                                                 Applications
                                             </router-link>
                                             <router-link class="dropdown-item" to="/bneval">
                                                 Current BNs
                                             </router-link>
-                                            <router-link class="dropdown-item" to="/evalarchive">
+                                            <router-link v-if="loggedInUser.isTrialNat" class="dropdown-item" to="/evalarchive">
                                                 Archive
                                             </router-link>
                                         </span>

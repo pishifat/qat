@@ -100,7 +100,12 @@ export default {
                         route = 'manageReports';
                         break;
                     case 'enableMockEvaluators':
-                        route = 'appEval';
+                        if (this.evalType == 'application') {
+                            route = 'appEval';
+                        } else if (this.evalType == 'currentBn' || this.evalType == 'resignation') {
+                            route = 'bnEval';
+                        }
+
                         type = 'enable mock evaluations';
                         break;
                     case 'eval':

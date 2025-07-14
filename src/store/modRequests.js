@@ -30,7 +30,6 @@ export default {
 
             // filter out users who don't have a specific preference ✔'d
             if (state.included.length) {
-                console.log('in2');
                 filtered.forEach((mode) => {
                     mode.users = mode.users.filter((user) => {
                         const preferences = [...user.genrePreferences, ...user.languagePreferences, ...user.osuStylePreferences, ...user.taikoStylePreferences, ...user.catchStylePreferences, ...user.maniaStylePreferences, ...user.maniaKeymodePreferences, ...user.detailPreferences, ...user.mapperPreferences];

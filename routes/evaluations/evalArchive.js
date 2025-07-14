@@ -27,6 +27,14 @@ const defaultAppPopulate = [
             select: 'username osuId groups',
         },
     },
+    {
+        path: 'mockReviews',
+        select: 'evaluator behaviorComment moddingComment vote',
+        populate: {
+            path: 'evaluator',
+            select: 'username osuId groups',
+        },
+    },
 ];
 
 const defaultBnPopulate = [
@@ -40,6 +48,14 @@ const defaultBnPopulate = [
     },
     {
         path: 'reviews',
+        select: 'evaluator behaviorComment moddingComment vote',
+        populate: {
+            path: 'evaluator',
+            select: 'username osuId groups',
+        },
+    },
+    {
+        path: 'mockReviews',
         select: 'evaluator behaviorComment moddingComment vote',
         populate: {
             path: 'evaluator',

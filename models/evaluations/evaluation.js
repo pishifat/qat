@@ -8,36 +8,12 @@ const evaluationSchema = new mongoose.Schema({
 
 class EvaluationService extends mongoose.Model {
 
-    static async findActiveEvaluations(user, isNat) {
+    static async findActiveEvaluations(user, isNat, isTrialNat) {
         let minDate = new Date();
         minDate.setDate(minDate.getDate() + 7);
 
         let query;
-
-        if (isNat) {
-            query = {
-                active: true,
-                deadline: { $lt: minDate },
-            }
-        } else {
-            const settings = await Settings.findOne({}); // there's only one
-            const trialNatEnabledModeSettings = settings.modeSettings.filter(s => s.hasTrialNat == true);
-            const trialNatModes = trialNatEnabledModeSettings.map(s => s.mode);
-
-            query = {
-                active: true,
-                deadline: { $lt: minDate },
-                user: { $ne: user._id },
-                $and: [
-                    { mode: user.modes },
-                    { mode: trialNatModes },
-                ]
-            }
-        }
-
-        return this
-            .find(query)
-            .populate([
+        let populate = [
                 {
                     path: 'user',
                     select: 'username osuId modesInfo groups evaluatorModes subjectiveEvalFeedback history',
@@ -67,6 +43,14 @@ class EvaluationService extends mongoose.Model {
                     },
                 },
                 {
+                    path: 'mockReviews',
+                    select: 'evaluator behaviorComment moddingComment vote',
+                    populate: {
+                        path: 'evaluator',
+                        select: 'username osuId groups discordId isBnEvaluator',
+                    },
+                },
+                {
                     path: 'rerolls',
                     populate: [
                         {
@@ -79,10 +63,51 @@ class EvaluationService extends mongoose.Model {
                         },
                     ],
                 },
+            ]
+
+        if (isNat) {
+            query = {
+                active: true,
+                deadline: { $lt: minDate },
+            }
+
+            populate.push(
                 {
                     path: 'selfSummary',
                 },
-            ])
+            )
+        } else if (isTrialNat) {
+            const settings = await Settings.findOne({}); // there's only one
+            const trialNatEnabledModeSettings = settings.modeSettings.filter(s => s.hasTrialNat == true);
+            const trialNatModes = trialNatEnabledModeSettings.map(s => s.mode);
+
+            query = {
+                active: true,
+                deadline: { $lt: minDate },
+                user: { $ne: user._id },
+                $and: [
+                    { mode: user.modes },
+                    { mode: trialNatModes },
+                ]
+            }
+        } else {
+            // technically this means the function loads inactive evals but i dont care
+            query = {
+                $or: [
+                    { active: true, discussion: false },
+                    { active: false, discussion: true },
+                ],
+                
+                deadline: { $lt: minDate },
+                user: { $ne: user._id },
+                mode: user.modes,
+                mockEvaluators: user._id,
+            }
+        }
+
+        return this
+            .find(query)
+            .populate(populate)
             .sort({ deadline: 1, consensus: 1, feedback: 1 });
     }
 
@@ -118,6 +143,14 @@ class EvaluationService extends mongoose.Model {
                     populate: {
                         path: 'evaluator',
                         select: 'username osuId groups',
+                    },
+                },
+                {
+                    path: 'mockReviews',
+                    select: 'evaluator behaviorComment moddingComment vote',
+                    populate: {
+                        path: 'evaluator',
+                        select: 'username osuId groups discordId isBnEvaluator',
                     },
                 },
             ])

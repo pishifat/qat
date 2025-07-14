@@ -256,6 +256,36 @@ async function setFeedback (evaluation, feedback, session) {
     return evaluation;
 }
 
+async function selectMockEvaluators (evaluation) {
+    // Find eligible users: full BNs in the evaluation's mode with isBnEvaluator: true and isTrialNat: false
+    const allEligibleUsers = await User.aggregate([
+        {
+            $match: {
+                groups: 'bn',
+                isBnEvaluator: true,
+                isTrialNat: false,
+                modesInfo: { 
+                    $elemMatch: { 
+                        mode: evaluation.mode, 
+                        level: 'full' 
+                    } 
+                },
+            },
+        },
+        { $sample: { size: 1000 } },
+    ]);
+
+    // Calculate selection count: 30% of eligible users, minimum 5
+    const thirtyPercent = Math.floor(allEligibleUsers.length * 0.3);
+    const selectionCount = Math.max(5, thirtyPercent);
+    
+    // Select the appropriate number of users (or all if fewer than 5)
+    const selectedCount = Math.min(selectionCount, allEligibleUsers.length);
+    const selectedUsers = allEligibleUsers.slice(0, selectedCount);
+
+    return selectedUsers;
+}
+
 async function replaceUser (evaluation, currentUserId, evaluatorId, isBn, selectedUserId) {
     const currentSelection = isBn ? evaluation.bnEvaluators.map(u => u.osuId) : evaluation.natEvaluators.map(u => u.osuId);
     let newEvaluator;
@@ -293,6 +323,7 @@ async function replaceUser (evaluation, currentUserId, evaluatorId, isBn, select
 module.exports = {
     submitEval,
     submitMockEval,
+    selectMockEvaluators,
     setGroupEval,
     setFeedback,
     replaceUser,

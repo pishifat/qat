@@ -47,9 +47,9 @@ const routes = [
 
     // BN/NAT
     { path: '/appeval', component: AppEvalPage, meta: { title: 'BN Application Evaluations', requiresBnOrNat: true } },
+    { path: '/bneval', component: BnEvalPage, meta: { title: 'Current BN Evaluations', requiresBnOrNat: true } },
 
     // NAT/Trial NAT
-    { path: '/bneval', component: BnEvalPage, meta: { title: 'Current BN Evaluations', requiresNatOrTrialNat: true } },
     { path: '/evalarchive', component: EvalArchive, meta: { title: 'Evaluation Archives', requiresNatOrTrialNat: true } },
 
     // NAT/GMT

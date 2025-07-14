@@ -4,6 +4,7 @@
             :message="message"
             :message-type="'enableMockEvaluators'"
             :mongo-id="selectedEvaluation.id"
+            :eval-type="selectedEvaluation.kind"
             :users="users"
             :custom-text="'Send message & enable mock evaluations'"
         />
