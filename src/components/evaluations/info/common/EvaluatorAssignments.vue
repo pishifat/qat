@@ -53,6 +53,7 @@
 
                         <enable-mock-evaluators-chat-message
                             :users="potentialMockEvaluators"
+                            :eval-type="selectedEvaluation.kind"
                         />
                     </div>
                 </div>
