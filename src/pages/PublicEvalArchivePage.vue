@@ -55,7 +55,7 @@
                 <transition-group name="list" tag="div" class="row">
                     <template v-if="filterEvals(paginatedArchivedApplications, consensusFilter)">
                         <evaluation-card
-                            
+                            key="applications-card"
                             v-for="application in filterEvals(paginatedArchivedApplications, consensusFilter)"
                             :key="application._id"
                             :evaluation="application"
@@ -63,7 +63,7 @@
                             target="#extendedInfo"
                         />
                     </template>
-                    <span v-else class="small">
+                    <span v-else class="small" key="applications-none">
                         None...
                     </span>
                 </transition-group>
@@ -83,6 +83,7 @@
                 <transition-group name="list" tag="div" class="row">
                     <template v-if="filterEvals(paginatedArchivedCurrentBnEvals, consensusFilter).length">
                         <evaluation-card
+                            key="bn-evals-card"
                             v-for="evaluation in filterEvals(paginatedArchivedCurrentBnEvals, consensusFilter)"
                             :key="evaluation._id"
                             :evaluation="evaluation"
@@ -90,7 +91,7 @@
                             target="#extendedInfo"
                         />
                     </template>
-                    <span v-else class="small">
+                    <span v-else class="small" key="bn-evals-none">
                         None...
                     </span>
                 </transition-group>
