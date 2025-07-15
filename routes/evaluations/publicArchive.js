@@ -52,13 +52,20 @@ function sanitizeReviews(reviews) {
     });
 }
 
-function sanitizePublicReviews(reviews) {
+function sanitizePublicReviews(reviews, currentUserId) {
     return reviews.map(review => {
+        const evaluatorData = {
+            isTrialNat: review.evaluator.isTrialNat,
+            groups: review.evaluator.groups,
+        };
+
+        // Include _id if this review belongs to the current user
+        if (currentUserId && review.evaluator._id.toString() === currentUserId.toString()) {
+            evaluatorData._id = review.evaluator._id;
+        }
+
         return {
-            evaluator: {
-                isTrialNat: review.evaluator.isTrialNat,
-                groups: review.evaluator.groups,
-            },
+            evaluator: evaluatorData,
             moddingComment: review.moddingComment,
             vote: review.vote,
             id: review.id,
@@ -125,7 +132,7 @@ router.get('/relevantInfo/:limit', async (req, res) => {
         if (isNat) {
             app.reviews = sanitizeReviews(app.reviews);
         } else if (app.isNewEvaluationFormat) {
-            app.reviews = sanitizePublicReviews(app.reviews);
+            app.reviews = sanitizePublicReviews(app.reviews, req.session.mongoId);
         } else {
             app.reviews = sanitizeBareboneReviews(app.reviews);
         }
@@ -152,7 +159,7 @@ router.get('/relevantInfo/:limit', async (req, res) => {
         if (isNat) {
             eval.reviews = sanitizeReviews(eval.reviews);
         } else if (eval.isNewEvaluationFormat) {
-            eval.reviews = sanitizePublicReviews(eval.reviews);
+            eval.reviews = sanitizePublicReviews(eval.reviews, req.session.mongoId);
         } else {
             eval.reviews = sanitizeBareboneReviews(eval.reviews);
         }
@@ -210,7 +217,7 @@ router.get('/search/:id', async (req, res) => {
     if (isNat) {
         eval.reviews = sanitizeReviews(eval.reviews);
     } else if (eval.isNewEvaluationFormat) {
-        eval.reviews = sanitizePublicReviews(eval.reviews);
+        eval.reviews = sanitizePublicReviews(eval.reviews, req.session.mongoId);
     } else {
         eval.reviews = sanitizeBareboneReviews(eval.reviews);
     }

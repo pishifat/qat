@@ -21,9 +21,9 @@
             </user-avatar>
 
             <div v-else class="text-center my-2 text-pastel-blue">
-                <b :class="voteColor(review.vote)">Evaluator {{ index }}</b>
+                <b :class="canSeeOwnVote() ? voteColor(review.vote) : ''">Evaluator {{ index }}</b>
 
-                <div v-if="loggedInUser && review.evaluator && review.evaluator.id == loggedInUser.id" :class="voteColor(review.vote)">
+                <div v-if="canSeeOwnVote()" :class="voteColor(review.vote)">
                     (this is you!)
                 </div>
             </div>
@@ -82,6 +82,9 @@ export default {
             } else if (vote == 3) {
                 return 'text-fail';
             }
+        },
+        canSeeOwnVote() {
+            return this.loggedInUser && this.review.evaluator && this.review.evaluator._id == this.loggedInUser._id;
         },
         async deleteReview() {
             if (confirm('Are you sure you want to delete this review?')) {
