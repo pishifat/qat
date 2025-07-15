@@ -257,7 +257,8 @@ async function setFeedback (evaluation, feedback, session) {
 }
 
 async function selectMockEvaluators (evaluation) {
-    // Find eligible users: full BNs in the evaluation's mode with isBnEvaluator: true and isTrialNat: false
+    // Find eligible users: full BNs in the evaluation's mode with isBnEvaluator: true and isTrialNat: false,
+    // excluding the evaluation's user
     const allEligibleUsers = await User.aggregate([
         {
             $match: {
@@ -270,6 +271,7 @@ async function selectMockEvaluators (evaluation) {
                         level: 'full' 
                     } 
                 },
+                _id: { $ne: evaluation.user._id },
             },
         },
         { $sample: { size: 1000 } },
