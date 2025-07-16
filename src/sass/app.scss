@@ -43,6 +43,10 @@
 
 .body-content-padding {
     padding-top: 94px !important;
+
+    @include media-breakpoint-down(md) {
+        padding-top: 24px !important;
+    }
 }
 
 sup {
