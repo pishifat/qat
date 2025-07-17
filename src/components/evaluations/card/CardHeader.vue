@@ -1,29 +1,41 @@
 <template>
     <div class="card-body">
-        <p class="card-text">
+        <p class="card-text d-flex align-items-center">
             <user-link
                 class="font-weight-bold"
                 :osu-id="osuId"
                 :username="username"
             />
-            <i v-if="mode == 'osu'" class="osu-icon mx-1" />
-            <i v-else-if="mode == 'taiko'" class="taiko-icon mx-1" />
-            <i v-else-if="mode == 'catch'" class="catch-icon mx-1" />
-            <i v-else-if="mode == 'mania'" class="mania-icon mx-1" />
-            <i v-if="isResignation" class="fas fa-walking mr-1" />
+            <i v-if="mode == 'osu'" class="osu-icon ml-2" />
+            <i v-else-if="mode == 'taiko'" class="taiko-icon ml-2" />
+            <i v-else-if="mode == 'catch'" class="catch-icon ml-2" />
+            <i v-else-if="mode == 'mania'" class="mania-icon ml-2" />
+            <i
+                v-if="isActive && hasMockEvaluators"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="mock evaluators enabled"
+                class="fas fa-flask ml-2 text-probation"
+            />
+            <i v-if="isResignation"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="resignation"
+                class="fas fa-walking ml-2 text-neutral"
+            />
             <i
                 v-if="isActive && !isReviewed && isDiscussion && !isResignation && !isNatEvaluation"
                 data-toggle="tooltip"
                 data-placement="top"
                 title="needs review"
-                class="fa fa-eye mr-1 text-warning"
+                class="fa fa-eye ml-2 text-warning"
             />
             <i
                 v-if="isActive && isApp && isNatOrTrialNat && !isSecurityChecked"
                 data-toggle="tooltip"
                 data-placement="top"
                 title="needs a security check"
-                class="fas fa-shield-alt mr-1"
+                class="fas fa-shield-alt ml-2"
                 :class="isSecurityChecked ? '' : 'text-warning'"
             />
             <i
@@ -31,7 +43,7 @@
                 data-toggle="tooltip"
                 data-placement="top"
                 title="needs a NAT buddy"
-                class="fas fa-user mr-1"
+                class="fas fa-user ml-2"
                 :class="hasNatBuddy ? '' : 'text-warning'"
             />
             <i
@@ -39,7 +51,7 @@
                 data-toggle="tooltip"
                 data-placement="top"
                 title="visible in public archives"
-                class="fas fa-globe-americas mr-1 text-success"
+                class="fas fa-globe-americas ml-2 text-success"
             />
         </p>
         <div v-if="consensus">
@@ -129,6 +141,10 @@ export default {
             default: true,
         },
         isApp: {
+            type: Boolean,
+            default: false,
+        },
+        hasMockEvaluators: {
             type: Boolean,
             default: false,
         },
