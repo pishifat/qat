@@ -1090,9 +1090,18 @@ router.post('/sendMessages/:id', middlewares.isNatOrTrialNat, async (req, res) =
 
     const osuIds = req.body.users.map(user => user.osuId);
 
-    const channel = {
-        name: `BN Eval Results (${evaluation.mode == 'osu' ? 'osu!' : `osu!${evaluation.mode}`})`,
-        description: `Results for your recent BN evaluation (${moment(evaluation.createdAt).format('YYYY-MM-DD')})`,
+    let channel;
+
+    if (req.body.type == 'enable mock evaluations') {
+        channel = {
+            name: `BN App Mock Eval (${application.mode == 'osu' ? 'osu!' : `osu!${application.mode}`})`,
+            description: `Invite to participate in a mock evaluation of a BN application`,
+        }
+    } else {
+        channel = {
+            name: `BN Eval Results (${evaluation.mode == 'osu' ? 'osu!' : `osu!${evaluation.mode}`})`,
+            description: `Results for your recent BN evaluation (${moment(evaluation.createdAt).format('YYYY-MM-DD')})`,
+        }
     }
 
     const message = await osuBot.sendAnnouncement(osuIds, channel, req.body.message);
