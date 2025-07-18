@@ -27,7 +27,7 @@
                 :is-public="evaluation.isPublic"
                 :is-active="evaluation.active"
                 :is-app="evaluation.isApplication"
-                :has-mock-evaluators="evaluation.mockEvaluators.length > 0"
+                :has-mock-evaluators="evaluation.mockEvaluators && evaluation.mockEvaluators.length > 0"
             />
 
             <card-footer
