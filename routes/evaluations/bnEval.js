@@ -1094,8 +1094,8 @@ router.post('/sendMessages/:id', middlewares.isNatOrTrialNat, async (req, res) =
 
     if (req.body.type == 'enable mock evaluations') {
         channel = {
-            name: `BN App Mock Eval (${application.mode == 'osu' ? 'osu!' : `osu!${application.mode}`})`,
-            description: `Invite to participate in a mock evaluation of a BN application`,
+            name: `BN Mock Eval (${evaluation.mode == 'osu' ? 'osu!' : `osu!${evaluation.mode}`})`,
+            description: `Invite to participate in a mock evaluation of a BN evaluation`,
         }
     } else {
         channel = {
