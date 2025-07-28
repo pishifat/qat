@@ -434,7 +434,7 @@ class UserService extends mongoose.Model {
         if (lastEvaluation) {
             for (const review of lastEvaluation.reviews) {
                 if (assignedNat.length < sampleSize) {
-                    if (review.evaluator.isNat && review.evaluator.inBag) {
+                    if (review.evaluator.isNat && review.evaluator.inBag && review.evaluator.isBnEvaluator) {
                         assignedNat.push(review.evaluator);
                         excludeOsuIds.push(review.evaluator.osuId);
                     }
