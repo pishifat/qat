@@ -174,51 +174,50 @@
                                 </li>
 
                                 <!-- GMT + BN -->
-
-                                <li v-if="loggedInUser.isBn" class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
-                                        Other
-                                    </a>
-                                    <div class="dropdown-menu">
-                                        <router-link class="dropdown-item" to="/charts">
-                                            Charts
-                                        </router-link>
-                                        <router-link class="dropdown-item" to="/vetoes">
-                                            Vetoes
-                                        </router-link>
-                                    </div>
-                                </li>
-
-                                <!-- GMT + Trial NAT -->
-
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
-                                        Evaluations
-                                    </a>
-                                    <div class="dropdown-menu">
-                                        <router-link class="dropdown-item" to="/yourevals">
-                                            Your Evaluations
-                                        </router-link>
-                                        <router-link class="dropdown-item" to="/publicarchive">
-                                            Public Evaluation Archives
-                                        </router-link>
-                                        <span v-if="loggedInUser.isTrialNat">
-                                            <router-link class="dropdown-item" to="/appeval">
-                                                Applications
+                                <span v-if="loggedInUser.isBn">
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                            Other
+                                        </a>
+                                        <div class="dropdown-menu">
+                                            <router-link class="dropdown-item" to="/charts">
+                                                Charts
                                             </router-link>
-                                            <router-link class="dropdown-item" to="/bneval">
-                                                Current BNs
+                                            <router-link class="dropdown-item" to="/vetoes">
+                                                Vetoes
                                             </router-link>
-                                            <router-link class="dropdown-item" to="/evalarchive">
-                                                Archive
+                                        </div>
+                                    </li>
+
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                            Evaluations
+                                        </a>
+                                        <div class="dropdown-menu">
+                                            <router-link class="dropdown-item" to="/yourevals">
+                                                Your Evaluations
                                             </router-link>
-                                        </span>
-                                    </div>
-                                </li>
+                                            <router-link class="dropdown-item" to="/publicarchive">
+                                                Public Evaluation Archives
+                                            </router-link>
+                                            <span v-if="loggedInUser.isTrialNat">
+                                                <router-link class="dropdown-item" to="/appeval">
+                                                    Applications
+                                                </router-link>
+                                                <router-link class="dropdown-item" to="/bneval">
+                                                    Current BNs
+                                                </router-link>
+                                                <router-link class="dropdown-item" to="/evalarchive">
+                                                    Archive
+                                                </router-link>
+                                            </span>
+                                        </div>
+                                    </li>
+                                </span>
 
-                                <!-- GMT -->
+                                <!-- GMT (not BN) -->
 
-                                <li v-if="!loggedInUser.isBn" class="nav-item dropdown">
+                                <li v-else class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
                                         Other
                                     </a>
