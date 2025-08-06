@@ -31,7 +31,7 @@ function getLimitedDefaultPopulate(mongoId) {
         path: 'mediations',
         populate: {
             path: 'mediator',
-            select: 'username osuId',
+            select: '-username -osuId -id -_id',
             match: {
                 _id: mongoId,
             },

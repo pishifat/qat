@@ -16,7 +16,7 @@
                     <span v-if="selectedVeto.reasons.length">
                         <hr />
                         <vote-stats :reason-index="reasonIndex" />
-                        <b>Discussion link:</b>
+                        <b class="mr-1">Discussion link:</b>
                         <a :href="reason.link" target="_blank">{{ reason.link }}</a>
                         <hr />
                     </span>
