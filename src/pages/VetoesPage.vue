@@ -50,6 +50,9 @@
                         v-if="!reachedMax"
                         type="button"
                         class="btn btn-secondary ml-2"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="This takes a long time to load"
                         @click="showAll($event)"
                     >
                         Show all vetoes
@@ -124,8 +127,8 @@ export default {
     },
     data() {
         return {
-            skip: 24,
-            limit: 24,
+            skip: 6,
+            limit: 6,
             reachedMax: false,
             oldVetoId: '',
             newVetoId: '',

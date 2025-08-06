@@ -21,6 +21,14 @@
                 </a>
             </user-avatar>
 
+            <user-avatar
+                v-else-if="mediation.mediator"
+                :user="mediation.mediator"
+                :text-color="voteColor(mediation.vote)"
+            >
+                <span v-if="mediation.vote == 2" class="text-secondary small">(partially agree)</span>
+            </user-avatar>
+
             <div v-else class="text-center my-2" :class="voteColor(mediation.vote)">
                 Anonymous
             </div>

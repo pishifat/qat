@@ -26,23 +26,31 @@ const defaultPopulate = [
 ];
 
 // hides mediator info
+function getLoggedOutPopulate() {
+    return {
+        path: 'mediations',
+        select: '-mediator',
+    };
+}
+
 function getLimitedDefaultPopulate(mongoId) {
     return {
         path: 'mediations',
         populate: {
             path: 'mediator',
-            select: '-username -osuId -id -_id',
             match: {
                 _id: mongoId,
             },
+            select: 'username osuId',
         },
     };
 }
 
 function getPopulate(isNat, mongoId) {
-    if (isNat) return defaultPopulate;
-
-    return getLimitedDefaultPopulate(mongoId);
+    if (!mongoId) return getLoggedOutPopulate();
+    if (!isNat) return getLimitedDefaultPopulate(mongoId)
+    
+    return defaultPopulate;
 }
 
 /* GET vetoes list. */
