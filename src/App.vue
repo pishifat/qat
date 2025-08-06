@@ -51,9 +51,6 @@
                                         Other
                                     </a>
                                     <div class="dropdown-menu">
-                                        <router-link class="dropdown-item" to="/charts">
-                                            Charts
-                                        </router-link>
                                         <router-link class="dropdown-item" to="/reports">
                                             Reports
                                         </router-link>
@@ -96,9 +93,6 @@
                                         Other
                                     </a>
                                     <div class="dropdown-menu">
-                                        <router-link class="dropdown-item" to="/charts">
-                                            Charts
-                                        </router-link>
                                         <router-link class="dropdown-item" to="/reports">
                                             Reports
                                         </router-link>
@@ -175,18 +169,10 @@
 
                                 <!-- GMT + BN -->
                                 <span v-if="loggedInUser.isBn">
-                                    <li class="nav-item dropdown">
-                                        <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
-                                            Other
-                                        </a>
-                                        <div class="dropdown-menu">
-                                            <router-link class="dropdown-item" to="/charts">
-                                                Charts
-                                            </router-link>
-                                            <router-link class="dropdown-item" to="/vetoes">
+                                    <li class="nav-item">
+                                        <router-link class="dropdown-item" to="/vetoes">
                                                 Vetoes
                                             </router-link>
-                                        </div>
                                     </li>
 
                                     <li class="nav-item dropdown">
@@ -222,9 +208,6 @@
                                         Other
                                     </a>
                                     <div class="dropdown-menu">
-                                        <router-link class="dropdown-item" to="/charts">
-                                            Charts
-                                        </router-link>
                                         <router-link class="dropdown-item" to="/vetoes">
                                             Vetoes (read-only)
                                         </router-link>
@@ -267,9 +250,6 @@
                                         Other
                                     </a>
                                     <div class="dropdown-menu">
-                                        <router-link class="dropdown-item" to="/charts">
-                                            Charts
-                                        </router-link>
                                         <router-link class="dropdown-item" to="/vetoes">
                                             Vetoes
                                         </router-link>
