@@ -143,17 +143,7 @@
                             <!-- GMT -->
 
                             <template v-else-if="loggedInUser.hasFullReadAccess && !loggedInUser.isNat">
-                                <li class="nav-item">
-                                    <router-link class="nav-link" to="/modrequests">
-                                        Request a BN
-                                    </router-link>
-                                </li>
-                                <li class="nav-item">
-                                    <router-link class="nav-link" to="/discussionvote">
-                                        Content Review
-                                    </router-link>
-                                </li>
-                                <li v-if="loggedInUser.hasFullReadAccess && !loggedInUser.isNat" class="nav-item dropdown">
+                                <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
                                         Reports
                                     </a>
@@ -166,55 +156,26 @@
                                         </router-link>
                                     </div>
                                 </li>
-
-                                <!-- GMT + BN -->
-                                <span v-if="loggedInUser.isBn">
-                                    <li class="nav-item">
-                                        <router-link class="dropdown-item" to="/vetoes">
-                                                Vetoes
-                                            </router-link>
-                                    </li>
-
-                                    <li class="nav-item dropdown">
-                                        <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
-                                            Evaluations
-                                        </a>
-                                        <div class="dropdown-menu">
-                                            <router-link class="dropdown-item" to="/yourevals">
-                                                Your Evaluations
-                                            </router-link>
-                                            <router-link class="dropdown-item" to="/publicarchive">
-                                                Public Evaluation Archives
-                                            </router-link>
-                                            <span v-if="loggedInUser.isTrialNat">
-                                                <router-link class="dropdown-item" to="/appeval">
-                                                    Applications
-                                                </router-link>
-                                                <router-link class="dropdown-item" to="/bneval">
-                                                    Current BNs
-                                                </router-link>
-                                                <router-link class="dropdown-item" to="/evalarchive">
-                                                    Archive
-                                                </router-link>
-                                            </span>
-                                        </div>
-                                    </li>
-                                </span>
-
-                                <!-- GMT (not BN) -->
-
-                                <li v-else class="nav-item dropdown">
+                                <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
                                         Other
                                     </a>
                                     <div class="dropdown-menu">
+                                        <router-link class="dropdown-item" to="/modrequests">
+                                            Request a BN
+                                        </router-link>
+                                        <router-link class="dropdown-item" to="/discussionvote">
+                                            Content Review
+                                        </router-link>
                                         <router-link class="dropdown-item" to="/vetoes">
-                                            Vetoes (read-only)
+                                            Vetoes {{ loggedInUser.isBn ? '' : '(read-only)' }}
                                         </router-link>
                                         <router-link class="dropdown-item" to="/grouphistory">
                                             Group History
                                         </router-link>
                                     </div>
+                                </li>
+                                <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
                                         Evaluations
                                     </a>
@@ -225,6 +186,17 @@
                                         <router-link class="dropdown-item" to="/publicarchive">
                                             Public Evaluation Archives
                                         </router-link>
+                                        <span v-if="loggedInUser.isTrialNat">
+                                            <router-link class="dropdown-item" to="/appeval">
+                                                Applications
+                                            </router-link>
+                                            <router-link class="dropdown-item" to="/bneval">
+                                                Current BNs
+                                            </router-link>
+                                            <router-link class="dropdown-item" to="/evalarchive">
+                                                Archive
+                                            </router-link>
+                                        </span>
                                     </div>
                                 </li>
                             </template>
