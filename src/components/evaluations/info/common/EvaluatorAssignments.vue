@@ -35,8 +35,11 @@
                 </div>
                 <div v-else-if="!selectedEvaluation.user.isNat">
                     <p><b>Mock evaluators:</b></p>
-                    <button class="btn btn-sm btn-secondary btn-block" @click="enableMockEvaluators">
+                    <button class="btn btn-sm btn-secondary btn-block" @click="enableMockEvaluators(false, $event)">
                         {{ potentialMockEvaluators ? 'Re-select mock evaluators' : 'Enable mock evaluators' }}
+                    </button>
+                    <button v-if="potentialMockEvaluators" class="btn btn-sm btn-primary btn-block" @click="enableMockEvaluators(true, $event)">
+                        Select all eligible users as mock evaluators
                     </button>
                     
                     <div v-if="potentialMockEvaluators && potentialMockEvaluators.length">
@@ -132,22 +135,9 @@ export default {
         },
     },
     methods: {
-        async selectBnEvaluators(e) {
-            const r = await this.$http.executePost('/appeval/selectBnEvaluators', {
-                mode: this.selectedEvaluation.mode,
-                id: this.selectedEvaluation.id,
-                includeUsers: this.includeUsers,
-                excludeUsers: this.excludeUsers,
-                totalUsers: this.totalUsers,
-            }, e);
-
-            if (r && !r.error) {
-                this.potentialBnEvaluators = r;
-            }
-        },
-        async enableMockEvaluators(e) {
+        async enableMockEvaluators(selectAll, e) {
             const route = this.selectedEvaluation.isApplication ? 'appeval' : 'bneval';
-            const r = await this.$http.executePost(`/${route}/selectMockEvaluators/${this.selectedEvaluation.id}`, {}, e);
+            const r = await this.$http.executePost(`/${route}/selectMockEvaluators/${this.selectedEvaluation.id}`, { selectAll }, e);
 
             if (r && !r.error) {
                 this.potentialMockEvaluators = r;

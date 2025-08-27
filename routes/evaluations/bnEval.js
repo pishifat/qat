@@ -1187,11 +1187,12 @@ router.post('/deleteReview/:id', middlewares.isAdmin, async (req, res) => {
 
 /* POST select mock evaluators */
 router.post('/selectMockEvaluators/:id', middlewares.isNat, async (req, res) => {
+    const selectAll = req.body.selectAll;
     const evaluation = await BnEvaluation
         .findById(req.params.id)
         .orFail();
 
-    const selectedUsers = await selectMockEvaluators(evaluation);
+    const selectedUsers = await selectMockEvaluators(evaluation, selectAll);
 
     // Return selected users without saving to database
     res.json(selectedUsers);

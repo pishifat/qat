@@ -536,77 +536,14 @@ router.post('/replaceUser/:id', middlewares.isNat, async (req, res) => {
     );
 });
 
-/* POST select BN evaluators */
-router.post('/selectBnEvaluators', middlewares.isNat, async (req, res) => {
-    const totalUsers = parseInt(req.body.totalUsers);
-
-    if (isNaN(totalUsers) || totalUsers < 1 || totalUsers > 10) {
-        return res.json({ error: 'Pick a number between 1 and 10' });
-    }
-
-    const allUsers = await User.aggregate([
-        {
-            $match: {
-                groups: 'bn',
-                isBnEvaluator: true,
-                modesInfo: { $elemMatch: { mode: req.body.mode, level: 'full' } },
-            },
-        },
-        { $sample: { size: 1000 } },
-    ]);
-    let users = [];
-    let excludeUserIds = [];
-
-    if (req.body.includeUsers) {
-        const includeUsers = req.body.includeUsers.split(',');
-
-        for (let i = 0; i < includeUsers.length; i++) {
-            const userToSearch = includeUsers[i].trim();
-            const user = await User.findByUsername(userToSearch);
-
-            if (user && user.modesInfo.some(m => m.mode === req.body.mode)) {
-                users.push(user);
-                excludeUserIds.push(user.id);
-            }
-        }
-    }
-
-
-    if (req.body.excludeUsers) {
-        const excludeUsers = req.body.excludeUsers.split(',');
-
-        for (let i = 0; i < excludeUsers.length; i++) {
-            const userToSearch = excludeUsers[i].trim();
-            const user = await User.findByUsername(userToSearch);
-
-            if (user) {
-                excludeUserIds.push(user.id);
-            }
-        }
-    }
-
-    const requiredUsers = users.length > totalUsers ? users.length : totalUsers;
-
-    for (let i = 0; users.length < requiredUsers && i < allUsers.length; i++) {
-        const user = allUsers[i];
-        const userId = user._id.toString();
-
-        if (!excludeUserIds.includes(userId)) {
-            users.push(user);
-            excludeUserIds.push(userId);
-        }
-    }
-
-    res.json(users);
-});
-
 /* POST select mock evaluators */
 router.post('/selectMockEvaluators/:id', middlewares.isNat, async (req, res) => {
+    const selectAll = req.body.selectAll;
     const evaluation = await AppEvaluation
         .findById(req.params.id)
         .orFail();
 
-    const selectedUsers = await selectMockEvaluators(evaluation);
+    const selectedUsers = await selectMockEvaluators(evaluation, selectAll);
 
     // Return selected users without saving to database
     res.json(selectedUsers);

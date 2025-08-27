@@ -256,7 +256,7 @@ async function setFeedback (evaluation, feedback, session) {
     return evaluation;
 }
 
-async function selectMockEvaluators (evaluation) {
+async function selectMockEvaluators (evaluation, selectAll) {
     // Find eligible users: full BNs in the evaluation's mode with isBnEvaluator: true and isTrialNat: false,
     // excluding the evaluation's user
     const allEligibleUsers = await User.aggregate([
@@ -276,6 +276,10 @@ async function selectMockEvaluators (evaluation) {
         },
         { $sample: { size: 1000 } },
     ]);
+
+    if (selectAll) {
+        return (allEligibleUsers);
+    }
 
     // Calculate selection count: 30% of eligible users, minimum 5
     const thirtyPercent = Math.floor(allEligibleUsers.length * 0.3);
