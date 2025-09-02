@@ -4,12 +4,12 @@
             <a :href="events && `#${eventsId}`" data-toggle="collapse"
                 >{{ header }} <i class="fas fa-angle-down"
             /></a>
-            ({{ isLoading ? '...' : events.length ? getCompletedEvaluations(events).length + '/' + events.length : '0' }})
+            ({{ isLoading ? '...' : events.length ? isMock ? events.length : getCompletedEvaluations(events).length + '/' + events.length : '0' }})
         </div>
 
         <div v-if="loggedInUser.isNat">
             <div v-if="events" :id="eventsId" class="collapse">
-                <ul v-if="events.length" class="small">
+                <ul v-if="!isMock && events.length" class="small">
                     <li><b>Assigned Evaluations:</b> {{ totalEvaluations }}</li>
                     <ul>
                         <li><b>Completed:</b> {{ totalCompletedEvaluations }} <span class="text-danger">({{ totalOverdueEvaluations }} overdue)</span></li>
@@ -24,10 +24,10 @@
                 </ul>
                 <data-table
                     v-if="events.length"
-                    :headers="['', 'Deadline', 'Eval submitted', 'Evaluation', 'Vote', 'Consensus']"
+                    :headers="isMock ? ['Deadline', 'Eval submitted', 'Evaluation', 'Vote', 'Consensus'] : ['', 'Deadline', 'Eval submitted', 'Evaluation', 'Vote', 'Consensus']"
                 >
                     <tr v-for="event in events" :key="event.id">
-                        <td>
+                        <td v-if="!isMock">
                             <i
                                 v-if="wasRerolled(event.rerolls)"
                                 class="fas fa-undo-alt text-warning"
@@ -44,8 +44,8 @@
                         <td class="text-nowrap">
                             {{ new Date(event.deadline).toString().slice(4, 10) }}
                         </td>
-                        <td class="text-nowrap" :class="evaluatedAfterDeadline(event.deadline, event.reviews) ? 'text-danger' : ''">
-                            {{ findReviewDate(event.reviews) }}
+                        <td class="text-nowrap" :class="evaluatedAfterDeadline(event.deadline, isMock ? event.mockReviews :event.reviews) ? 'text-danger' : ''">
+                            {{ findReviewDate(isMock ? event.mockReviews : event.reviews) }}
                         </td>
                         <td>
                             <a
@@ -61,8 +61,8 @@
                             </a>
                         </td>
                         <td>
-                            <span :class="'text-' + findVote(event.reviews)">
-                                {{ capitalizeFirstLetter(findVote(event.reviews)) }}
+                            <span :class="'text-' + findVote(isMock ? event.mockReviews : event.reviews)">
+                                {{ capitalizeFirstLetter(findVote(isMock ? event.mockReviews : event.reviews)) }}
                             </span>
                         </td>
                         <td>
@@ -109,6 +109,7 @@ export default {
             required: true,
         },
         isApplication: Boolean,
+        isMock: Boolean,
     },
     computed: {
         ...mapState('activity', ['isLoading']), 

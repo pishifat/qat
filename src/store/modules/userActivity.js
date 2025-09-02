@@ -13,6 +13,8 @@ export default {
         assignedBnApplications: [],
         natApplications: [],
         natBnEvaluations: [],
+        mockApplications: [],
+        mockBnEvaluations: [],
         month1Nominations: [],
         month2Nominations: [],
         month3Nominations: [],
@@ -53,6 +55,12 @@ export default {
         },
         setNatBnEvaluations (state, evaluations) {
             state.natBnEvaluations = evaluations;
+        },
+        setMockApplications (state, applications) {
+            state.mockApplications = applications;
+        },
+        setMockBnEvaluations (state, evaluations) {
+            state.mockBnEvaluations = evaluations;
         },
         setMonth1Nominations (state, month1Nominations) {
             state.month1Nominations = month1Nominations;

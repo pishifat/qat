@@ -971,6 +971,14 @@ const applicationPopulate = [
         },
     },
     {
+        path: 'mockReviews',
+        select: 'evaluator behaviorComment moddingComment vote createdAt',
+        populate: {
+            path: 'evaluator',
+            select: 'username osuId groups',
+        },
+    },
+    {
         path: 'rerolls',
         populate: [
             {
@@ -992,6 +1000,14 @@ const evaluationPopulate = [
     },
     {
         path: 'reviews',
+        select: 'evaluator behaviorComment moddingComment vote createdAt',
+        populate: {
+            path: 'evaluator',
+            select: 'username osuId groups',
+        },
+    },
+    {
+        path: 'mockReviews',
         select: 'evaluator behaviorComment moddingComment vote createdAt',
         populate: {
             path: 'evaluator',
@@ -1028,19 +1044,14 @@ router.get('/activity', async (req, res) => {
     minDate.setDate(minDate.getDate() - days);
     let maxDate = new Date(deadline);
 
-    // find all assigned applications for BN
-    const assignedBnApplications = await AppEvaluation
-        .find({
-            bnEvaluators: mongoId,
-            mode: modes,
-            createdAt: { $gt: minDate },
-            discussion: true,
-        })
-        .populate(applicationPopulate)
-        .sort({ createdAt: 1 });
-
-    // find all AppEvaluations & BnEvaluations/Resignations for NAT
-    let [appEvaluations, bnEvaluations] = await Promise.all([
+    /**
+     * appEvaluations: a NAT's evaluations of applications
+     * bnEvaluations: a NAT's evaluations of current BNs
+     * assignedBnApplications: a BN's assigned applications for evaluations (but not mock evaluations)
+     * mockAppEvaluations: a BN's mock evaluations of applications
+     * mockBnEvaluations: a BN's mock evaluations of current BNs
+     */
+    let [appEvaluations, bnEvaluations, assignedBnApplications, mockAppEvaluations, mockBnEvaluations] = await Promise.all([
         AppEvaluation
             .find({
                 createdAt: { $gt: minDate },
@@ -1050,7 +1061,6 @@ router.get('/activity', async (req, res) => {
             })
             .populate(applicationPopulate)
             .sort({ deadline: 1 }),
-
         Evaluation
             .find({
                 deadline: { $gt: minDate },
@@ -1059,16 +1069,53 @@ router.get('/activity', async (req, res) => {
             })
             .populate(evaluationPopulate)
             .sort({ deadline: 1 }),
+        AppEvaluation
+            .find({
+                bnEvaluators: mongoId,
+                mode: modes,
+                createdAt: { $gt: minDate },
+                discussion: true,
+            })
+            .populate(applicationPopulate)
+            .sort({ createdAt: 1 }),
+        AppEvaluation
+            .find({
+                mockEvaluators: mongoId,
+                mode: modes,
+                createdAt: { $gt: minDate },
+                discussion: true,
+            })
+            .populate(applicationPopulate)
+            .sort({ createdAt: 1 }),
+        Evaluation
+            .find({
+                mockEvaluators: mongoId,
+                mode: modes,
+                createdAt: { $gt: minDate },
+                discussion: true,
+            })
+            .populate(evaluationPopulate)
+            .sort({ createdAt: 1 }),
     ]);
 
-    // extract apps that user evaluated or was assigned to
+    // extract apps that NAT evaluated or was assigned to
     appEvaluations = appEvaluations.filter(a =>
         a.reviews.some(r => r.evaluator.id == mongoId || a.natEvaluators.includes(mongoId))
     );
 
-    // extract BnEvaluations/Resignations that user evaluated or was assigned to
+    // extract BnEvaluations/Resignations that NAT evaluated or was assigned to
     bnEvaluations = bnEvaluations.filter(e =>
         e.reviews.some(r => r.evaluator.id == mongoId || e.natEvaluators.includes(mongoId))
+    );
+
+    // extract apps that BN did mock eval for
+    mockAppEvaluations = mockAppEvaluations.filter(a =>
+        a.mockReviews.some(r => r.evaluator.id == mongoId)
+    );
+
+    // extract BnEvaluations/Resignations that BN did mock eval for
+    mockBnEvaluations = mockBnEvaluations.filter(e =>
+        e.mockReviews.some(r => r.evaluator.id == mongoId)
     );
 
     res.json({
@@ -1076,6 +1123,8 @@ router.get('/activity', async (req, res) => {
         assignedBnApplications,
         appEvaluations,
         bnEvaluations,
+        mockAppEvaluations,
+        mockBnEvaluations,
     });
 });
 

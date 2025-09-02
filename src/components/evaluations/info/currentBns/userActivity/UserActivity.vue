@@ -60,18 +60,10 @@
                 :header="'Pops done by user'"
             />
 
-            <template
-                v-if="
-                    loggedInUser && 
-                    loggedInUser.isNat &&
-                    (assignedBnApplications || natApplications || natBnEvaluations)
-                "
-            >
+            <template v-if="loggedInUser && loggedInUser.isNat">
                 <div class="mt-2">Evaluations</div>
                 <evaluation-list
-                    v-if="
-                        assignedBnApplications && assignedBnApplications.length
-                    "
+                    v-if="!isNat && assignedBnApplications && assignedBnApplications.length"
                     :events="assignedBnApplications"
                     :events-id="'assignedBnApplications'"
                     :header="'Application Evaluations (BN)'"
@@ -92,16 +84,30 @@
                     :is-application="false"
                     :mongo-id="mongoId"
                 />
+                <evaluation-list
+                    v-if="!isNat"
+                    :events="mockApplications"
+                    :events-id="'mockApplications'"
+                    :header="'Mock Application Evaluations'"
+                    :is-application="true"
+                    :is-mock="true"
+                    :mongo-id="mongoId"
+                />
+                <evaluation-list
+                    v-if="!isNat"
+                    :events="mockBnEvaluations"
+                    :events-id="'mockBnEvaluations'"
+                    :header="'Mock Current BN Evaluations'"
+                    :is-application="false"
+                    :is-mock="true"
+                    :mongo-id="mongoId"
+                />
             </template>
                 
-            <template
-                v-else-if="
-                    loggedInUser && !loggedInUser.isNat && isNat &&
-                    (assignedBnApplications || natApplications || natBnEvaluations)
-                "
-            >
+            <template v-else-if="loggedInUser && !loggedInUser.isNat && isNat">
                 <div class="mt-2">Evaluations</div>
                 <public-evaluation-list
+                    v-if="isNat"
                     :events="natApplications"
                     :events-id="'natApplications'"
                     :header="'Application Evaluations'"
@@ -109,6 +115,7 @@
                     :mongo-id="mongoId"
                 />
                 <public-evaluation-list
+                    v-if="isNat"
                     :events="natBnEvaluations"
                     :events-id="'natBnEvaluations'"
                     :header="'Current BN Evaluations'"
@@ -225,6 +232,8 @@ export default {
             'assignedBnApplications',
             'natApplications',
             'natBnEvaluations',
+            'mockApplications',
+            'mockBnEvaluations',
             'isLoading',
         ]),
     },
@@ -290,6 +299,8 @@ export default {
                     this.$store.commit('activity/setBnApplications', res.assignedBnApplications);
                     this.$store.commit('activity/setNatApplications', res.appEvaluations);
                     this.$store.commit('activity/setNatBnEvaluations', res.bnEvaluations);
+                    this.$store.commit('activity/setMockApplications', res.mockAppEvaluations);
+                    this.$store.commit('activity/setMockBnEvaluations', res.mockBnEvaluations);
                 }
 
                 this.$store.commit('activity/setIsLoading', false);
