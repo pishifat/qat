@@ -1082,8 +1082,9 @@ router.get('/activity', async (req, res) => {
             .find({
                 mockEvaluators: mongoId,
                 mode: modes,
-                createdAt: { $gt: minDate },
+                archivedAt: { $gt: minDate },
                 discussion: true,
+                active: false,
             })
             .populate(applicationPopulate)
             .sort({ createdAt: 1 }),
@@ -1091,8 +1092,9 @@ router.get('/activity', async (req, res) => {
             .find({
                 mockEvaluators: mongoId,
                 mode: modes,
-                createdAt: { $gt: minDate },
+                archivedAt: { $gt: minDate },
                 discussion: true,
+                active: false,
             })
             .populate(evaluationPopulate)
             .sort({ createdAt: 1 }),
