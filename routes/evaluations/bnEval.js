@@ -356,7 +356,7 @@ router.post('/setIndividualEval/', middlewares.isNat, async (req, res) => {
 });
 
 /* POST set evals as complete */
-router.post('/setComplete/', middlewares.isNat, async (req, res) => {
+router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
     let evaluations = await Evaluation
         .find({
             _id: {
