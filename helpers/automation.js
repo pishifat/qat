@@ -676,8 +676,8 @@ const notifyCurrentBnEvaluations = cron.schedule('3 17 * * *', async () => {
 function badgeCommand (osuId, currentBadge, value, type) {
     let command = '';
 
-    const natBadges = ['NAT1y.png', 'NAT2y.png', 'NAT3y.png', 'NAT4y.png', 'NAT5y.png', 'NAT6y.png', 'NAT7y.png', 'NAT8y.png', 'NAT9y.png', 'NAT10y.png'];
-    const bnBadges = ['BN1y.png', 'BN2y.png', 'BN3y.png', 'BN4y.png', 'BN5y.png', 'BN6y.png', 'BN7y.png', 'BN8y.png', 'BN9y.png', 'BN10y.png'];
+    const natBadges = ['NAT1y.png', 'NAT2y.png', 'NAT3y.png', 'NAT4y.png', 'NAT5y.png', 'NAT6y.png', 'NAT7y.png', 'NAT8y.png', 'NAT9y.png', 'NAT10y.png', 'NAT11y.png', 'NAT12y.png', 'NAT13y.png', 'NAT14y.png'];
+    const bnBadges = ['BN1y.png', 'BN2y.png', 'BN3y.png', 'BN4y.png', 'BN5y.png', 'BN6y.png', 'BN7y.png', 'BN8y.png', 'BN9y.png', 'BN10y.png', 'BN11y.png', 'BN12y.png', 'BN13y.png', 'BN14y.png'];
     const nomBadges = ['100_noms.png', 'noms200.png', 'noms400.png', 'noms600.png', 'noms800.png', 'noms1000.png', 'noms1500.png', 'noms2000.png'];
     const natTooltip = [
         'Longstanding contribution to the Nomination Assessment Team - 1 Year',
@@ -690,6 +690,10 @@ function badgeCommand (osuId, currentBadge, value, type) {
         'Longstanding contribution to the Nomination Assessment Team - 8 Years',
         'Longstanding contribution to the Nomination Assessment Team - 9 Years',
         'Longstanding contribution to the Nomination Assessment Team - 10 Years',
+        'Longstanding contribution to the Nomination Assessment Team - 11 Years',
+        'Longstanding contribution to the Nomination Assessment Team - 12 Years',
+        'Longstanding contribution to the Nomination Assessment Team - 13 Years',
+        'Longstanding contribution to the Nomination Assessment Team - 14 Years',
     ];
     const bnTooltip = [
         'Longstanding contribution to the Beatmap Nominators - 1 Year',
@@ -702,6 +706,10 @@ function badgeCommand (osuId, currentBadge, value, type) {
         'Longstanding contribution to the Beatmap Nominators - 8 Years',
         'Longstanding contribution to the Beatmap Nominators - 9 Years',
         'Longstanding contribution to the Beatmap Nominators - 10 Years',
+        'Longstanding contribution to the Beatmap Nominators - 11 Years',
+        'Longstanding contribution to the Beatmap Nominators - 12 Years',
+        'Longstanding contribution to the Beatmap Nominators - 13 Years',
+        'Longstanding contribution to the Beatmap Nominators - 14 Years',
     ];
     const nomTooltip = [
         'Nominated 100+ beatmaps as a Beatmap Nominator',
@@ -794,7 +802,7 @@ const badgeTracker = cron.schedule('8 18 * * *', async () => {
         // find bn badge discrepency
         const bnYears = util.yearsDuration(user.bnDuration + (30 * await scrap.findAdditionalBnMonths(user)));
 
-        if (bnYears <= 10 && bnYears !== user.bnProfileBadge) {
+        if (bnYears <= 14 && bnYears !== user.bnProfileBadge) {
             if (discordIds && discordIds.length) {
                 await discord.userHighlightWebhookPost('all', discordIds);
                 await util.sleep(500);
@@ -817,7 +825,7 @@ const badgeTracker = cron.schedule('8 18 * * *', async () => {
         // find nat badge discrepency
         const natYears = util.yearsDuration(user.natDuration);
 
-        if (natYears <= 10 && natYears !== user.natProfileBadge) {
+        if (natYears <= 14 && natYears !== user.natProfileBadge) {
             if (discordIds && discordIds.length) {
                 await discord.userHighlightWebhookPost('all', discordIds);
                 await util.sleep(500);
