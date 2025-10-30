@@ -19,7 +19,7 @@
                     <div v-if="isContentReview">Direct link to content</div>
                     <div v-else>Link to relevant discussion</div>
                     <div class="small text-secondary">
-                        <div v-if="isContentReview">If link is an image, the URL should end in .jpg or .png</div>
+                        <div v-if="isContentReview">If link is an image, the URL should end in <code>.jpg</code> or <code>.png</code>. Avoid Imgur if possible because it's blocked in some countries!</div>
                         <div v-else>Optional</div>
                     </div>
                     <input
