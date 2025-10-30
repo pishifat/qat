@@ -1,35 +1,32 @@
 <template>
     <div>
         <p>
-            <b>Category:</b>
+            <b>Category:</b> <span class="text-secondary">{{ category }}</span>
         </p>
+        <p>
+            <b>Reported:</b> <span class="text-secondary">{{ selectedReport.createdAt | toStandardDate }}</span>
+        </p>
+        <template v-if="selectedReport.link">
+            <p>
+                <b>Relevant link:</b>
+                <span class="text-secondary text-truncate">
+                    <a :href="selectedReport.link" target="_blank">
+                        {{ selectedReport.link }}
+                    </a>
+                </span>
+            </p>
 
-        <div class="ml-4 mb-3 small text-secondary">
-            {{ category }}
-        </div>
-
+            
+        </template>
         <p>
             <b>Reason:</b>
         </p>
 
         <div class="small ml-4 mb-3 text-secondary" v-html="$md.render(selectedReport.reason)" />
 
-        <template v-if="selectedReport.link">
-            <p>
-                <b>Relevant link:</b>
-            </p>
+        
 
-            <div class="small ml-4 mb-3 text-secondary text-truncate">
-                <a :href="selectedReport.link" target="_blank">
-                    {{ selectedReport.link }}
-                </a>
-            </div>
-        </template>
-
-        <p>
-            <b>Reported:</b>
-            <span class="text-secondary">{{ selectedReport.createdAt | toStandardDate }}</span>
-        </p>
+        
 
         <p v-if="!selectedReport.isActive">
             <b>Reported by:</b>
@@ -60,7 +57,7 @@ export default {
                 case 'stolenBeatmap':
                     return 'Stolen beatmap';
                 case 'beatmap':
-                    return 'beatmap';
+                    return 'Beatmap';
                 case 'contentCaseSong':
                     return 'Inappropriate song';
                 case 'contentCaseVisual':
