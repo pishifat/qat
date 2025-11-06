@@ -288,11 +288,9 @@ const notifyReports = cron.schedule('0 17 * * *', async () => {
  * send webhooks for vetoes that are automatically concluded or overdue
  */
 const notifyVetoes = cron.schedule('1 17 * * *', async () => {
-    const sevenDaysAgo = moment().subtract(7, 'days').toDate();
-
     // find overdue vetoes
     const activeVetoes = await Veto
-        .find({ status: 'wip', deadline: { $lt: sevenDaysAgo } })
+        .find({ status: 'wip', deadline: { $lt: new Date() } })
         .populate([
             {
                 path: 'mediations',
