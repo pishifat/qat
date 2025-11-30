@@ -6,6 +6,7 @@ const Logger = require('../models/log');
 const middlewares = require('../helpers/middlewares');
 const util = require('../helpers/util');
 const osuv1 = require('../helpers/osuv1');
+const osu = require('../helpers/osu');
 const osuBot = require('../helpers/osuBot');
 const discord = require('../helpers/discord');
 
@@ -109,44 +110,36 @@ router.get('/searchVeto/:id', async (req, res) => {
 
 /* POST create a new veto. */
 router.post('/submit', middlewares.isLoggedIn, async (req, res) => {
-    if (!req.body.reasons.length) {
+    const { mode, url, reasons } = req.body;
+
+    // validation
+    if (!reasons.length) {
         return res.json({ error: 'Veto must include reasons!' });
     }
 
-    const bmId = util.getBeatmapsetIdFromUrl(req.body.reasons[0].link);
+    util.isValidUrlOrThrow(url);
+    const beatmapsetId = util.getBeatmapsetIdFromUrl(url);
+    const osuBeatmapset = await osu.getBeatmapsetInfo(req.session.accessToken, beatmapsetId);
+    const eligibleStatuses = [-2, -1, 0, 3]; // see osu! api doc: https://osu.ppy.sh/docs/#beatmapset-rank-status
 
-    let containChecks = ['osu.ppy.sh/beatmapsets', 'discussion'];
-    containChecks.push(bmId);
-
-    for (let i = 0; i < containChecks.length; i++) {
-        const contain = containChecks[i];
-
-        for (let j = 0; j < req.body.reasons.length; j++) {
-            const reason = req.body.reasons[j];
-            util.isValidUrlOrThrow(reason.link, contain);
-        }
-
+    if (!eligibleStatuses.includes(osuBeatmapset.ranked)) {
+        return res.json({ error: `This map has a permanent leaderboard already!` });
     }
 
-    const bmInfo = await osuv1.beatmapsetInfo(bmId);
-
-    if (!bmInfo || bmInfo.error) {
-        return res.json(bmInfo);
+    if (!res.locals.userRequest.isBnOrNat) {
+        return res.json({ error: 'Only BN and NAT members can submit vetoes!' });
     }
 
-    if (!res.locals.userRequest.isBnOrNat && req.session.osuId != bmInfo.creator_id) {
-        return res.json({ error: 'You can only submit vetoes for mediation on your own beatmaps!' });
-    }
-
+    // create veto
     let veto = await Veto.create({
         vetoer: req.session.mongoId,
-        reasons: req.body.reasons,
-        beatmapId: bmInfo.beatmapset_id,
-        beatmapTitle: bmInfo.artist + ' - ' + bmInfo.title,
-        beatmapMapper: bmInfo.creator,
-        beatmapMapperId: bmInfo.creator_id,
-        mode: req.body.mode,
-        vetoFormat: 6,
+        reasons: reasons,
+        beatmapId: beatmapsetId,
+        beatmapTitle: osuBeatmapset.artist + ' - ' + osuBeatmapset.title,
+        beatmapMapper: osuBeatmapset.creator,
+        beatmapMapperId: osuBeatmapset.user_id,
+        mode,
+        vetoFormat: 7,
     });
     veto = await Veto
         .findById(veto._id)
@@ -230,7 +223,7 @@ router.post('/submitMediation/:id', middlewares.isLoggedIn, middlewares.isBnOrNa
         if (veto.reasons.length > 1) {
             for (let i = 0; i < veto.reasons.length; i++) {
                 const submittedFilteredMediations = veto.mediations.filter(mediation => mediation.vote && mediation.reasonIndex == i);
-                description += `\n- **Reason ${i + 1}:** ${veto.reasons[i].summary} (${submittedFilteredMediations.length}/${veto.mediations.length / veto.reasons.length})`;
+                description += `\n\n**Reason ${i + 1}:**\n${veto.reasons[i].summary} (${submittedFilteredMediations.length}/${veto.mediations.length / veto.reasons.length})`;
             }
         } else {
             description += ` (${count}/${veto.mediations.length})`;
@@ -469,39 +462,13 @@ router.post('/sendMessages/:id', middlewares.isLoggedIn, middlewares.isNat, asyn
         veto.mode);
 });
 
-// TODO delete this route when we're done using it
-/* POST migrate mediations */
-router.post('/migrateMediations', middlewares.isLoggedIn, middlewares.isAdmin, async (req, res) => {
-    const oldVetoId = req.body.oldVetoId;
-    const newVetoId = req.body.newVetoId;
+/* POST vouch */
+router.post('/vouch/:id', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
+    const veto = await Veto
+        .findById(req.params.id)
+        .orFail();
 
-    const [oldVeto, newVeto] = await Promise.all([
-        Veto.findById(oldVetoId).populate(defaultPopulate).orFail(),
-        Veto.findById(newVetoId).populate(defaultPopulate).orFail(),
-    ]);
-
-    if (oldVeto.beatmapId != newVeto.beatmapId) {
-        return res.json({ error: 'Beatmap IDs do not match!' });
-    }
-
-    let migrationCount = 0;
-
-    for (const newMediation of newVeto.mediations) {
-        for (const oldMediation of oldVeto.mediations) {
-            if (newMediation.reasonIndex == oldMediation.reasonIndex && newMediation.mediator.osuId == oldMediation.mediator.osuId) {
-                newMediation.comment = oldMediation.comment;
-                newMediation.vote = oldMediation.vote;
-                try {
-                    await newMediation.save();
-                    migrationCount++;
-                } catch (error) {
-                    console.log(error);
-                }
-            }
-        }
-    }
-
-    res.json({ success: `Migrated ${migrationCount} mediations!` });
+    // todo
 });
 
 module.exports = router;

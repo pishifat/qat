@@ -96,6 +96,10 @@ export default {
     object-fit: cover;
 }
 
+.status-bar-pending {
+    background: radial-gradient(var(--neutral), transparent 70%);
+}
+
 .status-bar-available {
     background: radial-gradient(var(--danger), transparent 70%);
 }

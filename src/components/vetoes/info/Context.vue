@@ -2,11 +2,12 @@
     <div class="mb-2">
         <b>Veto reasons:</b>
 
-        <ul>
+        <ol>
             <li v-for="reason in selectedVeto.reasons" :key="reason.summary">
-                <a :href="reason.link" target="_blank">{{ reason.summary }}</a>
+                <a v-if="selectedVeto.version <= 6" :href="reason.link" target="_blank">{{ reason.summary }}</a>
+                <span v-else v-html="$md.render(reason.summary)" />
             </li>
-        </ul>
+        </ol>
     </div>
 </template>
 

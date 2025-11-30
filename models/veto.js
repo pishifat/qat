@@ -5,14 +5,14 @@ const vetoesSchema = new mongoose.Schema({
     mode: { type: String, enum: ['osu', 'taiko', 'catch', 'mania', 'all'] },
     reasons: [{
         _id: false,
-        link: { type: String, required: true },
+        link: { type: String }, // previously required, but not anymore with current veto format
         summary: { type: String, required: true },
     }],
     beatmapId: { type: Number },
     beatmapTitle: { type: String },
-    beatmapMapper: { type: String },
-    beatmapMapperId: { type: Number },
-    status: { type: String, enum: ['available', 'wip', 'archive'], default: 'available' },
+    beatmapMapper: { type: String }, // username
+    beatmapMapperId: { type: Number }, // osuId
+    status: { type: String, enum: ['pending', 'available', 'wip', 'archive'], default: 'pending' },
     mediations: [{ type: 'ObjectId', ref: 'Mediation' }],
     deadline: { type: Date },
     vetoFormat: { type: Number },
@@ -23,6 +23,7 @@ const vetoesSchema = new mongoose.Schema({
             4 = previously "re-mediation" with all BNs and 2 week deadline, now selects all BNs with 1 week deadline
             5 = uphold % from 50 to 70, requires 60% of meditators to vote before concluding
             6 = uphold % from 70 to 60
+            7 = "reasons" does not have "link" field
         */
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 

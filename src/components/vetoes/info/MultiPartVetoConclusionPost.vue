@@ -60,7 +60,7 @@ export default {
                     threshold = 0.7 * sum;
                 }
                 
-                if (this.selectedVeto.vetoFormat == 6) {
+                if (this.selectedVeto.vetoFormat >= 6) {
                     threshold = 0.6 * sum;
                 }
 

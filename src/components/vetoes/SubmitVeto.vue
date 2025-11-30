@@ -1,8 +1,8 @@
 <template>
-    <modal-dialog id="addVeto" title="Submit a veto for mediation">
+    <modal-dialog id="addVeto" title="Submit a veto anonymously">
         <div class="container">
             <!-- game mode -->
-            <p>Game mode:</p>
+            <p><b>Game mode:</b></p>
             <div class="row ml-4">
                 <mode-select
                     v-model="mode"
@@ -12,56 +12,74 @@
                 />
             </div>
 
+            <!-- url -->
+            <p><b>Beatmap URL:</b></p>
+            <div class="row ml-4 mb-2">
+                <input
+                    v-model="url"
+                    type="text"
+                    class="form-control"
+                    placeholder="beatmap URL..."
+                >
+            </div>
+
             <!-- veto reasons -->
-            <p>Veto reasons:</p>
+            <p><b>Veto reasons:</b></p>
             <div>
-                <ul>
+                <ol>
                     <li v-if="!vetoReasons.length">
                         No reasons created...
                     </li>
                     <li v-for="reason in vetoReasons" v-else :key="reason.id">
-                        <a :href="reason.link" target="_blank">
-                            {{ reason.summary }}
+                        <span class="pre-line">{{ reason.summary }}</span>
+                        <a
+                            v-if="confirmDelete != reason.id"
+                            href="#"
+                            class="text-neutral small"
+                            @click.prevent="summary = reason.summary, removeReason(reason.id)"
+                        >
+                            edit
                         </a>
                         <a
                             v-if="confirmDelete != reason.id"
                             href="#"
-                            class="text-danger"
+                            class="text-danger small"
                             @click.prevent="confirmDelete = reason.id"
                         >
                             delete
                         </a>
                         <a
                             v-else
-                            class="text-danger"
+                            class="text-danger small"
                             href="#"
                             @click.prevent="removeReason(reason.id)"
                         >
                             confirm
                         </a>
                     </li>
-                </ul>
+                </ol>
             </div>
 
             <hr>
 
-            <p>Create veto reason:</p>
+            <p><b>Create veto reason:</b></p>
             <p class="small mx-2 mb-2">
-                Add veto reasons by linking a discussion post and summarizing the issue. <b>Add veto reason</b> will update the list above. When all reasons are added, click <b>Submit</b>.
+                <b>Add veto reason</b> will update the list above. When all reasons are added, click <b>Submit</b>.
             </p>
-            <input
-                v-model="link"
-                type="text"
-                class="form-control"
-                placeholder="discussion link..."
-            >
 
-            <input
+            <textarea
                 v-model="summary"
                 type="text"
                 class="form-control mb-1"
-                placeholder="summary of issue..."
-            >
+                rows="3"
+                placeholder="veto reason..."
+            />
+
+            <div v-if="summary.length" class="small mb-2">
+                <b>Preview</b> (<a href="https://www.markdownguide.org/basic-syntax/" target="_blank">markdown</a> is supported!)
+                <div class="small card card-body v-html-content" v-html="$md.render(summary)" />
+            </div>
+            
 
             <button type="submit" class="btn btn-primary btn-block" @click="addReason()">
                 Add veto reason
@@ -90,7 +108,7 @@ export default {
         return {
             vetoReasons: [],
             confirmDelete: null,
-            link: '',
+            url: '',
             summary: '',
             mode: '',
         };
@@ -102,47 +120,24 @@ export default {
     },
     methods: {
         addReason () {
-            if (!this.link.length || !this.summary.length) {
+            if (!this.summary.length) {
                 this.$store.dispatch('updateToastMessages', {
-                    message: `Cannot leave fields blank!`,
-                    type: 'danger',
-                });
-            } else if (!this.isValidUrl(this.link)) {
-                this.$store.dispatch('updateToastMessages', {
-                    message: `Links must be discussion posts from the same mapset!`,
+                    message: `Cannot submit empty reason!`,
                     type: 'danger',
                 });
             } else {
                 this.vetoReasons.push({
                     id: new Date().getTime(), // unique number
-                    link: this.link,
                     summary: this.summary,
                 });
-
-                this.link = '';
-                this.summary = '';
             }
+
+            this.summary = '';
         },
         isValidUrl(url) {
-            let bmId;
-
-            if (this.vetoReasons.length) {
-                const firstUrl = this.vetoReasons[0].link;
-                let indexStart = firstUrl.indexOf('beatmapsets/') + 'beatmapsets/'.length;
-                let indexEnd = firstUrl.indexOf('/discussion');
-
-                if (indexEnd !== -1) {
-                    bmId = firstUrl.slice(indexStart, indexEnd);
-                } else {
-                    bmId = firstUrl.slice(indexStart);
-                }
-            } else {
-                bmId = '';
-            }
-
             const regexp = /^(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/;
 
-            return regexp.test(url) && url.includes('osu.ppy.sh/beatmapsets') && url.includes('discussion') && url.includes(bmId);
+            return regexp.test(url) && url.includes('osu.ppy.sh/beatmapsets');
         },
         removeReason (id) {
             const i = this.vetoReasons.findIndex(r => r.id === id);
@@ -160,12 +155,18 @@ export default {
                     message: `Must include veto reasons!`,
                     type: 'danger',
                 });
+            } else if (!this.isValidUrl(this.url)) {
+                this.$store.dispatch('updateToastMessages', {
+                    message: `Invalid beatmap URL!`,
+                    type: 'danger',
+                });
             } else {
                 const data = await this.$http.executePost(
                     '/vetoes/submit',
                     {
-                        reasons: this.vetoReasons,
                         mode: this.mode,
+                        url: this.url,
+                        reasons: this.vetoReasons,
                     },
                     e
                 );

@@ -43,6 +43,8 @@ export default {
             let style = 'background-color: ';
 
             switch (this.selectedVeto.status) {
+                case 'pending':
+                    return style + 'var(--neutral)';
                 case 'available':
                     return style + 'var(--danger)';
                 case 'wip':

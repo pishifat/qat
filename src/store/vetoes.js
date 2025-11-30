@@ -49,11 +49,14 @@ export default {
 
             return vetoes;
         },
+        pendingVetoes: (state, getters) => {
+            return getters.filteredVetoes.filter(v => v.status === 'pending');
+        },
         activeVetoes: (state, getters) => {
             return getters.filteredVetoes.filter(v => v.status === 'available' || v.status == 'wip');
         },
         resolvedVetoes: (state, getters) => {
-            return getters.filteredVetoes.filter(v => v.status !== 'available' && v.status !== 'wip');
+            return getters.filteredVetoes.filter(v => v.status == 'archive');
         },
         paginatedResolvedVetoes: (state, getters, rootState) => {
             const limit = rootState.vetoes.pagination.limit;

@@ -15,6 +15,9 @@
             <!-- show context when mediations aren't visible -->
             <context v-else />
 
+            <!-- show vouch info when map veto is "pending" status -->
+            <vouches v-if="selectedVeto.status == 'pending' && loggedInUser.isBnOrNat" />
+
             <!-- show vote count to NATs -->
             <vote-count 
                 v-if="loggedInUser && loggedInUser.isNat"
@@ -26,9 +29,9 @@
                 :document="selectedVeto"
             />
 
-            <!-- show admin buttons to NATs -->
+            <!-- show admin buttons to NATs if veto is not "pending" -->
             <admin-buttons
-                v-if="loggedInUser && loggedInUser.isNat"
+                v-if="loggedInUser && loggedInUser.isNat && selectedVeto.status != 'pending'"
             />
 
             <!-- show mediation input for active mediators -->
@@ -48,6 +51,7 @@ import MediationInput from './info/MediationInput.vue';
 import ModalDialog from '../ModalDialog.vue';
 import DebugViewDocument from '../DebugViewDocument.vue';
 import Context from './info/Context.vue';
+import Vouches from './info/Vouches.vue';
 
 export default {
     name: 'VetoInfo',
@@ -59,6 +63,7 @@ export default {
         ModalDialog,
         DebugViewDocument,
         Context,
+        Vouches,
     },
     computed: {
         ...mapState([
