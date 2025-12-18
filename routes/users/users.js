@@ -113,6 +113,10 @@ router.get('/loadNextEvaluation/:id/:mode', async (req, res) => {
             }
 
             eval = noModeEvaluationRound;
+        } else {
+            eval = await ResignationEvaluation
+                .findOne({ user: req.params.id, mode: req.params.mode, active: true })
+                .select('reviews deadline discussion consensus active');
         }
     }
 
