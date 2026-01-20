@@ -787,7 +787,7 @@ const badgeTracker = cron.schedule('8 18 * * *', async () => {
                 [{
                     color: discord.webhookColors.darkOrange,
                     description: `[**${user.username}**](https://bn.mappersguild.com/users?id=${user.id}) ([osu!](https://osu.ppy.sh/users/${user.osuId})) needs new nomination count badge: **${thresholds[thresholdIndex - 1]} → ${thresholds[thresholdIndex]}**\n` + 
-                    '`' + badgeCommand(user.osuId, user.nominationsProfileBadge, thresholdIndex, 'nom') + '`',
+                    '```' + badgeCommand(user.osuId, user.nominationsProfileBadge, thresholdIndex, 'nom') + '```',
                     image: 
                         {
                             url: thresholdIndex == 1 ? 'https://assets.ppy.sh/profile-badges/100_noms@2x.png' : `https://assets.ppy.sh/profile-badges/noms${thresholds[thresholdIndex]}@2x.png`
@@ -810,7 +810,7 @@ const badgeTracker = cron.schedule('8 18 * * *', async () => {
                 [{
                     color: discord.webhookColors.darkOrange,
                     description: `[**${user.username}**](https://bn.mappersguild.com/users?id=${user.id}) ([osu!](https://osu.ppy.sh/users/${user.osuId})) needs new BN badge: **${user.bnProfileBadge} → ${bnYears}**\n` + 
-                    '`' + badgeCommand(user.osuId, user.bnProfileBadge, bnYears, 'bn') + '`',
+                    '```' + badgeCommand(user.osuId, user.bnProfileBadge, bnYears, 'bn') + '```',
                     image: 
                         {
                             url: `https://assets.ppy.sh/profile-badges/BN${bnYears}y@2x.png`
@@ -833,7 +833,7 @@ const badgeTracker = cron.schedule('8 18 * * *', async () => {
                 [{
                     color: discord.webhookColors.darkOrange,
                     description: `[**${user.username}**](https://bn.mappersguild.com/users?id=${user.id}) ([osu!](https://osu.ppy.sh/users/${user.osuId})) needs new NAT badge: **${user.natProfileBadge} → ${natYears}** \n` + 
-                    '`' + badgeCommand(user.osuId, user.natProfileBadge, natYears, 'nat') + '`',
+                    '```' + badgeCommand(user.osuId, user.natProfileBadge, natYears, 'nat') + '```',
                     image: 
                         {
                             url: `https://assets.ppy.sh/profile-badges/NAT${natYears}y@2x.png`
