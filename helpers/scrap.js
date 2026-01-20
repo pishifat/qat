@@ -116,7 +116,12 @@ async function findUniqueNominationsCount(initialDate, endDate, user, mode) {
     return events.length;
 }
 
-/* find months of sufficient BN activity for members of NAT */
+/**
+ * find months of sufficient BN activity for members of NAT
+ * 
+ * activity is counted based on calendar months (not rolling 30-day periods)
+ * partial months (first and last) are included
+ */
 async function findAdditionalBnMonths (user) {
     const bnSiteLeftTheWomb = new Date('2019-05-01');
     const activityRequirementChange = new Date('2024-11-03');
@@ -126,34 +131,47 @@ async function findAdditionalBnMonths (user) {
     if (user.natDuration) {
         const natHistory = user.history.filter(h => h.group == 'nat');
 
-        let startDate;
-        let nextDate;
-        let endDate;
-
         for (let j = 0; j < natHistory.length; j++) {
             if (!(j % 2)) {
                 const historyElement = natHistory[j];
 
-                startDate = new Date(historyElement.date);
-                nextDate = moment(startDate).add(1, 'months').toDate();
-                endDate = natHistory[j + 1] ? natHistory[j + 1].date : new Date();
+                // Get the actual join date and end date for this NAT period
+                let actualJoinDate = new Date(historyElement.date);
+                let endDate = natHistory[j + 1] ? natHistory[j + 1].date : new Date();
 
-                while (nextDate < endDate) {
-                    if (startDate < bnSiteLeftTheWomb) {
-                        startDate = moment(bnSiteLeftTheWomb).toDate();
-                        nextDate = moment(bnSiteLeftTheWomb).add(1, 'months').toDate();
-                    }
+                // Adjust join date if before bnSiteLeftTheWomb
+                if (actualJoinDate < bnSiteLeftTheWomb) {
+                    actualJoinDate = bnSiteLeftTheWomb;
+                }
 
-                    const count = await findUniqueNominationsCount(startDate, nextDate, user, historyElement.mode);
-                    startDate = moment(startDate).add(1, 'months').toDate();
-                    nextDate = moment(nextDate).add(1, 'months').toDate();
+                // Start from the beginning of the calendar month containing the join date
+                let currentMonthStart = moment(actualJoinDate).startOf('month');
+                let currentMonthEnd = moment(currentMonthStart).endOf('month');
 
+                // Process each calendar month until we reach the end date
+                while (currentMonthStart.toDate() < endDate) {
+                    // For the first month, use actual join date; for others, use start of month
+                    const monthStart = currentMonthStart.isSame(moment(actualJoinDate).startOf('month'), 'month')
+                        ? actualJoinDate
+                        : currentMonthStart.toDate();
+
+                    // For the last month, use end date; for others, use end of month
+                    const monthEnd = currentMonthEnd.toDate() > endDate
+                        ? endDate
+                        : currentMonthEnd.toDate();
+
+                    const count = await findUniqueNominationsCount(monthStart, monthEnd, user, historyElement.mode);
+
+                    // Determine activity requirement based on the start of the month being checked
                     const oldActivityRequirement = (historyElement.mode == 'mania' || historyElement.mode == 'catch') ? 2 : 3;
                     const newActivityRequirement = 2;
-
-                    const bnActivityRequirement = startDate < activityRequirementChange ? oldActivityRequirement : newActivityRequirement;
+                    const bnActivityRequirement = monthStart < activityRequirementChange ? oldActivityRequirement : newActivityRequirement;
 
                     if (count >= bnActivityRequirement) bnMonths++;
+
+                    // Move to next calendar month
+                    currentMonthStart = moment(currentMonthStart).add(1, 'month').startOf('month');
+                    currentMonthEnd = moment(currentMonthStart).endOf('month');
                 }
             }
         }
