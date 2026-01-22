@@ -12,7 +12,7 @@
             {{ isVouchingUser ? 'Remove your support for this veto' : 'I vouch for this veto!' }}
         </button>
 
-        <div v-if="loggedInUser.isNat" class="text-secondary small mt-3">
+        <div v-if="loggedInUser.isNat && loggedInUser.id != selectedVeto.vetoer.id" class="text-secondary small mt-3">
             <div><b>NAT-only information</b></div>
             <ul>
                 <li>
@@ -80,8 +80,8 @@
             <ul>
                 <li>the veto's creator</li>
                 <li>the vouching users</li>
-                <li>the map's creator(s)</li>
-                <li>the map's nominators</li>
+                <li>the mapset host</li>
+                <li>anyone else who the NAT thinks is relevant</li>
             </ul>
 
             ...with the goal of resolving the veto through discussion. If that doesn't work, the veto can be mediated by a larger group of Beatmap Nominators.
@@ -128,8 +128,6 @@ export default {
         },
         async createChatroom (e) {
             if (confirm(`Are you sure?`)) {
-
-                console.log('in');
                 const data = await this.$http.executePost(`/vetoes/createChatroom/${this.selectedVeto.id}`, { includeUsers: this.includeUsers }, e);
 
                 if (this.$http.isValid(data)) {

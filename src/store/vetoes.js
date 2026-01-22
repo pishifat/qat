@@ -98,5 +98,24 @@ export default {
 
             return chatroomUserIds.includes(rootState.loggedInUser.id);
         },
+        isChatroomUserPublic: (state, getters, rootState) => {
+            if (!rootState.loggedInUser || !getters.selectedVeto || !getters.selectedVeto.chatroomUsersPublic) return false;
+
+            const chatroomUserIds = getters.selectedVeto.chatroomUsersPublic.map(u => u.id);
+
+            return chatroomUserIds.includes(rootState.loggedInUser.id);
+        },
+        isMapper: (state, getters, rootState) => {
+            if (!rootState.loggedInUser || !getters.selectedVeto) return false;
+
+            return getters.selectedVeto.beatmapMapperId == rootState.loggedInUser.osuId;
+        },
+        isChatroomMediationRequestedUser: (state, getters, rootState) => {
+            if (!rootState.loggedInUser || !getters.selectedVeto || !getters.selectedVeto.isChatroomMediationRequestedUsers) return false;
+
+            const chatroomUserIds = getters.selectedVeto.isChatroomMediationRequestedUsers.map(u => u.id);
+
+            return chatroomUserIds.includes(rootState.loggedInUser.id);
+        },
     },
 };

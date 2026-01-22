@@ -1,12 +1,12 @@
 <template>
     <div>
-        <b>Mediations:</b>
-        <div v-if="selectedVeto.vetoFormat >= 2">
+        <b>Mediations</b>
+        <div v-if="selectedVeto.vetoFormat >= 2" class="mt-1">
             <div v-for="(reason, reasonIndex) in selectedVeto.reasons" :key="reasonIndex" class="mb-2">
 
                 <!-- collapse menu -->
-                <a v-if="selectedVeto.reasons.length" :href="'#reason-' + (reasonIndex + 1)" data-toggle="collapse">
-                    {{ reasonIndex + 1 }}. {{ reason.summary }} <i class="fas fa-angle-down" />
+                <a v-if="selectedVeto.reasons.length" :href="'#reason-' + (reasonIndex + 1)" data-toggle="collapse" class="ml-4">
+                    <b>{{ reasonIndex + 1 }}. {{ reason.summary }}</b> <i class="fas fa-angle-down" />
                 </a>
 
                 <!-- menu content -->
@@ -16,8 +16,10 @@
                     <span v-if="selectedVeto.reasons.length">
                         <hr />
                         <vote-stats :reason-index="reasonIndex" />
-                        <b class="mr-1">Discussion link:</b>
-                        <a :href="reason.link" target="_blank">{{ reason.link }}</a>
+                        <div v-if="selectedVeto.vetoFormat < 7">
+                            <b class="mr-1">Discussion link:</b>
+                            <a :href="reason.link" target="_blank">{{ reason.link }}</a>
+                        </div>
                         <hr />
                     </span>
 

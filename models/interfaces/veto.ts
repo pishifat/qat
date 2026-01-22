@@ -14,7 +14,15 @@ interface IVetoDocument extends Document {
     mediations?: IMediationDocument[];
     vouchingUsers?: IUserDocument[];
     chatroomUsers?: IUserDocument[];
+    chatroomUsersPublic?: IUserDocument[];
     chatroomInitiated?: Date;
+    chatroomMessages: {
+        date: Date;
+        content: string;
+        user: IUserDocument;
+        userIndex: number;
+        isSystem: Boolean;
+    }[];
     deadline?: Date;
     vetoFormat?: number;
 }

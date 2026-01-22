@@ -1,58 +1,68 @@
 <template>
     <div>
-        <div v-if="selectedVeto.mediations.length">
-            <!-- restart mediation if concluded -->
-            <button
-                v-if="selectedVeto.status == 'archive'"
-                class="btn btn-sm btn-danger btn-block mb-2"
-                @click="continueMediation($event)"
-            >
-                Resume veto mediation
+        <div v-if="selectedVeto.status == 'available'">
+            <b>Mediation phase</b>
+            <div class="mb-2 mt-2 ml-4">
+                Exclude specific user(s):
+                <input
+                    v-model="excludeUsers"
+                    class="form-control w-75 small"
+                    type="text"
+                    placeholder="username1, username2, username3..."
+                >
+                <div class="small text-secondary">
+                    The mapper and veto submitter are automatically excluded. Please manually exclude any guest difficulty creators and the nominating BNs.
+                </div>
+            </div>
+        </div>
+        <!--<button class="btn btn-sm btn-block btn-danger mb-2" @click="deleteVeto($event)">
+            Delete veto
+        </button>-->
+
+        <button class="btn btn-sm btn-block btn-primary" @click="selectMediators($event)">
+            {{ mediators ? 'Re-select mediators' : 'Select mediators' }}
+        </button>
+
+        <div v-if="mediators">
+            <hr />
+
+            <!-- begin mediation -->
+            <button class="btn btn-sm btn-block btn-success mb-2" @click="beginMediation($event)">
+                Begin mediation
             </button>
 
-            <!-- conclude mediation -->
-            <button
-                v-else
-                class="btn btn-sm btn-block btn-danger mb-2"
-                @click="concludeMediation($event)"
-            >
-                Conclude mediation
-            </button>
+            <!-- list mediators -->
+            <div class="row">
+                <div class="col-sm-3 align-self-center">
+                    <b>Users:</b>
+                    <div id="usernames" class="card card-body small">
+                        <ul class="list-unstyled">
+                            <li v-for="user in mediators" :key="user.id">
+                                {{ user.username }}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
 
-            <!-- view conclusion discussion post -->
-            <button class="btn btn-sm btn-block btn-primary mb-2" data-toggle="collapse" data-target="#conclusion">
-                Show full conclusion post(s) <i class="fas fa-angle-down" />
-            </button>
-            <div v-if="selectedVeto.vetoFormat >= 2">
-                <div v-for="(reason, i) in selectedVeto.reasons" :key="i">
-                    <multi-part-veto-conclusion-post
-                        :reason-index="i"
+                <!-- chat preview -->
+                <div class="col-sm-9">
+                    <b>Chat messages:</b>
+                    <veto-chat-message
+                        :users="slimmedMediators"
                     />
                 </div>
             </div>
-
-            <!-- view mediator chat message -->
-            <button class="btn btn-sm btn-block btn-primary mb-2" data-toggle="collapse" data-target="#messages">
-                Show veto chat messages <i class="fas fa-angle-down" />
-            </button>
-            <veto-chat-message
-                id="messages"
-                class="collapse"
-                :users="[]"
-            />
         </div>
     </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
-import MultiPartVetoConclusionPost from './MultiPartVetoConclusionPost.vue';
 import VetoChatMessage from '../VetoChatMessage.vue';
 
 export default {
     name: 'AdminButtons',
     components: {
-        MultiPartVetoConclusionPost,
         VetoChatMessage,
     },
     data() {
@@ -104,31 +114,6 @@ export default {
                     this.commitVeto(veto, 'Started veto mediation');
                 }
             } 
-        },
-        async concludeMediation (e, dismiss) {
-            const result = confirm(`Are you sure?`);
-
-            if (result) {
-                const veto = await this.$http.executePost(
-                    `/vetoes/concludeMediation/${this.selectedVeto.id}`,
-                    {
-                        dismiss,
-                    },
-                    e
-                );
-
-                this.commitVeto(veto, 'Concluded mediation');
-            }
-        },
-
-        async continueMediation (e) {
-            const result = confirm(`Are you sure? This should only be done if a mistake was made.`);
-
-            if (result) {
-                const veto = await this.$http.executePost(`/vetoes/continueMediation/${this.selectedVeto.id}`, {}, e);
-
-                this.commitVeto(veto, 'Re-opened mediation');
-            }
         },
         async selectMediators (e) {
             let excludeUsers = this.excludeUsers.split(',');

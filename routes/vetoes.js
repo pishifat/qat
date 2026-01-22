@@ -32,6 +32,18 @@ const defaultPopulate = [
         path: 'chatroomUsers',
         select: 'username osuId',
     },
+    {
+        path: 'chatroomUsersPublic',
+        select: 'username osuId',
+    },
+    {
+        path: 'chatroomMessages.user',
+        select: 'username osuId',
+    },
+    {
+        path: 'chatroomMediationRequestedUsers',
+        select: 'username osuId',
+    },
 ];
 
 // population for logged out users. hides mediator info
@@ -71,6 +83,20 @@ function getLimitedDefaultPopulate(mongoId) {
         },
         {
             path: 'chatroomUsers',
+            select: 'username osuId',
+            match: {
+                _id: mongoId,
+            },
+        },
+        {
+            path: 'chatroomUsersPublic',
+            select: 'username osuId',
+            match: {
+                _id: mongoId,
+            },
+        },
+        {
+            path: 'chatroomMediationRequestedUsers',
             select: 'username osuId',
             match: {
                 _id: mongoId,
@@ -127,7 +153,7 @@ router.get('/searchVeto/:id', async (req, res) => {
             .populate(
                 getPopulate(false, null)
             )
-            .select('-vouchingUsers -vetoer');
+            .select('-vouchingUsers -chatroomUsers -chatroomUsersPublic -chatroomMessages -vetoer');
     } else {
         const user = await User.findById(req.session.mongoId);
         const isNat = user.isNat;
@@ -382,7 +408,7 @@ router.post('/beginMediation/:id', middlewares.isLoggedIn, middlewares.isNat, as
         color: discord.webhookColors.purple,
         description: `Started mediation on [veto for **${v.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${v.id})`,
     }],
-        v.mode);
+        'publicVetoes');
 });
 
 /* POST conclude mediation */
@@ -409,7 +435,7 @@ router.post('/concludeMediation/:id', middlewares.isLoggedIn, middlewares.isNat,
         color: discord.webhookColors.purple,
         description: `Concluded mediation on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`,
     }],
-    veto.mode);
+    'publicVetoes');
 });
 
 /* POST continue mediation */
@@ -562,7 +588,7 @@ router.post('/toggleVouch/:id', middlewares.isLoggedIn, middlewares.isBnOrNat, a
 });
 
 /* POST change veto to "chatroom" status */
-router.post('/createChatroom/:id', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
+router.post('/createChatroom/:id', middlewares.isLoggedIn, middlewares.isNat, async (req, res) => {
     let chatroomUsers = [];
 
     const includeUsersSplit = req.body.includeUsers.split(',');
@@ -598,14 +624,27 @@ router.post('/createChatroom/:id', middlewares.isLoggedIn, middlewares.isBnOrNat
     veto.chatroomUsers = chatroomUsers;
     veto.status = 'chatroom';
     veto.chatroomInitiated = new Date();
+    veto.chatroomMessages.push({
+        date: new Date(),
+        content: `Welcome to the discussion forum for the pending veto on [**${veto.beatmapTitle}**](https://osu.ppy.sh/beatmapsets/${veto.beatmapId})! See the veto reasons above for context.\n\nUsers involved in this discussion:\n\n- Veto creator\n- BNs who vouched in support of the veto\n- Mapset host\n- Anyone else who the NAT thought was relevant\n\nAside from the mapset host, everyone in this discussion is **anonymous**. You can reveal your identity with a button below if you prefer to not be anonymous.\n\nYour goal is to resolve the veto's concerns through discussion and/or changes to the map. If a conclusion cannot be reached, you can allow the map to be mediated by a larger group of Beatmap Nominators. This option will become available 24h from this message!\n\nIf you have any questions or want to report something sketchy, talk to someone in the NAT.`,
+        user: null,
+        userIndex: 0,
+        isSystem: true,
+    });
+    veto.chatroomMessages.push({
+        date: new Date(),
+        content: `To start the discussion, the mapper should explain their thoughts on the veto!`,
+        user: null,
+        userIndex: 0,
+        isSystem: true,
+    });
+
     await veto.save();
 
     // send messages
     await veto.populate([
         { path: 'chatroomUsers', select: 'username osuId' },
     ]).execPopulate();
-
-    console.log(veto.chatroomUsers);
 
     const osuIds = veto.chatroomUsers.map(user => user.osuId);
 
@@ -645,7 +684,7 @@ router.post('/createChatroom/:id', middlewares.isLoggedIn, middlewares.isBnOrNat
         veto._id
     );
 
-    const description = `Discussion initiated on [veto for **${veto.beatmapTitle}** by **${veto.beatmapMapper}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`;
+    const description = `Discussion initiated on [veto for **${veto.beatmapTitle}**`;
     
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),
@@ -653,6 +692,198 @@ router.post('/createChatroom/:id', middlewares.isLoggedIn, middlewares.isBnOrNat
         description,
     }],
         'publicVetoes');
+});
+
+/* POST add message to veto chatroom */
+router.post('/saveMessage/:id', middlewares.isLoggedIn, async (req, res) => {
+    const message = req.body.message;
+
+    let veto = await Veto
+        .findById(req.params.id)
+        .populate(defaultPopulate)
+        .orFail();
+
+    const publicUserIds = veto.chatroomUsersPublic.map(u => u.id);
+    const isPublicUser = publicUserIds.includes(req.session.mongoId);
+    const privateUserIds = veto.chatroomUsers.map(u => u.id);
+    const userIndex = privateUserIds.findIndex(id => id == req.session.mongoId);
+
+    veto.chatroomMessages.push({
+        date: new Date(),
+        content: message,
+        user: isPublicUser ? req.session.mongoId : null,
+        userIndex: userIndex + 1,
+    });
+
+    await veto.save();
+
+    veto = await Veto
+        .findById(req.params.id)
+        .populate(
+            getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
+        );
+
+    res.json({ veto });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Sent message in veto discussion`,
+        'veto',
+        veto._id
+    );
+});
+
+/* POST reveal username in veto chatroom */
+router.post('/revealUsername/:id', middlewares.isLoggedIn, async (req, res) => {
+    let veto = await Veto
+        .findById(req.params.id)
+        .populate(defaultPopulate)
+        .orFail();
+
+    const privateUserIds = veto.chatroomUsers.map(u => u.id);
+    const userIndex = privateUserIds.findIndex(id => id == req.session.mongoId);
+
+    veto.chatroomUsersPublic.push(req.session.mongoId);
+    veto.chatroomMessages.push({
+        date: new Date(),
+        content: `**Anonymous user ${userIndex + 1}** is actually [**${req.session.username}**](https://osu.ppy.sh/users/${req.session.osuId})! This will be shown in future messages.`,
+        user: null,
+        userIndex: 0,
+        isSystem: true,
+    });
+
+    await veto.save();
+
+    veto = await Veto
+        .findById(req.params.id)
+        .populate(
+            getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
+        );
+
+    res.json({ veto });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Revealed username in veto discussion`,
+        'veto',
+        veto._id
+    );
+});
+
+/* POST request mediation */
+router.post('/requestMediation/:id', middlewares.isLoggedIn, async (req, res) => {
+    let veto = await Veto
+        .findById(req.params.id)
+        .populate(defaultPopulate)
+        .orFail();
+
+    const chatroomMediationRequestedUserIds = veto.chatroomMediationRequestedUsers.map(u => u.id);
+    
+    if (!veto.chatroomMediationRequestedUsers.includes(req.session.mongoId)) {
+        veto.chatroomMediationRequestedUsers.push(req.session.mongoId);
+    }
+
+    await veto.populate([
+        { path: 'chatroomMediationRequestedUsers', select: 'username osuId' },
+    ]).execPopulate();
+
+    const chatroomMediationRequestedUserOsuIds = veto.chatroomMediationRequestedUsers.map(u => u.osuId);
+    const mapperInitiated = chatroomMediationRequestedUserOsuIds.includes(veto.beatmapMapperId);
+    const chatroomUsersPublicIds = veto.chatroomUsersPublic.map(u => u.id);
+    const publicUserInitiated = chatroomUsersPublicIds.includes(req.session.mongoId);
+    const mapperLink = `[**${veto.beatmapMapper}**](https://osu.ppy.sh/users/${veto.beatmapMapperId})`;
+    const userLink = `[**${req.session.username}**](https://osu.ppy.sh/users/${req.session.osuId})`;
+
+    if (veto.chatroomMediationRequestedUsers.length >= 2 || mapperInitiated) {
+        veto.status = 'available';
+        veto.chatroomMessages.push({
+            date: new Date(),
+            content: `${mapperInitiated ? mapperLink : publicUserInitiated ? userLink : 'A user'} requested mediation. The discussion has concluded.`,
+            user: null,
+            userIndex: 0,
+            isSystem: true,
+        });
+    } else {
+        veto.chatroomMessages.push({
+            date: new Date(),
+            content: `${publicUserInitiated ? userLink : 'A user'} requested mediation. If another user requests mediation, the discussion will conclude.`,
+            user: null,
+            userIndex: 0,
+            isSystem: true,
+        });
+    }
+
+    await veto.save();
+
+    veto = await Veto
+        .findById(req.params.id)
+        .populate(
+            getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
+        );
+
+    res.json({ veto });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Requested mediation in veto discussion`,
+        'veto',
+        veto._id
+    );
+
+    const description = `Mediation requested on [veto for **${veto.beatmapTitle}** by **${veto.beatmapMapper}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`;
+
+    discord.webhookPost([{
+        author: discord.defaultWebhookAuthor(req.session),
+        color: discord.webhookColors.lightPink,
+        description,
+    }],
+        'publicVetoes');
+});
+
+/* GET refresh veto for chatroom purposes */
+router.get('/refreshVeto/:id', middlewares.isLoggedIn, async (req, res) => {
+    const veto = await Veto
+        .findById(req.params.id)
+        .populate(
+            getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
+        );
+
+    res.json({ veto });
+});
+
+/* POST delete message in veto chatroom */
+router.post('/deleteMessage/:id', middlewares.isLoggedIn, middlewares.isNat, async (req, res) => {
+    let veto = await Veto
+        .findById(req.params.id)
+        .populate(defaultPopulate)
+        .orFail();
+
+    const messageId = req.body.messageId;
+
+    const index = veto.chatroomMessages.findIndex(m => m.id == messageId);
+
+    if (index > 0) {
+        veto.chatroomMessages.splice(index, 1);
+    } else {
+        return res.json({ error: `Can't delete message.` });
+    }
+    
+    await veto.save();
+
+    veto = await Veto
+        .findById(req.params.id)
+        .populate(
+            getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
+        );
+
+    res.json({ veto });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Deleted message in veto discussion`,
+        'veto',
+        veto._id
+    );
 });
 
 module.exports = router;

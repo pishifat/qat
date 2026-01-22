@@ -25,7 +25,16 @@ const vetoesSchema = new mongoose.Schema({
     deadline: { type: Date },
     vouchingUsers: [{ type: 'ObjectId', ref: 'User' }],
     chatroomUsers: [{ type: 'ObjectId', ref: 'User' }],
+    chatroomUsersPublic: [{ type: 'ObjectId', ref: 'User' }],
     chatroomInitiated: { type: Date },
+    chatroomMessages: [{
+        date: { type: Date, required: true },
+        content: { type: String, required: true },
+        user: { type: 'ObjectId', ref: 'User' },
+        userIndex: { type: Number },
+        isSystem: { type: Boolean },
+    }],
+    chatroomMediationRequestedUsers: [{ type: 'ObjectId', ref: 'User' }],
     vetoFormat: { type: Number },
         /*
             1 = og (no longer used)
@@ -34,7 +43,7 @@ const vetoesSchema = new mongoose.Schema({
             4 = previously "re-mediation" with all BNs and 2 week deadline, now selects all BNs with 1 week deadline
             5 = uphold % from 50 to 70, requires 60% of meditators to vote before concluding
             6 = uphold % from 70 to 60
-            7 = "reasons" does not have "link" field
+            7 = "reasons" does not have "link" field, introduction of 'pending' and 'chatroom' statuses
         */
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 

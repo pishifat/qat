@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b>Mediation response:</b>
+        <b>Mediation response</b>
         <div class="small px-4 mb-2 text-secondary">
            Briefly explain why you agree or disagree with each veto reason below. You don't need to write a lot — even one sentence is okay! Your response will be anonymous.
         </div>
@@ -27,7 +27,7 @@
                         :name="'vote' + i"
                         value="1"
                     >
-                    <label class="form-check-label text-success" for="1">Agree with the veto</label>
+                    <label class="form-check-label text-success" for="1">Agree with the veto reason</label>
                 </div>
 
                 <div class="form-check form-check-inline">
@@ -39,7 +39,7 @@
                         :name="'vote' + i"
                         value="3"
                     >
-                    <label class="form-check-label text-danger" for="3">Disagree with the veto</label>
+                    <label class="form-check-label text-danger" for="3">Disagree with the veto reason</label>
                 </div>
                 <b v-if="input.comments[i] && input.comments[i].length > 250" :class="input.comments[i].length == 500 ? 'text-danger' : input.comments[i].length > 400 ? 'text-warning' : 'text-secondary'">{{ input.comments[i].length }}</b>
             </div>

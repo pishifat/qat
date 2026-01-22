@@ -90,6 +90,7 @@ async function sendMessages(userId, messages) {
  * @param {string} message
  */
 async function sendAnnouncement(userIds, channel, message) {
+    return { error: 'no messages pls' };
     const token = await getBotToken();
 
     await util.sleep(500); // prevent rate limiting
