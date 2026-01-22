@@ -1,6 +1,5 @@
 <template>
     <div>
-        <hr>
         <div v-if="selectedVeto.mediations.length">
             <!-- restart mediation if concluded -->
             <button

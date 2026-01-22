@@ -232,6 +232,7 @@ const server = app.listen(port, () => {
 
     if (config.enableAutomation) {
         automation.notifyReports.start();
+        automation.expirePendingVetoes.start();
         automation.notifyVetoes.start();
         automation.notifyApplicationEvaluations.start();
         automation.notifyCurrentBnEvaluations.start();

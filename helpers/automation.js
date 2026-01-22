@@ -285,6 +285,44 @@ const notifyReports = cron.schedule('0 17 * * *', async () => {
 });
 
 /**
+ * archive vetoes on maps that are ranked
+ */
+const expirePendingVetoes = cron.schedule('2 17 * * *', async () => {
+    const response = await osu.getClientCredentialsGrant();
+    const token = response.access_token;
+
+    // find pending vetoes
+    const pendingVetoes = await Veto
+        .find({ status: 'pending' });
+
+    // process pending vetoes
+    for (const veto of pendingVetoes) {
+        const osuBeatmapset = await osu.getBeatmapsetInfo(token, veto.beatmapId);
+        
+        if (osuBeatmapset.ranked == 1 && veto.vouchingUsers.length < 2) {
+            veto.status = 'archive';
+            await veto.save();
+
+            await discord.webhookPost(
+                [{
+                    color: discord.webhookColors.darkPurple,
+                    description: `Automatically concluded [pending veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id}). Not enough BNs supported the veto and the map is now Ranked!`,
+                }],
+                'publicVetoes'
+            );
+            await util.sleep(500);
+
+            await Logger.generate(
+                null,
+                `Veto concluded for "${veto.beatmapTitle}"`,
+                'veto',
+                veto._id
+            );
+        }
+    }
+});
+
+/**
  * send webhooks for vetoes that are automatically concluded or overdue
  */
 const notifyVetoes = cron.schedule('1 17 * * *', async () => {
@@ -302,7 +340,7 @@ const notifyVetoes = cron.schedule('1 17 * * *', async () => {
         ]);
 
 
-    // process vetoes
+    // process active vetoes
     for (const veto of activeVetoes) {
         let autoConclude = true;
 
@@ -340,7 +378,7 @@ const notifyVetoes = cron.schedule('1 17 * * *', async () => {
 
             await Logger.generate(
                 null,
-                `Veto concluded for "${veto.beatmapTitle}"`,
+                `Veto mediation concluded for "${veto.beatmapTitle}"`,
                 'veto',
                 veto._id
             );
@@ -1095,6 +1133,7 @@ const checkTenureValidity = cron.schedule('0 0 2 * *', async () => {
 
 module.exports = {
     notifyReports,
+    expirePendingVetoes,
     notifyVetoes,
     notifyApplicationEvaluations,
     notifyCurrentBnEvaluations,

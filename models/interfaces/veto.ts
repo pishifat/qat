@@ -12,6 +12,9 @@ interface IVetoDocument extends Document {
     beatmapMapperId: number;
     status?: string;
     mediations?: IMediationDocument[];
+    vouchingUsers?: IUserDocument[];
+    chatroomUsers?: IUserDocument[];
+    chatroomInitiated?: Date;
     deadline?: Date;
     vetoFormat?: number;
 }

@@ -53,7 +53,7 @@ export default {
             return getters.filteredVetoes.filter(v => v.status === 'pending');
         },
         activeVetoes: (state, getters) => {
-            return getters.filteredVetoes.filter(v => v.status === 'available' || v.status == 'wip');
+            return getters.filteredVetoes.filter(v => v.status === 'chatroom' || v.status === 'available' || v.status == 'wip');
         },
         resolvedVetoes: (state, getters) => {
             return getters.filteredVetoes.filter(v => v.status == 'archive');
@@ -73,11 +73,30 @@ export default {
             return state.vetoes.find(v => v.id === state.selectedVetoId);
         },
         isMediator: (state, getters, rootState) => {
-            if (!getters.selectedVeto) return false;
+            if (!rootState.loggedInUser || !getters.selectedVeto) return false;
 
             return getters.selectedVeto.mediations.some(m =>
                 rootState.loggedInUser && m.mediator && m.mediator.id == rootState.loggedInUser.id
             );
+        },
+        isVetoer: (state, getters, rootState) => {
+            if (!rootState.loggedInUser || !getters.selectedVeto || !getters.selectedVeto.vetoer) return false;
+
+            return getters.selectedVeto.vetoer.id == rootState.loggedInUser.id;
+        },
+        isVouchingUser: (state, getters, rootState) => {
+            if (!rootState.loggedInUser || !getters.selectedVeto || !getters.selectedVeto.vouchingUsers) return false;
+
+            const vouchingUserIds = getters.selectedVeto.vouchingUsers.map(u => u.id);
+
+            return vouchingUserIds.includes(rootState.loggedInUser.id);
+        },
+        isChatroomUser: (state, getters, rootState) => {
+            if (!rootState.loggedInUser || !getters.selectedVeto || !getters.selectedVeto.chatroomUsers) return false;
+
+            const chatroomUserIds = getters.selectedVeto.chatroomUsers.map(u => u.id);
+
+            return chatroomUserIds.includes(rootState.loggedInUser.id);
         },
     },
 };

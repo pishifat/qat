@@ -12,9 +12,20 @@ const vetoesSchema = new mongoose.Schema({
     beatmapTitle: { type: String },
     beatmapMapper: { type: String }, // username
     beatmapMapperId: { type: Number }, // osuId
-    status: { type: String, enum: ['pending', 'available', 'wip', 'archive'], default: 'pending' },
+    status: { type: String, enum: ['pending', 'chatroom', 'available', 'wip', 'archive'], default: 'pending' },
+        /*
+            these names are stupid because veto changes have been iterative, and changing names could lead to bugs that i don't want to deal with right now
+            pending = waiting for BNs to vouch for the veto
+            chatroom = specific users can anonymously discuss the veto
+            available = chat has concluded and mediation is necessary. NAT can review the veto in this case and begin mediation
+            wip = mediation period
+            archive = archive
+        */
     mediations: [{ type: 'ObjectId', ref: 'Mediation' }],
     deadline: { type: Date },
+    vouchingUsers: [{ type: 'ObjectId', ref: 'User' }],
+    chatroomUsers: [{ type: 'ObjectId', ref: 'User' }],
+    chatroomInitiated: { type: Date },
     vetoFormat: { type: Number },
         /*
             1 = og (no longer used)
