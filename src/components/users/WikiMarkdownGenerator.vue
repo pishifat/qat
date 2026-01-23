@@ -100,9 +100,6 @@ export default {
             // Generate markdown
             let markdown = '';
 
-            // Full BN section
-            markdown += '### Full Beatmap Nominators\n\n';
-            
             const modes = ['osu', 'taiko', 'catch', 'mania'];
             const modeNames = {
                 osu: 'osu!',
@@ -111,40 +108,38 @@ export default {
                 mania: 'osu!mania',
             };
 
-            modes.forEach(mode => {
-                markdown += `#### ${modeNames[mode]}\n\n`;
-                
-                if (grouped.full[mode].length === 0) {
-                    markdown += 'No members at this time.\n\n';
-                } else {
-                    markdown += '| Name | Additional languages |\n';
-                    markdown += '| :-- | :-- |\n';
-                    
-                    grouped.full[mode].forEach(user => {
-                        const flagMarkdown = user.countryCode ? `::{ flag=${user.countryCode.toUpperCase()} }:: ` : '';
-                        const usernameLink = `[${this.escapeMarkdown(user.username)}](https://osu.ppy.sh/users/${user.osuId})`;
-                        const languages = this.formatLanguages(user.languages);
-                        
-                        markdown += `| ${flagMarkdown}${usernameLink} | ${languages} |\n`;
-                    });
-                    
-                    markdown += '\n';
-                }
-            });
+            // Full BN section
+            markdown += this.generateSectionMarkdown(
+                'Full Beatmap Nominators',
+                grouped.full,
+                modes,
+                modeNames
+            );
 
             // Probation BN section
-            markdown += '### Probationary Beatmap Nominators\n\n';
+            markdown += this.generateSectionMarkdown(
+                'Probationary Beatmap Nominators',
+                grouped.probation,
+                modes,
+                modeNames
+            );
+
+            this.markdownOutput = markdown.trim();
+        },
+
+        generateSectionMarkdown (sectionTitle, groupedByMode, modes, modeNames) {
+            let markdown = `### ${sectionTitle}\n\n`;
 
             modes.forEach(mode => {
                 markdown += `#### ${modeNames[mode]}\n\n`;
                 
-                if (grouped.probation[mode].length === 0) {
+                if (groupedByMode[mode].length === 0) {
                     markdown += 'No members at this time.\n\n';
                 } else {
                     markdown += '| Name | Additional languages |\n';
                     markdown += '| :-- | :-- |\n';
                     
-                    grouped.probation[mode].forEach(user => {
+                    groupedByMode[mode].forEach(user => {
                         const flagMarkdown = user.countryCode ? `::{ flag=${user.countryCode.toUpperCase()} }:: ` : '';
                         const usernameLink = `[${this.escapeMarkdown(user.username)}](https://osu.ppy.sh/users/${user.osuId})`;
                         const languages = this.formatLanguages(user.languages);
@@ -156,7 +151,7 @@ export default {
                 }
             });
 
-            this.markdownOutput = markdown.trim();
+            return markdown;
         },
         
         formatLanguages (languages) {
