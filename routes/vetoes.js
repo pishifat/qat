@@ -260,7 +260,7 @@ router.post('/submit', middlewares.isLoggedIn, async (req, res) => {
         veto._id
     );
 
-    let description = `Submitted [veto for **${veto.beatmapTitle}** by **${veto.beatmapMapper}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`;
+    let description = `Anonymous user submitted [veto for **${veto.beatmapTitle}** by **${veto.beatmapMapper}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`;
 
     for (let i = 0; i < veto.reasons.length; i++) {
         description += `\n- **Reason ${i + 1}:** ${veto.reasons[i].summary}`;
