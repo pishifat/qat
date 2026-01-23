@@ -210,7 +210,7 @@ router.get('/searchVeto/:id', async (req, res) => {
 });
 
 /* POST create a new veto. */
-router.post('/submit', middlewares.isLoggedIn, async (req, res) => {
+router.post('/submit', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
     const { mode, url, reasons } = req.body;
 
     // validation

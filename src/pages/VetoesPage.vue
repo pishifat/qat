@@ -11,6 +11,7 @@
                     class="btn btn-block btn-primary my-1"
                     data-toggle="modal"
                     data-target="#addVeto"
+                    :disabled="isProbation"
                 >
                     Submit anonymous veto
                 </button>
@@ -171,6 +172,9 @@ export default {
             'resolvedVetoes',
             'paginatedResolvedVetoes',
         ]),
+        isProbation () {
+            return this.loggedInUser.probationModes.length > 0;
+        },
     },
     watch: {
         resolvedVetoes(v) {
