@@ -1962,33 +1962,6 @@ router.post('/doTemporaryThing', middlewares.isLoggedIn, middlewares.isAdmin, as
         console.log(user.username + ": " + user.nominationsProfileBadge);
     }*/
 
-    /* populate country codes for all BNs and NATs */
-
-    /*
-    console.log('Populating country codes for all BNs and NATs');
-    const users = await User.find({
-        groups: { $in: ['bn', 'nat'] },
-        $or: [
-            { countryCode: { $exists: false } },
-            { countryCode: null },
-        ],
-    });
-
-    const response = await osu.getClientCredentialsGrant();
-    const token = response.access_token;
-
-    for (const user of users) {
-        if (user.countryCode) continue;
-
-        const osuUser = await osu.getOtherUserInfo(token, user.osuId);
-        user.countryCode = osuUser.country_code;
-        await user.save();
-
-        console.log(`Populated country code for ${user.username} (${user.osuId}) - ${user.countryCode}`);
-        await util.sleep(500);
-    }
-    */
-
     console.log(users.length);
 
     res.json({
