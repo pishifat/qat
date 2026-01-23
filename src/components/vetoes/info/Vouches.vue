@@ -3,7 +3,7 @@
         <div>
             If you want this veto to take effect, you can anonymously <b>vouch for it below!</b>
         </div>
-        <div class="small text-secondary">Only members of the BN can vouch. NAT members are responsible for moderation.</div>
+        <div class="small text-secondary">Only members of the BN can vouch. By supporting the veto this way, you will be part of an anonymized discussion with the mapper. NAT members are responsible for moderation.</div>
         <button
             class="btn btn-sm btn-danger mt-2"
             @click="vouch(true, null, $event)"
@@ -59,7 +59,7 @@
                 </li>
             </ul>
             <div v-if="selectedVeto.vouchingUsers.length >= 2">
-                List anyone else who should be in the veto chatroom:
+                List anyone else who should be in the veto chatroom. For moderation purposes, every NAT can read the discussion, but only people listed can type.
                 <input
                     v-model="includeUsers"
                     class="form-control w-75 small"

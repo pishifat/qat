@@ -111,11 +111,28 @@ export default {
             return getters.selectedVeto.beatmapMapperId == rootState.loggedInUser.osuId;
         },
         isChatroomMediationRequestedUser: (state, getters, rootState) => {
-            if (!rootState.loggedInUser || !getters.selectedVeto || !getters.selectedVeto.isChatroomMediationRequestedUsers) return false;
+            if (!rootState.loggedInUser || !getters.selectedVeto || !getters.selectedVeto.chatroomMediationRequestedUsers) return false;
 
-            const chatroomUserIds = getters.selectedVeto.isChatroomMediationRequestedUsers.map(u => u.id);
+            const chatroomUserIds = getters.selectedVeto.chatroomMediationRequestedUsers.map(u => u.id);
 
             return chatroomUserIds.includes(rootState.loggedInUser.id);
+        },
+        isChatroomUpholdVoter: (state, getters, rootState) => {
+            if (!rootState.loggedInUser || !getters.selectedVeto || !getters.selectedVeto.chatroomUpholdVoters) return false;
+
+            const chatroomUpholdUserIds = getters.selectedVeto.chatroomUpholdVoters.map(u => u.id);
+
+            return chatroomUpholdUserIds.includes(rootState.loggedInUser.id);
+        },
+        isChatroomDismissVoter: (state, getters, rootState) => {
+            if (!rootState.loggedInUser || !getters.selectedVeto || !getters.selectedVeto.chatroomDismissVoters) return false;
+
+            const chatroomDismissUserIds = getters.selectedVeto.chatroomDismissVoters.map(u => u.id);
+
+            return chatroomDismissUserIds.includes(rootState.loggedInUser.id);
+        },
+        alreadyVoted: (state, getters) => {
+            return getters.isChatroomUpholdVoter || getters.isChatroomMediationRequestedUser;
         },
     },
 };

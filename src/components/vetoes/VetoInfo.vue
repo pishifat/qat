@@ -37,10 +37,17 @@
             </div>
 
             <!-- show chatroom component when veto is "chatroom" status -->
-            <chatroom v-if="selectedVeto.status == 'chatroom' && loggedInUser && (isChatroomUser || loggedInUser.isNat)" />
+            <chatroom
+                v-if="
+                    selectedVeto.status == 'chatroom' &&
+                    loggedInUser &&
+                    (isChatroomUser || loggedInUser.isNat)"
+                :class="selectedVeto.chatroomLocked ? 'fake-disabled' : ''"
+            />
             <div v-else-if="selectedVeto.status == 'chatroom'">
                 The veto is currently being discussed between the mapper(s) and Beatmap Nominators. If a conclusion can't be reached, a larger vote will be held!
             </div>
+            <chatroom-admin-buttons v-if="selectedVeto.status == 'chatroom' && loggedInUser && loggedInUser.isNat" />
             
             <!-- show admin buttons to NAT -->
             <begin-mediation
@@ -85,6 +92,7 @@ import DebugViewDocument from '../DebugViewDocument.vue';
 import Context from './info/Context.vue';
 import Vouches from './info/Vouches.vue';
 import Chatroom from './info/Chatroom.vue';
+import ChatroomAdminButtons from './info/ChatroomAdminButtons.vue';
 
 export default {
     name: 'VetoInfo',
@@ -99,6 +107,7 @@ export default {
         Context,
         Vouches,
         Chatroom,
+        ChatroomAdminButtons,
     },
     computed: {
         ...mapState([

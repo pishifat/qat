@@ -3,7 +3,7 @@
         <div class="container">
             <div class="row mb-3">
                 <div class="col-sm-12">
-                    <b class="mr-4">Game mode:</b>
+                    <b class="mr-4">Game mode</b>
 
                     <mode-select
                         v-model="selectedModes"

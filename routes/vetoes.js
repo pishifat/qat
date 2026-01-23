@@ -44,6 +44,14 @@ const defaultPopulate = [
         path: 'chatroomMediationRequestedUsers',
         select: 'username osuId',
     },
+    {
+        path: 'chatroomUpholdVoters',
+        select: 'username osuId',
+    },
+    {
+        path: 'chatroomDismissVoters',
+        select: 'username osuId',
+    },
 ];
 
 // population for logged out users. hides mediator info
@@ -97,6 +105,20 @@ function getLimitedDefaultPopulate(mongoId) {
         },
         {
             path: 'chatroomMediationRequestedUsers',
+            select: 'username osuId',
+            match: {
+                _id: mongoId,
+            },
+        },
+        {
+            path: 'chatroomUpholdVoters',
+            select: 'username osuId',
+            match: {
+                _id: mongoId,
+            },
+        },
+        {
+            path: 'chatroomDismissVoters',
             select: 'username osuId',
             match: {
                 _id: mongoId,
@@ -622,11 +644,12 @@ router.post('/createChatroom/:id', middlewares.isLoggedIn, middlewares.isNat, as
     chatroomUsers.push(veto.vetoer._id);
     chatroomUsers.push(mapper._id);
     veto.chatroomUsers = chatroomUsers;
+    veto.chatroomUsersPublic = [mapper._id];
     veto.status = 'chatroom';
     veto.chatroomInitiated = new Date();
     veto.chatroomMessages.push({
         date: new Date(),
-        content: `Welcome to the discussion forum for the pending veto on [**${veto.beatmapTitle}**](https://osu.ppy.sh/beatmapsets/${veto.beatmapId})! See the veto reasons above for context.\n\nUsers involved in this discussion:\n\n- Veto creator\n- BNs who vouched in support of the veto\n- Mapset host\n- Anyone else who the NAT thought was relevant\n\nAside from the mapset host, everyone in this discussion is **anonymous**. You can reveal your identity with a button below if you prefer to not be anonymous.\n\nYour goal is to resolve the veto's concerns through discussion and/or changes to the map. If a conclusion cannot be reached, you can allow the map to be mediated by a larger group of Beatmap Nominators. This option will become available 24h from this message!\n\nIf you have any questions or want to report something sketchy, talk to someone in the NAT.`,
+        content: `Welcome to the discussion forum for the pending veto on [**${veto.beatmapTitle}**](https://osu.ppy.sh/beatmapsets/${veto.beatmapId})! See the veto reasons above for context.\n\nUsers involved in this discussion:\n\n- Veto creator\n- BNs who vouched in support of the veto\n- Mapset host\n- Anyone else who the NAT thought was relevant\n\nAside from the mapset host, everyone in this discussion is **anonymous**. You can reveal your identity with a button below if you prefer to not be anonymous.\n\nYour goal is to resolve the veto's concerns through discussion and/or changes to the map. If a conclusion cannot be reached, you can allow the map to be mediated by a larger group of Beatmap Nominators. This option will become available 24h from this message!\n\nIf you have any questions or want to report something sketchy, talk to someone in the NAT. They can read this chatroom too.`,
         user: null,
         userIndex: 0,
         isSystem: true,
@@ -684,7 +707,7 @@ router.post('/createChatroom/:id', middlewares.isLoggedIn, middlewares.isNat, as
         veto._id
     );
 
-    const description = `Discussion initiated on [veto for **${veto.beatmapTitle}**`;
+    const description = `Discussion initiated on [veto for **${veto.beatmapTitle}**](https://osu.ppy.sh/beatmapsets/${veto.beatmapId})`;
     
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),
@@ -884,6 +907,211 @@ router.post('/deleteMessage/:id', middlewares.isLoggedIn, middlewares.isNat, asy
         'veto',
         veto._id
     );
+});
+
+/* POST start vote in veto chatroom */
+router.post('/startVote/:id', middlewares.isLoggedIn, async (req, res) => {
+    const veto = await Veto
+        .findById(req.params.id)
+        .populate(
+            getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
+        );
+
+    if (req.session.osuId != veto.beatmapMapperId) {
+        return res.json({ error: 'Only the mapper can start a vote!' });
+    }
+
+    veto.chatroomVoteEnabled = true;
+    veto.chatroomUpholdVoters = [];
+    veto.chatroomDismissVoters = [];
+    veto.chatroomMessages.push({
+        date: new Date(),
+        content: `[**${veto.beatmapMapper}**](https://osu.ppy.sh/users/${veto.beatmapMapperId}) started a vote to dismiss the veto!\n\nEnsure everyone knows which version of the map to vote on, then follow the instructions below.`,
+        user: null,
+        userIndex: 0,
+        isSystem: true,
+    });
+    await veto.save();
+
+    res.json({ veto });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Started vote for veto in discussion`,
+        'veto',
+        veto._id
+    );
+});
+
+/* POST submit vote in veto chatroom */
+router.post('/vote/:id', middlewares.isLoggedIn, async (req, res) => {
+    const vote = req.body.vote;
+    let veto = await Veto
+        .findById(req.params.id)
+        .populate(defaultPopulate)
+        .orFail();
+
+    if (!veto.chatroomVoteEnabled) {
+        return res.json({ error: 'Vote not in progress!' });
+    }
+
+    const validVotingUserIds = veto.vouchingUsers.map(u => u.id);
+    validVotingUserIds.push(veto.vetoer.id);
+
+    if (!validVotingUserIds.includes(req.session.mongoId)) {
+        return res.json({ error: 'Only the vetoer and the vouching users can vote!' });
+    }
+
+    const chatroomUsersPublicIds = veto.chatroomUsersPublic.map(u => u.id);
+    const isPublicUser = chatroomUsersPublicIds.includes(req.session.mongoId);
+    const privateUserIds = veto.chatroomUsers.map(u => u.id);
+    const userIndex = privateUserIds.findIndex(id => id == req.session.mongoId);
+    const userText = isPublicUser ? `[**${req.session.username}**](https://osu.ppy.sh/users/${req.session.osuId})` : `**Anonymous user ${userIndex + 1}**`;
+
+    const chatroomUpholdVotersIds = veto.chatroomUpholdVoters.map(u => u.id);
+    const chatroomDismissVotersIds = veto.chatroomDismissVoters.map(u => u.id);
+    let revote = false;
+
+    if (vote == 'uphold') {
+        if (chatroomUpholdVotersIds.includes(req.session.mongoId)) {
+            return res.json({ error: 'Already voted!' });
+        }
+
+        if (chatroomDismissVotersIds.includes(req.session.mongoId)) {
+            const index = veto.chatroomDismissVoters.findIndex(u => u.id == req.session.mongoId);
+            veto.chatroomDismissVoters.splice(index, 1);
+            revote = true;
+        }
+
+        veto.chatroomUpholdVoters.push(req.session.mongoId);
+    } else if (vote == 'dismiss') {
+        if (chatroomDismissVotersIds.includes(req.session.mongoId)) {
+            return res.json({ error: 'Already voted!' });
+        }
+
+        if (chatroomUpholdVotersIds.includes(req.session.mongoId)) {
+            const index = veto.chatroomUpholdVoters.findIndex(u => u.id == req.session.mongoId);
+            veto.chatroomUpholdVoters.splice(index, 1);
+            revote = true;
+        }
+
+        veto.chatroomDismissVoters.push(req.session.mongoId);
+    } else {
+        return res.json({ error: 'Invalid vote' });
+    }
+
+    veto.chatroomMessages.push({
+        date: new Date(),
+        content: `${userText} ${revote ? 'changed their vote' : 'voted'} to ${vote}!`,
+        user: null,
+        userIndex: 0,
+        isSystem: true,
+    });
+
+    if (veto.chatroomUpholdVoters.length >= 2) {
+        veto.chatroomMessages.push({
+            date: new Date(),
+            content: `A majority was reached! The veto was **not dismissed**, so the discussion will continue.\n\nIf the mapper makes further changes, a new vote can start.\n\nIf a conclusion cannot be reached, mediation may be requested.`,
+            user: null,
+            userIndex: 0,
+            isSystem: true,
+        });
+        veto.chatroomVoteEnabled = false;
+        veto.chatroomLocked = true;
+    } else if (veto.chatroomDismissVoters.length >= 2) {
+        veto.chatroomMessages.push({
+            date: new Date(),
+            content: `A majority was reached! The veto was **dismissed**, so the discussion has finished.\n\nThe NAT will review this discussion and archive the veto (if nothing broke). Thank you for participating!`,
+            user: null,
+            userIndex: 0,
+            isSystem: true,
+        });
+        veto.chatroomVoteEnabled = false;
+        veto.chatroomLocked = true;
+
+        discord.webhookPost([{
+            color: discord.webhookColors.purple,
+            description: `[Veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id}) dismissed by vote. Check to make sure if everything worked, and move to archive if so.`,
+        }],
+            veto.mode);
+    }
+
+    await veto.save();
+
+    veto = await Veto
+        .findById(req.params.id)
+        .populate(
+            getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
+        );
+
+    res.json({ veto });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Voted "${vote}" for veto in discussion`,
+        'veto',
+        veto._id
+    );
+});
+
+/* POST set veto status as "available" */
+router.post('/setStatusAvailable/:id', middlewares.isLoggedIn, middlewares.isNat, async (req, res) => {
+    const veto = await Veto
+        .findById(req.params.id)
+        .populate(
+            getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
+        ).orFail();
+
+    veto.status = 'available';
+    await veto.save();
+
+    res.json({ veto });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Set veto status to "available"`,
+        'veto',
+        veto._id
+    );
+
+    let description = `Concluded discussion on [veto for **${veto.beatmapTitle}** by **${veto.beatmapMapper}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`;
+
+    discord.webhookPost([{
+        author: discord.defaultWebhookAuthor(req.session),
+        color: discord.webhookColors.darkPurple,
+        description,
+    }],
+        'publicVetoes');
+});
+
+/* POST set veto status as "archive" */
+router.post('/setStatusArchive/:id', middlewares.isLoggedIn, middlewares.isNat, async (req, res) => {
+    const veto = await Veto
+        .findById(req.params.id)
+        .populate(
+            getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
+        ).orFail();
+
+    veto.status = 'archive';
+    await veto.save();
+
+    res.json({ veto });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Set veto status to "archive"`,
+        'veto',
+        veto._id
+    );
+
+    let description = `Archived [veto for **${veto.beatmapTitle}** by **${veto.beatmapMapper}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`;
+
+    discord.webhookPost([{
+        author: discord.defaultWebhookAuthor(req.session),
+        color: discord.webhookColors.gray,
+        description,
+    }],
+        'publicVetoes');
 });
 
 module.exports = router;

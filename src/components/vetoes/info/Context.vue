@@ -1,6 +1,6 @@
 <template>
     <div class="mb-2">
-        <b>Veto reasons:</b>
+        <b>Veto reasons</b>
 
         <ol>
             <li v-for="reason in selectedVeto.reasons" :key="reason.summary">

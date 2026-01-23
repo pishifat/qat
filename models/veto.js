@@ -35,6 +35,10 @@ const vetoesSchema = new mongoose.Schema({
         isSystem: { type: Boolean },
     }],
     chatroomMediationRequestedUsers: [{ type: 'ObjectId', ref: 'User' }],
+    chatroomVoteEnabled: { type: Boolean },
+    chatroomUpholdVoters: [{ type: 'ObjectId', ref: 'User' }],
+    chatroomDismissVoters: [{ type: 'ObjectId', ref: 'User' }],
+    chatroomLocked: { type: Boolean },
     vetoFormat: { type: Number },
         /*
             1 = og (no longer used)

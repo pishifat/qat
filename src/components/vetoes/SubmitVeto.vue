@@ -2,7 +2,7 @@
     <modal-dialog id="addVeto" title="Submit a veto anonymously">
         <div class="container">
             <!-- game mode -->
-            <p><b>Game mode:</b></p>
+            <p><b>Game mode</b></p>
             <div class="row ml-4">
                 <mode-select
                     v-model="mode"
@@ -13,7 +13,7 @@
             </div>
 
             <!-- url -->
-            <p><b>Beatmap URL:</b></p>
+            <p><b>Beatmap URL</b></p>
             <div class="row ml-4 mb-2">
                 <input
                     v-model="url"
@@ -24,7 +24,7 @@
             </div>
 
             <!-- veto reasons -->
-            <p><b>Veto reasons:</b></p>
+            <p><b>Veto reasons</b></p>
             <div>
                 <ol>
                     <li v-if="!vetoReasons.length">
@@ -62,7 +62,7 @@
 
             <hr>
 
-            <p><b>Create veto reason:</b></p>
+            <p><b>Create veto reason</b></p>
             <p class="small mx-2 mb-2">
                 <b>Add veto reason</b> will update the list above. When all reasons are added, click <b>Submit</b>.
             </p>

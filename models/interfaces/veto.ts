@@ -23,6 +23,11 @@ interface IVetoDocument extends Document {
         userIndex: number;
         isSystem: Boolean;
     }[];
+    chatroomMediationRequestedUsers?: IUserDocument[];
+    chatroomVoteEnabled?: Boolean;
+    chatroomUpholdVoters?: IUserDocument[];
+    chatroomDismissVoters?: IUserDocument[];
+    chatroomLocked?: Boolean;
     deadline?: Date;
     vetoFormat?: number;
 }
