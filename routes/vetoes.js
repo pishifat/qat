@@ -267,7 +267,6 @@ router.post('/submit', middlewares.isLoggedIn, async (req, res) => {
     }
 
     discord.webhookPost([{
-        author: discord.defaultWebhookAuthor(req.session),
         color: discord.webhookColors.darkPurple,
         description,
     }],
@@ -897,7 +896,6 @@ router.post('/requestMediation/:id', middlewares.isLoggedIn, async (req, res) =>
     const description = `Mediation requested on [veto for **${veto.beatmapTitle}** by **${veto.beatmapMapper}**](https://bn.mappersguild.com/vetoes?id=${veto.id}) (${veto.chatroomMediationRequestedUsers.length}/2)`;
 
     discord.webhookPost([{
-        author: discord.defaultWebhookAuthor(req.session),
         color: discord.webhookColors.lightPink,
         description,
     }],
