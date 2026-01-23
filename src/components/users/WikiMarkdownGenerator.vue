@@ -170,7 +170,7 @@ export default {
 
         escapeMarkdown (text) {
             // Escape special markdown characters in usernames
-            return text.replace(/[\[\]()]/g, '\\$&');
+            return text.replace(/[\[\]()_]/g, '\\$&');
         },
 
         async copyToClipboard () {
