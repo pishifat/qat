@@ -11,7 +11,6 @@
             <!-- show veto reasons and include mediation responses when possible -->
             <context v-if="!showMediations" />
             <mediations v-else />
-
             <!--show chatroom archive when veto is in mediation phases-->
             <div
                 v-if="
@@ -57,15 +56,15 @@
                 The veto discussion was inconclusive, so a mediation was requested. It'll begin soon!
             </div>
 
-            <!-- show vote count to NATs during mediation period -->
-            <vote-count 
-                v-if="selectedVeto.status == 'wip' && loggedInUser && loggedInUser.isNat"
-            />
-
             <!-- show mediation input for active mediators -->
             <mediation-input
                 v-if="selectedVeto.status == 'wip' && isMediator"
             />
+            <div v-else-if="selectedVeto.status == 'wip'">
+                <public-mediation-input v-if="loggedInUser && !loggedInUser.isBnOrNat" class="mt-4" />
+                <div v-else-if="!loggedInUser">If you want to give your opinion on the veto, log in.</div>
+                <div v-else-if="loggedInUser.isBnOrNat && !loggedInUser.isNat">There's nothing for you to do here.</div>
+            </div>
 
             <admin-buttons
                 v-if="loggedInUser && loggedInUser.isNat && (selectedVeto.status == 'wip' || selectedVeto.status == 'archive')"
@@ -93,6 +92,7 @@ import Context from './info/Context.vue';
 import Vouches from './info/Vouches.vue';
 import Chatroom from './info/Chatroom.vue';
 import ChatroomAdminButtons from './info/ChatroomAdminButtons.vue';
+import PublicMediationInput from './info/PublicMediationInput.vue';
 
 export default {
     name: 'VetoInfo',
@@ -108,6 +108,7 @@ export default {
         Vouches,
         Chatroom,
         ChatroomAdminButtons,
+        PublicMediationInput,
     },
     computed: {
         ...mapState([

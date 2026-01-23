@@ -52,6 +52,10 @@ const defaultPopulate = [
         path: 'chatroomDismissVoters',
         select: 'username osuId',
     },
+    {
+        path: 'publicMediations',
+        select: 'vote reasonIndex',
+    },
 ];
 
 // population for logged out users. hides mediator info
@@ -122,6 +126,16 @@ function getLimitedDefaultPopulate(mongoId) {
             select: 'username osuId',
             match: {
                 _id: mongoId,
+            },
+        },
+        {
+            path: 'publicMediations',
+            populate: {
+                path: 'mediator',
+                match: {
+                    _id: mongoId,
+                },
+                select: 'username osuId',
             },
         },
     ]
@@ -559,6 +573,10 @@ router.post('/toggleVouch/:id', middlewares.isLoggedIn, middlewares.isBnOrNat, a
 
     if (res.locals.userRequest.isNat && (userId == req.session.mongoId)) {
         return res.json({ error: "NAT members cannot vouch!" });
+    }
+
+    if (veto.vouchingUsers.length >= 2) {
+        return res.json({ error: "This veto has already been vouched for by 2 BNs! It'll progress soon..."})
     }
 
     const vouchingUserIds = veto.vouchingUsers.map(u => u.id);
@@ -1112,6 +1130,73 @@ router.post('/setStatusArchive/:id', middlewares.isLoggedIn, middlewares.isNat, 
         description,
     }],
         'publicVetoes');
+});
+
+/* POST submit public mediation */
+router.post('/submitPublicMediation/:id', middlewares.isLoggedIn, async (req, res) => {
+    const voteData = req.body.vote;
+    let veto = await Veto
+        .findById(req.params.id)
+        .populate(
+            getPopulate(false, req.session.mongoId)
+        ).orFail();
+
+    for (let index = 0; index < veto.reasons.length; index++) {
+        let mediation = veto.publicMediations.find(m => m.mediator.id == req.session.mongoId && m.reasonIndex == index);
+        const vote = voteData.votes[index];
+
+        if (!mediation && vote) {
+            mediation = new Mediation();
+            mediation.mediator = req.session.mongoId;
+            mediation.vote = voteData.votes[index];
+            mediation.reasonIndex = index;
+            await mediation.save();
+            veto.publicMediations.push(mediation);
+            await veto.save();
+        } else if (mediation && vote) {
+            mediation.vote = vote;
+            await mediation.save();
+        }
+    }
+
+    veto = await Veto
+        .findById(req.params.id)
+        .populate(
+            getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
+        ).orFail();
+
+    res.json({ veto });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Submitted community veto mediation`,
+        'veto',
+        veto._id
+    );
+});
+
+/* POST set veto reason status */
+router.post('/setVetoReasonStatus/:id', middlewares.isLoggedIn, middlewares.isNat, async (req, res) => {
+    const { status, reasonIndex } = req.body;
+
+    const veto = await Veto
+        .findById(req.params.id)
+        .populate(
+            getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
+        ).orFail();
+    await veto.save();
+
+    veto.reasons[reasonIndex].status = status;
+    await veto.save();
+
+    res.json({ veto });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Set veto reason status as "${status}"`,
+        'veto',
+        veto._id
+    );
 });
 
 module.exports = router;

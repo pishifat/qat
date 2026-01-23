@@ -134,5 +134,19 @@ export default {
         alreadyVoted: (state, getters) => {
             return getters.isChatroomUpholdVoter || getters.isChatroomMediationRequestedUser;
         },
+        mediationsGroup1: (state, getters, rootState) => (reasonIndex) => {
+            if (!rootState.loggedInUser || !getters.selectedVeto || !getters.selectedVeto.mediations) return [];
+
+            const reasonFilteredMediations = getters.selectedVeto.mediations.filter(m => m.reasonIndex == reasonIndex);
+
+            return reasonFilteredMediations.filter((_, i) => i % 2 === 0);
+        },
+        mediationsGroup2: (state, getters, rootState) => (reasonIndex) => {
+            if (!rootState.loggedInUser || !getters.selectedVeto || !getters.selectedVeto.mediations) return [];
+
+            const reasonFilteredMediations = getters.selectedVeto.mediations.filter(m => m.reasonIndex == reasonIndex);
+
+            return reasonFilteredMediations.filter((_, i) => i % 2 === 1);
+        },
     },
 };

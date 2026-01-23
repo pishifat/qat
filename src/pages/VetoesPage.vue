@@ -7,6 +7,7 @@
                 store-module="vetoes"
             >
                 <button
+                    v-if="loggedInUser && loggedInUser.isBnOrNat"
                     class="btn btn-block btn-primary my-1"
                     data-toggle="modal"
                     data-target="#addVeto"

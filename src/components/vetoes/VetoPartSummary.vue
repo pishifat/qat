@@ -13,7 +13,12 @@
             </span>
         </h5>
         <div class="card card-body small mb-4">
-            <a :href="reason.link" target="_blank" class="mb-2">{{ reason.summary }}</a>
+            <div v-if="reason.link">
+                <a :href="reason.link" target="_blank" class="mb-2">{{ reason.summary }}</a>
+            </div>
+            <div v-else>
+                {{ reason.summary }}
+            </div>
             <div v-if="isUpheld">
                 <div v-for="mediation in upholdMediations" :key="mediation.id">
                     <div class="mb-2">
@@ -77,8 +82,12 @@ export default {
                     threshold = 0.7 * sum;
                 }
                 
-                if (this.veto.vetoFormat >= 6) {
+                if (this.veto.vetoFormat == 6) {
                     threshold = 0.6 * sum;
+                }
+
+                if (this.veto.vetoFormat >= 7) {
+                    return this.veto.reasons[this.reasonIndex].status == 'upheld';
                 }
 
                 return this.upholdMediations.length >= threshold;

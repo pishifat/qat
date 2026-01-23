@@ -30,14 +30,26 @@
             <button class="btn btn-sm btn-block btn-success mb-2" @click="beginMediation($event)">
                 Begin mediation
             </button>
+            <div v-if="beginningMediation" class="mt-2 small text-secondary">this will take a few seconds...</div>
 
             <!-- list mediators -->
             <div class="row">
-                <div class="col-sm-3 align-self-center">
-                    <b>Users:</b>
-                    <div id="usernames" class="card card-body small">
+                <div class="col-sm-3">
+                    <b>Group 1</b>
+                    <div id="usernames1" class="card card-body small">
                         <ul class="list-unstyled">
-                            <li v-for="user in mediators" :key="user.id">
+                            <li v-for="user in group1" :key="user.id">
+                                {{ user.username }}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-sm-3">
+                    <b>Group 2</b>
+                    <div id="usernames2" class="card card-body small">
+                        <ul class="list-unstyled">
+                            <li v-for="user in group2" :key="user.id">
                                 {{ user.username }}
                             </li>
                         </ul>
@@ -45,7 +57,7 @@
                 </div>
 
                 <!-- chat preview -->
-                <div class="col-sm-9">
+                <div class="col-sm-6">
                     <b>Chat messages:</b>
                     <veto-chat-message
                         :users="slimmedMediators"
@@ -69,6 +81,7 @@ export default {
         return {
             mediators: null,
             excludeUsers: '',
+            beginningMediation: false,
         };
     },
     computed: {
@@ -84,6 +97,16 @@ export default {
 
                 return tempUsers;
             } else return [];
+        },
+        group1() {
+            if (this.mediators) {
+                return this.mediators.filter((_, i) => i % 2 === 0);
+            }
+        },
+        group2() {
+            if (this.mediators) {
+                return this.mediators.filter((_, i) => i % 2 === 1);
+            }
         },
     },
     watch: {
@@ -108,10 +131,12 @@ export default {
                 const result2 = confirm(`ARE YOU REALLY SURE YOU'VE SENT THE MESSAGES? DON'T BE STUPID.`);
 
                 if (result2) {
+                    this.beginningMediation = true;
                     const mediatorIds = this.mediators.map(m => m._id);
                     const veto = await this.$http.executePost(`/vetoes/beginMediation/${this.selectedVeto.id}`, { mediatorIds, reasons: this.selectedVeto.reasons }, e);
 
                     this.commitVeto(veto, 'Started veto mediation');
+                    this.beginningMediation = false;
                 }
             } 
         },

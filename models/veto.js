@@ -7,6 +7,7 @@ const vetoesSchema = new mongoose.Schema({
         _id: false,
         link: { type: String }, // previously required, but not anymore with current veto format
         summary: { type: String, required: true },
+        status: { type: String },
     }],
     beatmapId: { type: Number },
     beatmapTitle: { type: String },
@@ -39,6 +40,7 @@ const vetoesSchema = new mongoose.Schema({
     chatroomUpholdVoters: [{ type: 'ObjectId', ref: 'User' }],
     chatroomDismissVoters: [{ type: 'ObjectId', ref: 'User' }],
     chatroomLocked: { type: Boolean },
+    publicMediations: [{ type: 'ObjectId', ref: 'Mediation' }],
     vetoFormat: { type: Number },
         /*
             1 = og (no longer used)

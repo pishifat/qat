@@ -1,31 +1,32 @@
 <template>
     <div v-if="selectedVeto.vetoFormat >= 2">
-        <b>Stats</b>
-        <div :key="reasonIndex">
+        <b v-if="groupHeader.length">{{ groupHeader }}</b>
+        <div>
             <ul>
                 <li>
                     <label class="mb-0" data-toggle="tooltip" data-placement="right" title="% of submitted votes">
-                        <b>Agree:</b> {{ filterMediationsByIndex(upholdMediations, reasonIndex).length }} ({{ Math.round(filterMediationsByIndex(upholdMediations, reasonIndex).length / filterMediationsByIndex(validMediations, reasonIndex).length * 100) || '0' }}%)
+                        <b>Agree:</b> {{ upholdMediations.length }} ({{ Math.round(upholdMediations.length / validMediations.length * 100) || '0' }}%)
                     </label>
+                    <small v-if="selectedVeto.vetoFormat >= 6" class="ml-1 text-secondary">Uphold threshold: 60%</small>
                 </li>
-                <li v-if="filterMediationsByIndex(neutralMediations, reasonIndex).length" >
+                <li v-if="neutralMediations.length" >
                     <label class="mb-0" data-toggle="tooltip" data-placement="right" title="% of submitted votes">
-                        <b>Partially Agree:</b> {{ filterMediationsByIndex(neutralMediations, reasonIndex).length }} ({{ Math.round(filterMediationsByIndex(neutralMediations, reasonIndex).length / filterMediationsByIndex(validMediations, reasonIndex).length * 100) || '0' }}%)
+                        <b>{{ selectedVeto.vetoFormat >= 7 ? 'Neutral' : 'Partially Agree' }}:</b> {{ neutralMediations.length }} ({{ Math.round(neutralMediations.length / validMediations.length * 100) || '0' }}%)
                     </label>
                 </li>
                 <li>
                     <label class="mb-0" data-toggle="tooltip" data-placement="right" title="% of submitted votes">
-                        <b>Disagree:</b> {{ filterMediationsByIndex(withdrawMediations, reasonIndex).length }} ({{ Math.round(filterMediationsByIndex(withdrawMediations, reasonIndex).length / filterMediationsByIndex(validMediations, reasonIndex).length * 100) || '0' }}%)
+                        <b>Disagree:</b> {{ withdrawMediations.length }} ({{ Math.round(withdrawMediations.length / validMediations.length * 100) || '0' }}%)
                     </label>
                 </li>
-                <li>
+                <li v-if="!isPublic">
                     <label class="mb-0" data-toggle="tooltip" data-placement="right" title="% of assigned mediators">
-                        <b>Submitted votes:</b> {{ filterMediationsByIndex(validMediations, reasonIndex).length }} ({{ Math.round(filterMediationsByIndex(validMediations, reasonIndex).length / (selectedVeto.mediations.length / selectedVeto.reasons.length) * 100) || '0' }}%)
+                        <b>Submitted votes:</b> {{ validMediations.length }} ({{ Math.round(validMediations.length / mediations.length * 100) || '0' }}%)
                     </label>
                 </li>
-                <li>
+                <li v-if="!isPublic">
                     <label class="mb-0" data-toggle="tooltip" data-placement="right" title="users involved">
-                        <b>Assigned mediators:</b> {{ selectedVeto.mediations.length / selectedVeto.reasons.length }}
+                        <b>Assigned mediators:</b> {{ mediations.length }}
                     </label>
                 </li>
             </ul>
@@ -43,25 +44,37 @@ export default {
             type: Number,
             required: true,
         },
+        mediations: {
+            type: Array,
+            required: true,
+        },
+        groupHeader: {
+            type: String,
+            default: '',
+        },
+        isPublic: {
+            type: Boolean,
+            default: false,
+        }
     },
     computed: {
         ...mapGetters('vetoes', [
             'selectedVeto',
         ]),
         upholdMediations () {
-            return this.selectedVeto.mediations.filter(mediation => mediation.vote == 1);
+            return this.mediations.filter(mediation => mediation.vote == 1);
         },
         neutralMediations () {
-            return this.selectedVeto.mediations.filter(mediation => mediation.vote == 2);
+            return this.mediations.filter(mediation => mediation.vote == 2);
         },
         withdrawMediations () {
-            return this.selectedVeto.mediations.filter(mediation => mediation.vote  == 3);
+            return this.mediations.filter(mediation => mediation.vote  == 3);
         },
         submittedVotes () {
             return this.upholdMediations.length + this.neutralMediations.length + this.withdrawMediations.length;
         },
         validMediations () {
-            return this.selectedVeto.mediations.filter(mediation => mediation.vote);
+            return this.mediations.filter(mediation => mediation.vote);
         }
     },
     methods: {

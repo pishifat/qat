@@ -88,6 +88,13 @@ const vetoPrivatePopulate = [
             select: 'username osuId groups',
         },
     },
+    { 
+        path: 'publicMediations',
+        populate: {
+            path: 'mediator',
+            select: 'username osuId groups',
+        },
+    },
 ];
 
 /* GET evaluation results by ID */
@@ -156,6 +163,17 @@ router.get('/vetoMediators/:id', async (req, res) => {
     const userOsuIds = [];
 
     for (const mediation of veto.mediations) {
+        if (!userOsuIds.includes(mediation.mediator.osuId)) {
+            userOsuIds.push(mediation.mediator.osuId);
+            users.push({
+                osuId: mediation.mediator.osuId,
+                username: mediation.mediator.username,
+                groups: mediation.mediator.groups,
+            });
+        }
+    }
+
+    for (const mediation of veto.publicMediations) {
         if (!userOsuIds.includes(mediation.mediator.osuId)) {
             userOsuIds.push(mediation.mediator.osuId);
             users.push({
