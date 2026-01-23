@@ -16,6 +16,7 @@ const findAdditionalBnMonths = require('../../helpers/scrap').findAdditionalBnMo
 const util = require('../../helpers/util');
 const { BnEvaluationConsensus, BnEvaluationAddition, AppEvaluationConsensus, GenrePreferences, LanguagePreferences, DetailPreferences, MapperPreferences, OsuStylePreferences, TaikoStylePreferences, CatchStylePreferences, ManiaStylePreferences } = require('../../shared/enums');
 const { websocketManager } = require("../../helpers/websocket");
+const osu = require('../../helpers/osu');
 
 const router = express.Router();
 
@@ -1944,7 +1945,8 @@ router.get('/getEliteNominatorStats', middlewares.isLoggedIn, middlewares.isAdmi
 /* POST temporary things */
 router.post('/doTemporaryThing', middlewares.isLoggedIn, middlewares.isAdmin, async (req, res) => {
     const input = req.body.input;
-    console.log(input + '\n---');
+    console.log('executing temporary thing with input: ' + input);
+    console.log('---');
 
     /* users with nomination badges */
 
@@ -1959,6 +1961,33 @@ router.post('/doTemporaryThing', middlewares.isLoggedIn, middlewares.isAdmin, as
         await user.save();
         console.log(user.username + ": " + user.nominationsProfileBadge);
     }*/
+
+    /* populate country codes for all BNs and NATs */
+
+    /*
+    console.log('Populating country codes for all BNs and NATs');
+    const users = await User.find({
+        groups: { $in: ['bn', 'nat'] },
+        $or: [
+            { countryCode: { $exists: false } },
+            { countryCode: null },
+        ],
+    });
+
+    const response = await osu.getClientCredentialsGrant();
+    const token = response.access_token;
+
+    for (const user of users) {
+        if (user.countryCode) continue;
+
+        const osuUser = await osu.getOtherUserInfo(token, user.osuId);
+        user.countryCode = osuUser.country_code;
+        await user.save();
+
+        console.log(`Populated country code for ${user.username} (${user.osuId}) - ${user.countryCode}`);
+        await util.sleep(500);
+    }
+    */
 
     console.log(users.length);
 
