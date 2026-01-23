@@ -7,13 +7,35 @@
                 store-module="vetoes"
             >
                 <button
+                    v-if="loggedInUser && loggedInUser.isBnOrNat"
                     class="btn btn-block btn-primary my-1"
                     data-toggle="modal"
                     data-target="#addVeto"
                 >
-                    Submit veto
+                    Submit anonymous veto
                 </button>
             </filter-box>
+
+            <section class="card card-body">
+                <h2>
+                    Pending vetoes
+                    <small v-if="pendingVetoes"
+                        >({{ pendingVetoes.length }})</small
+                    >
+                </h2>
+
+                <div v-if="!pendingVetoes.length">
+                    None...
+                </div>
+
+                <transition-group name="list" tag="div" class="row">
+                    <veto-card
+                        v-for="veto in pendingVetoes"
+                        :key="veto.id"
+                        :veto="veto"
+                    />
+                </transition-group>
+            </section>
 
             <section class="card card-body">
                 <h2>
@@ -22,6 +44,10 @@
                         >({{ activeVetoes.length }})</small
                     >
                 </h2>
+
+                <div v-if="!activeVetoes.length">
+                    None...
+                </div>
 
                 <transition-group name="list" tag="div" class="row">
                     <veto-card
@@ -140,6 +166,7 @@ export default {
         ]),
         ...mapState('vetoes', ['vetoes']),
         ...mapGetters('vetoes', [
+            'pendingVetoes',
             'activeVetoes',
             'resolvedVetoes',
             'paginatedResolvedVetoes',

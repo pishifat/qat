@@ -32,6 +32,10 @@
         "id": "",
         "token": ""
     },
+    "publicVetoesWebhook": {
+        "id": "",
+        "token": ""
+    },
     "beatmapReportWebhook": {
         "id": "",
         "token": "",

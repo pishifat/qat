@@ -8,32 +8,72 @@
         </template>
 
         <div v-if="selectedVeto" class="container">
+            <!-- show veto reasons and include mediation responses when possible -->
+            <context v-if="!showMediations" />
+            <mediations v-else />
+            <!--show chatroom archive when veto is in mediation phases-->
+            <div
+                v-if="
+                    selectedVeto.status != 'pending' &&
+                    selectedVeto.status != 'chatroom' &&
+                    loggedInUser.isNat &&
+                    selectedVeto.vetoFormat >= 7"
+            >
+                <a href="#chatroom" data-toggle="collapse">
+                    <b>Discussion logs</b> <i class="fas fa-angle-down" />
+                </a>
+                <chatroom
+                    id="chatroom"
+                    class="fake-disabled collapse"
+                />
+            </div>
+            <hr />
 
-            <!-- show mediations to NAT if they're not active mediators -->
-            <mediations v-if="showMediations" />
+            <!-- show vouches component when  veto is "pending" status -->
+            <vouches v-if="selectedVeto.status == 'pending' && loggedInUser && loggedInUser.isBnOrNat" />
+            <div v-else-if="selectedVeto.status == 'pending'">
+                Veto is currently pending. If enough Beatmap Nominators support it, a discussion will happen!
+            </div>
 
-            <!-- show context when mediations aren't visible -->
-            <context v-else />
+            <!-- show chatroom component when veto is "chatroom" status -->
+            <chatroom
+                v-if="
+                    selectedVeto.status == 'chatroom' &&
+                    loggedInUser &&
+                    (isChatroomUser || loggedInUser.isNat)"
+                :class="selectedVeto.chatroomLocked ? 'fake-disabled' : ''"
+            />
+            <div v-else-if="selectedVeto.status == 'chatroom'">
+                The veto is currently being discussed between the mapper(s) and Beatmap Nominators. If a conclusion can't be reached, a larger vote will be held!
+            </div>
+            <chatroom-admin-buttons v-if="selectedVeto.status == 'chatroom' && loggedInUser && loggedInUser.isNat" />
+            
+            <!-- show admin buttons to NAT -->
+            <begin-mediation
+                v-if="loggedInUser && loggedInUser.isNat && selectedVeto.status == 'available'"
+            />
+            <div v-else-if="selectedVeto.status == 'available'">
+                The veto discussion was inconclusive, so a mediation was requested. It'll begin soon!
+            </div>
 
-            <!-- show vote count to NATs -->
-            <vote-count 
-                v-if="loggedInUser && loggedInUser.isNat"
+            <!-- show mediation input for active mediators -->
+            <mediation-input
+                v-if="selectedVeto.status == 'wip' && isMediator"
+            />
+            <div v-else-if="selectedVeto.status == 'wip'">
+                <public-mediation-input v-if="loggedInUser && !loggedInUser.isBnOrNat" class="mt-4" />
+                <div v-else-if="!loggedInUser">If you want to give your opinion on the veto, log in.</div>
+                <div v-else-if="loggedInUser.isBnOrNat && !loggedInUser.isNat">There's nothing for you to do here.</div>
+            </div>
+
+            <admin-buttons
+                v-if="loggedInUser && loggedInUser.isNat && (selectedVeto.status == 'wip' || selectedVeto.status == 'archive')"
             />
 
             <!-- show debug info to admins -->
             <debug-view-document 
                 v-if="loggedInUser && loggedInUser.isAdmin"
                 :document="selectedVeto"
-            />
-
-            <!-- show admin buttons to NATs -->
-            <admin-buttons
-                v-if="loggedInUser && loggedInUser.isNat"
-            />
-
-            <!-- show mediation input for active mediators -->
-            <mediation-input
-                v-if="isMediator && selectedVeto.status == 'wip'"
             />
         </div>
     </modal-dialog>
@@ -44,10 +84,15 @@ import { mapGetters, mapState } from 'vuex';
 import ModalHeader from './info/ModalHeader.vue';
 import Mediations from './info/Mediations.vue';
 import AdminButtons from './info/AdminButtons.vue';
+import BeginMediation from './info/BeginMediation.vue';
 import MediationInput from './info/MediationInput.vue';
 import ModalDialog from '../ModalDialog.vue';
 import DebugViewDocument from '../DebugViewDocument.vue';
 import Context from './info/Context.vue';
+import Vouches from './info/Vouches.vue';
+import Chatroom from './info/Chatroom.vue';
+import ChatroomAdminButtons from './info/ChatroomAdminButtons.vue';
+import PublicMediationInput from './info/PublicMediationInput.vue';
 
 export default {
     name: 'VetoInfo',
@@ -55,10 +100,15 @@ export default {
         ModalHeader,
         Mediations,
         AdminButtons,
+        BeginMediation,
         MediationInput,
         ModalDialog,
         DebugViewDocument,
         Context,
+        Vouches,
+        Chatroom,
+        ChatroomAdminButtons,
+        PublicMediationInput,
     },
     computed: {
         ...mapState([
@@ -67,6 +117,7 @@ export default {
         ...mapGetters('vetoes', [
             'selectedVeto',
             'isMediator',
+            'isChatroomUser',
         ]),
         showMediations() {
             if (this.selectedVeto.mediations.length) {
@@ -84,3 +135,10 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+.fake-disabled {
+    pointer-events: none;
+    opacity: 70%;
+}
+</style>

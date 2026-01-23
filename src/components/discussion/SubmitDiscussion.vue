@@ -49,7 +49,7 @@
             <div v-if="loggedInUser.isNat && !isContentReview">
                 <!-- game mode selection -->
                 <div class="d-flex align-items-center">
-                    <div>Game mode:</div>
+                    <div>Game mode</div>
                     <mode-select
                         v-model="mode"
                         :max-selection="1"

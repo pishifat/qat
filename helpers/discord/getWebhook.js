@@ -29,6 +29,9 @@ function getWebhook(webhook) {
         case 'taikoCatchManiaQualityAssurance':
             return url += `${config.taikoCatchManiaQualityAssuranceWebhook.id}/${config.taikoCatchManiaQualityAssuranceWebhook.token}`;
 
+        case 'publicVetoes':
+            return url += `${config.publicVetoesWebhook.id}/${config.publicVetoesWebhook.token}`;
+
         case 'beatmapReport':
             return url += `${config.beatmapReportWebhook.id}/${config.beatmapReportWebhook.token}`;
 

@@ -64,6 +64,10 @@ export default {
                     threshold = 0.6 * sum;
                 }
 
+                if (this.selectedVeto.vetoFormat >= 7) {
+                    return this.selectedVeto.reasons[this.reasonIndex].status == 'upheld';
+                }
+
                 return this.upholdMediations.length >= threshold;
             } else {
                 return this.upholdMediations.length > this.withdrawMediations.length;

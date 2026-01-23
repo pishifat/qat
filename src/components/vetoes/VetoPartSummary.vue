@@ -13,9 +13,14 @@
             </span>
         </h5>
         <div class="card card-body small mb-4">
-            <a :href="reason.link" target="_blank" class="mb-2">{{ reason.summary }}</a>
+            <div v-if="reason.link">
+                <a :href="reason.link" target="_blank" class="mb-2">{{ reason.summary }}</a>
+            </div>
+            <div v-else>
+                {{ reason.summary }}
+            </div>
             <div v-if="isUpheld">
-                <div v-for="(mediation, i) in upholdMediations" :key="mediation.id">
+                <div v-for="mediation in upholdMediations" :key="mediation.id">
                     <div class="mb-2">
                         <b>Anonymous - {{ mediation.vote === 2 ? 'partially agree' : 'agree' }}:</b>
                         <div class="pre-line">{{ mediation.comment }}</div>
@@ -23,7 +28,7 @@
                 </div>
             </div>
             <div v-else>
-                <div v-for="(mediation, i) in withdrawMediations" :key="mediation.id">
+                <div v-for="mediation in withdrawMediations" :key="mediation.id">
                     <div class="mb-2">
                         <b>Anonymous - {{ mediation.vote === 2 ? 'partially agree' : 'disagree' }}:</b>
                         <div class="pre-line">{{ mediation.comment }}</div>
@@ -79,6 +84,10 @@ export default {
                 
                 if (this.veto.vetoFormat == 6) {
                     threshold = 0.6 * sum;
+                }
+
+                if (this.veto.vetoFormat >= 7) {
+                    return this.veto.reasons[this.reasonIndex].status == 'upheld';
                 }
 
                 return this.upholdMediations.length >= threshold;

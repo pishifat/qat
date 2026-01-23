@@ -16,8 +16,11 @@ function escapeUsername(username) {
  * @param {string} url ex: https://osu.ppy.sh/beatmapsets/930028/discussion#/893132
  */
 function getBeatmapsetIdFromUrl(url) {
-    let indexStart = url.indexOf('beatmapsets/') + 'beatmapsets/'.length;
-    let indexEnd = url.indexOf('/discussion');
+    const indexStart = url.indexOf('beatmapsets/') + 'beatmapsets/'.length;
+    const iDiscussion = url.indexOf('/discussion');
+    const iHash = url.indexOf('#');
+    const indexEndCandidates = [iDiscussion, iHash, url.length].filter(i => i !== -1);
+    const indexEnd = Math.min(...indexEndCandidates);
     let bmId;
 
     if (indexEnd !== -1) {
