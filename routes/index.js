@@ -185,6 +185,7 @@ router.get('/callback', async (req, res) => {
             newUser.cover = cover;
             newUser.groups = groups;
             newUser.rankedBeatmapsets = rankedBeatmapsets;
+            newUser.countryCode = response.country_code;
             await newUser.save();
 
             req.session.mongoId = newUser._id;
@@ -214,6 +215,11 @@ router.get('/callback', async (req, res) => {
 
             if (!user.cover || user.cover != cover) {
                 user.cover = cover;
+                await user.save();
+            }
+
+            if (!user.countryCode || user.countryCode != response.country_code) {
+                user.countryCode = response.country_code;
                 await user.save();
             }
 

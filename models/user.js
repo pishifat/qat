@@ -69,6 +69,7 @@ const userSchema = new mongoose.Schema({
     isActiveContentReviewer: { type: Boolean, default: false },
     subjectiveEvalFeedback: { type: Boolean, default: false },
     lastActivityCheck: { type: Date },
+    countryCode: { type: String },
 
     /* temporary fields for qa leaderboard webhook */
     recentQaChecks: { type: Number },

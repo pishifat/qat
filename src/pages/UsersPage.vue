@@ -95,6 +95,10 @@
                 <elite-nominator-stats />
             </section>
 
+            <section v-if="loggedInUser && loggedInUser.isNat" class="card card-body">
+                <wiki-markdown-generator />
+            </section>
+
             <section v-if="loggedInUser && loggedInUser.isPishifat" class="card card-body">
                 <h5>Temporary button</h5>
                 <temporary-info />
@@ -121,6 +125,7 @@ import PaginationNav from '../components/PaginationNav.vue';
 import VibeCheckStats from '../components/users/VibeCheckStats.vue';
 import EliteNominatorStats from '../components/users/EliteNominatorStats.vue';
 import TemporaryInfo from '../components/users/TemporaryInfo.vue';
+import WikiMarkdownGenerator from '../components/users/WikiMarkdownGenerator.vue';
 
 
 export default {
@@ -137,6 +142,7 @@ export default {
         VibeCheckStats,
         EliteNominatorStats,
         TemporaryInfo,
+        WikiMarkdownGenerator,
     },
     data () {
         return {
