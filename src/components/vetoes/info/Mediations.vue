@@ -6,7 +6,7 @@
 
                 <!-- collapse menu -->
                 <a v-if="selectedVeto.reasons.length" :href="'#reason-' + (reasonIndex + 1)" data-toggle="collapse" class="ml-4">
-                    <b>{{ reasonIndex + 1 }}. {{ reason.summary }}</b> <span v-if="selectedVeto.vetoFormat >= 7">({{ reason.status ? reason.status : 'pending status' }}) </span><i class="fas fa-angle-down" />
+                    <b>{{ reasonIndex + 1 }}. {{ reason.summary }}</b> <span v-if="selectedVeto.vetoFormat >= 7 && selectedVeto.status == 'archive'">({{ reason.status ? reason.status : 'pending status' }}) </span><i class="fas fa-angle-down" />
                 </a>
 
                 <!-- menu content -->
@@ -48,7 +48,7 @@
                                     :is-public="true"
                                 />
                             </div>
-                            <div v-if="loggedInUser && loggedInUser.isNat">
+                            <div v-if="loggedInUser && loggedInUser.isNat && selectedVeto.status == 'archive'">
                                 <b>NAT moderation</b>
                                 <div class="small text-secondary">Based on the info above, mark the veto reason as "upheld" or "dismissed".</div>
                                 <div class="row">

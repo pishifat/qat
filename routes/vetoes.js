@@ -37,10 +37,6 @@ const defaultPopulate = [
         select: 'username osuId',
     },
     {
-        path: 'chatroomMessages.user',
-        select: 'username osuId',
-    },
-    {
         path: 'chatroomMediationRequestedUsers',
         select: 'username osuId',
     },
@@ -109,10 +105,7 @@ function getLimitedDefaultPopulate(mongoId) {
         },
         {
             path: 'chatroomMediationRequestedUsers',
-            select: 'username osuId',
-            match: {
-                _id: mongoId,
-            },
+            select: 'id',
         },
         {
             path: 'chatroomUpholdVoters',
@@ -138,6 +131,10 @@ function getLimitedDefaultPopulate(mongoId) {
                 select: 'username osuId',
             },
         },
+        {
+            path: 'chatroomMessages.user',
+            select: 'username osuId',
+        },
     ]
 }
 
@@ -159,7 +156,6 @@ router.get('/relevantInfo/:limit', async (req, res) => {
                 getPopulate(false, null)
             )
             .sort({ createdAt: -1 })
-            .select('-vouchingUsers -vetoer')
             .limit(parseInt(req.params.limit));
     } else {
         const user = await User.findById(req.session.mongoId);
@@ -172,6 +168,11 @@ router.get('/relevantInfo/:limit', async (req, res) => {
             )
             .sort({ createdAt: -1 })
             .limit(parseInt(req.params.limit));
+    }
+    
+    for (let i = 0; i < vetoes.length; i++) {
+        if (!vetoes[i].chatroomUsers.length) vetoes[i].chatroomMessages = [];
+        
     }
 
     res.json({
@@ -200,6 +201,10 @@ router.get('/searchVeto/:id', async (req, res) => {
                 getPopulate(isNat, req.session.mongoId)
             );
     }
+
+    if (!veto.chatroomUsers.length) veto.chatroomMessages = [];
+
+    console.log(veto);
 
     res.json(veto);
 });
@@ -306,6 +311,8 @@ router.post('/submitMediation/:id', middlewares.isLoggedIn, middlewares.isBnOrNa
             getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
         );
 
+    if (!veto.chatroomUsers.length) veto.chatroomMessages = [];
+
     // webhook
     let count = 0;
 
@@ -382,9 +389,16 @@ router.post('/resetMediation/:id', middlewares.isLoggedIn, middlewares.isAdmin, 
 });
 
 /* POST select mediators */
-router.post('/selectMediators', middlewares.isLoggedIn, middlewares.isNat, async (req, res) => {
-    const mode = req.body.mode;
-    const allUsers = await User.getAllBnAndNat();
+router.post('/selectMediators/:id', middlewares.isLoggedIn, middlewares.isNat, async (req, res) => {
+    const { mode, excludeUsers } = req.body;
+
+    const [allUsers, veto] = await Promise.all([
+        User.getAllBnAndNat(),
+        Veto
+            .findById(req.params.id)
+            .populate(defaultPopulate)
+            .orFail(),
+    ]);
 
     if (allUsers.error) {
         return res.json({
@@ -392,10 +406,18 @@ router.post('/selectMediators', middlewares.isLoggedIn, middlewares.isNat, async
         });
     }
 
+    excludeUsers.push(veto.vetoer.username);
+    
+    for (const user of veto.vouchingUsers) {
+        excludeUsers.push(user.username);
+    }
+
     let users = [];
 
-    for (const user of allUsers) {
-        if (!req.body.excludeUsers.includes(user.username.toLowerCase())) {
+    const shuffled = [...allUsers].sort(() => Math.random() - 0.5);
+
+    for (const user of shuffled) {
+        if (!excludeUsers.includes(user.username.toLowerCase())) {
             if (mode == 'all') {
                 users.push(user);
             } else if (user.modesInfo.some(m => m.mode === mode)) {
@@ -403,8 +425,10 @@ router.post('/selectMediators', middlewares.isLoggedIn, middlewares.isNat, async
             }
         }
     }
+    
+    const count = Math.ceil(users.length * 0.4);
 
-    res.json(users);
+    res.json(users.slice(0, count));
 });
 
 /* POST begin mediation */
@@ -697,8 +721,7 @@ router.post('/createChatroom/:id', middlewares.isLoggedIn, middlewares.isNat, as
 
     // sending each message in a separate announcement to preserve anonymity
     for (const user of veto.chatroomUsers) {
-        // const message = await osuBot.sendAnnouncement([user.osuId], channel, words);
-        const message = true;
+        const message = await osuBot.sendAnnouncement([user.osuId], channel, words);
         await util.sleep(500);
 
         if (message !== true) {
@@ -871,7 +894,7 @@ router.post('/requestMediation/:id', middlewares.isLoggedIn, async (req, res) =>
         veto._id
     );
 
-    const description = `Mediation requested on [veto for **${veto.beatmapTitle}** by **${veto.beatmapMapper}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`;
+    const description = `Mediation requested on [veto for **${veto.beatmapTitle}** by **${veto.beatmapMapper}**](https://bn.mappersguild.com/vetoes?id=${veto.id}) (${veto.chatroomMediationRequestedUsers.length}/2)`;
 
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),
@@ -1035,7 +1058,6 @@ router.post('/vote/:id', middlewares.isLoggedIn, async (req, res) => {
             isSystem: true,
         });
         veto.chatroomVoteEnabled = false;
-        veto.chatroomLocked = true;
     } else if (veto.chatroomDismissVoters.length >= 2) {
         veto.chatroomMessages.push({
             date: new Date(),
@@ -1164,6 +1186,8 @@ router.post('/submitPublicMediation/:id', middlewares.isLoggedIn, async (req, re
         .populate(
             getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
         ).orFail();
+
+    if (!veto.chatroomUsers.length) veto.chatroomMessages = [];
 
     res.json({ veto });
 

@@ -61,9 +61,13 @@
                 v-if="selectedVeto.status == 'wip' && isMediator"
             />
             <div v-else-if="selectedVeto.status == 'wip'">
-                <public-mediation-input v-if="loggedInUser && !loggedInUser.isBnOrNat" class="mt-4" />
+                <public-mediation-input v-if="loggedInUser && !loggedInUser.isBnOrNat && selectedVeto.vetoFormat >= 7" class="mt-4" />
                 <div v-else-if="!loggedInUser">If you want to give your opinion on the veto, log in.</div>
                 <div v-else-if="loggedInUser.isBnOrNat && !loggedInUser.isNat">There's nothing for you to do here.</div>
+            </div>
+
+            <div v-if="loggedInUser && !loggedInUser.isBnOrNat && selectedVeto.status == 'archive'">
+                This veto has been concluded!
             </div>
 
             <admin-buttons

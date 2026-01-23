@@ -10,14 +10,11 @@
                     type="text"
                     placeholder="username1, username2, username3..."
                 >
-                <div class="small text-secondary">
-                    The mapper and veto submitter are automatically excluded. Please manually exclude any guest difficulty creators and the nominating BNs.
+                <div class="small text-secondary w-75">
+                    The mapper, veto submitter, and vouching users are automatically excluded. Please manually exclude any guest difficulty creators, the nominating BNs, and anyone else who would be biased or otherwise unavailable.
                 </div>
             </div>
         </div>
-        <!--<button class="btn btn-sm btn-block btn-danger mb-2" @click="deleteVeto($event)">
-            Delete veto
-        </button>-->
 
         <button class="btn btn-sm btn-block btn-primary" @click="selectMediators($event)">
             {{ mediators ? 'Re-select mediators' : 'Select mediators' }}
@@ -149,24 +146,10 @@ export default {
 
             excludeUsers.push(this.selectedVeto.beatmapMapper.toLowerCase(), this.selectedVeto.vetoer.username.toLowerCase());
 
-            const result = await this.$http.executePost('/vetoes/selectMediators', { mode: this.selectedVeto.mode, excludeUsers }, e);
+            const result = await this.$http.executePost(`/vetoes/selectMediators/${this.selectedVeto.id}`, { mode: this.selectedVeto.mode, excludeUsers }, e);
 
             if (result && !result.error) {
                 this.mediators = result;
-            }
-        },
-        async deleteVeto (e) {
-            if (confirm(`Are you sure?`)) {
-                const result = await this.$http.executePost(`/vetoes/deleteVeto/${this.selectedVeto.id}`, e);
-
-                if (result && !result.error) {
-                    const res = await this.$http.executeGet('/vetoes/relevantInfo/');
-
-                    if (res) {
-                        $('#extendedInfo').modal('hide');
-                        this.$store.commit('vetoes/setVetoes', res.vetoes);
-                    }
-                }
             }
         },
     },

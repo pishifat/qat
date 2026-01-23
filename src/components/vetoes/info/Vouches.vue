@@ -74,6 +74,9 @@
                 </button>
             </div>
         </div>
+        <div v-else-if="loggedInUser.isNat && loggedInUser.id == selectedVeto.vetoer.id" class="text-secondary small mt-3">
+            This is where NAT moderation tools would be, but you veto'd the map, so you don't get access :)
+        </div>
 
         <div class="mt-4">
             After two Beatmap Nominators vouch for a pending veto, a private chatroom is created between... 

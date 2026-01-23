@@ -4,8 +4,7 @@
 
         <ol>
             <li v-for="reason in selectedVeto.reasons" :key="reason.summary">
-                <a v-if="selectedVeto.version <= 6" :href="reason.link" target="_blank">{{ reason.summary }}</a>
-                <span v-else v-html="$md.render(reason.summary)" />
+                <a v-if="selectedVeto.version <= 6" :href="reason.link" target="_blank">{{ reason.summary }}</a><span v-else v-html="$md.render(reason.summary)" />
             </li>
         </ol>
     </div>

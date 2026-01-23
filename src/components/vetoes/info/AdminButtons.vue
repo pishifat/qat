@@ -91,20 +91,6 @@ export default {
                 });
             }
         },
-        async beginMediation (e) {
-            const result = confirm(`Make sure to send messages prior to starting a mediation. If you've already done this, press OK.`);
-
-            if (result) {
-                const result2 = confirm(`ARE YOU REALLY SURE YOU'VE SENT THE MESSAGES? DON'T BE STUPID.`);
-
-                if (result2) {
-                    const mediatorIds = this.mediators.map(m => m._id);
-                    const veto = await this.$http.executePost(`/vetoes/beginMediation/${this.selectedVeto.id}`, { mediatorIds, reasons: this.selectedVeto.reasons }, e);
-
-                    this.commitVeto(veto, 'Started veto mediation');
-                }
-            } 
-        },
         async concludeMediation (e, dismiss) {
             const result = confirm(`Are you sure?`);
 
@@ -128,35 +114,6 @@ export default {
                 const veto = await this.$http.executePost(`/vetoes/continueMediation/${this.selectedVeto.id}`, {}, e);
 
                 this.commitVeto(veto, 'Re-opened mediation');
-            }
-        },
-        async selectMediators (e) {
-            let excludeUsers = this.excludeUsers.split(',');
-
-            for (let i = 0; i < excludeUsers.length; i++) {
-                excludeUsers[i] = excludeUsers[i].trim().toLowerCase();
-            }
-
-            excludeUsers.push(this.selectedVeto.beatmapMapper.toLowerCase(), this.selectedVeto.vetoer.username.toLowerCase());
-
-            const result = await this.$http.executePost('/vetoes/selectMediators', { mode: this.selectedVeto.mode, excludeUsers }, e);
-
-            if (result && !result.error) {
-                this.mediators = result;
-            }
-        },
-        async deleteVeto (e) {
-            if (confirm(`Are you sure?`)) {
-                const result = await this.$http.executePost(`/vetoes/deleteVeto/${this.selectedVeto.id}`, e);
-
-                if (result && !result.error) {
-                    const res = await this.$http.executeGet('/vetoes/relevantInfo/');
-
-                    if (res) {
-                        $('#extendedInfo').modal('hide');
-                        this.$store.commit('vetoes/setVetoes', res.vetoes);
-                    }
-                }
             }
         },
     },
