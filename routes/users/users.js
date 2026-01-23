@@ -16,6 +16,7 @@ const findAdditionalBnMonths = require('../../helpers/scrap').findAdditionalBnMo
 const util = require('../../helpers/util');
 const { BnEvaluationConsensus, BnEvaluationAddition, AppEvaluationConsensus, GenrePreferences, LanguagePreferences, DetailPreferences, MapperPreferences, OsuStylePreferences, TaikoStylePreferences, CatchStylePreferences, ManiaStylePreferences } = require('../../shared/enums');
 const { websocketManager } = require("../../helpers/websocket");
+const osu = require('../../helpers/osu');
 
 const router = express.Router();
 
@@ -1944,7 +1945,8 @@ router.get('/getEliteNominatorStats', middlewares.isLoggedIn, middlewares.isAdmi
 /* POST temporary things */
 router.post('/doTemporaryThing', middlewares.isLoggedIn, middlewares.isAdmin, async (req, res) => {
     const input = req.body.input;
-    console.log(input + '\n---');
+    console.log('executing temporary thing with input: ' + input);
+    console.log('---');
 
     /* users with nomination badges */
 
