@@ -95,7 +95,7 @@
                 <elite-nominator-stats />
             </section>
 
-            <section v-if="loggedInUser && loggedInUser.isNat" class="card card-body">
+            <section v-if="loggedInUser" class="card card-body">
                 <wiki-markdown-generator />
             </section>
 
