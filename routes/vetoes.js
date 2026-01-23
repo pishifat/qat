@@ -899,7 +899,7 @@ router.post('/requestMediation/:id', middlewares.isLoggedIn, async (req, res) =>
         color: discord.webhookColors.lightPink,
         description,
     }],
-        'publicVetoes');
+        veto.mode);
 });
 
 /* GET refresh veto for chatroom purposes */
