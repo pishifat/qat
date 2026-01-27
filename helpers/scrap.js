@@ -226,10 +226,60 @@ function findMissingContent(discussion, consensus) {
     return text;
 }
 
+/**
+ * Check if a user's tenure history overlaps with a date range
+ * @param {Array} history - Array of history entries for a specific group (bn or nat)
+ * @param {Date} startDate - Start of the date range
+ * @param {Date} endDate - End of the date range
+ * @returns {boolean} - True if the user was in the group during any part of the date range
+ */
+function checkTenureOverlap(history, startDate, endDate) {
+    if (!history || history.length === 0) return false;
+
+    const sortedHistory = [...history].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    // Track active periods using the same logic as getDuration
+    let isActive = 0;
+    const relevantHistory = [];
+
+    for (let i = 0; i < sortedHistory.length; i++) {
+        const entry = sortedHistory[i];
+        entry.kind === 'joined' ? isActive++ : isActive--;
+
+        // Only track transitions from inactive->active or active->inactive
+        if ((entry.kind === 'joined' && isActive === 1) || (entry.kind === 'left' && isActive === 0)) {
+            relevantHistory.push(entry);
+        }
+    }
+
+    // Pair up joined and left events
+    const joinedEvents = relevantHistory.filter(h => h.kind === 'joined');
+    const leftEvents = relevantHistory.filter(h => h.kind === 'left');
+
+    // Check each tenure period for overlap
+    for (const joinedEvent of joinedEvents) {
+        const periodStart = new Date(joinedEvent.date);
+        
+        // Find the corresponding left event (if any)
+        const leftIndex = leftEvents.findIndex(d => new Date(d.date) > periodStart);
+        const leftEvent = leftIndex !== -1 ? leftEvents[leftIndex] : null;
+        
+        const periodEnd = leftEvent ? new Date(leftEvent.date) : new Date(); // Use current date if still active
+
+        // Check if this period overlaps with the query date range
+        if (periodStart <= endDate && periodEnd >= startDate) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 module.exports = {
     getUserModsCount,
     findUniqueNominationsCount,
     findAdditionalBnMonths,
     findEvaluatorStatuses,
     findMissingContent,
+    checkTenureOverlap,
 };
