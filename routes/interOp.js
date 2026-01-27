@@ -114,6 +114,41 @@ router.get('/users/:userInput', async (req, res) => {
     res.json(user);
 });
 
+/* POST events for multiple beatmapsets */
+router.post('/events/byBeatmapsets', async (req, res) => {
+    const beatmapsetIds = req.body.beatmapsetIds;
+
+    if (!beatmapsetIds) {
+        return res.status(400).send({ error: 'beatmapsetIds array is required in request body' });
+    }
+
+    if (!Array.isArray(beatmapsetIds)) {
+        return res.status(400).send({ error: 'beatmapsetIds must be an array' });
+    }
+
+    if (beatmapsetIds.length === 0) {
+        return res.status(400).send({ error: 'beatmapsetIds array cannot be empty' });
+    }
+
+    if (beatmapsetIds.length > 1000) {
+        return res.status(400).send({ error: 'beatmapsetIds array cannot exceed 1000 items' });
+    }
+
+    const validIds = beatmapsetIds
+        .map(id => parseInt(id))
+        .filter(id => !isNaN(id) && id > 0);
+
+    if (validIds.length === 0) {
+        return res.status(400).send({ error: 'No valid beatmapset IDs provided' });
+    }
+
+    const events = await Aiess
+        .find({ beatmapsetId: { $in: validIds } })
+        .sort({ timestamp: 1 });
+
+    res.json(events);
+});
+
 /* GET events for beatmapsetID */
 router.get('/events/:beatmapsetId', async (req, res) => {
     res.json(
