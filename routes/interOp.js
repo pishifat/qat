@@ -10,6 +10,7 @@ const getGeneralEvents = require('./evaluations/bnEval').getGeneralEvents;
 const middlewares = require('../helpers/middlewares');
 const BnEvaluation = require('../models/evaluations/bnEvaluation');
 const Discussion = require('../models/discussion');
+const { checkTenureOverlap } = require('../helpers/scrap');
 
 const router = express.Router();
 
@@ -60,6 +61,46 @@ router.get('/users/all', async (_, res) => {
             ],
         })
     );
+});
+
+/* GET users who were BN/NAT during a date range */
+router.get('/users/byTenure', async (req, res) => {
+    const startDate = req.query.startDate ? new Date(req.query.startDate) : null;
+    const endDate = req.query.endDate ? new Date(req.query.endDate) : null;
+
+    if (!startDate || !endDate) {
+        return res.status(400).send({ error: 'startDate and endDate query parameters are required' });
+    }
+
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        return res.status(400).send({ error: 'Invalid date format. Use ISO 8601 format (e.g., 2024-01-01T00:00:00Z)' });
+    }
+
+    if (startDate > endDate) {
+        return res.status(400).send({ error: 'startDate must be before or equal to endDate' });
+    }
+
+    const users = await User.find({
+        history: { $ne: [], $exists: true },
+    });
+
+    const matchingUsers = {};
+
+    for (const user of users) {
+        if (!user.history || user.history.length === 0) continue;
+
+        const bnHistory = user.history.filter(h => h.group === 'bn');
+        const natHistory = user.history.filter(h => h.group === 'nat');
+
+        const wasBn = checkTenureOverlap(bnHistory, startDate, endDate);
+        const wasNat = checkTenureOverlap(natHistory, startDate, endDate);
+
+        if (wasBn || wasNat) {
+            matchingUsers[user.osuId] = user.username;
+        }
+    }
+
+    res.json(matchingUsers);
 });
 
 /* GET specific user info */
