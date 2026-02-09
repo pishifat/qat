@@ -31,13 +31,7 @@
 import { mapGetters } from 'vuex';
 
 export default {
-    name: 'ChatroomAdminButtons',
-    data() {
-        return {
-            mediators: null,
-            excludeUsers: '',
-        };
-    },
+    name: 'PreMediationAdminButtons',
     computed: {
         ...mapGetters('vetoes', [
             'selectedVeto',

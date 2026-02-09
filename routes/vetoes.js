@@ -204,8 +204,6 @@ router.get('/searchVeto/:id', async (req, res) => {
 
     if (!veto.chatroomUsers.length) veto.chatroomMessages = [];
 
-    console.log(veto);
-
     res.json(veto);
 });
 

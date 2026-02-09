@@ -91,18 +91,12 @@ export default {
                 });
             }
         },
-        async concludeMediation (e, dismiss) {
+        async concludeMediation (e) {
             const result = confirm(`Are you sure?`);
 
             if (result) {
                 const veto = await this.$http.executePost(
-                    `/vetoes/concludeMediation/${this.selectedVeto.id}`,
-                    {
-                        dismiss,
-                    },
-                    e
-                );
-
+                    `/vetoes/concludeMediation/${this.selectedVeto.id}`, {}, e);
                 this.commitVeto(veto, 'Concluded mediation');
             }
         },
