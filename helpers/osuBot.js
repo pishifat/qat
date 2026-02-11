@@ -40,6 +40,10 @@ async function getBotToken () {
  * @returns {Promise<boolean | {error: string}>}
  */
 async function sendMessage(userId, message) {
+    if (!config.enableMessages) {
+        return { error: 'Messages disabled in config' };
+    }
+
     const token = await getBotToken();
 
     await util.sleep(500); // prevent rate limiting
@@ -71,6 +75,10 @@ async function sendMessage(userId, message) {
  * @returns {Promise<boolean | {error: string}>}
  */
 async function sendMessages(userId, messages) {
+    if (!config.enableMessages) {
+        return { error: 'Messages disabled in config' };
+    }
+
     for (const message of messages) {
         const res = await sendMessage(userId, message);
 
@@ -90,6 +98,10 @@ async function sendMessages(userId, messages) {
  * @param {string} message
  */
 async function sendAnnouncement(userIds, channel, message) {
+    if (!config.enableMessages) {
+        return { error: 'Messages disabled in config' };
+    }
+
     const token = await getBotToken();
 
     await util.sleep(500); // prevent rate limiting

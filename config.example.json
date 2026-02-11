@@ -1,5 +1,6 @@
 {
     "enableAutomation": false,
+    "enableMessages": false,
     "session": "",
     "v1token": "",
     "connection": "",

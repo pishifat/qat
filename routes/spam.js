@@ -26,7 +26,7 @@ router.post('/sendMessages', middlewares.isAdmin, async (req, res) => {
     const message = await osuBot.sendAnnouncement(osuIds, channel, req.body.message);
 
     if (message !== true) {
-        return res.json({ error: `Message was not sent. Please let pishifat know!` });
+        return res.json({ error: message.error ? message.error : `Messages were not sent.` });
     }
 
     res.json({ success: 'Message sent! A copy was sent to you for confirmation' });

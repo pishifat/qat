@@ -238,7 +238,7 @@ router.post('/submitEvaluationMessage/:id', async (req, res) => {
         const message = await osuBot.sendAnnouncement([evaluation.user.osuId, req.session.osuId], channel, response);
     
         if (message !== true) {
-            return res.json({ error: `Messages were not sent. Please let pishifat know!` });
+            return res.json({ error: message.error ? message.error : `Messages were not sent.` });
         }
     } else {
         await discord.userHighlightWebhookPost(evaluation.mode, discordIds);
