@@ -96,7 +96,7 @@
                             <li>The veto's creator</li>
                             <li>Users who vouched for the veto</li>
                         </ul>
-                        <li>If the majority votes to <b>upheld the veto</b>, discussion will continue. The mapset host can start a new vote any time afterwards.</li>
+                        <li>If the majority votes to <b>uphold the veto</b>, discussion will continue. The mapset host can start a new vote any time afterwards.</li>
                         <li>If the majority votes to <b>dismiss the veto</b>, the discussion will end. The veto will be dismissed after the NAT reviews the discussion.</li>
                         <li>If someone is unresponsive and doesn't vote, contact the NAT.</li>
                     </ul>
@@ -210,12 +210,14 @@ export default {
     },
     mounted () {
         setInterval(async () => {
-            const data = await this.$http.executeGet(`/vetoes/refreshVeto/${this.selectedVeto.id}`);
+            if (this.selectedVeto.status == 'chatroom') {
+                const data = await this.$http.executeGet(`/vetoes/refreshVeto/${this.selectedVeto.id}`);
 
-            if (this.$http.isValid(data)) {
-                this.$store.commit(`vetoes/updateVeto`, data.veto);
+                if (this.$http.isValid(data)) {
+                    this.$store.commit(`vetoes/updateVeto`, data.veto);
+                }
             }
-        }, 360000);
+        }, 15000);
     },
     methods: {
         async saveMessage (e) {

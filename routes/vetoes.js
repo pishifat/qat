@@ -52,6 +52,10 @@ const defaultPopulate = [
         path: 'publicMediations',
         select: 'vote reasonIndex',
     },
+    {
+        path: 'chatroomMessages.user',
+        select: 'username osuId',
+    },
 ];
 
 // population for logged out users. hides mediator info
