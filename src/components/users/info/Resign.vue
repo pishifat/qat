@@ -7,7 +7,7 @@
             title="The NAT will evaluate your recent activity and remove you from the BN (usually within 24 hours)."
             @click="resignFromBn($event)"
         >
-            Resign from the {{ mode | formatMode }} Beatmap Nominators
+            Resign from the {{ formatMode(mode) }} Beatmap Nominators
         </button>
     </div>
 </template>

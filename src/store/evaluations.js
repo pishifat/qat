@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import pageFilters from './modules/pageFilters';
 import evalPagination from './modules/evalPagination';
 
@@ -39,7 +38,7 @@ export default {
         // modify data
         updateEvaluation (state, evaluation) {
             const i = state.evaluations.findIndex(a => a.id == evaluation.id);
-            if (i !== -1) Vue.set(state.evaluations, i, evaluation);
+            if (i !== -1) state.evaluations[i] = evaluation;
         },
         updateCheckedEvaluations (state, payload) {
             if (state.checkedEvaluations.length == payload.length) {

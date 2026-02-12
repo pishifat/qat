@@ -37,8 +37,8 @@
             :headers="category == 'error' ? ['date', 'user', 'action', 'stack', 'extra'] : category == 'all' ? ['date', 'category', 'user', 'action'] : ['date', 'user', 'action']"
         >
             <tr v-for="log in logs" :key="log.id">
-                <td data-toggle="tooltip" data-placement="left" :title="log.createdAt | toStandardDetailedDate">
-                    {{ log.createdAt | toRelativeDate }} 
+                <td data-toggle="tooltip" data-placement="left" :title="toStandardDetailedDate(log.createdAt)">
+                    {{ toRelativeDate(log.createdAt) }}
                 </td>
                 <td v-if="category == 'all'">
                     {{ log.category }}
@@ -47,13 +47,13 @@
                     {{ (log.user && log.user.username) || 'Anonymous' }}
                 </td>
                 <td>
-                    {{ log.action | shorten }}
+                    {{ shorten(log.action) }}
                 </td>
                 <td v-if="category == 'error'">
-                    {{ log.stack | shorten }}
+                    {{ shorten(log.stack) }}
                 </td>
                 <td v-if="category == 'error'">
-                    {{ log.extraInfo | shorten }}
+                    {{ shorten(log.extraInfo) }}
                 </td>
             </tr>
         </data-table>

@@ -56,8 +56,8 @@
         <section class="card card-body">
             <data-table :headers="['date', 'action', 'user', 'group']">
                 <tr v-for="event in events" :key="event.id">
-                    <td data-toggle="tooltip" data-placement="left" :title="event.created_at | toStandardDetailedDate">
-                        {{ event.created_at | toRelativeDate }} 
+                    <td data-toggle="tooltip" data-placement="left" :title="toStandardDetailedDate(event.created_at)">
+                        {{ toRelativeDate(event.created_at) }}
                     </td>
                     <td>
                         <i class="mr-1 fas" :class="parseAction(event.type, 'icon')" />

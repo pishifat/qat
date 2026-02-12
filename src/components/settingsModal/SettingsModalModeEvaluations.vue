@@ -34,7 +34,7 @@
                         "
                     />
                 </a>
-                {{ setting.mode | formatMode }}
+                {{ formatMode(setting.mode) }}
             </label>
             <div class="col-sm-8">
                 <input

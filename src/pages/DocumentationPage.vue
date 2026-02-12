@@ -21,7 +21,7 @@
                         />
                     </div>
                     <span class="small text-secondary my-1">
-                        Last updated: {{ article.updatedAt | toRelativeDate }} ({{ article.updatedAt | toStandardDetailedDate }})
+                        Last updated: {{ toRelativeDate(article.updatedAt) }} ({{ toStandardDetailedDate(article.updatedAt) }})
                     </span>
                     <div class="d-flex align-items-center">  
                         <button

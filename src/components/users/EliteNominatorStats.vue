@@ -45,7 +45,7 @@
                     <pre>{{ 'mode,uniqueNominations,uniqueMappers,uniqueMappersPercentage\n' + getModeStats() }}</pre>
                 </div>
                 <div class="col-sm-12" v-for="mode in modes" :key="mode">
-                    <h4 v-if="mode">{{ mode | formatMode }}</h4>
+                    <h4 v-if="mode">{{ formatMode(mode) }}</h4>
                     <pre>{{ 'userId,username,uniqueNominationCount,uniqueMapperCount,uniqueMappersPercentage,dqCount,minorCount,notableCount,severeCount,nomScore\n' + getStatsCsvByMode(mode) }}</pre>
                 </div>
             </div>

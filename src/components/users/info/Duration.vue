@@ -7,12 +7,12 @@
 
             <ul class="text-secondary">
                 <li v-for="history in sortedBnHistory" :key="history.date" class="small">
-                    {{ history.date | toStandardDate }}: {{ history.kind }}
+                    {{ toStandardDate(history.date) }}: {{ history.kind }}
                     <mode-display
                         :modes="history.mode"
                         data-toggle="tooltip"
                         data-placement="top"
-                        :title="history.mode | formatMode"
+                        :title="formatMode(history.mode)"
                     />
                         <a
                             v-if="history.relatedEvaluation && isEligibleToViewEvals"
@@ -41,12 +41,12 @@
 
             <ul class="text-secondary">
                 <li v-for="history in sortedNatHistory" :key="history.date" class="small">
-                    {{ history.date | toStandardDate }}: {{ history.kind }}
+                    {{ toStandardDate(history.date) }}: {{ history.kind }}
                     <mode-display
                         :modes="history.mode"
                         data-toggle="tooltip"
                         data-placement="top"
-                        :title="history.mode | formatMode"
+                        :title="formatMode(history.mode)"
                     />
                         <a
                             v-if="history.relatedEvaluation && isEligibleToViewEvals"

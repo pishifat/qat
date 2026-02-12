@@ -60,7 +60,7 @@
                     <table v-for="usersByMode in filteredUsers" :key="usersByMode._id" class="table table-sm table-dark table-hover col-6 col-md-3">
                         <span v-if="usersByMode.users.length">
                             <thead>
-                                <td v-if="usersByMode._id != 'none'">{{ usersByMode._id | formatMode }}</td>
+                                <td v-if="usersByMode._id != 'none'">{{ formatMode(usersByMode._id) }}</td>
                                 <td v-else>Structural NAT (see <a href="https://osu.ppy.sh/wiki/People/Nomination_Assessment_Team#structural">wiki</a>)</td>
                             </thead>
                             <tbody>

@@ -59,12 +59,8 @@
 <script>
 export default {
     name: 'ModeSelect',
-    model: {
-        prop: 'selectedMode',
-        event: 'change',
-    },
     props: {
-        selectedMode: {
+        modelValue: {
             type: [ String, Array ],
             required: true,
         },
@@ -96,23 +92,23 @@ export default {
                 switch (singleMode) {
                     case 'osu':
                         this.allModesCheck = this.taikoCheck = this.catchCheck = this.maniaCheck = false;
-                        this.$emit('change', this.osuCheck ? singleMode : '');
+                        this.$emit('update:modelValue', this.osuCheck ? singleMode : '');
                         break;
                     case 'taiko':
                         this.allModesCheck = this.osuCheck = this.catchCheck = this.maniaCheck = false;
-                        this.$emit('change', this.taikoCheck ? singleMode : '');
+                        this.$emit('update:modelValue', this.taikoCheck ? singleMode : '');
                         break;
                     case 'catch':
                         this.allModesCheck = this.osuCheck = this.taikoCheck = this.maniaCheck = false;
-                        this.$emit('change', this.catchCheck ? singleMode : '');
+                        this.$emit('update:modelValue', this.catchCheck ? singleMode : '');
                         break;
                     case 'mania':
                         this.allModesCheck = this.osuCheck = this.taikoCheck = this.catchCheck = false;
-                        this.$emit('change', this.maniaCheck ? singleMode : '');
+                        this.$emit('update:modelValue', this.maniaCheck ? singleMode : '');
                         break;
                     case 'all':
                         this.osuCheck = this.taikoCheck = this.catchCheck = this.maniaCheck = false;
-                        this.$emit('change', this.allModesCheck ? singleMode : '');
+                        this.$emit('update:modelValue', this.allModesCheck ? singleMode : '');
                         break;
                 }
             } else {
@@ -123,7 +119,7 @@ export default {
                 if (this.catchCheck) selectedModes.push('catch');
                 if (this.maniaCheck) selectedModes.push('mania');
 
-                this.$emit('change', selectedModes);
+                this.$emit('update:modelValue', selectedModes);
             }
         },
     },

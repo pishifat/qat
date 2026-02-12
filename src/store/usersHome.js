@@ -1,5 +1,3 @@
-import Vue from 'vue';
-
 export default {
     namespaced: true,
     state: {
@@ -17,7 +15,7 @@ export default {
         // modify data
         updateUser (state, user) {
             const i = state.users.findIndex(u => u.id === user.id);
-            if (i !== -1) Vue.set(state.users, i, user);
+            if (i !== -1) state.users[i] = user;
         },
     },
     getters: {

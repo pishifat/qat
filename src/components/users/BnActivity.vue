@@ -58,7 +58,7 @@
                     :osu-id="user.osuId"
                     :username="user.username"
                 />
-                (joined {{ user.joinDate | toStandardDate }})
+                (joined {{ toStandardDate(user.joinDate) }})
                 <ul>
                     <li
                         :class="user.uniqueNominations < Math.round(bnDaysDisplay/30) ?

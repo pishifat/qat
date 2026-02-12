@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import pageFilters from './modules/pageFilters';
 import pagination from './modules/pagination';
 
@@ -23,7 +22,7 @@ export default {
         // modify data
         updateDiscussionVote (state, discussionVote) {
             const i = state.discussionVotes.findIndex(d => d.id === discussionVote.id);
-            if (i !== -1) Vue.set(state.discussionVotes, i, discussionVote);
+            if (i !== -1) state.discussionVotes[i] = discussionVote;
         },
         addDiscussionVote (state, discussionVote) {
             state.discussionVotes.unshift(discussionVote);

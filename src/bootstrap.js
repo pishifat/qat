@@ -1,8 +1,6 @@
-import Vue from 'vue';
 import MarkdownIt from 'markdown-it';
 import moment from 'moment';
 import MarkdownItVideo from 'markdown-it-video';
-import http from './store/http';
 import osuTimestamps from './plugins/markdown-it-osu-timestamps';
 import MarkdownItColor from 'markdown-it-color';
 import $ from 'jquery';
@@ -11,7 +9,7 @@ import 'bootstrap';
 // Make jQuery available globally
 window.$ = window.jQuery = $;
 
-const md = new MarkdownIt('default', {
+export const md = new MarkdownIt('default', {
     html: false,
     breaks: true,
     linkify: true,
@@ -41,10 +39,6 @@ md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
     return defaultRender(tokens, idx, options, env, self);
 };
 
-Vue.prototype.$md = md;
-Vue.prototype.$moment = moment;
-Vue.prototype.$http = http;
-
 // locale for short dates
 moment.defineLocale('short', {
     parentLocale: 'en',
@@ -64,56 +58,6 @@ moment.defineLocale('short', {
         y:  "1y",
         yy: "%dy"
     }
-});
-
-Vue.filter('toStandardDate', (date) => {
-    if (!date) return '';
-
-    return moment(new Date(date)).format('YYYY-MM-DD');
-});
-
-Vue.filter('toMonthDayYear', (date) => {
-    if (!date) return '';
-
-    return moment(new Date(date)).format('MMM DD, YYYY');
-});
-
-Vue.filter('toStandardDetailedDate', (date) => {
-    if (!date) return '';
-
-    return moment(new Date(date)).format('YYYY-MM-DD hh:mm:ss A');
-});
-
-Vue.filter('toRelativeDate', (date) => {
-    if (!date) return '';
-
-    return moment(new Date(date)).locale('en').fromNow();
-});
-
-Vue.filter('toRelativeShortDate', (date) => {
-    if (!date) return '';
-
-    return moment(new Date(date)).locale('short').fromNow();
-});
-
-Vue.filter('shorten', (text, length) => {
-    if (!text) return '';
-
-    length = length || 90;
-
-    if (text.length > length) {
-        return text.toString().slice(0, length) + '...';
-    } else {
-        return text;
-    }
-});
-
-Vue.filter('formatMode', (mode) => {
-    if (!mode) return '';
-
-    if (mode == 'none') return 'structural';
-    else if (mode == 'osu') return 'osu!';
-    else return 'osu!' + mode;
 });
 
 $(document).ready(function() {

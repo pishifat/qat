@@ -1,9 +1,9 @@
 import { defineConfig } from 'vite'
-import { createVuePlugin } from 'vite-plugin-vue2'
+import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 
 export default defineConfig({
-  plugins: [createVuePlugin()],
+  plugins: [vue()],
   root: './src',
   publicDir: '../public', // Serve static assets from public directory
   optimizeDeps: {
@@ -42,8 +42,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
-      'shared/enums': resolve(__dirname, './shared/enums.mjs'),
-      'vue': 'vue/dist/vue.esm.js' // Use full build for Vue 2
+      'shared/enums': resolve(__dirname, './shared/enums.mjs')
     },
     extensions: ['.mjs', '.js', '.vue', '.json']
   },

@@ -62,7 +62,7 @@ const routes = [
     { path: '/logs', component: Logs, meta: { title: 'Logs' } },
     { path: '/spam', component: Spam, meta: { title: 'Spam', requiresNat: true } },
 
-    { path: '*', component: NotFound, meta: { title: 'Oops', public: true } },
+    { path: '/:pathMatch(.*)*', component: NotFound, meta: { title: 'Oops', public: true } },
 ];
 
 export default routes;

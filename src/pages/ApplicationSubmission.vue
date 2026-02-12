@@ -51,8 +51,8 @@
                 <div v-if="activeApps.length">
                     <div v-for="application in activeApps" :key="application.id">
                         <ul>
-                            <li><b>{{ application.mode | formatMode }}:</b> Application is in progress...
-                            <span class="text-secondary small">(applied {{ application.createdAt | toRelativeDate }})</span>
+                            <li><b>{{ formatMode(application.mode) }}:</b> Application is in progress...
+                            <span class="text-secondary small">(applied {{ toRelativeDate(application.createdAt) }})</span>
                             </li>
                             <progress-bar :evaluation="application" />
                             <p class="text-secondary small">In total, there are currently <b>{{ totalByMode(application.mode) }}</b> <b v-if="totalByModeOverdue(application.mode)" class="text-warning">({{ totalByModeOverdue(application.mode) }} overdue)</b> {{ application.mode == 'osu' ? 'osu!' : 'osu!' + application.mode }} application(s) being processed.</p>
@@ -62,15 +62,15 @@
                 <!-- cooldowns -->
                 <ul v-if="cooldowns.length">
                     <li v-for="evaluation in cooldowns" :key="evaluation.id">
-                        <div v-if="evaluation.isApplication"><b>{{ evaluation.mode | formatMode }}:</b> Because <a :href="'/message?eval=' + evaluation.id" target="_blank">your application was denied</a>, you cannot re-apply until <i>{{ new Date(evaluation.cooldownDate) }}</i></div>
-                        <div v-else-if="evaluation.isBnEvaluation"><b>{{ evaluation.mode | formatMode }}:</b> Because <a :href="'/message?eval=' + evaluation.id" target="_blank">you were removed from the BN</a>, you cannot re-apply until <i>{{ new Date(evaluation.cooldownDate) }}</i></div>
-                        <div v-else-if="evaluation.isResignation"><b>{{ evaluation.mode | formatMode }}:</b> Because of <a :href="'/message?eval=' + evaluation.id" target="_blank">the circumstances of your resignation</a>, you cannot re-apply until <i>{{ new Date(evaluation.cooldownDate) }}</i></div>
+                        <div v-if="evaluation.isApplication"><b>{{ formatMode(evaluation.mode) }}:</b> Because <a :href="'/message?eval=' + evaluation.id" target="_blank">your application was denied</a>, you cannot re-apply until <i>{{ new Date(evaluation.cooldownDate) }}</i></div>
+                        <div v-else-if="evaluation.isBnEvaluation"><b>{{ formatMode(evaluation.mode) }}:</b> Because <a :href="'/message?eval=' + evaluation.id" target="_blank">you were removed from the BN</a>, you cannot re-apply until <i>{{ new Date(evaluation.cooldownDate) }}</i></div>
+                        <div v-else-if="evaluation.isResignation"><b>{{ formatMode(evaluation.mode) }}:</b> Because of <a :href="'/message?eval=' + evaluation.id" target="_blank">the circumstances of your resignation</a>, you cannot re-apply until <i>{{ new Date(evaluation.cooldownDate) }}</i></div>
                     </li>
                 </ul>
                 <!-- current BN modes -->
                 <div v-if="loggedInUser.modes && loggedInUser.modes.length">
                     <ul v-for="mode in loggedInUser.modes" :key="mode">
-                        <li v-if="mode != 'none'"><b>{{ mode | formatMode }}:</b> You're already a BN for this mode!</li>
+                        <li v-if="mode != 'none'"><b>{{ formatMode(mode) }}:</b> You're already a BN for this mode!</li>
                     </ul>
                 </div>
             </div>
@@ -82,7 +82,7 @@
             <div class="card card-body">
                 <h4>Bypass application</h4>
                 <p class="mt-2">
-                    This option is available until {{ this.$moment(relevantResignation.archivedAt).add(1, 'years').format('YYYY-MM-DD') }} because you recently resigned from the {{ relevantResignation.mode | formatMode }} Beatmap Nominators.
+                    This option is available until {{ this.$moment(relevantResignation.archivedAt).add(1, 'years').format('YYYY-MM-DD') }} because you recently resigned from the {{ formatMode(relevantResignation.mode) }} Beatmap Nominators.
                 </p>
                 <p class="mt-2">
                     The NAT will review for any potential concerns and re-admit you to the Beatmap Nominators if everything is okay!
@@ -93,7 +93,7 @@
                     type="button"
                     @click="rejoinApply($event)"
                 >
-                    Request to re-join the Beatmap Nominators ({{ relevantResignation.mode | formatMode }})
+                    Request to re-join the Beatmap Nominators ({{ formatMode(relevantResignation.mode) }})
                 </button>
                 <p v-if="successInfo" class="mt-2">
                     {{ successInfo }}    

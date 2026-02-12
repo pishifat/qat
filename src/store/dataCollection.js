@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import pageFilters from './modules/pageFilters';
 
 export default {
@@ -21,7 +20,7 @@ export default {
         // modify data
         updateEvent (state, event) {
             const i = state.events.findIndex(e => e.id == event.id);
-            if (i >= 0) Vue.set(state.events[i], event.modifiedField, event.value);
+            if (i >= 0) state.events[i][event.modifiedField] = event.value;
         },
     },
     getters: {

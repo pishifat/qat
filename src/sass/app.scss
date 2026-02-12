@@ -13,7 +13,7 @@
     position: absolute;
 }
 
-.list-enter,
+.list-enter-from,
 .list-leave-to {
     opacity: 0;
     transform: translateY(30px);
@@ -23,7 +23,7 @@
     transition: opacity .2s;
 }
 
-.route-transition-enter, .route-transition-leave-to {
+.route-transition-enter-from, .route-transition-leave-to {
     opacity: 0;
 }
 

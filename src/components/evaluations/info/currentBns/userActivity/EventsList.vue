@@ -13,7 +13,7 @@
             >
                 <tr v-for="event in events" :key="event.id">
                     <td class="text-nowrap">
-                        {{ timestamp(event) | toMonthDayYear }}
+                        {{ toMonthDayYear(timestamp(event)) }}
                     </td>
                     <td>
                         <a 

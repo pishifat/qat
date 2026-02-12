@@ -24,7 +24,7 @@
             >
                 <tr v-for="event in filteredEvents" :key="event._id">
                     <td class="text-nowrap">
-                        {{ event.timestamp | toMonthDayYear }}
+                        {{ toMonthDayYear(event.timestamp) }}
                     </td>
                     <td class="w-25">
                         <a 

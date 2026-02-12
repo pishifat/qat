@@ -1,12 +1,9 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
+import { createStore } from 'vuex';
 import Axios from 'axios';
 import toastsModule from './modules/toasts';
 import userActivity from './modules/userActivity';
 
-Vue.use(Vuex);
-
-const store = new Vuex.Store({
+const store = createStore({
     modules: {
         toasts: toastsModule,
         activity: userActivity,

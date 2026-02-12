@@ -1,5 +1,3 @@
-import Vue from 'vue';
-
 export default {
     namespaced: true,
     state: {
@@ -11,7 +9,7 @@ export default {
         },
         updateAnnouncement (state, announcement) {
             const i = state.announcements.findIndex(a => a.id == announcement.id);
-            if (i !== -1) Vue.set(state.announcements, i, announcement);
+            if (i !== -1) state.announcements[i] = announcement;
         },
     },
 };

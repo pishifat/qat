@@ -8,7 +8,7 @@
 
             <h5 class="modal-title">
                 <user-link
-                    class="font-weight-bold text-white"
+                    class="font-weight-bold text-white mr-1"
                     :osu-id="selectedUser.osuId"
                     :username="selectedUser.username"
                 />

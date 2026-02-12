@@ -9,7 +9,7 @@
         <ul class="text-secondary small">
             <li v-if="warningNote">
                 <b>LATEST WARNING/ACTION - 
-                    {{ warningNote.updatedAt | toStandardDate }} -
+                    {{ toStandardDate(warningNote.updatedAt) }} -
                     <user-link
                         :osu-id="warningNote.author.osuId"
                         :username="warningNote.author.username"
@@ -32,7 +32,7 @@
                 :key="note.id"
             >
                 <b>
-                    {{ note.updatedAt | toStandardDate }} -
+                    {{ toStandardDate(note.updatedAt) }} -
                     <user-link
                         :osu-id="note.author.osuId"
                         :username="note.author.username"

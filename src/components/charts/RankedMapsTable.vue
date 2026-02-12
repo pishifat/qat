@@ -15,7 +15,7 @@
                     />
                 </td>
                 <td class="text-nowrap">
-                    {{ event.timestamp | toMonthDayYear }}
+                    {{ toMonthDayYear(event.timestamp) }}
                 </td>
                 <td>
                     <user-link

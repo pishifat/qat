@@ -1,5 +1,3 @@
-import Vue from 'vue';
-
 export default {
     namespaced: true,
     state: {
@@ -25,7 +23,7 @@ export default {
         // modify data
         updateOpenReport (state, report) {
             const i = state.openReports.findIndex(r => r.id === report.id);
-            if (i !== -1) Vue.set(state.openReports, i, report);
+            if (i !== -1) state.openReports[i] = report;
         },
     },
     getters: {

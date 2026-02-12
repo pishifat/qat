@@ -4,7 +4,7 @@
             <b>Category:</b> <span class="text-secondary">{{ category }}</span>
         </p>
         <p>
-            <b>Reported:</b> <span class="text-secondary">{{ selectedReport.createdAt | toStandardDate }}</span>
+            <b>Reported:</b> <span class="text-secondary">{{ toStandardDate(selectedReport.createdAt) }}</span>
         </p>
         <template v-if="selectedReport.link">
             <p>

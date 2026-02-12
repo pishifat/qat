@@ -20,7 +20,7 @@
                     v-else
                     :key="report.id"
                 >
-                    <a :href="'/managereports?id=' + report.id">{{ report.createdAt | toStandardDate }}</a>
+                    <a :href="'/managereports?id=' + report.id">{{ toStandardDate(report.createdAt) }}</a>
                     -
                     <span :class="`text-${report.valid == 1 ? 'success' : report.valid == 2 ? 'neutral' : report.valid == 3 ? 'danger' : ''}`">
                         {{ report.valid == 1 ? 'VALID' : report.valid == 2 ? 'PARTIALLY VALID' : report.valid == 3 ? 'INVALID' : '' }}

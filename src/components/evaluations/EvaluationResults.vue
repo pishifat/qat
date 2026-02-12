@@ -7,7 +7,7 @@
             />
         </h4>
         <h5 class="text-center">
-            {{ evaluation.mode | formatMode }} {{ evaluation.isApplication ? 'BN application' : 'nomination assessment' }} results
+            {{ formatMode(evaluation.mode) }} {{ evaluation.isApplication ? 'BN application' : 'nomination assessment' }} results
         </h5>
         <h5 v-if="consensus" class="text-center">
             Consensus:

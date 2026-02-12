@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import pageFilters from './modules/pageFilters';
 import pagination from './modules/pagination';
 
@@ -31,7 +30,7 @@ export default {
         // modify data
         updateUser (state, user) {
             const i = state.users.findIndex(u => u.id === user.id);
-            if (i !== -1) Vue.set(state.users, i, user);
+            if (i !== -1) state.users[i] = user;
         },
 
         // sort

@@ -1,5 +1,3 @@
-import Vue from 'vue';
-
 export default {
     namespaced: true,
     state: () => ({
@@ -82,19 +80,19 @@ export default {
 
             if (event.type == 'disqualify') {
                 i = state.disqualifications.findIndex(e => e._id == event.id);
-                if (i >= 0) Vue.set(state.disqualifications[i], event.modifiedField, event.value);
+                if (i >= 0) state.disqualifications[i][event.modifiedField] = event.value;
 
                 i = state.nominationsDisqualified.findIndex(e => e._id == event.id);
-                if (i >= 0) Vue.set(state.nominationsDisqualified[i], event.modifiedField, event.value);
+                if (i >= 0) state.nominationsDisqualified[i][event.modifiedField] = event.value;
 
                 i = state.disqualifiedQualityAssuranceChecks.findIndex(e => e._id == event.id);
-                if (i >= 0) Vue.set(state.disqualifiedQualityAssuranceChecks[i], event.modifiedField, event.value);
+                if (i >= 0) state.disqualifiedQualityAssuranceChecks[i][event.modifiedField] = event.value;
             } else if (event.type == 'nomination_reset') {
                 i = state.pops.findIndex(e => e._id == event.id);
-                if (i >= 0) Vue.set(state.pops[i], event.modifiedField, event.value);
+                if (i >= 0) state.pops[i][event.modifiedField] = event.value;
 
                 i = state.nominationsPopped.findIndex(e => e._id == event.id);
-                if (i >= 0) Vue.set(state.nominationsPopped[i], event.modifiedField, event.value);
+                if (i >= 0) state.nominationsPopped[i][event.modifiedField] = event.value;
             }
         },
     },

@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import pageFilters from './modules/pageFilters';
 import pagination from './modules/pagination';
 
@@ -23,7 +22,7 @@ export default {
         // modify data
         updateVeto (state, veto) {
             const i = state.vetoes.findIndex(v => v.id === veto.id);
-            if (i !== -1) Vue.set(state.vetoes, i, veto);
+            if (i !== -1) state.vetoes[i] = veto;
         },
         addVeto (state, veto) {
             state.vetoes.unshift(veto);
