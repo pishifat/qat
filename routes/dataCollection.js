@@ -206,12 +206,12 @@ router.post('/syncBeatmapsetEvents/:beatmapsetId', middlewares.isNat, async (req
                 aiessEvent.obviousness = relevantNominate.obviousness;
                 aiessEvent.severity = relevantNominate.severity;
                 await aiessEvent.save();
-                await relevantNominate.remove();
+                await relevantNominate.deleteOne();
             }
 
             // remove qualify events with no user id for safety
             if (!aiessEvent.userId) {
-                await aiessEvent.remove();
+                await aiessEvent.deleteOne();
             }
         }
     }

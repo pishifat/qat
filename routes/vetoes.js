@@ -525,7 +525,7 @@ router.post('/continueMediation/:id', middlewares.isLoggedIn, middlewares.isNat,
 /* POST delete veto */
 router.post('/deleteVeto/:id', middlewares.isLoggedIn, middlewares.isNat, async (req, res) => {
     const veto = await Veto
-        .findByIdAndRemove(req.params.id)
+        .findByIdAndDelete(req.params.id)
         .orFail();
 
     res.json({ success: 'Deleted' });

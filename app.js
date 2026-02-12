@@ -5,7 +5,7 @@ const middlewares = require("./helpers/middlewares")
 const logger = require('morgan');
 const mongoose = require('mongoose');
 const session = require('express-session');
-const MongoStore = require('connect-mongo')(session);
+const MongoStore = require('connect-mongo');
 const config = require('./config.json');
 const ws = require("ws");
 const crypto = require("crypto")
@@ -50,6 +50,9 @@ const groupHistoryRouter = require('./routes/groupHistory');
 const documentationRouter = require('./routes/documentation');
 const chartsRouter = require('./routes/charts');
 
+// set after all models are loaded to avoid discriminator conflicts
+mongoose.set('strictQuery', false);
+
 const app = express();
 
 global.ws = []; // array to access websocket clients
@@ -75,9 +78,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 //natdb
 mongoose.connect(config.connection, {
-    useFindAndModify: false,
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
     keepAlive: true,
     keepAliveInitialDelay: 300000,
     serverSelectionTimeoutMS: 10000,
@@ -107,7 +107,7 @@ setInterval(async () => {
 const sessionConfig = {
     name: 'bnsite_session',
     secret: config.session,
-    store: new MongoStore({ mongooseConnection: db }),
+    store: MongoStore.create({ mongoUrl: config.connection }),
     resave: false,
     saveUninitialized: false,
     cookie: {

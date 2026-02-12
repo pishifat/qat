@@ -76,7 +76,6 @@ router.get('/findAnnouncements', async (req, res) => {
 
     let announcements = await Announcement
         .find({})
-        .populate('beatmapset')
         .limit(limit)
         .sort({ createdAt: -1 });
 
