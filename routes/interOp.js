@@ -183,7 +183,7 @@ router.get('/users/joinLeaveByDateRange', async (req, res) => {
     };
 
     const buildTable = (addedByMode, departedByMode) => {
-        const rows = ['| | Users |', '| :-- | :-- |'];
+        const rows = ['|  | Users |', '| :-- | :-- |'];
         for (const m of MODES) {
             rows.push(`| ![${modeLabel(m)}](/wiki/shared/mode/${m}.png "${modeLabel(m)}") Added | ${formatCell(addedByMode[m])} |`);
             rows.push(`| ![${modeLabel(m)}](/wiki/shared/mode/${m}.png "${modeLabel(m)}") Departed | ${formatCell(departedByMode[m])} |`);
