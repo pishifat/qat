@@ -45,6 +45,7 @@
 <script>
 import { mapState } from 'vuex';
 import AddVotes from '../card/AddVotes.vue';
+import { toRelativeDate, toStandardDate } from '../../../filters';
 
 export default {
     name: 'CardFooter',
@@ -96,11 +97,11 @@ export default {
     methods: {
         transformedDeadline (deadline) {
             if (this.isActive) {
-                return this.$options.filters.toRelativeDate(deadline);
+                return toRelativeDate(deadline);
             } else if (this.archivedAt && this.archivedAt.length) {
-                return this.$options.filters.toStandardDate(this.archivedAt);
+                return toStandardDate(this.archivedAt);
             } else {
-                return this.$options.filters.toStandardDate(deadline);
+                return toStandardDate(deadline);
             }
         },
         separateEvals() {
