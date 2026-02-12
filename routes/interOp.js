@@ -10,7 +10,7 @@ const getGeneralEvents = require('./evaluations/bnEval').getGeneralEvents;
 const middlewares = require('../helpers/middlewares');
 const BnEvaluation = require('../models/evaluations/bnEvaluation');
 const Discussion = require('../models/discussion');
-const { checkTenureOverlap } = require('../helpers/scrap');
+const { checkTenureOverlap, getModesFromHistory } = require('../helpers/scrap');
 
 const router = express.Router();
 
@@ -84,7 +84,7 @@ router.get('/users/byTenure', async (req, res) => {
         history: { $ne: [], $exists: true },
     });
 
-    const matchingUsers = {};
+    const matchingUsers = [];
 
     for (const user of users) {
         if (!user.history || user.history.length === 0) continue;
@@ -96,11 +96,106 @@ router.get('/users/byTenure', async (req, res) => {
         const wasNat = checkTenureOverlap(natHistory, startDate, endDate);
 
         if (wasBn || wasNat) {
-            matchingUsers[user.osuId] = user.username;
+            // Start with user's current modes (excluding 'none')
+            const inferredGameModes = new Set(
+                (user.modes || []).filter(mode => mode !== 'none')
+            );
+
+            // Add modes from BN history within the date range
+            const bnModes = getModesFromHistory(bnHistory, startDate, endDate);
+            bnModes.forEach(mode => inferredGameModes.add(mode));
+
+            // Add modes from NAT history within the date range
+            const natModes = getModesFromHistory(natHistory, startDate, endDate);
+            natModes.forEach(mode => inferredGameModes.add(mode));
+
+            matchingUsers.push({
+                username: user.username,
+                osuId: user.osuId,
+                modes: Array.from(inferredGameModes).sort(),
+            });
         }
     }
 
     res.json(matchingUsers);
+});
+
+/* GET users who joined/left BN or NAT in a date range, as markdown tables */
+router.get('/users/joinLeaveByDateRange', async (req, res) => {
+    const startDate = req.query.startDate ? new Date(req.query.startDate) : null;
+    const endDate = req.query.endDate ? new Date(req.query.endDate) : null;
+
+    if (!startDate || !endDate) {
+        return res.status(400).send({ error: 'Query parameters "startDate" and "endDate" are required (ISO 8601)' });
+    }
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        return res.status(400).send({ error: 'Invalid startDate or endDate' });
+    }
+    if (startDate > endDate) {
+        return res.status(400).send({ error: 'startDate must be before or equal to endDate' });
+    }
+
+    const MODES = ['osu', 'taiko', 'catch', 'mania'];
+    const modeLabel = (m) => (m === 'osu' ? 'osu!' : `osu!${m}`);
+
+    const byMode = () => {
+        const o = {};
+        MODES.forEach(m => { o[m] = new Map(); }); // osuId -> username
+        return o;
+    };
+    const bnAddedByMode = byMode();
+    const bnDepartedByMode = byMode();
+    const natAddedByMode = byMode();
+    const natDepartedByMode = byMode();
+
+    const users = await User.find({
+        history: { $ne: [], $exists: true },
+    });
+
+    for (const user of users) {
+        if (!user.history || user.history.length === 0) continue;
+
+        for (const entry of user.history) {
+            const entryDate = new Date(entry.date);
+            // Include entry only when its date is within [startDate, endDate] (inclusive)
+            if (entryDate < startDate || entryDate > endDate) continue;
+
+            const mode = entry.mode || '';
+            if (!MODES.includes(mode)) continue;
+
+            if (entry.group === 'bn') {
+                if (entry.kind === 'joined') bnAddedByMode[mode].set(user.osuId, user.username);
+                else if (entry.kind === 'left') bnDepartedByMode[mode].set(user.osuId, user.username);
+            } else if (entry.group === 'nat') {
+                if (entry.kind === 'joined') natAddedByMode[mode].set(user.osuId, user.username);
+                else if (entry.kind === 'left') natDepartedByMode[mode].set(user.osuId, user.username);
+            }
+        }
+    }
+
+    const profileUrl = (osuId) => `https://osu.ppy.sh/users/${osuId}`;
+    const formatCell = (userMap) => {
+        if (!userMap || userMap.size === 0) return '—';
+        return Array.from(userMap.entries())
+            .sort((a, b) => a[1].localeCompare(b[1]))
+            .map(([osuId, username]) => `[${username}](${profileUrl(osuId)})`)
+            .join(', ');
+    };
+
+    const buildTable = (addedByMode, departedByMode) => {
+        const rows = ['|  | Users |', '| :-- | :-- |'];
+        for (const m of MODES) {
+            rows.push(`| ![${modeLabel(m)}](/wiki/shared/mode/${m}.png "${modeLabel(m)}") Added | ${formatCell(addedByMode[m])} |`);
+            rows.push(`| ![${modeLabel(m)}](/wiki/shared/mode/${m}.png "${modeLabel(m)}") Departed | ${formatCell(departedByMode[m])} |`);
+        }
+        return rows.join('\n');
+    };
+
+    const bnTable = buildTable(bnAddedByMode, bnDepartedByMode);
+    const natTable = buildTable(natAddedByMode, natDepartedByMode);
+
+    res.set('Content-Type', 'text/markdown');
+    res.send(`#### Beatmap Nominators\n\n${bnTable}\n\n#### Nomination Assessment Team\n\n${natTable}`);
 });
 
 /* GET specific user info */

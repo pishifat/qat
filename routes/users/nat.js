@@ -362,6 +362,13 @@ router.post('/editBadgeValue/:id', async (req, res) => {
             }],
             'all'
         );
+
+        Logger.generate(
+            req.session.mongoId,
+            `Updated ${type} badge value for user [**${u.username}**](https://osu.ppy.sh/users/${u.osuId}): **${req.body.group == 'nom' ? thresholds[originalValue] : originalValue} → ${req.body.group == 'nom' ? thresholds[value] : value}**`,
+            'user',
+            u._id
+        );
     }
 
     u = await User.findById(req.params.id);

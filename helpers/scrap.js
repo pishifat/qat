@@ -275,6 +275,59 @@ function checkTenureOverlap(history, startDate, endDate) {
     return false;
 }
 
+/**
+ * Get game modes from history entries that overlap with a date range
+ * @param {Array} history - Array of history entries for a specific group (bn or nat)
+ * @param {Date} startDate - Start of the date range
+ * @param {Date} endDate - End of the date range
+ * @returns {Array<string>} - Array of unique game modes from history entries within the date range
+ */
+function getModesFromHistory(history, startDate, endDate) {
+    if (!history || history.length === 0) return [];
+
+    const sortedHistory = [...history].sort((a, b) => new Date(a.date) - new Date(b.date));
+    const modes = new Set();
+
+    // Track active periods using the same logic as getDuration
+    let isActive = 0;
+    const relevantHistory = [];
+
+    for (let i = 0; i < sortedHistory.length; i++) {
+        const entry = sortedHistory[i];
+        entry.kind === 'joined' ? isActive++ : isActive--;
+
+        // Only track transitions from inactive->active or active->inactive
+        if ((entry.kind === 'joined' && isActive === 1) || (entry.kind === 'left' && isActive === 0)) {
+            relevantHistory.push(entry);
+        }
+    }
+
+    // Pair up joined and left events
+    const joinedEvents = relevantHistory.filter(h => h.kind === 'joined');
+    const leftEvents = relevantHistory.filter(h => h.kind === 'left');
+
+    // Check each tenure period for overlap and collect modes
+    for (const joinedEvent of joinedEvents) {
+        const periodStart = new Date(joinedEvent.date);
+        
+        // Find the corresponding left event (if any)
+        const leftIndex = leftEvents.findIndex(d => new Date(d.date) > periodStart);
+        const leftEvent = leftIndex !== -1 ? leftEvents[leftIndex] : null;
+        
+        const periodEnd = leftEvent ? new Date(leftEvent.date) : new Date(); // Use current date if still active
+
+        // Check if this period overlaps with the query date range
+        if (periodStart <= endDate && periodEnd >= startDate) {
+            // Add the mode from this history entry
+            if (joinedEvent.mode) {
+                modes.add(joinedEvent.mode);
+            }
+        }
+    }
+
+    return Array.from(modes);
+}
+
 module.exports = {
     getUserModsCount,
     findUniqueNominationsCount,
@@ -282,4 +335,5 @@ module.exports = {
     findEvaluatorStatuses,
     findMissingContent,
     checkTenureOverlap,
+    getModesFromHistory,
 };
