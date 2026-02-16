@@ -315,7 +315,7 @@ router.get('/findBnActivity/:days/:mode', async (req, res) => {
     res.json(info);
 });
 /* GET gmt activity */
-router.get('/findGmtActivity/:days', async (req, res) => {
+router.get('/findGmtActivity/:days', middlewares.hasFullReadAccess, async (req, res) => {
     let minDate = new Date();
     minDate.setDate(minDate.getDate() - parseInt(req.params.days));
 
