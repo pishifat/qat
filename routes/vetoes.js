@@ -710,7 +710,7 @@ router.post('/createChatroom/:id', middlewares.isLoggedIn, middlewares.isNat, as
     // send messages
     await veto.populate([
         { path: 'chatroomUsers', select: 'username osuId' },
-    ]).execPopulate();
+    ]);
 
     const osuIds = veto.chatroomUsers.map(user => user.osuId);
 
@@ -850,7 +850,7 @@ router.post('/requestMediation/:id', middlewares.isLoggedIn, async (req, res) =>
 
     await veto.populate([
         { path: 'chatroomMediationRequestedUsers', select: 'username osuId' },
-    ]).execPopulate();
+    ]);
 
     const chatroomMediationRequestedUserOsuIds = veto.chatroomMediationRequestedUsers.map(u => u.osuId);
     const mapperInitiated = chatroomMediationRequestedUserOsuIds.includes(veto.beatmapMapperId);

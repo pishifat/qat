@@ -481,7 +481,7 @@ const notifyApplicationEvaluations = cron.schedule('2 17 * * *', async () => {
                 await app.populate([
                     { path: 'bnEvaluators', select: 'username osuId discordId isBnEvaluator' },
                     { path: 'natEvaluators', select: 'username osuId discordId isBnEvaluator' },
-                ]).execPopulate();
+                ]);
                 evaluators = await Settings.getModeHasTrialNat(app.mode) ? app.natEvaluators.concat(app.bnEvaluators) : app.natEvaluators;
             }
 
@@ -590,8 +590,7 @@ const notifyCurrentBnEvaluations = cron.schedule('3 17 * * *', async () => {
                             select: 'discordId isBnEvaluator',
                         },
                     },
-                ])
-                .execPopulate();
+                ]);
 
             await eval.save();
         }
@@ -686,7 +685,7 @@ const notifyCurrentBnEvaluations = cron.schedule('3 17 * * *', async () => {
                 await eval.populate([
                     { path: 'bnEvaluators', select: 'username osuId discordId isBnEvaluator' },
                     { path: 'natEvaluators', select: 'username osuId discordId isBnEvaluator' },
-                ]).execPopulate();
+                ]);
                 evaluators = await Settings.getModeHasTrialNat(eval.mode) ? eval.natEvaluators.concat(eval.bnEvaluators) : eval.natEvaluators;
             }
 

@@ -705,7 +705,7 @@ router.post('/assignNatBuddy/:appId/:userId', middlewares.isNat, async (req, res
     app.natBuddy = nat._id;
     await app.save();
 
-    await app.populate(defaultPopulate).execPopulate();
+    await app.populate(defaultPopulate);
 
     res.json(app);
 
