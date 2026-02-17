@@ -10,11 +10,11 @@
                 <a
                     v-if="loggedInUser && loggedInUser.isNatLeader"
                     href="#"
-                    @click.prevent="deleteReview()"
                     class="text-danger"
                     data-toggle="tooltip"
                     data-placement="top"
                     title="Delete review"
+                    @click.prevent="deleteReview()"
                 >
                     <i class="fas fa-trash-alt" />
                 </a>

@@ -15,9 +15,15 @@
         <div v-if="selectedEvaluation" class="container">
             <div v-if="selectedEvaluation.isApplication && selectedEvaluation.active && !selectedEvaluation.discussion && !evaluatorVibeChecked()">
                 <b>Pre-evaluation:</b>
-                <div class="small ml-4">Based on what you currently know about this user, would you pass or fail their application?</div>
-                <div class="small ml-4">Feel free to look at the <a :href="`https://osu.ppy.sh/users/${this.selectedEvaluation.user.osuId}`" target="_blank">user's profile</a>, but do not research their mods yet.</div>
-                <div class="small ml-4 mt-2">Your vote will not be shown to the applicant (or anyone else). This only exists to gather fun stats.</div>
+                <div class="small ml-4">
+                    Based on what you currently know about this user, would you pass or fail their application?
+                </div>
+                <div class="small ml-4">
+                    Feel free to look at the <a :href="`https://osu.ppy.sh/users/${selectedEvaluation.user.osuId}`" target="_blank">user's profile</a>, but do not research their mods yet.
+                </div>
+                <div class="small ml-4 mt-2">
+                    Your vote will not be shown to the applicant (or anyone else). This only exists to gather fun stats.
+                </div>
                 <div class="form-inline justify-content-end">
                     <div class="form-check form-check-inline">
                         <input
@@ -51,7 +57,7 @@
             <div v-else>
                 <div v-if="selectedEvaluation.isApplication">
                     <main-application-info />
-                    <evaluation-is-security-checked class="mb-2" v-if="loggedInUser.isNat" />
+                    <evaluation-is-security-checked v-if="loggedInUser.isNat" class="mb-2" />
                 </div>
 
                 <div v-else>
@@ -71,8 +77,8 @@
                         :user="selectedEvaluation.user"
                         :show-activity-standing="true"
                     />
-                    <subjective-feedback-status 
-                        v-if="selectedEvaluation.user.isBn && !selectedEvaluation.isResignation && selectedEvaluation.mode === 'osu'" 
+                    <subjective-feedback-status
+                        v-if="selectedEvaluation.user.isBn && !selectedEvaluation.isResignation && selectedEvaluation.mode === 'osu'"
                     />
                 </div>
 
@@ -105,9 +111,9 @@
                         <modding-activity
                             :username="selectedEvaluation.user.username"
                         />
-                        <debug-view-document 
+                        <debug-view-document
                             v-if="loggedInUser.isAdmin"
-                            :document="selectedEvaluation" 
+                            :document="selectedEvaluation"
                         />
                     </div>
                 </template>
@@ -115,7 +121,7 @@
                 <discussion-info v-if="selectedEvaluation.discussion && (selectedEvaluation.isApplication || !selectedEvaluation.user.evaluatorModes.includes(selectedEvaluation.mode))" />
 
                 <template v-if="selectedEvaluation.active">
-                    <hr />
+                    <hr>
                     <evaluation-input v-if="selectedEvaluation.isApplication || (!selectedEvaluation.user.evaluatorModes.includes(selectedEvaluation.mode) && !selectedEvaluation.user.modes.includes('none'))" />
                     <nat-self-evaluation v-else-if="!selectedEvaluation.discussion && selectedEvaluation.user.id == loggedInUser.id && (selectedEvaluation.user.evaluatorModes.includes(selectedEvaluation.mode) || selectedEvaluation.user.modes.includes('none'))" />
                     <nat-leader-evaluation v-else-if="selectedEvaluation.discussion && loggedInUser.isNatLeader && (selectedEvaluation.user.evaluatorModes.includes(selectedEvaluation.mode) || selectedEvaluation.user.modes.includes('none'))" />
@@ -181,7 +187,7 @@ export default {
         ...mapGetters('evaluations', ['selectedEvaluation']),
         modes() {
             if (!this.selectedEvaluation) return [];
-            
+
             if (this.selectedEvaluation.user && this.selectedEvaluation.user.modes && this.selectedEvaluation.user.modes.length && !this.selectedEvaluation.user.modes.includes('none'))
                 return this.selectedEvaluation.user.modes;
 
@@ -198,7 +204,9 @@ export default {
                 if (vibeCheck.mediator.id == this.loggedInUser.id) {
                     return true;
                 }
-            };
+            }
+
+            ;
 
             return false;
         },

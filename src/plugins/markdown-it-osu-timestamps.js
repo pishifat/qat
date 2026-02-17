@@ -6,12 +6,13 @@ export default function osuTimestamps(md, options = {}) {
         const Token = state.Token;
 
         state.tokens.forEach((blockToken) => {
-            if (blockToken.type !== "inline") return;
+            if (blockToken.type !== 'inline') return;
 
             const tokens = [];
             blockToken.children.forEach((token) => {
-                if (token.type !== "text") {
+                if (token.type !== 'text') {
                     tokens.push(token);
+
                     return;
                 }
 
@@ -26,34 +27,34 @@ export default function osuTimestamps(md, options = {}) {
 
                     // push the text before the match as a text token
                     if (match.index > lastIndex) {
-                        const textToken = new Token("text", "", 0);
+                        const textToken = new Token('text', '', 0);
                         textToken.content = text.slice(lastIndex, match.index);
                         tokens.push(textToken);
                     }
 
                     // timestamp tokens
-                    const linkOpenToken = new Token("link_open", "a", 1);
-                    linkOpenToken.attrs = [["href", url]];
+                    const linkOpenToken = new Token('link_open', 'a', 1);
+                    linkOpenToken.attrs = [['href', url]];
                     linkOpenToken.attrPush(['class', 'timestamp-link']);
                     tokens.push(linkOpenToken);
 
                     if (wrapInCode) {
-                        const codeToken = new Token("code_inline", "code", 0);
+                        const codeToken = new Token('code_inline', 'code', 0);
                         codeToken.content = timestamp;
                         codeToken.attrPush(['class', 'timestamp']);
                         tokens.push(codeToken);
                     } else {
-                        const textToken = new Token("text", "", 0);
+                        const textToken = new Token('text', '', 0);
                         textToken.content = timestamp;
                         tokens.push(textToken);
                     }
 
-                    const linkCloseToken = new Token("link_close", "a", -1);
+                    const linkCloseToken = new Token('link_close', 'a', -1);
                     tokens.push(linkCloseToken);
 
                     // add a space
-                    const spaceToken = new Token("text", "", 0);
-                    spaceToken.content = " ";
+                    const spaceToken = new Token('text', '', 0);
+                    spaceToken.content = ' ';
                     tokens.push(spaceToken);
 
                     lastIndex = regex.lastIndex;
@@ -61,7 +62,7 @@ export default function osuTimestamps(md, options = {}) {
 
                 // push the remaining text after the last match as a text token
                 if (lastIndex < text.length) {
-                    const textToken = new Token("text", "", 0);
+                    const textToken = new Token('text', '', 0);
                     textToken.content = text.slice(lastIndex);
                     tokens.push(textToken);
                 }
@@ -71,5 +72,5 @@ export default function osuTimestamps(md, options = {}) {
         });
     }
 
-    md.core.ruler.push("osu_timestamps", osuTimestampsParser);
+    md.core.ruler.push('osu_timestamps', osuTimestampsParser);
 }

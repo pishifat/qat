@@ -7,45 +7,45 @@
         <div v-if="selectedUser">
             <div class="mx-3">
                 <b>Status:</b>
-                    <span
-                        class="badge badge-pill mx-1 text-lowercase"
-                        :class="getStatus(selectedUser.requestStatus) === 'closed' ? 'badge-danger' : getStatus(selectedUser.requestStatus) === 'open' ? 'badge-success' : 'badge-secondary'"
-                    >
-                        {{ getStatus(selectedUser.requestStatus) }}
-                    </span>
+                <span
+                    class="badge badge-pill mx-1 text-lowercase"
+                    :class="getStatus(selectedUser.requestStatus) === 'closed' ? 'badge-danger' : getStatus(selectedUser.requestStatus) === 'open' ? 'badge-success' : 'badge-secondary'"
+                >
+                    {{ getStatus(selectedUser.requestStatus) }}
+                </span>
             </div>
             <div class="mx-3">
                 <b>Last opened:</b>
-                <span 
+                <span
                     class="badge badge-pill mx-1 text-lowercase badge-secondary"
                     data-toggle="tooltip"
                     data-placement="right"
-                    :title="selectedUser.lastOpenedForRequests ? this.$moment(selectedUser.lastOpenedForRequests).format('YYYY-MM-DD hh:mm:ss A') : '¯\\_(ツ)_/¯'"
+                    :title="selectedUser.lastOpenedForRequests ? $moment(selectedUser.lastOpenedForRequests).format('YYYY-MM-DD hh:mm:ss A') : '¯\\_(ツ)_/¯'"
                 >
                     {{ calculateDateFromNow(selectedUser.lastOpenedForRequests) }}
                 </span>
             </div>
             <div class="mx-3">
                 <b>Request methods:</b>
-                    <span
-                        v-for="method in requestMethods(selectedUser.requestStatus)"
-                        :key="method"
-                        class="badge badge-pill mx-1 text-lowercase"
-                        :class="method === 'unknown' ? 'badge-secondary' : 'badge-primary'"
-                        v-html="$md.renderInline(formatLink(method, selectedUser.requestLink, selectedUser.osuId))"
-                    />
+                <span
+                    v-for="method in requestMethods(selectedUser.requestStatus)"
+                    :key="method"
+                    class="badge badge-pill mx-1 text-lowercase"
+                    :class="method === 'unknown' ? 'badge-secondary' : 'badge-primary'"
+                    v-html="$md.renderInline(formatLink(method, selectedUser.requestLink, selectedUser.osuId))"
+                />
             </div>
             <div v-if="selectedUser.languages.length" class="mx-3">
                 <b>Languages:</b>
-                    <span
-                        v-for="language in selectedUser.languages"
-                        :key="language"
-                        class="language-tag badge badge-pill mx-1 text-lowercase badge-secondary"
-                        v-html="language"
-                    />
+                <span
+                    v-for="language in selectedUser.languages"
+                    :key="language"
+                    class="language-tag badge badge-pill mx-1 text-lowercase badge-secondary"
+                    v-html="language"
+                />
             </div>
 
-            <hr />
+            <hr>
 
             <div class="mx-3">
                 <div>
@@ -53,7 +53,6 @@
                     <a
                         v-if="loggedInUser && loggedInUser._id === selectedUser.id && !isEditing"
                         href="#"
-                        class="ml-1"
                         @click.prevent="isEditing = !isEditing"
                     >
                         <i class="fas fa-edit" />
@@ -67,7 +66,7 @@
                         rows="4"
                         placeholder="BN requests info (markdown is supported!)"
                     />
-                    
+
                     <button type="submit" class="btn btn-sm btn-secondary" @click="updateRequestInfo($event)">
                         Update
                     </button>
@@ -83,7 +82,7 @@
                 </div>
             </div>
 
-            <hr />
+            <hr>
 
             <preferences />
 
@@ -92,7 +91,6 @@
                 :document="selectedUser"
             />
         </div>
-
     </modal-dialog>
 </template>
 
@@ -123,13 +121,14 @@ export default {
             return new URLSearchParams(this.$route.query).toString();
         },
     },
+    mixins: [ evaluations ],
     data () {
         return {
             isEditing: false,
             requestInfo: '',
         };
     },
-   watch: {
+    watch: {
         selectedUser() {
             this.requestInfo = this.selectedUser.requestInfo;
             this.isEditing = false;
@@ -139,7 +138,6 @@ export default {
         this.requestInfo = this.selectedUser?.requestInfo ?? '';
         this.isEditing = false;
     },
-    mixins: [ evaluations ],
     methods: {
         async updateRequestInfo(e) {
             e.preventDefault();
@@ -169,7 +167,7 @@ export default {
 
             if (requestStatus.includes('closed')) {
                 return 'closed';
-            } else 
+            } else
                 return 'open';
         },
         /** @returns {string} */
@@ -183,7 +181,7 @@ export default {
             } else if (status === 'Personal Queue') {
                 return `mod queue`;
             }
-            
+
             if (status === 'Game Chat') {
                 return `[chat](https://osu.ppy.sh/community/chat?sendto=${osuId})`;
             }
@@ -205,6 +203,6 @@ export default {
                 return `${remainingDays} days ago`;
             }
         },
-    }
+    },
 };
 </script>

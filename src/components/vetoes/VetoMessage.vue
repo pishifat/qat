@@ -69,18 +69,18 @@ export default {
     name: 'VetoMessage',
     components: {
         UserLink,
-        VetoPartSummary
-    },
-    data () {
-        return {
-            users: null,
-        };
+        VetoPartSummary,
     },
     props: {
         veto: {
             type: Object,
             required: true,
         },
+    },
+    data () {
+        return {
+            users: null,
+        };
     },
     async created() {
         if (this.veto.status == 'archive') {

@@ -42,9 +42,7 @@
         <section class="card card-body">
             <h2>
                 Active votes
-                <small v-if="activeDiscussionVotes"
-                    >({{ activeDiscussionVotes.length }})</small
-                >
+                <small v-if="activeDiscussionVotes">({{ activeDiscussionVotes.length }})</small>
             </h2>
 
             <div
@@ -68,7 +66,7 @@
             <h2>
                 Inactive votes
                 <small v-if="paginatedInactiveDiscussionVotes">
-                    ({{ inactiveDiscussionVotes.length  + (reachedMax ? '' : '+')}})
+                    ({{ inactiveDiscussionVotes.length + (reachedMax ? '' : '+') }})
                 </small>
 
                 <button
@@ -257,6 +255,7 @@ export default {
         },
         async showAll(e) {
             const result = confirm(`Are you sure? This will take a while.`);
+
             if (result) {
                 this.limit = 10000;
                 this.reachedMax = true;
@@ -265,7 +264,7 @@ export default {
         },
         async toggleShowExplicitContent(e) {
             await this.$http.executePost(`/users/${this.loggedInUser.id}/toggleShowExplicitContent`, {}, e);
-            
+
             this.tempShowExplicitContent = true;
         },
     },

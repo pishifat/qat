@@ -7,8 +7,8 @@ module.exports = [
         languageOptions: {
             ecmaVersion: 2018,
             sourceType: 'module',
-            parser: babelParser,
             parserOptions: {
+                parser: babelParser,
                 requireConfigFile: false,
             },
             globals: {

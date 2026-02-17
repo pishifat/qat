@@ -227,7 +227,7 @@ class UserService extends mongoose.Model {
                 {
                     $addFields: {
                         originalModesInfo: '$modesInfo', // Save the original array in a new field
-                    }
+                    },
                 },
                 {
                     $unwind: '$modesInfo',
@@ -355,7 +355,7 @@ class UserService extends mongoose.Model {
     }
 
     /**
-     * 
+     *
      * @param {string} mode
      * @param {number[]} [excludeOsuIds]
      * @param {number} [sampleSize]
@@ -372,8 +372,8 @@ class UserService extends mongoose.Model {
                     modesInfo: {
                         $elemMatch: {
                             mode,
-                            level: isNat ? 'evaluator' : 'full'
-                        }
+                            level: isNat ? 'evaluator' : 'full',
+                        },
                     },
                     isBnEvaluator: true,
                     inBag: isReset ? false : true,
@@ -430,8 +430,8 @@ class UserService extends mongoose.Model {
             - users who are still NAT and inBag and evaluated the user's last evaluation
             - anyone else in bag
         */
-       let assignedNat = [];
-            
+        let assignedNat = [];
+
         if (lastEvaluation) {
             for (const review of lastEvaluation.reviews) {
                 if (assignedNat.length < sampleSize) {

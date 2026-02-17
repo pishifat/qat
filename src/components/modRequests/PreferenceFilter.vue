@@ -5,11 +5,11 @@
             <div v-for="value in filteredValues" :key="value">
                 <i
                     class="fa-check-circle fake-checkbox"
-                    :class ="[included.includes(value) ? 'text-success fas' : 'far']"
+                    :class="[included.includes(value) ? 'text-success fas' : 'far']"
                     @click="$store.commit('modRequests/updateIncluded', value);"
                 />
                 <label
-                    class="form-check-label text-secondary ml-1"
+                    class="form-check-label text-secondary"
                 >
                     {{ value }}
                 </label>
@@ -37,11 +37,11 @@ export default {
     },
     computed: {
         ...mapState('modRequests', [
-            'included'
+            'included',
         ]),
         filteredValues() {
             return this.values.filter(v => v !== 'other');
-        }
+        },
     },
 };
 </script>

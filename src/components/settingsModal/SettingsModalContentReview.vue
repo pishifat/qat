@@ -20,10 +20,10 @@
                         class="form-check-label text-secondary"
                         for="settings-content-review"
                     >
-                    Content review pings
+                        Content review pings
                     </label>
                 </div>
-                <span class="text-danger small" v-if="!loggedInUser.discordId">
+                <span v-if="!loggedInUser.discordId" class="text-danger small">
                     Make sure to set your Discord ID below for this to work!
                 </span>
             </div>

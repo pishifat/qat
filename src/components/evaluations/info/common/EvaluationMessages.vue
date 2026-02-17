@@ -11,7 +11,8 @@
             v-for="(message, i) in evaluation.messages"
             :key="i"
             class="card card-body mb-2"
-            :class="`card-bg-${message.isNat ? 'nat' : evaluation.isApplication ? 'user' : 'bn'}`">
+            :class="`card-bg-${message.isNat ? 'nat' : evaluation.isApplication ? 'user' : 'bn'}`"
+        >
             <div>
                 <b>{{ new Date(message.date).toLocaleDateString() }}</b>
             </div>
@@ -21,8 +22,9 @@
         <div
             v-if="
                 (loggedInUser.id == evaluation.user.id && !evaluation.messagesLocked) ||
-                loggedInUser.isNat
-            ">
+                    loggedInUser.isNat
+            "
+        >
             <div v-if="replies" class="card card-body">
                 <textarea
                     id="messageInput"
@@ -33,8 +35,8 @@
                         evaluation.messagesLocked
                             ? 'messages are disabled.'
                             : evaluation.messages && evaluation.messages.length > 1
-                            ? 'type a reply...'
-                            : 'type a question about your evaluation...'
+                                ? 'type a reply...'
+                                : 'type a question about your evaluation...'
                     "
                     rows="2"
                     :disabled="evaluation.messagesLocked"
@@ -44,15 +46,17 @@
                     <div :class="loggedInUser.isNat ? 'col-sm-8' : 'col-sm-12'">
                         <button
                             class="btn btn-primary btn-block btn-sm mt-1"
+                            :disabled="evaluation.messagesLocked"
                             @click="saveMessage($event)"
-                            :disabled="evaluation.messagesLocked">
+                        >
                             Send message
                         </button>
                     </div>
                     <div v-if="loggedInUser.isNat" class="col-sm-4">
                         <button
                             class="btn btn-danger btn-block btn-sm mt-1"
-                            @click="toggleMessagesLocked($event)">
+                            @click="toggleMessagesLocked($event)"
+                        >
                             {{ evaluation.messagesLocked ? "Unlock" : "Lock" }} messages
                         </button>
                     </div>

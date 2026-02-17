@@ -5,7 +5,6 @@
                 Modding:
             </b>
             <a
-                class="ml-1"
                 data-toggle="tooltip"
                 data-placement="top"
                 title="Finds unique mod count in the last 90 days"

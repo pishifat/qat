@@ -5,7 +5,6 @@
                 Banned from BN:
             </b>
             <a
-                class="ml-1"
                 data-toggle="tooltip"
                 data-placement="top"
                 title="Toggle user's ban from BN"

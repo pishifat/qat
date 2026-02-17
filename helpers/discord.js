@@ -51,7 +51,7 @@ async function errorWebhookPost(error, message, webhook) {
 async function webhookPost(message, webhook) {
     let url = getWebhook(webhook);
     if (typeof url === 'object') return url;
-    
+
     try {
         await axios.post(url, {
             username,
@@ -65,7 +65,7 @@ async function webhookPost(message, webhook) {
 
 async function highlightWebhookPost(message, embeds, webhook) {
     const url = getWebhook(webhook);
-    const role = getRoles([webhook])
+    const role = getRoles([webhook]);
     if (typeof url === 'object') return url;
 
     try {
@@ -156,12 +156,13 @@ async function discussionWebhookPost(d, session) {
     const totalDisagreePercentage = Math.round((disagree.length / totalVotes) * 1000) / 10;
 
     let description = `Concluded vote for [discussion on **${d.title}**](http://bn.mappersguild.com/discussionvote?id=${d.id})`;
-    description += "\n\n";
+    description += '\n\n';
 
     // agree
     description += `- **${d.agreeOverwriteText ? d.agreeOverwriteText : 'Yes/Agree'}:**`;
+
     if (totalBnVotes) {
-        description += "\n";
+        description += '\n';
         description += `  - **NAT:** ${natAgreePercentage}% (${natAgree.length}/${totalNatVotes})\n`;
         description += `  - **BN:** ${bnAgreePercentage}% (${bnAgree.length}/${totalBnVotes})\n`;
         description += `  - **Total:** ${totalAgreePercentage}% (${agree.length}/${totalVotes})\n`;
@@ -172,8 +173,9 @@ async function discussionWebhookPost(d, session) {
     // neutral (if allowed)
     if (d.neutralAllowed) {
         description += `- **${d.neutralOverwriteText ? d.neutralOverwriteText : 'Neutral'}:**`;
+
         if (totalBnVotes) {
-            description += "\n";
+            description += '\n';
             description += `  - **NAT:** ${natNeutralPercentage}% (${natNeutral.length}/${totalNatVotes})\n`;
             description += `  - **BN:** ${bnNeutralPercentage}% (${bnNeutral.length}/${totalBnVotes})\n`;
             description += `  - **Total:** ${totalNeutralPercentage}% (${neutral.length}/${totalVotes})\n`;
@@ -184,8 +186,9 @@ async function discussionWebhookPost(d, session) {
 
     // disagree
     description += `- **${d.disagreeOverwriteText ? d.disagreeOverwriteText : 'No/Disagree'}:**`;
+
     if (totalBnVotes) {
-        description += "\n";
+        description += '\n';
         description += `  - **NAT:** ${natDisagreePercentage}% (${natDisagree.length}/${totalNatVotes})\n`;
         description += `  - **BN:** ${bnDisagreePercentage}% (${bnDisagree.length}/${totalBnVotes})\n`;
         description += `  - **Total:** ${totalDisagreePercentage}% (${disagree.length}/${totalVotes})\n`;
@@ -201,7 +204,7 @@ async function discussionWebhookPost(d, session) {
         }],
         //discussion.mode -- disabling this because of trial nat
         'all'
-    );    
+    );
 }
 
 async function contentCaseWebhookPost(d) {
@@ -253,7 +256,7 @@ async function contentCaseWebhookPost(d) {
     const channel = {
         name: 'Content Review Results',
         description: 'Results for your recent content review submission',
-    }
+    };
 
     let message = `The content you submitted has been reviewed by the BN/NAT! - ${d.discussionLink}`;
     message += `\n\n`;
@@ -269,12 +272,12 @@ async function contentCaseWebhookPost(d) {
 }
 
 async function announcementWebhookPost(session, title, description) {
-    title = '📢 ' + title
+    title = '📢 ' + title;
     const firstImage = description.match(/https?:\/\/.*\.(?:png|jpg|jpeg|gif|png)/i);
 
     // replace all image links ![](LINK) with [image](LINK)
     description = description.replace(/!\[.*\]\((https?:\/\/.*\.(?:png|jpg|jpeg|gif|png))\)/gi, '[image]($1)');
-    
+
     await webhookPost(
         [{
             color: webhookColors.lightBlue,

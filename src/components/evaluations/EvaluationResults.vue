@@ -40,7 +40,7 @@
             </div>
 
             <div v-if="evaluation.isApplication && positiveConsensus">
-                <hr />
+                <hr>
                 <a href="#newBnInformation" data-toggle="collapse">
                     <h5>New BN Information <i class="fas fa-angle-down" /></h5>
                 </a>
@@ -54,17 +54,18 @@
                         <p>If you're a returning BN who recently resigned on good terms, you're already a Full Beatmap Nominator (yay!) and your next evaluation is ~3 months from now.</p>
                         <p>Do note that you have to reach your game mode's minimum activity requirements during the first month to not risk being automatically dismissed.</p>
                     </div>
-                    <hr />
+                    <hr>
                     <div v-if="evaluation.natBuddy">
                         <h5>NAT mentor</h5>
                         <div class="mx-4">
                             <p><a :href="`https://osu.ppy.sh/users/${evaluation.natBuddy.osuId}`" target="_blank">{{ evaluation.natBuddy.username }}</a> is your new best friend. Feel free to contact them for questions or guidance related to being a Beatmap Nominator!</p>
                         </div>
-                        <hr />
+                        <hr>
                     </div>
                     <h5>References</h5>
                     <div class="mx-4">
-                        <p>Read the following pages:
+                        <p>
+                            Read the following pages:
                             <ul>
                                 <li><a href="https://osu.ppy.sh/help/wiki/People/Beatmap_Nominators/Rules" target="_blank">BN Rules</a></li>
                                 <li><a href="https://osu.ppy.sh/wiki/en/People/Beatmap_Nominators/Expectations" target="_blank">BN Expectations</a></li>
@@ -77,7 +78,7 @@
                 </div>
             </div>
 
-            <hr />
+            <hr>
 
             <div v-if="evaluation.feedback && evaluation.feedback.length">
                 <h5>{{ isNewEvaluationFormat ? 'Additional feedback' : 'Feedback' }}</h5>
@@ -118,7 +119,7 @@
                     </ul>
                 </div>
             </div>
-            <evaluation-messages 
+            <evaluation-messages
                 :is-new-evaluation-format="isNewEvaluationFormat"
                 :evaluation="evaluation"
                 :replies="true"

@@ -122,8 +122,8 @@
             >
 
             <input
-                id="neutralAllowedEdit"
                 v-if="isEditingOptions"
+                id="neutralAllowedEdit"
                 v-model="neutralAllowedEdit"
                 type="checkbox"
                 class="mt-2"
@@ -139,13 +139,15 @@
 
             <ul v-else class="small">
                 <li>{{ selectedDiscussionVote.agreeOverwriteText || 'Yes/Agree' }}</li>
-                <li v-if="selectedDiscussionVote.neutralAllowed">{{ selectedDiscussionVote.neutralOverwriteText || 'Neutral' }}</li>
+                <li v-if="selectedDiscussionVote.neutralAllowed">
+                    {{ selectedDiscussionVote.neutralOverwriteText || 'Neutral' }}
+                </li>
                 <li>{{ selectedDiscussionVote.disagreeOverwriteText || 'No/Disagree' }}</li>
             </ul>
         </p>
 
         <div v-if="selectedDiscussionVote.isContentReview && !selectedDiscussionVote.isActive">
-            <b>Consensus:</b> 
+            <b>Consensus:</b>
             <span :class="selectedDiscussionVote.isAcceptable == true ? 'text-success' : selectedDiscussionVote.isAcceptable == false ? 'text-danger' : 'text-secondary'">
                 {{ selectedDiscussionVote.isAcceptable == true ? 'Pass' : selectedDiscussionVote.isAcceptable == false ? 'Fail' : 'Unknown' }}
             </span>

@@ -23,11 +23,12 @@ router.post('/submitReport/', async (req, res) => {
     const blockedUrls = [
         'ppy.sh',
         'puu.sh',
-        'cdn.discordapp.com'
+        'cdn.discordapp.com',
     ];
 
     if (req.body.category == 'contentCaseVisual' && blockedUrls.some(url => link.includes(url))) {
         const url = new URL(link).hostname;
+
         return res.json({
             error: `Images hosted on ${url} are not allowed as they can expire quickly. please use a different image host.`,
         });
@@ -86,7 +87,7 @@ router.post('/submitReport/', async (req, res) => {
             }],
             'natUserReport'
         );
-        
+
         await discord.roleHighlightWebhookPost('natUserReport', ['mappingModdingCommunityInternal']);
 
         Logger.generate(

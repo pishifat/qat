@@ -7,7 +7,12 @@
             v-if="events.length"
             :headers="['', 'Ranked', 'Host', 'Mapset']"
         >
-            <tr v-for="event in events" :key="event.id" class="small" :class="getRowClass(event)">
+            <tr
+                v-for="event in events"
+                :key="event.id"
+                class="small"
+                :class="getRowClass(event)"
+            >
                 <td>
                     <i
                         :class="getCheckmarkClass(event)"
@@ -34,7 +39,9 @@
                 </td>
             </tr>
         </data-table>
-        <p v-else class="small ml-4">None...</p>
+        <p v-else class="small ml-4">
+            None...
+        </p>
     </div>
 </template>
 
@@ -71,7 +78,7 @@ export default {
             'loggedInUser',
         ]),
         selectedEventInThisMonth() {
-            return this.events.find(event => 
+            return this.events.find(event =>
                 event.charted && event.charted.includes(this.loggedInUser?.id)
             );
         },
@@ -82,58 +89,60 @@ export default {
         },
         isEventDisabled(event) {
             const selected = this.selectedEventInThisMonth;
+
             return (selected && selected._id !== event._id) || this.isLoading;
         },
         getRowClass(event) {
             const classes = [];
-            
+
             if (this.isEventSelected(event)) {
                 classes.push('chart-selected');
             }
-            
+
             if (this.isEventDisabled(event)) {
                 classes.push('chart-disabled');
             }
-            
+
             return classes.join(' ');
         },
         getCheckmarkClass(event) {
             const classes = ['fa-check-circle', 'fake-checkbox', 'ml-2'];
-            
+
             if (this.isEventSelected(event)) {
                 classes.push('fas', 'text-success');
             } else {
                 classes.push('far');
             }
-            
+
             if (this.isEventDisabled(event)) {
                 classes.push('chart-disabled-icon');
             }
-            
+
             if (this.isLoading) {
                 classes.push('chart-loading');
             }
-            
+
             return classes.join(' ');
         },
         async toggleFavorite(event) {
             if (this.isEventDisabled(event) || this.isLoading) {
                 return;
             }
-            
+
             this.isLoading = true;
-            
+
             try {
                 const response = await this.$http.executePost(`/charts/${event._id}/toggleSelection`);
-                
+
                 if (response.error) {
                     console.error('Error toggling selection:', response.error);
+
                     return;
                 }
-                
+
                 this.$emit('selection-changed', {
                     eventId: event._id,
-                    isSelected: response.isSelected
+                    isSelected: response.isSelected,
                 });
             } catch (error) {
                 console.error('Failed to toggle selection:', error);

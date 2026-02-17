@@ -28,7 +28,7 @@
                 Save
             </button>
 
-            <hr />
+            <hr>
 
             <obviousness-severity
                 :obviousness="selectedEvent.obviousness"

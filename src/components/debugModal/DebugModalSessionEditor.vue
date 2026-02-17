@@ -12,19 +12,21 @@
             <div class="row col-sm-9">
                 <div class="col-sm-6">
                     <div class="row">
-                        <span class="text-secondary col-sm-4">mongoId</span> <input class="form-control form-control-sm col-sm-6" v-model="mongoId" />
+                        <span class="text-secondary col-sm-4">mongoId</span> <input v-model="mongoId" class="form-control form-control-sm col-sm-6">
                     </div>
                     <div class="row">
-                        <span class="text-secondary col-sm-4">osuId</span> <input class="form-control form-control-sm col-sm-6" v-model="osuId" />
+                        <span class="text-secondary col-sm-4">osuId</span> <input v-model="osuId" class="form-control form-control-sm col-sm-6">
                     </div>
                     <div class="row">
-                        <span class="text-secondary col-sm-4">username</span> <input class="form-control form-control-sm col-sm-6" v-model="username" />
+                        <span class="text-secondary col-sm-4">username</span> <input v-model="username" class="form-control form-control-sm col-sm-6">
                     </div>
                     <div class="row">
-                        <span class="text-secondary col-sm-4">groups</span> <input class="form-control form-control-sm col-sm-6" v-model="groups" />
+                        <span class="text-secondary col-sm-4">groups</span> <input v-model="groups" class="form-control form-control-sm col-sm-6">
                     </div>
                     <div class="row mt-3">
-                        <button class="btn btn-sm btn-success col-sm-10" @click="save()">Save</button>
+                        <button class="btn btn-sm btn-success col-sm-10" @click="save()">
+                            Save
+                        </button>
                     </div>
                 </div>
                 <div class="col-sm-6">
@@ -59,6 +61,7 @@ export default {
     methods: {
         async getSession() {
             const res = await this.$http.executeGet(`/debug/session`);
+
             if (this.$http.isValid(res)) {
                 this.mongoId = res.session.mongoId;
                 this.osuId = res.session.osuId;

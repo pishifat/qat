@@ -43,13 +43,13 @@ export default {
     computed: {
         ...mapGetters('evaluations', ['selectedEvaluation']),
     },
-    async created() {
-        await this.loadNat();
-    },
     watch: {
         async selectedEvaluation() {
             await this.loadNat();
         },
+    },
+    async created() {
+        await this.loadNat();
     },
     methods: {
         async loadNat() {
@@ -70,16 +70,16 @@ export default {
             }
         },
         async assignNatBuddy(e) {
-            const result = await this.$http.executePost(`/appEval/assignNatBuddy/${this.selectedEvaluation.id}/${this.selectedUserId}`, e); 
-            
+            const result = await this.$http.executePost(`/appEval/assignNatBuddy/${this.selectedEvaluation.id}/${this.selectedUserId}`, e);
+
             if (result && !result.error) {
                 this.$store.commit('evaluations/updateEvaluation', result);
                 this.$store.dispatch('updateToastMessages', {
                     message: `Assigned NAT buddy`,
                     type: 'success',
                 });
-            }  
+            }
         },
     },
-}
+};
 </script>

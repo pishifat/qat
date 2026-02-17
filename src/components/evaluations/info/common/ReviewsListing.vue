@@ -8,7 +8,7 @@
             />
             <hr>
         </template>
-        
+
         <!-- Regular reviews -->
         <div v-for="(review, i) in sortedReviews" :key="review.id">
             <review-content
@@ -18,7 +18,7 @@
 
             <hr>
         </div>
-        
+
         <!-- All mock evaluations section (for NAT/TrialNAT) -->
         <template v-if="hasMockReviews && (loggedInUser.isTrialNat || loggedInUser.isNat)">
             <p>
@@ -26,14 +26,14 @@
                     Mock evaluations <i class="fas fa-angle-down" />
                 </a>
             </p>
-            
+
             <div id="mockEvaluations" class="collapse">
                 <div v-for="(review, i) in sortedMockReviews" :key="review.id">
                     <review-content
                         :review="review"
                         :index="i + 1"
                     />
-                    
+
                     <hr>
                 </div>
             </div>
@@ -59,6 +59,7 @@ export default {
         ]),
         sortedReviews () {
             const reviews = this.selectedEvaluation.reviews || [];
+
             if (this.loggedInUser && this.loggedInUser.isNat) {
                 const natReviews = reviews.filter(r => r.evaluator && r.evaluator.isNat);
                 const bnReviews = reviews.filter(r => r.evaluator && !r.evaluator.isNat);
@@ -72,16 +73,19 @@ export default {
             if (this.loggedInUser && (this.loggedInUser.isNat || this.loggedInUser.isTrialNat)) {
                 return null;
             }
-            
+
             const mockReviews = this.selectedEvaluation.mockReviews || [];
+
             return mockReviews.find(r => r.evaluator && r.evaluator.id === this.loggedInUser?.id && r.vote);
         },
         hasMockReviews() {
             const mockReviews = this.selectedEvaluation.mockReviews || [];
+
             return mockReviews.some(r => r.vote);
         },
         sortedMockReviews() {
             const mockReviews = this.selectedEvaluation.mockReviews || [];
+
             return mockReviews.filter(r => r.vote);
         },
     },

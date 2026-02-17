@@ -11,7 +11,7 @@
                 <td>
                     <div class="d-flex align-items-center">
                         <span
-                            data-toggle="tooltip" 
+                            data-toggle="tooltip"
                             :title="canVote ? '' : 'Only BNs can vote'"
                             class="vote-button-wrapper"
                         >
@@ -21,9 +21,9 @@
                             />
                         </span>
                         <span class="ml-1 mr-2 small text-success">{{ getUpvoteCount(event) }}</span>
-                        
+
                         <!--<span
-                            data-toggle="tooltip" 
+                            data-toggle="tooltip"
                             :title="canVote ? '' : 'Only BNs can vote'"
                             class="vote-button-wrapper"
                         >
@@ -45,13 +45,13 @@
                     >
                         <mode-display :modes="event.modes" />
                         {{ event.artistTitle }}
-                        
+
                     </a>
                     by
                     <user-link
-                            :username="event.creatorName"
-                            :osu-id="event.creatorId"
-                        />
+                        :username="event.creatorName"
+                        :osu-id="event.creatorId"
+                    />
                 </td>
                 <td>
                     <span v-if="event.charted && event.charted.length">
@@ -66,7 +66,9 @@
                 </td>
             </tr>
         </data-table>
-        <p v-else class="ml-4">No charted maps for this month...</p>
+        <p v-else class="ml-4">
+            No charted maps for this month...
+        </p>
     </div>
 </template>
 
@@ -106,6 +108,7 @@ export default {
             return [...this.events].sort((a, b) => {
                 const aScore = this.getNetVoteScore(a);
                 const bScore = this.getNetVoteScore(b);
+
                 return bScore - aScore; // Sort in descending order (highest score first)
             });
         },
@@ -137,77 +140,79 @@ export default {
         },
         getUpvoteClass(event) {
             const classes = ['fas', 'fa-circle-arrow-up', 'text-success'];
-            
+
             if (this.canVote) {
                 classes.push('fake-checkbox');
             } else {
                 classes.push('chart-disabled');
             }
-            
+
             if (this.isLoading) {
                 classes.push('chart-loading');
             }
-            
+
             return classes.join(' ');
         },
         getDownvoteClass(event) {
             const classes = ['fas', 'fa-circle-arrow-down', 'text-danger'];
-            
+
             if (this.canVote) {
                 classes.push('fake-checkbox');
             } else {
                 classes.push('chart-disabled');
             }
-            
+
             if (this.isLoading) {
                 classes.push('chart-loading');
             }
-            
+
             return classes.join(' ');
         },
         getNetVoteScore(event) {
             const upvotes = this.getUpvoteCount(event);
             //const downvotes = this.getDownvoteCount(event);
             const downvotes = 0;
+
             return upvotes - downvotes;
         },
         async vote(event, voteType) {
             if (this.isLoading || !this.canVote) {
                 return;
             }
-            
+
             this.isLoading = true;
-            
+
             try {
                 const response = await this.$http.executePost(`/charts/${event._id}/vote`, { voteType });
-                
+
                 if (response.error) {
                     console.error('Error voting on chart:', response.error);
+
                     return;
                 }
-                
+
                 // Update local data
                 if (!event.chartUpvoted) event.chartUpvoted = [];
                 if (!event.chartDownvoted) event.chartDownvoted = [];
-                
+
                 // Update vote arrays based on response
                 const userIndex = event.chartUpvoted.indexOf(this.loggedInUser.id);
                 const downUserIndex = event.chartDownvoted.indexOf(this.loggedInUser.id);
-                
+
                 if (response.userUpvoted) {
                     if (userIndex === -1) event.chartUpvoted.push(this.loggedInUser.id);
                     if (downUserIndex !== -1) event.chartDownvoted.splice(downUserIndex, 1);
                 } else {
                     if (userIndex !== -1) event.chartUpvoted.splice(userIndex, 1);
                 }
-                
+
                 if (response.userDownvoted) {
                     if (downUserIndex === -1) event.chartDownvoted.push(this.loggedInUser.id);
                     if (userIndex !== -1) event.chartUpvoted.splice(userIndex, 1);
                 } else {
                     if (downUserIndex !== -1) event.chartDownvoted.splice(downUserIndex, 1);
                 }
-                
+
             } catch (error) {
                 console.error('Failed to vote on chart:', error);
             } finally {

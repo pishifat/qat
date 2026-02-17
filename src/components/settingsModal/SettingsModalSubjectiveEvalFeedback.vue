@@ -20,7 +20,7 @@
                         class="form-check-label text-secondary"
                         for="settings-subjective-eval-feedback"
                     >
-                    Subjective feedback in evaluations
+                        Subjective feedback in evaluations
                     </label>
                 </div>
             </div>

@@ -59,7 +59,7 @@ function getWebhook(webhook) {
         case 'maniaBeatmapReport':
             return url += `${config.beatmapReportWebhook.id}/${config.beatmapReportWebhook.token}`;
 
-        case 'securityCheck': 
+        case 'securityCheck':
             return url += `${config.securityCheckWebhook.id}/${config.securityCheckWebhook.token}?thread_id=${config.securityCheckWebhook.threadId}`;
 
         case 'preferenceModeration':

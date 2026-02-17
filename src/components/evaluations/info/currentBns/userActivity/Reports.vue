@@ -1,9 +1,10 @@
 <template>
     <div>
         <div class="ml-2">
-            <a :href="userReports && `#${eventId}`" data-toggle="collapse"
-                >{{ header }} <i class="fas fa-angle-down"
-            /></a>
+            <a
+                :href="userReports && `#${eventId}`"
+                data-toggle="collapse"
+            >{{ header }} <i class="fas fa-angle-down" /></a>
             ({{ !userReports ? '...' : userReports.length }})
         </div>
 

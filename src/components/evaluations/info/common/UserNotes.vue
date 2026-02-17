@@ -8,7 +8,7 @@
 
         <ul class="text-secondary small">
             <li v-if="warningNote">
-                <b>LATEST WARNING/ACTION - 
+                <b>LATEST WARNING/ACTION -
                     {{ toStandardDate(warningNote.updatedAt) }} -
                     <user-link
                         :osu-id="warningNote.author.osuId"

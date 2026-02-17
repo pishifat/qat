@@ -9,11 +9,11 @@
             <div class="row">
                 <div class="col-sm-12 form-inline">
                     <label for="date">Input:</label>
-                    <input 
+                    <input
                         v-model="input"
                         class="form-control mx-2"
-                        placeholder="input..." 
-                    />
+                        placeholder="input..."
+                    >
                     <button
                         class="btn btn-sm btn-primary"
                         @click="doTemporaryThing($event)"

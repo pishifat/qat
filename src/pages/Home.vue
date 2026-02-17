@@ -14,11 +14,15 @@
             >
                 <table v-for="usersByMode in sorted" :key="usersByMode._id" class="table table-sm table-dark table-hover col-6 col-md-3">
                     <thead>
-                        <td v-if="usersByMode._id != 'none'">{{ formatMode(usersByMode._id) }}</td>
-                        <td v-else>Structural NAT (see <a href="https://osu.ppy.sh/wiki/People/Nomination_Assessment_Team#structural">wiki</a>)</td>
+                        <td v-if="usersByMode._id != 'none'">
+                            {{ formatMode(usersByMode._id) }}
+                        </td>
+                        <td v-else>
+                            Structural NAT (see <a href="https://osu.ppy.sh/wiki/People/Nomination_Assessment_Team#structural">wiki</a>)
+                        </td>
                     </thead>
                     <tbody>
-                        <tr v-for="user in usersByMode.users" :key="user.id"> 
+                        <tr v-for="user in usersByMode.users" :key="user.id">
                             <user-card :user="user" />
                         </tr>
                     </tbody>
@@ -41,7 +45,7 @@
         </a>
 
         <user-info />
-        
+
         <toast-messages />
     </div>
 </template>

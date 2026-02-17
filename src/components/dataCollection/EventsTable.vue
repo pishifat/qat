@@ -39,7 +39,7 @@
                             data-placement="right"
                             title="total drain time"
                         >
-                            ({{ totalDrain(event.beatmaps)}})
+                            ({{ totalDrain(event.beatmaps) }})
                         </span>
                     </td>
                     <!-- reason -->
@@ -88,10 +88,10 @@ export default {
 
             const rawSeconds = drain % 60;
             const seconds = rawSeconds > 9 ? rawSeconds : '0' + rawSeconds;
-            const minutes = (drain - seconds)/60
+            const minutes = (drain - seconds)/60;
 
-            return minutes + ":" + seconds;
+            return minutes + ':' + seconds;
         },
-    }
+    },
 };
 </script>

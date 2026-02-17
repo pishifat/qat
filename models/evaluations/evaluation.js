@@ -14,68 +14,68 @@ class EvaluationService extends mongoose.Model {
 
         let query;
         let populate = [
-                {
-                    path: 'user',
-                    select: 'username osuId modesInfo groups evaluatorModes subjectiveEvalFeedback history',
+            {
+                path: 'user',
+                select: 'username osuId modesInfo groups evaluatorModes subjectiveEvalFeedback history',
+            },
+            {
+                path: 'natBuddy',
+                select: 'username osuId',
+            },
+            {
+                path: 'natEvaluators',
+                select: 'username osuId discordId isBnEvaluator',
+            },
+            {
+                path: 'bnEvaluators',
+                select: 'username osuId discordId isBnEvaluator',
+            },
+            {
+                path: 'mockEvaluators',
+                select: 'username osuId discordId isBnEvaluator',
+            },
+            {
+                path: 'reviews',
+                select: 'evaluator behaviorComment moddingComment vote',
+                populate: {
+                    path: 'evaluator',
+                    select: 'username osuId groups discordId isBnEvaluator',
                 },
-                {
-                    path: 'natBuddy',
-                    select: 'username osuId',
+            },
+            {
+                path: 'mockReviews',
+                select: 'evaluator behaviorComment moddingComment vote',
+                populate: {
+                    path: 'evaluator',
+                    select: 'username osuId groups discordId isBnEvaluator',
                 },
-                {
-                    path: 'natEvaluators',
-                    select: 'username osuId discordId isBnEvaluator',
-                },
-                {
-                    path: 'bnEvaluators',
-                    select: 'username osuId discordId isBnEvaluator',
-                },
-                {
-                    path: 'mockEvaluators',
-                    select: 'username osuId discordId isBnEvaluator',
-                },
-                {
-                    path: 'reviews',
-                    select: 'evaluator behaviorComment moddingComment vote',
-                    populate: {
-                        path: 'evaluator',
-                        select: 'username osuId groups discordId isBnEvaluator',
+            },
+            {
+                path: 'rerolls',
+                populate: [
+                    {
+                        path: 'oldEvaluator',
+                        select: 'username osuId',
                     },
-                },
-                {
-                    path: 'mockReviews',
-                    select: 'evaluator behaviorComment moddingComment vote',
-                    populate: {
-                        path: 'evaluator',
-                        select: 'username osuId groups discordId isBnEvaluator',
+                    {
+                        path: 'newEvaluator',
+                        select: 'username osuId',
                     },
-                },
-                {
-                    path: 'rerolls',
-                    populate: [
-                        {
-                            path: 'oldEvaluator',
-                            select: 'username osuId',
-                        },
-                        {
-                            path: 'newEvaluator',
-                            select: 'username osuId',
-                        },
-                    ],
-                },
-            ]
+                ],
+            },
+        ];
 
         if (isNat) {
             query = {
                 active: true,
                 deadline: { $lt: minDate },
-            }
+            };
 
             populate.push(
                 {
                     path: 'selfSummary',
-                },
-            )
+                }
+            );
         } else if (isTrialNat) {
             const settings = await Settings.findOne({}); // there's only one
             const trialNatEnabledModeSettings = settings.modeSettings.filter(s => s.hasTrialNat == true);
@@ -88,8 +88,8 @@ class EvaluationService extends mongoose.Model {
                 $and: [
                     { mode: user.modes },
                     { mode: trialNatModes },
-                ]
-            }
+                ],
+            };
         } else {
             // technically this means the function loads inactive evals but i dont care
             query = {
@@ -97,12 +97,12 @@ class EvaluationService extends mongoose.Model {
                     { active: true, discussion: false },
                     { active: false, discussion: true },
                 ],
-                
+
                 deadline: { $lt: minDate },
                 user: { $ne: user._id },
                 mode: user.modes,
                 mockEvaluators: user._id,
-            }
+            };
         }
 
         return this

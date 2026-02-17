@@ -36,6 +36,7 @@ class AppEvaluationService extends mongoose.Model {
     */
     get isNewEvaluationFormat () {
         const newEvaluationFormatCutoff = new Date('2024-03-25');
+
         return new Date(this.archivedAt || this.createdAt) > newEvaluationFormatCutoff;
     }
 
@@ -69,7 +70,7 @@ class AppEvaluationService extends mongoose.Model {
                             select: 'username osuId',
                         },
                     ],
-                }
+                },
             ])
             .sort({
                 createdAt: 1,

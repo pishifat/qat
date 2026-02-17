@@ -7,7 +7,7 @@
             data-target="#extendedInfo"
             :data-discussion="discussion.id"
         >
-            <img v-if="isImage" :src="discussion.discussionLink" class="card-thumb" />
+            <img v-if="isImage" :src="discussion.discussionLink" class="card-thumb">
             <div class="card-body">
                 <div class="wrap-text">
                     <a
@@ -21,7 +21,7 @@
                 <div v-if="discussion.isContentReview && !discussion.isActive" class="small">
                     Consensus:
                     <span :class="discussion.isAcceptable == true ? 'text-success' : discussion.isAcceptable == false ? 'text-danger' : 'text-secondary'">
-                        {{ discussion.isAcceptable == true ? 'Pass' : discussion.isAcceptable == false ? 'Fail' : 'Unknown'}}
+                        {{ discussion.isAcceptable == true ? 'Pass' : discussion.isAcceptable == false ? 'Fail' : 'Unknown' }}
                     </span>
                 </div>
                 <div class="card-status" :class="discussion.isActive ? 'status-bar-active' : 'status-bar-inactive'" />

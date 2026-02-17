@@ -49,7 +49,7 @@ library.add(faCircleXmark);
 const app = createApp(App);
 app.use(store);
 app.use(router);
-app.component('font-awesome-icon', FontAwesomeIcon);
+app.component('FontAwesomeIcon', FontAwesomeIcon);
 
 // Global properties (replaces Vue.prototype)
 app.config.globalProperties.$md = md;

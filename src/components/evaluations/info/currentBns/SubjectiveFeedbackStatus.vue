@@ -1,7 +1,7 @@
 <template>
     <p>
         <b>Subjective feedback: </b>
-        <span 
+        <span
             v-if="selectedEvaluation.user.subjectiveEvalFeedback"
             class="text-success"
         >
@@ -21,5 +21,5 @@ export default {
     computed: {
         ...mapGetters('evaluations', ['selectedEvaluation']),
     },
-}
+};
 </script>

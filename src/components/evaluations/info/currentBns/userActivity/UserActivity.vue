@@ -4,9 +4,9 @@
 
         <p v-if="modes.length > 1" class="font-weight-bold form-inline">
             Game mode:
-                <mode-select 
-                class="ml-2"
+            <mode-select
                 v-model="selectedMode"
+                class="ml-2"
                 :max-selection="1"
                 :modes-filter="modes"
             />
@@ -22,7 +22,7 @@
                 min="1"
                 max="9999"
                 @keyup.enter="search"
-            />
+            >
             <span v-else class="mx-1">({{ daysInput }}</span>
             days)
             <a href="#" @click.prevent="search">
@@ -61,7 +61,9 @@
             />
 
             <template v-if="loggedInUser && loggedInUser.isNat">
-                <div class="mt-2">Evaluations</div>
+                <div class="mt-2">
+                    Evaluations
+                </div>
                 <evaluation-list
                     v-if="!isNat && assignedBnApplications && assignedBnApplications.length"
                     :events="assignedBnApplications"
@@ -103,9 +105,11 @@
                     :mongo-id="mongoId"
                 />
             </template>
-                
+
             <template v-else-if="loggedInUser && !loggedInUser.isNat && isNat">
-                <div class="mt-2">Evaluations</div>
+                <div class="mt-2">
+                    Evaluations
+                </div>
                 <public-evaluation-list
                     v-if="isNat"
                     :events="natApplications"
@@ -125,7 +129,9 @@
             </template>
 
             <template v-if="loggedInUser && loggedInUser.hasFullReadAccess && showArchive">
-                <div class="mt-2">Archives</div>
+                <div class="mt-2">
+                    Archives
+                </div>
                 <previous-evaluations
                     v-if="loggedInUser && loggedInUser.isNat"
                     :header="'Previous Evaluations'"
@@ -139,7 +145,7 @@
                 />
             </template>
         </div>
-        <hr />
+        <hr>
     </div>
 </template>
 

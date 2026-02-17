@@ -5,10 +5,12 @@
                 <h4 class="mx-auto mb-3">
                     Open Beatmap Nominators
                 </h4>
-                <p class="mx-auto mb-3 text-center">This is a list of Beatmap Nominators who are currently open for requests. Make sure to pay attention to their request methods and guidelines listed in their userpages!</p>
+                <p class="mx-auto mb-3 text-center">
+                    This is a list of Beatmap Nominators who are currently open for requests. Make sure to pay attention to their request methods and guidelines listed in their userpages!
+                </p>
                 <a
                     data-toggle="collapse"
-                    href='#filters'
+                    href="#filters"
                 >
                     <h5>Filter by preferences <i class="fas fa-angle-down" /></h5>
                 </a>
@@ -64,7 +66,7 @@
                                 <td v-else>Structural NAT (see <a href="https://osu.ppy.sh/wiki/People/Nomination_Assessment_Team#structural">wiki</a>)</td>
                             </thead>
                             <tbody>
-                                <tr v-for="user in usersByMode.users" :key="user.id"> 
+                                <tr v-for="user in usersByMode.users" :key="user.id">
                                     <user-card :user="user" />
                                 </tr>
                             </tbody>
@@ -119,16 +121,17 @@ export default {
             'users',
         ]),
         ...mapState('modRequests', [
-            'included'
+            'included',
         ]),
         ...mapGetters('modRequests', [
-            'filteredUsers'
+            'filteredUsers',
         ]),
     },
     beforeCreate () {
         if (!this.$store.hasModule('modRequests')) {
             this.$store.registerModule('modRequests', modRequestsModule);
         }
+
         if (!this.$store.hasModule('usersHome')) {
             this.$store.registerModule('usersHome', usersHomeModule);
         }

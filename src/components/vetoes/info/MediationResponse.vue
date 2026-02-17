@@ -11,11 +11,11 @@
                 <a
                     v-if="loggedInUser && loggedInUser.isNatLeader"
                     href="#"
-                    @click.prevent="resetMediation()"
                     class="text-danger"
                     data-toggle="tooltip"
                     data-placement="top"
                     title="Reset mediation"
+                    @click.prevent="resetMediation()"
                 >
                     <i class="fas fa-undo" />
                 </a>

@@ -91,8 +91,8 @@ export default {
         getBeatmapsetIdFromLink (url) {
             const regex = /^https:\/\/osu\.ppy\.sh\/beatmapsets\/(\d+)(?:#(osu|taiko|fruits|mania)\/\d+)?$/;
             const match = url.match(regex);
-  
+
             return match && match[1] ? match[1] : null;
-        }
+        },
     },
 };

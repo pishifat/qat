@@ -159,8 +159,8 @@ async function getDiscussions(token, params) {
 /**
  * Returns the events of a beatmapset of predefined types
  * * Event types: [`nominate`, `qualify`, `disqualify`, `nomination_reset`, `rank`]
- * @param {string} token 
- * @param {number | string} beatmapsetId 
+ * @param {string} token
+ * @param {number | string} beatmapsetId
  */
 async function getBeatmapsetEvents(token, beatmapsetId) {
     const events = ['nominate', 'qualify', 'disqualify', 'nomination_reset', 'rank'];

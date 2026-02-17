@@ -42,22 +42,22 @@ md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
 // locale for short dates
 moment.defineLocale('short', {
     parentLocale: 'en',
-    relativeTime : {
-        future: "in %s",
-        past:   "%s ago",
-        s  : '1s',
-        ss : '%ds',
-        m:  "1m",
-        mm: "%dm",
-        h:  "1h",
-        hh: "%dh",
-        d:  "1d",
-        dd: "%dd",
-        M:  "1mo",
-        MM: "%dmo",
-        y:  "1y",
-        yy: "%dy"
-    }
+    relativeTime: {
+        future: 'in %s',
+        past: '%s ago',
+        s: '1s',
+        ss: '%ds',
+        m: '1m',
+        mm: '%dm',
+        h: '1h',
+        hh: '%dh',
+        d: '1d',
+        dd: '%dd',
+        M: '1mo',
+        MM: '%dmo',
+        y: '1y',
+        yy: '%dy',
+    },
 });
 
 $(document).ready(function() {

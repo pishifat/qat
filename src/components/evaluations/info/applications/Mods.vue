@@ -11,7 +11,7 @@
                         </a>
                     </li>
                     <li>
-                        <b>.osz:</b> 
+                        <b>.osz:</b>
                         <a
                             v-if="isValidUrl(oszs[i])"
                             :href="oszs[i]"
@@ -94,7 +94,7 @@ export default {
             } else {
                 return true;
             }
-        }
+        },
     },
 };
 </script>

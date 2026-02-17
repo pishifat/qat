@@ -1,5 +1,5 @@
 <template>
-    <section class="card card-body" v-if="announcements.length">
+    <section v-if="announcements.length" class="card card-body">
         <div class="d-flex align-items-center mb-1">
             <h4 class="mb-0">
                 News from the NAT
@@ -20,9 +20,11 @@
                     type="button"
                     @click="showMore($event)"
                 >
-                    <i class="fas fa-angle-down mr-1" /> show more <i class="fas fa-angle-down ml-1" />
+                    <i class="fas fa-angle-down" /> show more <i class="fas fa-angle-down" />
                 </button>
-                <div v-else>No more announcements to load.</div>
+                <div v-else>
+                    No more announcements to load.
+                </div>
             </div>
         </div>
     </section>
@@ -36,7 +38,7 @@ import announcementsModule from '../../store/announcements';
 export default {
     name: 'Announcements',
     components: {
-        Announcement
+        Announcement,
     },
     data () {
         return {
@@ -57,9 +59,9 @@ export default {
     async created () {
         const announcements = await this.$http.initialRequest(`/findAnnouncements?limit=${this.limit}`);
 
-            if (announcements) {
-                this.$store.commit('announcements/setAnnouncements', announcements);
-            }
+        if (announcements) {
+            this.$store.commit('announcements/setAnnouncements', announcements);
+        }
     },
     methods: {
         async findNextAnnouncement (e) {
@@ -73,10 +75,11 @@ export default {
             this.limit *= 2;
             const currentLength = this.announcements.length;
             await this.findNextAnnouncement(e);
+
             if (this.announcements.length == currentLength) {
                 this.max = true;
             }
-        }
+        },
     },
 };
 </script>

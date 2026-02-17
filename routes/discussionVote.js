@@ -83,9 +83,10 @@ router.get('/relevantInfo/:limit', async (req, res) => {
 /* GET specific discussion */
 router.get('/searchDiscussionVote/:id', async (req, res) => {
     let discussion;
+
     if (res.locals.userRequest.hasFullReadAccess) {
         discussion = await Discussion
-            .findOne({ _id: req.params.id, isHidden: { $ne: true }})
+            .findOne({ _id: req.params.id, isHidden: { $ne: true } })
             .populate(defaultPopulate);
     } else {
         const tempDiscussion = await Discussion.findById(req.params.id);
@@ -117,16 +118,17 @@ router.post('/submit', middlewares.hasBasicAccess, async (req, res) => {
     const blockedUrls = [
         'ppy.sh',
         'puu.sh',
-        'cdn.discordapp.com'
+        'cdn.discordapp.com',
     ];
-    
+
     if (isContentReview && discussionLink.length > 0 && blockedUrls.some(u => discussionLink.includes(u))) {
         const url = new URL(discussionLink).hostname;
+
         return res.json({
             error: `Images hosted on ${url} are not allowed as they can expire quickly. please use a different image host.`,
         });
     }
-    
+
     if (discussionLink.length) {
         util.isValidUrlOrThrow(discussionLink);
     }

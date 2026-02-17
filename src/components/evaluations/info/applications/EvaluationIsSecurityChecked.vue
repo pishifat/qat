@@ -25,16 +25,16 @@ export default {
     },
     methods: {
         async toggleEvaluationIsSecurityChecked(e) {
-            const result = await this.$http.executePost(`/${this.selectedEvaluation.isApplication ? 'appEval' : 'bnEval'}/toggleisSecurityChecked/${this.selectedEvaluation.id}`, e); 
-            
+            const result = await this.$http.executePost(`/${this.selectedEvaluation.isApplication ? 'appEval' : 'bnEval'}/toggleisSecurityChecked/${this.selectedEvaluation.id}`, e);
+
             if (result && !result.error) {
                 this.$store.commit('evaluations/updateEvaluation', result);
                 this.$store.dispatch('updateToastMessages', {
                     message: `Toggled security check status`,
                     type: 'success',
                 });
-            }  
+            }
         },
     },
-}
+};
 </script>

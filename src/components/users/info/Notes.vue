@@ -7,7 +7,7 @@
         </p>
 
         <div v-if="warningNote" class="my-2">
-            <b>Latest warning/action - 
+            <b>Latest warning/action -
                 {{ toStandardDate(warningNote.updatedAt) }} -
                 <user-link
                     :osu-id="warningNote.author.osuId"
@@ -68,7 +68,7 @@
                     </b>
                     <a
                         href="#"
-                        class="ml-1 text-danger"
+                        class="text-danger"
                         data-toggle="tooltip"
                         data-placement="top"
                         title="delete note"

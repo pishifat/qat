@@ -3,21 +3,25 @@
         <div class="col-md-12">
             <section v-if="pages.length" class="card card-body docs-container">
                 <!-- introduction link, takes more space than regular docs pages-->
-                <router-link 
+                <router-link
                     to="/docs/Introduction"
                     class="docs-item card w-100"
                 >
                     <h3>Introduction</h3>
-                    <p class="small text-secondary">Welcome to the NAT!</p>
+                    <p class="small text-secondary">
+                        Welcome to the NAT!
+                    </p>
                 </router-link>
 
-                <router-link 
-                    :to="'/docs/' + page.slug"
-                    class="docs-item card"
+                <router-link
                     v-for="page in pages"
                     :key="page.id"
+                    :to="'/docs/' + page.slug"
+                    class="docs-item card"
                 >
-                    <h4 class="m-0">{{ page.title }}</h4>
+                    <h4 class="m-0">
+                        {{ page.title }}
+                    </h4>
                 </router-link>
             </section>
 
@@ -33,9 +37,9 @@
                         v-model="title"
                         class="form-control mb-2"
                         type="text"
-                    />
+                    >
                 </div>
-                
+
                 <div>
                     Content:
                     <textarea
@@ -72,7 +76,7 @@ export default {
             pages: [],
             title: '',
             content: '',
-        }
+        };
     },
     computed: {
         ...mapState([
@@ -95,7 +99,7 @@ export default {
             }
         },
     },
-}
+};
 </script>
 
 <style scoped>

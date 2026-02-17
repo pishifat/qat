@@ -7,7 +7,7 @@
                 <span v-else class="text-secondary">None...</span>
             </div>
         </div>
-        <hr />
+        <hr>
         <div class="row">
             <reviews-listing class="col-sm-12 mb-4" />
             <evaluation-input class="col-sm-12 mb-4" />

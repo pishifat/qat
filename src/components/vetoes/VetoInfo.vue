@@ -15,9 +15,9 @@
             <div
                 v-if="
                     selectedVeto.status != 'pending' &&
-                    selectedVeto.status != 'chatroom' &&
-                    loggedInUser.isNat &&
-                    selectedVeto.vetoFormat >= 7"
+                        selectedVeto.status != 'chatroom' &&
+                        loggedInUser.isNat &&
+                        selectedVeto.vetoFormat >= 7"
             >
                 <a href="#chatroom" data-toggle="collapse">
                     <b>Discussion logs</b> <i class="fas fa-angle-down" />
@@ -27,7 +27,7 @@
                     class="fake-disabled collapse"
                 />
             </div>
-            <hr />
+            <hr>
 
             <!-- show vouches component when  veto is "pending" status -->
             <vouches v-if="selectedVeto.status == 'pending' && loggedInUser && loggedInUser.isBnOrNat" />
@@ -39,15 +39,15 @@
             <chatroom
                 v-if="
                     selectedVeto.status == 'chatroom' &&
-                    loggedInUser &&
-                    (isChatroomUser || loggedInUser.isNat)"
+                        loggedInUser &&
+                        (isChatroomUser || loggedInUser.isNat)"
                 :class="selectedVeto.chatroomLocked ? 'fake-disabled' : ''"
             />
             <div v-else-if="selectedVeto.status == 'chatroom'">
                 The veto is currently being discussed between the mapper(s) and Beatmap Nominators. If a conclusion can't be reached, a larger vote will be held!
             </div>
             <pre-mediation-admin-buttons v-if="(selectedVeto.status == 'chatroom' || selectedVeto.status == 'pending') && loggedInUser && loggedInUser.isNat" />
-            
+
             <!-- show admin buttons to NAT -->
             <begin-mediation
                 v-if="loggedInUser && loggedInUser.isNat && selectedVeto.status == 'available'"
@@ -62,8 +62,12 @@
             />
             <div v-else-if="selectedVeto.status == 'wip'">
                 <public-mediation-input v-if="loggedInUser && !loggedInUser.isBnOrNat && selectedVeto.vetoFormat >= 7" class="mt-4" />
-                <div v-else-if="!loggedInUser">If you want to give your opinion on the veto, log in.</div>
-                <div v-else-if="loggedInUser.isBnOrNat && !loggedInUser.isNat">There's nothing for you to do here.</div>
+                <div v-else-if="!loggedInUser">
+                    If you want to give your opinion on the veto, log in.
+                </div>
+                <div v-else-if="loggedInUser.isBnOrNat && !loggedInUser.isNat">
+                    There's nothing for you to do here.
+                </div>
             </div>
 
             <div v-if="loggedInUser && !loggedInUser.isBnOrNat && selectedVeto.status == 'archive'">
@@ -75,7 +79,7 @@
             />
 
             <!-- show debug info to admins -->
-            <debug-view-document 
+            <debug-view-document
                 v-if="loggedInUser && loggedInUser.isAdmin"
                 :document="selectedVeto"
             />

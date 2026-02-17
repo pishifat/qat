@@ -3,13 +3,18 @@
         <h5 class="modal-title overflow-auto text-break py-1 d-inline-flex">
             Report:
             <user-link
-                class="mx-1"
                 v-if="selectedReport.culprit"
+                class="mx-1"
                 :osu-id="selectedReport.culprit.osuId"
                 :username="selectedReport.culprit.username"
             />
 
-            <a v-else :href="selectedReport.link" target="_blank" class="mx-1">
+            <a
+                v-else
+                :href="selectedReport.link"
+                target="_blank"
+                class="mx-1"
+            >
                 {{ selectedReport.link }}
             </a>
         </h5>

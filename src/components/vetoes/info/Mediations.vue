@@ -3,23 +3,26 @@
         <b>Mediations</b>
         <div v-if="selectedVeto.vetoFormat >= 2" class="mt-1">
             <div v-for="(reason, reasonIndex) in selectedVeto.reasons" :key="reasonIndex" class="mb-2">
-
                 <!-- collapse menu -->
-                <a v-if="selectedVeto.reasons.length" :href="'#reason-' + (reasonIndex + 1)" data-toggle="collapse" class="ml-4">
+                <a
+                    v-if="selectedVeto.reasons.length"
+                    :href="'#reason-' + (reasonIndex + 1)"
+                    data-toggle="collapse"
+                    class="ml-4"
+                >
                     <b>{{ reasonIndex + 1 }}. {{ reason.summary }}</b> <span v-if="selectedVeto.vetoFormat >= 7 && selectedVeto.status == 'archive'">({{ reason.status ? reason.status : 'pending status' }}) </span><i class="fas fa-angle-down" />
                 </a>
 
                 <!-- menu content -->
                 <div :id="'reason-' + (reasonIndex + 1)" class="collapse">
-
                     <!-- discussion link + stats -->
                     <div v-if="selectedVeto.reasons.length">
-                        <hr />
+                        <hr>
                         <b>Stats</b>
                         <vote-stats
                             v-if="selectedVeto.vetoFormat < 7"
                             :reason-index="reasonIndex"
-                            :mediations="selectedVeto.mediations.filter(m => m.reasonIndex === reasonIndex)"    
+                            :mediations="selectedVeto.mediations.filter(m => m.reasonIndex === reasonIndex)"
                         />
                         <div v-else>
                             <ul>
@@ -50,7 +53,9 @@
                             </div>
                             <div v-if="loggedInUser && loggedInUser.isNat && selectedVeto.status == 'archive'">
                                 <b>NAT moderation</b>
-                                <div class="small text-secondary">Based on the info above, mark the veto reason as "upheld" or "dismissed".</div>
+                                <div class="small text-secondary">
+                                    Based on the info above, mark the veto reason as "upheld" or "dismissed".
+                                </div>
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <button
@@ -73,12 +78,12 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div v-if="selectedVeto.vetoFormat < 7">
-                            <b class="mr-1">Discussion link:</b>
+                            <b>Discussion link:</b>
                             <a :href="reason.link" target="_blank">{{ reason.link }}</a>
                         </div>
-                        <hr />
+                        <hr>
                     </div>
 
                     <!-- mediations -->

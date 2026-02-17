@@ -2,10 +2,9 @@
     <div>
         <p>
             <b>
-                {{selectedUser.isNatOrTrialNat ? "Evaluations" : "Mock evaluations" }}:
+                {{ selectedUser.isNatOrTrialNat ? "Evaluations" : "Mock evaluations" }}:
             </b>
             <a
-                class="ml-1"
                 data-toggle="tooltip"
                 data-placement="top"
                 title="Toggle evaluations"

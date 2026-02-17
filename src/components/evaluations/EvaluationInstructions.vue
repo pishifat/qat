@@ -18,7 +18,7 @@
                 <li>Clear communication with the mapper.</li>
             </ul>
             <p class="small ml-4">
-                A more detailed explanation if the above can be found in 
+                A more detailed explanation if the above can be found in
                 <a href="https://osu.ppy.sh/wiki/en/People/Beatmap_Nominators/Becoming_a_Beatmap_Nominator#modding-expectations" target="_blank">this page</a>.
             </p>
             <p class="small ml-4">

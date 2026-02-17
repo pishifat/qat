@@ -1,20 +1,20 @@
 <template>
     <div class="d-inline-flex align-items-center">
-        <span 
-            v-if="!modesFilter || modesFilter && modesFilter.includes('osu')" 
-            data-toggle="tooltip" 
+        <span
+            v-if="!modesFilter || modesFilter && modesFilter.includes('osu')"
+            data-toggle="tooltip"
             title="osu!"
         >
             <i
                 :class="osuCheck ? 'osu-icon-check' : 'osu-icon'"
                 class="mode-icon-select fa-xl mr-1"
-                
+
                 @click="osuCheck = !osuCheck, updateSelectedMode('osu')"
             />
         </span>
-        <span 
-            v-if="!modesFilter || modesFilter && modesFilter.includes('taiko')" 
-            data-toggle="tooltip" 
+        <span
+            v-if="!modesFilter || modesFilter && modesFilter.includes('taiko')"
+            data-toggle="tooltip"
             title="osu!taiko"
         >
             <i
@@ -23,9 +23,9 @@
                 @click="taikoCheck = !taikoCheck, updateSelectedMode('taiko')"
             />
         </span>
-        <span 
-            v-if="!modesFilter || modesFilter && modesFilter.includes('catch')" 
-            data-toggle="tooltip" 
+        <span
+            v-if="!modesFilter || modesFilter && modesFilter.includes('catch')"
+            data-toggle="tooltip"
             title="osu!catch"
         >
             <i
@@ -34,9 +34,9 @@
                 @click="catchCheck = !catchCheck, updateSelectedMode('catch')"
             />
         </span>
-        <span 
-            v-if="!modesFilter || modesFilter && modesFilter.includes('mania')" 
-            data-toggle="tooltip" 
+        <span
+            v-if="!modesFilter || modesFilter && modesFilter.includes('mania')"
+            data-toggle="tooltip"
             title="osu!mania"
         >
             <i

@@ -7,9 +7,9 @@
         <div v-if="selectedReport" class="container">
             <context />
 
-            <debug-view-document 
+            <debug-view-document
                 v-if="loggedInUser.isAdmin"
-                :document="selectedReport" 
+                :document="selectedReport"
             />
 
             <hr>

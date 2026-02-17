@@ -7,7 +7,7 @@
 
         <div v-for="(reason, i) in selectedVeto.reasons" :key="i">
             <b>{{ i+1 }}. {{ reason.summary }}</b>
-            
+
             <div class="d-flex mb-4">
                 <div class="form-check form-check-inline">
                     <input

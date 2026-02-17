@@ -3,11 +3,13 @@
         <div>
             If you want this veto to take effect, you can anonymously <b>vouch for it below!</b>
         </div>
-        <div class="small text-secondary">Only members of the BN can vouch. By supporting the veto this way, you will be part of an anonymized discussion with the mapper. NAT members are responsible for moderation.</div>
+        <div class="small text-secondary">
+            Only members of the BN can vouch. By supporting the veto this way, you will be part of an anonymized discussion with the mapper. NAT members are responsible for moderation.
+        </div>
         <button
             class="btn btn-sm btn-danger mt-2"
-            @click="vouch(true, null, $event)"
             :disabled="loggedInUser.isNat || isVetoer"
+            @click="vouch(true, null, $event)"
         >
             {{ isVouchingUser ? 'Remove your support for this veto' : 'I vouch for this veto!' }}
         </button>
@@ -16,14 +18,14 @@
             <div><b>NAT-only information</b></div>
             <ul>
                 <li>
-                    Mapper: 
+                    Mapper:
                     <user-link
                         :username="selectedVeto.beatmapMapper"
                         :osu-id="selectedVeto.beatmapMapperId"
                     />
                 </li>
                 <li>
-                    Vetoer: 
+                    Vetoer:
                     <user-link
                         :username="selectedVeto.vetoer.username"
                         :osu-id="selectedVeto.vetoer.osuId"
@@ -32,7 +34,9 @@
                 <li>
                     Vouching users:
                     <ul>
-                        <li v-if="!selectedVeto.vouchingUsers || !selectedVeto.vouchingUsers.length">None</li>
+                        <li v-if="!selectedVeto.vouchingUsers || !selectedVeto.vouchingUsers.length">
+                            None
+                        </li>
                         <li v-for="user in selectedVeto.vouchingUsers" :key="user.id">
                             <user-link
                                 :username="user.username"
@@ -79,7 +83,7 @@
         </div>
 
         <div class="mt-4">
-            After two Beatmap Nominators vouch for a pending veto, a private chatroom is created between... 
+            After two Beatmap Nominators vouch for a pending veto, a private chatroom is created between...
             <ul>
                 <li>the veto's creator</li>
                 <li>the vouching users</li>
@@ -88,7 +92,6 @@
             </ul>
 
             ...with the goal of resolving the veto through discussion. If that doesn't work, the veto can be mediated by a larger group of Beatmap Nominators.
-
         </div>
     </div>
 </template>
@@ -138,6 +141,6 @@ export default {
                 }
             }
         },
-    }
+    },
 };
 </script>

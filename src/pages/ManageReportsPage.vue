@@ -9,7 +9,7 @@
                         v-for="report in openReports"
                         :key="report.id"
                         :report="report"
-                        @update:selectedReport="selectedReport = $event"
+                        @update:selected-report="selectedReport = $event"
                     />
                 </transition-group>
 

@@ -1,13 +1,14 @@
 <template>
     <div>
         <div class="ml-2">
-            <a :href="events && `#${eventsId}`" data-toggle="collapse"
-                >{{ header }} <i class="fas fa-angle-down"
-            /></a>
+            <a
+                :href="events && `#${eventsId}`"
+                data-toggle="collapse"
+            >{{ header }} <i class="fas fa-angle-down" /></a>
             ({{ isLoading ? '...' : events ? filteredEvents.length : '0' }})
         </div>
         <div v-if="events" :id="eventsId" class="collapse overflow-auto text-break">
-            <div 
+            <div
                 v-if="loggedInUser && loggedInUser.isNatOrTrialNat && events && events.length && (eventsId == 'nominationsDisqualified' || eventsId == 'nominationsPopped')"
                 class="text-secondary small"
             >
@@ -27,24 +28,24 @@
                         {{ toMonthDayYear(event.timestamp) }}
                     </td>
                     <td class="w-25">
-                        <a 
+                        <a
                             :href="'osu://dl/' + event.beatmapsetId"
                             data-toggle="tooltip"
                             data-placement="right"
                             title="osu!direct download"
                         >
-                            <i class="fas fa-file-download mr-1" />
+                            <i class="fas fa-file-download" />
                         </a>
                         <a
                             :href="
                                 event.discussionId
                                     ? 'https://osu.ppy.sh/beatmapsets/' +
-                                      event.beatmapsetId +
-                                      '/discussion/-/generalAll#/' +
-                                      event.discussionId
+                                        event.beatmapsetId +
+                                        '/discussion/-/generalAll#/' +
+                                        event.discussionId
                                     : 'https://osu.ppy.sh/beatmapsets/' +
-                                      event.beatmapsetId +
-                                      '/discussion/-/events'
+                                        event.beatmapsetId +
+                                        '/discussion/-/events'
                             "
                             target="_blank"
                         >
@@ -65,7 +66,9 @@
                     <nomination-reset-editing :event="event" />
                 </tr>
             </data-table>
-            <p v-else class="small ml-4">None...</p>
+            <p v-else class="small ml-4">
+                None...
+            </p>
         </div>
     </div>
 </template>
@@ -139,10 +142,10 @@ export default {
 
             const rawSeconds = drain % 60;
             const seconds = rawSeconds > 9 ? rawSeconds : '0' + rawSeconds;
-            const minutes = (drain - seconds)/60
+            const minutes = (drain - seconds)/60;
 
-            return minutes + ":" + seconds;
+            return minutes + ':' + seconds;
         },
-    }
+    },
 };
 </script>

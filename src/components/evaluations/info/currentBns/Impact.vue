@@ -1,28 +1,28 @@
 <template>
     <div>
         <p class="small">
-            <b class="mr-1">Impact level (legacy):</b>
+            <b>Impact level (legacy):</b>
             <span :class="getImpact(impact).color">
                 <i v-if="impact !== 0" :class="getImpact(impact).icon" />
                 <font-awesome-icon v-else :icon="getImpact(impact).icon" />
                 {{ getImpact(impact).text }}
             </span>
             <!--<span class="ml-2 btn-group">
-                <button 
+                <button
                     class="btn btn-sm btn-success"
                     @click.prevent="updateImpact(0)"
                     :disabled="impact === 0"
                 >
                     Minor
                 </button>
-                <button 
+                <button
                     class="btn btn-sm btn-warning"
                     @click.prevent="updateImpact(1)"
                     :disabled="impact === 1"
                 >
                     Notable
                 </button>
-                <button 
+                <button
                     class="btn btn-sm btn-danger"
                     @click.prevent="updateImpact(2)"
                     :disabled="impact === 2"

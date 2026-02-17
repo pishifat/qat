@@ -5,7 +5,6 @@
                 Content reviews:
             </b>
             <a
-                class="ml-1"
                 data-toggle="tooltip"
                 data-placement="top"
                 title="Toggle content review pings"

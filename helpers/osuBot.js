@@ -118,11 +118,11 @@ async function sendAnnouncement(userIds, channel, message) {
             },
             message,
             target_ids: userIds,
-            type: "ANNOUNCE",
+            type: 'ANNOUNCE',
         },
         {
             headers: {
-                Accept: "application/json",
+                Accept: 'application/json',
                 Authorization: `Bearer ${token}`,
             },
         });

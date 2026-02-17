@@ -94,10 +94,10 @@ async function findUniqueNominationsCount(initialDate, endDate, user, mode) {
             },
             timestamp: {
                 $gt: initialDate,
-                $lt: endDate
+                $lt: endDate,
             },
             modes: mode, // this line is the only difference
-        }
+        };
     } else {
         query = {
             userId: user.osuId,
@@ -106,11 +106,11 @@ async function findUniqueNominationsCount(initialDate, endDate, user, mode) {
             },
             timestamp: {
                 $gt: initialDate,
-                $lt: endDate
+                $lt: endDate,
             },
-        }
+        };
     }
-    
+
     const events = await Aiess.distinct('beatmapsetId', query);
 
     return events.length;
@@ -118,7 +118,7 @@ async function findUniqueNominationsCount(initialDate, endDate, user, mode) {
 
 /**
  * find months of sufficient BN activity for members of NAT
- * 
+ *
  * activity is counted based on calendar months (not rolling 30-day periods)
  * partial months (first and last) are included
  */
@@ -259,11 +259,11 @@ function checkTenureOverlap(history, startDate, endDate) {
     // Check each tenure period for overlap
     for (const joinedEvent of joinedEvents) {
         const periodStart = new Date(joinedEvent.date);
-        
+
         // Find the corresponding left event (if any)
         const leftIndex = leftEvents.findIndex(d => new Date(d.date) > periodStart);
         const leftEvent = leftIndex !== -1 ? leftEvents[leftIndex] : null;
-        
+
         const periodEnd = leftEvent ? new Date(leftEvent.date) : new Date(); // Use current date if still active
 
         // Check if this period overlaps with the query date range
@@ -309,11 +309,11 @@ function getModesFromHistory(history, startDate, endDate) {
     // Check each tenure period for overlap and collect modes
     for (const joinedEvent of joinedEvents) {
         const periodStart = new Date(joinedEvent.date);
-        
+
         // Find the corresponding left event (if any)
         const leftIndex = leftEvents.findIndex(d => new Date(d.date) > periodStart);
         const leftEvent = leftIndex !== -1 ? leftEvents[leftIndex] : null;
-        
+
         const periodEnd = leftEvent ? new Date(leftEvent.date) : new Date(); // Use current date if still active
 
         // Check if this period overlaps with the query date range

@@ -7,8 +7,7 @@
                 <a
                     href="https://osu.ppy.sh/help/wiki/People/Beatmap_Nominators"
                     target="_blank"
-                    >Beatmap Nominators</a
-                >
+                >Beatmap Nominators</a>
                 (BN) are a group of users in charge of promoting Ranked
                 beatmaps.
             </div>
@@ -27,9 +26,10 @@
             <div>
                 After your application is evaluated, you will receive an osu!
                 message from the
-                <a href="https://osu.ppy.sh/users/6616586" target="_blank"
-                    >NAT bot</a
-                >
+                <a
+                    href="https://osu.ppy.sh/users/6616586"
+                    target="_blank"
+                >NAT bot</a>
                 with the results. If your application is denied, you cannot
                 apply to the same game mode again for 60 days.
             </div>
@@ -46,35 +46,48 @@
         <template v-if="cooldowns.length || activeApps.length">
             <div class="card card-body">
                 <h4>Application status</h4>
-                <p class="text-secondary small">Applications tend to take around 15 days from submission to be concluded.</p>
+                <p class="text-secondary small">
+                    Applications tend to take around 15 days from submission to be concluded.
+                </p>
                 <!-- active applications -->
                 <div v-if="activeApps.length">
                     <div v-for="application in activeApps" :key="application.id">
                         <ul>
-                            <li><b>{{ formatMode(application.mode) }}:</b> Application is in progress...
-                            <span class="text-secondary small">(applied {{ toRelativeDate(application.createdAt) }})</span>
+                            <li>
+                                <b>{{ formatMode(application.mode) }}:</b> Application is in progress...
+                                <span class="text-secondary small">(applied {{ toRelativeDate(application.createdAt) }})</span>
                             </li>
                             <progress-bar :evaluation="application" />
-                            <p class="text-secondary small">In total, there are currently <b>{{ totalByMode(application.mode) }}</b> <b v-if="totalByModeOverdue(application.mode)" class="text-warning">({{ totalByModeOverdue(application.mode) }} overdue)</b> {{ application.mode == 'osu' ? 'osu!' : 'osu!' + application.mode }} application(s) being processed.</p>
+                            <p class="text-secondary small">
+                                In total, there are currently <b>{{ totalByMode(application.mode) }}</b> <b v-if="totalByModeOverdue(application.mode)" class="text-warning">({{ totalByModeOverdue(application.mode) }} overdue)</b> {{ application.mode == 'osu' ? 'osu!' : 'osu!' + application.mode }} application(s) being processed.
+                            </p>
                         </ul>
                     </div>
                 </div>
                 <!-- cooldowns -->
                 <ul v-if="cooldowns.length">
                     <li v-for="evaluation in cooldowns" :key="evaluation.id">
-                        <div v-if="evaluation.isApplication"><b>{{ formatMode(evaluation.mode) }}:</b> Because <a :href="'/message?eval=' + evaluation.id" target="_blank">your application was denied</a>, you cannot re-apply until <i>{{ new Date(evaluation.cooldownDate) }}</i></div>
-                        <div v-else-if="evaluation.isBnEvaluation"><b>{{ formatMode(evaluation.mode) }}:</b> Because <a :href="'/message?eval=' + evaluation.id" target="_blank">you were removed from the BN</a>, you cannot re-apply until <i>{{ new Date(evaluation.cooldownDate) }}</i></div>
-                        <div v-else-if="evaluation.isResignation"><b>{{ formatMode(evaluation.mode) }}:</b> Because of <a :href="'/message?eval=' + evaluation.id" target="_blank">the circumstances of your resignation</a>, you cannot re-apply until <i>{{ new Date(evaluation.cooldownDate) }}</i></div>
+                        <div v-if="evaluation.isApplication">
+                            <b>{{ formatMode(evaluation.mode) }}:</b> Because <a :href="'/message?eval=' + evaluation.id" target="_blank">your application was denied</a>, you cannot re-apply until <i>{{ new Date(evaluation.cooldownDate) }}</i>
+                        </div>
+                        <div v-else-if="evaluation.isBnEvaluation">
+                            <b>{{ formatMode(evaluation.mode) }}:</b> Because <a :href="'/message?eval=' + evaluation.id" target="_blank">you were removed from the BN</a>, you cannot re-apply until <i>{{ new Date(evaluation.cooldownDate) }}</i>
+                        </div>
+                        <div v-else-if="evaluation.isResignation">
+                            <b>{{ formatMode(evaluation.mode) }}:</b> Because of <a :href="'/message?eval=' + evaluation.id" target="_blank">the circumstances of your resignation</a>, you cannot re-apply until <i>{{ new Date(evaluation.cooldownDate) }}</i>
+                        </div>
                     </li>
                 </ul>
                 <!-- current BN modes -->
                 <div v-if="loggedInUser.modes && loggedInUser.modes.length">
                     <ul v-for="mode in loggedInUser.modes" :key="mode">
-                        <li v-if="mode != 'none'"><b>{{ formatMode(mode) }}:</b> You're already a BN for this mode!</li>
+                        <li v-if="mode != 'none'">
+                            <b>{{ formatMode(mode) }}:</b> You're already a BN for this mode!
+                        </li>
                     </ul>
                 </div>
             </div>
-            <hr />
+            <hr>
         </template>
 
         <!-- instant rejoin -->
@@ -82,7 +95,7 @@
             <div class="card card-body">
                 <h4>Bypass application</h4>
                 <p class="mt-2">
-                    This option is available until {{ this.$moment(relevantResignation.archivedAt).add(1, 'years').format('YYYY-MM-DD') }} because you recently resigned from the {{ formatMode(relevantResignation.mode) }} Beatmap Nominators.
+                    This option is available until {{ $moment(relevantResignation.archivedAt).add(1, 'years').format('YYYY-MM-DD') }} because you recently resigned from the {{ formatMode(relevantResignation.mode) }} Beatmap Nominators.
                 </p>
                 <p class="mt-2">
                     The NAT will review for any potential concerns and re-admit you to the Beatmap Nominators if everything is okay!
@@ -96,11 +109,10 @@
                     Request to re-join the Beatmap Nominators ({{ formatMode(relevantResignation.mode) }})
                 </button>
                 <p v-if="successInfo" class="mt-2">
-                    {{ successInfo }}    
+                    {{ successInfo }}
                 </p>
-                
             </div>
-            <hr />
+            <hr>
         </template>
 
         <!-- application -->
@@ -124,7 +136,7 @@
                 </div>
             </div>
 
-            <hr />
+            <hr>
 
             <!-- beatmaps -->
             <div v-if="step < 4">
@@ -133,8 +145,12 @@
                         <h4>Beatmap {{ i }}</h4>
                         <div v-if="i == 1">
                             Submit your mod on a map that is <b>ready to be nominated.</b> (...or ready to be nominated after your mod is applied)
-                            <div class="small text-secondary"><small>This intends to show your ability to conduct the final steps of the modding process and independently evaluate a map's readiness for Ranked.</small></div>
-                            <div class="mt-2">This map should...</div>
+                            <div class="small text-secondary">
+                                <small>This intends to show your ability to conduct the final steps of the modding process and independently evaluate a map's readiness for Ranked.</small>
+                            </div>
+                            <div class="mt-2">
+                                This map should...
+                            </div>
                             <ul>
                                 <li>have had 0 nominations when your mod was posted</li>
                                 <li>be modded by you in the last 6 months</li>
@@ -142,8 +158,12 @@
                         </div>
                         <div v-else-if="i == 2">
                             Submit your mod on a map that is <b>NOT ready to be nominated without significant improvements.</b>
-                            <div class="small text-secondary"><small>This intends to show your issue identification skills, communication skills, and understanding of standards for Ranked maps.</small></div>
-                            <div class="mt-2">This map should...</div>
+                            <div class="small text-secondary">
+                                <small>This intends to show your issue identification skills, communication skills, and understanding of standards for Ranked maps.</small>
+                            </div>
+                            <div class="mt-2">
+                                This map should...
+                            </div>
                             <ul>
                                 <li>include a spread with at least Normal, Hard, and Insane difficulties</li>
                                 <li>be hosted by a different user from the previous map</li>
@@ -152,15 +172,19 @@
                         </div>
                         <div v-else-if="i == 3">
                             Submit your mod on a map that, in your opinion, <b>proves you're able to judge map quality and readiness for Ranked.</b> You're free to choose a map that you would or would <i>not</i> nominate.
-                            <div class="small text-secondary"><small>This gives you an opportunity to fill any missing gaps in your application, keeping in mind the intentions stated in the descriptions of the previous submissions.</small></div>
-                            <div class="mt-2">This map should...</div>
+                            <div class="small text-secondary">
+                                <small>This gives you an opportunity to fill any missing gaps in your application, keeping in mind the intentions stated in the descriptions of the previous submissions.</small>
+                            </div>
+                            <div class="mt-2">
+                                This map should...
+                            </div>
                             <ul>
                                 <li>have had 0 nominations when your mod was posted</li>
                                 <li>be hosted by different users from the previous maps</li>
                                 <li>be modded by you in the last 6 months</li>
                             </ul>
                         </div>
-                        
+
                         <input
                             v-model="mods[i - 1]"
                             type="text"
@@ -168,19 +192,24 @@
                             placeholder="beatmap link"
                             maxlength="1000"
                             :disabled="!loggedInUser"
-                        />
+                        >
 
-                        <hr />
+                        <hr>
 
                         <div class="ml-2">
-                            <div v-if="i == 1">Briefly describe why the map is ready (or nearly ready) to be nominated:</div>
-                            <div v-if="i == 2">Briefly explain why the map is NOT ready to be nominated (use your modding to back up your reasons!):</div>
+                            <div v-if="i == 1">
+                                Briefly describe why the map is ready (or nearly ready) to be nominated:
+                            </div>
+                            <div v-if="i == 2">
+                                Briefly explain why the map is NOT ready to be nominated (use your modding to back up your reasons!):
+                            </div>
                             <div v-if="i == 3">
                                 Respond to either of these:
                                 <ul>
-                                <li>Briefly describe why the map is ready (or nearly ready) to be nominated</li>
-                                <li>Briefly explain why the map is NOT ready to be nominated</li>
-                            </ul></div>
+                                    <li>Briefly describe why the map is ready (or nearly ready) to be nominated</li>
+                                    <li>Briefly explain why the map is NOT ready to be nominated</li>
+                                </ul>
+                            </div>
                         </div>
 
                         <textarea
@@ -195,7 +224,7 @@
 
                         <b v-if="step == i && reasons[i - 1] && reasons[i - 1].length > 800" class="text-danger float-right">{{ reasons[i - 1].length }}/1000</b>
 
-                        <hr />
+                        <hr>
 
                         <div class="ml-2">
                             Please provide a copy of the map before your mod was applied. If you don't have it, write "none":
@@ -208,7 +237,7 @@
                             placeholder=".osz link"
                             maxlength="1000"
                             :disabled="!loggedInUser"
-                        />
+                        >
                     </div>
                 </div>
             </div>
@@ -220,33 +249,50 @@
                     <div v-if="mods[i - 1] || reasons[i - 1] || oszs[i - 1]">
                         <div>
                             Beatmap {{ i }}:
-                            <a v-if="mods[i - 1]" :href="mods[i - 1]" target="_blank" class="small">{{ mods[i - 1] }}</a>
+                            <a
+                                v-if="mods[i - 1]"
+                                :href="mods[i - 1]"
+                                target="_blank"
+                                class="small"
+                            >{{ mods[i - 1] }}</a>
                         </div>
                         <div>
                             .osz link:
-                            <a v-if="oszs[i - 1]" :href="oszs[i - 1]" target="_blank" class="small">{{ oszs[i - 1] }}</a>
+                            <a
+                                v-if="oszs[i - 1]"
+                                :href="oszs[i - 1]"
+                                target="_blank"
+                                class="small"
+                            >{{ oszs[i - 1] }}</a>
                         </div>
                         <div>
                             Response:
                             <div v-if="reasons[i - 1]" class="pre-line small" v-html="$md.render(reasons[i - 1].trim())" />
                         </div>
                     </div>
-                    
                 </div>
-                <div class="text-danger mt-4" v-if="!selectedMode || mods.length !== 3 || reasons.length !== 3 || oszs.length !== 3">
+                <div v-if="!selectedMode || mods.length !== 3 || reasons.length !== 3 || oszs.length !== 3" class="text-danger mt-4">
                     Missing application details:
                     <ul>
-                        <li v-if="selectedMode.length === 0">Game mode</li>
-                        <li v-if="missingInput(mods)">Beatmap links</li>
-                        <li v-if="missingInput(reasons)">Responses</li>
-                        <li v-if="missingInput(oszs)">.osz links</li>
+                        <li v-if="selectedMode.length === 0">
+                            Game mode
+                        </li>
+                        <li v-if="missingInput(mods)">
+                            Beatmap links
+                        </li>
+                        <li v-if="missingInput(reasons)">
+                            Responses
+                        </li>
+                        <li v-if="missingInput(oszs)">
+                            .osz links
+                        </li>
                     </ul>
                 </div>
 
                 <!-- comment -->
                 <div class="mb-2">
                     If you have anything to say to the people evaluating your application, write it here! (optional):
-                        <input
+                    <input
                         v-model="comment"
                         class="form-control"
                         type="text"
@@ -258,8 +304,8 @@
                 <!-- public visibility -->
                 <div class="form-check mb-2">
                     <input
-                        v-model="isPublic"
                         id="public-application"
+                        v-model="isPublic"
                         type="checkbox"
                         class="form-check-input"
                     >
@@ -270,13 +316,13 @@
                         Allow anyone to see your application
                     </label>
                 </div>
-                
-        
+
+
                 <button
                     class="btn btn-block btn-success"
                     type="button"
-                    @click="apply($event)"
                     :disabled="!selectedMode || mods.length !== 3 || reasons.length !== 3 || oszs.length !== 3"
+                    @click="apply($event)"
                 >
                     Apply for BN
                     <mode-display
@@ -288,7 +334,7 @@
                 </div>
             </div>
 
-            <hr />
+            <hr>
 
             <!-- bottom buttons -->
             <div class="row">
@@ -298,7 +344,7 @@
                         type="button"
                         @click="step--"
                     >
-                        <i class="ml-1 fas fa-arrow-left" />    
+                        <i class="fas fa-arrow-left" />
                         Back
                     </button>
                 </div>
@@ -306,11 +352,11 @@
                     <button
                         class="btn btn-block btn-secondary mt-2"
                         type="button"
-                        @click="step++"
                         :disabled="!loggedInUser"
+                        @click="step++"
                     >
                         Next
-                        <i class="ml-1 fas fa-arrow-right" />
+                        <i class="fas fa-arrow-right" />
                     </button>
                 </div>
             </div>
@@ -324,7 +370,7 @@
 import ToastMessages from '../components/ToastMessages.vue';
 import ModeSelect from '../components/ModeSelect.vue';
 import ModeDisplay from '../components/ModeDisplay.vue';
-import ProgressBar from '../components/evaluations/info/common/ProgressBar.vue'
+import ProgressBar from '../components/evaluations/info/common/ProgressBar.vue';
 import { mapState } from 'vuex';
 import evaluations from '../mixins/evaluations';
 
@@ -380,7 +426,7 @@ export default {
     watch: {
         selectedMode() {
             this.successInfo = '';
-            
+
             let modes = [];
 
             if (this.loggedInUser.modes && this.loggedInUser.modes.length) {
@@ -423,6 +469,7 @@ export default {
 
             if (result) {
                 const result2 = confirm(`Are you sure you want to apply to join the ${this.formatMode(this.selectedMode)} Beatmap Nominators?`);
+
                 if (result2) {
                     this.successInfo = `Submitting... (this will take a few seconds)`;
 

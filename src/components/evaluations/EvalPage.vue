@@ -243,7 +243,7 @@ export default {
                 let text = `Are you sure? The consensus of any BN evaluation will affect its respective user.\n\n`;
 
                 if (this.loggedInUser.isNatLeader) {
-                    text += `If you're archiving a NAT eval however, it will default their usergroup to NAT.`
+                    text += `If you're archiving a NAT eval however, it will default their usergroup to NAT.`;
                 } else {
                     text += `Only do this after feedback PMs have been sent.`;
                 }

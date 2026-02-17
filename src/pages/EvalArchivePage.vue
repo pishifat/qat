@@ -20,7 +20,7 @@
                             Search
                         </button>
                     </div>
-                    <hr />
+                    <hr>
                 </div>
 
                 <div v-if="loggedInUser.isNat">
@@ -61,9 +61,9 @@
                             Show recent
                         </button>
                     </div>
-                    <hr />
+                    <hr>
                 </div>
-                
+
                 <div>
                     <h4>
                         Search for evaluations participated in
@@ -78,7 +78,7 @@
                             class="form-control"
                             data-toggle="tooltip"
                             data-placement="top"
-                            title="leave field empty to load all evaluated users" 
+                            title="leave field empty to load all evaluated users"
                             @keyup.enter="queryParticipatedEvals($event)"
                         >
                         <input
@@ -94,12 +94,12 @@
                             title="leave field empty to set yourself as evaluator"
                             @keyup.enter="queryParticipatedEvals($event)"
                         >
-                        <button 
-                            class="btn btn-sm btn-primary ml-2" 
-                            type="submit" 
-                            
+                        <button
+                            class="btn btn-sm btn-primary ml-2"
+                            type="submit"
+
                             @click="queryParticipatedEvals($event)"
-                            >
+                        >
                             Search
                         </button>
                     </div>

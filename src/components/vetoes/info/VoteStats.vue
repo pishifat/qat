@@ -4,28 +4,53 @@
         <div>
             <ul>
                 <li>
-                    <label class="mb-0" data-toggle="tooltip" data-placement="right" title="% of submitted votes">
+                    <label
+                        class="mb-0"
+                        data-toggle="tooltip"
+                        data-placement="right"
+                        title="% of submitted votes"
+                    >
                         <b>Agree:</b> {{ upholdMediations.length }} ({{ Math.round(upholdMediations.length / validMediations.length * 100) || '0' }}%)
                     </label>
-                    <small v-if="selectedVeto.vetoFormat >= 6" class="ml-1 text-secondary">Uphold threshold: 60%</small>
+                    <small v-if="selectedVeto.vetoFormat >= 6" class="text-secondary">Uphold threshold: 60%</small>
                 </li>
-                <li v-if="neutralMediations.length" >
-                    <label class="mb-0" data-toggle="tooltip" data-placement="right" title="% of submitted votes">
+                <li v-if="neutralMediations.length">
+                    <label
+                        class="mb-0"
+                        data-toggle="tooltip"
+                        data-placement="right"
+                        title="% of submitted votes"
+                    >
                         <b>{{ selectedVeto.vetoFormat >= 7 ? 'Neutral' : 'Partially Agree' }}:</b> {{ neutralMediations.length }} ({{ Math.round(neutralMediations.length / validMediations.length * 100) || '0' }}%)
                     </label>
                 </li>
                 <li>
-                    <label class="mb-0" data-toggle="tooltip" data-placement="right" title="% of submitted votes">
+                    <label
+                        class="mb-0"
+                        data-toggle="tooltip"
+                        data-placement="right"
+                        title="% of submitted votes"
+                    >
                         <b>Disagree:</b> {{ withdrawMediations.length }} ({{ Math.round(withdrawMediations.length / validMediations.length * 100) || '0' }}%)
                     </label>
                 </li>
                 <li v-if="!isPublic">
-                    <label class="mb-0" data-toggle="tooltip" data-placement="right" title="% of assigned mediators">
+                    <label
+                        class="mb-0"
+                        data-toggle="tooltip"
+                        data-placement="right"
+                        title="% of assigned mediators"
+                    >
                         <b>Submitted votes:</b> {{ validMediations.length }} ({{ Math.round(validMediations.length / mediations.length * 100) || '0' }}%)
                     </label>
                 </li>
                 <li v-if="!isPublic">
-                    <label class="mb-0" data-toggle="tooltip" data-placement="right" title="users involved">
+                    <label
+                        class="mb-0"
+                        data-toggle="tooltip"
+                        data-placement="right"
+                        title="users involved"
+                    >
                         <b>Assigned mediators:</b> {{ mediations.length }}
                     </label>
                 </li>
@@ -55,7 +80,7 @@ export default {
         isPublic: {
             type: Boolean,
             default: false,
-        }
+        },
     },
     computed: {
         ...mapGetters('vetoes', [
@@ -75,12 +100,12 @@ export default {
         },
         validMediations () {
             return this.mediations.filter(mediation => mediation.vote);
-        }
+        },
     },
     methods: {
         filterMediationsByIndex(mediations, index) {
             return mediations.filter(mediation => mediation.reasonIndex == index);
         },
-    }
+    },
 };
 </script>

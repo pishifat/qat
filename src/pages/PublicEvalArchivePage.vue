@@ -8,45 +8,57 @@
                 :groups="null"
                 store-module="evaluations"
             >
-            <select
-                class="form-control"
-                v-model="consensusFilter"
-                @change="applyConsensusFilter($event.target.value)"
-            >
-                <option value="">Any consensus</option>
-                <option value="pass">Pass</option>
-                <option value="fail">Fail</option>
-                <option value="fullBn">Full BN</option>
-                <option value="probationBn">Probation BN</option>
-                <option value="removeFromBn">Remove From BN</option>
-            </select>
-            <div v-if="!reachedMax" class="row">
-                <div class="col-sm-6">
-                    <button
-                        type="button"
-                        class="mt-2 form-control btn btn-primary btn-sm"
-                        @click="showMore($event)"
-                    >
-                        Show more
-                    </button>
+                <select
+                    v-model="consensusFilter"
+                    class="form-control"
+                    @change="applyConsensusFilter($event.target.value)"
+                >
+                    <option value="">
+                        Any consensus
+                    </option>
+                    <option value="pass">
+                        Pass
+                    </option>
+                    <option value="fail">
+                        Fail
+                    </option>
+                    <option value="fullBn">
+                        Full BN
+                    </option>
+                    <option value="probationBn">
+                        Probation BN
+                    </option>
+                    <option value="removeFromBn">
+                        Remove From BN
+                    </option>
+                </select>
+                <div v-if="!reachedMax" class="row">
+                    <div class="col-sm-6">
+                        <button
+                            type="button"
+                            class="mt-2 form-control btn btn-primary btn-sm"
+                            @click="showMore($event)"
+                        >
+                            Show more
+                        </button>
+                    </div>
+                    <div class="col-sm-6">
+                        <button
+                            type="button"
+                            class="mt-2 form-control btn btn-secondary btn-sm"
+                            @click="showAll($event)"
+                        >
+                            Show all
+                        </button>
+                    </div>
                 </div>
-                <div class="col-sm-6">
-                    <button
-                        type="button"
-                        class="mt-2 form-control btn btn-secondary btn-sm"
-                        @click="showAll($event)"
-                    >
-                        Show all
-                    </button>
-                </div>
-            </div>
             </filter-box>
 
             <section class="card card-body">
                 <h2>
                     Application Evaluations
                     <small v-if="archivedApplications">
-                        ({{ filterEvals(archivedApplications, consensusFilter).length + (reachedMax ? '' : '+')}})
+                        ({{ filterEvals(archivedApplications, consensusFilter).length + (reachedMax ? '' : '+') }})
                     </small>
                 </h2>
                 <span v-if="!filterEvals(archivedApplications, consensusFilter).length" class="ml-4">
@@ -55,15 +67,15 @@
                 <transition-group name="list" tag="div" class="row">
                     <template v-if="filterEvals(paginatedArchivedApplications, consensusFilter)">
                         <evaluation-card
-                            key="applications-card"
                             v-for="application in filterEvals(paginatedArchivedApplications, consensusFilter)"
+                            key="applications-card"
                             :key="application._id"
                             :evaluation="application"
                             store-module="evaluations"
                             target="#extendedInfo"
                         />
                     </template>
-                    <span v-else class="small" key="applications-none">
+                    <span v-else key="applications-none" class="small">
                         None...
                     </span>
                 </transition-group>
@@ -74,7 +86,7 @@
                 <h2>
                     BN Evaluations
                     <small v-if="archivedCurrentBnEvals">
-                        ({{ filterEvals(archivedCurrentBnEvals, consensusFilter).length + (reachedMax ? '' : '+')}})
+                        ({{ filterEvals(archivedCurrentBnEvals, consensusFilter).length + (reachedMax ? '' : '+') }})
                     </small>
                 </h2>
                 <span v-if="!filterEvals(archivedCurrentBnEvals, consensusFilter).length" class="ml-4">
@@ -83,15 +95,15 @@
                 <transition-group name="list" tag="div" class="row">
                     <template v-if="filterEvals(paginatedArchivedCurrentBnEvals, consensusFilter).length">
                         <evaluation-card
-                            key="bn-evals-card"
                             v-for="evaluation in filterEvals(paginatedArchivedCurrentBnEvals, consensusFilter)"
+                            key="bn-evals-card"
                             :key="evaluation._id"
                             :evaluation="evaluation"
                             store-module="evaluations"
                             target="#extendedInfo"
                         />
                     </template>
-                    <span v-else class="small" key="bn-evals-none">
+                    <span v-else key="bn-evals-none" class="small">
                         None...
                     </span>
                 </transition-group>
@@ -162,7 +174,7 @@ export default {
         const id = this.$route.query.id;
 
         if (!id) await this.showMore(null, true);
-        
+
         else {
             const res = await this.$http.initialRequest(
                 `/publicArchive/search/${id}`
@@ -171,6 +183,7 @@ export default {
             if (this.$http.isValid(res)) {
                 this.$store.commit('evaluations/setEvaluations', [res.eval]);
                 this.$store.commit('evaluations/setSelectedEvaluationId', res.eval.id);
+
                 if (this.selectedEvaluation) {
                     $('#extendedInfo').modal('show');
                 } else {
@@ -178,7 +191,7 @@ export default {
                         message: `Couldn't find the evaluation!`,
                         type: 'danger',
                     });
-            }
+                }
             } else {
                 this.$store.dispatch('updateToastMessages', {
                     message: 'Application not found',
@@ -216,6 +229,7 @@ export default {
         },
         async showAll(e) {
             const result = confirm(`Are you sure? This will take a while.`);
+
             if (result) {
                 this.limit = 10000;
                 this.reachedMax = true;
@@ -224,12 +238,13 @@ export default {
         },
         filterEvals(evals, consensus) {
             if (!consensus.length) return evals;
+
             return evals.filter(e => e.consensus === consensus);
         },
         applyConsensusFilter(consensus) {
             this.consensusFilter = consensus;
             this.$store.commit('evaluations/pageFilters/setFilterConsensus', consensus);
-        }
+        },
     },
 };
 </script>

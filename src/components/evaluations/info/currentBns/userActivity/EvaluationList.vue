@@ -1,9 +1,10 @@
 <template>
     <div>
         <div class="ml-2">
-            <a :href="events && `#${eventsId}`" data-toggle="collapse"
-                >{{ header }} <i class="fas fa-angle-down"
-            /></a>
+            <a
+                :href="events && `#${eventsId}`"
+                data-toggle="collapse"
+            >{{ header }} <i class="fas fa-angle-down" /></a>
             ({{ isLoading ? '...' : events.length ? isMock ? events.length : getCompletedEvaluations(events).length + '/' + events.length : '0' }})
         </div>
 
@@ -37,7 +38,7 @@
                             <i
                                 v-else
                                 class="fas fa-clipboard-check text-success"
-                                data-toggle="tooltip" 
+                                data-toggle="tooltip"
                                 title="assigned"
                             />
                         </td>
@@ -51,9 +52,9 @@
                             <a
                                 :href="
                                     '/' +
-                                    (isApplication ? 'appeval' : 'bneval') +
-                                    '?id=' +
-                                    event.id
+                                        (isApplication ? 'appeval' : 'bneval') +
+                                        '?id=' +
+                                        event.id
                                 "
                                 target="_blank"
                             >
@@ -72,7 +73,9 @@
                         </td>
                     </tr>
                 </data-table>
-                <p v-else class="small ml-4">None...</p>
+                <p v-else class="small ml-4">
+                    None...
+                </p>
             </div>
         </div>
     </div>
@@ -85,10 +88,10 @@ import evaluations from '../../../../../mixins/evaluations.js';
 
 export default {
     name: 'EvaluationList',
-    mixins: [ evaluations ],
     components: {
         DataTable,
     },
+    mixins: [ evaluations ],
     props: {
         events: {
             type: Array,
@@ -112,7 +115,7 @@ export default {
         isMock: Boolean,
     },
     computed: {
-        ...mapState('activity', ['isLoading']), 
+        ...mapState('activity', ['isLoading']),
         ...mapState(['loggedInUser']),
 
         totalEvaluations() {
@@ -142,7 +145,7 @@ export default {
                     }
                 }
             }
-            
+
             return count;
         },
         totalAddedToManualRerolls() {
@@ -157,7 +160,7 @@ export default {
                     }
                 }
             }
-            
+
             return count;
         },
         totalAddedToAutomaticRerolls() {
@@ -172,7 +175,7 @@ export default {
                     }
                 }
             }
-            
+
             return count;
         },
     },

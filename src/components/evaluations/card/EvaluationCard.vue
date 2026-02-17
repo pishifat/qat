@@ -130,7 +130,7 @@ export default {
             this.$store.commit('evaluations/setSelectedEvaluationId', this.evaluation.id);
 
             if (
-                this.$route.query.id !== this.evaluation.id && 
+                this.$route.query.id !== this.evaluation.id &&
                 ((this.loggedInUser && this.loggedInUser.isNatOrTrialNat) || this.evaluation.isPublic)
             ) {
                 let url = this.$route.path;

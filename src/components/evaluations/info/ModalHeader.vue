@@ -3,7 +3,6 @@
         <h5 class="modal-title">
             {{ isApplication ? 'Application Evaluation:' : isBnEvaluation ? 'BN Evaluation:' : 'Resignation Evaluation:' }}
             <user-link
-                class="mr-1"
                 :osu-id="osuId"
                 :username="username"
                 @click.stop

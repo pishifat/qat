@@ -19,6 +19,7 @@ bnEvaluationSchema.virtual('isBnEvaluation').get(function () {
 */
 bnEvaluationSchema.virtual('isNewEvaluationFormat').get(function () {
     const newEvaluationFormatCutoff = new Date('2024-03-25');
+
     return new Date(this.archivedAt || this.createdAt) > newEvaluationFormatCutoff;
 });
 

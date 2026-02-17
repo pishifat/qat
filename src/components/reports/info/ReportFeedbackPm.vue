@@ -31,7 +31,7 @@ export default {
             message += `\n\n`;
             message += `view your full report and feedback here: https://bn.mappersguild.com/message?report=${this.selectedReport.id}`;
             message += `\n\n`;
-            message += `thank you!`
+            message += `thank you!`;
             message += `\n\n`;
             message += `—NAT`;
 

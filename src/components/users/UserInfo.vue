@@ -67,15 +67,14 @@
                         />
                     </div>
 
-                    <nat-subgroup-toggle 
-                        v-if="loggedInUser && loggedInUser.isNatLeader && selectedUser.isNat" 
+                    <nat-subgroup-toggle
+                        v-if="loggedInUser && loggedInUser.isNatLeader && selectedUser.isNat"
                     />
 
                     <modding-activity
                         :username="selectedUser.username"
                         class="mt-2"
                     />
-
                 </div>
             </div>
 
@@ -91,13 +90,13 @@
                 <badges
                     v-if="loggedInUser.isNatLeader"
                     class="mt-2"
-                    :user="selectedUser" 
+                    :user="selectedUser"
                 />
-                <hr> 
+                <hr>
                 <notes />
             </div>
 
-            <debug-view-document 
+            <debug-view-document
                 v-if="loggedInUser && loggedInUser.isAdmin"
                 :document="selectedUser"
             />
@@ -162,7 +161,7 @@ export default {
         },
         getModesFromHistory() {
             return [...new Set(this.selectedUser.history.map(history => history.mode))];
-        }
+        },
     },
 };
 </script>

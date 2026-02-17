@@ -1,6 +1,6 @@
 <template>
     <div>
-        <hr />
+        <hr>
         <b>NAT moderation</b>
         <div class="row mt-2">
             <!-- move to "available" status -->
@@ -24,7 +24,6 @@
             </div>
         </div>
     </div>
-    
 </template>
 
 <script>
@@ -56,6 +55,6 @@ export default {
                 }
             }
         },
-    }
+    },
 };
 </script>

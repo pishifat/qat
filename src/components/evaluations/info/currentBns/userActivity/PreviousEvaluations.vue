@@ -1,9 +1,10 @@
 <template>
     <div>
         <div class="ml-2">
-            <a :href="previousEvaluations && `#${eventId}`" data-toggle="collapse"
-                >{{ header }} <i class="fas fa-angle-down"
-            /></a>
+            <a
+                :href="previousEvaluations && `#${eventId}`"
+                data-toggle="collapse"
+            >{{ header }} <i class="fas fa-angle-down" /></a>
             ({{ isLoading ? '...' : previousEvaluations ? previousEvaluations.length : '0' }})
         </div>
 
@@ -25,7 +26,7 @@
                         :evaluation="evaluation"
                     />
                 </li>
-            </ul>   
+            </ul>
         </div>
     </div>
 </template>

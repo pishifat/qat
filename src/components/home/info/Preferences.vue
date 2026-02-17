@@ -9,7 +9,7 @@
                     <div v-for="genre in genreOptions" :key="genre">
                         <i
                             class="fa-check-circle fake-checkbox"
-                            :class ="[processing ? 'fake-disabled' : '', genrePreferences.includes(genre) ? 'text-success fas' : 'far']"
+                            :class="[processing ? 'fake-disabled' : '', genrePreferences.includes(genre) ? 'text-success fas' : 'far']"
                             @click="updateGenrePreferences(genre, true, $event)"
                         />
                         <i
@@ -18,12 +18,12 @@
                             @click="updateGenrePreferences(genre, false, $event)"
                         />
                         <label
-                            class="form-check-label text-secondary ml-1"
+                            class="form-check-label text-secondary"
                         >
                             {{ genre }}
                         </label>
                     </div>
-                    
+
                     <!-- Custom genre preferences -->
                     <div>
                         <div v-for="genre in customGenrePreferences" :key="genre">
@@ -39,30 +39,30 @@
                                 :class="[loggedInUser && loggedInUser._id === selectedUser.id ? 'fake-checkbox' : '', processing ? 'fake-disabled' : '']"
                                 @click="loggedInUser && loggedInUser._id === selectedUser.id ? removeCustomGenre(genre, $event) : null"
                             />
-                            <label class="form-check-label text-secondary ml-1">
+                            <label class="form-check-label text-secondary">
                                 {{ genre.startsWith('NOT ') ? genre.substring(4) : genre }}
                             </label>
                             <i
                                 v-if="loggedInUser && (loggedInUser._id === selectedUser.id || loggedInUser.groups.includes('nat') || loggedInUser.groups.includes('gmt'))"
                                 class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
                                 :class="[processing ? 'fake-disabled' : '']"
-                                @click="removeCustomGenre(genre, $event)"
                                 title="Remove custom genre"
+                                @click="removeCustomGenre(genre, $event)"
                             />
                         </div>
                         <div class="d-flex mt-2">
-                            <input 
+                            <input
                                 v-model="customGenreInput"
-                                type="text" 
-                                class="form-control form-control-sm" 
+                                type="text"
+                                class="form-control form-control-sm"
                                 placeholder="Add custom genre..."
                                 @keyup.enter="addCustomGenre"
-                            />
-                            <button 
-                                class="btn btn-outline-success btn-sm ml-2" 
-                                type="button" 
-                                @click="addCustomGenre"
+                            >
+                            <button
+                                class="btn btn-outline-success btn-sm ml-2"
+                                type="button"
                                 :disabled="!customGenreInput.trim() || processing"
+                                @click="addCustomGenre"
                             >
                                 Add
                             </button>
@@ -74,7 +74,7 @@
                         <i
                             v-if="genrePreferences.includes(genre)"
                             class="fa-check-circle"
-                            :class ="genrePreferences.includes(genre) ? 'text-success fas' : 'far'"
+                            :class="genrePreferences.includes(genre) ? 'text-success fas' : 'far'"
                         />
                         <i
                             v-else-if="genreNegativePreferences.includes(genre)"
@@ -83,7 +83,7 @@
                         />
                         <label
                             v-if="genrePreferences.includes(genre) || genreNegativePreferences.includes(genre)"
-                            class="form-check-label text-secondary ml-1"
+                            class="form-check-label text-secondary"
                         >
                             {{ genre }}
                         </label>
@@ -98,22 +98,22 @@
                             v-else
                             class="fa-check-circle text-success fas"
                         />
-                        <label class="form-check-label text-secondary ml-1">
+                        <label class="form-check-label text-secondary">
                             {{ genre.startsWith('NOT ') ? genre.substring(4) : genre }}
                         </label>
                         <i
                             v-if="loggedInUser && (loggedInUser.groups.includes('nat') || loggedInUser.groups.includes('gmt'))"
                             class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
                             :class="[processing ? 'fake-disabled' : '']"
-                            @click="removeCustomGenre(genre, $event)"
                             title="Remove custom genre"
+                            @click="removeCustomGenre(genre, $event)"
                         />
                     </div>
                     <small
                         v-if="!genrePreferences.length && !genreNegativePreferences.length && !customGenrePreferences.length"
-                        class="text-secondary ml-1"
+                        class="text-secondary"
                     >
-                    None...
+                        None...
                     </small>
                 </div>
             </div>
@@ -133,12 +133,12 @@
                             @click="updateLanguagePreferences(language, false, $event)"
                         />
                         <label
-                            class="form-check-label text-secondary ml-1"
+                            class="form-check-label text-secondary"
                         >
                             {{ language }}
                         </label>
                     </div>
-                    
+
                     <!-- Custom language preferences -->
                     <div>
                         <div v-for="language in customLanguagePreferences" :key="language">
@@ -154,30 +154,30 @@
                                 :class="[loggedInUser && loggedInUser._id === selectedUser.id ? 'fake-checkbox' : '', processing ? 'fake-disabled' : '']"
                                 @click="loggedInUser && loggedInUser._id === selectedUser.id ? removeCustomLanguage(language, $event) : null"
                             />
-                            <label class="form-check-label text-secondary ml-1">
+                            <label class="form-check-label text-secondary">
                                 {{ language.startsWith('NOT ') ? language.substring(4) : language }}
                             </label>
                             <i
                                 v-if="loggedInUser && (loggedInUser._id === selectedUser.id || loggedInUser.groups.includes('nat') || loggedInUser.groups.includes('gmt'))"
                                 class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
                                 :class="[processing ? 'fake-disabled' : '']"
-                                @click="removeCustomLanguage(language, $event)"
                                 title="Remove custom language"
+                                @click="removeCustomLanguage(language, $event)"
                             />
                         </div>
                         <div class="d-flex mt-2">
-                            <input 
+                            <input
                                 v-model="customLanguageInput"
-                                type="text" 
-                                class="form-control form-control-sm" 
+                                type="text"
+                                class="form-control form-control-sm"
                                 placeholder="Add custom language..."
                                 @keyup.enter="addCustomLanguage"
-                            />
-                            <button 
-                                class="btn btn-outline-success btn-sm ml-2" 
-                                type="button" 
-                                @click="addCustomLanguage"
+                            >
+                            <button
+                                class="btn btn-outline-success btn-sm ml-2"
+                                type="button"
                                 :disabled="!customLanguageInput.trim() || processing"
+                                @click="addCustomLanguage"
                             >
                                 Add
                             </button>
@@ -189,7 +189,7 @@
                         <i
                             v-if="languagePreferences.includes(language)"
                             class="fa-check-circle"
-                            :class ="languagePreferences.includes(language) ? 'text-success fas' : 'far'"
+                            :class="languagePreferences.includes(language) ? 'text-success fas' : 'far'"
                         />
                         <i
                             v-else-if="languageNegativePreferences.includes(language)"
@@ -198,7 +198,7 @@
                         />
                         <label
                             v-if="languagePreferences.includes(language) || languageNegativePreferences.includes(language)"
-                            class="form-check-label text-secondary ml-1"
+                            class="form-check-label text-secondary"
                         >
                             {{ language }}
                         </label>
@@ -213,22 +213,22 @@
                             v-else
                             class="fa-check-circle text-success fas"
                         />
-                        <label class="form-check-label text-secondary ml-1">
+                        <label class="form-check-label text-secondary">
                             {{ language.startsWith('NOT ') ? language.substring(4) : language }}
                         </label>
                         <i
                             v-if="loggedInUser && (loggedInUser.groups.includes('nat') || loggedInUser.groups.includes('gmt'))"
                             class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
                             :class="[processing ? 'fake-disabled' : '']"
-                            @click="removeCustomLanguage(language, $event)"
                             title="Remove custom language"
+                            @click="removeCustomLanguage(language, $event)"
                         />
                     </div>
                     <small
                         v-if="!languagePreferences.length && !languageNegativePreferences.length && !customLanguagePreferences.length"
-                        class="text-secondary ml-1"
+                        class="text-secondary"
                     >
-                    None...
+                        None...
                     </small>
                 </div>
             </div>
@@ -249,7 +249,7 @@
                                 @click="updateStylePreferences(style, false, 'osu', $event)"
                             />
                             <label
-                                class="form-check-label text-secondary ml-1"
+                                class="form-check-label text-secondary"
                             >
                                 {{ style }} <span class="small">(osu!)</span>
                             </label>
@@ -260,7 +260,7 @@
                             <i
                                 v-if="osuStylePreferences.includes(style)"
                                 class="fa-check-circle"
-                                :class ="osuStylePreferences.includes(style) ? 'text-success fas' : 'far'"
+                                :class="osuStylePreferences.includes(style) ? 'text-success fas' : 'far'"
                             />
                             <i
                                 v-else-if="osuStyleNegativePreferences.includes(style)"
@@ -269,16 +269,16 @@
                             />
                             <label
                                 v-if="osuStylePreferences.includes(style) || osuStyleNegativePreferences.includes(style)"
-                                class="form-check-label text-secondary ml-1"
+                                class="form-check-label text-secondary"
                             >
                                 {{ style }} <span class="small">(osu!)</span>
                             </label>
                         </div>
                         <small
                             v-if="!osuStylePreferences.length && !osuStyleNegativePreferences.length && !customMapPreferences.length"
-                            class="text-secondary ml-1"
+                            class="text-secondary"
                         >
-                        None... {{ modes.length > 1 ? '(osu!)' : '' }}
+                            None... {{ modes.length > 1 ? '(osu!)' : '' }}
                         </small>
                     </div>
                 </div>
@@ -296,7 +296,7 @@
                                 @click="updateStylePreferences(style, false, 'taiko', $event)"
                             />
                             <label
-                                class="form-check-label text-secondary ml-1"
+                                class="form-check-label text-secondary"
                             >
                                 {{ style }} <span class="small">(osu!taiko)</span>
                             </label>
@@ -307,7 +307,7 @@
                             <i
                                 v-if="taikoStylePreferences.includes(style)"
                                 class="fa-check-circle"
-                                :class ="taikoStylePreferences.includes(style) ? 'text-success fas' : 'far'"
+                                :class="taikoStylePreferences.includes(style) ? 'text-success fas' : 'far'"
                             />
                             <i
                                 v-else-if="taikoStyleNegativePreferences.includes(style)"
@@ -316,16 +316,16 @@
                             />
                             <label
                                 v-if="taikoStylePreferences.includes(style) || taikoStyleNegativePreferences.includes(style)"
-                                class="form-check-label text-secondary ml-1"
+                                class="form-check-label text-secondary"
                             >
                                 {{ style }} <span class="small">(osu!taiko)</span>
                             </label>
                         </div>
                         <small
                             v-if="!taikoStylePreferences.length && !taikoStyleNegativePreferences.length && !customMapPreferences.length"
-                            class="text-secondary ml-1"
+                            class="text-secondary"
                         >
-                        None... {{ modes.length > 1 ? '(osu!taiko)' : '' }}
+                            None... {{ modes.length > 1 ? '(osu!taiko)' : '' }}
                         </small>
                     </div>
                 </div>
@@ -343,7 +343,7 @@
                                 @click="updateStylePreferences(style, false, 'catch', $event)"
                             />
                             <label
-                                class="form-check-label text-secondary ml-1"
+                                class="form-check-label text-secondary"
                             >
                                 {{ style }} <span class="small">(osu!catch)</span>
                             </label>
@@ -354,7 +354,7 @@
                             <i
                                 v-if="catchStylePreferences.includes(style)"
                                 class="fa-check-circle"
-                                :class ="catchStylePreferences.includes(style) ? 'text-success fas' : 'far'"
+                                :class="catchStylePreferences.includes(style) ? 'text-success fas' : 'far'"
                             />
                             <i
                                 v-else-if="catchStyleNegativePreferences.includes(style)"
@@ -363,16 +363,16 @@
                             />
                             <label
                                 v-if="catchStylePreferences.includes(style) || catchStyleNegativePreferences.includes(style)"
-                                class="form-check-label text-secondary ml-1"
+                                class="form-check-label text-secondary"
                             >
                                 {{ style }} <span class="small">(osu!catch)</span>
                             </label>
                         </div>
                         <small
                             v-if="!catchStylePreferences.length && !catchStyleNegativePreferences.length && !customMapPreferences.length"
-                            class="text-secondary ml-1"
+                            class="text-secondary"
                         >
-                        None... {{ modes.length > 1 ? '(osu!catch)' : '' }}
+                            None... {{ modes.length > 1 ? '(osu!catch)' : '' }}
                         </small>
                     </div>
                 </div>
@@ -390,7 +390,7 @@
                                 @click="updateStylePreferences(style, false, 'mania', $event)"
                             />
                             <label
-                                class="form-check-label text-secondary ml-1"
+                                class="form-check-label text-secondary"
                             >
                                 {{ style }} <span class="small">(osu!mania)</span>
                             </label>
@@ -401,7 +401,7 @@
                             <i
                                 v-if="maniaStylePreferences.includes(style)"
                                 class="fa-check-circle"
-                                :class ="maniaStylePreferences.includes(style) ? 'text-success fas' : 'far'"
+                                :class="maniaStylePreferences.includes(style) ? 'text-success fas' : 'far'"
                             />
                             <i
                                 v-else-if="maniaStyleNegativePreferences.includes(style)"
@@ -410,20 +410,20 @@
                             />
                             <label
                                 v-if="maniaStylePreferences.includes(style) || maniaStyleNegativePreferences.includes(style)"
-                                class="form-check-label text-secondary ml-1"
+                                class="form-check-label text-secondary"
                             >
                                 {{ style }} <span class="small">(osu!mania)</span>
                             </label>
                         </div>
                         <small
                             v-if="!maniaStylePreferences.length && !maniaStyleNegativePreferences.length && !customMapPreferences.length"
-                            class="text-secondary ml-1"
+                            class="text-secondary"
                         >
-                        None... {{ modes.length > 1 ? '(osu!mania)' : '' }}
+                            None... {{ modes.length > 1 ? '(osu!mania)' : '' }}
                         </small>
                     </div>
                 </div>
-                
+
                 <!-- Custom map preferences -->
                 <div v-if="loggedInUser && loggedInUser._id === selectedUser.id">
                     <div>
@@ -440,30 +440,30 @@
                                 :class="[loggedInUser && loggedInUser._id === selectedUser.id ? 'fake-checkbox' : '', processing ? 'fake-disabled' : '']"
                                 @click="loggedInUser && loggedInUser._id === selectedUser.id ? removeCustomMap(map, $event) : null"
                             />
-                            <label class="form-check-label text-secondary ml-1">
+                            <label class="form-check-label text-secondary">
                                 {{ map.startsWith('NOT ') ? map.substring(4) : map }}
                             </label>
                             <i
                                 v-if="loggedInUser && (loggedInUser._id === selectedUser.id || loggedInUser.hasFullReadAccess)"
                                 class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
                                 :class="[processing ? 'fake-disabled' : '']"
-                                @click="removeCustomMap(map, $event)"
                                 title="Remove custom map preference"
+                                @click="removeCustomMap(map, $event)"
                             />
                         </div>
                         <div class="d-flex mt-2">
-                            <input 
+                            <input
                                 v-model="customMapInput"
-                                type="text" 
-                                class="form-control form-control-sm" 
+                                type="text"
+                                class="form-control form-control-sm"
                                 placeholder="Add custom map preference..."
                                 @keyup.enter="addCustomMap"
-                            />
-                            <button 
-                                class="btn btn-outline-success btn-sm ml-2" 
-                                type="button" 
-                                @click="addCustomMap"
+                            >
+                            <button
+                                class="btn btn-outline-success btn-sm ml-2"
+                                type="button"
                                 :disabled="!customMapInput.trim() || processing"
+                                @click="addCustomMap"
                             >
                                 Add
                             </button>
@@ -481,15 +481,15 @@
                             v-else
                             class="fa-check-circle text-success fas"
                         />
-                        <label class="form-check-label text-secondary ml-1">
+                        <label class="form-check-label text-secondary">
                             {{ map.startsWith('NOT ') ? map.substring(4) : map }}
                         </label>
                         <i
                             v-if="loggedInUser && loggedInUser.hasFullReadAccess"
                             class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
                             :class="[processing ? 'fake-disabled' : '']"
-                            @click="removeCustomMap(map, $event)"
                             title="Remove custom map preference"
+                            @click="removeCustomMap(map, $event)"
                         />
                     </div>
                 </div>
@@ -497,7 +497,7 @@
             <div v-if="modes.includes('mania')" class="col-sm-4 mb-4">
                 <h6>Keymode preferences</h6>
 
-                
+
                 <div v-if="loggedInUser && loggedInUser._id === selectedUser.id">
                     <div v-for="keymode in maniaKeymodeOptions" :key="keymode">
                         <i
@@ -511,7 +511,7 @@
                             @click="updateKeymodePreferences(keymode, false, $event)"
                         />
                         <label
-                            class="form-check-label text-secondary ml-1"
+                            class="form-check-label text-secondary"
                         >
                             {{ keymode }}
                         </label>
@@ -522,7 +522,7 @@
                         <i
                             v-if="maniaKeymodePreferences.includes(keymode)"
                             class="fa-check-circle"
-                            :class ="maniaKeymodePreferences.includes(keymode) ? 'text-success fas' : 'far'"
+                            :class="maniaKeymodePreferences.includes(keymode) ? 'text-success fas' : 'far'"
                         />
                         <i
                             v-else-if="maniaKeymodeNegativePreferences.includes(keymode)"
@@ -531,16 +531,16 @@
                         />
                         <label
                             v-if="maniaKeymodePreferences.includes(keymode) || maniaKeymodeNegativePreferences.includes(keymode)"
-                            class="form-check-label text-secondary ml-1"
+                            class="form-check-label text-secondary"
                         >
                             {{ keymode }}
                         </label>
                     </div>
                     <small
                         v-if="!maniaKeymodePreferences.length && !maniaKeymodeNegativePreferences.length"
-                        class="text-secondary ml-1"
+                        class="text-secondary"
                     >
-                    None...
+                        None...
                     </small>
                 </div>
             </div>
@@ -560,12 +560,12 @@
                             @click="updateDetailPreferences(detail, false, $event)"
                         />
                         <label
-                            class="form-check-label text-secondary ml-1"
+                            class="form-check-label text-secondary"
                         >
                             {{ detail }}
                         </label>
                     </div>
-                    
+
                     <!-- Custom detail preferences -->
                     <div>
                         <div v-for="detail in customDetailPreferences" :key="detail">
@@ -581,86 +581,86 @@
                                 :class="[loggedInUser && loggedInUser._id === selectedUser.id ? 'fake-checkbox' : '', processing ? 'fake-disabled' : '']"
                                 @click="loggedInUser && loggedInUser._id === selectedUser.id ? removeCustomDetail(detail, $event) : null"
                             />
-                            <label class="form-check-label text-secondary ml-1">
+                            <label class="form-check-label text-secondary">
                                 {{ detail.startsWith('NOT ') ? detail.substring(4) : detail }}
                             </label>
                             <i
                                 v-if="loggedInUser && (loggedInUser._id === selectedUser.id || loggedInUser.hasFullReadAccess)"
                                 class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
                                 :class="[processing ? 'fake-disabled' : '']"
-                                @click="removeCustomDetail(detail, $event)"
                                 title="Remove custom detail preference"
+                                @click="removeCustomDetail(detail, $event)"
                             />
                         </div>
                         <div class="d-flex mt-2">
-                            <input 
+                            <input
                                 v-model="customDetailInput"
-                                type="text" 
-                                class="form-control form-control-sm" 
+                                type="text"
+                                class="form-control form-control-sm"
                                 placeholder="Add custom detail preference..."
                                 @keyup.enter="addCustomDetail"
-                            />
-                            <button 
-                                class="btn btn-outline-success btn-sm ml-2" 
-                                type="button" 
-                                @click="addCustomDetail"
+                            >
+                            <button
+                                class="btn btn-outline-success btn-sm ml-2"
+                                type="button"
                                 :disabled="!customDetailInput.trim() || processing"
+                                @click="addCustomDetail"
                             >
                                 Add
                             </button>
                         </div>
                     </div>
                 </div>
-            <div v-else>
-                <div v-for="detail in detailOptions" :key="detail">
-                    <i
-                        v-if="detailPreferences.includes(detail)"
-                        class="fa-check-circle"
-                        :class ="detailPreferences.includes(detail) ? 'text-success fas' : 'far'"
-                    />
-                    <i
-                        v-else-if="detailNegativePreferences.includes(detail)"
-                        class="fa-times-circle"
-                        :class="detailNegativePreferences.includes(detail) ? 'text-danger fas' : 'far'"
-                    />
-                    <label
-                        v-if="detailPreferences.includes(detail) || detailNegativePreferences.includes(detail)"
-                        class="form-check-label text-secondary ml-1"
+                <div v-else>
+                    <div v-for="detail in detailOptions" :key="detail">
+                        <i
+                            v-if="detailPreferences.includes(detail)"
+                            class="fa-check-circle"
+                            :class="detailPreferences.includes(detail) ? 'text-success fas' : 'far'"
+                        />
+                        <i
+                            v-else-if="detailNegativePreferences.includes(detail)"
+                            class="fa-times-circle"
+                            :class="detailNegativePreferences.includes(detail) ? 'text-danger fas' : 'far'"
+                        />
+                        <label
+                            v-if="detailPreferences.includes(detail) || detailNegativePreferences.includes(detail)"
+                            class="form-check-label text-secondary"
+                        >
+                            {{ detail }}
+                        </label>
+                    </div>
+                    <!-- Display custom detail preferences for other users -->
+                    <div v-for="detail in customDetailPreferences" :key="detail">
+                        <i
+                            v-if="detail.startsWith('NOT ')"
+                            class="fa-times-circle text-danger fas"
+                        />
+                        <i
+                            v-else
+                            class="fa-check-circle text-success fas"
+                        />
+                        <label class="form-check-label text-secondary">
+                            {{ detail.startsWith('NOT ') ? detail.substring(4) : detail }}
+                        </label>
+                        <i
+                            v-if="loggedInUser && loggedInUser.hasFullReadAccess"
+                            class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
+                            :class="[processing ? 'fake-disabled' : '']"
+                            title="Remove custom detail preference"
+                            @click="removeCustomDetail(detail, $event)"
+                        />
+                    </div>
+                    <small
+                        v-if="!detailPreferences.length && !detailNegativePreferences.length && !customDetailPreferences.length"
+                        class="text-secondary"
                     >
-                        {{ detail }}
-                    </label>
+                        None...
+                    </small>
                 </div>
-                <!-- Display custom detail preferences for other users -->
-                <div v-for="detail in customDetailPreferences" :key="detail">
-                    <i
-                        v-if="detail.startsWith('NOT ')"
-                        class="fa-times-circle text-danger fas"
-                    />
-                    <i
-                        v-else
-                        class="fa-check-circle text-success fas"
-                    />
-                    <label class="form-check-label text-secondary ml-1">
-                        {{ detail.startsWith('NOT ') ? detail.substring(4) : detail }}
-                    </label>
-                    <i
-                        v-if="loggedInUser && loggedInUser.hasFullReadAccess"
-                        class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
-                        :class="[processing ? 'fake-disabled' : '']"
-                        @click="removeCustomDetail(detail, $event)"
-                        title="Remove custom detail preference"
-                    />
-                </div>
-                <small
-                    v-if="!detailPreferences.length && !detailNegativePreferences.length && !customDetailPreferences.length"
-                    class="text-secondary ml-1"
-                >
-                None...
-                </small>
             </div>
-        </div>
 
-        <div class="col-sm-4 mb-4">
+            <div class="col-sm-4 mb-4">
                 <h6>Mapper preferences</h6>
 
                 <div v-if="loggedInUser && loggedInUser._id === selectedUser.id">
@@ -676,12 +676,12 @@
                             @click="updateMapperPreferences(mapper, false, $event)"
                         />
                         <label
-                            class="form-check-label text-secondary ml-1"
+                            class="form-check-label text-secondary"
                         >
                             {{ mapper }}
                         </label>
                     </div>
-                    
+
                     <!-- Custom mapper preferences -->
                     <div>
                         <div v-for="mapper in customMapperPreferences" :key="mapper">
@@ -697,84 +697,84 @@
                                 :class="[loggedInUser && loggedInUser._id === selectedUser.id ? 'fake-checkbox' : '', processing ? 'fake-disabled' : '']"
                                 @click="loggedInUser && loggedInUser._id === selectedUser.id ? removeCustomMapper(mapper, $event) : null"
                             />
-                            <label class="form-check-label text-secondary ml-1">
+                            <label class="form-check-label text-secondary">
                                 {{ mapper.startsWith('NOT ') ? mapper.substring(4) : mapper }}
                             </label>
                             <i
                                 v-if="loggedInUser && (loggedInUser._id === selectedUser.id || loggedInUser.hasFullReadAccess)"
                                 class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
                                 :class="[processing ? 'fake-disabled' : '']"
-                                @click="removeCustomMapper(mapper, $event)"
                                 title="Remove custom mapper preference"
+                                @click="removeCustomMapper(mapper, $event)"
                             />
                         </div>
                         <div class="d-flex mt-2">
-                            <input 
+                            <input
                                 v-model="customMapperInput"
-                                type="text" 
-                                class="form-control form-control-sm" 
+                                type="text"
+                                class="form-control form-control-sm"
                                 placeholder="Add custom mapper preference..."
                                 @keyup.enter="addCustomMapper"
-                            />
-                            <button 
-                                class="btn btn-outline-success btn-sm ml-2" 
-                                type="button" 
-                                @click="addCustomMapper"
+                            >
+                            <button
+                                class="btn btn-outline-success btn-sm ml-2"
+                                type="button"
                                 :disabled="!customMapperInput.trim() || processing"
+                                @click="addCustomMapper"
                             >
                                 Add
                             </button>
                         </div>
                     </div>
                 </div>
-            <div v-else>
-                <div v-for="mapper in mapperOptions" :key="mapper">
-                    <i
-                        v-if="mapperPreferences.includes(mapper)"
-                        class="fa-check-circle"
-                        :class ="mapperPreferences.includes(mapper) ? 'text-success fas' : 'far'"
-                    />
-                    <i
-                        v-else-if="mapperNegativePreferences.includes(mapper)"
-                        class="fa-times-circle"
-                        :class="mapperNegativePreferences.includes(mapper) ? 'text-danger fas' : 'far'"
-                    />
-                    <label
-                        v-if="mapperPreferences.includes(mapper) || mapperNegativePreferences.includes(mapper)"
-                        class="form-check-label text-secondary ml-1"
+                <div v-else>
+                    <div v-for="mapper in mapperOptions" :key="mapper">
+                        <i
+                            v-if="mapperPreferences.includes(mapper)"
+                            class="fa-check-circle"
+                            :class="mapperPreferences.includes(mapper) ? 'text-success fas' : 'far'"
+                        />
+                        <i
+                            v-else-if="mapperNegativePreferences.includes(mapper)"
+                            class="fa-times-circle"
+                            :class="mapperNegativePreferences.includes(mapper) ? 'text-danger fas' : 'far'"
+                        />
+                        <label
+                            v-if="mapperPreferences.includes(mapper) || mapperNegativePreferences.includes(mapper)"
+                            class="form-check-label text-secondary"
+                        >
+                            {{ mapper }}
+                        </label>
+                    </div>
+                    <!-- Display custom mapper preferences for other users -->
+                    <div v-for="mapper in customMapperPreferences" :key="mapper">
+                        <i
+                            v-if="mapper.startsWith('NOT ')"
+                            class="fa-times-circle text-danger fas"
+                        />
+                        <i
+                            v-else
+                            class="fa-check-circle text-success fas"
+                        />
+                        <label class="form-check-label text-secondary">
+                            {{ mapper.startsWith('NOT ') ? mapper.substring(4) : mapper }}
+                        </label>
+                        <i
+                            v-if="loggedInUser && loggedInUser.hasFullReadAccess"
+                            class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
+                            :class="[processing ? 'fake-disabled' : '']"
+                            title="Remove custom mapper preference"
+                            @click="removeCustomMapper(mapper, $event)"
+                        />
+                    </div>
+                    <small
+                        v-if="!mapperPreferences.length && !mapperNegativePreferences.length && !customMapperPreferences.length"
+                        class="text-secondary"
                     >
-                        {{ mapper }}
-                    </label>
+                        None...
+                    </small>
                 </div>
-                <!-- Display custom mapper preferences for other users -->
-                <div v-for="mapper in customMapperPreferences" :key="mapper">
-                    <i
-                        v-if="mapper.startsWith('NOT ')"
-                        class="fa-times-circle text-danger fas"
-                    />
-                    <i
-                        v-else
-                        class="fa-check-circle text-success fas"
-                    />
-                    <label class="form-check-label text-secondary ml-1">
-                        {{ mapper.startsWith('NOT ') ? mapper.substring(4) : mapper }}
-                    </label>
-                    <i
-                        v-if="loggedInUser && loggedInUser.hasFullReadAccess"
-                        class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
-                        :class="[processing ? 'fake-disabled' : '']"
-                        @click="removeCustomMapper(mapper, $event)"
-                        title="Remove custom mapper preference"
-                    />
-                </div>
-                <small
-                    v-if="!mapperPreferences.length && !mapperNegativePreferences.length && !customMapperPreferences.length"
-                    class="text-secondary ml-1"
-                >
-                None...
-                </small>
             </div>
-        </div>
         </div>
     </div>
 </template>
@@ -1010,20 +1010,24 @@ export default {
             user.mapperPreferences = data.user.mapperPreferences;
             user.mapperNegativePreferences = data.user.mapperNegativePreferences;
             this.$store.commit('usersHome/updateUser', user);
-            
+
             this.processing = false;
         },
         addCustomGenre() {
             const genre = this.customGenreInput.trim();
+
             if (!genre || this.customGenrePreferences.includes(genre)) {
                 this.customGenreInput = '';
+
                 return;
             }
+
             this.updateCustomGenrePreferences(genre);
             this.customGenreInput = '';
         },
         async updateCustomGenrePreferences(genre, e) {
             this.processing = true;
+
             try {
                 const data = await this.$http.executePost(`/users/${this.loggedInUser.id}/updateCustomGenrePreferences`, {
                     genre,
@@ -1060,15 +1064,19 @@ export default {
         },
         addCustomLanguage() {
             const language = this.customLanguageInput.trim();
+
             if (!language || this.customLanguagePreferences.includes(language)) {
                 this.customLanguageInput = '';
+
                 return;
             }
+
             this.updateCustomLanguagePreferences(language);
             this.customLanguageInput = '';
         },
         async updateCustomLanguagePreferences(language, e) {
             this.processing = true;
+
             try {
                 const data = await this.$http.executePost(`/users/${this.loggedInUser.id}/updateCustomLanguagePreferences`, {
                     language,
@@ -1105,15 +1113,19 @@ export default {
         },
         addCustomMap() {
             const map = this.customMapInput.trim();
+
             if (!map || this.customMapPreferences.includes(map)) {
                 this.customMapInput = '';
+
                 return;
             }
+
             this.updateCustomMapPreferences(map);
             this.customMapInput = '';
         },
         async updateCustomMapPreferences(map, e) {
             this.processing = true;
+
             try {
                 const data = await this.$http.executePost(`/users/${this.selectedUser.id}/updateCustomMapPreferences`, {
                     map,
@@ -1150,15 +1162,19 @@ export default {
         },
         addCustomDetail() {
             const detail = this.customDetailInput.trim();
+
             if (!detail || this.customDetailPreferences.includes(detail)) {
                 this.customDetailInput = '';
+
                 return;
             }
+
             this.updateCustomDetailPreferences(detail);
             this.customDetailInput = '';
         },
         async updateCustomDetailPreferences(detail, e) {
             this.processing = true;
+
             try {
                 const data = await this.$http.executePost(`/users/${this.selectedUser.id}/updateCustomDetailPreferences`, {
                     detail,
@@ -1195,15 +1211,19 @@ export default {
         },
         addCustomMapper() {
             const mapper = this.customMapperInput.trim();
+
             if (!mapper || this.customMapperPreferences.includes(mapper)) {
                 this.customMapperInput = '';
+
                 return;
             }
+
             this.updateCustomMapperPreferences(mapper);
             this.customMapperInput = '';
         },
         async updateCustomMapperPreferences(mapper, e) {
             this.processing = true;
+
             try {
                 const data = await this.$http.executePost(`/users/${this.selectedUser.id}/updateCustomMapperPreferences`, {
                     mapper,

@@ -1,17 +1,17 @@
 <template>
-    <div 
-        class="card home-card" 
-        :style="cardDecoration(user)" 
-        @click="selectUser()"
+    <div
+        class="card home-card"
+        :style="cardDecoration(user)"
         data-toggle="modal"
         data-target="#userInfo"
+        @click="selectUser()"
     >
         <img :src="'https://a.ppy.sh/' + user.osuId" class="card-avatar-img">
         <div class="body">
             <span>
                 <user-link
-                :osu-id="user.osuId"
-                :username="user.username"
+                    :osu-id="user.osuId"
+                    :username="user.username"
                 />
                 <span v-if="user.requestStatus">
                     <span
@@ -19,10 +19,10 @@
                         :key="status"
                         class="badge badge-pill mx-1 text-lowercase"
                         :class="status === 'closed' ? 'badge-danger' : status === 'open' ? 'badge-success' : 'badge-primary'"
-                        v-html="requestType(status, user.requestLink, user.osuId).html || requestType(status, user.requestLink, user.osuId).type"
                         data-toggle="tooltip"
                         data-placement="top"
                         :title="requestType(status, user.requestLink, user.osuId).type"
+                        v-html="requestType(status, user.requestLink, user.osuId).html || requestType(status, user.requestLink, user.osuId).type"
                     />
                 </span>
             </span>
@@ -47,6 +47,7 @@ export default {
     components: {
         UserLink,
     },
+    mixins: [ evaluations ],
     props: {
         user: {
             type: Object,
@@ -58,7 +59,6 @@ export default {
             return this.user;
         },
     },
-    mixins: [ evaluations ],
     methods: {
         selectUser() {
             this.$store.commit('usersHome/setSelectedUserId', this.user.id);
@@ -124,9 +124,9 @@ export default {
         },
         /** @returns {string} */
         getCover(user) {
-            return user.cover ? user.cover : `https://a.ppy.sh/${user.osuId}` // fallback to avatar if no cover
+            return user.cover ? user.cover : `https://a.ppy.sh/${user.osuId}`; // fallback to avatar if no cover
         },
-    }
+    },
 };
 </script>
 

@@ -2,7 +2,9 @@
     <div class="card card-body">
         <div class="card card-body small mb-4">
             <h4>Announcement (home page and BN server)</h4>
-            <div class="text-secondary mb-2">This sends a message to the #announcements channel in the BN Discord server and displays the announcement on the front page of this website.</div>
+            <div class="text-secondary mb-2">
+                This sends a message to the #announcements channel in the BN Discord server and displays the announcement on the front page of this website.
+            </div>
             <ul class="text-secondary mb-2">
                 <li>Announcements support markdown formatting</li>
                 <li>The announcement Discord embed will display the first image linked in the announcement</li>
@@ -54,7 +56,7 @@
                 <button class="btn btn-secondary btn-sm my-1 col-sm-3 mx-2" @click="toggleRole()">
                     {{ roles.includes(selectedRole) ? 'Remove selected role' : 'Add selected role' }}
                 </button>
-                <div v-if="this.roles && this.roles.length" class="small text-secondary">
+                <div v-if="roles && roles.length" class="small text-secondary">
                     Selected roles: {{ roles }}
                 </div>
             </div>
@@ -65,9 +67,9 @@
                     v-model="title"
                     class="form-control mb-2"
                     type="text"
-                />
+                >
             </div>
-            
+
             <div>
                 Message:
 
@@ -79,12 +81,14 @@
                 />
             </div>
 
-            <div v-if="title.length && announcement.length"
+            <div
+                v-if="title.length && announcement.length"
                 class="mt-2"
                 data-toggle="tooltip"
                 data-placement="left"
-                title="only the first image will appear on the discord announcement">
-                <hr />
+                title="only the first image will appear on the discord announcement"
+            >
+                <hr>
                 Preview:
                 <div
                     class="pre-line"
@@ -92,10 +96,10 @@
                 >
                     <b v-for="role in roles" :key="role">@{{ role }} </b>
                     <b>{{ title }}</b>
-                    <span class="small v-html-content" v-html="$md.render(announcement)"></span>
+                    <span class="small v-html-content" v-html="$md.render(announcement)" />
                 </div>
                 <b v-if="announcement.length > 4096">TOO MANY CHARACTERS FOR DISCORD. shorten message pls</b>
-                <hr />
+                <hr>
             </div>
 
             <button v-if="announcement.length" class="btn btn-danger my-1" @click="sendAnnouncement($event)">
@@ -105,14 +109,16 @@
 
         <div class="card card-body small mb-4">
             <h4>Message (<a href="https://osu.ppy.sh/users/6616586" target="_blank">NAT bot</a>)</h4>
-            <div v-if="!loggedInUser.isNatLeader" class="text-secondary mb-2">You don't have permission to use this. If you think you should, talk to pishifat.</div>
+            <div v-if="!loggedInUser.isNatLeader" class="text-secondary mb-2">
+                You don't have permission to use this. If you think you should, talk to pishifat.
+            </div>
             <div>
                 Title:
                 <input
                     v-model="messageChannelTitle"
                     class="form-control mb-2"
                     type="text"
-                />
+                >
             </div>
             <div>
                 Description:
@@ -121,7 +127,7 @@
                     v-model="messageChannelDescription"
                     class="form-control mb-2"
                     type="text"
-                />
+                >
             </div>
             <div>
                 Message:
@@ -135,7 +141,7 @@
             </div>
 
             <div v-if="messageChannelTitle.length && message.length" class="mt-2">
-                <hr />
+                <hr>
                 Preview:
                 <div
                     class="pre-line"

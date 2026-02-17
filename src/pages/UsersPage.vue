@@ -57,7 +57,7 @@
                     <button v-if="loggedInUser && loggedInUser.isNat && !showOldUsers" class="btn btn-primary btn-sm ml-2 float-right" @click="loadBannedUsers($event)">
                         Show users banned from BN
                     </button>
-                    
+
                     <button v-if="!showOldUsers" class="btn btn-primary btn-sm ml-2 float-right" @click="loadPreviousBnAndNat($event)">
                         Show previous BN/NAT
                     </button>

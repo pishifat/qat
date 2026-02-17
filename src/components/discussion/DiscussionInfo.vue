@@ -16,7 +16,7 @@
                 Conclude Vote
             </button>
 
-            <debug-view-document 
+            <debug-view-document
                 v-if="loggedInUser.isAdmin"
                 :document="selectedDiscussionVote"
             />
@@ -32,7 +32,7 @@
                 <p v-else class="small">
                     Because you're not proficient in this proposal's game mode, you're not able to vote :(
                 </p>
-            </div> 
+            </div>
         </div>
     </modal-dialog>
 </template>

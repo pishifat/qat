@@ -38,7 +38,7 @@
         </div>
 
         <div v-if="bnActivity">
-            <hr />
+            <hr>
             <!-- TODO: rewrite this to return accurate and non-duped numbers -->
             <!--
             <div class="small mt-2">

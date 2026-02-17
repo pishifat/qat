@@ -79,7 +79,7 @@
                 <b>Preview</b> (<a href="https://www.markdownguide.org/basic-syntax/" target="_blank">markdown</a> is supported!)
                 <div class="small card card-body v-html-content" v-html="$md.render(summary)" />
             </div>
-            
+
 
             <button type="submit" class="btn btn-primary btn-block" @click="addReason()">
                 Add veto reason

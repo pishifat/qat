@@ -15,8 +15,8 @@ router.use(middlewares.isNat);
 router.post('/sendMessages', middlewares.isAdmin, async (req, res) => {
     const channel = {
         name: req.body.title,
-        description: req.body.description
-    }
+        description: req.body.description,
+    };
 
     let osuIds = req.body.users.split(',');
 

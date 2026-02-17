@@ -15,7 +15,7 @@
                 @keyup.enter="adjustEvaluationDeadline($event)"
             >
 
-            <span 
+            <span
                 v-else
                 data-toggle="tooltip"
                 data-placement="top"
@@ -34,22 +34,27 @@
                 <i class="fas fa-edit" />
             </a>
 
-            <button 
-                v-if="loggedInUser && loggedInUser.isNat" 
+            <button
+                v-if="loggedInUser && loggedInUser.isNat"
                 data-toggle="tooltip"
                 data-placement="top"
                 title="reset next evaluation date to default based on previous evaluations"
-                class="btn btn-sm btn-primary ml-2" type="submit" @click="reset($event)">
+                class="btn btn-sm btn-primary ml-2"
+                type="submit"
+                @click="reset($event)"
+            >
                 Reset
             </button>
 
             <button
-            v-if="loggedInUser && loggedInUser.isNat"
+                v-if="loggedInUser && loggedInUser.isNat"
                 data-toggle="tooltip"
                 data-placement="top"
                 title="create an evaluation with a deadline of 7 days from now"
-                class="btn btn-sm btn-nat ml-2" type="submit" @click="createEvaluation($event)"
-                >
+                class="btn btn-sm btn-nat ml-2"
+                type="submit"
+                @click="createEvaluation($event)"
+            >
                 Create evaluation
             </button>
         </p>
@@ -64,10 +69,10 @@ import evaluations from '../../../mixins/evaluations';
 
 export default {
     name: 'NextEvaluation',
-    mixins: [ evaluations ],
     components: {
         ProgressBar,
     },
+    mixins: [ evaluations ],
     props: {
         mode: {
             type: String,
@@ -114,6 +119,7 @@ export default {
     methods: {
         processDeadline (deadline) {
             const deadlineDate = new Date(deadline);
+
             if (!isNaN(deadlineDate)) {
 
                 this.newDeadlineInput = deadlineDate.toISOString().slice(0,10);
@@ -134,7 +140,7 @@ export default {
                 this.nextEvaluationText = nextEvaluationText;
 
                 this.displayProgressBar = today >= firstDate;
-                
+
             } else {
                 this.nextEvaluationText = deadline;
             }
@@ -183,11 +189,11 @@ export default {
                 if (this.$http.isValid(res)) {
                     $('#extendedInfo').modal('hide');
                     const evaluation = res.evaluations.find(e => e.user.id == this.selectedUser.id);
-                    if (evaluation) 
+                    if (evaluation)
                         this.$router.replace(`/bneval?id=${evaluation.id}`);
-                    else 
-                        this.$store.dispatch('updateToastMessages', { 
-                            message: 'Error redirecting to evaluation, try navigating manually', type: 'danger' 
+                    else
+                        this.$store.dispatch('updateToastMessages', {
+                            message: 'Error redirecting to evaluation, try navigating manually', type: 'danger',
                         });
                 }
             }

@@ -48,10 +48,11 @@ export default {
         /** @returns {Object} */
         userHeaderStyle() {
             if (!this.selectedUser) return {};
+
             return {
                 background: `linear-gradient(0deg, ${this.getUserColor()} -150%, rgba(0, 0, 0, 0.65) 130%), ${this.getCover()} center no-repeat`,
                 backgroundSize: 'cover',
-                borderBottom: `4px solid ${this.getUserColor()}`
+                borderBottom: `4px solid ${this.getUserColor()}`,
             };
         },
     },
@@ -65,7 +66,7 @@ export default {
     },
     methods: {
         getModes () {
-            return this.selectedUser ? this.selectedUser.modesInfo.map(m => m.mode) : ["osu", "taiko", "catch", "mania"];
+            return this.selectedUser ? this.selectedUser.modesInfo.map(m => m.mode) : ['osu', 'taiko', 'catch', 'mania'];
         },
         /** @returns {string} */
         getCover () {

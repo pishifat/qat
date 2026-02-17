@@ -19,8 +19,12 @@
             <div class="row mb-3">
                 <div class="col-sm-6">
                     <b>User(s):</b>
-                    <input v-model="includeUsers" class="ml-2 form-control" type="text"
-                        placeholder="username1, username2, username3...">
+                    <input
+                        v-model="includeUsers"
+                        class="ml-2 form-control"
+                        type="text"
+                        placeholder="username1, username2, username3..."
+                    >
                 </div>
             </div>
 
@@ -29,7 +33,12 @@
                     <b>Resignation:</b>
 
                     <div class="form-check ml-2">
-                        <input id="isResignation" v-model="isResignation" class="form-check-input" type="checkbox">
+                        <input
+                            id="isResignation"
+                            v-model="isResignation"
+                            class="form-check-input"
+                            type="checkbox"
+                        >
                         <label class="form-check-label text-secondary small" for="isResignation">
                             Checking this will replace vote/consensus options with "resigned on good/standard terms" and set
                             deadline to today.
@@ -56,16 +65,46 @@
                     </p>
                     <div id="advancedSettings" class="collapse container col-sm-12">
                         <b class="mr-4">User group:</b>
-                        <label class="mx-2" data-toggle="tooltip" data-placement="top" title="probation BN">
-                            <input v-model="groups" type="checkbox" class="probation-bn-radio hide-default" value="probationBn">
+                        <label
+                            class="mx-2"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            title="probation BN"
+                        >
+                            <input
+                                v-model="groups"
+                                type="checkbox"
+                                class="probation-bn-radio hide-default"
+                                value="probationBn"
+                            >
                             <i class="fab fa-accessible-icon" />
                         </label>
-                        <label class="mx-2" data-toggle="tooltip" data-placement="top" title="full BN">
-                            <input v-model="groups" type="checkbox" class="full-bn-radio hide-default" value="fullBn">
+                        <label
+                            class="mx-2"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            title="full BN"
+                        >
+                            <input
+                                v-model="groups"
+                                type="checkbox"
+                                class="full-bn-radio hide-default"
+                                value="fullBn"
+                            >
                             <i class="fas fa-walking" />
                         </label>
-                        <label class="mx-2" data-toggle="tooltip" data-placement="top" title="NAT">
-                            <input v-model="groups" type="checkbox" class="nat-radio hide-default" value="nat">
+                        <label
+                            class="mx-2"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            title="NAT"
+                        >
+                            <input
+                                v-model="groups"
+                                type="checkbox"
+                                class="nat-radio hide-default"
+                                value="nat"
+                            >
                             <i class="fas fa-running" />
                         </label>
 
@@ -75,8 +114,12 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <b>Exclude specific user(s):</b>
-                                <input v-model="excludeUsers" class="ml-2 form-control" type="text"
-                                    placeholder="username1, username2, username3...">
+                                <input
+                                    v-model="excludeUsers"
+                                    class="ml-2 form-control"
+                                    type="text"
+                                    placeholder="username1, username2, username3..."
+                                >
                             </div>
                         </div>
                     </div>
@@ -124,6 +167,7 @@ export default {
 
             if (confirmInput) {
                 let confirmGroupsInput = true;
+
                 if (this.groups.length) {
                     confirmGroupsInput = confirm(`Are you *really* sure? You should only select Probation/Full/NAT if you know what you're doing.`);
                 }

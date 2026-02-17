@@ -29,7 +29,7 @@ router.get('/:slug', async (req, res) => {
     if (!article) {
         return res.json({ error: 'article not found' });
     }
-    
+
     res.json(article);
 });
 

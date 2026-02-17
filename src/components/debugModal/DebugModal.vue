@@ -3,7 +3,7 @@
         <debug-modal-permissions />
 
         <hr>
-    
+
         <debug-modal-user-info />
 
         <hr>
@@ -29,5 +29,5 @@ export default {
     computed: mapState([
         'loggedInUser',
     ]),
-}
+};
 </script>

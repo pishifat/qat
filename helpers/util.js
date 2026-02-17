@@ -115,15 +115,15 @@ function setSession(session, response) {
 
 /**
  * Invalidates a given user's sessions, forcing them to re-login
- * @param {string} mongoId 
+ * @param {string} mongoId
  */
 async function invalidateSessions(mongoId) {
-    const sessionsCollection = mongoose.connection.collection("sessions");
+    const sessionsCollection = mongoose.connection.collection('sessions');
 
     const result = await sessionsCollection.deleteMany({
         session: {
             $regex: mongoId,
-            $options: "i",
+            $options: 'i',
         },
     });
 }
@@ -134,11 +134,13 @@ async function invalidateSessions(mongoId) {
  */
 function shuffleArray(array) {
     let currentIndex = array.length, randomIndex;
+
     while (currentIndex != 0) {
         randomIndex = Math.floor(Math.random() * currentIndex);
         currentIndex--;
         [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
     }
+
     return array;
 }
 
@@ -174,7 +176,7 @@ function yearsDuration(days) {
  * formats a mode string
  * @param {string} mode
  * @returns {string}
- * 
+ *
  * @example
  * formatMode('osu'); // returns 'osu!'
  * formatMode('taiko'); // returns 'osu!taiko'
@@ -196,9 +198,9 @@ function formatMode(mode) {
 function formatModeForDatabase(mode) {
     // The osu API uses the term fruits, but we use catch internally
     if (mode === 'fruits') {
-        return 'catch'
+        return 'catch';
     } else {
-        return mode
+        return mode;
     }
 }
 
@@ -216,5 +218,5 @@ module.exports = {
     makeWordFromField,
     yearsDuration,
     formatMode,
-    formatModeForDatabase
+    formatModeForDatabase,
 };

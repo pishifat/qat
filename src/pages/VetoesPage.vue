@@ -20,9 +20,7 @@
             <section class="card card-body">
                 <h2>
                     Pending vetoes
-                    <small v-if="pendingVetoes"
-                        >({{ pendingVetoes.length }})</small
-                    >
+                    <small v-if="pendingVetoes">({{ pendingVetoes.length }})</small>
                 </h2>
 
                 <div v-if="!pendingVetoes.length">
@@ -41,9 +39,7 @@
             <section class="card card-body">
                 <h2>
                     Active vetoes
-                    <small v-if="activeVetoes"
-                        >({{ activeVetoes.length }})</small
-                    >
+                    <small v-if="activeVetoes">({{ activeVetoes.length }})</small>
                 </h2>
 
                 <div v-if="!activeVetoes.length">
@@ -63,7 +59,7 @@
                 <h2>
                     Archived vetoes
                     <small v-if="paginatedResolvedVetoes">
-                        ({{ resolvedVetoes.length + (reachedMax ? '' : '+')}})
+                        ({{ resolvedVetoes.length + (reachedMax ? '' : '+') }})
                     </small>
                     <button
                         v-if="!reachedMax"
@@ -102,18 +98,18 @@
                     Note: reason order needs to match in both vetoes
                 </span>
                 <div class="form-inline">
-                    <input 
+                    <input
                         v-model="oldVetoId"
                         class="form-control mb-2"
                         type="text"
-                        placeholder="old veto ID..." 
-                    />
-                    <input 
+                        placeholder="old veto ID..."
+                    >
+                    <input
                         v-model="newVetoId"
                         class="form-control mb-2"
                         type="text"
-                        placeholder="new veto ID..." 
-                    />
+                        placeholder="new veto ID..."
+                    >
                     <button
                         class="btn btn-sm btn-secondary mb-2 ml-2"
                         @click="migrateMediations"
@@ -245,6 +241,7 @@ export default {
         },
         async showAll(e) {
             const result = confirm(`Are you sure? This will take a while.`);
+
             if (result) {
                 this.limit = 10000;
                 this.reachedMax = true;
@@ -253,6 +250,7 @@ export default {
         },
         async migrateMediations() {
             const result = confirm(`Are you sure?`);
+
             if (result) {
                 const data = await this.$http.executePost(
                     '/vetoes/migrateMediations',

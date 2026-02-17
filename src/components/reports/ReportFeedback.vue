@@ -70,15 +70,17 @@ export default {
             switch (this.report.valid) {
                 case 1:
                     if (this.report.isContentCase) {
-                        return 'Valid for use'
+                        return 'Valid for use';
                     } else {
                         return 'Valid';
                     }
+
                 case 2:
                     return 'Partially valid';
+
                 default: // case 3:
-                if (this.report.isContentCase) {
-                        return 'Invalid for use'
+                    if (this.report.isContentCase) {
+                        return 'Invalid for use';
                     } else {
                         return 'Invalid';
                     }

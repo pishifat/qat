@@ -78,7 +78,7 @@ router.post('/saveNote/:id', async (req, res) => {
     // save note to NAT self-summary eval thing
     if (evaluationId) {
         const natLeaders = await User.find({ isNatLeader: true });
-        
+
         await BnEvaluation.findByIdAndUpdate(evaluationId, {
             selfSummary: note._id,
             discussion: true,
@@ -124,7 +124,7 @@ router.post('/saveNote/:id', async (req, res) => {
         const natLeaders = await User.find({ isNatLeader: true });
         const discordIds = natLeaders.map(u => u.discordId);
         const user = await User.findById(req.params.id);
-        const mode = user.modes && user.modes.length ? user.modes[0] : 'osu' // priority: current mode > default to osu
+        const mode = user.modes && user.modes.length ? user.modes[0] : 'osu'; // priority: current mode > default to osu
         const evaluation = await BnEvaluation.findById(evaluationId).populate(defaultNatEvaluationPopulate);
 
         // Send moved to discussion notification
@@ -143,7 +143,7 @@ router.post('/saveNote/:id', async (req, res) => {
                     {
                         name: 'Assigned NAT leaders',
                         value: natLeaders.map(u => u.username).join(', '),
-                    }
+                    },
                 ],
             }],
             mode
@@ -201,7 +201,7 @@ router.post('/:id/toggleIsTrialNat', middlewares.isNat, async (req, res) => {
             [{
                 author: discord.defaultWebhookAuthor(req.session),
                 color: discord.webhookColors.lightPink,
-                description: `**${user.isTrialNat ? "Added" : "Removed"}** user [**${user.username}**](https://osu.ppy.sh/users/${user.osuId}) ${user.isTrialNat ? "to" : "from"} BN Evaluators`,
+                description: `**${user.isTrialNat ? 'Added' : 'Removed'}** user [**${user.username}**](https://osu.ppy.sh/users/${user.osuId}) ${user.isTrialNat ? 'to' : 'from'} BN Evaluators`,
             }],
             mode
         );
@@ -232,7 +232,7 @@ router.post('/:id/toggleIsBannedFromBn', middlewares.isNat, async (req, res) => 
         [{
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.lightPink,
-            description: `**${user.isBannedFromBn ? "Banned" : "Unbanned"}** user [**${user.username}**](https://osu.ppy.sh/users/${user.osuId}) from BN`,
+            description: `**${user.isBannedFromBn ? 'Banned' : 'Unbanned'}** user [**${user.username}**](https://osu.ppy.sh/users/${user.osuId}) from BN`,
         }],
         'all'
     );
@@ -244,7 +244,7 @@ router.post('/:id/toggleIsBannedFromBn', middlewares.isNat, async (req, res) => 
 
     Logger.generate(
         req.session.mongoId,
-        `${user.isBannedFromBn ? "Banned" : "Unbanned"} user [**${user.username}**](https://osu.ppy.sh/users/${user.osuId}) from BN`,
+        `${user.isBannedFromBn ? 'Banned' : 'Unbanned'} user [**${user.username}**](https://osu.ppy.sh/users/${user.osuId}) from BN`,
         'user',
         user._id
     );
@@ -268,7 +268,7 @@ router.get('/findUserBadgeInfo/:userId', async (req, res) => {
     const token = response.access_token;
 
     const newUsers = [];
-        
+
     for (let i = 0; i < badgeUsers.length; i++) {
         const user = badgeUsers[i];
 

@@ -93,6 +93,7 @@ export default {
                     message += `\n\n`;
                     message += `review reasons for your rejection here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id}`;
                     message += `\n\n`;
+
                     if (!this.hideCooldownText) {
                         message += `you can apply for BN in this game mode again on **${this.toStandardDate(this.selectedEvaluation.cooldownDate)}**`;
                         message += `\n\n`;
@@ -203,7 +204,7 @@ export default {
                         message += `review reasons for your removal here: https://bn.mappersguild.com/message?eval=${this.selectedEvaluation.id}`;
                         message += `\n\n`;
                     }
-                    
+
                     // reapply date
                     if (!this.hideCooldownText) {
                         message += `If you want to apply for BN again, you may do so on **${this.toStandardDate(this.selectedEvaluation.cooldownDate)}**.`;

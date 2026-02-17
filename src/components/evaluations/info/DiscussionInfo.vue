@@ -20,18 +20,18 @@
                         />
                     </div>
                     <div class="col-sm-4">
-                        <nat-buddy-assignment 
+                        <nat-buddy-assignment
                             v-if="
                                 loggedInUser &&
-                                loggedInUser.isNat && 
-                                selectedEvaluation.isApplication && 
-                                selectedEvaluation.consensus === 'pass'
+                                    loggedInUser.isNat &&
+                                    selectedEvaluation.isApplication &&
+                                    selectedEvaluation.consensus === 'pass'
                             "
                         />
                     </div>
-                </div>            
-                
-                <hr v-if="selectedEvaluation.consensus" />
+                </div>
+
+                <hr v-if="selectedEvaluation.consensus">
                 <feedback-info v-if="selectedEvaluation.consensus" />
             </div>
         </template>
@@ -39,13 +39,13 @@
         <!-- Only NAT can see the reviews if the application is active -->
         <template
             v-if="
-                loggedInUser && 
-                (!selectedEvaluation.active ||
-                loggedInUser.isNat ||
-                loggedInUser.isTrialNat)
+                loggedInUser &&
+                    (!selectedEvaluation.active ||
+                        loggedInUser.isNat ||
+                        loggedInUser.isTrialNat)
             "
         >
-            <hr v-if="selectedEvaluation.reviews.length" />
+            <hr v-if="selectedEvaluation.reviews.length">
             <reviews-listing />
         </template>
     </div>

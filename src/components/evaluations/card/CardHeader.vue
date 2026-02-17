@@ -17,7 +17,8 @@
                 title="mock evaluators enabled"
                 class="fas fa-flask ml-2 text-probation"
             />
-            <i v-if="isResignation"
+            <i
+                v-if="isResignation"
                 data-toggle="tooltip"
                 data-placement="top"
                 title="resignation"

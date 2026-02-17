@@ -1,9 +1,10 @@
 <template>
     <div>
         <div class="ml-2">
-            <a :href="events && `#${eventsId}`" data-toggle="collapse"
-                >{{ header }} <i class="fas fa-angle-down"
-            /></a>
+            <a
+                :href="events && `#${eventsId}`"
+                data-toggle="collapse"
+            >{{ header }} <i class="fas fa-angle-down" /></a>
             ({{ isLoading ? '...' : events ? events.length : '0' }})
         </div>
 
@@ -23,7 +24,9 @@
                     </td>
                 </tr>
             </data-table>
-            <p v-else class="small ml-4">None...</p>
+            <p v-else class="small ml-4">
+                None...
+            </p>
         </div>
     </div>
 </template>
@@ -36,11 +39,11 @@ import UserLink from '../../../../UserLink.vue';
 
 export default {
     name: 'EvaluationList',
-    mixins: [ evaluations ],
     components: {
         DataTable,
         UserLink,
     },
+    mixins: [ evaluations ],
     props: {
         events: {
             type: Array,
@@ -63,7 +66,7 @@ export default {
         isApplication: Boolean,
     },
     computed: {
-        ...mapState('activity', ['isLoading']), 
+        ...mapState('activity', ['isLoading']),
         ...mapState(['loggedInUser']),
     },
     methods: {

@@ -29,10 +29,10 @@ router.get('/relevantInfo', async (req, res) => {
                 active: false,
                 consensus: { $exists: true },
                 archivedAt: { $gt: oneYearAgo },
-                cooldownDate: { $lt: new Date() }
+                cooldownDate: { $lt: new Date() },
             })
             .sort({
-                createdAt: -1
+                createdAt: -1,
             }),
         AppEvaluation.find({
             user: req.session.mongoId,
@@ -53,7 +53,7 @@ router.get('/relevantInfo', async (req, res) => {
         ResignationEvaluation.find({
             user: req.session.mongoId,
             active: false,
-            cooldownDate: { $gt: new Date() }
+            cooldownDate: { $gt: new Date() },
         }),
         AppEvaluation
             .find({
@@ -65,6 +65,7 @@ router.get('/relevantInfo', async (req, res) => {
     activeApps = activeApps.map(app => {
         app = app.toObject();
         app.consensus = app.consensus && app.consensus.length ? 'fuck you' : undefined;
+
         return app;
     });
 
@@ -88,7 +89,7 @@ router.post('/apply', middlewares.isLoggedIn, async (req, res) => {
 
     if (res.locals.userRequest.isBannedFromBn) {
         return res.json({
-            error: `You're currently banned from joining the BN. Contact support@ppy.sh for details`
+            error: `You're currently banned from joining the BN. Contact support@ppy.sh for details`,
         });
     }
 
@@ -122,13 +123,14 @@ router.post('/apply', middlewares.isLoggedIn, async (req, res) => {
 
         const blockedUrls = [
             'puu.sh',
-            'cdn.discordapp.com'
+            'cdn.discordapp.com',
         ];
 
         if (blockedUrls.some(url => oszs[i].includes(url))) {
             const url = new URL(oszs[i]).hostname;
+
             return res.json({
-                error: `Files hosted on ${url} are not allowed as they can expire quickly. Please use a different file host.`
+                error: `Files hosted on ${url} are not allowed as they can expire quickly. Please use a different file host.`,
             });
         }
     }
@@ -186,7 +188,7 @@ router.post('/apply', middlewares.isLoggedIn, async (req, res) => {
                 user: req.session.mongoId,
                 mode,
                 active: false,
-                cooldownDate: { $gt: new Date() }
+                cooldownDate: { $gt: new Date() },
             })
             .sort({ createdAt: -1 }),
     ]);
@@ -224,14 +226,14 @@ router.post('/apply', middlewares.isLoggedIn, async (req, res) => {
 
     // create app
     const newBnApp = await AppEvaluation.create({
-            user: req.session.mongoId,
-            mode,
-            mods,
-            reasons,
-            oszs,
-            comment,
-            isPublic,
-        });
+        user: req.session.mongoId,
+        mode,
+        mods,
+        reasons,
+        oszs,
+        comment,
+        isPublic,
+    });
 
     if (!newBnApp) {
         return res.json({ error: 'Failed to process application!' });
@@ -292,8 +294,8 @@ router.post('/apply', middlewares.isLoggedIn, async (req, res) => {
         fields,
     }];
 
-    const securityCheckMessage = `Please conduct a BN security check on [**${userInfo.username}**](<https://osu.ppy.sh/users/${userInfo.id}>), then inform any of the assigned NAT below.`
-    
+    const securityCheckMessage = `Please conduct a BN security check on [**${userInfo.username}**](<https://osu.ppy.sh/users/${userInfo.id}>), then inform any of the assigned NAT below.`;
+
     await discord.highlightWebhookPost(securityCheckMessage, embed, 'securityCheck');
 
     // proceed
@@ -340,7 +342,7 @@ router.post('/rejoinApply', middlewares.isLoggedIn, async (req, res) => {
             }
         }
     }
-    
+
     const oneYearAgo = moment().subtract(1, 'years').toDate();
 
     const [cooldownApp, cooldownEval, lastResignation] = await Promise.all([
@@ -365,29 +367,29 @@ router.post('/rejoinApply', middlewares.isLoggedIn, async (req, res) => {
                 mode,
                 consensus: ResignationConsensus.ResignedOnGoodTerms,
                 archivedAt: { $gt: oneYearAgo },
-                cooldownDate: { $lt: new Date() }
+                cooldownDate: { $lt: new Date() },
             })
             .sort({
-                createdAt: -1
+                createdAt: -1,
             }),
     ]);
 
     // security for people who try to circumvent front-end
-    if (cooldownApp || cooldownEval || !lastResignation) { 
-        return res.json({ 
-            error: `You are not eligible to re-join right now.`
+    if (cooldownApp || cooldownEval || !lastResignation) {
+        return res.json({
+            error: `You are not eligible to re-join right now.`,
         });
     }
 
     // create app
     const newBnApp = await AppEvaluation.create({
-            user: req.session.mongoId,
-            mode,
-            mods: [],
-            reasons: [],
-            oszs: [],
-            isRejoinRequest: true,
-        });
+        user: req.session.mongoId,
+        mode,
+        mods: [],
+        reasons: [],
+        oszs: [],
+        isRejoinRequest: true,
+    });
 
     if (!newBnApp) {
         return res.json({ error: 'Failed to process application!' });
@@ -448,7 +450,7 @@ router.post('/rejoinApply', middlewares.isLoggedIn, async (req, res) => {
         fields,
     }];
 
-    const securityCheckMessage = `Please conduct a BN security check on [**${userInfo.username}**](<https://osu.ppy.sh/users/${userInfo.id}>), then inform any of the assigned NAT below.`
+    const securityCheckMessage = `Please conduct a BN security check on [**${userInfo.username}**](<https://osu.ppy.sh/users/${userInfo.id}>), then inform any of the assigned NAT below.`;
 
     await discord.highlightWebhookPost(securityCheckMessage, embed, 'securityCheck');
 
@@ -456,7 +458,7 @@ router.post('/rejoinApply', middlewares.isLoggedIn, async (req, res) => {
     res.json(newBnApp);
 
     Logger.generate(req.session.mongoId, `Requested to re-join ${mode} BN`, 'application', newBnApp._id);
-    
+
 });
 
 module.exports = router;

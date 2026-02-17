@@ -139,13 +139,13 @@ function getLimitedDefaultPopulate(mongoId) {
             path: 'chatroomMessages.user',
             select: 'username osuId',
         },
-    ]
+    ];
 }
 
 function getPopulate(isNat, mongoId) {
     if (!mongoId) return getLoggedOutPopulate();
-    if (!isNat) return getLimitedDefaultPopulate(mongoId)
-    
+    if (!isNat) return getLimitedDefaultPopulate(mongoId);
+
     return defaultPopulate;
 }
 
@@ -173,10 +173,10 @@ router.get('/relevantInfo/:limit', async (req, res) => {
             .sort({ createdAt: -1 })
             .limit(parseInt(req.params.limit));
     }
-    
+
     for (let i = 0; i < vetoes.length; i++) {
         if (!vetoes[i].chatroomUsers.length) vetoes[i].chatroomMessages = [];
-        
+
     }
 
     res.json({
@@ -236,7 +236,7 @@ router.post('/submit', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req
     // create veto
     let veto = await Veto.create({
         vetoer: req.session.mongoId,
-        reasons: reasons,
+        reasons,
         beatmapId: beatmapsetId,
         beatmapTitle: osuBeatmapset.artist + ' - ' + osuBeatmapset.title,
         beatmapMapper: osuBeatmapset.creator,
@@ -272,7 +272,7 @@ router.post('/submit', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req
         color: discord.webhookColors.darkPurple,
         description,
     }],
-        'publicVetoes');
+    'publicVetoes');
 });
 
 /* POST submit mediation */
@@ -338,7 +338,7 @@ router.post('/submitMediation/:id', middlewares.isLoggedIn, middlewares.isBnOrNa
             color: discord.webhookColors.lightPurple,
             description,
         }],
-            veto.mode);
+        veto.mode);
     }
 
     // return
@@ -376,7 +376,7 @@ router.post('/resetMediation/:id', middlewares.isLoggedIn, middlewares.isAdmin, 
         color: discord.webhookColors.black,
         description: `Reset mediation vote and comment by **${mediation.mediator.username}** for [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`,
     }],
-        veto.mode
+    veto.mode
     );
 
     res.json(veto);
@@ -408,7 +408,7 @@ router.post('/selectMediators/:id', middlewares.isLoggedIn, middlewares.isNat, a
     }
 
     excludeUsers.push(veto.vetoer.username);
-    
+
     for (const user of veto.vouchingUsers) {
         excludeUsers.push(user.username);
     }
@@ -426,7 +426,7 @@ router.post('/selectMediators/:id', middlewares.isLoggedIn, middlewares.isNat, a
             }
         }
     }
-    
+
     const count = Math.ceil(users.length * 0.4);
 
     res.json(users.slice(0, count));
@@ -469,7 +469,7 @@ router.post('/beginMediation/:id', middlewares.isLoggedIn, middlewares.isNat, as
         color: discord.webhookColors.purple,
         description: `Started mediation on [veto for **${v.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${v.id})`,
     }],
-        'publicVetoes');
+    'publicVetoes');
 });
 
 /* POST conclude mediation */
@@ -519,7 +519,7 @@ router.post('/continueMediation/:id', middlewares.isLoggedIn, middlewares.isNat,
         color: discord.webhookColors.purple,
         description: `**Resumed** mediation on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`,
     }],
-        veto.mode);
+    veto.mode);
 });
 
 /* POST delete veto */
@@ -542,7 +542,7 @@ router.post('/deleteVeto/:id', middlewares.isLoggedIn, middlewares.isNat, async 
         color: discord.webhookColors.black,
         description: `Deleted veto for **${veto.beatmapTitle}**`,
     }],
-        veto.mode);
+    veto.mode);
 });
 
 /* POST send messages */
@@ -558,7 +558,7 @@ router.post('/sendMessages/:id', middlewares.isLoggedIn, middlewares.isNat, asyn
     const channel = {
         name: `Veto Mediation (${veto.mode == 'all' ? 'All game modes' : veto.mode == 'osu' ? 'osu!' : `osu!${veto.mode}`})`,
         description: 'Request to participate in a veto mediation',
-    }
+    };
 
     const message = await osuBot.sendAnnouncement(osuIds, channel, req.body.message);
 
@@ -580,7 +580,7 @@ router.post('/sendMessages/:id', middlewares.isLoggedIn, middlewares.isNat, asyn
         color: discord.webhookColors.white,
         description: `Sent chat messages to mediators of [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`,
     }],
-        veto.mode);
+    veto.mode);
 });
 
 /* POST toggle vouch for a user on veto */
@@ -593,15 +593,15 @@ router.post('/toggleVouch/:id', middlewares.isLoggedIn, middlewares.isBnOrNat, a
         .orFail();
 
     if (veto.vetoer.id == userId) {
-        return res.json({ error: "You can't vouch for your own vetoes!" });
+        return res.json({ error: 'You can\'t vouch for your own vetoes!' });
     }
 
     if (res.locals.userRequest.isNat && (userId == req.session.mongoId)) {
-        return res.json({ error: "NAT members cannot vouch!" });
+        return res.json({ error: 'NAT members cannot vouch!' });
     }
 
     if (veto.vouchingUsers.length >= 2) {
-        return res.json({ error: "This veto has already been vouched for by 2 BNs! It'll progress soon..."})
+        return res.json({ error: 'This veto has already been vouched for by 2 BNs! It\'ll progress soon...' });
     }
 
     const vouchingUserIds = veto.vouchingUsers.map(u => u.id);
@@ -611,7 +611,7 @@ router.post('/toggleVouch/:id', middlewares.isLoggedIn, middlewares.isBnOrNat, a
     if (isVouching) {
         // add user to vouchingUsers
         veto.vouchingUsers.push(res.locals.userRequest._id);
-    
+
         if (veto.vouchingUsers.length == 2) {
             toggleWebhook = true;
         }
@@ -631,7 +631,7 @@ router.post('/toggleVouch/:id', middlewares.isLoggedIn, middlewares.isBnOrNat, a
 
     res.json({
         veto,
-        success: 'Done!'
+        success: 'Done!',
     });
 
     Logger.generate(
@@ -643,12 +643,12 @@ router.post('/toggleVouch/:id', middlewares.isLoggedIn, middlewares.isBnOrNat, a
 
     if (toggleWebhook) {
         const description = `**2 users** vouched for [veto for **${veto.beatmapTitle}** by **${veto.beatmapMapper}**](https://bn.mappersguild.com/vetoes?id=${veto.id})\n\nReview and initiate veto if necessary!`;
-        
+
         discord.webhookPost([{
             color: discord.webhookColors.lightPurple,
             description,
         }],
-            veto.mode);
+        veto.mode);
     }
 });
 
@@ -665,7 +665,7 @@ router.post('/createChatroom/:id', middlewares.isLoggedIn, middlewares.isNat, as
             const user = await User.findByUsernameOrOsuId(username);
 
             if (!user) {
-                return res.json({ error: `${username} is not in BNsite database. Ask them to log in.`});
+                return res.json({ error: `${username} is not in BNsite database. Ask them to log in.` });
             }
 
             chatroomUsers.push(user._id);
@@ -680,7 +680,7 @@ router.post('/createChatroom/:id', middlewares.isLoggedIn, middlewares.isNat, as
     const mapper = await User.findByUsernameOrOsuId(veto.beatmapMapperId);
 
     if (!mapper) {
-        return res.json({ error: `${veto.beatmapMapper} is not in BNsite database. Ask them to log in.`});
+        return res.json({ error: `${veto.beatmapMapper} is not in BNsite database. Ask them to log in.` });
     }
 
     chatroomUsers = chatroomUsers.concat(veto.vouchingUsers);
@@ -717,7 +717,7 @@ router.post('/createChatroom/:id', middlewares.isLoggedIn, middlewares.isNat, as
     const channel = {
         name: `Veto Discussion (${veto.mode == 'all' ? 'All game modes' : veto.mode == 'osu' ? 'osu!' : `osu!${veto.mode}`})`,
         description: `A pending veto you're involved with has opened discussion`,
-    }
+    };
     const words = `Discussion for the pending veto on [**${veto.beatmapTitle}**](https://osu.ppy.sh/beatmapsets/${veto.beatmapId}) has begun!\n\nTry to reach a conclusion here: http://bn.mappersguild.com/vetoes?id=${veto.id}\n\nIf a conclusion cannot be reached, the veto may be mediated by a larger group of Beatmap Nominators.`;
 
     // sending each message in a separate announcement to preserve anonymity
@@ -729,7 +729,7 @@ router.post('/createChatroom/:id', middlewares.isLoggedIn, middlewares.isNat, as
             return res.json({ error: message.error ? message.error : `Messages were not sent.` });
         }
     }
-    
+
     // update frontend and log
     veto = await Veto
         .findById(req.params.id)
@@ -739,7 +739,7 @@ router.post('/createChatroom/:id', middlewares.isLoggedIn, middlewares.isNat, as
 
     res.json({
         veto,
-        success: 'Chatroom initiated! Sent announcement message to involved users!'
+        success: 'Chatroom initiated! Sent announcement message to involved users!',
     });
 
     Logger.generate(
@@ -750,13 +750,13 @@ router.post('/createChatroom/:id', middlewares.isLoggedIn, middlewares.isNat, as
     );
 
     const description = `Discussion initiated on [veto for **${veto.beatmapTitle}**](https://osu.ppy.sh/beatmapsets/${veto.beatmapId})`;
-    
+
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),
         color: discord.webhookColors.pink,
         description,
     }],
-        'publicVetoes');
+    'publicVetoes');
 });
 
 /* POST add message to veto chatroom */
@@ -843,7 +843,7 @@ router.post('/requestMediation/:id', middlewares.isLoggedIn, async (req, res) =>
         .orFail();
 
     const chatroomMediationRequestedUserIds = veto.chatroomMediationRequestedUsers.map(u => u.id);
-    
+
     if (!veto.chatroomMediationRequestedUsers.includes(req.session.mongoId)) {
         veto.chatroomMediationRequestedUsers.push(req.session.mongoId);
     }
@@ -901,7 +901,7 @@ router.post('/requestMediation/:id', middlewares.isLoggedIn, async (req, res) =>
         color: discord.webhookColors.lightPink,
         description,
     }],
-        veto.mode);
+    veto.mode);
 });
 
 /* GET refresh veto for chatroom purposes */
@@ -931,7 +931,7 @@ router.post('/deleteMessage/:id', middlewares.isLoggedIn, middlewares.isNat, asy
     } else {
         return res.json({ error: `Can't delete message.` });
     }
-    
+
     await veto.save();
 
     veto = await Veto
@@ -1073,7 +1073,7 @@ router.post('/vote/:id', middlewares.isLoggedIn, async (req, res) => {
             color: discord.webhookColors.purple,
             description: `[Veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id}) dismissed by vote. Check to make sure if everything worked, and move to archive if so.`,
         }],
-            veto.mode);
+        veto.mode);
     }
 
     await veto.save();
@@ -1121,7 +1121,7 @@ router.post('/setStatusAvailable/:id', middlewares.isLoggedIn, middlewares.isNat
         color: discord.webhookColors.darkPurple,
         description,
     }],
-        'publicVetoes');
+    'publicVetoes');
 });
 
 /* POST set veto status as "archive" */
@@ -1151,7 +1151,7 @@ router.post('/setStatusArchive/:id', middlewares.isLoggedIn, middlewares.isNat, 
         color: discord.webhookColors.gray,
         description,
     }],
-        'publicVetoes');
+    'publicVetoes');
 });
 
 /* POST submit public mediation */

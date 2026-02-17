@@ -1,9 +1,10 @@
 <template>
     <div>
         <div class="ml-2">
-            <a :href="events && `#${eventsId}`" data-toggle="collapse"
-                >{{ header }} <i class="fas fa-angle-down"
-            /></a>
+            <a
+                :href="events && `#${eventsId}`"
+                data-toggle="collapse"
+            >{{ header }} <i class="fas fa-angle-down" /></a>
             ({{ isLoading ? '...' : events ? events.length : '0' }})
         </div>
         <div v-if="events" :id="eventsId" class="collapse">
@@ -16,20 +17,20 @@
                         {{ toMonthDayYear(timestamp(event)) }}
                     </td>
                     <td>
-                        <a 
+                        <a
                             :href="'osu://dl/' + beatmapsetId(event)"
                             data-toggle="tooltip"
                             data-placement="right"
                             title="osu!direct download"
                         >
-                            <i class="fas fa-file-download mr-1" />
+                            <i class="fas fa-file-download" />
                         </a>
                         <a
                             :href="
                                 'https://osu.ppy.sh/beatmapsets/' +
-                                beatmapsetId(event) +
-                                '/discussion?user=' +
-                                osuId
+                                    beatmapsetId(event) +
+                                    '/discussion?user=' +
+                                    osuId
                             "
                             target="_blank"
                         >
@@ -44,7 +45,7 @@
                             data-placement="right"
                             title="total drain time"
                         >
-                            ({{ totalDrain(event.beatmaps)}})
+                            ({{ totalDrain(event.beatmaps) }})
                         </span>
                         <a
                             v-if="loggedInUser && (loggedInUser.isNat || loggedInUser.isTrialNat) && isEvaluation"
@@ -73,7 +74,9 @@
                     </td>
                 </tr>
             </data-table>
-            <p v-else class="small ml-4">None...</p>
+            <p v-else class="small ml-4">
+                None...
+            </p>
         </div>
     </div>
 </template>
@@ -188,9 +191,9 @@ export default {
 
             const rawSeconds = drain % 60;
             const seconds = rawSeconds > 9 ? rawSeconds : '0' + rawSeconds;
-            const minutes = (drain - seconds)/60
+            const minutes = (drain - seconds)/60;
 
-            return minutes + ":" + seconds;
+            return minutes + ':' + seconds;
         },
     },
 };

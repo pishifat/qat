@@ -93,7 +93,7 @@ export default {
             this.$store.commit(this.storeModule + '/pageFilters/setFilterGroup', group);
         },
         formatOption (option) {
-            switch(option) {
+            switch (option) {
                 case 'osu':
                     return 'osu!';
                 case 'taiko':
@@ -111,7 +111,7 @@ export default {
                 default:
                     return option;
             }
-        }
+        },
     },
 };
 </script>

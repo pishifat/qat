@@ -5,7 +5,7 @@
                 User group ({{ formatMode(mode) }}):
             </b>
             <button
-                class="btn btn-sm btn-nat ml-1 mb-1"
+                class="btn btn-sm btn-nat mb-1"
                 href="#"
                 @click.prevent="addToNat()"
             >
@@ -13,7 +13,7 @@
             </button>
             <button
                 v-if="loggedInUser.isNatLeader && selectedUser.probationModes.includes(mode)"
-                class="btn btn-sm btn-bn ml-1 mb-1"
+                class="btn btn-sm btn-bn mb-1"
                 href="#"
                 data-toggle="tooltip"
                 title="For probation users who were supposed to join as full BN"

@@ -15,8 +15,6 @@
                     </a>
                 </span>
             </p>
-
-            
         </template>
         <p>
             <b>Reason:</b>
@@ -24,9 +22,9 @@
 
         <div class="small ml-4 mb-3 text-secondary" v-html="$md.render(selectedReport.reason)" />
 
-        
 
-        
+
+
 
         <p v-if="!selectedReport.isActive">
             <b>Reported by:</b>

@@ -1,12 +1,12 @@
 <template>
     <div>
-        <button v-if="!users" @click="findVibeCheckStats($event)" class="btn btn-sm btn-primary my-2">
+        <button v-if="!users" class="btn btn-sm btn-primary my-2" @click="findVibeCheckStats($event)">
             Load vibes
         </button>
-        <button v-else @click="natFilter = !natFilter" class="btn btn-sm btn-primary my-2">
+        <button v-else class="btn btn-sm btn-primary my-2" @click="natFilter = !natFilter">
             {{ natFilter ? 'Show all' : 'Show NAT only' }}
         </button>
-        <div v-for="user in users" :key=user.osuId v-if="!natFilter || user.isNat">
+        <div v-for="user in users" v-if="!natFilter || user.isNat" :key="user.osuId">
             <b>
                 <user-link
                     :osu-id="user.osuId"
@@ -31,7 +31,7 @@
                         {{ user.positiveVibes }} positive vibes
                     </li>
                     <li class="text-danger">
-                        {{ user.negativeVibes }} negative vibes    
+                        {{ user.negativeVibes }} negative vibes
                     </li>
                 </ul>
             </div>
@@ -59,11 +59,11 @@ export default {
 
             if (users) {
                 this.users = users.sort((a, b) => {
-                if (a.accuracy > b.accuracy) return -1;
-                if (a.accuracy < b.accuracy) return 1;
+                    if (a.accuracy > b.accuracy) return -1;
+                    if (a.accuracy < b.accuracy) return 1;
 
-                return 0;
-            });
+                    return 0;
+                });
             }
         },
     },

@@ -6,7 +6,7 @@
                     Application Evaluations
                     <small>({{ applications.length }})</small>
                 </h2>
-                
+
                 <transition-group
                     v-if="applications.length"
                     name="list"

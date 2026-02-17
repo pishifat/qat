@@ -9,19 +9,19 @@
             <div class="row">
                 <div class="col-sm-12 form-inline">
                     <label for="date">Start date:</label>
-                    <input 
+                    <input
                         v-model="minDate"
                         class="form-control mx-2"
                         type="date"
-                        placeholder="Start date..." 
-                    />
+                        placeholder="Start date..."
+                    >
                     <label for="date">End date:</label>
-                    <input 
+                    <input
                         v-model="maxDate"
                         class="form-control mx-2"
                         type="date"
                         placeholder="End date..."
-                    />
+                    >
                     <button
                         class="btn btn-sm btn-primary"
                         @click="getStats($event)"
@@ -32,11 +32,11 @@
             </div>
             <div v-if="jsonData" class="row">
                 <div class="col-sm-12">
-                    <hr />
-                        <a href="#expandJson" data-toggle="collapse">
-                            view full JSON <i class="fas fa-angle-down" />
-                        </a>
-                        <br>
+                    <hr>
+                    <a href="#expandJson" data-toggle="collapse">
+                        view full JSON <i class="fas fa-angle-down" />
+                    </a>
+                    <br>
                     <pre id="expandJson" class="collapse container">{{ JSON.stringify(jsonData, null, 4) }}</pre>
                     <br>
                 </div>
@@ -44,8 +44,10 @@
                     <h4>Mode stats</h4>
                     <pre>{{ 'mode,uniqueNominations,uniqueMappers,uniqueMappersPercentage\n' + getModeStats() }}</pre>
                 </div>
-                <div class="col-sm-12" v-for="mode in modes" :key="mode">
-                    <h4 v-if="mode">{{ formatMode(mode) }}</h4>
+                <div v-for="mode in modes" :key="mode" class="col-sm-12">
+                    <h4 v-if="mode">
+                        {{ formatMode(mode) }}
+                    </h4>
                     <pre>{{ 'userId,username,uniqueNominationCount,uniqueMapperCount,uniqueMappersPercentage,dqCount,minorCount,notableCount,severeCount,nomScore\n' + getStatsCsvByMode(mode) }}</pre>
                 </div>
             </div>
@@ -93,10 +95,12 @@ export default {
         },
         getStatsByMode(mode) {
             if (!this.nominatorStats) return [];
+
             return this.nominatorStats.filter(user => user.modes.includes(mode));
         },
         getStatsCsvByMode(mode) {
             const stats = this.getStatsByMode(mode);
+
             return stats.map(user => `${user.userId},${user.username},${user.uniqueNominationCount},${user.uniqueMapperCount},${user.uniqueMappersPercentage},${user.disqualifyCount},${user.minorDisqualifyCount},${user.notableDisqualifyCount},${user.severeDisqualifyCount},${user.nomScore}`).join('\n');
         },
         getModeStats() {

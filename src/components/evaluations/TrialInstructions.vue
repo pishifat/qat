@@ -4,23 +4,25 @@
 
         <div id="trialHandbook" class="collapse mt-4 mx-2">
             <h5>Resources</h5>
-                <p class="small ml-4">
-                    Refer to <a href="https://osu.ppy.sh/wiki/en/People/Nomination_Assessment_Team/Evaluations" target="_blank">this page</a> for a general overview on how evaluations are conducted, and <a href="https://osu.ppy.sh/wiki/en/People/Beatmap_Nominators/Becoming_a_Beatmap_Nominator#application-process" target="_blank">this page</a> for a more detailed explanation on how applications work.
-                </p>
-                <h6 class="ml-4">Markdown guide</h6>
-                <ul class="small ml-4">
-                    <li><code>**Bold text**</code></li>
-                    <li><code>*Italic text*</code></li>
-                    <li><code>~~Strikethrough~~</code></li>
-                    <li><code>`Inline code`</code></li>
-                    <li><code>> Quote block</code></li>
-                    <li><code>{#HEXCODE}(colored text)</code></li>
-                    <li><code>[Link text](https://osu.ppy.sh)</code></li>
-                    <li><code>![](imageLink)</code> to insert images</li>
-                    <li><code>@[youtube](youtubeVideoId)</code> to embed a YouTube video</li>
-                    <li><code>---</code> for a horizontal line (used for breaks)</li>
-                    <li><code>```</code>on top and bottom for a code block</li> 
-                </ul>
+            <p class="small ml-4">
+                Refer to <a href="https://osu.ppy.sh/wiki/en/People/Nomination_Assessment_Team/Evaluations" target="_blank">this page</a> for a general overview on how evaluations are conducted, and <a href="https://osu.ppy.sh/wiki/en/People/Beatmap_Nominators/Becoming_a_Beatmap_Nominator#application-process" target="_blank">this page</a> for a more detailed explanation on how applications work.
+            </p>
+            <h6 class="ml-4">
+                Markdown guide
+            </h6>
+            <ul class="small ml-4">
+                <li><code>**Bold text**</code></li>
+                <li><code>*Italic text*</code></li>
+                <li><code>~~Strikethrough~~</code></li>
+                <li><code>`Inline code`</code></li>
+                <li><code>> Quote block</code></li>
+                <li><code>{#HEXCODE}(colored text)</code></li>
+                <li><code>[Link text](https://osu.ppy.sh)</code></li>
+                <li><code>![](imageLink)</code> to insert images</li>
+                <li><code>@[youtube](youtubeVideoId)</code> to embed a YouTube video</li>
+                <li><code>---</code> for a horizontal line (used for breaks)</li>
+                <li><code>```</code>on top and bottom for a code block</li>
+            </ul>
             <br>
             <h5>Evaluating applicants</h5>
             <p class="small ml-4">
@@ -55,7 +57,6 @@
             <p class="small ml-4">
                 <b>Please don't leak anything!!!</b> We know you probably think this is obvious but it still needs to be said, considering that trust is a major part of being an NAT member.
             </p>
-                
         </div>
     </section>
 </template>

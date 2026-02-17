@@ -14,7 +14,7 @@ const vetoesSchema = new mongoose.Schema({
     beatmapMapper: { type: String }, // username
     beatmapMapperId: { type: Number }, // osuId
     status: { type: String, enum: ['pending', 'chatroom', 'available', 'wip', 'archive'], default: 'pending' },
-        /*
+    /*
             these names are stupid because veto changes have been iterative, and changing names could lead to bugs that i don't want to deal with right now
             pending = waiting for BNs to vouch for the veto
             chatroom = specific users can anonymously discuss the veto
@@ -42,7 +42,7 @@ const vetoesSchema = new mongoose.Schema({
     chatroomLocked: { type: Boolean },
     publicMediations: [{ type: 'ObjectId', ref: 'Mediation' }],
     vetoFormat: { type: Number },
-        /*
+    /*
             1 = og (no longer used)
             2 = multi-reason vetoes (no longer used)
             3 = no more "partially agree" (default veto) (no longer used)

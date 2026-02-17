@@ -8,7 +8,7 @@
 
             <h5 class="modal-title">
                 <user-link
-                    class="font-weight-bold text-white mr-1"
+                    class="font-weight-bold text-white"
                     :osu-id="selectedUser.osuId"
                     :username="selectedUser.username"
                 />
@@ -50,6 +50,7 @@ export default {
             } else if (!this.selectedUser.hasBasicAccess) {
                 return 'var(--primary)';
             }
+
             return `var(--${(this.selectedUser.groups.includes('nat') ? 'danger' : this.selectedUser.groups.includes('bn') ? 'bn' : 'primary')})`;
         },
         /** @returns {Object} */
@@ -57,7 +58,7 @@ export default {
             return {
                 background: `linear-gradient(0deg, ${this.getUserColor} -150%, rgba(0, 0, 0, 0.65) 130%), ${this.getCover} center no-repeat`,
                 backgroundSize: 'cover',
-                borderBottom: `4px solid ${this.getUserColor}`
+                borderBottom: `4px solid ${this.getUserColor}`,
             };
         },
     },

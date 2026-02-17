@@ -6,7 +6,7 @@
             class="card card-body mb-2"
             :class="message.isSystem ? 'card-bg-nat' : 'card-bg-user'"
         >
-            <img v-if="message.user" :src="'https://a.ppy.sh/' + message.user.osuId" class="card-avatar-img" />
+            <img v-if="message.user" :src="'https://a.ppy.sh/' + message.user.osuId" class="card-avatar-img">
             <div>
                 <b v-if="message.user">
                     <user-link
@@ -52,8 +52,8 @@
                 <div>
                     <button
                         class="btn btn-danger btn-block btn-sm mt-1"
-                        @click="saveMessage($event)"
                         :disabled="!isChatroomUser"
+                        @click="saveMessage($event)"
                     >
                         Submit post
                     </button>
@@ -63,11 +63,11 @@
                         <button
                             class="btn btn-block btn-sm"
                             :class="disableRevealUsernameButton ? 'btn-secondary' : 'btn-danger'"
-                            @click="revealUsername($event)"
                             :disabled="disableRevealUsernameButton"
                             data-toggle="tooltip"
                             data-placement="top"
                             :title="isChatroomUserPublic ? 'your username is already revealed!' : 'your future posts will not be anonymous!'"
+                            @click="revealUsername($event)"
                         >
                             Reveal your username
                         </button>
@@ -76,17 +76,17 @@
                         <button
                             class="btn btn-block btn-sm"
                             :class="disableRequestMediationButton ? 'btn-secondary' : 'btn-danger'"
-                            @click="requestMediation($event)"
                             :disabled="disableRequestMediationButton"
                             data-toggle="tooltip"
                             data-placement="top"
                             :title="isChatroomMediationRequestedUser ? 'you already requested mediation!' : !vetoMediationAvailable ? `this option will be available after ${cutoffDate.toLocaleString()}` : isVetoer || isVouchingUser ? 'between the veto-er and the vouching users, 2 people must request mediation!' : isMapper ? 'this will end the discussion and move to a larger vote!' : 'only the mapset host, vetoer, and vouching user can request mediation'"
+                            @click="requestMediation($event)"
                         >
                             Request veto mediation <span v-if="isVouchingUser || isVetoer">({{ selectedVeto.chatroomMediationRequestedUsers ? selectedVeto.chatroomMediationRequestedUsers.length : '0' }}/2)</span>
                         </button>
                     </div>
                 </div>
-                <hr />
+                <hr>
                 <div>
                     <b>Vote to dismiss veto</b>
                     <ul>
@@ -106,12 +106,11 @@
                         <button
                             class="btn btn-block btn-sm"
                             :class="disableStartVoteButton ? 'btn-secondary' : 'btn-danger'"
-                            @click="startVote($event)"
                             :disabled="disableStartVoteButton"
                             data-toggle="tooltip"
                             data-placement="top"
                             :title="selectedVeto.chatroomVoteEnabled ? 'a vote is already in progress!' : isMapper ? `start a vote based on your map's most recent changes` : 'only the mapper can do this!'"
-                            
+                            @click="startVote($event)"
                         >
                             Start vote to dismiss veto
                         </button>
@@ -120,11 +119,11 @@
                         <button
                             class="btn btn-block btn-sm"
                             :class="disableUpholdVoteButton ? 'btn-secondary' : 'btn-danger'"
-                            @click="vote('uphold', $event)"
                             :disabled="disableUpholdVoteButton"
                             data-toggle="tooltip"
                             data-placement="top"
                             :title="isChatroomUpholdVoter ? 'you already voted' : isVetoerOrVouchingUser && disableUpholdVoteButton ? `the mapper must begin the vote!` : isVetoerOrVouchingUser ? 'uphold = map needs more changes' : 'only the veto creator and vouching users can vote'"
+                            @click="vote('uphold', $event)"
                         >
                             Vote to uphold
                         </button>
@@ -133,12 +132,11 @@
                         <button
                             class="btn btn-block btn-sm"
                             :class="disableDismissVoteButton ? 'btn-secondary' : 'btn-danger'"
-                            @click="vote('dismiss', $event)"
                             :disabled="disableDismissVoteButton"
                             data-toggle="tooltip"
                             data-placement="top"
                             :title="isChatroomDismissVoter ? 'you already voted' : isVetoerOrVouchingUser && disableDismissVoteButton ? `the mapper must begin the vote!` : isVetoerOrVouchingUser ? 'dismiss = map is acceptable' : 'only the veto creator and vouching users can vote'"
-                            
+                            @click="vote('dismiss', $event)"
                         >
                             Vote to dismiss
                         </button>
@@ -200,7 +198,7 @@ export default {
         },
         disableStartVoteButton() {
             return !this.isMapper || this.selectedVeto.chatroomVoteEnabled;
-        }
+        },
     },
     data() {
         return {
@@ -273,7 +271,7 @@ export default {
                 }
             }
         },
-    }
+    },
 };
 </script>
 

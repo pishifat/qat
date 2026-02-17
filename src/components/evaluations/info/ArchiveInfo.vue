@@ -50,12 +50,11 @@
                 </p>
 
                 <div v-if="selectedEvaluation.feedback" class="card card-body small" v-html="$md.render(selectedEvaluation.feedback)" />
-
             </div>
 
             <hr>
 
-            <reviews-listing 
+            <reviews-listing
                 v-if="loggedInUser.isNatLeader || !isNatEvaluation"
             />
 
@@ -64,9 +63,9 @@
                 :is-new-evaluation-format="selectedEvaluation.isNewEvaluationFormat"
             />
 
-            <debug-view-document 
+            <debug-view-document
                 v-if="loggedInUser.isAdmin"
-                :document="selectedEvaluation" 
+                :document="selectedEvaluation"
             />
 
             <button
@@ -118,7 +117,7 @@ export default {
         /** @returns {string | string[]} */
         modes () {
             if (!this.selectedEvaluation) return [];
-            
+
             if (this.selectedEvaluation.user.modes.length && !this.selectedEvaluation.user.modes.includes('none'))
                 return this.selectedEvaluation.user.modes;
 

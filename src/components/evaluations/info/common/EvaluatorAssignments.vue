@@ -41,7 +41,7 @@
                     <button v-if="potentialMockEvaluators" class="btn btn-sm btn-primary btn-block" @click="enableMockEvaluators(true, $event)">
                         Select all eligible users as mock evaluators
                     </button>
-                    
+
                     <div v-if="potentialMockEvaluators && potentialMockEvaluators.length">
                         <p class="my-3">
                             Users:
@@ -103,13 +103,13 @@ export default {
             const reviews = this.selectedEvaluation.reviews || [];
             const evaluators = reviews.map(review => review.evaluator);
             const mockReviews = this.selectedEvaluation.mockReviews || [];
-            
+
             // Add mock evaluators to the list with a special flag for styling (only those who submitted reviews)
             const mockEvaluatorsWithFlag = mockReviews.map(review => ({
                 ...review.evaluator,
-                isMockEvaluator: true
+                isMockEvaluator: true,
             }));
-            
+
             return [...evaluators, ...mockEvaluatorsWithFlag];
         },
         hasMockEvaluators() {
@@ -119,12 +119,12 @@ export default {
             const hasBnEvaluators = this.selectedEvaluation.bnEvaluators && this.selectedEvaluation.bnEvaluators.length;
             const columnCount = hasBnEvaluators ? 4 : 3; // NAT, BN (optional), Mock, Total
             const colClass = columnCount === 4 ? 'col-lg-3' : 'col-lg-4';
-            
+
             return {
                 natEvaluators: colClass,
                 bnEvaluators: colClass,
                 mockEvaluators: colClass,
-                totalEvaluations: colClass
+                totalEvaluations: colClass,
             };
         },
     },

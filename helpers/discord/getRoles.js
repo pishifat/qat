@@ -4,7 +4,7 @@ let config = webhookConfig.get();
 function getRoles(roles) {
     webhookConfig.reload();
     config = webhookConfig.get();
-    
+
     let pings = '';
 
     for (const role of roles) {
@@ -98,7 +98,7 @@ function getRoles(roles) {
                 break;
         }
     }
-    
+
     return pings.trim();
 }
 

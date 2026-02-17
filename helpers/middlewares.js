@@ -98,7 +98,7 @@ async function hasPrivateInterOpsAccess(req, res, next) {
     next();
 }
 
-async function isPishifat(req, res, next) {
+function isPishifat(req, res, next) {
     const u = res.locals.userRequest;
     if (u.osuId !== config.admin.pishifat) return unauthorize(req, res);
 
@@ -107,7 +107,7 @@ async function isPishifat(req, res, next) {
 
 function discordEmbeds(req, res, next) {
     // skip if user is not a discord crawler
-    if (req.headers["user-agent"] !== "Mozilla/5.0 (compatible; Discordbot/2.0; +https://discordapp.com)")
+    if (req.headers['user-agent'] !== 'Mozilla/5.0 (compatible; Discordbot/2.0; +https://discordapp.com)')
         return next();
 
     const routes = [
@@ -129,7 +129,7 @@ function discordEmbeds(req, res, next) {
         { path: 'datacollection', title: 'Manage Resets' },
         { path: 'logs', title: 'Logs' },
         { path: 'spam', title: 'Spam' },
-        { path: 'grouphistory', title: 'Group History'},
+        { path: 'grouphistory', title: 'Group History' },
         { path: 'publicarchive', title: 'Public Evaluation Archives' },
         { path: 'docs', title: 'Documentation' },
     ];
@@ -138,9 +138,9 @@ function discordEmbeds(req, res, next) {
     const notFound = !route && req.path !== '/';
 
     const title = !notFound ? route.title : 'not found :(';
-    const siteName = notFound || (route.path.length && route.path !== 'home') ? "BN Management" : "";
+    const siteName = notFound || (route.path.length && route.path !== 'home') ? 'BN Management' : '';
     const url = `https://bn.mappersguild.com${req.path}`;
-    const description = `The place for everything related to the Beatmap Nominators${notFound ? ', not for whatever you were looking for.' : '!'}`
+    const description = `The place for everything related to the Beatmap Nominators${notFound ? ', not for whatever you were looking for.' : '!'}`;
 
     const html = `<html lang="en" prefix="og: https://ogp.me/ns#">
     <head>

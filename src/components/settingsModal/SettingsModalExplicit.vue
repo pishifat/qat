@@ -20,7 +20,7 @@
                         class="form-check-label text-secondary"
                         for="settings-explicit"
                     >
-                    Show explicit content
+                        Show explicit content
                     </label>
                 </div>
             </div>

@@ -258,7 +258,7 @@ router.get('/callback', async (req, res) => {
                     if ((group.id == 7 || group.id == 28 || group.id == 32) && group.playmodes && group.playmodes.length) {
                         modesInfo.push({
                             mode: group.playmodes[0] == 'fruits' ? 'catch' : group.playmodes[0],
-                            level: 'full'
+                            level: 'full',
                         });
                     }
                 }

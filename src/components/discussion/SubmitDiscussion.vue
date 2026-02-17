@@ -16,11 +16,19 @@
             <!-- link -->
             <div class="row mb-2">
                 <div class="col-sm-12">
-                    <div v-if="isContentReview">Direct link to content</div>
-                    <div v-else>Link to relevant discussion</div>
+                    <div v-if="isContentReview">
+                        Direct link to content
+                    </div>
+                    <div v-else>
+                        Link to relevant discussion
+                    </div>
                     <div class="small text-secondary">
-                        <div v-if="isContentReview">If link is an image, the URL should end in <code>.jpg</code> or <code>.png</code>. Avoid Imgur if possible because it's blocked in some countries!</div>
-                        <div v-else>Optional</div>
+                        <div v-if="isContentReview">
+                            If link is an image, the URL should end in <code>.jpg</code> or <code>.png</code>. Avoid Imgur if possible because it's blocked in some countries!
+                        </div>
+                        <div v-else>
+                            Optional
+                        </div>
                     </div>
                     <input
                         v-model="discussionLink"
@@ -34,8 +42,12 @@
             <div class="row mb-2">
                 <div class="col-sm-12">
                     <div>{{ isContentReview ? 'Beatmap link and additional information' : `Context for vote/discussion` }}</div>
-                    <div v-if="isContentReview" class="small text-secondary">If this is a video submission, provide timestamps for the section that needs to be reviewed</div>
-                    <div v-else class="small text-secondary">Anything useful for people participating in this discussion</div>
+                    <div v-if="isContentReview" class="small text-secondary">
+                        If this is a video submission, provide timestamps for the section that needs to be reviewed
+                    </div>
+                    <div v-else class="small text-secondary">
+                        Anything useful for people participating in this discussion
+                    </div>
                     <textarea
                         v-model="shortReason"
                         class="form-control"
@@ -117,7 +129,9 @@
                 <!-- custom vote text -->
                 <div v-if="voteOptions >= 2" class="mt-1">
                     <div>Replace option text</div>
-                    <div class="small text-secondary">Default option text will replace any empty inputs</div>
+                    <div class="small text-secondary">
+                        Default option text will replace any empty inputs
+                    </div>
                     <input
                         v-model="agreeOverwriteText"
                         type="text"
@@ -139,7 +153,7 @@
                     >
                 </div>
             </div>
-            
+
             <!-- submit -->
             <hr>
             <div class="row">
@@ -201,13 +215,14 @@ export default {
     methods: {
         async submitDiscussion(e) {
             let missingInfo;
+
             if (this.isContentReview && (!this.discussionLink || !this.shortReason)) {
                 missingInfo = true;
             } else if (!this.isContentReview && (!this.title || !this.shortReason || !this.mode.length || !this.group.length || this.voteOptions === null)) {
                 missingInfo = true;
             }
 
-            
+
 
             if (missingInfo) {
                 return this.$store.dispatch('updateToastMessages', {

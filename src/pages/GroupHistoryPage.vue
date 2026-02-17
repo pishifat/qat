@@ -4,16 +4,16 @@
             <div class="form-inline">
                 <input
                     id="user"
+                    v-model="params.user"
                     class="form-control col-md-6"
                     type="text"
                     autocomplete="off"
                     placeholder="username or osu! ID..."
-                    v-model="params.user"
                 >
                 <select
                     id="group"
-                    class="form-control col-md-6"
                     v-model="params.group"
+                    class="form-control col-md-6"
                 >
                     <option
                         v-for="group in groups"
@@ -26,18 +26,18 @@
                 </select>
                 <input
                     id="min_date"
+                    v-model="params.min_date"
                     class="form-control col-md-6"
                     type="text"
-                    v-model="params.min_date"
                     placeholder="start date..."
                     @focus="setInputType($event, 'date')"
                     @blur="setInputType($event, 'text')"
                 >
                 <input
                     id="max_date"
+                    v-model="params.max_date"
                     class="form-control col-md-6"
                     type="text"
-                    v-model="params.max_date"
                     placeholder="end date..."
                     @focus="setInputType($event, 'date')"
                     @blur="setInputType($event, 'text')"
@@ -47,9 +47,8 @@
                     type="submit"
                     @click="search()"
                 >
-                Search
+                    Search
                 </button>
-
             </div>
         </section>
 
@@ -60,7 +59,7 @@
                         {{ toRelativeDate(event.created_at) }}
                     </td>
                     <td>
-                        <i class="mr-1 fas" :class="parseAction(event.type, 'icon')" />
+                        <i class="fas" :class="parseAction(event.type, 'icon')" />
                         <span>{{ parseAction(event.type, 'text') }}</span>
                     </td>
                     <td>
@@ -72,7 +71,7 @@
                         <a :href="'https://osu.ppy.sh/groups/' + event.group_id" target="_blank">
                             {{ event.group_name }}
                         </a>
-                        <mode-display v-if="event.playmodes" class="ml-1" :modes="event.playmodes" />
+                        <mode-display v-if="event.playmodes" :modes="event.playmodes" />
                     </td>
                 </tr>
             </data-table>
@@ -83,7 +82,7 @@
                 type="button"
                 @click="showMore($event)"
             >
-                <i class="fas fa-angle-down mr-1" /> show more <i class="fas fa-angle-down ml-1" />
+                <i class="fas fa-angle-down" /> show more <i class="fas fa-angle-down" />
             </button>
         </section>
         <toast-messages />
@@ -105,7 +104,7 @@ export default {
     data() {
         return {
             events: [],
-            groups: [ 
+            groups: [
                 { id: 0, identifier: null, name: 'All groups' },
                 { id: 28, identifier: 'bng', name: 'Beatmap Nominators' },
                 { id: 32, identifier: 'bng_limited', name: 'Beatmap Nominators (Probationary)' },
@@ -180,7 +179,7 @@ export default {
             return type === 'icon' ? icon : text;
         },
         async getHistory() {
-            const response = await this.$http.initialRequest('/groupHistory')
+            const response = await this.$http.initialRequest('/groupHistory');
 
             if (this.params.cursor_string) {
                 this.events = this.events.concat(response.data.events);
@@ -192,6 +191,7 @@ export default {
         },
         async showMore(e, clearEvents = false) {
             let params = '';
+
             for (const key in this.params) {
                 if (this.params[key]) {
                     params += `${key}=${this.params[key]}&`;
@@ -203,17 +203,17 @@ export default {
 
             if (clearEvents) this.events = [];
 
-            if (response.data.events.length) this.events = [...this.events, ...response.data.events]
-            
+            if (response.data.events.length) this.events = [...this.events, ...response.data.events];
+
             this.params.cursor_string = response.data.cursor_string;
         },
         async search(e) {
             this.params.cursor_string = null;
-            await this.showMore(e, true)
+            await this.showMore(e, true);
         },
         setInputType(e, type) {
             if (type === 'text' && e.target.value === '') e.target.type = 'text';
-            else e.target.type = 'date';            
+            else e.target.type = 'date';
         },
     },
 };

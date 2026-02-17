@@ -57,7 +57,7 @@ export default {
         findUserSummary() {
             this.selfSummaryText = '';
             this.noteId = '';
-            
+
             if (this.selectedEvaluation.selfSummary) {
                 this.selfSummaryText = this.selectedEvaluation.selfSummary.comment;
                 this.noteId = this.selectedEvaluation.selfSummary.id;

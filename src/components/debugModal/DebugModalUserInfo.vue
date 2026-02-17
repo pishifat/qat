@@ -4,7 +4,7 @@
             <div class="col-sm-3">
                 <div>User Document</div>
                 <small class="text-secondary">
-                    Your current user document              
+                    Your current user document
                 </small>
             </div>
             <div class="col-sm-9">

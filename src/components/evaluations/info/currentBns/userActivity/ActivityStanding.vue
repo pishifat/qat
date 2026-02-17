@@ -39,7 +39,7 @@ export default {
             'month3Nominations',
             'currentMonthNominations',
             'isLoading',
-            'selectedUser'
+            'selectedUser',
         ]),
         bnJoinDate() {
             if (this.selectedUser.groups.includes('bn') && this.selectedUser.history && this.selectedUser.history.length) {
@@ -47,7 +47,7 @@ export default {
             }
 
             return new Date();
-        }
+        },
     },
     methods: {
         generateDisplayText (month, i) {
@@ -69,8 +69,8 @@ export default {
             } else if (month >= 2) {
                 return 'bg-success';
             }
-        }
-    }
+        },
+    },
 };
 </script>
 

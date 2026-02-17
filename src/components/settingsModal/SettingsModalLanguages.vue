@@ -28,19 +28,19 @@
                             v-if="!userLanguages.includes(selectedLanguage)"
                             class="btn btn-sm btn-outline-success"
                             type="button"
-                            @click="updateLanguages($event)"
                             :disabled="userLanguages.includes(selectedLanguage)"
+                            @click="updateLanguages($event)"
                         >
                             <i class="fas fa-plus" />
                         </button>
                     </div>
                     <div class="input-group-append">
                         <button
-                        v-if="userLanguages.includes(selectedLanguage)"
+                            v-if="userLanguages.includes(selectedLanguage)"
                             class="btn btn-sm btn-outline-danger"
                             type="button"
-                            @click="updateLanguages($event)"
                             :disabled="!userLanguages.includes(selectedLanguage)"
+                            @click="updateLanguages($event)"
                         >
                             <i class="fas fa-minus" />
                         </button>

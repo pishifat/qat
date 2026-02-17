@@ -54,10 +54,10 @@ export default {
                 });
 
                 if (this.$http.isValid(res)) {
-                let user = this.selectedUser;
-                user.discordId = res.discordId;
-                this.$store.commit('users/updateUser', user);
-            }
+                    let user = this.selectedUser;
+                    user.discordId = res.discordId;
+                    this.$store.commit('users/updateUser', user);
+                }
             }
 
             this.editingIdInput = !this.editingIdInput;

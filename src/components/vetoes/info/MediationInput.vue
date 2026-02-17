@@ -2,7 +2,7 @@
     <div class="mb-4">
         <b>Mediation response</b>
         <div class="small px-4 mb-2 text-secondary">
-           Briefly explain why you agree or disagree with each veto reason below. You don't need to write a lot — even one sentence is okay! Your response will be anonymous.
+            Briefly explain why you agree or disagree with each veto reason below. You don't need to write a lot — even one sentence is okay! Your response will be anonymous.
         </div>
 
         <div v-for="(reason, i) in selectedVeto.reasons" :key="i">

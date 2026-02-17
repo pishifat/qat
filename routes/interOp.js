@@ -21,7 +21,7 @@ router.use((req, res, next) => {
     const isWs = req.header('Upgrade');
 
     if (!secret || !username || config.interOpAccess[username].secret !== secret) {
-        if (isWs != "websocket") return res.status(401).send({ error: 'Invalid credentials' });
+        if (isWs != 'websocket') return res.status(401).send({ error: 'Invalid credentials' });
     }
 
     return next();
@@ -128,9 +128,11 @@ router.get('/users/joinLeaveByDateRange', async (req, res) => {
     if (!startDate || !endDate) {
         return res.status(400).send({ error: 'Query parameters "startDate" and "endDate" are required (ISO 8601)' });
     }
+
     if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
         return res.status(400).send({ error: 'Invalid startDate or endDate' });
     }
+
     if (startDate > endDate) {
         return res.status(400).send({ error: 'startDate must be before or equal to endDate' });
     }
@@ -141,8 +143,10 @@ router.get('/users/joinLeaveByDateRange', async (req, res) => {
     const byMode = () => {
         const o = {};
         MODES.forEach(m => { o[m] = new Map(); }); // osuId -> username
+
         return o;
     };
+
     const bnAddedByMode = byMode();
     const bnDepartedByMode = byMode();
     const natAddedByMode = byMode();
@@ -174,8 +178,10 @@ router.get('/users/joinLeaveByDateRange', async (req, res) => {
     }
 
     const profileUrl = (osuId) => `https://osu.ppy.sh/users/${osuId}`;
+
     const formatCell = (userMap) => {
         if (!userMap || userMap.size === 0) return '—';
+
         return Array.from(userMap.entries())
             .sort((a, b) => a[1].localeCompare(b[1]))
             .map(([osuId, username]) => `[${username}](${profileUrl(osuId)})`)
@@ -184,10 +190,12 @@ router.get('/users/joinLeaveByDateRange', async (req, res) => {
 
     const buildTable = (addedByMode, departedByMode) => {
         const rows = ['|  | Users |', '| :-- | :-- |'];
+
         for (const m of MODES) {
             rows.push(`| ![${modeLabel(m)}](/wiki/shared/mode/${m}.png "${modeLabel(m)}") Added | ${formatCell(addedByMode[m])} |`);
             rows.push(`| ![${modeLabel(m)}](/wiki/shared/mode/${m}.png "${modeLabel(m)}") Departed | ${formatCell(departedByMode[m])} |`);
         }
+
         return rows.join('\n');
     };
 
@@ -315,7 +323,7 @@ router.get('/eventsByDate/:date', async (req, res) => {
 /* GET content review */
 router.get('/contentReview/:limit', async (req, res) => {
     let limit = parseInt(req.params.limit);
-    
+
     if (isNaN(limit)) {
         return res.status(404).send({ error: 'Invalid limit' });
     }
@@ -323,6 +331,7 @@ router.get('/contentReview/:limit', async (req, res) => {
     if (limit > 100) {
         limit = 100;
     }
+
     res.json(
         await Discussion
             .find({
@@ -333,7 +342,7 @@ router.get('/contentReview/:limit', async (req, res) => {
             })
             .limit(limit)
             .select('discussionLink shortReason title')
-            .sort({ createdAt: -1 }),
+            .sort({ createdAt: -1 })
     );
 });
 
@@ -474,7 +483,7 @@ router.get('/submittedEvaluations/:userInput/:days', middlewares.hasPrivateInter
     if (isNaN(days)) {
         return res.status(404).send({ error: 'Invalid days count' });
     }
-    
+
     let date = new Date();
     date.setDate(date.getDate() - days);
 
@@ -489,7 +498,7 @@ router.get('/submittedEvaluations/:userInput/:days', middlewares.hasPrivateInter
 
     for (const review of reviews) {
         let evaluation;
-        
+
         // check for app
         evaluation = await AppEvaluation
             .findOne({
@@ -499,10 +508,10 @@ router.get('/submittedEvaluations/:userInput/:days', middlewares.hasPrivateInter
 
         if (!evaluation) {
             evaluation = await BnEvaluation
-            .findOne({
-                reviews: review._id,
-            })
-            .populate(evaluationPopulate);
+                .findOne({
+                    reviews: review._id,
+                })
+                .populate(evaluationPopulate);
         }
 
         submittedEvaluations.push(evaluation);
@@ -534,33 +543,33 @@ router.get('/assignedEvaluations/:userInput/:days', middlewares.hasPrivateInterO
             natEvaluators: user._id,
             $or: [
                 { active: true },
-                { 
+                {
                     active: false,
-                    consensus: {$exists: true }
-                }
+                    consensus: { $exists: true },
+                },
             ],
             createdAt: { $gt: date },
         })
         .populate(evaluationPopulate);
-    
+
     const assignedEvaluations = await Evaluation
         .find({
             natEvaluators: user._id,
             $or: [
                 { active: true },
-                { 
+                {
                     active: false,
-                    consensus: {$exists: true }
-                }
+                    consensus: { $exists: true },
+                },
             ],
             createdAt: { $gt: date },
         })
         .populate(evaluationPopulate);
 
     res.json({
-        assignedApplications: assignedApplications,
-        assignedEvaluations: assignedEvaluations,
-    })
+        assignedApplications,
+        assignedEvaluations,
+    });
 });
 
 module.exports = router;

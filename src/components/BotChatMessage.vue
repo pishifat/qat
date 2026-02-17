@@ -4,25 +4,26 @@
             <span v-html="$md.render(message)" />
         </div>
 
-        <button v-if="
-            users.length &&
-            ((!isReviewable || (isReviewed && !isPassApp)) || (isReviewed && isPassApp && isSecurityChecked && hasNatBuddy))
+        <button
+            v-if="
+                users.length &&
+                    ((!isReviewable || (isReviewed && !isPassApp)) || (isReviewed && isPassApp && isSecurityChecked && hasNatBuddy))
             "
-            class="btn btn-sm btn-block btn-success mb-2" 
+            class="btn btn-sm btn-block btn-success mb-2"
             @click="sendMessage($event)"
         >
             {{ customText }}
         </button>
         <div v-if="isReviewable && !isReviewed" class="alert alert-warning mb-2 mt-2">
-            <i class="fas fa-exclamation-triangle"></i>
+            <i class="fas fa-exclamation-triangle" />
             Evaluation needs to be marked as reviewed before sending!
         </div>
         <div v-if="isPassApp && !isSecurityChecked" class="alert alert-warning mb-2 mt-2">
-            <i class="fas fa-exclamation-triangle"></i>
+            <i class="fas fa-exclamation-triangle" />
             User needs to be marked as security checked before proceeding!
         </div>
         <div v-if="isPassApp && !hasNatBuddy" class="alert alert-warning mb-2 mt-2">
-            <i class="fas fa-exclamation-triangle"></i>
+            <i class="fas fa-exclamation-triangle" />
             User is lonely and needs a NAT buddy before sending!
         </div>
     </div>
@@ -36,7 +37,7 @@ export default {
         message: {
             type: String,
             default() {
-                return "you shouldn't be seeing this, contact pishifat ASAP";
+                return 'you shouldn\'t be seeing this, contact pishifat ASAP';
             },
             required: true,
         },

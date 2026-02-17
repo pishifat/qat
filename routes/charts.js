@@ -10,14 +10,14 @@ const router = express.Router();
 router.get('/:id/rankedNominations/:year/:month', middlewares.isLoggedIn, async (req, res) => {
     try {
         const user = await User.findById(req.params.id).orFail();
-        
+
         if (req.session.mongoId != user.id) {
             return res.json({ error: 'Unauthorized' });
         }
 
         const year = parseInt(req.params.year);
         const month = parseInt(req.params.month) - 1; // Month is 0-indexed in Date constructor
-        
+
         if (isNaN(year) || isNaN(month) || month < 0 || month > 11) {
             return res.json({ error: 'Invalid year or month' });
         }
@@ -25,16 +25,16 @@ router.get('/:id/rankedNominations/:year/:month', middlewares.isLoggedIn, async 
         // Create date range for ranked maps in the specified month
         const rankStartDate = new Date(year, month, 1);
         const rankEndDate = new Date(year, month + 1, 0); // Last day of the month
-        
+
         // Look back 1 year for nominations prior to the rank month
         const nominationStartDate = new Date(year - 1, month, 1);
         const nominationEndDate = rankEndDate;
 
         // Get unique user events (nominations/qualifications) from the past year
-        const modes = user.modes.length && !user.modes.includes('none') 
-            ? user.modes 
+        const modes = user.modes.length && !user.modes.includes('none')
+            ? user.modes
             : ['osu', 'taiko', 'catch', 'mania'];
-        
+
         const uniqueUserEvents = await Aiess.getUniqueUserEvents(
             user.osuId,
             nominationStartDate,
@@ -55,14 +55,14 @@ router.get('/:id/rankedNominations/:year/:month', middlewares.isLoggedIn, async 
             .find({
                 beatmapsetId: { $in: beatmapsetIds },
                 type: 'rank',
-                timestamp: { $gte: rankStartDate, $lte: rankEndDate }
+                timestamp: { $gte: rankStartDate, $lte: rankEndDate },
             })
             .sort({ timestamp: -1 });
 
-        res.json({ 
+        res.json({
             events: rankEvents,
             month: req.params.month,
-            year: req.params.year
+            year: req.params.year,
         });
     } catch (error) {
         console.error('Error fetching ranked nominations:', error);
@@ -76,42 +76,42 @@ router.get('/month/:year/:month', async (req, res) => {
         const year = parseInt(req.params.year);
         const month = parseInt(req.params.month) - 1; // Month is 0-indexed in Date constructor
         let mode = req.query.mode || 'osu';
-        
+
         if (isNaN(year) || isNaN(month) || month < 0 || month > 11) {
             return res.json({ error: 'Invalid year or month' });
         }
-        
+
         // Default 'none' mode to 'osu'
         if (mode === 'none') {
             mode = 'osu';
         }
-        
+
         if (!['osu', 'taiko', 'catch', 'mania'].includes(mode)) {
             return res.json({ error: 'Invalid mode' });
         }
-        
+
         // Create date range for the specified month
         const startDate = new Date(year, month, 1);
         const endDate = new Date(year, month + 1, 0); // Last day of the month
-        
+
         // Find events that are charted and within the date range, filtered by mode
         const chartedEvents = await Aiess
             .find({
                 timestamp: { $gte: startDate, $lte: endDate },
                 charted: { $exists: true, $ne: [] },
                 type: 'rank',
-                modes: mode
+                modes: mode,
             })
             .populate('charted', 'username osuId')
             .sort({ timestamp: -1 });
-        
-        res.json({ 
+
+        res.json({
             events: chartedEvents,
             month: req.params.month,
             year: req.params.year,
-            mode: mode
+            mode,
         });
-        
+
     } catch (error) {
         console.error('Error fetching charted events:', error);
         res.json({ error: 'Failed to fetch charted events' });
@@ -138,6 +138,7 @@ router.post('/:eventId/toggleSelection', middlewares.isLoggedIn, async (req, res
         if (!event.charted) {
             event.charted = [];
         }
+
         if (!event.chartUpvoted) {
             event.chartUpvoted = [];
         }
@@ -149,24 +150,28 @@ router.post('/:eventId/toggleSelection', middlewares.isLoggedIn, async (req, res
         if (userIndex === -1) {
             // User hasn't selected this event, add them to both charted and chartUpvoted
             event.charted.push(userId);
+
             if (upvoteIndex === -1) {
                 event.chartUpvoted.push(userId);
             }
+
             isSelected = true;
         } else {
             // User has selected this event, remove them from both charted and chartUpvoted
             event.charted.splice(userIndex, 1);
+
             if (upvoteIndex !== -1) {
                 event.chartUpvoted.splice(upvoteIndex, 1);
             }
+
             isSelected = false;
         }
 
         await event.save();
 
-        res.json({  
+        res.json({
             isSelected,
-            eventId: event._id
+            eventId: event._id,
         });
 
         Logger.generate(
@@ -205,7 +210,7 @@ router.post('/:eventId/vote', middlewares.isLoggedIn, middlewares.isBnOrNat, asy
 
         const upvoteIndex = event.chartUpvoted.indexOf(userId);
         const downvoteIndex = event.chartDownvoted.indexOf(userId);
-        
+
         let action = '';
 
         if (voteType === 'up') {
@@ -213,7 +218,7 @@ router.post('/:eventId/vote', middlewares.isLoggedIn, middlewares.isBnOrNat, asy
             if (downvoteIndex !== -1) {
                 event.chartDownvoted.splice(downvoteIndex, 1);
             }
-            
+
             // Toggle upvote
             if (upvoteIndex === -1) {
                 event.chartUpvoted.push(userId);
@@ -227,7 +232,7 @@ router.post('/:eventId/vote', middlewares.isLoggedIn, middlewares.isBnOrNat, asy
             if (upvoteIndex !== -1) {
                 event.chartUpvoted.splice(upvoteIndex, 1);
             }
-            
+
             // Toggle downvote
             if (downvoteIndex === -1) {
                 event.chartDownvoted.push(userId);

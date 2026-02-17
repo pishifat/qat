@@ -21,13 +21,15 @@
         </button>
 
         <div v-if="mediators">
-            <hr />
+            <hr>
 
             <!-- begin mediation -->
             <button class="btn btn-sm btn-block btn-success mb-2" @click="beginMediation($event)">
                 Begin mediation
             </button>
-            <div v-if="beginningMediation" class="mt-2 small text-secondary">this will take a few seconds...</div>
+            <div v-if="beginningMediation" class="mt-2 small text-secondary">
+                this will take a few seconds...
+            </div>
 
             <!-- list mediators -->
             <div class="row">
@@ -88,6 +90,7 @@ export default {
         slimmedMediators() {
             if (this.mediators) {
                 const tempUsers = [];
+
                 for (const mediator of this.mediators) {
                     tempUsers.push({ osuId: mediator.osuId });
                 }
@@ -135,7 +138,7 @@ export default {
                     this.commitVeto(veto, 'Started veto mediation');
                     this.beginningMediation = false;
                 }
-            } 
+            }
         },
         async selectMediators (e) {
             let excludeUsers = this.excludeUsers.split(',');

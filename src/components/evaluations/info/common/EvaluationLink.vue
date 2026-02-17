@@ -17,5 +17,5 @@ export default {
     computed: {
         ...mapGetters('evaluations', ['selectedEvaluation']),
     },
-}; 
+};
 </script>

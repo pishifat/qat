@@ -4,17 +4,17 @@
             <!-- VCC violations checkbox -->
             <div v-if="!selectedDiscussionVote.onlyWrittenInput && isContentReview && vote == 3">
                 Select the <a href="https://osu.ppy.sh/wiki/en/Rules/Visual_Content_Considerations" target="_blank">Visual Content Considerations</a> that are violated:
-                <div class="form-check ml-4" v-for="(option, i) in vccOptions" :key="i">
+                <div v-for="(option, i) in vccOptions" :key="i" class="form-check ml-4">
                     <div v-if="option.active">
                         <input
-                            :key="i"
                             :id="option.name"
+                            :key="i"
                             v-model="vccChecked"
                             class="form-check-input"
                             type="checkbox"
                             name="violation"
                             :value="option.name"
-                         >
+                        >
                         <label class="form-check-label" :for="option.name">{{ option.text }}</label>
                     </div>
                 </div>
@@ -73,8 +73,8 @@
             <div class="d-flex justify-content-end mt-2">
                 <button
                     class="btn btn-sm btn-primary"
-                    @click="submitMediation($event)"
                     :disabled="isContentReview && (!vote || (vote == 3 && !vccChecked.length))"
+                    @click="submitMediation($event)"
                 >
                     Submit
                 </button>
@@ -93,7 +93,7 @@ export default {
     props: {
         isContentReview: {
             type: Boolean,
-            default: false, 
+            default: false,
         },
     },
     data() {

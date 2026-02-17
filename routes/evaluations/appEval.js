@@ -26,7 +26,7 @@ const defaultPopulate = [
     { path: 'bnEvaluators', select: 'username osuId discordId isBnEvaluator' },
     { path: 'natEvaluators', select: 'username osuId discordId isBnEvaluator' },
     { path: 'mockEvaluators', select: 'username osuId discordId isBnEvaluator' },
-    { 
+    {
         path: 'vibeChecks',
         select: 'mediator vote',
         populate: {
@@ -62,14 +62,14 @@ const defaultPopulate = [
                 select: 'username osuId',
             },
         ],
-    }
+    },
 ];
 
 // hides all reviews other than current user
 function getActiveBnDefaultPopulate(mongoId) {
     return [
         { path: 'user', select: 'username osuId' },
-        { 
+        {
             path: 'vibeChecks',
             select: 'mediator vote',
             populate: {
@@ -127,14 +127,14 @@ router.get('/relevantInfo', async (req, res) => {
         const settings = await Settings.findOne({}); // there's only one
         const trialNatEnabledModeSettings = settings.modeSettings.filter(s => s.hasTrialNat == true);
         const trialNatModes = trialNatEnabledModeSettings.map(s => s.mode);
-        
+
         applications = await AppEvaluation
             .find({
                 active: true,
                 $and: [
                     { mode: res.locals.userRequest.modes },
                     { mode: trialNatModes },
-                ]
+                ],
             })
             .populate(defaultPopulate)
             .sort({
@@ -153,17 +153,17 @@ router.get('/relevantInfo', async (req, res) => {
                 .sort({
                     createdAt: -1,
                 }),
-                AppEvaluation
-                    .find({
-                        mockEvaluators: req.session.mongoId,
-                        discussion: true,
-                        active: false,
-                    })
-                    .select(['active', 'user', 'discussion', 'mockReviews', 'mode', 'mods', 'reasons', 'oszs', 'createdAt', 'updatedAt', 'comment', 'consensus']) // "consensus" is the only difference
-                    .populate(inactiveBnDefaultPopulate)
-                    .sort({
-                        createdAt: -1,
-                    })
+            AppEvaluation
+                .find({
+                    mockEvaluators: req.session.mongoId,
+                    discussion: true,
+                    active: false,
+                })
+                .select(['active', 'user', 'discussion', 'mockReviews', 'mode', 'mods', 'reasons', 'oszs', 'createdAt', 'updatedAt', 'comment', 'consensus']) // "consensus" is the only difference
+                .populate(inactiveBnDefaultPopulate)
+                .sort({
+                    createdAt: -1,
+                }),
         ]);
 
         applications = activeApplications.concat(inactiveApplications);
@@ -290,7 +290,7 @@ router.post('/submitEval/:id', middlewares.isBnOrNat, async (req, res) => {
             evaluation,
             req.session,
             req.body.moddingComment,
-            req.body.vote,
+            req.body.vote
         );
     } else {
         if (!res.locals.userRequest.isNat && !res.locals.userRequest.isTrialNat) {
@@ -304,7 +304,7 @@ router.post('/submitEval/:id', middlewares.isBnOrNat, async (req, res) => {
             req.session,
             res.locals.userRequest.isNat || res.locals.userRequest.isTrialNat,
             req.body.moddingComment,
-            req.body.vote,
+            req.body.vote
         );
     }
 
@@ -482,7 +482,7 @@ router.post('/setConsensus/:id', middlewares.isNatOrTrialNat, async (req, res) =
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.lightBlue,
             description: `[**${evaluation.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${evaluation.id}) consensus set to **${req.body.consensus || 'none'}**`,
-        }
+        },
     ];
 
     await discord.webhookPost(embed, evaluation.mode);
@@ -559,7 +559,7 @@ router.post('/selectMockEvaluators/:id', middlewares.isNat, async (req, res) => 
 /* POST enable mock evaluators */
 router.post('/enableMockEvaluators/:id', middlewares.isNat, async (req, res) => {
     const mockEvaluators = req.body.mockEvaluators || [];
-    
+
     for (let i = 0; i < mockEvaluators.length; i++) {
         const mockEvaluator = mockEvaluators[i];
         const user = await User.findOne({ osuId: mockEvaluator.osuId });
@@ -607,12 +607,12 @@ router.post('/sendMessages/:id', middlewares.isNatOrTrialNat, async (req, res) =
         channel = {
             name: `BN App Mock Eval (${application.mode == 'osu' ? 'osu!' : `osu!${application.mode}`})`,
             description: `Invite to participate in a mock evaluation of a BN application`,
-        }
+        };
     } else {
         channel = {
             name: `BN App Results (${application.mode == 'osu' ? 'osu!' : `osu!${application.mode}`})`,
             description: `Results for your recent BN application (${moment(application.createdAt).format('YYYY-MM-DD')})`,
-        }
+        };
     }
 
     const message = await osuBot.sendAnnouncement(osuIds, channel, req.body.message);
@@ -643,7 +643,7 @@ router.post('/toggleIsReviewed/:id', middlewares.isNat, async (req, res) => {
     const app = await AppEvaluation
         .findById(req.params.id)
         .populate(defaultPopulate);
-        
+
     app.isReviewed = !app.isReviewed;
     await app.save();
 
@@ -669,7 +669,7 @@ router.post('/toggleIsSecurityChecked/:id', middlewares.isNat, async (req, res) 
     const app = await AppEvaluation
         .findById(req.params.id)
         .populate(defaultPopulate);
-        
+
     app.isSecurityChecked = !app.isSecurityChecked;
     await app.save();
 
@@ -701,7 +701,7 @@ router.post('/assignNatBuddy/:appId/:userId', middlewares.isNat, async (req, res
             .findById(req.params.userId)
             .orFail(),
     ]);
-    
+
     app.natBuddy = nat._id;
     await app.save();
 

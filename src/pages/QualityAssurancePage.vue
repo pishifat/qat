@@ -29,7 +29,7 @@
                         title="show 200 more events throughout all modes"
                         @click="loadMore($event)"
                     >
-                        <i class="fas fa-angle-down mr-1" /> show more <i class="fas fa-angle-down ml-1" />
+                        <i class="fas fa-angle-down" /> show more <i class="fas fa-angle-down" />
                     </button>
                 </div>
             </section>

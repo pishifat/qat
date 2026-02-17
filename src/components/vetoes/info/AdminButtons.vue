@@ -68,6 +68,7 @@ export default {
         slimmedMediators() {
             if (this.mediators) {
                 const tempUsers = [];
+
                 for (const mediator of this.mediators) {
                     tempUsers.push({ osuId: mediator.osuId });
                 }

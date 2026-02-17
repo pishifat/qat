@@ -16,14 +16,12 @@
                 />
                 <small
                     v-if="bnHistory.length"
-                    class="ml-1"
                 >
                     BN for {{ calculateDuration('bn') }}
                 </small>
 
                 <small
                     v-if="natHistory.length"
-                    class="ml-1"
                 >
                     NAT for {{ calculateDuration('nat') }}
 

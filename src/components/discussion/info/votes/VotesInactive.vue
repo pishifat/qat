@@ -6,14 +6,19 @@
             Violations against the <a href="https://osu.ppy.sh/wiki/en/Rules/Visual_Content_Considerations" target="_blank">Visual Content Considerations</a>:
             <ul>
                 <span v-for="option in visualContentConsiderations" :key="option.name">
-                    <li v-if="countVccSelections(option.name)"><b>{{ option.text }}:</b> {{ countVccSelections(option.name)}} vote{{ countVccSelections(option.name) == 1 ? '' : 's' }}</li>
+                    <li v-if="countVccSelections(option.name)"><b>{{ option.text }}:</b> {{ countVccSelections(option.name) }} vote{{ countVccSelections(option.name) == 1 ? '' : 's' }}</li>
                 </span>
             </ul>
             <hr>
         </div>
 
         <!-- show/hide bns button -->
-        <button v-if="selectedDiscussionVote.isContentReview" class="btn btn-sm btn-block btn-primary ml-2 mb-2" type="submit" @click="showAll = !showAll">
+        <button
+            v-if="selectedDiscussionVote.isContentReview"
+            class="btn btn-sm btn-block btn-primary ml-2 mb-2"
+            type="submit"
+            @click="showAll = !showAll"
+        >
             {{ showAll ? 'Hide BN votes' : 'Show all votes' }}
         </button>
 
@@ -133,7 +138,7 @@ export default {
             }
 
             return count;
-        }
+        },
     },
 };
 </script>

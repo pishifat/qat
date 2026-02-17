@@ -39,15 +39,15 @@ export default {
             return this.type ? this.$store.state[this.storeModule].evalPagination : this.$store.state[this.storeModule].pagination;
         },
         page () {
-            return this.type === 'applications' ? 
+            return this.type === 'applications' ?
                 this.pagination.archivedAppsPage :
-                this.type === 'evaluations' ? 
+                this.type === 'evaluations' ?
                     this.pagination.archivedCurrentBnEvalsPage :
                     this.pagination.page;
         },
         maxPages () {
-            return this.type === 'applications' ? 
-                this.pagination.archivedAppsMaxPages : 
+            return this.type === 'applications' ?
+                this.pagination.archivedAppsMaxPages :
                 this.type === 'evaluations' ?
                     this.pagination.archivedCurrentBnEvalsMaxPages :
                     this.pagination.maxPages;
@@ -55,8 +55,8 @@ export default {
     },
     methods: {
         increasePage () {
-            const mutation = 
-                this.type === 'applications' ? 
+            const mutation =
+                this.type === 'applications' ?
                     '/evalPagination/increaseArchivedAppsPage' :
                     this.type === 'evaluations' ?
                         '/evalPagination/increaseArchivedCurrentBnEvalsPage' :
@@ -65,8 +65,8 @@ export default {
             this.$store.commit(this.storeModule + mutation);
         },
         decreasePage () {
-            const mutation = 
-                this.type === 'applications' ? 
+            const mutation =
+                this.type === 'applications' ?
                     '/evalPagination/decreaseArchivedAppsPage' :
                     this.type === 'evaluations' ?
                         '/evalPagination/decreaseArchivedCurrentBnEvalsPage' :

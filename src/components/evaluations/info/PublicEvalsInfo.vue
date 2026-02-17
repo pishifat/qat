@@ -48,13 +48,11 @@
             </div>
 
             <div v-if="!selectedEvaluation.isResignation && selectedEvaluation.feedback && selectedEvaluation.feedback !== 'None'">
-
                 <p>
                     <b>Feedback:</b>
                 </p>
 
                 <div v-if="selectedEvaluation.feedback" class="card card-body small v-html-content" v-html="$md.render(selectedEvaluation.feedback)" />
-
             </div>
 
             <div v-if="selectedEvaluation.evaluators && selectedEvaluation.evaluators.length">
@@ -75,7 +73,7 @@
             </div>
 
             <hr>
-            <reviews-listing 
+            <reviews-listing
                 v-if="loggedInUser && loggedInUser.isNatLeader || !isNatEvaluation"
             />
 
@@ -85,7 +83,7 @@
                 :is-new-evaluation-format="selectedEvaluation.isNewEvaluationFormat"
             />
 
-            <debug-view-document 
+            <debug-view-document
                 v-if="loggedInUser && loggedInUser.isAdmin"
                 :document="selectedEvaluation"
             />
@@ -132,7 +130,7 @@ export default {
         /** @returns {string | string[]} */
         modes () {
             if (!this.selectedEvaluation) return [];
-            
+
             if (this.selectedEvaluation.user.modes.length && !this.selectedEvaluation.user.modes.includes('none'))
                 return this.selectedEvaluation.user.modes;
 

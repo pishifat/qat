@@ -10,15 +10,19 @@
             <div class="row mb-3">
                 <div class="col-sm-6">
                     <b>User:</b>
-                    <input v-model="username" class="form-control" type="text" placeholder="username or osuID...">
+                    <input
+                        v-model="username"
+                        class="form-control"
+                        type="text"
+                        placeholder="username or osuID..."
+                    >
                 </div>
             </div>
             <div class="row col-sm-6">
                 <b>Comment:</b>
             </div>
             <div class="row mb-3">
-
-                <div class="col-sm-6">                    
+                <div class="col-sm-6">
                     <textarea
                         v-model="comment"
                         class="form-control mb-2"
@@ -28,7 +32,9 @@
                 </div>
                 <div class="col-sm-6 mb-2">
                     <div v-if="comment && comment.length" class="small card card-body v-html-content" v-html="$md.render(comment)" />
-                    <div v-else class="small card card-body text-secondary">comment preview</div>
+                    <div v-else class="small card card-body text-secondary">
+                        comment preview
+                    </div>
                 </div>
             </div>
             <hr>
@@ -64,6 +70,7 @@ export default {
                         message: `Must select game mode and input a username!`,
                         type: 'danger',
                     });
+
                     return;
                 }
 

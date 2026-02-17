@@ -1,62 +1,62 @@
 <template>
-        <div class="row">
-            <div class="col-md-12">
-                <section v-if="loggedInUser.isNat && isEditing" class="card card-body">
-                    <div>
-                        Title:
-                        <input
-                            v-model="article.title"
-                            class="form-control mb-2"
-                            type="text"
-                        />
-                    </div>
-                    <div>
-                        Content:
-                        <span class="small text-secondary">(It's recommended to use an external markdown editor for larger edits.)</span>
-                        <textarea
-                            v-model="article.content"
-                            class="form-control form-control-sm"
-                            type="text"
-                            :rows="Math.min(article.content.split('\n').length + 1, 20)"
-                        />
-                    </div>
-                    <span class="small text-secondary my-1">
-                        Last updated: {{ toRelativeDate(article.updatedAt) }} ({{ toStandardDetailedDate(article.updatedAt) }})
-                    </span>
-                    <div class="d-flex align-items-center">  
-                        <button
-                            class="btn btn-secondary"
-                            @click="edit($event)"
-                        >
-                            Update
-                        </button>
-                        <button
-                            class="btn btn-primary mx-2"
-                            @click="disableEdit()"
-                        >
-                            Cancel
-                        </button>
-                    </div>
-                </section>
+    <div class="row">
+        <div class="col-md-12">
+            <section v-if="loggedInUser.isNat && isEditing" class="card card-body">
+                <div>
+                    Title:
+                    <input
+                        v-model="article.title"
+                        class="form-control mb-2"
+                        type="text"
+                    >
+                </div>
+                <div>
+                    Content:
+                    <span class="small text-secondary">(It's recommended to use an external markdown editor for larger edits.)</span>
+                    <textarea
+                        v-model="article.content"
+                        class="form-control form-control-sm"
+                        type="text"
+                        :rows="Math.min(article.content.split('\n').length + 1, 20)"
+                    />
+                </div>
+                <span class="small text-secondary my-1">
+                    Last updated: {{ toRelativeDate(article.updatedAt) }} ({{ toStandardDetailedDate(article.updatedAt) }})
+                </span>
+                <div class="d-flex align-items-center">
+                    <button
+                        class="btn btn-secondary"
+                        @click="edit($event)"
+                    >
+                        Update
+                    </button>
+                    <button
+                        class="btn btn-primary mx-2"
+                        @click="disableEdit()"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </section>
 
-                <section class="card card-body v-html-content">
-                    <div class="d-flex align-items-center">
-                        <span class="title-text">{{ article.title }}</span>
-                        <a
-                            v-if="loggedInUser.isNat"
-                            href="#"
-                            class="ml-2"
-                            @click.prevent="isEditing = !isEditing"
-                        >
-                            <i class="fas fa-edit" />
-                        </a>
-                    </div>
-                    <hr class="mt-1 mb-3" />
-                    <span v-html="$md.render(article.content)"></span>
-                    <toast-messages />
-                </section>
-            </div>
+            <section class="card card-body v-html-content">
+                <div class="d-flex align-items-center">
+                    <span class="title-text">{{ article.title }}</span>
+                    <a
+                        v-if="loggedInUser.isNat"
+                        href="#"
+                        class="ml-2"
+                        @click.prevent="isEditing = !isEditing"
+                    >
+                        <i class="fas fa-edit" />
+                    </a>
+                </div>
+                <hr class="mt-1 mb-3">
+                <span v-html="$md.render(article.content)" />
+                <toast-messages />
+            </section>
         </div>
+    </div>
 </template>
 
 <script>
@@ -79,7 +79,7 @@ export default {
                 content: '',
             },
             isEditing: false,
-        }
+        };
     },
     computed: {
         ...mapState([
@@ -88,9 +88,10 @@ export default {
     },
     async created () {
         const article = await this.$http.initialRequest('/docs/' + this.$route.params.slug);
-        
+
         if (!this.$http.isValid(article)) {
             this.$router.push('/docs');
+
             return;
         }
 
@@ -121,7 +122,7 @@ export default {
             }
         },
     },
-}
+};
 </script>
 
 <style scoped>

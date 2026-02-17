@@ -134,7 +134,7 @@ router.get('/participatedEvals', async (req, res) => {
     }
 
     let reviews = await Review.find({ evaluator: evaluatorToSearch });
-    
+
     let bnApplicationsQuery = AppEvaluation
         .find({
             active: false,
@@ -143,7 +143,7 @@ router.get('/participatedEvals', async (req, res) => {
         })
         .populate(defaultAppPopulate)
         .sort({ createdAt: -1 });
-    
+
     let bnEvaluationsQuery = Evaluation
         .find({
             active: false,

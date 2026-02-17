@@ -13,11 +13,12 @@ class ArticleService extends mongoose.Model {
 
     static findByTitle(title) {
         const parsedTitle = title.toLowerCase().replace(/_/g, ' ');
+
         return Article.findOne({
             type: 'documentation',
             $or: [
                 { title: new RegExp(`^${parsedTitle}$`, 'i') }, // case-insensitive
-            ]
+            ],
         });
     }
 }

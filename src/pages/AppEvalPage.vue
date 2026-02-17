@@ -22,7 +22,7 @@
                     @click="openAddApplication()"
                 >
                     Create a BN application
-                </button>  
+                </button>
             </template>
             <template #instructions>
                 <evaluation-instructions />

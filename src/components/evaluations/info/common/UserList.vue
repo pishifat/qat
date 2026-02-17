@@ -4,7 +4,12 @@
             <b>{{ header }}</b>
         </p>
         <ul>
-            <li v-for="user in userList" :key="user.id" class="small" :class="{ 'text-muted': user.isMockEvaluator }">
+            <li
+                v-for="user in userList"
+                :key="user.id"
+                class="small"
+                :class="{ 'text-muted': user.isMockEvaluator }"
+            >
                 {{ user.username }}
                 <a
                     v-if="nominatorAssessmentMongoId && loggedInUser && loggedInUser.isNat && !isEditing && !disableReplace"
@@ -31,7 +36,6 @@
                         data-toggle="tooltip"
                         data-placement="top"
                         title="replace with random user"
-                        class="mr-1"
                         @click.prevent="replaceUser(user.id, $event);"
                     >
                         <i class="fas fa-dice text-success" />

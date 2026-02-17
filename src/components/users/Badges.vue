@@ -3,7 +3,6 @@
         <b>Badges:</b>
 
         <a
-            class="ml-1"
             data-toggle="tooltip"
             data-placement="top"
             title="loads badge tracker"
@@ -12,7 +11,7 @@
         >
             <i class="fas fa-search" />
         </a>
-        
+
         <div v-if="badgeUsers.length">
             <div v-for="user in badgeUsers" :key="user.id" class="small mb-1">
                 <div v-if="user || (compareBadgeDuration(user.bnProfileBadge, user.bnDuration) || compareBadgeDuration(user.natProfileBadge, user.natDuration) || compareNominationsBadge(user.nominationsProfileBadge, user.actualNominationsProfileBadge))">
@@ -125,6 +124,7 @@ export default {
         },
         compareBadgeDuration (currentBadge, days) {
             if ((this.yearsDuration(days) > 14) && (currentBadge === 14)) return false; // remove this line when +5 year badges are added
+
             return (currentBadge || 0) != this.yearsDuration(days);
         },
         compareNominationsBadge (currentBadge, actual) {

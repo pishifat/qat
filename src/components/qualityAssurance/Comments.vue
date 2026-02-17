@@ -14,7 +14,7 @@
             </span>
             <span
                 v-else-if="!showInput"
-                class="ml-1 text-white"
+                class="text-white"
                 v-html="$md.renderInline(userComment)"
             />
             <input

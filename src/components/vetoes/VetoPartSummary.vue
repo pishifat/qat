@@ -23,7 +23,9 @@
                 <div v-for="mediation in upholdMediations" :key="mediation.id">
                     <div class="mb-2">
                         <b>Anonymous - {{ mediation.vote === 2 ? 'partially agree' : 'agree' }}:</b>
-                        <div class="pre-line">{{ mediation.comment }}</div>
+                        <div class="pre-line">
+                            {{ mediation.comment }}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -31,7 +33,9 @@
                 <div v-for="mediation in withdrawMediations" :key="mediation.id">
                     <div class="mb-2">
                         <b>Anonymous - {{ mediation.vote === 2 ? 'partially agree' : 'disagree' }}:</b>
-                        <div class="pre-line">{{ mediation.comment }}</div>
+                        <div class="pre-line">
+                            {{ mediation.comment }}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -81,7 +85,7 @@ export default {
                 if (this.veto.vetoFormat == 5) {
                     threshold = 0.7 * sum;
                 }
-                
+
                 if (this.veto.vetoFormat == 6) {
                     threshold = 0.6 * sum;
                 }

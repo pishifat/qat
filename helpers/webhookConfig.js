@@ -4,6 +4,7 @@ let cachedConfig = load();
 
 function load() {
     const config = JSON.parse(fs.readFileSync('webhooks.json', 'utf8'));
+
     return config;
 }
 
@@ -16,14 +17,14 @@ function get() {
 }
 
 /**
- * @param {string} webhook 
- * @param {string} id 
- * @param {string} token 
+ * @param {string} webhook
+ * @param {string} id
+ * @param {string} token
  */
 function update(webhook, id, token) {
     cachedConfig[webhook] = {
         id,
-        token
+        token,
     };
 
     fs.writeFileSync('webhooks.json', JSON.stringify(cachedConfig, null, 4));
@@ -32,5 +33,5 @@ function update(webhook, id, token) {
 module.exports = {
     reload,
     get,
-    update
+    update,
 };

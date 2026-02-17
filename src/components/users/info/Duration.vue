@@ -14,17 +14,16 @@
                         data-placement="top"
                         :title="formatMode(history.mode)"
                     />
-                        <a
-                            v-if="history.relatedEvaluation && isEligibleToViewEvals"
-                            :href="`/${loggedInUser.isNat ? 'evalarchive' : 'yourevals'}?id=${history.relatedEvaluation}`"
-                            target="_blank"
-                            
-                        >
-                            (eval)
-                        </a>
+                    <a
+                        v-if="history.relatedEvaluation && isEligibleToViewEvals"
+                        :href="`/${loggedInUser.isNat ? 'evalarchive' : 'yourevals'}?id=${history.relatedEvaluation}`"
+                        target="_blank"
+                    >
+                        (eval)
+                    </a>
                 </li>
-                <li 
-                    v-if="this.additional"
+                <li
+                    v-if="additional"
                     data-toggle="tooltip"
                     data-placement="top"
                     title="time is added for the user's BN badge, but not included in tenure above"
@@ -48,14 +47,13 @@
                         data-placement="top"
                         :title="formatMode(history.mode)"
                     />
-                        <a
-                            v-if="history.relatedEvaluation && isEligibleToViewEvals"
-                            :href="`/${loggedInUser.isNat ? 'evalarchive' : 'yourevals'}?id=${history.relatedEvaluation}`"
-                            target="_blank"
-                            
-                        >
-                            (eval)
-                        </a>
+                    <a
+                        v-if="history.relatedEvaluation && isEligibleToViewEvals"
+                        :href="`/${loggedInUser.isNat ? 'evalarchive' : 'yourevals'}?id=${history.relatedEvaluation}`"
+                        target="_blank"
+                    >
+                        (eval)
+                    </a>
                 </li>
             </ul>
         </div>
@@ -69,10 +67,10 @@ import ModeDisplay from '../../ModeDisplay.vue';
 
 export default {
     name: 'Duration',
-    mixins: [ duration ],
     components: {
         ModeDisplay,
     },
+    mixins: [ duration ],
     data () {
         return {
             additional: null,
@@ -103,17 +101,18 @@ export default {
         },
         isEligibleToViewEvals () {
             if (!this.loggedInUser) return false;
+
             return this.loggedInUser.isNat || this.loggedInUser.id === this.selectedUser.id;
         },
-    },
-    created () {
-        this.findAdditionalBnMonths();
     },
     watch: {
         selectedUser() {
             this.additional = null;
             this.findAdditionalBnMonths();
         },
+    },
+    created () {
+        this.findAdditionalBnMonths();
     },
     methods: {
         async findAdditionalBnMonths() {

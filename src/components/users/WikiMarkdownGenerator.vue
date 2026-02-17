@@ -4,17 +4,17 @@
         <p class="text-secondary small">
             Generate BN listing for the wiki page.
         </p>
-        
+
         <div>
-            <button 
-                class="btn btn-primary btn-sm" 
+            <button
+                class="btn btn-primary btn-sm"
                 @click="generateMarkdown"
             >
                 Generate BN listing
             </button>
-            <button 
+            <button
                 v-if="markdownOutput"
-                class="btn btn-success btn-sm ml-2" 
+                class="btn btn-success btn-sm ml-2"
                 @click="copyToClipboard"
             >
                 Copy to Clipboard
@@ -22,9 +22,9 @@
         </div>
 
         <div v-if="markdownOutput" class="card mt-3">
-            <textarea 
-                v-model="markdownOutput" 
-                class="form-control" 
+            <textarea
+                v-model="markdownOutput"
+                class="form-control"
                 rows="20"
                 readonly
                 style="font-family: monospace; font-size: 12px;"
@@ -51,13 +51,14 @@ export default {
     methods: {
         generateMarkdown () {
             // Filter users to only include BN
-            const bnUsers = this.users.filter(user => 
-                user.groups && user.groups.includes('bn') && 
+            const bnUsers = this.users.filter(user =>
+                user.groups && user.groups.includes('bn') &&
                 user.modesInfo && user.modesInfo.length > 0
             );
 
             if (bnUsers.length === 0) {
                 this.markdownOutput = 'No BNs found.';
+
                 return;
             }
 
@@ -80,8 +81,9 @@ export default {
             bnUsers.forEach(user => {
                 user.modesInfo.forEach(modeInfo => {
                     if (modeInfo.mode === 'none') return;
-                    
+
                     const level = modeInfo.level === 'full' ? 'full' : 'probation';
+
                     if (grouped[level][modeInfo.mode]) {
                         grouped[level][modeInfo.mode].push(user);
                     }
@@ -91,7 +93,7 @@ export default {
             // Sort users alphabetically by username
             Object.keys(grouped).forEach(level => {
                 Object.keys(grouped[level]).forEach(mode => {
-                    grouped[level][mode].sort((a, b) => 
+                    grouped[level][mode].sort((a, b) =>
                         a.username.localeCompare(b.username, 'en', { sensitivity: 'base' })
                     );
                 });
@@ -132,28 +134,28 @@ export default {
 
             modes.forEach(mode => {
                 markdown += `#### ${modeNames[mode]}\n\n`;
-                
+
                 if (groupedByMode[mode].length === 0) {
                     markdown += 'No members at this time.\n\n';
                 } else {
                     markdown += '| Name | Additional languages |\n';
                     markdown += '| :-- | :-- |\n';
-                    
+
                     groupedByMode[mode].forEach(user => {
                         const flagMarkdown = user.countryCode ? `::{ flag=${user.countryCode.toUpperCase()} }:: ` : '';
                         const usernameLink = `[${this.escapeMarkdown(user.username)}](https://osu.ppy.sh/users/${user.osuId})`;
                         const languages = this.formatLanguages(user.languages);
-                        
+
                         markdown += `| ${flagMarkdown}${usernameLink} | ${languages} |\n`;
                     });
-                    
+
                     markdown += '\n';
                 }
             });
 
             return markdown;
         },
-        
+
         formatLanguages (languages) {
             if (!languages || languages.length === 0) {
                 return '';
@@ -162,6 +164,7 @@ export default {
             // Capitalize first letter of each language
             const formatted = languages.map(lang => {
                 if (!lang) return '';
+
                 return lang.charAt(0).toUpperCase() + lang.slice(1);
             });
 

@@ -6,13 +6,13 @@
                 <b>{{ reroll.createdAt.toString().slice(0,10) }}:</b>
                 {{ reroll.type == 'automatic' ? 'Automatically added ' : 'Manually replaced ' }}
                 <span v-if="reroll.type == 'manual'">
-                    <user-link 
+                    <user-link
                         :username="reroll.oldEvaluator.username"
                         :osu-id="reroll.oldEvaluator.osuId"
                     />
                     with
                 </span>
-                <user-link 
+                <user-link
                     :username="reroll.newEvaluator.username"
                     :osu-id="reroll.newEvaluator.osuId"
                 />

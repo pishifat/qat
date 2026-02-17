@@ -6,7 +6,7 @@
             </a>
             by
             <user-link
-                class="text-white mr-1"
+                class="text-white"
                 :osu-id="selectedVeto.beatmapMapperId"
                 :username="selectedVeto.beatmapMapper"
             />

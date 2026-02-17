@@ -17,7 +17,9 @@
                 </div>
                 <div class="col-sm-6 mb-2">
                     <div v-if="feedback && feedback.length" class="small card card-body v-html-content" v-html="$md.render(feedback)" />
-                    <div v-else class="small card card-body text-secondary">feedback preview</div>
+                    <div v-else class="small card card-body text-secondary">
+                        feedback preview
+                    </div>
                 </div>
             </div>
 
@@ -32,7 +34,7 @@
                 Save feedback
             </button>
 
-        <hr />
+            <hr>
             <div v-if="negativeConsensus" class="mb-3">
                 <b>Hide cooldown text: </b>
                 <a
@@ -55,7 +57,7 @@
                 class="form-control my-2 mt-4"
                 type="text"
                 placeholder="discord invite link..."
-            />
+            >
         </div>
 
         <feedback-pm
@@ -122,6 +124,7 @@ export default {
         },
         getRows() {
             const lines = this.feedback.split('\n');
+
             return Math.max(lines.length, 2);
         },
         toggleHideCooldownText(e) {

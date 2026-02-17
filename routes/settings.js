@@ -32,7 +32,7 @@ router.post('/update', async (req, res) => {
 /* POST toggle hasTrialNat */
 router.post('/toggleHasTrialNat', async (req, res) => {
     const mode = req.body.mode;
-    const parsedMode = `osu!${mode !== "osu" ? mode : ""}`;
+    const parsedMode = `osu!${mode !== 'osu' ? mode : ''}`;
     const settings = await Settings.findOne();
     const settingIndex = settings.modeSettings.findIndex(s => s.mode === mode);
 
@@ -44,7 +44,7 @@ router.post('/toggleHasTrialNat', async (req, res) => {
             // @ts-ignore
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.pink,
-            description: `**${settings.modeSettings[settingIndex].hasTrialNat ? "Enabled" : "Disabled"}** BN evaluators for **${parsedMode}**`,
+            description: `**${settings.modeSettings[settingIndex].hasTrialNat ? 'Enabled' : 'Disabled'}** BN evaluators for **${parsedMode}**`,
         }],
         mode
     );
