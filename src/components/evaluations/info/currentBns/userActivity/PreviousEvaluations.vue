@@ -1,9 +1,9 @@
 <template>
     <div>
-        <div class="ml-2">
+        <div class="ms-2">
             <a
                 :href="previousEvaluations && `#${eventId}`"
-                data-toggle="collapse"
+                data-bs-toggle="collapse"
             >{{ header }} <i class="fas fa-angle-down" /></a>
             ({{ isLoading ? '...' : previousEvaluations ? previousEvaluations.length : '0' }})
         </div>

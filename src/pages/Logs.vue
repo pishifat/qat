@@ -4,7 +4,7 @@
             v-if="loggedInUser.isNat"
             id="mode"
             v-model="category"
-            class="form-control mb-4"
+            class="form-select mb-4"
             @change="loadCategory($event)"
         >
             <option value="all">
@@ -25,7 +25,7 @@
             v-else
             id="mode"
             v-model="publicCategory"
-            class="form-control mb-4"
+            class="form-select mb-4"
             @change="loadCategory($event)"
         >
             <option v-for="log in publicCategories" :key="log" :value="log">
@@ -37,7 +37,7 @@
             :headers="category == 'error' ? ['date', 'user', 'action', 'stack', 'extra'] : category == 'all' ? ['date', 'category', 'user', 'action'] : ['date', 'user', 'action']"
         >
             <tr v-for="log in logs" :key="log.id">
-                <td data-toggle="tooltip" data-placement="left" :title="toStandardDetailedDate(log.createdAt)">
+                <td data-bs-toggle="tooltip" data-bs-placement="left" :title="toStandardDetailedDate(log.createdAt)">
                     {{ toRelativeDate(log.createdAt) }}
                 </td>
                 <td v-if="category == 'all'">

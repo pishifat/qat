@@ -1,9 +1,9 @@
 <template>
     <div>
-        <div class="ml-2">
+        <div class="ms-2">
             <a
                 :href="events && `#${eventsId}`"
-                data-toggle="collapse"
+                data-bs-toggle="collapse"
             >{{ header }} <i class="fas fa-angle-down" /></a>
             ({{ isLoading ? '...' : events.length ? isMock ? events.length : getCompletedEvaluations(events).length + '/' + events.length : '0' }})
         </div>
@@ -32,13 +32,13 @@
                             <i
                                 v-if="wasRerolled(event.rerolls)"
                                 class="fas fa-undo-alt text-warning"
-                                data-toggle="tooltip"
+                                data-bs-toggle="tooltip"
                                 title="replaced someone else"
                             />
                             <i
                                 v-else
                                 class="fas fa-clipboard-check text-success"
-                                data-toggle="tooltip"
+                                data-bs-toggle="tooltip"
                                 title="assigned"
                             />
                         </td>
@@ -73,7 +73,7 @@
                         </td>
                     </tr>
                 </data-table>
-                <p v-else class="small ml-4">
+                <p v-else class="small ms-4">
                     None...
                 </p>
             </div>

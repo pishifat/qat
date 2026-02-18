@@ -9,7 +9,7 @@
 
         <span
             v-if="neutral"
-            class="badge badge-light mx-1"
+            class="badge bg-light mx-1"
         >
             {{ neutral }}
         </span>

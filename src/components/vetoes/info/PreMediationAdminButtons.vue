@@ -6,7 +6,7 @@
             <!-- move to "available" status -->
             <div class="col-sm-6">
                 <button
-                    class="btn btn-sm btn-danger btn-block mb-2"
+                    class="btn btn-sm btn-danger w-100 mb-2"
                     @click="setStatusAvailable($event)"
                 >
                     Move to mediation
@@ -16,7 +16,7 @@
             <!-- move to "archive" status -->
             <div class="col-sm-6">
                 <button
-                    class="btn btn-sm btn-block btn-danger mb-2"
+                    class="btn btn-sm w-100 btn-danger mb-2"
                     @click="setStatusArchive($event)"
                 >
                     Move to archive

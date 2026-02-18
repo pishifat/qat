@@ -4,7 +4,7 @@ import MarkdownItVideo from 'markdown-it-video';
 import osuTimestamps from './plugins/markdown-it-osu-timestamps';
 import MarkdownItColor from 'markdown-it-color';
 import $ from 'jquery';
-import 'bootstrap';
+import { Tooltip } from 'bootstrap';
 
 // Make jQuery available globally
 window.$ = window.jQuery = $;
@@ -60,6 +60,15 @@ moment.defineLocale('short', {
     },
 });
 
-$(document).ready(function() {
-    ($('body')).tooltip({ selector: '[data-toggle=tooltip]', trigger: 'hover' });
+function initTooltips() {
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+        if (!Tooltip.getInstance(el)) {
+            new Tooltip(el, { trigger: 'hover' });
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initTooltips();
+    new MutationObserver(initTooltips).observe(document.body, { childList: true, subtree: true });
 });

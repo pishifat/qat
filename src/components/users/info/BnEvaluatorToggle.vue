@@ -5,8 +5,8 @@
                 {{ selectedUser.isNatOrTrialNat ? "Evaluations" : "Mock evaluations" }}:
             </b>
             <a
-                data-toggle="tooltip"
-                data-placement="top"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
                 title="Toggle evaluations"
                 href="#"
                 @click.prevent="switchBnEvaluator($event)"

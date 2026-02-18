@@ -1,6 +1,6 @@
 <template>
     <div>
-        <button class="btn btn-sm btn-block btn-primary mb-2" data-toggle="collapse" data-target="#chatMessage">
+        <button class="btn btn-sm w-100 btn-primary mb-2" data-bs-toggle="collapse" data-bs-target="#chatMessage">
             See full chat message <i class="fas fa-angle-down" />
         </button>
 
@@ -11,13 +11,13 @@
 
             <div class="row">
                 <div :class="osuId ? 'col-sm-6' : 'col-sm-12'">
-                    <a :href="`message?${messageType}=${mongoId}`" target="_blank" class="btn btn-sm btn-block btn-primary mb-2">
+                    <a :href="`message?${messageType}=${mongoId}`" target="_blank" class="btn btn-sm w-100 btn-primary mb-2">
                         Preview message
                     </a>
                 </div>
                 <div v-if="osuId" class="col-sm-6">
                     <div>
-                        <a :href="'https://osu.ppy.sh/community/chat?sendto=' + osuId" target="_blank" class="btn btn-sm btn-block btn-primary mb-2">
+                        <a :href="'https://osu.ppy.sh/community/chat?sendto=' + osuId" target="_blank" class="btn btn-sm w-100 btn-primary mb-2">
                             Open osu! chat
                         </a>
                     </div>
@@ -28,7 +28,7 @@
                             :username="user.username"
                             :osu-id="user.osuId"
                         />
-                        <a :href="'https://osu.ppy.sh/community/chat?sendto=' + user.osuId" target="_blank" class="btn btn-sm btn-block btn-primary mb-2">
+                        <a :href="'https://osu.ppy.sh/community/chat?sendto=' + user.osuId" target="_blank" class="btn btn-sm w-100 btn-primary mb-2">
                             Open osu! chat
                         </a>
                     </div>

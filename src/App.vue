@@ -12,8 +12,8 @@
                     <button
                         class="navbar-toggler"
                         type="button"
-                        data-toggle="collapse"
-                        data-target="#navbar"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#navbar"
                     >
                         <span class="navbar-toggler-icon" />
                     </button>
@@ -47,7 +47,7 @@
                                     </router-link>
                                 </li>
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
                                         Other
                                     </a>
                                     <div class="dropdown-menu">
@@ -66,7 +66,7 @@
                                     </div>
                                 </li>
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
                                         Evaluations
                                     </a>
                                     <div class="dropdown-menu">
@@ -89,7 +89,7 @@
                                     </router-link>
                                 </li>
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
                                         Other
                                     </a>
                                     <div class="dropdown-menu">
@@ -102,7 +102,7 @@
                                     </div>
                                 </li>
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
                                         Evaluations
                                     </a>
                                     <div class="dropdown-menu">
@@ -126,7 +126,7 @@
                                     </div>
                                 </li>
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
                                         BN pages
                                     </a>
                                     <div class="dropdown-menu">
@@ -144,7 +144,7 @@
 
                             <template v-else-if="loggedInUser.hasFullReadAccess && !loggedInUser.isNat">
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
                                         Reports
                                     </a>
                                     <div class="dropdown-menu">
@@ -157,7 +157,7 @@
                                     </div>
                                 </li>
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
                                         Other
                                     </a>
                                     <div class="dropdown-menu">
@@ -176,7 +176,7 @@
                                     </div>
                                 </li>
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
                                         Evaluations
                                     </a>
                                     <div class="dropdown-menu">
@@ -205,7 +205,7 @@
 
                             <template v-else-if="loggedInUser.hasFullReadAccess">
                                 <li v-if="loggedInUser.hasFullReadAccess" class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
                                         Reports
                                     </a>
                                     <div class="dropdown-menu">
@@ -218,7 +218,7 @@
                                     </div>
                                 </li>
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
                                         Other
                                     </a>
                                     <div class="dropdown-menu">
@@ -234,7 +234,7 @@
                                     </div>
                                 </li>
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
                                         Evaluations
                                     </a>
                                     <div class="dropdown-menu">
@@ -269,7 +269,7 @@
                                     </router-link>
                                 </li>
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
                                         Logs
                                     </a>
                                     <div class="dropdown-menu">
@@ -287,8 +287,8 @@
                                 <a
                                     class="nav-link"
                                     href="#"
-                                    data-toggle="modal"
-                                    data-target="#DebugMenu"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#DebugMenu"
                                 >
                                     <i class="fas fa-bug text-warning" />
                                 </a>
@@ -298,8 +298,8 @@
                                 <a
                                     class="nav-link"
                                     href="#"
-                                    data-toggle="modal"
-                                    data-target="#globalSettings"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#globalSettings"
                                 >
                                     <i class="fas fa-cog text-info" />
                                 </a>
@@ -324,7 +324,7 @@
             :class="{ 'body-content-padding': loggedInUser }"
         >
             <div v-if="loggedInUser" class="card">
-                <div class="card-header d-flex align-items-center">
+                <div class="card-header d-flex align-items-center" style="--bs-card-cap-padding-y: 0.75rem;">
                     <div class="card-header-img" />
                     <h4 class="mb-0">
                         {{ title || 'Home' }}
@@ -340,11 +340,11 @@
                                 <img
                                     src="/images/qatlogo.png"
                                     alt="NAT"
-                                    class="mr-1"
+                                    class="me-1"
                                     style="border-radius: 100%; box-shadow: 0px 1px 5px #41bba12e; width: 130px;"
                                 >
                             </div>
-                            <div v-if="!isPublicPage" class="text-danger font-weight-bold my-3 text-center">
+                            <div v-if="!isPublicPage" class="text-danger fw-bold my-3 text-center">
                                 Login first to visit this page!
                             </div>
                             <a href="/api/login" class="btn btn-lg btn-primary" type="submit">

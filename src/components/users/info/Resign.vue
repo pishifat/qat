@@ -1,9 +1,9 @@
 <template>
     <div>
         <button
-            class="btn btn-block btn-danger"
-            data-toggle="tooltip"
-            data-placement="top"
+            class="btn w-100 btn-danger"
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
             title="The NAT will evaluate your recent activity and remove you from the BN (usually within 24 hours)."
             @click="resignFromBn($event)"
         >

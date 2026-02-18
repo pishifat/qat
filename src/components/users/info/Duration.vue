@@ -10,8 +10,8 @@
                     {{ toStandardDate(history.date) }}: {{ history.kind }}
                     <mode-display
                         :modes="history.mode"
-                        data-toggle="tooltip"
-                        data-placement="top"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
                         :title="formatMode(history.mode)"
                     />
                     <a
@@ -24,8 +24,8 @@
                 </li>
                 <li
                     v-if="additional"
-                    data-toggle="tooltip"
-                    data-placement="top"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
                     title="time is added for the user's BN badge, but not included in tenure above"
                     class="small"
                 >
@@ -43,8 +43,8 @@
                     {{ toStandardDate(history.date) }}: {{ history.kind }}
                     <mode-display
                         :modes="history.mode"
-                        data-toggle="tooltip"
-                        data-placement="top"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
                         :title="formatMode(history.mode)"
                     />
                     <a

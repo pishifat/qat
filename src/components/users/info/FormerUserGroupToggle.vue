@@ -6,10 +6,10 @@
         <mode-select
             v-model="selectedMode"
             :max-selection="1"
-            class="ml-1"
+            class="ms-1"
         />
         <button
-            class="btn btn-sm btn-nat ml-1 mb-1"
+            class="btn btn-sm btn-nat ms-1 mb-1"
             href="#"
             @click.prevent="addToNat()"
         >

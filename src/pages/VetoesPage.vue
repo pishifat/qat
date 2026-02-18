@@ -8,9 +8,9 @@
             >
                 <button
                     v-if="loggedInUser && loggedInUser.isBnOrNat"
-                    class="btn btn-block btn-primary my-1"
-                    data-toggle="modal"
-                    data-target="#addVeto"
+                    class="btn w-100 btn-primary my-1"
+                    data-bs-toggle="modal"
+                    data-bs-target="#addVeto"
                     :disabled="isProbation"
                 >
                     Submit anonymous veto
@@ -64,7 +64,7 @@
                     <button
                         v-if="!reachedMax"
                         type="button"
-                        class="btn btn-primary ml-2"
+                        class="btn btn-primary ms-2"
                         @click="showMore($event)"
                     >
                         Show more vetoes
@@ -72,9 +72,9 @@
                     <button
                         v-if="!reachedMax"
                         type="button"
-                        class="btn btn-secondary ml-2"
-                        data-toggle="tooltip"
-                        data-placement="top"
+                        class="btn btn-secondary ms-2"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
                         title="This takes a long time to load"
                         @click="showAll($event)"
                     >
@@ -97,7 +97,7 @@
                 <span class="small text-secondary mb-2">
                     Note: reason order needs to match in both vetoes
                 </span>
-                <div class="form-inline">
+                <div class="d-flex flex-wrap align-items-center">
                     <input
                         v-model="oldVetoId"
                         class="form-control mb-2"
@@ -111,7 +111,7 @@
                         placeholder="new veto ID..."
                     >
                     <button
-                        class="btn btn-sm btn-secondary mb-2 ml-2"
+                        class="btn btn-sm btn-secondary mb-2 ms-2"
                         @click="migrateMediations"
                     >
                         Migrate mediations

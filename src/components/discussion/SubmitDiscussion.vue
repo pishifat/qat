@@ -66,16 +66,16 @@
                         v-model="mode"
                         :max-selection="1"
                         :all-modes="true"
-                        class="ml-2"
+                        class="ms-2"
                     />
                 </div>
                 <!-- who can participate -->
-                <div class="form-inline">
+                <div class="d-flex flex-wrap align-items-center mt-2">
                     Who can participate:
                     <select
                         id="user"
                         v-model="group"
-                        class="form-control form-control-sm ml-2"
+                        class="form-select form-select-sm ms-2 w-auto"
                     >
                         <option
                             value=""
@@ -96,15 +96,15 @@
                     </select>
                 </div>
                 <!-- who can participate -->
-                <div class="form-inline">
+                <div class="d-flex flex-wrap align-items-center mt-2">
                     Number of vote options:
                     <select
                         id="user"
-                        v-model="voteOptions"
-                        class="form-control form-control-sm ml-2"
+                        v-model="group"
+                        class="form-select form-select-sm ms-2 w-auto"
                     >
                         <option
-                            :value="null"
+                            value=""
                             disabled
                         >
                             Select a number
@@ -161,7 +161,7 @@
                     Only submit inappropriate backgrounds or videos from qualified or soon-to-be-qualified maps. For Ranked or Graveyard maps, use the beatmap report system on osu-web.
                 </div>
                 <div :class="isContentReview ? 'col-sm-2' : 'col-sm-12'">
-                    <button type="submit" class="btn btn-primary float-right" @click="submitDiscussion($event)">
+                    <button type="submit" class="btn btn-primary float-end" @click="submitDiscussion($event)">
                         Submit
                     </button>
                 </div>

@@ -69,7 +69,7 @@
             />
 
             <button
-                class="btn btn-sm btn-danger float-right"
+                class="btn btn-sm btn-danger float-end"
                 @click="unarchive($event)"
             >
                 Un-archive

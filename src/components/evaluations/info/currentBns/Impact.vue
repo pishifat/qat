@@ -7,7 +7,7 @@
                 <font-awesome-icon v-else :icon="getImpact(impact).icon" />
                 {{ getImpact(impact).text }}
             </span>
-            <!--<span class="ml-2 btn-group">
+            <!--<span class="ms-2 btn-group">
                 <button
                     class="btn btn-sm btn-success"
                     @click.prevent="updateImpact(0)"

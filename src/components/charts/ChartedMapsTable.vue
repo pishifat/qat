@@ -1,6 +1,6 @@
 <template>
     <div class="charted-maps-table">
-        <div class="ml-2">
+        <div class="ms-2">
             <h5>{{ monthTitle }}</h5>
         </div>
         <data-table
@@ -11,7 +11,7 @@
                 <td>
                     <div class="d-flex align-items-center">
                         <span
-                            data-toggle="tooltip"
+                            data-bs-toggle="tooltip"
                             :title="canVote ? '' : 'Only BNs can vote'"
                             class="vote-button-wrapper"
                         >
@@ -20,10 +20,10 @@
                                 @click="vote(event, 'up')"
                             />
                         </span>
-                        <span class="ml-1 mr-2 small text-success">{{ getUpvoteCount(event) }}</span>
+                        <span class="ms-1 me-2 small text-success">{{ getUpvoteCount(event) }}</span>
 
                         <!--<span
-                            data-toggle="tooltip"
+                            data-bs-toggle="tooltip"
                             :title="canVote ? '' : 'Only BNs can vote'"
                             class="vote-button-wrapper"
                         >
@@ -32,7 +32,7 @@
                                 @click="vote(event, 'down')"
                             />
                         </span>
-                        <span class="ml-1 small text-danger">{{ getDownvoteCount(event) }}</span>-->
+                        <span class="ms-1 small text-danger">{{ getDownvoteCount(event) }}</span>-->
                     </div>
                 </td>
                 <td class="text-nowrap">
@@ -66,7 +66,7 @@
                 </td>
             </tr>
         </data-table>
-        <p v-else class="ml-4">
+        <p v-else class="ms-4">
             No charted maps for this month...
         </p>
     </div>

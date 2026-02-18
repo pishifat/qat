@@ -2,19 +2,19 @@
     <div>
         <div v-if="!onlyWrittenInput">
             {{ mediations.length }} "{{ type }}" {{ mediations.length == 1 ? 'vote' : 'votes' }}
-            <div class="font-weight-bold small">
+            <div class="fw-bold small">
                 GMT/NAT: {{ Math.round((natGmtMediations.length/totalNatGmtMediations)*1000) / 10 || 0 }}%
             </div>
-            <div class="font-weight-bold small">
+            <div class="fw-bold small">
                 BN: {{ Math.round((bnMediations.length/totalBnMediations)*1000) / 10 || 0 }}%
             </div>
-            <div class="font-weight-bold small">
+            <div class="fw-bold small">
                 Total: {{ Math.round(((bnMediations.length + natGmtMediations.length)/(totalBnMediations + totalNatGmtMediations))*1000) / 10 || 0 }}%
             </div>
         </div>
 
         <ul v-if="loggedInUser.hasBasicAccess">
-            <li v-for="mediation in mediations" :key="mediation.id" class="small ml-2">
+            <li v-for="mediation in mediations" :key="mediation.id" class="small ms-2">
                 <span v-if="loggedInUser.hasFullReadAccess">
                     <user-link
                         :username="mediation.mediator.username"
@@ -27,7 +27,7 @@
 
                 <span
                     v-if="mediation.comment && mediation.comment.length"
-                    class="text-secondary pre-wrap ml-2"
+                    class="text-secondary pre-wrap ms-2"
                     v-html="$md.render(mediation.comment)"
                 />
             </li>

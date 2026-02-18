@@ -59,6 +59,7 @@ module.exports = [
                 'multiline': 1,
             }],
             'vue/no-v-html': 'off',
+            'vue/multi-word-component-names': 'off',
             'no-trailing-spaces': 'error',
             'key-spacing': 'error',
             'keyword-spacing': 'error',

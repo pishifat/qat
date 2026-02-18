@@ -4,7 +4,7 @@
             <b>Consensus:</b>
             <span
                 v-if="selectedEvaluation.consensus"
-                class="mr-2 text-capitalize"
+                class="me-2 text-capitalize"
                 :class="consensusColor"
             >
                 {{ consensusText }}
@@ -26,7 +26,7 @@
         <p v-if="canHaveAddition">
             <b>Addition:</b>
             <span
-                class="mr-2 text-capitalize"
+                class="me-2 text-capitalize"
                 :class="consensusColor"
             >
                 {{ additionText }}

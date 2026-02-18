@@ -2,7 +2,7 @@
     <section class="card card-body">
         <h3 class="mb-0">
             <a
-                data-toggle="collapse"
+                data-bs-toggle="collapse"
                 href="#data-collection"
             >
                 Data Collection
@@ -15,7 +15,7 @@
             <span class="small text-secondary mb-2">
                 Only use this for confirmed cases of missing nominations/resets.
             </span>
-            <div class="form-inline">
+            <div class="d-flex flex-wrap align-items-center">
                 <input
                     v-model="beatmapsetLink"
                     class="form-control mb-2 "
@@ -23,7 +23,7 @@
                     placeholder="beatmapset link..."
                 >
                 <button
-                    class="btn btn-sm btn-secondary mb-2 ml-2"
+                    class="btn btn-sm btn-secondary mb-2 ms-2"
                     @click="syncEvents"
                 >
                     Sync events

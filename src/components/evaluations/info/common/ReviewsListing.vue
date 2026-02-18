@@ -22,7 +22,7 @@
         <!-- All mock evaluations section (for NAT/TrialNAT) -->
         <template v-if="hasMockReviews && (loggedInUser.isTrialNat || loggedInUser.isNat)">
             <p>
-                <a href="#mockEvaluations" data-toggle="collapse">
+                <a href="#mockEvaluations" data-bs-toggle="collapse">
                     Mock evaluations <i class="fas fa-angle-down" />
                 </a>
             </p>

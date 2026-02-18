@@ -5,8 +5,8 @@
                 Content reviews:
             </b>
             <a
-                data-toggle="tooltip"
-                data-placement="top"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
                 title="Toggle content review pings"
                 href="#"
                 @click.prevent="switchContentReview($event)"

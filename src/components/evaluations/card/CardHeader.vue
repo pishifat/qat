@@ -2,57 +2,57 @@
     <div class="card-body">
         <p class="card-text d-flex align-items-center">
             <user-link
-                class="font-weight-bold"
+                class="fw-bold"
                 :osu-id="osuId"
                 :username="username"
             />
-            <i v-if="mode == 'osu'" class="osu-icon ml-2" />
-            <i v-else-if="mode == 'taiko'" class="taiko-icon ml-2" />
-            <i v-else-if="mode == 'catch'" class="catch-icon ml-2" />
-            <i v-else-if="mode == 'mania'" class="mania-icon ml-2" />
+            <i v-if="mode == 'osu'" class="osu-icon ms-2" />
+            <i v-else-if="mode == 'taiko'" class="taiko-icon ms-2" />
+            <i v-else-if="mode == 'catch'" class="catch-icon ms-2" />
+            <i v-else-if="mode == 'mania'" class="mania-icon ms-2" />
             <i
                 v-if="isActive && hasMockEvaluators"
-                data-toggle="tooltip"
-                data-placement="top"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
                 title="mock evaluators enabled"
-                class="fas fa-flask ml-2 text-probation"
+                class="fas fa-flask ms-2 text-probation"
             />
             <i
                 v-if="isResignation"
-                data-toggle="tooltip"
-                data-placement="top"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
                 title="resignation"
-                class="fas fa-walking ml-2 text-neutral"
+                class="fas fa-walking ms-2 text-neutral"
             />
             <i
                 v-if="isActive && !isReviewed && isDiscussion && !isResignation && !isNatEvaluation"
-                data-toggle="tooltip"
-                data-placement="top"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
                 title="needs review"
-                class="fa fa-eye ml-2 text-warning"
+                class="fa fa-eye ms-2 text-warning"
             />
             <i
                 v-if="isActive && isApp && isNatOrTrialNat && !isSecurityChecked"
-                data-toggle="tooltip"
-                data-placement="top"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
                 title="needs a security check"
-                class="fas fa-shield-alt ml-2"
+                class="fas fa-shield-alt ms-2"
                 :class="isSecurityChecked ? '' : 'text-warning'"
             />
             <i
                 v-if="isActive && isPassApp && isNatOrTrialNat && !hasNatBuddy"
-                data-toggle="tooltip"
-                data-placement="top"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
                 title="needs a NAT buddy"
-                class="fas fa-user ml-2"
+                class="fas fa-user ms-2"
                 :class="hasNatBuddy ? '' : 'text-warning'"
             />
             <i
                 v-if="!isActive && isPublic"
-                data-toggle="tooltip"
-                data-placement="top"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
                 title="visible in public archives"
-                class="fas fa-globe-americas ml-2 text-success"
+                class="fas fa-globe-americas ms-2 text-success"
             />
         </p>
         <div v-if="consensus">

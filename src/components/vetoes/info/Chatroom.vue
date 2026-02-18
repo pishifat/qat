@@ -51,7 +51,7 @@
                 <b v-if="messageInput && messageInput.length > 4500" :class="messageInput.length == 5000 ? 'text-danger' : messageInput.length > 4500 ? 'text-warning' : 'text-secondary'">{{ messageInput.length }}</b>
                 <div>
                     <button
-                        class="btn btn-danger btn-block btn-sm mt-1"
+                        class="btn btn-danger w-100 btn-sm mt-1"
                         :disabled="!isChatroomUser"
                         @click="saveMessage($event)"
                     >
@@ -61,11 +61,11 @@
                 <div class="row mt-2">
                     <div class="col-sm-6">
                         <button
-                            class="btn btn-block btn-sm"
+                            class="btn w-100 btn-sm"
                             :class="disableRevealUsernameButton ? 'btn-secondary' : 'btn-danger'"
                             :disabled="disableRevealUsernameButton"
-                            data-toggle="tooltip"
-                            data-placement="top"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
                             :title="isChatroomUserPublic ? 'your username is already revealed!' : 'your future posts will not be anonymous!'"
                             @click="revealUsername($event)"
                         >
@@ -74,11 +74,11 @@
                     </div>
                     <div class="col-sm-6">
                         <button
-                            class="btn btn-block btn-sm"
+                            class="btn w-100 btn-sm"
                             :class="disableRequestMediationButton ? 'btn-secondary' : 'btn-danger'"
                             :disabled="disableRequestMediationButton"
-                            data-toggle="tooltip"
-                            data-placement="top"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
                             :title="isChatroomMediationRequestedUser ? 'you already requested mediation!' : !vetoMediationAvailable ? `this option will be available after ${cutoffDate.toLocaleString()}` : isVetoer || isVouchingUser ? 'between the veto-er and the vouching users, 2 people must request mediation!' : isMapper ? 'this will end the discussion and move to a larger vote!' : 'only the mapset host, vetoer, and vouching user can request mediation'"
                             @click="requestMediation($event)"
                         >
@@ -104,11 +104,11 @@
                 <div class="row mt-2">
                     <div class="col-sm-6">
                         <button
-                            class="btn btn-block btn-sm"
+                            class="btn w-100 btn-sm"
                             :class="disableStartVoteButton ? 'btn-secondary' : 'btn-danger'"
                             :disabled="disableStartVoteButton"
-                            data-toggle="tooltip"
-                            data-placement="top"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
                             :title="selectedVeto.chatroomVoteEnabled ? 'a vote is already in progress!' : isMapper ? `start a vote based on your map's most recent changes` : 'only the mapper can do this!'"
                             @click="startVote($event)"
                         >
@@ -117,11 +117,11 @@
                     </div>
                     <div class="col-sm-3">
                         <button
-                            class="btn btn-block btn-sm"
+                            class="btn w-100 btn-sm"
                             :class="disableUpholdVoteButton ? 'btn-secondary' : 'btn-danger'"
                             :disabled="disableUpholdVoteButton"
-                            data-toggle="tooltip"
-                            data-placement="top"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
                             :title="isChatroomUpholdVoter ? 'you already voted' : isVetoerOrVouchingUser && disableUpholdVoteButton ? `the mapper must begin the vote!` : isVetoerOrVouchingUser ? 'uphold = map needs more changes' : 'only the veto creator and vouching users can vote'"
                             @click="vote('uphold', $event)"
                         >
@@ -130,11 +130,11 @@
                     </div>
                     <div class="col-sm-3">
                         <button
-                            class="btn btn-block btn-sm"
+                            class="btn w-100 btn-sm"
                             :class="disableDismissVoteButton ? 'btn-secondary' : 'btn-danger'"
                             :disabled="disableDismissVoteButton"
-                            data-toggle="tooltip"
-                            data-placement="top"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
                             :title="isChatroomDismissVoter ? 'you already voted' : isVetoerOrVouchingUser && disableDismissVoteButton ? `the mapper must begin the vote!` : isVetoerOrVouchingUser ? 'dismiss = map is acceptable' : 'only the veto creator and vouching users can vote'"
                             @click="vote('dismiss', $event)"
                         >
@@ -154,6 +154,12 @@ export default {
     name: 'Chatroom',
     components: {
         UserLink,
+    },
+    data() {
+        return {
+            messageInput: '',
+            confirmDelete: '',
+        };
     },
     computed: {
         ...mapState([
@@ -199,12 +205,6 @@ export default {
         disableStartVoteButton() {
             return !this.isMapper || this.selectedVeto.chatroomVoteEnabled;
         },
-    },
-    data() {
-        return {
-            messageInput: '',
-            confirmDelete: '',
-        };
     },
     mounted () {
         setInterval(async () => {
@@ -289,13 +289,13 @@ export default {
 }
 .card-avatar-img {
     position: absolute;
-    top: calc(50% - 30px);
-    left: -8px;
+    top: 15px;
+    left: -12px;
     max-width: 24px;
     max-height: 24px;
     object-fit: cover;
     border-radius: 100%;
     box-shadow: 0 1px 1rem rgba(10, 10, 25, .9);
-    background-color: var(--gray-dark);
+    background-color: var(--bs-gray-800);
 }
 </style>

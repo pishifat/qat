@@ -5,11 +5,11 @@
         :style="userHeaderStyle"
     >
         <div class="d-flex flex-row align-items-center">
-            <img :src="'https://a.ppy.sh/' + selectedUser.osuId" class="avatar-img mr-3">
+            <img :src="'https://a.ppy.sh/' + selectedUser.osuId" class="avatar-img me-3">
 
             <h5 class="modal-title">
                 <user-link
-                    class="font-weight-bold text-white"
+                    class="fw-bold text-white"
                     :osu-id="selectedUser.osuId"
                     :username="selectedUser.username"
                 />
@@ -19,9 +19,7 @@
                 />
             </h5>
         </div>
-        <button type="button" class="close" data-dismiss="modal">
-            <span>&times;</span>
-        </button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
 </template>
 
@@ -75,12 +73,12 @@ export default {
         /** @returns {string} */
         getUserColor () {
             if (this.selectedUser.groups == 'nat') {
-                return 'var(--danger)';
+                return 'var(--bs-danger)';
             }
             else if (this.selectedUser.groups == 'bn' && this.selectedUser.level == 'full') {
-                return 'var(--bn)';
+                return 'var(--bs-bn)';
             }
-            else return 'var(--probation)';
+            else return 'var(--bs-probation)';
         },
     },
 };
@@ -98,7 +96,7 @@ export default {
     object-fit: cover;
     border-radius: 100%;
     box-shadow: 0 1px 1rem rgba(10, 10, 25, .9);
-    background-color: var(--gray-dark);
+    background-color: var(--bs-gray-800);
 }
 
 .user-header {

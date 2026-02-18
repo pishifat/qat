@@ -35,10 +35,10 @@
                 </div>
                 <div v-else-if="!selectedEvaluation.user.isNat">
                     <p><b>Mock evaluators:</b></p>
-                    <button class="btn btn-sm btn-secondary btn-block" @click="enableMockEvaluators(false, $event)">
+                    <button class="btn btn-sm btn-secondary w-100" @click="enableMockEvaluators(false, $event)">
                         {{ potentialMockEvaluators ? 'Re-select mock evaluators' : 'Enable mock evaluators' }}
                     </button>
-                    <button v-if="potentialMockEvaluators" class="btn btn-sm btn-primary btn-block" @click="enableMockEvaluators(true, $event)">
+                    <button v-if="potentialMockEvaluators" class="btn btn-sm btn-primary w-100" @click="enableMockEvaluators(true, $event)">
                         Select all eligible users as mock evaluators
                     </button>
 

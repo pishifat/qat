@@ -2,8 +2,8 @@
     <div class="col-md-6 col-lg-4 my-2" @click="selectVeto()">
         <div
             class="card card-individual"
-            data-toggle="modal"
-            data-target="#extendedInfo"
+            data-bs-toggle="modal"
+            data-bs-target="#extendedInfo"
             :data-veto="veto.id"
         >
             <img :src="`https://assets.ppy.sh/beatmaps/${veto.beatmapId}/covers/card.jpg`" class="card-img">
@@ -20,7 +20,7 @@
                 <div class="small">
                     Hosted by
                     <user-link
-                        class="font-weight-bold"
+                        class="fw-bold"
                         :osu-id="veto.beatmapMapperId"
                         :username="veto.beatmapMapper"
                         @click.stop
@@ -29,11 +29,11 @@
 
                 <div class="card-status" :class="`status-bar-${veto.status}`" />
                 <div class="card-icons">
-                    <span v-if="veto.status === 'wip'" class="small float-left">
+                    <span v-if="veto.status === 'wip'" class="small float-start">
                         <i
                             class="fas fa-clock mx-1"
-                            data-toggle="tooltip"
-                            data-placement="top"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
                             title="deadline"
                         />
                         <date-display :date="veto.deadline" />
@@ -41,7 +41,7 @@
 
                     <date-display
                         v-else
-                        class="small float-left"
+                        class="small float-start"
                         :date="veto.createdAt"
                     />
 
@@ -97,23 +97,23 @@ export default {
 }
 
 .status-bar-pending {
-    background: radial-gradient(var(--neutral), transparent 70%);
+    background: radial-gradient(var(--bs-neutral), transparent 70%);
 }
 
 .status-bar-chatroom {
-    background: radial-gradient(var(--gmt), transparent 70%);
+    background: radial-gradient(var(--bs-gmt), transparent 70%);
 }
 
 .status-bar-available {
-    background: radial-gradient(var(--danger), transparent 70%);
+    background: radial-gradient(var(--bs-danger), transparent 70%);
 }
 
 .status-bar-wip {
-    background: radial-gradient(var(--warning), transparent 70%);
+    background: radial-gradient(var(--bs-warning), transparent 70%);
 }
 
 .status-bar-archive {
-    background: radial-gradient(var(--success), transparent 70%);
+    background: radial-gradient(var(--bs-success), transparent 70%);
 }
 
 </style>

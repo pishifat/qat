@@ -16,8 +16,8 @@
                 </button>
                 <button
                     class="btn btn-sm mb-3 mt-1 btn-nat"
-                    data-toggle="tooltip"
-                    data-placement="top"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
                     title="Make sure you're already NAT with a mode before using this"
                     @click="moveToStructuralNat($event)"
                 >
@@ -82,8 +82,8 @@
                 <br>
                 <button
                     class="btn btn-sm mb-3 mt-1 btn-danger"
-                    data-toggle="tooltip"
-                    data-placement="top"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
                     title="This won't remove you from the BN group, it will only remove your mode from full and probation"
                     @click="removeFromBn('osu', $event)"
                 >
@@ -91,8 +91,8 @@
                 </button>
                 <button
                     class="btn btn-sm mb-3 mt-1 btn-danger"
-                    data-toggle="tooltip"
-                    data-placement="top"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
                     title="This won't remove you from the BN group, it will only remove your mode from full and probation"
                     @click="removeFromBn('taiko', $event)"
                 >
@@ -100,8 +100,8 @@
                 </button>
                 <button
                     class="btn btn-sm mb-3 mt-1 btn-danger"
-                    data-toggle="tooltip"
-                    data-placement="top"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
                     title="This won't remove you from the BN group, it will only remove your mode from full and probation"
                     @click="removeFromBn('catch', $event)"
                 >
@@ -109,8 +109,8 @@
                 </button>
                 <button
                     class="btn btn-sm mb-3 mt-1 btn-danger"
-                    data-toggle="tooltip"
-                    data-placement="top"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
                     title="This won't remove you from the BN group, it will only remove your mode from full and probation"
                     @click="removeFromBn('mania', $event)"
                 >

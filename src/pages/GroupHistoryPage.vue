@@ -1,7 +1,7 @@
 <template>
     <div>
         <section class="card card-body">
-            <div class="form-inline">
+            <div class="d-flex flex-wrap align-items-center">
                 <input
                     id="user"
                     v-model="params.user"
@@ -13,7 +13,7 @@
                 <select
                     id="group"
                     v-model="params.group"
-                    class="form-control col-md-6"
+                    class="form-select col-md-6"
                 >
                     <option
                         v-for="group in groups"
@@ -55,7 +55,7 @@
         <section class="card card-body">
             <data-table :headers="['date', 'action', 'user', 'group']">
                 <tr v-for="event in events" :key="event.id">
-                    <td data-toggle="tooltip" data-placement="left" :title="toStandardDetailedDate(event.created_at)">
+                    <td data-bs-toggle="tooltip" data-bs-placement="left" :title="toStandardDetailedDate(event.created_at)">
                         {{ toRelativeDate(event.created_at) }}
                     </td>
                     <td>

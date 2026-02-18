@@ -10,7 +10,7 @@
             >
                 <select
                     v-model="consensusFilter"
-                    class="form-control"
+                    class="form-select"
                     @change="applyConsensusFilter($event.target.value)"
                 >
                     <option value="">
@@ -61,7 +61,7 @@
                         ({{ filterEvals(archivedApplications, consensusFilter).length + (reachedMax ? '' : '+') }})
                     </small>
                 </h2>
-                <span v-if="!filterEvals(archivedApplications, consensusFilter).length" class="ml-4">
+                <span v-if="!filterEvals(archivedApplications, consensusFilter).length" class="ms-4">
                     None...
                 </span>
                 <transition-group name="list" tag="div" class="row">
@@ -89,7 +89,7 @@
                         ({{ filterEvals(archivedCurrentBnEvals, consensusFilter).length + (reachedMax ? '' : '+') }})
                     </small>
                 </h2>
-                <span v-if="!filterEvals(archivedCurrentBnEvals, consensusFilter).length" class="ml-4">
+                <span v-if="!filterEvals(archivedCurrentBnEvals, consensusFilter).length" class="ms-4">
                     None...
                 </span>
                 <transition-group name="list" tag="div" class="row">

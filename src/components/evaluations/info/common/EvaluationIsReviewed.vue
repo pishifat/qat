@@ -3,8 +3,8 @@
         <b>Reviewed: </b>
         <a
             href="#"
-            data-toggle="tooltip"
-            data-placement="right"
+            data-bs-toggle="tooltip"
+            data-bs-placement="right"
             title="toggle eval review status"
             @click.prevent="toggleEvaluationIsReviewed($event)"
         >

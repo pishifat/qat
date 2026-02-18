@@ -1,27 +1,6 @@
 // Buttons =====================================================================
 
-.input-group {
-    align-items: center;
-}
-
-.input-group-append {
-    border: {
-        top: 3px solid transparent;
-        right: 3px solid transparent;
-        bottom: 3px solid transparent;
-    }
-}
-
-.input-group-prepend {
-    border: {
-        top: 3px solid transparent;
-        left: 3px solid transparent;
-        bottom: 3px solid transparent;
-    }
-}
-
-.input-group-append > .btn,
-.input-group-prepend > .btn {
+.input-group > .btn {
     border-width: 3px;
 }
 
@@ -29,10 +8,15 @@
 
 .table-dark {
     background-color: transparent;
+    --bs-table-bg: transparent;
+    --bs-table-hover-bg: rgba(255, 255, 255, 0.075);
+
+    & > thead {
+        --bs-table-bg: #{$bright-blue-gray};
+    }
 
     & > thead > tr {
-        @extend .text-center, .text-uppercase, .font-weight-bold;
-        background-color: $bright-blue-gray;
+        @extend .text-center, .text-uppercase, .fw-bold;
         border-color: rgba($bright-blue-gray, 0.2);
 
         & th {
@@ -105,6 +89,14 @@
                     }
                 }
 
+                @include media-breakpoint-only(xxl) {
+                    width: 1400px;
+
+                    &::before {
+                        background-image: linear-gradient(to right, $blue-gray, transparent 200px, transparent 1200px, $blue-gray 1400px);
+                    }
+                }
+
                 &::before {
                     content: "";
                     display: block;
@@ -141,9 +133,15 @@
     }
 }
 
+// Form checks =================================================================
+
+.form-check-input {
+    border-color: hsl(170, 20%, 45%);
+}
+
 // Indicators ==================================================================
 
-.close {
+.btn-close {
     opacity: 0.4;
 
     &:hover,

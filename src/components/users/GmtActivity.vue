@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="form-inline">
+        <div class="d-flex flex-wrap align-items-center">
             <input
                 v-model="gmtDays"
                 class="form-control w-25"
@@ -12,9 +12,9 @@
             >
 
             <button
-                class="btn btn-sm btn-primary ml-1"
-                data-toggle="tooltip"
-                data-placement="right"
+                class="btn btn-sm btn-primary ms-1"
+                data-bs-toggle="tooltip"
+                data-bs-placement="right"
                 title="Finds GMT vote activity, defaults to 30 days"
                 @click="findGmtActivity($event)"
             >

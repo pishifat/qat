@@ -2,8 +2,8 @@
     <div
         class="card home-card"
         :style="cardDecoration(user)"
-        data-toggle="modal"
-        data-target="#userInfo"
+        data-bs-toggle="modal"
+        data-bs-target="#userInfo"
         @click="selectUser()"
     >
         <img :src="'https://a.ppy.sh/' + user.osuId" class="card-avatar-img">
@@ -17,10 +17,10 @@
                     <span
                         v-for="status in requestMethods(user.requestStatus)"
                         :key="status"
-                        class="badge badge-pill mx-1 text-lowercase"
-                        :class="status === 'closed' ? 'badge-danger' : status === 'open' ? 'badge-success' : 'badge-primary'"
-                        data-toggle="tooltip"
-                        data-placement="top"
+                        class="badge rounded-pill mx-1 text-lowercase"
+                        :class="status === 'closed' ? 'bg-danger' : status === 'open' ? 'bg-success' : 'bg-primary'"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
                         :title="requestType(status, user.requestLink, user.osuId).type"
                         v-html="requestType(status, user.requestLink, user.osuId).html || requestType(status, user.requestLink, user.osuId).type"
                     />
@@ -28,9 +28,9 @@
             </span>
         </div>
         <span
-            class="text-light mr-2"
-            data-toggle="tooltip"
-            data-placement="top"
+            class="text-light me-2"
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
             title="view request info"
         >
             <i class="fas fa-ellipsis-v" />
@@ -107,20 +107,20 @@ export default {
             let css = this.getCardBackground(user);
 
             if (user.level == 'evaluator') {
-                return css += 'border-left: 4px solid var(--danger);';
+                return css += 'border-left: 4px solid var(--bs-danger);';
             }
 
             if (user.level === 'probation') {
-                return css += 'border-left: 4px solid var(--probation);';
+                return css += 'border-left: 4px solid var(--bs-probation);';
             }
 
             if (user.level === 'full') {
-                return css += 'border-left: 4px solid var(--bn);';
+                return css += 'border-left: 4px solid var(--bs-bn);';
             }
         },
         /** @returns {string} */
         getCardBackground(user) {
-            return `background: linear-gradient(90deg, var(--bright-blue-gray) 6%, rgba(0, 0, 0, 0.82) 140%), url(${this.getCover(user)}) center no-repeat; background-size: cover;`;
+            return `background: linear-gradient(90deg, var(--bs-bright-blue-gray) 6%, rgba(0, 0, 0, 0.82) 140%), url(${this.getCover(user)}) center no-repeat; background-size: cover;`;
         },
         /** @returns {string} */
         getCover(user) {
@@ -139,7 +139,7 @@ export default {
     object-fit: cover;
     border-radius: 100%;
     box-shadow: 0 1px 1rem rgba(10, 10, 25, .9);
-    background-color: var(--gray-dark);
+    background-color: var(--bs-gray-800);
 }
 
 .body {

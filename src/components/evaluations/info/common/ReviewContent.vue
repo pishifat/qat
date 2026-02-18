@@ -11,8 +11,8 @@
                     v-if="loggedInUser && loggedInUser.isNatLeader"
                     href="#"
                     class="text-danger"
-                    data-toggle="tooltip"
-                    data-placement="top"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
                     title="Delete review"
                     @click.prevent="deleteReview()"
                 >
@@ -33,11 +33,11 @@
             <div class="row">
                 <div class="col-sm-12">
                     <b>{{ selectedEvaluation.user.isNat ? 'NAT activity:' : 'Modding:' }}</b>
-                    <div class="small ml-2 card card-body" v-html="$md.render(review.moddingComment)" />
+                    <div class="small ms-2 card card-body" v-html="$md.render(review.moddingComment)" />
                 </div>
                 <div v-if="review.behaviorComment" class="col-sm-12">
                     <b>Behavior:</b>
-                    <div class="small ml-2 card card-body" v-html="$md.render(review.behaviorComment)" />
+                    <div class="small ms-2 card card-body" v-html="$md.render(review.behaviorComment)" />
                 </div>
             </div>
         </div>

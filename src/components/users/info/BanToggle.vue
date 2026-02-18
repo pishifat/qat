@@ -5,8 +5,8 @@
                 Banned from BN:
             </b>
             <a
-                data-toggle="tooltip"
-                data-placement="top"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
                 title="Toggle user's ban from BN"
                 href="#"
                 @click.prevent="toggleIsBannedFromBn()"

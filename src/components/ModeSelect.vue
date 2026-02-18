@@ -2,50 +2,50 @@
     <div class="d-inline-flex align-items-center">
         <span
             v-if="!modesFilter || modesFilter && modesFilter.includes('osu')"
-            data-toggle="tooltip"
+            data-bs-toggle="tooltip"
             title="osu!"
         >
             <i
                 :class="osuCheck ? 'osu-icon-check' : 'osu-icon'"
-                class="mode-icon-select fa-xl mr-1"
+                class="mode-icon-select fa-xl me-1"
 
                 @click="osuCheck = !osuCheck, updateSelectedMode('osu')"
             />
         </span>
         <span
             v-if="!modesFilter || modesFilter && modesFilter.includes('taiko')"
-            data-toggle="tooltip"
+            data-bs-toggle="tooltip"
             title="osu!taiko"
         >
             <i
                 :class="taikoCheck ? 'taiko-icon-check' : 'taiko-icon'"
-                class="mode-icon-select fa-xl mr-1"
+                class="mode-icon-select fa-xl me-1"
                 @click="taikoCheck = !taikoCheck, updateSelectedMode('taiko')"
             />
         </span>
         <span
             v-if="!modesFilter || modesFilter && modesFilter.includes('catch')"
-            data-toggle="tooltip"
+            data-bs-toggle="tooltip"
             title="osu!catch"
         >
             <i
                 :class="catchCheck ? 'catch-icon-check' : 'catch-icon'"
-                class="mode-icon-select fa-xl mr-1"
+                class="mode-icon-select fa-xl me-1"
                 @click="catchCheck = !catchCheck, updateSelectedMode('catch')"
             />
         </span>
         <span
             v-if="!modesFilter || modesFilter && modesFilter.includes('mania')"
-            data-toggle="tooltip"
+            data-bs-toggle="tooltip"
             title="osu!mania"
         >
             <i
                 :class="maniaCheck ? 'mania-icon-check' : 'mania-icon'"
-                class="mode-icon-select fa-xl mr-1"
+                class="mode-icon-select fa-xl me-1"
                 @click="maniaCheck = !maniaCheck, updateSelectedMode('mania')"
             />
         </span>
-        <span data-toggle="tooltip" title="all modes">
+        <span data-bs-toggle="tooltip" title="all modes">
             <i
                 v-if="allModes"
                 :class="allModesCheck ? 'text-info' : ''"

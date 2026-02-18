@@ -4,7 +4,7 @@
             <!-- VCC violations checkbox -->
             <div v-if="!selectedDiscussionVote.onlyWrittenInput && isContentReview && vote == 3">
                 Select the <a href="https://osu.ppy.sh/wiki/en/Rules/Visual_Content_Considerations" target="_blank">Visual Content Considerations</a> that are violated:
-                <div v-for="(option, i) in vccOptions" :key="i" class="form-check ml-4">
+                <div v-for="(option, i) in vccOptions" :key="i" class="form-check ms-4">
                     <div v-if="option.active">
                         <input
                             :id="option.name"
@@ -33,7 +33,7 @@
 
             <!-- vote -->
             <div v-if="!selectedDiscussionVote.onlyWrittenInput" class="mt-2">
-                <div class="form-inline justify-content-end">
+                <div class="d-flex flex-wrap align-items-center justify-content-end">
                     <div class="form-check form-check-inline">
                         <input
                             id="1"

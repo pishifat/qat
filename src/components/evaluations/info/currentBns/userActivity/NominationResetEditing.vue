@@ -6,7 +6,7 @@
                 <span
                     v-if="hasSEV"
                     :class="calculateSEVColor"
-                    data-toggle="tooltip"
+                    data-bs-toggle="tooltip"
                     :title="getSeverityTooltip(event.obviousness, event.severity)"
                 >
                     ({{ event.obviousness }}/{{ event.severity }})
@@ -14,7 +14,7 @@
                 <span
                     v-else-if="hasImpact"
                     :class="getImpact(event.impactNum).color"
-                    data-toggle="tooltip"
+                    data-bs-toggle="tooltip"
                     :title="getImpact(event.impactNum).text"
                 >
                     <i v-if="event.impactNum !== 0" :class="getImpact(event.impactNum).icon" />
@@ -38,7 +38,7 @@
             <span
                 v-if="loggedInUser && loggedInUser.isNat && hasData"
                 :class="getImpact(event.impactNum).color"
-                data-toggle="tooltip"
+                data-bs-toggle="tooltip"
                 :title="getImpact(event.impactNum).text"
             >
                 <i v-if="event.impactNum !== 0" :class="getImpact(event.impactNum).icon" />
@@ -52,12 +52,12 @@
             </p>
             <textarea
                 v-model="newEventContent"
-                class="form-control form-control-sm mr-2"
+                class="form-control form-control-sm me-2"
                 type="text"
                 rows="4"
                 maxlength="1000"
             />
-            <button class="btn btn-sm btn-primary btn-block mb-2" @click="updateContent($event);">
+            <button class="btn btn-sm btn-primary w-100 mb-2" @click="updateContent($event);">
                 Save
             </button>
 

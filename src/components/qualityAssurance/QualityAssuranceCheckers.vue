@@ -11,7 +11,7 @@
                 <img
                     class="avatar-img avatar-img--small"
                     :src="'https://a.ppy.sh/' + check.user.osuId"
-                    data-toggle="tooltip"
+                    data-bs-toggle="tooltip"
                     :title="`${check.user.username} (${check.mode})`"
                 >
             </a>
@@ -25,7 +25,7 @@
                 <img
                     class="avatar-img avatar-img--small"
                     :src="'https://a.ppy.sh/' + loggedInUser.osuId"
-                    data-toggle="tooltip"
+                    data-bs-toggle="tooltip"
                     :title="loggedInUser.username"
                 >
             </a>

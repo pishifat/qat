@@ -12,7 +12,7 @@
             />
             <votes-inactive v-else />
 
-            <button v-if="selectedDiscussionVote.isActive && loggedInUser.hasFullReadAccess" class="btn btn-sm btn-danger btn-block mt-3" @click="concludeMediation($event)">
+            <button v-if="selectedDiscussionVote.isActive && loggedInUser.hasFullReadAccess" class="btn btn-sm btn-danger w-100 mt-3" @click="concludeMediation($event)">
                 Conclude Vote
             </button>
 
@@ -22,13 +22,13 @@
             />
 
             <div v-if="selectedDiscussionVote.isActive && loggedInUser.hasBasicAccess">
-                <hr>
-
                 <!-- only show voting options for users of specified mode -->
                 <mediator-options
                     v-if="loggedInUser.modes.includes(selectedDiscussionVote.mode) || selectedDiscussionVote.mode == 'all' || loggedInUser.modes.includes('none')"
                     :is-content-review="selectedDiscussionVote.isContentReview"
-                />
+                >
+                    <hr>
+                </mediator-options>
                 <p v-else class="small">
                     Because you're not proficient in this proposal's game mode, you're not able to vote :(
                 </p>

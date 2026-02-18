@@ -1,9 +1,9 @@
 <template>
     <div>
-        <div class="ml-2">
+        <div class="ms-2">
             <a
                 :href="events && `#${eventsId}`"
-                data-toggle="collapse"
+                data-bs-toggle="collapse"
             >{{ header }} <i class="fas fa-angle-down" /></a>
             ({{ isLoading ? '...' : events ? events.length : '0' }})
         </div>
@@ -19,8 +19,8 @@
                     <td>
                         <a
                             :href="'osu://dl/' + beatmapsetId(event)"
-                            data-toggle="tooltip"
-                            data-placement="right"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="right"
                             title="osu!direct download"
                         >
                             <i class="fas fa-file-download" />
@@ -41,8 +41,8 @@
                         <span
                             v-if="event.beatmaps && event.beatmaps.length"
                             class="text-secondary small"
-                            data-toggle="tooltip"
-                            data-placement="right"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="right"
                             title="total drain time"
                         >
                             ({{ totalDrain(event.beatmaps) }})
@@ -51,8 +51,8 @@
                             v-if="loggedInUser && (loggedInUser.isNat || loggedInUser.isTrialNat) && isEvaluation"
                             href="#"
                             :class="processing ? 'processing' : ''"
-                            data-toggle="tooltip"
-                            data-placement="right"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="right"
                             title="mark map as reviewed"
                             @click.prevent="toggleIsReviewed(event)"
                         >
@@ -74,7 +74,7 @@
                     </td>
                 </tr>
             </data-table>
-            <p v-else class="small ml-4">
+            <p v-else class="small ms-4">
                 None...
             </p>
         </div>

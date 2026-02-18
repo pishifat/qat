@@ -9,17 +9,15 @@
                 :placeholder="placeholder || ''"
                 @change="updateFilterValue($event.target.value)"
             >
-            <div class="input-group-append">
-                <button class="btn btn-sm btn-primary px-3">
-                    <i class="fas fa-search" />
-                </button>
-            </div>
+            <button class="btn btn-sm btn-primary px-3 h-75 mt-1">
+                <i class="fas fa-search" />
+            </button>
         </div>
 
         <select
             v-if="modes && modes.length"
             id="mode"
-            class="form-control"
+            class="form-select my-1"
             @change="updateFilterMode(modes[$event.target.selectedIndex])"
         >
             <option
@@ -35,7 +33,7 @@
         <select
             v-if="groups && groups.length"
             id="group"
-            class="form-control"
+            class="form-select"
             @change="updateFilterGroup(groups[$event.target.selectedIndex])"
         >
             <option

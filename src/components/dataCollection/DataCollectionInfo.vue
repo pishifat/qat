@@ -18,13 +18,13 @@
 
             <textarea
                 v-model="newEventContent"
-                class="form-control form-control-sm mr-2"
+                class="form-control form-control-sm me-2"
                 type="text"
                 rows="4"
                 maxlength="1000"
             />
 
-            <button class="btn btn-sm btn-block btn-primary mb-2" @click="updateContent($event)">
+            <button class="btn btn-sm w-100 btn-primary mb-2" @click="updateContent($event)">
                 Save
             </button>
 

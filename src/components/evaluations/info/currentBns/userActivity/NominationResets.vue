@@ -1,9 +1,9 @@
 <template>
     <div>
-        <div class="ml-2">
+        <div class="ms-2">
             <a
                 :href="events && `#${eventsId}`"
-                data-toggle="collapse"
+                data-bs-toggle="collapse"
             >{{ header }} <i class="fas fa-angle-down" /></a>
             ({{ isLoading ? '...' : events ? filteredEvents.length : '0' }})
         </div>
@@ -30,8 +30,8 @@
                     <td class="w-25">
                         <a
                             :href="'osu://dl/' + event.beatmapsetId"
-                            data-toggle="tooltip"
-                            data-placement="right"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="right"
                             title="osu!direct download"
                         >
                             <i class="fas fa-file-download" />
@@ -56,8 +56,8 @@
                         <span
                             v-if="event.beatmaps && event.beatmaps.length"
                             class="text-secondary small"
-                            data-toggle="tooltip"
-                            data-placement="right"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="right"
                             title="total drain time"
                         >
                             ({{ totalDrain(event.beatmaps) }})
@@ -66,7 +66,7 @@
                     <nomination-reset-editing :event="event" />
                 </tr>
             </data-table>
-            <p v-else class="small ml-4">
+            <p v-else class="small ms-4">
                 None...
             </p>
         </div>

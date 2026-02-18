@@ -3,7 +3,7 @@
         <div v-if="isQualityAssuranceChecker" class="col-sm-12 my-2" :class="otherChecksWithComments.length ? 'mb-1' : ''">
             <a
                 href="#"
-                class="ml-2"
+                class="ms-2"
                 :class="disable ? 'disabled' : ''"
                 @click.prevent="showInput = !showInput"
             >
@@ -21,7 +21,7 @@
                 v-if="showInput"
                 v-model="userComment"
                 :disabled="disable"
-                class="form-control form-control-sm ml-2 w-75"
+                class="form-control form-control-sm ms-2 w-75"
                 type="text"
                 maxlength="1000"
                 placeholder="enter to submit..."

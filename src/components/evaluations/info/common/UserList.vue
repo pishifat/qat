@@ -23,8 +23,8 @@
                     <a
                         v-if="nominatorAssessmentMongoId && loggedInUser && loggedInUser.isNat && isEditing && user.id == editedEvaluatorId"
                         href="#"
-                        data-toggle="tooltip"
-                        data-placement="top"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
                         title="close"
                         @click="isEditing = false; editedEvaluatorId = ''"
                     >
@@ -33,8 +33,8 @@
                     <a
                         v-if="nominatorAssessmentMongoId && loggedInUser && loggedInUser.isNat"
                         href="#"
-                        data-toggle="tooltip"
-                        data-placement="top"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
                         title="replace with random user"
                         @click.prevent="replaceUser(user.id, $event);"
                     >
@@ -42,11 +42,11 @@
                     </a>
                 </span>
 
-                <span v-if="nominatorAssessmentMongoId && loggedInUser && loggedInUser.isNat && isEditing && user.id == editedEvaluatorId && !disableReplace" class="form-inline">
+                <span v-if="nominatorAssessmentMongoId && loggedInUser && loggedInUser.isNat && isEditing && user.id == editedEvaluatorId && !disableReplace" class="d-flex flex-wrap align-items-center">
                     <select
                         id="user"
                         v-model="selectedUserId"
-                        class="form-control ml-2"
+                        class="form-select ms-2"
                     >
                         <option
                             v-for="user in replaceNat ? nat : trialNat"
@@ -62,10 +62,10 @@
                     <a
                         v-if="nominatorAssessmentMongoId && loggedInUser && loggedInUser.isNat"
                         href="#"
-                        data-toggle="tooltip"
-                        data-placement="top"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
                         title="replace with selected user"
-                        class="ml-1"
+                        class="ms-1"
                         @click.prevent="replaceUserSpecific(user.id, $event);"
                     >
                         <i class="fas fa-undo-alt text-success" />

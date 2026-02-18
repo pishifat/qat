@@ -3,8 +3,8 @@
         <div
             class="card cursor-pointer"
             :class="report.valid == 1 ? 'border-success' : report.valid == 2 ? 'border-info' : report.valid == 3 ? 'border-danger' : ''"
-            data-toggle="modal"
-            data-target="#reportInfo"
+            data-bs-toggle="modal"
+            data-bs-target="#reportInfo"
             :data-user="report.id"
         >
             <div class="card-body">
@@ -36,7 +36,7 @@
                         :include-time="true"
                     />
                 </span>
-                <span class="small float-right">{{ category }}</span>
+                <span class="small float-end">{{ category }}</span>
             </div>
         </div>
     </div>

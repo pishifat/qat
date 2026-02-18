@@ -7,7 +7,7 @@
                 </span>
             </div>
             <div class="row">
-                <div class="col-sm-12 form-inline">
+                <div class="col-sm-12 d-flex flex-wrap align-items-center">
                     <label for="date">Input:</label>
                     <input
                         v-model="input"

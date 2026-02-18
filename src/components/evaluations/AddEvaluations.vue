@@ -3,15 +3,15 @@
         <div class="container">
             <div class="row mb-3">
                 <div class="col-sm-12">
-                    <b class="mr-4">Game mode</b>
+                    <b class="me-4">Game mode</b>
 
                     <mode-select
                         v-model="selectedModes"
                         :max-selection="4"
-                        class="ml-2"
+                        class="ms-2"
                     />
 
-                    <p class="small text-secondary ml-2 mt-1">
+                    <p class="small text-secondary ms-2 mt-1">
                         Specify mode(s) for evaluations. Multi-mode BNs can generate multiple evaluations.
                     </p>
                 </div>
@@ -21,7 +21,7 @@
                     <b>User(s):</b>
                     <input
                         v-model="includeUsers"
-                        class="ml-2 form-control"
+                        class="ms-2 form-control"
                         type="text"
                         placeholder="username1, username2, username3..."
                     >
@@ -32,7 +32,7 @@
                 <div class="col-sm-12">
                     <b>Resignation:</b>
 
-                    <div class="form-check ml-2">
+                    <div class="form-check ms-2">
                         <input
                             id="isResignation"
                             v-model="isResignation"
@@ -46,12 +46,12 @@
                     </div>
                 </div>
                 <div v-if="!isResignation" class="col-sm-12 mt-3">
-                    <div class="form-inline">
+                    <div class="d-flex flex-wrap align-items-center">
                         <b>Deadline:</b>
-                        <input v-model="deadline" class="ml-1 form-control" type="date">
+                        <input v-model="deadline" class="ms-1 form-control" type="date">
                     </div>
 
-                    <small class="text-secondary ml-2 mt-1">
+                    <small class="text-secondary ms-2 mt-1">
                         Only deadlines within the next week will be displayed.
                     </small>
                 </div>
@@ -59,16 +59,16 @@
             <div v-if="loggedInUser.isNatLeader" class="row">
                 <div class="col-sm-12">
                     <p>
-                        <a href="#advancedSettings" data-toggle="collapse">
+                        <a href="#advancedSettings" data-bs-toggle="collapse">
                             Advanced settings <i class="fas fa-angle-down" />
                         </a>
                     </p>
                     <div id="advancedSettings" class="collapse container col-sm-12">
-                        <b class="mr-4">User group:</b>
+                        <b class="me-4">User group:</b>
                         <label
                             class="mx-2"
-                            data-toggle="tooltip"
-                            data-placement="top"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
                             title="probation BN"
                         >
                             <input
@@ -81,8 +81,8 @@
                         </label>
                         <label
                             class="mx-2"
-                            data-toggle="tooltip"
-                            data-placement="top"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
                             title="full BN"
                         >
                             <input
@@ -95,8 +95,8 @@
                         </label>
                         <label
                             class="mx-2"
-                            data-toggle="tooltip"
-                            data-placement="top"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
                             title="NAT"
                         >
                             <input
@@ -108,7 +108,7 @@
                             <i class="fas fa-running" />
                         </label>
 
-                        <p class="small text-secondary ml-2">
+                        <p class="small text-secondary ms-2">
                             Generate evaluations for all members of a user group. Only use this if you know what you're doing.
                         </p>
                         <div class="row">
@@ -116,7 +116,7 @@
                                 <b>Exclude specific user(s):</b>
                                 <input
                                     v-model="excludeUsers"
-                                    class="ml-2 form-control"
+                                    class="ms-2 form-control"
                                     type="text"
                                     placeholder="username1, username2, username3..."
                                 >
@@ -128,7 +128,7 @@
 
             <hr>
 
-            <button class="btn btn-primary mb-2 mt-4 btn-block" @click="addEvaluations($event)">
+            <button class="btn btn-primary mb-2 mt-4 w-100" @click="addEvaluations($event)">
                 Generate evaluations
             </button>
         </div>

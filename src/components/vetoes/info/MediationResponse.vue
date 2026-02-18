@@ -12,8 +12,8 @@
                     v-if="loggedInUser && loggedInUser.isNatLeader"
                     href="#"
                     class="text-danger"
-                    data-toggle="tooltip"
-                    data-placement="top"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
                     title="Reset mediation"
                     @click.prevent="resetMediation()"
                 >

@@ -8,18 +8,18 @@
                 store-module="users"
             >
                 <div v-if="loggedInUser && loggedInUser.isNat" class="row">
-                    <div class="col-sm-4 input-group">
-                        <input
-                            id="search"
-                            v-model="userInput"
-                            class="form-control"
-                            type="text"
-                            autocomplete="off"
-                            placeholder="open card for username or osu ID..."
-                            @keyup.enter="openUserModal($event)"
-                        >
-                        <div class="input-group-append">
-                            <button class="btn btn-sm btn-primary px-3" @click="openUserModal($event)">
+                    <div class="col-sm-4">
+                        <div class="input-group">
+                            <input
+                                id="search"
+                                v-model="userInput"
+                                class="form-control"
+                                type="text"
+                                autocomplete="off"
+                                placeholder="open card for username or osu ID..."
+                                @keyup.enter="openUserModal($event)"
+                            >
+                            <button class="btn btn-sm btn-primary px-3 h-75 mt-1" @click="openUserModal($event)">
                                 <i class="fas fa-external-link-alt" />
                             </button>
                         </div>
@@ -54,11 +54,11 @@
                         </a>
                     </div>
 
-                    <button v-if="loggedInUser && loggedInUser.isNat && !showOldUsers" class="btn btn-primary btn-sm ml-2 float-right" @click="loadBannedUsers($event)">
+                    <button v-if="loggedInUser && loggedInUser.isNat && !showOldUsers" class="btn btn-primary btn-sm ms-2 float-end" @click="loadBannedUsers($event)">
                         Show users banned from BN
                     </button>
 
-                    <button v-if="!showOldUsers" class="btn btn-primary btn-sm ml-2 float-right" @click="loadPreviousBnAndNat($event)">
+                    <button v-if="!showOldUsers" class="btn btn-primary btn-sm ms-2 float-end" @click="loadPreviousBnAndNat($event)">
                         Show previous BN/NAT
                     </button>
                 </div>
@@ -119,7 +119,6 @@ import UserCard from '../components/users/UserCard.vue';
 import UserInfo from '../components/users/UserInfo.vue';
 import BnActivity from '../components/users/BnActivity.vue';
 import GmtActivity from '../components/users/GmtActivity.vue';
-import Badges from '../components/users/Badges.vue';
 import FilterBox from '../components/FilterBox.vue';
 import PaginationNav from '../components/PaginationNav.vue';
 import VibeCheckStats from '../components/users/VibeCheckStats.vue';
@@ -136,7 +135,6 @@ export default {
         UserInfo,
         BnActivity,
         GmtActivity,
-        Badges,
         FilterBox,
         PaginationNav,
         VibeCheckStats,

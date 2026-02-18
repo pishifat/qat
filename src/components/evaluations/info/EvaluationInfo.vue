@@ -15,16 +15,16 @@
         <div v-if="selectedEvaluation" class="container">
             <div v-if="selectedEvaluation.isApplication && selectedEvaluation.active && !selectedEvaluation.discussion && !evaluatorVibeChecked()">
                 <b>Pre-evaluation:</b>
-                <div class="small ml-4">
+                <div class="small ms-4">
                     Based on what you currently know about this user, would you pass or fail their application?
                 </div>
-                <div class="small ml-4">
+                <div class="small ms-4">
                     Feel free to look at the <a :href="`https://osu.ppy.sh/users/${selectedEvaluation.user.osuId}`" target="_blank">user's profile</a>, but do not research their mods yet.
                 </div>
-                <div class="small ml-4 mt-2">
+                <div class="small ms-4 mt-2">
                     Your vote will not be shown to the applicant (or anyone else). This only exists to gather fun stats.
                 </div>
-                <div class="form-inline justify-content-end">
+                <div class="d-flex flex-wrap align-items-center justify-content-end">
                     <div class="form-check form-check-inline">
                         <input
                             id="1"
@@ -88,7 +88,7 @@
 
                 <template v-if="loggedInUser.isNat || loggedInUser.isTrialNat">
                     <p>
-                        <a href="#additionalInfo" data-toggle="collapse">
+                        <a href="#additionalInfo" data-bs-toggle="collapse">
                             Additional info <i class="fas fa-angle-down" />
                         </a>
                     </p>

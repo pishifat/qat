@@ -8,22 +8,22 @@
                 store-module="evaluations"
             >
                 <template v-if="loggedInUser.isNat">
-                    <button class="btn btn-block btn-primary my-1" @click="selectAll()">
+                    <button class="btn w-100 btn-primary my-1" @click="selectAll()">
                         Select all
                     </button>
 
                     <div class="sort-filter sort-filter--small">
                         <span class="sort-filter__title--large">Mark selected as</span>
-                        <button class="btn btn-primary btn-sm ml-2 mt-2" @click="setGroupEval($event)">
+                        <button class="btn btn-primary btn-sm ms-2 mt-2" @click="setGroupEval($event)">
                             Group evaluation
                         </button>
-                        <button class="btn btn-primary btn-sm ml-2 mt-2" @click="setIndividualEval($event)">
+                        <button class="btn btn-primary btn-sm ms-2 mt-2" @click="setIndividualEval($event)">
                             Individual evaluation
                         </button>
                         <button
-                            class="btn btn-danger btn-sm ml-2 mt-2"
-                            data-toggle="tooltip"
-                            data-placement="top"
+                            class="btn btn-danger btn-sm ms-2 mt-2"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
                             title="Moves an evaluation to archives and applies its consensus to its user"
                             @click="setComplete($event)"
                         >
@@ -39,8 +39,8 @@
                 <h2>
                     Individual Evaluations
                     <sup
-                        data-toggle="tooltip"
-                        data-placement="top"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
                         title="Evaluations are hidden from others to avoid confirmation bias"
                     >
                         ?
@@ -60,7 +60,7 @@
                 </transition-group>
 
                 <div class="row">
-                    <p v-if="!individualEvaluations || !individualEvaluations.length" class="ml-4">
+                    <p v-if="!individualEvaluations || !individualEvaluations.length" class="ms-4">
                         Nothing to evaluate...
                     </p>
                 </div>
@@ -70,8 +70,8 @@
                 <h2>
                     {{ discussionEvaluationsTitle }}
                     <sup
-                        data-toggle="tooltip"
-                        data-placement="top"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
                         :title="discussionEvaluationsHelp"
                     >
                         ?
@@ -89,7 +89,7 @@
                 </transition-group>
 
                 <div class="row">
-                    <p v-if="!discussionEvaluations || !discussionEvaluations.length" class="ml-4">
+                    <p v-if="!discussionEvaluations || !discussionEvaluations.length" class="ms-4">
                         Nothing to evaluate...
                     </p>
                 </div>

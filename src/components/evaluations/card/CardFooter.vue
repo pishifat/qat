@@ -2,9 +2,9 @@
     <div class="card-footer d-flex justify-content-start align-items-center">
         <span
             v-if="loggedInUser && loggedInUser.isNatOrTrialNat && !isDiscussion"
-            class="badge badge-info mx-1"
-            data-toggle="tooltip"
-            data-placement="top"
+            class="badge bg-info mx-1"
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
             :title="separateEvals()"
         >
             {{ reviews.length }}
@@ -15,16 +15,16 @@
             :inputs="reviews"
         />
 
-        <span class="mr-1 ml-auto small">
+        <span class="me-1 ms-auto small">
             <i
-                class="fas fa-clock mr-1"
-                data-toggle="tooltip"
-                data-placement="top"
+                class="fas fa-clock me-1"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
                 title="deadline"
             />
             <span
-                data-toggle="tooltip"
-                data-placement="top"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
                 title="final deadline"
             >
                 {{ transformedDeadline(deadline) }}
@@ -34,7 +34,7 @@
         <input
             v-if="loggedInUser && loggedInUser.isNat && isActive"
             v-model="checkedEvaluations"
-            class="mx-1 ml-auto"
+            class="mx-1 ms-auto"
             type="checkbox"
             :value="evaluationId"
             @click.stop

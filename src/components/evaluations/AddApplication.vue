@@ -3,8 +3,8 @@
         <div class="container">
             <div class="row mb-3">
                 <div class="col-sm-12">
-                    <b class="mr-4">Game mode:</b>
-                    <mode-select v-model="mode" :max-selection="1" class="ml-2" />
+                    <b class="me-4">Game mode:</b>
+                    <mode-select v-model="mode" :max-selection="1" class="ms-2" />
                 </div>
             </div>
             <div class="row mb-3">
@@ -38,7 +38,7 @@
                 </div>
             </div>
             <hr>
-            <button class="btn btn-primary mb-2 mt-4 btn-block" @click="createApplication($event)">
+            <button class="btn btn-primary mb-2 mt-4 w-100" @click="createApplication($event)">
                 Create application
             </button>
         </div>

@@ -9,7 +9,7 @@
                 role="status"
                 style="height: 3rem; width: 3rem;"
             >
-                <span class="sr-only">Loading...</span>
+                <span class="visually-hidden">Loading...</span>
             </div>
         </div>
         <div

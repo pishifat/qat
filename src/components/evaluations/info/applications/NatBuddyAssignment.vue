@@ -1,10 +1,10 @@
 <template>
-    <div class="form-inline">
+    <div class="d-flex flex-wrap align-items-center">
         <b>NAT buddy: </b>
         <select
             id="user"
             v-model="selectedUserId"
-            class="form-control form-control-sm ml-2"
+            class="form-select form-select-sm ms-2"
             @change="assignNatBuddy($event);"
         >
             <option

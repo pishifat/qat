@@ -8,7 +8,7 @@
                 :class="bgClass(month, i)"
             >
                 <span class="segment-text">
-                    <b class="mr-1">{{ $moment().subtract(3 - i, 'months').format('MMMM') }}: </b> {{ month }} map{{ month == 1 ? '' : 's' }}
+                    <b class="me-1">{{ $moment().subtract(3 - i, 'months').format('MMMM') }}: </b> {{ month }} map{{ month == 1 ? '' : 's' }}
                 </span>
             </div>
         </div>
@@ -19,7 +19,7 @@
                 class="segment bg-secondary w-25"
             >
                 <span class="segment-text">
-                    <b class="mr-1">{{ $moment().subtract(4 - i, 'months').format('MMMM') }}: </b> loading...
+                    <b class="me-1">{{ $moment().subtract(4 - i, 'months').format('MMMM') }}: </b> loading...
                 </span>
             </div>
         </div>

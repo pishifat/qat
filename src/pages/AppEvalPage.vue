@@ -16,9 +16,9 @@
             <template #individual-evaluations-title>
                 <button
                     v-if="loggedInUser.isNat"
-                    class="btn btn-primary ml-2"
-                    data-toggle="modal"
-                    data-target="#addApplication"
+                    class="btn btn-primary ms-2"
+                    data-bs-toggle="modal"
+                    data-bs-target="#addApplication"
                     @click="openAddApplication()"
                 >
                     Create a BN application

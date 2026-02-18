@@ -9,7 +9,7 @@
                 users.length &&
                     ((!isReviewable || (isReviewed && !isPassApp)) || (isReviewed && isPassApp && isSecurityChecked && hasNatBuddy))
             "
-            class="btn btn-sm btn-block btn-success mb-2"
+            class="btn btn-sm w-100 btn-success mb-2"
             @click="sendMessage($event)"
         >
             {{ customText }}

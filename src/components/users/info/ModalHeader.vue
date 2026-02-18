@@ -4,11 +4,11 @@
         :style="userHeaderStyle"
     >
         <div class="d-flex flex-row align-items-center">
-            <img :src="'https://a.ppy.sh/' + selectedUser.osuId" class="avatar-img mr-3">
+            <img :src="'https://a.ppy.sh/' + selectedUser.osuId" class="avatar-img me-3">
 
             <h5 class="modal-title">
                 <user-link
-                    class="font-weight-bold text-white"
+                    class="fw-bold text-white"
                     :osu-id="selectedUser.osuId"
                     :username="selectedUser.username"
                 />
@@ -18,9 +18,7 @@
                 />
             </h5>
         </div>
-        <button type="button" class="close" data-dismiss="modal">
-            <span>&times;</span>
-        </button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
 </template>
 
@@ -46,12 +44,12 @@ export default {
         /** @returns {string} */
         getUserColor() {
             if (this.selectedUser.probationModes.length && !this.selectedUser.isNat) {
-                return 'var(--probation)';
+                return 'var(--bs-probation)';
             } else if (!this.selectedUser.hasBasicAccess) {
-                return 'var(--primary)';
+                return 'var(--bs-primary)';
             }
 
-            return `var(--${(this.selectedUser.groups.includes('nat') ? 'danger' : this.selectedUser.groups.includes('bn') ? 'bn' : 'primary')})`;
+            return `var(--bs-${(this.selectedUser.groups.includes('nat') ? 'danger' : this.selectedUser.groups.includes('bn') ? 'bn' : 'primary')})`;
         },
         /** @returns {Object} */
         userHeaderStyle() {
@@ -77,7 +75,7 @@ export default {
     object-fit: cover;
     border-radius: 100%;
     box-shadow: 0 1px 1rem rgba(10, 10, 25, .9);
-    background-color: var(--gray-dark);
+    background-color: var(--bs-gray-800);
 }
 
 .user-header {

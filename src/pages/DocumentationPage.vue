@@ -45,7 +45,7 @@
                     <a
                         v-if="loggedInUser.isNat"
                         href="#"
-                        class="ml-2"
+                        class="ms-2"
                         @click.prevent="isEditing = !isEditing"
                     >
                         <i class="fas fa-edit" />
@@ -165,7 +165,7 @@ export default {
     border-bottom: 2px solid rgba(124, 151, 165, 0.2);
 }
 :deep(thead tr th) {
-    background-color: var(--bright-blue-gray);
+    background-color: var(--bs-bright-blue-gray);
     border-color: rgba(124, 151, 165, 0.2);
     padding: 5px 10px;
 }

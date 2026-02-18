@@ -9,7 +9,7 @@
                     This is a list of Beatmap Nominators who are currently open for requests. Make sure to pay attention to their request methods and guidelines listed in their userpages!
                 </p>
                 <a
-                    data-toggle="collapse"
+                    data-bs-toggle="collapse"
                     href="#filters"
                 >
                     <h5>Filter by preferences <i class="fas fa-angle-down" /></h5>

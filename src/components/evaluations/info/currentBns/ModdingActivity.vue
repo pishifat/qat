@@ -5,8 +5,8 @@
                 Modding:
             </b>
             <a
-                data-toggle="tooltip"
-                data-placement="top"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
                 title="Finds unique mod count in the last 90 days"
                 href="#"
                 @click.prevent="findModCount()"

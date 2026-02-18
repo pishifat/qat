@@ -1,6 +1,6 @@
 <template>
     <span
-        data-toggle="tooltip"
+        data-bs-toggle="tooltip"
         :title="tooltip"
     >
         {{ momented.locale('en').fromNow() }}

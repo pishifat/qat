@@ -3,8 +3,8 @@
         <b>Badges:</b>
 
         <a
-            data-toggle="tooltip"
-            data-placement="top"
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
             title="loads badge tracker"
             href="#"
             @click.prevent="findUserBadgeInfo()"

@@ -1,25 +1,25 @@
 <template>
     <div>
-        <div class="ml-2">
+        <div class="ms-2">
             <h5>
-                <a href="#rankedMapsNominated" data-toggle="collapse">
+                <a href="#rankedMapsNominated" data-bs-toggle="collapse">
                     Ranked maps nominated by you <i class="fas fa-angle-down" />
                 </a>
             </h5>
         </div>
 
         <div id="rankedMapsNominated" class="collapse">
-            <div class="ml-2">
+            <div class="ms-2">
                 <p>You can select one map in every month as the "best" map you nominated. Selected maps will appear in the charts below with other nominators' selections. There is no objective criteria for what makes a map the "best" in this context, but please don't select joke/troll maps. If a month doesn't have any maps that you think are worth charting, you don't need to choose one. Read the longer text under <b>Monthly Charts</b> for more details.</p>
                 <p>Maps are listed based on their Ranked dates. If a map is not Ranked yet, it won't be chart-able.</p>
                 <hr>
             </div>
 
             <!-- Month/Year Selector -->
-            <div class="form-inline ml-2 mb-3">
+            <div class="d-flex flex-wrap align-items-center ms-2 mb-3">
                 <select
                     v-model="selectedMonth"
-                    class="form-control"
+                    class="form-select"
                     @change="loadNominationsForMonth"
                 >
                     <option v-for="month in months" :key="month.value" :value="month.value">
@@ -29,7 +29,7 @@
 
                 <select
                     v-model="selectedYear"
-                    class="form-control ml-2"
+                    class="form-select ms-2"
                     @change="loadNominationsForMonth"
                 >
                     <option v-for="year in years" :key="year" :value="year">
@@ -38,7 +38,7 @@
                 </select>
 
                 <button
-                    class="btn btn-sm btn-primary ml-2"
+                    class="btn btn-sm btn-primary ms-2"
                     :disabled="loading"
                     @click="loadNominationsForMonth"
                 >
@@ -261,7 +261,7 @@ export default {
 </script>
 
 <style scoped>
-div.form-inline select.form-control {
+.d-flex select.form-control {
     margin: 0 !important;
     padding: 0 0.75rem !important;
     vertical-align: middle !important;

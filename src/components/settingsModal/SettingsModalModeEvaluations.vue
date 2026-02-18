@@ -20,8 +20,8 @@
             >
                 <a
                     href="#"
-                    data-toggle="tooltip"
-                    data-placement="right"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="right"
                     title="toggle BN Evaluators for mode"
                     @click.prevent="toggleHasTrialNat(setting.mode, $event)"
                 >

@@ -14,7 +14,7 @@
                 Roles:
                 <select
                     v-model="selectedRole"
-                    class="form-control form-control-sm my-1 mx-1 col-sm-3"
+                    class="form-select form-select-sm my-1 mx-1 col-sm-3"
                 >
                     <option value="" disabled>
                         Select a role
@@ -84,8 +84,8 @@
             <div
                 v-if="title.length && announcement.length"
                 class="mt-2"
-                data-toggle="tooltip"
-                data-placement="left"
+                data-bs-toggle="tooltip"
+                data-bs-placement="left"
                 title="only the first image will appear on the discord announcement"
             >
                 <hr>
@@ -170,7 +170,7 @@
 
                 <select
                     v-model="group"
-                    class="form-control form-control-sm my-1 mx-1 col-sm-3"
+                    class="form-select form-select-sm my-1 mx-1 col-sm-3"
                 >
                     <option value="" disabled>
                         Select a group
@@ -188,7 +188,7 @@
 
                 <select
                     v-model="mode"
-                    class="form-control form-control-sm my-1 mx-1 col-sm-3"
+                    class="form-select form-select-sm my-1 mx-1 col-sm-3"
                 >
                     <option value="" disabled>
                         Select a mode

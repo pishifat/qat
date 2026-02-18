@@ -8,9 +8,9 @@
                 <p>
                     <b>{{ selectedEvaluation.user.isNat && loggedInUser.isNatLeader ? 'NAT activity comments:' : 'Evaluation:' }}</b>
                     <a
-                        :class="'ml-1 ' + (previewModdingComment ? 'text-success' : '')"
-                        data-toggle="tooltip"
-                        data-placement="top"
+                        :class="'ms-1 ' + (previewModdingComment ? 'text-success' : '')"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
                         title="toggle comment preview"
                         href="#"
                         @click.prevent="togglePreviewModdingComment()"
@@ -35,7 +35,7 @@
             </div>
         </div>
 
-        <div class="form-inline justify-content-end">
+        <div class="d-flex flex-wrap align-items-center justify-content-end">
             <div class="form-check form-check-inline">
                 <input
                     id="1"
