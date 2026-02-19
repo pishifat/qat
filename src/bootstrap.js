@@ -4,10 +4,21 @@ import MarkdownItVideo from 'markdown-it-video';
 import osuTimestamps from './plugins/markdown-it-osu-timestamps';
 import MarkdownItColor from 'markdown-it-color';
 import $ from 'jquery';
-import { Tooltip } from 'bootstrap';
+import { Modal, Tooltip } from 'bootstrap';
 
 // Make jQuery available globally
 window.$ = window.jQuery = $;
+
+$.fn.modal = function (action) {
+    this.each(function () {
+        if (action === 'show') {
+            Modal.getOrCreateInstance(this).show();
+        } else if (action === 'hide') {
+            Modal.getOrCreateInstance(this).hide();
+        }
+    });
+    return this;
+};
 
 export const md = new MarkdownIt('default', {
     html: false,
