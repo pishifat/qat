@@ -1,7 +1,6 @@
 <template>
     <div>
         <template v-if="(loggedInUser && (loggedInUser.isNat || loggedInUser.isTrialNat)) && !selectedEvaluation.user.isNat">
-            <hr>
             <p>
                 <a href="#consensusSettings" data-bs-toggle="collapse">
                     Consensus settings <i class="fas fa-angle-down" />
