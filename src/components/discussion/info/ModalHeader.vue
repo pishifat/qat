@@ -4,7 +4,7 @@
             <a
                 v-if="selectedDiscussionVote.discussionLink"
                 :href="selectedDiscussionVote.discussionLink"
-                target="_blank"
+                @click.prevent="confirmAndOpen(selectedDiscussionVote.discussionLink)"
             >
                 {{ selectedDiscussionVote.title }}
             </a>
@@ -32,5 +32,12 @@ export default {
     computed: mapGetters('discussionVote', [
         'selectedDiscussionVote',
     ]),
+    methods: {
+        confirmAndOpen(url) {
+            if (confirm(`This will redirect you to another webpage or download a file. This is user-submitted content, so if you don't trust the url, don't proceed.\n\n${url}`)) {
+                window.location.href = url;
+            }
+        },
+    },
 };
 </script>

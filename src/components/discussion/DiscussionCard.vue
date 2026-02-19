@@ -3,8 +3,7 @@
         <div
             class="card card-individual"
             :class="['border-' + findRelevantMediation(), discussion.isNatOnly ? 'nat-vote' : '']"
-            data-bs-toggle="modal"
-            data-bs-target="#extendedInfo"
+            role="button"
             :data-discussion="discussion.id"
         >
             <img v-if="isImage" :src="discussion.discussionLink" class="card-thumb">
@@ -13,9 +12,10 @@
                     <a
                         v-if="discussion.discussionLink"
                         :href="discussion.discussionLink"
-                        target="_blank"
-                        @click.stop
-                    ><b>{{ discussion.title }}</b></a>
+                        @click.stop.prevent="confirmAndOpen(discussion.discussionLink)"
+                    >
+                        <b>{{ discussion.title }}</b>
+                    </a>
                     <span v-else><b>{{ discussion.title }}</b></span>
                 </div>
                 <div v-if="discussion.isContentReview && !discussion.isActive" class="small">
@@ -63,6 +63,11 @@ export default {
             required: true,
         },
     },
+    data() {
+        return {
+            isConfirming: false,
+        };
+    },
     computed: {
         ...mapState([
             'loggedInUser',
@@ -77,12 +82,23 @@ export default {
         },
     },
     methods: {
+        confirmAndOpen(url) {
+            this.isConfirming = true;
+            if (confirm(`This will redirect you to another webpage or download a file. This is user-submitted content, so if you don't trust the url, don't proceed.\n\n${url}`)) {
+                window.location.href = url;
+            }
+            setTimeout(() => { this.isConfirming = false; }, 0);
+        },
         selectDiscussion() {
+            if (this.isConfirming) return;
+
             this.$store.commit('discussionVote/setSelectedDiscussionVoteId', this.discussion.id);
 
             if (this.$route.query.id !== this.discussion.id) {
                 this.$router.replace(`/discussionvote?id=${this.discussion.id}`);
             }
+
+            $('#extendedInfo').modal('show');
         },
         findRelevantMediation() {
             let vote;
