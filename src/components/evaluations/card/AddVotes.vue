@@ -2,21 +2,21 @@
     <span>
         <span
             v-if="positive"
-            class="badge badge-pass mx-1"
+            class="badge bg-pass mx-1"
         >
             {{ positive }}
         </span>
 
         <span
             v-if="neutral"
-            class="badge badge-light mx-1"
+            class="badge bg-light mx-1"
         >
             {{ neutral }}
         </span>
 
         <span
             v-if="negative"
-            class="badge badge-fail mx-1"
+            class="badge bg-fail mx-1"
         >
             {{ negative }}
         </span>

@@ -11,27 +11,41 @@
             </div>
             <div class="row col-sm-9">
                 <div class="col-sm-6">
-                    <div class="row">
-                        <span class="text-secondary col-sm-4">mongoId</span> <input v-model="mongoId" class="form-control form-control-sm col-sm-6">
+                    <div class="row align-items-center">
+                        <label class="col-sm-3 text-secondary">mongoId</label>
+                        <div class="col-sm-7">
+                            <input v-model="mongoId" class="form-control form-control-sm">
+                        </div>
                     </div>
-                    <div class="row">
-                        <span class="text-secondary col-sm-4">osuId</span> <input v-model="osuId" class="form-control form-control-sm col-sm-6">
+                    <div class="row align-items-center">
+                        <label class="col-sm-3 text-secondary">osuId</label>
+                        <div class="col-sm-7">
+                            <input v-model="osuId" class="form-control form-control-sm">
+                        </div>
                     </div>
-                    <div class="row">
-                        <span class="text-secondary col-sm-4">username</span> <input v-model="username" class="form-control form-control-sm col-sm-6">
+                    <div class="row align-items-center">
+                        <label class="col-sm-3 text-secondary">username</label>
+                        <div class="col-sm-7">
+                            <input v-model="username" class="form-control form-control-sm">
+                        </div>
                     </div>
-                    <div class="row">
-                        <span class="text-secondary col-sm-4">groups</span> <input v-model="groups" class="form-control form-control-sm col-sm-6">
+                    <div class="row align-items-center">
+                        <label class="col-sm-3 text-secondary">groups</label>
+                        <div class="col-sm-7">
+                            <input v-model="groups" class="form-control form-control-sm">
+                        </div>
                     </div>
                     <div class="row mt-3">
-                        <button class="btn btn-sm btn-success col-sm-10" @click="save()">
-                            Save
-                        </button>
+                        <div class="col-sm-10">
+                            <button class="btn btn-sm btn-success w-100" @click="save()">
+                                Save
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div class="col-sm-6">
                     <p>
-                        <a href="#sessionInfo" data-toggle="collapse">
+                        <a href="#sessionInfo" data-bs-toggle="collapse">
                             view raw session <i class="fas fa-angle-down" />
                         </a>
                     </p>

@@ -1,11 +1,12 @@
 import Axios from 'axios';
 import store from './main';
+import { Tooltip } from 'bootstrap';
 
 async function executeRequest (requestType, url, data, e, updateLoadingState, store) {
     if (updateLoadingState) store.commit('updateLoadingState');
     if (e) e.target.disabled = true;
 
-    $(`[data-toggle='tooltip']`).tooltip('hide');
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => Tooltip.getInstance(el)?.hide());
 
     try {
         let res;

@@ -18,8 +18,8 @@
             </div>
         </div>
 
-        <div class="form-inline justify-content-end">
-            <button class="btn btn-sm btn-primary float-right" @click="saveNote($event)">
+        <div class="d-flex flex-wrap align-items-center justify-content-end">
+            <button class="btn btn-sm btn-primary float-end" @click="saveNote($event)">
                 {{ noteId ? 'Update Summary' : 'Submit Summary' }}
             </button>
         </div>

@@ -13,7 +13,7 @@
                     />
                 </transition-group>
 
-                <p v-if="!openReports || openReports.length == 0" class="ml-4">
+                <p v-if="!openReports || openReports.length == 0" class="ms-4">
                     No open reports...
                 </p>
             </section>
@@ -21,7 +21,7 @@
             <section class="card card-body">
                 <h2>Closed Reports</h2>
 
-                <div class="form-inline">
+                <div class="input-group w-25">
                     <input
                         v-model="searchValue"
                         type="text"
@@ -31,12 +31,12 @@
                         class="form-control"
                         @keyup.enter="query($event)"
                     >
-                    <button class="btn btn-sm btn-primary ml-2" type="submit" @click="query($event)">
+                    <button class="btn btn-sm btn-primary h-75 mt-1" type="submit" @click="query($event)">
                         Search archives
                     </button>
                 </div>
 
-                <div class="form-inline mt-2">
+                <div class="input-group mt-2 w-25">
                     <input
                         v-model="limit"
                         type="text"
@@ -46,7 +46,7 @@
                         class="form-control"
                         @keyup.enter="queryRecent($event)"
                     >
-                    <button class="btn btn-sm btn-primary ml-2" type="submit" @click="queryRecent($event)">
+                    <button class="btn btn-sm btn-primary h-75 mt-1" type="submit" @click="queryRecent($event)">
                         Show recent
                     </button>
                 </div>
@@ -60,7 +60,7 @@
                         />
                     </transition-group>
 
-                    <p v-if="!closedReports || closedReports.length == 0" class="ml-4 mt-2">
+                    <p v-if="!closedReports || closedReports.length == 0" class="ms-4 mt-2">
                         No closed reports...
                     </p>
                 </template>

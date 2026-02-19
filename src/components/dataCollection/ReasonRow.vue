@@ -4,7 +4,7 @@
         <span
             v-if="hasSEV"
             :class="calculateSEVColor"
-            data-toggle="tooltip"
+            data-bs-toggle="tooltip"
             :title="getSeverityTooltip(event.obviousness, event.severity)"
         >
             ({{ event.obviousness }}/{{ event.severity }})
@@ -12,7 +12,7 @@
         <span
             v-else-if="hasImpact"
             :class="getImpact(event.impactNum).color"
-            data-toggle="tooltip"
+            data-bs-toggle="tooltip"
             :title="getImpact(event.impactNum).text"
         >
             <i v-if="event.impactNum !== 0" :class="getImpact(event.impactNum).icon" />
@@ -22,8 +22,8 @@
         <!-- edit button -->
         <a
             href="#"
-            data-toggle="modal"
-            data-target="#editReason"
+            data-bs-toggle="modal"
+            data-bs-target="#editReason"
             :data-entry="event.id"
             @click="selectEvent()"
         >

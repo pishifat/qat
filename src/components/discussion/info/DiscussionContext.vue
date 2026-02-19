@@ -6,8 +6,8 @@
             >
                 <a
                     href="#"
-                    data-toggle="tooltip"
-                    data-placement="top"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
                     title="edit link"
                     @click.prevent="editLink"
                 >
@@ -36,8 +36,8 @@
         <p v-if="isEditable && !selectedDiscussionVote.isContentReview">
             <a
                 href="#"
-                data-toggle="tooltip"
-                data-placement="top"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
                 title="edit title"
                 @click.prevent="editTitle"
             >
@@ -62,8 +62,8 @@
             <a
                 v-if="isEditable"
                 href="#"
-                data-toggle="tooltip"
-                data-placement="top"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
                 title="edit title"
                 @click.prevent="editProposal"
             >
@@ -86,8 +86,8 @@
         <p v-if="isEditable && !selectedDiscussionVote.isContentReview">
             <a
                 href="#"
-                data-toggle="tooltip"
-                data-placement="top"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
                 title="edit title"
                 @click.prevent="editOptions"
             >

@@ -16,9 +16,7 @@
                 :show-all="true"
             />
         </h5>
-        <button type="button" class="close" data-dismiss="modal">
-            &times;
-        </button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
 </template>
 
@@ -44,17 +42,17 @@ export default {
 
             switch (this.selectedVeto.status) {
                 case 'pending':
-                    return style + 'var(--neutral)';
+                    return style + 'var(--bs-neutral)';
                 case 'chatroom':
-                    return style + 'var(--primary)';
+                    return style + 'var(--bs-primary)';
                 case 'available':
-                    return style + 'var(--danger)';
+                    return style + 'var(--bs-danger)';
                 case 'wip':
-                    return style + 'var(--warning)';
+                    return style + 'var(--bs-warning)';
                 case 'archive':
-                    return style + 'var(--success)';
+                    return style + 'var(--bs-success)';
                 default:
-                    return style + 'var(--bright-blue-gray)';
+                    return style + 'var(--bs-bright-blue-gray)';
             }
         },
     },

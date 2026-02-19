@@ -10,23 +10,25 @@
                 name="route-transition"
                 mode="out-in"
                 tag="div"
-                class="row align-items-start"
+                class="row align-items-start gx-0"
             >
-                <table v-for="usersByMode in sorted" :key="usersByMode._id" class="table table-sm table-dark table-hover col-6 col-md-3">
-                    <thead>
-                        <td v-if="usersByMode._id != 'none'">
-                            {{ formatMode(usersByMode._id) }}
-                        </td>
-                        <td v-else>
-                            Structural NAT (see <a href="https://osu.ppy.sh/wiki/People/Nomination_Assessment_Team#structural">wiki</a>)
-                        </td>
-                    </thead>
-                    <tbody>
-                        <tr v-for="user in usersByMode.users" :key="user.id">
-                            <user-card :user="user" />
-                        </tr>
-                    </tbody>
-                </table>
+                <div v-for="usersByMode in sorted" :key="usersByMode._id" class="col-6 col-md-3">
+                    <table class="table table-sm table-dark table-hover">
+                        <thead>
+                            <td v-if="usersByMode._id != 'none'">
+                                {{ formatMode(usersByMode._id) }}
+                            </td>
+                            <td v-else>
+                                Structural NAT (see <a href="https://osu.ppy.sh/wiki/People/Nomination_Assessment_Team#structural">wiki</a>)
+                            </td>
+                        </thead>
+                        <tbody>
+                            <tr v-for="user in usersByMode.users" :key="user.id">
+                                <user-card :user="user" />
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </transition-group>
         </section>
 
@@ -56,7 +58,6 @@ import evaluations from '../mixins/evaluations';
 import usersHomeModule from '../store/usersHome';
 import ToastMessages from '../components/ToastMessages.vue';
 import Announcements from '../components/home/Announcements.vue';
-import UserLink from '../components/UserLink.vue';
 import UserCard from '../components/home/UserCard.vue';
 import UserInfo from '../components/home/UserInfo.vue';
 
@@ -65,7 +66,6 @@ export default {
     components: {
         ToastMessages,
         Announcements,
-        UserLink,
         UserCard,
         UserInfo,
     },

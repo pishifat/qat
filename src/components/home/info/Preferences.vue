@@ -44,7 +44,7 @@
                             </label>
                             <i
                                 v-if="loggedInUser && (loggedInUser._id === selectedUser.id || loggedInUser.groups.includes('nat') || loggedInUser.groups.includes('gmt'))"
-                                class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
+                                class="fas fa-trash fa-sm ms-2 fake-checkbox text-danger"
                                 :class="[processing ? 'fake-disabled' : '']"
                                 title="Remove custom genre"
                                 @click="removeCustomGenre(genre, $event)"
@@ -59,7 +59,7 @@
                                 @keyup.enter="addCustomGenre"
                             >
                             <button
-                                class="btn btn-outline-success btn-sm ml-2"
+                                class="btn btn-outline-success btn-sm ms-2"
                                 type="button"
                                 :disabled="!customGenreInput.trim() || processing"
                                 @click="addCustomGenre"
@@ -103,7 +103,7 @@
                         </label>
                         <i
                             v-if="loggedInUser && (loggedInUser.groups.includes('nat') || loggedInUser.groups.includes('gmt'))"
-                            class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
+                            class="fas fa-trash fa-sm ms-2 fake-checkbox text-danger"
                             :class="[processing ? 'fake-disabled' : '']"
                             title="Remove custom genre"
                             @click="removeCustomGenre(genre, $event)"
@@ -159,7 +159,7 @@
                             </label>
                             <i
                                 v-if="loggedInUser && (loggedInUser._id === selectedUser.id || loggedInUser.groups.includes('nat') || loggedInUser.groups.includes('gmt'))"
-                                class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
+                                class="fas fa-trash fa-sm ms-2 fake-checkbox text-danger"
                                 :class="[processing ? 'fake-disabled' : '']"
                                 title="Remove custom language"
                                 @click="removeCustomLanguage(language, $event)"
@@ -174,7 +174,7 @@
                                 @keyup.enter="addCustomLanguage"
                             >
                             <button
-                                class="btn btn-outline-success btn-sm ml-2"
+                                class="btn btn-outline-success btn-sm ms-2"
                                 type="button"
                                 :disabled="!customLanguageInput.trim() || processing"
                                 @click="addCustomLanguage"
@@ -218,7 +218,7 @@
                         </label>
                         <i
                             v-if="loggedInUser && (loggedInUser.groups.includes('nat') || loggedInUser.groups.includes('gmt'))"
-                            class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
+                            class="fas fa-trash fa-sm ms-2 fake-checkbox text-danger"
                             :class="[processing ? 'fake-disabled' : '']"
                             title="Remove custom language"
                             @click="removeCustomLanguage(language, $event)"
@@ -445,7 +445,7 @@
                             </label>
                             <i
                                 v-if="loggedInUser && (loggedInUser._id === selectedUser.id || loggedInUser.hasFullReadAccess)"
-                                class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
+                                class="fas fa-trash fa-sm ms-2 fake-checkbox text-danger"
                                 :class="[processing ? 'fake-disabled' : '']"
                                 title="Remove custom map preference"
                                 @click="removeCustomMap(map, $event)"
@@ -460,7 +460,7 @@
                                 @keyup.enter="addCustomMap"
                             >
                             <button
-                                class="btn btn-outline-success btn-sm ml-2"
+                                class="btn btn-outline-success btn-sm ms-2"
                                 type="button"
                                 :disabled="!customMapInput.trim() || processing"
                                 @click="addCustomMap"
@@ -486,7 +486,7 @@
                         </label>
                         <i
                             v-if="loggedInUser && loggedInUser.hasFullReadAccess"
-                            class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
+                            class="fas fa-trash fa-sm ms-2 fake-checkbox text-danger"
                             :class="[processing ? 'fake-disabled' : '']"
                             title="Remove custom map preference"
                             @click="removeCustomMap(map, $event)"
@@ -586,7 +586,7 @@
                             </label>
                             <i
                                 v-if="loggedInUser && (loggedInUser._id === selectedUser.id || loggedInUser.hasFullReadAccess)"
-                                class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
+                                class="fas fa-trash fa-sm ms-2 fake-checkbox text-danger"
                                 :class="[processing ? 'fake-disabled' : '']"
                                 title="Remove custom detail preference"
                                 @click="removeCustomDetail(detail, $event)"
@@ -601,7 +601,7 @@
                                 @keyup.enter="addCustomDetail"
                             >
                             <button
-                                class="btn btn-outline-success btn-sm ml-2"
+                                class="btn btn-outline-success btn-sm ms-2"
                                 type="button"
                                 :disabled="!customDetailInput.trim() || processing"
                                 @click="addCustomDetail"
@@ -645,7 +645,7 @@
                         </label>
                         <i
                             v-if="loggedInUser && loggedInUser.hasFullReadAccess"
-                            class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
+                            class="fas fa-trash fa-sm ms-2 fake-checkbox text-danger"
                             :class="[processing ? 'fake-disabled' : '']"
                             title="Remove custom detail preference"
                             @click="removeCustomDetail(detail, $event)"
@@ -702,7 +702,7 @@
                             </label>
                             <i
                                 v-if="loggedInUser && (loggedInUser._id === selectedUser.id || loggedInUser.hasFullReadAccess)"
-                                class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
+                                class="fas fa-trash fa-sm ms-2 fake-checkbox text-danger"
                                 :class="[processing ? 'fake-disabled' : '']"
                                 title="Remove custom mapper preference"
                                 @click="removeCustomMapper(mapper, $event)"
@@ -717,7 +717,7 @@
                                 @keyup.enter="addCustomMapper"
                             >
                             <button
-                                class="btn btn-outline-success btn-sm ml-2"
+                                class="btn btn-outline-success btn-sm ms-2"
                                 type="button"
                                 :disabled="!customMapperInput.trim() || processing"
                                 @click="addCustomMapper"
@@ -761,7 +761,7 @@
                         </label>
                         <i
                             v-if="loggedInUser && loggedInUser.hasFullReadAccess"
-                            class="fas fa-trash fa-sm ml-2 fake-checkbox text-danger"
+                            class="fas fa-trash fa-sm ms-2 fake-checkbox text-danger"
                             :class="[processing ? 'fake-disabled' : '']"
                             title="Remove custom mapper preference"
                             @click="removeCustomMapper(mapper, $event)"

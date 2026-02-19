@@ -23,7 +23,7 @@
     "@popperjs/core": "^2.11.8",
     "axios": "^1.13.5",
     "babel-plugin-transform-regenerator": "^6.26.0",
-    "bootstrap": "^4.6.2",
+    "bootstrap": "^5.3.3",
     "cheerio": "^1.0.0-rc.10",
     "connect-mongo": "^4.6.0",
     "cookie-parser": "^1.4.5",
@@ -48,7 +48,7 @@
   "devDependencies": {
     "@babel/eslint-parser": "^7.28.6",
     "@rollup/plugin-commonjs": "^28.0.5",
-    "@types/bootstrap": "^4.5.0",
+    "@types/bootstrap": "^5.2.0",
     "@types/jquery": "^3.5.1",
     "@types/markdown-it": "^12.0.1",
     "@vitejs/plugin-vue": "^6.0.4",

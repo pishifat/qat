@@ -7,11 +7,11 @@
                 </span>
             </div>
             <div class="row">
-                <div class="col-sm-12 form-inline">
+                <div class="col-sm-12 d-flex flex-wrap align-items-center">
                     <label for="date">Input:</label>
                     <input
                         v-model="input"
-                        class="form-control mx-2"
+                        class="form-control w-auto mx-2"
                         placeholder="input..."
                     >
                     <button

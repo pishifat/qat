@@ -2,8 +2,8 @@
     <div>
         <a
             v-if="isQualityAssuranceChecker"
-            data-toggle="tooltip"
-            data-placement="top"
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
             title="toggle QA checker"
             class="btn btn-sm btn-link"
             :disabled="forceDisabled"
@@ -14,8 +14,8 @@
 
         <button
             v-else-if="!isMaxChecks"
-            data-toggle="tooltip"
-            data-placement="top"
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
             title="toggle QA checker"
             class="btn btn-sm btn-link"
             :disabled="forceDisabled"

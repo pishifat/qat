@@ -7,7 +7,7 @@
                 </span>
             </div>
             <div class="row">
-                <div class="col-sm-12 form-inline">
+                <div class="col-sm-12 d-flex flex-wrap align-items-center">
                     <label for="date">Start date:</label>
                     <input
                         v-model="minDate"
@@ -33,7 +33,7 @@
             <div v-if="jsonData" class="row">
                 <div class="col-sm-12">
                     <hr>
-                    <a href="#expandJson" data-toggle="collapse">
+                    <a href="#expandJson" data-bs-toggle="collapse">
                         view full JSON <i class="fas fa-angle-down" />
                     </a>
                     <br>

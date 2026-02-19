@@ -8,8 +8,8 @@
             <div class="mx-3">
                 <b>Status:</b>
                 <span
-                    class="badge badge-pill mx-1 text-lowercase"
-                    :class="getStatus(selectedUser.requestStatus) === 'closed' ? 'badge-danger' : getStatus(selectedUser.requestStatus) === 'open' ? 'badge-success' : 'badge-secondary'"
+                    class="badge rounded-pill mx-1 text-lowercase"
+                    :class="getStatus(selectedUser.requestStatus) === 'closed' ? 'bg-danger' : getStatus(selectedUser.requestStatus) === 'open' ? 'bg-success' : 'bg-secondary'"
                 >
                     {{ getStatus(selectedUser.requestStatus) }}
                 </span>
@@ -17,9 +17,9 @@
             <div class="mx-3">
                 <b>Last opened:</b>
                 <span
-                    class="badge badge-pill mx-1 text-lowercase badge-secondary"
-                    data-toggle="tooltip"
-                    data-placement="right"
+                    class="badge rounded-pill mx-1 text-lowercase bg-secondary text-dark"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="right"
                     :title="selectedUser.lastOpenedForRequests ? $moment(selectedUser.lastOpenedForRequests).format('YYYY-MM-DD hh:mm:ss A') : '¯\\_(ツ)_/¯'"
                 >
                     {{ calculateDateFromNow(selectedUser.lastOpenedForRequests) }}
@@ -30,8 +30,8 @@
                 <span
                     v-for="method in requestMethods(selectedUser.requestStatus)"
                     :key="method"
-                    class="badge badge-pill mx-1 text-lowercase"
-                    :class="method === 'unknown' ? 'badge-secondary' : 'badge-primary'"
+                    class="badge rounded-pill mx-1 text-lowercase"
+                    :class="method === 'unknown' ? 'bg-secondary' : 'bg-primary'"
                     v-html="$md.renderInline(formatLink(method, selectedUser.requestLink, selectedUser.osuId))"
                 />
             </div>
@@ -40,7 +40,7 @@
                 <span
                     v-for="language in selectedUser.languages"
                     :key="language"
-                    class="language-tag badge badge-pill mx-1 text-lowercase badge-secondary"
+                    class="language-tag badge rounded-pill mx-1 text-lowercase bg-secondary text-dark"
                     v-html="language"
                 />
             </div>
@@ -110,6 +110,13 @@ export default {
         Preferences,
         DebugViewDocument,
     },
+    mixins: [ evaluations ],
+    data () {
+        return {
+            isEditing: false,
+            requestInfo: '',
+        };
+    },
     computed: {
         ...mapState([
             'loggedInUser',
@@ -120,13 +127,6 @@ export default {
         queryString() {
             return new URLSearchParams(this.$route.query).toString();
         },
-    },
-    mixins: [ evaluations ],
-    data () {
-        return {
-            isEditing: false,
-            requestInfo: '',
-        };
     },
     watch: {
         selectedUser() {

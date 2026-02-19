@@ -5,7 +5,7 @@
                 <b>Feedback:</b>
             </p>
 
-            <p class="small ml-2">
+            <p class="small ms-2">
                 This will be sent to the reporter in an osu! message. Include the consensus and any actions being taken.
             </p>
 
@@ -16,7 +16,7 @@
                 rows="4"
             />
 
-            <div class="form-inline justify-content-end">
+            <div class="d-flex flex-wrap align-items-center justify-content-end">
                 <div class="form-check form-check-inline">
                     <input
                         id="1"
@@ -52,20 +52,20 @@
                 </div>
             </div>
 
-            <div class="form-inline justify-content-end">
+            <div class="d-flex flex-wrap align-items-center justify-content-end">
                 <button
                     v-if="selectedReport.category && selectedReport.category.includes('contentCase')"
                     class="btn btn-sm btn-primary mx-1"
-                    data-toggle="tooltip"
-                    data-placement="top"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
                     title="Deletes report and creates content review for relevant link"
                     @click="sendToContentReview($event);"
                 >
                     Send to content review
                 </button> <button
                     class="btn btn-sm btn-success mx-1"
-                    data-toggle="tooltip"
-                    data-placement="top"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
                     title="Generates feedback PM and stores feedback/validity inputs"
                     @click="submitReportEval($event);"
                 >
@@ -74,8 +74,8 @@
 
                 <button
                     class="btn btn-sm btn-danger mx-1"
-                    data-toggle="tooltip"
-                    data-placement="top"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
                     title="Disables feedback/validity inputs and reveals reporter"
                     @click="submitReportEval($event, true)"
                 >

@@ -3,7 +3,7 @@
         <section class="card card-body">
             <h3 class="mb-0">
                 <a
-                    data-toggle="collapse"
+                    data-bs-toggle="collapse"
                     :href="`#${target}`"
                 >
                     {{ title }}
@@ -35,8 +35,8 @@
                         <span
                             v-if="event.beatmaps && event.beatmaps.length"
                             class="text-secondary small"
-                            data-toggle="tooltip"
-                            data-placement="right"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="right"
                             title="total drain time"
                         >
                             ({{ totalDrain(event.beatmaps) }})

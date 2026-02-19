@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="ml-2">
+        <div class="ms-2">
             <h5>{{ monthTitle }}</h5>
         </div>
         <data-table
@@ -39,7 +39,7 @@
                 </td>
             </tr>
         </data-table>
-        <p v-else class="small ml-4">
+        <p v-else class="small ms-4">
             None...
         </p>
     </div>
@@ -106,7 +106,7 @@ export default {
             return classes.join(' ');
         },
         getCheckmarkClass(event) {
-            const classes = ['fa-check-circle', 'fake-checkbox', 'ml-2'];
+            const classes = ['fa-check-circle', 'fake-checkbox', 'ms-2'];
 
             if (this.isEventSelected(event)) {
                 classes.push('fas', 'text-success');

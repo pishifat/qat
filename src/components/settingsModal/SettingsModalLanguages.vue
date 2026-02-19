@@ -13,7 +13,7 @@
                     <select
                         id="user-languages"
                         v-model="selectedLanguage"
-                        class="form-control ml-2"
+                        class="form-select ms-2"
                     >
                         <option
                             v-for="language in availableLanguages"
@@ -23,28 +23,24 @@
                             {{ language }}
                         </option>
                     </select>
-                    <div class="input-group-append">
-                        <button
-                            v-if="!userLanguages.includes(selectedLanguage)"
-                            class="btn btn-sm btn-outline-success"
-                            type="button"
-                            :disabled="userLanguages.includes(selectedLanguage)"
-                            @click="updateLanguages($event)"
-                        >
-                            <i class="fas fa-plus" />
-                        </button>
-                    </div>
-                    <div class="input-group-append">
-                        <button
-                            v-if="userLanguages.includes(selectedLanguage)"
-                            class="btn btn-sm btn-outline-danger"
-                            type="button"
-                            :disabled="!userLanguages.includes(selectedLanguage)"
-                            @click="updateLanguages($event)"
-                        >
-                            <i class="fas fa-minus" />
-                        </button>
-                    </div>
+                    <button
+                        v-if="!userLanguages.includes(selectedLanguage)"
+                        class="btn btn-sm btn-outline-success"
+                        type="button"
+                        :disabled="userLanguages.includes(selectedLanguage)"
+                        @click="updateLanguages($event)"
+                    >
+                        <i class="fas fa-plus" />
+                    </button>
+                    <button
+                        v-if="userLanguages.includes(selectedLanguage)"
+                        class="btn btn-sm btn-outline-danger"
+                        type="button"
+                        :disabled="!userLanguages.includes(selectedLanguage)"
+                        @click="updateLanguages($event)"
+                    >
+                        <i class="fas fa-minus" />
+                    </button>
                 </div>
                 <span class="small text-secondary">Current languages: {{ userLanguages.length ? userLanguages.join(', ') : 'none' }}</span>
             </div>

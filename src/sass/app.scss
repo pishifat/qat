@@ -66,7 +66,7 @@ section {
 }
 
 .sort-filter {
-    @extend .mt-3, .ml-3;
+    @extend .mt-3, .ms-3;
 
     display: flex;
     flex-wrap: wrap;
@@ -152,23 +152,23 @@ input[type="radio"] + .fas { cursor: pointer; }
 
 /* Checked */
 .checkmark-radio:checked + .fa-check:before { 
-    color: var(--info);
+    color: var(--bs-info);
     content: "\f00c"; 
 }
 .cross-radio:checked + .fa-times:before { 
-    color: var(--info);
+    color: var(--bs-info);
     content: "\f00d"; 
 }
 .probation-bn-radio:checked + .fa-accessible-icon:before { 
-    color: var(--info);
+    color: var(--bs-info);
     content: "\f368"; 
 }
 .full-bn-radio:checked + .fa-walking:before { 
-    color: var(--info);
+    color: var(--bs-info);
     content: "\f554"; 
 }
 .nat-radio:checked + .fa-running:before { 
-    color: var(--info);
+    color: var(--bs-info);
     content: "\f70c"; 
 }
 /* END RADIO MODES */

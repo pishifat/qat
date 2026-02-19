@@ -20,7 +20,7 @@
             <b>Reason:</b>
         </p>
 
-        <div class="small ml-4 mb-3 text-secondary" v-html="$md.render(selectedReport.reason)" />
+        <div class="small ms-4 mb-3 text-secondary" v-html="$md.render(selectedReport.reason)" />
 
 
 

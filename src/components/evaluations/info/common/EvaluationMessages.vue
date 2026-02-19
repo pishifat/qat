@@ -45,7 +45,7 @@
                 <div class="row">
                     <div :class="loggedInUser.isNat ? 'col-sm-8' : 'col-sm-12'">
                         <button
-                            class="btn btn-primary btn-block btn-sm mt-1"
+                            class="btn btn-primary w-100 btn-sm mt-1"
                             :disabled="evaluation.messagesLocked"
                             @click="saveMessage($event)"
                         >
@@ -54,7 +54,7 @@
                     </div>
                     <div v-if="loggedInUser.isNat" class="col-sm-4">
                         <button
-                            class="btn btn-danger btn-block btn-sm mt-1"
+                            class="btn btn-danger w-100 btn-sm mt-1"
                             @click="toggleMessagesLocked($event)"
                         >
                             {{ evaluation.messagesLocked ? "Unlock" : "Lock" }} messages

@@ -102,7 +102,7 @@
                 </p>
                 <button
                     v-if="!successInfo"
-                    class="btn btn-block btn-success"
+                    class="btn w-100 btn-success"
                     type="button"
                     @click="rejoinApply($event)"
                 >
@@ -188,7 +188,7 @@
                         <input
                             v-model="mods[i - 1]"
                             type="text"
-                            class="form-control ml-2 mb-2"
+                            class="form-control ms-2 mb-2"
                             placeholder="beatmap link"
                             maxlength="1000"
                             :disabled="!loggedInUser"
@@ -196,7 +196,7 @@
 
                         <hr>
 
-                        <div class="ml-2">
+                        <div class="ms-2">
                             <div v-if="i == 1">
                                 Briefly describe why the map is ready (or nearly ready) to be nominated:
                             </div>
@@ -215,25 +215,25 @@
                         <textarea
                             v-model="reasons[i - 1]"
                             type="text"
-                            class="form-control ml-2 mb-2"
+                            class="form-control ms-2 mb-2"
                             placeholder="response"
                             maxlength="1000"
                             rows="2"
                             :disabled="!loggedInUser"
                         />
 
-                        <b v-if="step == i && reasons[i - 1] && reasons[i - 1].length > 800" class="text-danger float-right">{{ reasons[i - 1].length }}/1000</b>
+                        <b v-if="step == i && reasons[i - 1] && reasons[i - 1].length > 800" class="text-danger float-end">{{ reasons[i - 1].length }}/1000</b>
 
                         <hr>
 
-                        <div class="ml-2">
+                        <div class="ms-2">
                             Please provide a copy of the map before your mod was applied. If you don't have it, write "none":
                         </div>
 
                         <input
                             v-model="oszs[i - 1]"
                             type="text"
-                            class="form-control ml-2 mb-2"
+                            class="form-control ms-2 mb-2"
                             placeholder=".osz link"
                             maxlength="1000"
                             :disabled="!loggedInUser"
@@ -319,7 +319,7 @@
 
 
                 <button
-                    class="btn btn-block btn-success"
+                    class="btn w-100 btn-success text-white"
                     type="button"
                     :disabled="!selectedMode || mods.length !== 3 || reasons.length !== 3 || oszs.length !== 3"
                     @click="apply($event)"
@@ -340,7 +340,7 @@
             <div class="row">
                 <div v-if="step != 1" :class="step == 4 ? 'col-sm-12' : 'col-sm-6'">
                     <button
-                        class="btn btn-block btn-primary mt-2"
+                        class="btn w-100 btn-primary mt-2"
                         type="button"
                         @click="step--"
                     >
@@ -350,7 +350,7 @@
                 </div>
                 <div v-if="step != 4" :class="step == 1 ? 'col-sm-12' : 'col-sm-6'">
                     <button
-                        class="btn btn-block btn-secondary mt-2"
+                        class="btn w-100 btn-secondary mt-2"
                         type="button"
                         :disabled="!loggedInUser"
                         @click="step++"

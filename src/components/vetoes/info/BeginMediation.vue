@@ -2,7 +2,7 @@
     <div>
         <div v-if="selectedVeto.status == 'available'">
             <b>Mediation phase</b>
-            <div class="mb-2 mt-2 ml-4">
+            <div class="mb-2 mt-2 ms-4">
                 Exclude specific user(s):
                 <input
                     v-model="excludeUsers"
@@ -16,7 +16,7 @@
             </div>
         </div>
 
-        <button class="btn btn-sm btn-block btn-primary" @click="selectMediators($event)">
+        <button class="btn btn-sm w-100 btn-primary" @click="selectMediators($event)">
             {{ mediators ? 'Re-select mediators' : 'Select mediators' }}
         </button>
 
@@ -24,7 +24,7 @@
             <hr>
 
             <!-- begin mediation -->
-            <button class="btn btn-sm btn-block btn-success mb-2" @click="beginMediation($event)">
+            <button class="btn btn-sm w-100 btn-success mb-2" @click="beginMediation($event)">
                 Begin mediation
             </button>
             <div v-if="beginningMediation" class="mt-2 small text-secondary">

@@ -1,9 +1,9 @@
 <template>
     <div>
-        <div class="ml-2">
+        <div class="ms-2">
             <a
                 :href="events && `#${eventsId}`"
-                data-toggle="collapse"
+                data-bs-toggle="collapse"
             >{{ header }} <i class="fas fa-angle-down" /></a>
             ({{ isLoading ? '...' : events ? events.length : '0' }})
         </div>
@@ -24,7 +24,7 @@
                     </td>
                 </tr>
             </data-table>
-            <p v-else class="small ml-4">
+            <p v-else class="small ms-4">
                 None...
             </p>
         </div>

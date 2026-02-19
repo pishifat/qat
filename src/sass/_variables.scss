@@ -40,22 +40,30 @@ $light:         $gray-600;
 $dark:          $gray-800;
 
 $theme-colors: (
-  "nat": #bc584d,
-  "bn": #6d44af ,
-  "probation": #c78bc9c5,
-  "trial-nat": #ca75df,
-  "gmt": #99eb47,
-  "pass": $success,
-  "neutral": $gray-500,
-  "fail": $danger,
-  "blue-gray": $blue-gray,
+  "primary":         $primary,
+  "secondary":       $secondary,
+  "success":         $success,
+  "info":            $info,
+  "warning":         $warning,
+  "danger":          $danger,
+  "light":           $light,
+  "dark":            $dark,
+  "nat":             #bc584d,
+  "bn":              #6d44af,
+  "probation":       #c78bc9c5,
+  "trial-nat":       #ca75df,
+  "gmt":             #99eb47,
+  "pass":            $success,
+  "neutral":         $gray-500,
+  "fail":            $danger,
+  "blue-gray":       $blue-gray,
   "bright-blue-gray": $bright-blue-gray,
-  "bright-blue": $bright-blue,
-  "pastel-blue": $pastel-blue,
+  "bright-blue":     $bright-blue,
+  "pastel-blue":     $pastel-blue,
 );
 
 $component-active-bg: $gray-900;
-$yiq-contrasted-threshold:  175;
+$min-contrast-ratio:   2.5;
 
 // Typography
 
@@ -65,6 +73,8 @@ $font-family-base:                  'Baloo 2', sans-serif;
 $paragraph-margin-bottom:           0.5rem;
 $small-font-size:                   85%;
 $badge-font-weight:                 normal;
+$badge-padding-y:                   0.35em;
+$badge-padding-x:                   0.4em;
 
 // Body
 
@@ -74,10 +84,21 @@ $body-color:                      $gray-100;
 // Links
 
 $link-color:                      $pastel-blue;
+$link-decoration:                 none;
+$link-hover-decoration:           underline;
+
+// Form checks
+
+$form-check-input-bg:               hsl(170, 20%, 28%);
+$form-check-input-checked-bg-color: $bright-blue;
+$form-check-input-checked-border-color: $bright-blue;
 
 // Forms
+$form-select-indicator-color:       $gray-300;
+$form-select-border-radius:         0.2rem;
+$form-select-padding-y:             0.2rem;
+$form-select-padding-x:             0.5rem;
 
-$input-height-border:               3px;
 $input-bg:                          hsl(170, 20%, 22%);
 $input-color:                     #fff;
 $input-border-color:                transparent;
@@ -88,14 +109,11 @@ $input-disabled-bg:                 hsl(170, 20%, 16%);
 $input-group-addon-color:           $gray-500;
 $input-group-addon-bg:              $gray-700;
 
-$custom-file-color:                 $gray-500;
-$custom-file-border-color:          $gray-700;
-
 // Dropdowns
 
 $dropdown-bg:                       $gray-900;
 $dropdown-border-color:             $gray-700;
-$dropdown-divider-bg:               $gray-700;
+$dropdown-divider-color:            $gray-700;
 
 $dropdown-link-color:               $white;
 $dropdown-link-hover-color:         $white;
@@ -118,6 +136,10 @@ $navbar-padding-y:                  1rem;
 $navbar-dark-color:                 rgba($white, .85);
 $navbar-dark-hover-color:           $white;
 
+// Tooltips
+
+$tooltip-color:                     $white;
+
 // Cards
 
 $card-cap-bg:                       $bright-blue-gray;
@@ -129,11 +151,6 @@ $modal-content-bg:                  hsl(170, 20%, 16.5%);
 $modal-content-border-color:        hsl(170, 20%, 16.5%);
 
 $modal-header-border-color:         hsl(170, 20%, 16.5%);
-
-// Close
-
-$close-color:                       $white;
-$close-text-shadow:                 none;
 
 // Shadows
 

@@ -19,7 +19,7 @@
                     <h4>Type of report:</h4>
                     <select
                         v-model="category"
-                        class="form-control my-1"
+                        class="form-select my-1"
                         :disabled="!loggedInUser"
                     >
                         <option value="" disabled>
@@ -119,70 +119,70 @@
                         </div>
                     </div>
 
-                    <div v-if="category == 'contentCaseVisual'" class="row col-sm-12">
-                        <p>Video submission:</p>
-                        <div class="row ml-1">
-                            <label
-                                class="mx-1"
-                                data-toggle="tooltip"
-                                data-placement="top"
-                                title="content is NOT a video"
+                    <div v-if="category == 'contentCaseVisual'" class="d-flex align-items-center mb-2">
+                        <p class="mb-0 me-2">
+                            Video submission:
+                        </p>
+                        <label
+                            class="mx-1"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            title="content is NOT a video"
+                        >
+                            <input
+                                v-model="videoStatus"
+                                type="radio"
+                                class="cross-radio hide-default"
+                                name="isVideo"
+                                value="noVideo"
                             >
-                                <input
-                                    v-model="videoStatus"
-                                    type="radio"
-                                    class="cross-radio hide-default"
-                                    name="isVideo"
-                                    value="noVideo"
-                                >
-                                <i class="fas fa-times fa-lg" />
-                            </label>
-                            <label
-                                class="mx-1"
-                                data-toggle="tooltip"
-                                data-placement="top"
-                                title="content is a video"
+                            <i class="fas fa-times fa-lg" />
+                        </label>
+                        <label
+                            class="mx-1"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            title="content is a video"
+                        >
+                            <input
+                                v-model="videoStatus"
+                                type="radio"
+                                class="checkmark-radio hide-default"
+                                name="isVideo"
+                                value="isVideo"
                             >
-                                <input
-                                    v-model="videoStatus"
-                                    type="radio"
-                                    class="checkmark-radio hide-default"
-                                    name="isVideo"
-                                    value="isVideo"
-                                >
-                                <i class="fas fa-check fa-lg" />
-                            </label>
-                        </div>
+                            <i class="fas fa-check fa-lg" />
+                        </label>
                     </div>
 
-                    <small v-if="category == 'contentCaseVisual'" class="mb-3 row col-sm-12">If this is a video submission, you'll need to provide timestamps of the clips that need to be reviewed</small>
+                    <p v-if="category == 'contentCaseVisual'" class="small">
+                        If this is a video submission, you'll need to provide timestamps of the clips that need to be reviewed.
+                    </p>
 
-                    <div v-if="category == 'contentCaseVisual' && isVideoSubmission" class="row mb-3 col-sm-12">
+                    <div v-if="category == 'contentCaseVisual' && isVideoSubmission" class="mb-3">
                         <small class="mb-1">Timestamps:</small>
                         <textarea
                             v-model="timestamps"
-                            class="form-control col-sm-12"
+                            class="form-control"
                             placeholder="timestamps..."
                             rows="3"
                         />
                     </div>
 
-                    <div class="row">
-                        <div class="col-sm-12 text-center">
-                            <button
-                                class="btn btn-primary btn-block"
-                                type="button"
-                                @click="submit($event)"
-                            >
-                                Submit Report
-                            </button>
+                    <div class="text-center">
+                        <button
+                            class="btn btn-primary w-100"
+                            type="button"
+                            @click="submit($event)"
+                        >
+                            Submit Report
+                        </button>
 
-                            <div
-                                v-if="successInfo"
-                                class="pt-2 text-success small"
-                            >
-                                {{ successInfo }}
-                            </div>
+                        <div
+                            v-if="successInfo"
+                            class="pt-2 text-success small"
+                        >
+                            {{ successInfo }}
                         </div>
                     </div>
                 </div>

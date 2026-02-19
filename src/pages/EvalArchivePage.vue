@@ -6,17 +6,17 @@
                     <h4>
                         Search for evaluations of a user
                     </h4>
-                    <div class="form-inline">
+                    <div class="d-flex flex-wrap align-items-center">
                         <input
                             v-model="searchValue"
                             type="text"
                             placeholder="username or ID..."
                             maxlength="18"
                             autocomplete="off"
-                            class="form-control"
+                            class="form-control w-auto"
                             @keyup.enter="query($event)"
                         >
-                        <button class="btn btn-sm btn-primary ml-2" type="submit" @click="query($event)">
+                        <button class="btn btn-sm btn-primary ms-2" type="submit" @click="query($event)">
                             Search
                         </button>
                     </div>
@@ -27,37 +27,37 @@
                     <h4>
                         Show recent evaluations
                     </h4>
-                    <div class="form-inline">
+                    <div class="d-flex flex-wrap align-items-center">
                         <input
                             v-model="limit"
                             type="text"
                             placeholder="# entries..."
                             maxlength="3"
                             autocomplete="off"
-                            class="form-control"
+                            class="form-control w-auto"
                             @keyup.enter="queryRecent($event)"
                         >
 
                         <select
                             v-model="mode"
-                            class="form-control ml-1"
+                            class="form-select w-auto ms-1"
                             @change="queryRecent($event)"
                         >
-                            <option class="ml-2" value="osu" selected>
+                            <option class="ms-2" value="osu" selected>
                                 osu!
                             </option>
-                            <option class="ml-2" value="taiko">
+                            <option class="ms-2" value="taiko">
                                 osu!taiko
                             </option>
-                            <option class="ml-2" value="catch">
+                            <option class="ms-2" value="catch">
                                 osu!catch
                             </option>
-                            <option class="ml-2" value="mania">
+                            <option class="ms-2" value="mania">
                                 osu!mania
                             </option>
                         </select>
 
-                        <button class="btn btn-sm btn-primary ml-2" type="submit" @click="queryRecent($event)">
+                        <button class="btn btn-sm btn-primary ms-2" type="submit" @click="queryRecent($event)">
                             Show recent
                         </button>
                     </div>
@@ -68,16 +68,16 @@
                     <h4>
                         Search for evaluations participated in
                     </h4>
-                    <div class="form-inline">
+                    <div class="d-flex flex-wrap align-items-center">
                         <input
                             v-model="participatedSearchValue"
                             type="text"
                             placeholder="username or ID..."
                             maxlength="18"
                             autocomplete="off"
-                            class="form-control"
-                            data-toggle="tooltip"
-                            data-placement="top"
+                            class="form-control w-auto"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
                             title="leave field empty to load all evaluated users"
                             @keyup.enter="queryParticipatedEvals($event)"
                         >
@@ -88,14 +88,14 @@
                             placeholder="evaluator username or ID..."
                             maxlength="18"
                             autocomplete="off"
-                            class="form-control"
-                            data-toggle="tooltip"
-                            data-placement="top"
+                            class="form-control w-auto ms-1"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
                             title="leave field empty to set yourself as evaluator"
                             @keyup.enter="queryParticipatedEvals($event)"
                         >
                         <button
-                            class="btn btn-sm btn-primary ml-2"
+                            class="btn btn-sm btn-primary ms-2"
                             type="submit"
 
                             @click="queryParticipatedEvals($event)"
@@ -127,7 +127,7 @@
                     />
                 </transition-group>
 
-                <p v-else class="ml-4">
+                <p v-else class="ms-4">
                     None...
                 </p>
             </section>
@@ -153,7 +153,7 @@
                     />
                 </transition-group>
 
-                <p v-else class="ml-4">
+                <p v-else class="ms-4">
                     None...
                 </p>
             </section>

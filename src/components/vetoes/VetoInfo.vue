@@ -19,7 +19,7 @@
                         loggedInUser.isNat &&
                         selectedVeto.vetoFormat >= 7"
             >
-                <a href="#chatroom" data-toggle="collapse">
+                <a href="#chatroom" data-bs-toggle="collapse">
                     <b>Discussion logs</b> <i class="fas fa-angle-down" />
                 </a>
                 <chatroom
@@ -27,7 +27,6 @@
                     class="fake-disabled collapse"
                 />
             </div>
-            <hr>
 
             <!-- show vouches component when  veto is "pending" status -->
             <vouches v-if="selectedVeto.status == 'pending' && loggedInUser && loggedInUser.isBnOrNat" />

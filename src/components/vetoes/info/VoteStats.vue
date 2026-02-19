@@ -6,8 +6,8 @@
                 <li>
                     <label
                         class="mb-0"
-                        data-toggle="tooltip"
-                        data-placement="right"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="right"
                         title="% of submitted votes"
                     >
                         <b>Agree:</b> {{ upholdMediations.length }} ({{ Math.round(upholdMediations.length / validMediations.length * 100) || '0' }}%)
@@ -17,8 +17,8 @@
                 <li v-if="neutralMediations.length">
                     <label
                         class="mb-0"
-                        data-toggle="tooltip"
-                        data-placement="right"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="right"
                         title="% of submitted votes"
                     >
                         <b>{{ selectedVeto.vetoFormat >= 7 ? 'Neutral' : 'Partially Agree' }}:</b> {{ neutralMediations.length }} ({{ Math.round(neutralMediations.length / validMediations.length * 100) || '0' }}%)
@@ -27,8 +27,8 @@
                 <li>
                     <label
                         class="mb-0"
-                        data-toggle="tooltip"
-                        data-placement="right"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="right"
                         title="% of submitted votes"
                     >
                         <b>Disagree:</b> {{ withdrawMediations.length }} ({{ Math.round(withdrawMediations.length / validMediations.length * 100) || '0' }}%)
@@ -37,8 +37,8 @@
                 <li v-if="!isPublic">
                     <label
                         class="mb-0"
-                        data-toggle="tooltip"
-                        data-placement="right"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="right"
                         title="% of assigned mediators"
                     >
                         <b>Submitted votes:</b> {{ validMediations.length }} ({{ Math.round(validMediations.length / mediations.length * 100) || '0' }}%)
@@ -47,8 +47,8 @@
                 <li v-if="!isPublic">
                     <label
                         class="mb-0"
-                        data-toggle="tooltip"
-                        data-placement="right"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="right"
                         title="users involved"
                     >
                         <b>Assigned mediators:</b> {{ mediations.length }}

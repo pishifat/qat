@@ -12,7 +12,7 @@
                         />
 
                         <beatmap-metadata
-                            class="mt-2 ml-2"
+                            class="mt-2 ms-2"
                             :artist-title="event.artistTitle"
                             :beatmapset-id="event.beatmapsetId"
                         />
@@ -21,18 +21,18 @@
                     <div class="col-sm-12 col-md-7 mt-2">
                         <div class="row">
                             <beatmap-host
-                                class="col-sm-3 ml-2 ml-sm-0"
+                                class="col-sm-3 ms-2 ms-sm-0"
                                 :creator-id="event.creatorId"
                                 :creator-name="event.creatorName"
                             />
 
                             <due-date
-                                class="col-sm-3 ml-2 ml-sm-0"
+                                class="col-sm-3 ms-2 ms-sm-0"
                                 :timestamp="event.timestamp"
                             />
 
                             <quality-assurance-checkers
-                                class="col-sm-4 ml-2 ml-sm-0"
+                                class="col-sm-4 ms-2 ms-sm-0"
                                 :quality-assurance-checks="event.qualityAssuranceChecks"
                                 :is-quality-assurance-checker="isQualityAssuranceChecker"
                                 :show-all="showAll"
@@ -40,7 +40,7 @@
 
                             <assignment-buttons
                                 v-if="!isOutdated && loggedInUser.hasBasicAccess"
-                                class="col-sm-2 ml-2 ml-sm-0 text-center"
+                                class="col-sm-2 ms-2 ms-sm-0 text-center"
                                 :event-id="event.id"
                                 :is-quality-assurance-checker="isQualityAssuranceChecker"
                                 :is-max-checks="isMaxChecks"

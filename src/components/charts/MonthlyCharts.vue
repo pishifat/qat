@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="ml-2">
+        <div class="ms-2">
             <h4>Monthly Charts</h4>
             <p>This page was inspired by the <a href="https://osu.ppy.sh/home/news/2025-06-25-survey-the-state-of-ranked" target="_blank">State of Ranked survey</a>. Fill it out if you haven't already!</p>
             <p class="pt-3">
@@ -15,10 +15,10 @@
         </div>
 
         <!-- Month/Year/Mode Selector -->
-        <div class="form-inline ml-2 mb-3">
+        <div class="d-flex flex-wrap align-items-center ms-2 mb-3">
             <select
                 v-model="selectedMode"
-                class="form-control"
+                class="form-select"
                 @change="loadChartedEvents"
             >
                 <option value="osu">
@@ -37,7 +37,7 @@
 
             <select
                 v-model="selectedMonth"
-                class="form-control ml-2"
+                class="form-select ms-2"
                 @change="loadChartedEvents"
             >
                 <option v-for="month in months" :key="month.value" :value="month.value">
@@ -47,7 +47,7 @@
 
             <select
                 v-model="selectedYear"
-                class="form-control ml-2"
+                class="form-select ms-2"
                 @change="loadChartedEvents"
             >
                 <option v-for="year in years" :key="year" :value="year">
@@ -56,7 +56,7 @@
             </select>
 
             <button
-                class="btn btn-sm btn-primary ml-2"
+                class="btn btn-sm btn-primary ms-2"
                 :disabled="loading"
                 @click="loadChartedEvents"
             >
@@ -233,7 +233,7 @@ export default {
 </script>
 
 <style scoped>
-div.form-inline select.form-control {
+.d-flex select.form-control {
     margin: 0 !important;
     padding: 0 0.75rem !important;
     vertical-align: middle !important;

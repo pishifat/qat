@@ -15,7 +15,7 @@
         <!-- show/hide bns button -->
         <button
             v-if="selectedDiscussionVote.isContentReview"
-            class="btn btn-sm btn-block btn-primary ml-2 mb-2"
+            class="btn btn-sm w-100 btn-primary ms-2 mb-2"
             type="submit"
             @click="showAll = !showAll"
         >

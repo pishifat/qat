@@ -14,7 +14,7 @@
                     :username="warningNote.author.username"
                 />
             </b>
-            <div class="ml-4 small text-secondary" v-html="$md.render(warningNote.comment)" />
+            <div class="ms-4 small text-secondary" v-html="$md.render(warningNote.comment)" />
         </div>
 
         <textarea
@@ -26,12 +26,12 @@
 
         <div class="row mt-1">
             <div class="col-sm-6">
-                <button class="btn btn-primary btn-block btn-sm" @click="saveNote($event)">
+                <button class="btn btn-primary w-100 btn-sm" @click="saveNote($event)">
                     Save new note
                 </button>
             </div>
             <div class="col-sm-6">
-                <button class="btn btn-danger btn-block btn-sm" @click="saveNote($event, 'warning')">
+                <button class="btn btn-danger w-100 btn-sm" @click="saveNote($event, 'warning')">
                     {{ warningNote ? 'Overwrite' : 'Save' }} warning
                 </button>
             </div>
@@ -41,8 +41,8 @@
             <b>
                 Other notes
             </b>
-            <p class="p-40 mt-2 ml-3">
-                <a href="#otherNotes" data-toggle="collapse">
+            <p class="p-40 mt-2 ms-3">
+                <a href="#otherNotes" data-bs-toggle="collapse">
                     Notes <i class="fas fa-angle-down" />
                 </a>
             </p>
@@ -69,8 +69,8 @@
                     <a
                         href="#"
                         class="text-danger"
-                        data-toggle="tooltip"
-                        data-placement="top"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
                         title="delete note"
                         @click.prevent="hideNote(note.id);"
                     >
@@ -79,15 +79,15 @@
                     <a
                         v-if="note.author.id == loggedInUser.id"
                         href="#"
-                        data-toggle="tooltip"
-                        data-placement="top"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
                         title="edit note"
                         @click.prevent="editNoteId == note.id ? editNoteId = '' : editNoteId = note.id, editNoteComment = note.comment"
                     >
                         <i class="fas fa-edit" />
                     </a>
 
-                    <div v-if="note.id != editNoteId" class="text-secondary ml-2" v-html="$md.render(note.comment)" />
+                    <div v-if="note.id != editNoteId" class="text-secondary ms-2" v-html="$md.render(note.comment)" />
                     <div v-else>
                         <textarea
                             v-model="editNoteComment"
@@ -96,7 +96,7 @@
                             rows="2"
                         />
 
-                        <button class="btn btn-primary btn-sm btn-block mt-1" @click="editNote($event)">
+                        <button class="btn btn-primary btn-sm w-100 mt-1" @click="editNote($event)">
                             Edit note
                         </button>
                     </div>

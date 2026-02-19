@@ -14,7 +14,7 @@
             </button>
             <button
                 v-if="markdownOutput"
-                class="btn btn-success btn-sm ml-2"
+                class="btn btn-success btn-sm ms-2"
                 @click="copyToClipboard"
             >
                 Copy to Clipboard

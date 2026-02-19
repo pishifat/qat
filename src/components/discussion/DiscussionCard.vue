@@ -3,8 +3,8 @@
         <div
             class="card card-individual"
             :class="['border-' + findRelevantMediation(), discussion.isNatOnly ? 'nat-vote' : '']"
-            data-toggle="modal"
-            data-target="#extendedInfo"
+            data-bs-toggle="modal"
+            data-bs-target="#extendedInfo"
             :data-discussion="discussion.id"
         >
             <img v-if="isImage" :src="discussion.discussionLink" class="card-thumb">
@@ -27,16 +27,16 @@
                 <div class="card-status" :class="discussion.isActive ? 'status-bar-active' : 'status-bar-inactive'" />
 
                 <div>
-                    <span class="small float-left">{{ toStandardDate(discussion.createdAt) }}</span>
+                    <span class="small float-start mt-1">{{ toStandardDate(discussion.createdAt) }}</span>
 
                     <add-votes
                         v-if="!discussion.isActive || loggedInUser.isNatLeader"
-                        class="ml-2"
+                        class="ms-2"
                         :inputs="discussion.mediations"
                     />
 
                     <mode-display
-                        class="float-right"
+                        class="float-end"
                         :modes="discussion.mode"
                         :show-all="true"
                     />
@@ -115,7 +115,7 @@ export default {
     object-fit: cover;
     border-radius: 10%;
     box-shadow: 0 1px 1rem rgba(10, 10, 25, .9);
-    background-color: var(--gray-dark);
+    background-color: var(--bs-gray-800);
 }
 
 .status-bar-active {
@@ -123,7 +123,7 @@ export default {
 }
 
 .status-bar-inactive {
-    background: radial-gradient(var(--gray), transparent 70%);
+    background: radial-gradient(var(--bs-gray-600), transparent 70%);
 }
 
 .nat-vote {

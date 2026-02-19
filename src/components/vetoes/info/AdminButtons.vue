@@ -4,7 +4,7 @@
             <!-- restart mediation if concluded -->
             <button
                 v-if="selectedVeto.status == 'archive'"
-                class="btn btn-sm btn-danger btn-block mb-2"
+                class="btn btn-sm btn-danger w-100 mb-2"
                 @click="continueMediation($event)"
             >
                 Resume veto mediation
@@ -13,14 +13,14 @@
             <!-- conclude mediation -->
             <button
                 v-else
-                class="btn btn-sm btn-block btn-danger mb-2"
+                class="btn btn-sm w-100 btn-danger mb-2"
                 @click="concludeMediation($event)"
             >
                 Conclude mediation
             </button>
 
             <!-- view conclusion discussion post -->
-            <button class="btn btn-sm btn-block btn-primary mb-2" data-toggle="collapse" data-target="#conclusion">
+            <button class="btn btn-sm w-100 btn-primary mb-2" data-bs-toggle="collapse" data-bs-target="#conclusion">
                 Show full conclusion post(s) <i class="fas fa-angle-down" />
             </button>
             <div v-if="selectedVeto.vetoFormat >= 2">
@@ -32,7 +32,7 @@
             </div>
 
             <!-- view mediator chat message -->
-            <button class="btn btn-sm btn-block btn-primary mb-2" data-toggle="collapse" data-target="#messages">
+            <button class="btn btn-sm w-100 btn-primary mb-2" data-bs-toggle="collapse" data-bs-target="#messages">
                 Show veto chat messages <i class="fas fa-angle-down" />
             </button>
             <veto-chat-message

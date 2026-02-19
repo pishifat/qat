@@ -1,7 +1,7 @@
 <template>
     <div>
         <!-- title -->
-        <div class="form-inline">
+        <div class="d-flex flex-wrap align-items-center">
             <input
                 v-if="isEditingTitle"
                 v-model="newTitleInput"
@@ -18,7 +18,7 @@
             <a
                 v-if="loggedInUser && loggedInUser.isNat"
                 href="#"
-                class="ml-1"
+                class="ms-1"
                 @click.prevent="isEditingTitle = !isEditingTitle"
             >
                 <i class="fas fa-edit" />
@@ -34,10 +34,10 @@
                     rows="4"
                     placeholder="new content"
                 />
-                <button type="submit" class="btn btn-secondary float-right" @click="updateAnnouncement($event)">
+                <button type="submit" class="btn btn-secondary float-end" @click="updateAnnouncement($event)">
                     Update
                 </button>
-                <button type="submit" class="btn btn-primary float-right mx-2" @click="isEditingContent = !isEditingContent">
+                <button type="submit" class="btn btn-primary float-end mx-2" @click="isEditingContent = !isEditingContent">
                     Cancel
                 </button>
             </div>
@@ -47,7 +47,7 @@
                 <button
                     v-if="loggedInUser && loggedInUser.isNat"
                     type="submit"
-                    class="btn btn-primary float-right"
+                    class="btn btn-primary float-end"
                     @click="isEditingContent = !isEditingContent"
                 >
                     Edit

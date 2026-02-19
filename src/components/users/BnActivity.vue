@@ -1,9 +1,9 @@
 <template>
     <div>
-        <div class="form-inline">
+        <div class="d-flex flex-wrap align-items-center">
             <input
                 v-model="bnDays"
-                class="form-control"
+                class="form-control w-auto"
                 type="text"
                 autocomplete="off"
                 placeholder="days of activity..."
@@ -11,25 +11,25 @@
                 @keyup.enter="findBnActivity($event)"
             >
 
-            <select v-model="bnMode" class="form-control ml-1" @change="findBnActivity($event)">
-                <option class="ml-2" value="osu" selected>
+            <select v-model="bnMode" class="form-select w-auto mx-1" @change="findBnActivity($event)">
+                <option class="ms-2" value="osu" selected>
                     osu!
                 </option>
-                <option class="ml-2" value="taiko">
+                <option class="ms-2" value="taiko">
                     osu!taiko
                 </option>
-                <option class="ml-2" value="catch">
+                <option class="ms-2" value="catch">
                     osu!catch
                 </option>
-                <option class="ml-2" value="mania">
+                <option class="ms-2" value="mania">
                     osu!mania
                 </option>
             </select>
 
             <button
-                class="btn btn-sm btn-primary ml-1"
-                data-toggle="tooltip"
-                data-placement="right"
+                class="btn btn-sm btn-primary ms-1"
+                data-bs-toggle="tooltip"
+                data-bs-placement="right"
                 title="Finds BN nomination, pop/dq, and report activity, defaults to 30 days"
                 @click="findBnActivity($event)"
             >
@@ -73,7 +73,7 @@
                     <li>Next evaluation: {{ user.nextEvaluation ? user.nextEvaluation : 'Never' }}</li>
                 </ul>
             </div>
-            <p class="small ml-2">
+            <p class="small ms-2">
                 Note: Nominations only accounted for after March 31st 2019.
             </p>
         </div>

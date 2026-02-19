@@ -17,7 +17,7 @@
                 <small>({{ user.correct }}/{{ user.correct + user.incorrect }})</small>
             </b>
             -
-            <a data-toggle="collapse" :href="`#details${user.osuId}`"><small>details <i class="fas fa-angle-down" /></small></a>
+            <a data-bs-toggle="collapse" :href="`#details${user.osuId}`"><small>details <i class="fas fa-angle-down" /></small></a>
 
             <div :id="`details${user.osuId}`" class="collapse">
                 <ul>

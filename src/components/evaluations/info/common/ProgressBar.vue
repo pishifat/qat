@@ -4,47 +4,47 @@
             <div
                 class="progress-bar bg-bright-blue"
                 style="width: 16.66%; border-right: 2px solid #22282a;"
-                data-toggle="tooltip"
-                data-placement="top"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
                 :title="evaluation.isApplication ? 'application submitted' : 'evaluation created'"
             />
             <div
                 class="progress-bar"
                 style="width: 16.66%; border-right: 2px solid #22282a;"
                 :class="getProgressBarState(1) ? 'bg-bright-blue' : 'bg-light'"
-                data-toggle="tooltip"
-                data-placement="top"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
                 title="1/3 evaluations completed"
             />
             <div
                 class="progress-bar"
                 style="width: 16.66%; border-right: 2px solid #22282a;"
                 :class="getProgressBarState(2) ? 'bg-bright-blue' : 'bg-light'"
-                data-toggle="tooltip"
-                data-placement="top"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
                 title="2/3 evaluations completed"
             />
             <div
                 class="progress-bar"
                 style="width: 16.66%; border-right: 2px solid #22282a;"
                 :class="getProgressBarState(3) ? 'bg-bright-blue' : 'bg-light'"
-                data-toggle="tooltip"
-                data-placement="top"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
                 title="3/3 evaluations completed"
             />
             <div
                 class="progress-bar"
                 style="width: 16.66%; border-right: 2px solid #22282a;"
                 :class="getProgressBarState(4) ? 'bg-bright-blue' : 'bg-light'"
-                data-toggle="tooltip"
-                data-placement="top"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
                 title="consensus set"
             />
             <div
                 class="progress-bar bg-light"
                 style="width: 16.66%"
-                data-toggle="tooltip"
-                data-placement="top"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
                 :title="evaluation.isApplication ? 'application returned' : 'evaluation returned'"
             />
         </div>

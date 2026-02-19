@@ -15,7 +15,7 @@
         <div class="row">
             <div class="col-sm-4">
                 <button
-                    class=" btn btn-sm btn-success btn-block "
+                    class=" btn btn-sm btn-success w-100 "
                     @click="archiveNatEvaluation($event, 'nat')"
                 >
                     Archive
@@ -23,7 +23,7 @@
             </div>
             <div class="col-sm-4">
                 <button
-                    class="btn btn-sm btn-secondary btn-block"
+                    class="btn btn-sm btn-secondary w-100"
                     @click="archiveNatEvaluation($event, 'bn')"
                 >
                     Archive & move from NAT to BN
@@ -31,7 +31,7 @@
             </div>
             <div class="col-sm-4">
                 <button
-                    class="btn btn-sm btn-danger btn-block"
+                    class="btn btn-sm btn-danger w-100"
                     @click="archiveNatEvaluation($event, 'user')"
                 >
                     Archive & remove from NAT

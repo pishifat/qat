@@ -6,8 +6,8 @@
         <div
             class="card border-dark cursor-pointer"
             :class="[isSelected ? 'bg-blue-gray' : '', 'border-' + relevantReviewVote, isAssigned ? 'assigned' : '', 'card-bg-' + imageClass]"
-            data-toggle="modal"
-            :data-target="target"
+            data-bs-toggle="modal"
+            :data-bs-target="target"
         >
             <card-header
                 :mode="evaluation.mode"

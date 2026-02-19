@@ -3,18 +3,18 @@
         <div class="container">
             <!-- game mode -->
             <p><b>Game mode</b></p>
-            <div class="row ml-4">
+            <div class="row">
                 <mode-select
                     v-model="mode"
                     :max-selection="1"
                     :all-modes="true"
-                    class="ml-2 mb-2"
+                    class="ms-2 mb-2"
                 />
             </div>
 
             <!-- url -->
             <p><b>Beatmap URL</b></p>
-            <div class="row ml-4 mb-2">
+            <div class="row ms-2 mb-2">
                 <input
                     v-model="url"
                     type="text"
@@ -81,12 +81,12 @@
             </div>
 
 
-            <button type="submit" class="btn btn-primary btn-block" @click="addReason()">
+            <button type="submit" class="btn btn-primary w-100" @click="addReason()">
                 Add veto reason
             </button>
             <hr>
 
-            <button type="submit" class="btn btn-primary float-right" @click="submitVeto($event)">
+            <button type="submit" class="btn btn-primary float-end" @click="submitVeto($event)">
                 Submit
             </button>
         </div>

@@ -2,8 +2,8 @@
     <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3 my-3" @click="selectUser()">
         <div
             class="card card-individual"
-            data-toggle="modal"
-            data-target="#extendedInfo"
+            data-bs-toggle="modal"
+            data-bs-target="#extendedInfo"
             :class="`card-bg-${user.probationModes.length && !user.isNat ? 'probation' : user.groups.includes('bn') ? 'bn' : user.groups.includes('nat') ? 'nat' : 'user'}`"
         >
             <img :src="'https://a.ppy.sh/' + user.osuId" class="card-avatar-img">
@@ -82,7 +82,7 @@ export default {
     object-fit: cover;
     border-radius: 100%;
     box-shadow: 0 1px 1rem rgba(10, 10, 25, .9);
-    background-color: var(--gray-dark);
+    background-color: var(--bs-gray-800);
 }
 
 .card-icons {

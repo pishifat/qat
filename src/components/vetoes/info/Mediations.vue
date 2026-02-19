@@ -7,8 +7,8 @@
                 <a
                     v-if="selectedVeto.reasons.length"
                     :href="'#reason-' + (reasonIndex + 1)"
-                    data-toggle="collapse"
-                    class="ml-4"
+                    data-bs-toggle="collapse"
+                    class="ms-4"
                 >
                     <b>{{ reasonIndex + 1 }}. {{ reason.summary }}</b> <span v-if="selectedVeto.vetoFormat >= 7 && selectedVeto.status == 'archive'">({{ reason.status ? reason.status : 'pending status' }}) </span><i class="fas fa-angle-down" />
                 </a>
@@ -59,7 +59,7 @@
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <button
-                                            class="btn btn-sm btn-primary btn-block mb-2"
+                                            class="btn btn-sm btn-primary w-100 mb-2"
                                             @click="setVetoReasonStatus('upheld', reasonIndex, $event)"
                                         >
                                             Mark veto reason as "upheld"
@@ -69,7 +69,7 @@
                                     <!-- move to "archive" status -->
                                     <div class="col-sm-6">
                                         <button
-                                            class="btn btn-sm btn-block btn-primary mb-2"
+                                            class="btn btn-sm w-100 btn-primary mb-2"
                                             @click="setVetoReasonStatus('dismissed', reasonIndex, $event)"
                                         >
                                             Mark veto reason as "dismissed"

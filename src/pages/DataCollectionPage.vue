@@ -6,7 +6,7 @@
                 :modes="['', 'osu', 'taiko', 'catch', 'mania']"
                 store-module="dataCollection"
             >
-                <button class="btn btn-sm btn-block btn-primary mt-2" @click="isUnsetEvents ? loadRecentEvents($event) : loadUnsetEvents($event)">
+                <button class="btn btn-sm w-100 btn-primary mt-2" @click="isUnsetEvents ? loadRecentEvents($event) : loadUnsetEvents($event)">
                     {{ isUnsetEvents ? 'Load all events from the last 90 days' : 'Load events without SEV scores from the last year' }}
                 </button>
             </filter-box>

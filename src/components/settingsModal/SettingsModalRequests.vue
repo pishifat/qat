@@ -48,15 +48,13 @@
                                 class="form-control"
                                 placeholder="Link your modding queue/form..."
                             >
-                            <div class="input-group-append">
-                                <button
-                                    class="btn btn-sm btn-outline-success"
-                                    type="button"
-                                    @click="updateRequestStatus"
-                                >
-                                    <i class="fas fa-save" />
-                                </button>
-                            </div>
+                            <button
+                                class="btn btn-sm btn-outline-success"
+                                type="button"
+                                @click="updateRequestStatus"
+                            >
+                                <i class="fas fa-save" />
+                            </button>
                         </div>
                     </template>
                 </div>

@@ -9,7 +9,7 @@
             </div>
             <div class="col-sm-9">
                 <p>
-                    <a href="#userDocument" data-toggle="collapse">
+                    <a href="#userDocument" data-bs-toggle="collapse">
                         view user document <i class="fas fa-angle-down" />
                     </a>
                 </p>

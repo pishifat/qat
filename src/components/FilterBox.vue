@@ -9,44 +9,46 @@
                 :placeholder="placeholder || ''"
                 @change="updateFilterValue($event.target.value)"
             >
-            <div class="input-group-append">
-                <button class="btn btn-sm btn-primary px-3">
-                    <i class="fas fa-search" />
-                </button>
-            </div>
+            <button class="btn btn-sm btn-primary px-3 h-75 mt-1">
+                <i class="fas fa-search" />
+            </button>
         </div>
 
-        <select
-            v-if="modes && modes.length"
-            id="mode"
-            class="form-control"
-            @change="updateFilterMode(modes[$event.target.selectedIndex])"
-        >
-            <option
-                v-for="mode in modes"
-                :key="mode"
-                :value="mode"
-                :selected="mode === filters.mode"
+        <div class="input-group">
+            <select
+                v-if="modes && modes.length"
+                id="mode"
+                class="form-select mt-2 ms-1"
+                @change="updateFilterMode(modes[$event.target.selectedIndex])"
             >
-                {{ mode === '' ? 'All modes' : formatOption(mode) }}
-            </option>
-        </select>
+                <option
+                    v-for="mode in modes"
+                    :key="mode"
+                    :value="mode"
+                    :selected="mode === filters.mode"
+                >
+                    {{ mode === '' ? 'All modes' : formatOption(mode) }}
+                </option>
+            </select>
+        </div>
 
-        <select
-            v-if="groups && groups.length"
-            id="group"
-            class="form-control"
-            @change="updateFilterGroup(groups[$event.target.selectedIndex])"
-        >
-            <option
-                v-for="group in groups"
-                :key="group"
-                :value="group"
-                :selected="group === filters.group"
+        <div class="input-group">
+            <select
+                v-if="groups && groups.length"
+                id="group"
+                class="form-select ms-1 my-2"
+                @change="updateFilterGroup(groups[$event.target.selectedIndex])"
             >
-                {{ group === '' ? 'All groups' : formatOption(group) }}
-            </option>
-        </select>
+                <option
+                    v-for="group in groups"
+                    :key="group"
+                    :value="group"
+                    :selected="group === filters.group"
+                >
+                    {{ group === '' ? 'All groups' : formatOption(group) }}
+                </option>
+            </select>
+        </div>
 
         <slot />
     </section>

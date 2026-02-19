@@ -2,17 +2,17 @@
     <div :key="mongoId">
         <activity-standing v-if="showActivityStanding" />
 
-        <p v-if="modes.length > 1" class="font-weight-bold form-inline">
+        <p v-if="modes.length > 1" class="fw-bold d-flex flex-wrap align-items-center">
             Game mode:
             <mode-select
                 v-model="selectedMode"
-                class="ml-2"
+                class="ms-2"
                 :max-selection="1"
                 :modes-filter="modes"
             />
         </p>
 
-        <p class="font-weight-bold form-inline">
+        <p class="fw-bold d-flex flex-wrap align-items-center">
             <span>User activity</span>
             <input
                 v-if="editingDaysInput"
@@ -26,7 +26,7 @@
             <span v-else class="mx-1">({{ daysInput }}</span>
             days)
             <a href="#" @click.prevent="search">
-                <i class="fas fa-edit ml-1" />
+                <i class="fas fa-edit ms-1" />
             </a>
         </p>
 

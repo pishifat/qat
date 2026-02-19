@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p class="form-inline">
+        <p class="d-flex flex-wrap align-items-center">
             <b>
                 Discord ID:
             </b>
@@ -15,7 +15,7 @@
             >
             <span v-else class="mx-1">{{ idInput }}</span>
             <a href="#" @click.prevent="save()">
-                <i class="fas fa-edit ml-1" />
+                <i class="fas fa-edit ms-1" />
             </a>
         </p>
     </div>

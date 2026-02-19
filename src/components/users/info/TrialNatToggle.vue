@@ -5,8 +5,8 @@
                 BN Evaluator:
             </b>
             <a
-                data-toggle="tooltip"
-                data-placement="top"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
                 title="Toggle BN Evaluator"
                 href="#"
                 @click.prevent="toggleIsTrialNat()"

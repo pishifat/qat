@@ -23,12 +23,12 @@
                 </div>
             </div>
 
-            <b v-if="feedback && feedback.length > 500" class="text-warning float-right">{{ feedback.length }}</b>
+            <b v-if="feedback && feedback.length > 500" class="text-warning float-end">{{ feedback.length }}</b>
 
             <span v-if="feedback != selectedEvaluation.feedback" class="small text-danger">Feedback is currently not saved.</span>
 
             <button
-                class="btn btn-sm btn-block btn-primary ml-0 ml-sm-auto"
+                class="btn btn-sm w-100 btn-primary ms-0 ms-sm-auto"
                 @click="setFeedback($event)"
             >
                 Save feedback
@@ -39,8 +39,8 @@
                 <b>Hide cooldown text: </b>
                 <a
                     href="#"
-                    data-toggle="tooltip"
-                    data-placement="right"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="right"
                     title="Will reset on page refresh"
                     @click.prevent="toggleHideCooldownText($event)"
                 >

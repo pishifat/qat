@@ -20,7 +20,7 @@
 
         <div v-if="consensus">
             <div v-if="evaluation.isApplication">
-                <a href="#applicationInfo" data-toggle="collapse">
+                <a href="#applicationInfo" data-bs-toggle="collapse">
                     <h5>Application details <i class="fas fa-angle-down" /></h5>
                 </a>
                 <div id="applicationInfo" class="collapse mx-4">
@@ -41,7 +41,7 @@
 
             <div v-if="evaluation.isApplication && positiveConsensus">
                 <hr>
-                <a href="#newBnInformation" data-toggle="collapse">
+                <a href="#newBnInformation" data-bs-toggle="collapse">
                     <h5>New BN Information <i class="fas fa-angle-down" /></h5>
                 </a>
 
@@ -96,7 +96,7 @@
                         <div class="col-sm-10">
                             <div class="row">
                                 <div class="col-sm-12">
-                                    <div class="small ml-2 card card-body" v-html="$md.render(review.moddingComment)" />
+                                    <div class="small ms-2 card card-body" v-html="$md.render(review.moddingComment)" />
                                 </div>
                             </div>
                         </div>

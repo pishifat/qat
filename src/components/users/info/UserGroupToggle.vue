@@ -15,7 +15,7 @@
                 v-if="loggedInUser.isNatLeader && selectedUser.probationModes.includes(mode)"
                 class="btn btn-sm btn-bn mb-1"
                 href="#"
-                data-toggle="tooltip"
+                data-bs-toggle="tooltip"
                 title="For probation users who were supposed to join as full BN"
                 @click.prevent="forceFullBn()"
             >

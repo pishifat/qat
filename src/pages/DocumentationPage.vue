@@ -45,7 +45,7 @@
                     <a
                         v-if="loggedInUser.isNat"
                         href="#"
-                        class="ml-2"
+                        class="ms-2"
                         @click.prevent="isEditing = !isEditing"
                     >
                         <i class="fas fa-edit" />
@@ -133,67 +133,67 @@ export default {
 }
 
 /* headers */
-::v-deep h1 {
+:deep(h1) {
     border-bottom: 1px solid rgba(211, 211, 211, 0.25);
     margin-bottom: 1rem;
     padding-bottom: 0.5rem;
     font-weight: 600;
     font-size: 30px;
 }
-::v-deep h2 {
+:deep(h2) {
     margin: 2rem 0 1rem;
     border-bottom: 1px solid rgba(211, 211, 211, 0.25);
     padding-bottom: 0.5rem;
     font-weight: 600;
     font-size: 24px;
 }
-::v-deep h3 {
+:deep(h3) {
     margin: 2rem 0 1rem;
     font-size: 20px;
 }
-::v-deep h4 {
+:deep(h4) {
     margin: 2rem 0 1rem;
     font-size: 16px;
 }
 
 /* tables */
-::v-deep table {
+:deep(table) {
     border-collapse: collapse;
     margin: 2rem 0;
 }
-::v-deep thead tr {
+:deep(thead tr) {
     border-bottom: 2px solid rgba(124, 151, 165, 0.2);
 }
-::v-deep thead tr th {
-    background-color: var(--bright-blue-gray);
+:deep(thead tr th) {
+    background-color: var(--bs-bright-blue-gray);
     border-color: rgba(124, 151, 165, 0.2);
     padding: 5px 10px;
 }
-::v-deep tbody tr {
+:deep(tbody tr) {
     border-bottom: 1px solid rgba(211, 211, 211, 0.15);
 }
-::v-deep tbody tr:last-child {
+:deep(tbody tr:last-child) {
     border-bottom: none;
 }
-::v-deep tbody tr td {
+:deep(tbody tr td) {
     padding: 5px;
 }
 
 /* center images that are the only child of a p element */
-::v-deep p > img:only-child {
+:deep(p > img:only-child) {
     display: block;
     margin: 0 auto;
 }
 
 /* align other images to the left */
-::v-deep img {
+:deep(img) {
     display: inline-block;
     margin: 0;
     padding: 5px;
 }
 
 /* list elements */
-::v-deep li {
+:deep(li) {
     padding: 2px 0;
 }
 </style>
