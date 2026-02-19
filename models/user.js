@@ -492,7 +492,13 @@ class UserService extends mongoose.Model {
             sampleSize = await Settings.getModeHasTrialNat(mode) ? await Settings.getModeEvaluationsRequired(mode) - 1 : await Settings.getModeEvaluationsRequired(mode);
         }
 
-        return this.queryAssignmentUsers(mode, excludeOsuIds, sampleSize, false, false);
+        let users = this.queryAssignmentUsers(mode, excludeOsuIds, sampleSize, false, false);
+
+        if (!users.length) {
+            users = this.queryAssignmentUsers(mode, excludeOsuIds, sampleSize, false, true); // fixes edge case where there are no bag users when trial nat period begins
+        }
+
+        return users;
     }
 }
 
