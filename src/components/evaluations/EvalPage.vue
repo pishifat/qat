@@ -8,9 +8,11 @@
                 store-module="evaluations"
             >
                 <template v-if="loggedInUser.isNat">
-                    <button class="btn w-100 btn-primary my-1" @click="selectAll()">
-                        Select all
-                    </button>
+                    <div class="px-1">
+                        <button class="btn w-100 btn-primary my-2" @click="selectAll()">
+                            Select all
+                        </button>
+                    </div>
 
                     <div class="sort-filter sort-filter--small">
                         <span class="sort-filter__title--large">Mark selected as</span>
