@@ -57,10 +57,10 @@
                     name="route-transition"
                     mode="out-in"
                     tag="div"
-                    class="row align-items-start mt-2"
+                    class="row align-items-start gx-0 mt-2"
                 >
-                    <table v-for="usersByMode in filteredUsers" :key="usersByMode._id" class="table table-sm table-dark table-hover col-6 col-md-3">
-                        <span v-if="usersByMode.users.length">
+                    <div v-for="usersByMode in filteredUsers" :key="usersByMode._id" class="col-6 col-md-3">
+                        <table v-if="usersByMode.users.length" class="table table-sm table-dark table-hover">
                             <thead>
                                 <td v-if="usersByMode._id != 'none'">{{ formatMode(usersByMode._id) }}</td>
                                 <td v-else>Structural NAT (see <a href="https://osu.ppy.sh/wiki/People/Nomination_Assessment_Team#structural">wiki</a>)</td>
@@ -70,8 +70,8 @@
                                     <user-card :user="user" />
                                 </tr>
                             </tbody>
-                        </span>
-                    </table>
+                        </table>
+                    </div>
                 </transition-group>
             </section>
         </div>

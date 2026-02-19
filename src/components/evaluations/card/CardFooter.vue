@@ -15,7 +15,7 @@
             :inputs="reviews"
         />
 
-        <span class="me-1 ms-auto small">
+        <span class="me-1 ms-auto small py-1 px-1">
             <i
                 class="fas fa-clock me-1"
                 data-bs-toggle="tooltip"

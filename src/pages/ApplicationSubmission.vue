@@ -319,7 +319,7 @@
 
 
                 <button
-                    class="btn w-100 btn-success"
+                    class="btn w-100 btn-success text-white"
                     type="button"
                     :disabled="!selectedMode || mods.length !== 3 || reasons.length !== 3 || oszs.length !== 3"
                     @click="apply($event)"

@@ -16,11 +16,6 @@
                 Conclude Vote
             </button>
 
-            <debug-view-document
-                v-if="loggedInUser.isAdmin"
-                :document="selectedDiscussionVote"
-            />
-
             <div v-if="selectedDiscussionVote.isActive && loggedInUser.hasBasicAccess">
                 <!-- only show voting options for users of specified mode -->
                 <mediator-options
@@ -33,6 +28,11 @@
                     Because you're not proficient in this proposal's game mode, you're not able to vote :(
                 </p>
             </div>
+
+            <debug-view-document
+                v-if="loggedInUser.isAdmin"
+                :document="selectedDiscussionVote"
+            />
         </div>
     </modal-dialog>
 </template>

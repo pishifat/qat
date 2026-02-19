@@ -6,15 +6,17 @@
                 :modes="['', 'osu', 'taiko', 'catch', 'mania']"
                 store-module="vetoes"
             >
-                <button
-                    v-if="loggedInUser && loggedInUser.isBnOrNat"
-                    class="btn w-100 btn-primary my-1"
-                    data-bs-toggle="modal"
-                    data-bs-target="#addVeto"
-                    :disabled="isProbation"
-                >
-                    Submit anonymous veto
-                </button>
+                <div class="input-group ps-1">
+                    <button
+                        v-if="loggedInUser && loggedInUser.isBnOrNat"
+                        class="btn w-100 btn-primary my-1 mt-3"
+                        data-bs-toggle="modal"
+                        data-bs-target="#addVeto"
+                        :disabled="isProbation"
+                    >
+                        Submit anonymous veto
+                    </button>
+                </div>
             </filter-box>
 
             <section class="card card-body">

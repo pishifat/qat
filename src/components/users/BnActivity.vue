@@ -3,7 +3,7 @@
         <div class="d-flex flex-wrap align-items-center">
             <input
                 v-model="bnDays"
-                class="form-control"
+                class="form-control w-auto"
                 type="text"
                 autocomplete="off"
                 placeholder="days of activity..."
@@ -11,7 +11,7 @@
                 @keyup.enter="findBnActivity($event)"
             >
 
-            <select v-model="bnMode" class="form-select ms-1" @change="findBnActivity($event)">
+            <select v-model="bnMode" class="form-select w-auto mx-1" @change="findBnActivity($event)">
                 <option class="ms-2" value="osu" selected>
                     osu!
                 </option>

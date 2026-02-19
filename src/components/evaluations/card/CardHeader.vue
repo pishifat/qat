@@ -1,5 +1,5 @@
 <template>
-    <div class="card-body">
+    <div class="card-body px-4 py-4">
         <p class="card-text d-flex align-items-center">
             <user-link
                 class="fw-bold"

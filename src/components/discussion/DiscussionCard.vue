@@ -27,7 +27,7 @@
                 <div class="card-status" :class="discussion.isActive ? 'status-bar-active' : 'status-bar-inactive'" />
 
                 <div>
-                    <span class="small float-start">{{ toStandardDate(discussion.createdAt) }}</span>
+                    <span class="small float-start mt-1">{{ toStandardDate(discussion.createdAt) }}</span>
 
                     <add-votes
                         v-if="!discussion.isActive || loggedInUser.isNatLeader"

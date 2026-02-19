@@ -1,54 +1,64 @@
 <template>
     <div>
         <section class="card card-body">
-            <div class="d-flex flex-wrap align-items-center">
-                <input
-                    id="user"
-                    v-model="params.user"
-                    class="form-control col-md-6"
-                    type="text"
-                    autocomplete="off"
-                    placeholder="username or osu! ID..."
-                >
-                <select
-                    id="group"
-                    v-model="params.group"
-                    class="form-select col-md-6"
-                >
-                    <option
-                        v-for="group in groups"
-                        :key="group.id"
-                        :value="group.identifier"
-                        :selected="group.identifier === params.group"
+            <div class="row g-2">
+                <div class="col-md-6">
+                    <input
+                        id="user"
+                        v-model="params.user"
+                        class="form-control"
+                        type="text"
+                        autocomplete="off"
+                        placeholder="username or osu! ID..."
                     >
-                        {{ group.name }}
-                    </option>
-                </select>
-                <input
-                    id="min_date"
-                    v-model="params.min_date"
-                    class="form-control col-md-6"
-                    type="text"
-                    placeholder="start date..."
-                    @focus="setInputType($event, 'date')"
-                    @blur="setInputType($event, 'text')"
-                >
-                <input
-                    id="max_date"
-                    v-model="params.max_date"
-                    class="form-control col-md-6"
-                    type="text"
-                    placeholder="end date..."
-                    @focus="setInputType($event, 'date')"
-                    @blur="setInputType($event, 'text')"
-                >
-                <button
-                    class="btn btn-primary col-md-12 mt-3"
-                    type="submit"
-                    @click="search()"
-                >
-                    Search
-                </button>
+                </div>
+                <div class="col-md-6">
+                    <select
+                        id="group"
+                        v-model="params.group"
+                        class="form-select mt-1 ms-1"
+                    >
+                        <option
+                            v-for="group in groups"
+                            :key="group.id"
+                            :value="group.identifier"
+                            :selected="group.identifier === params.group"
+                        >
+                            {{ group.name }}
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <input
+                        id="min_date"
+                        v-model="params.min_date"
+                        class="form-control"
+                        type="text"
+                        placeholder="start date..."
+                        @focus="setInputType($event, 'date')"
+                        @blur="setInputType($event, 'text')"
+                    >
+                </div>
+                <div class="col-md-6">
+                    <input
+                        id="max_date"
+                        v-model="params.max_date"
+                        class="form-control"
+                        type="text"
+                        placeholder="end date..."
+                        @focus="setInputType($event, 'date')"
+                        @blur="setInputType($event, 'text')"
+                    >
+                </div>
+                <div class="col-12 mt-1">
+                    <button
+                        class="btn btn-primary w-100"
+                        type="submit"
+                        @click="search()"
+                    >
+                        Search
+                    </button>
+                </div>
             </div>
         </section>
 

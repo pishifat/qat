@@ -26,7 +26,6 @@
                     id="chatroom"
                     class="fake-disabled collapse"
                 />
-                <hr>
             </div>
 
             <!-- show vouches component when  veto is "pending" status -->

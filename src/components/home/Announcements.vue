@@ -65,7 +65,7 @@ export default {
     },
     methods: {
         async findNextAnnouncement (e) {
-            const announcements = await this.$http.executeGet(`/findAnnouncements?limit=${this.limit}`, e);
+            const announcements = await this.$http.executeGet(`/findAnnouncements?limit=${this.limit + 1}`, e);
 
             if (announcements) {
                 this.$store.commit('announcements/setAnnouncements', announcements);

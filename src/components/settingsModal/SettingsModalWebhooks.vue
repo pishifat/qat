@@ -23,21 +23,25 @@
                 >
             </div>
             <div class="col-sm-4">
-                <div class="row display-flex align-items-center justify-content-center">
-                    <input
-                        v-model="webhook.token"
-                        class="col-sm-10 form-control form-control-sm"
-                        type="text"
-                        maxlength="100"
-                        placeholder="token..."
-                    >
-                    <a
-                        href="#"
-                        class="col-sm-2 text-success"
-                        @click.prevent="update(webhookName, webhook.id, webhook.token, $event)"
-                    >
-                        <i class="fas fa-save" />
-                    </a>
+                <div class="row align-items-center">
+                    <div class="col-10">
+                        <input
+                            v-model="webhook.token"
+                            class="form-control form-control-sm"
+                            type="text"
+                            maxlength="100"
+                            placeholder="token..."
+                        >
+                    </div>
+                    <div class="col-2">
+                        <a
+                            href="#"
+                            class="text-success"
+                            @click.prevent="update(webhookName, webhook.id, webhook.token, $event)"
+                        >
+                            <i class="fas fa-save" />
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

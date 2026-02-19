@@ -73,6 +73,8 @@ $font-family-base:                  'Baloo 2', sans-serif;
 $paragraph-margin-bottom:           0.5rem;
 $small-font-size:                   85%;
 $badge-font-weight:                 normal;
+$badge-padding-y:                   0.35em;
+$badge-padding-x:                   0.4em;
 
 // Body
 
@@ -93,9 +95,9 @@ $form-check-input-checked-border-color: $bright-blue;
 
 // Forms
 $form-select-indicator-color:       $gray-300;
-$form-select-padding-y:             0.25rem;
+$form-select-border-radius:         0.2rem;
+$form-select-padding-y:             0.2rem;
 $form-select-padding-x:             0.5rem;
-$form-select-font-size:             0.875rem;
 
 $input-bg:                          hsl(170, 20%, 22%);
 $input-color:                     #fff;

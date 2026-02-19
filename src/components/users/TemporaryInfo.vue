@@ -11,7 +11,7 @@
                     <label for="date">Input:</label>
                     <input
                         v-model="input"
-                        class="form-control mx-2"
+                        class="form-control w-auto mx-2"
                         placeholder="input..."
                     >
                     <button

@@ -15,26 +15,28 @@
             :modes="['', 'osu', 'taiko', 'catch', 'mania']"
             store-module="discussionVote"
         >
-            <div v-if="loggedInUser.hasBasicAccess" class="row">
-                <div :class="loggedInUser.isNat ? 'col-sm-6' : 'col-sm-12'">
-                    <button
-                        class="btn w-100 btn-primary my-1"
-                        data-bs-toggle="modal"
-                        data-bs-target="#addDiscussion"
-                        @click="isContentReview = true"
-                    >
-                        Submit content for review
-                    </button>
-                </div>
-                <div v-if="loggedInUser.isNat" class="col-sm-6">
-                    <button
-                        class="btn w-100 btn-primary my-1"
-                        data-bs-toggle="modal"
-                        data-bs-target="#addDiscussion"
-                        @click="isContentReview = false"
-                    >
-                        Submit topic for vote/discussion
-                    </button>
+            <div class="ms-1 mt-2">
+                <div v-if="loggedInUser.hasBasicAccess" class="row">
+                    <div :class="loggedInUser.isNat ? 'col-sm-6' : 'col-sm-12'">
+                        <button
+                            class="btn w-100 btn-primary my-1"
+                            data-bs-toggle="modal"
+                            data-bs-target="#addDiscussion"
+                            @click="isContentReview = true"
+                        >
+                            Submit content for review
+                        </button>
+                    </div>
+                    <div v-if="loggedInUser.isNat" class="col-sm-6">
+                        <button
+                            class="btn w-100 btn-primary my-1"
+                            data-bs-toggle="modal"
+                            data-bs-target="#addDiscussion"
+                            @click="isContentReview = false"
+                        >
+                            Submit topic for vote/discussion
+                        </button>
+                    </div>
                 </div>
             </div>
         </filter-box>

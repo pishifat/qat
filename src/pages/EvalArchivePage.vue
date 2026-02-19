@@ -13,7 +13,7 @@
                             placeholder="username or ID..."
                             maxlength="18"
                             autocomplete="off"
-                            class="form-control"
+                            class="form-control w-auto"
                             @keyup.enter="query($event)"
                         >
                         <button class="btn btn-sm btn-primary ms-2" type="submit" @click="query($event)">
@@ -34,13 +34,13 @@
                             placeholder="# entries..."
                             maxlength="3"
                             autocomplete="off"
-                            class="form-control"
+                            class="form-control w-auto"
                             @keyup.enter="queryRecent($event)"
                         >
 
                         <select
                             v-model="mode"
-                            class="form-select ms-1"
+                            class="form-select w-auto ms-1"
                             @change="queryRecent($event)"
                         >
                             <option class="ms-2" value="osu" selected>
@@ -75,7 +75,7 @@
                             placeholder="username or ID..."
                             maxlength="18"
                             autocomplete="off"
-                            class="form-control"
+                            class="form-control w-auto"
                             data-bs-toggle="tooltip"
                             data-bs-placement="top"
                             title="leave field empty to load all evaluated users"
@@ -88,7 +88,7 @@
                             placeholder="evaluator username or ID..."
                             maxlength="18"
                             autocomplete="off"
-                            class="form-control"
+                            class="form-control w-auto ms-1"
                             data-bs-toggle="tooltip"
                             data-bs-placement="top"
                             title="leave field empty to set yourself as evaluator"

@@ -8,48 +8,50 @@
                 :groups="null"
                 store-module="evaluations"
             >
-                <select
-                    v-model="consensusFilter"
-                    class="form-select"
-                    @change="applyConsensusFilter($event.target.value)"
-                >
-                    <option value="">
-                        Any consensus
-                    </option>
-                    <option value="pass">
-                        Pass
-                    </option>
-                    <option value="fail">
-                        Fail
-                    </option>
-                    <option value="fullBn">
-                        Full BN
-                    </option>
-                    <option value="probationBn">
-                        Probation BN
-                    </option>
-                    <option value="removeFromBn">
-                        Remove From BN
-                    </option>
-                </select>
-                <div v-if="!reachedMax" class="row">
-                    <div class="col-sm-6">
-                        <button
-                            type="button"
-                            class="mt-2 form-control btn btn-primary btn-sm"
-                            @click="showMore($event)"
-                        >
-                            Show more
-                        </button>
-                    </div>
-                    <div class="col-sm-6">
-                        <button
-                            type="button"
-                            class="mt-2 form-control btn btn-secondary btn-sm"
-                            @click="showAll($event)"
-                        >
-                            Show all
-                        </button>
+                <div class="me-1 mt-2">
+                    <select
+                        v-model="consensusFilter"
+                        class="form-select ms-1"
+                        @change="applyConsensusFilter($event.target.value)"
+                    >
+                        <option value="">
+                            Any consensus
+                        </option>
+                        <option value="pass">
+                            Pass
+                        </option>
+                        <option value="fail">
+                            Fail
+                        </option>
+                        <option value="fullBn">
+                            Full BN
+                        </option>
+                        <option value="probationBn">
+                            Probation BN
+                        </option>
+                        <option value="removeFromBn">
+                            Remove From BN
+                        </option>
+                    </select>
+                    <div v-if="!reachedMax" class="row">
+                        <div class="col-sm-6">
+                            <button
+                                type="button"
+                                class="mt-2 form-control btn btn-primary btn-sm ms-1"
+                                @click="showMore($event)"
+                            >
+                                Show more
+                            </button>
+                        </div>
+                        <div class="col-sm-6">
+                            <button
+                                type="button"
+                                class="mt-2 form-control btn btn-secondary btn-sm"
+                                @click="showAll($event)"
+                            >
+                                Show all
+                            </button>
+                        </div>
                     </div>
                 </div>
             </filter-box>

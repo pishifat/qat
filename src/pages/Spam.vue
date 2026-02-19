@@ -1,6 +1,6 @@
 <template>
-    <div class="card card-body">
-        <div class="card card-body small mb-4">
+    <div class="card">
+        <div class="card-body small mb-4">
             <h4>Announcement (home page and BN server)</h4>
             <div class="text-secondary mb-2">
                 This sends a message to the #announcements channel in the BN Discord server and displays the announcement on the front page of this website.
@@ -14,7 +14,7 @@
                 Roles:
                 <select
                     v-model="selectedRole"
-                    class="form-select form-select-sm my-1 mx-1 col-sm-3"
+                    class="form-select form-select-sm my-1 mx-1 col-sm-3 w-25"
                 >
                     <option value="" disabled>
                         Select a role
@@ -107,7 +107,9 @@
             </button>
         </div>
 
-        <div class="card card-body small mb-4">
+        <hr>
+
+        <div class="card-body small mb-4">
             <h4>Message (<a href="https://osu.ppy.sh/users/6616586" target="_blank">NAT bot</a>)</h4>
             <div v-if="!loggedInUser.isNatLeader" class="text-secondary mb-2">
                 You don't have permission to use this. If you think you should, talk to pishifat.
@@ -163,14 +165,14 @@
                 rows="4"
             />
 
-            <div class="row mx-2 my-2 s">
-                <button class="btn btn-secondary btn-sm my-1 col-sm-5 mx-2" @click="findUserOsuIds($event)">
+            <div class="d-flex flex-wrap align-items-center my-2">
+                <button class="btn btn-secondary btn-sm me-1" @click="findUserOsuIds($event)">
                     Load user IDs
                 </button>
 
                 <select
                     v-model="group"
-                    class="form-select form-select-sm my-1 mx-1 col-sm-3"
+                    class="form-select w-auto mx-1"
                 >
                     <option value="" disabled>
                         Select a group
@@ -188,7 +190,7 @@
 
                 <select
                     v-model="mode"
-                    class="form-select form-select-sm my-1 mx-1 col-sm-3"
+                    class="form-select w-auto mx-1"
                 >
                     <option value="" disabled>
                         Select a mode

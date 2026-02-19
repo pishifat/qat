@@ -3,12 +3,11 @@
         <div class="container">
             <div class="row mb-3">
                 <div class="col-sm-12">
-                    <b class="me-4">Game mode</b>
+                    <b>Game mode:</b>
 
                     <mode-select
                         v-model="selectedModes"
                         :max-selection="4"
-                        class="ms-2"
                     />
 
                     <p class="small text-secondary ms-2 mt-1">

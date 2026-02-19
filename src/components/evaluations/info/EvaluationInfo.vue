@@ -111,10 +111,6 @@
                         <modding-activity
                             :username="selectedEvaluation.user.username"
                         />
-                        <debug-view-document
-                            v-if="loggedInUser.isAdmin"
-                            :document="selectedEvaluation"
-                        />
                     </div>
                 </template>
 
@@ -130,6 +126,10 @@
                     </div>
                 </template>
             </div>
+            <debug-view-document
+                v-if="loggedInUser.isAdmin"
+                :document="selectedEvaluation"
+            />
         </div>
     </modal-dialog>
 </template>
