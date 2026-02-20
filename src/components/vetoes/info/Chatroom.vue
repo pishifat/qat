@@ -4,7 +4,7 @@
             v-for="(message, i) in selectedVeto.chatroomMessages"
             :key="i"
             class="card card-body mb-2"
-            :class="message.isSystem ? 'card-bg-nat' : 'card-bg-user'"
+            :class="message.isSystem ? 'card-bg-system' : message.isModerator ? 'card-bg-nat' : 'card-bg-user'"
         >
             <img v-if="message.user" :src="'https://a.ppy.sh/' + message.user.osuId" class="card-avatar-img">
             <div>
@@ -44,15 +44,15 @@
                     v-model="messageInput"
                     class="form-control"
                     maxlength="5000"
-                    :placeholder="isChatroomUser ? 'type here...' : `if you were part of the discussion, you would be able to type here...`"
+                    :placeholder="isChatroomUser || loggedInUser.isNat ? 'type here...' : `if you were part of the discussion, you would be able to type here...`"
                     rows="2"
-                    :disabled="!isChatroomUser"
+                    :disabled="!isChatroomUser && !loggedInUser.isNat"
                 />
                 <b v-if="messageInput && messageInput.length > 4500" :class="messageInput.length == 5000 ? 'text-danger' : messageInput.length > 4500 ? 'text-warning' : 'text-secondary'">{{ messageInput.length }}</b>
                 <div>
                     <button
                         class="btn btn-danger w-100 btn-sm mt-1"
-                        :disabled="!isChatroomUser"
+                        :disabled="!isChatroomUser && !loggedInUser.isNat"
                         @click="saveMessage($event)"
                     >
                         Submit post
@@ -276,11 +276,16 @@ export default {
 </script>
 
 <style scoped>
-.card-bg-nat {
+.card-bg-system {
     background-image: url('/images/nat.png');
     background-repeat: repeat-y;
     background-position: left;
     background-blend-mode: saturation;
+}
+.card-bg-nat {
+    background-image: url('/images/nat.png');
+    background-repeat: repeat-y;
+    background-position: left;
 }
 .card-bg-user {
     background-image: url('/images/user.png');

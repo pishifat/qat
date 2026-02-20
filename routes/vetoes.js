@@ -692,7 +692,7 @@ router.post('/createChatroom/:id', middlewares.isLoggedIn, middlewares.isNat, as
     veto.chatroomInitiated = new Date();
     veto.chatroomMessages.push({
         date: new Date(),
-        content: `Welcome to the discussion forum for the pending veto on [**${veto.beatmapTitle}**](https://osu.ppy.sh/beatmapsets/${veto.beatmapId})! See the veto reasons above for context.\n\nUsers involved in this discussion:\n\n- Veto creator (anonymous)\n- BNs who vouched in support of the veto (anonymous)\n- Mapset host\n- Anyone else who the NAT thought was relevant\n\nAside from the mapset host, everyone in this discussion is **anonymous**. You can reveal your identity with a button below if you prefer to not be anonymous.\n\nYour goal is to resolve the veto's concerns through discussion and/or changes to the map. If a conclusion cannot be reached, you can allow the map to be mediated by a larger group of Beatmap Nominators. This option will become available 24h from this message!\n\nIf you have any questions or want to report something sketchy, talk to someone in the NAT. They can read this chatroom too.`,
+        content: `Welcome to the discussion forum for the pending veto on [**${veto.beatmapTitle}**](https://osu.ppy.sh/beatmapsets/${veto.beatmapId})! See the veto reasons above for context.\n\nUsers involved in this discussion:\n\n- Veto creator (anonymous)\n- BNs who vouched in support of the veto (anonymous)\n- Mapset host\n- Anyone else who the NAT thought was relevant\n\nThe veto's creator and vouching users are **anonymous**. If you're one of these users, you can reveal your identity with a button below.\n\nYour goal is to resolve the veto's concerns through discussion and/or changes to the map. If a conclusion cannot be reached, you can allow the map to be mediated by a larger group of Beatmap Nominators. This option will become available 24h from this message!\n\nIf you have any questions or want to report something sketchy, talk to someone in the NAT. They can read this chatroom too.`,
         user: null,
         userIndex: 0,
         isSystem: true,
@@ -776,8 +776,9 @@ router.post('/saveMessage/:id', middlewares.isLoggedIn, async (req, res) => {
     veto.chatroomMessages.push({
         date: new Date(),
         content: message,
-        user: isPublicUser ? req.session.mongoId : null,
+        user: isPublicUser || userIndex == -1 ? req.session.mongoId : null,
         userIndex: userIndex + 1,
+        isModerator: userIndex == -1,
     });
 
     await veto.save();

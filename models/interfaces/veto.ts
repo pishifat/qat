@@ -23,6 +23,7 @@ interface IVetoDocument extends Document {
         user: IUserDocument;
         userIndex: number;
         isSystem: Boolean;
+        isModerator: Boolean;
     }[];
     chatroomMediationRequestedUsers?: IUserDocument[];
     chatroomVoteEnabled?: Boolean;
