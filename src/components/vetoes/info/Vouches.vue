@@ -85,8 +85,8 @@
         <div class="mt-4">
             After two Beatmap Nominators vouch for a pending veto, a private chatroom is created between...
             <ul>
-                <li>the veto's creator</li>
-                <li>the vouching users</li>
+                <li>the veto's creator (anonymous)</li>
+                <li>the vouching users (anonymous)</li>
                 <li>the mapset host</li>
                 <li>anyone else who the NAT thinks is relevant</li>
             </ul>

@@ -654,7 +654,7 @@ router.post('/toggleVouch/:id', middlewares.isLoggedIn, middlewares.isBnOrNat, a
 
 /* POST change veto to "chatroom" status */
 router.post('/createChatroom/:id', middlewares.isLoggedIn, middlewares.isNat, async (req, res) => {
-    let chatroomUsers = [];
+    let chatroomUsersPublic = [];
 
     const includeUsersSplit = req.body.includeUsers.split(',');
 
@@ -668,7 +668,7 @@ router.post('/createChatroom/:id', middlewares.isLoggedIn, middlewares.isNat, as
                 return res.json({ error: `${username} is not in BNsite database. Ask them to log in.` });
             }
 
-            chatroomUsers.push(user._id);
+            chatroomUsersPublic.push(user._id);
         }
     }
 
@@ -683,16 +683,15 @@ router.post('/createChatroom/:id', middlewares.isLoggedIn, middlewares.isNat, as
         return res.json({ error: `${veto.beatmapMapper} is not in BNsite database. Ask them to log in.` });
     }
 
-    chatroomUsers = chatroomUsers.concat(veto.vouchingUsers);
-    chatroomUsers.push(veto.vetoer._id);
-    chatroomUsers.push(mapper._id);
-    veto.chatroomUsers = chatroomUsers;
-    veto.chatroomUsersPublic = [mapper._id];
+    chatroomUsersPublic.push(mapper._id);
+    veto.chatroomUsersPublic = chatroomUsersPublic;
+    veto.chatroomUsers = chatroomUsersPublic.concat(veto.vouchingUsers);
+    veto.chatroomUsers.push(veto.vetoer._id);
     veto.status = 'chatroom';
     veto.chatroomInitiated = new Date();
     veto.chatroomMessages.push({
         date: new Date(),
-        content: `Welcome to the discussion forum for the pending veto on [**${veto.beatmapTitle}**](https://osu.ppy.sh/beatmapsets/${veto.beatmapId})! See the veto reasons above for context.\n\nUsers involved in this discussion:\n\n- Veto creator\n- BNs who vouched in support of the veto\n- Mapset host\n- Anyone else who the NAT thought was relevant\n\nAside from the mapset host, everyone in this discussion is **anonymous**. You can reveal your identity with a button below if you prefer to not be anonymous.\n\nYour goal is to resolve the veto's concerns through discussion and/or changes to the map. If a conclusion cannot be reached, you can allow the map to be mediated by a larger group of Beatmap Nominators. This option will become available 24h from this message!\n\nIf you have any questions or want to report something sketchy, talk to someone in the NAT. They can read this chatroom too.`,
+        content: `Welcome to the discussion forum for the pending veto on [**${veto.beatmapTitle}**](https://osu.ppy.sh/beatmapsets/${veto.beatmapId})! See the veto reasons above for context.\n\nUsers involved in this discussion:\n\n- Veto creator (anonymous)\n- BNs who vouched in support of the veto (anonymous)\n- Mapset host\n- Anyone else who the NAT thought was relevant\n\nAside from the mapset host, everyone in this discussion is **anonymous**. You can reveal your identity with a button below if you prefer to not be anonymous.\n\nYour goal is to resolve the veto's concerns through discussion and/or changes to the map. If a conclusion cannot be reached, you can allow the map to be mediated by a larger group of Beatmap Nominators. This option will become available 24h from this message!\n\nIf you have any questions or want to report something sketchy, talk to someone in the NAT. They can read this chatroom too.`,
         user: null,
         userIndex: 0,
         isSystem: true,
