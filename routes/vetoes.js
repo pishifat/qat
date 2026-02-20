@@ -685,8 +685,9 @@ router.post('/createChatroom/:id', middlewares.isLoggedIn, middlewares.isNat, as
 
     chatroomUsersPublic.push(mapper._id);
     veto.chatroomUsersPublic = chatroomUsersPublic;
-    veto.chatroomUsers = chatroomUsersPublic.concat(veto.vouchingUsers);
-    veto.chatroomUsers.push(veto.vetoer._id);
+    veto.chatroomUsers = [veto.vetoer._id];
+    veto.chatroomUsers = veto.chatroomUsers.concat(veto.vouchingUsers);
+    veto.chatroomUsers = veto.chatroomUsers.concat(chatroomUsersPublic);
     veto.status = 'chatroom';
     veto.chatroomInitiated = new Date();
     veto.chatroomMessages.push({

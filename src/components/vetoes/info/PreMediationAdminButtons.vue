@@ -23,14 +23,30 @@
                 </button>
             </div>
         </div>
+        <div>
+            Users in this chatroom:
+            <ul>
+                <li v-for="user in selectedVeto.chatroomUsers" :key="user.id">
+                    <user-link
+                        :username="user.username"
+                        :osu-id="user.osuId"
+                    />
+                    <span v-if="!selectedVeto.chatroomUsersPublic.map(u => u.id).includes(user.id)">(anonymous)</span>
+                </li>
+            </ul>
+        </div>
     </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
+import UserLink from '../../UserLink.vue';
 
 export default {
     name: 'PreMediationAdminButtons',
+    components: {
+        UserLink,
+    },
     computed: {
         ...mapGetters('vetoes', [
             'selectedVeto',
