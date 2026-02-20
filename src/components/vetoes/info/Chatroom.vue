@@ -1,5 +1,16 @@
 <template>
     <div class="mb-2">
+        <div>
+            <button
+                class="btn btn-primary w-100 btn-sm mt-1 mb-4"
+                :disabled="!isChatroomUser && !loggedInUser.isNat"
+                @click="scrollToBottom()"
+            >
+                <i class="fa-solid fa-arrow-down mx-4"></i>
+                Skip to latest message
+                <i class="fa-solid fa-arrow-down mx-4"></i>
+            </button>
+        </div>
         <div
             v-for="(message, i) in selectedVeto.chatroomMessages"
             :key="i"
@@ -86,7 +97,7 @@
                         </button>
                     </div>
                 </div>
-                <hr>
+                <hr id="scrollEnd" >
                 <div>
                     <b>Vote to dismiss veto</b>
                     <ul>
@@ -218,6 +229,29 @@ export default {
         }, 15000);
     },
     methods: {
+        scrollToBottom () {
+            const target = document.getElementById('scrollEnd');
+
+            if (!target) return;
+
+            let scrollEl = target.parentElement;
+
+            while (scrollEl) {
+                const { overflow, overflowY } = getComputedStyle(scrollEl);
+
+                if (/auto|scroll/.test(overflow + overflowY) && scrollEl.scrollHeight > scrollEl.clientHeight) {
+                    break;
+                }
+
+                scrollEl = scrollEl.parentElement;
+            }
+
+            if (scrollEl) {
+                const targetRect = target.getBoundingClientRect();
+                const scrollRect = scrollEl.getBoundingClientRect();
+                scrollEl.scrollTop += targetRect.bottom - scrollRect.bottom;
+            }
+        },
         async saveMessage (e) {
             if (confirm(`Are you sure? You can't edit after it is posted.`)) {
                 const data = await this.$http.executePost(`/vetoes/saveMessage/${this.selectedVeto.id}`, { message: this.messageInput }, e);
