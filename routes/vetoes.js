@@ -1155,6 +1155,35 @@ router.post('/setStatusArchive/:id', middlewares.isLoggedIn, middlewares.isNat, 
     'publicVetoes');
 });
 
+/* POST remove user from chatroom */
+router.post('/removeUserFromChatroom/:id', middlewares.isLoggedIn, middlewares.isNat, async (req, res) => {
+    const veto = await Veto
+        .findById(req.params.id)
+        .populate(
+            getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
+        ).orFail();
+
+    const userId = req.body.userId;
+    const chatroomUserIds = veto.chatroomUsers.map(u => u.id);
+    const i = chatroomUserIds.indexOf(userId);
+
+    if (i !== -1) {
+        veto.chatroomUsers.splice(i, 1);
+        await veto.save();
+    } else {
+        return res.json({ error: 'User could not be removed' });
+    }
+
+    res.json({ veto });
+
+    Logger.generate(
+        req.session.mongoId,
+        `Removed ${userId} from veto chatroom`,
+        'veto',
+        veto._id
+    );
+});
+
 /* POST submit public mediation */
 router.post('/submitPublicMediation/:id', middlewares.isLoggedIn, async (req, res) => {
     const voteData = req.body.vote;

@@ -32,6 +32,22 @@
                         :osu-id="user.osuId"
                     />
                     <span v-if="!selectedVeto.chatroomUsersPublic.map(u => u.id).includes(user.id)">(anonymous)</span>
+                    <a
+                        v-if="confirmDelete != user.id"
+                        href="#"
+                        class="text-danger small"
+                        @click.prevent="confirmDelete = user.id"
+                    >
+                        remove user from chatroom
+                    </a>
+                    <a
+                        v-else
+                        class="text-danger small"
+                        href="#"
+                        @click.prevent="removeUserFromChatroom(user.id, $event)"
+                    >
+                        confirm
+                    </a>
                 </li>
             </ul>
         </div>
@@ -46,6 +62,11 @@ export default {
     name: 'PreMediationAdminButtons',
     components: {
         UserLink,
+    },
+    data() {
+        return {
+            confirmDelete: '',
+        };
     },
     computed: {
         ...mapGetters('vetoes', [
@@ -69,6 +90,14 @@ export default {
                 if (this.$http.isValid(data)) {
                     this.$store.commit('vetoes/updateVeto', data.veto);
                 }
+            }
+        },
+        async removeUserFromChatroom (userId, e) {
+            const data = await this.$http.executePost(`/vetoes/removeUserFromChatroom/${this.selectedVeto.id}`, { userId }, e);
+
+            if (this.$http.isValid(data)) {
+                this.$store.commit('vetoes/updateVeto', data.veto);
+                this.confirmDelete = '';
             }
         },
     },
