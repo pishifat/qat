@@ -159,20 +159,46 @@ router.get('/users/joinLeaveByDateRange', async (req, res) => {
     for (const user of users) {
         if (!user.history || user.history.length === 0) continue;
 
+        // Collect in-range events per (group, mode), sorted by date
+        const eventsByGroupMode = { bn: {}, nat: {} };
+        MODES.forEach(m => { eventsByGroupMode.bn[m] = []; eventsByGroupMode.nat[m] = []; });
+
         for (const entry of user.history) {
             const entryDate = new Date(entry.date);
-            // Include entry only when its date is within [startDate, endDate] (inclusive)
             if (entryDate < startDate || entryDate > endDate) continue;
 
             const mode = entry.mode || '';
             if (!MODES.includes(mode)) continue;
+            if (entry.group !== 'bn' && entry.group !== 'nat') continue;
 
-            if (entry.group === 'bn') {
-                if (entry.kind === 'joined') bnAddedByMode[mode].set(user.osuId, user.username);
-                else if (entry.kind === 'left') bnDepartedByMode[mode].set(user.osuId, user.username);
-            } else if (entry.group === 'nat') {
-                if (entry.kind === 'joined') natAddedByMode[mode].set(user.osuId, user.username);
-                else if (entry.kind === 'left') natDepartedByMode[mode].set(user.osuId, user.username);
+            const list = eventsByGroupMode[entry.group][mode];
+            list.push({ kind: entry.kind, date: entryDate });
+        }
+
+        // Sort each list by date and decide Added / Departed
+        for (const group of ['bn', 'nat']) {
+            const addedMap = group === 'bn' ? bnAddedByMode : natAddedByMode;
+            const departedMap = group === 'bn' ? bnDepartedByMode : natDepartedByMode;
+
+            for (const mode of MODES) {
+                const events = eventsByGroupMode[group][mode].sort((a, b) => a.date - b.date);
+
+                const hasJoined = events.some(e => e.kind === 'joined');
+                if (hasJoined) addedMap[mode].set(user.osuId, user.username);
+
+                // A "left" is invalidated if there is any "joined" after it in the range
+                const hasUninvalidatedLeft = events.some((e, i) => {
+                    if (e.kind !== 'left') return false;
+                    const joinedAfter = events.slice(i + 1).some(later => later.kind === 'joined');
+
+                    return !joinedAfter;
+                });
+
+                if (hasUninvalidatedLeft) {
+                    departedMap[mode].set(user.osuId, user.username);
+                } else {
+                    departedMap[mode].delete(user.osuId);
+                }
             }
         }
     }
@@ -263,13 +289,13 @@ router.get('/events/:beatmapsetId', async (req, res) => {
 
 /* GET quality assurance events by user osu! ID */
 // ! Deprecated
-router.get('/qaEventsByUser/:osuId', async (req, res) => {
+router.get('/qaEventsByUser/:osuId', (req, res) => {
     res.status(410).send({ error: 'This endpoint is deprecated' });
 });
 
 /* GET all recent QA info */
 // ! Deprecated
-router.get('/qaInfo/', async (req, res) => {
+router.get('/qaInfo/', (req, res) => {
     res.status(410).send({ error: 'This endpoint is deprecated' });
 });
 
