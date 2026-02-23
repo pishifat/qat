@@ -145,7 +145,13 @@ export default {
 
 <style scoped>
 .fake-disabled {
-    pointer-events: none;
     opacity: 70%;
+}
+
+.fake-disabled :deep(button),
+.fake-disabled :deep(input),
+.fake-disabled :deep(textarea),
+.fake-disabled :deep(a) {
+    pointer-events: none;
 }
 </style>
