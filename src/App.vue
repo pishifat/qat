@@ -10,7 +10,7 @@
                     class="navbar navbar-expand-lg navbar-dark navbar-nat"
                 >
                     <button
-                        class="navbar-toggler"
+                        class="navbar-toggler ms-3"
                         type="button"
                         data-bs-toggle="collapse"
                         data-bs-target="#navbar"

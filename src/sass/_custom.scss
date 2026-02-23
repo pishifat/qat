@@ -133,6 +133,14 @@
     }
 }
 
+@include media-breakpoint-down(lg) {
+    .navbar-nat {
+        .navbar-nav {
+            padding-left: 1rem;
+        }
+    }
+}
+
 // Form checks =================================================================
 
 .form-check-input {
