@@ -23,33 +23,73 @@
                 </button>
             </div>
         </div>
-        <div>
+        <div class="mt-2">
             Users in this chatroom:
-            <ul>
-                <li v-for="user in selectedVeto.chatroomUsers" :key="user.id">
-                    <user-link
-                        :username="user.username"
-                        :osu-id="user.osuId"
-                    />
-                    <span v-if="!selectedVeto.chatroomUsersPublic.map(u => u.id).includes(user.id)">(anonymous)</span>
-                    <a
-                        v-if="confirmDelete != user.id"
-                        href="#"
-                        class="text-danger small"
-                        @click.prevent="confirmDelete = user.id"
-                    >
-                        remove user from chatroom
-                    </a>
-                    <a
-                        v-else
-                        class="text-danger small"
-                        href="#"
-                        @click.prevent="removeUserFromChatroom(user.id, $event)"
-                    >
-                        confirm
-                    </a>
-                </li>
-            </ul>
+            <data-table :headers="['User', 'Role', 'Status', 'Actions']" class="mt-1 mb-0">
+                <tr v-for="user in selectedVeto.chatroomUsers" :key="user.id">
+                    <td>
+                        <user-link
+                            :username="user.username"
+                            :osu-id="user.osuId"
+                        />
+                    </td>
+                    <td class="text-center">
+                        <span
+                            v-if="selectedVeto.vetoer && selectedVeto.vetoer.id === user.id"
+                            class="text-warning me-1"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            title="Vetoer"
+                        >
+                            <i class="fa-solid fa-gavel" />
+                        </span>
+                        <span
+                            v-if="selectedVeto.vouchingUsers && selectedVeto.vouchingUsers.some(u => u.id === user.id)"
+                            class="text-info"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            title="Vouching user"
+                        >
+                            <i class="fa-solid fa-user-check" />
+                        </span>
+                        <span v-if="!(selectedVeto.vetoer && selectedVeto.vetoer.id === user.id) && !(selectedVeto.vouchingUsers && selectedVeto.vouchingUsers.some(u => u.id === user.id))" class="text-muted">
+                            —
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <span
+                            v-if="selectedVeto.chatroomUsersPublic.map(u => u.id).includes(user.id)"
+                            class="text-success"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            title="Username revealed"
+                        >
+                            <i class="fa-solid fa-user" />
+                        </span>
+                        <span
+                            v-else
+                            class="text-secondary"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            title="Anonymous"
+                        >
+                            <i class="fa-solid fa-user-secret" />
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-link text-danger p-0"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            title="Remove user from chatroom"
+                            @click="removeUserFromChatroom(user.id, $event)"
+                        >
+                            <i class="fa-solid fa-user-minus" />
+                        </button>
+                    </td>
+                </tr>
+            </data-table>
         </div>
     </div>
 </template>
@@ -57,16 +97,13 @@
 <script>
 import { mapGetters } from 'vuex';
 import UserLink from '../../UserLink.vue';
+import DataTable from '../../DataTable.vue';
 
 export default {
     name: 'PreMediationAdminButtons',
     components: {
         UserLink,
-    },
-    data() {
-        return {
-            confirmDelete: '',
-        };
+        DataTable,
     },
     computed: {
         ...mapGetters('vetoes', [
@@ -93,11 +130,12 @@ export default {
             }
         },
         async removeUserFromChatroom (userId, e) {
+            if (!confirm('Remove this user from the chatroom?')) return;
+
             const data = await this.$http.executePost(`/vetoes/removeUserFromChatroom/${this.selectedVeto.id}`, { userId }, e);
 
             if (this.$http.isValid(data)) {
                 this.$store.commit('vetoes/updateVeto', data.veto);
-                this.confirmDelete = '';
             }
         },
     },

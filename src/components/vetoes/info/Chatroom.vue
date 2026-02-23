@@ -1,51 +1,48 @@
 <template>
     <div class="mb-2">
-        <div>
-            <button
-                class="btn btn-primary w-100 btn-sm mt-1 mb-4"
-                :disabled="!isChatroomUser && !loggedInUser.isNat"
-                @click="scrollToBottom()"
-            >
-                <i class="fa-solid fa-arrow-down mx-4"></i>
-                Skip to latest message
-                <i class="fa-solid fa-arrow-down mx-4"></i>
-            </button>
-        </div>
         <div
-            v-for="(message, i) in selectedVeto.chatroomMessages"
-            :key="i"
-            class="card card-body mb-2"
-            :class="message.isSystem ? 'card-bg-system' : message.isModerator ? 'card-bg-nat' : 'card-bg-user'"
+            ref="messagesScroll"
+            class="chatroom-messages"
         >
-            <img v-if="message.user" :src="'https://a.ppy.sh/' + message.user.osuId" class="card-avatar-img">
-            <div>
-                <b v-if="message.user">
-                    <user-link
-                        :username="message.user.username"
-                        :osu-id="message.user.osuId"
-                    />
-                </b>
-                <b v-else>{{ message.isSystem ? 'BN website' : `Anonymous user ${message.userIndex}` }}</b> — <b>{{ new Date(message.date).toLocaleString() }}</b>
-                <span v-if="!message.isSystem && loggedInUser.isNat">
-                    <a
-                        v-if="confirmDelete != message._id.toString()"
-                        href="#"
-                        class="text-danger small"
-                        @click.prevent="confirmDelete = message._id.toString()"
+            <div
+                v-for="(message, i) in selectedVeto.chatroomMessages"
+                :key="i"
+                class="card card-body mb-2"
+                :class="message.isSystem ? 'card-bg-system' : message.isModerator ? 'card-bg-nat' : 'card-bg-user'"
+            >
+                <div class="card-message-header">
+                    <img
+                        v-if="message.user"
+                        :src="'https://a.ppy.sh/' + message.user.osuId"
+                        class="card-avatar-img"
+                        alt=""
                     >
-                        delete
-                    </a>
-                    <a
-                        v-else
-                        class="text-danger small"
-                        href="#"
-                        @click.prevent="deleteMessage(message._id.toString(), $event)"
-                    >
-                        confirm
-                    </a>
-                </span>
+                    <div>
+                        <b v-if="message.user">
+                            <user-link
+                                :username="message.user.username"
+                                :osu-id="message.user.osuId"
+                            />
+                        </b>
+                        <b v-else>{{ message.isSystem ? 'BN website' : `Anonymous user ${message.userIndex}` }}</b> —
+                        <b data-bs-toggle="tooltip" data-bs-placement="top" :title="toStandardDetailedDate(message.date)">
+                            {{ toRelativeDate(message.date) }}
+                        </b>
+                        <button
+                            v-if="!message.isSystem && loggedInUser.isNat"
+                            type="button"
+                            class="btn btn-sm btn-link text-danger p-0 ms-1"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            title="Delete message"
+                            @click="deleteMessage(message._id.toString(), $event)"
+                        >
+                            <i class="fa-solid fa-trash" />
+                        </button>
+                    </div>
+                </div>
+                <div v-html="$md.render(message.content)" />
             </div>
-            <div v-html="$md.render(message.content)" />
         </div>
 
         <div>
@@ -97,7 +94,7 @@
                         </button>
                     </div>
                 </div>
-                <hr id="scrollEnd" >
+                <hr>
                 <div>
                     <b>Vote to dismiss veto</b>
                     <ul>
@@ -169,7 +166,7 @@ export default {
     data() {
         return {
             messageInput: '',
-            confirmDelete: '',
+            initialScrollDone: false,
         };
     },
     computed: {
@@ -217,7 +214,22 @@ export default {
             return !this.isMapper || this.selectedVeto.chatroomVoteEnabled;
         },
     },
+    watch: {
+        'selectedVeto.chatroomMessages': {
+            handler (messages) {
+                if (!messages || messages.length === 0 || this.initialScrollDone) return;
+                this.initialScrollDone = true;
+                this.scheduleInitialScroll();
+            },
+            immediate: true,
+        },
+    },
     mounted () {
+        if (this.selectedVeto.chatroomMessages?.length && !this.initialScrollDone) {
+            this.initialScrollDone = true;
+            this.scheduleInitialScroll();
+        }
+
         setInterval(async () => {
             if (this.selectedVeto.status == 'chatroom') {
                 const data = await this.$http.executeGet(`/vetoes/refreshVeto/${this.selectedVeto.id}`);
@@ -229,28 +241,23 @@ export default {
         }, 15000);
     },
     methods: {
+        scheduleInitialScroll () {
+            this.$nextTick(() => this.scrollToBottom());
+            setTimeout(() => this.scrollToBottom(), 100);
+            setTimeout(() => this.scrollToBottom(), 350);
+        },
         scrollToBottom () {
-            const target = document.getElementById('scrollEnd');
+            const el = this.$refs.messagesScroll;
+            if (!el) return;
 
-            if (!target) return;
+            const scroll = () => {
+                el.scrollTop = el.scrollHeight;
+            };
 
-            let scrollEl = target.parentElement;
-
-            while (scrollEl) {
-                const { overflow, overflowY } = getComputedStyle(scrollEl);
-
-                if (/auto|scroll/.test(overflow + overflowY) && scrollEl.scrollHeight > scrollEl.clientHeight) {
-                    break;
-                }
-
-                scrollEl = scrollEl.parentElement;
-            }
-
-            if (scrollEl) {
-                const targetRect = target.getBoundingClientRect();
-                const scrollRect = scrollEl.getBoundingClientRect();
-                scrollEl.scrollTop += targetRect.bottom - scrollRect.bottom;
-            }
+            requestAnimationFrame(() => {
+                scroll();
+                requestAnimationFrame(scroll);
+            });
         },
         async saveMessage (e) {
             if (confirm(`Are you sure? You can't edit after it is posted.`)) {
@@ -259,6 +266,7 @@ export default {
                 if (this.$http.isValid(data)) {
                     this.$store.commit('vetoes/updateVeto', data.veto);
                     this.messageInput = '';
+                    this.$nextTick(() => this.scrollToBottom());
                 }
             }
         },
@@ -281,6 +289,8 @@ export default {
             }
         },
         async deleteMessage (messageId, e) {
+            if (!confirm('Delete this message?')) return;
+
             const data = await this.$http.executePost(`/vetoes/deleteMessage/${this.selectedVeto.id}`, { messageId }, e);
 
             if (this.$http.isValid(data)) {
@@ -310,6 +320,12 @@ export default {
 </script>
 
 <style scoped>
+.chatroom-messages {
+    max-height: 50vh;
+    min-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+}
 .card-bg-system {
     background-image: url('/images/nat.png');
     background-repeat: repeat-y;
@@ -326,12 +342,16 @@ export default {
     background-repeat: repeat-y;
     background-position: left;
 }
+.card-message-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
 .card-avatar-img {
-    position: absolute;
-    top: 15px;
-    left: -12px;
-    max-width: 24px;
-    max-height: 24px;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
     object-fit: cover;
     border-radius: 100%;
     box-shadow: 0 1px 1rem rgba(10, 10, 25, .9);
