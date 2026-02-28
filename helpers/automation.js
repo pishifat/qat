@@ -933,6 +933,58 @@ const spawnHighActivityEvaluations = cron.schedule('1 19 * * *', async () => {
 });
 
 /**
+ * for BNs returning from a good-term resignation, set evaluation consensus to removeFromBn if they had <2 unique nominations in their first 30 days. checked daily
+ */
+const spawnLowActivityEvaluations = cron.schedule('2 19 * * *', async () => {
+    const thirtyDaysAgo = moment().subtract(30, 'days').startOf('day').toDate();
+    const thirtyOneDaysAgo = moment().subtract(31, 'days').startOf('day').toDate();
+    const newDeadline = moment().add(7, 'days').toDate();
+
+    const bnsWithRecentJoin = await User.find({
+        groups: 'bn',
+        history: {
+            $elemMatch: {
+                group: 'bn',
+                kind: 'joined',
+                date: { $gte: thirtyOneDaysAgo, $lt: thirtyDaysAgo },
+            },
+        },
+    });
+
+    const recentJoins = [];
+
+    for (const bn of bnsWithRecentJoin) {
+        const joinEntry = bn.history.find(
+            h => h.group === 'bn' && h.kind === 'joined' && h.date >= thirtyOneDaysAgo && h.date < thirtyDaysAgo
+        );
+
+        const app = await AppEvaluation.findById(joinEntry.relatedEvaluation);
+
+        if (!app?.isRejoinRequest) continue;
+
+        recentJoins.push({ bn, mode: joinEntry.mode, joinDate: joinEntry.date });
+    }
+
+    for (const { bn, mode, joinDate } of recentJoins) {
+        const pendingEvaluation = await BnEvaluation.findOne({ user: bn._id, mode, active: true, natEvaluators: [] });
+
+        if (pendingEvaluation) {
+            const nomCount = await scrap.findUniqueNominationsCount(new Date(joinDate), new Date(), bn);
+
+            if (nomCount < 2) {
+                const days = util.findDaysBetweenDates(new Date(), new Date(joinDate));
+                pendingEvaluation.activityToCheck = days;
+                pendingEvaluation.deadline = newDeadline;
+                pendingEvaluation.consensus = BnEvaluationConsensus.RemoveFromBn;
+                await pendingEvaluation.save();
+            }
+        }
+    }
+}, {
+    scheduled: false,
+});
+
+/**
  * everything below this point is a development webhook (they only appear for pishifat to find or fix broken things)
  * i also don't fully trust any of them to do what they aim to do, but they're too insignificant to be worth the effort to investigate and fix
  */
@@ -1145,4 +1197,5 @@ module.exports = {
     notifyBeatmapReports,
     spawnProbationEvaluations,
     spawnHighActivityEvaluations,
+    spawnLowActivityEvaluations,
 };
