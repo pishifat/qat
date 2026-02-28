@@ -1,6 +1,6 @@
 <template>
     <div class="row">
-        <div class="col-6 text-right">
+        <div class="col-6 text-end">
             <button
                 v-if="page > 1"
                 class="btn btn-lg btn-link"
