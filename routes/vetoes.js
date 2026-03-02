@@ -268,11 +268,14 @@ router.post('/submit', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req
         description += `\n- **Reason ${i + 1}:** ${veto.reasons[i].summary}`;
     }
 
-    discord.webhookPost([{
+    const vetoRole = veto.mode === 'all'
+        ? ['osuVeto', 'taikoVeto', 'catchVeto', 'maniaVeto']
+        : [`${veto.mode}Veto`];
+
+    await discord.roleHighlightWebhookPost('publicVetoes', vetoRole, '', [{
         color: discord.webhookColors.darkPurple,
         description,
-    }],
-    'publicVetoes');
+    }]);
 });
 
 /* POST submit mediation */
