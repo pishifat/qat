@@ -585,7 +585,7 @@ router.post('/sendMessages/:id', middlewares.isLoggedIn, middlewares.isNat, asyn
 
 /* POST toggle vouch for a user on veto */
 router.post('/toggleVouch/:id', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
-    const userId = req.body.specificUserId || req.session.mongoId;
+    const userId = req.session.mongoId;
 
     let veto = await Veto
         .findById(req.params.id)
@@ -596,7 +596,7 @@ router.post('/toggleVouch/:id', middlewares.isLoggedIn, middlewares.isBnOrNat, a
         return res.json({ error: 'You can\'t vouch for your own vetoes!' });
     }
 
-    if (res.locals.userRequest.isNat && (userId == req.session.mongoId)) {
+    if (res.locals.userRequest.isNat) {
         return res.json({ error: 'NAT members cannot vouch!' });
     }
 

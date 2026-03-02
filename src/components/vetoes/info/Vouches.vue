@@ -9,7 +9,7 @@
         <button
             class="btn btn-sm btn-danger mt-2"
             :disabled="loggedInUser.isNat || isVetoer"
-            @click="vouch(true, null, $event)"
+            @click="vouch($event)"
         >
             {{ isVouchingUser ? 'Remove your support for this veto' : 'I vouch for this veto!' }}
         </button>
@@ -121,11 +121,11 @@ export default {
         };
     },
     methods: {
-        async vouch (isVouching, specificUserId, e) {
+        async vouch (e) {
             let text = `Are you sure?\n\nBy vouching for this veto, you are expected to participate in an anonymous discussion with the mapper.`;
 
-            if (!isVouching || confirm(text)) {
-                const data = await this.$http.executePost(`/vetoes/toggleVouch/${this.selectedVeto.id}`, { specificUserId }, e);
+            if (this.isVouchingUser || confirm(text)) {
+                const data = await this.$http.executePost(`/vetoes/toggleVouch/${this.selectedVeto.id}`, {}, e);
 
                 if (this.$http.isValid(data)) {
                     this.$store.commit('vetoes/updateVeto', data.veto);
