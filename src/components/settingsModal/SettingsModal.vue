@@ -4,43 +4,24 @@
 
         <template v-if="loggedInUser.isBnOrNat">
             <hr>
-
-            <template>
-                <settings-modal-evaluator />
-
-                <hr>
-            </template>
-
-            <template v-if="loggedInUser.isBn && loggedInUser.modesInfo.some(m => m.mode === 'osu')">
-                <settings-modal-subjective-eval-feedback />
-
-                <hr>
-            </template>
-
-            <settings-modal-requests />
-
+            <settings-modal-evaluator />
             <hr>
-
+            <settings-modal-requests />
+            <hr>
             <settings-modal-languages />
         </template>
 
         <template v-if="loggedInUser.hasFullReadAccess">
             <hr>
-
             <settings-modal-content-review />
-
             <hr>
-
             <settings-modal-discord />
         </template>
 
         <template v-if="loggedInUser.isNat">
             <hr>
-
             <settings-modal-mode-evaluations />
-
             <hr>
-
             <settings-modal-webhooks />
         </template>
     </modal-dialog>
@@ -57,7 +38,6 @@ import SettingsModalLanguages from './SettingsModalLanguages.vue';
 import SettingsModalExplicit from './SettingsModalExplicit.vue';
 import SettingsModalWebhooks from './SettingsModalWebhooks.vue';
 import SettingsModalContentReview from './SettingsModalContentReview.vue';
-import SettingsModalSubjectiveEvalFeedback from './SettingsModalSubjectiveEvalFeedback.vue';
 
 export default {
     components: {
@@ -70,7 +50,6 @@ export default {
         SettingsModalExplicit,
         SettingsModalWebhooks,
         SettingsModalContentReview,
-        SettingsModalSubjectiveEvalFeedback,
     },
     computed: mapState([
         'loggedInUser',

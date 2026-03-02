@@ -1820,39 +1820,6 @@ router.post('/toggleEvalVisibility/:id', async (req, res) => {
     );
 });
 
-/* POST toggle subjectiveEvalFeedback */
-router.post('/:id/toggleSubjectiveEvalFeedback', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
-    const user = await User.findById(req.params.id).orFail();
-
-    if (req.session.mongoId != user.id) {
-        return res.json({
-            error: 'Unauthorized',
-        });
-    }
-
-    // osu! only
-    if (!user.isBnFor('osu')) {
-        return res.json({
-            error: 'only osu! BNs can do this.',
-        });
-    }
-
-    user.subjectiveEvalFeedback = !user.subjectiveEvalFeedback;
-    await user.save();
-
-    res.json({
-        user,
-        success: 'Toggled receiving subjective eval feedback!',
-    });
-
-    Logger.generate(
-        req.session.mongoId,
-        `Opted "${user.username}" ${user.showExplicitContent ? 'in' : 'out of'} receiving subjective eval feedback`,
-        'user',
-        user._id
-    );
-});
-
 /* GET get various bn stats in a time period */
 router.get('/getEliteNominatorStats', middlewares.isLoggedIn, middlewares.isAdmin, async (req, res) => {
     const minDate = new Date(req.query.minDate);

@@ -5,8 +5,11 @@ const webhookColors = require('./discord/webhookColors');
 const util = require('./util');
 
 const username = 'bnsite';
-const avatar_url = 'https://bn.mappersguild.com/images/qatlogo.png';
+const avatar_url = 'https://raw.githubusercontent.com/pishifat/qat/refs/heads/master/public/images/qatlogo.png';
 
+/**
+ * internal: posts embed error to dev webhook on failure.
+ */
 async function errorWebhookPost(error, message, webhook) {
     const url = getWebhook('dev');
     if (typeof url === 'object') return url;
@@ -48,6 +51,11 @@ async function errorWebhookPost(error, message, webhook) {
     }
 }
 
+/**
+ * posts embeds to the given webhook by name.
+ * @param {Array} message - discord embed objects
+ * @param {string} webhook - webhook key (e.g. 'publicVetoes', 'announcement')
+ */
 async function webhookPost(message, webhook) {
     let url = getWebhook(webhook);
     if (typeof url === 'object') return url;
@@ -63,6 +71,12 @@ async function webhookPost(message, webhook) {
     }
 }
 
+/**
+ * posts embeds with a role ping; uses webhook name as the role key in getRoles.
+ * @param {string} message - optional text before/after embed
+ * @param {Array} embeds - discord embed objects
+ * @param {string} webhook - webhook key (also used to resolve role)
+ */
 async function highlightWebhookPost(message, embeds, webhook) {
     const url = getWebhook(webhook);
     const role = getRoles([webhook]);
@@ -80,6 +94,12 @@ async function highlightWebhookPost(message, embeds, webhook) {
     }
 }
 
+/**
+ * posts content pinging the given discord user ids (optional text appended).
+ * @param {string} webhook - webhook key
+ * @param {Array<string>} discordIds - discord user ids to mention
+ * @param {string} [text] - optional message after pings
+ */
 async function userHighlightWebhookPost(webhook, discordIds, text) {
     const url = getWebhook(webhook);
     if (typeof url === 'object') return url;
@@ -101,7 +121,14 @@ async function userHighlightWebhookPost(webhook, discordIds, text) {
     }
 }
 
-async function roleHighlightWebhookPost(webhook, roles, text) {
+/**
+ * posts content pinging the given role keys, with optional text and embeds.
+ * @param {string} webhook - webhook key
+ * @param {Array<string>} roles - role keys for getRoles (e.g. 'osuVeto', 'natInternal')
+ * @param {string} [text] - optional message after pings
+ * @param {Array} [embeds] - optional discord embed objects
+ */
+async function roleHighlightWebhookPost(webhook, roles, text, embeds) {
     const url = getWebhook(webhook);
     let content = getRoles(roles);
     if (typeof url === 'object') return url;
@@ -113,12 +140,16 @@ async function roleHighlightWebhookPost(webhook, roles, text) {
             username,
             avatar_url,
             content,
+            embeds,
         });
     } catch (error) {
         await errorWebhookPost(error, content, webhook);
     }
 }
 
+/**
+ * returns default author object for webhook embeds (username, avatar, profile link).
+ */
 function defaultWebhookAuthor(session) {
     return {
         name: session.username,
@@ -127,6 +158,11 @@ function defaultWebhookAuthor(session) {
     };
 }
 
+/**
+ * posts discussion vote result to the all webhook.
+ * @param {Object} d - discussion document with mediations
+ * @param {Object} session - user session for author
+ */
 async function discussionWebhookPost(d, session) {
     const agree = d.mediations.filter(m => m.vote == 1);
     const neutral = d.mediations.filter(m => m.vote == 2);
@@ -207,6 +243,11 @@ async function discussionWebhookPost(d, session) {
     );
 }
 
+/**
+ * posts content case vote result to content-case and internal webhooks; saves consensus, returns message and channel for email.
+ * @param {Object} d - discussion document with mediations
+ * @returns {{ message: string, channel: Object }}
+ */
 async function contentCaseWebhookPost(d) {
     const agree = d.mediations.filter(m => m.vote == 1);
     const disagree = d.mediations.filter(m => m.vote == 3);
@@ -271,6 +312,13 @@ async function contentCaseWebhookPost(d) {
     return { message, channel };
 }
 
+/**
+ * posts announcement with title and description to the announcement webhook.
+ * @param {Object} session - user session for author
+ * @param {string} title - announcement title (prefix added automatically)
+ * @param {string} description - markdown body, images linked
+ * @returns {{ success: string }}
+ */
 async function announcementWebhookPost(session, title, description) {
     title = '📢 ' + title;
     const firstImage = description.match(/https?:\/\/.*\.(?:png|jpg|jpeg|gif|png)/i);

@@ -54,7 +54,6 @@ interface IUser {
     requestInfo: string;
     lastOpenedForRequests: Date;
     isActiveContentReviewer: boolean;
-    subjectiveEvalFeedback: boolean;
     lastActivityCheck: Date;
     countryCode?: string;
 
