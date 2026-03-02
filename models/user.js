@@ -67,7 +67,6 @@ const userSchema = new mongoose.Schema({
     requestInfo: { type: String },
     lastOpenedForRequests: { type: Date },
     isActiveContentReviewer: { type: Boolean, default: false },
-    subjectiveEvalFeedback: { type: Boolean, default: false },
     lastActivityCheck: { type: Date },
     countryCode: { type: String },
 

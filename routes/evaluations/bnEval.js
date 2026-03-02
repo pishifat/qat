@@ -27,7 +27,7 @@ router.use(middlewares.hasBasicAccess);
 const defaultPopulate = [
     {
         path: 'user',
-        select: 'username osuId modesInfo groups evaluatorModes subjectiveEvalFeedback',
+        select: 'username osuId modesInfo groups evaluatorModes',
     },
     {
         path: 'natEvaluators',

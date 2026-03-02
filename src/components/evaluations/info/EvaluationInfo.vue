@@ -77,9 +77,6 @@
                         :user="selectedEvaluation.user"
                         :show-activity-standing="true"
                     />
-                    <subjective-feedback-status
-                        v-if="selectedEvaluation.user.isBn && !selectedEvaluation.isResignation && selectedEvaluation.mode === 'osu'"
-                    />
                 </div>
 
                 <evaluation-link />
@@ -152,7 +149,6 @@ import ModalDialog from '../../ModalDialog.vue';
 import MainApplicationInfo from './applications/MainApplicationInfo.vue';
 import DiscussionInfo from './DiscussionInfo.vue';
 import EvaluationIsSecurityChecked from './applications/EvaluationIsSecurityChecked.vue';
-import SubjectiveFeedbackStatus from './currentBns/SubjectiveFeedbackStatus.vue';
 import DebugViewDocument from '../../DebugViewDocument.vue';
 
 export default {
@@ -173,7 +169,6 @@ export default {
         MainApplicationInfo,
         DiscussionInfo,
         EvaluationIsSecurityChecked,
-        SubjectiveFeedbackStatus,
         DebugViewDocument,
         AssignmentHistory,
     },

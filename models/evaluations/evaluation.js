@@ -16,7 +16,7 @@ class EvaluationService extends mongoose.Model {
         let populate = [
             {
                 path: 'user',
-                select: 'username osuId modesInfo groups evaluatorModes subjectiveEvalFeedback history',
+                select: 'username osuId modesInfo groups evaluatorModes history',
             },
             {
                 path: 'natBuddy',
