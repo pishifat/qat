@@ -96,6 +96,18 @@ function getRoles(roles) {
             case 'securityCheck':
                 pings += `<@&${config.securityCheckWebhook.role}> `;
                 break;
+            case 'osuVeto':
+                pings += `<@&${config.publicVetoesWebhook.osuRole}> `;
+                break;
+            case 'taikoVeto':
+                pings += `<@&${config.publicVetoesWebhook.taikoRole}> `;
+                break;
+            case 'catchVeto':
+                pings += `<@&${config.publicVetoesWebhook.catchRole}> `;
+                break;
+            case 'maniaVeto':
+                pings += `<@&${config.publicVetoesWebhook.maniaRole}> `;
+                break;
         }
     }
 

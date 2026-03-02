@@ -34,7 +34,11 @@
     },
     "publicVetoesWebhook": {
         "id": "",
-        "token": ""
+        "token": "",
+        "osuRole": "",
+        "taikoRole": "",
+        "catchRole": "",
+        "maniaRole": ""
     },
     "beatmapReportWebhook": {
         "id": "",
