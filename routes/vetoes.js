@@ -153,9 +153,54 @@ function getPopulate(isNat, mongoId) {
     return defaultPopulate;
 }
 
+/** Returns a 403 response if the user is not a chatroom participant and not NAT; otherwise null. */
+function ensureChatroomParticipantOrNat(req, res, veto) {
+    const chatroomUserIds = (veto.chatroomUsers || []).map(u => (u && (u.id || (u._id && u._id.toString()))) || null).filter(Boolean);
+    const isParticipant = chatroomUserIds.some(id => id == req.session.mongoId);
+    const isNat = res.locals.userRequest && res.locals.userRequest.isNat;
+
+    if (!isParticipant && !isNat) {
+        return res.status(403).json({ error: 'Only chatroom participants can perform this action.' });
+    }
+
+    return null;
+}
+
+/**
+ * Returns a plain-object veto safe to send to a non-NAT user:
+ * - filters mediations and publicMediations to only the current user's entries
+ *   unless user is NAT or veto is archived
+ */
+function sanitizeVeto(veto, mongoId, isNat) {
+    const obj = veto && (typeof veto.toObject === 'function' ? veto.toObject() : { ...veto });
+
+    if (!obj) return obj;
+    if (isNat) return obj;
+    if (obj.status === 'archive') return obj;
+    if (!mongoId) return obj;
+
+    const mediatorMatchesUser = (m) => {
+        if (!m || !m.mediator) return false;
+        const mid = m.mediator.id || m.mediator;
+
+        return String(mid) === String(mongoId);
+    };
+
+    if (Array.isArray(obj.mediations)) {
+        obj.mediations = obj.mediations.filter(mediatorMatchesUser);
+    }
+
+    if (Array.isArray(obj.publicMediations)) {
+        obj.publicMediations = obj.publicMediations.filter(mediatorMatchesUser);
+    }
+
+    return obj;
+}
+
 /* GET vetoes list. */
 router.get('/relevantInfo/:limit', async (req, res) => {
     let vetoes;
+    let isNat = false;
 
     if (!req.session.mongoId) {
         vetoes = await Veto
@@ -167,7 +212,7 @@ router.get('/relevantInfo/:limit', async (req, res) => {
             .limit(parseInt(req.params.limit));
     } else {
         const user = await User.findById(req.session.mongoId);
-        const isNat = user.isNat;
+        isNat = user.isNat;
 
         vetoes = await Veto
             .find({})
@@ -183,6 +228,10 @@ router.get('/relevantInfo/:limit', async (req, res) => {
 
     }
 
+    if (req.session.mongoId && !isNat) {
+        vetoes = vetoes.map(v => sanitizeVeto(v, req.session.mongoId, isNat));
+    }
+
     res.json({
         vetoes,
     });
@@ -191,6 +240,7 @@ router.get('/relevantInfo/:limit', async (req, res) => {
 /* GET specific veto */
 router.get('/searchVeto/:id', async (req, res) => {
     let veto;
+    let isNat = false;
 
     if (!req.session.mongoId) {
         veto = await Veto
@@ -201,7 +251,7 @@ router.get('/searchVeto/:id', async (req, res) => {
             .select('-vouchingUsers -chatroomUsers -chatroomUsersPublic -chatroomMessages -vetoer');
     } else {
         const user = await User.findById(req.session.mongoId);
-        const isNat = user.isNat;
+        isNat = user.isNat;
 
         veto = await Veto
             .findById(req.params.id)
@@ -211,6 +261,10 @@ router.get('/searchVeto/:id', async (req, res) => {
     }
 
     if (!veto.chatroomUsers.length) veto.chatroomMessages = [];
+
+    if (req.session.mongoId && !isNat) {
+        veto = sanitizeVeto(veto, req.session.mongoId, isNat);
+    }
 
     res.json(veto);
 });
@@ -253,6 +307,10 @@ router.post('/submit', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req
         .populate(
             getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
         );
+
+    if (!res.locals.userRequest.isNat) {
+        veto = sanitizeVeto(veto, req.session.mongoId, res.locals.userRequest.isNat);
+    }
 
     res.json({
         veto,
@@ -348,9 +406,11 @@ router.post('/submitMediation/:id', middlewares.isLoggedIn, middlewares.isBnOrNa
         veto.mode);
     }
 
+    const vetoForResponse = sanitizeVeto(veto, req.session.mongoId, res.locals.userRequest.isNat);
+
     // return
     res.json({
-        veto,
+        veto: vetoForResponse,
         success: 'Submitted mediation',
     });
 
@@ -385,6 +445,10 @@ router.post('/resetMediation/:id', middlewares.isLoggedIn, middlewares.isAdmin, 
     }],
     veto.mode
     );
+
+    if (!res.locals.userRequest.isNat) {
+        veto = sanitizeVeto(veto, req.session.mongoId, res.locals.userRequest.isNat);
+    }
 
     res.json(veto);
 
@@ -636,6 +700,10 @@ router.post('/toggleVouch/:id', middlewares.isLoggedIn, middlewares.isBnOrNat, a
             getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
         );
 
+    if (!res.locals.userRequest.isNat) {
+        veto = sanitizeVeto(veto, req.session.mongoId, res.locals.userRequest.isNat);
+    }
+
     res.json({
         veto,
         success: 'Done!',
@@ -775,6 +843,9 @@ router.post('/saveMessage/:id', middlewares.isLoggedIn, async (req, res) => {
         .populate(defaultPopulate)
         .orFail();
 
+    const forbidden = ensureChatroomParticipantOrNat(req, res, veto);
+    if (forbidden) return forbidden;
+
     const publicUserIds = veto.chatroomUsersPublic.map(u => u.id);
     const isPublicUser = publicUserIds.includes(req.session.mongoId);
     const privateUserIds = veto.chatroomUsers.map(u => u.id);
@@ -796,6 +867,10 @@ router.post('/saveMessage/:id', middlewares.isLoggedIn, async (req, res) => {
             getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
         );
 
+    if (!res.locals.userRequest.isNat) {
+        veto = sanitizeVeto(veto, req.session.mongoId, res.locals.userRequest.isNat);
+    }
+
     res.json({ veto });
 
     Logger.generate(
@@ -812,6 +887,9 @@ router.post('/revealUsername/:id', middlewares.isLoggedIn, async (req, res) => {
         .findById(req.params.id)
         .populate(defaultPopulate)
         .orFail();
+
+    const forbidden = ensureChatroomParticipantOrNat(req, res, veto);
+    if (forbidden) return forbidden;
 
     const privateUserIds = veto.chatroomUsers.map(u => u.id);
     const userIndex = privateUserIds.findIndex(id => id == req.session.mongoId);
@@ -833,6 +911,10 @@ router.post('/revealUsername/:id', middlewares.isLoggedIn, async (req, res) => {
             getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
         );
 
+    if (!res.locals.userRequest.isNat) {
+        veto = sanitizeVeto(veto, req.session.mongoId, res.locals.userRequest.isNat);
+    }
+
     res.json({ veto });
 
     Logger.generate(
@@ -849,6 +931,9 @@ router.post('/requestMediation/:id', middlewares.isLoggedIn, async (req, res) =>
         .findById(req.params.id)
         .populate(defaultPopulate)
         .orFail();
+
+    const forbidden = ensureChatroomParticipantOrNat(req, res, veto);
+    if (forbidden) return forbidden;
 
     const chatroomMediationRequestedUserIds = veto.chatroomMediationRequestedUsers.map(u => u.id);
 
@@ -894,6 +979,10 @@ router.post('/requestMediation/:id', middlewares.isLoggedIn, async (req, res) =>
             getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
         );
 
+    if (!res.locals.userRequest.isNat) {
+        veto = sanitizeVeto(veto, req.session.mongoId, res.locals.userRequest.isNat);
+    }
+
     res.json({ veto });
 
     Logger.generate(
@@ -920,7 +1009,9 @@ router.get('/refreshVeto/:id', middlewares.isLoggedIn, async (req, res) => {
             getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
         );
 
-    res.json({ veto });
+    const vetoForResponse = sanitizeVeto(veto, req.session.mongoId, res.locals.userRequest.isNat);
+
+    res.json({ veto: vetoForResponse });
 });
 
 /* POST delete message in veto chatroom */
@@ -947,6 +1038,10 @@ router.post('/deleteMessage/:id', middlewares.isLoggedIn, middlewares.isNat, asy
         .populate(
             getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
         );
+
+    if (!res.locals.userRequest.isNat) {
+        veto = sanitizeVeto(veto, req.session.mongoId, res.locals.userRequest.isNat);
+    }
 
     res.json({ veto });
 
@@ -982,7 +1077,9 @@ router.post('/startVote/:id', middlewares.isLoggedIn, async (req, res) => {
     });
     await veto.save();
 
-    res.json({ veto });
+    const vetoForResponse = sanitizeVeto(veto, req.session.mongoId, res.locals.userRequest.isNat);
+
+    res.json({ veto: vetoForResponse });
 
     Logger.generate(
         req.session.mongoId,
@@ -1091,6 +1188,10 @@ router.post('/vote/:id', middlewares.isLoggedIn, async (req, res) => {
         .populate(
             getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
         );
+
+    if (!res.locals.userRequest.isNat) {
+        veto = sanitizeVeto(veto, req.session.mongoId, res.locals.userRequest.isNat);
+    }
 
     res.json({ veto });
 
@@ -1226,7 +1327,9 @@ router.post('/submitPublicMediation/:id', middlewares.isLoggedIn, async (req, re
 
     if (!veto.chatroomUsers.length) veto.chatroomMessages = [];
 
-    res.json({ veto });
+    const vetoForResponse = sanitizeVeto(veto, req.session.mongoId, res.locals.userRequest.isNat);
+
+    res.json({ veto: vetoForResponse });
 
     Logger.generate(
         req.session.mongoId,
