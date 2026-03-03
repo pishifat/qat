@@ -50,7 +50,11 @@ const defaultPopulate = [
     },
     {
         path: 'publicMediations',
-        select: 'vote reasonIndex',
+        select: 'vote reasonIndex mediator',
+        populate: {
+            path: 'mediator',
+            select: 'username osuId',
+        },
     },
     {
         path: 'chatroomMessages.user',
@@ -1193,7 +1197,7 @@ router.post('/submitPublicMediation/:id', middlewares.isLoggedIn, async (req, re
     let veto = await Veto
         .findById(req.params.id)
         .populate(
-            getPopulate(false, req.session.mongoId)
+            getPopulate(true, req.session.mongoId)
         ).orFail();
 
     for (let index = 0; index < veto.reasons.length; index++) {
