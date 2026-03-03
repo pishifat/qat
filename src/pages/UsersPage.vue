@@ -82,7 +82,7 @@
             <section class="card card-body">
                 <h5>Activity stats</h5>
                 <bn-activity class="my-2" />
-                <gmt-activity class="my-2" />
+                <gmt-activity v-if="loggedInUser && loggedInUser.hasFullReadAccess" class="my-2" />
             </section>
 
             <section v-if="loggedInUser && loggedInUser.isNatLeader" class="card card-body">

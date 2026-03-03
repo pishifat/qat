@@ -3,7 +3,7 @@
         <div class="container">
             <div class="row">
                 <span class="col-sm-12 small text-secondary mb-2">
-                    This takes some time to load and is resource-intensive. Use sparingly.
+                    Outdated, replaced by external tooling.
                 </span>
             </div>
             <div class="row">
@@ -56,12 +56,9 @@
 </template>
 
 <script>
-import UserLink from '../UserLink.vue';
-
 export default {
     name: 'EliteNominatorStats',
     components: {
-        UserLink,
     },
     data () {
         return {
