@@ -3,10 +3,10 @@
         <button v-if="!users" class="btn btn-sm btn-primary my-2" @click="findVibeCheckStats($event)">
             Load vibes
         </button>
-        <button v-else class="btn btn-sm btn-primary my-2" @click="natFilter = !natFilter">
+        <button v-else class="btn btn-sm btn-secondary my-2" @click="natFilter = !natFilter">
             {{ natFilter ? 'Show all' : 'Show NAT only' }}
         </button>
-        <div v-for="user in users" v-if="!natFilter || user.isNat" :key="user.osuId">
+        <div v-for="user in filteredUsers" :key="user.osuId">
             <b>
                 <user-link
                     :osu-id="user.osuId"
@@ -52,6 +52,14 @@ export default {
             users: null,
             natFilter: true,
         };
+    },
+    computed: {
+        filteredUsers() {
+            if (!this.users) return [];
+            if (!this.natFilter) return this.users;
+
+            return this.users.filter((u) => u.isNat);
+        },
     },
     methods: {
         async findVibeCheckStats(e) {

@@ -1329,7 +1329,7 @@ router.post('/submitPublicMediation/:id', middlewares.isLoggedIn, async (req, re
 
     const vetoForResponse = sanitizeVeto(veto, req.session.mongoId, res.locals.userRequest.isNat);
 
-    res.json({ veto: vetoForResponse });
+    res.json({ veto: vetoForResponse, success: 'Submitted mediation!' });
 
     Logger.generate(
         req.session.mongoId,
