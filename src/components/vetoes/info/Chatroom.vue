@@ -238,7 +238,7 @@ export default {
                     this.$store.commit(`vetoes/updateVeto`, data.veto);
                 }
             }
-        }, 15000);
+        }, 30 * 1000); // 30 seconds
     },
     methods: {
         scheduleInitialScroll () {
