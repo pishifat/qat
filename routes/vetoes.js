@@ -168,8 +168,8 @@ function ensureChatroomParticipantOrNat(req, res, veto) {
 
 /**
  * Returns a plain-object veto safe to send to a non-NAT user:
- * - filters mediations and publicMediations to only the current user's entries
- *   unless user is NAT or veto is archived
+ * - filters mediations and publicMediations to only the current user's entries unless user is NAT or veto is archived
+ * - anonymizes chatroomMediationRequestedUsers (keeps array length and current user's ref, replaces others with placeholder)
  */
 function sanitizeVeto(veto, mongoId, isNat) {
     const obj = veto && (typeof veto.toObject === 'function' ? veto.toObject() : { ...veto });
@@ -186,12 +186,27 @@ function sanitizeVeto(veto, mongoId, isNat) {
         return String(mid) === String(mongoId);
     };
 
+    const userRefMatches = (u) => {
+        if (!u) return false;
+        const uid = u.id || (u._id && u._id.toString());
+
+        return uid && String(uid) === String(mongoId);
+    };
+
+    // filter mediations
     if (Array.isArray(obj.mediations)) {
         obj.mediations = obj.mediations.filter(mediatorMatchesUser);
     }
 
     if (Array.isArray(obj.publicMediations)) {
         obj.publicMediations = obj.publicMediations.filter(mediatorMatchesUser);
+    }
+
+    // anonymize chatroomMediationRequestedUsers
+    if (Array.isArray(obj.chatroomMediationRequestedUsers)) {
+        obj.chatroomMediationRequestedUsers = obj.chatroomMediationRequestedUsers.map(u =>
+            userRefMatches(u) ? u : { id: '__anonymous__' }
+        );
     }
 
     return obj;
