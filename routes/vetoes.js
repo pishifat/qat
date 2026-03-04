@@ -174,35 +174,22 @@ function ensureChatroomParticipantOrNat(req, res, veto) {
 function sanitizeVeto(veto, mongoId, isNat) {
     const obj = veto && (typeof veto.toObject === 'function' ? veto.toObject() : { ...veto });
 
-    if (!obj) return obj;
-    if (isNat) return obj;
-    if (obj.status === 'archive') return obj;
-    if (!mongoId) return obj;
+    if (!obj || isNat || !mongoId) return obj;
 
-    const mediatorMatchesUser = (m) => {
-        if (!m || !m.mediator) return false;
-        const mid = m.mediator.id || m.mediator;
+    const mediatorMatchesUser = (m) => m && m.mediator && String(m.mediator.id || m.mediator) === String(mongoId);
+    const userRefMatches = (u) => u && String(u.id || (u._id && u._id.toString())) === String(mongoId);
 
-        return String(mid) === String(mongoId);
-    };
-
-    const userRefMatches = (u) => {
-        if (!u) return false;
-        const uid = u.id || (u._id && u._id.toString());
-
-        return uid && String(uid) === String(mongoId);
-    };
-
-    // filter mediations
-    if (Array.isArray(obj.mediations)) {
+    // 1. Filter mediations
+    if (obj.status !== 'archive' && Array.isArray(obj.mediations)) {
         obj.mediations = obj.mediations.filter(mediatorMatchesUser);
     }
 
-    if (Array.isArray(obj.publicMediations)) {
+    // 2. Filter publicMediations
+    if (obj.status !== 'archive' && Array.isArray(obj.publicMediations)) {
         obj.publicMediations = obj.publicMediations.filter(mediatorMatchesUser);
     }
 
-    // anonymize chatroomMediationRequestedUsers
+    // 3. Anonymize chatroomMediationRequestedUsers (keep length + current user, anonymize others)
     if (Array.isArray(obj.chatroomMediationRequestedUsers)) {
         obj.chatroomMediationRequestedUsers = obj.chatroomMediationRequestedUsers.map(u =>
             userRefMatches(u) ? u : { id: '__anonymous__' }
