@@ -19,52 +19,21 @@
                 </div>
             </filter-box>
 
-            <section class="card card-body">
+            <section
+                v-for="status in vetoStatuses"
+                :key="status.id"
+                class="card card-body"
+            >
                 <h2>
-                    Pending vetoes
-                    <small v-if="pendingVetoes">({{ pendingVetoes.length }})</small>
-                </h2>
-
-                <div v-if="!pendingVetoes.length">
-                    None...
-                </div>
-
-                <transition-group name="list" tag="div" class="row">
-                    <veto-card
-                        v-for="veto in pendingVetoes"
-                        :key="veto.id"
-                        :veto="veto"
-                    />
-                </transition-group>
-            </section>
-
-            <section class="card card-body">
-                <h2>
-                    Active vetoes
-                    <small v-if="activeVetoes">({{ activeVetoes.length }})</small>
-                </h2>
-
-                <div v-if="!activeVetoes.length">
-                    None...
-                </div>
-
-                <transition-group name="list" tag="div" class="row">
-                    <veto-card
-                        v-for="veto in activeVetoes"
-                        :key="veto.id"
-                        :veto="veto"
-                    />
-                </transition-group>
-            </section>
-
-            <section class="card card-body">
-                <h2>
-                    Archived vetoes
-                    <small v-if="paginatedResolvedVetoes">
+                    {{ status.label }}
+                    <small v-if="status.isArchive && status.vetoes.length">
                         ({{ resolvedVetoes.length + (reachedMax ? '' : '+') }})
                     </small>
+                    <small v-else-if="status.vetoes.length">
+                        ({{ status.vetoes.length }})
+                    </small>
                     <button
-                        v-if="!reachedMax"
+                        v-if="status.isArchive && !reachedMax"
                         type="button"
                         class="btn btn-primary ms-2"
                         @click="showMore($event)"
@@ -72,7 +41,7 @@
                         Show more vetoes
                     </button>
                     <button
-                        v-if="!reachedMax"
+                        v-if="status.isArchive && !reachedMax"
                         type="button"
                         class="btn btn-secondary ms-2"
                         data-bs-toggle="tooltip"
@@ -84,15 +53,19 @@
                     </button>
                 </h2>
 
+                <div v-if="!status.vetoes.length">
+                    None...
+                </div>
+
                 <transition-group name="list" tag="div" class="row">
                     <veto-card
-                        v-for="veto in paginatedResolvedVetoes"
+                        v-for="veto in status.vetoes"
                         :key="veto.id"
                         :veto="veto"
                     />
                 </transition-group>
 
-                <pagination-nav store-module="vetoes" />
+                <pagination-nav v-if="status.isArchive" store-module="vetoes" />
             </section>
             <section v-if="loggedInUser && loggedInUser.isNatLeader" class="card card-body">
                 <h2>Admin</h2>
@@ -166,10 +139,24 @@ export default {
         ...mapState('vetoes', ['vetoes']),
         ...mapGetters('vetoes', [
             'pendingVetoes',
-            'activeVetoes',
+            'chatroomVetoes',
+            'availableVetoes',
+            'wipVetoes',
             'resolvedVetoes',
             'paginatedResolvedVetoes',
         ]),
+        vetoStatuses() {
+            const statuses = [
+                { id: 'pending', label: 'Pending Vetoes', vetoes: this.pendingVetoes, isArchive: false },
+                { id: 'chatroom', label: 'Active Chatrooms', vetoes: this.chatroomVetoes, isArchive: false },
+                { id: 'available', label: 'Vetoes Requesting Mediation', vetoes: this.availableVetoes, isArchive: false },
+                { id: 'wip', label: 'Mediation in Progress', vetoes: this.wipVetoes, isArchive: false },
+                { id: 'archive', label: 'Archived Vetoes', vetoes: this.paginatedResolvedVetoes, isArchive: true },
+            ];
+            const canSeePending = this.loggedInUser && this.loggedInUser.isBnOrNat;
+
+            return canSeePending ? statuses : statuses.filter(s => s.id !== 'pending');
+        },
         isProbation () {
             return this.loggedInUser.probationModes.length > 0;
         },
