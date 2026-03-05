@@ -75,7 +75,7 @@ morgan.token('status-colored', (req, res) => {
 });
 
 morgan.token('username-colored', (req, res) => {
-    const username = req.session.username || 'Unknown';
+    const username = req.session?.username || 'Unknown';
 
     return consoleStyles(username, username === 'Unknown' ? ['dim'] : ['cyan', 'dim']);
 });
