@@ -190,6 +190,18 @@ function ensureChatroomParticipantOrNat(req, res, veto) {
     return null;
 }
 
+/** True if the current user is allowed to request mediation (vetoer, vouching user, or mapset host). */
+function canRequestMediation(req, veto) {
+    const mongoId = String(req.session.mongoId);
+    const vetoerId = veto.vetoer && String(veto.vetoer.id || veto.vetoer._id);
+    if (vetoerId === mongoId) return true;
+    const voucherIds = (veto.vouchingUsers || []).map(u => u && String(u.id || u._id));
+    if (voucherIds.includes(mongoId)) return true;
+    if (veto.beatmapMapperId != null && Number(veto.beatmapMapperId) === Number(req.session.osuId)) return true;
+
+    return false;
+}
+
 /**
  * Returns a plain-object veto safe to send to a non-NAT user:
  * - filters mediations and publicMediations to only the current user's entries unless user is NAT or veto is archived
@@ -1026,12 +1038,18 @@ router.post('/requestMediation/:id', middlewares.isLoggedIn, async (req, res) =>
         .populate(defaultPopulate)
         .orFail();
 
-    const forbidden = ensureChatroomParticipantOrNat(req, res, veto);
-    if (forbidden) return forbidden;
+    if (veto.status !== 'chatroom') {
+        return res.status(400).json({ error: 'Mediation can only be requested during the chatroom phase.' });
+    }
 
-    const chatroomMediationRequestedUserIds = veto.chatroomMediationRequestedUsers.map(u => u.id);
+    if (!canRequestMediation(req, veto)) {
+        return res.status(403).json({ error: 'Only the vetoer, vouching users, or mapset host can request mediation.' });
+    }
 
-    if (!veto.chatroomMediationRequestedUsers.includes(req.session.mongoId)) {
+    const requestedIds = (veto.chatroomMediationRequestedUsers || []).map(u => String(u && (u.id || u._id)));
+    const alreadyRequested = requestedIds.includes(String(req.session.mongoId));
+
+    if (!alreadyRequested) {
         veto.chatroomMediationRequestedUsers.push(req.session.mongoId);
     }
 
@@ -1039,33 +1057,36 @@ router.post('/requestMediation/:id', middlewares.isLoggedIn, async (req, res) =>
         { path: 'chatroomMediationRequestedUsers', select: 'username osuId' },
     ]);
 
-    const chatroomMediationRequestedUserOsuIds = veto.chatroomMediationRequestedUsers.map(u => u.osuId);
-    const mapperInitiated = chatroomMediationRequestedUserOsuIds.includes(veto.beatmapMapperId);
-    const chatroomUsersPublicIds = veto.chatroomUsersPublic.map(u => u.id);
-    const publicUserInitiated = chatroomUsersPublicIds.includes(req.session.mongoId);
+    const mapperInitiated = (veto.chatroomMediationRequestedUsers || []).some(u => u && Number(u.osuId) === Number(veto.beatmapMapperId));
+    const requestCount = (veto.chatroomMediationRequestedUsers || []).length;
+    const shouldStart = mapperInitiated || requestCount >= 2;
+
     const mapperLink = `[**${veto.beatmapMapper}**](https://osu.ppy.sh/users/${veto.beatmapMapperId})`;
     const userLink = `[**${req.session.username}**](https://osu.ppy.sh/users/${req.session.osuId})`;
+    const isMapper = Number(veto.beatmapMapperId) === Number(req.session.osuId);
 
-    if (veto.chatroomMediationRequestedUsers.length >= 2 || mapperInitiated) {
-        veto.status = 'available';
-        veto.chatroomMessages.push({
-            date: new Date(),
-            content: `${mapperInitiated ? mapperLink : publicUserInitiated ? userLink : 'A user'} requested mediation. The discussion has concluded.`,
-            user: null,
-            userIndex: 0,
-            isSystem: true,
-        });
-    } else {
-        veto.chatroomMessages.push({
-            date: new Date(),
-            content: `${publicUserInitiated ? userLink : 'A user'} requested mediation. If another user requests mediation, the discussion will conclude.`,
-            user: null,
-            userIndex: 0,
-            isSystem: true,
-        });
+    if (!alreadyRequested) {
+        if (shouldStart) {
+            veto.status = 'available';
+            veto.chatroomMessages.push({
+                date: new Date(),
+                content: `${mapperInitiated ? mapperLink : isMapper ? userLink : 'A user'} requested mediation. The discussion has concluded.`,
+                user: null,
+                userIndex: 0,
+                isSystem: true,
+            });
+        } else {
+            veto.chatroomMessages.push({
+                date: new Date(),
+                content: `${isMapper ? userLink : 'A user'} requested mediation. Two requests are needed (mapset host counts as two).`,
+                user: null,
+                userIndex: 0,
+                isSystem: true,
+            });
+        }
+
+        await veto.save();
     }
-
-    await veto.save();
 
     veto = await Veto
         .findById(req.params.id)
@@ -1086,13 +1107,15 @@ router.post('/requestMediation/:id', middlewares.isLoggedIn, async (req, res) =>
         veto._id
     );
 
-    const description = `Mediation requested on [veto for **${veto.beatmapTitle}** by **${veto.beatmapMapper}**](https://bn.mappersguild.com/vetoes?id=${veto.id}) (${veto.chatroomMediationRequestedUsers.length}/2)`;
+    if (!alreadyRequested) {
+        const description = `Mediation requested on [veto for **${veto.beatmapTitle}** by **${veto.beatmapMapper}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`;
 
-    discord.webhookPost([{
-        color: discord.webhookColors.lightPink,
-        description,
-    }],
-    veto.mode);
+        discord.webhookPost([{
+            color: discord.webhookColors.lightPink,
+            description,
+        }],
+        veto.mode);
+    }
 });
 
 /* GET refresh veto for chatroom purposes */
