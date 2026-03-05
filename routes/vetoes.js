@@ -11,6 +11,8 @@ const discord = require('../helpers/discord');
 
 const router = express.Router();
 
+router.use(middlewares.isLoggedIn);
+
 // population for NAT
 const defaultPopulate = [
     {
