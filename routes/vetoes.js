@@ -1134,6 +1134,9 @@ router.get('/refreshVeto/:id', middlewares.isLoggedIn, async (req, res) => {
         return res.status(404).json({ error: 'Veto not found' });
     }
 
+    const forbidden = ensureChatroomParticipantOrNat(req, res, veto);
+    if (forbidden) return forbidden;
+
     const vetoForResponse = sanitizeVeto(veto, req.session.mongoId, res.locals.userRequest.isNat);
 
     res.json({ veto: vetoForResponse });
