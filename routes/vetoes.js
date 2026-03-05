@@ -341,6 +341,16 @@ router.post('/submit', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req
         return res.json({ error: 'Veto must include reasons!' });
     }
 
+    const fortyEightHoursAgo = new Date(Date.now() - 48 * 60 * 60 * 1000);
+    const recentVeto = await Veto.findOne(
+        { vetoer: req.session.mongoId, createdAt: { $gte: fortyEightHoursAgo } },
+        { _id: 1 }
+    ).lean();
+
+    if (recentVeto) {
+        return res.json({ error: 'You can only submit one veto every 48 hours. Please try again later.' });
+    }
+
     util.isValidUrlOrThrow(url);
     const beatmapsetId = util.getBeatmapsetIdFromUrl(url);
     const osuBeatmapset = await osu.getBeatmapsetInfo(req.session.accessToken, beatmapsetId);
@@ -740,6 +750,19 @@ router.post('/toggleVouch/:id', middlewares.isLoggedIn, middlewares.isBnOrNat, a
 
     const vouchingUserIds = veto.vouchingUsers.map(u => u.id);
     const isVouching = !vouchingUserIds.includes(userId);
+
+    if (isVouching) {
+        const fortyEightHoursAgo = new Date(Date.now() - 48 * 60 * 60 * 1000);
+        const recentVouch = await Veto.findOne(
+            { vouchingUsers: userId, updatedAt: { $gte: fortyEightHoursAgo } },
+            { _id: 1 }
+        ).lean();
+
+        if (recentVouch) {
+            return res.json({ error: 'You can only vouch for one veto every 48 hours. Please try again later.' });
+        }
+    }
+
     let toggleWebhook = false;
 
     if (isVouching) {

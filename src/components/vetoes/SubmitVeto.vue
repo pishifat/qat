@@ -1,6 +1,11 @@
 <template>
     <modal-dialog id="addVeto" title="Submit a veto anonymously">
         <div class="container">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle" />
+                Do note that you can only submit one veto every 48 hours.
+            </div>
+
             <!-- game mode -->
             <p><b>Game mode</b></p>
             <div class="row">
