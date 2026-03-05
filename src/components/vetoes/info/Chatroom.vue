@@ -29,7 +29,7 @@
                             {{ toRelativeDate(message.date) }}
                         </b>
                         <button
-                            v-if="!message.isSystem && loggedInUser.isNat"
+                            v-if="!message.isSystem && loggedInUser?.isNat"
                             type="button"
                             class="btn btn-sm btn-link text-danger p-0 ms-1"
                             data-bs-toggle="tooltip"
@@ -45,22 +45,22 @@
             </div>
         </div>
 
-        <div>
+        <div v-if="selectedVeto.status != 'archive'">
             <div class="card card-body">
                 <textarea
                     id="messageInput"
                     v-model="messageInput"
                     class="form-control"
                     maxlength="5000"
-                    :placeholder="isChatroomUser || loggedInUser.isNat ? 'type here...' : `if you were part of the discussion, you would be able to type here...`"
+                    :placeholder="isChatroomUser || loggedInUser?.isNat ? 'type here...' : `if you were part of the discussion, you would be able to type here...`"
                     rows="2"
-                    :disabled="!isChatroomUser && !loggedInUser.isNat"
+                    :disabled="!isChatroomUser && !loggedInUser?.isNat"
                 />
                 <b v-if="messageInput && messageInput.length > 4500" :class="messageInput.length == 5000 ? 'text-danger' : messageInput.length > 4500 ? 'text-warning' : 'text-secondary'">{{ messageInput.length }}</b>
                 <div>
                     <button
                         class="btn btn-danger w-100 btn-sm mt-1"
-                        :disabled="!isChatroomUser && !loggedInUser.isNat"
+                        :disabled="!isChatroomUser && !loggedInUser?.isNat"
                         @click="saveMessage($event)"
                     >
                         Submit post

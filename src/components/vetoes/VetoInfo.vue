@@ -11,13 +11,15 @@
             <!-- show veto reasons and include mediation responses when possible -->
             <context v-if="!showMediations" />
             <mediations v-else />
-            <!--show chatroom archive when veto is in mediation phases-->
+            <!--show chatroom archive when veto is in mediation phases, or to everyone when archived-->
             <div
                 v-if="
-                    selectedVeto.status != 'pending' &&
+                    (selectedVeto.status != 'pending' &&
                         selectedVeto.status != 'chatroom' &&
-                        loggedInUser.isNat &&
-                        selectedVeto.vetoFormat >= 7"
+                        selectedVeto.status != 'archive' &&
+                        loggedInUser &&loggedInUser?.isNat &&
+                        selectedVeto.vetoFormat >= 7) ||
+                        (selectedVeto.status == 'archive' && selectedVeto.vetoFormat >= 7)"
             >
                 <a href="#chatroom" data-bs-toggle="collapse">
                     <b>Discussion logs</b> <i class="fas fa-angle-down" />
@@ -43,6 +45,7 @@
                 :class="selectedVeto.chatroomLocked ? 'fake-disabled' : ''"
             />
             <div v-else-if="selectedVeto.status == 'chatroom'">
+                <hr />
                 The veto is currently being discussed between the mapper(s) and Beatmap Nominators. If a conclusion can't be reached, a larger vote will be held!
             </div>
             <pre-mediation-admin-buttons v-if="(selectedVeto.status == 'chatroom' || selectedVeto.status == 'pending') && loggedInUser && loggedInUser.isNat" />
