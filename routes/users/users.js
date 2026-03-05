@@ -17,6 +17,7 @@ const util = require('../../helpers/util');
 const { BnEvaluationConsensus, BnEvaluationAddition, AppEvaluationConsensus, GenrePreferences, LanguagePreferences, DetailPreferences, MapperPreferences, OsuStylePreferences, TaikoStylePreferences, CatchStylePreferences, ManiaStylePreferences } = require('../../shared/enums');
 const { websocketManager } = require("../../helpers/websocket");
 const osu = require('../../helpers/osu');
+const { guard } = require('../../helpers/guard');
 
 const router = express.Router();
 
@@ -36,24 +37,34 @@ const evaluationsPopulate = [
 ];
 
 /* GET user list */
-router.get('/relevantInfo', async (req, res) => {
+router.get('/relevantInfo', middlewares.optionalLogin, async (req, res) => {
     const users = await User
         .find({
             groups: { $in: ['bn', 'nat'] },
         });
 
     res.json({
-        users,
+        users: guard({
+            data: users,
+            allowed: !!(res.locals.userRequest && res.locals.userRequest.isNat),
+            attributes: ['isBannedFromBn', 'history.relatedEvaluation'],
+        }),
     });
 });
 
 /* GET extended user list */
-router.get('/loadPreviousBnAndNat', async (req, res) => {
+router.get('/loadPreviousBnAndNat', middlewares.optionalLogin, async (req, res) => {
     const users = await User.find({
         history: { $exists: true, $ne: [] },
     }).sort({ username: 1 });
 
-    res.json({ users });
+    res.json({
+        users: guard({
+            data: users,
+            allowed: !!(res.locals.userRequest && res.locals.userRequest.isNat),
+            attributes: ['isBannedFromBn', 'history.relatedEvaluation'],
+        }),
+    });
 });
 
 /* GET NAT list */
@@ -87,12 +98,20 @@ router.get('/loadBannedUsers', middlewares.isLoggedIn, middlewares.isNat, async 
 });
 
 /* GET user */
-router.get('/loadUser/:userInput', async (req, res) => {
+router.get('/loadUser/:userInput', middlewares.optionalLogin, async (req, res) => {
     if (!req.params.userInput.length) {
         return res.json({ error: 'No input' });
     }
 
-    res.json(await User.findByUsernameOrOsuId(req.params.userInput) || await User.findById(req.params.userInput));
+    const user = await User.findByUsernameOrOsuId(req.params.userInput) || await User.findById(req.params.userInput);
+
+    res.json(
+        guard({
+            data: user,
+            allowed: !!(res.locals.userRequest && res.locals.userRequest.isNat),
+            attributes: ['isBannedFromBn', 'history.relatedEvaluation'],
+        })
+    );
 });
 
 /* GET user next evaluation */
