@@ -55,7 +55,7 @@
                                             Reports
                                         </router-link>
                                         <router-link class="dropdown-item" to="/vetoes">
-                                            Vetoes (read-only)
+                                            Vetoes
                                         </router-link>
                                         <router-link class="dropdown-item" to="/discussionvote">
                                             Content Review (read-only)
