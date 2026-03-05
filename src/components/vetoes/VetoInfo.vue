@@ -14,15 +14,7 @@
             <vouches-display v-if="loggedInUser && loggedInUser.isNat && selectedVeto.vetoFormat >= 7 && selectedVeto.status != 'pending'" />
 
             <!--show chatroom archive when veto is in mediation phases, or to everyone when archived-->
-            <div
-                v-if="
-                    (selectedVeto.status != 'pending' &&
-                        selectedVeto.status != 'chatroom' &&
-                        selectedVeto.status != 'archive' &&
-                        loggedInUser &&loggedInUser?.isNat &&
-                        selectedVeto.vetoFormat >= 7) ||
-                        (selectedVeto.status == 'archive' && selectedVeto.vetoFormat >= 7)"
-            >
+            <div v-if="showChatroom" class="mb-2">
                 <a href="#chatroom" data-bs-toggle="collapse">
                     <b>Discussion logs</b> <i class="fas fa-angle-down" />
                 </a>
@@ -30,6 +22,12 @@
                     id="chatroom"
                     class="fake-disabled collapse"
                 />
+            </div>
+            <div v-else-if="selectedVeto.vetoFormat >= 7 && selectedVeto.status === 'archive'">
+                <hr>
+                <p class="text-muted">
+                    This veto never entered the discussion phase.
+                </p>
             </div>
 
             <!-- show vouches component when  veto is "pending" status -->
@@ -145,6 +143,19 @@ export default {
             }
 
             return false;
+        },
+        showChatroom() {
+            const v = this.selectedVeto;
+            if (!v?.chatroomMessages?.length) return false;
+            if (v.vetoFormat < 7) return false;
+
+            // Archived: show discussion logs to everyone
+            if (v.status === 'archive') return true;
+
+            // Mediation phases: show only to NAT
+            const inMediationPhase = v.status === 'wip' || v.status === 'available';
+
+            return inMediationPhase && this.loggedInUser?.isNat;
         },
     },
 };
