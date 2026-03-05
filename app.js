@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const middlewares = require("./helpers/middlewares")
-const logger = require('morgan');
+const logger = require('./helpers/logger');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
@@ -70,7 +70,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
 // middlewares and such
-app.use(logger('dev'));
+app.use(logger);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -98,7 +98,7 @@ db.once('open', function () {
 setInterval(async () => {
     try {
       await mongoose.connection.db.admin().ping();
-    } catch {
+    } catch (err) {
       console.error('no connection. hopefully the next line initiates `pm2 restart`');
       process.exit(1);
     }
