@@ -15,10 +15,16 @@ function unauthorize(req, res, customError) {
     }
 }
 
-async function isLoggedIn(req, res, next) {
+async function validateLogin(req, res, next, optional) {
     const u = await User.findById(req.session.mongoId);
 
     if (!u) {
+        if (optional) {
+            res.locals.userRequest = null;
+
+            return next();
+        }
+
         return unauthorize(req, res);
     }
 
@@ -29,6 +35,12 @@ async function isLoggedIn(req, res, next) {
         if (response.error) {
             req.session.destroy();
 
+            if (optional) {
+                res.locals.userRequest = null;
+
+                return next();
+            }
+
             throw new OsuResponseError(response, 'Error refreshing token');
         }
 
@@ -37,6 +49,15 @@ async function isLoggedIn(req, res, next) {
 
     res.locals.userRequest = u;
     next();
+}
+
+function isLoggedIn(req, res, next) {
+    return validateLogin(req, res, next, false);
+}
+
+/** Populates userRequest when logged in; does not unauthorize when not. */
+function optionalLogin(req, res, next) {
+    return validateLogin(req, res, next, true);
 }
 
 function isBnOrNat(req, res, next) {
@@ -166,6 +187,7 @@ function discordEmbeds(req, res, next) {
 
 module.exports = {
     isLoggedIn,
+    optionalLogin,
     isBnOrNat,
     isNat,
     hasFullReadAccessOrTrialNat,

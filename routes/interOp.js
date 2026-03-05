@@ -11,6 +11,7 @@ const middlewares = require('../helpers/middlewares');
 const BnEvaluation = require('../models/evaluations/bnEvaluation');
 const Discussion = require('../models/discussion');
 const { checkTenureOverlap, getModesFromHistory } = require('../helpers/scrap');
+const { guard } = require('../helpers/guard');
 
 const router = express.Router();
 
@@ -49,16 +50,30 @@ router.get('/', (req, res) => {
 
 /* GET users in BN/NAT */
 router.get('/users', async (_, res) => {
-    res.json(await User.find({ groups: { $in: ['bn', 'nat'] } }));
+    const users = await User.find({ groups: { $in: ['bn', 'nat'] } });
+
+    res.json(
+        guard({
+            data: users,
+            allowed: false,
+            attributes: ['isBannedFromBn', 'history.relatedEvaluation'],
+        })
+    );
 });
 
 /* GET users in or previously in BN/NAT */
 router.get('/users/all', async (_, res) => {
+    const users = await User.find({
+        $or: [
+            { history: { $ne: [], $exists: true } },
+        ],
+    });
+
     res.json(
-        await User.find({
-            $or: [
-                { history: { $ne: [], $exists: true } },
-            ],
+        guard({
+            data: users,
+            allowed: false,
+            attributes: ['isBannedFromBn', 'history.relatedEvaluation'],
         })
     );
 });
@@ -237,10 +252,16 @@ router.get('/users/:userInput', async (req, res) => {
     const user = await User.findByUsernameOrOsuId(req.params.userInput);
 
     if (!user) {
-        res.status(404).send({ error: 'User not found' });
+        return res.status(404).send({ error: 'User not found' });
     }
 
-    res.json(user);
+    res.json(
+        guard({
+            data: user,
+            allowed: false,
+            attributes: ['isBannedFromBn', 'history.relatedEvaluation'],
+        })
+    );
 });
 
 /* POST events for multiple beatmapsets */

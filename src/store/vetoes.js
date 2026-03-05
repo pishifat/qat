@@ -51,8 +51,14 @@ export default {
         pendingVetoes: (state, getters) => {
             return getters.filteredVetoes.filter(v => v.status === 'pending');
         },
-        activeVetoes: (state, getters) => {
-            return getters.filteredVetoes.filter(v => v.status === 'chatroom' || v.status === 'available' || v.status == 'wip');
+        chatroomVetoes: (state, getters) => {
+            return getters.filteredVetoes.filter(v => v.status === 'chatroom');
+        },
+        availableVetoes: (state, getters) => {
+            return getters.filteredVetoes.filter(v => v.status === 'available');
+        },
+        wipVetoes: (state, getters) => {
+            return getters.filteredVetoes.filter(v => v.status === 'wip');
         },
         resolvedVetoes: (state, getters) => {
             return getters.filteredVetoes.filter(v => v.status == 'archive');

@@ -122,7 +122,7 @@ export default {
     },
     methods: {
         async vouch (e) {
-            let text = `Are you sure?\n\nBy vouching for this veto, you are expected to participate in an anonymous discussion with the mapper.`;
+            let text = `Are you sure?\n\nBy vouching for this veto, you are expected to participate in an anonymous discussion with the mapper.\n\n You can only vouch for one veto every 48 hours.`;
 
             if (this.isVouchingUser || confirm(text)) {
                 const data = await this.$http.executePost(`/vetoes/toggleVouch/${this.selectedVeto.id}`, {}, e);

@@ -47,6 +47,36 @@ function getActiveBnDefaultPopulate (mongoId) {
     };
 }
 
+/**
+ * Returns a plain-object discussion safe to send to a non–full-read user:
+ * - When active: keeps only the current user's mediation; removes all others.
+ * - When inactive: keeps all mediations but replaces mediator with placeholder (anonymize user ids only; optionally keep groups).
+ */
+function sanitizeDiscussionMediations(discussion, mongoId, hasFullReadAccess) {
+    if (!discussion || hasFullReadAccess || !mongoId) {
+        return discussion && (typeof discussion.toObject === 'function' ? discussion.toObject() : { ...discussion });
+    }
+
+    const obj = discussion && (typeof discussion.toObject === 'function' ? discussion.toObject() : { ...discussion });
+    if (!obj || !Array.isArray(obj.mediations)) return obj;
+
+    const mediatorMatchesUser = (m) => m && m.mediator && String(m.mediator.id || m.mediator._id || m.mediator) === String(mongoId);
+    const anonymousPlaceholder = (groups) => (groups && groups.length ? { id: '__anonymous__', groups } : { id: '__anonymous__' });
+
+    if (obj.isActive) {
+        obj.mediations = obj.mediations.filter(mediatorMatchesUser);
+    } else {
+        obj.mediations = obj.mediations.map((m) => {
+            const copy = { ...m };
+            copy.mediator = anonymousPlaceholder(m.mediator && m.mediator.groups);
+
+            return copy;
+        });
+    }
+
+    return obj;
+}
+
 /* GET discussions. */
 router.get('/relevantInfo/:limit', async (req, res) => {
     const limit = parseInt(req.params.limit);
@@ -75,6 +105,11 @@ router.get('/relevantInfo/:limit', async (req, res) => {
         discussions = activeDiscussions.concat(inactiveDiscussions);
     }
 
+    const hasFullReadAccess = !!(res.locals.userRequest && res.locals.userRequest.hasFullReadAccess);
+    const mongoId = req.session.mongoId;
+
+    discussions = discussions.map((d) => sanitizeDiscussionMediations(d, mongoId, hasFullReadAccess));
+
     res.json({
         discussions,
     });
@@ -102,7 +137,10 @@ router.get('/searchDiscussionVote/:id', async (req, res) => {
         }
     }
 
-    res.json(discussion);
+    const hasFullReadAccess = !!(res.locals.userRequest && res.locals.userRequest.hasFullReadAccess);
+    const out = sanitizeDiscussionMediations(discussion, req.session.mongoId, hasFullReadAccess);
+
+    res.json(out);
 });
 
 /* POST create a new discussion vote. */
@@ -176,8 +214,11 @@ router.post('/submit', middlewares.hasBasicAccess, async (req, res) => {
         .findById(discussion.id)
         .populate(defaultPopulate);
 
+    const hasFullReadAccess = !!(res.locals.userRequest && res.locals.userRequest.hasFullReadAccess);
+    const out = sanitizeDiscussionMediations(discussion, req.session.mongoId, hasFullReadAccess);
+
     res.json({
-        discussion,
+        discussion: out,
         success: 'Submitted discussion',
     });
     Logger.generate(
@@ -286,8 +327,11 @@ router.post('/submitMediation/:id', middlewares.hasBasicAccess, async (req, res)
             res.locals.userRequest.isNat ? defaultPopulate : getActiveBnDefaultPopulate(req.session.mongoId)
         );
 
+    const hasFullReadAccess = !!(res.locals.userRequest && res.locals.userRequest.hasFullReadAccess);
+    const out = sanitizeDiscussionMediations(d, req.session.mongoId, hasFullReadAccess);
+
     res.json({
-        discussion: d,
+        discussion: out,
         success: 'Submitted vote',
     });
 

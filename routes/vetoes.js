@@ -155,6 +155,28 @@ function getPopulate(isNat, mongoId) {
     return defaultPopulate;
 }
 
+/** Populate for archived veto when shown to anyone (e.g. logged-out). Includes full chatroom and mediations. */
+function getPopulateForArchivedPublic() {
+    return [
+        {
+            path: 'mediations',
+            select: '-mediator',
+        },
+        {
+            path: 'chatroomUsers',
+            select: 'username osuId',
+        },
+        {
+            path: 'chatroomUsersPublic',
+            select: 'username osuId',
+        },
+        {
+            path: 'chatroomMessages.user',
+            select: 'username osuId',
+        },
+    ];
+}
+
 /** Returns a 403 response if the user is not a chatroom participant and not NAT; otherwise null. */
 function ensureChatroomParticipantOrNat(req, res, veto) {
     const chatroomUserIds = (veto.chatroomUsers || []).map(u => (u && (u.id || (u._id && u._id.toString()))) || null).filter(Boolean);
@@ -166,6 +188,18 @@ function ensureChatroomParticipantOrNat(req, res, veto) {
     }
 
     return null;
+}
+
+/** True if the current user is allowed to request mediation (vetoer, vouching user, or mapset host). */
+function canRequestMediation(req, veto) {
+    const mongoId = String(req.session.mongoId);
+    const vetoerId = veto.vetoer && String(veto.vetoer.id || veto.vetoer._id);
+    if (vetoerId === mongoId) return true;
+    const voucherIds = (veto.vouchingUsers || []).map(u => u && String(u.id || u._id));
+    if (voucherIds.includes(mongoId)) return true;
+    if (veto.beatmapMapperId != null && Number(veto.beatmapMapperId) === Number(req.session.osuId)) return true;
+
+    return false;
 }
 
 /**
@@ -205,18 +239,19 @@ function sanitizeVeto(veto, mongoId, isNat) {
 router.get('/relevantInfo/:limit', async (req, res) => {
     let vetoes;
     let isNat = false;
+    let canSeePending = false;
 
     if (!req.session.mongoId) {
         vetoes = await Veto
             .find({})
-            .populate(
-                getPopulate(false, null)
-            )
+            .select('-vouchingUsers -vetoer')
+            .populate(getPopulateForArchivedPublic())
             .sort({ createdAt: -1 })
             .limit(parseInt(req.params.limit));
     } else {
         const user = await User.findById(req.session.mongoId);
         isNat = user.isNat;
+        canSeePending = user && user.isBnOrNat;
 
         vetoes = await Veto
             .find({})
@@ -228,8 +263,21 @@ router.get('/relevantInfo/:limit', async (req, res) => {
     }
 
     for (let i = 0; i < vetoes.length; i++) {
-        if (!vetoes[i].chatroomUsers.length) vetoes[i].chatroomMessages = [];
+        if (vetoes[i].status !== 'archive' && !(vetoes[i].chatroomUsers && vetoes[i].chatroomUsers.length)) vetoes[i].chatroomMessages = [];
+    }
 
+    if (!req.session.mongoId) {
+        for (let i = 0; i < vetoes.length; i++) {
+            if (vetoes[i].status !== 'archive') {
+                vetoes[i].chatroomMessages = [];
+                vetoes[i].chatroomUsers = [];
+                vetoes[i].chatroomUsersPublic = [];
+            }
+        }
+    }
+
+    if (!canSeePending) {
+        vetoes = vetoes.filter(v => v.status !== 'pending');
     }
 
     if (req.session.mongoId && !isNat) {
@@ -245,17 +293,34 @@ router.get('/relevantInfo/:limit', async (req, res) => {
 router.get('/searchVeto/:id', async (req, res) => {
     let veto;
     let isNat = false;
+    let canSeePending = false;
 
     if (!req.session.mongoId) {
-        veto = await Veto
-            .findById(req.params.id)
-            .populate(
-                getPopulate(false, null)
-            )
-            .select('-vouchingUsers -chatroomUsers -chatroomUsersPublic -chatroomMessages -vetoer');
+        const vetoStatus = await Veto.findById(req.params.id).select('status').lean();
+
+        if (!vetoStatus) {
+            return res.status(404).json({ error: 'Veto not found' });
+        }
+
+        if (vetoStatus.status === 'pending') {
+            return res.status(404).json({ error: 'Veto not found' });
+        }
+
+        if (vetoStatus.status === 'archive') {
+            veto = await Veto
+                .findById(req.params.id)
+                .populate(getPopulateForArchivedPublic())
+                .select('-vouchingUsers -vetoer');
+        } else {
+            veto = await Veto
+                .findById(req.params.id)
+                .populate(getPopulate(false, null))
+                .select('-vouchingUsers -chatroomUsers -chatroomUsersPublic -chatroomMessages -vetoer');
+        }
     } else {
         const user = await User.findById(req.session.mongoId);
         isNat = user.isNat;
+        canSeePending = user && user.isBnOrNat;
 
         veto = await Veto
             .findById(req.params.id)
@@ -264,7 +329,15 @@ router.get('/searchVeto/:id', async (req, res) => {
             );
     }
 
-    if (!veto.chatroomUsers.length) veto.chatroomMessages = [];
+    if (!veto) {
+        return res.status(404).json({ error: 'Veto not found' });
+    }
+
+    if (veto.status === 'pending' && !canSeePending) {
+        return res.status(404).json({ error: 'Veto not found' });
+    }
+
+    if (veto.status !== 'archive' && !(veto.chatroomUsers && veto.chatroomUsers.length)) veto.chatroomMessages = [];
 
     if (req.session.mongoId && !isNat) {
         veto = sanitizeVeto(veto, req.session.mongoId, isNat);
@@ -280,6 +353,16 @@ router.post('/submit', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req
     // validation
     if (!reasons.length) {
         return res.json({ error: 'Veto must include reasons!' });
+    }
+
+    const fortyEightHoursAgo = new Date(Date.now() - 48 * 60 * 60 * 1000);
+    const recentVeto = await Veto.findOne(
+        { vetoer: req.session.mongoId, createdAt: { $gte: fortyEightHoursAgo } },
+        { _id: 1 }
+    ).lean();
+
+    if (recentVeto) {
+        return res.json({ error: 'You can only submit one veto every 48 hours. Please try again later.' });
     }
 
     util.isValidUrlOrThrow(url);
@@ -687,6 +770,19 @@ router.post('/toggleVouch/:id', middlewares.isLoggedIn, middlewares.isBnOrNat, a
 
     const vouchingUserIds = veto.vouchingUsers.map(u => u.id);
     const isVouching = !vouchingUserIds.includes(userId);
+
+    if (isVouching) {
+        const fortyEightHoursAgo = new Date(Date.now() - 48 * 60 * 60 * 1000);
+        const recentVouch = await Veto.findOne(
+            { vouchingUsers: userId, updatedAt: { $gte: fortyEightHoursAgo } },
+            { _id: 1 }
+        ).lean();
+
+        if (recentVouch) {
+            return res.json({ error: 'You can only vouch for one veto every 48 hours. Please try again later.' });
+        }
+    }
+
     let toggleWebhook = false;
 
     if (isVouching) {
@@ -942,12 +1038,18 @@ router.post('/requestMediation/:id', middlewares.isLoggedIn, async (req, res) =>
         .populate(defaultPopulate)
         .orFail();
 
-    const forbidden = ensureChatroomParticipantOrNat(req, res, veto);
-    if (forbidden) return forbidden;
+    if (veto.status !== 'chatroom') {
+        return res.status(400).json({ error: 'Mediation can only be requested during the chatroom phase.' });
+    }
 
-    const chatroomMediationRequestedUserIds = veto.chatroomMediationRequestedUsers.map(u => u.id);
+    if (!canRequestMediation(req, veto)) {
+        return res.status(403).json({ error: 'Only the vetoer, vouching users, or mapset host can request mediation.' });
+    }
 
-    if (!veto.chatroomMediationRequestedUsers.includes(req.session.mongoId)) {
+    const requestedIds = (veto.chatroomMediationRequestedUsers || []).map(u => String(u && (u.id || u._id)));
+    const alreadyRequested = requestedIds.includes(String(req.session.mongoId));
+
+    if (!alreadyRequested) {
         veto.chatroomMediationRequestedUsers.push(req.session.mongoId);
     }
 
@@ -955,33 +1057,36 @@ router.post('/requestMediation/:id', middlewares.isLoggedIn, async (req, res) =>
         { path: 'chatroomMediationRequestedUsers', select: 'username osuId' },
     ]);
 
-    const chatroomMediationRequestedUserOsuIds = veto.chatroomMediationRequestedUsers.map(u => u.osuId);
-    const mapperInitiated = chatroomMediationRequestedUserOsuIds.includes(veto.beatmapMapperId);
-    const chatroomUsersPublicIds = veto.chatroomUsersPublic.map(u => u.id);
-    const publicUserInitiated = chatroomUsersPublicIds.includes(req.session.mongoId);
+    const mapperInitiated = (veto.chatroomMediationRequestedUsers || []).some(u => u && Number(u.osuId) === Number(veto.beatmapMapperId));
+    const requestCount = (veto.chatroomMediationRequestedUsers || []).length;
+    const shouldStart = mapperInitiated || requestCount >= 2;
+
     const mapperLink = `[**${veto.beatmapMapper}**](https://osu.ppy.sh/users/${veto.beatmapMapperId})`;
     const userLink = `[**${req.session.username}**](https://osu.ppy.sh/users/${req.session.osuId})`;
+    const isMapper = Number(veto.beatmapMapperId) === Number(req.session.osuId);
 
-    if (veto.chatroomMediationRequestedUsers.length >= 2 || mapperInitiated) {
-        veto.status = 'available';
-        veto.chatroomMessages.push({
-            date: new Date(),
-            content: `${mapperInitiated ? mapperLink : publicUserInitiated ? userLink : 'A user'} requested mediation. The discussion has concluded.`,
-            user: null,
-            userIndex: 0,
-            isSystem: true,
-        });
-    } else {
-        veto.chatroomMessages.push({
-            date: new Date(),
-            content: `${publicUserInitiated ? userLink : 'A user'} requested mediation. If another user requests mediation, the discussion will conclude.`,
-            user: null,
-            userIndex: 0,
-            isSystem: true,
-        });
+    if (!alreadyRequested) {
+        if (shouldStart) {
+            veto.status = 'available';
+            veto.chatroomMessages.push({
+                date: new Date(),
+                content: `${mapperInitiated ? mapperLink : isMapper ? userLink : 'A user'} requested mediation. The discussion has concluded.`,
+                user: null,
+                userIndex: 0,
+                isSystem: true,
+            });
+        } else {
+            veto.chatroomMessages.push({
+                date: new Date(),
+                content: `${isMapper ? userLink : 'A user'} requested mediation. Two requests are needed (mapset host counts as two).`,
+                user: null,
+                userIndex: 0,
+                isSystem: true,
+            });
+        }
+
+        await veto.save();
     }
-
-    await veto.save();
 
     veto = await Veto
         .findById(req.params.id)
@@ -1002,13 +1107,15 @@ router.post('/requestMediation/:id', middlewares.isLoggedIn, async (req, res) =>
         veto._id
     );
 
-    const description = `Mediation requested on [veto for **${veto.beatmapTitle}** by **${veto.beatmapMapper}**](https://bn.mappersguild.com/vetoes?id=${veto.id}) (${veto.chatroomMediationRequestedUsers.length}/2)`;
+    if (!alreadyRequested) {
+        const description = `Mediation requested on [veto for **${veto.beatmapTitle}** by **${veto.beatmapMapper}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`;
 
-    discord.webhookPost([{
-        color: discord.webhookColors.lightPink,
-        description,
-    }],
-    veto.mode);
+        discord.webhookPost([{
+            color: discord.webhookColors.lightPink,
+            description,
+        }],
+        veto.mode);
+    }
 });
 
 /* GET refresh veto for chatroom purposes */
@@ -1018,6 +1125,14 @@ router.get('/refreshVeto/:id', middlewares.isLoggedIn, async (req, res) => {
         .populate(
             getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
         );
+
+    if (!veto) {
+        return res.status(404).json({ error: 'Veto not found' });
+    }
+
+    if (veto.status === 'pending' && !res.locals.userRequest.isBnOrNat) {
+        return res.status(404).json({ error: 'Veto not found' });
+    }
 
     const vetoForResponse = sanitizeVeto(veto, req.session.mongoId, res.locals.userRequest.isNat);
 
