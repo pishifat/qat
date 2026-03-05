@@ -151,8 +151,35 @@ router.get('/report/:id', async (req, res) => {
 /* GET veto by ID */
 router.get('/veto/:id', async (req, res) => {
     const veto = await Veto.findById(req.params.id).populate(vetoPopulate);
+    let payload = veto;
 
-    return res.json(veto);
+    if (veto.vetoFormat >= 7) {
+        // lobotomize veto to only include necessary fields for VetoMessage.vue
+        payload = {
+            id: veto.id,
+            beatmapId: veto.beatmapId,
+            beatmapTitle: veto.beatmapTitle,
+            beatmapMapperId: veto.beatmapMapperId,
+            beatmapMapper: veto.beatmapMapper,
+            status: veto.status,
+            vetoFormat: veto.vetoFormat,
+            reasons: veto.reasons.map(r => ({
+                link: r.link,
+                summary: r.summary,
+                ...(r.status != null && { status: r.status }),
+            })),
+            ...(veto.status === 'archive' && {
+                mediations: veto.mediations.map(m => ({
+                    id: m._id,
+                    vote: m.vote,
+                    reasonIndex: m.reasonIndex,
+                    comment: m.comment,
+                })),
+            }),
+        };
+    }
+
+    return res.json(payload);
 });
 
 /* GET veto mediators */

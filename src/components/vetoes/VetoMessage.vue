@@ -44,7 +44,7 @@
                     :reason-index="i"
                 />
             </div>
-            <div class="card card-body small mb-4">
+            <div v-if="veto.vetoFormat < 7" class="card card-body small mb-4">
                 <span>Users involved in this veto's mediation: </span>
 
                 <ul>
