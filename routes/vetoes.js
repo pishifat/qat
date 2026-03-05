@@ -373,10 +373,10 @@ router.post('/submitMediation/:id', middlewares.isLoggedIn, middlewares.isBnOrNa
         await mediation.save();
     }
 
-    const veto = await Veto
+    let veto = await Veto
         .findById(req.params.id)
         .populate(
-            getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
+            getPopulate(true, req.session.mongoId)
         );
 
     if (!veto.chatroomUsers.length) veto.chatroomMessages = [];
@@ -407,6 +407,12 @@ router.post('/submitMediation/:id', middlewares.isLoggedIn, middlewares.isBnOrNa
         }],
         veto.mode);
     }
+
+    veto = await Veto
+        .findById(req.params.id)
+        .populate(
+            getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
+        );
 
     const vetoForResponse = sanitizeVeto(veto, req.session.mongoId, res.locals.userRequest.isNat);
 
