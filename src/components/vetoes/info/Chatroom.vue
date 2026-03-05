@@ -180,6 +180,7 @@ export default {
         return {
             messageInput: '',
             initialScrollDone: false,
+            refreshIntervalId: null,
         };
     },
     computed: {
@@ -243,17 +244,41 @@ export default {
             this.scheduleInitialScroll();
         }
 
-        setInterval(async () => {
-            if (this.selectedVeto.status == 'chatroom') {
-                const data = await this.$http.executeGet(`/vetoes/refreshVeto/${this.selectedVeto.id}`);
-
-                if (this.$http.isValid(data)) {
-                    this.$store.commit(`vetoes/updateVeto`, data.veto);
-                }
-            }
-        }, 30 * 1000); // 30 seconds
+        this.startRefreshInterval();
+        document.addEventListener('visibilitychange', this.onVisibilityChange);
+    },
+    beforeUnmount () {
+        document.removeEventListener('visibilitychange', this.onVisibilityChange);
+        this.stopRefreshInterval();
     },
     methods: {
+        startRefreshInterval () {
+            this.stopRefreshInterval();
+            this.refreshIntervalId = setInterval(this.refreshVeto, 30 * 1000);
+        },
+        stopRefreshInterval () {
+            if (this.refreshIntervalId != null) {
+                clearInterval(this.refreshIntervalId);
+                this.refreshIntervalId = null;
+            }
+        },
+        onVisibilityChange () {
+            if (document.visibilityState === 'visible') {
+                this.refreshVeto();
+                this.startRefreshInterval();
+            } else {
+                this.stopRefreshInterval();
+            }
+        },
+        async refreshVeto () {
+            if (this.selectedVeto?.status !== 'chatroom') return;
+
+            const data = await this.$http.executeGet(`/vetoes/refreshVeto/${this.selectedVeto.id}`);
+
+            if (this.$http.isValid(data)) {
+                this.$store.commit('vetoes/updateVeto', data.veto);
+            }
+        },
         scheduleInitialScroll () {
             this.$nextTick(() => this.scrollToBottom());
             setTimeout(() => this.scrollToBottom(), 100);
