@@ -66,7 +66,7 @@ const defaultPopulate = [
 function getLoggedOutPopulate() {
     return {
         path: 'mediations',
-        select: '-mediator',
+        select: '-mediator -comment -vote',
     };
 }
 
@@ -82,11 +82,11 @@ function getLimitedDefaultPopulate(mongoId) {
         },
         {
             path: 'mediations',
+            match: {
+                mediator: mongoId,
+            },
             populate: {
                 path: 'mediator',
-                match: {
-                    _id: mongoId,
-                },
                 select: 'username osuId',
             },
         },
@@ -131,11 +131,11 @@ function getLimitedDefaultPopulate(mongoId) {
         },
         {
             path: 'publicMediations',
+            match: {
+                mediator: mongoId,
+            },
             populate: {
                 path: 'mediator',
-                match: {
-                    _id: mongoId,
-                },
                 select: 'username osuId',
             },
         },
