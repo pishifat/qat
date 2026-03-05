@@ -11,6 +11,8 @@
             <!-- show veto reasons and include mediation responses when possible -->
             <context v-if="!showMediations" />
             <mediations v-else />
+            <vouches-display v-if="loggedInUser && loggedInUser.isNat && selectedVeto.vetoFormat >= 7 && selectedVeto.status != 'pending'" />
+
             <!--show chatroom archive when veto is in mediation phases, or to everyone when archived-->
             <div
                 v-if="
@@ -103,6 +105,7 @@ import Vouches from './info/Vouches.vue';
 import Chatroom from './info/Chatroom.vue';
 import PreMediationAdminButtons from './info/PreMediationAdminButtons.vue';
 import PublicMediationInput from './info/PublicMediationInput.vue';
+import VouchesDisplay from './info/VouchesDisplay.vue';
 
 export default {
     name: 'VetoInfo',
@@ -119,6 +122,7 @@ export default {
         Chatroom,
         PreMediationAdminButtons,
         PublicMediationInput,
+        VouchesDisplay,
     },
     computed: {
         ...mapState([
