@@ -35,6 +35,7 @@ const vetoesSchema = new mongoose.Schema({
         userIndex: { type: Number },
         isSystem: { type: Boolean },
         isModerator: { type: Boolean },
+        isVetoer: { type: Boolean },
     }],
     chatroomMediationRequestedUsers: [{ type: 'ObjectId', ref: 'User' }],
     chatroomVoteEnabled: { type: Boolean },

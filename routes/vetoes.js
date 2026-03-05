@@ -957,12 +957,15 @@ router.post('/saveMessage/:id', middlewares.isLoggedIn, async (req, res) => {
     const privateUserIds = veto.chatroomUsers.map(u => u.id);
     const userIndex = privateUserIds.findIndex(id => id == req.session.mongoId);
 
+    const isVetoerOrVouchingUser = veto.vetoer.id == req.session.mongoId || veto.vouchingUsers.some(u => u.id == req.session.mongoId);
+
     veto.chatroomMessages.push({
         date: new Date(),
         content: message,
         user: isPublicUser || userIndex == -1 ? req.session.mongoId : null,
         userIndex: userIndex + 1,
         isModerator: userIndex == -1,
+        isVetoer: isVetoerOrVouchingUser,
     });
 
     await veto.save();

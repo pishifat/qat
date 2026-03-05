@@ -18,15 +18,28 @@
                         alt=""
                     >
                     <div>
-                        <b v-if="message.user">
+                        <b
+                            v-if="message.user"
+                            :class="{ 'text-warning': message.isVetoer }"
+                        >
                             <user-link
                                 :username="message.user.username"
                                 :osu-id="message.user.osuId"
                             />
                         </b>
-                        <b v-else>{{ message.isSystem ? 'BN website' : `Anonymous user ${message.userIndex}` }}</b> —
+                        <b
+                            v-else
+                            :class="{ 'text-warning': message.isVetoer }"
+                        >{{ message.isSystem ? 'BN website' : `Anonymous user ${message.userIndex}` }}</b>
+                        <i
+                            v-if="message.isVetoer"
+                            class="fa-solid fa-gavel text-warning ms-1"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            title="Vetoer"
+                        />
                         <b data-bs-toggle="tooltip" data-bs-placement="top" :title="toStandardDetailedDate(message.date)">
-                            {{ toRelativeDate(message.date) }}
+                            — {{ toRelativeDate(message.date) }}
                         </b>
                         <button
                             v-if="!message.isSystem && loggedInUser?.isNat"
@@ -356,5 +369,8 @@ export default {
     border-radius: 100%;
     box-shadow: 0 1px 1rem rgba(10, 10, 25, .9);
     background-color: var(--bs-gray-800);
+}
+.text-warning :deep(a) {
+    color: var(--bs-warning);
 }
 </style>
