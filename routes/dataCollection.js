@@ -114,7 +114,7 @@ async function sevRatingWebhook(event, req) {
                 }],
 
             }],
-            mode,
+            mode
         );
     }
 }
@@ -132,7 +132,7 @@ router.post('/updateContent/:id', middlewares.isNat, async (req, res) => {
         await sevRatingWebhook(event, req);
     }
 
-    Logger.generate(req.session.mongoId, `Updated DQ reason of s/${event.beatmapsetId} to "${event.content}"`, 'dataCollection', event._id);
+    Logger.generate(req.session.mongoId, `Updated DQ reason of s/${event.beatmapsetId} to '${event.content}'`, 'dataCollection', event._id);
 });
 
 /* POST sync beatmapset events */
@@ -186,18 +186,19 @@ router.post('/syncBeatmapsetEvents/:beatmapsetId', middlewares.isNat, async (req
         await newEvent.save();
     }
 
-    // re-fetch to get updated data 
+    // re-fetch to get updated data
     aiessEvents = await Aiess.find({ beatmapsetId: req.params.beatmapsetId }).sort({ timestamp: -1 });
 
     // deduplicate events, specifically merging qualify and its relevant nominate
     for (const aiessEvent of aiessEvents) {
-        if (aiessEvent.type === "qualify") {
+        if (aiessEvent.type === 'qualify') {
             // check for relevant nominate that has an equal timestamp
             const relevantNominate = aiessEvents.find(
                 (e) =>
-                    e.type === "nominate" &&
+                    e.type === 'nominate' &&
                     new Date(e.timestamp).getTime() === new Date(aiessEvent.timestamp).getTime()
             );
+
             if (relevantNominate) {
                 aiessEvent.userId = relevantNominate.userId;
                 aiessEvent.content = relevantNominate.content;
@@ -246,7 +247,7 @@ router.post('/updateObviousness/:id', middlewares.isNat, async (req, res) => {
         await sevRatingWebhook(event, req);
     }
 
-    Logger.generate(req.session.mongoId, `Updated obviousness of s/${event.beatmapsetId} to "${obviousness}"`, 'dataCollection', event._id);
+    Logger.generate(req.session.mongoId, `Updated obviousness of s/${event.beatmapsetId} to '${obviousness}'`, 'dataCollection', event._id);
 });
 
 /* POST edit severity */
@@ -270,7 +271,7 @@ router.post('/updateSeverity/:id', middlewares.isNat, async (req, res) => {
         await sevRatingWebhook(event, req);
     }
 
-    Logger.generate(req.session.mongoId, `Updated severity of s/${event.beatmapsetId} to "${severity}"`, 'dataCollection', event._id);
+    Logger.generate(req.session.mongoId, `Updated severity of s/${event.beatmapsetId} to '${severity}'`, 'dataCollection', event._id);
 });
 
 module.exports = router;
