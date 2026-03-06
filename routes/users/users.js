@@ -1627,7 +1627,7 @@ router.post('/:id/forceFullBn', middlewares.isLoggedIn, middlewares.isAdmin, asy
 
 
 /* GET aiess info */
-router.get('/activity', async (req, res) => {
+router.get('/activity', middlewares.optionalLogin, async (req, res) => {
     let days = parseInt(req.query.days);
     if (isNaN(days)) days = 90;
     else if (days > 10000) days = 9999;
@@ -1675,8 +1675,11 @@ router.get('/activity', async (req, res) => {
         e.reviews.some(r => r.evaluator.id == mongoId)
     );
 
+    const isNatOrTrialNat = res.locals.userRequest && res.locals.userRequest.isNatOrTrialNat;
+    const generalEvents = await getGeneralEvents(osuId, mongoId, modes, minDate, maxDate, isNatOrTrialNat);
+
     res.json({
-        ...await getGeneralEvents(osuId, mongoId, modes, minDate, maxDate),
+        ...generalEvents,
         appEvaluations,
         bnEvaluations,
     });

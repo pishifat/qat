@@ -798,7 +798,7 @@ router.post('/replaceUser/:id', middlewares.isNat, async (req, res) => {
     );
 });
 
-async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
+async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate, includeObviousnessSeverity = true) {
     const userOsuId = parseInt(osuIdInput);
 
     if (isNaN(osuIdInput)) {
@@ -806,7 +806,7 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
     }
 
     // get base data
-    const [uniqueNominations, disqualifications, pops, qualityAssuranceChecks, uniqueNominations3Months] = await Promise.all([
+    let [uniqueNominations, disqualifications, pops, qualityAssuranceChecks, uniqueNominations3Months] = await Promise.all([
         Aiess.getUniqueUserEvents(userOsuId, minDate, maxDate, modes, ['nominate', 'qualify']),
         Aiess.getUserEvents(userOsuId, minDate, maxDate, modes, ['disqualify']),
         Aiess.getUserEvents(userOsuId, minDate, maxDate, modes, ['nomination_reset']),
@@ -940,6 +940,19 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate) {
         } else if (timestamp >= currentMonthStart && timestamp < today) {
             currentMonthNominations.push(nomination);
         }
+    }
+
+    if (!includeObviousnessSeverity) {
+        const stripObviousnessSeverity = (event) => {
+            if (event == null || typeof event !== 'object') return event;
+            const { obviousness, severity, ...rest } = event;
+            return rest;
+        };
+        nominationsDisqualified = nominationsDisqualified.map(stripObviousnessSeverity);
+        nominationsPopped = nominationsPopped.map(stripObviousnessSeverity);
+        disqualifications = disqualifications.map(stripObviousnessSeverity);
+        pops = pops.map(stripObviousnessSeverity);
+        disqualifiedQualityAssuranceChecks = disqualifiedQualityAssuranceChecks.map(stripObviousnessSeverity);
     }
 
     return {
@@ -1121,7 +1134,7 @@ router.get('/activity', async (req, res) => {
     );
 
     res.json({
-        ...await getGeneralEvents(osuId, mongoId, modes, minDate, maxDate),
+        ...await getGeneralEvents(osuId, mongoId, modes, minDate, maxDate, res.locals.userRequest.isNatOrTrialNat),
         assignedBnApplications,
         appEvaluations,
         bnEvaluations,
