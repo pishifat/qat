@@ -19,10 +19,9 @@ const router = express.Router();
 router.use((req, res, next) => {
     const secret = req.header('secret');
     const username = req.header('username');
-    const isWs = req.header('Upgrade');
 
     if (!secret || !username || !config.interOpAccess[username] || config.interOpAccess[username].secret !== secret) {
-        if (isWs != 'websocket') return res.status(401).send({ error: 'Invalid credentials' });
+        return res.status(401).send({ error: 'Invalid credentials' });
     }
 
     return next();
