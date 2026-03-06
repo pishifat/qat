@@ -45,7 +45,7 @@ const routes = [
     { path: '/discussionvote', component: DiscussionVote, meta: { title: 'Content Review' } },
     { path: '/grouphistory', component: GroupHistory, meta: { title: 'Group History', public: true } },
     { path: '/publicarchive', component: PublicEvalArchive, meta: { title: 'Public Evaluation Archives' }, meta: { public: true } },
-    { path: '/markdown', component: MarkdownPage, meta: { title: 'Markdown Editor' } },
+    { path: '/markdown', component: MarkdownPage, meta: { title: 'Markdown Editor', public: true } },
 
     // BN/NAT
     { path: '/appeval', component: AppEvalPage, meta: { title: 'BN Application Evaluations', requiresBnOrNat: true } },
