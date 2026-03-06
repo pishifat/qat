@@ -2,13 +2,15 @@ const moment = require('moment');
 const mongoose = require('mongoose');
 
 /**
- * Just replaces () and [] for now..
+ * Escape username for safe use inside a RegExp (e.g. ^escaped$).
+ * Escapes all regex metacharacters so the value is matched literally and cannot alter the regex.
  * @param {string} username
+ * @returns {string}
  */
 function escapeUsername(username) {
     username = username.trim();
 
-    return username.replace(/[()[\]]/g, '\\$&');
+    return username.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&');
 }
 
 /**
@@ -166,6 +168,20 @@ function makeWordFromField (field) {
 }
 
 /**
+ * Check if a string is a valid MongoDB ObjectId (24 hex chars).
+ * Use before findById/findByIdAndUpdate to avoid CastError on invalid ids.
+ * Accepts string or Mongoose ObjectId.
+ * @param {string|import('mongoose').Types.ObjectId} id
+ * @returns {boolean}
+ */
+function isValidMongoId(id) {
+    if (id == null) return false;
+    const s = typeof id === 'string' ? id.trim() : (id.toString && id.toString());
+
+    return typeof s === 'string' && /^[a-fA-F0-9]{24}$/.test(s);
+}
+
+/**
  * @param {number} days
  */
 function yearsDuration(days) {
@@ -217,6 +233,7 @@ module.exports = {
     shuffleArray,
     makeWordFromField,
     yearsDuration,
+    isValidMongoId,
     formatMode,
     formatModeForDatabase,
 };

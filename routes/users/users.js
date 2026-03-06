@@ -103,7 +103,11 @@ router.get('/loadUser/:userInput', middlewares.optionalLogin, async (req, res) =
         return res.json({ error: 'No input' });
     }
 
-    const user = await User.findByUsernameOrOsuId(req.params.userInput) || await User.findById(req.params.userInput);
+    const user = util.isValidMongoId(req.params.userInput) ? await User.findById(req.params.userInput) : await User.findByUsernameOrOsuId(req.params.userInput);
+
+    if (!user) {
+        return res.json({ error: 'User not found' });
+    }
 
     res.json(
         guard({
