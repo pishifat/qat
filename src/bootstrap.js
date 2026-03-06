@@ -60,6 +60,13 @@ export function sanitizeUrlForCss(url) {
     return safeUrl.replace(/[()'"\\]/g, '\\$&');
 }
 
+export function proxyUrl(url) {
+    if (!url || typeof url !== 'string') return null;
+    if (!/^https?:\/\//i.test(url)) return null;
+
+    return `/api/proxy/image?url=${encodeURIComponent(btoa(url))}`;
+}
+
 // Remember old renderer, if overridden, or proxy to default renderer
 const defaultRender = md.renderer.rules.link_open || function (tokens, idx, options, env, self) {
     return self.renderToken(tokens, idx, options);
@@ -75,6 +82,26 @@ md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
     }
 
     return defaultRender(tokens, idx, options, env, self);
+};
+
+// Proxy external images to prevent IP leakage
+const defaultImageRender = md.renderer.rules.image || function (tokens, idx, options, env, self) {
+    return self.renderToken(tokens, idx, options);
+};
+
+md.renderer.rules.image = function (tokens, idx, options, env, self) {
+    const token = tokens[idx];
+    const srcIndex = token.attrIndex('src');
+
+    if (srcIndex >= 0) {
+        const proxied = proxyUrl(token.attrs[srcIndex][1]);
+
+        if (proxied) {
+            token.attrs[srcIndex][1] = proxied;
+        }
+    }
+
+    return defaultImageRender(tokens, idx, options, env, self);
 };
 
 // locale for short dates

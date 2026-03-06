@@ -6,7 +6,7 @@
             role="button"
             :data-discussion="discussion.id"
         >
-            <img v-if="isImage" :src="safeDiscussionLink" class="card-thumb">
+            <img v-if="isImage" :src="proxyImageLink" class="card-thumb">
             <div class="card-body">
                 <div class="wrap-text">
                     <a
@@ -75,6 +75,9 @@ export default {
         /** @returns {string|null} */
         safeDiscussionLink() {
             return this.sanitizeUrl(this.discussion?.discussionLink);
+        },
+        proxyImageLink() {
+            return this.safeDiscussionLink ? this.proxyUrl(this.safeDiscussionLink) : null;
         },
         /** @returns {boolean} */
         isImage() {

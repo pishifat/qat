@@ -1,6 +1,6 @@
 import './sass/app.scss';
 import './bootstrap';
-import { md, sanitizeUrl, sanitizeUrlForCss } from './bootstrap';
+import { md, sanitizeUrl, sanitizeUrlForCss, proxyUrl } from './bootstrap';
 import moment from 'moment';
 import http from './store/http';
 import { createApp } from 'vue';
@@ -66,5 +66,6 @@ app.config.globalProperties.shorten = shorten;
 app.config.globalProperties.formatMode = formatMode;
 app.config.globalProperties.sanitizeUrl = sanitizeUrl;
 app.config.globalProperties.sanitizeUrlForCss = sanitizeUrlForCss;
+app.config.globalProperties.proxyUrl = proxyUrl;
 
 app.mount('#app');

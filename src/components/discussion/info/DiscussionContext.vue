@@ -28,7 +28,7 @@
                 <span v-else-if="safeDiscussionLink" class="small" v-html="$md.render(safeDiscussionLink)" />
                 <span v-else class="small text-secondary">Invalid URL</span>
             </div>
-            <img v-if="isImage" class="img-responsive fit-image mb-2" :src="safeDiscussionLink">
+            <img v-if="isImage" class="img-responsive fit-image mb-2" :src="proxyImageLink">
         </div>
         <p v-else-if="!selectedDiscussionVote.isContentReview && safeDiscussionLink" class="mb-2">
             <a :href="safeDiscussionLink" target="_blank" rel="noopener noreferrer">Read and contribute to the full discussion here</a>
@@ -222,6 +222,9 @@ export default {
         /** @returns {boolean} */
         isImage() {
             return this.safeDiscussionLink && (this.safeDiscussionLink.match(/\.(jpeg|jpg|gif|png)$/) != null);
+        },
+        proxyImageLink() {
+            return this.safeDiscussionLink ? this.proxyUrl(this.safeDiscussionLink) : null;
         },
     },
     watch: {
