@@ -80,17 +80,12 @@ morgan.token('username-colored', (req, res) => {
     return consoleStyles(username, username === 'Unknown' ? ['dim'] : ['cyan', 'dim']);
 });
 
-morgan.token('ip-colored', (req) => {
-    const ip = req.ip || req.connection.remoteAddress || 'Unknown IP';
-
-    return consoleStyles(ip, ip === 'Unknown IP' ? ['dim'] : ['orange', 'dim']);
-});
 
 logger = morgan(
     `:time-colored — :method-colored ${consoleStyles(':url', [
         'yellow',
         'bold',
-    ])} :status-colored — :username-colored — :ip-colored — ${consoleStyles(':response-time ms', [
+    ])} :status-colored — :username-colored — ${consoleStyles(':response-time ms', [
         'magenta',
     ])}`
 );
