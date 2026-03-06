@@ -145,7 +145,16 @@ router.get('/evaluation/:id', async (req, res) => {
 
 /* GET report by ID */
 router.get('/report/:id', async (req, res) => {
-    return res.json(await Report.findById(req.params.id).populate(reportPopulate));
+    const report = await Report.findById(req.params.id).populate(reportPopulate);
+    if (!report) {
+        return res.json({ error: 'Report not found' });
+    }
+    const isReporter = report.reporter && res.locals.userRequest.osuId === report.reporter.osuId;
+    const isNat = res.locals.userRequest.isNat;
+    if (!isReporter && !isNat) {
+        return res.json({ error: 'Unauthorized - You must be the report submitter or NAT to view this report' });
+    }
+    return res.json(report);
 });
 
 /* GET veto by ID */
@@ -186,18 +195,16 @@ router.get('/veto/:id', async (req, res) => {
 router.get('/vetoMediators/:id', async (req, res) => {
     const veto = await Veto.findById(req.params.id).populate(vetoPrivatePopulate);
 
-    const users = [];
-    const userOsuIds = [];
+    if (!veto) {
+        return res.json({ error: 'Veto not found' });
+    }
 
-    for (const mediation of veto.mediations) {
-        if (!userOsuIds.includes(mediation.mediator.osuId)) {
-            userOsuIds.push(mediation.mediator.osuId);
-            users.push({
-                osuId: mediation.mediator.osuId,
-                username: mediation.mediator.username,
-                groups: mediation.mediator.groups,
-            });
-        }
+    if (veto.status != 'archive') {
+        return res.json({ error: 'Veto is not archived' });
+    }
+
+    if (veto.vetoFormat >= 7) {
+        return res.json([]);
     }
 
     for (const mediation of veto.publicMediations) {
@@ -231,6 +238,16 @@ router.post('/submitEvaluationMessage/:id', async (req, res) => {
     else if (eval) evaluation = eval;
     else if (appOldPopulate) evaluation = appOldPopulate;
     else if (evalOldPopulate) evaluation = evalOldPopulate;
+
+    if (!evaluation) {
+        return res.json({ error: 'Evaluation not found' });
+    }
+
+    const isRecipient = req.session.mongoId === evaluation.user._id;
+    const isNat = res.locals.userRequest.isNat;
+    if (!isRecipient && !isNat) {
+        return res.json({ error: 'Unauthorized - You must be the evaluation recipient or NAT to submit messages' });
+    }
 
     if (evaluation.messagesLocked) {
         return res.json({ error: 'Messages are locked for this evaluation' });
