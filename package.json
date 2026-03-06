@@ -2,13 +2,13 @@
   "name": "qat",
   "version": "0.0.0",
   "private": true,
-  "scripts": {
+"scripts": {
     "dev": "run-p -rl watch-app watch-src",
-    "watch-app": "set NODE_ENV=development&& nodemon ./app.js",
+    "watch-app": "cross-env NODE_ENV=development nodemon ./app.js",
     "watch-src": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "prod": "set NODE_ENV=production&& node ./app.js",
+    "prod": "cross-env NODE_ENV=production node ./app.js",
     "lint": "eslint .",
     "tsc": "tsc"
   },
@@ -52,6 +52,7 @@
     "@types/jquery": "^3.5.1",
     "@types/markdown-it": "^12.0.1",
     "@vitejs/plugin-vue": "^6.0.4",
+    "cross-env": "^10.1.0",
     "eslint": "^9.39.2",
     "eslint-plugin-vue": "^9.33.0",
     "nodemon": "^3.1.11",

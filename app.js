@@ -229,7 +229,7 @@ const port = process.env.PORT || '3001';
 app.set('port', port);
 
 const server = app.listen(port, () => {
-    console.log('Listening on ' + port);
+    console.log(`Listening on ${port} in ${app.get('env')} mode`);
 
     if (config.enableAutomation) {
         automation.notifyReports.start();
