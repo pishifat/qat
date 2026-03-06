@@ -13,8 +13,8 @@
             </span>
         </h5>
         <div class="card card-body small mb-4">
-            <div v-if="reason.link">
-                <a :href="reason.link" target="_blank" class="mb-2">{{ reason.summary }}</a>
+            <div v-if="safeReasonLink">
+                <a :href="safeReasonLink" target="_blank" rel="noopener noreferrer" class="mb-2">{{ reason.summary }}</a>
             </div>
             <div v-else>
                 {{ reason.summary }}
@@ -60,6 +60,9 @@ export default {
     computed: {
         reason () {
             return this.veto.reasons[this.reasonIndex];
+        },
+        safeReasonLink () {
+            return this.sanitizeUrl(this.reason?.link);
         },
         shuffledMediations () {
             let shuffled = this.veto.mediations.filter(m => m.vote && m.reasonIndex == this.reasonIndex);

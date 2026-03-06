@@ -10,9 +10,10 @@
             <p>
                 <b>Relevant link:</b>
                 <span class="text-secondary text-truncate">
-                    <a :href="selectedReport.link" target="_blank">
+                    <a v-if="safeLink" :href="safeLink" target="_blank" rel="noopener noreferrer">
                         {{ selectedReport.link }}
                     </a>
+                    <span v-else>{{ selectedReport.link }}</span>
                 </span>
             </p>
         </template>
@@ -50,6 +51,9 @@ export default {
         ...mapGetters('manageReports', [
             'selectedReport',
         ]),
+        safeLink() {
+            return this.sanitizeUrl(this.selectedReport.link);
+        },
         category() {
             switch (this.selectedReport.category) {
                 case 'stolenBeatmap':

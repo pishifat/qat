@@ -123,8 +123,8 @@ router.get('/login', (req, res) => {
     );
 });
 
-/* GET destroy session */
-router.get('/logout', async (req, res) => {
+/* POST destroy session */
+router.post('/logout', async (req, res) => {
     await req.session.destroy();
     res.redirect('/');
 });

@@ -68,7 +68,9 @@ export default {
         },
         /** @returns {string} */
         getCover () {
-            return this.selectedUser.cover ? `url(${this.selectedUser.cover})` : `url(https://a.ppy.sh/${this.selectedUser.osuId})`;
+            const safeCover = this.selectedUser.cover ? this.sanitizeUrlForCss(this.selectedUser.cover) : null;
+
+            return safeCover ? `url(${safeCover})` : `url(https://a.ppy.sh/${this.selectedUser.osuId})`;
         },
         /** @returns {string} */
         getUserColor () {

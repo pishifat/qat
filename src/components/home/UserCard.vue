@@ -93,11 +93,17 @@ export default {
             };
 
             if (status === 'Personal Queue' && requestLink) {
-                requestType.html = `<a href="${requestLink}" target="_blank"><i class="fas fa-external-link-alt" /></a>`;
+                const safeUrl = this.sanitizeUrl(requestLink);
+
+                if (safeUrl) {
+                    requestType.html = `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt" /></a>`;
+                } else {
+                    requestType.html = `<i class="fas fa-external-link-alt" />`;
+                }
             } else if (status === 'Personal Queue') {
                 requestType.html = `<i class="fas fa-external-link-alt" />`;
             } else if (status === 'Game Chat') {
-                requestType.html = `<a href="https://osu.ppy.sh/community/chat?sendto=${osuId}" target="_blank"><i class="fas fa-comment" /></a>`;
+                requestType.html = `<a href="https://osu.ppy.sh/community/chat?sendto=${encodeURIComponent(osuId)}" target="_blank" rel="noopener noreferrer"><i class="fas fa-comment" /></a>`;
             }
 
             return requestType;
@@ -124,7 +130,9 @@ export default {
         },
         /** @returns {string} */
         getCover(user) {
-            return user.cover ? user.cover : `https://a.ppy.sh/${user.osuId}`; // fallback to avatar if no cover
+            const safeCover = user.cover ? this.sanitizeUrlForCss(user.cover) : null;
+
+            return safeCover || `https://a.ppy.sh/${user.osuId}`;
         },
     },
 };
