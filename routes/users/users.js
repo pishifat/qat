@@ -537,7 +537,7 @@ router.post('/:id/toggleShowExplicitContent', middlewares.isLoggedIn, async (req
 router.post('/:id/toggleIsActiveContentReviewer', middlewares.isLoggedIn, middlewares.hasFullReadAccess, async (req, res) => {
     const user = await User.findById(req.params.id).orFail();
 
-    if (req.session.mongoId != user.id && !res.locals.userRequest.hasFullReadAccess) {
+    if (req.session.mongoId != user.id && !res.locals.userRequest.isNat) {
         return res.json({
             error: 'Unauthorized',
         });
