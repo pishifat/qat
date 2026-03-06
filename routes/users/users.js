@@ -449,7 +449,10 @@ router.get('/findVibeCheckStats', middlewares.isLoggedIn, middlewares.isAdmin, a
 router.post('/updateDiscordId', middlewares.isLoggedIn, middlewares.hasFullReadAccessOrTrialNat, async (req, res) => {
     let user;
 
-    if (req.body.userId) {
+    if (req.body.userId && req.body.userId !== req.session.mongoId) {
+        if (!res.locals.userRequest.isNat) {
+            return res.json({ error: 'Only NAT can update other users\' Discord IDs' });
+        }
         user = await User.findById(req.body.userId);
     } else {
         user = res.locals.userRequest;
