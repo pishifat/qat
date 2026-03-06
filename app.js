@@ -1,14 +1,14 @@
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
-const middlewares = require("./helpers/middlewares")
+const middlewares = require('./helpers/middlewares');
 const logger = require('./helpers/logger');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const config = require('./config.json');
-const ws = require("ws");
-const crypto = require("crypto")
+const ws = require('ws');
+const crypto = require('crypto');
 require('express-async-errors');
 
 // Return the 'new' updated object by default when doing findByIdAndUpdate
@@ -56,10 +56,10 @@ mongoose.set('strictQuery', false);
 const app = express();
 
 global.ws = []; // array to access websocket clients
-const wsServer = new ws.Server({ noServer: true, path: "/websocket/interOp" });
+const wsServer = new ws.Server({ noServer: true, path: '/websocket/interOp' });
 
-wsServer.on("connection", (socket, request) => {
-	console.log(`${request.headers['username'] || request.socket.remoteAddress} is connected via websocket`);
+wsServer.on('connection', (socket, request) => {
+    console.log(`${request.headers['username'] || request.socket.remoteAddress} is connected via websocket`);
 });
 
 // discord embeds
@@ -97,12 +97,12 @@ db.once('open', function () {
 
 setInterval(async () => {
     try {
-      await mongoose.connection.db.admin().ping();
+        await mongoose.connection.db.admin().ping();
     } catch (err) {
-      console.error('no connection. hopefully the next line initiates `pm2 restart`');
-      process.exit(1);
+        console.error('no connection. hopefully the next line initiates `pm2 restart`');
+        process.exit(1);
     }
-  }, 300000);
+}, 300000);
 
 const sessionConfig = {
     name: 'bnsite_session',
@@ -165,12 +165,11 @@ app.use(function (req, res) {
     if (req.path.startsWith('/api')) {
         return res.status(404).json({ error: 'Not found' });
     }
-    
+
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // error handler
-// eslint-disable-next-line no-unused-vars
 app.use(function (err, req, res, next) {
     let customErrorMessage;
     if (err.name == 'DocumentNotFoundError') customErrorMessage = 'Not found';
@@ -187,7 +186,7 @@ app.use(function (err, req, res, next) {
             // @ts-ignore
             if (error.kind === 'required') {
                 // @ts-ignore
-                customErrorMessage += `\n"${error.path}" is missing.`;
+                customErrorMessage += `\n'${error.path}' is missing.`;
                 // @ts-ignore
             } else if (error.kind === 'maxlength') {
                 // @ts-ignore
@@ -250,80 +249,81 @@ const server = app.listen(port, () => {
 });
 
 // setup websocket
-server.on("upgrade", (request, socket, head) => {
+server.on('upgrade', (request, socket, head) => {
     wsServer.handleUpgrade(request, socket, head, (socket, request) => {
-		const secret = request.headers?.secret;
-		const username = request.headers?.username;
-		const tags = request.headers?.tags;
-	
-		if (!config.interOpAccess[username?.toString()])
-			return sendError(401, "User not found!");
-	
-		if (!tags || tags.toString().split("+").length == 0)
-			return sendError(400, "Provide valid tags to listen to!");
-	
-		if (
-			!secret ||
-			!username ||
-			config.interOpAccess[username?.toString()].secret !== secret
-		)
-			return sendError(401, "Invalid key!");
-	
-		function sendError(code, text) {
-			socket.send(
-			JSON.stringify({
-				status: code,
-				statusText: text,
-			})
-			);
-	
-			socket.close();
-		}
-	
-		const socketId = crypto.randomBytes(25).toString("hex");
-	
-		const stopPingListener = () => {
-			const socketIndex = global.ws.findIndex((s) => s.id == socketId);
-	
-			if (socketIndex == -1) return;
-	
-			if (global.ws[socketIndex]) {
-				clearInterval(global.ws[socketIndex].pingInterval)
-	
-				return console.log(`Stopped websocket ping listener for ${request.headers['username'] || request.socket.remoteAddress}`);
-			}
-		}
-	
-		(global.ws || []).push({
-			tags: sanitizeTags(tags),
-			ws: socket,
-			pingInterval: setInterval(() => {
-			socket.send(JSON.stringify({
-				type: "PING",
-				data: null
-			}), (err) => {
-				if (err) return stopPingListener;
-	
-				return console.log(`Sent websocket ping for ${request.headers['username'] || request.socket.remoteAddress}`);
-			})
-			}, 300000), // Ping at every 5 minutes
-			id: socketId,
-		});
-	
-		socket.onclose = stopPingListener;
-	
-		wsServer.emit("connection", socket, request);
+        const secret = request.headers?.secret;
+        const username = request.headers?.username;
+        const tags = request.headers?.tags;
+
+        if (!config.interOpAccess[username?.toString()]) return sendError(401, 'User not found!');
+
+        if (!tags || tags.toString().split('+').length == 0) return sendError(400, 'Provide valid tags to listen to!');
+
+        if (!secret || !username || config.interOpAccess[username?.toString()].secret !== secret)
+            return sendError(401, 'Invalid key!');
+
+        function sendError(code, text) {
+            socket.send(
+                JSON.stringify({
+                    status: code,
+                    statusText: text,
+                })
+            );
+
+            socket.close();
+        }
+
+        const socketId = crypto.randomBytes(25).toString('hex');
+
+        const stopPingListener = () => {
+            const socketIndex = global.ws.findIndex((s) => s.id == socketId);
+
+            if (socketIndex == -1) return;
+
+            if (global.ws[socketIndex]) {
+                clearInterval(global.ws[socketIndex].pingInterval);
+
+                return console.log(
+                    `Stopped websocket ping listener for ${request.headers['username'] || request.socket.remoteAddress}`
+                );
+            }
+        };
+
+        (global.ws || []).push({
+            tags: sanitizeTags(tags),
+            ws: socket,
+            pingInterval: setInterval(() => {
+                socket.send(
+                    JSON.stringify({
+                        type: 'PING',
+                        data: null,
+                    }),
+                    (err) => {
+                        if (err) return stopPingListener;
+
+                        return console.log(
+                            `Sent websocket ping for ${request.headers['username'] || request.socket.remoteAddress}`
+                        );
+                    }
+                );
+            }, 300000), // Ping at every 5 minutes
+            id: socketId,
+        });
+
+        socket.onclose = stopPingListener;
+
+        wsServer.emit('connection', socket, request);
     });
-  
+
     function sanitizeTags(requestTags) {
-		const tags = requestTags.toString().split("+");
-		const availableTags = websocketManager.availableTags;
-		const sanitizedTags = tags
-			.map((t) => (t || "").toLowerCase().trim())
-			.filter((t) => t.trim().toLowerCase() != "")
-			.filter((t) => availableTags.includes(t));
-  
-      	return sanitizedTags;
+        const tags = requestTags.toString().split('+');
+        const availableTags = websocketManager.availableTags;
+        const sanitizedTags = tags
+            .map((t) => (t || '').toLowerCase().trim())
+            .filter((t) => t.trim().toLowerCase() != '')
+            .filter((t) => availableTags.includes(t));
+
+        return sanitizedTags;
     }
 });
 
