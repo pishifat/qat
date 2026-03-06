@@ -306,7 +306,7 @@
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link" href="/api/logout">
+                                <a class="nav-link" href="#" @click.prevent="logout">
                                     <i class="fas fa-sign-out-alt text-danger" />
                                 </a>
                             </li>
@@ -400,6 +400,12 @@ export default {
         /** @returns {boolean} */
         isPublicPage () {
             return this.$route.meta.public;
+        },
+    },
+    methods: {
+        async logout () {
+            await this.$http.executePost('/logout', {});
+            window.location.href = '/';
         },
     },
 };
