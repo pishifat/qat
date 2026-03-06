@@ -25,12 +25,13 @@
                     @keyup.enter="update()"
                 >
 
-                <span v-else class="small" v-html="$md.render(selectedDiscussionVote.discussionLink)" />
+                <span v-else-if="safeDiscussionLink" class="small" v-html="$md.render(safeDiscussionLink)" />
+                <span v-else class="small text-secondary">Invalid URL</span>
             </div>
-            <img v-if="isImage" class="img-responsive fit-image mb-2" :src="selectedDiscussionVote.discussionLink">
+            <img v-if="isImage" class="img-responsive fit-image mb-2" :src="safeDiscussionLink">
         </div>
-        <p v-else-if="!selectedDiscussionVote.isContentReview && selectedDiscussionVote.discussionLink" class="mb-2">
-            <a :href="selectedDiscussionVote.discussionLink" target="_blank">Read and contribute to the full discussion here</a>
+        <p v-else-if="!selectedDiscussionVote.isContentReview && safeDiscussionLink" class="mb-2">
+            <a :href="safeDiscussionLink" target="_blank" rel="noopener noreferrer">Read and contribute to the full discussion here</a>
         </p>
 
         <p v-if="isEditable && !selectedDiscussionVote.isContentReview">
@@ -208,6 +209,10 @@ export default {
         ...mapGetters('discussionVote', [
             'selectedDiscussionVote',
         ]),
+        /** @returns {string|null} */
+        safeDiscussionLink() {
+            return this.sanitizeUrl(this.selectedDiscussionVote?.discussionLink);
+        },
         /** @returns {boolean} */
         isEditable() {
             return this.selectedDiscussionVote.isActive &&
@@ -216,7 +221,7 @@ export default {
         },
         /** @returns {boolean} */
         isImage() {
-            return (this.selectedDiscussionVote.discussionLink.match(/\.(jpeg|jpg|gif|png)$/) != null);
+            return this.safeDiscussionLink && (this.safeDiscussionLink.match(/\.(jpeg|jpg|gif|png)$/) != null);
         },
     },
     watch: {

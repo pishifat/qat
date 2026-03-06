@@ -10,13 +10,15 @@
             />
 
             <a
-                v-else
-                :href="selectedReport.link"
+                v-else-if="safeLink"
+                :href="safeLink"
                 target="_blank"
+                rel="noopener noreferrer"
                 class="mx-1"
             >
                 {{ selectedReport.link }}
             </a>
+            <span v-else class="mx-1">{{ selectedReport.link }}</span>
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
@@ -31,8 +33,13 @@ export default {
     components: {
         UserLink,
     },
-    computed: mapGetters('manageReports', [
-        'selectedReport',
-    ]),
+    computed: {
+        ...mapGetters('manageReports', [
+            'selectedReport',
+        ]),
+        safeLink() {
+            return this.sanitizeUrl(this.selectedReport?.link);
+        },
+    },
 };
 </script>

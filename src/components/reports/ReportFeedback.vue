@@ -27,7 +27,8 @@
         <div>
             <div v-if="report.link">
                 <h5>Relevant link</h5>
-                <span class="mb-4" v-html="$md.render(report.link)" />
+                <a v-if="safeLink" :href="safeLink" target="_blank" rel="noopener noreferrer" class="mb-4">{{ report.link }}</a>
+                <span v-else class="mb-4 text-secondary">{{ report.link }}</span>
             </div>
 
             <h5>Report</h5>
@@ -54,6 +55,10 @@ export default {
         },
     },
     computed: {
+        /** @returns {string|null} */
+        safeLink() {
+            return this.sanitizeUrl(this.report.link);
+        },
         /** @returns {string} */
         consensusColor() {
             switch (this.report.valid) {

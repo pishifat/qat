@@ -2,8 +2,8 @@
     <div class="modal-header bg-primary">
         <h5 class="modal-title">
             <a
-                v-if="selectedDiscussionVote.discussionLink"
-                :href="selectedDiscussionVote.discussionLink"
+                v-if="safeDiscussionLink"
+                :href="safeDiscussionLink"
                 @click.prevent="confirmAndOpen(selectedDiscussionVote.discussionLink)"
             >
                 {{ selectedDiscussionVote.title }}
@@ -29,13 +29,26 @@ export default {
     components: {
         ModeDisplay,
     },
-    computed: mapGetters('discussionVote', [
-        'selectedDiscussionVote',
-    ]),
+    computed: {
+        ...mapGetters('discussionVote', [
+            'selectedDiscussionVote',
+        ]),
+        safeDiscussionLink() {
+            return this.sanitizeUrl(this.selectedDiscussionVote?.discussionLink);
+        },
+    },
     methods: {
         confirmAndOpen(url) {
-            if (confirm(`This will redirect you to another webpage or download a file. This is user-submitted content, so if you don't trust the url, don't proceed.\n\n${url}`)) {
-                window.location.href = url;
+            const safeUrl = this.sanitizeUrl(url);
+
+            if (!safeUrl) {
+                alert('Invalid or unsafe URL.');
+
+                return;
+            }
+
+            if (confirm(`This will redirect you to another webpage or download a file. This is user-submitted content, so if you don't trust the url, don't proceed.\n\n${safeUrl}`)) {
+                window.location.href = safeUrl;
             }
         },
     },

@@ -81,7 +81,8 @@
 
                         <div v-if="selectedVeto.vetoFormat < 7">
                             <b>Discussion link:</b>
-                            <a :href="reason.link" target="_blank">{{ reason.link }}</a>
+                            <a v-if="getSafeReasonLink(reason.link)" :href="getSafeReasonLink(reason.link)" target="_blank" rel="noopener noreferrer">{{ reason.link }}</a>
+                            <span v-else>{{ reason.link }}</span>
                         </div>
                         <hr>
                     </div>
@@ -159,6 +160,9 @@ export default {
         ]),
     },
     methods: {
+        getSafeReasonLink(link) {
+            return this.sanitizeUrl(link);
+        },
         async setVetoReasonStatus (status, reasonIndex, e) {
             const data = await this.$http.executePost(`/vetoes/setVetoReasonStatus/${this.selectedVeto.id}`, { status, reasonIndex }, e);
 

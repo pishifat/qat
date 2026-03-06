@@ -6,12 +6,12 @@
             role="button"
             :data-discussion="discussion.id"
         >
-            <img v-if="isImage" :src="discussion.discussionLink" class="card-thumb">
+            <img v-if="isImage" :src="safeDiscussionLink" class="card-thumb">
             <div class="card-body">
                 <div class="wrap-text">
                     <a
-                        v-if="discussion.discussionLink"
-                        :href="discussion.discussionLink"
+                        v-if="safeDiscussionLink"
+                        :href="safeDiscussionLink"
                         @click.stop.prevent="confirmAndOpen(discussion.discussionLink)"
                     >
                         <b>{{ discussion.title }}</b>
@@ -72,20 +72,32 @@ export default {
         ...mapState([
             'loggedInUser',
         ]),
+        /** @returns {string|null} */
+        safeDiscussionLink() {
+            return this.sanitizeUrl(this.discussion?.discussionLink);
+        },
         /** @returns {boolean} */
         isImage() {
-            if (this.discussion && this.discussion.discussionLink) {
-                return (this.discussion.discussionLink.match(/\.(jpeg|jpg|gif|png)$/) != null);
-            } else {
-                return null;
+            if (this.safeDiscussionLink) {
+                return (this.safeDiscussionLink.match(/\.(jpeg|jpg|gif|png)$/) != null);
             }
+
+            return false;
         },
     },
     methods: {
         confirmAndOpen(url) {
+            const safeUrl = this.sanitizeUrl(url);
+
+            if (!safeUrl) {
+                alert('Invalid or unsafe URL.');
+
+                return;
+            }
+
             this.isConfirming = true;
-            if (confirm(`This will redirect you to another webpage or download a file. This is user-submitted content, so if you don't trust the url, don't proceed.\n\n${url}`)) {
-                window.location.href = url;
+            if (confirm(`This will redirect you to another webpage or download a file. This is user-submitted content, so if you don't trust the url, don't proceed.\n\n${safeUrl}`)) {
+                window.location.href = safeUrl;
             }
             setTimeout(() => { this.isConfirming = false; }, 0);
         },

@@ -566,7 +566,13 @@ router.post('/:id/toggleIsActiveContentReviewer', middlewares.isLoggedIn, middle
 /* POST switch/update request status */
 router.post('/:id/updateRequestStatus', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
     if (req.body.requestLink) {
-        util.isValidUrlOrThrow(req.body.requestLink);
+        try {
+            util.isValidUrlOrThrow(req.body.requestLink);
+        } catch (error) {
+            return res.json({
+                error: 'Invalid URL',
+            });
+        }
     }
 
     const user = await User.findById(req.params.id).orFail();

@@ -41,8 +41,7 @@
                     v-for="language in selectedUser.languages"
                     :key="language"
                     class="language-tag badge rounded-pill mx-1 text-lowercase bg-secondary text-dark"
-                    v-html="language"
-                />
+                >{{ language }}</span>
             </div>
 
             <hr>
@@ -177,13 +176,15 @@ export default {
             status = this.makeWordFromField(status);
 
             if (status === 'Personal Queue' && requestLink) {
-                return `[mod queue](${requestLink})`;
+                const safeUrl = this.sanitizeUrl(requestLink);
+
+                return safeUrl ? `[mod queue](${safeUrl})` : 'mod queue';
             } else if (status === 'Personal Queue') {
                 return `mod queue`;
             }
 
             if (status === 'Game Chat') {
-                return `[chat](https://osu.ppy.sh/community/chat?sendto=${osuId})`;
+                return `[chat](https://osu.ppy.sh/community/chat?sendto=${encodeURIComponent(osuId)})`;
             }
 
             return status;

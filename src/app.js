@@ -1,6 +1,6 @@
 import './sass/app.scss';
 import './bootstrap';
-import { md } from './bootstrap';
+import { md, sanitizeUrl, sanitizeUrlForCss } from './bootstrap';
 import moment from 'moment';
 import http from './store/http';
 import { createApp } from 'vue';
@@ -64,5 +64,7 @@ app.config.globalProperties.toRelativeDate = toRelativeDate;
 app.config.globalProperties.toRelativeShortDate = toRelativeShortDate;
 app.config.globalProperties.shorten = shorten;
 app.config.globalProperties.formatMode = formatMode;
+app.config.globalProperties.sanitizeUrl = sanitizeUrl;
+app.config.globalProperties.sanitizeUrlForCss = sanitizeUrlForCss;
 
 app.mount('#app');

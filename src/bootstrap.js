@@ -17,6 +17,7 @@ $.fn.modal = function (action) {
             Modal.getOrCreateInstance(this).hide();
         }
     });
+
     return this;
 };
 
@@ -32,6 +33,32 @@ export const md = new MarkdownIt('default', {
     .use(osuTimestamps, { wrapInCode: true })
     .use(MarkdownItVideo)
     .use(MarkdownItColor, { inline: true });
+
+const UNSAFE_PROTOCOL_RE = /^(javascript|vbscript|file|data):/i;
+md.validateLink = (url) => !UNSAFE_PROTOCOL_RE.test(url);
+
+export function sanitizeUrl(url) {
+    if (!url || typeof url !== 'string') return null;
+
+    try {
+        const parsed = new URL(url);
+
+        if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+            return null;
+        }
+
+        return parsed.href;
+    } catch {
+        return null;
+    }
+}
+
+export function sanitizeUrlForCss(url) {
+    const safeUrl = sanitizeUrl(url);
+    if (!safeUrl) return null;
+
+    return safeUrl.replace(/[()'"\\]/g, '\\$&');
+}
 
 // Remember old renderer, if overridden, or proxy to default renderer
 const defaultRender = md.renderer.rules.link_open || function (tokens, idx, options, env, self) {

@@ -16,13 +16,15 @@
                         @click.stop
                     />
                     <a
-                        v-else
-                        :href="report.link"
+                        v-else-if="safeLink"
+                        :href="safeLink"
                         target="_blank"
+                        rel="noopener noreferrer"
                         @click.stop
                     >
                         {{ report.link }}
                     </a>
+                    <span v-else>{{ report.link }}</span>
                     -
                     <span class="small">{{ report.reason }}</span>
                 </p>
@@ -59,6 +61,9 @@ export default {
         },
     },
     computed: {
+        safeLink() {
+            return this.sanitizeUrl(this.report.link);
+        },
         category() {
             switch (this.report.category) {
                 case 'stolenBeatmap':
