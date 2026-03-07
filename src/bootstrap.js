@@ -73,12 +73,20 @@ const defaultRender = md.renderer.rules.link_open || function (tokens, idx, opti
 };
 
 md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
-    let aIndex = tokens[idx].attrIndex('target');
+    const token = tokens[idx];
+    let aIndex = token.attrIndex('target');
 
     if (aIndex < 0) {
-        tokens[idx].attrPush(['target', '_blank']);
+        token.attrPush(['target', '_blank']);
     } else {
-        tokens[idx].attrs[aIndex][1] = '_blank';
+        token.attrs[aIndex][1] = '_blank';
+    }
+
+    aIndex = token.attrIndex('rel');
+    if (aIndex < 0) {
+        token.attrPush(['rel', 'noopener noreferrer']);
+    } else {
+        token.attrs[aIndex][1] = 'noopener noreferrer';
     }
 
     return defaultRender(tokens, idx, options, env, self);
@@ -99,6 +107,13 @@ md.renderer.rules.image = function (tokens, idx, options, env, self) {
         if (proxied) {
             token.attrs[srcIndex][1] = proxied;
         }
+    }
+
+    const relIndex = token.attrIndex('referrerpolicy');
+    if (relIndex < 0) {
+        token.attrPush(['referrerpolicy', 'no-referrer']);
+    } else {
+        token.attrs[relIndex][1] = 'no-referrer';
     }
 
     return defaultImageRender(tokens, idx, options, env, self);
