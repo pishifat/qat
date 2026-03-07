@@ -115,12 +115,15 @@ router.get('/login', (req, res) => {
         redirectUrl: req.get('referer'),
     };
 
-    res.redirect(
-        'https://osu.ppy.sh/oauth/authorize?response_type=code&client_id=' + config.oauth.id +
-        '&redirect_uri=' + encodeURIComponent(config.oauth.redirect) +
-        '&state=' + encodeURIComponent(state) +
-        '&scope=identify+public'
-    );
+    req.session.save((err) => {
+        if (err) return res.status(500).render('error', { message: 'Session save failed' });
+        res.redirect(
+            'https://osu.ppy.sh/oauth/authorize?response_type=code&client_id=' + config.oauth.id +
+            '&redirect_uri=' + encodeURIComponent(config.oauth.redirect) +
+            '&state=' + encodeURIComponent(state) +
+            '&scope=identify+public'
+        );
+    });
 });
 
 /* POST destroy session */
