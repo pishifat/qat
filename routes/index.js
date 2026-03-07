@@ -354,7 +354,13 @@ router.get('/callback', async (req, res) => {
             }
         }
         console.log('[oauth] callback: success, redirectTo=', redirectTo);
-        res.redirect(redirectTo);
+        req.session.save((err) => {
+            if (err) {
+                console.error('[oauth] callback: session save failed', err);
+                return res.status(500).render('error', { message: 'Session save failed' });
+            }
+            res.redirect(redirectTo);
+        });
     }
 });
 
