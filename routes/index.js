@@ -359,7 +359,12 @@ router.get('/callback', async (req, res) => {
                 console.error('[oauth] callback: session save failed', err);
                 return res.status(500).render('error', { message: 'Session save failed' });
             }
-            res.redirect(redirectTo);
+            // Use 200 + meta refresh so Set-Cookie is not stripped by proxies on 302
+            const escaped = redirectTo.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+            res.set('Cache-Control', 'no-store');
+            res.status(200).send(
+                `<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url=${escaped}"><title>Redirecting</title></head><body>Redirecting...</body></html>`
+            );
         });
     }
 });
