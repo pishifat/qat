@@ -49,7 +49,6 @@ const debugRouter = require('./routes/debug');
 const groupHistoryRouter = require('./routes/groupHistory');
 const documentationRouter = require('./routes/documentation');
 const chartsRouter = require('./routes/charts');
-const proxyRouter = require('./routes/proxy');
 
 // set after all models are loaded to avoid discriminator conflicts
 mongoose.set('strictQuery', false);
@@ -152,7 +151,6 @@ apiRouter.use('/debug', debugRouter);
 apiRouter.use('/groupHistory', groupHistoryRouter);
 apiRouter.use('/docs', documentationRouter);
 apiRouter.use('/charts', chartsRouter);
-apiRouter.use('/proxy', proxyRouter);
 
 app.use('/api', apiRouter);
 

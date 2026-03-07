@@ -64,7 +64,7 @@ export function proxyUrl(url) {
     if (!url || typeof url !== 'string') return null;
     if (!/^https?:\/\//i.test(url)) return null;
 
-    return `/api/proxy/image?url=${encodeURIComponent(btoa(url))}`;
+    return `https://wsrv.nl/?url=${encodeURIComponent(url)}`;
 }
 
 // Remember old renderer, if overridden, or proxy to default renderer
