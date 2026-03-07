@@ -17,49 +17,6 @@ const Announcement = require('../models/announcement');
 
 const router = express.Router();
 
-const STATE_TTL_MS = 10 * 60 * 1000; // 10 minutes
-
-function b64UrlEncode(strOrBuf) {
-    const b = Buffer.isBuffer(strOrBuf) ? strOrBuf : Buffer.from(strOrBuf, 'utf8');
-    return b.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-}
-
-function b64UrlDecode(str) {
-    let b64 = str.replace(/-/g, '+').replace(/_/g, '/');
-    while (b64.length % 4) b64 += '=';
-    return Buffer.from(b64, 'base64');
-}
-
-function createSignedState(redirectUrl) {
-    const payload = JSON.stringify({
-        n: crypto.randomBytes(24).toString('hex'),
-        r: redirectUrl || '',
-        t: Date.now(),
-    });
-    const payloadB64 = b64UrlEncode(payload);
-    const sig = crypto.createHmac('sha256', config.session).update(payloadB64).digest();
-    return payloadB64 + '.' + b64UrlEncode(sig);
-}
-
-function verifySignedState(stateStr) {
-    if (!stateStr || typeof stateStr !== 'string') return null;
-    const dot = stateStr.indexOf('.');
-    if (dot === -1) return null;
-    const payloadB64 = stateStr.slice(0, dot);
-    const sigB64 = stateStr.slice(dot + 1);
-    const expectedSig = crypto.createHmac('sha256', config.session).update(payloadB64).digest();
-    const actualSig = b64UrlDecode(sigB64);
-    if (actualSig.length !== expectedSig.length || !crypto.timingSafeEqual(expectedSig, actualSig)) return null;
-    let payload;
-    try {
-        payload = JSON.parse(b64UrlDecode(payloadB64).toString('utf8'));
-    } catch {
-        return null;
-    }
-    if (Date.now() - payload.t > STATE_TTL_MS) return null;
-    return payload.r || '/';
-}
-
 /* GET index bn listing */
 router.get('/relevantInfo', async (req, res) => {
     res.json({
@@ -151,7 +108,12 @@ router.post('/updateAnnouncement/:id', async (req, res) => {
 
 /* GET 'login' to get user's info */
 router.get('/login', (req, res) => {
-    const state = createSignedState(req.get('referer'));
+    const state = crypto.randomBytes(48).toString('base64');
+
+    req.session._state = {
+        state,
+        redirectUrl: req.get('referer'),
+    };
 
     res.redirect(
         'https://osu.ppy.sh/oauth/authorize?response_type=code&client_id=' + config.oauth.id +
@@ -169,15 +131,17 @@ router.post('/logout', async (req, res) => {
 
 /* GET user's token and user's info to login */
 router.get('/callback', async (req, res) => {
-    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
-    res.set('Pragma', 'no-cache');
-
     if (!req.query.code || req.query.error) {
         return res.status(500).render('error', { message: req.query.error || 'Something went wrong' });
     }
 
-    const redirectUrl = verifySignedState(decodeURIComponent(req.query.state));
-    if (redirectUrl === null) {
+    const decodedState = decodeURIComponent(req.query.state);
+    const savedState = {
+        ...req.session._state,
+    };
+    req.session._state = undefined;
+
+    if (decodedState !== savedState.state) {
         return res.status(403).render('error', { message: 'unauthorized' });
     }
 
@@ -317,19 +281,7 @@ router.get('/callback', async (req, res) => {
         req.session.username = username;
         req.session.groups = groups;
 
-        let redirectTo = '/';
-        if (redirectUrl && redirectUrl !== '/') {
-            try {
-                const currentOrigin = req.protocol + '://' + req.get('host');
-                const redirectParsed = new URL(redirectUrl, currentOrigin);
-                if (redirectParsed.origin === new URL(currentOrigin).origin) {
-                    redirectTo = redirectParsed.pathname + redirectParsed.search;
-                }
-            } catch {
-                redirectTo = '/';
-            }
-        }
-        res.redirect(redirectTo);
+        res.redirect(savedState.redirectUrl || '/');
     }
 });
 
