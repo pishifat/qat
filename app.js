@@ -67,6 +67,7 @@ wsServer.on('connection', (socket, request) => {
 // discord embeds
 app.use(middlewares.discordEmbeds);
 
+/*
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
@@ -74,7 +75,7 @@ app.use(helmet({
         },
     },
     crossOriginOpenerPolicy: false,
-}));
+}));*/
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
