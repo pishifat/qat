@@ -73,6 +73,7 @@ app.use(helmet({
             'img-src': ["'self'", 'data:', 'https:'],
         },
     },
+    crossOriginOpenerPolicy: false,
 }));
 
 // view engine setup
