@@ -35,3 +35,7 @@ public/index.html
 yarn.lock
 .claude/
 CLAUDE.md
+
+config.json.*
+webhooks.json.*
+public/*.png
