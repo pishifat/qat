@@ -131,6 +131,9 @@ router.post('/logout', async (req, res) => {
 
 /* GET user's token and user's info to login */
 router.get('/callback', async (req, res) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.set('Pragma', 'no-cache');
+
     if (!req.query.code || req.query.error) {
         return res.status(500).render('error', { message: req.query.error || 'Something went wrong' });
     }
@@ -141,7 +144,11 @@ router.get('/callback', async (req, res) => {
     };
     req.session._state = undefined;
 
+    console.log('decodedState', decodedState);
+    console.log('savedState.state', savedState.state);
+
     if (decodedState !== savedState.state) {
+        console.log('failed to validate state')
         return res.status(403).render('error', { message: 'unauthorized' });
     }
 
