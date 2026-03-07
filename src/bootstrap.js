@@ -2,7 +2,7 @@ import MarkdownIt from 'markdown-it';
 import moment from 'moment';
 import MarkdownItVideo from 'markdown-it-video';
 import osuTimestamps from './plugins/markdown-it-osu-timestamps';
-import MarkdownItColor from 'markdown-it-color';
+import markdownItHexColor from './plugins/markdown-it-hex-color';
 import $ from 'jquery';
 import { Modal, Tooltip } from 'bootstrap';
 
@@ -32,7 +32,7 @@ export const md = new MarkdownIt('default', {
     .disable(['lheading'])
     .use(osuTimestamps, { wrapInCode: true })
     .use(MarkdownItVideo)
-    .use(MarkdownItColor, { inline: true });
+    .use(markdownItHexColor);
 
 const UNSAFE_PROTOCOL_RE = /^(javascript|vbscript|file|data):/i;
 md.validateLink = (url) => !UNSAFE_PROTOCOL_RE.test(url);
