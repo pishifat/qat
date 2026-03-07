@@ -17,6 +17,68 @@ const Announcement = require('../models/announcement');
 
 const router = express.Router();
 
+const STATE_TTL_MS = 10 * 60 * 1000;
+
+function b64UrlEncode(strOrBuf) {
+    const b = Buffer.isBuffer(strOrBuf) ? strOrBuf : Buffer.from(strOrBuf, 'utf8');
+    return b.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function b64UrlDecode(str) {
+    let b64 = str.replace(/-/g, '+').replace(/_/g, '/');
+    while (b64.length % 4) b64 += '=';
+    return Buffer.from(b64, 'base64');
+}
+
+function createSignedState(redirectUrl) {
+    const payload = JSON.stringify({
+        n: crypto.randomBytes(24).toString('hex'),
+        r: redirectUrl || '',
+        t: Date.now(),
+    });
+    const payloadB64 = b64UrlEncode(payload);
+    const sig = crypto.createHmac('sha256', config.session).update(payloadB64).digest();
+    return payloadB64 + '.' + b64UrlEncode(sig);
+}
+
+function verifySignedState(stateStr) {
+    if (!stateStr || typeof stateStr !== 'string') {
+        console.log('[oauth] verifySignedState: missing or invalid state string');
+        return null;
+    }
+    const dot = stateStr.indexOf('.');
+    if (dot === -1) {
+        console.log('[oauth] verifySignedState: no separator in state');
+        return null;
+    }
+    const payloadB64 = stateStr.slice(0, dot);
+    const sigB64 = stateStr.slice(dot + 1);
+    let actualSig;
+    try {
+        actualSig = b64UrlDecode(sigB64);
+    } catch (e) {
+        console.log('[oauth] verifySignedState: sig decode failed', e.message);
+        return null;
+    }
+    const expectedSig = crypto.createHmac('sha256', config.session).update(payloadB64).digest();
+    if (actualSig.length !== expectedSig.length || !crypto.timingSafeEqual(expectedSig, actualSig)) {
+        console.log('[oauth] verifySignedState: signature mismatch');
+        return null;
+    }
+    let payload;
+    try {
+        payload = JSON.parse(b64UrlDecode(payloadB64).toString('utf8'));
+    } catch (e) {
+        console.log('[oauth] verifySignedState: payload parse failed', e.message);
+        return null;
+    }
+    if (Date.now() - payload.t > STATE_TTL_MS) {
+        console.log('[oauth] verifySignedState: state expired');
+        return null;
+    }
+    return payload.r || '/';
+}
+
 /* GET index bn listing */
 router.get('/relevantInfo', async (req, res) => {
     res.json({
@@ -108,14 +170,10 @@ router.post('/updateAnnouncement/:id', async (req, res) => {
 
 /* GET 'login' to get user's info */
 router.get('/login', (req, res) => {
-    const state = crypto.randomBytes(48).toString('base64');
+    const referer = req.get('referer');
+    const state = createSignedState(referer);
 
-    req.session._state = {
-        state,
-        redirectUrl: req.get('referer'),
-    };
-
-    console.log('req.session._state from login:', req.session._state);
+    console.log('[oauth] login: redirect_uri=', config.oauth.redirect, 'referer=', referer || '(none)');
 
     res.redirect(
         'https://osu.ppy.sh/oauth/authorize?response_type=code&client_id=' + config.oauth.id +
@@ -134,20 +192,16 @@ router.post('/logout', async (req, res) => {
 /* GET user's token and user's info to login */
 router.get('/callback', async (req, res) => {
     if (!req.query.code || req.query.error) {
+        console.log('[oauth] callback: missing code or error', req.query.error || 'no code');
         return res.status(500).render('error', { message: req.query.error || 'Something went wrong' });
     }
 
-    const decodedState = decodeURIComponent(req.query.state);
-    const savedState = {
-        ...req.session._state,
-    };
-    console.log('savedState from callback:', savedState);
-    req.session._state = undefined;
+    const rawState = req.query.state;
+    const redirectUrl = verifySignedState(decodeURIComponent(rawState));
 
-    if (decodedState !== savedState.state) {
-        console.log('no match: decodedState', decodedState);
-        console.log('no match: savedState.state', savedState.state);
-        console.log('failed to validate state')
+    console.log('[oauth] callback: state present=', !!rawState, 'verify ok=', redirectUrl !== null, 'redirectUrl=', redirectUrl === null ? '(invalid)' : redirectUrl || '(root)');
+
+    if (redirectUrl === null) {
         return res.status(403).render('error', { message: 'unauthorized' });
     }
 
@@ -287,7 +341,20 @@ router.get('/callback', async (req, res) => {
         req.session.username = username;
         req.session.groups = groups;
 
-        res.redirect(savedState.redirectUrl || '/');
+        let redirectTo = '/';
+        if (redirectUrl && redirectUrl !== '/') {
+            try {
+                const currentOrigin = req.protocol + '://' + req.get('host');
+                const redirectParsed = new URL(redirectUrl, currentOrigin);
+                if (redirectParsed.origin === new URL(currentOrigin).origin) {
+                    redirectTo = redirectParsed.pathname + redirectParsed.search;
+                }
+            } catch {
+                redirectTo = '/';
+            }
+        }
+        console.log('[oauth] callback: success, redirectTo=', redirectTo);
+        res.redirect(redirectTo);
     }
 });
 
