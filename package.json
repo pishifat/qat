@@ -8,7 +8,7 @@
     "watch-src": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "prod": "cross-env NODE_ENV=production node ./app.js",
+    "prod": "cross-env NODE_ENV=development node ./app.js",
     "lint": "eslint .",
     "tsc": "tsc"
   },
