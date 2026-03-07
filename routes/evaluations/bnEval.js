@@ -292,7 +292,7 @@ router.post('/submitEval/:id', async (req, res) => {
     const isBnEvaluator = evaluation.bnEvaluators.some(u => u.id == userId);
     const isMockEvaluator = evaluation.mockEvaluators.some(u => u.id == userId);
 
-    if (!isNatEvaluator && !isBnEvaluator && !isMockEvaluator) {
+    if (!res.locals.userRequest.isNatOrTrialNat && !isNatEvaluator && !isBnEvaluator && !isMockEvaluator) {
         return res.json({ error: 'You are not assigned to this evaluation' });
     }
 
