@@ -1,8 +1,6 @@
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
-const helmet = require('helmet');
-const mongoSanitize = require('express-mongo-sanitize');
 const middlewares = require('./helpers/middlewares');
 const logger = require('./helpers/logger');
 const mongoose = require('mongoose');
@@ -67,14 +65,6 @@ wsServer.on('connection', (socket, request) => {
 // discord embeds
 app.use(middlewares.discordEmbeds);
 
-app.use(helmet({
-    contentSecurityPolicy: {
-        directives: {
-            'img-src': ["'self'", 'data:', 'https:'],
-        },
-    },
-}));
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
@@ -84,7 +74,6 @@ app.use(logger);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(mongoSanitize());
 app.use(express.static(path.join(__dirname, 'public')));
 
 //natdb
@@ -130,6 +119,7 @@ const sessionConfig = {
 if (app.get('env') === 'production') {
     app.set('trust proxy', 1);
     sessionConfig.cookie.secure = true;
+    sessionConfig.cookie.sameSite = 'none';
 }
 
 app.use(session(sessionConfig));
