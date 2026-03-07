@@ -39,3 +39,4 @@ CLAUDE.md
 config.json.*
 webhooks.json.*
 public/*.png
+public/*.jpg
