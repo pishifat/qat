@@ -115,6 +115,8 @@ router.get('/login', (req, res) => {
         redirectUrl: req.get('referer'),
     };
 
+    console.log('req.session._state from login:', req.session._state);
+
     res.redirect(
         'https://osu.ppy.sh/oauth/authorize?response_type=code&client_id=' + config.oauth.id +
         '&redirect_uri=' + encodeURIComponent(config.oauth.redirect) +
@@ -139,9 +141,13 @@ router.get('/callback', async (req, res) => {
     const savedState = {
         ...req.session._state,
     };
+    console.log('savedState from callback:', savedState);
     req.session._state = undefined;
 
     if (decodedState !== savedState.state) {
+        console.log('no match: decodedState', decodedState);
+        console.log('no match: savedState.state', savedState.state);
+        console.log('failed to validate state')
         return res.status(403).render('error', { message: 'unauthorized' });
     }
 
