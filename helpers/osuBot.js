@@ -41,7 +41,10 @@ async function getBotToken () {
  */
 async function sendMessage(userId, message) {
     if (!config.enableMessages) {
-        return { error: 'Messages disabled in config' };
+        console.log('Messages disabled in config');
+        console.log("Recipient: ", userId);
+        console.log("Message: ", message);
+        return;
     }
 
     const token = await getBotToken();
@@ -76,7 +79,10 @@ async function sendMessage(userId, message) {
  */
 async function sendMessages(userId, messages) {
     if (!config.enableMessages) {
-        return { error: 'Messages disabled in config' };
+        console.log('Messages disabled in config');
+        console.log("Recipient: ", userId);
+        console.log("Messages: ", messages);
+        return;
     }
 
     for (const message of messages) {
@@ -99,7 +105,13 @@ async function sendMessages(userId, messages) {
  */
 async function sendAnnouncement(userIds, channel, message) {
     if (!config.enableMessages) {
-        return { error: 'Messages disabled in config' };
+        console.log('Messages disabled in config');
+        console.log("Recipients: ", userIds);
+        console.log("Channel: ", channel);
+        console.log("Channel name: ", channel.name);
+        console.log("Channel description: ", channel.description);
+        console.log("Message: ", message);
+        return true;
     }
 
     const token = await getBotToken();
