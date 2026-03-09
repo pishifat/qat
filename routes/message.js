@@ -243,7 +243,7 @@ router.post('/submitEvaluationMessage/:id', async (req, res) => {
         return res.json({ error: 'Evaluation not found' });
     }
 
-    const isRecipient = req.session.mongoId === evaluation.user._id;
+    const isRecipient = req.session.mongoId === evaluation.user.id;
     const isNat = res.locals.userRequest.isNat;
     if (!isRecipient && !isNat) {
         return res.json({ error: 'Unauthorized - You must be the evaluation recipient or NAT to submit messages' });
