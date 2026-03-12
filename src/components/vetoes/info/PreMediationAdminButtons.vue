@@ -45,12 +45,12 @@
                         </span>
                         <span
                             v-if="selectedVeto.vouchingUsers && selectedVeto.vouchingUsers.some(u => u.id === user.id)"
-                            class="text-info"
+                            class="text-probation"
                             data-bs-toggle="tooltip"
                             data-bs-placement="top"
                             title="Vouching user"
                         >
-                            <i class="fa-solid fa-user-check" />
+                            <i class="fa-solid fa-hand" />
                         </span>
                         <span v-if="!(selectedVeto.vetoer && selectedVeto.vetoer.id === user.id) && !(selectedVeto.vouchingUsers && selectedVeto.vouchingUsers.some(u => u.id === user.id))" class="text-muted">
                             —
