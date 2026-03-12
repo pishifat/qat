@@ -274,12 +274,15 @@ router.get('/relevantInfo/:limit', async (req, res) => {
             .sort({ createdAt: -1 })
             .limit(limit);
     } else {
+        const nonArchivedFilter = canSeePending
+            ? { status: { $ne: 'archive' } }
+            : { status: { $nin: ['archive', 'pending'] } };
         const [archived, nonArchived] = await Promise.all([
             Veto.find({ status: 'archive' })
                 .populate(getPopulateForArchivedPublic(req.session.mongoId))
                 .sort({ createdAt: -1 })
                 .limit(limit),
-            Veto.find({ status: { $ne: 'archive' } })
+            Veto.find(nonArchivedFilter)
                 .populate(getLimitedDefaultPopulate(req.session.mongoId))
                 .sort({ createdAt: -1 })
                 .limit(limit),
@@ -291,10 +294,6 @@ router.get('/relevantInfo/:limit', async (req, res) => {
 
     for (let i = 0; i < vetoes.length; i++) {
         if (vetoes[i].status !== 'archive' && !(vetoes[i].chatroomUsers && vetoes[i].chatroomUsers.length)) vetoes[i].chatroomMessages = [];
-    }
-
-    if (!canSeePending) {
-        vetoes = vetoes.filter(v => v.status !== 'pending');
     }
 
     if (!isNat) {
