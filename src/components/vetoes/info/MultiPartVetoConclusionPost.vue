@@ -9,8 +9,8 @@
             <span v-if="item.link"> **Original post:** {{ item.link }}</span>
             <br>
             <span>Outcome: {{ item.isUpheld ? '**upheld**' : '**dismissed**' }}</span>
-            <span>---</span>
         </template>
+        <span>---</span>
 
         <br>
         <span>View the full outcome of this veto here: https://bn.mappersguild.com/vetoes?id={{ selectedVeto.id }}</span>
