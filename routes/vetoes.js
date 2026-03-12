@@ -150,30 +150,50 @@ function getLimitedDefaultPopulate(mongoId) {
 
 function getPopulate(isNat, mongoId, status) {
     if (!mongoId) return getLoggedOutPopulate();
-    if (!isNat && status === 'archive') return getPopulateForArchivedPublic();
+    if (!isNat && status === 'archive') return getPopulateForArchivedPublic(mongoId);
     if (!isNat) return getLimitedDefaultPopulate(mongoId);
 
     return defaultPopulate;
 }
 
-/** Populate for archived veto when shown to anyone (e.g. logged-out). Includes full chatroom, mediations and publicMediations with mediator hidden. */
-function getPopulateForArchivedPublic() {
+function getPopulateForArchivedPublic(mongoId) {
     return [
         {
-            path: 'mediations',
-            select: '-mediator',
+            path: 'vetoer',
+            select: 'username osuId',
+            match: { _id: mongoId },
         },
         {
-            path: 'publicMediations',
-            select: 'vote reasonIndex',
+            path: 'mediations',
+            select: '-mediator -_id',
+        },
+        {
+            path: 'vouchingUsers',
+            select: 'username osuId',
+            match: { _id: mongoId },
         },
         {
             path: 'chatroomUsers',
             select: 'username osuId',
+            match: { _id: mongoId },
         },
         {
             path: 'chatroomUsersPublic',
             select: 'username osuId',
+        },
+        {
+            path: 'chatroomUpholdVoters',
+            select: 'username osuId',
+            match: { _id: mongoId },
+        },
+        {
+            path: 'chatroomDismissVoters',
+            select: 'username osuId',
+            match: { _id: mongoId },
+        },
+        {
+            path: 'publicMediations',
+            select: 'vote reasonIndex -_id',
         },
         {
             path: 'chatroomMessages.user',
@@ -256,7 +276,7 @@ router.get('/relevantInfo/:limit', async (req, res) => {
     } else {
         const [archived, nonArchived] = await Promise.all([
             Veto.find({ status: 'archive' })
-                .populate(getPopulateForArchivedPublic())
+                .populate(getPopulateForArchivedPublic(req.session.mongoId))
                 .sort({ createdAt: -1 })
                 .limit(limit),
             Veto.find({ status: { $ne: 'archive' } })
