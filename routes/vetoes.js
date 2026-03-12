@@ -240,46 +240,64 @@ function sanitizeVeto(veto, mongoId, isNat) {
     return obj;
 }
 
+function logger(username, message) {
+    console.log(`[${new Date().toISOString()}] [${username}] ${message}`);
+}
+
 /* GET vetoes list. */
 router.get('/relevantInfo/:limit', async (req, res) => {
+    logger(res.locals.userRequest.username, 'Fetching relevant info for vetoes');
     const isNat = res.locals.userRequest.isNat;
     const canSeePending = res.locals.userRequest.isBnOrNat;
     const limit = parseInt(req.params.limit);
 
     let vetoes;
     if (isNat) {
+        logger(res.locals.userRequest.username, 'Fetching vetoes for NAT');
         vetoes = await Veto
             .find({})
             .populate(getPopulate(true, req.session.mongoId))
             .sort({ createdAt: -1 })
-            .limit(limit);
+            .limit(limit)
+            .lean();
+        logger(res.locals.userRequest.username, `Fetched ${vetoes.length} vetoes`);
     } else {
+        logger(res.locals.userRequest.username, 'Fetching vetoes for non-NAT');
         const [archived, nonArchived] = await Promise.all([
             Veto.find({ status: 'archive' })
                 .populate(getPopulateForArchivedPublic())
                 .sort({ createdAt: -1 })
-                .limit(limit),
+                .limit(limit)
+                .lean(),
             Veto.find({ status: { $ne: 'archive' } })
                 .populate(getLimitedDefaultPopulate(req.session.mongoId))
                 .sort({ createdAt: -1 })
-                .limit(limit),
+                .limit(limit)
+                .lean(),
         ]);
+        logger(res.locals.userRequest.username, `Fetched ${archived.length} archived vetoes and ${nonArchived.length} non-archived vetoes`);
+        logger(res.locals.userRequest.username, `Sorting and slicing vetoes`);
         vetoes = [...archived, ...nonArchived]
             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
             .slice(0, limit);
+        logger(res.locals.userRequest.username, `Sorted and sliced vetoes`);
     }
 
     for (let i = 0; i < vetoes.length; i++) {
         if (vetoes[i].status !== 'archive' && !(vetoes[i].chatroomUsers && vetoes[i].chatroomUsers.length)) vetoes[i].chatroomMessages = [];
     }
+    logger(res.locals.userRequest.username, `Filtered chatroom messages for ${vetoes.length} vetoes`);
 
     if (!canSeePending) {
         vetoes = vetoes.filter(v => v.status !== 'pending');
+        logger(res.locals.userRequest.username, `Filtered pending vetoes`);
     }
 
     if (!isNat) {
         vetoes = vetoes.map(v => sanitizeVeto(v, req.session.mongoId, isNat));
+        logger(res.locals.userRequest.username, `Sanitized vetoes`);
     }
+    logger(res.locals.userRequest.username, `Sending vetoes`);
 
     res.json({
         vetoes,
