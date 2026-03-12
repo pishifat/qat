@@ -203,11 +203,14 @@ router.get('/vetoMediators/:id', async (req, res) => {
         return res.json({ error: 'Veto is not archived' });
     }
 
+    const users = [];
+    const userOsuIds = [];
+
     if (veto.vetoFormat >= 7) {
-        return res.json([]);
+        return res.json(users);
     }
 
-    for (const mediation of veto.publicMediations) {
+    for (const mediation of veto.mediations) {
         if (!userOsuIds.includes(mediation.mediator.osuId)) {
             userOsuIds.push(mediation.mediator.osuId);
             users.push({
