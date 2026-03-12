@@ -148,19 +148,24 @@ function getLimitedDefaultPopulate(mongoId) {
     ];
 }
 
-function getPopulate(isNat, mongoId) {
+function getPopulate(isNat, mongoId, status) {
     if (!mongoId) return getLoggedOutPopulate();
+    if (!isNat && status === 'archive') return getPopulateForArchivedPublic();
     if (!isNat) return getLimitedDefaultPopulate(mongoId);
 
     return defaultPopulate;
 }
 
-/** Populate for archived veto when shown to anyone (e.g. logged-out). Includes full chatroom and mediations. */
+/** Populate for archived veto when shown to anyone (e.g. logged-out). Includes full chatroom, mediations and publicMediations with mediator hidden. */
 function getPopulateForArchivedPublic() {
     return [
         {
             path: 'mediations',
             select: '-mediator',
+        },
+        {
+            path: 'publicMediations',
+            select: 'vote reasonIndex',
         },
         {
             path: 'chatroomUsers',
@@ -237,50 +242,42 @@ function sanitizeVeto(veto, mongoId, isNat) {
 
 /* GET vetoes list. */
 router.get('/relevantInfo/:limit', async (req, res) => {
+    const isNat = res.locals.userRequest.isNat;
+    const canSeePending = res.locals.userRequest.isBnOrNat;
+    const limit = parseInt(req.params.limit);
+
     let vetoes;
-    let isNat = false;
-    let canSeePending = false;
-
-    if (!req.session.mongoId) {
+    if (isNat) {
         vetoes = await Veto
             .find({})
-            .select('-vouchingUsers -vetoer')
-            .populate(getPopulateForArchivedPublic())
+            .populate(getPopulate(true, req.session.mongoId))
             .sort({ createdAt: -1 })
-            .limit(parseInt(req.params.limit));
+            .limit(limit);
     } else {
-        const user = await User.findById(req.session.mongoId);
-        isNat = user.isNat;
-        canSeePending = user && user.isBnOrNat;
-
-        vetoes = await Veto
-            .find({})
-            .populate(
-                getPopulate(isNat, req.session.mongoId)
-            )
-            .sort({ createdAt: -1 })
-            .limit(parseInt(req.params.limit));
+        const [archived, nonArchived] = await Promise.all([
+            Veto.find({ status: 'archive' })
+                .populate(getPopulateForArchivedPublic())
+                .sort({ createdAt: -1 })
+                .limit(limit),
+            Veto.find({ status: { $ne: 'archive' } })
+                .populate(getLimitedDefaultPopulate(req.session.mongoId))
+                .sort({ createdAt: -1 })
+                .limit(limit),
+        ]);
+        vetoes = [...archived, ...nonArchived]
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .slice(0, limit);
     }
 
     for (let i = 0; i < vetoes.length; i++) {
         if (vetoes[i].status !== 'archive' && !(vetoes[i].chatroomUsers && vetoes[i].chatroomUsers.length)) vetoes[i].chatroomMessages = [];
     }
 
-    if (!req.session.mongoId) {
-        for (let i = 0; i < vetoes.length; i++) {
-            if (vetoes[i].status !== 'archive') {
-                vetoes[i].chatroomMessages = [];
-                vetoes[i].chatroomUsers = [];
-                vetoes[i].chatroomUsersPublic = [];
-            }
-        }
-    }
-
     if (!canSeePending) {
         vetoes = vetoes.filter(v => v.status !== 'pending');
     }
 
-    if (req.session.mongoId && !isNat) {
+    if (!isNat) {
         vetoes = vetoes.map(v => sanitizeVeto(v, req.session.mongoId, isNat));
     }
 
@@ -291,55 +288,28 @@ router.get('/relevantInfo/:limit', async (req, res) => {
 
 /* GET specific veto */
 router.get('/searchVeto/:id', async (req, res) => {
-    let veto;
-    let isNat = false;
-    let canSeePending = false;
+    const isNat = res.locals.userRequest.isNat;
+    const canSeePending = res.locals.userRequest.isBnOrNat;
 
-    if (!req.session.mongoId) {
-        const vetoStatus = await Veto.findById(req.params.id).select('status').lean();
-
-        if (!vetoStatus) {
-            return res.status(404).json({ error: 'Veto not found' });
-        }
-
-        if (vetoStatus.status === 'pending') {
-            return res.status(404).json({ error: 'Veto not found' });
-        }
-
-        if (vetoStatus.status === 'archive') {
-            veto = await Veto
-                .findById(req.params.id)
-                .populate(getPopulateForArchivedPublic())
-                .select('-vouchingUsers -vetoer');
-        } else {
-            veto = await Veto
-                .findById(req.params.id)
-                .populate(getPopulate(false, null))
-                .select('-vouchingUsers -chatroomUsers -chatroomUsersPublic -chatroomMessages -vetoer');
-        }
-    } else {
-        const user = await User.findById(req.session.mongoId);
-        isNat = user.isNat;
-        canSeePending = user && user.isBnOrNat;
-
-        veto = await Veto
-            .findById(req.params.id)
-            .populate(
-                getPopulate(isNat, req.session.mongoId)
-            );
+    const statusDoc = await Veto.findById(req.params.id).select('status').lean();
+    if (!statusDoc) {
+        return res.status(404).json({ error: 'Veto not found' });
     }
+    if (statusDoc.status === 'pending' && !canSeePending) {
+        return res.status(404).json({ error: 'Veto not found' });
+    }
+
+    let veto = await Veto
+        .findById(req.params.id)
+        .populate(getPopulate(isNat, req.session.mongoId, statusDoc.status));
 
     if (!veto) {
         return res.status(404).json({ error: 'Veto not found' });
     }
 
-    if (veto.status === 'pending' && !canSeePending) {
-        return res.status(404).json({ error: 'Veto not found' });
-    }
-
     if (veto.status !== 'archive' && !(veto.chatroomUsers && veto.chatroomUsers.length)) veto.chatroomMessages = [];
 
-    if (req.session.mongoId && !isNat) {
+    if (!isNat) {
         veto = sanitizeVeto(veto, req.session.mongoId, isNat);
     }
 
@@ -1481,10 +1451,14 @@ router.post('/setVetoReasonStatus/:id', middlewares.isLoggedIn, middlewares.isNa
         ).orFail();
     await veto.save();
 
+    if (status !== 'upheld' && status !== 'dismissed') {
+        return res.json({ error: 'Invalid status' });
+    }
+
     veto.reasons[reasonIndex].status = status;
     await veto.save();
 
-    res.json({ veto });
+    res.json({ veto, success: 'Set veto reason status to ' + status });
 
     Logger.generate(
         req.session.mongoId,
