@@ -10,7 +10,11 @@
                     data-bs-toggle="collapse"
                     class="ms-4"
                 >
-                    <b>{{ reasonIndex + 1 }}. {{ reason.summary }}</b> <span v-if="selectedVeto.vetoFormat >= 7 && selectedVeto.status == 'archive'">({{ reason.status ? reason.status : 'pending status' }}) </span><i class="fas fa-angle-down" />
+                    <span v-if="selectedVeto.vetoFormat >= 7 && selectedVeto.status == 'archive'" class="me-1">
+                        <i v-if="reason.status === 'upheld'" class="fas fa-check-circle text-success" data-bs-toggle="tooltip" data-bs-placement="top" title="upheld" />
+                        <i v-else-if="reason.status === 'dismissed'" class="fas fa-times-circle text-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="dismissed" />
+                        <i v-else class="fas fa-question-circle text-secondary" data-bs-toggle="tooltip" data-bs-placement="top" title="pending status" />
+                    </span><b>{{ reasonIndex + 1 }}. {{ reason.summary }}</b> <i class="fas fa-angle-down" />
                 </a>
 
                 <!-- menu content -->
@@ -26,9 +30,9 @@
                         />
                         <div v-else>
                             <ul>
-                                <li>If both groups are above the uphold threshold, the veto is upheld.</li>
-                                <li>If both groups are below the uphold threshold, the veto is dismissed.</li>
-                                <li>If neither group reaches the same consensus, a public vote determines the consensus.</li>
+                                <li>If both groups are above the uphold threshold, the veto is <b class="text-success">upheld</b>.</li>
+                                <li>If both groups are below the uphold threshold, the veto is <b class="text-danger">dismissed</b>.</li>
+                                <li>If neither group reaches the same consensus, <b>the public vote determines the consensus</b>.</li>
                             </ul>
                             <div class="row small">
                                 <vote-stats
@@ -51,7 +55,16 @@
                                     :is-public="true"
                                 />
                             </div>
+                            <div v-if="selectedVeto.reasons[reasonIndex].status">
+                                <p>
+                                    This veto reason has been marked as 
+                                    <b :class="selectedVeto.reasons[reasonIndex].status === 'upheld' ? 'text-success' : 'text-danger'">
+                                        {{ selectedVeto.reasons[reasonIndex].status }}
+                                    </b>.
+                                </p>
+                            </div>
                             <div v-if="loggedInUser && loggedInUser.isNat && selectedVeto.status == 'archive'">
+                                <hr />
                                 <b>NAT moderation</b>
                                 <div class="small text-secondary">
                                     Based on the info above, mark the veto reason as "upheld" or "dismissed".
@@ -59,7 +72,7 @@
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <button
-                                            class="btn btn-sm btn-primary w-100 mb-2"
+                                            class="btn btn-sm btn-success w-100 mb-2"
                                             @click="setVetoReasonStatus('upheld', reasonIndex, $event)"
                                         >
                                             Mark veto reason as "upheld"
@@ -69,7 +82,7 @@
                                     <!-- move to "archive" status -->
                                     <div class="col-sm-6">
                                         <button
-                                            class="btn btn-sm w-100 btn-primary mb-2"
+                                            class="btn btn-sm w-100 btn-danger mb-2"
                                             @click="setVetoReasonStatus('dismissed', reasonIndex, $event)"
                                         >
                                             Mark veto reason as "dismissed"
@@ -164,6 +177,8 @@ export default {
             return this.sanitizeUrl(link);
         },
         async setVetoReasonStatus (status, reasonIndex, e) {
+            if (!confirm(`Are you sure you want to mark this veto reason as "${status}"?`)) return;
+
             const data = await this.$http.executePost(`/vetoes/setVetoReasonStatus/${this.selectedVeto.id}`, { status, reasonIndex }, e);
 
             if (this.$http.isValid(data)) {
