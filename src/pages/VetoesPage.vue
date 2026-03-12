@@ -157,10 +157,8 @@ export default {
                 { id: 'archive', label: 'Archived Vetoes', vetoes: this.paginatedResolvedVetoes, isArchive: true },
             ];
             const canSeePending = this.loggedInUser && this.loggedInUser.isBnOrNat;
-            const canSeeNeedsConsensus = this.loggedInUser && this.loggedInUser.isNat;
 
-            return (canSeePending ? statuses : statuses.filter(s => s.id !== 'pending'))
-                .filter(s => canSeeNeedsConsensus || s.id !== 'needsConsensus');
+            return canSeePending ? statuses : statuses.filter(s => s.id !== 'pending');
         },
         isProbation () {
             return this.loggedInUser.probationModes.length > 0;
