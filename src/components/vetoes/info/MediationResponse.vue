@@ -33,7 +33,7 @@
                 Anonymous
             </div>
         </div>
-        <div class="col-sm-10 card card-body small">
+        <div class="col-sm-10 card card-body bg-primary small">
             <div v-if="!mediation.comment">
                 ...
             </div>

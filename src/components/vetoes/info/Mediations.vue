@@ -2,26 +2,30 @@
     <div>
         <b>Mediations</b>
         <div v-if="selectedVeto.vetoFormat >= 2" class="mt-1">
-            <div v-for="(reason, reasonIndex) in selectedVeto.reasons" :key="reasonIndex" class="mb-2">
-                <!-- collapse menu -->
-                <a
+            <div v-for="(reason, reasonIndex) in selectedVeto.reasons" :key="reasonIndex" class="card mb-2">
+                <!-- collapse trigger styled as card header -->
+                <button
                     v-if="selectedVeto.reasons.length"
-                    :href="'#reason-' + (reasonIndex + 1)"
+                    type="button"
+                    class="card-header py-2 w-100 text-start border-0 d-flex align-items-center text-decoration-none"
+                    :data-bs-target="'#reason-' + (reasonIndex + 1)"
                     data-bs-toggle="collapse"
-                    class="ms-4"
+                    aria-expanded="false"
+                    :aria-controls="'reason-' + (reasonIndex + 1)"
                 >
-                    <span v-if="selectedVeto.vetoFormat >= 7 && selectedVeto.status == 'archive'" class="me-1">
+                    <span v-if="selectedVeto.vetoFormat >= 7 && selectedVeto.status == 'archive'" class="me-2">
                         <i v-if="reason.status === 'upheld'" class="fas fa-check-circle text-success" data-bs-toggle="tooltip" data-bs-placement="top" title="upheld" />
                         <i v-else-if="reason.status === 'dismissed'" class="fas fa-times-circle text-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="dismissed" />
                         <i v-else class="fas fa-question-circle text-secondary" data-bs-toggle="tooltip" data-bs-placement="top" title="pending status" />
-                    </span><b>{{ reasonIndex + 1 }}. {{ reason.summary }}</b> <i class="fas fa-angle-down" />
-                </a>
+                    </span>
+                    <b class="flex-grow-1">{{ reasonIndex + 1 }}. {{ reason.summary }}</b>
+                    <i class="fas fa-angle-down ms-1 collapse-chevron" />
+                </button>
 
                 <!-- menu content -->
                 <div :id="'reason-' + (reasonIndex + 1)" class="collapse">
-                    <!-- discussion link + stats -->
+                    <div class="card-body">
                     <div v-if="selectedVeto.reasons.length">
-                        <hr>
                         <b>Stats</b>
                         <vote-stats
                             v-if="selectedVeto.vetoFormat < 7"
@@ -135,11 +139,10 @@
                             </div>
                         </div>
                     </div>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <!-- old mediations -->
         <div v-else>
             <div v-for="(mediation, i) in selectedVeto.mediations" :key="mediation.id">
                 <mediation-response
@@ -188,3 +191,21 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+.card-header[data-bs-toggle="collapse"] {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border-radius: 0.25rem;
+}
+.card-header[data-bs-toggle="collapse"]:hover {
+    background-color: rgba(0, 0, 0, 0.1) !important;
+    border-radius: 0.25rem;
+}
+.collapse-chevron {
+    transition: transform 0.25s ease;
+}
+.card-header[data-bs-toggle="collapse"][aria-expanded="true"] .collapse-chevron {
+    transform: rotate(180deg);
+}
+</style>
