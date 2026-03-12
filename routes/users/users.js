@@ -1,5 +1,6 @@
 const express = require('express');
 const User = require('../../models/user');
+const Veto = require('../../models/veto');
 const Logger = require('../../models/log');
 const AppEvaluation = require('../../models/evaluations/appEvaluation');
 const BnEvaluation = require('../../models/evaluations/bnEvaluation');
@@ -1949,6 +1950,68 @@ router.post('/doTemporaryThing', middlewares.isLoggedIn, middlewares.isAdmin, as
     const input = req.body.input;
     console.log('executing temporary thing with input: ' + input);
     console.log('---');
+
+    /* Migration: veto chatroomMessages isSystem/isModerator/isVetoer -> role. Two runs: (1) bools, (2) vetoer/voucher from user. */
+    if (input === 'vetoChatroomRoleMigration') {
+        const vetoes = await Veto.find({ 'chatroomMessages.0': { $exists: true } }).lean();
+        let updated = 0;
+        let messagesUpdated = 0;
+        for (const veto of vetoes) {
+            const messages = veto.chatroomMessages || [];
+            const vetoerId = veto.vetoer && (veto.vetoer.toString ? veto.vetoer.toString() : String(veto.vetoer));
+            const voucherIds = (veto.vouchingUsers || []).map(u => (u && u.toString ? u.toString() : String(u)));
+
+            /* Run 1: set role from bools. isVetoer (meant vetoer or voucher) defaults to 'vetoer'; run 2 corrects vouchers. */
+            let migrated = messages.map((msg) => {
+                let role = msg.role != null ? msg.role : null;
+                const hasOld = 'isSystem' in msg || 'isModerator' in msg || 'isVetoer' in msg;
+
+                if (role == null && hasOld) {
+                    role = 'user';
+                    if (msg.isSystem) role = 'system';
+                    else if (msg.isModerator) role = 'moderator';
+                    else if (msg.isVetoer) role = 'vetoer';
+                    messagesUpdated++;
+                } else if (role == null) {
+                    role = 'user';
+                    messagesUpdated++;
+                }
+
+                return { ...msg, role };
+            });
+
+            /* Run 2: (1) For role === 'user', set vetoer/voucher from message.user. (2) For role === 'vetoer', correct to 'voucher' when user is in vouchingUsers. */
+            migrated = migrated.map((msg) => {
+                const userId = msg.user && (msg.user.toString ? msg.user.toString() : String(msg.user));
+                if (msg.role === 'user') {
+                    if (userId === vetoerId) {
+                        messagesUpdated++;
+                        return { ...msg, role: 'vetoer' };
+                    }
+                    if (userId && voucherIds.includes(userId)) {
+                        messagesUpdated++;
+                        return { ...msg, role: 'voucher' };
+                    }
+                    return msg;
+                }
+                if (msg.role === 'vetoer' && userId && voucherIds.includes(userId) && userId !== vetoerId) {
+                    messagesUpdated++;
+                    return { ...msg, role: 'voucher' };
+                }
+                return msg;
+            });
+
+            if (messages.length > 0) {
+                await Veto.updateOne(
+                    { _id: veto._id },
+                    { $set: { chatroomMessages: migrated } }
+                );
+                updated++;
+            }
+        }
+        console.log(`vetoChatroomRoleMigration: ${updated} vetoes updated, ${messagesUpdated} messages migrated`);
+        return res.json({ success: 'ok', updated, messagesUpdated });
+    }
 
     /* users with nomination badges */
 

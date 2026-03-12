@@ -8,7 +8,7 @@
                 v-for="(message, i) in selectedVeto.chatroomMessages"
                 :key="i"
                 class="card card-body mb-2"
-                :class="message.isSystem ? 'card-bg-system' : message.isModerator ? 'card-bg-nat' : 'card-bg-user'"
+                :class="message.role === 'system' ? 'card-bg-system' : message.role === 'moderator' ? 'card-bg-nat' : 'card-bg-user'"
             >
                 <div class="card-message-header">
                     <img
@@ -18,31 +18,36 @@
                         alt=""
                     >
                     <div>
-                        <b
-                            v-if="message.user"
-                            :class="{ 'text-warning': message.isVetoer }"
-                        >
+                        <b v-if="message.user">
                             <user-link
                                 :username="message.user.username"
                                 :osu-id="message.user.osuId"
+                                :class="message.role === 'vetoer' ? 'text-warning' : message.role === 'voucher' ? 'text-probation' : ''"
                             />
                         </b>
                         <b
                             v-else
-                            :class="{ 'text-warning': message.isVetoer }"
-                        >{{ message.isSystem ? 'BN website' : `Anonymous user ${message.userIndex}` }}</b>
+                            :class="message.role === 'vetoer' ? 'text-warning' : message.role === 'voucher' ? 'text-probation' : ''"
+                        >{{ message.role === 'system' ? 'BN website' : `Anonymous user ${message.userIndex}` }}</b>
                         <i
-                            v-if="message.isVetoer"
+                            v-if="message.role === 'vetoer'"
                             class="fa-solid fa-gavel text-warning ms-1"
                             data-bs-toggle="tooltip"
                             data-bs-placement="top"
                             title="Vetoer"
                         />
+                        <i
+                            v-else-if="message.role === 'voucher'"
+                            class="fa-solid fa-hand text-probation ms-1"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            title="Vouching user"
+                        />
                         <b data-bs-toggle="tooltip" data-bs-placement="top" :title="toStandardDetailedDate(message.date)">
                             — {{ toRelativeDate(message.date) }}
                         </b>
                         <button
-                            v-if="!message.isSystem && loggedInUser?.isNat"
+                            v-if="message.role !== 'system' && loggedInUser?.isNat"
                             type="button"
                             class="btn btn-sm btn-link text-danger p-0 ms-1"
                             data-bs-toggle="tooltip"

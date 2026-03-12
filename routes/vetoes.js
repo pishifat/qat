@@ -846,14 +846,14 @@ router.post('/createChatroom/:id', middlewares.isLoggedIn, middlewares.isNat, as
         content: `Welcome to the discussion forum for the pending veto on [**${veto.beatmapTitle}**](https://osu.ppy.sh/beatmapsets/${veto.beatmapId})! See the veto reasons above for context.\n\nUsers involved in this discussion:\n\n- Veto creator (anonymous)\n- BNs who vouched in support of the veto (anonymous)\n- Mapset host\n- Anyone else who the NAT thought was relevant\n\nThe veto's creator and vouching users are **anonymous**. If you're one of these users, you can reveal your identity with a button below.\n\nYour goal is to resolve the veto's concerns through discussion and/or changes to the map. Follow [osu!'s code of conduct](https://osu.ppy.sh/wiki/en/Rules/Code_of_conduct_for_modding_and_mapping) while doing this, and do not expose this discussion to outsiders! If a conclusion cannot be reached, you can allow the map to be mediated by a larger group of Beatmap Nominators. This option will become available 24h from this message!\n\nIf you have any questions or want to report something sketchy, talk to someone in the NAT. They can read and speak in this chatroom too.`,
         user: null,
         userIndex: 0,
-        isSystem: true,
+        role: 'system',
     });
     veto.chatroomMessages.push({
         date: new Date(),
         content: `To start the discussion, the mapper should explain their thoughts on the veto!`,
         user: null,
         userIndex: 0,
-        isSystem: true,
+        role: 'system',
     });
 
     await veto.save();
@@ -927,15 +927,15 @@ router.post('/saveMessage/:id', middlewares.isLoggedIn, async (req, res) => {
     const privateUserIds = veto.chatroomUsers.map(u => u.id);
     const userIndex = privateUserIds.findIndex(id => id == req.session.mongoId);
 
-    const isVetoerOrVouchingUser = veto.vetoer.id == req.session.mongoId || veto.vouchingUsers.some(u => u.id == req.session.mongoId);
+    const isVetoer = veto.vetoer.id == req.session.mongoId;
+    const isVouchingUser = veto.vouchingUsers.some(u => u.id == req.session.mongoId);
 
     veto.chatroomMessages.push({
         date: new Date(),
         content: message,
         user: isPublicUser || userIndex == -1 ? req.session.mongoId : null,
         userIndex: userIndex + 1,
-        isModerator: userIndex == -1,
-        isVetoer: isVetoerOrVouchingUser,
+        role: userIndex === -1 ? 'moderator' : (isVetoer ? 'vetoer' : isVouchingUser ? 'voucher' : 'user'),
     });
 
     await veto.save();
@@ -979,7 +979,7 @@ router.post('/revealUsername/:id', middlewares.isLoggedIn, async (req, res) => {
         content: `**Anonymous user ${userIndex + 1}** is actually [**${req.session.username}**](https://osu.ppy.sh/users/${req.session.osuId})! This will be shown in future messages.`,
         user: null,
         userIndex: 0,
-        isSystem: true,
+        role: 'system',
     });
 
     await veto.save();
@@ -1046,7 +1046,7 @@ router.post('/requestMediation/:id', middlewares.isLoggedIn, async (req, res) =>
                 content: `${mapperInitiated ? mapperLink : isMapper ? userLink : 'A user'} requested mediation. The discussion has concluded.`,
                 user: null,
                 userIndex: 0,
-                isSystem: true,
+                role: 'system',
             });
         } else {
             veto.chatroomMessages.push({
@@ -1054,7 +1054,7 @@ router.post('/requestMediation/:id', middlewares.isLoggedIn, async (req, res) =>
                 content: `${isMapper ? userLink : 'A user'} requested mediation. Two requests are needed (mapset host counts as two).`,
                 user: null,
                 userIndex: 0,
-                isSystem: true,
+                role: 'system',
             });
         }
 
@@ -1174,7 +1174,7 @@ router.post('/startVote/:id', middlewares.isLoggedIn, async (req, res) => {
         content: `[**${veto.beatmapMapper}**](https://osu.ppy.sh/users/${veto.beatmapMapperId}) started a vote to dismiss the veto!\n\nEnsure everyone knows which version of the map to vote on, then follow the instructions below.`,
         user: null,
         userIndex: 0,
-        isSystem: true,
+        role: 'system',
     });
     await veto.save();
 
@@ -1252,7 +1252,7 @@ router.post('/vote/:id', middlewares.isLoggedIn, async (req, res) => {
         content: `${userText} ${revote ? 'changed their vote' : 'voted'} to ${vote}!`,
         user: null,
         userIndex: 0,
-        isSystem: true,
+        role: 'system',
     });
 
     if (veto.chatroomUpholdVoters.length >= 2) {
@@ -1261,7 +1261,7 @@ router.post('/vote/:id', middlewares.isLoggedIn, async (req, res) => {
             content: `A majority was reached! The veto was **not dismissed**, so the discussion will continue.\n\nIf the mapper makes further changes, a new vote can start.\n\nIf a conclusion cannot be reached, mediation may be requested.`,
             user: null,
             userIndex: 0,
-            isSystem: true,
+            role: 'system',
         });
         veto.chatroomVoteEnabled = false;
     } else if (veto.chatroomDismissVoters.length >= 2) {
@@ -1270,7 +1270,7 @@ router.post('/vote/:id', middlewares.isLoggedIn, async (req, res) => {
             content: `A majority was reached! The veto was **dismissed**, so the discussion has finished.\n\nThe NAT will review this discussion and archive the veto (if nothing broke). Thank you for participating!`,
             user: null,
             userIndex: 0,
-            isSystem: true,
+            role: 'system',
         });
         veto.chatroomVoteEnabled = false;
         veto.chatroomLocked = true;

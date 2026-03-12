@@ -22,9 +22,7 @@ interface IVetoDocument extends Document {
         content: string;
         user: IUserDocument;
         userIndex: number;
-        isSystem: Boolean;
-        isModerator: Boolean;
-        isVetoer: Boolean;
+        role: 'system' | 'moderator' | 'vetoer' | 'voucher' | 'user';
     }[];
     chatroomMediationRequestedUsers?: IUserDocument[];
     chatroomVoteEnabled?: Boolean;
