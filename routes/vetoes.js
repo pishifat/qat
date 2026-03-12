@@ -1449,7 +1449,6 @@ router.post('/setVetoReasonStatus/:id', middlewares.isLoggedIn, middlewares.isNa
         .populate(
             getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
         ).orFail();
-    await veto.save();
 
     if (status !== 'upheld' && status !== 'dismissed') {
         return res.json({ error: 'Invalid status' });
