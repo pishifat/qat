@@ -24,11 +24,7 @@
                 Show full conclusion post(s) <i class="fas fa-angle-down" />
             </button>
             <div v-if="selectedVeto.vetoFormat >= 2">
-                <div v-for="(reason, i) in selectedVeto.reasons" :key="i">
-                    <multi-part-veto-conclusion-post
-                        :reason-index="i"
-                    />
-                </div>
+                <multi-part-veto-conclusion-post />
             </div>
 
             <!-- view mediator chat message -->

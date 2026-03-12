@@ -1,21 +1,27 @@
 <template>
     <div id="conclusion" class="collapse card card-body my-2 small pre-line">
-        <span>This beatmap has undergone veto mediation by the Beatmap Nominators.</span>
-        <br>
-        <span>**Issue summary:** "{{ selectedVeto.reasons[reasonIndex].summary }}"</span>
-        <span>**Original post:** {{ selectedVeto.reasons[reasonIndex].link }}</span>
+        <span>This beatmap has undergone veto mediation.</span>
         <br>
 
-        <span>After an anonymous vote, this {{ selectedVeto.reasons.length > 1 ? 'portion of the veto' : 'veto' }} will be {{ isUpheld ? '**upheld**' : '**dismissed**' }}.</span>
-        <span>Reasons why Beatmap Nominators {{ isUpheld ? 'agree' : 'disagree' }} with it can be found here: https://bn.mappersguild.com/message?veto={{ selectedVeto.id }}</span>
+        <template v-for="(item, i) in reasonBlocks" :key="i">
+            <span>---</span>
+            <span>"{{ item.summary }}"</span>
+            <span v-if="item.link"> **Original post:** {{ item.link }}</span>
+            <br>
+            <span>Outcome: {{ item.isUpheld ? '**upheld**' : '**dismissed**' }}</span>
+            <span>---</span>
+        </template>
+
+        <br>
+        <span>View the full outcome of this veto here: https://bn.mappersguild.com/vetoes?id={{ selectedVeto.id }}</span>
         <br>
 
-        <div v-if="isUpheld">
-            <span>This beatmap cannot be nominated until changes are made that address the veto's concerns and the veto-ing nominator is satisfied (within reasonable limits).</span>
+        <div v-if="allDismissed">
+            <span>This veto has been dismissed. This beatmap may now be re-nominated.</span>
         </div>
 
         <div v-else>
-            <span>If all portions of the veto have been dismissed, this beatmap may now be re-nominated.</span>
+            <span>This beatmap cannot be nominated until changes are made that address the veto's concerns and the veto-ing nominator is satisfied (within reasonable limits).</span>
         </div>
     </div>
 </template>
@@ -24,54 +30,64 @@
 import { mapGetters } from 'vuex';
 
 export default {
-    name: 'ConclusionPost',
-    props: {
-        reasonIndex: {
-            type: Number,
-            required: true,
-        },
-    },
+    name: 'MultiPartVetoConclusionPost',
     computed: {
         ...mapGetters('vetoes', [
             'selectedVeto',
         ]),
-        shuffledMediations () {
-            let shuffled = this.selectedVeto.mediations.filter(m => m.vote && m.reasonIndex == this.reasonIndex);
+        reasonSummariesWithLinks () {
+            const reasons = this.selectedVeto.reasons || [];
+            return reasons.map((r, i) => ({
+                summary: r.summary,
+                link: r.link || null,
+                reasonIndex: i,
+            }));
+        },
+        reasonBlocks () {
+            return this.reasonSummariesWithLinks.map((item, i) => ({
+                ...item,
+                isUpheld: this.isReasonUpheld(i),
+            }));
+        },
+        reasonOutcomes () {
+            const reasons = this.selectedVeto.reasons || [];
+            return reasons.map((_, i) => ({
+                reasonIndex: i,
+                isUpheld: this.isReasonUpheld(i),
+            }));
+        },
+        allUpheld () {
+            return this.reasonOutcomes.length > 0 && this.reasonOutcomes.every(o => o.isUpheld);
+        },
+        allDismissed () {
+            return this.reasonOutcomes.length > 0 && this.reasonOutcomes.every(o => !o.isUpheld);
+        },
+        agreementSentence () {
+            if (this.allUpheld) return 'agree with it';
+            if (this.allDismissed) return 'disagree with it';
+            return 'agree or disagree with each portion';
+        },
+    },
+    methods: {
+        isReasonUpheld (reasonIndex) {
+            const veto = this.selectedVeto;
+            const upholdMediations = veto.mediations.filter(m => m.vote && m.reasonIndex === reasonIndex && m.vote !== 3);
+            const withdrawMediations = veto.mediations.filter(m => m.vote && m.reasonIndex === reasonIndex && m.vote !== 1);
 
-            for (let i = shuffled.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-            }
-
-            return shuffled;
-        },
-        upholdMediations () {
-            return this.selectedVeto.mediations.filter(mediation => mediation.vote && mediation.reasonIndex == this.reasonIndex && mediation.vote !== 3);
-        },
-        withdrawMediations () {
-            return this.selectedVeto.mediations.filter(mediation => mediation.vote && mediation.reasonIndex == this.reasonIndex && mediation.vote !== 1);
-        },
-        isUpheld () {
-            if (this.selectedVeto.vetoFormat >= 5) {
-                const sum = this.upholdMediations.length + this.withdrawMediations.length;
+            if (veto.vetoFormat >= 5) {
+                const sum = upholdMediations.length + withdrawMediations.length;
                 let threshold;
 
-                if (this.selectedVeto.vetoFormat == 5) {
-                    threshold = 0.7 * sum;
+                if (veto.vetoFormat === 5) threshold = 0.7 * sum;
+                else if (veto.vetoFormat === 6) threshold = 0.6 * sum;
+                else if (veto.vetoFormat >= 7) {
+                    const status = veto.reasons[reasonIndex] && veto.reasons[reasonIndex].status;
+                    return status === 'upheld';
                 }
 
-                if (this.selectedVeto.vetoFormat == 6) {
-                    threshold = 0.6 * sum;
-                }
-
-                if (this.selectedVeto.vetoFormat >= 7) {
-                    return this.selectedVeto.reasons[this.reasonIndex].status == 'upheld';
-                }
-
-                return this.upholdMediations.length >= threshold;
-            } else {
-                return this.upholdMediations.length > this.withdrawMediations.length;
+                return sum > 0 && upholdMediations.length >= threshold;
             }
+            return upholdMediations.length > withdrawMediations.length;
         },
     },
 };
