@@ -27,7 +27,7 @@
                 <h2>
                     {{ status.label }}
                     <small v-if="status.isArchive && status.vetoes.length">
-                        ({{ resolvedVetoes.length + (reachedMax ? '' : '+') }})
+                        ({{ fullyResolvedVetoes.length + (reachedMax ? '' : '+') }})
                     </small>
                     <small v-else-if="status.vetoes.length">
                         ({{ status.vetoes.length }})
@@ -143,26 +143,31 @@ export default {
             'availableVetoes',
             'wipVetoes',
             'resolvedVetoes',
+            'needsConsensusVetoes',
+            'fullyResolvedVetoes',
             'paginatedResolvedVetoes',
         ]),
         vetoStatuses() {
             const statuses = [
                 { id: 'pending', label: 'Pending Vetoes', vetoes: this.pendingVetoes, isArchive: false },
                 { id: 'chatroom', label: 'Active Chatrooms', vetoes: this.chatroomVetoes, isArchive: false },
-                { id: 'available', label: 'Vetoes Requesting Mediation', vetoes: this.availableVetoes, isArchive: false },
+                { id: 'available', label: 'Requesting Mediation', vetoes: this.availableVetoes, isArchive: false },
                 { id: 'wip', label: 'Mediation in Progress', vetoes: this.wipVetoes, isArchive: false },
+                { id: 'needsConsensus', label: 'Needs Consensus', vetoes: this.needsConsensusVetoes, isArchive: false },
                 { id: 'archive', label: 'Archived Vetoes', vetoes: this.paginatedResolvedVetoes, isArchive: true },
             ];
             const canSeePending = this.loggedInUser && this.loggedInUser.isBnOrNat;
+            const canSeeNeedsConsensus = this.loggedInUser && this.loggedInUser.isNat;
 
-            return canSeePending ? statuses : statuses.filter(s => s.id !== 'pending');
+            return (canSeePending ? statuses : statuses.filter(s => s.id !== 'pending'))
+                .filter(s => canSeeNeedsConsensus || s.id !== 'needsConsensus');
         },
         isProbation () {
             return this.loggedInUser.probationModes.length > 0;
         },
     },
     watch: {
-        resolvedVetoes(v) {
+        fullyResolvedVetoes(v) {
             this.$store.dispatch('vetoes/pagination/updateMaxPages', v.length);
         },
     },

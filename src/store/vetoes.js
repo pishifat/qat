@@ -63,11 +63,25 @@ export default {
         resolvedVetoes: (state, getters) => {
             return getters.filteredVetoes.filter(v => v.status == 'archive');
         },
+        needsConsensusVetoes: (state, getters) => {
+            return getters.resolvedVetoes.filter(v =>
+                v.vetoFormat >= 7 &&
+                v.mediations && v.mediations.length > 0 &&
+                v.reasons && v.reasons.some(r => r.status !== 'upheld' && r.status !== 'dismissed')
+            );
+        },
+        fullyResolvedVetoes: (state, getters) => {
+            return getters.resolvedVetoes.filter(v =>
+                v.vetoFormat < 7 ||
+                !v.mediations || v.mediations.length === 0 ||
+                !v.reasons || v.reasons.every(r => r.status === 'upheld' || r.status === 'dismissed')
+            );
+        },
         paginatedResolvedVetoes: (state, getters, rootState) => {
             const limit = rootState.vetoes.pagination.limit;
             const page = rootState.vetoes.pagination.page;
 
-            return getters.resolvedVetoes.slice(
+            return getters.fullyResolvedVetoes.slice(
                 limit * (page - 1),
                 limit * page
             );
