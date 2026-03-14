@@ -4,6 +4,7 @@ const ApplicationSubmission = () => import(/* webpackChunkName: "public", webpac
 const ReportSubmission = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/ReportSubmission.vue');
 const Users = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/UsersPage.vue');
 const Vetoes = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/VetoesPage.vue');
+const VetoDetail = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/VetoDetailPage.vue');
 const QualityAssurance = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/QualityAssurancePage.vue');
 const YourEvals = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/YourEvalsPage.vue');
 const Message = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/MessagePage.vue');
@@ -33,10 +34,18 @@ const Documentation = () => import(/* webpackChunkName: "nat", webpackPrefetch: 
 const routes = [
     // Public
     { path: '/', component: Home, alias: '/home', name: 'home', meta: { public: true } },
-    { path: '/bnapps', component: ApplicationSubmission, meta: { title: 'Beatmap Nominator Application' }, meta: { public: true } },
-    { path: '/reports', component: ReportSubmission, meta: { title: 'Report Submission' }, meta: { public: true } },
-    { path: '/users', component: Users, meta: { title: 'BN/NAT Listing' }, meta: { public: true } },
-    { path: '/vetoes', component: Vetoes, meta: { title: 'Vetoes' }, meta: { public: true } },
+    { path: '/bnapps', component: ApplicationSubmission, meta: { title: 'Beatmap Nominator Application', public: true } },
+    { path: '/reports', component: ReportSubmission, meta: { title: 'Report Submission', public: true } },
+    { path: '/users', component: Users, meta: { title: 'BN/NAT Listing', public: true } },
+    { path: '/vetoes', component: Vetoes, meta: { title: 'Vetoes', public: true }, beforeEnter: (to, from, next) => {
+        // redirect old query links (e.g. /vetoes?id=123) to new route
+        if (to.query.id) {
+            next({ path: `/vetoes/${to.query.id}`, replace: true });
+        } else {
+            next();
+        }
+    } },
+    { path: '/vetoes/:id', component: VetoDetail, name: 'vetoDetail', meta: { title: 'Veto Details', public: true } },
     { path: '/qualityassurance', component: QualityAssurance, meta: { title: 'Quality Assurance' } },
     { path: '/yourevals', component: YourEvals, meta: { title: 'Your Evaluations' } },
     { path: '/message', component: Message, meta: { title: 'Message from the NAT' } },
@@ -44,7 +53,7 @@ const routes = [
     { path: '/charts', component: BnCharts, meta: { title: 'BN Charts' } },
     { path: '/discussionvote', component: DiscussionVote, meta: { title: 'Content Review' } },
     { path: '/grouphistory', component: GroupHistory, meta: { title: 'Group History', public: true } },
-    { path: '/publicarchive', component: PublicEvalArchive, meta: { title: 'Public Evaluation Archives' }, meta: { public: true } },
+    { path: '/publicarchive', component: PublicEvalArchive, meta: { title: 'Public Evaluation Archives', public: true } },
     { path: '/markdown', component: MarkdownPage, meta: { title: 'Markdown Editor', public: true } },
 
     // BN/NAT

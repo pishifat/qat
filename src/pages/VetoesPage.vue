@@ -26,31 +26,12 @@
             >
                 <h2>
                     {{ status.label }}
-                    <small v-if="status.isArchive && status.vetoes.length">
-                        ({{ fullyResolvedVetoes.length + (reachedMax ? '' : '+') }})
+                    <small v-if="status.isArchive && archivedPagination.totalCount">
+                        ({{ archivedPagination.totalCount }})
                     </small>
                     <small v-else-if="status.vetoes.length">
                         ({{ status.vetoes.length }})
                     </small>
-                    <button
-                        v-if="status.isArchive && !reachedMax"
-                        type="button"
-                        class="btn btn-primary ms-2"
-                        @click="showMore($event)"
-                    >
-                        Show more vetoes
-                    </button>
-                    <button
-                        v-if="status.isArchive && !reachedMax"
-                        type="button"
-                        class="btn btn-secondary ms-2"
-                        data-bs-toggle="tooltip"
-                        data-bs-placement="top"
-                        title="This takes a long time to load"
-                        @click="showAll($event)"
-                    >
-                        Show all vetoes
-                    </button>
                 </h2>
 
                 <div v-if="!status.vetoes.length">
@@ -65,7 +46,16 @@
                     />
                 </transition-group>
 
-                <pagination-nav v-if="status.isArchive" store-module="vetoes" />
+                <div v-if="status.isArchive && archivedLoading" class="text-center pt-3">
+                    <div
+                        class="spinner-border"
+                        role="status"
+                        style="height: 1.62rem; width: 1.62rem;"
+                    >
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <pagination-nav v-else-if="status.isArchive" store-module="vetoes" />
             </section>
             <section v-if="loggedInUser && loggedInUser.isNatLeader" class="card card-body">
                 <h2>Admin</h2>
@@ -95,8 +85,6 @@
             </section>
         </div>
 
-        <veto-info />
-
         <submit-veto />
 
         <toast-messages />
@@ -108,7 +96,6 @@ import { mapState, mapGetters } from 'vuex';
 import vetoesModule from '../store/vetoes';
 import ToastMessages from '../components/ToastMessages.vue';
 import VetoCard from '../components/vetoes/VetoCard.vue';
-import VetoInfo from '../components/vetoes/VetoInfo.vue';
 import SubmitVeto from '../components/vetoes/SubmitVeto.vue';
 import FilterBox from '../components/FilterBox.vue';
 import PaginationNav from '../components/PaginationNav.vue';
@@ -118,25 +105,22 @@ export default {
     components: {
         ToastMessages,
         VetoCard,
-        VetoInfo,
         SubmitVeto,
         FilterBox,
         PaginationNav,
     },
     data() {
         return {
-            skip: 6,
-            limit: 6,
-            reachedMax: false,
             oldVetoId: '',
             newVetoId: '',
+            archivedLoading: false,
         };
     },
     computed: {
         ...mapState([
             'loggedInUser',
         ]),
-        ...mapState('vetoes', ['vetoes']),
+        ...mapState('vetoes', ['archivedPagination']),
         ...mapGetters('vetoes', [
             'pendingVetoes',
             'chatroomVetoes',
@@ -165,8 +149,10 @@ export default {
         },
     },
     watch: {
-        fullyResolvedVetoes(v) {
-            this.$store.dispatch('vetoes/pagination/updateMaxPages', v.length);
+        'archivedPagination.page': {
+            handler(page, oldPage) {
+                if (page > 0 && oldPage !== undefined) this.fetchVetoList(page);
+            },
         },
     },
     beforeCreate() {
@@ -175,69 +161,25 @@ export default {
         }
     },
     async created() {
-        if (this.vetoes.length) return;
-
-        const id = this.$route.query.id;
-
-        if (!id) await this.showMore(null, true);
-
-        else {
-            const veto = await this.$http.initialRequest(
-                `/vetoes/searchVeto/${id}`
-            );
-
-            if (this.$http.isValid(veto)) {
-                this.$store.commit('vetoes/setVetoes', [veto]);
-                this.$store.commit('vetoes/setSelectedVetoId', id);
-                $('#extendedInfo').modal('show');
-            } else {
-                this.$store.dispatch('updateToastMessages', {
-                    message: 'Veto not found',
-                    type: 'danger',
-                });
-            }
-        }
-    },
-    mounted() {
-        setInterval(async () => {
-            this.limit -= this.skip;
-            await this.showMore(null);
-        }, 21600000);
+        await this.fetchVetoList(1, true);
     },
     methods: {
-        async showMore(e, firstLoad) {
-            this.limit += this.skip;
-
-            const startVetoesCount = this.vetoes.length;
-
-            let data;
-
-            if (firstLoad) {
-                data = await this.$http.initialRequest(
-                    `/vetoes/relevantInfo/${this.limit}`
-                );
-            } else {
-                data = await this.$http.executeGet(
-                    `/vetoes/relevantInfo/${this.limit}`,
-                    e
-                );
-            }
-
-            if (data.vetoes) {
-                this.$store.commit('vetoes/setVetoes', data.vetoes);
-
-                if (data.vetoes.length == startVetoesCount) {
-                    this.reachedMax = true;
+        async fetchVetoList(archivedPage = 1, isInitialLoad = false) {
+            const limit = 21;
+            const url = `/v2/vetoes?archivedPage=${archivedPage}&limit=${limit}`;
+            if (!isInitialLoad) this.archivedLoading = true;
+            try {
+                const data = isInitialLoad
+                    ? await this.$http.initialRequest(url)
+                    : await this.$http.executeGet(url);
+                if (data && data.active !== undefined) {
+                    this.$store.commit('vetoes/setVetoListData', {
+                        active: data.active,
+                        archived: data.archived,
+                    });
                 }
-            }
-        },
-        async showAll(e) {
-            const result = confirm(`Are you sure? This will take a while.`);
-
-            if (result) {
-                this.limit = 10000;
-                this.reachedMax = true;
-                await this.showMore(e);
+            } finally {
+                if (!isInitialLoad) this.archivedLoading = false;
             }
         },
         async migrateMediations() {

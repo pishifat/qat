@@ -1,6 +1,14 @@
 import pageFilters from './modules/pageFilters';
 import pagination from './modules/pagination';
 
+/** Mediations can be full array (detail) or just length number (list). */
+function mediationCount(v) {
+    if (!v) return 0;
+    if (Array.isArray(v.mediations)) return v.mediations.length;
+    if (typeof v.mediations === 'number') return v.mediations;
+    return 0;
+}
+
 export default {
     namespaced: true,
     modules: {
@@ -10,6 +18,10 @@ export default {
     state: {
         vetoes: [],
         selectedVetoId: null,
+        selectedVetoData: null,
+        activeVetoes: [],
+        archivedVetoes: [],
+        archivedPagination: { page: 1, limit: 24, totalCount: 0, totalPages: 1 },
     },
     mutations: {
         setVetoes (state, vetoes) {
@@ -18,34 +30,54 @@ export default {
         setSelectedVetoId (state, value) {
             state.selectedVetoId = value;
         },
+        setSelectedVeto (state, veto) {
+            state.selectedVetoData = veto;
+        },
+        setVetoListData (state, { active, archived }) {
+            if (active) state.activeVetoes = active;
+            if (archived) {
+                state.archivedVetoes = archived.vetoes || [];
+                state.archivedPagination = {
+                    page: archived.page || 1,
+                    limit: archived.limit || 24,
+                    totalCount: archived.totalCount || 0,
+                    totalPages: archived.totalPages || 1,
+                };
+            }
+        },
+        setArchivedPage (state, page) {
+            state.archivedPagination = { ...state.archivedPagination, page };
+        },
 
         // modify data
         updateVeto (state, veto) {
+            if (state.selectedVetoData && state.selectedVetoData.id === veto.id) {
+                state.selectedVetoData = veto;
+            }
             const i = state.vetoes.findIndex(v => v.id === veto.id);
             if (i !== -1) state.vetoes[i] = veto;
         },
         addVeto (state, veto) {
             state.vetoes.unshift(veto);
+            state.activeVetoes.unshift(veto);
         },
     },
     getters: {
         // page vetoes
         filteredVetoes: (state, getters, rootState) => {
-            let vetoes = [...state.vetoes];
+            let vetoes = [...state.activeVetoes, ...state.archivedVetoes];
             const mode = rootState.vetoes.pageFilters.filters.mode;
             const value = rootState.vetoes.pageFilters.filters.value;
 
             if (mode) {
                 vetoes = vetoes.filter(v => v.mode === mode);
             }
-
             if (value) {
                 vetoes = vetoes.filter(v =>
-                    v.beatmapTitle.toLowerCase().includes(value.toLowerCase()) ||
-                    v.beatmapMapper.toLowerCase().includes(value.toLowerCase())
+                    (v.beatmapTitle || '').toLowerCase().includes(value.toLowerCase()) ||
+                    (v.beatmapMapper || '').toLowerCase().includes(value.toLowerCase())
                 );
             }
-
             return vetoes;
         },
         pendingVetoes: (state, getters) => {
@@ -66,29 +98,24 @@ export default {
         needsConsensusVetoes: (state, getters) => {
             return getters.resolvedVetoes.filter(v =>
                 v.vetoFormat >= 7 &&
-                v.mediations && v.mediations.length > 0 &&
+                mediationCount(v) > 0 &&
                 v.reasons && v.reasons.some(r => r.status !== 'upheld' && r.status !== 'dismissed')
             );
         },
         fullyResolvedVetoes: (state, getters) => {
             return getters.resolvedVetoes.filter(v =>
                 v.vetoFormat < 7 ||
-                !v.mediations || v.mediations.length === 0 ||
+                mediationCount(v) === 0 ||
                 !v.reasons || v.reasons.every(r => r.status === 'upheld' || r.status === 'dismissed')
             );
         },
-        paginatedResolvedVetoes: (state, getters, rootState) => {
-            const limit = rootState.vetoes.pagination.limit;
-            const page = rootState.vetoes.pagination.page;
-
-            return getters.fullyResolvedVetoes.slice(
-                limit * (page - 1),
-                limit * page
-            );
+        paginatedResolvedVetoes: (state, getters) => {
+            return getters.fullyResolvedVetoes;
         },
 
-        // selected veto
+        // selected veto (from detail fetch or from vetoes list)
         selectedVeto: (state) => {
+            if (state.selectedVetoData) return state.selectedVetoData;
             return state.vetoes.find(v => v.id === state.selectedVetoId);
         },
         isMediator: (state, getters, rootState) => {

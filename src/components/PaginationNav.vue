@@ -39,6 +39,9 @@ export default {
             return this.type ? this.$store.state[this.storeModule].evalPagination : this.$store.state[this.storeModule].pagination;
         },
         page () {
+            if (this.storeModule === 'vetoes') {
+                return this.$store.state.vetoes.archivedPagination.page;
+            }
             return this.type === 'applications' ?
                 this.pagination.archivedAppsPage :
                 this.type === 'evaluations' ?
@@ -46,6 +49,9 @@ export default {
                     this.pagination.page;
         },
         maxPages () {
+            if (this.storeModule === 'vetoes') {
+                return this.$store.state.vetoes.archivedPagination.totalPages;
+            }
             return this.type === 'applications' ?
                 this.pagination.archivedAppsMaxPages :
                 this.type === 'evaluations' ?
@@ -55,6 +61,10 @@ export default {
     },
     methods: {
         increasePage () {
+            if (this.storeModule === 'vetoes') {
+                this.$store.commit('vetoes/setArchivedPage', this.page + 1);
+                return;
+            }
             const mutation =
                 this.type === 'applications' ?
                     '/evalPagination/increaseArchivedAppsPage' :
@@ -65,6 +75,10 @@ export default {
             this.$store.commit(this.storeModule + mutation);
         },
         decreasePage () {
+            if (this.storeModule === 'vetoes') {
+                this.$store.commit('vetoes/setArchivedPage', this.page - 1);
+                return;
+            }
             const mutation =
                 this.type === 'applications' ?
                     '/evalPagination/decreaseArchivedAppsPage' :
