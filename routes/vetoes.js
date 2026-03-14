@@ -260,7 +260,7 @@ function sanitizeVeto(veto, mongoId, isNat) {
     return obj;
 }
 
-/* GET vetoes list. */
+/* GET vetoes list.
 router.get('/relevantInfo/:limit', async (req, res) => {
     const isNat = res.locals.userRequest.isNat;
     const canSeePending = res.locals.userRequest.isBnOrNat;
@@ -304,8 +304,9 @@ router.get('/relevantInfo/:limit', async (req, res) => {
         vetoes,
     });
 });
+ */
 
-/* GET specific veto */
+/* GET specific veto 
 router.get('/searchVeto/:id', async (req, res) => {
     const isNat = res.locals.userRequest.isNat;
     const canSeePending = res.locals.userRequest.isBnOrNat;
@@ -334,6 +335,7 @@ router.get('/searchVeto/:id', async (req, res) => {
 
     res.json(veto);
 });
+*/
 
 /* POST create a new veto. */
 router.post('/submit', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req, res) => {
@@ -400,7 +402,7 @@ router.post('/submit', middlewares.isLoggedIn, middlewares.isBnOrNat, async (req
         veto._id
     );
 
-    let description = `Anonymous user submitted [veto for **${veto.beatmapTitle}** by **${veto.beatmapMapper}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`;
+    let description = `Anonymous user submitted [veto for **${veto.beatmapTitle}** by **${veto.beatmapMapper}**](https://bn.mappersguild.com/vetoes/${veto.id})`;
 
     for (let i = 0; i < veto.reasons.length; i++) {
         description += `\n- **Reason ${i + 1}:** ${veto.reasons[i].summary}`;
@@ -463,7 +465,7 @@ router.post('/submitMediation/:id', middlewares.isLoggedIn, middlewares.isBnOrNa
     }
 
     if (isFirstComment) {
-        let description = `Submitted opinion on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`;
+        let description = `Submitted opinion on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes/${veto.id})`;
 
         if (veto.reasons.length > 1) {
             for (let i = 0; i < veto.reasons.length; i++) {
@@ -523,7 +525,7 @@ router.post('/resetMediation/:id', middlewares.isLoggedIn, middlewares.isAdmin, 
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),
         color: discord.webhookColors.black,
-        description: `Reset mediation vote and comment by **${mediation.mediator.username}** for [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`,
+        description: `Reset mediation vote and comment by **${mediation.mediator.username}** for [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes/${veto.id})`,
     }],
     veto.mode
     );
@@ -620,7 +622,7 @@ router.post('/beginMediation/:id', middlewares.isLoggedIn, middlewares.isNat, as
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),
         color: discord.webhookColors.purple,
-        description: `Started mediation on [veto for **${v.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${v.id})`,
+        description: `Started mediation on [veto for **${v.beatmapTitle}**](https://bn.mappersguild.com/vetoes/${v.id})`,
     }],
     'publicVetoes');
 });
@@ -647,7 +649,7 @@ router.post('/concludeMediation/:id', middlewares.isLoggedIn, middlewares.isNat,
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),
         color: discord.webhookColors.purple,
-        description: `Concluded mediation on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`,
+        description: `Concluded mediation on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes/${veto.id})`,
     }],
     'publicVetoes');
 });
@@ -670,7 +672,7 @@ router.post('/continueMediation/:id', middlewares.isLoggedIn, middlewares.isNat,
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),
         color: discord.webhookColors.purple,
-        description: `**Resumed** mediation on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`,
+        description: `**Resumed** mediation on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes/${veto.id})`,
     }],
     veto.mode);
 });
@@ -731,7 +733,7 @@ router.post('/sendMessages/:id', middlewares.isLoggedIn, middlewares.isNat, asyn
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),
         color: discord.webhookColors.white,
-        description: `Sent chat messages to mediators of [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`,
+        description: `Sent chat messages to mediators of [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes/${veto.id})`,
     }],
     veto.mode);
 });
@@ -812,7 +814,7 @@ router.post('/toggleVouch/:id', middlewares.isLoggedIn, middlewares.isBnOrNat, a
     );
 
     if (toggleWebhook) {
-        const description = `**2 users** vouched for [veto for **${veto.beatmapTitle}** by **${veto.beatmapMapper}**](https://bn.mappersguild.com/vetoes?id=${veto.id})\n\nReview and initiate veto if necessary!`;
+        const description = `**2 users** vouched for [veto for **${veto.beatmapTitle}** by **${veto.beatmapMapper}**](https://bn.mappersguild.com/vetoes/${veto.id})\n\nReview and initiate veto if necessary!`;
 
         discord.webhookPost([{
             color: discord.webhookColors.lightPurple,
@@ -888,7 +890,7 @@ router.post('/createChatroom/:id', middlewares.isLoggedIn, middlewares.isNat, as
         name: `Veto Discussion (${veto.mode == 'all' ? 'All game modes' : veto.mode == 'osu' ? 'osu!' : `osu!${veto.mode}`})`,
         description: `A pending veto you're involved with has opened discussion`,
     };
-    const words = `Discussion for the pending veto on [**${veto.beatmapTitle}**](https://osu.ppy.sh/beatmapsets/${veto.beatmapId}) has begun!\n\nTry to reach a conclusion here: http://bn.mappersguild.com/vetoes?id=${veto.id}\n\nIf a conclusion cannot be reached, the veto may be mediated by a larger group of Beatmap Nominators.`;
+    const words = `Discussion for the pending veto on [**${veto.beatmapTitle}**](https://osu.ppy.sh/beatmapsets/${veto.beatmapId}) has begun!\n\nTry to reach a conclusion here: http://bn.mappersguild.com/vetoes/${veto.id}\n\nIf a conclusion cannot be reached, the veto may be mediated by a larger group of Beatmap Nominators.`;
 
     // sending each message in a separate announcement to preserve anonymity
     for (const user of veto.chatroomUsers) {
@@ -1100,7 +1102,7 @@ router.post('/requestMediation/:id', middlewares.isLoggedIn, async (req, res) =>
     );
 
     if (!alreadyRequested) {
-        const description = `Mediation requested on [veto for **${veto.beatmapTitle}** by **${veto.beatmapMapper}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`;
+        const description = `Mediation requested on [veto for **${veto.beatmapTitle}** by **${veto.beatmapMapper}**](https://bn.mappersguild.com/vetoes/${veto.id})`;
 
         discord.webhookPost([{
             color: discord.webhookColors.lightPink,
@@ -1296,7 +1298,7 @@ router.post('/vote/:id', middlewares.isLoggedIn, async (req, res) => {
 
         discord.webhookPost([{
             color: discord.webhookColors.purple,
-            description: `[Veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id}) dismissed by vote. Check to make sure if everything worked, and move to archive if so.`,
+            description: `[Veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes/${veto.id}) dismissed by vote. Check to make sure if everything worked, and move to archive if so.`,
         }],
         veto.mode);
     }
@@ -1343,7 +1345,7 @@ router.post('/setStatusAvailable/:id', middlewares.isLoggedIn, middlewares.isNat
         veto._id
     );
 
-    let description = `Concluded discussion on [veto for **${veto.beatmapTitle}** by **${veto.beatmapMapper}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`;
+    let description = `Concluded discussion on [veto for **${veto.beatmapTitle}** by **${veto.beatmapMapper}**](https://bn.mappersguild.com/vetoes/${veto.id})`;
 
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),
@@ -1373,7 +1375,7 @@ router.post('/setStatusArchive/:id', middlewares.isLoggedIn, middlewares.isNat, 
         veto._id
     );
 
-    let description = `Archived [veto for **${veto.beatmapTitle}** by **${veto.beatmapMapper}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`;
+    let description = `Archived [veto for **${veto.beatmapTitle}** by **${veto.beatmapMapper}**](https://bn.mappersguild.com/vetoes/${veto.id})`;
 
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor(req.session),

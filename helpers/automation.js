@@ -306,7 +306,7 @@ const expirePendingVetoes = cron.schedule('2 17 * * *', async () => {
             await discord.webhookPost(
                 [{
                     color: discord.webhookColors.darkPurple,
-                    description: `Automatically concluded [pending veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id}). Not enough BNs supported the veto and the map is now Ranked!`,
+                    description: `Automatically concluded [pending veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes/${veto.id}). Not enough BNs supported the veto and the map is now Ranked!`,
                 }],
                 'publicVetoes'
             );
@@ -370,7 +370,7 @@ const notifyVetoes = cron.schedule('1 17 * * *', async () => {
             await discord.webhookPost(
                 [{
                     color: discord.webhookColors.purple,
-                    description: `Automatically concluded mediation on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes?id=${veto.id})`,
+                    description: `Automatically concluded mediation on [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes/${veto.id})`,
                 }],
                 veto.mode
             );
@@ -385,7 +385,7 @@ const notifyVetoes = cron.schedule('1 17 * * *', async () => {
         } else { // send overdue webhook and reminders to users
             await discord.webhookPost(
                 [{
-                    description: `Veto mediation for [**${veto.beatmapTitle}**](http://bn.mappersguild.com/vetoes?id=${veto.id}) is overdue!\n\nLess than 60% of users have voted. Sending reminders...`,
+                    description: `Veto mediation for [**${veto.beatmapTitle}**](http://bn.mappersguild.com/vetoes/${veto.id}) is overdue!\n\nLess than 60% of users have voted. Sending reminders...`,
                     color: discord.webhookColors.red,
                 }],
                 veto.mode
@@ -398,7 +398,7 @@ const notifyVetoes = cron.schedule('1 17 * * *', async () => {
                 name: `Veto mediation reminder`,
                 description: 'Notice for veto mediation',
             }
-            const message = `This veto still needs your input! Please submit your opinion here: http://bn.mappersguild.com/vetoes?id=${veto.id}`;
+            const message = `This veto still needs your input! Please submit your opinion here: http://bn.mappersguild.com/vetoes/${veto.id}`;
             await osuBot.sendAnnouncement(pendingOsuIds, channel, message);
         }
     }

@@ -15,7 +15,7 @@
         </h5>
 
         <h5 v-if="veto.status !== 'archive'" class="text-center">
-            <a :href="'/vetoes?id=' + veto.id">View mediation here</a>
+            <a :href="'/vetoes/' + veto.id">View mediation here</a>
         </h5>
 
         <div v-if="veto.status !== 'archive'">
@@ -31,7 +31,7 @@
                     </ul>
                 </div>
                 <hr>
-                <p><b>Please post your opinion on the veto <a :href="'/vetoes?id=' + veto.id">here</a> within one week.</b></p>
+                <p><b>Please post your opinion on the veto <a :href="'/vetoes/' + veto.id">here</a> within one week.</b></p>
                 <div>Your decision will be anonymous to everyone but members of the NAT.</div>
                 <div>Thank you!</div>
             </div>
