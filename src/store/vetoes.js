@@ -64,21 +64,9 @@ export default {
     },
     getters: {
         // page vetoes
-        filteredVetoes: (state, getters, rootState) => {
-            let vetoes = [...state.activeVetoes, ...state.archivedVetoes];
-            const mode = rootState.vetoes.pageFilters.filters.mode;
-            const value = rootState.vetoes.pageFilters.filters.value;
-
-            if (mode) {
-                vetoes = vetoes.filter(v => v.mode === mode);
-            }
-            if (value) {
-                vetoes = vetoes.filter(v =>
-                    (v.beatmapTitle || '').toLowerCase().includes(value.toLowerCase()) ||
-                    (v.beatmapMapper || '').toLowerCase().includes(value.toLowerCase())
-                );
-            }
-            return vetoes;
+        // Server applies mode/search filters; list is already filtered
+        filteredVetoes: (state) => {
+            return [...state.activeVetoes, ...state.archivedVetoes];
         },
         pendingVetoes: (state, getters) => {
             return getters.filteredVetoes.filter(v => v.status === 'pending');
@@ -112,6 +100,8 @@ export default {
         paginatedResolvedVetoes: (state, getters) => {
             return getters.fullyResolvedVetoes;
         },
+        /** Server-returned archived list (filtered + paginated by API). Use for Archived section to avoid omitting vetoes that lack reason.status. */
+        archivedVetoesList: (state) => state.archivedVetoes,
 
         // selected veto (from detail fetch or from vetoes list)
         selectedVeto: (state) => {

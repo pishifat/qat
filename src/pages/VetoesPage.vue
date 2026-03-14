@@ -128,8 +128,7 @@ export default {
             'wipVetoes',
             'resolvedVetoes',
             'needsConsensusVetoes',
-            'fullyResolvedVetoes',
-            'paginatedResolvedVetoes',
+            'archivedVetoesList',
         ]),
         vetoStatuses() {
             const statuses = [
@@ -138,7 +137,7 @@ export default {
                 { id: 'available', label: 'Requesting Mediation', vetoes: this.availableVetoes, isArchive: false },
                 { id: 'wip', label: 'Mediation in Progress', vetoes: this.wipVetoes, isArchive: false },
                 { id: 'needsConsensus', label: 'Needs Consensus', vetoes: this.needsConsensusVetoes, isArchive: false },
-                { id: 'archive', label: 'Archived Vetoes', vetoes: this.paginatedResolvedVetoes, isArchive: true },
+                { id: 'archive', label: 'Archived Vetoes', vetoes: this.archivedVetoesList, isArchive: true },
             ];
             const canSeePending = this.loggedInUser && this.loggedInUser.isBnOrNat;
 
@@ -154,6 +153,13 @@ export default {
                 if (page > 0 && oldPage !== undefined) this.fetchVetoList(page);
             },
         },
+        '$store.state.vetoes.pageFilters.filters': {
+            handler() {
+                this.$store.commit('vetoes/setArchivedPage', 1);
+                this.fetchVetoList(1, false);
+            },
+            deep: true,
+        },
     },
     beforeCreate() {
         if (!this.$store.hasModule('vetoes')) {
@@ -166,7 +172,14 @@ export default {
     methods: {
         async fetchVetoList(archivedPage = 1, isInitialLoad = false) {
             const limit = 21;
-            const url = `/v2/vetoes?archivedPage=${archivedPage}&limit=${limit}`;
+            const filters = this.$store.state.vetoes?.pageFilters?.filters || {};
+            const params = new URLSearchParams({
+                archivedPage: String(archivedPage),
+                limit: String(limit),
+            });
+            if (filters.mode) params.set('mode', filters.mode);
+            if (filters.value) params.set('search', filters.value);
+            const url = `/v2/vetoes?${params.toString()}`;
             if (!isInitialLoad) this.archivedLoading = true;
             try {
                 const data = isInitialLoad

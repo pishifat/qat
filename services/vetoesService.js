@@ -1,4 +1,5 @@
 const Veto = require('../models/veto');
+const { escapeRegex } = require('../helpers/util');
 
 // Minimal projection for list views
 const MINIMAL_SELECT = '_id beatmapId beatmapTitle beatmapMapper beatmapMapperId mode status createdAt deadline vetoFormat reasons mediations';
@@ -84,12 +85,40 @@ function ensureId(doc) {
 }
 
 /**
- * Fetch non-archived vetoes with minimal projection (no populate).
+ * Build MongoDB filter for list filtering (mode + beatmap search).
+ * Mode filter matches vetoes where mode is the specified mode or "all" (all applies to every mode).
+ * @param {{ mode?: string, search?: string }} opts
+ * @returns {object} Filter to merge with status filter
  */
-async function fetchActiveVetoesMinimal(isNat, canSeePending, mongoId) {
+function buildListFilters(opts = {}) {
+    const conditions = [];
+    if (opts.mode && opts.mode.trim()) {
+        const modeStr = opts.mode.trim();
+        conditions.push({ $or: [{ mode: modeStr }, { mode: 'all' }] });
+    }
+    if (opts.search && opts.search.trim()) {
+        const escaped = escapeRegex(opts.search.trim());
+        conditions.push({
+            $or: [
+                { beatmapTitle: { $regex: escaped, $options: 'i' } },
+                { beatmapMapper: { $regex: escaped, $options: 'i' } },
+            ],
+        });
+    }
+    if (conditions.length === 0) return {};
+    if (conditions.length === 1) return conditions[0];
+    return { $and: conditions };
+}
+
+/**
+ * Fetch non-archived vetoes with minimal projection (no populate).
+ * @param {object} listFilters - Optional { mode, search } for server-side filtering
+ */
+async function fetchActiveVetoesMinimal(isNat, canSeePending, mongoId, listFilters = {}) {
     const filter = canSeePending
         ? { status: { $ne: 'archive' } }
         : { status: { $nin: ['archive', 'pending'] } };
+    Object.assign(filter, buildListFilters(listFilters));
 
     const vetoes = await Veto.find(filter)
         .select(MINIMAL_SELECT)
@@ -102,10 +131,14 @@ async function fetchActiveVetoesMinimal(isNat, canSeePending, mongoId) {
 /**
  * Fetch archived vetoes with minimal projection, paginated.
  * mediations is returned as length only to keep payload small.
+ * @param {object} listFilters - Optional { mode, search } for server-side filtering
  */
-async function fetchArchivedVetoesMinimal(page, limit, mongoId) {
+async function fetchArchivedVetoesMinimal(page, limit, mongoId, listFilters = {}) {
+    const filter = { status: 'archive' };
+    Object.assign(filter, buildListFilters(listFilters));
+
     const skip = (Math.max(1, page) - 1) * limit;
-    const vetoes = await Veto.find({ status: 'archive' })
+    const vetoes = await Veto.find(filter)
         .select(MINIMAL_SELECT)
         .sort({ createdAt: -1 })
         .skip(skip)
@@ -120,10 +153,13 @@ async function fetchArchivedVetoesMinimal(page, limit, mongoId) {
 }
 
 /**
- * Count archived vetoes for pagination.
+ * Count archived vetoes for pagination (respects same list filters).
+ * @param {object} listFilters - Optional { mode, search }
  */
-async function countArchivedVetoes() {
-    return Veto.countDocuments({ status: 'archive' });
+async function countArchivedVetoes(listFilters = {}) {
+    const filter = { status: 'archive' };
+    Object.assign(filter, buildListFilters(listFilters));
+    return Veto.countDocuments(filter);
 }
 
 /**

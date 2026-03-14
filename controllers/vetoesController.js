@@ -11,10 +11,15 @@ async function getList(req, res) {
     const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 21));
     const mongoId = req.session.mongoId;
 
+    const listFilters = {
+        mode: (req.query.mode || '').trim() || undefined,
+        search: (req.query.search || req.query.value || '').trim() || undefined,
+    };
+
     const [active, archivedVetoes, totalCount] = await Promise.all([
-        vetoesService.fetchActiveVetoesMinimal(isNat, canSeePending, mongoId),
-        vetoesService.fetchArchivedVetoesMinimal(archivedPage, limit, mongoId),
-        vetoesService.countArchivedVetoes(),
+        vetoesService.fetchActiveVetoesMinimal(isNat, canSeePending, mongoId, listFilters),
+        vetoesService.fetchArchivedVetoesMinimal(archivedPage, limit, mongoId, listFilters),
+        vetoesService.countArchivedVetoes(listFilters),
     ]);
 
     const totalPages = Math.max(1, Math.ceil(totalCount / limit));
