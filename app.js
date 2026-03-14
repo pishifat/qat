@@ -37,6 +37,7 @@ const manageReportsRouter = require('./routes/manageReports');
 const usersRouter = require('./routes/users/users');
 const natRouter = require('./routes/users/nat');
 const vetoesRouter = require('./routes/vetoes');
+const vetoesV2Router = require('./routes/vetoesV2');
 const discussionVoteRouter = require('./routes/discussionVote');
 const qualityAssuranceRouter = require('./routes/qualityAssurance');
 const logsRouter = require('./routes/logs');
@@ -152,6 +153,8 @@ apiRouter.use('/debug', debugRouter);
 apiRouter.use('/groupHistory', groupHistoryRouter);
 apiRouter.use('/docs', documentationRouter);
 apiRouter.use('/charts', chartsRouter);
+
+apiRouter.use('/v2/vetoes', vetoesV2Router);
 
 app.use('/api', apiRouter);
 

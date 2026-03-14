@@ -1,9 +1,8 @@
 <template>
-    <div class="col-md-6 col-lg-4 my-2" @click="selectVeto()">
-        <div
-            class="card card-individual"
-            data-bs-toggle="modal"
-            data-bs-target="#extendedInfo"
+    <div class="col-md-6 col-lg-4 my-2">
+        <router-link
+            :to="'/vetoes/' + veto.id"
+            class="card card-individual text-decoration-none text-body"
             :data-veto="veto.id"
         >
             <img :src="`https://assets.ppy.sh/beatmaps/${veto.beatmapId}/covers/card.jpg`" class="card-img">
@@ -51,7 +50,7 @@
                     />
                 </div>
             </div>
-        </div>
+        </router-link>
     </div>
 </template>
 
@@ -71,15 +70,6 @@ export default {
         veto: {
             type: Object,
             required: true,
-        },
-    },
-    methods: {
-        selectVeto () {
-            this.$store.commit('vetoes/setSelectedVetoId', this.veto.id);
-
-            if (this.$route.query.id !== this.veto.id) {
-                this.$router.replace(`/vetoes?id=${this.veto.id}`);
-            }
         },
     },
 };

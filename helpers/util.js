@@ -14,6 +14,16 @@ function escapeUsername(username) {
 }
 
 /**
+ * Escape special regex characters for safe use in MongoDB $regex (or other RegExp).
+ * @param {string} str
+ * @returns {string}
+ */
+function escapeRegex(str) {
+    if (typeof str !== 'string') return '';
+    return str.replace(/\\/g, '\\\\').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
  *
  * @param {string} url ex: https://osu.ppy.sh/beatmapsets/930028/discussion#/893132
  */
@@ -222,6 +232,7 @@ function formatModeForDatabase(mode) {
 
 module.exports = {
     escapeUsername,
+    escapeRegex,
     getBeatmapsetIdFromUrl,
     isValidUrl,
     isValidUrlOrThrow,

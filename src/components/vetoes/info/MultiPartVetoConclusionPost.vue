@@ -13,7 +13,7 @@
         <span>---</span>
 
         <br>
-        <span>View the full outcome of this veto here: https://bn.mappersguild.com/vetoes?id={{ selectedVeto.id }}</span>
+        <span>View the full outcome of this veto here: https://bn.mappersguild.com/vetoes/{{ selectedVeto.id }}</span>
         <br>
 
         <div v-if="allDismissed">
