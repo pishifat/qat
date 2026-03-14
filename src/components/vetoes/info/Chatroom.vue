@@ -2,12 +2,12 @@
     <div class="mb-2">
         <div
             ref="messagesScroll"
-            class="chatroom-messages"
+            class="chatroom-messages card"
         >
             <div
                 v-for="(message, i) in selectedVeto.chatroomMessages"
                 :key="i"
-                class="card card-body mb-2"
+                class="card card-body mb-2 bg-primary"
                 :class="message.role === 'system' ? 'card-bg-system' : message.role === 'moderator' ? 'card-bg-nat' : 'card-bg-user'"
             >
                 <div class="card-message-header">
@@ -368,6 +368,8 @@ export default {
     min-height: 200px;
     overflow-y: auto;
     margin-bottom: 1rem;
+    padding: 1rem;
+    border: 0px;
 }
 .card-bg-system {
     background-image: url('/images/nat.png');
