@@ -25,6 +25,11 @@ const vetoesSchema = new mongoose.Schema({
     mediations: [{ type: 'ObjectId', ref: 'Mediation' }],
     deadline: { type: Date },
     vouchingUsers: [{ type: 'ObjectId', ref: 'User' }],
+    vouchHistory: [{
+        user: { type: 'ObjectId', ref: 'User', required: true },
+        type: { type: String, enum: ['vouch', 'unvouch'], required: true },
+        timestamp: { type: Date, required: true, default: Date.now },
+    }],
     chatroomUsers: [{ type: 'ObjectId', ref: 'User' }],
     chatroomUsersPublic: [{ type: 'ObjectId', ref: 'User' }],
     chatroomInitiated: { type: Date },

@@ -231,6 +231,7 @@ function canRequestMediation(req, veto) {
  * Returns a plain-object veto safe to send to a non-NAT user:
  * - filters mediations and publicMediations to only the current user's entries unless user is NAT or veto is archived
  * - anonymizes chatroomMediationRequestedUsers (keeps array length and current user's ref, replaces others with placeholder)
+ * - hides vouchHistory from non-NAT users
  */
 function sanitizeVeto(veto, mongoId, isNat) {
     const obj = veto && (typeof veto.toObject === 'function' ? veto.toObject() : { ...veto });
@@ -256,6 +257,9 @@ function sanitizeVeto(veto, mongoId, isNat) {
             userRefMatches(u) ? u : { id: '__anonymous__' }
         );
     }
+
+    // 4. vouchHistory is only used internally; hide it from non-NAT users
+    obj.vouchHistory = [];
 
     return obj;
 }
@@ -763,22 +767,50 @@ router.post('/toggleVouch/:id', middlewares.isLoggedIn, middlewares.isBnOrNat, a
     const isVouching = !vouchingUserIds.includes(userId);
 
     if (isVouching) {
-        const fortyEightHoursAgo = new Date(Date.now() - 48 * 60 * 60 * 1000);
-        const recentVouch = await Veto.findOne(
-            { vouchingUsers: userId, updatedAt: { $gte: fortyEightHoursAgo } },
-            { _id: 1 }
-        ).lean();
+        const allVouchedVetoes = await Veto.find({ 'vouchHistory.user': userId });
 
-        if (recentVouch) {
-            return res.json({ error: 'You can only vouch for one veto every 48 hours. Please try again later.' });
+        // Find the most recent vouch across all vetoes that isn't followed by an unvouch
+        let lastActiveVouch = null;
+
+        for (const v of allVouchedVetoes) {
+            const userHistory = (v.vouchHistory || [])
+                .filter(entry => String(entry.user) === String(userId))
+                .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+            if (!userHistory.length) continue;
+
+            const latest = userHistory[userHistory.length - 1];
+
+            if (latest.type === 'vouch') {
+                if (!lastActiveVouch || new Date(latest.timestamp) > new Date(lastActiveVouch.timestamp)) {
+                    lastActiveVouch = latest;
+                }
+            }
+        }
+
+        if (lastActiveVouch) {
+            const fortyEightHoursAgo = new Date(Date.now() - 48 * 60 * 60 * 1000);
+
+            if (lastActiveVouch.timestamp >= fortyEightHoursAgo) {
+                return res.json({ error: 'You can only vouch for one veto every 48 hours. Please try again later.' });
+            }
         }
     }
 
     let toggleWebhook = false;
 
+    if (!Array.isArray(veto.vouchHistory)) {
+        veto.vouchHistory = [];
+    }
+
     if (isVouching) {
         // add user to vouchingUsers
         veto.vouchingUsers.push(res.locals.userRequest._id);
+        veto.vouchHistory.push({
+            user: userId,
+            type: 'vouch',
+            timestamp: new Date(),
+        });
 
         if (veto.vouchingUsers.length == 2) {
             toggleWebhook = true;
@@ -787,6 +819,11 @@ router.post('/toggleVouch/:id', middlewares.isLoggedIn, middlewares.isBnOrNat, a
         // remove user from vouchingUsers
         let index = veto.vouchingUsers.findIndex(u => u.id == userId);
         veto.vouchingUsers.splice(index, 1);
+        veto.vouchHistory.push({
+            user: userId,
+            type: 'unvouch',
+            timestamp: new Date(),
+        });
     }
 
     await veto.save();
@@ -803,7 +840,7 @@ router.post('/toggleVouch/:id', middlewares.isLoggedIn, middlewares.isBnOrNat, a
 
     res.json({
         veto,
-        success: 'Done!',
+        success: `${isVouching? 'Vouched' : 'Removed vouch'} for veto`,
     });
 
     Logger.generate(

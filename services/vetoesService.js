@@ -74,6 +74,9 @@ function sanitizeVeto(veto, mongoId, isNat) {
             userRefMatches(u) ? u : { id: '__anonymous__' }
         );
     }
+
+    obj.vouchHistory = [];
+
     return obj;
 }
 
