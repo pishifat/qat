@@ -11,6 +11,7 @@
                 {{ error }}
             </div>
         </div>
+        <toast-messages />
     </div>
 </template>
 
@@ -19,12 +20,14 @@ import { mapGetters } from 'vuex';
 import vetoesModule from '../store/vetoes';
 import VetoDetailHeader from '../components/vetoes/info/VetoDetailHeader.vue';
 import VetoDetailContent from '../components/vetoes/VetoDetailContent.vue';
+import ToastMessages from '../components/ToastMessages.vue';
 
 export default {
     name: 'VetoDetailPage',
     components: {
         VetoDetailHeader,
         VetoDetailContent,
+        ToastMessages,
     },
     data() {
         return {
