@@ -150,9 +150,9 @@ router.get('/report/:id', async (req, res) => {
         return res.json({ error: 'Report not found' });
     }
     const isReporter = report.reporter && res.locals.userRequest.osuId === report.reporter.osuId;
-    const isNat = res.locals.userRequest.isNat;
-    if (!isReporter && !isNat) {
-        return res.json({ error: 'Unauthorized - You must be the report submitter or NAT to view this report' });
+    const isModerator = res.locals.userRequest.hasFullReadAccess;
+    if (!isReporter && !isModerator) {
+        return res.json({ error: 'Unauthorized - You must be the report submitter or a moderator to view this report' });
     }
     return res.json(report);
 });
