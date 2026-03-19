@@ -148,8 +148,7 @@ export default {
 
 .fake-disabled :deep(button),
 .fake-disabled :deep(input),
-.fake-disabled :deep(textarea),
-.fake-disabled :deep(a) {
+.fake-disabled :deep(textarea) {
     pointer-events: none;
 }
 
