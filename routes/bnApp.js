@@ -320,6 +320,12 @@ router.post('/rejoinApply', middlewares.isLoggedIn, async (req, res) => {
         });
     }
 
+    if (res.locals.userRequest.isBannedFromBn) {
+        return res.json({
+            error: `You're currently banned from joining the BN. Contact support@ppy.sh for details`,
+        });
+    }
+
     // get user's osu! information
     const userInfo = await osu.getUserInfo(req.session.accessToken);
 

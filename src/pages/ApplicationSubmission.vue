@@ -90,8 +90,12 @@
             <hr>
         </template>
 
+        <div v-if="loggedInUser && loggedInUser.isBannedFromBn" class="alert alert-danger">
+            You are currently banned from joining the Beatmap Nominators. Contact support@ppy.sh for more information.
+        </div>
+
         <!-- instant rejoin -->
-        <template v-if="relevantResignation && relevantResignation.consensus === 'resignedOnGoodTerms' && !cooldowns.length">
+        <template v-if="relevantResignation && relevantResignation.consensus === 'resignedOnGoodTerms' && !cooldowns.length && !loggedInUser.isBannedFromBn">
             <div class="card card-body">
                 <h4>Bypass application</h4>
                 <p class="mt-2">
@@ -116,7 +120,7 @@
         </template>
 
         <!-- application -->
-        <div class="card card-body">
+        <div v-if="!loggedInUser.isBannedFromBn" class="card card-body">
             <!-- game modes -->
             <div>
                 <h4>Game mode</h4>
