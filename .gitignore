@@ -24,6 +24,7 @@ jspm_packages/
 # dotenv environment variables file
 .env
 
+# manual
 config.json
 webhooks.json
 dist/
@@ -33,9 +34,6 @@ public/index.html
 .vscode/
 *.csv
 yarn.lock
-.claude/
-CLAUDE.md
-
 config.json.*
 webhooks.json.*
 public/*.png
