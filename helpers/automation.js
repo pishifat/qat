@@ -517,7 +517,7 @@ const notifyCurrentBnEvaluations = cron.schedule('3 17 * * *', async () => {
         let needsNewEvaluator;
 
         const hasAssignedNatEvaluators = eval.natEvaluators && eval.natEvaluators.length;
-        const hasAssignedBnEvaluators = eval.natEvaluators && eval.natEvaluators.length;
+        const hasAssignedBnEvaluators = eval.bnEvaluators && eval.bnEvaluators.length;
 
         if (!hasAssignedNatEvaluators) {
             // check user activity, send notice if too low
