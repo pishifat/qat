@@ -4,7 +4,7 @@ const AppEvaluation = require('../../models/evaluations/appEvaluation');
 const BnEvaluation = require('../../models/evaluations/bnEvaluation');
 const User = require('../../models/user');
 const Logger = require('../../models/log');
-const { submitEval, submitMockEval, selectMockEvaluators, setGroupEval, setFeedback, replaceUser } = require('./evaluations');
+const { submitEval, submitMockEval, selectMockEvaluators, setGroupEval, setFeedback, replaceUser, convertMockReviewToReviews } = require('./evaluations');
 const middlewares = require('../../helpers/middlewares');
 const util = require('../../helpers/util');
 const discord = require('../../helpers/discord');
@@ -787,6 +787,44 @@ router.post('/deleteReview/:id', middlewares.isAdmin, async (req, res) => {
         'appEvaluation',
         app._id
     );
+});
+
+/* POST convert mock review to formal reviews */
+router.post('/convertMockReview/:id', middlewares.isNat, async (req, res) => {
+    let evaluation = await AppEvaluation
+        .findById(req.params.id)
+        .populate(defaultPopulate)
+        .orFail();
+
+    const result = await convertMockReviewToReviews(evaluation, req.body.mockReviewId);
+
+    if (result.error) {
+        return res.json({ error: result.error });
+    }
+
+    evaluation = await AppEvaluation
+        .findById(req.params.id)
+        .populate(defaultPopulate);
+
+    const converted = evaluation.reviews.find(r => String(r._id) === String(req.body.mockReviewId));
+
+    res.json(evaluation);
+
+    if (converted) {
+        discord.webhookPost([{
+            author: discord.defaultWebhookAuthor(req.session),
+            color: discord.webhookColors.lightGreen,
+            description: `Converted mock evaluation by **${converted.evaluator.username}** to a real review on [**${evaluation.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${evaluation.id})`,
+        }],
+        evaluation.mode);
+
+        Logger.generate(
+            req.session.mongoId,
+            `Converted mock evaluation by "${converted.evaluator.username}" to real review on ${evaluation.user.username}'s ${evaluation.mode} BN app`,
+            'appEvaluation',
+            evaluation._id
+        );
+    }
 });
 
 module.exports = router;

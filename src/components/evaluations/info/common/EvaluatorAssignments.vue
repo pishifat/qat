@@ -63,8 +63,11 @@
             </div>
             <div :class="columnClasses.totalEvaluations">
                 <user-list
-                    :header="'Total evaluations: (' + (selectedEvaluation.reviews || []).length + ')'"
+                    :header="'Total evaluations: (' + submittedEvaluators.length + ')'"
                     :user-list="submittedEvaluators"
+                    :is-application="selectedEvaluation.isApplication"
+                    :convert-mock-review-evaluation-id="selectedEvaluation.id"
+                    :mode="selectedEvaluation.mode"
                 />
             </div>
         </div>
@@ -108,6 +111,7 @@ export default {
             const mockEvaluatorsWithFlag = mockReviews.map(review => ({
                 ...review.evaluator,
                 isMockEvaluator: true,
+                convertMockReviewId: review.id || review._id,
             }));
 
             return [...evaluators, ...mockEvaluatorsWithFlag];

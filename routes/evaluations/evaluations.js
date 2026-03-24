@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Review = require('../../models/evaluations/review');
 const Logger = require('../../models/log');
 const User = require('../../models/user');
@@ -326,6 +327,56 @@ async function replaceUser (evaluation, currentUserId, evaluatorId, isBn, select
     return newEvaluator;
 }
 
+/**
+ * Move a Review from mockReviews to reviews and its corresponding evaluator to bnEvaluators
+ * @param {import('../../models/interfaces/evaluations').IEvaluationDocument} evaluation
+ * @param {string} mockReviewId
+ * @returns {Promise<{ error?: string }>}
+ */
+async function convertMockReviewToReviews(evaluation, mockReviewId) {
+    const idStr = String(mockReviewId);
+    const mockReview = evaluation.mockReviews.find(r => String(r._id) === idStr);
+
+    if (!mockReview) {
+        return { error: 'Mock review not found' };
+    }
+
+    let evaluatorId;
+    if (mockReview.evaluator && mockReview.evaluator._id) {
+        evaluatorId = String(mockReview.evaluator._id);
+    } else {
+        const doc = await Review.findById(mockReview._id).select('evaluator').orFail();
+        evaluatorId = String(doc.evaluator);
+    }
+
+    const duplicate = evaluation.reviews.some(r => {
+        const eid = r.evaluator && r.evaluator._id ? String(r.evaluator._id) : String(r.evaluator);
+        return eid === evaluatorId;
+    });
+
+    if (duplicate) {
+        return { error: 'This evaluator already has a real review' };
+    }
+
+    const evaluatorObjectId = new mongoose.Types.ObjectId(evaluatorId);
+
+    const inMockEvaluators = evaluation.mockEvaluators.some(u => String(u._id || u) === evaluatorId);
+    if (inMockEvaluators) {
+        evaluation.mockEvaluators.pull(evaluatorObjectId);
+    }
+
+    const inBnEvaluators = evaluation.bnEvaluators.some(u => String(u._id || u) === evaluatorId);
+    if (!inBnEvaluators) {
+        evaluation.bnEvaluators.push(evaluatorObjectId);
+    }
+
+    evaluation.mockReviews.pull(mockReview._id);
+    evaluation.reviews.push(mockReview._id);
+    await evaluation.save();
+
+    return {};
+}
+
 module.exports = {
     submitEval,
     submitMockEval,
@@ -333,4 +384,5 @@ module.exports = {
     setGroupEval,
     setFeedback,
     replaceUser,
+    convertMockReviewToReviews,
 };

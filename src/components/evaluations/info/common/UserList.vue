@@ -12,6 +12,17 @@
             >
                 {{ user.username }}
                 <a
+                    v-if="convertMockReviewEvaluationId && loggedInUser && loggedInUser.isNat && user.convertMockReviewId"
+                    href="#"
+                    class="ms-1"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    title="Convert to a real review"
+                    @click.prevent="convertMockReview(user.convertMockReviewId, $event)"
+                >
+                    <i class="fas fa-level-up-alt text-info" />
+                </a>
+                <a
                     v-if="nominatorAssessmentMongoId && loggedInUser && loggedInUser.isNat && !isEditing && !disableReplace"
                     href="#"
                     @click="isEditing = true; editedEvaluatorId = user.id"
@@ -97,6 +108,10 @@ export default {
             type: String || null,
             default: null,
         },
+        convertMockReviewEvaluationId: {
+            type: String,
+            default: null,
+        },
         replaceNat: Boolean,
         replaceTrialNat: Boolean,
         mode: {
@@ -142,6 +157,23 @@ export default {
         },
     },
     methods: {
+        async convertMockReview (mockReviewId, e) {
+            const result = confirm('Convert this mock evaluation to a real one? This will also assign the author to the evaluation as a BN Evaluator.');
+
+            if (result) {
+                const r = await this.$http.executePost(`/${this.isApplication ? 'appEval' : 'bnEval'}/convertMockReview/${this.convertMockReviewEvaluationId}`, {
+                    mockReviewId,
+                }, e);
+
+                if (r && !r.error) {
+                    this.$store.commit('evaluations/updateEvaluation', r);
+                    this.$store.dispatch('updateToastMessages', {
+                        message: 'Mock evaluation converted to formal review',
+                        type: 'success',
+                    });
+                }
+            }
+        },
         async replaceUser (evaluatorId, e) {
             const result = confirm(`Are you sure? This will replace with a random user in the 'bag'`);
 
