@@ -52,7 +52,7 @@
                     </a>
                 </div>
                 <hr class="mt-1 mb-3">
-                <span v-html="$md.render(article.content)" />
+                <span v-html="$md.render(article.content, { skipImageProxy: true })" />
                 <toast-messages />
             </section>
         </div>

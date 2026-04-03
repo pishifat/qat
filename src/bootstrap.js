@@ -101,7 +101,7 @@ md.renderer.rules.image = function (tokens, idx, options, env, self) {
     const token = tokens[idx];
     const srcIndex = token.attrIndex('src');
 
-    if (srcIndex >= 0) {
+    if (srcIndex >= 0 && !env?.skipImageProxy) {
         const proxied = proxyUrl(token.attrs[srcIndex][1]);
 
         if (proxied) {
