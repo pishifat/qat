@@ -29,7 +29,7 @@
                             :href="
                                 'https://osu.ppy.sh/beatmapsets/' +
                                     beatmapsetId(event) +
-                                    '/discussion?user=' +
+                                    '/discussion/-/generalAll/total?user=' +
                                     osuId
                             "
                             target="_blank"
