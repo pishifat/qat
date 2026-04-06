@@ -8,5 +8,6 @@ router.use(middlewares.isLoggedIn);
 
 router.get('/', vetoesController.getList);
 router.get('/:id', vetoesController.getById);
+router.post('/:id/chatrooms', vetoesController.createChatroom);
 
 module.exports = router;

@@ -2,6 +2,35 @@ const moment = require('moment');
 const { default: Axios } = require('axios');
 const Aiess = require('../models/aiess');
 
+const ANON_ADJECTIVES = ['Amber', 'Brisk', 'Calm', 'Clever', 'Cobalt', 'Crimson', 'Daring', 'Echo', 'Golden', 'Hidden', 'Ivory', 'Jade', 'Lively', 'Lucky', 'Mellow', 'Misty', 'Nimble', 'Quiet', 'Rapid', 'Sable', 'Silver', 'Solar', 'Swift', 'Velvet'];
+const ANON_NOUNS = ['Comet', 'Falcon', 'Harbor', 'Lantern', 'Maple', 'Meteor', 'Oak', 'Orbit', 'Otter', 'Pine', 'Quartz', 'Raven', 'River', 'Signal', 'Sparrow', 'Summit', 'Tide', 'Trail', 'Vale', 'Willow', 'Wisp', 'Wolf'];
+
+function toTitleCase(value) {
+    return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+}
+
+function generateAnonName(existingAnonNames = new Set()) {
+    for (let i = 0; i < 200; i++) {
+        const adjective = ANON_ADJECTIVES[Math.floor(Math.random() * ANON_ADJECTIVES.length)];
+        const noun = ANON_NOUNS[Math.floor(Math.random() * ANON_NOUNS.length)];
+        const anonName = `${toTitleCase(adjective)} ${toTitleCase(noun)}`;
+
+        if (!existingAnonNames.has(anonName.toLowerCase())) {
+            existingAnonNames.add(anonName.toLowerCase());
+            return anonName;
+        }
+    }
+
+    let fallbackNumber = existingAnonNames.size + 1;
+    while (existingAnonNames.has(`anonymous participant ${fallbackNumber}`)) {
+        fallbackNumber += 1;
+    }
+
+    const fallback = `Anonymous Participant ${fallbackNumber}`;
+    existingAnonNames.add(fallback.toLowerCase());
+    return fallback;
+}
+
 /**
  * Calculate mods count for each month
  * @param {string} username
@@ -336,4 +365,5 @@ module.exports = {
     findMissingContent,
     checkTenureOverlap,
     getModesFromHistory,
+    generateAnonName,
 };

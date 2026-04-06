@@ -1,4 +1,10 @@
 const Veto = require('../models/veto');
+const User = require('../models/user');
+const Logger = require('../models/log');
+const chatroomsService = require('./chatroomsService');
+const util = require('../helpers/util');
+const osuBot = require('../helpers/osuBot');
+const discord = require('../helpers/discord');
 const { escapeRegex } = require('../helpers/util');
 
 // Minimal projection for list views
@@ -187,6 +193,132 @@ async function getVetoById(id, mongoId, isNat, canSeePending) {
     return veto;
 }
 
+function createError(status, message) {
+    const error = new Error(message);
+    error.status = status;
+    return error;
+}
+
+function parseIncludeUsers(includeUsers) {
+    return String(includeUsers || '')
+        .split(',')
+        .map(value => value.trim())
+        .filter(Boolean);
+}
+
+async function createVetoChatroom(vetoId, payload, actor) {
+    if (!actor?.isNat) {
+        throw createError(403, 'Only NAT can create veto chatrooms.');
+    }
+
+    let veto = await Veto.findById(vetoId)
+        .populate(defaultPopulate)
+        .orFail(() => createError(404, 'Veto not found.'));
+
+    if ((veto.vouchingUsers || []).length < 2) {
+        throw createError(400, 'At least two vouching users are required before starting a veto chatroom.');
+    }
+    if (veto.status !== 'pending') {
+        throw createError(400, 'This veto cannot move to the chatroom phase right now.');
+    }
+
+    const mapper = await User.findByUsernameOrOsuId(veto.beatmapMapperId);
+    if (!mapper) {
+        throw createError(404, `${veto.beatmapMapper} is not in BNsite database. Ask them to log in.`);
+    }
+
+    const additionalParticipants = parseIncludeUsers(payload.includeUsers);
+    const roomCount = await chatroomsService.listRoomsByTarget('veto', vetoId, actor);
+    const baseName = veto.status === 'archive'
+        ? `Post-mediation: ${veto.beatmapTitle}`
+        : `Veto Discussion: ${veto.beatmapTitle}`;
+    const defaultName = roomCount.length === 0
+        ? baseName
+        : `${baseName} (${roomCount.length + 1})`;
+
+    const chatroom = await chatroomsService.createRoom({
+        name: String(payload.name || '').trim() || defaultName,
+        type: 'veto',
+        targetId: vetoId,
+        isPublic: !!payload.isPublic,
+        participantEntries: [
+            {
+                userId: veto.vetoer?._id,
+                role: 'vetoer',
+            },
+            ...(veto.vouchingUsers || []).map(user => ({
+                userId: user._id,
+                role: 'voucher',
+            })),
+            {
+                userId: mapper._id,
+                role: 'user',
+            },
+            ...additionalParticipants.map(identifier => ({
+                identifier,
+                role: 'user',
+            })),
+        ],
+        publicParticipantIds: [
+            mapper._id,
+        ],
+        publicParticipantIdentifiers: additionalParticipants,
+        systemMessages: [
+            {
+                content: `Welcome to the discussion forum for the pending veto on [**${veto.beatmapTitle}**](https://osu.ppy.sh/beatmapsets/${veto.beatmapId})! See the veto reasons above for context.\n\nUsers involved in this discussion:\n\n- Veto creator (anonymous)\n- BNs who vouched in support of the veto (anonymous)\n- Mapset host\n- Anyone else who the NAT thought was relevant\n\nThe veto's creator and vouching users are **anonymous**. If you're one of these users, you can reveal your identity with a button below.\n\nYour goal is to resolve the veto's concerns through discussion and/or changes to the map. Follow [osu!'s code of conduct](https://osu.ppy.sh/wiki/en/Rules/Code_of_conduct_for_modding_and_mapping) while doing this, and do not expose this discussion to outsiders! If a conclusion cannot be reached, you can allow the map to be mediated by a larger group of Beatmap Nominators. This option will become available 24h from this message!\n\nIf you have any questions or want to report something sketchy, talk to someone in the NAT. They can read and speak in this chatroom too.`,
+            },
+            {
+                content: 'To start the discussion, the mapper should explain their thoughts on the veto!',
+            },
+        ],
+    }, actor);
+
+    veto.status = 'chatroom';
+    veto.chatroomInitiated = new Date();
+    await veto.save();
+
+    const channel = {
+        name: `Veto Discussion (${veto.mode == 'all' ? 'All game modes' : veto.mode == 'osu' ? 'osu!' : `osu!${veto.mode}`})`,
+        description: 'A pending veto you are involved with has opened discussion',
+    };
+    const words = `Discussion for the pending veto on [**${veto.beatmapTitle}**](https://osu.ppy.sh/beatmapsets/${veto.beatmapId}) has begun!\n\nTry to reach a conclusion here: http://bn.mappersguild.com/vetoes/${veto.id}\n\nIf a conclusion cannot be reached, the veto may be mediated by a larger group of Beatmap Nominators.`;
+
+    for (const participant of chatroom.participants || []) {
+        const message = await osuBot.sendAnnouncement([participant.osuId], channel, words);
+        await util.sleep(500);
+
+        if (message !== true) {
+            break;
+        }
+    }
+
+    Logger.generate(
+        actor.id || actor._id,
+        'Initiated chatroom for veto',
+        'veto',
+        veto._id
+    );
+
+    const description = `Discussion initiated on [veto for **${veto.beatmapTitle}**](https://osu.ppy.sh/beatmapsets/${veto.beatmapId})`;
+
+    discord.webhookPost([{
+        author: discord.defaultWebhookAuthor({
+            username: actor.username,
+            osuId: actor.osuId,
+        }),
+        color: discord.webhookColors.pink,
+        description,
+    }],
+    'publicVetoes');
+
+    const updatedVeto = await getVetoById(vetoId, actor.id || actor._id, true, true);
+
+    return {
+        chatroom,
+        veto: updatedVeto,
+    };
+}
+
 module.exports = {
     getPopulate,
     getLimitedDefaultPopulate,
@@ -196,4 +328,5 @@ module.exports = {
     fetchArchivedVetoesMinimal,
     countArchivedVetoes,
     getVetoById,
+    createVetoChatroom,
 };

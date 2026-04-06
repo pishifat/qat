@@ -23,7 +23,7 @@
                 </button>
             </div>
         </div>
-        <div class="mt-2">
+        <div v-if="selectedVeto.chatroomUsers && selectedVeto.chatroomUsers.length" class="mt-2">
             Users in this chatroom:
             <data-table :headers="['User', 'Role', 'Status', 'Actions']" class="mt-1 mb-0">
                 <tr v-for="user in selectedVeto.chatroomUsers" :key="user.id">

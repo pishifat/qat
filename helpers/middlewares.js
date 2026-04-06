@@ -139,6 +139,7 @@ function discordEmbeds(req, res, next) {
         { path: 'users', title: 'BN/NAT Listing' },
         { path: 'vetoes', title: 'Vetoes' },
         { path: 'vetoes/:id', title: 'Veto Details' },
+        { path: 'chatrooms/:id', title: 'Chatroom' },
         { path: 'qualityassurance', title: 'Quality Assurance' },
         { path: 'yourevals', title: 'Your Evaluations' },
         { path: 'message', title: 'Message from the NAT' },
