@@ -1,14 +1,11 @@
 <template>
-    <div v-if="selectedVeto" class="card card-body mt-3">
-        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+    <div v-if="selectedVeto" class="mt-3">
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
             <div>
-                <h4 class="mb-0">Reusable chatrooms</h4>
-                <div class="small text-secondary">
-                    Generic chatrooms attached to this veto.
-                </div>
+                <h4 class="mb-0">Chatrooms</h4>
             </div>
             <button type="button" class="btn btn-sm btn-outline-secondary" :disabled="loadingRooms" @click="fetchRooms">
-                Refresh rooms
+                Refresh
             </button>
         </div>
 
@@ -22,7 +19,11 @@
                 {{ listError }}
             </div>
 
-            <div v-if="!roomSummaries.length" class="text-secondary">
+            <div v-else-if="showChatroomPhaseNotice" class="text-secondary">
+                The veto is currently being discussed between the mapper(s) and Beatmap Nominators. If a conclusion can't be reached, a larger vote will be held!
+            </div>
+
+            <div v-else-if="!roomSummaries.length" class="text-secondary">
                 No reusable chatrooms yet.
             </div>
 
@@ -30,7 +31,7 @@
                 <div
                     v-for="room in roomSummaries"
                     :key="room.id"
-                    class="col-md-6 col-lg-4 my-2"
+                    class="col-md-12 col-lg-6 my-2"
                 >
                     <router-link
                         :to="`/chatrooms/${room.id}`"
@@ -47,11 +48,8 @@
                                 {{ room.participantCount }} participant{{ room.participantCount === 1 ? '' : 's' }}
                             </div>
                             <div class="d-flex gap-1 flex-wrap">
-                                <span class="badge" :class="room.isLocked ? 'text-bg-warning' : 'text-bg-success'">
-                                    {{ room.isLocked ? 'Locked' : 'Open' }}
-                                </span>
-                                <span v-if="room.viewerCanModerate" class="badge text-bg-danger">
-                                    NAT controls
+                                <span class="badge" :class="room.isLocked ? 'text-bg-secondary' : 'text-bg-success'">
+                                    {{ room.isLocked ? 'Locked' : 'Active' }}
                                 </span>
                             </div>
                         </div>
@@ -65,7 +63,7 @@
 
 <script>
 import Axios from 'axios';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import chatroomsModule from '../../../store/chatrooms';
 
 export default {
@@ -77,11 +75,20 @@ export default {
         };
     },
     computed: {
-        ...mapGetters('vetoes', ['selectedVeto']),
+        ...mapState(['loggedInUser']),
+        ...mapGetters('vetoes', ['selectedVeto', 'isChatroomUser']),
         ...mapGetters('chatrooms', ['roomsForTarget']),
         roomSummaries() {
             if (!this.selectedVeto?.id) return [];
             return this.roomsForTarget('veto', this.selectedVeto.id);
+        },
+        showChatroomPhaseNotice() {
+            return this.selectedVeto?.status === 'chatroom'
+                && !!this.selectedVeto?.chatroomMessages?.length
+                && !this.roomSummaries.length
+                && !this.loadingRooms
+                && !this.listError
+                && !(this.loggedInUser && (this.isChatroomUser || this.loggedInUser.isNat));
         },
     },
     watch: {

@@ -45,10 +45,12 @@
                     (isChatroomUser || loggedInUser.isNat)"
             :class="selectedVeto.chatroomLocked ? 'fake-disabled' : ''"
         />
-        <div v-else-if="selectedVeto.status == 'chatroom' && selectedVeto.chatroomMessages && selectedVeto.chatroomMessages.length">
-            <hr />
-            The veto is currently being discussed between the mapper(s) and Beatmap Nominators. If a conclusion can't be reached, a larger vote will be held!
-        </div>
+        <veto-chatrooms />
+
+        <hr />
+
+        <veto-discussion-actions />
+
         <pre-mediation-admin-buttons v-if="(selectedVeto.status == 'chatroom' || selectedVeto.status == 'pending') && loggedInUser && loggedInUser.isNat" />
 
         <!-- show admin buttons to NAT -->
@@ -81,7 +83,6 @@
             v-if="loggedInUser && loggedInUser.isNat && (selectedVeto.status == 'wip' || selectedVeto.status == 'archive')"
         />
 
-        <veto-chatrooms />
 
         <!-- show debug info to admins -->
         <debug-view-document
@@ -105,6 +106,7 @@ import VetoChatrooms from './info/VetoChatrooms.vue';
 import PreMediationAdminButtons from './info/PreMediationAdminButtons.vue';
 import PublicMediationInput from './info/PublicMediationInput.vue';
 import VouchesDisplay from './info/VouchesDisplay.vue';
+import VetoDiscussionActions from './info/VetoDiscussionActions.vue';
 
 export default {
     name: 'VetoDetailContent',
@@ -121,6 +123,7 @@ export default {
         PreMediationAdminButtons,
         PublicMediationInput,
         VouchesDisplay,
+        VetoDiscussionActions,
     },
     computed: {
         ...mapState(['loggedInUser']),
