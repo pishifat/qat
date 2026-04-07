@@ -24,7 +24,7 @@
             </div>
 
             <div v-else-if="!roomSummaries.length" class="text-secondary">
-                No reusable chatrooms yet.
+                No chatrooms yet.
             </div>
 
             <div v-else class="row">

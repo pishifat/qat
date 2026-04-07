@@ -76,7 +76,7 @@
                     </td>
                     <td class="text-center">
                         <span
-                            v-if="publicParticipantIds.includes(participant.id)"
+                            v-if="participant.identityPublic"
                             class="text-success"
                             data-bs-toggle="tooltip"
                             data-bs-placement="top"
@@ -146,9 +146,6 @@ export default {
     computed: {
         canSubmitParticipants() {
             return this.participantIdentifiers.trim() || this.publicParticipantIdentifiers.trim();
-        },
-        publicParticipantIds() {
-            return (this.room.publicParticipants || []).map(user => user.id);
         },
     },
     methods: {

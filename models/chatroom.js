@@ -19,6 +19,10 @@ const chatroomParticipantSchema = new mongoose.Schema({
         trim: true,
         maxlength: 100,
     },
+    identityPublic: {
+        type: Boolean,
+        default: false,
+    },
 }, { _id: false });
 
 const chatroomSchema = new mongoose.Schema({
@@ -39,10 +43,6 @@ const chatroomSchema = new mongoose.Schema({
         required: true,
     },
     participants: [chatroomParticipantSchema],
-    publicParticipants: [{
-        type: 'ObjectId',
-        ref: 'User',
-    }],
     isPublic: {
         type: Boolean,
         default: false,
@@ -54,14 +54,9 @@ const chatroomSchema = new mongoose.Schema({
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 chatroomSchema.pre('validate', function (next) {
-    const participantIds = (this.participants || []).map(participant => String(participant.user));
-    const invalidPublicParticipant = (this.publicParticipants || []).find(id => !participantIds.includes(String(id)));
     const anonNames = (this.participants || []).map(participant => (participant.anonName || '').trim().toLowerCase()).filter(Boolean);
     const duplicateAnonNames = anonNames.find((anonName, i) => anonNames.indexOf(anonName) !== i);
 
-    if (invalidPublicParticipant) {
-        this.invalidate('publicParticipants', 'Public participants must also be participants.');
-    }
     if (duplicateAnonNames) {
         this.invalidate('participants', 'Participant anonymous names must be unique within the chatroom.');
     }

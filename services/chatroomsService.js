@@ -144,6 +144,7 @@ function normalizeParticipant(participant) {
         ...normalized,
         role: participant.role,
         anonName: participant.anonName,
+        identityPublic: !!participant.identityPublic,
     };
 }
 
@@ -152,16 +153,16 @@ function formatAnonUserLabel(anonName) {
 }
 
 function formatParticipantSystemName(participant, options = {}) {
-    const { publicParticipantIds = new Set(), userMap = new Map() } = options;
+    const { userMap = new Map() } = options;
     const userId = toIdString(participant);
 
-    if (publicParticipantIds.has(userId)) {
-        const populatedUser = normalizeUser(participant?.user);
-        const mappedUser = userMap.get(userId);
-        return populatedUser?.username || mappedUser?.username || participant?.anonName || 'User';
+    if (!participant.identityPublic) {
+        return formatAnonUserLabel(participant?.anonName || 'Anonymous participant');
     }
 
-    return formatAnonUserLabel(participant?.anonName || 'Anonymous participant');
+    const populatedUser = normalizeUser(participant?.user);
+    const mappedUser = userMap.get(userId);
+    return populatedUser?.username || mappedUser?.username || participant?.anonName || 'User';
 }
 
 function isNat(user) {
@@ -175,9 +176,8 @@ function isParticipant(user, room) {
 
 function isPublicParticipant(user, room) {
     if (!user || !room) return false;
-    const mongoId = toIdString(user);
-    const participantIds = uniqueIds(room.publicParticipants);
-    return participantIds.includes(mongoId);
+    const entry = getParticipantEntry(room, user);
+    return !!(entry && entry.identityPublic);
 }
 
 function canModerateRoom(user) {
@@ -291,7 +291,10 @@ function sanitizeRoomSummaryForUser(room, viewer) {
         isPublic: !!obj.isPublic,
         isLocked: !!obj.isLocked,
         participantCount: (obj.participants || []).length,
-        publicParticipants: (obj.publicParticipants || []).map(normalizeUser).filter(Boolean),
+        publicParticipants: (obj.participants || [])
+            .filter(participant => participant.identityPublic)
+            .map(participant => normalizeUser(participant.user))
+            .filter(Boolean),
         createdAt: obj.createdAt,
         updatedAt: obj.updatedAt,
         viewerCanModerate: moderator,
@@ -328,8 +331,7 @@ function sanitizeRoomForUser(room, messages, viewer, context = null) {
 
 async function getRoomDocumentById(id) {
     return await Chatroom.findById(id)
-        .populate({ path: 'participants.user', select: USER_SELECT })
-        .populate({ path: 'publicParticipants', select: USER_SELECT });
+        .populate({ path: 'participants.user', select: USER_SELECT });
 }
 
 async function getRoomMessages(roomId) {
@@ -359,8 +361,7 @@ async function listRoomsByTarget(type, targetId, viewer) {
         targetId,
     })
         .sort({ createdAt: -1 })
-        .populate({ path: 'participants.user', select: USER_SELECT })
-        .populate({ path: 'publicParticipants', select: USER_SELECT });
+        .populate({ path: 'participants.user', select: USER_SELECT });
 
     return rooms
         .filter(room => canViewRoom(viewer, room))
@@ -380,6 +381,7 @@ async function resolveParticipantEntries(entries = [], existingParticipants = []
             user: userId,
             role: normalizeParticipantRole(existingParticipant.role),
             anonName: existingParticipant.anonName || generateAnonName(existingAnonNames),
+            identityPublic: !!existingParticipant.identityPublic,
         });
     }
 
@@ -406,6 +408,7 @@ async function resolveParticipantEntries(entries = [], existingParticipants = []
             user: userId,
             role: normalizeParticipantRole(entry.role),
             anonName: (entry.anonName || '').trim() || generateAnonName(existingAnonNames),
+            identityPublic: !!entry.identityPublic,
         });
     }
 
@@ -438,8 +441,8 @@ async function createRoom(payload, actor) {
         identifiers: payload.publicParticipantIdentifiers,
     });
 
-    const publicParticipantIds = uniqueIds(publicParticipants);
-    const participantEntriesById = new Map(participants.map(participant => [toIdString(participant), participant]));
+    const publicIdSet = new Set(uniqueIds(publicParticipants));
+    const participantEntriesById = new Map(participants.map(participant => [toIdString(participant.user), participant]));
 
     for (const publicParticipant of publicParticipants) {
         const publicParticipantId = toIdString(publicParticipant);
@@ -448,7 +451,10 @@ async function createRoom(payload, actor) {
                 user: publicParticipantId,
                 role: 'user',
                 anonName: generateAnonName(getExistingAnonNames(Array.from(participantEntriesById.values()))),
+                identityPublic: true,
             });
+        } else {
+            participantEntriesById.get(publicParticipantId).identityPublic = true;
         }
     }
 
@@ -459,7 +465,6 @@ async function createRoom(payload, actor) {
         type,
         targetId: payload.targetId,
         participants: participantEntries,
-        publicParticipants: publicParticipantIds,
         isPublic: !!payload.isPublic,
         isLocked: !!payload.isLocked,
     });
@@ -514,7 +519,7 @@ async function addParticipants(roomId, payload, actor) {
         identifiers: payload.publicParticipantIdentifiers,
     });
 
-    const participantEntriesById = new Map(participants.map(participant => [toIdString(participant), participant]));
+    const participantEntriesById = new Map(participants.map(participant => [toIdString(participant.user), participant]));
 
     for (const publicParticipant of publicParticipants) {
         const publicParticipantId = toIdString(publicParticipant);
@@ -523,22 +528,22 @@ async function addParticipants(roomId, payload, actor) {
                 user: publicParticipantId,
                 role: 'user',
                 anonName: generateAnonName(getExistingAnonNames(Array.from(participantEntriesById.values()))),
+                identityPublic: true,
             });
+        } else {
+            participantEntriesById.get(publicParticipantId).identityPublic = true;
         }
     }
 
     room.participants = Array.from(participantEntriesById.values());
-    room.publicParticipants = uniqueIds([...(room.publicParticipants || []), ...publicParticipants]);
 
     await room.save();
 
     const addedParticipants = (room.participants || []).filter(participant => !existingParticipantIds.has(toIdString(participant)));
     if (addedParticipants.length) {
-        const publicParticipantIds = new Set(uniqueIds(room.publicParticipants));
         const publicParticipantUserMap = new Map(publicParticipants.map(user => [toIdString(user), normalizeUser(user)]));
         const addedNames = addedParticipants
             .map(participant => formatParticipantSystemName(participant, {
-                publicParticipantIds,
                 userMap: publicParticipantUserMap,
             }))
             .filter(Boolean);
@@ -570,10 +575,8 @@ async function removeParticipant(roomId, userId, actor) {
     const room = await Chatroom.findById(roomId).orFail(() => createError(404, 'Chatroom not found.'));
     const targetUserId = String(userId);
     const participantIds = (room.participants || []).filter(participant => toIdString(participant) !== targetUserId);
-    const publicParticipantIds = uniqueIds(room.publicParticipants).filter(id => id !== targetUserId);
 
     room.participants = participantIds;
-    room.publicParticipants = publicParticipantIds;
     await room.save();
 
     return await getRoomById(room._id, actor);
@@ -621,8 +624,13 @@ async function revealSelf(roomId, actor) {
     }
 
     const participantEntry = getParticipantEntry(room, actor);
+    const participantIndex = (room.participants || []).findIndex(participant => toIdString(participant) === toIdString(actor));
 
-    room.publicParticipants = uniqueIds([...(room.publicParticipants || []), actor._id]);
+    if (participantIndex >= 0) {
+        room.participants[participantIndex].identityPublic = true;
+        room.markModified('participants');
+    }
+
     await room.save();
 
     await ChatroomMessage.create({

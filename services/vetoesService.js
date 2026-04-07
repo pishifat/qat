@@ -245,24 +245,24 @@ async function createVetoChatroom(vetoId, payload, actor) {
             {
                 userId: veto.vetoer?._id,
                 role: 'vetoer',
+                identityPublic: false,
             },
             ...(veto.vouchingUsers || []).map(user => ({
                 userId: user._id,
                 role: 'voucher',
+                identityPublic: false,
             })),
             {
                 userId: mapper._id,
                 role: 'user',
+                identityPublic: true,
             },
             ...additionalParticipants.map(identifier => ({
                 identifier,
                 role: 'user',
+                identityPublic: true,
             })),
         ],
-        publicParticipantIds: [
-            mapper._id,
-        ],
-        publicParticipantIdentifiers: additionalParticipants,
         systemMessages: [
             {
                 content: `Welcome to the discussion forum for the pending veto on [**${veto.beatmapTitle}**](https://osu.ppy.sh/beatmapsets/${veto.beatmapId})! See the veto reasons above for context.\n\nUsers involved in this discussion:\n\n- Veto creator (anonymous)\n- BNs who vouched in support of the veto (anonymous)\n- Mapset host\n- Anyone else who the NAT thought was relevant\n\nThe veto's creator and vouching users are **anonymous**. If you're one of these users, you can reveal your identity with a button below.\n\nYour goal is to resolve the veto's concerns through discussion and/or changes to the map. Follow [osu!'s code of conduct](https://osu.ppy.sh/wiki/en/Rules/Code_of_conduct_for_modding_and_mapping) while doing this, and do not expose this discussion to outsiders! If a conclusion cannot be reached, you can allow the map to be mediated by a larger group of Beatmap Nominators. This option will become available 24h from this message!\n\nIf you have any questions or want to report something sketchy, talk to someone in the NAT. They can read and speak in this chatroom too.`,
