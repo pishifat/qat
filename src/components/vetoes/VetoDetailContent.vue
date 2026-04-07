@@ -6,7 +6,7 @@
         <vouches-display v-if="loggedInUser && loggedInUser.isNat && selectedVeto.vetoFormat >= 7 && selectedVeto.status != 'pending'" />
 
         <!--show chatroom archive when veto is in mediation phases, or to everyone when archived-->
-        <div v-if="showChatroom" class="card mb-2">
+        <div v-if="showLegacyChatroom" class="card mb-2">
             <button
                 type="button"
                 class="card-header py-2 w-100 text-start border-0 d-flex align-items-center text-decoration-none"
@@ -15,14 +15,14 @@
                 aria-expanded="false"
                 aria-controls="chatroom"
             >
-                <b class="flex-grow-1">Discussion logs</b>
+                <b class="flex-grow-1">Discussion logs (legacy)</b>
                 <i class="fas fa-angle-down ms-1 collapse-chevron" />
             </button>
             <div id="chatroom" class="collapse">
                 <chatroom class="fake-disabled" />
             </div>
         </div>
-        <div v-else-if="selectedVeto.vetoFormat >= 7 && selectedVeto.status === 'archive'">
+        <div v-else-if="showNeverEnteredDiscussionNotice">
             <hr>
             <p class="text-muted">
                 This veto never entered the discussion phase.
@@ -45,11 +45,9 @@
                     (isChatroomUser || loggedInUser.isNat)"
             :class="selectedVeto.chatroomLocked ? 'fake-disabled' : ''"
         />
-        <veto-chatrooms />
+        <veto-chatrooms v-if="showModernChatroom" />
 
-        <hr />
-
-        <veto-discussion-actions />
+        <veto-discussion-actions v-if="selectedVeto.status == 'chatroom' && isChatroomUser" />
 
         <pre-mediation-admin-buttons v-if="(selectedVeto.status == 'chatroom' || selectedVeto.status == 'pending') && loggedInUser && loggedInUser.isNat" />
 
@@ -138,14 +136,29 @@ export default {
             if (this.selectedVeto.status == 'archive') return true;
             return false;
         },
-        showChatroom() {
+        /**
+         * After the live chatroom phase: archived → everyone; wip/available → NAT only.
+         * Not shown during active chatroom (that uses inline Chatroom / VetoChatrooms).
+         */
+        vetoDiscussionArchiveVisible() {
             const v = this.selectedVeto;
-            if (!v?.chatroomMessages?.length) return false;
-            if (v.vetoFormat < 7) return false;
-            if (v.status === 'chatroom') return false;
+            if (!v || v.vetoFormat < 7 || v.status === 'chatroom') return false;
             if (v.status === 'archive') return true;
-            const inMediationPhase = v.status === 'wip' || v.status === 'available';
-            return inMediationPhase && this.loggedInUser?.isNat;
+            if (v.status === 'wip' || v.status === 'available') return !!this.loggedInUser?.isNat;
+            return false;
+        },
+        showLegacyChatroom() {
+            return this.vetoDiscussionArchiveVisible && !!this.selectedVeto?.chatroomMessages?.length;
+        },
+        showModernChatroom() {
+            return this.vetoDiscussionArchiveVisible && !!this.selectedVeto?.discussionChatroom;
+        },
+        showNeverEnteredDiscussionNotice() {
+            const v = this.selectedVeto;
+            return v?.vetoFormat >= 7
+                && v.status === 'archive'
+                && !this.showLegacyChatroom
+                && !this.showModernChatroom;
         },
     },
 };

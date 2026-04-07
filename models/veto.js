@@ -48,6 +48,8 @@ const vetoesSchema = new mongoose.Schema({
     chatroomUpholdVoters: [{ type: 'ObjectId', ref: 'User' }],
     chatroomDismissVoters: [{ type: 'ObjectId', ref: 'User' }],
     chatroomLocked: { type: Boolean },
+    /** Primary reusable Chatroom for veto discussion (system messages + workflow). */
+    discussionChatroom: { type: 'ObjectId', ref: 'Chatroom' },
     publicMediations: [{ type: 'ObjectId', ref: 'Mediation' }],
     vetoFormat: { type: Number },
     /*

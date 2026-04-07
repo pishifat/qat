@@ -152,6 +152,21 @@ function formatAnonUserLabel(anonName) {
     return `anon user "${anonName}"`;
 }
 
+/**
+ * Markdown line for veto discussion vote system messages (reusable chatroom).
+ * @param {{ mongoId?: string, username?: string, osuId?: number }} sessionUser
+ */
+function vetoDiscussionVoteActorLabel(sessionUser, room) {
+    if (!sessionUser || !room) return 'A user';
+    const entry = getParticipantEntry(room, sessionUser.mongoId);
+    if (!entry) return 'A user';
+    if (entry.identityPublic) {
+        const u = normalizeUser(entry.user);
+        if (u?.username) return `[**${u.username}**](https://osu.ppy.sh/users/${u.osuId})`;
+    }
+    return `**${formatAnonUserLabel(entry.anonName || 'Anonymous participant')}**`;
+}
+
 function formatParticipantSystemName(participant, options = {}) {
     const { userMap = new Map() } = options;
     const userId = toIdString(participant);
@@ -696,4 +711,5 @@ module.exports = {
     revealSelf,
     deleteMessage,
     restoreMessage,
+    vetoDiscussionVoteActorLabel,
 };

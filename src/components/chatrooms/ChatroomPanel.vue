@@ -88,6 +88,17 @@ export default {
             return this.roomRefreshMeta(this.roomId);
         },
     },
+    watch: {
+        'room.isLocked': {
+            handler(isLocked) {
+                if (isLocked) {
+                    this.stopRefreshInterval();
+                } else if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+                    this.startRefreshInterval();
+                }
+            },
+        },
+    },
     async mounted() {
         await this.refreshRoom();
         this.startRefreshInterval();
@@ -114,6 +125,7 @@ export default {
         },
         startRefreshInterval() {
             this.stopRefreshInterval();
+            if (this.room?.isLocked) return;
             this.refreshIntervalId = setInterval(() => {
                 this.refreshRoom();
             }, 30 * 1000);
@@ -127,7 +139,9 @@ export default {
         onVisibilityChange() {
             if (document.visibilityState === 'visible') {
                 this.refreshRoom();
-                this.startRefreshInterval();
+                if (!this.room?.isLocked) {
+                    this.startRefreshInterval();
+                }
             } else {
                 this.stopRefreshInterval();
             }

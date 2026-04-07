@@ -1,6 +1,8 @@
 const Veto = require('../models/veto');
 const User = require('../models/user');
 const Logger = require('../models/log');
+const Chatroom = require('../models/chatroom');
+const ChatroomMessage = require('../models/chatroomMessage');
 const chatroomsService = require('./chatroomsService');
 const util = require('../helpers/util');
 const osuBot = require('../helpers/osuBot');
@@ -20,6 +22,7 @@ const defaultPopulate = [
     { path: 'chatroomMediationRequestedUsers', select: 'username osuId' },
     { path: 'chatroomUpholdVoters', select: 'username osuId' },
     { path: 'chatroomDismissVoters', select: 'username osuId' },
+    { path: 'discussionChatroom', select: '_id' },
     { path: 'publicMediations', select: 'vote reasonIndex mediator', populate: { path: 'mediator', select: 'username osuId' } },
     { path: 'chatroomMessages.user', select: 'username osuId' },
 ];
@@ -34,6 +37,7 @@ function getLimitedDefaultPopulate(mongoId) {
         { path: 'chatroomMediationRequestedUsers', select: 'id' },
         { path: 'chatroomUpholdVoters', select: 'username osuId', match: { _id: mongoId } },
         { path: 'chatroomDismissVoters', select: 'username osuId', match: { _id: mongoId } },
+        { path: 'discussionChatroom', select: '_id' },
         { path: 'publicMediations', match: { mediator: mongoId }, populate: { path: 'mediator', select: 'username osuId' } },
         { path: 'chatroomMessages.user', select: 'username osuId' },
     ];
@@ -48,6 +52,7 @@ function getPopulateForArchivedPublic(mongoId) {
         { path: 'chatroomUsersPublic', select: 'username osuId' },
         { path: 'chatroomUpholdVoters', select: 'username osuId', match: { _id: mongoId } },
         { path: 'chatroomDismissVoters', select: 'username osuId', match: { _id: mongoId } },
+        { path: 'discussionChatroom', select: '_id' },
         { path: 'publicMediations', select: 'vote reasonIndex -_id' },
         { path: 'chatroomMessages.user', select: 'username osuId' },
     ];
@@ -171,6 +176,76 @@ async function countArchivedVetoes(listFilters = {}) {
     return Veto.countDocuments(filter);
 }
 
+async function resolveDiscussionChatroomId(veto) {
+    const vid = veto._id || veto.id;
+    if (!vid) return null;
+    const explicit = veto.discussionChatroom && (veto.discussionChatroom._id || veto.discussionChatroom);
+    if (explicit) return explicit;
+    const room = await Chatroom.findOne({ type: 'veto', targetId: vid }).sort({ createdAt: -1 }).select('_id').lean();
+    return room?._id || null;
+}
+
+/**
+ * Append system lines to the veto's reusable discussion chatroom when one exists.
+ * @param {object} veto Mongoose doc or plain veto with _id / discussionChatroom
+ * @param {string[]} contents
+ * @returns {Promise<boolean>} true if messages were written to ChatroomMessage
+ */
+async function appendVetoDiscussionSystemMessages(veto, contents) {
+    if (!contents || !contents.length) return false;
+    const chatroomId = await resolveDiscussionChatroomId(veto);
+    if (!chatroomId) return false;
+    await ChatroomMessage.insertMany(contents.map(content => ({
+        chatroom: chatroomId,
+        user: null,
+        content,
+        role: 'system',
+        isAnonymous: false,
+    })));
+    return true;
+}
+
+async function lockVetoDiscussionChatroom(veto) {
+    const chatroomId = await resolveDiscussionChatroomId(veto);
+    if (chatroomId) {
+        await Chatroom.findByIdAndUpdate(chatroomId, { $set: { isLocked: true } });
+    }
+}
+
+async function publishVetoDiscussionChatroom(veto) {
+    const chatroomId = await resolveDiscussionChatroomId(veto);
+    if (chatroomId) {
+        await Chatroom.findByIdAndUpdate(chatroomId, { $set: { isPublic: true } });
+    }
+}
+
+async function viewerIsDiscussionParticipant(vetoDoc, mongoId) {
+    if (!mongoId) return false;
+    const chatroomId = await resolveDiscussionChatroomId(vetoDoc);
+    if (chatroomId) {
+        const room = await Chatroom.findById(chatroomId).select('participants').lean();
+        const ids = (room?.participants || []).map(p => String(p.user));
+        return ids.includes(String(mongoId));
+    }
+    const legacyUsers = (vetoDoc.chatroomUsers || []).map(u => String(u._id || u.id || u));
+    return legacyUsers.includes(String(mongoId));
+}
+
+/**
+ * Plain veto payload for API responses (sanitize + discussion participation flag).
+ */
+async function finalizeVetoResponse(vetoDoc, mongoId, isNat) {
+    if (!vetoDoc) return null;
+    const obj = !isNat
+        ? sanitizeVeto(vetoDoc, mongoId, false)
+        : (typeof vetoDoc.toObject === 'function' ? vetoDoc.toObject() : { ...vetoDoc });
+    ensureId(obj);
+    if (mongoId) {
+        obj.viewerIsDiscussionParticipant = await viewerIsDiscussionParticipant(vetoDoc, mongoId);
+    }
+    return obj;
+}
+
 /**
  * Fetch full veto by ID with permissions and sanitization.
  */
@@ -179,18 +254,14 @@ async function getVetoById(id, mongoId, isNat, canSeePending) {
     if (!statusDoc) return null;
     if (statusDoc.status === 'pending' && !canSeePending) return null;
 
-    let veto = await Veto.findById(id).populate(getPopulate(isNat, mongoId, statusDoc.status));
+    const veto = await Veto.findById(id).populate(getPopulate(isNat, mongoId, statusDoc.status));
     if (!veto) return null;
 
     if (veto.status !== 'archive' && !(veto.chatroomUsers && veto.chatroomUsers.length)) {
         veto.chatroomMessages = [];
     }
 
-    if (!isNat) {
-        veto = sanitizeVeto(veto, mongoId, isNat);
-    }
-
-    return veto;
+    return finalizeVetoResponse(veto, mongoId, isNat);
 }
 
 function createError(status, message) {
@@ -275,6 +346,7 @@ async function createVetoChatroom(vetoId, payload, actor) {
 
     veto.status = 'chatroom';
     veto.chatroomInitiated = new Date();
+    veto.discussionChatroom = chatroom.id;
     await veto.save();
 
     const channel = {
@@ -329,4 +401,10 @@ module.exports = {
     countArchivedVetoes,
     getVetoById,
     createVetoChatroom,
+    resolveDiscussionChatroomId,
+    appendVetoDiscussionSystemMessages,
+    lockVetoDiscussionChatroom,
+    publishVetoDiscussionChatroom,
+    finalizeVetoResponse,
+    viewerIsDiscussionParticipant,
 };

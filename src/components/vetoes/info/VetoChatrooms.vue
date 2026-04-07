@@ -4,7 +4,7 @@
             <div>
                 <h4 class="mb-0">Chatrooms</h4>
             </div>
-            <button type="button" class="btn btn-sm btn-outline-secondary" :disabled="loadingRooms" @click="fetchRooms">
+            <button v-if="!showChatroomPhaseNotice" type="button" class="btn btn-sm btn-outline-secondary" :disabled="loadingRooms" @click="fetchRooms">
                 Refresh
             </button>
         </div>
@@ -83,12 +83,7 @@ export default {
             return this.roomsForTarget('veto', this.selectedVeto.id);
         },
         showChatroomPhaseNotice() {
-            return this.selectedVeto?.status === 'chatroom'
-                && !!this.selectedVeto?.chatroomMessages?.length
-                && !this.roomSummaries.length
-                && !this.loadingRooms
-                && !this.listError
-                && !(this.loggedInUser && (this.isChatroomUser || this.loggedInUser.isNat));
+            return this.selectedVeto?.status === 'chatroom' && !this.isChatroomUser && !this.loggedInUser?.isNat;
         },
     },
     watch: {

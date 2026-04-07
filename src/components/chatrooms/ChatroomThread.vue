@@ -8,14 +8,17 @@
                 <span v-if="room.isLocked" class="badge text-bg-warning">Locked</span>
             </div>
             <div class="small text-secondary d-flex flex-wrap align-items-center gap-2">
-                <span v-if="refreshMeta.isRefreshing">Refreshing...</span>
-                <span v-else-if="refreshMeta.lastError" class="text-danger">{{ refreshMeta.lastError }}</span>
-                <span v-else>
-                    Refreshing in {{ countdownSeconds }}s
-                </span>
-                <button type="button" class="btn btn-sm btn-outline-secondary" @click="$emit('refresh')">
-                    Refresh
-                </button>
+
+                <template v-if="!room.isLocked">
+                    <span v-if="refreshMeta.isRefreshing">Refreshing...</span>
+                    <span v-else-if="refreshMeta.lastError" class="text-danger">{{ refreshMeta.lastError }}</span>
+                    <span v-else>
+                        Refreshing in {{ countdownSeconds }}s
+                    </span>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" @click="$emit('refresh')">
+                        Refresh
+                    </button>
+                </template>
             </div>
         </div>
 
