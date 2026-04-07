@@ -45,7 +45,7 @@
                     (isChatroomUser || loggedInUser.isNat)"
             :class="selectedVeto.chatroomLocked ? 'fake-disabled' : ''"
         />
-        <veto-chatrooms v-if="showModernChatroom" />
+        <veto-chatrooms v-if="showVetoChatroomsPanel" />
 
         <veto-discussion-actions v-if="selectedVeto.status == 'chatroom' && isChatroomUser" />
 
@@ -150,15 +150,28 @@ export default {
         showLegacyChatroom() {
             return this.vetoDiscussionArchiveVisible && !!this.selectedVeto?.chatroomMessages?.length;
         },
-        showModernChatroom() {
-            return this.vetoDiscussionArchiveVisible && !!this.selectedVeto?.discussionChatroom;
+        /**
+         * Reusable chatroom list (and NAT tools). Archived: anyone if a discussion room exists; NAT always on archive to allow post-mediation rooms.
+         * WIP/available: NAT only when the veto has a linked primary discussion room.
+         */
+        showVetoChatroomsPanel() {
+            const v = this.selectedVeto;
+            if (!v || v.vetoFormat < 7 || v.status === 'chatroom') return false;
+            if (v.status === 'archive') {
+                if (v.discussionChatroom) return true;
+                return !!this.loggedInUser?.isNat;
+            }
+            if (v.status === 'wip' || v.status === 'available') {
+                return !!this.loggedInUser?.isNat && !!v.discussionChatroom;
+            }
+            return false;
         },
         showNeverEnteredDiscussionNotice() {
             const v = this.selectedVeto;
-            return v?.vetoFormat >= 7
-                && v.status === 'archive'
-                && !this.showLegacyChatroom
-                && !this.showModernChatroom;
+            if (v?.vetoFormat < 7 || v.status !== 'archive' || this.showLegacyChatroom) return false;
+            if (v.discussionChatroom) return false;
+            if (this.loggedInUser?.isNat) return false;
+            return true;
         },
     },
 };

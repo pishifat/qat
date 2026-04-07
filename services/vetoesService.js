@@ -391,6 +391,96 @@ async function createVetoChatroom(vetoId, payload, actor) {
     };
 }
 
+/**
+ * NAT-only: add another reusable chatroom on an already-archived veto (follow-up after mediation).
+ * Does not change veto status or discussionChatroom.
+ */
+async function createPostMediationVetoChatroom(vetoId, payload, actor) {
+    if (!actor?.isNat) {
+        throw createError(403, 'Only NAT can create post-mediation chatrooms.');
+    }
+
+    const veto = await Veto.findById(vetoId)
+        .populate(defaultPopulate)
+        .orFail(() => createError(404, 'Veto not found.'));
+
+    if (veto.status !== 'archive') {
+        throw createError(400, 'Post-mediation chatrooms can only be created for archived vetoes.');
+    }
+
+    const mapper = await User.findByUsernameOrOsuId(veto.beatmapMapperId);
+    if (!mapper) {
+        throw createError(404, `${veto.beatmapMapper} is not in BNsite database. Ask them to log in.`);
+    }
+
+    const additionalParticipants = parseIncludeUsers(payload.includeUsers);
+    const roomCount = await chatroomsService.listRoomsByTarget('veto', vetoId, actor);
+    const baseName = `Post-mediation: ${veto.beatmapTitle}`;
+    const defaultName = roomCount.length === 0
+        ? baseName
+        : `${baseName} (${roomCount.length + 1})`;
+
+    const participantEntries = [
+        {
+            userId: veto.vetoer?._id,
+            role: 'vetoer',
+            identityPublic: false,
+        },
+        ...(veto.vouchingUsers || []).map(user => ({
+            userId: user._id,
+            role: 'voucher',
+            identityPublic: false,
+        })),
+        {
+            userId: mapper._id,
+            role: 'user',
+            identityPublic: true,
+        },
+        ...additionalParticipants.map(identifier => ({
+            identifier,
+            role: 'user',
+            identityPublic: true,
+        })),
+    ];
+
+    const chatroom = await chatroomsService.createRoom({
+        name: String(payload.name || '').trim() || defaultName,
+        type: 'veto',
+        targetId: vetoId,
+        isPublic: !!payload.isPublic,
+        participantEntries,
+        systemMessages: [
+            {
+                content: `This is a **post-mediation** discussion for the archived veto on [**${veto.beatmapTitle}**](https://osu.ppy.sh/beatmapsets/${veto.beatmapId}). The veto process has already concluded; use this space for any follow-up between the people involved.\n\nFollow [osu!'s code of conduct](https://osu.ppy.sh/wiki/en/Rules/Code_of_conduct_for_modding_and_mapping). NAT can read and moderate here as usual.`,
+            },
+        ],
+    }, actor);
+
+    Logger.generate(
+        actor.id || actor._id,
+        'Created post-mediation chatroom for archived veto',
+        'veto',
+        veto._id
+    );
+
+    discord.webhookPost([{
+        author: discord.defaultWebhookAuthor({
+            username: actor.username,
+            osuId: actor.osuId,
+        }),
+        color: discord.webhookColors.pink,
+        description: `Post-mediation chatroom created on [archived veto **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes/${veto.id})`,
+    }],
+    'publicVetoes');
+
+    const updatedVeto = await getVetoById(vetoId, actor.id || actor._id, true, true);
+
+    return {
+        chatroom,
+        veto: updatedVeto,
+    };
+}
+
 module.exports = {
     getPopulate,
     getLimitedDefaultPopulate,
@@ -401,6 +491,7 @@ module.exports = {
     countArchivedVetoes,
     getVetoById,
     createVetoChatroom,
+    createPostMediationVetoChatroom,
     resolveDiscussionChatroomId,
     appendVetoDiscussionSystemMessages,
     lockVetoDiscussionChatroom,

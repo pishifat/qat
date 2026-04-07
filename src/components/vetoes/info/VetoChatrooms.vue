@@ -27,7 +27,7 @@
                 No chatrooms yet.
             </div>
 
-            <div v-else class="row">
+            <div v-if="roomSummaries.length" class="row">
                 <div
                     v-for="room in roomSummaries"
                     :key="room.id"
@@ -56,6 +56,58 @@
                     </router-link>
                 </div>
             </div>
+
+            <template v-if="loggedInUser?.isNat && selectedVeto?.status === 'archive'">
+                <button
+                    type="button"
+                    class="btn btn-sm w-100 btn-secondary mb-2"
+                    data-bs-toggle="collapse"
+                    :data-bs-target="'#veto-post-mediation-chatroom-' + selectedVeto.id"
+                >
+                    Post-mediation chatroom <i class="fas fa-angle-down" />
+                </button>
+                <div
+                    :id="'veto-post-mediation-chatroom-' + selectedVeto.id"
+                    class="collapse"
+                >
+                    <div class="card card-body mb-2">
+                        <p class="small text-secondary mb-2">
+                            Archived vetoes only. Adds the vetoer, vouching users, and mapper automatically; include any other users below.
+                        </p>
+                        <input
+                            v-model="postMediationIncludeUsers"
+                            class="form-control form-control-sm mb-2"
+                            type="text"
+                            placeholder="Extra participants (username or osu! id, comma-separated)"
+                        >
+                        <input
+                            v-model="postMediationName"
+                            class="form-control form-control-sm mb-2"
+                            type="text"
+                            placeholder="Optional custom room name"
+                        >
+                        <div class="form-check mb-2">
+                            <input
+                                :id="'veto-pm-chatroom-public-' + selectedVeto.id"
+                                v-model="postMediationIsPublic"
+                                class="form-check-input"
+                                type="checkbox"
+                            >
+                            <label class="form-check-label" :for="'veto-pm-chatroom-public-' + selectedVeto.id">
+                                Public room (any logged-in user can view)
+                            </label>
+                        </div>
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-primary"
+                            :disabled="postMediationSubmitting"
+                            @click="createPostMediationChatroom($event)"
+                        >
+                            Create post-mediation chatroom
+                        </button>
+                    </div>
+                </div>
+            </template>
         </div>
 
     </div>
@@ -72,6 +124,10 @@ export default {
         return {
             loadingRooms: false,
             listError: null,
+            postMediationIncludeUsers: '',
+            postMediationName: '',
+            postMediationIsPublic: false,
+            postMediationSubmitting: false,
         };
     },
     computed: {
@@ -130,6 +186,42 @@ export default {
                 this.listError = 'Could not load chatrooms.';
             } finally {
                 this.loadingRooms = false;
+            }
+        },
+        async createPostMediationChatroom(e) {
+            if (!this.selectedVeto?.id || !confirm('Create a new post-mediation chatroom for this archived veto?')) return;
+
+            this.postMediationSubmitting = true;
+            try {
+                const data = await this.$http.executePost(
+                    `/v2/vetoes/${this.selectedVeto.id}/chatrooms/post-mediation`,
+                    {
+                        includeUsers: this.postMediationIncludeUsers,
+                        name: this.postMediationName.trim() || undefined,
+                        isPublic: this.postMediationIsPublic,
+                    },
+                    e
+                );
+
+                if (this.$http.isValid(data) && data.chatroom) {
+                    if (data.veto) {
+                        this.$store.commit('vetoes/updateVeto', data.veto);
+                    }
+                    if (this.$store.hasModule('chatrooms')) {
+                        this.$store.commit('chatrooms/addRoomToTarget', {
+                            type: 'veto',
+                            targetId: this.selectedVeto.id,
+                            room: data.chatroom,
+                        });
+                        this.$store.commit('chatrooms/setRoom', data.chatroom);
+                    }
+                    this.postMediationIncludeUsers = '';
+                    this.postMediationName = '';
+                    this.postMediationIsPublic = false;
+                    await this.fetchRooms();
+                }
+            } finally {
+                this.postMediationSubmitting = false;
             }
         },
     },

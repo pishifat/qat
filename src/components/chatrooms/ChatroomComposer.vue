@@ -1,5 +1,5 @@
 <template>
-    <section v-if="!room.isLocked" class="card card-body">
+    <section v-if="!room.isLocked && room.viewerCanPost" class="card card-body">
         <textarea
             v-model="messageInput"
             class="form-control"

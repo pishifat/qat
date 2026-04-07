@@ -83,8 +83,33 @@ async function createChatroom(req, res) {
     }
 }
 
+/**
+ * POST post-mediation chatroom (archived vetoes only)
+ * @route POST /api/v2/vetoes/:id/chatrooms/post-mediation
+ */
+async function createPostMediationChatroom(req, res) {
+    try {
+        const result = await vetoesService.createPostMediationVetoChatroom(
+            req.params.id,
+            req.body,
+            res.locals.userRequest
+        );
+
+        res.json({
+            chatroom: result.chatroom,
+            veto: result.veto,
+            success: 'Post-mediation chatroom created.',
+        });
+    } catch (error) {
+        res.status(error.status || 500).json({
+            error: error.message || 'Something went wrong!',
+        });
+    }
+}
+
 module.exports = {
     getList,
     getById,
     createChatroom,
+    createPostMediationChatroom,
 };
