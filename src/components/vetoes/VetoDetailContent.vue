@@ -137,7 +137,7 @@ export default {
         },
         /**
          * After the live chatroom phase: archived → everyone; wip/available → NAT only.
-         * Not shown during active chatroom (that uses inline LegacyChatroom / VetoChatrooms).
+         * Not shown during active chatroom (legacy log uses LegacyChatroom; live discussion uses VetoChatrooms + /chatrooms/:id).
          */
         vetoDiscussionArchiveVisible() {
             const v = this.selectedVeto;
@@ -150,12 +150,15 @@ export default {
             return this.vetoDiscussionArchiveVisible && !!this.selectedVeto?.chatroomMessages?.length;
         },
         /**
-         * Reusable chatroom list (and NAT tools). Archived: anyone if a discussion room exists; NAT always on archive to allow post-mediation rooms.
+         * Reusable chatroom list (and NAT tools).
+         * Live chatroom phase: show for vetoFormat >= 7 (list API enforces access).
+         * Archived: anyone if a discussion room exists; NAT always on archive for post-mediation create.
          * WIP/available: NAT only when the veto has a linked primary discussion room.
          */
         showVetoChatroomsPanel() {
             const v = this.selectedVeto;
-            if (!v || v.vetoFormat < 7 || v.status === 'chatroom') return false;
+            if (!v || v.vetoFormat < 7) return false;
+            if (v.status === 'chatroom') return true;
             if (v.status === 'archive') {
                 if (v.discussionChatroom) return true;
                 return !!this.loggedInUser?.isNat;

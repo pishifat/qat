@@ -217,24 +217,6 @@ function getPopulateForArchivedPublic(mongoId) {
     ];
 }
 
-/** Returns a 403 response if the user is not a chatroom participant and not NAT; otherwise null. */
-async function ensureChatroomParticipantOrNat(req, res, veto) {
-    const chatroomUserIds = (veto.chatroomUsers || []).map(u => (u && (u.id || (u._id && u._id.toString()))) || null).filter(Boolean);
-    const isLegacyParticipant = chatroomUserIds.some(id => id == req.session.mongoId);
-    const isNat = res.locals.userRequest && res.locals.userRequest.isNat;
-
-    if (isNat || isLegacyParticipant) {
-        return null;
-    }
-
-    const inDiscussionRoom = await vetoesService.viewerIsDiscussionParticipant(veto, req.session.mongoId);
-    if (inDiscussionRoom) {
-        return null;
-    }
-
-    return res.status(403).json({ error: 'Only chatroom participants can perform this action.' });
-}
-
 /** True if the current user is allowed to request mediation (vetoer, vouching user, or mapset host). */
 function canRequestMediation(req, veto) {
     const mongoId = String(req.session.mongoId);
@@ -402,7 +384,9 @@ router.post('/submitMediation/:id', middlewares.isLoggedIn, middlewares.isBnOrNa
             getPopulate(true, req.session.mongoId)
         );
 
-    if (!veto.chatroomUsers.length) veto.chatroomMessages = [];
+    if (!veto.discussionChatroom && !veto.chatroomUsers?.length) {
+        veto.chatroomMessages = [];
+    }
 
     // webhook
     let count = 0;
@@ -1167,7 +1151,9 @@ router.post('/submitPublicMediation/:id', middlewares.isLoggedIn, async (req, re
             getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
         ).orFail();
 
-    if (!veto.chatroomUsers.length) veto.chatroomMessages = [];
+    if (!veto.discussionChatroom && !veto.chatroomUsers?.length) {
+        veto.chatroomMessages = [];
+    }
 
     const vetoForResponse = sanitizeVeto(veto, req.session.mongoId, res.locals.userRequest.isNat);
 
