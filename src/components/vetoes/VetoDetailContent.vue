@@ -19,7 +19,7 @@
                 <i class="fas fa-angle-down ms-1 collapse-chevron" />
             </button>
             <div id="chatroom" class="collapse">
-                <chatroom class="fake-disabled" />
+                <legacy-chatroom />
             </div>
         </div>
         <div v-else-if="showNeverEnteredDiscussionNotice">
@@ -35,15 +35,14 @@
             Veto is currently pending. If enough Beatmap Nominators support it, a discussion will happen!
         </div>
 
-        <!-- show chatroom component when veto is "chatroom" status -->
-        <chatroom
+        <!-- legacy embedded discussion log (read-only); live discussion uses reusable chatrooms -->
+        <legacy-chatroom
             v-if="
                 selectedVeto.status == 'chatroom' &&
                     selectedVeto.chatroomMessages &&
                     selectedVeto.chatroomMessages.length &&
                     loggedInUser &&
                     (isChatroomUser || loggedInUser.isNat)"
-            :class="selectedVeto.chatroomLocked ? 'fake-disabled' : ''"
         />
         <veto-chatrooms v-if="showVetoChatroomsPanel" />
 
@@ -99,7 +98,7 @@ import MediationInput from './info/MediationInput.vue';
 import DebugViewDocument from '../DebugViewDocument.vue';
 import Context from './info/Context.vue';
 import Vouches from './info/Vouches.vue';
-import Chatroom from './info/Chatroom.vue';
+import LegacyChatroom from './info/LegacyChatroom.vue';
 import VetoChatrooms from './info/VetoChatrooms.vue';
 import PreMediationAdminButtons from './info/PreMediationAdminButtons.vue';
 import PublicMediationInput from './info/PublicMediationInput.vue';
@@ -116,7 +115,7 @@ export default {
         DebugViewDocument,
         Context,
         Vouches,
-        Chatroom,
+        LegacyChatroom,
         VetoChatrooms,
         PreMediationAdminButtons,
         PublicMediationInput,
@@ -138,7 +137,7 @@ export default {
         },
         /**
          * After the live chatroom phase: archived → everyone; wip/available → NAT only.
-         * Not shown during active chatroom (that uses inline Chatroom / VetoChatrooms).
+         * Not shown during active chatroom (that uses inline LegacyChatroom / VetoChatrooms).
          */
         vetoDiscussionArchiveVisible() {
             const v = this.selectedVeto;
@@ -178,16 +177,6 @@ export default {
 </script>
 
 <style scoped>
-.fake-disabled {
-    opacity: 70%;
-}
-
-.fake-disabled :deep(button),
-.fake-disabled :deep(input),
-.fake-disabled :deep(textarea) {
-    pointer-events: none;
-}
-
 .card-header[data-bs-toggle="collapse"] {
     cursor: pointer;
     transition: background-color 0.2s ease;
