@@ -29,6 +29,9 @@ interface IVetoDocument extends Document {
     chatroomUpholdVoters?: IUserDocument[];
     chatroomDismissVoters?: IUserDocument[];
     chatroomLocked?: Boolean;
+    discussionChatroom?: string;
+    /** Set on API responses when the viewer is in the linked reusable discussion chatroom. */
+    viewerIsDiscussionParticipant?: boolean;
     publicMediations?: IMediationDocument[];
     vetoFormat?: number;
 }

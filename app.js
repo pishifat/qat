@@ -38,6 +38,7 @@ const usersRouter = require('./routes/users/users');
 const natRouter = require('./routes/users/nat');
 const vetoesRouter = require('./routes/vetoes');
 const vetoesV2Router = require('./routes/vetoesV2');
+const chatroomsV2Router = require('./routes/chatroomsV2');
 const discussionVoteRouter = require('./routes/discussionVote');
 const qualityAssuranceRouter = require('./routes/qualityAssurance');
 const logsRouter = require('./routes/logs');
@@ -155,6 +156,7 @@ apiRouter.use('/docs', documentationRouter);
 apiRouter.use('/charts', chartsRouter);
 
 apiRouter.use('/v2/vetoes', vetoesV2Router);
+apiRouter.use('/v2/chatrooms', chatroomsV2Router);
 
 app.use('/api', apiRouter);
 

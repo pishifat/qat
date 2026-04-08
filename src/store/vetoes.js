@@ -128,16 +128,13 @@ export default {
             return vouchingUserIds.includes(rootState.loggedInUser.id);
         },
         isChatroomUser: (state, getters, rootState) => {
-            if (!rootState.loggedInUser || !getters.selectedVeto || !getters.selectedVeto.chatroomUsers) return false;
+            if (!rootState.loggedInUser || !getters.selectedVeto) return false;
+
+            if (getters.selectedVeto.viewerIsDiscussionParticipant) return true;
+
+            if (!getters.selectedVeto.chatroomUsers) return false;
 
             const chatroomUserIds = getters.selectedVeto.chatroomUsers.map(u => u.id);
-
-            return chatroomUserIds.includes(rootState.loggedInUser.id);
-        },
-        isChatroomUserPublic: (state, getters, rootState) => {
-            if (!rootState.loggedInUser || !getters.selectedVeto || !getters.selectedVeto.chatroomUsersPublic) return false;
-
-            const chatroomUserIds = getters.selectedVeto.chatroomUsersPublic.map(u => u.id);
 
             return chatroomUserIds.includes(rootState.loggedInUser.id);
         },

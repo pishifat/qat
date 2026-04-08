@@ -59,7 +59,57 @@ async function getById(req, res) {
     res.json(veto);
 }
 
+/**
+ * POST create a reusable chatroom for a veto
+ * @route POST /api/v2/vetoes/:id/chatrooms
+ */
+async function createChatroom(req, res) {
+    try {
+        const chatroom = await vetoesService.createVetoChatroom(
+            req.params.id,
+            req.body,
+            res.locals.userRequest
+        );
+
+        res.json({
+            chatroom: chatroom.chatroom,
+            veto: chatroom.veto,
+            success: 'Chatroom initiated.',
+        });
+    } catch (error) {
+        res.status(error.status || 500).json({
+            error: error.message || 'Something went wrong!',
+        });
+    }
+}
+
+/**
+ * POST post-mediation chatroom (archived vetoes only)
+ * @route POST /api/v2/vetoes/:id/chatrooms/post-mediation
+ */
+async function createPostMediationChatroom(req, res) {
+    try {
+        const result = await vetoesService.createPostMediationVetoChatroom(
+            req.params.id,
+            req.body,
+            res.locals.userRequest
+        );
+
+        res.json({
+            chatroom: result.chatroom,
+            veto: result.veto,
+            success: 'Post-mediation chatroom created.',
+        });
+    } catch (error) {
+        res.status(error.status || 500).json({
+            error: error.message || 'Something went wrong!',
+        });
+    }
+}
+
 module.exports = {
     getList,
     getById,
+    createChatroom,
+    createPostMediationChatroom,
 };

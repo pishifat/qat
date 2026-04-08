@@ -6,7 +6,7 @@
         <vouches-display v-if="loggedInUser && loggedInUser.isNat && selectedVeto.vetoFormat >= 7 && selectedVeto.status != 'pending'" />
 
         <!--show chatroom archive when veto is in mediation phases, or to everyone when archived-->
-        <div v-if="showChatroom" class="card mb-2">
+        <div v-if="showLegacyChatroom" class="card mb-2">
             <button
                 type="button"
                 class="card-header py-2 w-100 text-start border-0 d-flex align-items-center text-decoration-none"
@@ -15,14 +15,14 @@
                 aria-expanded="false"
                 aria-controls="chatroom"
             >
-                <b class="flex-grow-1">Discussion logs</b>
+                <b class="flex-grow-1">Discussion logs (legacy)</b>
                 <i class="fas fa-angle-down ms-1 collapse-chevron" />
             </button>
             <div id="chatroom" class="collapse">
-                <chatroom class="fake-disabled" />
+                <legacy-chatroom />
             </div>
         </div>
-        <div v-else-if="selectedVeto.vetoFormat >= 7 && selectedVeto.status === 'archive'">
+        <div v-else-if="showNeverEnteredDiscussionNotice">
             <hr>
             <p class="text-muted">
                 This veto never entered the discussion phase.
@@ -35,18 +35,19 @@
             Veto is currently pending. If enough Beatmap Nominators support it, a discussion will happen!
         </div>
 
-        <!-- show chatroom component when veto is "chatroom" status -->
-        <chatroom
+        <!-- legacy embedded discussion log (read-only); live discussion uses reusable chatrooms -->
+        <legacy-chatroom
             v-if="
                 selectedVeto.status == 'chatroom' &&
+                    selectedVeto.chatroomMessages &&
+                    selectedVeto.chatroomMessages.length &&
                     loggedInUser &&
                     (isChatroomUser || loggedInUser.isNat)"
-            :class="selectedVeto.chatroomLocked ? 'fake-disabled' : ''"
         />
-        <div v-else-if="selectedVeto.status == 'chatroom'">
-            <hr />
-            The veto is currently being discussed between the mapper(s) and Beatmap Nominators. If a conclusion can't be reached, a larger vote will be held!
-        </div>
+        <veto-chatrooms v-if="showVetoChatroomsPanel" />
+
+        <veto-discussion-actions v-if="selectedVeto.status == 'chatroom' && isChatroomUser" />
+
         <pre-mediation-admin-buttons v-if="(selectedVeto.status == 'chatroom' || selectedVeto.status == 'pending') && loggedInUser && loggedInUser.isNat" />
 
         <!-- show admin buttons to NAT -->
@@ -79,6 +80,7 @@
             v-if="loggedInUser && loggedInUser.isNat && (selectedVeto.status == 'wip' || selectedVeto.status == 'archive')"
         />
 
+
         <!-- show debug info to admins -->
         <debug-view-document
             v-if="loggedInUser && loggedInUser.isAdmin"
@@ -96,10 +98,12 @@ import MediationInput from './info/MediationInput.vue';
 import DebugViewDocument from '../DebugViewDocument.vue';
 import Context from './info/Context.vue';
 import Vouches from './info/Vouches.vue';
-import Chatroom from './info/Chatroom.vue';
+import LegacyChatroom from './info/LegacyChatroom.vue';
+import VetoChatrooms from './info/VetoChatrooms.vue';
 import PreMediationAdminButtons from './info/PreMediationAdminButtons.vue';
 import PublicMediationInput from './info/PublicMediationInput.vue';
 import VouchesDisplay from './info/VouchesDisplay.vue';
+import VetoDiscussionActions from './info/VetoDiscussionActions.vue';
 
 export default {
     name: 'VetoDetailContent',
@@ -111,10 +115,12 @@ export default {
         DebugViewDocument,
         Context,
         Vouches,
-        Chatroom,
+        LegacyChatroom,
+        VetoChatrooms,
         PreMediationAdminButtons,
         PublicMediationInput,
         VouchesDisplay,
+        VetoDiscussionActions,
     },
     computed: {
         ...mapState(['loggedInUser']),
@@ -129,29 +135,51 @@ export default {
             if (this.selectedVeto.status == 'archive') return true;
             return false;
         },
-        showChatroom() {
+        /**
+         * After the live chatroom phase: archived → everyone; wip/available → NAT only.
+         * Not shown during active chatroom (legacy log uses LegacyChatroom; live discussion uses VetoChatrooms + /chatrooms/:id).
+         */
+        vetoDiscussionArchiveVisible() {
             const v = this.selectedVeto;
-            if (!v?.chatroomMessages?.length) return false;
-            if (v.vetoFormat < 7) return false;
+            if (!v || v.vetoFormat < 7 || v.status === 'chatroom') return false;
             if (v.status === 'archive') return true;
-            const inMediationPhase = v.status === 'wip' || v.status === 'available';
-            return inMediationPhase && this.loggedInUser?.isNat;
+            if (v.status === 'wip' || v.status === 'available') return !!this.loggedInUser?.isNat;
+            return false;
+        },
+        showLegacyChatroom() {
+            return this.vetoDiscussionArchiveVisible && !!this.selectedVeto?.chatroomMessages?.length;
+        },
+        /**
+         * Reusable chatroom list (and NAT tools).
+         * Live chatroom phase: show for vetoFormat >= 7 (list API enforces access).
+         * Archived: anyone if a discussion room exists; NAT always on archive for post-mediation create.
+         * WIP/available: NAT only when the veto has a linked primary discussion room.
+         */
+        showVetoChatroomsPanel() {
+            const v = this.selectedVeto;
+            if (!v || v.vetoFormat < 7) return false;
+            if (v.status === 'chatroom') return true;
+            if (v.status === 'archive') {
+                if (v.discussionChatroom) return true;
+                return !!this.loggedInUser?.isNat;
+            }
+            if (v.status === 'wip' || v.status === 'available') {
+                return !!this.loggedInUser?.isNat && !!v.discussionChatroom;
+            }
+            return false;
+        },
+        showNeverEnteredDiscussionNotice() {
+            const v = this.selectedVeto;
+            if (v?.vetoFormat < 7 || v.status !== 'archive' || this.showLegacyChatroom) return false;
+            if (v.discussionChatroom) return false;
+            if (this.loggedInUser?.isNat) return false;
+            return true;
         },
     },
 };
 </script>
 
 <style scoped>
-.fake-disabled {
-    opacity: 70%;
-}
-
-.fake-disabled :deep(button),
-.fake-disabled :deep(input),
-.fake-disabled :deep(textarea) {
-    pointer-events: none;
-}
-
 .card-header[data-bs-toggle="collapse"] {
     cursor: pointer;
     transition: background-color 0.2s ease;

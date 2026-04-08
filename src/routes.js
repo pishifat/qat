@@ -5,6 +5,7 @@ const ReportSubmission = () => import(/* webpackChunkName: "public", webpackPref
 const Users = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/UsersPage.vue');
 const Vetoes = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/VetoesPage.vue');
 const VetoDetail = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/VetoDetailPage.vue');
+const ChatroomDetail = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/ChatroomDetailPage.vue');
 const QualityAssurance = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/QualityAssurancePage.vue');
 const YourEvals = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/YourEvalsPage.vue');
 const Message = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/MessagePage.vue');
@@ -46,6 +47,7 @@ const routes = [
         }
     } },
     { path: '/vetoes/:id', component: VetoDetail, name: 'vetoDetail', meta: { title: 'Veto Details', public: true } },
+    { path: '/chatrooms/:id', component: ChatroomDetail, name: 'chatroomDetail', meta: { title: 'Chatroom', public: true } },
     { path: '/qualityassurance', component: QualityAssurance, meta: { title: 'Quality Assurance' } },
     { path: '/yourevals', component: YourEvals, meta: { title: 'Your Evaluations' } },
     { path: '/message', component: Message, meta: { title: 'Message from the NAT' } },

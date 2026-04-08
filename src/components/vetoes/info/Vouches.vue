@@ -134,10 +134,23 @@ export default {
         },
         async createChatroom (e) {
             if (confirm(`Are you sure?`)) {
-                const data = await this.$http.executePost(`/vetoes/createChatroom/${this.selectedVeto.id}`, { includeUsers: this.includeUsers }, e);
+                const data = await this.$http.executePost(`/v2/vetoes/${this.selectedVeto.id}/chatrooms`, {
+                    includeUsers: this.includeUsers,
+                }, e);
 
-                if (this.$http.isValid(data)) {
-                    this.$store.commit('vetoes/updateVeto', data.veto);
+                if (this.$http.isValid(data) && data.chatroom) {
+                    if (data.veto) {
+                        this.$store.commit('vetoes/updateVeto', data.veto);
+                    }
+                    if (this.$store.hasModule('chatrooms')) {
+                        this.$store.commit('chatrooms/addRoomToTarget', {
+                            type: 'veto',
+                            targetId: this.selectedVeto.id,
+                            room: data.chatroom,
+                        });
+                        this.$store.commit('chatrooms/setRoom', data.chatroom);
+                    }
+                    this.includeUsers = '';
                 }
             }
         },

@@ -16,6 +16,7 @@ const Aiess = require('../models/aiess');
 const Discussion = require('../models/discussion');
 const Report = require('../models/report');
 const Logger = require('../models/log');
+const vetoesService = require('../services/vetoesService');
 const ResignationEvaluation = require('../models/evaluations/resignationEvaluation');
 const Settings = require('../models/settings');
 const { replaceUser } = require('../routes/evaluations/evaluations');
@@ -303,6 +304,12 @@ const expirePendingVetoes = cron.schedule('2 17 * * *', async () => {
             veto.status = 'archive';
             await veto.save();
 
+            try {
+                await vetoesService.publishVetoDiscussionChatroom(veto);
+            } catch (err) {
+                console.error('[automation expirePendingVetoes] publishVetoDiscussionChatroom failed:', err);
+            }
+
             await discord.webhookPost(
                 [{
                     color: discord.webhookColors.darkPurple,
@@ -366,6 +373,12 @@ const notifyVetoes = cron.schedule('1 17 * * *', async () => {
         if (autoConclude) { // send archive webhook
             veto.status = 'archive';
             await veto.save();
+
+            try {
+                await vetoesService.publishVetoDiscussionChatroom(veto);
+            } catch (err) {
+                console.error('[automation notifyVetoes] publishVetoDiscussionChatroom failed:', err);
+            }
 
             await discord.webhookPost(
                 [{
