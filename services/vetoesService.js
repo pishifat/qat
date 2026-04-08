@@ -277,6 +277,22 @@ function parseIncludeUsers(includeUsers) {
         .filter(Boolean);
 }
 
+/**
+ * osu! bot announcement to each chatroom participant (same flow for pending and post-mediation rooms).
+ * @param {object} chatroom - Sanitized room from chatroomsService (moderator view includes participant osuIds).
+ * @param {{ name: string, description: string }} channel
+ */
+async function announceVetoChatroomToParticipants(chatroom, channel, words) {
+    for (const participant of chatroom.participants || []) {
+        const message = await osuBot.sendAnnouncement([participant.osuId], channel, words);
+        await util.sleep(500);
+
+        if (message !== true) {
+            break;
+        }
+    }
+}
+
 async function createVetoChatroom(vetoId, payload, actor) {
     if (!actor?.isNat) {
         throw createError(403, 'Only NAT can create veto chatrooms.');
@@ -349,20 +365,14 @@ async function createVetoChatroom(vetoId, payload, actor) {
     veto.discussionChatroom = chatroom.id;
     await veto.save();
 
-    const channel = {
-        name: `Veto Discussion (${veto.mode == 'all' ? 'All game modes' : veto.mode == 'osu' ? 'osu!' : `osu!${veto.mode}`})`,
-        description: 'A pending veto you are involved with has opened discussion',
-    };
-    const words = `Discussion for the pending veto on [**${veto.beatmapTitle}**](https://osu.ppy.sh/beatmapsets/${veto.beatmapId}) has begun!\n\nTry to reach a conclusion here: http://bn.mappersguild.com/vetoes/${veto.id}\n\nIf a conclusion cannot be reached, the veto may be mediated by a larger group of Beatmap Nominators.`;
-
-    for (const participant of chatroom.participants || []) {
-        const message = await osuBot.sendAnnouncement([participant.osuId], channel, words);
-        await util.sleep(500);
-
-        if (message !== true) {
-            break;
-        }
-    }
+    await announceVetoChatroomToParticipants(
+        chatroom,
+        {
+            name: `Veto Discussion (${veto.mode == 'all' ? 'All game modes' : veto.mode == 'osu' ? 'osu!' : `osu!${veto.mode}`})`,
+            description: 'A pending veto you are involved with has opened discussion',
+        },
+        `Discussion for the pending veto on [**${veto.beatmapTitle}**](https://osu.ppy.sh/beatmapsets/${veto.beatmapId}) has begun!\n\nTry to reach a conclusion here: http://bn.mappersguild.com/vetoes/${veto.id}\n\nIf a conclusion cannot be reached, the veto may be mediated by a larger group of Beatmap Nominators.`,
+    );
 
     Logger.generate(
         actor.id || actor._id,
@@ -455,6 +465,15 @@ async function createPostMediationVetoChatroom(vetoId, payload, actor) {
             },
         ],
     }, actor);
+
+    await announceVetoChatroomToParticipants(
+        chatroom,
+        {
+            name: 'Post-mediation Discussion',
+            description: 'An archived veto you are involved with has a new post-mediation discussion',
+        },
+        `A **post-mediation** discussion has been opened for the archived veto on [**${veto.beatmapTitle}**](https://osu.ppy.sh/beatmapsets/${veto.beatmapId}).\n\nContinue the conversation here: http://bn.mappersguild.com/vetoes/${veto.id}`,
+    );
 
     Logger.generate(
         actor.id || actor._id,
