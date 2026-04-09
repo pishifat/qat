@@ -151,18 +151,13 @@ export default {
         },
         /**
          * Reusable chatroom list (and NAT tools).
-         * Live chatroom phase: show for vetoFormat >= 7 (list API enforces access).
-         * Archived: anyone if a discussion room exists; NAT always on archive for post-mediation create.
+         * Live chatroom phase/Archived: show for vetoFormat >= 7 (list API enforces access).
          * WIP/available: NAT only when the veto has a linked primary discussion room.
          */
         showVetoChatroomsPanel() {
             const v = this.selectedVeto;
             if (!v || v.vetoFormat < 7) return false;
-            if (v.status === 'chatroom') return true;
-            if (v.status === 'archive') {
-                if (v.discussionChatroom) return true;
-                return !!this.loggedInUser?.isNat;
-            }
+            if (v.status === 'chatroom' || v.status === 'archive') return true;
             if (v.status === 'wip' || v.status === 'available') {
                 return !!this.loggedInUser?.isNat && !!v.discussionChatroom;
             }
