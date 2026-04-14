@@ -199,6 +199,11 @@ function canModerateRoom(user) {
     return isNat(user);
 }
 
+function actsAsModeratorWhenPosting(user, room) {
+    if (!canModerateRoom(user)) return false;
+    return !isParticipant(user, room);
+}
+
 function canViewRoom(user, room) {
     if (!room) return false;
     if (canModerateRoom(user)) return true;
@@ -208,7 +213,7 @@ function canViewRoom(user, room) {
 
 function canPostMessage(user, room) {
     if (!user || !room) return false;
-    if (canModerateRoom(user)) return true;
+    if (actsAsModeratorWhenPosting(user, room)) return true;
     if (room.isLocked) return false;
     return isParticipant(user, room);
 }
@@ -613,8 +618,9 @@ async function createMessage(roomId, payload, actor) {
     const userId = toIdString(actor);
     const context = await getRoomTypeContext(room);
     const participantEntry = getParticipantEntry(room, actor);
-    const role = canModerateRoom(actor, room) ? 'moderator' : getRoomRole(room, userId, context, participantEntry);
-    const isAnonymous = !canModerateRoom(actor, room) && !isPublicParticipant(actor, room);
+    const moderatorPosting = canModerateRoom(actor) && !participantEntry;
+    const role = moderatorPosting ? 'moderator' : getRoomRole(room, userId, context, participantEntry);
+    const isAnonymous = !moderatorPosting && !isPublicParticipant(actor, room);
 
     const message = new ChatroomMessage({
         chatroom: room._id,
