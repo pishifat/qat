@@ -1,69 +1,114 @@
 const webhookConfig = require('../webhookConfig.js');
-let config = webhookConfig.get();
 
-function getWebhook(webhook) {
-    webhookConfig.reload();
-    config = webhookConfig.get();
+const BASE = 'https://discordapp.com/api/webhooks/';
 
-    let url = 'https://discordapp.com/api/webhooks/';
+/**
+ * @param {unknown} entry
+ * @returns {string | { error: string }}
+ */
+function pathPart(entry) {
+    if (!entry || typeof entry !== 'object' || !entry.id || !entry.token) {
+        return { error: 'webhook not configured' };
+    }
+
+    return `${entry.id}/${entry.token}`;
+}
+
+/**
+ * @param {string} url
+ * @param {unknown} entry
+ */
+function appendPath(url, entry) {
+    const part = pathPart(entry);
+
+    if (typeof part === 'object') return part;
+
+    return url + part;
+}
+
+/**
+ * @param {string} url
+ * @param {unknown} entry
+ */
+function appendPathWithOptionalThread(url, entry) {
+    const part = pathPart(entry);
+
+    if (typeof part === 'object') return part;
+
+    let out = url + part;
+    // @ts-ignore threadId optional on forum/thread webhooks
+    if (entry.threadId) out += `?thread_id=${entry.threadId}`;
+
+    return out;
+}
+
+/**
+ * @param {string} webhook
+ * @returns {Promise<string | { error: string }>}
+ */
+async function getWebhook(webhook) {
+    await webhookConfig.reload();
+    const config = webhookConfig.get();
+
+    let url = BASE;
 
     switch (webhook) {
         case 'osu':
-            return url += `${config.standardWebhook.id}/${config.standardWebhook.token}`;
+            return appendPath(url, config.standardWebhook);
 
         case 'taiko':
-            return url += `${config.taikoWebhook.id}/${config.taikoWebhook.token}`;
+            return appendPath(url, config.taikoWebhook);
 
         case 'catch':
-            return url += `${config.catchWebhook.id}/${config.catchWebhook.token}`;
+            return appendPath(url, config.catchWebhook);
 
         case 'mania':
-            return url += `${config.maniaWebhook.id}/${config.maniaWebhook.token}`;
+            return appendPath(url, config.maniaWebhook);
 
         case 'all':
-            return url += `${config.allWebhook.id}/${config.allWebhook.token}`;
+            return appendPath(url, config.allWebhook);
 
         case 'standardQualityAssurance':
-            return url += `${config.standardQualityAssuranceWebhook.id}/${config.standardQualityAssuranceWebhook.token}`;
+            return appendPath(url, config.standardQualityAssuranceWebhook);
 
         case 'taikoCatchManiaQualityAssurance':
-            return url += `${config.taikoCatchManiaQualityAssuranceWebhook.id}/${config.taikoCatchManiaQualityAssuranceWebhook.token}`;
+            return appendPath(url, config.taikoCatchManiaQualityAssuranceWebhook);
 
         case 'publicVetoes':
-            return url += `${config.publicVetoesWebhook.id}/${config.publicVetoesWebhook.token}`;
+            return appendPath(url, config.publicVetoesWebhook);
 
         case 'beatmapReport':
-            return url += `${config.beatmapReportWebhook.id}/${config.beatmapReportWebhook.token}`;
+            return appendPath(url, config.beatmapReportWebhook);
 
         case 'rankedBeatmapReport':
-            return url += `${config.rankedBeatmapReportWebhook.id}/${config.rankedBeatmapReportWebhook.token}?thread_id=${config.rankedBeatmapReportWebhook.threadId}`;
+            return appendPathWithOptionalThread(url, config.rankedBeatmapReportWebhook);
 
         case 'natUserReport':
-            return url += `${config.natReportWebhook.id}/${config.natReportWebhook.token}`;
+            return appendPath(url, config.natReportWebhook);
 
         case 'contentCase':
-            return url += `${config.contentCasesWebhook.id}/${config.contentCasesWebhook.token}`;
+            return appendPath(url, config.contentCasesWebhook);
 
         case 'internalContentCase':
-            return url += `${config.internalContentCasesWebhook.id}/${config.internalContentCasesWebhook.token}`;
+            return appendPath(url, config.internalContentCasesWebhook);
 
         case 'dev':
-            return url += `${config.devWebhook.id}/${config.devWebhook.token}`;
+            return appendPath(url, config.devWebhook);
 
         case 'announcement':
-            return url += `${config.announcementWebhook.id}/${config.announcementWebhook.token}`;
+            return appendPath(url, config.announcementWebhook);
 
         case 'osuBeatmapReport':
         case 'taikoBeatmapReport':
         case 'catchBeatmapReport':
         case 'maniaBeatmapReport':
-            return url += `${config.beatmapReportWebhook.id}/${config.beatmapReportWebhook.token}`;
+            return appendPath(url, config.beatmapReportWebhook);
 
         case 'securityCheck':
-            return url += `${config.securityCheckWebhook.id}/${config.securityCheckWebhook.token}?thread_id=${config.securityCheckWebhook.threadId}`;
+            return appendPathWithOptionalThread(url, config.securityCheckWebhook);
 
         case 'preferenceModeration':
-            return url += `${config.preferenceModerationWebhook.id}/${config.preferenceModerationWebhook.token}`;
+            return appendPath(url, config.preferenceModerationWebhook);
 
         default:
             return { error: 'no webhook specified' };

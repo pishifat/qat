@@ -1,15 +1,44 @@
-const fs = require('fs');
+const fs = require('fs').promises;
+const path = require('path');
 
-let cachedConfig = load();
+const CONFIG_PATH = path.join(__dirname, '..', 'webhooks.json');
 
-function load() {
-    const config = JSON.parse(fs.readFileSync('webhooks.json', 'utf8'));
+/** @type {Record<string, unknown>} */
+let cachedConfig = {};
 
-    return config;
+/**
+ * @returns {Promise<Record<string, unknown>>}
+ */
+async function loadFromDisk() {
+    try {
+        const raw = await fs.readFile(CONFIG_PATH, 'utf8');
+        const parsed = JSON.parse(raw);
+
+        if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+            console.warn('[webhookConfig] webhooks.json must contain a JSON object; using empty config');
+            return {};
+        }
+
+        return parsed;
+    } catch (e) {
+        if (e && e.code === 'ENOENT') {
+            console.warn('[webhookConfig] webhooks.json not found; using empty config');
+        } else if (e instanceof SyntaxError) {
+            console.warn('[webhookConfig] webhooks.json is not valid JSON; using empty config:', e.message);
+        } else {
+            console.warn('[webhookConfig] Failed to read webhooks.json; using empty config:', e.message);
+        }
+
+        return {};
+    }
 }
 
-function reload() {
-    cachedConfig = load();
+async function init() {
+    cachedConfig = await loadFromDisk();
+}
+
+async function reload() {
+    cachedConfig = await loadFromDisk();
 }
 
 function get() {
@@ -21,16 +50,29 @@ function get() {
  * @param {string} id
  * @param {string} token
  */
-function update(webhook, id, token) {
-    cachedConfig[webhook] = {
+async function update(webhook, id, token) {
+    const prev =
+        cachedConfig[webhook] && typeof cachedConfig[webhook] === 'object'
+            ? cachedConfig[webhook]
+            : {};
+
+    const merged = {
+        ...prev,
         id,
         token,
     };
 
-    fs.writeFileSync('webhooks.json', JSON.stringify(cachedConfig, null, 4));
+    const nextConfig = {
+        ...cachedConfig,
+        [webhook]: merged,
+    };
+
+    await fs.writeFile(CONFIG_PATH, JSON.stringify(nextConfig, null, 4), 'utf8');
+    cachedConfig = nextConfig;
 }
 
 module.exports = {
+    init,
     reload,
     get,
     update,

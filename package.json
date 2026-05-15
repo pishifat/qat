@@ -68,7 +68,8 @@
   "nodemonConfig": {
     "ignore": [
       "public/*",
-      "src/*"
+      "src/*",
+      "webhooks.json"
     ]
   }
 }

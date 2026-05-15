@@ -11,7 +11,7 @@ const avatar_url = 'https://raw.githubusercontent.com/pishifat/qat/refs/heads/ma
  * internal: posts embed error to dev webhook on failure.
  */
 async function errorWebhookPost(error, message, webhook) {
-    const url = getWebhook('dev');
+    const url = await getWebhook('dev');
     if (typeof url === 'object') return url;
 
     const fields = [
@@ -57,7 +57,7 @@ async function errorWebhookPost(error, message, webhook) {
  * @param {string} webhook - webhook key (e.g. 'publicVetoes', 'announcement')
  */
 async function webhookPost(message, webhook) {
-    let url = getWebhook(webhook);
+    let url = await getWebhook(webhook);
     if (typeof url === 'object') return url;
 
     try {
@@ -72,14 +72,63 @@ async function webhookPost(message, webhook) {
 }
 
 /**
+ * POST embeds using raw webhook id/token from config (e.g. immediately after settings save).
+ * Preserves optional forum/thread targeting via threadId.
+ * @param {{ id?: string, token?: string, threadId?: string }} credentials
+ * @param {Array} embeds
+ */
+async function webhookPostByCredentials(credentials, embeds) {
+    const { id, token, threadId } = credentials || {};
+    if (!id || !token) return;
+
+    let url = `https://discordapp.com/api/webhooks/${id}/${token}`;
+    if (threadId) {
+        url += `?thread_id=${encodeURIComponent(threadId)}`;
+    }
+
+    try {
+        await axios.post(url, {
+            username,
+            avatar_url,
+            embeds,
+        });
+    } catch (error) {
+        await errorWebhookPost(error, embeds, 'webhookPostByCredentials');
+    }
+}
+
+/**
+ * Same payload as webhookPostByCredentials but throws on HTTP/network error (for callers that handle fallback).
+ * @param {{ id?: string, token?: string, threadId?: string }} credentials
+ * @param {Array} embeds
+ */
+async function webhookPostByCredentialsOrThrow(credentials, embeds) {
+    const { id, token, threadId } = credentials || {};
+    if (!id || !token) {
+        throw new Error('Missing webhook id or token');
+    }
+
+    let url = `https://discordapp.com/api/webhooks/${id}/${token}`;
+    if (threadId) {
+        url += `?thread_id=${encodeURIComponent(threadId)}`;
+    }
+
+    await axios.post(url, {
+        username,
+        avatar_url,
+        embeds,
+    });
+}
+
+/**
  * posts embeds with a role ping; uses webhook name as the role key in getRoles.
  * @param {string} message - optional text before/after embed
  * @param {Array} embeds - discord embed objects
  * @param {string} webhook - webhook key (also used to resolve role)
  */
 async function highlightWebhookPost(message, embeds, webhook) {
-    const url = getWebhook(webhook);
-    const role = getRoles([webhook]);
+    const url = await getWebhook(webhook);
+    const role = await getRoles([webhook]);
     if (typeof url === 'object') return url;
 
     try {
@@ -101,7 +150,7 @@ async function highlightWebhookPost(message, embeds, webhook) {
  * @param {string} [text] - optional message after pings
  */
 async function userHighlightWebhookPost(webhook, discordIds, text) {
-    const url = getWebhook(webhook);
+    const url = await getWebhook(webhook);
     if (typeof url === 'object') return url;
 
     if (!text) text = '';
@@ -129,8 +178,8 @@ async function userHighlightWebhookPost(webhook, discordIds, text) {
  * @param {Array} [embeds] - optional discord embed objects
  */
 async function roleHighlightWebhookPost(webhook, roles, text, embeds) {
-    const url = getWebhook(webhook);
-    let content = getRoles(roles);
+    const url = await getWebhook(webhook);
+    let content = await getRoles(roles);
     if (typeof url === 'object') return url;
 
     if (text) content += ` ${text}`;
@@ -375,6 +424,8 @@ function findEvaluatorHighlights(reviews, evaluators, discussion) {
 
 module.exports = {
     webhookPost,
+    webhookPostByCredentials,
+    webhookPostByCredentialsOrThrow,
     highlightWebhookPost,
     userHighlightWebhookPost,
     roleHighlightWebhookPost,

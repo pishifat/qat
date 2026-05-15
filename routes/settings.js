@@ -68,11 +68,65 @@ router.post('/webhooks/update', async (req, res) => {
     const id = req.body.id;
     const token = req.body.token;
 
-    webhookConfig.update(webhook, id, token);
-    webhookConfig.reload();
+    const priorEntry = webhookConfig.get()[webhook];
+    const priorCreds =
+        priorEntry && typeof priorEntry === 'object'
+            ? {
+                id: priorEntry.id,
+                token: priorEntry.token,
+                threadId: priorEntry.threadId,
+            }
+            : {};
+
+    const sessionAuthor = discord.defaultWebhookAuthor(req.session);
+    const successEmbeds = [
+        {
+            author: sessionAuthor,
+            color: discord.webhookColors.lightBlue,
+            description: `Updated location of webhook \`${webhook}\``,
+        },
+    ];
+
+    try {
+        await webhookConfig.update(webhook, id, token);
+    } catch (err) {
+        console.error('[settings] webhooks/update write failed:', err);
+        await discord.webhookPostByCredentials(priorCreds, [
+            {
+                author: sessionAuthor,
+                color: discord.webhookColors.darkYellow,
+                description: `Could not save \`${webhook}\` to disk (previous credentials are unchanged).`,
+            },
+        ]);
+
+        return res.status(500).json({
+            error: 'Could not write webhooks configuration',
+        });
+    }
+
+    const entry = webhookConfig.get()[webhook];
+
+    try {
+        await discord.webhookPostByCredentialsOrThrow(entry, successEmbeds);
+    } catch (err) {
+        console.error('[settings] webhooks/update confirmation post failed:', err);
+        await discord.webhookPostByCredentials(priorCreds, [
+            {
+                author: sessionAuthor,
+                color: discord.webhookColors.darkYellow,
+                description: `New credentials for \`${webhook}\` were saved, but the confirmation message failed to reach the new webhook. Verify the ID and token.`,
+            },
+        ]);
+
+        return res.json({
+            success: `updated ${webhook}`,
+            pingOk: false,
+        });
+    }
 
     res.json({
         success: `updated ${webhook}`,
+        pingOk: true,
     });
 });
 
