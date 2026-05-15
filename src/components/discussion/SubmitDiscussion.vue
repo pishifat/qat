@@ -99,8 +99,8 @@
                 <div class="d-flex flex-wrap align-items-center mt-2">
                     Number of vote options:
                     <select
-                        id="user"
-                        v-model="group"
+                        id="vote-options"
+                        v-model="voteOptions"
                         class="form-select form-select-sm ms-2 w-auto"
                     >
                         <option
