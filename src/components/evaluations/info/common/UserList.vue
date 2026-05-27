@@ -12,7 +12,7 @@
             >
                 {{ user.username }}
                 <a
-                    v-if="convertMockReviewEvaluationId && loggedInUser && loggedInUser.isNat && user.convertMockReviewId"
+                    v-if="convertMockReviewEvaluationId && loggedInUser && loggedInUser.isNat && user.convertMockReviewId && user.isTrialNat"
                     href="#"
                     class="ms-1"
                     data-bs-toggle="tooltip"

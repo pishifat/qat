@@ -349,6 +349,14 @@ async function convertMockReviewToReviews(evaluation, mockReviewId) {
         evaluatorId = String(doc.evaluator);
     }
 
+    const evaluatorUser = mockReview.evaluator && mockReview.evaluator.isTrialNat !== undefined
+        ? mockReview.evaluator
+        : await User.findById(evaluatorId).select('isTrialNat').orFail();
+
+    if (!evaluatorUser.isTrialNat) {
+        return { error: 'Only mock reviews from BN Evaluators can be converted' };
+    }
+
     const duplicate = evaluation.reviews.some(r => {
         const eid = r.evaluator && r.evaluator._id ? String(r.evaluator._id) : String(r.evaluator);
         return eid === evaluatorId;
