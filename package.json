@@ -9,6 +9,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "prod": "cross-env NODE_ENV=development node ./app.js",
+    "deploy": "npm run build && pm2 restart bn",
     "lint": "eslint .",
     "tsc": "tsc"
   },
