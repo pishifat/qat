@@ -459,7 +459,9 @@ router.post('/updateDiscordId', middlewares.isLoggedIn, middlewares.hasFullReadA
         user = res.locals.userRequest;
     }
 
-    user.discordId = req.body.discordId;
+    user.discordId = req.body.discordId == null
+        ? req.body.discordId
+        : String(req.body.discordId).trim();
     await user.save();
 
     res.json({

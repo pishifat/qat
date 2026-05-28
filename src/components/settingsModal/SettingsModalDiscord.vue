@@ -11,7 +11,9 @@
                 <div class="input-group">
                     <input
                         v-model="discordId"
-                        type="number"
+                        type="text"
+                        inputmode="numeric"
+                        pattern="[0-9]*"
                         class="form-control"
                         placeholder="ID..."
                     >
@@ -34,7 +36,7 @@ import { mapState } from 'vuex';
 export default {
     data () {
         return {
-            discordId: 0,
+            discordId: '',
         };
     },
     computed: mapState([
@@ -46,7 +48,7 @@ export default {
     methods: {
         async updateDiscordId (e) {
             await this.$http.executePost(`/users/updateDiscordId`, {
-                discordId: this.discordId,
+                discordId: String(this.discordId).trim(),
             }, e);
         },
     },

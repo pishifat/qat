@@ -8,9 +8,9 @@
                 v-if="editingIdInput"
                 v-model="idInput"
                 class="form-control form-control-sm w-25"
-                type="number"
-                min="1"
-                max="20"
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
                 @keyup.enter="save()"
             >
             <span v-else class="mx-1">{{ idInput }}</span>
@@ -49,7 +49,7 @@ export default {
         async save () {
             if (this.editingIdInput) {
                 const res = await this.$http.executePost(`/users/updateDiscordId`, {
-                    discordId: this.idInput,
+                    discordId: String(this.idInput).trim(),
                     userId: this.selectedUser.id,
                 });
 
