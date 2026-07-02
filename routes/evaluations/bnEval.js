@@ -612,7 +612,7 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
         // nat eval logs
         if (isNatEvalArchive) {
             let userGroup = (req.body.userGroup || 'nat').toUpperCase();
-            if (userGroup == 'user') userGroup = 'User';
+            if (userGroup == 'USER') userGroup = 'User';
 
             Logger.generate(
                 req.session.mongoId,
