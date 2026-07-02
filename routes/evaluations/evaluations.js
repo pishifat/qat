@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Review = require('../../models/evaluations/review');
 const Logger = require('../../models/log');
 const User = require('../../models/user');
+const Note = require('../../models/note');
 const Evaluation = require('../../models/evaluations/evaluation');
 const AppEvaluation = require('../../models/evaluations/appEvaluation');
 const BnEvaluation = require('../../models/evaluations/bnEvaluation');
@@ -11,6 +12,7 @@ const discord = require('../../helpers/discord');
 const util = require('../../helpers/util');
 const { EvaluationKind, BnEvaluationConsensus, ResignationConsensus } = require('../../shared/enums');
 const moment = require('moment');
+const { isNatEvaluation } = require('../../shared/isNatEvaluation');
 
 /**
  * @param {import('../../models/interfaces/evaluations').IEvaluationDocument} evaluation
@@ -85,7 +87,7 @@ async function submitEval (evaluation, session, isNat, comment, vote) {
         // Send new review notification
         let description = formatDescription(evaluation, 'Submitted eval for', '');
 
-        if (!evaluation.user.isNat) {
+        if (!isNatEvaluation(evaluation)) {
             discord.webhookPost(
                 [{
                     author: discord.defaultWebhookAuthor(session),
@@ -173,8 +175,68 @@ async function submitMockEval (evaluation, session, comment, vote) {
     return isNewEvaluation;
 }
 
-async function setGroupEval (evaluations, session) {
+async function setGroupEval (evaluations, session, viewer) {
     for (const evaluation of evaluations) {
+        if (isNatEvaluation(evaluation)) {
+            if (!viewer?.isNatLeader) {
+                throw new Error('Only NAT leaders can move NAT evaluations to group discussion.');
+            }
+
+            const natLeaders = await User.find({ isNatLeader: true });
+            evaluation.discussion = true;
+            evaluation.natEvaluators = natLeaders.map(u => u._id);
+
+            let summaryText = '*No summary provided*';
+
+            if (!evaluation.selfSummary) {
+                const placeholderNote = await Note.create({
+                    author: session.mongoId,
+                    user: evaluation.user.id || evaluation.user._id,
+                    comment: summaryText,
+                    isSummary: true,
+                });
+                evaluation.selfSummary = placeholderNote._id;
+            } else if (evaluation.selfSummary.comment) {
+                summaryText = evaluation.selfSummary.comment;
+            } else {
+                const note = await Note.findById(evaluation.selfSummary);
+
+                summaryText = note?.comment || summaryText;
+            }
+
+            await evaluation.save();
+
+            await discord.webhookPost(
+                [{
+                    thumbnail: {
+                        url: `https://a.ppy.sh/${evaluation.user.osuId}`,
+                    },
+                    author: discord.defaultWebhookAuthor(session),
+                    color: discord.webhookColors.lightRed,
+                    description: `Moved [**${evaluation.user.username}**'s NAT eval](https://bn.mappersguild.com/bneval?id=${evaluation.id}) to group discussion`,
+                    fields: [
+                        {
+                            name: 'Summary',
+                            value: summaryText.length > 950 ? summaryText.slice(0, 950) + '... *(truncated)*' : summaryText,
+                        },
+                        {
+                            name: 'Assigned NAT leaders',
+                            value: natLeaders.map(u => u.username).join(', '),
+                        },
+                    ],
+                }],
+                evaluation.mode
+            );
+
+            const discordIds = natLeaders.map(u => u.discordId).filter(Boolean);
+
+            if (discordIds.length) {
+                await discord.userHighlightWebhookPost(evaluation.mode, discordIds);
+            }
+
+            continue;
+        }
+
         evaluation.discussion = true;
         await evaluation.save();
 
@@ -188,47 +250,23 @@ async function setGroupEval (evaluations, session) {
             else if (review.vote == 3) totalFail++;
         });
 
-        // Send moved notification
-        
-        if (evaluation.user.evaluatorModes && evaluation.user.evaluatorModes.includes(evaluation.mode)) {
-            const selfSummary = evaluation.selfSummary?.comment || '*No summary provided*';
-            discord.webhookPost(
-                [{
-                    thumbnail: {
-                        url: `https://a.ppy.sh/${evaluation.user.osuId}`,
+        await discord.webhookPost(
+            [{
+                thumbnail: {
+                    url: `https://a.ppy.sh/${evaluation.user.osuId}`,
+                },
+                author: discord.defaultWebhookAuthor(session),
+                color: discord.webhookColors.lightRed,
+                description: formatDescription(evaluation, 'Moved', 'to group discussion'),
+                fields: [
+                    {
+                        name: 'Votes',
+                        value: formatConsensus(evaluation.kind, totalPass, totalNeutral, totalFail),
                     },
-                    author: discord.defaultWebhookAuthor(session),
-                    color: discord.webhookColors.lightRed,
-                    description: `Moved [**${evaluation.user.username}**'s NAT eval](https://bn.mappersguild.com/bneval?id=${evaluation.id}) to group discussion`,
-                    fields: [
-                        {
-                            name: 'Summary',
-                            value: selfSummary.length > 950 ? selfSummary.slice(0, 950) + '... *(truncated)*' : selfSummary,
-                        },
-                    ],
-                }],
-                evaluation.mode
-            );
-
-        } else {
-            discord.webhookPost(
-                [{
-                    thumbnail: {
-                        url: `https://a.ppy.sh/${evaluation.user.osuId}`,
-                    },
-                    author: discord.defaultWebhookAuthor(session),
-                    color: discord.webhookColors.lightRed,
-                    description: formatDescription(evaluation, 'Moved', 'to group discussion'),
-                    fields: [
-                        {
-                            name: 'Votes',
-                            value: formatConsensus(evaluation.kind, totalPass, totalNeutral, totalFail),
-                        },
-                    ],
-                }],
-                evaluation.mode
-            );
-        }
+                ],
+            }],
+            evaluation.mode
+        );
     }
 }
 

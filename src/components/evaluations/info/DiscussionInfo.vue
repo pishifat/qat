@@ -1,6 +1,6 @@
 <template>
     <div>
-        <template v-if="(loggedInUser && (loggedInUser.isNat || loggedInUser.isTrialNat)) && !selectedEvaluation.user.isNat">
+        <template v-if="(loggedInUser && (loggedInUser.isNat || loggedInUser.isTrialNat)) && !isNatEval">
             <p>
                 <a href="#consensusSettings" data-bs-toggle="collapse">
                     Consensus settings <i class="fas fa-angle-down" />
@@ -52,6 +52,7 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import { isNatEvaluation } from 'shared/isNatEvaluation';
 import Consensus from './common/Consensus.vue';
 import ReviewsListing from './common/ReviewsListing.vue';
 import FeedbackInfo from './common/FeedbackInfo.vue';
@@ -78,6 +79,9 @@ export default {
         ...mapGetters('evaluations', ['selectedEvaluation']),
         consensus() {
             return this.selectedEvaluation.consensus;
+        },
+        isNatEval () {
+            return isNatEvaluation(this.selectedEvaluation);
         },
     },
 };

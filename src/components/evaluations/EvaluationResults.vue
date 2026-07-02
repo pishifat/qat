@@ -85,7 +85,7 @@
                 <div class="card card-body small mb-4 v-html-content" v-html="$md.render(evaluation.feedback)" />
             </div>
 
-            <div v-if="isNewEvaluationFormat && !evaluation.isNatEvaluation && evaluation.reviews && evaluation.reviews.length">
+            <div v-if="isNewEvaluationFormat && canSeeReviews && evaluation.reviews && evaluation.reviews.length">
                 <h5>Evaluations</h5>
                 <div v-for="(review, index) in evaluation.reviews" :key="review.id">
                     <div class="row my-3">
@@ -120,6 +120,7 @@
                 </div>
             </div>
             <evaluation-messages
+                v-if="!isNatEval"
                 :is-new-evaluation-format="isNewEvaluationFormat"
                 :evaluation="evaluation"
                 :replies="true"
@@ -131,6 +132,7 @@
 
 <script>
 import { mapState } from 'vuex';
+import { isNatEvaluation } from 'shared/isNatEvaluation';
 import ToastMessages from '../../components/ToastMessages.vue';
 import evaluations from '../../mixins/evaluations.js';
 import enums from 'shared/enums';
@@ -178,6 +180,12 @@ export default {
         addition () {
             if (this.evaluation.addition !== BnEvaluationAddition.None) return this.evaluation.addition;
             else return null;
+        },
+        isNatEval () {
+            return isNatEvaluation(this.evaluation);
+        },
+        canSeeReviews () {
+            return this.canSeeEvalReviews(this.evaluation, this.loggedInUser);
         },
     },
 };

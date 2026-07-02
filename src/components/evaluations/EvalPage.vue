@@ -106,6 +106,7 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import { isNatEvaluation } from 'shared/isNatEvaluation';
 import evaluationsModule from '../../store/evaluations';
 import ToastMessages from '../ToastMessages.vue';
 import FilterBox from '../FilterBox.vue';
@@ -190,6 +191,12 @@ export default {
         }, 21600000);
     },
     methods: {
+        getCheckedEvaluations () {
+            return this.evaluations.filter(e => this.checkedEvaluations.includes(e.id));
+        },
+        hasNatEvalInSelection () {
+            return this.getCheckedEvaluations().some(e => isNatEvaluation(e));
+        },
         selectAll() {
             this.$store.commit(`evaluations/updateCheckedEvaluations`, [
                 ...this.individualEvaluations.map(a => a.id),
@@ -208,6 +215,15 @@ export default {
         },
         async setGroupEval(e) {
             if (this.checkedEvaluations.length) {
+                if (this.kind !== 'applications' && this.hasNatEvalInSelection() && !this.loggedInUser?.isNatLeader) {
+                    this.$store.dispatch('updateToastMessages', {
+                        message: 'Only NAT leaders can move NAT evaluations to group discussion.',
+                        type: 'danger',
+                    });
+
+                    return;
+                }
+
                 const result = confirm(`Are you sure?`);
 
                 if (result) {
@@ -225,6 +241,15 @@ export default {
         },
         async setIndividualEval(e) {
             if (this.checkedEvaluations.length) {
+                if (this.kind !== 'applications' && this.hasNatEvalInSelection()) {
+                    this.$store.dispatch('updateToastMessages', {
+                        message: 'NAT evaluations cannot be set to individual evaluation.',
+                        type: 'danger',
+                    });
+
+                    return;
+                }
+
                 const result = confirm(`Are you sure?`);
 
                 if (result) {
@@ -244,11 +269,11 @@ export default {
             if (this.checkedEvaluations.length) {
                 let text = `Are you sure? The consensus of any BN evaluation will affect its respective user.\n\n`;
 
-                if (this.loggedInUser.isNatLeader) {
-                    text += `If you're archiving a NAT eval however, it will default their usergroup to NAT.`;
-                } else {
-                    text += `Only do this after feedback PMs have been sent.`;
+                if (this.kind !== 'applications' && this.hasNatEvalInSelection()) {
+                    text += `NAT evaluations in this selection will be archived as remaining in NAT unless archived individually with another outcome.\n\n`;
                 }
+
+                text += `Only do this after feedback PMs have been sent.`;
 
                 const result = confirm(text);
 

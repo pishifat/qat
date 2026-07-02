@@ -241,13 +241,13 @@ function findEvaluatorStatuses(reviews, evaluators, discussion) {
  * @param {string} feedback
  * @returns {string} text for webhook
  */
-function findMissingContent(discussion, consensus) {
+function findMissingContent(discussion, consensus, isNatEval = false) {
     let text = '\n**Next step:** ';
 
     if (!discussion) {
         text += `get more evaluations`;
     } else if (!consensus) {
-        text += `decide consensus`;
+        text += isNatEval ? `NAT leaders: archive eval` : `decide consensus`;
     } else {
         text += `send PM`;
     }

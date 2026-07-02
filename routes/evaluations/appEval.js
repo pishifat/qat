@@ -328,7 +328,7 @@ router.post('/setGroupEval/', middlewares.isNat, async (req, res) => {
         })
         .populate(defaultPopulate);
 
-    await setGroupEval(evaluations, req.session);
+    await setGroupEval(evaluations, req.session, res.locals.userRequest);
 
     let a = await AppEvaluation.findActiveApps();
     res.json(a);

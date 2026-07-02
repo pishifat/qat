@@ -19,6 +19,7 @@ const Logger = require('../models/log');
 const vetoesService = require('../services/vetoesService');
 const ResignationEvaluation = require('../models/evaluations/resignationEvaluation');
 const Settings = require('../models/settings');
+const { isNatEvaluation } = require('../shared/isNatEvaluation');
 const { replaceUser } = require('../routes/evaluations/evaluations');
 const { BnEvaluationConsensus, BnEvaluationAddition } = require('../shared/enums');
 const getGeneralEvents = require('../routes/evaluations/bnEval').getGeneralEvents;
@@ -523,8 +524,8 @@ const notifyCurrentBnEvaluations = cron.schedule('3 17 * * *', async () => {
     for (const eval of activeBnEvaluations) {
         const deadline = eval.discussion ? moment(eval.deadline).add(7, 'days').toDate() : new Date(eval.deadline); // front-end adds 7 days to deadline for evals in group phase, so webhooks should reflect that
 
-        const isNat = eval.user.groups.includes('nat');
-        let description = `[**${eval.user.username}**'s ${isNat ? 'NAT eval' : eval.isResignation ? 'resignation' : 'current BN eval'}](http://bn.mappersguild.com/bneval?id=${eval.id}) `;
+        const isNatEval = isNatEvaluation(eval);
+        let description = `[**${eval.user.username}**'s ${isNatEval ? 'NAT eval' : eval.isResignation ? 'resignation' : 'current BN eval'}](http://bn.mappersguild.com/bneval?id=${eval.id}) `;
         let color;
         let generateWebhook;
         let needsNewEvaluator;
@@ -555,7 +556,7 @@ const notifyCurrentBnEvaluations = cron.schedule('3 17 * * *', async () => {
                     .sort({ archivedAt: -1 }),
             ]);
 
-            if (lastApp && lastEval && new Date(lastEval.archivedAt) > new Date(lastApp.archivedAt)) { // only check people who haven't recently rejoined BN
+            if (!isNatEval && lastApp && lastEval && new Date(lastEval.archivedAt) > new Date(lastApp.archivedAt)) { // only check people who haven't recently rejoined BN
                 
                 const uniqueNominations = await scrap.findUniqueNominationsCount(moment().subtract(eval.activityToCheck, 'days').toDate(), new Date(), eval.user);
                 
@@ -580,7 +581,7 @@ const notifyCurrentBnEvaluations = cron.schedule('3 17 * * *', async () => {
             }
             
             // add user assignments
-            if (isNat) {
+            if (isNatEval) {
                 eval.natEvaluators = [eval.user._id];
             } else {
                 eval.natEvaluators = await User.getAssignedNat(eval.mode, eval.user.id);
@@ -615,7 +616,7 @@ const notifyCurrentBnEvaluations = cron.schedule('3 17 * * *', async () => {
             color = discord.webhookColors.red;
             generateWebhook = true;
 
-            if (!eval.discussion && !eval.user.groups.includes('nat')) {
+            if (!eval.discussion && !isNatEval) {
                 needsNewEvaluator = true;
             }
         } else if (tomorrow > deadline) {
@@ -630,13 +631,13 @@ const notifyCurrentBnEvaluations = cron.schedule('3 17 * * *', async () => {
 
         // send webhooks
         if (generateWebhook) {
-            let evaluators = await Settings.getModeHasTrialNat(eval.mode) && !isNat ? eval.natEvaluators.concat(eval.bnEvaluators) : eval.natEvaluators;
+            let evaluators = await Settings.getModeHasTrialNat(eval.mode) && !isNatEval ? eval.natEvaluators.concat(eval.bnEvaluators) : eval.natEvaluators;
             const fields = [];
 
             // set more webhook content
             if (hasAssignedNatEvaluators) {
                 description += scrap.findEvaluatorStatuses(eval.reviews, evaluators, eval.discussion);
-                description += scrap.findMissingContent(eval.discussion, eval.consensus);
+                description += scrap.findMissingContent(eval.discussion, eval.consensus, isNatEval);
             } else {
                 const natList = eval.natEvaluators.map(u => u.username).join(', ');
                 const trialNatList = eval.bnEvaluators.map(u => u.username).join(', ');

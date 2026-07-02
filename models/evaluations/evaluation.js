@@ -74,6 +74,7 @@ class EvaluationService extends mongoose.Model {
             populate.push(
                 {
                     path: 'selfSummary',
+                    select: 'comment',
                 }
             );
         } else if (isTrialNat) {

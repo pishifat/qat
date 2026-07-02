@@ -25,7 +25,7 @@
                 :mongo-id="selectedEvaluation.user.id"
                 :unique="selectedEvaluation.id"
                 :overwrite-days="selectedEvaluation.activityToCheck ? selectedEvaluation.activityToCheck + 7 : 90 + 7"
-                :is-nat="selectedEvaluation.user.isNat"
+                :is-nat="isNatEval"
                 :user="selectedEvaluation.user"
             />
 
@@ -52,13 +52,17 @@
                 <div v-if="selectedEvaluation.feedback" class="card card-body small" v-html="$md.render(selectedEvaluation.feedback)" />
             </div>
 
+            <div v-if="isNatEval && selfSummaryComment" class="my-3">
+                <b>Self-reported summary:</b>
+                <div class="small card card-body" v-html="$md.render(selfSummaryComment)" />
+            </div>
+
             <hr>
 
-            <reviews-listing
-                v-if="loggedInUser.isNatLeader || !isNatEvaluation"
-            />
+            <reviews-listing v-if="canSeeReviews" />
 
             <evaluation-messages
+                v-if="!isNatEval"
                 :evaluation="selectedEvaluation"
                 :is-new-evaluation-format="selectedEvaluation.isNewEvaluationFormat"
             />
@@ -80,6 +84,8 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import { isNatEvaluation } from 'shared/isNatEvaluation';
+import evaluations from '../../../mixins/evaluations';
 import ModalHeader from './ModalHeader.vue';
 import Consensus from './common/Consensus.vue';
 import ReviewsListing from './common/ReviewsListing.vue';
@@ -95,6 +101,7 @@ import DebugViewDocument from '../../DebugViewDocument.vue';
 
 export default {
     name: 'ArchiveInfo',
+    mixins: [ evaluations ],
     components: {
         ModalHeader,
         Consensus,
@@ -123,8 +130,14 @@ export default {
 
             return [this.selectedEvaluation.mode];
         },
-        isNatEvaluation () {
-            return ['remainInNat', 'moveToBn', 'removeFromNat'].includes(this.selectedEvaluation.consensus);
+        isNatEval () {
+            return isNatEvaluation(this.selectedEvaluation);
+        },
+        selfSummaryComment () {
+            return this.getSelfSummaryComment(this.selectedEvaluation);
+        },
+        canSeeReviews () {
+            return this.canSeeEvalReviews(this.selectedEvaluation, this.loggedInUser);
         },
     },
     methods: {

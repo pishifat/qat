@@ -33,7 +33,7 @@ const evaluationsPopulate = [
     },
     {
         path: 'user',
-        select: 'username osuId',
+        select: 'username osuId modesInfo groups',
     },
 ];
 
@@ -1537,9 +1537,6 @@ router.post('/:id/changeEvaluatorMode', middlewares.isLoggedIn, middlewares.isNa
         }
     }
     
-    user.modes = [mode];
-    user.evaluatorModes = [mode];
-
     await user.save();
 
     discord.webhookPost(

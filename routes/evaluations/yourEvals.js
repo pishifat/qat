@@ -4,6 +4,7 @@ const Evaluation = require('../../models/evaluations/evaluation');
 const User = require('../../models/user');
 const middlewares = require('../../helpers/middlewares');
 const util = require('../../helpers/util');
+const { isNatEvaluation } = require('../../shared/isNatEvaluation');
 
 const router = express.Router();
 
@@ -25,6 +26,10 @@ const defaultAppPopulate = [
 
 const defaultBnPopulate = [
     { path: 'user', select: 'username osuId modesInfo groups' },
+    {
+        path: 'selfSummary',
+        select: 'comment',
+    },
     {
         path: 'reviews',
         select: 'moddingComment vote',
@@ -74,6 +79,24 @@ function sanitizeBareboneReviews(reviews) {
             _id: review._id,
         }
     });
+}
+
+function applyReviewVisibility(eval, viewer) {
+    if (viewer.isNatLeader) {
+        eval.reviews = sanitizeReviews(eval.reviews);
+    } else if (isNatEvaluation(eval)) {
+        eval.reviews = sanitizeBareboneReviews(eval.reviews);
+    } else if (viewer.isNat) {
+        eval.reviews = sanitizeReviews(eval.reviews);
+    } else if (eval.isNewEvaluationFormat) {
+        eval.reviews = sanitizePublicReviews(eval.reviews);
+    } else {
+        eval.reviews = sanitizeBareboneReviews(eval.reviews);
+    }
+
+    if (!viewer.isNat && !viewer.isNatLeader) {
+        eval.reviews = util.shuffleArray(eval.reviews);
+    }
 }
 
 /* GET search for your evals */
@@ -160,13 +183,7 @@ router.get('/search', async (req, res) => {
             };
         });
 
-        if (isNat) {
-            eval.reviews = sanitizeReviews(eval.reviews);
-        }else if (eval.isNewEvaluationFormat) {
-            eval.reviews = sanitizePublicReviews(eval.reviews);
-        } else {
-            eval.reviews = sanitizeBareboneReviews(eval.reviews);
-        }
+        applyReviewVisibility(eval, res.locals.userRequest);
 
         evaluationsJson.push(eval);
     }

@@ -6,7 +6,7 @@
             </div>
             <div class="col-sm-12">
                 <p>
-                    <b>{{ selectedEvaluation.user.isNat && loggedInUser.isNatLeader ? 'NAT activity comments:' : 'Evaluation:' }}</b>
+                    <b>{{ isNatEvalLeaderInput ? 'NAT activity comments:' : 'Evaluation:' }}</b>
                     <a
                         :class="'ms-1 ' + (previewModdingComment ? 'text-success' : '')"
                         data-bs-toggle="tooltip"
@@ -45,7 +45,7 @@
                     name="vote"
                     value="1"
                 >
-                <label class="form-check-label text-pass" for="1">{{ selectedEvaluation.isApplication ? 'Pass' : (selectedEvaluation.user.evaluatorModes.includes(selectedEvaluation.mode) || selectedEvaluation.user.evaluatorModes.includes("none")) && loggedInUser.isNatLeader ? 'Remain in NAT' : selectedEvaluation.isBnEvaluation ? 'Full BN' : 'Resign on good terms' }}</label>
+                <label class="form-check-label text-pass" for="1">{{ selectedEvaluation.isApplication ? 'Pass' : isNatEvalLeaderInput ? 'Remain in NAT' : selectedEvaluation.isBnEvaluation ? 'Full BN' : 'Resign on good terms' }}</label>
             </div>
             <div class="form-check form-check-inline">
                 <input
@@ -56,7 +56,7 @@
                     name="vote"
                     value="2"
                 >
-                <label class="form-check-label text-neutral" for="2">{{ selectedEvaluation.isApplication ? 'Neutral' : (selectedEvaluation.user.evaluatorModes.includes(selectedEvaluation.mode) || selectedEvaluation.user.evaluatorModes.includes("none")) && loggedInUser.isNatLeader ? 'Investigate' : selectedEvaluation.isBnEvaluation ? 'Warning' : 'Resign on standard terms' }}</label>
+                <label class="form-check-label text-neutral" for="2">{{ selectedEvaluation.isApplication ? 'Neutral' : isNatEvalLeaderInput ? 'Investigate' : selectedEvaluation.isBnEvaluation ? 'Warning' : 'Resign on standard terms' }}</label>
             </div>
             <div v-if="!selectedEvaluation.isResignation" class="form-check form-check-inline">
                 <input
@@ -67,7 +67,7 @@
                     name="vote"
                     value="3"
                 >
-                <label class="form-check-label text-fail" for="3">{{ selectedEvaluation.isApplication ? 'Fail' : (selectedEvaluation.user.evaluatorModes.includes(selectedEvaluation.mode) || selectedEvaluation.user.evaluatorModes.includes("none")) && loggedInUser.isNatLeader ? 'Remove from NAT' : 'Remove from BN' }}</label>
+                <label class="form-check-label text-fail" for="3">{{ selectedEvaluation.isApplication ? 'Fail' : isNatEvalLeaderInput ? 'Remove from NAT' : 'Remove from BN' }}</label>
             </div>
 
             <button class="btn btn-sm btn-primary" @click="submitEval($event)">
@@ -79,6 +79,7 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import { isNatEvaluation } from 'shared/isNatEvaluation';
 
 export default {
     name: 'EvaluationInput',
@@ -99,6 +100,9 @@ export default {
         ...mapGetters('evaluations', [
             'selectedEvaluation',
         ]),
+        isNatEvalLeaderInput () {
+            return isNatEvaluation(this.selectedEvaluation) && this.loggedInUser.isNatLeader;
+        },
     },
     watch: {
         selectedEvaluation() {

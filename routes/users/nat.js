@@ -91,8 +91,17 @@ router.post('/saveNote/:id', async (req, res) => {
         .findById(note._id)
         .populate(defaultNotePopulate);
 
+    let evaluation;
+
+    if (evaluationId) {
+        evaluation = await BnEvaluation
+            .findById(evaluationId)
+            .populate(defaultNatEvaluationPopulate);
+    }
+
     res.json({
         note,
+        evaluation,
         success: 'Added note',
     });
 
@@ -123,9 +132,7 @@ router.post('/saveNote/:id', async (req, res) => {
     if (evaluationId) {
         const natLeaders = await User.find({ isNatLeader: true });
         const discordIds = natLeaders.map(u => u.discordId);
-        const user = await User.findById(req.params.id);
-        const mode = user.modes && user.modes.length ? user.modes[0] : 'osu'; // priority: current mode > default to osu
-        const evaluation = await BnEvaluation.findById(evaluationId).populate(defaultNatEvaluationPopulate);
+        const mode = evaluation?.mode || 'osu';
 
         // Send moved to discussion notification
         await discord.webhookPost(

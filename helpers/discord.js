@@ -155,9 +155,13 @@ async function userHighlightWebhookPost(webhook, discordIds, text) {
 
     if (!text) text = '';
 
-    for (const id of discordIds) {
+    const ids = (discordIds || []).filter(Boolean);
+
+    for (const id of ids) {
         text += `<@${id}> `;
     }
+
+    if (!text.trim()) return;
 
     try {
         await axios.post(url, {
@@ -402,10 +406,11 @@ function findEvaluatorHighlights(reviews, evaluators, discussion) {
         // NAT evaluation: ping the user or NAT leader
         discordIds.push(evaluators[0].discordId);
     } else if (discussion) {
-        // group evaluation: ping anyone who evaluated
-        for (const review of reviews) {
-            if (review.evaluators && review.evaluator.groups.includes('nat') && review.evaluator.isBnEvaluator) {
-                discordIds.push(review.evaluator.discordId);
+        const evaluatorIds = reviews.map(r => r.evaluator.id);
+
+        for (const user of evaluators) {
+            if (!evaluatorIds.includes(user.id) && user.discordId) {
+                discordIds.push(user.discordId);
             }
         }
     } else {

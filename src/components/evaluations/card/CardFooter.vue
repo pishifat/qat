@@ -31,14 +31,17 @@
             </span>
         </span>
 
-        <input
+        <span
             v-if="loggedInUser && loggedInUser.isNat && isActive"
-            v-model="checkedEvaluations"
-            class="mx-1 ms-auto"
-            type="checkbox"
-            :value="evaluationId"
+            class="eval-card-checkbox mx-1 ms-auto"
             @click.stop
         >
+            <input
+                v-model="checkedEvaluations"
+                type="checkbox"
+                :value="evaluationId"
+            >
+        </span>
     </div>
 </template>
 

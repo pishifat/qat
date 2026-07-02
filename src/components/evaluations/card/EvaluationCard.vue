@@ -1,13 +1,11 @@
 <template>
     <div
         class="col-xl-3 col-lg-4 col-md-6 col-sm-12 my-2"
-        @click="select()"
+        @click="select($event)"
     >
         <div
             class="card border-dark cursor-pointer"
             :class="[isSelected ? 'bg-blue-gray' : '', 'border-' + relevantReviewVote, isAssigned ? 'assigned' : '', 'card-bg-' + imageClass]"
-            data-bs-toggle="modal"
-            :data-bs-target="target"
         >
             <card-header
                 :mode="evaluation.mode"
@@ -23,7 +21,7 @@
                 :is-nat-or-trial-nat="loggedInUser && loggedInUser.isNatOrTrialNat"
                 :is-discussion="evaluation.discussion"
                 :is-resignation="evaluation.kind == 'resignation'"
-                :is-nat-evaluation="Boolean(evaluation.selfSummary)"
+                :is-nat-evaluation="isNatEval"
                 :is-public="evaluation.isPublic"
                 :is-active="evaluation.active"
                 :is-app="evaluation.isApplication"
@@ -37,7 +35,7 @@
                 :is-discussion="evaluation.discussion"
                 :is-active="evaluation.active"
                 :archived-at="evaluation.archivedAt"
-                :is-nat="['remainInNat', 'moveToBn', 'removeFromNat'].includes(evaluation.consensus) || Boolean(evaluation.selfSummary)"
+                :is-nat="isNatEval"
                 :is-public="evaluation.isPublic"
                 :is-application="evaluation.isApplication"
             />
@@ -47,6 +45,7 @@
 
 <script>
 import { mapState } from 'vuex';
+import { isNatEvaluation, userIsNatEvaluatorForMode } from 'shared/isNatEvaluation';
 import CardHeader from './CardHeader.vue';
 import CardFooter from './CardFooter.vue';
 
@@ -73,6 +72,9 @@ export default {
         ...mapState('evaluations', [
             'checkedEvaluations',
         ]),
+        isNatEval () {
+            return isNatEvaluation(this.evaluation);
+        },
         relevantReviewVote () {
             const reviews = this.evaluation.reviews || [];
             const mockReviews = this.evaluation.mockReviews || [];
@@ -106,7 +108,7 @@ export default {
             if (this.evaluation.isApplication || this.evaluation.isResignation || this.evaluation.consensus === 'removeFromNat') return 'user';
             else if (this.evaluation.user.probationModes.includes(this.evaluation.mode) || this.evaluation.consensus === 'probationBn') return 'probation';
             else if (this.evaluation.user.fullModes.includes(this.evaluation.mode) || this.evaluation.consensus === 'fullBn' || this.evaluation.consensus === 'moveToBn') return 'bn';
-            else if (this.evaluation.user.evaluatorModes.includes(this.evaluation.mode) || this.evaluation.user.evaluatorModes.includes('none') || this.evaluation.consensus === 'remainInNat') return 'nat';
+            else if (userIsNatEvaluatorForMode(this.evaluation.user, this.evaluation.mode) || this.evaluation.consensus === 'remainInNat') return 'nat';
             else return 'user';
         },
         isSelected () {
@@ -126,7 +128,11 @@ export default {
         },
     },
     methods: {
-        select() {
+        select(event) {
+            if (event?.target?.closest('.eval-card-checkbox')) {
+                return;
+            }
+
             this.$store.commit('evaluations/setSelectedEvaluationId', this.evaluation.id);
 
             if (
@@ -145,6 +151,8 @@ export default {
 
                 this.$router.replace(`${url}?id=${this.evaluation.id}`);
             }
+
+            $(this.target).modal('show');
         },
     },
 };

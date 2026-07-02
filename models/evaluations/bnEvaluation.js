@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Evaluation = require('./evaluation');
+const { isNatEvaluation } = require('../../shared/isNatEvaluation');
 
 const bnEvaluationSchema = new mongoose.Schema({
     consensus: { type: String, enum: ['fullBn', 'probationBn', 'removeFromBn', 'remainInNat', 'moveToBn', 'removeFromNat'] }, // last 3 are only for NAT evals. which are mechanically BN evals. it's bad i know.
@@ -24,7 +25,7 @@ bnEvaluationSchema.virtual('isNewEvaluationFormat').get(function () {
 });
 
 bnEvaluationSchema.virtual('isNatEvaluation').get(function () {
-    return this.consensus === 'remainInNat' || this.consensus === 'moveToBn' || this.consensus === 'removeFromNat';
+    return isNatEvaluation(this);
 });
 
 /**

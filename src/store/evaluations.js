@@ -1,5 +1,6 @@
 import pageFilters from './modules/pageFilters';
 import evalPagination from './modules/evalPagination';
+import { isNatEvaluation } from 'shared/isNatEvaluation';
 
 export default {
     namespaced: true,
@@ -61,9 +62,15 @@ export default {
             }
 
             if (group) {
-                evaluations = evaluations.filter(a =>
-                    a.user.groups.includes(group)
-                );
+                if (group === 'nat') {
+                    evaluations = evaluations.filter(a => isNatEvaluation(a));
+                } else if (group === 'bn') {
+                    evaluations = evaluations.filter(a => a.isBnEvaluation && !isNatEvaluation(a));
+                } else {
+                    evaluations = evaluations.filter(a =>
+                        a.user.groups.includes(group)
+                    );
+                }
             }
 
             if (value) {

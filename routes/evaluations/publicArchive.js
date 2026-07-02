@@ -3,7 +3,7 @@ const AppEvaluation = require('../../models/evaluations/appEvaluation');
 const Evaluation = require('../../models/evaluations/evaluation');
 const User = require('../../models/user');
 const util = require('../../helpers/util');
-const middlewares = require('../../helpers/middlewares');
+const { isNatEvaluation } = require('../../shared/isNatEvaluation');
 
 const router = express.Router();
 
@@ -25,6 +25,10 @@ const defaultAppPopulate = [
 
 const defaultBnPopulate = [
     { path: 'user', select: 'username osuId modesInfo groups' },
+    {
+        path: 'selfSummary',
+        select: 'comment',
+    },
     {
         path: 'reviews',
         select: 'moddingComment vote',
@@ -83,14 +87,33 @@ function sanitizeBareboneReviews(reviews) {
     });
 }
 
+function applyReviewVisibility(eval, viewer) {
+    if (viewer?.isNatLeader) {
+        eval.reviews = sanitizeReviews(eval.reviews);
+    } else if (isNatEvaluation(eval)) {
+        eval.reviews = sanitizeBareboneReviews(eval.reviews);
+    } else if (viewer?.isNat) {
+        eval.reviews = sanitizeReviews(eval.reviews);
+    } else if (eval.isNewEvaluationFormat) {
+        eval.reviews = sanitizePublicReviews(eval.reviews, viewer?.id);
+    } else {
+        eval.reviews = sanitizeBareboneReviews(eval.reviews);
+    }
+
+    if (!viewer?.isNat && !viewer?.isNatLeader) {
+        eval.reviews = util.shuffleArray(eval.reviews);
+    }
+}
+
 /* GET public evals */
 router.get('/relevantInfo/:limit', async (req, res) => {
-    let isNat;
+    let viewer = null;
 
     if (req.session.mongoId) {
-        const user = await User.findById(req.session.mongoId);
-        isNat = user.isNat;
+        viewer = await User.findById(req.session.mongoId);
     }
+
+    const isNat = viewer?.isNat;
 
     const limit = parseInt(req.params.limit);
     let applicationsJson = [];
@@ -156,16 +179,7 @@ router.get('/relevantInfo/:limit', async (req, res) => {
             };
         });
 
-        if (isNat) {
-            eval.reviews = sanitizeReviews(eval.reviews);
-        } else if (eval.isNewEvaluationFormat) {
-            eval.reviews = sanitizePublicReviews(eval.reviews, req.session.mongoId);
-        } else {
-            eval.reviews = sanitizeBareboneReviews(eval.reviews);
-        }
-
-        // shuffle the reviews array for non-NATs
-        if (!isNat) eval.reviews = util.shuffleArray(eval.reviews);
+        applyReviewVisibility(eval, viewer);
 
         bnEvaluationsJson.push(eval);
     }
@@ -179,11 +193,10 @@ router.get('/relevantInfo/:limit', async (req, res) => {
 /* GET specific public eval */
 router.get('/search/:id', async (req, res) => {
     const id = req.params.id;
-    let isNat;
+    let viewer = null;
 
     if (req.session.mongoId) {
-        const user = await User.findById(req.session.mongoId);
-        isNat = user.isNat;
+        viewer = await User.findById(req.session.mongoId);
     }
 
     let eval = await AppEvaluation.findOne({
@@ -214,16 +227,7 @@ router.get('/search/:id', async (req, res) => {
         };
     });
 
-    if (isNat) {
-        eval.reviews = sanitizeReviews(eval.reviews);
-    } else if (eval.isNewEvaluationFormat) {
-        eval.reviews = sanitizePublicReviews(eval.reviews, req.session.mongoId);
-    } else {
-        eval.reviews = sanitizeBareboneReviews(eval.reviews);
-    }
-
-        // shuffle the reviews array for non-NATs
-        if (!isNat) eval.reviews = util.shuffleArray(eval.reviews);
+    applyReviewVisibility(eval, viewer);
 
     res.json({
         eval,

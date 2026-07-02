@@ -1,4 +1,5 @@
 import enums from 'shared/enums';
+import { isNatEvaluation, userIsNatEvaluatorForMode } from 'shared/isNatEvaluation';
 const { BnEvaluationConsensus, AppEvaluationConsensus, ResignationConsensus, BnEvaluationAddition } = enums;
 
 export default {
@@ -93,6 +94,30 @@ export default {
             const match = url.match(regex);
 
             return match && match[1] ? match[1] : null;
+        },
+        isNatEvaluation (evaluation) {
+            return isNatEvaluation(evaluation);
+        },
+        userIsNatEvaluatorForMode (user, mode) {
+            return userIsNatEvaluatorForMode(user, mode);
+        },
+        getSelfSummaryComment (evaluation) {
+            const summary = evaluation?.selfSummary;
+
+            if (!summary || typeof summary === 'string') return '';
+
+            return typeof summary.comment === 'string' ? summary.comment : '';
+        },
+        canSeeEvalReviews (evaluation, loggedInUser) {
+            if (loggedInUser?.isNatLeader) return true;
+
+            if (!isNatEvaluation(evaluation)) return true;
+
+            if (!loggedInUser) return false;
+
+            if (evaluation.user?.id === loggedInUser.id) return false;
+
+            return false;
         },
     },
 };

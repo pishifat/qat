@@ -17,6 +17,7 @@ const util = require('../../helpers/util');
 const { BnEvaluationConsensus, BnEvaluationAddition, ResignationConsensus, Cooldown } = require('../../shared/enums');
 const osuBot = require('../../helpers/osuBot');
 const Settings = require('../../models/settings');
+const { isNatEvaluation, userIsNatEvaluatorForMode } = require('../../shared/isNatEvaluation');
 
 const router = express.Router();
 
@@ -81,7 +82,15 @@ router.get('/relevantInfo', async (req, res) => {
     const evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, res.locals.userRequest.isNat, res.locals.userRequest.isTrialNat);
 
     // Strip reviews field for mock evaluators on active evaluations
-    const processedEvaluations = evaluations.map(evaluation => {
+    const processedEvaluations = evaluations
+        .filter(evaluation => {
+            if (res.locals.userRequest.isTrialNat && !res.locals.userRequest.isNat) {
+                return !isNatEvaluation(evaluation);
+            }
+
+            return true;
+        })
+        .map(evaluation => {
         // Check if current user is a mock evaluator and evaluation is active
         const isMockEvaluator = evaluation.mockEvaluators && 
             evaluation.mockEvaluators.some(mockEvaluator => 
@@ -210,7 +219,8 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
         for (let i = 0; i < result.length; i++) {
             const er = result[i];
             const u = await User.findById(er.user);
-            const assignedNat = u.isNat ? [u] : await User.getAssignedNat(er.mode, u.id, [u.osuId]);
+            const isNatEval = isNatEvaluation({ user: u, mode: er.mode });
+            const assignedNat = isNatEval ? [u] : await User.getAssignedNat(er.mode, u.id, [u.osuId]);
             er.natEvaluators = assignedNat;
             await er.populate(defaultPopulate);
 
@@ -227,14 +237,14 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
             const natList = assignedNat.map(u => u.username).join(', ');
             
             fields.push({
-                name: 'Assigned NAT',
+                name: isNatEval ? 'Assigned (self-summary)' : 'Assigned NAT',
                 value: natList,
             });
 
             let discordIds = assignedNat.map(n => n.discordId).filter(d => d);
 
-            // assign trial NAT
-            if (await Settings.getModeHasTrialNat(er.mode)) {
+            // assign trial NAT (BN evals only)
+            if (!isNatEval && await Settings.getModeHasTrialNat(er.mode)) {
                 const assignedTrialNat = await User.getAssignedTrialNat(er.mode);
                 er.bnEvaluators = assignedTrialNat;
                 const trialNatList = assignedTrialNat.map(n => n.username).join(', ');
@@ -251,14 +261,16 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
                 [{
                     author: discord.defaultWebhookAuthor(req.session),
                     color: discord.webhookColors.white,
-                    description: `Created [**${u.username}**'s ${u.isNat ? 'NAT' : isResignation ? 'resignation' : 'current BN'} eval](http://bn.mappersguild.com/bneval?id=${er.id})`,
+                    description: `Created [**${u.username}**'s ${isNatEval ? 'NAT' : isResignation ? 'resignation' : 'current BN'} eval](http://bn.mappersguild.com/bneval?id=${er.id})`,
                     fields,
                 }],
                 er.mode
             );
             await util.sleep(500);
 
-            await discord.userHighlightWebhookPost(er.mode, discordIds);
+            if (discordIds.length) {
+                await discord.userHighlightWebhookPost(er.mode, discordIds);
+            }
         }
     }
 
@@ -335,7 +347,11 @@ router.post('/setGroupEval/', middlewares.isNat, async (req, res) => {
         })
         .populate(defaultPopulate);
 
-    await setGroupEval(evaluations, req.session);
+    if (evaluations.some(e => isNatEvaluation(e)) && !res.locals.userRequest.isNatLeader) {
+        return res.json({ error: 'Only NAT leaders can move NAT evaluations to group discussion.' });
+    }
+
+    await setGroupEval(evaluations, req.session, res.locals.userRequest);
     evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, true);
     res.json(evaluations);
     Logger.generate(
@@ -347,13 +363,23 @@ router.post('/setGroupEval/', middlewares.isNat, async (req, res) => {
 
 /* POST set invidivual eval */
 router.post('/setIndividualEval/', middlewares.isNat, async (req, res) => {
+    let evaluations = await Evaluation
+        .find({
+            _id: { $in: req.body.evalIds },
+        })
+        .populate(defaultPopulate);
+
+    if (evaluations.some(e => isNatEvaluation(e))) {
+        return res.json({ error: 'NAT evaluations cannot be set as individual evaluation.' });
+    }
+
     await Evaluation.updateMany({
         _id: { $in: req.body.evalIds },
     }, {
         discussion: false,
     });
 
-    const evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, true);
+    evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, true);
 
     res.json(evaluations);
     Logger.generate(
@@ -378,10 +404,25 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
         let resetSession = false;
         let user = await User.findById(evaluation.user);
         const i = user.modesInfo.findIndex(m => m.mode === evaluation.mode);
+        const isNatEvalArchive = userIsNatEvaluatorForMode(user, evaluation.mode);
 
         // nat evaluation processing
-        if (user.evaluatorModes.includes(evaluation.mode) || user.evaluatorModes.includes('none')) {
+        if (isNatEvalArchive) {
+            if (!res.locals.userRequest.isNatLeader) {
+                return res.json({ error: 'Only NAT leaders can archive NAT evaluations.' });
+            }
+
+            if (!evaluation.discussion || !evaluation.selfSummary) {
+                return res.json({ error: 'NAT evaluations require a submitted summary and discussion before archiving.' });
+            }
+
             const userGroup = req.body.userGroup || 'nat';
+
+            if (!['nat', 'bn', 'user'].includes(userGroup)) {
+                return res.json({ error: 'NAT evaluations require userGroup to be nat, bn, or user.' });
+            }
+
+            const evalMode = evaluation.mode == 'none' ? 'osu' : evaluation.mode;
 
             if (userGroup == 'nat') {
                 const random75 = Math.round(Math.random() * (80 - 70) + 70); // between 70 and 80 days
@@ -390,7 +431,7 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
 
                 await BnEvaluation.create({
                     user: evaluation.user,
-                    mode: evaluation.mode == 'none' ? 'osu' : evaluation.mode,
+                    mode: evalMode,
                     deadline,
                     activityToCheck: random75,
                     natEvaluators: [evaluation.user],
@@ -440,7 +481,7 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
 
                 await BnEvaluation.create({
                     user: evaluation.user,
-                    mode: evaluation.mode,
+                    mode: evalMode,
                     deadline,
                     activityToCheck,
                 });
@@ -569,12 +610,13 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
         await evaluation.save();
 
         // nat eval logs
-        if (user.isNat) {
-            const userGroup = req.body.userGroup || 'nat';
+        if (isNatEvalArchive) {
+            let userGroup = (req.body.userGroup || 'nat').toUpperCase();
+            if (userGroup == 'user') userGroup = 'User';
 
             Logger.generate(
                 req.session.mongoId,
-                `Archived ${user.username}'s ${evaluation.mode} NAT eval (Usergroup: ${userGroup.toUpperCase()})"`,
+                `Archived ${user.username}'s ${evaluation.mode} NAT eval (Usergroup: ${userGroup})"`,
                 'bnEvaluation',
                 evaluation._id
             );
@@ -583,7 +625,7 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
                 [{
                     author: discord.defaultWebhookAuthor(req.session),
                     color: discord.webhookColors.black,
-                    description: `Archived [**${user.username}**'s NAT eval](http://bn.mappersguild.com/bneval?id=${evaluation.id}). Usergroup: **${userGroup.toUpperCase()}**`,
+                    description: `Archived [**${user.username}**'s NAT eval](http://bn.mappersguild.com/bneval?id=${evaluation.id}). Usergroup: **${userGroup}**`,
                 }],
                 evaluation.mode
             );

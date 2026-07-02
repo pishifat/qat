@@ -33,7 +33,7 @@
                         :disable-replace="true"
                     />
                 </div>
-                <div v-else-if="!selectedEvaluation.user.isNat">
+                <div v-else-if="!isNatEval">
                     <p><b>Mock evaluators:</b></p>
                     <button class="btn btn-sm btn-secondary w-100" @click="enableMockEvaluators(false, $event)">
                         {{ potentialMockEvaluators ? 'Re-select mock evaluators' : 'Enable mock evaluators' }}
@@ -76,6 +76,7 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import { isNatEvaluation } from 'shared/isNatEvaluation';
 import UserList from './UserList.vue';
 import EnableMockEvaluatorsChatMessage from '../applications/EnableMockEvaluatorsChatMessage.vue';
 
@@ -101,6 +102,9 @@ export default {
         ...mapGetters('evaluations', [
             'selectedEvaluation',
         ]),
+        isNatEval() {
+            return isNatEvaluation(this.selectedEvaluation);
+        },
         /** @returns {Object[]} */
         submittedEvaluators() {
             const reviews = this.selectedEvaluation.reviews || [];

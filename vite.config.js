@@ -13,7 +13,7 @@ export default defineConfig({
   root: './src',
   publicDir: '../public', // Serve static assets from public directory
   optimizeDeps: {
-    include: ['shared/enums.mjs'],
+    include: ['shared/enums.mjs', 'shared/isNatEvaluation.mjs'],
   },
   build: {
     outDir: '../public',
@@ -48,7 +48,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
-      'shared/enums': resolve(__dirname, './shared/enums.mjs')
+      'shared/enums': resolve(__dirname, './shared/enums.mjs'),
+      'shared/isNatEvaluation': resolve(__dirname, './shared/isNatEvaluation.mjs'),
     },
     extensions: ['.mjs', '.js', '.vue', '.json']
   },

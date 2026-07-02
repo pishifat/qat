@@ -102,6 +102,13 @@ function isNatOrTrialNat(req, res, next) {
     next();
 }
 
+function isNatLeader(req, res, next) {
+    const u = res.locals.userRequest;
+    if (!u.isNatLeader) return unauthorize(req, res);
+
+    next();
+}
+
 function isAdmin(req, res, next) {
     const u = res.locals.userRequest;
     const valid = config.admin.users;
@@ -194,6 +201,7 @@ module.exports = {
     isNat,
     hasFullReadAccessOrTrialNat,
     isNatOrTrialNat,
+    isNatLeader,
     isAdmin,
     hasBasicAccess,
     hasFullReadAccess,

@@ -73,7 +73,7 @@
                                 : 90 + 7
                         "
                         :is-evaluation="true"
-                        :is-nat="selectedEvaluation.user.isNat"
+                        :is-nat="isNatEval"
                         :user="selectedEvaluation.user"
                         :show-activity-standing="true"
                     />
@@ -112,12 +112,13 @@
                     <hr>
                 </template>
 
-                <discussion-info v-if="selectedEvaluation.discussion && (selectedEvaluation.isApplication || !selectedEvaluation.user.evaluatorModes.includes(selectedEvaluation.mode))" />
+                <discussion-info v-if="selectedEvaluation.discussion && (selectedEvaluation.isApplication || !isNatEval)" />
 
                 <template v-if="selectedEvaluation.active">
-                    <evaluation-input v-if="selectedEvaluation.isApplication || (!selectedEvaluation.user.evaluatorModes.includes(selectedEvaluation.mode) && !selectedEvaluation.user.modes.includes('none'))" />
-                    <nat-self-evaluation v-else-if="!selectedEvaluation.discussion && selectedEvaluation.user.id == loggedInUser.id && (selectedEvaluation.user.evaluatorModes.includes(selectedEvaluation.mode) || selectedEvaluation.user.modes.includes('none'))" />
-                    <nat-leader-evaluation v-else-if="selectedEvaluation.discussion && loggedInUser.isNatLeader && (selectedEvaluation.user.evaluatorModes.includes(selectedEvaluation.mode) || selectedEvaluation.user.modes.includes('none'))" />
+                    <evaluation-input v-if="selectedEvaluation.isApplication || !isNatEval" />
+                    <nat-self-evaluation v-else-if="!selectedEvaluation.discussion && selectedEvaluation.user.id == loggedInUser.id && isNatEval" />
+                    <nat-evaluated-summary v-else-if="selectedEvaluation.discussion && isNatEval && selectedEvaluation.user.id == loggedInUser.id && !loggedInUser.isNatLeader" />
+                    <nat-leader-evaluation v-else-if="selectedEvaluation.discussion && loggedInUser.isNatLeader && isNatEval" />
                     <div v-else>
                         There's nothing for you to do here. :)
                     </div>
@@ -133,12 +134,14 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import { isNatEvaluation } from 'shared/isNatEvaluation';
 import ModalHeader from './ModalHeader.vue';
 import PreviousEvaluations from './common/PreviousEvaluations.vue';
 import UserNotes from './common/UserNotes.vue';
 import UserReports from './currentBns/UserReports.vue';
 import ModdingActivity from './currentBns/ModdingActivity.vue';
 import NatSelfEvaluation from './currentBns/NatSelfEvaluation.vue';
+import NatEvaluatedSummary from './currentBns/NatEvaluatedSummary.vue';
 import NatLeaderEvaluation from './currentBns/NatLeaderEvaluation.vue';
 import UserActivity from './currentBns/userActivity/UserActivity.vue';
 import EvaluationInput from './common/EvaluationInput.vue';
@@ -160,6 +163,7 @@ export default {
         UserReports,
         ModdingActivity,
         NatSelfEvaluation,
+        NatEvaluatedSummary,
         NatLeaderEvaluation,
         UserActivity,
         EvaluationInput,
@@ -187,6 +191,9 @@ export default {
                 return this.selectedEvaluation.user.modes;
 
             return [this.selectedEvaluation.mode];
+        },
+        isNatEval () {
+            return isNatEvaluation(this.selectedEvaluation);
         },
     },
     methods: {

@@ -32,7 +32,7 @@
         <div class="col-sm-10">
             <div class="row">
                 <div class="col-sm-12">
-                    <b>{{ selectedEvaluation.user.isNat ? 'NAT activity:' : 'Modding:' }}</b>
+                    <b>{{ isNatEval ? 'NAT activity:' : 'Modding:' }}</b>
                     <div class="small ms-2 card card-body" v-html="$md.render(review.moddingComment)" />
                 </div>
                 <div v-if="review.behaviorComment" class="col-sm-12">
@@ -72,6 +72,9 @@ export default {
         ...mapGetters('evaluations', [
             'selectedEvaluation']
         ),
+        isNatEval () {
+            return this.isNatEvaluation(this.selectedEvaluation);
+        },
     },
     methods: {
         voteColor(vote) {

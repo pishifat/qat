@@ -61,6 +61,8 @@ export interface IBnEvaluationDocument extends IEvaluationBase, Document {
     deadline?: Date;
     addition?: string;
     activityToCheck?: number;
+    selfSummary?: { id?: string; comment?: string };
+    isNatEvaluation?: boolean;
     kind?: string;
     length?: number;
 }

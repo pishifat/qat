@@ -41,6 +41,9 @@ export default {
         ...mapState([
             'loggedInUser',
         ]),
+        ...mapState('evaluations', [
+            'evaluations',
+        ]),
         ...mapGetters('evaluations', [
             'selectedEvaluation',
         ]),
@@ -64,29 +67,44 @@ export default {
             }
         },
         async saveNote(e) {
-            if (this.selfSummaryText.length) {
-                const result = await this.$http.executePost('/users/nat/saveNote/' + this.selectedEvaluation.user.id, { noteId: this.noteId, evaluationId: this.selectedEvaluation.id, comment: this.selfSummaryText, isSummary: true }, e);
+            if (!this.selfSummaryText.length) {
+                this.$store.dispatch('updateToastMessages', {
+                    message: 'Summary cannot be empty.',
+                    type: 'danger',
+                });
 
-                if (result && !result.error) {
-                    this.$store.commit('evaluations/updateEvaluation', result);
-                    $('#evaluationInfo').modal('hide');
+                return;
+            }
 
-                    const data = await this.$http.initialRequest(`/bnEval/relevantInfo`);
+            const result = await this.$http.executePost('/users/nat/saveNote/' + this.selectedEvaluation.user.id, { noteId: this.noteId, evaluationId: this.selectedEvaluation.id, comment: this.selfSummaryText, isSummary: true }, e);
 
-                    if (this.$http.isValid(data)) {
-                        this.$store.commit(`evaluations/setEvaluations`, data.evaluations);
-                        const id = this.$route.query.id;
+            if (result && !result.error) {
+                if (result.evaluation) {
+                    this.$store.commit('evaluations/updateEvaluation', result.evaluation);
+                }
 
-                        if (id) {
-                            const i = this.evaluations.findIndex(a => a.id == id);
+                $('#evaluationInfo').modal('hide');
 
-                            if (i >= 0) {
-                                this.$store.commit(`evaluations/setSelectedEvaluationId`, id);
-                                $('#evaluationInfo').modal('show');
-                            }
+                const data = await this.$http.initialRequest(`/bnEval/relevantInfo`);
+
+                if (this.$http.isValid(data)) {
+                    this.$store.commit(`evaluations/setEvaluations`, data.evaluations);
+                    const id = this.$route.query.id;
+
+                    if (id) {
+                        const i = this.evaluations.findIndex(a => a.id == id);
+
+                        if (i >= 0) {
+                            this.$store.commit(`evaluations/setSelectedEvaluationId`, id);
+                            $('#evaluationInfo').modal('show');
                         }
                     }
                 }
+
+                this.$store.dispatch('updateToastMessages', {
+                    message: 'Submitted summary',
+                    type: 'success',
+                });
             }
         },
     },

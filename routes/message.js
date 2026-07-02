@@ -246,6 +246,10 @@ router.post('/submitEvaluationMessage/:id', async (req, res) => {
         return res.json({ error: 'Evaluation not found' });
     }
 
+    if (evaluation.isNatEvaluation) {
+        return res.json({ error: 'Messages are not available for NAT evaluations.' });
+    }
+
     const isRecipient = req.session.mongoId === evaluation.user.id;
     const isNat = res.locals.userRequest.isNat;
     if (!isRecipient && !isNat) {
@@ -326,6 +330,14 @@ router.post('/toggleMessagesLocked/:id', middlewares.isNat, async (req, res) => 
     else if (eval) evaluation = eval;
     else if (appOldPopulate) evaluation = appOldPopulate;
     else if (evalOldPopulate) evaluation = evalOldPopulate;
+
+    if (!evaluation) {
+        return res.json({ error: 'Evaluation not found' });
+    }
+
+    if (evaluation.isNatEvaluation) {
+        return res.json({ error: 'Messages are not available for NAT evaluations.' });
+    }
 
     evaluation.messagesLocked = !evaluation.messagesLocked;
 
