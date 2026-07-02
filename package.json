@@ -12,8 +12,7 @@
     "deploy": "npm run build && pm2 restart bn",
     "lint": "eslint .",
     "tsc": "tsc",
-    "embed:cr-fingerprints": "node scripts/embedCrFingerprints.js",
-    "revert:cr-r2": "node scripts/revertCrR2Migration.js"
+    "embed:cr-fingerprints": "node scripts/embedCrFingerprints.js"
   },
   "dependencies": {
     "@babel/core": "^7.11.4",
