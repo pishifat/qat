@@ -4,7 +4,7 @@
             <div class="col-sm-6">
                 <div>Do you want to show explicit content?</div>
                 <small class="text-secondary">
-                    For transparency, votes about explicit content usage can be viewed from the <a href="/discussionvote">Content Review</a> section of this website.
+                    For transparency, votes about explicit content usage can be viewed from the <a href="/contentreview">Content Review</a> section of this website.
                 </small>
             </div>
             <div class="col-sm-6">

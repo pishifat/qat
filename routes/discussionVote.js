@@ -1,444 +1,70 @@
 const express = require('express');
 const middlewares = require('../helpers/middlewares');
-const discord = require('../helpers/discord');
-const osuBot = require('../helpers/osuBot');
-const util = require('../helpers/util');
-const { websocketManager } = require('../helpers/websocket');
-const Discussion = require('../models/discussion');
-const Mediation = require('../models/mediation');
-const Logger = require('../models/log');
-const User = require('../models/user');
+const discussionsService = require('../services/discussionsService');
 
 const router = express.Router();
 
 router.use(middlewares.isLoggedIn);
 
-const defaultPopulate = [
-    {
-        path: 'mediations',
-        populate: {
-            path: 'mediator',
-            select: 'username osuId groups',
-        },
-    },
-    { path: 'creator' },
-];
-
-const inactiveBnDefaultPopulate = [
-    {
-        path: 'mediations',
-        populate: {
-            path: 'mediator',
-            select: 'groups',
-        },
-    },
-];
-
-function getActiveBnDefaultPopulate (mongoId) {
-    return {
-        path: 'mediations',
-        populate: {
-            path: 'mediator',
-            select: 'username osuId groups',
-            match: {
-                _id: mongoId,
-            },
-        },
-    };
-}
-
-/**
- * Returns a plain-object discussion safe to send to a non–full-read user:
- * - When active: keeps only the current user's mediation; removes all others.
- * - When inactive: keeps all mediations but replaces mediator with placeholder (anonymize user ids only; optionally keep groups).
- */
-function sanitizeDiscussionMediations(discussion, mongoId, hasFullReadAccess) {
-    if (!discussion || hasFullReadAccess || !mongoId) {
-        return discussion && (typeof discussion.toObject === 'function' ? discussion.toObject() : { ...discussion });
-    }
-
-    const obj = discussion && (typeof discussion.toObject === 'function' ? discussion.toObject() : { ...discussion });
-    if (!obj || !Array.isArray(obj.mediations)) return obj;
-
-    const mediatorMatchesUser = (m) => m && m.mediator && String(m.mediator.id || m.mediator._id || m.mediator) === String(mongoId);
-    const anonymousPlaceholder = (groups) => (groups && groups.length ? { id: '__anonymous__', groups } : { id: '__anonymous__' });
-
-    if (obj.isActive) {
-        obj.mediations = obj.mediations.filter(mediatorMatchesUser);
-    } else {
-        obj.mediations = obj.mediations.map((m) => {
-            const copy = { ...m };
-            copy.mediator = anonymousPlaceholder(m.mediator && m.mediator.groups);
-
-            return copy;
-        });
-    }
-
-    return obj;
-}
-
-/* GET discussions. */
-router.get('/relevantInfo/:limit', async (req, res) => {
-    const limit = parseInt(req.params.limit);
-    let discussions;
-
-    if (res.locals.userRequest.hasFullReadAccess) {
-        discussions = await Discussion
-            .find({ isHidden: { $ne: true } })
-            .populate(defaultPopulate)
-            .sort({ createdAt: -1 })
-            .limit(limit);
-
-    } else {
-        const [activeDiscussions, inactiveDiscussions] = await Promise.all([
-            Discussion
-                .find({ isNatOnly: { $ne: true }, isActive: true, isHidden: { $ne: true } })
-                .populate(getActiveBnDefaultPopulate(req.session.mongoId))
-                .sort({ createdAt: -1 }),
-            Discussion
-                .find({ isNatOnly: { $ne: true }, isActive: false, isHidden: { $ne: true } })
-                .populate(inactiveBnDefaultPopulate)
-                .sort({ createdAt: -1 })
-                .limit(limit),
-        ]);
-
-        discussions = activeDiscussions.concat(inactiveDiscussions);
-    }
-
-    const hasFullReadAccess = !!(res.locals.userRequest && res.locals.userRequest.hasFullReadAccess);
-    const mongoId = req.session.mongoId;
-
-    discussions = discussions.map((d) => sanitizeDiscussionMediations(d, mongoId, hasFullReadAccess));
-
-    res.json({
-        discussions,
-    });
-});
-
-/* GET specific discussion */
-router.get('/searchDiscussionVote/:id', async (req, res) => {
-    let discussion;
-
-    if (res.locals.userRequest.hasFullReadAccess) {
-        discussion = await Discussion
-            .findOne({ _id: req.params.id, isHidden: { $ne: true } })
-            .populate(defaultPopulate);
-    } else {
-        const tempDiscussion = await Discussion.findById(req.params.id);
-
-        if (tempDiscussion.isActive) {
-            discussion = await Discussion
-                .findOne({ _id: req.params.id, isNatOnly: { $ne: true }, isActive: true, isHidden: { $ne: true } })
-                .populate(getActiveBnDefaultPopulate(req.session.mongoId));
-        } else {
-            discussion = await Discussion
-                .findOne({ isNatOnly: { $ne: true }, isActive: false, isHidden: { $ne: true } })
-                .populate(inactiveBnDefaultPopulate);
-        }
-    }
-
-    const hasFullReadAccess = !!(res.locals.userRequest && res.locals.userRequest.hasFullReadAccess);
-    const out = sanitizeDiscussionMediations(discussion, req.session.mongoId, hasFullReadAccess);
-
-    res.json(out);
-});
-
-/* POST create a new discussion vote. */
 router.post('/submit', middlewares.hasBasicAccess, async (req, res) => {
-    const { discussionLink, title, shortReason, mode, isNatOnly, neutralAllowed, onlyWrittenInput, isContentReview, customText, agreeOverwriteText, neutralOverwriteText, disagreeOverwriteText } = req.body;
-
-    if (!discussionLink.length && isContentReview) {
-        return res.json({
-            error: 'No link provided',
-        });
-    }
-
-    const blockedUrls = [
-        'ppy.sh',
-        'puu.sh',
-        'cdn.discordapp.com',
-    ];
-
-    if (isContentReview && discussionLink.length > 0 && blockedUrls.some(u => discussionLink.includes(u))) {
-        const url = new URL(discussionLink).hostname;
-
-        return res.json({
-            error: `Images hosted on ${url} are not allowed as they can expire quickly. please use a different image host.`,
-        });
-    }
-
-    if (discussionLink.length) {
-        util.isValidUrlOrThrow(discussionLink);
-    }
-
-    let overwriteTitle = title;
-    let overwriteShortReason = shortReason;
-
-    if (isContentReview) {
-        const contentReviewCount = await Discussion.countDocuments({ isContentReview: true });
-        overwriteTitle = `Content review #${contentReviewCount + 251}`;
-        overwriteShortReason = `Is this content appropriate for a beatmap? ${discussionLink}`;
-
-        if (shortReason.length) {
-            overwriteShortReason += `\n\n*${shortReason}*`;
+    try {
+        const result = await discussionsService.submitDiscussion(req.body, req.session, res.locals.userRequest);
+        if (result.error) {
+            return res.json({ error: result.error });
         }
-    }
-
-    let finalAgreeText;
-    let finalNeutralText;
-    let finalDisagreeText;
-
-    if (customText) {
-        if (agreeOverwriteText.length) finalAgreeText = agreeOverwriteText;
-        if (neutralAllowed && neutralOverwriteText.length) finalNeutralText = neutralOverwriteText;
-        if (disagreeOverwriteText.length) finalDisagreeText = disagreeOverwriteText;
-    }
-
-    let discussion = await Discussion.create({
-        discussionLink: discussionLink.length > 0 ? discussionLink : null,
-        title: overwriteTitle,
-        shortReason: overwriteShortReason,
-        mode,
-        creator: req.session.mongoId,
-        isNatOnly,
-        neutralAllowed,
-        reasonAllowed: true,
-        onlyWrittenInput,
-        isContentReview,
-        agreeOverwriteText: finalAgreeText,
-        neutralOverwriteText: finalNeutralText,
-        disagreeOverwriteText: finalDisagreeText,
-    });
-
-    discussion = await Discussion
-        .findById(discussion.id)
-        .populate(defaultPopulate);
-
-    const hasFullReadAccess = !!(res.locals.userRequest && res.locals.userRequest.hasFullReadAccess);
-    const out = sanitizeDiscussionMediations(discussion, req.session.mongoId, hasFullReadAccess);
-
-    res.json({
-        discussion: out,
-        success: 'Submitted discussion',
-    });
-    Logger.generate(
-        req.session.mongoId,
-        'Submitted a discussion for voting',
-        'discussionVote',
-        discussion._id
-    );
-
-    // websocket for CRs
-    if (isContentReview) {
-        websocketManager.sendNotification('data:content_review', {
-            title: discussion.title,
-            shortReason: discussion.shortReason,
-            discussionLink: discussion.discussionLink,
-            timestamp: new Date(),
-        });
-    }
-
-    // webhooks
-
-    // #content-cases or #evaluations (BN server)
-    await discord.webhookPost(
-        [{
-            author: discord.defaultWebhookAuthor(req.session),
-            color: discord.webhookColors.yellow,
-            description: `**New discussion up for vote:** [${overwriteTitle}](http://bn.mappersguild.com/discussionvote?id=${discussion.id})`,
-            fields: [
-                {
-                    name: `Topic`,
-                    value: overwriteShortReason.length > 900 ? overwriteShortReason.slice(0, 900) + '... *(truncated)*' : overwriteShortReason,
-                },
-            ],
-        }],
-        isContentReview ? 'contentCase' : 'all'
-    );
-
-    if (isContentReview) {
-        // #content-review (internal)
-        await discord.webhookPost(
-            [{
-                author: discord.defaultWebhookAuthor(req.session),
-                color: discord.webhookColors.yellow,
-                description: `**New discussion up for vote:** [${overwriteTitle}](http://bn.mappersguild.com/discussionvote?id=${discussion.id})`,
-                fields: [
-                    {
-                        name: `Topic`,
-                        value: overwriteShortReason.length > 900 ? overwriteShortReason.slice(0, 900) + '... *(truncated)*' : overwriteShortReason,
-                    },
-                ],
-            }],
-            'internalContentCase'
-        );
-
-        // #content-review (internal)
-
-        const users = await User.find({ isActiveContentReviewer: true });
-        const discordIds = users.map(u => u.discordId).filter(d => d);
-
-        // ping in groups of 20 to not hit character limit
-        for (let i = 0; i < discordIds.length; i += 20) {
-            await util.sleep(1000);
-            await discord.userHighlightWebhookPost('internalContentCase', discordIds.slice(i, i + 20));
-        }
+        res.json(result);
+    } catch (error) {
+        res.json({ error: error.message || 'Failed to submit discussion' });
     }
 });
 
-/* POST submit mediation */
 router.post('/submitMediation/:id', middlewares.hasBasicAccess, async (req, res) => {
-    const discussion = await Discussion
-        .findById(req.params.id)
-        .populate('mediations');
-
-    if (!req.body.vote && !discussion.onlyWrittenInput) {
-        return res.json({
-            error: 'Select your vote!',
-        });
-    }
-
-    if (discussion.isNatOnly && !res.locals.userRequest.isNatOrTrialNat) {
-        return res.json({ error: 'Only NAT members can vote on this' });
-    }
-
-    let mediation = discussion.mediations.find(m => m.mediator == req.session.mongoId);
-    let isNewMediation = false;
-
-    if (!mediation) {
-        isNewMediation = true;
-        mediation = new Mediation();
-        mediation.mediator = req.session.mongoId;
-    }
-
-    mediation.comment = req.body.comment;
-    mediation.vote = discussion.onlyWrittenInput ? 2 : req.body.vote;
-    mediation.vccChecked = req.body.vccChecked;
-    await mediation.save();
-
-    if (isNewMediation) {
-        discussion.mediations.push(mediation);
-        await discussion.save();
-    }
-
-    let d = await Discussion
-        .findById(req.params.id)
-        .populate(
-            res.locals.userRequest.isNat ? defaultPopulate : getActiveBnDefaultPopulate(req.session.mongoId)
-        );
-
-    const hasFullReadAccess = !!(res.locals.userRequest && res.locals.userRequest.hasFullReadAccess);
-    const out = sanitizeDiscussionMediations(d, req.session.mongoId, hasFullReadAccess);
-
-    res.json({
-        discussion: out,
-        success: 'Submitted vote',
-    });
-
-    Logger.generate(
-        req.session.mongoId,
-        'Submitted vote for a discussion',
-        'discussionVote',
-        d._id
+    const result = await discussionsService.submitMediation(
+        req.params.id,
+        req.body,
+        req.session,
+        res.locals.userRequest
     );
+    if (result.error) {
+        return res.json({ error: result.error });
+    }
+    res.json(result);
 });
 
-/* POST conclude mediation */
 router.post('/concludeMediation/:id', middlewares.hasFullReadAccess, async (req, res) => {
-    const discussion = await Discussion
-        .findByIdAndUpdate(req.params.id, { isActive: false })
-        .populate(defaultPopulate);
-
-    res.json({
-        discussion,
-        success: 'Concluded vote',
-    });
-
-    Logger.generate(
-        req.session.mongoId,
-        'Concluded vote for a discussion',
-        'discussionVote',
-        discussion._id
-    );
-
-    if (!discussion.isContentReview) {
-        discord.discussionWebhookPost(discussion, req.session);
+    const result = await discussionsService.concludeMediation(req.params.id, req.session);
+    if (result.error) {
+        return res.json({ error: result.error });
     }
+    res.json(result);
 });
 
-/* POST update discussion */
 router.post('/:id/update', middlewares.hasFullReadAccess, async (req, res) => {
-    const title = req.body.title;
-    const shortReason = req.body.shortReason;
-    const discussionLink = req.body.discussionLink || '';
-    const agreeOverwriteText = req.body.agreeOverwriteText || '';
-    const neutralOverwriteText = req.body.neutralOverwriteText || '';
-    const disagreeOverwriteText = req.body.disagreeOverwriteText || '';
-    const neutralAllowed = req.body.neutralAllowed || false;
-
-    if (!title || !shortReason) {
-        return res.json({
-            error: 'Missing data',
-        });
+    try {
+        const result = await discussionsService.updateDiscussion(req.params.id, req.body, req.session);
+        if (result.error) {
+            return res.json({ error: result.error });
+        }
+        res.json(result);
+    } catch (error) {
+        res.json({ error: error.message || 'Failed to update discussion' });
     }
-
-    const discussion = await Discussion
-        .findOne({
-            _id: req.params.id,
-            isActive: true,
-        })
-        .populate(defaultPopulate)
-        .orFail();
-
-    discussion.title = title;
-    discussion.shortReason = shortReason;
-    discussion.discussionLink = discussionLink;
-    discussion.agreeOverwriteText = agreeOverwriteText;
-    discussion.neutralOverwriteText = neutralOverwriteText;
-    discussion.disagreeOverwriteText = disagreeOverwriteText;
-    discussion.neutralAllowed = neutralAllowed;
-
-    await discussion.save();
-
-    res.json({
-        discussion,
-        success: 'Updated',
-    });
-
-    Logger.generate(
-        req.session.mongoId,
-        `Changed discussion title to "${title}" and proposal to "${shortReason}"`,
-        'discussionVote',
-        discussion._id
-    );
 });
 
-/* POST set isAcceptable for content review */
 router.post('/:id/setIsAcceptable', middlewares.hasFullReadAccess, async (req, res) => {
-    const isAcceptable = req.body.isAcceptable;
-
-    const discussion = await Discussion
-        .findOne({
-            _id: req.params.id,
-            isActive: false,
-        })
-        .populate(defaultPopulate)
-        .orFail();
-
-    discussion.isAcceptable = isAcceptable;
-    await discussion.save();
-
-    res.json({
-        discussion,
-        success: 'Updated',
-    });
-
-    Logger.generate(
-        req.session.mongoId,
-        `Changed consensus to ${isAcceptable ? 'pass' : 'fail'}`,
-        'discussionVote',
-        discussion._id
-    );
+    try {
+        const result = await discussionsService.setIsAcceptable(
+            req.params.id,
+            req.body.isAcceptable,
+            req.session
+        );
+        if (result.error) {
+            return res.json({ error: result.error });
+        }
+        res.json(result);
+    } catch (error) {
+        res.json({ error: error.message || 'Failed to update consensus' });
+    }
 });
 
 module.exports = router;

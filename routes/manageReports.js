@@ -214,7 +214,7 @@ router.post('/sendToContentReview/:id', async (req, res) => {
     await discord.webhookPost(
         [{
             author: discord.defaultWebhookAuthor(req.session),
-            description: `Converted [**${report.reportCategory}**](http://bn.mappersguild.com/managereports?id=${report.id}) to [${title}](http://bn.mappersguild.com/discussionvote?id=${d.id})`,
+            description: `Converted [**${report.reportCategory}**](http://bn.mappersguild.com/managereports?id=${report.id}) to [${title}](http://bn.mappersguild.com/contentreview/${d.id})`,
             color: discord.webhookColors.red,
         }],
         'natUserReport'
@@ -225,7 +225,7 @@ router.post('/sendToContentReview/:id', async (req, res) => {
         [{
             author: discord.defaultWebhookAuthor(report.reporter),
             color: discord.webhookColors.yellow,
-            description: `**New discussion up for vote:** [${title}](http://bn.mappersguild.com/discussionvote?id=${d.id})`,
+            description: `**New discussion up for vote:** [${title}](http://bn.mappersguild.com/contentreview/${d.id})`,
             fields: [
                 {
                     name: `Topic`,
@@ -241,7 +241,7 @@ router.post('/sendToContentReview/:id', async (req, res) => {
         [{
             author: discord.defaultWebhookAuthor(report.reporter),
             color: discord.webhookColors.yellow,
-            description: `**New discussion up for vote:** [${title}](http://bn.mappersguild.com/discussionvote?id=${d.id})`,
+            description: `**New discussion up for vote:** [${title}](http://bn.mappersguild.com/contentreview/${d.id})`,
             fields: [
                 {
                     name: `Topic`,

@@ -57,7 +57,7 @@
                                         <router-link class="dropdown-item" to="/vetoes">
                                             Vetoes
                                         </router-link>
-                                        <router-link class="dropdown-item" to="/discussionvote">
+                                        <router-link class="dropdown-item" to="/contentreview">
                                             Content Review (read-only)
                                         </router-link>
                                         <router-link class="dropdown-item" to="/grouphistory">
@@ -130,8 +130,11 @@
                                         BN pages
                                     </a>
                                     <div class="dropdown-menu">
-                                        <router-link class="dropdown-item" to="/discussionvote">
+                                        <router-link class="dropdown-item" to="/contentreview">
                                             Content Review
+                                        </router-link>
+                                        <router-link class="dropdown-item" to="/discussionvote">
+                                            Discussion Votes
                                         </router-link>
                                         <router-link class="dropdown-item" to="/vetoes">
                                             Vetoes
@@ -164,8 +167,11 @@
                                         <router-link class="dropdown-item" to="/modrequests">
                                             Request a BN
                                         </router-link>
-                                        <router-link class="dropdown-item" to="/discussionvote">
+                                        <router-link class="dropdown-item" to="/contentreview">
                                             Content Review
+                                        </router-link>
+                                        <router-link class="dropdown-item" to="/discussionvote">
+                                            Discussion Votes
                                         </router-link>
                                         <router-link class="dropdown-item" to="/vetoes">
                                             Vetoes {{ loggedInUser.isBn ? '' : '(read-only)' }}
@@ -225,8 +231,11 @@
                                         <router-link class="dropdown-item" to="/vetoes">
                                             Vetoes
                                         </router-link>
-                                        <router-link class="dropdown-item" to="/discussionvote">
+                                        <router-link class="dropdown-item" to="/contentreview">
                                             Content Review
+                                        </router-link>
+                                        <router-link class="dropdown-item" to="/discussionvote">
+                                            Discussion Votes
                                         </router-link>
                                         <router-link class="dropdown-item" to="/modrequests">
                                             Request a BN
@@ -362,9 +371,11 @@
                         </div>
                     </div>
                 </section>
-                <transition name="route-transition" mode="out-in">
-                    <router-view v-if="loggedInUser || isPublicPage" />
-                </transition>
+                <router-view v-if="loggedInUser || isPublicPage" v-slot="{ Component }">
+                    <transition name="route-transition" mode="out-in">
+                        <component :is="Component" :key="$route.fullPath" />
+                    </transition>
+                </router-view>
             </loading-page>
         </div>
 
