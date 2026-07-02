@@ -9,6 +9,7 @@
             <filter-box
                 :placeholder="'enter to search content reviews...'"
                 store-module="contentReviews"
+                :enable-image-search="true"
             >
                 <div class="ms-1 mt-2">
                     <button
@@ -121,6 +122,10 @@ export default {
             },
             deep: true,
         },
+        '$store.state.contentReviews.imageSearchFile'() {
+            this.$store.commit('contentReviews/setArchivedPage', 1);
+            this.fetchList(1, false);
+        },
     },
     beforeCreate() {
         if (!this.$store.hasModule('contentReviews')) {
@@ -136,17 +141,32 @@ export default {
         async fetchList(archivedPage = 1, isInitialLoad = false) {
             const limit = 21;
             const filters = this.$store.state.contentReviews?.pageFilters?.filters || {};
-            const params = new URLSearchParams({
-                archivedPage: String(archivedPage),
-                limit: String(limit),
-            });
-            if (filters.value) params.set('search', filters.value);
-            const url = `/v2/content-reviews?${params.toString()}`;
+            const imageFile = this.$store.state.contentReviews?.imageSearchFile;
+
             if (!isInitialLoad) this.archivedLoading = true;
+
             try {
-                const data = isInitialLoad
-                    ? await this.$http.initialRequest(url)
-                    : await this.$http.executeGet(url);
+                let data;
+
+                if (imageFile) {
+                    const formData = new FormData();
+                    formData.append('image', imageFile);
+                    formData.append('archivedPage', String(archivedPage));
+                    formData.append('limit', String(limit));
+                    data = await this.$http.executePostMultipart('/v2/content-reviews/image-search', formData);
+                } else {
+                    const params = new URLSearchParams({
+                        archivedPage: String(archivedPage),
+                        limit: String(limit),
+                    });
+                    if (filters.value) params.set('search', filters.value);
+                    const url = `/v2/content-reviews?${params.toString()}`;
+
+                    data = isInitialLoad
+                        ? await this.$http.initialRequest(url)
+                        : await this.$http.executeGet(url);
+                }
+
                 if (data && data.active !== undefined) {
                     this.$store.commit('contentReviews/setDiscussionListData', {
                         active: data.active,

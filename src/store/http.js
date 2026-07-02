@@ -44,6 +44,36 @@ const http = {
         return await executeRequest('post', url, data, e, false, store);
     },
 
+    async executePostMultipart (url, formData, e) {
+        if (e) e.target.disabled = true;
+
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => Tooltip.getInstance(el)?.hide());
+
+        try {
+            const res = await Axios.post('/api' + url, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+
+            if (res.data.error) {
+                store.dispatch('updateToastMessages', { message: res.data.error });
+            }
+
+            if (res.data.success) {
+                store.dispatch('updateToastMessages', {
+                    type: 'success',
+                    message: res.data.success,
+                });
+            }
+
+            return res.data;
+        } catch (error) {
+            store.dispatch('updateToastMessages', { message: 'Something went wrong!' });
+            return { error: 'Something went wrong' };
+        } finally {
+            if (e) e.target.disabled = false;
+        }
+    },
+
     async executeGet (url, e, updateLoadingState) {
         return await executeRequest('get', url, null, e, updateLoadingState, store);
     },
