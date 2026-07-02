@@ -49,6 +49,7 @@ export const VisualContentConsiderations = [
     { name: 'drugs', text: 'examples of drug use, preparation, or identification with illicit drug subculture', active: true },
     { name: 'inflammatory', text: 'depictions of deliberately inflammatory political, cultural, religious, or social content', active: true },
     { name: 'suicide', text: 'imagery depicting suicidal or self-harming behaviour, including preparation or imminent attempts', active: true },
+    { name: 'other', text: 'other (specify in comment)', active: true },
 ];
 
 // preferences

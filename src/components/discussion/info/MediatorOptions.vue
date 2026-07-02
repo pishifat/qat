@@ -3,6 +3,7 @@
         <div class="mb-2">
             <!-- VCC violations checkbox -->
             <div v-if="!selectedDiscussion.onlyWrittenInput && isContentReview && vote == 3">
+                <hr>
                 Select the <a href="https://osu.ppy.sh/wiki/en/Rules/Visual_Content_Considerations" target="_blank">Visual Content Considerations</a> that are violated:
                 <div v-for="(option, i) in vccOptions" :key="i" class="form-check ms-4">
                     <div v-if="option.active">
@@ -27,7 +28,7 @@
                 id="comment"
                 v-model="comment"
                 class="form-control"
-                placeholder="your thoughts... (optional)"
+                :placeholder="commentRequired ? 'your thoughts... (required)' : 'your thoughts... (optional)'"
                 rows="2"
             />
 
@@ -73,7 +74,7 @@
             <div class="d-flex justify-content-end mt-2">
                 <button
                     class="btn btn-sm btn-primary"
-                    :disabled="isContentReview && (!vote || (vote == 3 && !vccChecked.length))"
+                    :disabled="isSubmitDisabled"
                     @click="submitMediation($event)"
                 >
                     Submit
@@ -111,6 +112,16 @@ export default {
         ...mapState([
             'loggedInUser',
         ]),
+        commentRequired() {
+            return this.vote == 3 && this.vccChecked.includes('other');
+        },
+        isSubmitDisabled() {
+            if (!this.isContentReview) return false;
+            if (!this.vote) return true;
+            if (this.vote == 3 && !this.vccChecked.length) return true;
+            if (this.commentRequired && !this.comment?.trim()) return true;
+            return false;
+        },
     },
     watch: {
         selectedDiscussion() {
