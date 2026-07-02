@@ -36,7 +36,7 @@ const inactiveBnDefaultPopulate = [
 const listMediationPopulate = [
     {
         path: 'mediations',
-        select: 'vote',
+        select: 'vote mediator',
     },
 ];
 
@@ -119,9 +119,29 @@ function sanitizeDiscussionMediations(discussion, mongoId, hasFullReadAccess) {
     return obj;
 }
 
+function getUserVoteFromMediations(mediations, mongoId) {
+    if (!mongoId || !Array.isArray(mediations)) return null;
+
+    for (const m of mediations) {
+        const mediatorId = m.mediator && (m.mediator.id || m.mediator._id || m.mediator);
+        if (mediatorId != null && String(mediatorId) === String(mongoId)) {
+            return m.vote;
+        }
+    }
+
+    return null;
+}
+
 function finalizeDiscussionResponse(discussion, mongoId, hasFullReadAccess) {
     if (!discussion) return null;
+    const raw = discussion && (typeof discussion.toObject === 'function' ? discussion.toObject() : discussion);
+    const userVote = getUserVoteFromMediations(raw.mediations, mongoId);
     const obj = sanitizeDiscussionMediations(discussion, mongoId, hasFullReadAccess);
+
+    if (userVote != null) {
+        obj.userVote = userVote;
+    }
+
     return ensureId(obj);
 }
 

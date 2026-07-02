@@ -23,8 +23,8 @@
             :data-discussion="discussion.id"
         >
             <div
-                class="card card-individual h-100"
-                :class="[voteBorderClass, discussion.isNatOnly ? 'nat-vote' : '']"
+                class="card border-dark card-individual h-100"
+                :class="['border-' + findRelevantMediation(), discussion.isNatOnly ? 'nat-vote' : '']"
             >
                 <img
                     v-if="showImageBackground"
@@ -150,10 +150,6 @@ export default {
             if (this.contentType === 'video') return 'fas fa-video text-danger';
             return 'fas fa-question-circle text-secondary';
         },
-        voteBorderClass() {
-            const vote = this.findRelevantMediation();
-            return vote ? `border-${vote}` : null;
-        },
         consensusClass() {
             if (this.discussion.isAcceptable === true) return 'text-success';
             if (this.discussion.isAcceptable === false) return 'text-danger';
@@ -195,17 +191,27 @@ export default {
             }
         },
         findRelevantMediation() {
-            if (!this.loggedInUser || !Array.isArray(this.discussion.mediations)) return null;
+            if (!this.loggedInUser) return '';
 
-            for (const m of this.discussion.mediations) {
-                if (m.mediator && m.mediator.id == this.loggedInUser.id) {
-                    if (m.vote == 1) return 'pass';
-                    if (m.vote == 2) return 'neutral';
-                    if (m.vote == 3) return 'fail';
+            let voteValue = this.discussion.userVote;
+
+            if (voteValue == null && Array.isArray(this.discussion.mediations)) {
+                const userId = this.loggedInUser.id || this.loggedInUser._id;
+
+                for (const m of this.discussion.mediations) {
+                    const mediatorId = m.mediator && (m.mediator.id || m.mediator._id || m.mediator);
+                    if (mediatorId != null && mediatorId == userId) {
+                        voteValue = m.vote;
+                        break;
+                    }
                 }
             }
 
-            return null;
+            if (voteValue == 1) return 'pass';
+            if (voteValue == 2) return 'neutral';
+            if (voteValue == 3) return 'fail';
+
+            return '';
         },
     },
 };
@@ -261,11 +267,11 @@ export default {
 }
 
 .status-bar-active {
-    background: radial-gradient(#fff, transparent 70%);
+    background: radial-gradient(var(--bs-warning), transparent 70%);
 }
 
 .status-bar-inactive {
-    background: radial-gradient(var(--bs-gray-600), transparent 70%);
+    background: radial-gradient(var(--bs-neutral), transparent 70%);
 }
 
 .nat-vote {
