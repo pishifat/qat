@@ -2,7 +2,7 @@
   "name": "qat",
   "version": "0.0.0",
   "private": true,
-"scripts": {
+  "scripts": {
     "dev": "run-p -rl watch-app watch-src",
     "watch-app": "cross-env NODE_ENV=development nodemon ./app.js",
     "watch-src": "vite",
@@ -11,7 +11,8 @@
     "prod": "cross-env NODE_ENV=development node ./app.js",
     "deploy": "npm run build && pm2 restart bn",
     "lint": "eslint .",
-    "tsc": "tsc"
+    "tsc": "tsc",
+    "embed:cr-fingerprints": "node scripts/embedCrFingerprints.js"
   },
   "dependencies": {
     "@babel/core": "^7.11.4",
@@ -35,13 +36,16 @@
     "express-session": "^1.17.1",
     "hbs": "^4.1.2",
     "helmet": "^8.0.0",
+    "imghash": "^1.1.4",
     "jquery": "^3.7.1",
     "markdown-it": "^14.1.1",
     "markdown-it-video": "^0.6.3",
     "moment": "^2.29.3",
     "mongoose": "^6.13.9",
     "morgan": "^1.10.1",
+    "multer": "^2.2.0",
     "node-cron": "^2.0.3",
+    "sharp": "^0.34.5",
     "vue": "^3.5.28",
     "vue-router": "^4.6.4",
     "vuex": "^4.1.0",

@@ -13,6 +13,8 @@ export default {
         activeDiscussions: [],
         archivedDiscussions: [],
         archivedPagination: { page: 1, limit: 21, totalCount: 0, totalPages: 1 },
+        imageSearchFile: null,
+        imageSearchPreview: null,
     },
     mutations: {
         setSelectedDiscussionId(state, value) {
@@ -65,6 +67,16 @@ export default {
         },
         addDiscussion(state, discussion) {
             state.activeDiscussions.unshift(discussion);
+        },
+        setImageSearchFile(state, file) {
+            state.imageSearchFile = file;
+        },
+        setImageSearchPreview(state, preview) {
+            state.imageSearchPreview = preview;
+        },
+        clearImageSearch(state) {
+            state.imageSearchFile = null;
+            state.imageSearchPreview = null;
         },
     },
     getters: {

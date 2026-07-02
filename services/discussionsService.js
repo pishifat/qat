@@ -6,6 +6,9 @@ const discord = require('../helpers/discord');
 const util = require('../helpers/util');
 const { websocketManager } = require('../helpers/websocket');
 const { escapeRegex } = require('../helpers/util');
+const { isDiscussionImageUrl } = require('../helpers/discussionImage');
+const imageFingerprintService = require('./imageFingerprintService');
+const imageSimilarityService = require('./imageSimilarityService');
 
 const MINIMAL_SELECT = '_id title mode isActive isAcceptable isNatOnly isContentReview createdAt discussionLink mediations neutralAllowed onlyWrittenInput';
 
@@ -282,6 +285,19 @@ async function submitDiscussion(body, session, userRequest) {
         if (disagreeOverwriteText.length) finalDisagreeText = disagreeOverwriteText;
     }
 
+    let imageSimilarity;
+    let imageSimilarityMethod;
+
+    if (isContentReview && discussionLink.length && isDiscussionImageUrl(discussionLink)) {
+        try {
+            const fingerprintResult = await imageFingerprintService.fingerprintFromUrl(discussionLink);
+            imageSimilarity = fingerprintResult.fingerprint;
+            imageSimilarityMethod = fingerprintResult.method;
+        } catch (error) {
+            console.warn(`CR image fingerprint failed for ${discussionLink}: ${error.message}`);
+        }
+    }
+
     let discussion = await Discussion.create({
         discussionLink: discussionLink.length > 0 ? discussionLink : null,
         title: overwriteTitle,
@@ -296,6 +312,7 @@ async function submitDiscussion(body, session, userRequest) {
         agreeOverwriteText: finalAgreeText,
         neutralOverwriteText: finalNeutralText,
         disagreeOverwriteText: finalDisagreeText,
+        ...(imageSimilarity ? { imageSimilarity, imageSimilarityMethod } : {}),
     });
 
     discussion = await Discussion.findById(discussion.id).populate(defaultPopulate);
@@ -477,6 +494,117 @@ async function setIsAcceptable(id, isAcceptable, session) {
     return { discussion, success: 'Updated' };
 }
 
+async function searchContentReviewsByImage(fileBuffer, archivedPage, limit, mongoId, hasFullReadAccess, method = imageSimilarityService.DEFAULT_METHOD) {
+    let fingerprint;
+
+    try {
+        const fingerprintResult = await imageFingerprintService.fingerprintFromBuffer(fileBuffer, method);
+        fingerprint = fingerprintResult.fingerprint;
+    } catch (error) {
+        return { error: error.message || 'Failed to process image' };
+    }
+
+    const filter = {
+        isHidden: { $ne: true },
+        isContentReview: true,
+        imageSimilarity: { $exists: true, $ne: null },
+    };
+
+    if (!hasFullReadAccess) {
+        filter.isNatOnly = { $ne: true };
+    }
+
+    const candidates = await Discussion.find(filter)
+        .select(`${MINIMAL_SELECT} imageSimilarity imageSimilarityMethod isActive`)
+        .lean();
+
+    const ranked = imageSimilarityService.rankBySimilarity(fingerprint, candidates, { method });
+
+    if (!ranked.length) {
+        return {
+            active: [],
+            archived: {
+                discussions: [],
+                page: archivedPage,
+                limit,
+                totalCount: 0,
+                totalPages: 1,
+            },
+            similarityScores: {},
+        };
+    }
+
+    const similarityScores = {};
+    const idOrder = new Map();
+
+    ranked.forEach((entry, index) => {
+        const id = String(entry.doc._id);
+        similarityScores[id] = entry.distance;
+        idOrder.set(id, index);
+    });
+
+    const activeIds = ranked.filter((entry) => entry.doc.isActive).map((entry) => entry.doc._id);
+    const archivedIds = ranked.filter((entry) => !entry.doc.isActive).map((entry) => entry.doc._id);
+
+    const activePopulate = hasFullReadAccess
+        ? listMediationPopulate
+        : [getActiveBnDefaultPopulate(mongoId)];
+    const archivedPopulate = hasFullReadAccess
+        ? listMediationPopulate
+        : listInactiveBnPopulate;
+
+    let active = [];
+
+    if (activeIds.length) {
+        const activeDocs = await Discussion.find({
+            _id: { $in: activeIds },
+            ...filter,
+        })
+            .select(MINIMAL_SELECT)
+            .populate(activePopulate)
+            .lean();
+
+        activeDocs.sort((a, b) => idOrder.get(String(a._id)) - idOrder.get(String(b._id)));
+        active = activeDocs.map((d) => ensureId(
+            finalizeDiscussionResponse(d, mongoId, hasFullReadAccess)
+        ));
+    }
+
+    const totalCount = archivedIds.length;
+    const skip = (Math.max(1, archivedPage) - 1) * limit;
+    const archivedPageIds = archivedIds.slice(skip, skip + limit);
+    const totalPages = Math.max(1, Math.ceil(totalCount / limit));
+
+    let archivedPageItems = [];
+
+    if (archivedPageIds.length) {
+        const archivedDocs = await Discussion.find({
+            _id: { $in: archivedPageIds },
+            ...filter,
+        })
+            .select(MINIMAL_SELECT)
+            .populate(archivedPopulate)
+            .lean();
+
+        archivedDocs.sort((a, b) => idOrder.get(String(a._id)) - idOrder.get(String(b._id)));
+        archivedPageItems = archivedDocs.map((d) => ensureId(
+            finalizeDiscussionResponse(d, mongoId, hasFullReadAccess)
+        ));
+    }
+
+    return {
+        active,
+        archived: {
+            discussions: archivedPageItems,
+            page: archivedPage,
+            limit,
+            totalCount,
+            totalPages,
+        },
+        similarityScores,
+    };
+}
+
 module.exports = {
     defaultPopulate,
     getActiveBnDefaultPopulate,
@@ -491,6 +619,7 @@ module.exports = {
     getDiscussionById,
     resolveDiscussionRoute,
     submitDiscussion,
+    searchContentReviewsByImage,
     submitMediation,
     concludeMediation,
     updateDiscussion,
