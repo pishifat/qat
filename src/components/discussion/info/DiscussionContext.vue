@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-if="selectedDiscussionVote.isContentReview">
+        <div v-if="selectedDiscussion.isContentReview">
             <div
                 v-if="isEditable"
             >
@@ -28,13 +28,25 @@
                 <span v-else-if="safeDiscussionLink" class="small" v-html="$md.render(safeDiscussionLink)" />
                 <span v-else class="small text-secondary">Invalid URL</span>
             </div>
-            <img v-if="isImage" class="img-responsive fit-image mb-2" :src="proxyImageLink">
+            <div
+                v-if="youtubeVideoId"
+                class="ratio ratio-16x9 mb-2 discussion-youtube-embed"
+            >
+                <iframe
+                    :src="youtubeEmbedUrl"
+                    title="YouTube video"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen
+                    referrerpolicy="strict-origin-when-cross-origin"
+                />
+            </div>
+            <img v-else-if="isImage" class="img-responsive fit-image mb-2" :src="proxyImageLink">
         </div>
-        <p v-else-if="!selectedDiscussionVote.isContentReview && safeDiscussionLink" class="mb-2">
+        <p v-else-if="!selectedDiscussion.isContentReview && safeDiscussionLink" class="mb-2">
             <a :href="safeDiscussionLink" target="_blank" rel="noopener noreferrer">Read and contribute to the full discussion here</a>
         </p>
 
-        <p v-if="isEditable && !selectedDiscussionVote.isContentReview">
+        <p v-if="isEditable && !selectedDiscussion.isContentReview">
             <a
                 href="#"
                 data-bs-toggle="tooltip"
@@ -56,7 +68,7 @@
                 @keyup.enter="update()"
             >
 
-            <span v-else class="small">{{ selectedDiscussionVote.title }}</span>
+            <span v-else class="small">{{ selectedDiscussion.title }}</span>
         </p>
 
         <p>
@@ -81,10 +93,10 @@
                 rows="3"
             />
 
-            <span v-else class="small" v-html="$md.render(selectedDiscussionVote.shortReason)" />
+            <span v-else class="small" v-html="$md.render(selectedDiscussion.shortReason)" />
         </p>
 
-        <p v-if="isEditable && !selectedDiscussionVote.isContentReview">
+        <p v-if="isEditable && !selectedDiscussion.isContentReview">
             <a
                 href="#"
                 data-bs-toggle="tooltip"
@@ -106,7 +118,7 @@
                 @keyup.enter="update()"
             >
             <input
-                v-if="isEditingOptions && selectedDiscussionVote.neutralAllowed"
+                v-if="isEditingOptions && selectedDiscussion.neutralAllowed"
                 v-model="neutralOverwriteTextEditContent"
                 class="form-control form-control-sm w-50"
                 type="text"
@@ -139,20 +151,20 @@
             </label>
 
             <ul v-else class="small">
-                <li>{{ selectedDiscussionVote.agreeOverwriteText || 'Yes/Agree' }}</li>
-                <li v-if="selectedDiscussionVote.neutralAllowed">
-                    {{ selectedDiscussionVote.neutralOverwriteText || 'Neutral' }}
+                <li>{{ selectedDiscussion.agreeOverwriteText || 'Yes/Agree' }}</li>
+                <li v-if="selectedDiscussion.neutralAllowed">
+                    {{ selectedDiscussion.neutralOverwriteText || 'Neutral' }}
                 </li>
-                <li>{{ selectedDiscussionVote.disagreeOverwriteText || 'No/Disagree' }}</li>
+                <li>{{ selectedDiscussion.disagreeOverwriteText || 'No/Disagree' }}</li>
             </ul>
         </p>
 
-        <div v-if="selectedDiscussionVote.isContentReview && !selectedDiscussionVote.isActive">
+        <div v-if="selectedDiscussion.isContentReview && !selectedDiscussion.isActive">
             <b>Consensus:</b>
-            <span :class="selectedDiscussionVote.isAcceptable == true ? 'text-success' : selectedDiscussionVote.isAcceptable == false ? 'text-danger' : 'text-secondary'">
-                {{ selectedDiscussionVote.isAcceptable == true ? 'Pass' : selectedDiscussionVote.isAcceptable == false ? 'Fail' : 'Unknown' }}
+            <span :class="selectedDiscussion.isAcceptable == true ? 'text-success' : selectedDiscussion.isAcceptable == false ? 'text-danger' : 'text-secondary'">
+                {{ selectedDiscussion.isAcceptable == true ? 'Pass' : selectedDiscussion.isAcceptable == false ? 'Fail' : 'Unknown' }}
             </span>
-            <span v-if="loggedInUser.hasFullReadAccess && !selectedDiscussionVote.isAcceptable && selectedDiscussionVote.isAcceptable != false" class="btn-group">
+            <span v-if="loggedInUser.hasFullReadAccess && !selectedDiscussion.isAcceptable && selectedDiscussion.isAcceptable != false" class="btn-group">
                 <button
                     class="btn btn-sm btn-success"
                     @click="setIsAcceptable(true, $event);"
@@ -168,7 +180,7 @@
             </span>
         </div>
 
-        <div v-if="selectedDiscussionVote.isContentReview && selectedDiscussionVote.isActive">
+        <div v-if="selectedDiscussion.isContentReview && selectedDiscussion.isActive">
             <b>Content review notes:</b>
             <div class="small">
                 <ul>
@@ -183,10 +195,12 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapState } from 'vuex';
+import discussionStoreMixin from '../../../mixins/discussionStore';
 
 export default {
     name: 'DiscussionContext',
+    mixins: [discussionStoreMixin],
     data() {
         return {
             isEditingTitle: false,
@@ -206,51 +220,58 @@ export default {
         ...mapState([
             'loggedInUser',
         ]),
-        ...mapGetters('discussionVote', [
-            'selectedDiscussionVote',
-        ]),
         /** @returns {string|null} */
         safeDiscussionLink() {
-            return this.sanitizeUrl(this.selectedDiscussionVote?.discussionLink);
+            return this.sanitizeUrl(this.selectedDiscussion?.discussionLink);
         },
         /** @returns {boolean} */
         isEditable() {
-            return this.selectedDiscussionVote.isActive &&
-                ((!this.selectedDiscussionVote.isContentReview && (this.selectedDiscussionVote.creator.id == this.loggedInUser.id || this.loggedInUser.isNatLeader)) ||
-                (this.selectedDiscussionVote.isContentReview && (this.loggedInUser.groups.includes('nat') || this.loggedInUser.groups.includes('gmt'))));
+            const creatorId = this.selectedDiscussion.creator?.id || this.selectedDiscussion.creator?._id;
+            return this.selectedDiscussion.isActive &&
+                ((!this.selectedDiscussion.isContentReview && (creatorId == this.loggedInUser.id || this.loggedInUser.isNatLeader)) ||
+                (this.selectedDiscussion.isContentReview && (this.loggedInUser.groups.includes('nat') || this.loggedInUser.groups.includes('gmt'))));
         },
         /** @returns {boolean} */
         isImage() {
-            return this.safeDiscussionLink && (this.safeDiscussionLink.match(/\.(jpeg|jpg|gif|png)$/) != null);
+            return this.isDiscussionImageUrl(this.safeDiscussionLink);
         },
         proxyImageLink() {
-            return this.safeDiscussionLink ? this.proxyUrl(this.safeDiscussionLink) : null;
+            const imageUrl = this.resolveDiscussionImageUrl(this.safeDiscussionLink);
+            return imageUrl ? this.proxyUrl(imageUrl) : null;
+        },
+        youtubeVideoId() {
+            return this.extractYoutubeVideoId(this.safeDiscussionLink);
+        },
+        youtubeEmbedUrl() {
+            return this.youtubeVideoId
+                ? `https://www.youtube-nocookie.com/embed/${this.youtubeVideoId}`
+                : null;
         },
     },
     watch: {
-        selectedDiscussionVote () {
+        selectedDiscussion () {
             this.isEditingTitle = false;
-            this.editTitleContent = this.selectedDiscussionVote.title;
+            this.editTitleContent = this.selectedDiscussion.title;
             this.isEditingProposal = false;
-            this.editProposalContent = this.selectedDiscussionVote.shortReason;
+            this.editProposalContent = this.selectedDiscussion.shortReason;
             this.isEditingLink = false;
-            this.editLinkContent = this.selectedDiscussionVote.discussionLink;
+            this.editLinkContent = this.selectedDiscussion.discussionLink;
             this.isEditingOptions = false;
-            this.agreeOverwriteTextEditContent = this.selectedDiscussionVote.agreeOverwriteText;
-            this.neutralOverwriteTextEditContent = this.selectedDiscussionVote.neutralOverwriteText;
-            this.disagreeOverwriteTextEditContent = this.selectedDiscussionVote.disagreeOverwriteText;
-            this.neutralAllowedEdit = this.selectedDiscussionVote.neutralAllowed;
+            this.agreeOverwriteTextEditContent = this.selectedDiscussion.agreeOverwriteText;
+            this.neutralOverwriteTextEditContent = this.selectedDiscussion.neutralOverwriteText;
+            this.disagreeOverwriteTextEditContent = this.selectedDiscussion.disagreeOverwriteText;
+            this.neutralAllowedEdit = this.selectedDiscussion.neutralAllowed;
         },
     },
     created () {
-        if (this.selectedDiscussionVote) {
-            this.editTitleContent = this.selectedDiscussionVote.title;
-            this.editProposalContent = this.selectedDiscussionVote.shortReason;
-            this.editLinkContent = this.selectedDiscussionVote.discussionLink;
-            this.agreeOverwriteTextEditContent = this.selectedDiscussionVote.agreeOverwriteText;
-            this.neutralOverwriteTextEditContent = this.selectedDiscussionVote.neutralOverwriteText;
-            this.disagreeOverwriteTextEditContent = this.selectedDiscussionVote.disagreeOverwriteText;
-            this.neutralAllowedEdit = this.selectedDiscussionVote.neutralAllowed;
+        if (this.selectedDiscussion) {
+            this.editTitleContent = this.selectedDiscussion.title;
+            this.editProposalContent = this.selectedDiscussion.shortReason;
+            this.editLinkContent = this.selectedDiscussion.discussionLink;
+            this.agreeOverwriteTextEditContent = this.selectedDiscussion.agreeOverwriteText;
+            this.neutralOverwriteTextEditContent = this.selectedDiscussion.neutralOverwriteText;
+            this.disagreeOverwriteTextEditContent = this.selectedDiscussion.disagreeOverwriteText;
+            this.neutralAllowedEdit = this.selectedDiscussion.neutralAllowed;
         }
     },
     methods: {
@@ -284,7 +305,7 @@ export default {
         },
         async update () {
             const data = await this.$http.executePost(
-                `/discussionVote/${this.selectedDiscussionVote.id}/update`, {
+                `/discussionVote/${this.selectedDiscussion.id}/update`, {
                     title: this.editTitleContent,
                     shortReason: this.editProposalContent,
                     discussionLink: this.editLinkContent,
@@ -295,7 +316,7 @@ export default {
                 });
 
             if (this.$http.isValid(data)) {
-                this.$store.commit('discussionVote/updateDiscussionVote', data.discussion);
+                this.updateDiscussionInStore(data.discussion);
 
                 this.isEditingTitle = false;
                 this.isEditingProposal = false;
@@ -304,12 +325,12 @@ export default {
         },
         async setIsAcceptable (isAcceptable, e) {
             const data = await this.$http.executePost(
-                `/discussionVote/${this.selectedDiscussionVote.id}/setIsAcceptable`, {
+                `/discussionVote/${this.selectedDiscussion.id}/setIsAcceptable`, {
                     isAcceptable,
                 }, e);
 
             if (this.$http.isValid(data)) {
-                this.$store.commit('discussionVote/updateDiscussionVote', data.discussion);
+                this.updateDiscussionInStore(data.discussion);
             }
         },
     },
@@ -321,6 +342,10 @@ export default {
 .fit-image{
     width: 100%;
     object-fit: cover;
+}
+
+.discussion-youtube-embed iframe {
+    border: 0;
 }
 
 </style>

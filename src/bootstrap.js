@@ -67,6 +67,76 @@ export function proxyUrl(url) {
     return `https://wsrv.nl/?url=${encodeURIComponent(url)}`;
 }
 
+const IMAGE_EXT_RE = /\.(jpeg|jpg|gif|png|webp)$/i;
+
+function hasImageExtension(url) {
+    try {
+        return IMAGE_EXT_RE.test(new URL(url).pathname);
+    } catch {
+        return false;
+    }
+}
+
+function isSulImageHost(url) {
+    try {
+        return new URL(url).hostname.endsWith('s-ul.eu');
+    } catch {
+        return false;
+    }
+}
+
+export function isDiscussionImageUrl(url) {
+    if (!url) return false;
+    return hasImageExtension(url) || isSulImageHost(url);
+}
+
+export function resolveDiscussionImageUrl(url) {
+    if (!url || !isDiscussionImageUrl(url)) return null;
+    if (hasImageExtension(url)) return url;
+
+    try {
+        const parsed = new URL(url);
+        parsed.pathname = `${parsed.pathname.replace(/\/$/, '')}.jpg`;
+        return parsed.href;
+    } catch {
+        return null;
+    }
+}
+
+export function extractYoutubeVideoId(url) {
+    if (!url) return null;
+
+    try {
+        const parsed = new URL(url);
+        const host = parsed.hostname.replace(/^www\./, '');
+
+        if (host === 'youtu.be') {
+            const id = parsed.pathname.slice(1).split('/')[0];
+            return id || null;
+        }
+
+        if (host === 'youtube.com' || host === 'm.youtube.com' || host === 'music.youtube.com') {
+            if (parsed.pathname === '/watch') {
+                return parsed.searchParams.get('v');
+            }
+
+            const pathMatch = parsed.pathname.match(/^\/(embed|shorts|live)\/([^/?]+)/);
+            if (pathMatch) return pathMatch[2];
+        }
+    } catch {
+        return null;
+    }
+
+    return null;
+}
+
+export function resolveDiscussionContentType(url) {
+    if (!url) return 'unknown';
+    if (extractYoutubeVideoId(url)) return 'video';
+    if (isDiscussionImageUrl(url)) return 'image';
+    return 'unknown';
+}
+
 // Remember old renderer, if overridden, or proxy to default renderer
 const defaultRender = md.renderer.rules.link_open || function (tokens, idx, options, env, self) {
     return self.renderToken(tokens, idx, options);

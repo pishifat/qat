@@ -1,12 +1,13 @@
 <template>
     <div>
         <p>
-            <b>Total votes</b> ({{ selectedDiscussionVote.mediations.length }})
+            <b>Total votes</b> ({{ selectedDiscussion.mediations.length }})
         </p>
 
         <ul v-if="loggedInUser.hasFullReadAccess">
-            <li v-for="mediation in selectedDiscussionVote.mediations" :key="mediation.id" class="small">
+            <li v-for="mediation in selectedDiscussion.mediations" :key="mediation.id" class="small">
                 <user-link
+                    v-if="mediation.mediator"
                     :username="mediation.mediator.username"
                     :osu-id="mediation.mediator.osuId"
                 />
@@ -16,7 +17,8 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex';
+import { mapState } from 'vuex';
+import discussionStoreMixin from '../../../../mixins/discussionStore';
 import UserLink from '../../../UserLink.vue';
 
 export default {
@@ -24,12 +26,10 @@ export default {
     components: {
         UserLink,
     },
+    mixins: [discussionStoreMixin],
     computed: {
         ...mapState([
             'loggedInUser',
-        ]),
-        ...mapGetters('discussionVote', [
-            'selectedDiscussionVote',
         ]),
     },
 };

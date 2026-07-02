@@ -189,6 +189,10 @@ export default {
             type: Boolean,
             required: true,
         },
+        storeModule: {
+            type: String,
+            required: true,
+        },
     },
     data() {
         return {
@@ -252,7 +256,7 @@ export default {
 
             if (this.$http.isValid(data)) {
                 $('#addDiscussion').modal('hide');
-                this.$store.commit('discussionVote/addDiscussionVote', data.discussion);
+                this.$store.commit(`${this.storeModule}/addDiscussion`, data.discussion);
             }
         },
     },

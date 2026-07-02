@@ -15,14 +15,14 @@
 
         <ul v-if="loggedInUser.hasBasicAccess">
             <li v-for="mediation in mediations" :key="mediation.id" class="small ms-2">
-                <span v-if="loggedInUser.hasFullReadAccess">
+                <span v-if="loggedInUser.hasFullReadAccess && mediation.mediator">
                     <user-link
                         :username="mediation.mediator.username"
                         :osu-id="mediation.mediator.osuId"
                     />
                 </span>
                 <span v-else>
-                    <span>{{ mediation.mediator.groups.includes('gmt') ? 'Anon GMT' : mediation.mediator.groups.includes('nat') ? 'Anon NAT' : mediation.mediator.groups.includes('bn') ? 'Anon BN' : 'Anon user (ex-GMT/NAT/BN)' }}</span>
+                    <span>{{ anonLabel(mediation.mediator) }}</span>
                 </span>
 
                 <span
@@ -75,6 +75,15 @@ export default {
         mediations() {
             if (this.showAll) return this.bnMediations.concat(this.natGmtMediations);
             else return this.natGmtMediations;
+        },
+    },
+    methods: {
+        anonLabel(mediator) {
+            const groups = mediator?.groups || [];
+            if (groups.includes('gmt')) return 'Anon GMT';
+            if (groups.includes('nat')) return 'Anon NAT';
+            if (groups.includes('bn')) return 'Anon BN';
+            return 'Anon user (ex-GMT/NAT/BN)';
         },
     },
 };

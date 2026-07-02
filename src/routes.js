@@ -13,9 +13,14 @@ const GroupHistory = () => import(/* webpackChunkName: "public", webpackPrefetch
 const PublicEvalArchive = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/PublicEvalArchivePage.vue');
 const MarkdownPage = () => import(/* webpackChunkName: "public", webpackPrefetch: true */ './pages/MarkdownPage.vue');
 
+import discussionLegacyRedirect from './utils/discussionLegacyRedirect';
+
 const ModRequests = () => import(/* webpackChunkName: "bn", webpackPrefetch: true */ './pages/ModRequests.vue');
 const BnCharts = () => import(/* webpackChunkName: "bn", webpackPrefetch: true */ './pages/BnCharts.vue');
-const DiscussionVote = () => import(/* webpackChunkName: "bn", webpackPrefetch: true */ './pages/DiscussionVotePage.vue');
+const ContentReviews = () => import(/* webpackChunkName: "bn", webpackPrefetch: true */ './pages/ContentReviewsPage.vue');
+const ContentReviewDetail = () => import(/* webpackChunkName: "bn", webpackPrefetch: true */ './pages/ContentReviewDetailPage.vue');
+const DiscussionVotes = () => import(/* webpackChunkName: "bn", webpackPrefetch: true */ './pages/DiscussionVotesPage.vue');
+const DiscussionVoteDetail = () => import(/* webpackChunkName: "bn", webpackPrefetch: true */ './pages/DiscussionVoteDetailPage.vue');
 const AppEvalPage = () => import(/* webpackChunkName: "bn", webpackPrefetch: true */ './pages/AppEvalPage.vue');
 
 const BnEvalPage = () => import(/* webpackChunkName: "bn", webpackPrefetch: true */ './pages/BnEvalPage.vue'); // trial NAT only
@@ -53,7 +58,10 @@ const routes = [
     { path: '/message', component: Message, meta: { title: 'Message from the NAT' } },
     { path: '/modrequests', component: ModRequests, meta: { title: 'Request a BN', public: true } },
     { path: '/charts', component: BnCharts, meta: { title: 'BN Charts' } },
-    { path: '/discussionvote', component: DiscussionVote, meta: { title: 'Content Review' } },
+    { path: '/contentreview', component: ContentReviews, meta: { title: 'Content Review' }, beforeEnter: discussionLegacyRedirect },
+    { path: '/contentreview/:id', component: ContentReviewDetail, name: 'contentReviewDetail', meta: { title: 'Content Review' } },
+    { path: '/discussionvote', component: DiscussionVotes, meta: { title: 'Discussion Votes' }, beforeEnter: discussionLegacyRedirect },
+    { path: '/discussionvote/:id', component: DiscussionVoteDetail, name: 'discussionVoteDetail', meta: { title: 'Discussion Vote' } },
     { path: '/grouphistory', component: GroupHistory, meta: { title: 'Group History', public: true } },
     { path: '/publicarchive', component: PublicEvalArchive, meta: { title: 'Public Evaluation Archives', public: true } },
     { path: '/markdown', component: MarkdownPage, meta: { title: 'Markdown Editor', public: true } },
