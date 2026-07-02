@@ -60,9 +60,30 @@ export function sanitizeUrlForCss(url) {
     return safeUrl.replace(/[()'"\\]/g, '\\$&');
 }
 
+const PROXY_WHITELIST_HOSTS = [
+    'imgur.com',
+    's-ul.eu',
+];
+
+function isProxyWhitelisted(url) {
+    try {
+        const hostname = new URL(url).hostname.replace(/^www\./, '');
+
+        return PROXY_WHITELIST_HOSTS.some((host) => (
+            hostname === host || hostname.endsWith(`.${host}`)
+        ));
+    } catch {
+        return false;
+    }
+}
+
 export function proxyUrl(url) {
     if (!url || typeof url !== 'string') return null;
     if (!/^https?:\/\//i.test(url)) return null;
+
+    if (isProxyWhitelisted(url)) {
+        return url;
+    }
 
     return `https://wsrv.nl/?url=${encodeURIComponent(url)}`;
 }
