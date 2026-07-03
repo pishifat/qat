@@ -151,6 +151,12 @@ export function extractYoutubeVideoId(url) {
     return null;
 }
 
+export function resolveYoutubeThumbnailUrl(url) {
+    const id = extractYoutubeVideoId(url);
+    if (!id) return null;
+    return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+}
+
 export function resolveDiscussionContentType(url) {
     if (!url) return 'unknown';
     if (extractYoutubeVideoId(url)) return 'video';

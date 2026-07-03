@@ -1,6 +1,6 @@
 import './sass/app.scss';
 import './bootstrap';
-import { md, sanitizeUrl, sanitizeUrlForCss, proxyUrl, isDiscussionImageUrl, resolveDiscussionImageUrl, extractYoutubeVideoId, resolveDiscussionContentType } from './bootstrap';
+import { md, sanitizeUrl, sanitizeUrlForCss, proxyUrl, isDiscussionImageUrl, resolveDiscussionImageUrl, extractYoutubeVideoId, resolveYoutubeThumbnailUrl, resolveDiscussionContentType } from './bootstrap';
 import moment from 'moment';
 import http from './store/http';
 import { createApp } from 'vue';
@@ -70,6 +70,7 @@ app.config.globalProperties.proxyUrl = proxyUrl;
 app.config.globalProperties.isDiscussionImageUrl = isDiscussionImageUrl;
 app.config.globalProperties.resolveDiscussionImageUrl = resolveDiscussionImageUrl;
 app.config.globalProperties.extractYoutubeVideoId = extractYoutubeVideoId;
+app.config.globalProperties.resolveYoutubeThumbnailUrl = resolveYoutubeThumbnailUrl;
 app.config.globalProperties.resolveDiscussionContentType = resolveDiscussionContentType;
 
 app.mount('#app');

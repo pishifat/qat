@@ -27,8 +27,8 @@
                 :class="['border-' + findRelevantMediation(), discussion.isNatOnly ? 'nat-vote' : '']"
             >
                 <img
-                    v-if="showImageBackground"
-                    :src="proxyImageLink"
+                    v-if="showCardBackground"
+                    :src="cardBackgroundLink"
                     class="card-bg"
                     alt=""
                 >
@@ -130,11 +130,19 @@ export default {
             const imageUrl = this.resolveDiscussionImageUrl(this.safeDiscussionLink);
             return imageUrl ? this.proxyUrl(imageUrl) : null;
         },
+        cardBackgroundLink() {
+            if (!this.discussion.isContentReview) return null;
+            if (this.isImage) return this.proxyImageLink;
+            if (this.contentType === 'video') {
+                return this.resolveYoutubeThumbnailUrl(this.safeDiscussionLink);
+            }
+            return null;
+        },
         isImage() {
             return this.isDiscussionImageUrl(this.safeDiscussionLink);
         },
-        showImageBackground() {
-            return this.discussion.isContentReview && this.isImage;
+        showCardBackground() {
+            return Boolean(this.cardBackgroundLink);
         },
         contentType() {
             if (!this.discussion.isContentReview) return null;
