@@ -143,6 +143,16 @@ export default {
         contentTypeLabel() {
             if (this.contentType === 'image') return 'Image';
             if (this.contentType === 'video') return 'Video';
+
+            if (this.safeDiscussionLink) {
+                try {
+                    const hostname = new URL(this.safeDiscussionLink).hostname.replace(/^www\./, '');
+                    if (hostname) return hostname;
+                } catch {
+                    // fall through
+                }
+            }
+
             return 'Unknown content type';
         },
         contentTypeIconClass() {
