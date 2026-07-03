@@ -127,7 +127,7 @@
                             class="mx-1"
                             data-bs-toggle="tooltip"
                             data-bs-placement="top"
-                            title="content is NOT a video"
+                            :title="isVideoLink ? 'video detected from link' : 'content is NOT a video'"
                         >
                             <input
                                 v-model="videoStatus"
@@ -135,6 +135,7 @@
                                 class="cross-radio hide-default"
                                 name="isVideo"
                                 value="noVideo"
+                                :disabled="isVideoLink"
                             >
                             <i class="fas fa-times fa-lg" />
                         </label>
@@ -160,12 +161,13 @@
                     </p>
 
                     <div v-if="category == 'contentCaseVisual' && isVideoSubmission" class="mb-3">
-                        <small class="mb-1">Timestamps:</small>
+                        <small class="mb-1">Timestamps: <span class="text-danger">*</span></small>
                         <textarea
                             v-model="timestamps"
                             class="form-control"
                             placeholder="timestamps..."
                             rows="3"
+                            required
                         />
                     </div>
 
@@ -269,8 +271,35 @@ export default {
         isVideoSubmission () {
             return this.videoStatus == 'isVideo';
         },
+        isVideoLink () {
+            if (this.category !== 'contentCaseVisual') return false;
+
+            return this.resolveDiscussionContentType(this.link) === 'video';
+        },
+    },
+    watch: {
+        link (newLink) {
+            this.syncVideoStatusFromLink(newLink);
+        },
+        category (newCategory) {
+            if (newCategory === 'contentCaseVisual') {
+                this.syncVideoStatusFromLink(this.link);
+            }
+        },
+        videoStatus (newStatus) {
+            if (this.isVideoLink && newStatus !== 'isVideo') {
+                this.videoStatus = 'isVideo';
+            }
+        },
     },
     methods: {
+        syncVideoStatusFromLink (link) {
+            if (this.category !== 'contentCaseVisual') return;
+
+            if (this.resolveDiscussionContentType(link) === 'video') {
+                this.videoStatus = 'isVideo';
+            }
+        },
         async submit (e) {
             if (this.category == 'contentCaseVisual' && !this.videoStatus.length) {
                 return this.$store.dispatch('updateToastMessages', {
@@ -279,7 +308,7 @@ export default {
                 });
             }
 
-            if (this.category == 'contentCaseVisual' && this.isVideoSubmission && !this.timestamps.length) {
+            if (this.category == 'contentCaseVisual' && this.isVideoSubmission && !this.timestamps.trim().length) {
                 return this.$store.dispatch('updateToastMessages', {
                     type: 'danger',
                     message: 'You need to provide timestamps for video submissions!',

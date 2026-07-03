@@ -38,12 +38,68 @@
                     >
                 </div>
             </div>
+            <!-- video submission -->
+            <div v-if="isContentReview" class="row mb-2">
+                <div class="col-sm-12 d-flex align-items-center">
+                    <div class="me-2">
+                        Video submission:
+                    </div>
+                    <label
+                        class="mx-1"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        :title="isVideoLink ? 'video detected from link' : 'content is NOT a video'"
+                    >
+                        <input
+                            v-model="videoStatus"
+                            type="radio"
+                            class="cross-radio hide-default"
+                            name="contentReviewIsVideo"
+                            value="noVideo"
+                            :disabled="isVideoLink"
+                        >
+                        <i class="fas fa-times fa-lg" />
+                    </label>
+                    <label
+                        class="mx-1"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title="content is a video"
+                    >
+                        <input
+                            v-model="videoStatus"
+                            type="radio"
+                            class="checkmark-radio hide-default"
+                            name="contentReviewIsVideo"
+                            value="isVideo"
+                        >
+                        <i class="fas fa-check fa-lg" />
+                    </label>
+                </div>
+            </div>
+            <div v-if="isContentReview" class="row mb-2">
+                <div class="col-sm-12 small text-secondary">
+                    If this is a video submission, you'll need to provide timestamps of the clips that need to be reviewed.
+                </div>
+            </div>
+            <div v-if="isContentReview && isVideoSubmission" class="row mb-2">
+                <div class="col-sm-12">
+                    <small class="mb-1">Timestamps: <span class="text-danger">*</span></small>
+                    <textarea
+                        v-model="timestamps"
+                        class="form-control"
+                        placeholder="timestamps..."
+                        rows="3"
+                        required
+                    />
+                </div>
+            </div>
             <!-- information -->
             <div class="row mb-2">
                 <div class="col-sm-12">
                     <div>{{ isContentReview ? 'Beatmap link and additional information' : `Context for vote/discussion` }}</div>
                     <div v-if="isContentReview" class="small text-secondary">
-                        If this is a video submission, provide timestamps for the section that needs to be reviewed
+                        Any helpful information for reviewers
                     </div>
                     <div v-else class="small text-secondary">
                         Anything useful for people participating in this discussion
@@ -205,6 +261,8 @@ export default {
             agreeOverwriteText: '',
             neutralOverwriteText: '',
             disagreeOverwriteText: '',
+            videoStatus: '',
+            timestamps: '',
         };
     },
     computed: {
@@ -215,9 +273,48 @@ export default {
         isNatOnly () {
             return this.group === 'nat';
         },
+        isVideoSubmission () {
+            return this.videoStatus === 'isVideo';
+        },
+        isVideoLink () {
+            if (!this.isContentReview) return false;
+
+            return this.resolveDiscussionContentType(this.discussionLink) === 'video';
+        },
+    },
+    watch: {
+        discussionLink (newLink) {
+            this.syncVideoStatusFromLink(newLink);
+        },
+        videoStatus (newStatus) {
+            if (this.isVideoLink && newStatus !== 'isVideo') {
+                this.videoStatus = 'isVideo';
+            }
+        },
     },
     methods: {
+        syncVideoStatusFromLink (link) {
+            if (!this.isContentReview) return;
+
+            if (this.resolveDiscussionContentType(link) === 'video') {
+                this.videoStatus = 'isVideo';
+            }
+        },
         async submitDiscussion(e) {
+            if (this.isContentReview && !this.videoStatus.length) {
+                return this.$store.dispatch('updateToastMessages', {
+                    type: 'danger',
+                    message: 'You need to specify if this is a video submission or not!',
+                });
+            }
+
+            if (this.isContentReview && this.isVideoSubmission && !this.timestamps.trim().length) {
+                return this.$store.dispatch('updateToastMessages', {
+                    type: 'danger',
+                    message: 'You need to provide timestamps for video submissions!',
+                });
+            }
+
             let missingInfo;
 
             if (this.isContentReview && (!this.discussionLink || !this.shortReason)) {
@@ -240,7 +337,9 @@ export default {
                 {
                     discussionLink: this.discussionLink,
                     title: this.title,
-                    shortReason: this.shortReason,
+                    shortReason: this.shortReason.concat(
+                        this.timestamps.trim().length ? `\n\n**Timestamps:**\n${this.timestamps.trim()}` : ''
+                    ),
                     mode: this.isContentReview ? 'all' : this.mode,
                     isNatOnly: this.isNatOnly,
                     neutralAllowed: this.voteOptions === 3,

@@ -157,9 +157,18 @@ export function resolveYoutubeThumbnailUrl(url) {
     return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
 }
 
+function hasVideoExtension(url) {
+    try {
+        return /\.mp4$/i.test(new URL(url).pathname);
+    } catch {
+        return false;
+    }
+}
+
 export function resolveDiscussionContentType(url) {
     if (!url) return 'unknown';
     if (extractYoutubeVideoId(url)) return 'video';
+    if (hasVideoExtension(url)) return 'video';
     if (isDiscussionImageUrl(url)) return 'image';
     return 'unknown';
 }
