@@ -371,11 +371,9 @@
                         </div>
                     </div>
                 </section>
-                <router-view v-if="loggedInUser || isPublicPage" v-slot="{ Component }">
-                    <transition name="route-transition" mode="out-in">
-                        <component :is="Component" :key="$route.fullPath" />
-                    </transition>
-                </router-view>
+                <transition name="route-transition" mode="out-in">
+                    <router-view v-if="loggedInUser || isPublicPage" />
+                </transition>
             </loading-page>
         </div>
 
