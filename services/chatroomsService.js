@@ -3,6 +3,8 @@ const Chatroom = require('../models/chatroom');
 const ChatroomMessage = require('../models/chatroomMessage');
 const User = require('../models/user');
 const Veto = require('../models/veto');
+const Logger = require('../models/log');
+const discord = require('../helpers/discord');
 const { generateAnonName } = require('../helpers/scrap');
 
 const SUPPORTED_CHATROOM_TYPES = ['veto'];
@@ -225,7 +227,37 @@ function canRevealSelf(user, room) {
 }
 
 async function getVetoContext(targetId) {
-    return await Veto.findById(targetId).select('vetoer vouchingUsers');
+    return await Veto.findById(targetId).select('vetoer vouchingUsers mode beatmapTitle');
+}
+
+async function getVetoForAudit(room) {
+    if (normalizeType(room.type) !== 'veto') return null;
+
+    const veto = await Veto.findById(room.targetId).select('mode').lean();
+    if (!veto) return null;
+
+    return ensureId(veto);
+}
+
+function formatChatroomLink(room) {
+    const chatroomUrl = `http://bn.mappersguild.com/chatrooms/${toIdString(room)}`;
+    return `[**${room.name}**](${chatroomUrl})`;
+}
+
+async function recordNatModerationAction(room, actor, { logAction, webhookVerb, webhookColor }) {
+    const veto = await getVetoForAudit(room);
+    const relatedId = veto ? veto.id : toIdString(room.targetId);
+
+    Logger.generate(toIdString(actor), logAction, 'veto', relatedId);
+
+    await discord.webhookPost([{
+        author: discord.defaultWebhookAuthor({
+            username: actor.username,
+            osuId: actor.osuId,
+        }),
+        color: webhookColor,
+        description: `${webhookVerb} ${formatChatroomLink(room)}`,
+    }], veto?.mode || 'all');
 }
 
 async function getRoomTypeContext(room) {
@@ -517,6 +549,12 @@ async function setRoomLockState(roomId, isLocked, actor) {
     room.isLocked = !!isLocked;
     await room.save();
 
+    await recordNatModerationAction(room, actor, {
+        logAction: `${isLocked ? 'Locked' : 'Unlocked'} chatroom "${room.name}"`,
+        webhookVerb: `${isLocked ? 'Locked' : 'Unlocked'} chatroom`,
+        webhookColor: isLocked ? discord.webhookColors.black : discord.webhookColors.white,
+    });
+
     return await getRoomById(room._id, actor);
 }
 
@@ -531,6 +569,12 @@ async function toggleRoomVisibility(roomId, actor) {
     const room = await Chatroom.findById(roomId).orFail(() => createError(404, 'Chatroom not found.'));
     room.isPublic = !room.isPublic;
     await room.save();
+
+    await recordNatModerationAction(room, actor, {
+        logAction: `Set chatroom "${room.name}" visibility to ${room.isPublic ? 'public' : 'private'}`,
+        webhookVerb: `${room.isPublic ? 'Made chatroom public: ' : 'Made chatroom private: '}`,
+        webhookColor: room.isPublic ? discord.webhookColors.lightBlue : discord.webhookColors.gray,
+    });
 
     return await getRoomById(room._id, actor);
 }
@@ -575,14 +619,14 @@ async function addParticipants(roomId, payload, actor) {
     await room.save();
 
     const addedParticipants = (room.participants || []).filter(participant => !existingParticipantIds.has(toIdString(participant)));
-    if (addedParticipants.length) {
-        const publicParticipantUserMap = new Map(publicParticipants.map(user => [toIdString(user), normalizeUser(user)]));
-        const addedNames = addedParticipants
-            .map(participant => formatParticipantSystemName(participant, {
-                userMap: publicParticipantUserMap,
-            }))
-            .filter(Boolean);
+    const publicParticipantUserMap = new Map(publicParticipants.map(user => [toIdString(user), normalizeUser(user)]));
+    const addedNames = addedParticipants
+        .map(participant => formatParticipantSystemName(participant, {
+            userMap: publicParticipantUserMap,
+        }))
+        .filter(Boolean);
 
+    if (addedNames.length) {
         await ChatroomMessage.create({
             chatroom: room._id,
             user: null,
@@ -592,6 +636,16 @@ async function addParticipants(roomId, payload, actor) {
             isAnonymous: false,
         });
     }
+
+    const addedSummary = addedNames.length ? addedNames.join(', ') : null;
+
+    await recordNatModerationAction(room, actor, {
+        logAction: addedSummary
+            ? `Added ${addedSummary} to chatroom "${room.name}"`
+            : `Updated participants in chatroom "${room.name}"`,
+        webhookVerb: addedSummary ? `Added ${addedSummary} to chatroom` : 'Updated participants in chatroom',
+        webhookColor: discord.webhookColors.lightGreen,
+    });
 
     return await getRoomById(room._id, actor);
 }
@@ -609,10 +663,21 @@ async function removeParticipant(roomId, userId, actor) {
 
     const room = await Chatroom.findById(roomId).orFail(() => createError(404, 'Chatroom not found.'));
     const targetUserId = String(userId);
+    const removedEntry = (room.participants || []).find(participant => toIdString(participant) === targetUserId);
+    const removedUser = removedEntry
+        ? await User.findById(toIdString(removedEntry.user)).select('username')
+        : null;
+    const removedLabel = removedUser?.username || 'a user';
     const participantIds = (room.participants || []).filter(participant => toIdString(participant) !== targetUserId);
 
     room.participants = participantIds;
     await room.save();
+
+    await recordNatModerationAction(room, actor, {
+        logAction: `Removed ${removedLabel} from chatroom "${room.name}"`,
+        webhookVerb: `Removed **${removedLabel}** from chatroom`,
+        webhookColor: discord.webhookColors.darkOrange,
+    });
 
     return await getRoomById(room._id, actor);
 }
@@ -698,6 +763,12 @@ async function updateMessageDeletedAt(roomId, messageId, deletedAt, actor) {
 
     message.deletedAt = deletedAt;
     await message.save();
+
+    await recordNatModerationAction(room, actor, {
+        logAction: `${deletedAt ? 'Deleted' : 'Restored'} a message in chatroom "${room.name}"`,
+        webhookVerb: deletedAt ? 'Deleted a message in chatroom' : 'Restored a message in chatroom',
+        webhookColor: deletedAt ? discord.webhookColors.darkRed : discord.webhookColors.lightGreen,
+    });
 
     return await getRoomById(room._id, actor);
 }
