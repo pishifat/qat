@@ -96,6 +96,22 @@ async function unlock(req, res) {
 }
 
 /**
+ * POST toggle chatroom visibility
+ * @route POST /api/v2/chatrooms/:id/toggle-visibility
+ */
+async function toggleVisibility(req, res) {
+    try {
+        const chatroom = await chatroomsService.toggleRoomVisibility(req.params.id, res.locals.userRequest);
+        res.json({
+            chatroom,
+            success: chatroom.isPublic ? 'Chatroom is now public.' : 'Chatroom is now private.',
+        });
+    } catch (error) {
+        return handleError(res, error);
+    }
+}
+
+/**
  * POST add chatroom participants
  * @route POST /api/v2/chatrooms/:id/participants/add
  */
@@ -196,6 +212,7 @@ module.exports = {
     createMessage,
     lock,
     unlock,
+    toggleVisibility,
     addParticipants,
     removeParticipant,
     revealSelf,

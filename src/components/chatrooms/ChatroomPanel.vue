@@ -41,6 +41,7 @@
                 :is-submitting="isSubmitting"
                 @lock="lockRoom"
                 @unlock="unlockRoom"
+                @toggle-visibility="toggleVisibility"
                 @add-participants="addParticipants"
                 @remove-participant="removeParticipant"
             />
@@ -209,6 +210,11 @@ export default {
         async unlockRoom(e) {
             await this.runMutation(async () => {
                 return await this.$http.executePost(`/v2/chatrooms/${this.roomId}/unlock`, {}, e);
+            });
+        },
+        async toggleVisibility(e) {
+            await this.runMutation(async () => {
+                return await this.$http.executePost(`/v2/chatrooms/${this.roomId}/toggle-visibility`, {}, e);
             });
         },
         async addParticipants({ participantIdentifiers, publicParticipantIdentifiers, event }) {

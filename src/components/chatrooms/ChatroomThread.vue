@@ -3,7 +3,7 @@
         <div class="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2">
             <div class="d-flex flex-wrap gap-2 align-items-center">
                 <span class="badge" :class="room.isPublic ? 'text-bg-info' : 'text-bg-secondary'">
-                    {{ room.isPublic ? 'Public room' : 'Participants only' }}
+                    {{ room.isPublic ? 'Visible to public' : 'Visible to participants only' }}
                 </span>
                 <span v-if="room.isLocked" class="badge text-bg-warning">Locked</span>
             </div>

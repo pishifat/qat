@@ -521,6 +521,21 @@ async function setRoomLockState(roomId, isLocked, actor) {
 }
 
 /**
+ * Toggle whether a chatroom is publicly viewable.
+ */
+async function toggleRoomVisibility(roomId, actor) {
+    if (!canModerateRoom(actor)) {
+        throw createError(403, 'Only NAT can change chatroom visibility.');
+    }
+
+    const room = await Chatroom.findById(roomId).orFail(() => createError(404, 'Chatroom not found.'));
+    room.isPublic = !room.isPublic;
+    await room.save();
+
+    return await getRoomById(room._id, actor);
+}
+
+/**
  * Add participants to a chatroom and emit a system audit message.
  */
 async function addParticipants(roomId, payload, actor) {
@@ -711,6 +726,7 @@ module.exports = {
     listRoomsByTarget,
     createRoom,
     setRoomLockState,
+    toggleRoomVisibility,
     addParticipants,
     removeParticipant,
     createMessage,

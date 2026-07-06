@@ -2,14 +2,24 @@
     <section v-if="room.viewerCanModerate" class="card card-body">
         <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-2">
             <h4>NAT moderation</h4>
-            <button
-                class="btn btn-sm"
-                :class="room.isLocked ? 'btn-success' : 'btn-danger'"
-                :disabled="isSubmitting"
-                @click="$emit(room.isLocked ? 'unlock' : 'lock', $event)"
-            >
-                {{ room.isLocked ? 'Unlock chatroom' : 'Lock chatroom' }}
-            </button>
+            <div class="d-flex flex-wrap gap-2">
+                <button
+                    class="btn btn-sm"
+                    :class="room.isPublic ? 'btn-secondary' : 'btn-info'"
+                    :disabled="isSubmitting"
+                    @click="$emit('toggle-visibility', $event)"
+                >
+                    {{ room.isPublic ? 'Make private' : 'Make public' }}
+                </button>
+                <button
+                    class="btn btn-sm"
+                    :class="room.isLocked ? 'btn-success' : 'btn-danger'"
+                    :disabled="isSubmitting"
+                    @click="$emit(room.isLocked ? 'unlock' : 'lock', $event)"
+                >
+                    {{ room.isLocked ? 'Unlock chatroom' : 'Lock chatroom' }}
+                </button>
+            </div>
         </div>
 
         <div class="small text-secondary mb-3">
@@ -136,7 +146,7 @@ export default {
             default: false,
         },
     },
-    emits: ['lock', 'unlock', 'add-participants', 'remove-participant'],
+    emits: ['lock', 'unlock', 'toggle-visibility', 'add-participants', 'remove-participant'],
     data() {
         return {
             participantIdentifiers: '',
