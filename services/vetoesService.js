@@ -381,7 +381,7 @@ async function createVetoChatroom(vetoId, payload, actor) {
         veto._id
     );
 
-    const description = `Discussion initiated on [veto for **${veto.beatmapTitle}**](https://osu.ppy.sh/beatmapsets/${veto.beatmapId})`;
+    const description = `Discussion initiated on [veto for **${veto.beatmapTitle}**](http://bn.mappersguild.com/vetoes/${veto.id})`;
 
     discord.webhookPost([{
         author: discord.defaultWebhookAuthor({
