@@ -36,13 +36,28 @@
                             <a href="#" @click.prevent="editBadgeValue(user.id, 'nom', false)"><i class="fas fa-minus" /></a>
                         </li>
                         <li v-if="compareBadgeDuration(user.bnProfileBadge, user.bnDuration)">
-                            <code>{{ badgeCommand(user.osuId, user.bnProfileBadge, user.bnDuration, 'bn') }}</code>
+                            <div class="badge-command">
+                                <pre><code>{{ badgeCommand(user.osuId, user.bnProfileBadge, user.bnDuration, 'bn') }}</code></pre>
+                                <a href="#" class="badge-command-copy" title="copy command" @click.prevent="copyBadgeCommand(user.osuId, user.bnProfileBadge, user.bnDuration, 'bn')">
+                                    <i class="fas fa-copy" />
+                                </a>
+                            </div>
                         </li>
                         <li v-if="compareBadgeDuration(user.natProfileBadge, user.natDuration)">
-                            <code>{{ badgeCommand(user.osuId, user.natProfileBadge, user.natDuration, 'nat') }}</code>
+                            <div class="badge-command">
+                                <pre><code>{{ badgeCommand(user.osuId, user.natProfileBadge, user.natDuration, 'nat') }}</code></pre>
+                                <a href="#" class="badge-command-copy" title="copy command" @click.prevent="copyBadgeCommand(user.osuId, user.natProfileBadge, user.natDuration, 'nat')">
+                                    <i class="fas fa-copy" />
+                                </a>
+                            </div>
                         </li>
                         <li v-if="compareNominationsBadge(user.nominationsProfileBadge, user.actualNominationsProfileBadge)">
-                            <code>{{ badgeCommand(user.osuId, user.nominationsProfileBadge, user.actualNominationsProfileBadge, 'nom') }}</code>
+                            <div class="badge-command">
+                                <pre><code>{{ badgeCommand(user.osuId, user.nominationsProfileBadge, user.actualNominationsProfileBadge, 'nom') }}</code></pre>
+                                <a href="#" class="badge-command-copy" title="copy command" @click.prevent="copyBadgeCommand(user.osuId, user.nominationsProfileBadge, user.actualNominationsProfileBadge, 'nom')">
+                                    <i class="fas fa-copy" />
+                                </a>
+                            </div>
                         </li>
                     </ul>
                 </div>
@@ -145,6 +160,20 @@ export default {
             }
         },
 
+        async copyBadgeCommand (osuId, currentBadge, value, type) {
+            try {
+                await navigator.clipboard.writeText(this.badgeCommand(osuId, currentBadge, value, type));
+                this.$store.dispatch('updateToastMessages', {
+                    type: 'success',
+                    message: 'Copied to clipboard!',
+                });
+            } catch (err) {
+                this.$store.dispatch('updateToastMessages', {
+                    type: 'error',
+                    message: 'Failed to copy to clipboard',
+                });
+            }
+        },
         badgeCommand (osuId, currentBadge, value, type) {
             let command = '';
 
@@ -215,3 +244,22 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+.badge-command {
+    position: relative;
+}
+
+.badge-command pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin-bottom: 12px;
+    padding-right: 1.5rem;
+}
+
+.badge-command-copy {
+    position: absolute;
+    top: 0.25rem;
+    right: 0.35rem;
+}
+</style>
