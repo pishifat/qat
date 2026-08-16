@@ -32,6 +32,37 @@ export default {
             type: String,
             default: 'lg',
         },
+        documentTitle: {
+            type: String,
+            default: '',
+        },
+    },
+    watch: {
+        documentTitle() {
+            this.applyDocumentTitle();
+        },
+    },
+    mounted() {
+        this.$el.addEventListener('shown.bs.modal', this.applyDocumentTitle);
+        this.$el.addEventListener('hidden.bs.modal', this.restoreDocumentTitle);
+    },
+    beforeUnmount() {
+        this.$el.removeEventListener('shown.bs.modal', this.applyDocumentTitle);
+        this.$el.removeEventListener('hidden.bs.modal', this.restoreDocumentTitle);
+    },
+    methods: {
+        applyDocumentTitle() {
+            if (this.documentTitle && this.$el.classList.contains('show')) {
+                document.title = `${this.documentTitle} · BN Management`;
+            }
+        },
+        restoreDocumentTitle() {
+            if (!this.documentTitle) return;
+
+            document.title = this.$route.meta.title
+                ? `${this.$route.meta.title} · BN Management`
+                : 'BN Management';
+        },
     },
 };
 </script>

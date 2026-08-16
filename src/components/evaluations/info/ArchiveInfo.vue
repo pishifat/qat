@@ -2,6 +2,7 @@
     <modal-dialog
         id="evaluationArchiveInfo"
         modal-size="xl"
+        :document-title="documentTitle"
     >
         <template v-if="selectedEvaluation" #header>
             <modal-header
@@ -121,6 +122,11 @@ export default {
         ...mapGetters('evaluations', [
             'selectedEvaluation',
         ]),
+        documentTitle() {
+            if (!this.selectedEvaluation || !this.selectedEvaluation.user) return '';
+
+            return `${this.selectedEvaluation.user.username}'s ${this.selectedEvaluation.isApplication ? 'App' : 'Eval'}`;
+        },
         /** @returns {string | string[]} */
         modes () {
             if (!this.selectedEvaluation) return [];

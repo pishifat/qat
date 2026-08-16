@@ -1,5 +1,5 @@
 <template>
-    <modal-dialog id="evaluationInfo" modal-size="xl">
+    <modal-dialog id="evaluationInfo" modal-size="xl" :document-title="documentTitle">
         <template v-if="selectedEvaluation" #header>
             <modal-header
                 :mode="selectedEvaluation.mode"
@@ -184,6 +184,11 @@ export default {
     computed: {
         ...mapState(['loggedInUser']),
         ...mapGetters('evaluations', ['selectedEvaluation']),
+        documentTitle() {
+            if (!this.selectedEvaluation || !this.selectedEvaluation.user) return '';
+
+            return `${this.selectedEvaluation.user.username}'s ${this.selectedEvaluation.isApplication ? 'App' : 'Eval'}`;
+        },
         modes() {
             if (!this.selectedEvaluation) return [];
 

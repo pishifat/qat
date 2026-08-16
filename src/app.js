@@ -20,7 +20,11 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-    document.title = to.meta.title ? `${to.meta.title} · BN Management` : 'BN Management';
+    const isQueryOnlyChange = from.matched.length && to.path === from.path;
+
+    if (!isQueryOnlyChange) {
+        document.title = to.meta.title ? `${to.meta.title} · BN Management` : 'BN Management';
+    }
 
     if (!store.state.initialized) {
         await store.dispatch('setInitialData');

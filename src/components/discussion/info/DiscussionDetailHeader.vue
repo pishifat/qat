@@ -49,6 +49,16 @@ export default {
             return this.sanitizeUrl(this.selectedDiscussion?.discussionLink);
         },
     },
+    watch: {
+        'selectedDiscussion.title': {
+            immediate: true,
+            handler(title) {
+                if (title) {
+                    document.title = `${title} · ${this.$route.meta.title} · BN Management`;
+                }
+            },
+        },
+    },
     methods: {
         onBack() {
             this.$store.commit(`${this.storeModule}/setSelectedDiscussion`, null);

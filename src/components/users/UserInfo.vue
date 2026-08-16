@@ -1,5 +1,5 @@
 <template>
-    <modal-dialog id="extendedInfo">
+    <modal-dialog id="extendedInfo" :document-title="documentTitle">
         <template v-if="selectedUser" #header>
             <modal-header />
         </template>
@@ -154,6 +154,9 @@ export default {
         ...mapGetters('users', [
             'selectedUser',
         ]),
+        documentTitle() {
+            return this.selectedUser ? `${this.selectedUser.username}'s Profile` : '';
+        },
     },
     methods: {
         getUserLastHistoryDate() {
